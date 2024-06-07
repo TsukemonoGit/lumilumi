@@ -1,7 +1,5 @@
 <script lang="ts">
   import Counter from "./Counter.svelte";
-  import welcome from "$lib/images/svelte-welcome.webp";
-  import welcome_fallback from "$lib/images/svelte-welcome.png";
 
   import HexToSvg from "./HexToSvg.svelte";
   import NostrMain from "../lib/components/NostrMain.svelte";
@@ -12,7 +10,7 @@
   const userColor = calculateColor(testpub);
   //import { init as initNostrLogin } from "nostr-login";
   import { onMount } from "svelte";
-  import { createRxNostr } from "rx-nostr";
+
   import { app } from "$lib/stores/stores";
   import { setRxNostr } from "$lib/func/nostr";
 
@@ -36,20 +34,6 @@
 </svelte:head>
 
 <section>
-  <h1>
-    <span class="welcome" style:--usercolor={userColor}>
-      <picture>
-        <source srcset={welcome} type="image/webp" />
-        <img src={welcome_fallback} alt="Welcome" />
-      </picture>
-    </span>
-
-    to your new<br />SvelteKit app
-  </h1>
-
-  <h2>
-    try editing <strong>src/routes/+page.svelte</strong>
-  </h2>
   <NostrMain />
   <div class="svgset">
     <HexToSvg

@@ -9,6 +9,7 @@
   import SetDefaultRelays from "./SetDefaultRelays.svelte";
   import { app } from "$lib/stores/stores";
   import Contacts from "./Contacts.svelte";
+  import UniqueEventList from "./UniqueEventList.svelte";
 
   const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
   const pubkey =
@@ -19,7 +20,7 @@
     // Extract the last 'e' tag in .tags (NIP-25)
     return reaction.tags.filter(([tag]) => tag === "e").slice(-1)[0][1];
   };
-
+  const maxSize = 50;
   const pubkeysIn = (contacts: Nostr.Event) => {
     return contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
@@ -31,7 +32,18 @@
   };
 
   const sorted = (events: Nostr.Event[]) => {
-    return [...events].sort((a, b) => b.created_at - a.created_at);
+    // Use a Map to store events by their id to ensure uniqueness
+    const uniqueEventsMap = new Map<string, Nostr.Event>();
+
+    events.forEach((event) => {
+      uniqueEventsMap.set(event.id, event);
+    });
+
+    // Convert the map values back to an array and sort by created_at
+    const sortedEvents = [...uniqueEventsMap.values()].sort(
+      (a, b) => b.created_at - a.created_at
+    );
+    return sortedEvents.slice(0, maxSize);
   };
 
   $: content = $app?.rxNostr
@@ -43,7 +55,7 @@
   <title>timeline | nosvelte</title>
 </svelte:head>
 
-<h1>timeline</h1>
+<h1 class="text-5xl text-orange-600">timeline</h1>
 <div>defaultrelays</div>
 <div>{content}</div>
 relays
@@ -53,7 +65,7 @@ relays
   <div slot="loading">loading</div>
   <div slot="error">error</div>
   <div slot="nodata">nodata</div>
-  <div class="card border-1 m-4 p-4">
+  <div class="container break-all break-words overflow-x-hidden">
     {#each relays as relay, index}
       {index} {JSON.stringify(relay)}
     {/each}
@@ -70,34 +82,40 @@ relays
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
-      <div>
+      <!-- <div>
         {JSON.stringify(contacts)}
-      </div>
+      </div> -->
 
-      <!-- <UniqueEventList
-      queryKey={['timeline', 'feed', pubkey]}
-      filters={[
-        {
-          authors: pubkeysIn(contacts),
-          kinds: [1, 6, 7],
-          limit: 10
-        }
-      ]}
-      {req}
-      let:events
-    >
-      <div slot="loading">
-        <p>Loading...</p>
-      </div>
+      <UniqueEventList
+        queryKey={["timeline", "feed", pubkey]}
+        filters={[
+          {
+            authors: pubkeysIn(contacts),
+            kinds: [1, 6],
+            limit: 10,
+          },
+        ]}
+        {req}
+        let:events
+      >
+        <div slot="loading">
+          <p>Loading...</p>
+        </div>
 
-      <div slot="error" let:error>
-        <p>{error}</p>
-      </div>
+        <div slot="error" let:error>
+          <p>{error}</p>
+        </div>
 
-      <div style="display: flex; flex-direction: column; gap: 1em;">
-        {#each sorted(events) as event (event.id)}
-        
-          <Metadata
+        <div
+          class="max-w-[100vw] break-all break-words box-border overflow-x-clip"
+        >
+          {#each sorted(events) as event (event.id)}
+            <div
+              class="max-w-[100vw] break-all break-words whitespace-pre-wrap box-border m-2 overflow-x-clip"
+            >
+              {event.content}
+            </div>
+            <!-- <Metadata
             queryKey={['timeline', 'metadata', event.pubkey]}
             pubkey={event.pubkey}
             let:metadata
@@ -169,10 +187,10 @@ relays
                 </Text>
               {/if}
             </section>
-          </Metadata>
-        {/each}
-      </div>
-    </UniqueEventList> -->
+          </Metadata> -->
+          {/each}
+        </div>
+      </UniqueEventList>
     </Contacts>
   </div>
 </SetDefaultRelays>
