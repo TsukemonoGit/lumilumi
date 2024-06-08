@@ -4,16 +4,31 @@
    * @copyright 2023 Akiomi Kamakura
    */
 
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, type DefaultRelayConfig } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./SetDefaultRelays.svelte";
   import { app } from "$lib/stores/stores";
   import Contacts from "./Contacts.svelte";
   import UniqueEventList from "./UniqueEventList.svelte";
+  import { onMount } from "svelte";
 
   const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
   const pubkey =
     "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
+  const STORAGE_KEY = "relaySettings";
+  let localRelays: DefaultRelayConfig[];
+  onMount(() => {
+    const savedSettings = localStorage.getItem(STORAGE_KEY);
+    if (savedSettings) {
+      const { relays: savedRelays, useRelaySet: savedRelaySet } =
+        JSON.parse(savedSettings);
+      if (savedRelaySet === "1") {
+        //0が10002か3、１がlocal
+        localRelays = savedRelays;
+      }
+    }
+  });
+
   const req = createRxForwardReq();
 
   const targetEventIdOf = (reaction: Nostr.Event) => {
@@ -59,7 +74,7 @@
 <div>defaultrelays</div>
 <div>{content}</div>
 relays
-<SetDefaultRelays {pubkey} let:relays let:status>
+<SetDefaultRelays relays={localRelays} {pubkey} let:relays let:status>
   {status}
 
   <div slot="loading">loading</div>
@@ -113,6 +128,8 @@ relays
             <div
               class="max-w-[100vw] break-all break-words whitespace-pre-wrap box-border m-2 overflow-x-clip"
             >
+              <!--多分リポストのコンテントに全部突っ込むタイプのやつがイベント丸ごとでてきて見えてる -->
+              kind:{event.kind}
               {event.content}
             </div>
             <!-- <Metadata

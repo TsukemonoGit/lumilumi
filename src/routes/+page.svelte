@@ -8,24 +8,24 @@
     "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
 
   const userColor = calculateColor(testpub);
-  //import { init as initNostrLogin } from "nostr-login";
-  import { onMount } from "svelte";
+  // import { init as initNostrLogin } from "nostr-login";
+  // import { onMount } from "svelte";
 
-  import { app } from "$lib/stores/stores";
-  import { setRxNostr } from "$lib/func/nostr";
-
-  onMount(() => {
-    // make sure this is called before any
-    // window.nostr calls are made
-    if (typeof window !== "undefined") {
-      if (!$app?.rxNostr) {
-        setRxNostr();
-      }
-      // initNostrLogin({
-      //   /*options*/
-      // });
-    }
-  });
+  // import { app } from "$lib/stores/stores";
+  // import { setRxNostr } from "$lib/func/nostr";
+  // import { browser } from "$app/environment";
+  // onMount(() => {
+  //   // make sure this is called before any
+  //   // window.nostr calls are made
+  //   if (browser) {
+  //     if (!$app?.rxNostr) {
+  //       setRxNostr();
+  //     }
+  //     initNostrLogin({
+  //       /*options*/
+  //     });
+  //   }
+  // });
 </script>
 
 <svelte:head>

@@ -1,3 +1,5 @@
+export const relayRegex = /^wss?:\/\/\S+$/;
+
 /**
  * @license Apache-2.0
  * @copyright 2023 Akiomi Kamakura
@@ -84,7 +86,7 @@ export function useReq(
 
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            console.log(v);
+            //console.log(v);
             if (fulfilled) {
               queryClient.setQueryData(queryKey, v);
             } else {
@@ -113,7 +115,7 @@ export function useReq(
   return {
     data: derived(query, ($query) => $query.data, initData),
     status: derived([query, status], ([$query, $status]) => {
-      console.log($query.data);
+      //console.log($query.data);
       if ($query.isSuccess) {
         return "success";
       } else if ($query.isError) {

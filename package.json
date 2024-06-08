@@ -16,6 +16,7 @@
 		"@sveltejs/adapter-auto": "^3.2.1",
 		"@sveltejs/kit": "^2.5.10",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@tailwindcss/typography": "^0.5.13",
 		"@types/ws": "^8.5.10",
 		"autoprefixer": "^10.4.19",
 		"postcss": "^8.4.38",
@@ -29,6 +30,7 @@
 	"type": "module",
 	"dependencies": {
 		"@tanstack/svelte-query": "^5.40.1",
+		"lucide-svelte": "^0.390.0",
 		"nostr-login": "^1.4.4",
 		"nostr-typedef": "^0.9.0",
 		"rx-nostr": "^2.7.3",

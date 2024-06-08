@@ -1,7 +1,25 @@
 <script>
   import Header from "./Header.svelte";
+  import { onMount } from "svelte";
 
+  import { app } from "$lib/stores/stores";
+  import { setRxNostr } from "$lib/func/nostr";
+  import { browser } from "$app/environment";
   import "../app.css";
+
+  onMount(async () => {
+    // make sure this is called before any
+    // window.nostr calls are made
+    if (browser) {
+      if (!$app?.rxNostr) {
+        setRxNostr();
+      }
+      const nostrLogin = await import("nostr-login");
+      nostrLogin.init({
+        /*options*/
+      });
+    }
+  });
 </script>
 
 <div class="app">

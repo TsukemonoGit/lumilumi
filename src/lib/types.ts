@@ -1,6 +1,7 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
 import type {
+  AcceptableDefaultRelaysConfig,
   DefaultRelayConfig,
   EventPacket,
   RxNostr,
@@ -22,7 +23,7 @@ export interface ReqResult<A> {
 
 export interface UseConnectionsOpts {
   rxNostr: RxNostr;
-  relays: (string | DefaultRelayConfig)[];
+  relays: AcceptableDefaultRelaysConfig[];
 }
 
 export interface UseReqOpts<A> {
