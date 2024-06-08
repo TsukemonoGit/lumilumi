@@ -39,3 +39,8 @@ export type ToastData = {
   description: string;
   color: string;
 };
+
+export interface Profile {
+  name?: string;
+  display_name?: string;
+}
