@@ -128,7 +128,7 @@
     <div class="flex items-center gap-3">
       <button
         use:melt={$radioGroupitem(option)}
-        class="grid h-6 w-6 cursor-default place-items-center rounded-full shadow-sm border border-magnum-500 hover:bg-magnum-100"
+        class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
         id={option}
         aria-labelledby="{option}-label"
       >
@@ -137,7 +137,7 @@
         {/if}
       </button>
       <label
-        class="font-medium capitalize leading-none"
+        class="font-medium capitalize leading-none cursor-pointer"
         for={option}
         id="{option}-label"
       >
