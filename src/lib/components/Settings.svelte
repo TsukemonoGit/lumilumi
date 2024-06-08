@@ -27,7 +27,6 @@
   } = createRadioGroup({
     defaultValue: "0",
     value: radioGroupSelected,
-    onValueChange: radioGroupValueChange,
   });
 
   const optionsArr = ["0", "1"];
@@ -130,10 +129,6 @@
       });
     }
   }
-
-  function radioGroupValueChange(args: { curr: string; next: string }): string {
-    return args.next;
-  }
 </script>
 
 <!-- ラジオボタン -->
@@ -169,9 +164,10 @@
 <!-- リレー設定 -->
 <div>
   {#if $radioGroupSelected === "1"}
-    <div>
+    <div class="w-fit">
       {#each $relays as relay, index}
-        <div>
+        <hr />
+        <div class="flex gap-4 my-1">
           <div>{relay.url}</div>
           <label>
             <input type="checkbox" bind:checked={relay.read} />
@@ -183,41 +179,45 @@
           </label>
           <button on:click={() => removeRelay(index)}>✕</button>
         </div>
+        <hr />
       {/each}
-      <form>
-        <div class="flex flex-col items-start justify-center">
-          <label
-            use:melt={$relayInputroot}
-            for="relay"
-            class="mb-0.5 font-medium text-magnum-900"
-            data-melt-part="root"
-          >
-            <span>Relay URL</span>
-          </label>
+
+      <div class="flex flex-col items-start justify-center">
+        <label
+          use:melt={$relayInputroot}
+          for="relay"
+          class="mb-0.5 font-medium text-magnum-900"
+          data-melt-part="root"
+        >
+          <span>Relay URL</span>
+        </label>
+        <div class="flex flex-row items-start justify-center">
           <input
             type="text"
             id="relay"
-            class="h-10 w-[240px] rounded-md bg-white px-3 py-2 text-magnum-700"
+            class="h-10 w-[240px] rounded-md bg-white px-3 py-2 text-magnum-700 border border-magnum-500"
             placeholder="wss://"
             bind:value={relayInput}
           />
+
+          <button
+            class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+            on:click={addRelay}>Add</button
+          >
         </div>
-      </form>
-      <button
-        class="ml-auto rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={addRelay}>追加ボタン</button
-      >
+      </div>
     </div>
   {/if}
-
-  <button
-    class="ml-auto rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    on:click={saveSettings}>保存ボタン</button
-  >
-  <button
-    class="ml-auto rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    on:click={cancelSettings}>キャンセルボタン</button
-  >
+  <div class="flex flex-row items-start gap-4 mt-4">
+    <button
+      class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      on:click={saveSettings}>SAVE</button
+    >
+    <button
+      class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      on:click={cancelSettings}>CANSEL</button
+    >
+  </div>
 </div>
 
 <!-- Toast表示 -->

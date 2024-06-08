@@ -75,7 +75,12 @@
 <div>defaultrelays</div>
 <div>{content}</div>
 relays
-<SetDefaultRelays relays={localRelays} {pubkey} let:relays let:status>
+<SetDefaultRelays
+  relays={localRelays && localRelays.length > 0 ? localRelays : undefined}
+  {pubkey}
+  let:relays
+  let:status
+>
   {status}
 
   <div slot="loading">loading</div>

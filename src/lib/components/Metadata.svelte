@@ -23,11 +23,11 @@
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
-  const filter: QueryFilters = { queryKey: ["metadata", pubkey] };
+
   //$: console.log($queryClient.getQueriesData(filter));
   $: {
     const data = $queryClient.getQueriesData({ queryKey: ["metadata"] });
-    console.log("metadata:", data);
+    //console.log("metadata:", data);
     saveMetadataToLocalStorage(data);
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

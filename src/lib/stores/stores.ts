@@ -24,9 +24,9 @@ export const getMetadataFromLocalStorage = (): void => {
   }
 
   const metadata = JSON.parse(metadataStr);
-  console.log(metadata);
+  // console.log(metadata);
   Object.keys(metadata).forEach((pubkey) => {
-    console.log(metadata[pubkey]);
+    //  console.log(metadata[pubkey]);
 
     get(queryClient).setQueriesData(
       { queryKey: ["metadata", pubkey] },
@@ -34,5 +34,5 @@ export const getMetadataFromLocalStorage = (): void => {
     );
   });
 
-  console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
+  // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
 };
