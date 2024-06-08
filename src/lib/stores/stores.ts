@@ -1,6 +1,8 @@
 import { QueryClient, type QueryClientConfig } from "@tanstack/svelte-query";
 import { get, writable } from "svelte/store";
 import { type RxNostr, createRxNostr, type EventPacket } from "rx-nostr";
+import type { ToastData } from "$lib/types";
+import type { AddToastProps, Toast } from "@melt-ui/svelte";
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -36,3 +38,9 @@ export const getMetadataFromLocalStorage = (): void => {
 
   // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
 };
+
+export const toastSettings = writable<{
+  title: string;
+  description: string;
+  color: string;
+}>();

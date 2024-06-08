@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
@@ -6,6 +6,10 @@
   import { setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
+
+  import { setTheme } from "$lib/func/settings";
+  import type { Theme } from "$lib/types";
+  import Toast from "$lib/components/Toast.svelte";
 
   onMount(async () => {
     // make sure this is called before any
@@ -19,23 +23,25 @@
         /*options*/
       });
       getMetadataFromLocalStorage();
+      const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
+      console.log(theme);
+      setTheme(theme);
     }
   });
 </script>
 
-<div class="app">
-  <Header />
+<Header />
+<Toast />
+<main>
+  <slot />
+</main>
 
-  <main>
-    <slot />
-  </main>
+<footer>
+  <p>
+    visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
+  </p>
+</footer>
 
-  <footer>
-    <p>
-      visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
-    </p>
-  </footer>
-</div>
 <!-- 
 <style>
   .app {

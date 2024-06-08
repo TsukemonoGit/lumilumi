@@ -4,6 +4,8 @@
   import HexToSvg from "./HexToSvg.svelte";
   import NostrMain from "../lib/components/NostrMain.svelte";
   import { calculateColor } from "$lib/func/util";
+  import Toast from "$lib/components/Toast.svelte";
+  import Header from "./Header.svelte";
   const testpub =
     "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
 
@@ -81,26 +83,5 @@
     justify-content: center;
     align-items: center;
     flex: 0.6;
-  }
-
-  h1 {
-    width: 100%;
-  }
-
-  .welcome {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 0 0 calc(100% * 495 / 2048) 0;
-    background-color: var(--usercolor);
-  }
-
-  .welcome img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    display: block;
   }
 </style>

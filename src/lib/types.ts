@@ -33,3 +33,9 @@ export interface UseReqOpts<A> {
   req?: RxReqBase;
   initData?: A;
 }
+export type Theme = "light" | "dark" | "system";
+export type ToastData = {
+  title: string;
+  description: string;
+  color: string;
+};

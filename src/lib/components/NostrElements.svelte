@@ -8,10 +8,11 @@
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./SetDefaultRelays.svelte";
   import { app } from "$lib/stores/stores";
-  import Contacts from "./Contacts.svelte";
-  import UniqueEventList from "./UniqueEventList.svelte";
+  import Contacts from "./NostrData/Contacts.svelte";
+  import UniqueEventList from "./NostrData/UniqueEventList.svelte";
   import { onMount } from "svelte";
-  import Metadata from "./Metadata.svelte";
+  import Metadata from "./NostrData/Metadata.svelte";
+  import EventCard from "./EventCard.svelte";
 
   const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
   const pubkey =
@@ -130,90 +131,26 @@ relays
         <div
           class="max-w-[100vw] break-all break-words box-border overflow-x-clip"
         >
-          {#each sorted(events) as event (event.id)}
-            <div
-              class="max-w-[100vw] break-all break-words whitespace-pre-wrap box-border m-2 overflow-x-clip"
+          {#each sorted(events) as event (event.id)}<div
+              class="max-w-[100vw] break-all break-words whitespace-pre-line m-1 box-border overflow-x-clip"
             >
               <Metadata
                 queryKey={["metadata", event.pubkey]}
                 pubkey={event.pubkey}
                 let:metadata
               >
-                <div slot="loading">loading {event.pubkey}:{event.content}</div>
-                <div slot="nodata">nodata {event.pubkey}:{event.content}</div>
-                <div slot="error">error {event.pubkey}:{event.content}</div>
-                <section style="border: 1px black solid; padding: 1em;">
-                  {#if event.kind === 1}
-                    <p>
-                      {JSON.parse(metadata.content).name ??
-                        "nostrich"}:{event.content}
-                    </p>
-                  {:else if event.kind === 6}
-                    <p>
-                      reposted by {JSON.parse(metadata.content).name ??
-                        "nostrich"}
-                    </p>
-                    <!-- <Text
-                  queryKey={['timeline', targetEventIdOf(event)]}
-                  id={targetEventIdOf(event)}
-                  let:text
-                >
-                  <div slot="nodata">
-                    <p>Failed to get note ({targetEventIdOf(event)})</p>
-                  </div>
-
-                  <Metadata
-                    queryKey={['timeline', 'metadata', text.pubkey]}
-                    pubkey={text.pubkey}
-                    let:metadata={repostedMetadata}
-                  >
-                    <div slot="nodata">
-                      <p>Failed to get profile (text.pubkey)</p>
-                    </div>
-
-                    <p>
-                      {JSON.parse(repostedMetadata.content).name ?? 'nostrich'}
-                      :
-                      {text.content}
-                    </p>
-                  </Metadata>
-                </Text>
-              {:else if event.kind === 7}
-                <p>
-                  {event.content === '+' ? '👍' : event.content}
-                  by
-                  {JSON.parse(metadata.content).name ?? 'nostrich'}
-                </p>
-                <Text
-                  queryKey={['timeline', targetEventIdOf(event)]}
-                  id={targetEventIdOf(event)}
-                  let:text
-                >
-                  <div slot="nodata">
-                    <p>Failed to get note ({targetEventIdOf(event)})</p>
-                  </div>
-
-                  <Metadata
-                    queryKey={['timeline', 'metadata', text.pubkey]}
-                    pubkey={text.pubkey}
-                    let:metadata={reactedMetadata}
-                  >
-                    <div slot="nodata">
-                      <p>Failed to get profile (text.pubkey)</p>
-                    </div>
-
-                    <p>
-                      {JSON.parse(reactedMetadata.content).name ?? 'nostrich'}
-                      :
-                      {text.content}
-                    </p>
-                  </Metadata>
-                </Text> -->
-                  {/if}
-                </section>
-              </Metadata>
-            </div>
-          {/each}
+                <div slot="loading">
+                  <EventCard note={event} status="loading" />
+                </div>
+                <div slot="nodata">
+                  <EventCard note={event} status="nodata" />
+                </div>
+                <div slot="error">
+                  <EventCard note={event} status="error" />
+                </div>
+                <EventCard {metadata} note={event} /></Metadata
+              >
+            </div>{/each}
         </div>
       </UniqueEventList>
     </Contacts>

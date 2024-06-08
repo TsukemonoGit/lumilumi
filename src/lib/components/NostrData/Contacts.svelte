@@ -22,17 +22,14 @@
   if (relays && $app?.rxNostr) {
     $app?.rxNostr.setDefaultRelays(relays);
   }
-  $: console.log($app?.rxNostr.getAllRelayStatus());
-  $: console.log(pubkey);
-  $: console.log(queryKey);
-  $: console.log(req);
+
   $: result = $app?.rxNostr
     ? useContacts($app?.rxNostr, queryKey, pubkey, req)
     : undefined;
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-  $: console.log($data);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
     default: { contacts: Nostr.Event; status: ReqStatus };
