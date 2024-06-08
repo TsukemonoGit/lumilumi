@@ -44,3 +44,8 @@ export interface Profile {
   name?: string;
   display_name?: string;
 }
+declare global {
+  interface Window {
+    nostr?: Nostr.Nip07.Nostr;
+  }
+}

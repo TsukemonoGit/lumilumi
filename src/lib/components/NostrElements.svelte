@@ -13,10 +13,13 @@
   import { onMount } from "svelte";
   import Metadata from "./NostrData/Metadata.svelte";
   import EventCard from "./EventCard.svelte";
-
-  const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
-  const pubkey =
-    "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
+  let pubkey: string;
+  //const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
+  onMount(async () => {
+    pubkey = await (window.nostr as Nostr.Nip07.Nostr).getPublicKey();
+  });
+  // const pubkey =
+  //   "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
   // const STORAGE_KEY = "relaySettings";
   // let localRelays: DefaultRelayConfig[];
   // onMount(() => {
