@@ -11,6 +11,7 @@
   import Contacts from "./Contacts.svelte";
   import UniqueEventList from "./UniqueEventList.svelte";
   import { onMount } from "svelte";
+  import Metadata from "./Metadata.svelte";
 
   const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
   const pubkey =
@@ -128,25 +129,26 @@ relays
             <div
               class="max-w-[100vw] break-all break-words whitespace-pre-wrap box-border m-2 overflow-x-clip"
             >
-              <!--多分リポストのコンテントに全部突っ込むタイプのやつがイベント丸ごとでてきて見えてる -->
-              kind:{event.kind}
-              {event.content}
-            </div>
-            <!-- <Metadata
-            queryKey={['timeline', 'metadata', event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <section style="border: 1px black solid; padding: 1em;">
-              {#if event.kind === 1}
-                <p>
-                  {JSON.parse(metadata.content).name ?? 'nostrich'}
-                  :
-                  {event.content}
-                </p>
-              {:else if event.kind === 6}
-                <p>reposted by {JSON.parse(metadata.content).name ?? 'nostrich'}</p>
-                <Text
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading">loading {event.pubkey}:{event.content}</div>
+                <div slot="nodata">nodata {event.pubkey}:{event.content}</div>
+                <div slot="error">error {event.pubkey}:{event.content}</div>
+                <section style="border: 1px black solid; padding: 1em;">
+                  {#if event.kind === 1}
+                    <p>
+                      {JSON.parse(metadata.content).name ??
+                        "nostrich"}:{event.content}
+                    </p>
+                  {:else if event.kind === 6}
+                    <p>
+                      reposted by {JSON.parse(metadata.content).name ??
+                        "nostrich"}
+                    </p>
+                    <!-- <Text
                   queryKey={['timeline', targetEventIdOf(event)]}
                   id={targetEventIdOf(event)}
                   let:text
@@ -201,10 +203,11 @@ relays
                       {text.content}
                     </p>
                   </Metadata>
-                </Text>
-              {/if}
-            </section>
-          </Metadata> -->
+                </Text> -->
+                  {/if}
+                </section>
+              </Metadata>
+            </div>
           {/each}
         </div>
       </UniqueEventList>

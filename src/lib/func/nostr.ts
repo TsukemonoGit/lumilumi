@@ -50,8 +50,8 @@ export function useReq(
     console.log("error");
     throw Error();
   }
-  console.log(_rxNostr.getDefaultRelays());
-  console.log(filters);
+  // console.log(_rxNostr.getDefaultRelays());
+  //  console.log(filters);
   let _req:
     | RxReqBase
     | (RxReq<"backward"> & {

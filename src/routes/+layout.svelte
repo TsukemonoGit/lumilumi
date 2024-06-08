@@ -2,7 +2,7 @@
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
-  import { app } from "$lib/stores/stores";
+  import { app, getMetadataFromLocalStorage } from "$lib/stores/stores";
   import { setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
@@ -18,6 +18,7 @@
       nostrLogin.init({
         /*options*/
       });
+      getMetadataFromLocalStorage();
     }
   });
 </script>
