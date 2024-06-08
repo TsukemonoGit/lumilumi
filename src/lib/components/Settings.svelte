@@ -11,8 +11,9 @@
   import { toastSettings } from "$lib/stores/stores";
 
   const relays = writable<DefaultRelayConfig[]>([]);
-  const useConfiguredRelays = writable<boolean>(true);
+
   const STORAGE_KEY = "relaySettings";
+  const useConfiguredRelays = writable<boolean>(true);
   const radioGroupSelected = writable("0");
   let relayInput: string = "";
 
@@ -118,40 +119,41 @@
   }
 </script>
 
-<!-- ラジオボタン -->
-<div
-  use:melt={$radioGrouproot}
-  class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
-  aria-label="View density"
->
-  {#each optionsArr as option}
-    <div class="flex items-center gap-3">
-      <button
-        use:melt={$radioGroupitem(option)}
-        class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
-        id={option}
-        aria-labelledby="{option}-label"
-      >
-        {#if $radioGroupisChecked(option)}
-          <div class="h-3 w-3 rounded-full bg-magnum-500" />
-        {/if}
-      </button>
-      <label
-        class="font-medium capitalize leading-none cursor-pointer"
-        for={option}
-        id="{option}-label"
-      >
-        {optionsArrStr[Number(option)]}
-      </label>
-    </div>
-  {/each}
-  <input name="line-height" use:melt={$radioGrouphiddenInput} />
-</div>
+<div class="container flex flex-col gap-3">
+  <!-- ラジオボタン -->
+  <div
+    use:melt={$radioGrouproot}
+    class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
+    aria-label="View density"
+  >
+    {#each optionsArr as option}
+      <div class="flex items-center gap-3">
+        <button
+          use:melt={$radioGroupitem(option)}
+          class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
+          id={option}
+          aria-labelledby="{option}-label"
+        >
+          {#if $radioGroupisChecked(option)}
+            <div class="h-3 w-3 rounded-full bg-magnum-500" />
+          {/if}
+        </button>
+        <label
+          class="font-medium capitalize leading-none cursor-pointer"
+          for={option}
+          id="{option}-label"
+        >
+          {optionsArrStr[Number(option)]}
+        </label>
+      </div>
+    {/each}
+    <input name="line-height" use:melt={$radioGrouphiddenInput} />
+  </div>
 
-<!-- リレー設定 -->
-<div>
+  <!-- リレー設定 -->
+
   {#if $radioGroupSelected === "1"}
-    <div class="w-fit">
+    <div class="w-fit ml-8">
       {#each $relays as relay, index}
         <hr />
         <div class="flex gap-4 my-1">
@@ -169,7 +171,7 @@
         <hr />
       {/each}
 
-      <div class="flex flex-col items-start justify-center">
+      <div class="flex flex-col items-start justify-center my-2">
         <div class="flex flex-row items-start justify-center">
           <input
             type="text"
@@ -187,6 +189,11 @@
       </div>
     </div>
   {/if}
+
+  <!------>
+
+  <ThemeSwitch />
+
   <div class="flex flex-row items-start gap-4 mt-4">
     <button
       class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
@@ -198,5 +205,3 @@
     >
   </div>
 </div>
-<!------>
-<ThemeSwitch />

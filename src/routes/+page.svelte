@@ -4,12 +4,12 @@
   import HexToSvg from "./HexToSvg.svelte";
   import NostrMain from "../lib/components/NostrMain.svelte";
   import { calculateColor } from "$lib/func/util";
-  import Toast from "$lib/components/Toast.svelte";
-  import Header from "./Header.svelte";
-  const testpub =
-    "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
+  // import Toast from "$lib/components/Toast.svelte";
+  // import Header from "./Header.svelte";
+  // const testpub =
+  //   "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
 
-  const userColor = calculateColor(testpub);
+  // const userColor = calculateColor(testpub);
   // import { init as initNostrLogin } from "nostr-login";
   // import { onMount } from "svelte";
 
@@ -32,7 +32,7 @@
 
 <svelte:head>
   <title>Home</title>
-  <meta name="description" content="Svelte demo app" />
+  <meta name="description" content="lumilumi" />
 </svelte:head>
 
 <section>

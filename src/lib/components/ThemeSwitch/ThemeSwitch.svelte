@@ -61,13 +61,13 @@
 </script>
 
 <button
-  class="transition-colors hover:text-neutral-50 flex"
+  class="flex items-center h-10 w-fit rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
   aria-label="Open theme switcher"
   data-open={$open ? "" : undefined}
   use:melt={$trigger}
 >
   <ThemeIcon theme={userPrefersMode} />
-  <span class="mx-2">Theme Select</span>
+  <div class="mx-2">Theme Select</div>
 </button>
 
 {#if $open}
