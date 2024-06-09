@@ -9,6 +9,6 @@
 <QueryClientProvider client={$queryClient}
   ><NostrElements /></QueryClientProvider
 >
-<div class="fixed right-auto bottom-5">
+<div class="fixed right-auto bottom-5 z-10">
   <OpenPostWindow />
 </div>
