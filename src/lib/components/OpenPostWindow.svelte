@@ -34,8 +34,9 @@
       };
 
       await publishEvent(newev);
-      //初期化
-      text = "";
+
+      // ダイアログを閉じる
+      $open = false;
     }
   };
   // ダイアログが閉じるときにtextをリセット
@@ -86,7 +87,6 @@
           Cancel
         </button>
         <button
-          use:melt={$close}
           class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
           on:click={postNote}
