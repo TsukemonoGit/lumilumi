@@ -96,7 +96,6 @@ relays
     <Contacts
       queryKey={["timeline", "contacts", pubkey]}
       {pubkey}
-      {relays}
       let:contacts
       let:status
       >{status}
@@ -112,7 +111,15 @@ relays
         filters={[
           {
             authors: pubkeysIn(contacts),
-            kinds: [1, 6],
+            kinds: [1, 6, 16],
+            limit: 10,
+          },
+          {
+            kinds: [
+              1 /*リプライ*/, 6 /*kind1のリポスト*/,
+              /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
+            ],
+            "#p": [pubkey],
             limit: 10,
           },
         ]}

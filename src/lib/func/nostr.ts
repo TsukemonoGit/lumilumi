@@ -16,19 +16,26 @@ import {
   type RxReqOverable,
   type RxReqPipeable,
   createRxBackwardReq,
-  tie,
   createRxNostr,
   type DefaultRelayConfig,
   type AcceptableDefaultRelaysConfig,
   type RxNostr,
+  createTie,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
+
 let rxNostr: RxNostr;
 export function setRxNostr() {
   rxNostr = createRxNostr();
   app.set({ rxNostr: rxNostr });
+}
+
+const [tie, tieMap] = createTie();
+
+export function getRelaysById(id: string): string[] {
+  return Array.from(tieMap.get(id) || []);
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
@@ -77,7 +84,7 @@ export function useReq(
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relay })
-    .pipe(tie(), operator);
+    .pipe(tie, operator);
   const query = createQuery({
     queryKey: queryKey,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {

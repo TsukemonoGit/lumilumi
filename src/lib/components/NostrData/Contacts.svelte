@@ -19,7 +19,7 @@
   export let req: RxReqBase | undefined = undefined;
   export let relays: DefaultRelayConfig[] | undefined = undefined;
   // TODO: Check if $app.rxNostr is defined
-  if (relays && $app?.rxNostr) {
+  if (relays && relays.length > 0 && $app?.rxNostr) {
     $app?.rxNostr.setDefaultRelays(relays);
   }
 

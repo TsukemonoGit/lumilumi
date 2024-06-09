@@ -2,6 +2,8 @@
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
   import { filterKind } from "rx-nostr";
+  import { getRelaysById } from "$lib/func/nostr";
+  import { Repeat } from "lucide-svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
@@ -23,22 +25,30 @@
       )?.name}
     {/if}
     <hr />
+    {note.tags}
+    <hr />
     {note.content}
   </div>
-{:else if note.kind === 6}
+{:else if note.kind === 6 || note.kind === 16}
   <div class="rounded-md border border-magnum-500">
-    {#if metadata}
-      Kind:6 {profile(metadata)?.name}
-    {/if}
+    <div class="flex gap-1">
+      <Repeat size="20" class=" mt-auto" />
+      {#if metadata}
+        {profile(metadata)?.name}
+      {/if}
+    </div>
     <hr />
     {JSON.stringify(note.tags)}
   </div>
 {:else}
   <div class="rounded-md border border-magnum-500">
-    {#if metadata}
+    kind:{note.kind}{#if metadata}
       {profile(metadata)?.name}
     {/if}
+    <hr />
+    {note.tags}
     <hr />
     {note.content}
   </div>
 {/if}
+{getRelaysById(note.id)}
