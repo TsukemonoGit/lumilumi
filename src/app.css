@@ -175,12 +175,6 @@
   }
 }
 
-/* Force inputs to use light background, when forced to use light mode in dark mode.
- :where is used to lower CSS specifity */
-:where(.force-dark input) {
-  background-color: inherit;
-}
-
 body {
   background-color: theme("colors.neutral.900");
   color: theme("colors.white");
@@ -212,4 +206,8 @@ body {
   .container {
     @apply px-4;
   }
+}
+
+input[type="text"] {
+  background-color: rgb(var(--color-neutral-900) / 1);
 }

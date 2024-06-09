@@ -15,9 +15,9 @@
   import EventCard from "./EventCard.svelte";
   let pubkey: string;
   //const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
-  onMount(async () => {
-    pubkey = await (window.nostr as Nostr.Nip07.Nostr).getPublicKey();
-  });
+  // onMount(async () => {
+  //   pubkey = await (window.nostr as Nostr.Nip07.Nostr).getPublicKey();
+  // });
   // const pubkey =
   //   "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
   // const STORAGE_KEY = "relaySettings";
@@ -78,9 +78,9 @@
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
 <div>defaultrelays</div>
-<div>{content}</div>
+<div class="break-all">{content}</div>
 relays
-<SetDefaultRelays {pubkey} let:relays let:status>
+<SetDefaultRelays let:pubkey let:relays let:status>
   {status}
 
   <div slot="loading">loading</div>

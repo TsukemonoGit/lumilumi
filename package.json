@@ -32,6 +32,7 @@
 		"@tanstack/svelte-query": "^5.40.1",
 		"lucide-svelte": "^0.390.0",
 		"nostr-login": "^1.4.4",
+		"nostr-tools": "^2.7.0",
 		"nostr-typedef": "^0.9.0",
 		"rx-nostr": "^2.7.3",
 		"ws": "^8.17.0"

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { DefaultRelayConfig } from "rx-nostr";
+  import { getPublicKey, type DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
@@ -9,12 +9,14 @@
   import X from "lucide-svelte/icons/x";
   import ThemeSwitch from "./ThemeSwitch/ThemeSwitch.svelte";
   import { toastSettings } from "$lib/stores/stores";
+  import { nip19 } from "nostr-tools";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
   const STORAGE_KEY = "relaySettings";
   const useConfiguredRelays = writable<boolean>(true);
   const radioGroupSelected = writable("0");
+  const pubkey = writable("");
   let relayInput: string = "";
 
   // ラジオボタン設定
@@ -41,15 +43,29 @@
   } = createLabel();
 
   // ローカルストレージから設定を読み込む
-  onMount(() => {
+  onMount(async () => {
     const savedSettings = localStorage.getItem(STORAGE_KEY);
     if (savedSettings) {
-      const { relays: savedRelays, useRelaySet: savedRelaySet } =
-        JSON.parse(savedSettings);
+      const {
+        relays: savedRelays,
+        useRelaySet: savedRelaySet,
+        pubkey: savedPubkey,
+      } = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
+      pubkey.set(savedPubkey);
     } else {
       radioGroupSelected.set("0");
+      try {
+        const gotPubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        ).getPublicKey();
+        if (gotPubkey) {
+          pubkey.set(gotPubkey);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   });
 
@@ -76,7 +92,7 @@
       const hasRead = currentRelays.some((relay) => relay.read);
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
-        console.log("toast");
+        //console.log("toast");
         $toastSettings = {};
         $toastSettings = {
           title: "Error",
@@ -87,10 +103,18 @@
         return;
       }
     }
-
+    if (!$pubkey || $pubkey === "") {
+      $toastSettings = {
+        title: "Error",
+        description: "error pubkey",
+        color: "bg-red-500",
+      };
+      return;
+    }
     const settings = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
+      pubkey: $pubkey,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     $toastSettings = {};
@@ -120,6 +144,10 @@
 </script>
 
 <div class="container flex flex-col gap-3">
+  <div class="text-sm opacity-50 break-all">
+    <div>[pubkey]</div>
+    {nip19.npubEncode($pubkey)}
+  </div>
   <!-- ラジオボタン -->
   <div
     use:melt={$radioGrouproot}

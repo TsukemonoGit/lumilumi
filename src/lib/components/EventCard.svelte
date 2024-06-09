@@ -17,7 +17,9 @@
 {#if note.kind === 1}
   <div class="rounded-md border border-magnum-500">
     {#if metadata}
-      {profile(metadata)?.name}
+      {profile(metadata)?.display_name ?? profile(metadata)?.name}@{profile(
+        metadata
+      )?.name}
     {/if}
     <hr />
     {note.content}
