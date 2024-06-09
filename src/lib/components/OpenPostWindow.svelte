@@ -31,6 +31,8 @@
       };
 
       await publishEvent(newev);
+      //初期化
+      text = "";
     }
   };
 </script>
