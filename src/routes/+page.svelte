@@ -37,7 +37,7 @@
 
 <section>
   <NostrMain />
-  <div class="svgset">
+  <div class="svgset flex-wrap">
     <HexToSvg
       hexString={"a3bce095cd0e8348b094c9201bd0c3270eafaf78f776517f4101326daf5cb7ff"}
     />

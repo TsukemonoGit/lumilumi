@@ -24,7 +24,7 @@ import {
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
-
+import * as Nostr from "nostr-typedef";
 let rxNostr: RxNostr;
 export function setRxNostr() {
   rxNostr = createRxNostr();
@@ -132,4 +132,19 @@ export function useReq(
       }
     }),
   };
+}
+
+export function publishEvent(ev: Nostr.EventParameters) {
+  const _rxNostr = get(app).rxNostr;
+  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+    console.log("error");
+    throw Error();
+  }
+  _rxNostr.send(ev).subscribe((packet) => {
+    console.log(
+      `リレー ${packet.from} への送信が ${
+        packet.ok ? "成功" : "失敗"
+      } しました。`
+    );
+  });
 }

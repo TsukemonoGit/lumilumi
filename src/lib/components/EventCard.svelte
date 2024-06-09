@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
+  import { filterKind } from "rx-nostr";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
@@ -27,7 +28,7 @@
 {:else if note.kind === 6}
   <div class="rounded-md border border-magnum-500">
     {#if metadata}
-      {profile(metadata)?.name}
+      Kind:6 {profile(metadata)?.name}
     {/if}
     <hr />
     {JSON.stringify(note.tags)}
