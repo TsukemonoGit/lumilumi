@@ -50,7 +50,7 @@
     const IDs = tags?.filter((tag) => tag[0] === "e");
     const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
     const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
-    console.log(root?.[1]);
+    //  console.log(root?.[1]);
     return {
       replyUsers: users,
       replyID: reply ? reply[1] : root ? root[1] : undefined,
