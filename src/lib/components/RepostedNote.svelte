@@ -11,9 +11,9 @@
 
 <div class="p-2">
   {#if tag[0] === "e"}
-    {#if kind}
+    <!-- {#if kind}
       {kind}
-    {/if}
+    {/if} -->
 
     <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
       <div slot="loading">

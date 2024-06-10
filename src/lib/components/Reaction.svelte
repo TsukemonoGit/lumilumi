@@ -5,9 +5,9 @@
   const getEmoji = (
     ev: Nostr.Event
   ): { alt: string; url: string } | undefined => {
-    console.log(ev.tags);
+    //console.log(ev.tags);
     const emojiTag = ev.tags.find((item) => item[0] === "emoji");
-    console.log(emojiTag);
+    //  console.log(emojiTag);
     if (emojiTag) {
       return { alt: emojiTag[1], url: emojiTag[2] };
     } else {

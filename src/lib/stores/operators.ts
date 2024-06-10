@@ -7,6 +7,8 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan } from "rxjs";
+import { queryClient } from "./stores";
+import { get } from "svelte/store";
 
 export function filterId(
   id: string
@@ -58,7 +60,13 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
 }
 
 export function scanArray<A>(): OperatorFunction<A, A[]> {
-  return scan((acc: A[], a: A) => [...acc, a], []);
+  return scan((acc: A[], a: A) => {
+    // クエリデータの設定
+    if ((a as EventPacket).event && (a as EventPacket).event.id) {
+      get(queryClient).setQueryData(["timeline", (a as any).event.id], a);
+    }
+    return [...acc, a];
+  }, []);
 }
 
 export function collectGroupBy<A, K>(

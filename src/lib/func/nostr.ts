@@ -134,6 +134,7 @@ export function useReq(
             //console.log(v);
             if (fulfilled) {
               queryClient.setQueryData(queryKey, v);
+
               // metadataの場合はローカルストレージに保存
               if (queryKey[0] === "metadata" && v) {
                 saveMetadataToLocalStorage(queryKey, v as EventPacket);
