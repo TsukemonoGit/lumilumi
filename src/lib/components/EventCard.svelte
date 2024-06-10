@@ -47,13 +47,13 @@
         return acc;
       }
     }, []);
-    const IDs = tags.filter((tag) => tag[0] === "e");
-    const root = IDs.find((item) => item.length > 2 && item[2] === "root");
-    const reply = IDs.find((item) => item.length > 2 && item[2] === "reply");
-
+    const IDs = tags?.filter((tag) => tag[0] === "e");
+    const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
+    const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
+    console.log(root?.[1]);
     return {
       replyUsers: users,
-      replyID: reply ? reply[0] : root ? root[0] : undefined,
+      replyID: reply ? reply[1] : root ? root[1] : undefined,
     };
   };
 </script>
@@ -67,9 +67,13 @@
     {/if}
     <hr />
     {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-      <Reply {replyID} {replyUsers} />
+      {#if replyID || replyUsers.length > 0}<div class="px-2">
+          <Reply {replyID} {replyUsers} />
+          <hr />
+        </div>
+      {/if}
     {/await}
-    <hr />
+
     {note.content}
   {:else if note.kind === 6 || note.kind === 16}
     <div class="flex gap-1">
