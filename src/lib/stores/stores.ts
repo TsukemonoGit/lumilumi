@@ -44,3 +44,5 @@ export const toastSettings = writable<{
   description: string;
   color: string;
 }>();
+
+export const loginUser = writable<string>();

@@ -38,7 +38,7 @@
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-  $: console.log($data);
+
   interface $$Slots {
     default: {
       relays: DefaultRelayConfig[];

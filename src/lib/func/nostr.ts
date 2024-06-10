@@ -47,19 +47,37 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
 }
 
 let savedMetadata: [QueryKey, unknown][];
+let followingList: string[];
+export function setSavedMetadata(data: [QueryKey, unknown][]) {
+  //nostrMainで呼び出してセット
+  savedMetadata = data;
+}
+export function setFollowingList(data: string[]) {
+  followingList = data;
+  //console.log(followingList);
+}
 // メタデータをlocalStorageに保存する関数
-const saveMetadataToLocalStorage = (metadata: [QueryKey, unknown][]) => {
-  // unknownがnullでないもののみをフィルタリング
-  const savemetadata = metadata.filter(
-    (item: [QueryKey, unknown]) => item[1] !== undefined
-  );
-
-  // 文字列に変換してローカルストレージに保存
-  localStorage.setItem("metadata", JSON.stringify(savemetadata));
-  savedMetadata = savemetadata;
-
-  console.log(savemetadata);
+const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
+  if (
+    !savedMetadata.find(([savedKey]) => savedKey === key) &&
+    !followingList.find((pubkey) => pubkey === data.event.pubkey)
+  ) {
+    savedMetadata.push([key, data]);
+    localStorage.setItem("metadata", JSON.stringify(savedMetadata));
+  }
 };
+//すでにそのキーの値があったらスルー
+//また、フォロイーセットに含まれないpubkeyの場合もスルーする
+// // unknownがnullでないもののみをフィルタリング
+// const savemetadata = metadata.filter(
+//   (item: [QueryKey, unknown]) => item[1] !== undefined
+// );
+
+// // 文字列に変換してローカルストレージに保存
+// localStorage.setItem("metadata", JSON.stringify(savemetadata));
+// savedMetadata = savemetadata;
+
+//console.log(savemetadata);
 
 export function useReq(
   {
@@ -117,16 +135,8 @@ export function useReq(
             if (fulfilled) {
               queryClient.setQueryData(queryKey, v);
               // metadataの場合はローカルストレージに保存
-              if (queryKey[0] === "metadata") {
-                const currentData = queryClient.getQueriesData({
-                  queryKey: ["metadata"],
-                });
-                if (
-                  currentData &&
-                  (!savedMetadata || currentData.length > savedMetadata.length)
-                ) {
-                  saveMetadataToLocalStorage(currentData);
-                }
+              if (queryKey[0] === "metadata" && v) {
+                saveMetadataToLocalStorage(queryKey, v as EventPacket);
               }
             } else {
               resolve(v);

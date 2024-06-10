@@ -10,47 +10,25 @@
   import { app } from "$lib/stores/stores";
   import Contacts from "./NostrData/Contacts.svelte";
   import UniqueEventList from "./NostrData/UniqueEventList.svelte";
-  import { onMount } from "svelte";
+
   import Metadata from "./NostrData/Metadata.svelte";
   import EventCard from "./EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
-  let pubkey: string;
-  //const relays = ["wss://relay.damus.io", "wss://relay-jp.nostr.wirednet.jp"];
-  // onMount(async () => {
-  //   pubkey = await (window.nostr as Nostr.Nip07.Nostr).getPublicKey();
-  // });
-  // const pubkey =
-  //   "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5";
-  // const STORAGE_KEY = "relaySettings";
-  // let localRelays: DefaultRelayConfig[];
-  // onMount(() => {
-  //   const savedSettings = localStorage.getItem(STORAGE_KEY);
-  //   console.log(savedSettings);
-  //   if (savedSettings) {
-  //     const { relays: savedRelays, useRelaySet: savedRelaySet } =
-  //       JSON.parse(savedSettings);
-  //     if (savedRelaySet === "1") {
-  //       //0が10002か3、１がlocal
-  //       localRelays = savedRelays;
-  //     }
-  //   }
-  // });
+  import { setFollowingList } from "$lib/func/nostr";
 
   const req = createRxForwardReq();
 
-  const targetEventIdOf = (reaction: Nostr.Event) => {
-    // Extract the last 'e' tag in .tags (NIP-25)
-    return reaction.tags.filter(([tag]) => tag === "e").slice(-1)[0][1];
-  };
   const maxSize = 50;
   const pubkeysIn = (contacts: Nostr.Event) => {
-    return contacts.tags.reduce((acc, [tag, value]) => {
+    const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
         return [...acc, value];
       } else {
         return acc;
       }
     }, []);
+    setFollowingList(followingList);
+    return followingList;
   };
 
   const sorted = (events: Nostr.Event[]) => {
@@ -104,9 +82,6 @@ relays
         <div slot="loading">loading</div>
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
-        <!-- <div>
-        {JSON.stringify(contacts)}
-      </div> -->
 
         <UniqueEventList
           queryKey={["timeline", "feed", pubkey]}
