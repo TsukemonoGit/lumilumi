@@ -6,88 +6,33 @@
   import { get, writable, readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
   import { type DefaultRelayConfig } from "rx-nostr";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { relaySearchRelays } from "$lib/stores/relays";
 
   export let req: RxReqBase | undefined = undefined;
-  export let relays: DefaultRelayConfig[] | undefined = undefined;
+  let relays: DefaultRelayConfig[] | undefined = undefined;
 
-  const STORAGE_KEY = "relaySettings";
-  let localRelays: DefaultRelayConfig[] | undefined = undefined;
-  let pubkey: string = "";
-
-  onMount(() => {
-    initializeRxNostr();
-    const savedSettings = loadSettingsFromLocalStorage();
-    if (savedSettings) {
-      applySavedSettings(savedSettings);
-    } else {
-      goto("/settings");
-    }
-  });
-
-  function initializeRxNostr() {
-    if (!$app?.rxNostr) {
-      setRxNostr();
-    }
-  }
-
-  function loadSettingsFromLocalStorage() {
-    const savedSettings = localStorage.getItem(STORAGE_KEY);
-    console.log(savedSettings);
-    return savedSettings ? JSON.parse(savedSettings) : null;
-  }
-
-  function applySavedSettings(settings: {
-    relays: DefaultRelayConfig[];
-    useRelaySet: string;
-    pubkey: string;
-  }) {
-    const {
-      relays: savedRelays,
-      useRelaySet: savedRelaySet,
-      pubkey: savedPubkey,
-    } = settings;
-    console.log(savedRelays);
-    if (savedRelaySet === "1" && savedRelays.length > 0) {
-      localRelays = savedRelays;
-      setRelays(localRelays as DefaultRelayConfig[]);
-    } else {
-      localRelays = [];
-      setRelays(relaySearchRelays);
-    }
-    pubkey = savedPubkey;
-  }
-
-  $: console.log(localRelays !== undefined);
-  $: console.log(localRelays !== undefined && $app?.rxNostr);
+  export let localRelays: DefaultRelayConfig[];
+  export let pubkey: string;
 
   $: result = deriveResult(localRelays, pubkey, req);
 
   function deriveResult(
-    localRelays: DefaultRelayConfig[] | undefined,
+    localRelays: DefaultRelayConfig[],
     pubkey: string,
     req: RxReqBase | undefined
   ) {
-    if (localRelays !== undefined) {
-      if (localRelays.length <= 0 && $app?.rxNostr) {
-        return useRelaySet(
-          ["defaultRelay", pubkey],
-          [
-            { authors: [pubkey], kinds: [3, 10002], limit: 1 },
-          ] as Nostr.Filter[],
-          req
-        );
-      } else if (localRelays.length > 0) {
-        return {
-          data: readable(localRelays),
-          status: readable("success" as ReqStatus),
-          error: readable(undefined),
-        };
-      }
+    if (!localRelays || localRelays.length <= 0) {
+      return useRelaySet(
+        ["defaultRelay", pubkey],
+        [{ authors: [pubkey], kinds: [3, 10002], limit: 1 }] as Nostr.Filter[],
+        req
+      );
+    } else {
+      return {
+        data: readable(localRelays),
+        status: readable("success" as ReqStatus),
+        error: readable(undefined),
+      };
     }
-    return undefined;
   }
 
   $: data = result?.data;
@@ -98,7 +43,6 @@
     default: {
       relays: DefaultRelayConfig[];
       status: ReqStatus;
-      pubkey: string;
     };
     loading: Record<never, never>;
     error: { error: Error };
@@ -107,11 +51,11 @@
 </script>
 
 {#if relays}
-  <slot {relays} status="success" {pubkey} />
+  <slot {relays} status="success" />
 {:else if $error}
   <slot name="error" error={$error} />
 {:else if $data && $data.length > 0}
-  <slot relays={localRelays ?? $data} status={$status ?? "error"} {pubkey} />
+  <slot relays={localRelays ?? $data} status={$status ?? "error"} />
 {:else if $status === "loading"}
   <slot name="loading" />
 {:else}

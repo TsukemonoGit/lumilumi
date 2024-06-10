@@ -4,6 +4,7 @@
   import HexToSvg from "./HexToSvg.svelte";
   import NostrMain from "../lib/components/NostrMain.svelte";
   import { calculateColor } from "$lib/func/util";
+  import NostrElements from "$lib/components/NostrElements.svelte";
   // import Toast from "$lib/components/Toast.svelte";
   // import Header from "./Header.svelte";
   // const testpub =
@@ -36,7 +37,7 @@
 </svelte:head>
 
 <section>
-  <NostrMain />
+  <NostrElements />
   <div class="svgset flex-wrap">
     <HexToSvg
       hexString={"a3bce095cd0e8348b094c9201bd0c3270eafaf78f776517f4101326daf5cb7ff"}

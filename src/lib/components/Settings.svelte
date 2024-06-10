@@ -5,7 +5,7 @@
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import type { ChangeFn } from "@melt-ui/svelte/internal/helpers";
   import { relayRegex } from "$lib/func/nostr";
-
+  import * as Nostr from "nostr-typedef";
   import X from "lucide-svelte/icons/x";
   import ThemeSwitch from "./ThemeSwitch/ThemeSwitch.svelte";
   import { toastSettings } from "$lib/stores/stores";
@@ -93,7 +93,7 @@
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
         //console.log("toast");
-        $toastSettings = {};
+
         $toastSettings = {
           title: "Error",
           description:
@@ -117,7 +117,7 @@
       pubkey: $pubkey,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    $toastSettings = {};
+
     $toastSettings = {
       title: "Success",
       description: "設定が保存されました。",
@@ -133,7 +133,7 @@
         JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
-      $toastSettings = {};
+
       $toastSettings = {
         title: "Warning",
         description: "設定がリセットされました。",

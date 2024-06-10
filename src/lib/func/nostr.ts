@@ -8,7 +8,11 @@ export const relayRegex = /^wss?:\/\/\S+$/;
 
 import { app } from "$lib/stores/stores";
 import type { UseReqOpts, ReqResult, RxReqBase, ReqStatus } from "$lib/types";
-import { useQueryClient, createQuery } from "@tanstack/svelte-query";
+import {
+  useQueryClient,
+  createQuery,
+  type QueryKey,
+} from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
 import {
   type EventPacket,
@@ -41,6 +45,22 @@ export function getRelaysById(id: string): string[] {
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   rxNostr.setDefaultRelays(relays);
 }
+
+let savedMetadata: [QueryKey, unknown][];
+// メタデータをlocalStorageに保存する関数
+const saveMetadataToLocalStorage = (metadata: [QueryKey, unknown][]) => {
+  // unknownがnullでないもののみをフィルタリング
+  const savemetadata = metadata.filter(
+    (item: [QueryKey, unknown]) => item[1] !== undefined
+  );
+
+  // 文字列に変換してローカルストレージに保存
+  localStorage.setItem("metadata", JSON.stringify(savemetadata));
+  savedMetadata = savemetadata;
+
+  console.log(savemetadata);
+};
+
 export function useReq(
   {
     queryKey,
@@ -96,6 +116,18 @@ export function useReq(
             //console.log(v);
             if (fulfilled) {
               queryClient.setQueryData(queryKey, v);
+              // metadataの場合はローカルストレージに保存
+              if (queryKey[0] === "metadata") {
+                const currentData = queryClient.getQueriesData({
+                  queryKey: ["metadata"],
+                });
+                if (
+                  currentData &&
+                  (!savedMetadata || currentData.length > savedMetadata.length)
+                ) {
+                  saveMetadataToLocalStorage(currentData);
+                }
+              }
             } else {
               resolve(v);
               fulfilled = true;

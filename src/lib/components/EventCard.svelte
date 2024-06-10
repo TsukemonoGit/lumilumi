@@ -51,4 +51,5 @@
     {note.content}
   </div>
 {/if}
+<!--seenonの更新を検知できないので新しいノートがでたりとかで画面更新されるときにシーンonも更新される-->
 {getRelaysById(note.id)}
