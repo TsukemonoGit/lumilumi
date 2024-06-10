@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
   import { getRelaysById } from "$lib/func/nostr";
-  import { Repeat } from "lucide-svelte";
+  import { Repeat, TriangleAlert } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import Reply from "./Reply.svelte";
@@ -57,6 +57,10 @@
       replyID: reply ? reply[1] : root ? root[1] : undefined,
     };
   };
+  let loadWarning = false;
+  const checkContentWarning = (tags: string[][]): string[] | undefined => {
+    return tags.find((item) => item[0] === "content-warning");
+  };
 </script>
 
 <div class="rounded-md border {noteClass()} ">
@@ -74,8 +78,17 @@
         </div>
       {/if}
     {/await}
-
-    {note.content}
+    {#await checkContentWarning(note.tags) then tag}
+      {#if tag && !loadWarning}
+        <button
+          class="flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
+          on:click={() => (loadWarning = true)}
+          ><TriangleAlert size="20" />{tag[1] ?? "warning"}</button
+        >
+      {:else}
+        {note.content}
+      {/if}
+    {/await}
   {:else if note.kind === 6 || note.kind === 16}
     <div class="flex gap-1">
       <Repeat size="20" class=" mt-auto  stroke-magnum-500" />

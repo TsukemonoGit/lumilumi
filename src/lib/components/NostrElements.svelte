@@ -18,7 +18,7 @@
 
   const req = createRxForwardReq();
 
-  const maxSize = 50;
+  const maxSize = 100;
   const pubkeysIn = (contacts: Nostr.Event) => {
     const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
@@ -89,7 +89,7 @@ relays
             {
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
-              limit: 10,
+              limit: 20,
             },
             {
               kinds: [

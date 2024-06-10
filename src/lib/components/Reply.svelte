@@ -3,10 +3,14 @@
   import EventCard from "./EventCard.svelte";
   import Text from "./NostrData/Text.svelte";
   import Metadata from "./NostrData/Metadata.svelte";
-  export let replyID: string | undefined;
-  export let replyUsers: string[];
+
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
+  import { Reply } from "lucide-svelte";
+
+  export let replyID: string | undefined;
+  export let replyUsers: string[];
+
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);
@@ -20,12 +24,10 @@
 
 <div>
   {#if replyUsers.length > 0}
-    <div class="text-sm text-neutral-500">
+    <div class="text-sm text-neutral-500 flex">
       {#each replyUsers as user}
         @<Metadata queryKey={["metadata", user]} pubkey={user} let:metadata>
-          <div slot="loading">
-            {nip19.npubEncode(user)}
-          </div>
+          <div slot="loading">{nip19.npubEncode(user)}</div>
           <div slot="nodata">
             {nip19.npubEncode(user)}
           </div>
@@ -41,7 +43,7 @@
     {#if !loadNote}
       <button
         class="flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={() => (loadNote = true)}>Load replied</button
+        on:click={() => (loadNote = true)}><Reply size="20" />replied</button
       >
     {:else}
       <Text queryKey={["timeline", replyID]} id={replyID} let:text>
