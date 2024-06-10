@@ -9,7 +9,7 @@
   export let kind: number | undefined;
 </script>
 
-<div class="p-2">
+<div class="px-2">
   {#if tag[0] === "e"}
     <!-- {#if kind}
       {kind}

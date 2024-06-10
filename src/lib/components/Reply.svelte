@@ -14,38 +14,11 @@
       return undefined;
     }
   };
+
+  let loadNote = false;
 </script>
 
 <div>
-  {#if replyID}
-    <Text queryKey={["timeline", replyID]} id={replyID} let:text>
-      <div slot="loading">
-        <p>Loading {nip19.noteEncode(replyID)}</p>
-      </div>
-      <div slot="nodata">
-        <p>nodata {nip19.noteEncode(replyID)}</p>
-      </div>
-      <div slot="error" let:error>
-        <p>{error} {nip19.noteEncode(replyID)}</p>
-      </div>
-      <Metadata
-        queryKey={["metadata", text.pubkey]}
-        pubkey={text.pubkey}
-        let:metadata
-      >
-        <div slot="loading">
-          <EventCard note={text} />
-        </div>
-        <div slot="nodata">
-          <EventCard note={text} />
-        </div>
-        <div slot="error" let:error>
-          <EventCard note={text} />
-        </div>
-        <EventCard note={text} {metadata} />
-      </Metadata>
-    </Text>
-  {/if}
   {#if replyUsers.length > 0}
     <div class="text-sm text-neutral-500">
       {#each replyUsers as user}
@@ -63,5 +36,41 @@
         </Metadata>
       {/each}
     </div>
+  {/if}
+  {#if replyID}
+    {#if !loadNote}
+      <button
+        class="flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+        on:click={() => (loadNote = true)}>Load replied</button
+      >
+    {:else}
+      <Text queryKey={["timeline", replyID]} id={replyID} let:text>
+        <div slot="loading">
+          <p>Loading {nip19.noteEncode(replyID)}</p>
+        </div>
+        <div slot="nodata">
+          <p>nodata {nip19.noteEncode(replyID)}</p>
+        </div>
+        <div slot="error" let:error>
+          <p>{error} {nip19.noteEncode(replyID)}</p>
+        </div>
+        <Metadata
+          queryKey={["metadata", text.pubkey]}
+          pubkey={text.pubkey}
+          let:metadata
+        >
+          <div slot="loading">
+            <EventCard note={text} />
+          </div>
+          <div slot="nodata">
+            <EventCard note={text} />
+          </div>
+          <div slot="error" let:error>
+            <EventCard note={text} />
+          </div>
+          <EventCard note={text} {metadata} />
+        </Metadata>
+      </Text>
+    {/if}
   {/if}
 </div>

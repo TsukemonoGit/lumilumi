@@ -7,6 +7,7 @@
   import RepostedNote from "./RepostedNote.svelte";
   import Reply from "./Reply.svelte";
   import { loginUser } from "$lib/stores/stores";
+  import NoteActionButtons from "./NoteActionButtons.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
@@ -112,6 +113,7 @@
     <hr />
     {note.content}
   {/if}
+  <NoteActionButtons {note} />
 </div>
 <!--seenonの更新を検知できないので新しいノートがでたりとかで画面更新されるときにシーンonも更新される-->
 {getRelaysById(note.id)}
