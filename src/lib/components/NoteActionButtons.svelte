@@ -1,49 +1,25 @@
 <script lang="ts">
-  import { Repeat, Heart, MessageSquare, Ellipsis } from "lucide-svelte";
+  import { createPopover, createSync, melt } from "@melt-ui/svelte";
+  import { Repeat, Heart, MessageSquare, Ellipsis, X } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
+  import { fade } from "svelte/transition";
+  import Popover from "./Popover.svelte";
 
   export let note: Nostr.Event;
-
-  function handleClickReply(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
-    throw new Error("Function not implemented.");
-  }
-
-  function handleClickRepost(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
-    throw new Error("Function not implemented.");
-  }
-
-  function handleClickReaction(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
-    throw new Error("Function not implemented.");
-  }
-
-  function handleClickEllopsis(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
-    throw new Error("Function not implemented.");
-  }
 </script>
 
 <div class="flex justify-around">
-  <button
-    class="hover:opacity-75 active:opacity-50 text-magnum-500"
-    on:click={handleClickReply}><MessageSquare size="20" /></button
-  >
-  <button
-    class="hover:opacity-75 active:opacity-50 text-magnum-500"
-    on:click={handleClickRepost}><Repeat size="20" /></button
-  >
-  <button
-    class="hover:opacity-75 active:opacity-50 text-magnum-500"
-    on:click={handleClickReaction}><Heart size="20" /></button
-  >
-  <button
-    class="hover:opacity-75 active:opacity-50 text-magnum-500"
-    on:click={handleClickEllopsis}><Ellipsis size="20" /></button
-  >
+  <Popover {note}>
+    <MessageSquare size="20" />
+    <div slot="popoverContent">test</div>
+  </Popover>
+  <Popover {note}>
+    <Repeat size="20" />
+  </Popover>
+  <Popover {note}>
+    <Heart size="20" />
+  </Popover>
+  <Popover {note}>
+    <Ellipsis size="20" />
+  </Popover>
 </div>
