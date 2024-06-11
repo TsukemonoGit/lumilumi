@@ -6,6 +6,7 @@
   import Popover from "./Elements/Popover.svelte";
   import DropdownMenu from "./Elements/DropdownMenu.svelte";
   import Dialog from "./Elements/Dialog.svelte";
+  import { getRelaysById } from "$lib/func/nostr";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -58,11 +59,15 @@
     </div>
   {/if}
 </div>
-<Dialog bind:open={dialogOpen} dialogTitle={"EVENT JSON"}>
-  <div
-    slot="main"
-    class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh]"
-  >
-    {JSON.stringify(note, null, 2)}
-  </div>
-</Dialog>
+<Dialog bind:open={dialogOpen}>
+  <div slot="main">
+    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
+    <div
+      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh]"
+    >
+      {JSON.stringify(note, null, 2)}
+    </div>
+    <h2 class="m-0 text-lg font-medium">Seen on</h2>
+    {getRelaysById(note.id)}
+  </div></Dialog
+>
