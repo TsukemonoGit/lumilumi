@@ -20,9 +20,10 @@
     useQueryClient,
     type QueryKey,
   } from "@tanstack/svelte-query";
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient, reactions } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
   import { writable } from "svelte/store";
+  import { afterUpdate } from "svelte";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -50,7 +51,7 @@
       window.open(url, "_blank", "noreferrer");
     }
   };
-  let reaction = writable<string>();
+  // let reaction = writable<string | null>(null);
 
   const handleClickReaction = () => {
     const tmp = "+";
@@ -67,20 +68,55 @@
   };
 
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
-  $: if (queryClient && !$reaction) {
-    const data = useQueryClient().getQueryData(["reaction", note.id]);
+  //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
+  // afterUpdate(() => {
+  //   if ($queryClient && !$reaction) {
+  //     const data = $queryClient.getQueryData(["reaction", note.id]);
 
-    if (data) {
-      const tmp = (data as EventPacket).event.content;
+  //     if (data) {
+  //       const tmp = (data as EventPacket).event.content;
+  //       if (tmp === "+") {
+  //         reaction.set("🧡");
+  //       } else if (tmp === "-") {
+  //         reaction.set("👎️");
+  //       } else {
+  //         reaction.set(tmp);
+  //       }
+  //       console.log($reaction);
+  //     }
+  //   }
+  // });
+  // $: if ($reaction === null && $queryClient) {
+  //   const data = $queryClient.getQueryData(["reaction", note.id]);
+
+  //   if (data) {
+  //     const tmp = (data as EventPacket).event.content;
+  //     if (tmp === "+") {
+  //       reaction.set("🧡");
+  //     } else if (tmp === "-") {
+  //       reaction.set("👎️");
+  //     } else {
+  //       reaction.set(tmp);
+  //     }
+  //     console.log($reaction);
+  //   }
+  // }
+  let reaction = "";
+  reactions.subscribe((store) => {
+    const reactionData = store.get(note.id);
+    if (reactionData) {
+      const tmp = reactionData.content;
       if (tmp === "+") {
-        reaction.set("🧡");
+        reaction = "🧡";
       } else if (tmp === "-") {
-        reaction.set("👎️");
+        reaction = "👎️";
       } else {
-        reaction.set(tmp);
+        reaction = tmp;
       }
+    } else {
+      reaction = "";
     }
-  }
+  });
 </script>
 
 <div>
@@ -100,7 +136,7 @@
         <Repeat size="20" />
       </Popover>
       <!--リアクション-->
-      {#if !$reaction}
+      {#if !reaction || reaction === ""}
         <button on:click={handleClickReaction}>
           <Heart
             size="20"
@@ -108,7 +144,7 @@
           />
         </button>
       {:else}
-        <div>{$reaction}</div>
+        <div>{reaction}</div>
       {/if}
       <!--カスタムリアクション-->
       <Popover {note}>

@@ -1,9 +1,8 @@
 import { QueryClient, type QueryClientConfig } from "@tanstack/svelte-query";
 import { get, writable } from "svelte/store";
 import { type RxNostr, createRxNostr, type EventPacket } from "rx-nostr";
-import type { ToastData } from "$lib/types";
-import type { AddToastProps, Toast } from "@melt-ui/svelte";
 
+import * as Nostr from "nostr-typedef";
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -46,3 +45,4 @@ export const toastSettings = writable<{
 }>();
 
 export const loginUser = writable<string>();
+export const reactions = writable(new Map<string, Nostr.Event>());

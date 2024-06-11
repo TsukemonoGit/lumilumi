@@ -7,9 +7,9 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan } from "rxjs";
-import { loginUser, queryClient } from "./stores";
+import { loginUser, queryClient, reactions } from "./stores";
 import { get } from "svelte/store";
-
+import * as Nostr from "nostr-typedef";
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
@@ -74,7 +74,11 @@ export function scanArray<A>(): OperatorFunction<A, A[]> {
       //  console.log(a);
       const id = (a as EventPacket).event.tags.find((tag) => tag[0] === "e");
       if (id) {
-        get(queryClient).setQueryData(["reaction", id[1]], a);
+        //別でストアに入れてみる
+        reactions.update((store) => {
+          store.set(id[1], (a as EventPacket).event);
+          return store;
+        });
       }
     }
     return [...acc, a];
