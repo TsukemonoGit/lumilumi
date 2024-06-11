@@ -6,12 +6,12 @@
 
   import { createRxForwardReq, type DefaultRelayConfig } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
-  import SetDefaultRelays from "./SetDefaultRelays.svelte";
+  import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import { app } from "$lib/stores/stores";
-  import Contacts from "./NostrData/Contacts.svelte";
-  import UniqueEventList from "./NostrData/UniqueEventList.svelte";
+  import Contacts from "./NostrMainData/Contacts.svelte";
+  import UniqueEventList from "./NostrMainData/UniqueEventList.svelte";
 
-  import Metadata from "./NostrData/Metadata.svelte";
+  import Metadata from "./NostrMainData/Metadata.svelte";
   import EventCard from "./EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";

@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { setRelays, setRxNostr } from "$lib/func/nostr";
-  import { app } from "$lib/stores/stores";
   import { useRelaySet } from "$lib/stores/useRelaySet";
-  import type { ReqResult, ReqStatus, RxReqBase } from "$lib/types";
-  import { get, writable, readable } from "svelte/store";
+  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import { readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
   import { type DefaultRelayConfig } from "rx-nostr";
 

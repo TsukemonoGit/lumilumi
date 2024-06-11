@@ -57,7 +57,7 @@
       replyID: reply ? reply[1] : root ? root[1] : undefined,
     };
   };
-  let loadWarning = false;
+  let loadWarning = 0;
   const checkContentWarning = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "content-warning");
   };
@@ -79,12 +79,23 @@
       {/if}
     {/await}
     {#await checkContentWarning(note.tags) then tag}
-      {#if tag && !loadWarning}
-        <button
-          class="flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
-          on:click={() => (loadWarning = true)}
-          ><TriangleAlert size="20" />{tag[1] ?? "warning"}</button
-        >
+      {#if tag}
+        {note.content.slice(0, loadWarning)}
+        <div class="flex gap-2">
+          {#if loadWarning < note.content.length}<button
+              class="brerak-all flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
+              on:click={() =>
+                (loadWarning = Math.min(loadWarning + 5, note.content.length))}
+              ><TriangleAlert size="20" />{tag[1] ?? "warning"}</button
+            >{/if}
+          {#if loadWarning > 0}
+            <button
+              class="brerak-all flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
+              on:click={() => (loadWarning = Math.max(loadWarning - 5, 0))}
+              >hide warning</button
+            >
+          {/if}
+        </div>
       {:else}
         {note.content}
       {/if}
@@ -126,6 +137,7 @@
     <hr />
     {note.content}
   {/if}
+
   <NoteActionButtons {note} />
 </div>
 <!--seenonの更新を検知できないので新しいノートがでたりとかで画面更新されるときにシーンonも更新される-->

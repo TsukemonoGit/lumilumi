@@ -6,8 +6,7 @@
   import { X, SquarePen } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
-  import { onDestroy } from "svelte";
-  import { writable } from "svelte/store";
+
   let text: string = "";
 
   const {

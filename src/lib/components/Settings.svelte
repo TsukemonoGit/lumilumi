@@ -7,7 +7,7 @@
   import { relayRegex } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
   import X from "lucide-svelte/icons/x";
-  import ThemeSwitch from "./ThemeSwitch/ThemeSwitch.svelte";
+  import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
   import { toastSettings } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
 

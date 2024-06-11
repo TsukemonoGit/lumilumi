@@ -9,7 +9,7 @@
 
   import { setTheme } from "$lib/func/settings";
   import type { Theme } from "$lib/types";
-  import Toast from "$lib/components/Toast.svelte";
+  import Toast from "$lib/components/Elements/Toast.svelte";
 
   onMount(async () => {
     // make sure this is called before any

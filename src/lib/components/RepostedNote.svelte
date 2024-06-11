@@ -1,8 +1,8 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
   import EventCard from "./EventCard.svelte";
-  import Metadata from "./NostrData/Metadata.svelte";
-  import Text from "./NostrData/Text.svelte";
+  import Metadata from "./NostrMainData/Metadata.svelte";
+  import Text from "./NostrMainData/Text.svelte";
 
   //tagはaかe
   export let tag: string[];
