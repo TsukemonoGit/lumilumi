@@ -61,7 +61,7 @@
     />
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
+            max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-neutral-900
             p-6 shadow-lg"
       use:melt={$content}
     >
@@ -70,7 +70,7 @@
       <fieldset class="mb-4 flex items-center gap-5">
         <textarea
           class="inline-flex h-24 w-full flex-1 items-center justify-center
-                    rounded-md border border-solid p-2 leading-none bg-neutral-800"
+                    rounded-sm border border-solid p-2 leading-none bg-neutral-800"
           id="note"
           bind:value={text}
           placeholder="いま どうしてる？"

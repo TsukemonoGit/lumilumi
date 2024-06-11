@@ -96,7 +96,7 @@ relays
                 /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
               ],
               "#p": [pubkey],
-              limit: 10,
+              limit: 5,
             },
           ]}
           req={createRxForwardReq()}
@@ -141,7 +141,7 @@ relays
             {
               kinds: [7],
               authors: [pubkey],
-              limit: 10,
+              limit: 5,
             },
           ]}
           req={createRxForwardReq()}

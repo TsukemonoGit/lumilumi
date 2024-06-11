@@ -10,6 +10,7 @@
     FileJson2,
     ExternalLink,
     SquareArrowOutUpRight,
+    Earth,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { fade } from "svelte/transition";
@@ -35,26 +36,35 @@
   const menuTexts = [
     { text: "View Json", icon: FileJson2 },
     { text: "Open in njump", icon: SquareArrowOutUpRight },
+    { text: "Google Translate", icon: Earth },
   ];
   const handleSelectItem = (index: number) => {
     console.log(menuTexts[index]);
-    if (index === 0) {
-      //view json
-      $dialogOpen = true;
-    }
+    switch (index) {
+      case 0:
+        //view json
+        $dialogOpen = true;
+        break;
 
-    if (index === 1) {
-      //open in njump
-      const eventpointer: nip19.EventPointer = {
-        id: note.id,
-        relays: getRelaysById(note.id),
-        author: note.pubkey,
-        kind: note.kind,
-      };
-      const nevent = nip19.neventEncode(eventpointer);
-      const url = `https://njump.me/${nevent}`;
+      case 1:
+        //open in njump
+        const eventpointer: nip19.EventPointer = {
+          id: note.id,
+          relays: getRelaysById(note.id),
+          author: note.pubkey,
+          kind: note.kind,
+        };
+        const nevent = nip19.neventEncode(eventpointer);
+        const url = `https://njump.me/${nevent}`;
 
-      window.open(url, "_blank", "noreferrer");
+        window.open(url, "_blank", "noreferrer");
+        break;
+
+      case 2:
+        const translateUrl = `https://translate.google.com/?sl=auto&op=translate&text=${encodeURIComponent(note.content)}`;
+
+        window.open(translateUrl, "_blank", "noreferrer");
+        break;
     }
   };
   // let reaction = writable<string | null>(null);
@@ -123,10 +133,15 @@
       reaction = "";
     }
   });
+  let replyText: string;
+  $: console.log(replyText);
+
+  //https://translate.google.com/?sl=auto&op=translate&text={0}
+  //https://www.deepl.com/translator?share=generic#auto/auto/{0}
 </script>
 
 <div>
-  <div class="flex justify-around">
+  <div class="flex justify-around py-0.5">
     {#if note.kind === 1}
       <!--リプライ-->
       <button on:click={() => (openReplyWindow = !openReplyWindow)}>
@@ -162,12 +177,35 @@
       <Ellipsis size="20" />
     </DropdownMenu>
   </div>
+
+  <!--replyWindow-->
   {#if openReplyWindow}
     <div class="w-[100%] p-2">
-      <textarea class="w-[100%] rounded-md">{note.pubkey}</textarea>
+      <textarea
+        rows="3"
+        class="w-[100%] rounded-md bg-neutral-950"
+        bind:value={replyText}
+      />
+
+      <div class=" flex justify-end gap-4">
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+        >
+          Cancel
+        </button>
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+        >
+          Send
+        </button>
+      </div>
     </div>
   {/if}
 </div>
+
+<!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   <div slot="main">
     <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
