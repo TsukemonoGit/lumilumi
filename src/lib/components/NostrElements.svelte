@@ -88,7 +88,7 @@ relays
             {
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
-              limit: 20,
+              limit: 50,
             },
             {
               kinds: [

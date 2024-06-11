@@ -84,7 +84,21 @@
       {/if}
     {/await}
     {#await checkContentWarning(note.tags) then tag}
-      {#if tag}
+      <div class="relative">
+        <div class="ml-4">{note.content}</div>
+        {#if tag}
+          <div class="absolute top-0 left-0 w-full h-full flex">
+            <div
+              class="  ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
+            >
+              <div class="flex -rotate-180">
+                {tag[1] ?? "warning"}<TriangleAlert size="20" />
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+      <!-- {#if tag}
         {note.content.slice(0, loadWarning)}
         <div class="flex gap-2">
           {#if loadWarning < note.content.length}<button
@@ -103,7 +117,7 @@
         </div>
       {:else}
         {note.content}
-      {/if}
+      {/if} -->
     {/await}
     <NoteActionButtons {note} />
   {:else if note.kind === 6 || note.kind === 16}
