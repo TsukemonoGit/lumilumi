@@ -3,7 +3,7 @@
 
   import { fly } from "svelte/transition";
 
-  export let menuTexts: string[] = [];
+  export let menuTexts: { icon: any; text: string }[] = [];
   export let handleSelectItem: (arg0: number) => any;
   const {
     elements: { trigger, menu, item, separator, arrow, overlay },
@@ -32,13 +32,13 @@
     use:melt={$menu}
     transition:fly={{ duration: 150, y: -10 }}
   >
-    {#each menuTexts as text, index}
+    {#each menuTexts as { icon: Icon, text }, index}
       <div
         class="item"
         use:melt={$item}
         on:m-click={() => handleSelectItem(index)}
       >
-        {text}
+        <Icon class="icon mr-2 size-4 " />{text}
       </div>
     {/each}
     <!-- <div class="item" use:melt={$item}>About Melt UI</div>
@@ -113,7 +113,7 @@
     @apply min-w-[220px] shadow-md shadow-black/30;
   }
   .item {
-    @apply relative h-6 min-h-[24px] select-none rounded-sm pl-6 pr-1;
+    @apply relative h-8 min-h-[24px] select-none rounded-sm pl-6 pr-1;
     @apply z-40 text-magnum-50 outline-none;
     @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
     @apply data-[disabled]:text-neutral-600;

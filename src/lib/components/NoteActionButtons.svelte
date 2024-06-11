@@ -7,6 +7,9 @@
     Ellipsis,
     X,
     SmilePlus,
+    FileJson2,
+    ExternalLink,
+    SquareArrowOutUpRight,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { fade } from "svelte/transition";
@@ -29,7 +32,10 @@
   export let openReplyWindow: boolean = false;
 
   let dialogOpen: any;
-  const menuTexts = ["View Json", "Open in njump"];
+  const menuTexts = [
+    { text: "View Json", icon: FileJson2 },
+    { text: "Open in njump", icon: SquareArrowOutUpRight },
+  ];
   const handleSelectItem = (index: number) => {
     console.log(menuTexts[index]);
     if (index === 0) {
