@@ -8,6 +8,7 @@
   import Reply from "./Reply.svelte";
   import { loginUser } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtons.svelte";
+  import { nip19 } from "nostr-tools";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
@@ -69,6 +70,10 @@
       {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
         class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
       >
+    {:else}
+      <span class="text-neutral-500 text-sm"
+        >@{nip19.npubEncode(note.pubkey)}</span
+      >
     {/if}
     <hr />
     {#await replyedEvent(note.tags) then { replyID, replyUsers }}
@@ -100,12 +105,17 @@
         {note.content}
       {/if}
     {/await}
+    <NoteActionButtons {note} />
   {:else if note.kind === 6 || note.kind === 16}
-    <div class="flex gap-1">
+    <!--リポスト-->
+    <div class="flex flex-wrap gap-1">
       <Repeat size="20" class=" mt-auto  stroke-magnum-500" />
       {#if metadata}
         {profile(metadata)?.name ?? profile(metadata)?.display_name}
       {/if}
+      <div class="ml-auto mr-2">
+        <NoteActionButtons {note} />
+      </div>
     </div>
     <hr />
     {#await repostedId(note.tags) then { kind, tag }}
@@ -114,6 +124,7 @@
       {/if}
     {/await}
   {:else if note.kind === 7}
+    <!--リアクション-->
     <div class="flex gap-1">
       <div class="w-fit"><Reaction event={note} /></div>
       {#if metadata}
@@ -121,6 +132,9 @@
           {profile(metadata)?.name}
         </div>
       {/if}
+      <div class="ml-auto mr-2">
+        <NoteActionButtons {note} />
+      </div>
     </div>
     <hr />
     {#await repostedId(note.tags) then { kind, tag }}
@@ -129,6 +143,7 @@
       {/if}
     {/await}
   {:else}
+    <!--その他-->
     kind:{note.kind}{#if metadata}
       {profile(metadata)?.name}
     {/if}
@@ -136,7 +151,6 @@
     {note.tags}
     <hr />
     {note.content}
+    <NoteActionButtons {note} />
   {/if}
-
-  <NoteActionButtons {note} />
 </div>

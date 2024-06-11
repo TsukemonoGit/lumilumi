@@ -7,16 +7,32 @@
   import DropdownMenu from "./Elements/DropdownMenu.svelte";
   import Dialog from "./Elements/Dialog.svelte";
   import { getRelaysById } from "$lib/func/nostr";
+  import { nip19 } from "nostr-tools";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
 
   let dialogOpen: any;
-  const menuTexts = ["View Json", "test"];
+  const menuTexts = ["View Json", "Open in njump"];
   const handleSelectItem = (index: number) => {
     console.log(menuTexts[index]);
     if (index === 0) {
+      //view json
       $dialogOpen = true;
+    }
+
+    if (index === 1) {
+      //open in njump
+      const eventpointer: nip19.EventPointer = {
+        id: note.id,
+        relays: getRelaysById(note.id),
+        author: note.pubkey,
+        kind: note.kind,
+      };
+      const nevent = nip19.neventEncode(eventpointer);
+      const url = `https://njump.me/${nevent}`;
+
+      window.open(url, "_blank", "noreferrer");
     }
   };
 </script>
