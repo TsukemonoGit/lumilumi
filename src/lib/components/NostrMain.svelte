@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    QueryClient,
-    QueryClientProvider,
-    type QueryKey,
-  } from "@tanstack/svelte-query";
+  import { QueryClientProvider } from "@tanstack/svelte-query";
   import { app, loginUser, queryClient } from "$lib/stores/stores";
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";

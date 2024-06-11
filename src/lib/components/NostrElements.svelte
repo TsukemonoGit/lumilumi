@@ -15,8 +15,7 @@
   import EventCard from "./EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
-
-  const req = createRxForwardReq();
+  import Reactions from "./NostrMainData/Reactions.svelte";
 
   const maxSize = 100;
   const pubkeysIn = (contacts: Nostr.Event) => {
@@ -100,7 +99,7 @@ relays
               limit: 10,
             },
           ]}
-          {req}
+          req={createRxForwardReq()}
           let:events
         >
           <div slot="loading">
@@ -136,6 +135,17 @@ relays
               </div>{/each}
           </div>
         </UniqueEventList>
+        <Reactions
+          queryKey={["reaction"]}
+          filters={[
+            {
+              kinds: [7],
+              authors: [pubkey],
+              limit: 10,
+            },
+          ]}
+          req={createRxForwardReq()}
+        />
       </Contacts>
     </div>
   </SetDefaultRelays>

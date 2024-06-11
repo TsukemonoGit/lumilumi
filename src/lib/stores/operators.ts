@@ -7,7 +7,7 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan } from "rxjs";
-import { queryClient } from "./stores";
+import { loginUser, queryClient } from "./stores";
 import { get } from "svelte/store";
 
 export function filterId(
@@ -64,6 +64,18 @@ export function scanArray<A>(): OperatorFunction<A, A[]> {
     // クエリデータの設定
     if ((a as EventPacket)?.event && (a as EventPacket)?.event?.id) {
       get(queryClient).setQueryData(["timeline", (a as any).event.id], a);
+    }
+    //reactionの場合どれへのリアクションかわかるようにしてくえりーにいれる
+    if (
+      (a as EventPacket)?.event &&
+      (a as EventPacket)?.event?.kind === 7 &&
+      (a as EventPacket)?.event?.pubkey === get(loginUser)
+    ) {
+      //  console.log(a);
+      const id = (a as EventPacket).event.tags.find((tag) => tag[0] === "e");
+      if (id) {
+        get(queryClient).setQueryData(["reaction", id[1]], a);
+      }
     }
     return [...acc, a];
   }, []);

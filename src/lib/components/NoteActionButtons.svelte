@@ -1,13 +1,28 @@
 <script lang="ts">
   import { createPopover, createSync, melt } from "@melt-ui/svelte";
-  import { Repeat, Heart, MessageSquare, Ellipsis, X } from "lucide-svelte";
+  import {
+    Repeat,
+    Heart,
+    MessageSquare,
+    Ellipsis,
+    X,
+    SmilePlus,
+  } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { fade } from "svelte/transition";
   import Popover from "./Elements/Popover.svelte";
   import DropdownMenu from "./Elements/DropdownMenu.svelte";
   import Dialog from "./Elements/Dialog.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
+  import {
+    useHydrate,
+    useQueryClient,
+    type QueryKey,
+  } from "@tanstack/svelte-query";
+  import { queryClient } from "$lib/stores/stores";
+  import type { EventPacket } from "rx-nostr";
+  import { writable } from "svelte/store";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -35,36 +50,72 @@
       window.open(url, "_blank", "noreferrer");
     }
   };
+  let reaction = writable<string>();
+
+  const handleClickReaction = () => {
+    const tmp = "+";
+    const ev: Nostr.EventParameters = {
+      kind: 7,
+      tags: [
+        ["p", note.pubkey],
+        ["e", note.id],
+        ["k", note.kind.toString()],
+      ],
+      content: tmp,
+    };
+    publishEvent(ev);
+  };
+
+  //リアクションしてないやつだけリアクションしたかどうか監視する感じで
+  $: if (queryClient && !$reaction) {
+    const data = useQueryClient().getQueryData(["reaction", note.id]);
+
+    if (data) {
+      const tmp = (data as EventPacket).event.content;
+      if (tmp === "+") {
+        reaction.set("🧡");
+      } else if (tmp === "-") {
+        reaction.set("👎️");
+      } else {
+        reaction.set(tmp);
+      }
+    }
+  }
 </script>
 
 <div>
   <div class="flex justify-around">
     {#if note.kind === 1}
+      <!--リプライ-->
       <button on:click={() => (openReplyWindow = !openReplyWindow)}>
-        {#if openReplyWindow}
-          <MessageSquare
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 fill-magnum-700"
-          />
-        {:else}
-          <MessageSquare
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 "
-          />
-        {/if}
+        <MessageSquare
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
+            ? 'fill-magnum-700'
+            : ''}"
+        />
       </button>
-
+      <!--リポスト-->
       <Popover {note}>
         <Repeat size="20" />
       </Popover>
+      <!--リアクション-->
+      {#if !$reaction}
+        <button on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          />
+        </button>
+      {:else}
+        <div>{$reaction}</div>
+      {/if}
+      <!--カスタムリアクション-->
       <Popover {note}>
-        <Heart size="20" />
+        <SmilePlus size="20" />
       </Popover>
-    {:else}
-      <div />
-      <div />
-      <div />
     {/if}
+    <!--メニュー-->
     <DropdownMenu {menuTexts} {handleSelectItem}>
       <Ellipsis size="20" />
     </DropdownMenu>
