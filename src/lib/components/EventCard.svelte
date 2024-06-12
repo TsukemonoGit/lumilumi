@@ -101,12 +101,12 @@
           <div class="relative">
             <Content text={note.content} tags={note.tags} />
             {#if tag}
-              <div class="absolute top-0 left-0 w-full h-full flex">
+              <div class=" absolute top-0 left-0 w-full h-full flex">
                 <div
-                  class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
+                  class="scale-150 rounded-sm resizable ml-auto mt-auto mr-1 mb-1 w-full h-full max-w-[80%] max-h-[80%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
                 >
                   <div
-                    class=" flex flex-auto justify-center items-center w-hull -rotate-180"
+                    class="scale-50 flex flex-auto justify-center content-center items-center w-hull -rotate-180"
                   >
                     <TriangleAlert
                       size="20"
