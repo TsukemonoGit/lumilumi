@@ -3,18 +3,16 @@
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
-  import type { ChangeFn } from "@melt-ui/svelte/internal/helpers";
-  import { relayRegex } from "$lib/func/nostr";
+
   import * as Nostr from "nostr-typedef";
-  import X from "lucide-svelte/icons/x";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
   import { toastSettings } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
+  import { relayRegex } from "$lib/func/util";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
   const STORAGE_KEY = "relaySettings";
-  const useConfiguredRelays = writable<boolean>(true);
   const radioGroupSelected = writable("0");
   const pubkey = writable("");
   let relayInput: string = "";

@@ -1,23 +1,10 @@
 <script lang="ts">
-  import { nip19 } from "nostr-tools";
-  import EventCard from "./EventCard.svelte";
-  import Text from "./NostrMainData/Text.svelte";
-  import Metadata from "./NostrMainData/Metadata.svelte";
-
-  import * as Nostr from "nostr-typedef";
-  import type { Profile } from "$lib/types";
   import { Reply } from "lucide-svelte";
+  import UserName from "./UserName.svelte";
+  import Note from "./Note.svelte";
 
   export let replyID: string | undefined;
   export let replyUsers: string[];
-
-  const profile = (ev: Nostr.Event): Profile | undefined => {
-    try {
-      return JSON.parse(ev.content);
-    } catch (error) {
-      return undefined;
-    }
-  };
 
   let loadNote = false;
 </script>
@@ -26,16 +13,7 @@
   {#if replyUsers.length > 0}
     <div class="text-sm text-neutral-500 flex">
       {#each replyUsers as user}
-        @<Metadata queryKey={["metadata", user]} pubkey={user} let:metadata>
-          <div slot="loading">{nip19.npubEncode(user)}</div>
-          <div slot="nodata">
-            {nip19.npubEncode(user)}
-          </div>
-          <div slot="error" let:error>
-            {nip19.npubEncode(user)}
-          </div>
-          {profile(metadata)?.name ?? profile(metadata)?.display_name}
-        </Metadata>
+        <UserName pubhex={user} />
       {/each}
     </div>
   {/if}
@@ -46,33 +24,7 @@
         on:click={() => (loadNote = true)}><Reply size="20" />replied</button
       >
     {:else}
-      <Text queryKey={["timeline", replyID]} id={replyID} let:text>
-        <div slot="loading">
-          <p>Loading {nip19.noteEncode(replyID)}</p>
-        </div>
-        <div slot="nodata">
-          <p>nodata {nip19.noteEncode(replyID)}</p>
-        </div>
-        <div slot="error" let:error>
-          <p>{error} {nip19.noteEncode(replyID)}</p>
-        </div>
-        <Metadata
-          queryKey={["metadata", text.pubkey]}
-          pubkey={text.pubkey}
-          let:metadata
-        >
-          <div slot="loading">
-            <EventCard note={text} />
-          </div>
-          <div slot="nodata">
-            <EventCard note={text} />
-          </div>
-          <div slot="error" let:error>
-            <EventCard note={text} />
-          </div>
-          <EventCard note={text} {metadata} />
-        </Metadata>
-      </Text>
+      <Note id={replyID} />
     {/if}
   {/if}
 </div>

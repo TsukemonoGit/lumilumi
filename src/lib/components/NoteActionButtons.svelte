@@ -278,7 +278,7 @@
       </div>
       <textarea
         rows="3"
-        class="w-[100%] rounded-md bg-neutral-950"
+        class="w-[100%] rounded-md bg-neutral-950 mt-1"
         bind:value={replyText}
       />
 

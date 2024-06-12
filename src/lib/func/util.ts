@@ -1,3 +1,5 @@
+export const relayRegex = /^wss?:\/\/\S+$/;
+export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;
 // RGB 値を計算する関数
 export function calculateColor(hex: string): string {
   if (!hex) {

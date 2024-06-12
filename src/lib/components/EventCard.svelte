@@ -9,10 +9,11 @@
   import { loginUser } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtons.svelte";
   import { nip19 } from "nostr-tools";
+  import Content from "./Content.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
-
+  import Avatar from "svelte-boring-avatars";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);
@@ -58,50 +59,68 @@
       replyID: reply ? reply[1] : root ? root[1] : undefined,
     };
   };
-  let loadWarning = 0;
+
   const checkContentWarning = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "content-warning");
+  };
+  const splitHexColorString = (hexString: string): string[] => {
+    return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
   };
 </script>
 
 <div class="rounded-md border {noteClass()} ">
   {#if note.kind === 1}
-    {#if metadata}
-      {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-        class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
-      >
-    {:else}
-      <span class="text-neutral-500 text-sm"
-        >@{nip19.npubEncode(note.pubkey)}</span
-      >
-    {/if}
-    <hr />
-    {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-      {#if replyID || replyUsers.length > 0}<div class="px-2">
-          <Reply {replyID} {replyUsers} />
-          <hr />
-        </div>
-      {/if}
-    {/await}
-    {#await checkContentWarning(note.tags) then tag}
-      <div class="relative">
-        {note.content}
-        {#if tag}
-          <div class="absolute top-0 left-0 w-full h-full flex">
-            <div
-              class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
-            >
-              <div
-                class=" flex flex-auto justify-center items-center w-hull -rotate-180"
-              >
-                <TriangleAlert size="20" class="text-magnum-300" />{tag[1] ??
-                  "warning"}<TriangleAlert size="20" class="text-magnum-300" />
-              </div>
-            </div>
-          </div>
-        {/if}
+    <div class="grid grid-cols-[auto_1fr]">
+      <div class="p-1">
+        <Avatar
+          size={40}
+          name={note.pubkey}
+          variant="beam"
+          colors={splitHexColorString(note.pubkey)}
+        />
       </div>
-      <!-- {#if tag}
+      <div>
+        {#if metadata}
+          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+            class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
+          >
+        {:else}
+          <span class="text-neutral-500 text-sm"
+            >@{nip19.npubEncode(note.pubkey)}</span
+          >
+        {/if}
+        <hr />
+        {#await replyedEvent(note.tags) then { replyID, replyUsers }}
+          {#if replyID || replyUsers.length > 0}<div class="px-2">
+              <Reply {replyID} {replyUsers} />
+              <hr />
+            </div>
+          {/if}
+        {/await}
+        {#await checkContentWarning(note.tags) then tag}
+          <div class="relative">
+            <Content text={note.content} tags={note.tags} />
+            {#if tag}
+              <div class="absolute top-0 left-0 w-full h-full flex">
+                <div
+                  class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
+                >
+                  <div
+                    class=" flex flex-auto justify-center items-center w-hull -rotate-180"
+                  >
+                    <TriangleAlert
+                      size="20"
+                      class="text-magnum-300"
+                    />{tag[1] ?? "warning"}<TriangleAlert
+                      size="20"
+                      class="text-magnum-300"
+                    />
+                  </div>
+                </div>
+              </div>
+            {/if}
+          </div>
+          <!-- {#if tag}
         {note.content.slice(0, loadWarning)}
         <div class="flex gap-2">
           {#if loadWarning < note.content.length}<button
@@ -121,14 +140,31 @@
       {:else}
         {note.content}
       {/if} -->
-    {/await}
-    <NoteActionButtons {note} />
+        {/await}
+        <NoteActionButtons {note} />
+      </div>
+    </div>
   {:else if note.kind === 6 || note.kind === 16}
     <!--リポスト-->
     <div class="flex flex-wrap gap-1">
       <Repeat size="20" class=" mt-auto  stroke-magnum-500" />
+      <div class="self-center">
+        <Avatar
+          size={20}
+          name={note.pubkey}
+          variant="beam"
+          colors={splitHexColorString(note.pubkey)}
+        />
+      </div>
       {#if metadata}
-        {profile(metadata)?.name ?? profile(metadata)?.display_name}
+        {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+          class="text-neutral-500 text-sm mt-auto"
+          >@{profile(metadata)?.name}</span
+        >
+      {:else}
+        <span class="text-neutral-500 text-sm"
+          >@{nip19.npubEncode(note.pubkey)}</span
+        >
       {/if}
       <div class="ml-auto mr-2">
         <NoteActionButtons {note} />
@@ -144,10 +180,23 @@
     <!--リアクション-->
     <div class="flex gap-1">
       <div class="w-fit"><Reaction event={note} /></div>
+      <div class="self-center">
+        <Avatar
+          size={20}
+          name={note.pubkey}
+          variant="beam"
+          colors={splitHexColorString(note.pubkey)}
+        />
+      </div>
       {#if metadata}
-        <div class="break-keep whitespace-nowrap">
-          {profile(metadata)?.name}
-        </div>
+        {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+          class="text-neutral-500 text-sm mt-auto"
+          >@{profile(metadata)?.name}</span
+        >
+      {:else}
+        <span class="text-neutral-500 text-sm"
+          >@{nip19.npubEncode(note.pubkey)}</span
+        >
       {/if}
       <div class="ml-auto mr-2">
         <NoteActionButtons {note} />
@@ -167,7 +216,7 @@
     <hr />
     {note.tags}
     <hr />
-    {note.content}
+    <Content text={note.content} tags={note.tags} />
     <NoteActionButtons {note} />
   {/if}
 </div>
