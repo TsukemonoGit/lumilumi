@@ -181,7 +181,7 @@
 </script>
 
 <div>
-  <div class="flex justify-around py-0.5">
+  <div class="flex justify-between py-0.5 mr-2">
     {#if note.kind === 1}
       <!--リプライ-->
       <button on:click={() => (openReplyWindow = !openReplyWindow)}>

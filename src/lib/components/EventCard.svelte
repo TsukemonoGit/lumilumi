@@ -172,7 +172,7 @@
           >
         {/if}
       </div>
-      <div class="ml-auto mr-2">
+      <div class="ml-auto">
         <NoteActionButtons {note} />
       </div>
     </div>
