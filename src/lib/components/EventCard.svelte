@@ -15,6 +15,8 @@
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
   import Avatar from "svelte-boring-avatars";
+  import WarningHide1 from "./Elements/WarningHide1.svelte";
+  import WarningHide2 from "./Elements/WarningHide2.svelte";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);
@@ -99,26 +101,13 @@
           {/if}
         {/await}
         {#await checkContentWarning(note.tags) then tag}
-          <div class="relative max-h-64 overflow-y-auto">
-            <Content text={note.content} tags={note.tags} />
+          <div class="relative">
+            <div class=" max-h-64 overflow-y-auto">
+              <Content text={note.content} tags={note.tags} />
+            </div>
             {#if tag}
-              <div class="absolute top-0 left-0 w-full h-full flex">
-                <div
-                  class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
-                >
-                  <div
-                    class=" flex flex-auto justify-center items-center w-hull -rotate-180"
-                  >
-                    <TriangleAlert
-                      size="20"
-                      class="text-magnum-300"
-                    />{tag[1] ?? "warning"}<TriangleAlert
-                      size="20"
-                      class="text-magnum-300"
-                    />
-                  </div>
-                </div>
-              </div>
+              <!-- <WarningHide1 text={tag[1]} /> -->
+              <WarningHide2 text={tag[1]} />
             {/if}
           </div>
         {/await}
