@@ -85,14 +85,17 @@
     {/await}
     {#await checkContentWarning(note.tags) then tag}
       <div class="relative">
-        <div class="ml-4">{note.content}</div>
+        {note.content}
         {#if tag}
           <div class="absolute top-0 left-0 w-full h-full flex">
             <div
-              class="  ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
+              class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
             >
-              <div class="flex -rotate-180">
-                {tag[1] ?? "warning"}<TriangleAlert size="20" />
+              <div
+                class=" flex flex-auto justify-center items-center w-hull -rotate-180"
+              >
+                <TriangleAlert size="20" class="text-magnum-300" />{tag[1] ??
+                  "warning"}<TriangleAlert size="20" class="text-magnum-300" />
               </div>
             </div>
           </div>
@@ -168,3 +171,12 @@
     <NoteActionButtons {note} />
   {/if}
 </div>
+
+<style>
+  .resizable {
+    /*  border: 1px solid rgba(255, 100, 100, 0.8);
+   box-shadow:
+      inset 1px 1px 2px rgba(255, 0, 100, 0.2),
+      inset -1px -1px 2px rgba(255, 0, 100, 0.2); */
+  }
+</style>
