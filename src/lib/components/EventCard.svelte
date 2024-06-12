@@ -84,14 +84,16 @@
         />
       </div>
       <div>
-        <div class="flex">
+        <div class="flex flex-wrap align-middle">
           {#if metadata}
             {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
+              class="text-neutral-500 text-sm mt-auto mb-auto ml-1"
+            >
+              @{profile(metadata)?.name}</span
             >
           {:else}
-            <span class="text-neutral-500 text-sm"
-              >@{nip19.npubEncode(note.pubkey)}</span
+            <span class="text-neutral-500 text-sm mt-auto mb-auto break-all">
+              @{nip19.npubEncode(note.pubkey)}</span
             >
           {/if}
           <div
