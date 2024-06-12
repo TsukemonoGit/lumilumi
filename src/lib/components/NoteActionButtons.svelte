@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createPopover, createSync, melt } from "@melt-ui/svelte";
   import {
     Repeat,
     Heart,
@@ -11,23 +10,20 @@
     ExternalLink,
     SquareArrowOutUpRight,
     Earth,
+    Plus,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import { fade } from "svelte/transition";
+
   import Popover from "./Elements/Popover.svelte";
   import DropdownMenu from "./Elements/DropdownMenu.svelte";
   import Dialog from "./Elements/Dialog.svelte";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import {
-    useHydrate,
-    useQueryClient,
-    type QueryKey,
-  } from "@tanstack/svelte-query";
-  import { queryClient, reactions } from "$lib/stores/stores";
-  import type { EventPacket } from "rx-nostr";
-  import { writable } from "svelte/store";
-  import { afterUpdate } from "svelte";
+
+  import { reactions } from "$lib/stores/stores";
+  import Metadata from "./NostrMainData/Metadata.svelte";
+  import type { Profile } from "$lib/types";
+  import { writable, type Writable } from "svelte/store";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -134,10 +130,54 @@
     }
   });
   let replyText: string;
-  $: console.log(replyText);
 
   //https://translate.google.com/?sl=auto&op=translate&text={0}
   //https://www.deepl.com/translator?share=generic#auto/auto/{0}
+
+  const metadataName = (ev: Nostr.Event): string => {
+    try {
+      const profile: Profile = JSON.parse(ev.content);
+      if (profile.name) {
+        return profile.name;
+      } else {
+        return "";
+      }
+    } catch (error) {
+      return "";
+    }
+  };
+  let allPtag: string[] = note.tags.reduce((acc, item) => {
+    if (item[0] === "p" && !acc.includes(item[1]) && item[1] !== note.pubkey) {
+      acc.push(item[1]);
+    }
+    return acc;
+  }, []);
+
+  let additionalReplyUsers: Writable<string[]> = writable([...allPtag] ?? []);
+
+  const handleClickReplySend = () => {
+    const replyUsersArray: string[][] = $additionalReplyUsers.map((user) => [
+      "p",
+      user,
+    ]);
+    const root = note.tags.find(
+      (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
+    );
+    const etag = root
+      ? [root, ["e", note.id, getRelaysById(note.id)?.[0], "reply"]]
+      : [["e", note.id, getRelaysById(note.id)?.[0], "root"]];
+    const ev: Nostr.EventParameters = {
+      content: replyText,
+      tags: [["p", note.pubkey], ...replyUsersArray, ...etag],
+      kind: 1,
+    };
+    publishEvent(ev);
+    replyText = "";
+    openReplyWindow = false;
+
+    console.log(ev);
+    // ここで ev を送信するロジックを追加します
+  };
 </script>
 
 <div>
@@ -181,6 +221,61 @@
   <!--replyWindow-->
   {#if openReplyWindow}
     <div class="w-[100%] p-2">
+      <div class="flex gap-1">
+        <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+          @<Metadata
+            queryKey={["metadata", note.pubkey]}
+            pubkey={note.pubkey}
+            let:metadata
+          >
+            {metadataName(metadata)}
+          </Metadata>
+        </div>
+        {#if allPtag}
+          {#each allPtag as replyuser, index}
+            <div
+              class=" rounded-md {$additionalReplyUsers.includes(replyuser)
+                ? 'bg-magnum-300'
+                : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
+            >
+              @<Metadata
+                queryKey={["metadata", replyuser]}
+                pubkey={replyuser}
+                let:metadata
+              >
+                {metadataName(metadata)}
+              </Metadata>
+              {#if $additionalReplyUsers.includes(replyuser)}
+                <button
+                  class=" inline-flex h-6 w-6 appearance-none align-middle
+                   rounded-full p-1 text-magnum-800
+                  hover:bg-magnum-100 focus:shadow-magnum-400"
+                  on:click={() => {
+                    additionalReplyUsers.update((users) => {
+                      users.splice(index, 1);
+                      return users;
+                    });
+                  }}
+                >
+                  <X class="size-4" />
+                </button>
+              {:else}<button
+                  class=" inline-flex h-6 w-6 appearance-none align-middle
+               rounded-full p-1 text-magnum-800
+              hover:bg-magnum-100 focus:shadow-magnum-400"
+                  on:click={() => {
+                    additionalReplyUsers.update((users) => {
+                      users.push(replyuser);
+                      return users;
+                    });
+                  }}
+                >
+                  <Plus class="size-4" />
+                </button>{/if}
+            </div>
+          {/each}
+        {/if}
+      </div>
       <textarea
         rows="3"
         class="w-[100%] rounded-md bg-neutral-950"
@@ -191,12 +286,17 @@
         <button
           class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+          on:click={() => {
+            replyText = "";
+            $additionalReplyUsers = [...allPtag];
+          }}
         >
           Cancel
         </button>
         <button
           class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+          on:click={handleClickReplySend}
         >
           Send
         </button>
