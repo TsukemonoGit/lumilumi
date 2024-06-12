@@ -4,10 +4,10 @@
    * @copyright 2023 Akiomi Kamakura
    */
 
-  import { createRxForwardReq, type DefaultRelayConfig } from "rx-nostr";
+  import { createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
-  import { app } from "$lib/stores/stores";
+
   import Contacts from "./NostrMainData/Contacts.svelte";
   import UniqueEventList from "./NostrMainData/UniqueEventList.svelte";
 
@@ -44,10 +44,6 @@
     );
     return sortedEvents.slice(0, maxSize);
   };
-
-  $: content = $app?.rxNostr
-    ? JSON.stringify($app?.rxNostr.getDefaultRelays())
-    : "";
 </script>
 
 <svelte:head>
@@ -55,30 +51,19 @@
 </svelte:head>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
-<div>defaultrelays</div>
-<div class="break-all">{content}</div>
-relays
+
 <NostrMain let:pubkey let:localRelays>
   <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
-    {status}
-
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
     <div class="container break-all break-words overflow-x-hidden">
-      {#each relays as relay, index}
-        {index} {JSON.stringify(relay)}
-      {/each}
-
-      contacts
-
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}
         {pubkey}
         let:contacts
         let:status
-        >{status}
-        <div slot="loading">loading</div>
+        ><div slot="loading">loading</div>
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
 

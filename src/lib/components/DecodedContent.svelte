@@ -32,14 +32,20 @@
   </span>
 {:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="16" class="text-magnum-300 fill-magnum-700" />
+    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
     <Note id={decoded.data.id} /><Quote
       size="16"
-      class="text-magnum-300 fill-magnum-600"
+      class="text-magnum-500 fill-magnum-600"
     />
   </span>
 {:else if decoded.type === "note"}
-  <Note id={decoded.data} />
+  <span class="grid grid-cols-[auto_1fr_auto]">
+    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
+    <Note id={decoded.data} /><Quote
+      size="16"
+      class="text-magnum-500 fill-magnum-600"
+    />
+  </span>
 {:else if decoded.type === "naddr"}
   <!---->
 {:else if decoded.type === "nprofile"}<!---->

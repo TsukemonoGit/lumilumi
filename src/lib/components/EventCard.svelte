@@ -91,7 +91,7 @@
         {/if}
         <hr />
         {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-          {#if replyID || replyUsers.length > 0}<div class="px-2">
+          {#if replyID || replyUsers.length > 0}<div class="">
               <Reply {replyID} {replyUsers} />
               <hr />
             </div>
