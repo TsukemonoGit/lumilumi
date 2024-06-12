@@ -17,6 +17,7 @@
   import Avatar from "svelte-boring-avatars";
   import WarningHide1 from "./Elements/WarningHide1.svelte";
   import WarningHide2 from "./Elements/WarningHide2.svelte";
+  import { formatAbsoluteDate } from "$lib/func/util";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);
@@ -39,8 +40,8 @@
     const ptag = note.tags.find((tag) => tag[0] === "p");
 
     return (ptag?.[1] as string) === $loginUser
-      ? "border-magnum-500 bg-magnum-700/20"
-      : "border-magnum-500";
+      ? "border-magnum-600 bg-magnum-700/20"
+      : "border-magnum-600";
   };
 
   const replyedEvent = (
@@ -83,15 +84,22 @@
         />
       </div>
       <div>
-        {#if metadata}
-          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
+        <div class="flex">
+          {#if metadata}
+            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+              class="text-neutral-500 text-sm">@{profile(metadata)?.name}</span
+            >
+          {:else}
+            <span class="text-neutral-500 text-sm"
+              >@{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+          <div
+            class="inline-flex ml-auto mr-1 text-magnum-100 text-xs mt-auto mb-auto"
           >
-        {:else}
-          <span class="text-neutral-500 text-sm"
-            >@{nip19.npubEncode(note.pubkey)}</span
-          >
-        {/if}
+            {formatAbsoluteDate(note.created_at)}
+          </div>
+        </div>
         <hr />
         {#await replyedEvent(note.tags) then { replyID, replyUsers }}
           {#if replyID || replyUsers.length > 0}<div class="">

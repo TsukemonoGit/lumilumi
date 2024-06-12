@@ -11,7 +11,7 @@
 
 <div>
   {#if replyUsers.length > 0}
-    <div class="text-sm text-neutral-500 flex">
+    <div class="text-sm text-neutral-500 flex break-all">
       {#each replyUsers as user}
         <UserName pubhex={user} />
       {/each}

@@ -10,3 +10,10 @@ test("", () => {
   ];
   expect(parseText(text, tags));
 });
+
+test("", () => {
+  const text = "₍                ･ᴗ･                 ₎";
+  const tags: string[][] = [];
+  console.log(parseText(text, tags));
+  expect(parseText(text, tags));
+});

@@ -20,7 +20,7 @@
     if (content === undefined) {
       return undefined;
     }
-    console.log(content);
+    // console.log(content);
     try {
       const decoded: nip19.DecodeResult = nip19.decode(content);
       if (decoded.type === "naddr") {
@@ -56,14 +56,14 @@
       {/await}
     {:else if part.type === "url"}
       <a
-        class="underline text-magnum-400 break-all"
+        class="underline text-magnum-300 break-all"
         href={part.content}
         target="_blank"
         rel="noopener noreferrer">{part.content}</a
       >
     {:else}
       <span
-        class="whitespace-pre-line break-words word"
+        class="whitespace-pre-wrap break-words word"
         style="word-break: break-word;">{part.content}</span
       >
     {/if}

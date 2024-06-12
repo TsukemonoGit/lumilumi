@@ -25,3 +25,28 @@ export function calculateColor(hex: string): string {
 
   return `rgb(${r},${g},${b})`;
 }
+
+export function formatAbsoluteDate(unixTime: number): string {
+  const date = new Date(unixTime * 1000);
+  const now = new Date();
+
+  const sameYear = date.getFullYear() === now.getFullYear();
+  const sameMonth = sameYear && date.getMonth() === now.getMonth();
+  const sameDay = sameMonth && date.getDate() === now.getDate();
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+
+  if (!sameDay) {
+    options.month = "2-digit";
+    options.day = "2-digit";
+  }
+
+  if (!sameYear) {
+    options.year = "numeric";
+  }
+
+  return date.toLocaleString([], options);
+}
