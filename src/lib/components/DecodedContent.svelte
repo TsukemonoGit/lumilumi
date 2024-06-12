@@ -27,13 +27,13 @@
 </script>
 
 {#if decoded.type === "npub"}
-  <span class="text-sm text-neutral-500 flex">
+  <span class="text-sm text-neutral-500 flex-inline">
     <UserName pubhex={decoded.data} />
   </span>
 {:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data.id} /><Quote
+    <Note id={decoded.data.id} mini={true} /><Quote
       size="16"
       class="text-magnum-500 fill-magnum-600"
     />
@@ -41,7 +41,7 @@
 {:else if decoded.type === "note"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data} /><Quote
+    <Note id={decoded.data} mini={true} /><Quote
       size="16"
       class="text-magnum-500 fill-magnum-600"
     />

@@ -55,21 +55,17 @@
         {/if}
       {/await}
     {:else if part.type === "url"}
-      <a href={part.content} target="_blank" rel="noopener noreferrer"
-        >{part.content}</a
+      <a
+        class="underline text-magnum-400 break-all"
+        href={part.content}
+        target="_blank"
+        rel="noopener noreferrer">{part.content}</a
       >
     {:else}
-      <span>{part.content}</span>
+      <span
+        class="whitespace-pre-line break-words word"
+        style="word-break: break-word;">{part.content}</span
+      >
     {/if}
   {/each}
 </div>
-
-<style>
-  span {
-    /* スパンのスタイルを必要に応じて追加 */
-  }
-  a {
-    color: blue;
-    text-decoration: underline;
-  }
-</style>

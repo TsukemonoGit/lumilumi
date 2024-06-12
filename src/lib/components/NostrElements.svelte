@@ -57,7 +57,7 @@
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
-    <div class="container break-all break-words overflow-x-hidden">
+    <div class="container break-words overflow-x-hidden">
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}
         {pubkey}
@@ -95,11 +95,9 @@
             <p>{error}</p>
           </div>
 
-          <div
-            class="max-w-[100vw] break-all break-words box-border overflow-x-clip"
-          >
+          <div class="max-w-[100vw] break-words box-border overflow-x-clip">
             {#each sorted(events) as event (event.id)}<div
-                class="max-w-[100vw] break-all break-words whitespace-pre-line m-1 box-border overflow-x-clip"
+                class="max-w-[100vw] break-words whitespace-pre-line m-1 box-border overflow-x-clip"
               >
                 <Metadata
                   queryKey={["metadata", event.pubkey]}

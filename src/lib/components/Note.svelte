@@ -4,6 +4,7 @@
   import { nip19 } from "nostr-tools";
   import EventCard from "./EventCard.svelte";
   export let id: string;
+  export let mini: boolean = false;
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
@@ -22,14 +23,14 @@
     let:metadata
   >
     <div slot="loading">
-      <EventCard note={text} />
+      <EventCard note={text} {mini} />
     </div>
     <div slot="nodata">
-      <EventCard note={text} />
+      <EventCard note={text} {mini} />
     </div>
     <div slot="error" let:error>
-      <EventCard note={text} />
+      <EventCard note={text} {mini} />
     </div>
-    <EventCard note={text} {metadata} />
+    <EventCard note={text} {metadata} {mini} />
   </Metadata>
 </Text>

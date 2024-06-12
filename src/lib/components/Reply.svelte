@@ -24,7 +24,7 @@
         on:click={() => (loadNote = true)}><Reply size="20" />replied</button
       >
     {:else}
-      <Note id={replyID} />
+      <Note id={replyID} mini={true} />
     {/if}
   {/if}
 </div>

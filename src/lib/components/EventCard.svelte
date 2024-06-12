@@ -13,6 +13,7 @@
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
+  export let mini: boolean = false;
   import Avatar from "svelte-boring-avatars";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
@@ -70,10 +71,10 @@
 
 <div class="rounded-md border {noteClass()} ">
   {#if note.kind === 1}
-    <div class="grid grid-cols-[auto_1fr]">
+    <div class={"grid grid-cols-[auto_1fr]"}>
       <div class="p-1">
         <Avatar
-          size={40}
+          size={mini ? 20 : 40}
           name={note.pubkey}
           variant="beam"
           colors={splitHexColorString(note.pubkey)}
@@ -98,15 +99,15 @@
           {/if}
         {/await}
         {#await checkContentWarning(note.tags) then tag}
-          <div class="relative">
+          <div class="relative max-h-64 overflow-y-auto">
             <Content text={note.content} tags={note.tags} />
             {#if tag}
-              <div class=" absolute top-0 left-0 w-full h-full flex">
+              <div class="absolute top-0 left-0 w-full h-full flex">
                 <div
-                  class="scale-150 rounded-sm resizable ml-auto mt-auto mr-1 mb-1 w-full h-full max-w-[80%] max-h-[80%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
+                  class="rounded-sm resizable ml-auto mt-auto w-full h-full max-h-[100%] flex resize bg-magnum-600 z-20 overflow-hidden rotate-180"
                 >
                   <div
-                    class="scale-50 flex flex-auto justify-center content-center items-center w-hull -rotate-180"
+                    class=" flex flex-auto justify-center items-center w-hull -rotate-180"
                   >
                     <TriangleAlert
                       size="20"
@@ -120,26 +121,6 @@
               </div>
             {/if}
           </div>
-          <!-- {#if tag}
-        {note.content.slice(0, loadWarning)}
-        <div class="flex gap-2">
-          {#if loadWarning < note.content.length}<button
-              class="brerak-all flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
-              on:click={() =>
-                (loadWarning = Math.min(loadWarning + 5, note.content.length))}
-              ><TriangleAlert size="20" />{tag[1] ?? "warning"}</button
-            >{/if}
-          {#if loadWarning > 0}
-            <button
-              class="brerak-all flex items-center w-fit px-2 rounded-md bg-magnum-400 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
-              on:click={() => (loadWarning = Math.max(loadWarning - 5, 0))}
-              >hide warning</button
-            >
-          {/if}
-        </div>
-      {:else}
-        {note.content}
-      {/if} -->
         {/await}
         <NoteActionButtons {note} />
       </div>
@@ -156,16 +137,18 @@
           colors={splitHexColorString(note.pubkey)}
         />
       </div>
-      {#if metadata}
-        {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-          class="text-neutral-500 text-sm mt-auto"
-          >@{profile(metadata)?.name}</span
-        >
-      {:else}
-        <span class="text-neutral-500 text-sm"
-          >@{nip19.npubEncode(note.pubkey)}</span
-        >
-      {/if}
+      <div class="break-all break-words whitespace-pre-line">
+        {#if metadata}
+          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+            class="text-neutral-500 text-sm mt-auto"
+            >@{profile(metadata)?.name}</span
+          >
+        {:else}
+          <span class="text-neutral-500 text-sm"
+            >@{nip19.npubEncode(note.pubkey)}</span
+          >
+        {/if}
+      </div>
       <div class="ml-auto mr-2">
         <NoteActionButtons {note} />
       </div>
@@ -188,16 +171,18 @@
           colors={splitHexColorString(note.pubkey)}
         />
       </div>
-      {#if metadata}
-        {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-          class="text-neutral-500 text-sm mt-auto"
-          >@{profile(metadata)?.name}</span
-        >
-      {:else}
-        <span class="text-neutral-500 text-sm"
-          >@{nip19.npubEncode(note.pubkey)}</span
-        >
-      {/if}
+      <div class="break-all break-words whitespace-pre-line">
+        {#if metadata}
+          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+            class="text-neutral-500 text-sm mt-auto"
+            >@{profile(metadata)?.name}</span
+          >
+        {:else}
+          <span class="text-neutral-500 text-sm"
+            >@{nip19.npubEncode(note.pubkey)}</span
+          >
+        {/if}
+      </div>
       <div class="ml-auto mr-2">
         <NoteActionButtons {note} />
       </div>
