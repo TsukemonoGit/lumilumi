@@ -91,7 +91,7 @@
     &:not(.dark) {
       --color-magnum-50: 65 28 9;
       --color-magnum-100: 121 58 21;
-      --color-magnum-200: 150 69 22 252;
+      --color-magnum-200: 150 69 22;
       --color-magnum-300: 189 87 17;
       --color-magnum-400: 228 115 18;
       --color-magnum-500: 243 141 28;

@@ -15,7 +15,7 @@
   });
 
   // $: bgColor = `bg-magnum-600/${$value}`;
-  $: bgColor = `rgba(249, 201, 120, ${1 - $value[0] / 100})`;
+  // $: bgColor = `rgba(249, 201, 120, ${1 - $value[0] / 100})`;
 </script>
 
 <div
@@ -29,14 +29,14 @@
 </div>
 <span
   use:melt={$root}
-  class="relative flex h-[24px] w-full items-center overflow-hidden"
+  class="relative flex h-[24px] w-[95%] mx-auto items-center"
 >
-  <span class="h-[3px] w-full bg-black/40">
-    <span use:melt={$range} class="h-[3px] bg-white" />
+  <span class="h-[3px] w-full bg-magnum-100/40">
+    <span use:melt={$range} class="h-[3px] bg-neutral-900/80" />
   </span>
 
   <span
     use:melt={$thumbs[0]}
-    class="h-5 w-5 rounded-full bg-white focus:ring-4 focus:!ring-black/40"
+    class="h-5 w-5 rounded-full bg-magnum-950 focus:ring-4 focus:!ring-magnum-300/40"
   />
 </span>

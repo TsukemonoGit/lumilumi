@@ -121,7 +121,7 @@
             {/if}
           </div>
         {/await}
-        <NoteActionButtons {note} />
+        <NoteActionButtons {note} {metadata} />
       </div>
     </div>
   {:else if note.kind === 6 || note.kind === 16}
@@ -149,7 +149,7 @@
         {/if}
       </div>
       <div class="ml-auto mr-2">
-        <NoteActionButtons {note} />
+        <NoteActionButtons {note} {metadata} />
       </div>
     </div>
     <hr />
@@ -183,7 +183,7 @@
         {/if}
       </div>
       <div class="ml-auto">
-        <NoteActionButtons {note} />
+        <NoteActionButtons {note} {metadata} />
       </div>
     </div>
     <hr />
@@ -201,7 +201,7 @@
     {note.tags}
     <hr />
     <Content text={note.content} tags={note.tags} />
-    <NoteActionButtons {note} />
+    <NoteActionButtons {note} {metadata} />
   {/if}
 </div>
 

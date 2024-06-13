@@ -27,7 +27,7 @@
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
-
+  export let metadata: Nostr.Event | undefined = undefined;
   let dialogOpen: any;
   const menuTexts = [
     { text: "View Json", icon: FileJson2 },
@@ -310,10 +310,18 @@
   <div slot="main">
     <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
     <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh]"
+      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
     >
       {JSON.stringify(note, null, 2)}
     </div>
+    {#if metadata}
+      <h2 class="m-0 text-lg font-medium">METADATA</h2>
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      >
+        {JSON.stringify(metadata, null, 2)}
+      </div>
+    {/if}
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     {getRelaysById(note.id)}
   </div></Dialog
