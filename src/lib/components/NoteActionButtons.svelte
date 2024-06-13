@@ -24,7 +24,7 @@
   import Metadata from "./NostrMainData/Metadata.svelte";
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
-  import punycode from "punycode/";
+  import punycode from "punycode/punycode.js";
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
   export let metadata: Nostr.Event | undefined = undefined;
