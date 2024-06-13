@@ -68,7 +68,7 @@
         <img
           alt="img"
           src={part.content}
-          class="max-w-full max-h-42 object-contain"
+          class="max-w-full w-80 max-h-42 object-contain"
         />
       {:else if $showImg && movieRegex.test(part.content)}
         <video controls src={part.content}>
