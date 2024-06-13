@@ -170,7 +170,7 @@
         <NoteActionButtons {note} {metadata} />
       </div>
     </div>
-    <hr />
+
     {#await repostedId(note.tags) then { kind, tag }}
       {#if tag}
         <RepostedNote {tag} {kind} />
@@ -212,7 +212,7 @@
         <NoteActionButtons {note} {metadata} />
       </div>
     </div>
-    <hr />
+
     {#await repostedId(note.tags) then { kind, tag }}
       {#if tag}
         <RepostedNote {tag} {kind} />
