@@ -3,7 +3,7 @@
   import { createPopover, createSync, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  let open = false;
+  export let open = false;
   export let note;
   const {
     elements: { trigger, content, arrow, close },

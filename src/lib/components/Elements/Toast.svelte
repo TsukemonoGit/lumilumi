@@ -13,7 +13,6 @@
     actions: { portal },
   } = createToaster<ToastData>();
 
-  $: console.log($toastSettings);
   $: if ($toastSettings) {
     addToast({
       data: $toastSettings,

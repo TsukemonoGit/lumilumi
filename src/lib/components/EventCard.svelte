@@ -87,12 +87,12 @@
         <div class="flex flex-wrap align-middle">
           {#if metadata}
             {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-neutral-500 text-sm mt-auto mb-auto ml-1"
+              class="text-magnum-100 text-sm mt-auto mb-auto ml-1"
             >
               @{profile(metadata)?.name}</span
             >
           {:else}
-            <span class="text-neutral-500 text-sm mt-auto mb-auto break-all">
+            <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">
               @{nip19.npubEncode(note.pubkey)}</span
             >
           {/if}
@@ -139,11 +139,11 @@
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-neutral-500 text-sm mt-auto"
+            class="text-magnum-100 text-sm mt-auto"
             >@{profile(metadata)?.name}</span
           >
         {:else}
-          <span class="text-neutral-500 text-sm"
+          <span class="text-magnum-100 text-sm"
             >@{nip19.npubEncode(note.pubkey)}</span
           >
         {/if}
@@ -173,11 +173,11 @@
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-neutral-500 text-sm mt-auto"
+            class="text-magnum-100 text-sm mt-auto"
             >@{profile(metadata)?.name}</span
           >
         {:else}
-          <span class="text-neutral-500 text-sm"
+          <span class="text-magnum-100 text-sm"
             >@{nip19.npubEncode(note.pubkey)}</span
           >
         {/if}
