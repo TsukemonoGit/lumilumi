@@ -6,11 +6,12 @@
   import { getMetadataFromLocalStorage, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
-
+  import { pwaAssetsHead } from "virtual:pwa-assets/head";
   import { setTheme } from "$lib/func/settings";
   import type { Theme } from "$lib/types";
   import Toast from "$lib/components/Elements/Toast.svelte";
-
+  import { pwaInfo } from "virtual:pwa-info";
+  $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
     // make sure this is called before any
     // window.nostr calls are made
@@ -29,6 +30,16 @@
     }
   });
 </script>
+
+<svelte:head>
+  {@html webManifestLink}
+  {#if pwaAssetsHead.themeColor}
+    <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
+  {/if}
+  {#each pwaAssetsHead.links as link}
+    <link {...link} />
+  {/each}
+</svelte:head>
 
 <Header />
 <Toast />

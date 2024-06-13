@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>Setting</title>
+  <title>lumilumi-Setting</title>
   <meta name="description" content="Lumi Setting" />
 </svelte:head>
 <Settings />

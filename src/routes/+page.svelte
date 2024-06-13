@@ -32,8 +32,8 @@
 </script>
 
 <svelte:head>
-  <title>Home</title>
-  <meta name="description" content="lumilumi" />
+  <title>Lumilumi-Home</title>
+  <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 
 <section>

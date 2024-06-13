@@ -46,10 +46,6 @@
   };
 </script>
 
-<svelte:head>
-  <title>timeline | nosvelte</title>
-</svelte:head>
-
 <h1 class="text-5xl text-orange-600">timeline</h1>
 
 <NostrMain let:pubkey let:localRelays>

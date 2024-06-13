@@ -7,7 +7,8 @@
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest"
+		"test": "vitest",
+		"generate-pwa-assets": "pwa-assets-generator"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^5.0.13",
@@ -21,6 +22,8 @@
 		"@testing-library/svelte": "^5.1.0",
 		"@types/punycode": "^2.1.4",
 		"@types/ws": "^8.5.10",
+		"@vite-pwa/assets-generator": "^0.2.4",
+		"@vite-pwa/sveltekit": "^0.5.0",
 		"autoprefixer": "^10.4.19",
 		"postcss": "^8.4.38",
 		"svelte": "^4.2.18",
