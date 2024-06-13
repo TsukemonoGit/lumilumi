@@ -55,7 +55,7 @@
   };
 </script>
 
-<div class="!leading-none">
+<div class="">
   {#each parts as part}
     {#if part.type === "nip19"}
       {#await nip19Decode(part.content) then decoded}
@@ -86,7 +86,7 @@
         <img
           alt={part.content}
           src={part.url}
-          class="inline h-6 object-contain"
+          class="inline h-8 object-contain"
         />
       {:else}
         :{part.content}:
