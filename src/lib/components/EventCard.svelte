@@ -93,13 +93,14 @@
         {/if}
       </div>
       <div>
-        <div class="flex flex-wrap align-middle">
+        <div class="flex align-middle">
           {#if metadata}
-            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-magnum-100 text-sm mt-auto mb-auto ml-1"
-            >
-              @{profile(metadata)?.name}</span
-            >
+            <div>
+              {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+                class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
+                >@{profile(metadata)?.name}</span
+              >
+            </div>
           {:else}
             <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">
               @{nip19.npubEncode(note.pubkey)}</span
@@ -121,7 +122,7 @@
         {/await}
         {#await checkContentWarning(note.tags) then tag}
           <div class="relative">
-            <div class=" max-h-64 overflow-y-auto">
+            <div class=" max-h-72 overflow-y-auto">
               <Content text={note.content} tags={note.tags} />
             </div>
             {#if tag}

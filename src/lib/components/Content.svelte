@@ -2,9 +2,14 @@
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
+  import { showImg } from "$lib/stores/stores";
 
   export let text: string;
   export let tags: string[][];
+  /** ImageFile_Check_正規表現_パターン */
+  const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
+  //movie
+  const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
   const parts = parseText(text, tags);
 
@@ -54,13 +59,24 @@
           <DecodedContent {decoded} />
         {/if}
       {/await}
-    {:else if part.type === "url"}
-      <a
-        class="underline text-magnum-300 break-all"
-        href={part.content}
-        target="_blank"
-        rel="noopener noreferrer">{part.content}</a
-      >
+    {:else if part.type === "url" && part.content}
+      {#if $showImg && imageRegex.test(part.content)}
+        <img
+          alt="img"
+          src={part.content}
+          class="max-w-full max-h-42 object-contain"
+        />
+      {:else if $showImg && movieRegex.test(part.content)}
+        <video controls src={part.content}>
+          <track default kind="captions" />
+        </video>
+      {:else}
+        <a
+          class="underline text-magnum-300 break-all"
+          href={part.content}
+          target="_blank"
+          rel="noopener noreferrer">{part.content}</a
+        >{/if}
     {:else}
       <span
         class="whitespace-pre-wrap break-words word"
