@@ -50,7 +50,7 @@ let savedMetadata: [QueryKey, unknown][] = [];
 let followingList: string[] = [];
 
 let metadataChanged = false;
-
+//metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
   if (followingList.length > 0) {
     while (queue.length > 0) {

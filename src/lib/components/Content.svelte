@@ -11,7 +11,11 @@
   //movie
   const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
-  const parts = parseText(text, tags);
+  const parts: {
+    type: string;
+    content: string | undefined;
+    url?: string | undefined;
+  }[] = parseText(text, tags);
 
   const nip19Decode = (
     content: string | undefined
@@ -51,7 +55,7 @@
   };
 </script>
 
-<div>
+<div class="!leading-none">
   {#each parts as part}
     {#if part.type === "nip19"}
       {#await nip19Decode(part.content) then decoded}
@@ -77,6 +81,16 @@
           target="_blank"
           rel="noopener noreferrer">{part.content}</a
         >{/if}
+    {:else if part.type === "emoji"}
+      {#if $showImg}
+        <img
+          alt={part.content}
+          src={part.url}
+          class="inline h-6 object-contain"
+        />
+      {:else}
+        :{part.content}:
+      {/if}
     {:else}
       <span
         class="whitespace-pre-wrap break-words word"
