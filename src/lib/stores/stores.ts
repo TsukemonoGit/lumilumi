@@ -1,8 +1,13 @@
-import { QueryClient, type QueryClientConfig } from "@tanstack/svelte-query";
+import {
+  QueryClient,
+  type QueryClientConfig,
+  type QueryKey,
+} from "@tanstack/svelte-query";
 import { get, writable } from "svelte/store";
 import { type RxNostr, createRxNostr, type EventPacket } from "rx-nostr";
 
 import * as Nostr from "nostr-typedef";
+
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -14,29 +19,10 @@ const config: QueryClientConfig = {
     },
   },
 };
+export const metadataQueue = writable<[QueryKey, EventPacket][]>([]);
 export const queryClient = writable(new QueryClient(config));
 
 export const app = writable<{ rxNostr: RxNostr }>();
-// localStorageからメタデータを取得する関数
-export const getMetadataFromLocalStorage = (): void => {
-  const metadataStr = localStorage.getItem("metadata");
-  if (!metadataStr) {
-    return;
-  }
-
-  const metadata = JSON.parse(metadataStr);
-  // console.log(metadata);
-  Object.keys(metadata).forEach((pubkey) => {
-    //  console.log(metadata[pubkey]);
-
-    get(queryClient).setQueriesData(
-      { queryKey: ["metadata", pubkey] },
-      metadata[pubkey]
-    );
-  });
-
-  // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
-};
 
 export const toastSettings = writable<{
   title: string;

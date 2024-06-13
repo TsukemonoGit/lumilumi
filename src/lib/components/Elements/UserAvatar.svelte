@@ -22,7 +22,7 @@
   />
   <span
     use:melt={$fallback}
-    class="text-sm font-medium text-magnum-700 overflow-hidden h-full w-full"
+    class="text-sm font-medium text-magnum-100 overflow-hidden h-full w-full"
     >{name}</span
   >
 </div>

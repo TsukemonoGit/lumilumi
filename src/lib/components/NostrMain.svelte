@@ -11,7 +11,7 @@
   import type { LumiSetting } from "$lib/types";
 
   const STORAGE_KEY = "lumiSetting";
-  const STORAGE_METADATA = "metadata";
+
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
   let loading = true; // ローディング状態を追跡する変数を追加
@@ -19,7 +19,7 @@
   onMount(() => {
     initializeRxNostr();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
-    setMetadata();
+
     if (savedSettings) {
       applySavedSettings(savedSettings);
     } else {
@@ -27,12 +27,7 @@
     }
     loading = false; // 初期化処理が完了したらローディングを終了
   });
-  function setMetadata() {
-    const savedData = localStorage.getItem(STORAGE_METADATA);
-    if (savedData) {
-      setSavedMetadata(JSON.parse(savedData));
-    }
-  }
+
   function initializeRxNostr() {
     if (!$app?.rxNostr) {
       setRxNostr();

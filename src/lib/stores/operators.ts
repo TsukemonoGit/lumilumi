@@ -6,10 +6,12 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
-import { filter, map, pipe, scan } from "rxjs";
-import { loginUser, queryClient, reactions } from "./stores";
+import { filter, map, pipe, scan, tap } from "rxjs";
+import { loginUser, metadataQueue, queryClient, reactions } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
+import type { QueryKey } from "@tanstack/svelte-query";
+
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
@@ -113,4 +115,14 @@ export function scanLatestEach<A, K>(f: (a: A) => K): OperatorFunction<A, A[]> {
       Array.from(dict.entries()).map(([, value]) => value.slice(-1)[0])
     )
   );
+}
+
+export function metadata(
+  queryKey: QueryKey
+): OperatorFunction<EventPacket, EventPacket> {
+  return tap((event: EventPacket) => {
+    if (queryKey[0] === "metadata") {
+      metadataQueue.update((queue) => [...queue, [queryKey, event]]);
+    }
+  });
 }

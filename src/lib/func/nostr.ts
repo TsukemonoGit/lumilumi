@@ -4,7 +4,7 @@
  * @license This code is a derivative work based on code licensed under the Apache License, Version 2.0.
  */
 
-import { app } from "$lib/stores/stores";
+import { app, metadataQueue, queryClient } from "$lib/stores/stores";
 import type { UseReqOpts, ReqResult, RxReqBase, ReqStatus } from "$lib/types";
 import {
   useQueryClient,
@@ -27,6 +27,7 @@ import {
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
+import { metadata } from "$lib/stores/operators";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -44,26 +45,81 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   rxNostr.setDefaultRelays(relays);
 }
 
-let savedMetadata: [QueryKey, unknown][];
-let followingList: string[];
+// metadataの保存
+let savedMetadata: [QueryKey, unknown][] = [];
+let followingList: string[] = [];
+
+let metadataChanged = false;
+
+metadataQueue.subscribe((queue) => {
+  if (followingList.length > 0) {
+    while (queue.length > 0) {
+      const [key, data] = queue.shift()!;
+      saveMetadataToLocalStorage(key, data);
+    }
+    if (metadataChanged) {
+      localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
+      metadataChanged = false;
+    }
+  }
+});
+
 export function setSavedMetadata(data: [QueryKey, unknown][]) {
-  //nostrMainで呼び出してセット
+  // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
   savedMetadata = data;
 }
+
 export function setFollowingList(data: string[]) {
   followingList = data;
-  //console.log(followingList);
+  // console.log(followingList);
 }
-// メタデータをlocalStorageに保存する関数
+
 const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
   if (
-    !savedMetadata.find(([savedKey]) => savedKey === key) &&
-    !followingList.find((pubkey) => pubkey === data.event.pubkey)
+    !savedMetadata.some(
+      ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
+    ) && // まだ保存してない人
+    followingList.includes(data.event.pubkey) // フォローしてる人
   ) {
     savedMetadata.push([key, data]);
-    localStorage.setItem("metadata", JSON.stringify(savedMetadata));
+    metadataChanged = true;
   }
 };
+
+export const getMetadataFromLocalStorage = (): void => {
+  const metadataStr = localStorage.getItem("metadata");
+  if (!metadataStr) {
+    return;
+  }
+
+  const metadata = JSON.parse(metadataStr);
+  setSavedMetadata(metadata);
+  // console.log(metadata);
+  Object.keys(metadata).forEach((pubkey) => {
+    //  console.log(metadata[pubkey]);
+
+    get(queryClient).setQueriesData(
+      { queryKey: ["metadata", pubkey] },
+      metadata[pubkey]
+    );
+  });
+
+  // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
+};
+// const processMetadataQueue = () => {
+//   while (get(metadataQueue).length > 0) {
+//     const [key, data] = get(metadataQueue).shift()!;
+//     saveMetadataToLocalStorage(key, data);
+//   }
+//   if (metadataChanged) {
+//     localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
+//     metadataChanged = false;
+//   }
+// };
+
+// Set an interval to process the queue periodically
+//setInterval(processMetadataQueue, 1000);
+
 //すでにそのキーの値があったらスルー
 //また、フォロイーセットに含まれないpubkeyの場合もスルーする
 // // unknownがnullでないもののみをフィルタリング
@@ -120,7 +176,7 @@ export function useReq(
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relay })
-    .pipe(tie, operator);
+    .pipe(tie, metadata(queryKey), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
@@ -132,11 +188,6 @@ export function useReq(
             //console.log(v);
             if (fulfilled) {
               queryClient.setQueryData(queryKey, v);
-
-              // metadataの場合はローカルストレージに保存
-              if (queryKey[0] === "metadata" && v) {
-                saveMetadataToLocalStorage(queryKey, v as EventPacket);
-              }
             } else {
               resolve(v);
               fulfilled = true;

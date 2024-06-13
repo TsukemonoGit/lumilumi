@@ -122,7 +122,7 @@
         {/await}
         {#await checkContentWarning(note.tags) then tag}
           <div class="relative">
-            <div class=" max-h-72 overflow-y-auto">
+            <div class=" max-h-64 overflow-y-auto">
               <Content text={note.content} tags={note.tags} />
             </div>
             {#if tag}
