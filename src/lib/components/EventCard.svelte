@@ -6,7 +6,7 @@
   import Reaction from "./Reaction.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import Reply from "./Reply.svelte";
-  import { loginUser } from "$lib/stores/stores";
+  import { loginUser, showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtons.svelte";
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -18,6 +18,7 @@
   import WarningHide1 from "./Elements/WarningHide1.svelte";
   import WarningHide2 from "./Elements/WarningHide2.svelte";
   import { formatAbsoluteDate } from "$lib/func/util";
+  import UserAvatar from "./Elements/UserAvatar.svelte";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);
@@ -76,12 +77,20 @@
   {#if note.kind === 1}
     <div class={"grid grid-cols-[auto_1fr]"}>
       <div class="p-1">
-        <Avatar
-          size={mini ? 20 : 40}
-          name={note.pubkey}
-          variant="beam"
-          colors={splitHexColorString(note.pubkey)}
-        />
+        {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
+          <UserAvatar
+            url={profile(metadata)?.picture}
+            name={profile(metadata)?.name}
+            {mini}
+          />
+        {:else}
+          <Avatar
+            size={mini ? 20 : 40}
+            name={note.pubkey}
+            variant="beam"
+            colors={splitHexColorString(note.pubkey)}
+          />
+        {/if}
       </div>
       <div>
         <div class="flex flex-wrap align-middle">
@@ -129,12 +138,20 @@
     <div class="flex flex-wrap gap-1">
       <Repeat size="20" class=" mt-auto  stroke-magnum-500" />
       <div class="self-center">
-        <Avatar
-          size={20}
-          name={note.pubkey}
-          variant="beam"
-          colors={splitHexColorString(note.pubkey)}
-        />
+        {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
+          <UserAvatar
+            url={profile(metadata)?.picture}
+            name={profile(metadata)?.name}
+            mini={true}
+          />
+        {:else}
+          <Avatar
+            size={20}
+            name={note.pubkey}
+            variant="beam"
+            colors={splitHexColorString(note.pubkey)}
+          />
+        {/if}
       </div>
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -163,12 +180,20 @@
     <div class="flex gap-1">
       <div class="w-fit"><Reaction event={note} /></div>
       <div class="self-center">
-        <Avatar
-          size={20}
-          name={note.pubkey}
-          variant="beam"
-          colors={splitHexColorString(note.pubkey)}
-        />
+        {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
+          <UserAvatar
+            url={profile(metadata)?.picture}
+            name={profile(metadata)?.name}
+            mini={true}
+          />
+        {:else}
+          <Avatar
+            size={20}
+            name={note.pubkey}
+            variant="beam"
+            colors={splitHexColorString(note.pubkey)}
+          />
+        {/if}
       </div>
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}

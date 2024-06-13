@@ -41,11 +41,26 @@ export type ToastData = {
 };
 
 export interface Profile {
+  [key: string]: any;
   name?: string;
+  about?: string;
+  picture?: string;
+  nip05?: string;
   display_name?: string;
+  website?: string;
+  banner?: string;
+  bot?: boolean;
+  lud16?: string;
 }
 declare global {
   interface Window {
     nostr?: Nostr.Nip07.Nostr;
   }
+}
+
+export interface LumiSetting {
+  relays: DefaultRelayConfig[];
+  useRelaySet: string;
+  pubkey: string;
+  showImg?: boolean;
 }

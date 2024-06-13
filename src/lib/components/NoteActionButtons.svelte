@@ -25,6 +25,7 @@
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
   import punycode from "punycode/punycode.js";
+  import Reaction from "./Reaction.svelte";
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -113,21 +114,10 @@
   //     console.log($reaction);
   //   }
   // }
-  let reaction = "";
+
+  let reactionData: Nostr.Event<number> | undefined;
   reactions.subscribe((store) => {
-    const reactionData = store.get(note.id);
-    if (reactionData) {
-      const tmp = reactionData.content;
-      if (tmp === "+") {
-        reaction = "🧡";
-      } else if (tmp === "-") {
-        reaction = "👎️";
-      } else {
-        reaction = tmp;
-      }
-    } else {
-      reaction = "";
-    }
+    reactionData = store.get(note.id);
   });
   let replyText: string;
 
@@ -240,7 +230,7 @@
         <Repeat size="20" />
       </Popover>
       <!--リアクション-->
-      {#if !reaction || reaction === ""}
+      {#if reactionData === undefined}
         <button on:click={handleClickReaction}>
           <Heart
             size="20"
@@ -248,7 +238,7 @@
           />
         </button>
       {:else}
-        <div>{reaction}</div>
+        <Reaction event={reactionData} />
       {/if}
       <!--カスタムリアクション-->
       <Popover {note} bind:open>

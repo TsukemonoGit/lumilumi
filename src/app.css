@@ -215,3 +215,24 @@ input[type="text"] {
 hr {
   border-top: 1px solid rgb(var(--color-magnum-100) / 0.2);
 }
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+.rounded-checkbox {
+  width: 24px !important;
+  height: 24px !important;
+
+  border: 1px solid theme("colors.magnum.400");
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+.rounded-checkbox:checked {
+  appearance: auto;
+
+  accent-color: theme("colors.magnum.400");
+}

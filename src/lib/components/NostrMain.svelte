@@ -1,6 +1,6 @@
 <script lang="ts">
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import { app, loginUser, queryClient } from "$lib/stores/stores";
+  import { app, loginUser, queryClient, showImg } from "$lib/stores/stores";
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
@@ -8,8 +8,9 @@
   import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
+  import type { LumiSetting } from "$lib/types";
 
-  const STORAGE_KEY = "relaySettings";
+  const STORAGE_KEY = "lumiSetting";
   const STORAGE_METADATA = "metadata";
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
@@ -17,7 +18,7 @@
 
   onMount(() => {
     initializeRxNostr();
-    const savedSettings = loadSettingsFromLocalStorage();
+    const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
     setMetadata();
     if (savedSettings) {
       applySavedSettings(savedSettings);
@@ -38,21 +39,18 @@
     }
   }
 
-  function loadSettingsFromLocalStorage() {
+  function loadSettingsFromLocalStorage(): LumiSetting | null {
     const savedSettings = localStorage.getItem(STORAGE_KEY);
     //console.log(savedSettings);
-    return savedSettings ? JSON.parse(savedSettings) : null;
+    return savedSettings ? (JSON.parse(savedSettings) as LumiSetting) : null;
   }
 
-  function applySavedSettings(settings: {
-    relays: DefaultRelayConfig[];
-    useRelaySet: string;
-    pubkey: string;
-  }) {
+  function applySavedSettings(settings: LumiSetting) {
     const {
       relays: savedRelays,
       useRelaySet: savedRelaySet,
       pubkey: savedPubkey,
+      showImg: savedShowImg,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -64,6 +62,9 @@
     }
     pubkey = savedPubkey;
     $loginUser = pubkey;
+    if (savedShowImg) {
+      $showImg = savedShowImg;
+    }
   }
 
   //$: console.log($queryClient.getQueriesData(filter));

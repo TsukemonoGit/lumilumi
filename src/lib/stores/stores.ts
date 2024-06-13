@@ -46,3 +46,4 @@ export const toastSettings = writable<{
 
 export const loginUser = writable<string>();
 export const reactions = writable(new Map<string, Nostr.Event>());
+export const showImg = writable<boolean>(false);

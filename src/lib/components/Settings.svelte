@@ -6,15 +6,18 @@
 
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
-  import { toastSettings } from "$lib/stores/stores";
+  import { loginUser, showImg, toastSettings } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
+  import type { LumiSetting } from "$lib/types";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
-  const STORAGE_KEY = "relaySettings";
+  const STORAGE_KEY = "lumiSetting";
+  const Delete_STORAGE_KEY = "relaySettings";
   const radioGroupSelected = writable("0");
   const pubkey = writable("");
+  const _showImg = writable<boolean>(false);
   let relayInput: string = "";
 
   // ラジオボタン設定
@@ -42,16 +45,26 @@
 
   // ローカルストレージから設定を読み込む
   onMount(async () => {
-    const savedSettings = localStorage.getItem(STORAGE_KEY);
+    const deletesettings = localStorage.getItem(Delete_STORAGE_KEY);
+    let savedSettings = localStorage.getItem(STORAGE_KEY);
+    if (deletesettings) {
+      savedSettings = deletesettings;
+      localStorage.setItem(STORAGE_KEY, savedSettings);
+      localStorage.removeItem(Delete_STORAGE_KEY);
+    }
     if (savedSettings) {
       const {
         relays: savedRelays,
         useRelaySet: savedRelaySet,
         pubkey: savedPubkey,
-      } = JSON.parse(savedSettings);
+        showImg: savedShowImg,
+      }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
       pubkey.set(savedPubkey);
+      if (savedShowImg) {
+        _showImg.set(savedShowImg);
+      }
     } else {
       radioGroupSelected.set("0");
       try {
@@ -113,6 +126,7 @@
       relays: $relays,
       useRelaySet: $radioGroupSelected,
       pubkey: $pubkey,
+      showImg: $_showImg,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
@@ -121,16 +135,26 @@
       description: "設定が保存されました。",
       color: "bg-green-500",
     };
+    $loginUser = $pubkey;
+    $showImg = $_showImg;
   }
 
   function cancelSettings() {
     console.log("cansel");
     const savedSettings = localStorage.getItem(STORAGE_KEY);
     if (savedSettings) {
-      const { relays: savedRelays, useRelaySet: savedRelaySet } =
-        JSON.parse(savedSettings);
+      const {
+        relays: savedRelays,
+        useRelaySet: savedRelaySet,
+        pubkey: savedPubkey,
+        showImg: savedShowImg,
+      }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
+      pubkey.set(savedPubkey);
+      if (savedShowImg !== undefined) {
+        showImg.set(savedShowImg);
+      }
 
       $toastSettings = {
         title: "Warning",
@@ -147,79 +171,94 @@
     {nip19.npubEncode($pubkey)}
   </div>
   <!-- ラジオボタン -->
-  <div
-    use:melt={$radioGrouproot}
-    class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
-    aria-label="View density"
-  >
-    {#each optionsArr as option}
-      <div class="flex items-center gap-3">
-        <button
-          use:melt={$radioGroupitem(option)}
-          class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
-          id={option}
-          aria-labelledby="{option}-label"
-        >
-          {#if $radioGroupisChecked(option)}
-            <div class="h-3 w-3 rounded-full bg-magnum-500" />
-          {/if}
-        </button>
-        <label
-          class="font-medium capitalize leading-none cursor-pointer"
-          for={option}
-          id="{option}-label"
-        >
-          {optionsArrStr[Number(option)]}
-        </label>
-      </div>
-    {/each}
-    <input name="line-height" use:melt={$radioGrouphiddenInput} />
-  </div>
-
-  <!-- リレー設定 -->
-
-  {#if $radioGroupSelected === "1"}
-    <div class="w-fit ml-8">
-      {#each $relays as relay, index}
-        <hr />
-        <div class="flex gap-4 my-1">
-          <div>{relay.url}</div>
-          <label>
-            <input type="checkbox" bind:checked={relay.read} />
-            read
-          </label>
-          <label>
-            <input type="checkbox" bind:checked={relay.write} />
-            write
-          </label>
-          <button on:click={() => removeRelay(index)}>✕</button>
-        </div>
-        <hr />
-      {/each}
-
-      <div class="flex flex-col items-start justify-center my-2">
-        <div class="flex flex-row items-start justify-center">
-          <input
-            type="text"
-            id="relay"
-            class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-            placeholder="wss://"
-            bind:value={relayInput}
-          />
-
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">relay</div>
+    <div
+      use:melt={$radioGrouproot}
+      class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
+      aria-label="View density"
+    >
+      {#each optionsArr as option}
+        <div class="flex items-center gap-3">
           <button
-            class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-            on:click={addRelay}>Add</button
+            use:melt={$radioGroupitem(option)}
+            class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
+            id={option}
+            aria-labelledby="{option}-label"
           >
+            {#if $radioGroupisChecked(option)}
+              <div class="h-3 w-3 rounded-full bg-magnum-500" />
+            {/if}
+          </button>
+          <label
+            class="font-medium capitalize leading-none cursor-pointer"
+            for={option}
+            id="{option}-label"
+          >
+            {optionsArrStr[Number(option)]}
+          </label>
+        </div>
+      {/each}
+      <input name="line-height" use:melt={$radioGrouphiddenInput} />
+    </div>
+
+    <!-- リレー設定 -->
+
+    {#if $radioGroupSelected === "1"}
+      <div class="w-fit ml-8">
+        {#each $relays as relay, index}
+          <hr />
+          <div class="flex gap-4 my-1">
+            <div>{relay.url}</div>
+            <label>
+              <input type="checkbox" bind:checked={relay.read} />
+              read
+            </label>
+            <label>
+              <input type="checkbox" bind:checked={relay.write} />
+              write
+            </label>
+            <button on:click={() => removeRelay(index)}>✕</button>
+          </div>
+          <hr />
+        {/each}
+
+        <div class="flex flex-col items-start justify-center my-2">
+          <div class="flex flex-row items-start justify-center">
+            <input
+              type="text"
+              id="relay"
+              class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
+              placeholder="wss://"
+              bind:value={relayInput}
+            />
+
+            <button
+              class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+              on:click={addRelay}>Add</button
+            >
+          </div>
         </div>
       </div>
-    </div>
-  {/if}
-
-  <!------>
-
-  <ThemeSwitch />
-
+    {/if}
+  </div>
+  <!--- 表示設定 --->
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">display</div>
+    <label>
+      <input
+        type="checkbox"
+        class="rounded-checkbox"
+        bind:checked={$_showImg}
+      />
+      load and show image
+    </label>
+  </div>
+  <!-- Theme 設定 -->
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">theme</div>
+    <ThemeSwitch />
+  </div>
   <div class="flex flex-row items-start gap-4 mt-4">
     <button
       class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
