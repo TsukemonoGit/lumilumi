@@ -72,11 +72,18 @@ export function parseText(
       const matchingTag = tags.find(
         (tag) => tag[0] === "emoji" && tag[1] === emojiContent
       );
-      parts.push({
-        type: "emoji",
-        url: matchingTag ? matchingTag[2] : undefined,
-        content: emojiContent,
-      });
+      if (matchingTag) {
+        parts.push({
+          type: "emoji",
+          url: matchingTag ? matchingTag[2] : undefined,
+          content: emojiContent,
+        });
+      } else {
+        parts.push({
+          type: "text",
+          content: emojiMatch?.[0],
+        });
+      }
       remainingText = remainingText.slice(
         emojiIndex + (emojiMatch as RegExpMatchArray)[0].length
       );
