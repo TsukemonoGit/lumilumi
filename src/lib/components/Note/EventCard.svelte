@@ -232,12 +232,3 @@
     <NoteActionButtons {note} {metadata} />
   {/if}
 </div>
-
-<style>
-  .resizable {
-    /*  border: 1px solid rgba(255, 100, 100, 0.8);
-   box-shadow:
-      inset 1px 1px 2px rgba(255, 0, 100, 0.2),
-      inset -1px -1px 2px rgba(255, 0, 100, 0.2); */
-  }
-</style>

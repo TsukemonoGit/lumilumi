@@ -297,21 +297,19 @@
   </div>
   <!--- Emoji --->
   <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">douki</div>
-    <label>
-      Emoji
+    <div class=" text-magnum-200 font-bold text-lg">douki</div>
+    <div>
       <button
         class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={handleClickEmoji}>Emoji</button
-      >
-    </label>
-    <label>
-      Mute
+      ><span class="ml-2">最終更新日時：</span>
+    </div>
+    <div class="mt-2">
       <button
         class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={handleClickMute}>Mute</button
-      >
-    </label>
+      ><span class="ml-2">最終更新日時：</span>
+    </div>
   </div>
 
   <!-- Theme 設定 -->
