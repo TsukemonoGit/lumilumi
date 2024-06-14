@@ -170,7 +170,7 @@
       <CustomReaction {note} />
     {/if}
     <!--メニュー-->
-    <EllipsisMenu {note} />
+    <EllipsisMenu {note} profile={metadata} />
   </div>
 
   <!--replyWindow-->

@@ -14,14 +14,23 @@
   import { metadata } from "$lib/stores/operators";
   import Dialog from "./Elements/Dialog.svelte";
   export let note: Nostr.Event;
+  export let profile: Nostr.Event<number> | undefined;
   let dialogOpen: any;
 
-  const menuTexts = [
-    { text: "Copy EventID", icon: Copy, num: 3 },
-    { text: "View Json", icon: FileJson2, num: 0 },
-    { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
-    { text: "Google Translate", icon: Earth, num: 2 },
-  ];
+  const menuTexts = profile
+    ? [
+        { text: "Copy EventID", icon: Copy, num: 3 },
+        { text: "Copy Pubkey", icon: Copy, num: 4 },
+        { text: "View Json", icon: FileJson2, num: 0 },
+        { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
+        { text: "Google Translate", icon: Earth, num: 2 },
+      ]
+    : [
+        { text: "Copy EventID", icon: Copy, num: 3 },
+        { text: "View Json", icon: FileJson2, num: 0 },
+        { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
+        { text: "Google Translate", icon: Earth, num: 2 },
+      ];
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
@@ -56,6 +65,28 @@
         //Copy EventID
         try {
           await navigator.clipboard.writeText(nevent);
+          $toastSettings = {
+            title: "Success",
+            description: `Copied to clipboard`,
+            color: "bg-green-500",
+          };
+        } catch (error: any) {
+          console.error(error.message);
+          $toastSettings = {
+            title: "Warning",
+            description: "Failed to copy",
+            color: "bg-orange-500",
+          };
+        }
+      case 4:
+        //Copy Pubkey
+        if (!profile?.pubkey) {
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(
+            nip19.npubEncode(profile?.pubkey)
+          );
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
