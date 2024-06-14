@@ -63,4 +63,12 @@ export interface LumiSetting {
   useRelaySet: string;
   pubkey: string;
   showImg?: boolean;
+  emoji?: {
+    list: string[][];
+    updated: number; //最後に同期した日付
+  };
+  mute?: {
+    list: string[][];
+    updated: number; //最終同期日時};
+  };
 }

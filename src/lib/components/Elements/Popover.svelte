@@ -4,7 +4,7 @@
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
   export let open = false;
-  export let note;
+
   const {
     elements: { trigger, content, arrow, close },
     states,
@@ -57,6 +57,6 @@
   }
 
   .content {
-    @apply z-20 w-60 rounded-[4px] bg-neutral-800 p-5 shadow-sm;
+    @apply z-20 rounded-[4px] bg-neutral-800 p-2 shadow-md;
   }
 </style>

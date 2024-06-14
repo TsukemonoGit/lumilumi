@@ -1,4 +1,7 @@
+import { queryClient } from "$lib/stores/stores";
 import type { Theme, ToastData } from "$lib/types";
+import type { QueryKey } from "@tanstack/svelte-query";
+import { get } from "svelte/store";
 
 export function setTheme(theme: Theme) {
   if (
@@ -10,4 +13,12 @@ export function setTheme(theme: Theme) {
   } else {
     document.documentElement.classList.remove("dark");
   }
+}
+
+export function getMutelist(pubkey: string) {
+  const defaultRelay = get(queryClient).getQueryData([
+    "defaultRelay",
+    pubkey,
+  ] as QueryKey);
+  console.log(defaultRelay);
 }

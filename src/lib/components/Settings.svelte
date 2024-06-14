@@ -10,6 +10,7 @@
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
   import type { LumiSetting } from "$lib/types";
+  import { getMutelist } from "$lib/func/settings";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
@@ -82,7 +83,10 @@
 
   function addRelay() {
     if (!relayInput) return;
-    const input = relayInput.trim();
+    let input = relayInput.trim();
+    if (!input.endsWith("/")) {
+      input = input + "/";
+    }
     if (relayRegex.test(input)) {
       relays.update((current) => [
         ...current,
@@ -163,12 +167,49 @@
       };
     }
   }
+  const handleClickLogin = async () => {
+    try {
+      const gotPubkey = await (
+        window.nostr as Nostr.Nip07.Nostr
+      ).getPublicKey();
+      if (gotPubkey) {
+        pubkey.set(gotPubkey);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleClickEmoji = () => {};
+  const handleClickMute = async () => {
+    try {
+      const gotPubkey = await (
+        window.nostr as Nostr.Nip07.Nostr
+      ).getPublicKey();
+      if (gotPubkey) {
+        pubkey.set(gotPubkey);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    if ($pubkey === "") {
+      return;
+    }
+    await getMutelist($pubkey);
+  };
 </script>
 
 <div class="container flex flex-col gap-3">
   <div class="text-sm opacity-50 break-all">
-    <div>[pubkey]</div>
-    {nip19.npubEncode($pubkey)}
+    {#if $pubkey !== ""}
+      <div>[pubkey]</div>
+      {nip19.npubEncode($pubkey)}
+    {:else}
+      <button
+        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+        on:click={handleClickLogin}>Login</button
+      >
+    {/if}
   </div>
   <!-- ラジオボタン -->
   <div class="border border-magnum-500 rounded-md p-2">
@@ -254,6 +295,25 @@
       load and show image
     </label>
   </div>
+  <!--- Emoji --->
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">douki</div>
+    <label>
+      Emoji
+      <button
+        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+        on:click={handleClickEmoji}>Emoji</button
+      >
+    </label>
+    <label>
+      Mute
+      <button
+        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+        on:click={handleClickMute}>Mute</button
+      >
+    </label>
+  </div>
+
   <!-- Theme 設定 -->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">theme</div>

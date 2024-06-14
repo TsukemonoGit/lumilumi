@@ -1,5 +1,6 @@
 <script>
   import { page } from "$app/stores";
+  import RelayStatus from "$lib/components/RelayStatus.svelte";
   import logo from "$lib/images/favicon.svg";
   import github from "$lib/images/github.svg";
 </script>
@@ -24,12 +25,8 @@
       >
         <a href="/settings">Settings</a>
       </li>
-      <li
-        aria-current={$page.url.pathname.startsWith("/sverdle")
-          ? "page"
-          : undefined}
-      >
-        <a href="/sverdle">Sverdle</a>
+      <li>
+        <RelayStatus />
       </li>
     </ul>
     <svg viewBox="0 0 2 3" aria-hidden="true">

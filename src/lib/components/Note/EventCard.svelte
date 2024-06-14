@@ -1,13 +1,12 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
-  import { getRelaysById } from "$lib/func/nostr";
+
   import { Repeat2, TriangleAlert } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
-  import RepostedNote from "./RepostedNote.svelte";
-  import Reply from "./Reply.svelte";
+
   import { loginUser, showImg } from "$lib/stores/stores";
-  import NoteActionButtons from "./NoteActionButtons.svelte";
+
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
   export let note: Nostr.Event;
@@ -15,10 +14,13 @@
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
   import Avatar from "svelte-boring-avatars";
-  import WarningHide1 from "./Elements/WarningHide1.svelte";
-  import WarningHide2 from "./Elements/WarningHide2.svelte";
+  import WarningHide1 from "../Elements/WarningHide1.svelte";
+  import WarningHide2 from "../Elements/WarningHide2.svelte";
   import { formatAbsoluteDate } from "$lib/func/util";
-  import UserAvatar from "./Elements/UserAvatar.svelte";
+  import UserAvatar from "../Elements/UserAvatar.svelte";
+  import Reply from "./Reply.svelte";
+  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import RepostedNote from "./RepostedNote.svelte";
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);

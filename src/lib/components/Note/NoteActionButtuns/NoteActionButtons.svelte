@@ -2,20 +2,20 @@
   import { Repeat2, Heart, MessageSquare, X, Plus, Quote } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import Popover from "./Elements/Popover.svelte";
-  import DropdownMenu from "./Elements/DropdownMenu.svelte";
-  import Dialog from "./Elements/Dialog.svelte";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import { reactions, toastSettings } from "$lib/stores/stores";
-  import Metadata from "./NostrMainData/Metadata.svelte";
+
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
 
-  import Reaction from "./Reaction.svelte";
   import EllipsisMenu from "./EllipsisMenu.svelte";
   import CustomReaction from "./CustomReaction.svelte";
+  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import Reaction from "../Reaction.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
   export let metadata: Nostr.Event | undefined = undefined;

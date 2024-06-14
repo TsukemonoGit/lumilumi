@@ -1,9 +1,9 @@
 <script lang="ts">
+  import Popover from "$lib/components/Elements/Popover.svelte";
   import { publishEvent } from "$lib/func/nostr";
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import punycode from "punycode/punycode";
-  import Popover from "./Elements/Popover.svelte";
 
   export let note: Nostr.Event;
 
@@ -52,13 +52,13 @@
   };
 </script>
 
-<Popover {note} bind:open>
+<Popover bind:open>
   <SmilePlus size="20" />
   <div slot="popoverContent">
-    <div class="flex gap-1">
+    <div class="flex gap-1 pr-8 pl-2">
       <input
         type="text"
-        class="h-10 w-full rounded-md px-3 py-2 text-magnum-100 border
+        class="h-10 w-32 rounded-md px-3 py-2 text-magnum-100 border
              {customReactionError ? 'border-red-500' : 'border-neutral-900'}"
         bind:value={customReaction}
       />

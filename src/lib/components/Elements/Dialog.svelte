@@ -3,9 +3,7 @@
   /** Internal helpers */
 
   import { fade } from "svelte/transition";
-  import { X, SquarePen } from "lucide-svelte";
-  import * as Nostr from "nostr-typedef";
-  import { publishEvent } from "$lib/func/nostr";
+  import { X } from "lucide-svelte";
 
   const {
     elements: {

@@ -12,7 +12,7 @@
   import UniqueEventList from "./NostrMainData/UniqueEventList.svelte";
 
   import Metadata from "./NostrMainData/Metadata.svelte";
-  import EventCard from "./EventCard.svelte";
+  import EventCard from "./Note/EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
   import Reactions from "./NostrMainData/Reactions.svelte";

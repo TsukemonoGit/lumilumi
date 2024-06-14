@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Text from "./NostrMainData/Text.svelte";
-  import Metadata from "./NostrMainData/Metadata.svelte";
+  import Text from "../NostrMainData/Text.svelte";
+  import Metadata from "../NostrMainData/Metadata.svelte";
   import { nip19 } from "nostr-tools";
   import EventCard from "./EventCard.svelte";
   export let id: string;

@@ -7,12 +7,14 @@
     FileJson2,
     SquareArrowOutUpRight,
   } from "lucide-svelte";
-  import DropdownMenu from "./Elements/DropdownMenu.svelte";
+
   import * as Nostr from "nostr-typedef";
   import { getRelaysById } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import { metadata } from "$lib/stores/operators";
-  import Dialog from "./Elements/Dialog.svelte";
+  import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+
   export let note: Nostr.Event;
   export let profile: Nostr.Event<number> | undefined;
   let dialogOpen: any;
