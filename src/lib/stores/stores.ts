@@ -4,7 +4,12 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { get, writable } from "svelte/store";
-import { type RxNostr, createRxNostr, type EventPacket } from "rx-nostr";
+import {
+  type RxNostr,
+  createRxNostr,
+  type EventPacket,
+  type DefaultRelayConfig,
+} from "rx-nostr";
 
 import * as Nostr from "nostr-typedef";
 
@@ -33,3 +38,4 @@ export const toastSettings = writable<{
 export const loginUser = writable<string>();
 export const reactions = writable(new Map<string, Nostr.Event>());
 export const showImg = writable<boolean>(false);
+export const defaultRelays = writable();

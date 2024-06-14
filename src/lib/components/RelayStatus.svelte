@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { app } from "$lib/stores/stores";
+  import { app, defaultRelays } from "$lib/stores/stores";
   import { MoveUp, MoveDown, Circle } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
 
@@ -14,15 +14,11 @@
   // | "rejected"
   // | "terminated";
 
-  $: readRelays = $app?.rxNostr?.getDefaultRelays()
-    ? Object.values($app?.rxNostr?.getDefaultRelays()).filter(
-        (config) => config.read
-      )
+  $: readRelays = $defaultRelays
+    ? Object.values($defaultRelays).filter((config) => config.read)
     : [];
-  $: writeRelays = $app?.rxNostr?.getDefaultRelays()
-    ? Object.values($app?.rxNostr?.getDefaultRelays()).filter(
-        (config) => config.write
-      )
+  $: writeRelays = $defaultRelays
+    ? Object.values($defaultRelays).filter((config) => config.write)
     : [];
   let open: boolean;
 

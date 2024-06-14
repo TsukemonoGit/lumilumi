@@ -4,7 +4,12 @@
  * @license This code is a derivative work based on code licensed under the Apache License, Version 2.0.
  */
 
-import { app, metadataQueue, queryClient } from "$lib/stores/stores";
+import {
+  app,
+  defaultRelays,
+  metadataQueue,
+  queryClient,
+} from "$lib/stores/stores";
 import type { UseReqOpts, ReqResult, RxReqBase, ReqStatus } from "$lib/types";
 import {
   useQueryClient,
@@ -43,6 +48,7 @@ export function getRelaysById(id: string): string[] {
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   rxNostr.setDefaultRelays(relays);
+  defaultRelays.set(rxNostr.getDefaultRelays());
 }
 
 // metadataの保存
