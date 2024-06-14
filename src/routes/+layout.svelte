@@ -2,7 +2,7 @@
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
-  import { app } from "$lib/stores/stores";
+  import { app, queryClient } from "$lib/stores/stores";
   import { getMetadataFromLocalStorage, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
@@ -11,6 +11,7 @@
   import type { Theme } from "$lib/types";
   import Toast from "$lib/components/Elements/Toast.svelte";
   import { pwaInfo } from "virtual:pwa-info";
+  import { QueryClientProvider } from "@tanstack/svelte-query";
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
     // make sure this is called before any
@@ -40,19 +41,19 @@
     <link {...link} />
   {/each}
 </svelte:head>
+<QueryClientProvider client={$queryClient}>
+  <Header />
+  <Toast />
+  <main>
+    <slot />
+  </main>
 
-<Header />
-<Toast />
-<main>
-  <slot />
-</main>
-
-<footer>
-  <p>
-    visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
-  </p>
-</footer>
-
+  <footer>
+    <p>
+      visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
+    </p>
+  </footer>
+</QueryClientProvider>
 <!-- 
 <style>
   .app {

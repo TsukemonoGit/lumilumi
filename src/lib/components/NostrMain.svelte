@@ -65,15 +65,14 @@
   //$: console.log($queryClient.getQueriesData(filter));
 </script>
 
-<QueryClientProvider client={$queryClient}>
-  {#if loading}
-    <slot name="loading" />
-  {:else}
-    <slot {pubkey} {localRelays}>
-      <NostrElements />
-    </slot>
-  {/if}
-</QueryClientProvider>
+{#if loading}
+  <slot name="loading" />
+{:else}
+  <slot {pubkey} {localRelays}>
+    <NostrElements />
+  </slot>
+{/if}
+
 <div class="fixed right-auto bottom-5 z-10">
   <OpenPostWindow />
 </div>

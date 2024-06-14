@@ -1,16 +1,25 @@
 <script lang="ts">
-  import { getPublicKey, type DefaultRelayConfig } from "rx-nostr";
-  import { onMount } from "svelte";
-  import { writable } from "svelte/store";
+  import {
+    uniq,
+    verify,
+    type DefaultRelayConfig,
+    type EventPacket,
+  } from "rx-nostr";
+  import { getContext, onMount } from "svelte";
+  import { derived, writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
 
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
-  import { loginUser, showImg, toastSettings } from "$lib/stores/stores";
+  import { app, loginUser, showImg, toastSettings } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
   import type { LumiSetting } from "$lib/types";
-  import { getMutelist } from "$lib/func/settings";
+
+  //  import { promiseRelaySet } from "$lib/stores/promiseRelaySet";
+
+  import UpdateMuteList from "./UpdateMuteList.svelte";
+  import { setRxNostr } from "$lib/func/nostr";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
@@ -181,22 +190,6 @@
   };
 
   const handleClickEmoji = () => {};
-  const handleClickMute = async () => {
-    try {
-      const gotPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      ).getPublicKey();
-      if (gotPubkey) {
-        pubkey.set(gotPubkey);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    if ($pubkey === "") {
-      return;
-    }
-    await getMutelist($pubkey);
-  };
 </script>
 
 <div class="container flex flex-col gap-3">
@@ -299,15 +292,12 @@
   <div class="border border-magnum-500 rounded-md p-2">
     <div class=" text-magnum-200 font-bold text-lg">douki</div>
     <div>
-      <button
-        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickEmoji}>Emoji</button
-      ><span class="ml-2">最終更新日時：</span>
+      <UpdateMuteList bind:pubkey={$pubkey} />
     </div>
     <div class="mt-2">
       <button
         class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickMute}>Mute</button
+        on:click={() => handleClickEmoji()}>Emoji</button
       ><span class="ml-2">最終更新日時：</span>
     </div>
   </div>

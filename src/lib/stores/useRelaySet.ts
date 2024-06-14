@@ -16,7 +16,7 @@ import { setRelays, useReq } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
 import { app } from "./stores";
 import { scanArray } from "./operators";
-
+import * as Nostr from "nostr-typedef";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
@@ -45,11 +45,19 @@ function toRelaySet(
     return [];
   } else if (Array.isArray(value)) {
     let relay: DefaultRelayConfig[] = [];
+    let kind3: Nostr.Event;
+    let kind10002: Nostr.Event;
     value.forEach((packet) => {
       if (packet.event.kind === 3) {
-        relay = relay.concat(setRelaysByKind3(packet.event));
+        if (
+          !kind10002 &&
+          (!kind3 || packet.event.created_at > kind3.created_at)
+        )
+          relay = setRelaysByKind3(packet.event);
+        kind3 = packet.event;
       } else if (packet.event.kind === 10002) {
-        relay = relay.concat(setRelaysByKind10002(packet.event));
+        if (!kind10002 || packet.event.created_at > kind10002.created_at)
+          relay = setRelaysByKind10002(packet.event);
       }
     });
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）
@@ -67,7 +75,7 @@ function toRelaySet(
   }
 }
 
-function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
+export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
   console.log(event);
   try {
     const relayList: { [key: string]: { read: boolean; write: boolean } } =
@@ -83,7 +91,7 @@ function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
   }
 }
 
-function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
+export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
   console.log(event);
   try {
     const relayList: string[][] = event.tags;

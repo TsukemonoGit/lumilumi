@@ -149,7 +149,11 @@ export function useReq(
   }: UseReqOpts<EventPacket | EventPacket[]>,
   relay: string[] | undefined = undefined
 ): ReqResult<EventPacket | EventPacket[]> {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
+
+  if (!_queryClient) {
+    throw Error();
+  }
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("error");
@@ -193,7 +197,7 @@ export function useReq(
           next: (v: EventPacket | EventPacket[]) => {
             //console.log(v);
             if (fulfilled) {
-              queryClient.setQueryData(queryKey, v);
+              _queryClient.setQueryData(queryKey, v);
             } else {
               resolve(v);
               fulfilled = true;
