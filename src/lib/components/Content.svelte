@@ -71,7 +71,11 @@
           class="max-w-full w-80 max-h-42 object-contain"
         />
       {:else if $showImg && movieRegex.test(part.content)}
-        <video controls src={part.content}>
+        <video
+          controls
+          src={part.content}
+          class=" object-contain max-w-full w-80 max-h-42"
+        >
           <track default kind="captions" />
         </video>
       {:else}

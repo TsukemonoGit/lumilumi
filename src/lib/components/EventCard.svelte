@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
   import { getRelaysById } from "$lib/func/nostr";
-  import { Repeat, TriangleAlert } from "lucide-svelte";
+  import { Repeat2, TriangleAlert } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import Reply from "./Reply.svelte";
@@ -137,7 +137,7 @@
   {:else if note.kind === 6 || note.kind === 16}
     <!--リポスト-->
     <div class="flex flex-wrap gap-1">
-      <Repeat size="20" class=" mt-auto  stroke-magnum-500" />
+      <Repeat2 size="20" class=" mt-auto  stroke-magnum-500" />
       <div class="self-center">
         {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
           <UserAvatar
