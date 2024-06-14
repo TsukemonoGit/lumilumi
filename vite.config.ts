@@ -18,6 +18,7 @@ export default defineConfig({
         display: "standalone",
         theme_color: "#ffffff",
       },
+      registerType: "autoUpdate",
     }),
     //   {
     //   registerType: "autoUpdate",
