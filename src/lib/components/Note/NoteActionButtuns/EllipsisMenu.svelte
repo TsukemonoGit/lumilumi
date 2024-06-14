@@ -80,6 +80,7 @@
             color: "bg-orange-500",
           };
         }
+        break;
       case 4:
         //Copy Pubkey
         if (!profile?.pubkey) {
@@ -102,6 +103,7 @@
             color: "bg-orange-500",
           };
         }
+        break;
     }
   };
 </script>
