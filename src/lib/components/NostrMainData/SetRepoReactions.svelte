@@ -9,7 +9,8 @@
   export let req: RxReqBase | undefined = undefined;
   export let relays: DefaultRelayConfig[] | undefined = undefined;
   export let filters: Nostr.Filter[];
-  if (relays) {
+
+  $: if (relays) {
     rxNostr.setDefaultRelays(relays);
   }
 

@@ -433,7 +433,10 @@ export function useReq3({
   if (!_queryClient) {
     throw Error();
   }
-
+  console.log(rxNostr.getDefaultRelays());
+  if (Object.entries(rxNostr.getDefaultRelays()).length <= 0) {
+    rxNostr.setDefaultRelays(get(app).rxNostr.getDefaultRelays());
+  }
   let _req:
     | RxReqBase
     | (RxReq<"backward"> & {
@@ -466,7 +469,7 @@ export function useReq3({
 
         obs.subscribe({
           next: (v: EventPacket) => {
-            console.log(v);
+            console.log("[packet]", v);
             if (fulfilled) {
               if (v.event.kind === 7) {
                 _queryClient.setQueryData(["reaction", v.event.id], v);
