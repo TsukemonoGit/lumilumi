@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    uniq,
-    verify,
-    type DefaultRelayConfig,
-    type EventPacket,
-  } from "rx-nostr";
+  import { type DefaultRelayConfig } from "rx-nostr";
   import { getContext, onMount } from "svelte";
   import { derived, writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
@@ -18,8 +13,9 @@
 
   //  import { promiseRelaySet } from "$lib/stores/promiseRelaySet";
 
+  import type { MuteList } from "$lib/types";
+  import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { setRxNostr } from "$lib/func/nostr";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
@@ -29,6 +25,9 @@
   const pubkey = writable("");
   const _showImg = writable<boolean>(false);
   let relayInput: string = "";
+  let muteList: { list: MuteList; updated: number } | undefined = undefined;
+
+  let emojiList: { list: string[][]; updated: number } | undefined = undefined;
 
   // ラジオボタン設定
   const {
@@ -44,10 +43,7 @@
   });
 
   const optionsArr = ["0", "1"];
-  const optionsArrStr = [
-    "kind10002(もしくはkind3)をつかう",
-    "設定したリレーを使う",
-  ];
+  const optionsArrStr = ["kind:10002 を使う", "設定したリレーを使う"];
   //inputurl
   const {
     elements: { root: relayInputroot },
@@ -68,6 +64,8 @@
         useRelaySet: savedRelaySet,
         pubkey: savedPubkey,
         showImg: savedShowImg,
+        mute: savedMute,
+        emoji: savedEmoji,
       }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
@@ -75,6 +73,10 @@
       if (savedShowImg) {
         _showImg.set(savedShowImg);
       }
+      if (savedMute) {
+        muteList = savedMute;
+      }
+      if (savedEmoji) emojiList = savedEmoji;
     } else {
       radioGroupSelected.set("0");
       try {
@@ -140,6 +142,8 @@
       useRelaySet: $radioGroupSelected,
       pubkey: $pubkey,
       showImg: $_showImg,
+      mute: muteList,
+      emoji: emojiList,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
@@ -275,6 +279,18 @@
         </div>
       </div>
     {/if}
+    {#if $loginUser}
+      <a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10002"
+      >
+        NostViewstr で Relaylist (kind:10002) を編集する
+      </a>
+    {/if}
   </div>
   <!--- 表示設定 --->
   <div class="border border-magnum-500 rounded-md p-2">
@@ -291,15 +307,36 @@
   <!--- Emoji --->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class=" text-magnum-200 font-bold text-lg">douki</div>
-    <div>
-      <UpdateMuteList bind:pubkey={$pubkey} />
-    </div>
     <div class="mt-2">
-      <button
-        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={() => handleClickEmoji()}>Emoji</button
-      ><span class="ml-2">最終更新日時：mada</span>
+      <UpdateMuteList bind:pubkey={$pubkey} bind:muteList />
     </div>
+    {#if $loginUser}
+      <a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10000"
+      >
+        NostViewstr で MuteList ( kind:10000 ) を編集する
+      </a>
+    {/if}
+    <div class="mt-4">
+      <UpdateEmojiList bind:pubkey={$pubkey} bind:emojiList />
+    </div>
+    {#if $loginUser}
+      <a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10030"
+      >
+        NostViewstr で EmojiList ( kind:10030 ) を編集する
+      </a>
+    {/if}
   </div>
 
   <!-- Theme 設定 -->

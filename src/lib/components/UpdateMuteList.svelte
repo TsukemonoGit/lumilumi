@@ -1,8 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { getDoukiList, getQueryRelays } from "$lib/func/settings";
+  import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
+  import type { MuteList } from "$lib/types";
+  import { formatAbsoluteDate } from "$lib/func/util";
+  import Dialog from "./Elements/Dialog.svelte";
+  import { nip19 } from "nostr-tools";
 
   export let pubkey: string;
+  export let muteList: { list: MuteList; updated: number } | undefined;
+  let dialogOpen: any;
   async function handleClickMute() {
     try {
       const gotPubkey = await (
@@ -25,12 +31,61 @@
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10000], authors: [pubkey] },
     ];
-    const event = await getDoukiList(filters, relays);
-    console.log(event);
+    const pk = await getDoukiList(filters, relays);
+    // console.log(event);
+    muteList = {
+      list: await toMuteList(pk.event),
+      updated: Math.floor(Date.now() / 1000),
+    };
   }
 </script>
 
 <button
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
   on:click={handleClickMute}>Mute</button
-><span class="ml-2">最終更新日時：mada</span>
+><span class="ml-2"
+  >最終更新日時：{muteList ? formatAbsoluteDate(muteList?.updated) : ""}</span
+>{#if muteList}<button
+    class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+    on:click={() => ($dialogOpen = true)}>view data</button
+  >{/if}
+<!--JSON no Dialog-->
+<Dialog bind:open={dialogOpen}>
+  <div slot="main">
+    {#if muteList}
+      <h2 class="m-0 text-lg font-medium">Event</h2>
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
+      >
+        {#each muteList.list.e as e}
+          <li>{e}</li>
+        {/each}
+      </ul>
+
+      <h2 class="m-0 text-lg font-medium">User</h2>
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
+      >
+        {#each muteList.list.p as p}
+          <li>{nip19.npubEncode(p)}</li>
+        {/each}
+      </ul>
+      <h2 class="m-0 text-lg font-medium">Hashtag</h2>
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
+      >
+        {#each muteList.list.t as t}
+          <li>{t}</li>
+        {/each}
+      </ul>
+      <h2 class="m-0 text-lg font-medium">Ward</h2>
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
+      >
+        {#each muteList.list.word as word}
+          <li>{word}</li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+</Dialog>
