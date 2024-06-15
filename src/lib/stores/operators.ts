@@ -7,7 +7,7 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
-import { loginUser, metadataQueue, queryClient, reactions } from "./stores";
+import { loginUser, metadataQueue, queryClient } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import type { QueryKey } from "@tanstack/svelte-query";
@@ -67,22 +67,7 @@ export function scanArray<A>(): OperatorFunction<A, A[]> {
     if ((a as EventPacket)?.event && (a as EventPacket)?.event?.id) {
       get(queryClient).setQueryData(["timeline", (a as any).event.id], a);
     }
-    //reactionの場合どれへのリアクションかわかるようにしてくえりーにいれる
-    if (
-      (a as EventPacket)?.event &&
-      (a as EventPacket)?.event?.kind === 7 &&
-      (a as EventPacket)?.event?.pubkey === get(loginUser)
-    ) {
-      //  console.log(a);
-      const id = (a as EventPacket).event.tags.find((tag) => tag[0] === "e");
-      if (id) {
-        //別でストアに入れてみる
-        reactions.update((store) => {
-          store.set(id[1], (a as EventPacket).event);
-          return store;
-        });
-      }
-    }
+
     return [...acc, a];
   }, []);
 }

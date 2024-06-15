@@ -33,6 +33,15 @@ export interface UseReqOpts<A> {
   req?: RxReqBase;
   initData?: A;
 }
+export interface UseReqOpts2<A> {
+  rxNostr: RxNostr;
+  queryKey: QueryKey;
+  filters: Nostr.Filter[];
+  operator: OperatorFunction<EventPacket, A>;
+  req?: RxReqBase;
+  initData?: A;
+}
+
 export type Theme = "light" | "dark" | "system";
 export type ToastData = {
   title: string;

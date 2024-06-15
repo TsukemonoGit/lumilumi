@@ -9,7 +9,7 @@
   } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
-  import { reactions, toastSettings } from "$lib/stores/stores";
+  import { app, loginUser, toastSettings } from "$lib/stores/stores";
 
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
@@ -19,6 +19,10 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Reaction from "../Reaction.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
+  import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
+  import { createRxForwardReq, createRxNostr } from "rx-nostr";
+  import { onDestroy } from "svelte";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -43,10 +47,6 @@
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
 
-  let reactionData: Nostr.Event<number> | undefined;
-  reactions.subscribe((store) => {
-    reactionData = store.get(note.id);
-  });
   let replyText: string;
 
   //https://translate.google.com/?sl=auto&op=translate&text={0}
@@ -101,7 +101,6 @@
     { text: "Repost", icon: Repeat2, num: 0 },
     { text: "Quote", icon: Quote, num: 1 },
   ];
-  let repostClass: string = "";
 
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index].num);
@@ -134,11 +133,8 @@
                 ],
                 content: "",
               };
-        const res = await promisePublishEvent(ev);
-        console.log(res);
-        if (res.find((item) => item.ok)) {
-          repostClass = "text-magnum-300";
-        }
+        publishEvent(ev);
+
         break;
       case 1:
         //Quote
@@ -146,6 +142,16 @@
         break;
     }
   };
+  const arxNostr = createRxNostr();
+  const prxNostr = createRxNostr();
+  const areq = createRxForwardReq("a" + note.id.slice(0, 10));
+  const preq = createRxForwardReq("a" + note.id.slice(0, 10));
+  onDestroy(() => {
+    // console.log("destroy");
+    //購読終了したい
+    arxNostr.dispose();
+    prxNostr.dispose();
+  });
 </script>
 
 <div>
@@ -161,20 +167,72 @@
         />
       </button>
       <!--リポスト-->
-      <DropdownMenu {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" class={repostClass} />
-      </DropdownMenu>
+      <Reposted
+        rxNostr={prxNostr}
+        req={preq}
+        queryKey={["repost", note.id]}
+        bind:pubkey={$loginUser}
+        id={note.id}
+        let:repostData
+      >
+        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
+        </DropdownMenu>
+      </Reposted>
       <!--リアクション-->
-      {#if reactionData === undefined}
-        <button on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500"
-          />
-        </button>
-      {:else}
-        <Reaction event={reactionData} />
-      {/if}
+      <Reactioned
+        rxNostr={arxNostr}
+        req={areq}
+        queryKey={["reaction", note.id]}
+        bind:pubkey={$loginUser}
+        id={note.id}
+        let:reactionData
+      >
+        <div slot="loading">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        <div slot="nodata">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        <div slot="error">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        {#if reactionData === undefined}
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        {:else}
+          <Reaction event={reactionData} />
+        {/if}
+      </Reactioned>
       <!--カスタムリアクション-->
       <CustomReaction {note} />
     {/if}

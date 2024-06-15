@@ -15,7 +15,7 @@
   import EventCard from "./Note/EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
-  import Reactions from "./NostrMainData/Reactions.svelte";
+  import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
 
   const maxSize = 100;
   const pubkeysIn = (contacts: Nostr.Event) => {
@@ -114,7 +114,7 @@
               </div>{/each}
           </div>
         </UniqueEventList>
-        <Reactions
+        <Reactionsforme
           queryKey={["reaction"]}
           filters={[
             {
