@@ -86,7 +86,7 @@
         OK
       </button>
     </div>
-    {#if $emojis.length > 0}
+    {#if $emojis && $emojis.length > 0}
       <div
         class="border border-magnum-600 flex flex-wrap max-h-40 overflow-y-auto"
       >
