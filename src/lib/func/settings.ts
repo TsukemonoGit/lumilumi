@@ -50,6 +50,8 @@ export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
         },
         complete: () => {
           console.log("Completed!");
+          subscription.unsubscribe();
+          rxNostr.dispose();
           resolve();
         },
       });
@@ -90,6 +92,8 @@ export async function getDoukiList(
         },
         complete: () => {
           console.log("Completed!");
+          subscription.unsubscribe();
+          rxNostr.dispose();
           resolve(res);
         },
       });
@@ -194,6 +198,8 @@ export async function getNaddrEmojiList(
         },
         complete: () => {
           console.log("Completed!");
+          subscription.unsubscribe();
+          rxNostr.dispose();
           resolve(res);
         },
       });

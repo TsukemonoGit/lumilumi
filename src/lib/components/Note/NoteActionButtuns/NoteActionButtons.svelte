@@ -9,7 +9,12 @@
   } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
-  import { app, loginUser, toastSettings } from "$lib/stores/stores";
+  import {
+    app,
+    defaultRelays,
+    loginUser,
+    toastSettings,
+  } from "$lib/stores/stores";
 
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
@@ -144,6 +149,8 @@
   };
   const arxNostr = createRxNostr();
   const prxNostr = createRxNostr();
+  arxNostr.setDefaultRelays($defaultRelays);
+  prxNostr.setDefaultRelays($defaultRelays);
   const areq = createRxForwardReq("a" + note.id.slice(0, 10));
   const preq = createRxForwardReq("a" + note.id.slice(0, 10));
   onDestroy(() => {

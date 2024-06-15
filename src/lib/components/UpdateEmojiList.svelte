@@ -10,12 +10,13 @@
   import { formatAbsoluteDate } from "$lib/func/util";
   import Dialog from "./Elements/Dialog.svelte";
   import { nip19 } from "nostr-tools";
-  import { showImg } from "$lib/stores/stores";
+  import { nowProgress, showImg } from "$lib/stores/stores";
+  import { now } from "rx-nostr";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;
   let dialogOpen: any;
-  async function handleClickMute() {
+  async function handleClickEmoji() {
     let list: string[][] = [];
     try {
       const gotPubkey = await (
@@ -35,6 +36,7 @@
     if (!relays) {
       return;
     }
+    $nowProgress = true;
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10030], authors: [pubkey] },
     ];
@@ -74,14 +76,6 @@
     );
     console.log(naddrFilters);
 
-    // フィルターを5個ずつのチャンクに分割する関数
-    function chunkArray(array: any[], chunkSize: number) {
-      return Array.from(
-        { length: Math.ceil(array.length / chunkSize) },
-        (_, i) => array.slice(i * chunkSize, i * chunkSize + chunkSize)
-      );
-    }
-
     const chunkedFilters = chunkArray(naddrFilters, 5);
 
     // 全てのチャンクを並列で処理する
@@ -91,25 +85,37 @@
 
     // 各チャンクの結果を結合する
     pkListArray.flat().forEach((pk) => {
-      list = [
-        ...list,
-        ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
-          if (tag === "emoji") {
-            return [...acc, value];
-          } else {
-            return acc;
-          }
-        }, []),
-      ];
+      if (pk && pk.event) {
+        list = [
+          ...list,
+          ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
+            if (tag === "emoji") {
+              return [...acc, value];
+            } else {
+              return acc;
+            }
+          }, []),
+        ];
+      }
     });
+
     // console.log(list.length);
     emojiList = { list: list, updated: Math.floor(Date.now() / 1000) };
+    $nowProgress = false;
+  }
+
+  // フィルターを5個ずつのチャンクに分割する関数
+  function chunkArray(array: any[], chunkSize: number) {
+    return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+      array.slice(i * chunkSize, i * chunkSize + chunkSize)
+    );
   }
 </script>
 
 <button
+  disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-  on:click={handleClickMute}>Emoji</button
+  on:click={handleClickEmoji}>Emoji</button
 ><span class="ml-2"
   >最終更新日時：{emojiList ? formatAbsoluteDate(emojiList?.updated) : ""}</span
 >{#if emojiList}<button

@@ -316,13 +316,6 @@ export function useReq2({
     throw Error();
   }
   const _rxNostr = rxNostr;
-  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    if (get(app).rxNostr.getDefaultRelays()) {
-      _rxNostr.setDefaultRelays(get(app).rxNostr.getDefaultRelays());
-    } else {
-      throw Error;
-    }
-  }
 
   let _req:
     | RxReqBase

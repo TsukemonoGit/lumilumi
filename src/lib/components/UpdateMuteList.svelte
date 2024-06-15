@@ -5,6 +5,7 @@
   import { formatAbsoluteDate } from "$lib/func/util";
   import Dialog from "./Elements/Dialog.svelte";
   import { nip19 } from "nostr-tools";
+  import { nowProgress } from "$lib/stores/stores";
 
   export let pubkey: string;
   export let muteList: { list: MuteList; updated: number } | undefined;
@@ -28,6 +29,7 @@
     if (!relays) {
       return;
     }
+    $nowProgress = true;
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10000], authors: [pubkey] },
     ];
@@ -37,10 +39,12 @@
       list: await toMuteList(pk.event),
       updated: Math.floor(Date.now() / 1000),
     };
+    $nowProgress = false;
   }
 </script>
 
 <button
+  disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
   on:click={handleClickMute}>Mute</button
 ><span class="ml-2"

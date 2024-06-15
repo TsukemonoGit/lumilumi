@@ -205,8 +205,6 @@
       console.log(error);
     }
   };
-
-  const handleClickEmoji = () => {};
 </script>
 
 <div class="container flex flex-col gap-3">
