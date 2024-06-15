@@ -17,7 +17,7 @@
   import { setFollowingList } from "$lib/func/nostr";
   import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
 
-  const maxSize = 100;
+  const maxSize = 50;
   const pubkeysIn = (contacts: Nostr.Event) => {
     const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
