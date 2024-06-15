@@ -10,6 +10,7 @@
   import { formatAbsoluteDate } from "$lib/func/util";
   import Dialog from "./Elements/Dialog.svelte";
   import { nip19 } from "nostr-tools";
+  import { showImg } from "$lib/stores/stores";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;
@@ -72,9 +73,24 @@
       []
     );
     console.log(naddrFilters);
-    const pkList = await getNaddrEmojiList(naddrFilters, relays);
-    console.log(pkList);
-    pkList.map((pk) => {
+
+    // フィルターを5個ずつのチャンクに分割する関数
+    function chunkArray(array: any[], chunkSize: number) {
+      return Array.from(
+        { length: Math.ceil(array.length / chunkSize) },
+        (_, i) => array.slice(i * chunkSize, i * chunkSize + chunkSize)
+      );
+    }
+
+    const chunkedFilters = chunkArray(naddrFilters, 5);
+
+    // 全てのチャンクを並列で処理する
+    const pkListArray = await Promise.all(
+      chunkedFilters.map((chunk) => getNaddrEmojiList(chunk, relays))
+    );
+
+    // 各チャンクの結果を結合する
+    pkListArray.flat().forEach((pk) => {
       list = [
         ...list,
         ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
@@ -86,6 +102,7 @@
         }, []),
       ];
     });
+    // console.log(list.length);
     emojiList = { list: list, updated: Math.floor(Date.now() / 1000) };
   }
 </script>
@@ -104,13 +121,23 @@
   <div slot="main">
     {#if emojiList}
       <h2 class="m-0 text-lg font-medium">EmojiList</h2>
-      <ul
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh]"
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
       >
-        {#each emojiList.list as e}
-          <li>{e}</li>
+        {#each emojiList.list as e, index}
+          <div
+            class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
+          >
+            {#if $showImg}<img
+                loading="lazy"
+                class="h-12 object-contain justify-self-center"
+                src={e[1]}
+                alt={e[0]}
+              />{:else}{e[1]}{/if}
+            <div class="break-keep">{e[0]}</div>
+          </div>
         {/each}
-      </ul>
+      </div>
     {/if}
   </div>
 </Dialog>

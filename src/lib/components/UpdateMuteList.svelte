@@ -57,8 +57,8 @@
       <ul
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
       >
-        {#each muteList.list.e as e}
-          <li>{e}</li>
+        {#each muteList.list.e as e, index}
+          <li>{index}, {e}</li>
         {/each}
       </ul>
 
@@ -66,24 +66,24 @@
       <ul
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
       >
-        {#each muteList.list.p as p}
-          <li>{nip19.npubEncode(p)}</li>
+        {#each muteList.list.p as p, index}
+          <li>{index}, {nip19.npubEncode(p)}</li>
         {/each}
       </ul>
       <h2 class="m-0 text-lg font-medium">Hashtag</h2>
       <ul
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
       >
-        {#each muteList.list.t as t}
-          <li>{t}</li>
+        {#each muteList.list.t as t, index}
+          <li>{index}, {t}</li>
         {/each}
       </ul>
       <h2 class="m-0 text-lg font-medium">Ward</h2>
       <ul
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
       >
-        {#each muteList.list.word as word}
-          <li>{word}</li>
+        {#each muteList.list.word as word, index}
+          <li>{index}, {word}</li>
         {/each}
       </ul>
     {/if}

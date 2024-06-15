@@ -6,7 +6,14 @@
 
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
-  import { app, loginUser, showImg, toastSettings } from "$lib/stores/stores";
+  import {
+    app,
+    emojis,
+    loginUser,
+    mutes,
+    showImg,
+    toastSettings,
+  } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
   import type { LumiSetting } from "$lib/types";
@@ -154,6 +161,12 @@
     };
     $loginUser = $pubkey;
     $showImg = $_showImg;
+    if (muteList) {
+      $mutes = muteList.list;
+    }
+    if (emojiList) {
+      $emojis = emojiList.list;
+    }
   }
 
   function cancelSettings() {

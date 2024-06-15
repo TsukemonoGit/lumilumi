@@ -1,6 +1,7 @@
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { publishEvent } from "$lib/func/nostr";
+  import { emojis, showImg } from "$lib/stores/stores";
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import punycode from "punycode/punycode";
@@ -50,6 +51,22 @@
     open = false;
     customReaction = "";
   };
+
+  const handleClickEmoji = (e: string[]) => {
+    const ev: Nostr.EventParameters = {
+      kind: 7,
+      tags: [
+        ["p", note.pubkey],
+        ["e", note.id],
+        ["k", note.kind.toString()],
+        ["emoji", ...e],
+      ],
+      content: `:${e[0]}:`,
+    };
+    publishEvent(ev);
+    open = false;
+    customReaction = "";
+  };
 </script>
 
 <Popover bind:open>
@@ -69,6 +86,26 @@
         OK
       </button>
     </div>
+    {#if $emojis.length > 0}
+      <div
+        class="border border-magnum-600 flex flex-wrap max-h-40 overflow-y-auto"
+      >
+        {#each $emojis as e, index}
+          <button
+            on:click={() => handleClickEmoji(e)}
+            class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+          >
+            {#if $showImg}
+              <img
+                loading="lazy"
+                class="h-4 object-contain justify-self-center"
+                src={e[1]}
+                alt={e[0]}
+              />{:else}{e[0]}{/if}
+          </button>
+        {/each}
+      </div>
+    {/if}
     {#if customReactionError}
       <div class="text-red-500 text-sm mt-1">
         {customReactionErrorMessage}
