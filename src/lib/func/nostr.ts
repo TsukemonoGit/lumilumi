@@ -385,7 +385,7 @@ export function useReq2({
   return {
     data: derived(query, ($query) => $query.data, initData),
     status: derived([query, status], ([$query, $status]) => {
-      console.log($query.data);
+      // console.log($query.data);
       if ($query.isSuccess) {
         return "success";
       } else if ($query.isError) {
@@ -403,3 +403,25 @@ export function useReq2({
     }),
   };
 }
+
+//ConnectionState
+// | "initialized"
+// | "connecting"
+// | "connected"
+// | "waiting-for-retrying"
+// | "retrying"
+// | "dormant"
+// | "error"
+// | "rejected"
+// | "terminated";
+// const reconectableStatus:ConnectionState[]=[];
+// export function relaysReconnectChallenge() {
+//   if (Object.entries(defaultRelays).length == 0) {
+//     return;
+//   }
+//   Object.entries(defaultRelays).forEach(([key, value], index) => {
+//     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
+//       get(app).rxNostr.reconnect(key);
+//     }
+//   });
+// }

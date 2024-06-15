@@ -3,7 +3,11 @@
   import { onMount } from "svelte";
 
   import { app, queryClient } from "$lib/stores/stores";
-  import { getMetadataFromLocalStorage, setRxNostr } from "$lib/func/nostr";
+  import {
+    getMetadataFromLocalStorage,
+    //relaysReconnectChallenge,
+    setRxNostr,
+  } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
@@ -30,8 +34,15 @@
       setTheme(theme);
     }
   });
+
+  // function onVisibilityChange() {
+  //   if (document?.visibilityState === "visible") {
+  //     relaysReconnectChallenge();
+  //   }
+  // }
 </script>
 
+<!-- <svelte:document on:visibilitychange={onVisibilityChange} /> -->
 <svelte:head>
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}

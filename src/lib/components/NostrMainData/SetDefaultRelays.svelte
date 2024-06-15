@@ -22,7 +22,7 @@
       return useRelaySet(
         ["defaultRelay", pubkey],
         [
-          { authors: [pubkey], kinds: [3], limit: 1 },
+          // { authors: [pubkey], kinds: [3], limit: 1 },
           { authors: [pubkey], kinds: [10002], limit: 1 },
         ] as Nostr.Filter[],
         req

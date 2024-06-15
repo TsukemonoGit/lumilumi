@@ -6,12 +6,10 @@ import {
 import { get, writable } from "svelte/store";
 import {
   type RxNostr,
-  createRxNostr,
   type EventPacket,
   type DefaultRelayConfig,
 } from "rx-nostr";
-
-import * as Nostr from "nostr-typedef";
+import type { MuteList } from "$lib/types";
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -38,4 +36,6 @@ export const toastSettings = writable<{
 export const loginUser = writable<string>();
 
 export const showImg = writable<boolean>(false);
-export const defaultRelays = writable();
+export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
+export const emojis = writable<string[][]>();
+export const mutes = writable<MuteList>();

@@ -66,6 +66,7 @@
     {:else if part.type === "url" && part.content}
       {#if $showImg && imageRegex.test(part.content)}
         <img
+          loading="lazy"
           alt="img"
           src={part.content}
           class="max-w-full w-80 max-h-42 object-contain"
@@ -88,6 +89,7 @@
     {:else if part.type === "emoji"}
       {#if $showImg}
         <img
+          loading="lazy"
           alt={part.content}
           src={part.url}
           class="inline h-8 object-contain"

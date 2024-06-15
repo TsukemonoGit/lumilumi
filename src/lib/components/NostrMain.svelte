@@ -1,6 +1,6 @@
 <script lang="ts">
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import { app, loginUser, queryClient, showImg } from "$lib/stores/stores";
+  import { app, emojis, loginUser, mutes, showImg } from "$lib/stores/stores";
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
@@ -46,6 +46,8 @@
       useRelaySet: savedRelaySet,
       pubkey: savedPubkey,
       showImg: savedShowImg,
+      mute: savedMute,
+      emoji: savedEmoji,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -59,6 +61,12 @@
     $loginUser = pubkey;
     if (savedShowImg) {
       $showImg = savedShowImg;
+    }
+    if (savedMute) {
+      $mutes = savedMute.list;
+    }
+    if (savedEmoji) {
+      $emojis = savedEmoji.list;
     }
   }
 
