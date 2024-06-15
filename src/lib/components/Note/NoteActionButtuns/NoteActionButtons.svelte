@@ -24,10 +24,10 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Reaction from "../Reaction.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
-  import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
+
   import { createRxForwardReq, createRxNostr } from "rx-nostr";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
+  import RepoReactions from "$lib/components/NostrMainData/RepoReactions.svelte";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -147,17 +147,18 @@
         break;
     }
   };
-  const arxNostr = createRxNostr();
-  const prxNostr = createRxNostr();
-  arxNostr.setDefaultRelays($defaultRelays);
-  prxNostr.setDefaultRelays($defaultRelays);
-  const areq = createRxForwardReq("a" + note.id.slice(0, 10));
-  const preq = createRxForwardReq("a" + note.id.slice(0, 10));
+  const rxNostr = createRxNostr();
+  //const prxNostr = createRxNostr();
+  onMount(() => {
+    rxNostr.setDefaultRelays($defaultRelays);
+  });
+  const req = createRxForwardReq("a" + note.id.slice(0, 10));
+
   onDestroy(() => {
     // console.log("destroy");
     //購読終了したい
-    arxNostr.dispose();
-    prxNostr.dispose();
+    rxNostr.dispose();
+    //  prxNostr.dispose();
   });
 </script>
 
@@ -174,61 +175,24 @@
         />
       </button>
       <!--リポスト-->
-      <Reposted
-        rxNostr={prxNostr}
-        req={preq}
-        queryKey={["repost", note.id]}
+      <RepoReactions
+        {rxNostr}
+        {req}
         bind:pubkey={$loginUser}
         id={note.id}
         let:repostData
-      >
-        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-
-        <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
-        </DropdownMenu>
-      </Reposted>
-      <!--リアクション-->
-      <Reactioned
-        rxNostr={arxNostr}
-        req={areq}
-        queryKey={["reaction", note.id]}
-        bind:pubkey={$loginUser}
-        id={note.id}
         let:reactionData
       >
-        <div slot="loading">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
-        <div slot="nodata">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
-        <div slot="error">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
+        {#if repostData === undefined}
+          <DropdownMenu {menuTexts} {handleSelectItem}>
+            <Repeat2 size="20" />
+          </DropdownMenu>
+        {:else}
+          <DropdownMenu {menuTexts} {handleSelectItem}>
+            <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
+          </DropdownMenu>
+        {/if}
+
         {#if reactionData === undefined}
           <button on:click={handleClickReaction}>
             <Heart
@@ -239,7 +203,7 @@
         {:else}
           <Reaction event={reactionData} />
         {/if}
-      </Reactioned>
+      </RepoReactions>
       <!--カスタムリアクション-->
       <CustomReaction {note} />
     {/if}
