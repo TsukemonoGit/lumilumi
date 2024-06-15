@@ -2,7 +2,11 @@
   import { Repeat2, Heart, MessageSquare, X, Plus, Quote } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+  import {
+    getRelaysById,
+    promisePublishEvent,
+    publishEvent,
+  } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import { reactions, toastSettings } from "$lib/stores/stores";
@@ -97,6 +101,7 @@
     { text: "Repost", icon: Repeat2, num: 0 },
     { text: "Quote", icon: Quote, num: 1 },
   ];
+  let repostClass: string = "";
 
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index].num);
@@ -129,7 +134,11 @@
                 ],
                 content: "",
               };
-        publishEvent(ev);
+        const res = await promisePublishEvent(ev);
+        console.log(res);
+        if (res.find((item) => item.ok)) {
+          repostClass = "text-magnum-300";
+        }
         break;
       case 1:
         //Quote
@@ -153,7 +162,7 @@
       </button>
       <!--リポスト-->
       <DropdownMenu {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
+        <Repeat2 size="20" class={repostClass} />
       </DropdownMenu>
       <!--リアクション-->
       {#if reactionData === undefined}

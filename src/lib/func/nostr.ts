@@ -28,6 +28,8 @@ import {
   type AcceptableDefaultRelaysConfig,
   type RxNostr,
   createTie,
+  type OkPacketAgainstEvent,
+  nip07Signer,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
@@ -256,4 +258,38 @@ export function publishEvent(ev: Nostr.EventParameters) {
       } しました。`
     );
   });
+}
+
+export async function promisePublishEvent(
+  ev: Nostr.EventParameters
+): Promise<OkPacketAgainstEvent[]> {
+  const _rxNostr = get(app).rxNostr;
+  const signer = nip07Signer();
+  const event = await signer.signEvent(ev);
+  //署名の時間がタイムアウトカウントされないように先に署名
+  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+    console.log("error");
+    throw Error();
+  }
+  const res = await new Promise<OkPacketAgainstEvent[]>((resolve) => {
+    let res: OkPacketAgainstEvent[] = [];
+    setTimeout(() => {
+      resolve(res);
+    }, 2000);
+
+    _rxNostr.send(event).subscribe({
+      next: (packet) => {
+        console.log(
+          `リレー ${packet.from} への送信が ${
+            packet.ok ? "成功" : "失敗"
+          } しました。`
+        );
+        res.push(packet);
+      },
+      complete: () => {
+        resolve(res);
+      },
+    });
+  });
+  return res;
 }
