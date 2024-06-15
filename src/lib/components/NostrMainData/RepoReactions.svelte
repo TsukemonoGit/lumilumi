@@ -7,37 +7,39 @@
    */
 
   import type Nostr from "nostr-typedef";
-  import type { RxNostr } from "rx-nostr";
+  import type { EventPacket, RxNostr } from "rx-nostr";
 
-  import { useRepReactioned } from "$lib/stores/useRepReaction";
-  export let rxNostr: RxNostr;
+  import { queryClient } from "$lib/stores/stores";
+  import { afterUpdate } from "svelte";
+  import { QueryObserver } from "@tanstack/svelte-query";
 
-  export let pubkey: string;
   export let id: string;
   export let req: RxReqBase | undefined = undefined;
+  let reactionData: EventPacket;
+  let repostData: EventPacket;
+  // afterUpdate(() => {
+  //   reactionData = $queryClient.getQueryData(["reaction", id]) as EventPacket;
+  //   repostData = $queryClient.getQueryData(["repost", id]) as EventPacket;
+  //   console.log(reactionData);
+  // });
 
-  $: results = useRepReactioned(rxNostr, ["reaction", id], pubkey, id, req);
+  const observer = new QueryObserver($queryClient, {
+    queryKey: ["reaction", id],
+  });
 
-  $: data = results.data;
-  $: status = results.status;
-  $: error = results.error;
-  $: reactionData = $data?.find((item) => item.event.kind === 7);
-  $: repostData = $data?.find(
-    (item) => item.event.kind === 6 || item.event.kind === 16
-  );
-  $: console.log($data);
+  const unsubscribe = observer.subscribe((result) => {
+    console.log(result);
+
+    unsubscribe();
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
     default: {
-      status: ReqStatus;
       repostData?: Nostr.Event | undefined;
       reactionData?: Nostr.Event | undefined;
     };
   }
 </script>
 
-<slot
-  repostData={repostData?.event}
-  status={$status}
-  reactionData={reactionData?.event}
-/>
+<slot repostData={repostData?.event} reactionData={reactionData?.event} />

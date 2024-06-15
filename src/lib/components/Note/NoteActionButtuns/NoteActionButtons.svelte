@@ -147,19 +147,21 @@
         break;
     }
   };
-  const rxNostr = createRxNostr();
-  //const prxNostr = createRxNostr();
-  onMount(() => {
-    rxNostr.setDefaultRelays($defaultRelays);
-  });
-  const req = createRxForwardReq("a" + note.id.slice(0, 10));
+  // const rxNostr = createRxNostr();
+  // //const prxNostr = createRxNostr();
+  // onMount(() => {
+  //   rxNostr.setDefaultRelays($defaultRelays);
+  // });
+  // const req = createRxForwardReq("a" + note.id.slice(0, 10));
 
-  onDestroy(() => {
-    // console.log("destroy");
-    //購読終了したい
-    rxNostr.dispose();
-    //  prxNostr.dispose();
-  });
+  // onDestroy(() => {
+  //   // console.log("destroy");
+  //   //購読終了したい
+  //   rxNostr.dispose();
+  //   //  prxNostr.dispose();
+  // });
+  let repostData: undefined;
+  let reactionData: undefined;
 </script>
 
 <div>
@@ -175,35 +177,35 @@
         />
       </button>
       <!--リポスト-->
-      <RepoReactions
+      <!-- <RepoReactions
         {rxNostr}
         {req}
         bind:pubkey={$loginUser}
         id={note.id}
         let:repostData
         let:reactionData
-      >
-        {#if repostData === undefined}
-          <DropdownMenu {menuTexts} {handleSelectItem}>
-            <Repeat2 size="20" />
-          </DropdownMenu>
-        {:else}
-          <DropdownMenu {menuTexts} {handleSelectItem}>
-            <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
-          </DropdownMenu>
-        {/if}
+      > -->
+      {#if repostData === undefined}
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+      {:else}
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
+        </DropdownMenu>
+      {/if}
 
-        {#if reactionData === undefined}
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        {:else}
-          <Reaction event={reactionData} />
-        {/if}
-      </RepoReactions>
+      {#if reactionData === undefined}
+        <button on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          />
+        </button>
+      {:else}
+        <Reaction event={reactionData} />
+      {/if}
+      <!-- </RepoReactions> -->
       <!--カスタムリアクション-->
       <CustomReaction {note} />
     {/if}
