@@ -1,4 +1,4 @@
-import { latestbyId, scanArray } from "$lib/stores/operators";
+import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { loginUser, queryClient } from "$lib/stores/stores";
 import {
@@ -190,7 +190,13 @@ export async function getNaddrEmojiList(
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), scanArray(), completeOnTimeout(3000))
+      .pipe(
+        verify(),
+        uniq(),
+        latestEachNaddr(),
+        scanArray(),
+        completeOnTimeout(3000)
+      )
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);

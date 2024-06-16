@@ -72,7 +72,7 @@
 <Popover bind:open>
   <SmilePlus size="20" />
   <div slot="popoverContent">
-    <div class="flex gap-1 pr-8 pl-2">
+    <div class="flex gap-1 pr-8 pl-2 max-w-80">
       <input
         type="text"
         class="h-10 w-32 rounded-md px-3 py-2 text-magnum-100 border
@@ -88,21 +88,23 @@
     </div>
     {#if $emojis && $emojis.length > 0}
       <div
-        class="border border-magnum-600 flex flex-wrap max-h-40 overflow-y-auto"
+        class="border border-magnum-600 flex flex-wrap max-w-80 max-h-80 overflow-y-auto"
       >
         {#each $emojis as e, index}
-          <button
-            on:click={() => handleClickEmoji(e)}
-            class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-          >
-            {#if $showImg}
-              <img
-                loading="lazy"
-                class="h-4 object-contain justify-self-center"
-                src={e[1]}
-                alt={e[0]}
-              />{:else}{e[0]}{/if}
-          </button>
+          {#if customReaction === "" || e[0].includes(customReaction)}
+            <button
+              on:click={() => handleClickEmoji(e)}
+              class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+            >
+              {#if $showImg}
+                <img
+                  loading="lazy"
+                  class="h-4 object-contain justify-self-center"
+                  src={e[1]}
+                  alt={e[0]}
+                />{:else}{e[0]}{/if}
+            </button>
+          {/if}
         {/each}
       </div>
     {/if}
