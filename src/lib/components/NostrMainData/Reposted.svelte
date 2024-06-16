@@ -1,41 +1,63 @@
 <script lang="ts">
-  import { useMetadata } from "$lib/stores/useMetadata";
   import type { ReqStatus, RxReqBase } from "$lib/types";
-  import { app, queryClient } from "$lib/stores/stores";
+
   /**
    * @license Apache-2.0
    * @copyright 2023 Akiomi Kamakura
    */
 
-  import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import { useReposted } from "$lib/stores/useReposted";
-  import type { RxNostr } from "rx-nostr";
+  import type { EventPacket, RxNostr } from "rx-nostr";
 
-  export let queryKey: QueryKey;
-  export let pubkey: string;
+  import { queryClient } from "$lib/stores/stores";
+  import { afterUpdate } from "svelte";
+  import { QueryObserver } from "@tanstack/svelte-query";
+
   export let id: string;
   export let req: RxReqBase | undefined = undefined;
-  export let rxNostr: RxNostr;
-  $: result = useReposted(rxNostr, queryKey, pubkey, id, req);
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
-  //  $: console.log($data);
+  let _result: { data: any; status: any; error: any };
+  // afterUpdate(() => {
+  //   reactionData = $queryClient.getQueryData([
+  //     "reactions",
+  //     "reaction",
+  //     id,
+  //   ]) as EventPacket;
+  //   repostData = $queryClient.getQueryData([
+  //     "reactions",
+  //     "repost",
+  //     id,
+  //   ]) as EventPacket;
+  //   console.log(reactionData);
+  // });
+
+  const observer2 = new QueryObserver($queryClient, {
+    queryKey: ["reactions", "repost", id],
+  });
+
+  const unsubscribe2 = observer2.subscribe((result: any) => {
+    if (_result?.status !== "success") {
+      _result = result;
+    }
+  });
+
+  $: data = _result?.data;
+  $: status = _result?.status;
+  $: error = _result?.error;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
-    default: { repostData: Nostr.Event; status: ReqStatus };
+    default: { event: Nostr.Event; status: ReqStatus };
     loading: Record<never, never>;
     error: { error: Error };
     nodata: Record<never, never>;
   }
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
-{:else if $data}
-  <slot repostData={$data?.event} status={$status} />
-{:else if $status === "loading"}
+{#if error}
+  <slot name="error" {error} />
+{:else if data}
+  <slot event={data?.event} {status} />
+{:else if status === "loading"}
   <slot name="loading" />
 {:else}
   <slot name="nodata" />

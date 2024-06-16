@@ -4,7 +4,7 @@
    * @copyright 2023 Akiomi Kamakura
    */
 
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createRxNostr } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
 
@@ -16,6 +16,10 @@
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
   import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
+  import { defaultRelays, loginUser } from "$lib/stores/stores";
+
+  import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
+  import { onDestroy } from "svelte";
 
   const maxSize = 50;
   const pubkeysIn = (contacts: Nostr.Event) => {
@@ -29,7 +33,7 @@
     setFollowingList(followingList);
     return followingList;
   };
-
+  let viewEvents: Nostr.Event<number>[] = [];
   const sorted = (events: Nostr.Event[]) => {
     // Use a Map to store events by their id to ensure uniqueness
     const uniqueEventsMap = new Map<string, Nostr.Event>();
@@ -42,8 +46,72 @@
     const sortedEvents = [...uniqueEventsMap.values()].sort(
       (a, b) => b.created_at - a.created_at
     );
+    viewEvents = sortedEvents.slice(0, maxSize);
     return sortedEvents.slice(0, maxSize);
   };
+  // const rxNostr = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
+  // const req = createRxForwardReq();
+  let filters: Nostr.Filter[];
+  let lastUpdateTimestamp: number = Date.now() + 3000; // 前回の更新タイムスタンプ//初回は結構待つためにちょっとサバ読んだ時間にしちゃう
+  const updateInterval = 1 * 1000; // 1秒（ミリ秒）
+
+  $: if (viewEvents.length > 10) {
+    const currentTimestamp = Date.now();
+    if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
+      // 前回の更新から時間場合は何もしない
+
+      const eValues: string[] = viewEvents.reduce((acc: string[], item) => {
+        if ([7, 6, 16].includes(item.kind)) {
+          const tag = item.tags.find((tag) => tag[0] === "e");
+          if (tag) {
+            acc.push(tag[1]);
+          }
+        } else {
+          acc.push(item.id);
+        }
+        return acc;
+      }, []);
+
+      filters = [
+        {
+          "#e": eValues,
+          authors: [$loginUser],
+          // kinds: [7, 6, 16], // コメントアウトしておく
+        },
+      ];
+
+      lastUpdateTimestamp = currentTimestamp; // タイムスタンプを更新
+    }
+  }
+
+  // $: filters = [
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [7],
+  //   },
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [6],
+  //   },
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [16],
+  //   },
+  // ];
+  // $: filters = viewEvents
+  //   .map((item) => ({
+  //     "#e": [item.id],
+  //     authors: [$loginUser],
+  //     kinds: [7, 6, 16],
+  //   }))
+  //   .slice(0, 10);
+
+  // onDestroy(() => {
+  //   rxNostr.dispose();
+  // });
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
@@ -53,6 +121,7 @@
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
+    <SetRepoReactions bind:filters />
     <div class="container break-words overflow-x-hidden">
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}

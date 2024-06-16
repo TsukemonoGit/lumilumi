@@ -16,6 +16,7 @@ import type {
   RxReqBase,
   ReqStatus,
   UseReqOpts2,
+  UseReqOpts3,
 } from "$lib/types";
 import {
   useQueryClient,
@@ -36,11 +37,13 @@ import {
   createTie,
   type OkPacketAgainstEvent,
   nip07Signer,
+  createRxForwardReq,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { metadata } from "$lib/stores/operators";
+import { metadata, scanArray } from "$lib/stores/operators";
+import { set3Relays } from "./reactions";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -57,6 +60,7 @@ export function getRelaysById(id: string): string[] {
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   rxNostr.setDefaultRelays(relays);
   defaultRelays.set(rxNostr.getDefaultRelays());
+  set3Relays(relays);
 }
 
 // metadataの保存
@@ -309,7 +313,7 @@ export function useReq2({
   operator,
   req,
   initData,
-}: UseReqOpts2<EventPacket>): ReqResult<EventPacket> {
+}: UseReqOpts2<EventPacket[]>): ReqResult<EventPacket[]> {
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
 
   if (!_queryClient) {
@@ -340,15 +344,15 @@ export function useReq2({
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = _rxNostr.use(_req).pipe(operator);
+  const obs: Observable<EventPacket[]> = _rxNostr.use(_req).pipe(operator);
   const query = createQuery({
     queryKey: queryKey,
-    queryFn: (): Promise<EventPacket> => {
+    queryFn: (): Promise<EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
 
         obs.subscribe({
-          next: (v: EventPacket) => {
+          next: (v: EventPacket[]) => {
             // console.log(v);
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
