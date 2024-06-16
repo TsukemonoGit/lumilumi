@@ -150,6 +150,9 @@ export const getMetadataFromLocalStorage = (): void => {
 // savedMetadata = savemetadata;
 
 //console.log(savemetadata);
+function generateRandomId(length: number = 6): string {
+  return Array.from({ length }, () => Math.random().toString(36)[2]).join("");
+}
 
 export function useReq(
   {
@@ -190,7 +193,7 @@ export function useReq(
   if (req) {
     _req = req;
   } else {
-    _req = createRxBackwardReq();
+    _req = createRxBackwardReq(generateRandomId());
   }
 
   const status = writable<ReqStatus>("loading");
