@@ -6,6 +6,7 @@
   import type Nostr from "nostr-typedef";
   import type { RxNostr } from "rx-nostr";
   import { readable } from "svelte/store";
+  import { changeEmit } from "$lib/func/reactions";
 
   export let rxNostr: RxNostr | undefined = undefined;
   export let req: RxReqBase | undefined = undefined;
@@ -16,7 +17,7 @@
 
   let lastUpdateTimestamp = Date.now() + 2000; // 初回は余裕を持たせる
   const updateInterval = 1000; // 1秒（ミリ秒）
-
+  result = useRepReactionList(rxNostr, filters, req);
   $: if (events) {
     const currentTimestamp = Date.now();
     if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
@@ -39,8 +40,9 @@
           kinds: [7, 6, 16], // 明示的に種類を指定
         },
       ];
-      result = useRepReactionList(rxNostr, filters, req);
+
       lastUpdateTimestamp = currentTimestamp;
+      changeEmit(filters);
     }
   }
 

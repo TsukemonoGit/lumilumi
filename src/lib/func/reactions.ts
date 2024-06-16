@@ -9,12 +9,16 @@ import {
 } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
-
+import * as Nostr from "nostr-typedef";
 const rxNostr3 = createRxNostr(); //reaction repost用
 export function set3Relays(relays: any) {
   rxNostr3.setDefaultRelays(relays);
 }
-//const req3 = createRxForwardReq();
+const req3 = createRxForwardReq();
+
+export function changeEmit(filters: Nostr.Filter[]) {
+  req3.emit(filters);
+}
 export function useReq3({
   rxNostr,
   operator,
@@ -24,7 +28,7 @@ export function useReq3({
   initData,
 }: UseReqOpts3<EventPacket>) {
   console.log(filters);
-  const req3 = createRxForwardReq();
+  //const req3 = createRxForwardReq();
   // const req3 = createRxBackwardReq();
   //const req3 = createRxBackwardReq("reactions");
   // const rxNostr3 = get(app).rxNostr;
@@ -36,12 +40,12 @@ export function useReq3({
     throw Error();
   }
 
-  let _req = req3;
+  // let _req = req3;
 
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = rxNostr3.use(_req).pipe(operator);
+  const obs: Observable<EventPacket> = rxNostr3.use(req3).pipe(operator);
 
   const query = createQuery({
     queryKey: ["reactions"],
@@ -82,7 +86,7 @@ export function useReq3({
             }
           },
         });
-        _req.emit(filters);
+        // _req.emit(filters);
       });
     },
   });
