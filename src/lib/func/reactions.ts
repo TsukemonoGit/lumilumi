@@ -1,14 +1,23 @@
-import { queryClient } from "$lib/stores/stores";
+import { app, queryClient } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
+import {
+  createRxNostr,
+  createRxForwardReq,
+  type EventPacket,
+  createRxBackwardReq,
+} from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
-const rxNostr3 = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
-const req3 = createRxForwardReq("reactions");
-
+import * as Nostr from "nostr-typedef";
+const rxNostr3 = createRxNostr(); //reaction repost用
 export function set3Relays(relays: any) {
   rxNostr3.setDefaultRelays(relays);
+}
+const req3 = createRxForwardReq();
+
+export function changeEmit(filters: Nostr.Filter[]) {
+  req3.emit(filters);
 }
 export function useReq3({
   rxNostr,
@@ -18,19 +27,25 @@ export function useReq3({
   req,
   initData,
 }: UseReqOpts3<EventPacket>) {
+  console.log(filters);
+  //const req3 = createRxForwardReq();
+  // const req3 = createRxBackwardReq();
+  //const req3 = createRxBackwardReq("reactions");
+  // const rxNostr3 = get(app).rxNostr;
   const _queryClient = get(queryClient); // useQueryClient();
   //console.log(filters);
   //console.log(rxNostr3.getDefaultRelays());
+
   if (!_queryClient) {
     throw Error();
   }
 
-  let _req = req3;
+  // let _req = req3;
 
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = rxNostr3.use(_req).pipe(operator);
+  const obs: Observable<EventPacket> = rxNostr3.use(req3).pipe(operator);
 
   const query = createQuery({
     queryKey: ["reactions"],
@@ -40,7 +55,7 @@ export function useReq3({
 
         obs.subscribe({
           next: (v: EventPacket) => {
-            //       console.log("[packet]", v);
+            console.log("[packet]", v);
             if (fulfilled) {
               const etag = v.event.tags.find((item) => item[0] === "e");
               if (v.event.kind === 7 && etag) {
@@ -71,7 +86,7 @@ export function useReq3({
             }
           },
         });
-        _req.emit(filters);
+        // _req.emit(filters);
       });
     },
   });

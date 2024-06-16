@@ -61,46 +61,58 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   );
 }
 
-export function scanArray<A>(): OperatorFunction<A, A[]> {
+export function scanArray<A extends EventPacket>(
+  amount: number = 100
+): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
     // クエリデータの設定
-    if ((a as EventPacket)?.event && (a as EventPacket)?.event?.id) {
-      get(queryClient).setQueryData(["timeline", (a as any).event.id], a);
+    if (a.event && a.event.id) {
+      get(queryClient).setQueryData(["timeline", a.event.id], a);
     }
 
-    return [...acc, a];
+    // 新しい順にソート
+    const sorted = [...acc, a].sort(
+      (a, b) => b.event.created_at - a.event.created_at
+    );
+
+    // amountを超える古い部分を捨てる
+    if (sorted.length > amount) {
+      sorted.length = amount;
+    }
+
+    return sorted;
   }, []);
 }
 
-export function collectGroupBy<A, K>(
-  f: (a: A) => K
-): OperatorFunction<A, Map<K, A[]>> {
-  return pipe(
-    scanArray(),
-    map((xs) => {
-      const dict = new Map<K, A[]>();
-      xs.forEach((x) => {
-        const key = f(x);
-        const value = dict.get(key);
-        if (value) {
-          dict.set(key, [...value, x]);
-        } else {
-          dict.set(key, [x]);
-        }
-      });
-      return dict;
-    })
-  );
-}
+// export function collectGroupBy<A, K>(
+//   f: (a: A) => K
+// ): OperatorFunction<A, Map<K, A[]>> {
+//   return pipe(
+//     scanArray(),
+//     map((xs) => {
+//       const dict = new Map<K, A[]>();
+//       xs.forEach((x) => {
+//         const key = f(x);
+//         const value = dict.get(key);
+//         if (value) {
+//           dict.set(key, [...value, x]);
+//         } else {
+//           dict.set(key, [x]);
+//         }
+//       });
+//       return dict;
+//     })
+//   );
+// }
 
-export function scanLatestEach<A, K>(f: (a: A) => K): OperatorFunction<A, A[]> {
-  return pipe(
-    collectGroupBy(f),
-    map((dict) =>
-      Array.from(dict.entries()).map(([, value]) => value.slice(-1)[0])
-    )
-  );
-}
+// export function scanLatestEach<A, K>(f: (a: A) => K): OperatorFunction<A, A[]> {
+//   return pipe(
+//     collectGroupBy(f),
+//     map((dict) =>
+//       Array.from(dict.entries()).map(([, value]) => value.slice(-1)[0])
+//     )
+//   );
+// }
 
 export function metadata(
   queryKey: QueryKey

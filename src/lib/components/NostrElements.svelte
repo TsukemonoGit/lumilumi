@@ -20,8 +20,8 @@
 
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import { onDestroy } from "svelte";
+  import TimelineList from "./NostrMainData/TimelineList.svelte";
 
-  const maxSize = 50;
   const pubkeysIn = (contacts: Nostr.Event) => {
     const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
@@ -34,55 +34,10 @@
     return followingList;
   };
   let viewEvents: Nostr.Event<number>[] = [];
-  const sorted = (events: Nostr.Event[]) => {
-    // Use a Map to store events by their id to ensure uniqueness
-    const uniqueEventsMap = new Map<string, Nostr.Event>();
 
-    events.forEach((event) => {
-      uniqueEventsMap.set(event.id, event);
-    });
-
-    // Convert the map values back to an array and sort by created_at
-    const sortedEvents = [...uniqueEventsMap.values()].sort(
-      (a, b) => b.created_at - a.created_at
-    );
-    viewEvents = sortedEvents.slice(0, maxSize);
-    return sortedEvents.slice(0, maxSize);
-  };
   // const rxNostr = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
   // const req = createRxForwardReq();
   let filters: Nostr.Filter[];
-  let lastUpdateTimestamp: number = Date.now() + 1000; // 前回の更新タイムスタンプ//初回は結構待つためにちょっとサバ読んだ時間にしちゃう
-  const updateInterval = 3 * 1000; // 1秒（ミリ秒）
-
-  $: if (viewEvents.length > 10) {
-    const currentTimestamp = Date.now();
-    if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
-      // 前回の更新から時間場合は何もしない
-
-      const eValues: string[] = viewEvents.reduce((acc: string[], item) => {
-        if ([7, 6, 16].includes(item.kind)) {
-          const tag = item.tags.find((tag) => tag[0] === "e");
-          if (tag) {
-            acc.push(tag[1]);
-          }
-        } else {
-          acc.push(item.id);
-        }
-        return acc;
-      }, []);
-
-      filters = [
-        {
-          "#e": eValues,
-          authors: [$loginUser],
-          // kinds: [7, 6, 16], // コメントアウトしておく
-        },
-      ];
-
-      lastUpdateTimestamp = currentTimestamp; // タイムスタンプを更新
-    }
-  }
 
   // $: filters = [
   //   {
@@ -121,7 +76,7 @@
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
-    <SetRepoReactions bind:filters />
+
     <div class="container break-words overflow-x-hidden">
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}
@@ -132,8 +87,9 @@
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
 
-        <UniqueEventList
+        <TimelineList
           queryKey={["timeline", "feed", pubkey]}
+          amount={50}
           filters={[
             {
               authors: pubkeysIn(contacts),
@@ -152,6 +108,7 @@
           req={createRxForwardReq()}
           let:events
         >
+          <SetRepoReactions {events} />
           <div slot="loading">
             <p>Loading...</p>
           </div>
@@ -161,7 +118,7 @@
           </div>
 
           <div class="max-w-[100vw] break-words box-border overflow-x-clip">
-            {#each sorted(events) as event (event.id)}<div
+            {#each events as event (event.id)}<div
                 class="max-w-[100vw] break-words whitespace-pre-line m-1 box-border overflow-x-clip"
               >
                 <Metadata
@@ -182,7 +139,7 @@
                 >
               </div>{/each}
           </div>
-        </UniqueEventList>
+        </TimelineList>
         <Reactionsforme
           queryKey={["reaction"]}
           filters={[
