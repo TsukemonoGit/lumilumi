@@ -69,13 +69,13 @@
           loading="lazy"
           alt="img"
           src={part.content}
-          class="max-w-full w-80 max-h-42 object-contain"
+          class=" max-w-80 max-h-80 object-contain"
         />
       {:else if $showImg && movieRegex.test(part.content)}
         <video
           controls
           src={part.content}
-          class=" object-contain max-w-full w-80 max-h-42"
+          class=" object-contain max-w-80 max-h-80"
         >
           <track default kind="captions" />
         </video>
