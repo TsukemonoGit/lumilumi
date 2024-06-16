@@ -56,7 +56,7 @@ export function useReq3({
 
         obs.subscribe({
           next: (v: EventPacket) => {
-            console.log("[packet]", v);
+            //   console.log("[packet]", v);
             if (fulfilled) {
               const etag = v.event.tags.find((item) => item[0] === "e");
               if (v.event.kind === 7 && etag) {
