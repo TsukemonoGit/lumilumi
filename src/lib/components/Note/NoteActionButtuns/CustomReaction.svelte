@@ -91,10 +91,12 @@
         class="border border-magnum-600 flex flex-wrap max-w-80 max-h-80 overflow-y-auto"
       >
         {#each $emojis as e, index}
-          {#if customReaction === "" || e[0].includes(customReaction)}
+          {#if customReaction === "" || e[0]
+              .toLowerCase()
+              .includes(customReaction.toLowerCase())}
             <button
               on:click={() => handleClickEmoji(e)}
-              class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >
               {#if $showImg}
                 <img

@@ -3,9 +3,10 @@
   /** Internal helpers */
 
   import { fade } from "svelte/transition";
-  import { X, SquarePen } from "lucide-svelte";
+  import { X, SquarePen, SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
+  import { emojis, showImg } from "$lib/stores/stores";
 
   let text: string = "";
 
@@ -42,6 +43,10 @@
   $: if (!$open) {
     text = "";
   }
+
+  let customReaction: string = "";
+  let viewCustomEmojis: boolean;
+  const handleClickEmoji = (e: string[]) => {};
 </script>
 
 <button
@@ -78,6 +83,28 @@
       </fieldset>
 
       <div class="mt-6 flex justify-end gap-4">
+        {#if $emojis && $emojis.length > 0}
+          {#if viewCustomEmojis}
+            <input
+              type="text"
+              class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+              bind:value={customReaction}
+            />
+          {/if}
+          <button
+            on:click={() => {
+              viewCustomEmojis = !viewCustomEmojis;
+            }}
+            class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+          >
+            <SmilePlus
+              size="20"
+              class={viewCustomEmojis ? "fill-magnum-700" : ""}
+            />
+          </button>
+        {/if}
         <button
           use:melt={$close}
           class="inline-flex h-8 items-center justify-center rounded-sm
@@ -93,6 +120,31 @@
           Post
         </button>
       </div>
+
+      {#if viewCustomEmojis}
+        <div
+          class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
+        >
+          {#each $emojis as e, index}
+            {#if customReaction === "" || e[0]
+                .toLowerCase()
+                .includes(customReaction.toLowerCase())}
+              <button
+                on:click={() => handleClickEmoji(e)}
+                class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              >
+                {#if $showImg}
+                  <img
+                    loading="lazy"
+                    class="h-4 object-contain justify-self-center"
+                    src={e[1]}
+                    alt={e[0]}
+                  />{:else}{e[0]}{/if}
+              </button>
+            {/if}
+          {/each}
+        </div>
+      {/if}
       <button
         use:melt={$close}
         aria-label="close"
