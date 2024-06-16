@@ -5,7 +5,7 @@
   import { Repeat2, TriangleAlert } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import { loginUser, showImg } from "$lib/stores/stores";
+  import { loginUser, showImg, viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -21,6 +21,22 @@
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
+  import { onDestroy, onMount } from "svelte";
+
+  let currentNoteId: string | undefined = undefined;
+
+  $: if (note && note.id !== currentNoteId) {
+    $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
+    if (!$viewEventIds.includes(note.id)) {
+      $viewEventIds.push(note.id);
+    }
+    currentNoteId = note.id;
+  }
+
+  onDestroy(() => {
+    $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
+  });
+
   const profile = (ev: Nostr.Event): Profile | undefined => {
     try {
       return JSON.parse(ev.content);

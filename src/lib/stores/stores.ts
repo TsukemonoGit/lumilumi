@@ -10,7 +10,7 @@ import {
   type DefaultRelayConfig,
 } from "rx-nostr";
 import type { MuteList } from "$lib/types";
-
+import * as Nostr from "nostr-typedef";
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -41,3 +41,5 @@ export const emojis = writable<string[][]>();
 export const mutes = writable<MuteList>();
 export const mutebykinds = writable<{ kind: number; list: string[] }[]>([]);
 export const nowProgress = writable<boolean>(false);
+
+export const viewEventIds = writable<string[]>([]);

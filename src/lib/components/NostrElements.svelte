@@ -108,7 +108,7 @@
           req={createRxForwardReq()}
           let:events
         >
-          <SetRepoReactions {events} />
+          <SetRepoReactions />
           <div slot="loading">
             <p>Loading...</p>
           </div>
