@@ -87,6 +87,7 @@ export interface LumiSetting {
     list: MuteList;
     updated: number; //最終同期日時};
   };
+  mutebykinds?: { list: string; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
 }
 export interface MuteList {
   p: string[];

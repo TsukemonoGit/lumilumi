@@ -11,6 +11,7 @@
     emojis,
     loginUser,
     mutes,
+    mutebykinds,
     showImg,
     toastSettings,
   } from "$lib/stores/stores";
@@ -23,6 +24,7 @@
   import type { MuteList } from "$lib/types";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
+  import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
@@ -33,7 +35,9 @@
   const _showImg = writable<boolean>(false);
   let relayInput: string = "";
   let muteList: { list: MuteList; updated: number } | undefined = undefined;
-
+  let mutebykindList:
+    | { list: { kind: number; list: string[] }[]; updated: number }
+    | undefined = undefined;
   let emojiList: { list: string[][]; updated: number } | undefined = undefined;
 
   // ラジオボタン設定
@@ -73,6 +77,7 @@
         showImg: savedShowImg,
         mute: savedMute,
         emoji: savedEmoji,
+        mutebykinds: savedMutebykinds,
       }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
@@ -84,6 +89,13 @@
         muteList = savedMute;
       }
       if (savedEmoji) emojiList = savedEmoji;
+      if (savedMutebykinds) {
+        mutebykindList = {
+          list: JSON.parse(savedMutebykinds.list),
+          updated: savedMutebykinds.updated,
+        };
+        $mutebykinds = mutebykindList.list;
+      }
     } else {
       radioGroupSelected.set("0");
       try {
@@ -144,6 +156,7 @@
       };
       return;
     }
+    console.log(mutebykindList);
     const settings = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
@@ -151,6 +164,12 @@
       showImg: $_showImg,
       mute: muteList,
       emoji: emojiList,
+      mutebykinds: mutebykindList
+        ? {
+            list: JSON.stringify(mutebykindList.list),
+            updated: mutebykindList.updated,
+          }
+        : {},
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
@@ -167,6 +186,9 @@
     if (emojiList) {
       $emojis = emojiList.list;
     }
+    if (mutebykindList) {
+      $mutebykinds = mutebykindList.list;
+    }
   }
 
   function cancelSettings() {
@@ -178,10 +200,22 @@
         useRelaySet: savedRelaySet,
         pubkey: savedPubkey,
         showImg: savedShowImg,
+        mute: savedMute,
+        emoji: savedEmoji,
+        mutebykinds: savedMutebykinds,
       }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
       pubkey.set(savedPubkey);
+      muteList = savedMute;
+      emojiList = savedEmoji;
+      mutebykindList = savedMutebykinds
+        ? {
+            list: JSON.parse(savedMutebykinds.list),
+            updated: savedMutebykinds.updated,
+          }
+        : undefined;
+
       if (savedShowImg !== undefined) {
         showImg.set(savedShowImg);
       }
@@ -315,9 +349,10 @@
       load and show image
     </label>
   </div>
-  <!--- Emoji --->
+  <!--- Douki --->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class=" text-magnum-200 font-bold text-lg">douki</div>
+    <!--mute-->
     <div class="mt-2">
       <UpdateMuteList bind:pubkey={$pubkey} bind:muteList />
     </div>
@@ -333,6 +368,23 @@
         NostViewstr で MuteList ( kind:10000 ) を編集する
       </a>
     {/if}
+    <!--mute by kind-->
+    <div class="mt-2">
+      <UpdateMutebykindList bind:pubkey={$pubkey} bind:mutebykindList />
+    </div>
+    {#if $loginUser}
+      <a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/30007"
+      >
+        NostViewstr で MutebykindList ( kind:30007 ) を編集する
+      </a>
+    {/if}
+    <!--emoji-->
     <div class="mt-4">
       <UpdateEmojiList bind:pubkey={$pubkey} bind:emojiList />
     </div>

@@ -1,4 +1,4 @@
-import { scanArray } from "$lib/stores/operators";
+import { latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { loginUser, queryClient } from "$lib/stores/stores";
 import {
@@ -80,7 +80,7 @@ export async function getDoukiList(
       subscription.unsubscribe();
       rxNostr.dispose();
       resolve(res);
-    }, 3000);
+    }, 4000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
     const subscription = rxNostr
       .use(rxReq)
@@ -209,4 +209,94 @@ export async function getNaddrEmojiList(
 
   console.log("kekka", event);
   return event;
+}
+
+export async function getMutebykindList(
+  filters: Filter[],
+  relays: DefaultRelayConfig[]
+): Promise<EventPacket[]> {
+  const rxNostr = createRxNostr();
+  const rxReq = createRxBackwardReq();
+  rxNostr.setDefaultRelays(relays);
+
+  const event = await new Promise<EventPacket[]>((resolve) => {
+    let res: EventPacket[];
+    setTimeout(() => {
+      subscription.unsubscribe();
+      rxNostr.dispose();
+      resolve(res);
+    }, 4000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
+
+    const subscription = rxNostr
+      .use(rxReq)
+      .pipe(verify(), uniq(), latestbyId(), completeOnTimeout(2000))
+      .subscribe({
+        next: (packet) => {
+          console.log("Received:", packet);
+          res = packet;
+        },
+        complete: () => {
+          console.log("Completed!");
+          subscription.unsubscribe();
+          rxNostr.dispose();
+          resolve(res);
+        },
+      });
+
+    rxReq.emit(filters);
+  });
+
+  console.log("kekka", event);
+  return event;
+}
+
+//pachet[]をmutebykindのほぞんのかたちにする
+export async function getMuteByList(
+  packets: EventPacket[]
+): Promise<{ kind: number; list: string[] }[]> {
+  const muteByList: { kind: number; list: string[] }[] = [];
+
+  for (const packet of packets) {
+    const kind = Number(
+      packet.event.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
+    );
+    let pTags = packet.event.tags
+      .filter((tag) => tag[0] === "p")
+      .map((tag) => tag[1]);
+
+    if (packet.event.content.length > 0) {
+      const privateTags = await decryptContent(packet.event);
+      if (privateTags && privateTags.length > 0) {
+        const ppTags = privateTags
+          .filter((tag: string[]) => tag[0] === "p")
+          .map((tag: string[]) => tag[1]);
+        if (ppTags.length > 0) {
+          pTags = [...pTags, ...ppTags];
+        }
+      }
+    }
+
+    if (pTags.length > 0) {
+      const existingKind = muteByList.findIndex((item) => item.kind === kind);
+      if (existingKind !== -1) {
+        muteByList[existingKind].list.push(...pTags);
+      } else {
+        muteByList.push({ kind, list: pTags });
+      }
+    }
+  }
+
+  return muteByList;
+}
+
+async function decryptContent(event: Nostr.Event): Promise<string[][] | null> {
+  try {
+    const privateTagsJson = await (
+      window?.nostr as Nostr.Nip07.Nostr
+    )?.nip04?.decrypt(event.pubkey, event.content);
+    return privateTagsJson ? JSON.parse(privateTagsJson) : null;
+  } catch (error) {
+    console.error("Failed to decrypt content:", error);
+    return null;
+  }
 }

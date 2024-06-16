@@ -84,11 +84,14 @@ export function scanArray<A extends EventPacket>(
   }, []);
 }
 
+// export function scanArray0<A>(): OperatorFunction<A, A[]> {
+//   return scan((acc: A[], a: A) => [...acc, a], []);
+// }
 // export function collectGroupBy<A, K>(
 //   f: (a: A) => K
 // ): OperatorFunction<A, Map<K, A[]>> {
 //   return pipe(
-//     scanArray(),
+//     scanArray0(),
 //     map((xs) => {
 //       const dict = new Map<K, A[]>();
 //       xs.forEach((x) => {
@@ -122,4 +125,31 @@ export function metadata(
       metadataQueue.update((queue) => [...queue, [queryKey, event]]);
     }
   });
+}
+
+export function latestbyId<A extends EventPacket>(): OperatorFunction<A, A[]> {
+  return pipe(
+    scan((acc: Map<string, A>, eventPacket: A) => {
+      const tagValue = getTagValue(eventPacket, "d");
+      if (tagValue) {
+        const existingPacket = acc.get(tagValue);
+        if (
+          !existingPacket ||
+          existingPacket.event.created_at < eventPacket.event.created_at
+        ) {
+          acc.set(tagValue, eventPacket);
+        }
+      }
+      return acc;
+    }, new Map<string, A>()),
+    map((acc) => Array.from(acc.values()))
+  );
+}
+
+function getTagValue(
+  eventPacket: EventPacket,
+  tagKey: string
+): string | undefined {
+  const tag = eventPacket.event.tags.find((tag) => tag[0] === tagKey);
+  return tag ? tag[1] : undefined;
 }
