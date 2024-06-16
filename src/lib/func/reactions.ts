@@ -10,13 +10,14 @@ import {
 import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
-const rxNostr3 = createRxNostr(); //reaction repost用
+const rxNostr3 = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
 export function set3Relays(relays: any) {
   rxNostr3.setDefaultRelays(relays);
 }
 const req3 = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {
+  console.log(filters);
   req3.emit(filters);
 }
 export function useReq3({
