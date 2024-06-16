@@ -9,13 +9,6 @@
   } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
-  import {
-    app,
-    defaultRelays,
-    loginUser,
-    toastSettings,
-  } from "$lib/stores/stores";
-
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
 
@@ -24,10 +17,8 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Reaction from "../Reaction.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-
-  import { createRxForwardReq, createRxNostr } from "rx-nostr";
-  import { onDestroy, onMount } from "svelte";
-  import RepoReactions from "$lib/components/NostrMainData/RepoReactions.svelte";
+  import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
+  import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
 
   export let note: Nostr.Event;
   export let openReplyWindow: boolean = false;
@@ -147,21 +138,6 @@
         break;
     }
   };
-  // const rxNostr = createRxNostr();
-  // //const prxNostr = createRxNostr();
-  // onMount(() => {
-  //   rxNostr.setDefaultRelays($defaultRelays);
-  // });
-  // const req = createRxForwardReq("a" + note.id.slice(0, 10));
-
-  // onDestroy(() => {
-  //   // console.log("destroy");
-  //   //購読終了したい
-  //   rxNostr.dispose();
-  //   //  prxNostr.dispose();
-  // });
-  let repostData: undefined;
-  let reactionData: undefined;
 </script>
 
 <div>
@@ -177,35 +153,58 @@
         />
       </button>
       <!--リポスト-->
-      <!-- <RepoReactions
-        {rxNostr}
-        {req}
-        bind:pubkey={$loginUser}
-        id={note.id}
-        let:repostData
-        let:reactionData
-      > -->
-      {#if repostData === undefined}
-        <DropdownMenu {menuTexts} {handleSelectItem}>
+      <Reposted id={note.id} let:event>
+        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
           <Repeat2 size="20" />
         </DropdownMenu>
-      {:else}
-        <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" class={repostData ? "text-magnum-300" : ""} />
+        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
         </DropdownMenu>
-      {/if}
+        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
 
-      {#if reactionData === undefined}
-        <button on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500"
-          />
-        </button>
-      {:else}
-        <Reaction event={reactionData} />
-      {/if}
-      <!-- </RepoReactions> -->
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
+        </DropdownMenu>
+      </Reposted>
+      <!--リアクション-->
+      <Reactioned id={note.id} let:event>
+        <div slot="loading">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        <div slot="nodata">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        <div slot="error">
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        </div>
+        {#if event === undefined}
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        {:else}
+          <Reaction {event} />
+        {/if}
+      </Reactioned>
       <!--カスタムリアクション-->
       <CustomReaction {note} />
     {/if}

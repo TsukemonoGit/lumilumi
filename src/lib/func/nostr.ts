@@ -37,11 +37,13 @@ import {
   createTie,
   type OkPacketAgainstEvent,
   nip07Signer,
+  createRxForwardReq,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, scanArray } from "$lib/stores/operators";
+import { set3Relays } from "./reactions";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -58,6 +60,7 @@ export function getRelaysById(id: string): string[] {
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   rxNostr.setDefaultRelays(relays);
   defaultRelays.set(rxNostr.getDefaultRelays());
+  set3Relays(relays);
 }
 
 // metadataの保存
@@ -419,104 +422,3 @@ export function useReq2({
 //     }
 //   });
 // }
-
-export function useReq3({
-  rxNostr,
-  operator,
-  filters,
-
-  req,
-  initData,
-}: UseReqOpts3<EventPacket>) {
-  const _queryClient = get(queryClient); // useQueryClient();
-  console.log(filters);
-  if (!_queryClient) {
-    throw Error();
-  }
-  console.log(rxNostr.getDefaultRelays());
-  if (Object.entries(rxNostr.getDefaultRelays()).length <= 0) {
-    rxNostr.setDefaultRelays(get(app).rxNostr.getDefaultRelays());
-  }
-  let _req:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
-        RxReqPipeable);
-
-  if (req) {
-    _req = req;
-  } else {
-    _req = createRxBackwardReq();
-  }
-
-  const status = writable<ReqStatus>("loading");
-  const error = writable<Error>();
-
-  const obs: Observable<EventPacket> = rxNostr.use(_req).pipe(operator);
-  const query = createQuery({
-    queryKey: ["reaction", "repost"],
-    queryFn: (): Promise<EventPacket> => {
-      return new Promise((resolve, reject) => {
-        let fulfilled = false;
-
-        obs.subscribe({
-          next: (v: EventPacket) => {
-            console.log("[packet]", v);
-            if (fulfilled) {
-              if (v.event.kind === 7) {
-                _queryClient.setQueryData(["reaction", v.event.id], v);
-              } else if (v.event.kind === 6 || v.event.kind === 16) {
-                _queryClient.setQueryData(["repost", v.event.id], v);
-              }
-            } else {
-              resolve(v);
-              fulfilled = true;
-            }
-          },
-
-          complete: () => status.set("success"),
-          error: (e) => {
-            console.error("[rx-nostr]", e);
-            status.set("error");
-            error.set(e);
-
-            if (!fulfilled) {
-              reject(e);
-              fulfilled = true;
-            }
-          },
-        });
-        _req.emit(filters);
-      });
-    },
-  });
-
-  return {
-    data: derived(query, ($query) => $query.data, initData),
-    status: derived([query, status], ([$query, $status]) => {
-      // console.log($query.data);
-      if ($query.isSuccess) {
-        return "success";
-      } else if ($query.isError) {
-        return "error";
-      } else {
-        return $status;
-      }
-    }),
-    error: derived([query, error], ([$query, $error]) => {
-      if ($query.isError) {
-        return $query.error;
-      } else {
-        return $error;
-      }
-    }),
-  };
-}

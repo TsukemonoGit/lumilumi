@@ -1,18 +1,17 @@
-import type { QueryKey } from "@tanstack/svelte-query";
 import type { EventPacket, RxNostr } from "rx-nostr";
 import { uniq, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { useReq, useReq2, useReq3 } from "$lib/func/nostr.js";
+import { useReq, useReq2 } from "$lib/func/nostr.js";
 import type { RxReqBase, ReqResult } from "$lib/types.js";
-import { scanArray } from "./operators";
+import { useReq3 } from "$lib/func/reactions";
 
 export function useRepReactionList(
-  rxNostr: RxNostr,
+  rxNostr: RxNostr | undefined,
   filters: Nostr.Filter[],
   req?: RxReqBase | undefined
 ) {
-  const operator = pipe();
+  const operator = pipe(verify());
   return useReq3({
     rxNostr,
 

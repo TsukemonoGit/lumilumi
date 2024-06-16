@@ -17,7 +17,7 @@
   import { setFollowingList } from "$lib/func/nostr";
   import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
   import { defaultRelays, loginUser } from "$lib/stores/stores";
-  import RepoReactions from "./NostrMainData/RepoReactions.svelte";
+
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import { onDestroy } from "svelte";
 
@@ -49,34 +49,69 @@
     viewEvents = sortedEvents.slice(0, maxSize);
     return sortedEvents.slice(0, maxSize);
   };
-  const rxNostr = createRxNostr(); //reaction repost用
-  const req = createRxForwardReq("rearep");
-  $: filters = [
-    {
-      "#e": viewEvents.map((item) => item.id),
-      authors: [$loginUser],
-      kinds: [7],
-    },
-    {
-      "#e": viewEvents.map((item) => item.id),
-      authors: [$loginUser],
-      kinds: [6],
-    },
-    {
-      "#e": viewEvents.map((item) => item.id),
-      authors: [$loginUser],
-      kinds: [16],
-    },
-  ];
-  // $: filters = viewEvents.map((item) => ({
-  //   "#e": [item.id],
-  //   authors: [$loginUser],
-  //   kinds: [7, 6, 16],
-  // }));
+  // const rxNostr = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
+  // const req = createRxForwardReq();
+  let filters: Nostr.Filter[];
+  let lastUpdateTimestamp: number = 0; // 前回の更新タイムスタンプ
+  const updateInterval = 1 * 1000; // 1秒（ミリ秒）
 
-  onDestroy(() => {
-    rxNostr.dispose();
-  });
+  $: if (viewEvents.length > 30) {
+    const currentTimestamp = Date.now();
+    if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
+      // 前回の更新から5分経っていない場合は何もしない
+
+      const eValues: string[] = viewEvents.reduce((acc: string[], item) => {
+        if ([7, 6, 16].includes(item.kind)) {
+          const tag = item.tags.find((tag) => tag[0] === "e");
+          if (tag) {
+            acc.push(tag[1]);
+          }
+        } else {
+          acc.push(item.id);
+        }
+        return acc;
+      }, []);
+
+      filters = [
+        {
+          "#e": eValues,
+          authors: [$loginUser],
+          // kinds: [7, 6, 16], // コメントアウトしておく
+        },
+      ];
+
+      lastUpdateTimestamp = currentTimestamp; // タイムスタンプを更新
+    }
+  }
+
+  // $: filters = [
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [7],
+  //   },
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [6],
+  //   },
+  //   {
+  //     "#e": viewEvents.map((item) => item.id),
+  //     authors: [$loginUser],
+  //     kinds: [16],
+  //   },
+  // ];
+  // $: filters = viewEvents
+  //   .map((item) => ({
+  //     "#e": [item.id],
+  //     authors: [$loginUser],
+  //     kinds: [7, 6, 16],
+  //   }))
+  //   .slice(0, 10);
+
+  // onDestroy(() => {
+  //   rxNostr.dispose();
+  // });
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
@@ -86,7 +121,7 @@
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
-    <SetRepoReactions {rxNostr} {relays} {req} bind:filters />
+    <SetRepoReactions bind:filters />
     <div class="container break-words overflow-x-hidden">
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}
