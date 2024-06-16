@@ -19,8 +19,8 @@ export function useReq3({
   initData,
 }: UseReqOpts3<EventPacket>) {
   const _queryClient = get(queryClient); // useQueryClient();
-  console.log(filters);
-  console.log(rxNostr3.getDefaultRelays());
+  //console.log(filters);
+  //console.log(rxNostr3.getDefaultRelays());
   if (!_queryClient) {
     throw Error();
   }
@@ -40,17 +40,17 @@ export function useReq3({
 
         obs.subscribe({
           next: (v: EventPacket) => {
-            console.log("[packet]", v);
+            //       console.log("[packet]", v);
             if (fulfilled) {
               const etag = v.event.tags.find((item) => item[0] === "e");
               if (v.event.kind === 7 && etag) {
-                console.log("[reaction]", v);
+                //       console.log("[reaction]", v);
                 _queryClient.setQueryData(
                   ["reactions", "reaction", etag[1]],
                   v
                 );
               } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-                console.log("[repost]", v);
+                //          console.log("[repost]", v);
                 _queryClient.setQueryData(["reactions", "repost", etag[1]], v);
               }
             } else {
@@ -79,7 +79,7 @@ export function useReq3({
   return {
     data: derived(query, ($query) => $query.data, initData),
     status: derived([query, status], ([$query, $status]) => {
-      console.log($query.data);
+      // console.log($query.data);
       if ($query.isSuccess) {
         return "success";
       } else if ($query.isError) {

@@ -52,13 +52,13 @@
   // const rxNostr = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
   // const req = createRxForwardReq();
   let filters: Nostr.Filter[];
-  let lastUpdateTimestamp: number = 0; // 前回の更新タイムスタンプ
+  let lastUpdateTimestamp: number = Date.now() + 3000; // 前回の更新タイムスタンプ//初回は結構待つためにちょっとサバ読んだ時間にしちゃう
   const updateInterval = 1 * 1000; // 1秒（ミリ秒）
 
-  $: if (viewEvents.length > 30) {
+  $: if (viewEvents.length > 10) {
     const currentTimestamp = Date.now();
     if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
-      // 前回の更新から5分経っていない場合は何もしない
+      // 前回の更新から時間場合は何もしない
 
       const eValues: string[] = viewEvents.reduce((acc: string[], item) => {
         if ([7, 6, 16].includes(item.kind)) {
