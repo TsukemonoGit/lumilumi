@@ -165,6 +165,9 @@ function getTagValue(
 //muteCheck
 export function muteCheck(): OperatorFunction<EventPacket, EventPacket> {
   return filter((eventPacket) => {
+    if (!get(mutes)) {
+      return true;
+    }
     // Check if the eventPacket should be muted based on mutes.p
     if (shouldMuteByP(eventPacket)) {
       return false;
