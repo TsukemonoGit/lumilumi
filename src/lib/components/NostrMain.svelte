@@ -73,10 +73,10 @@
     if (savedMute) {
       $mutes = savedMute.list;
     }
-    if (savedEmoji) {
+    if (savedEmoji && savedEmoji.list) {
       $emojis = savedEmoji.list;
     }
-    if (savedMutebykinds?.list) {
+    if (savedMutebykinds && savedMutebykinds.list) {
       try {
         $mutebykinds = JSON.parse(savedMutebykinds.list);
       } catch (error) {

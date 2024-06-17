@@ -258,20 +258,28 @@
 
   // 設定が変更されたかどうかをチェックする関数
   function settingsChanged(): boolean {
-    const currentSettings = {
+    let currentSettings: LumiSetting = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
       pubkey: $pubkey,
       showImg: $_showImg,
-      mute: muteList,
-      emoji: emojiList,
-      mutebykinds: mutebykindList
-        ? {
-            list: JSON.stringify(mutebykindList.list),
-            updated: mutebykindList.updated,
-          }
-        : {},
     };
+    // muteList が定義されていて、updated プロパティが undefined でない場合のみ、mute を含める
+    if (muteList && muteList.updated !== undefined) {
+      currentSettings = { ...currentSettings, mute: muteList };
+    }
+    if (emojiList && emojiList.list.length > 0) {
+      currentSettings = { ...currentSettings, emoji: emojiList };
+    }
+    if (mutebykindList && mutebykindList.list.length > 0) {
+      currentSettings = {
+        ...currentSettings,
+        mutebykinds: {
+          list: JSON.stringify(mutebykindList.list),
+          updated: mutebykindList.updated,
+        },
+      };
+    }
     return (
       JSON.stringify(currentSettings) !== JSON.stringify($originalSettings)
     );
