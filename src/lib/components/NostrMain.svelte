@@ -77,7 +77,11 @@
       $emojis = savedEmoji.list;
     }
     if (savedMutebykinds?.list) {
-      $mutebykinds = JSON.parse(savedMutebykinds.list);
+      try {
+        $mutebykinds = JSON.parse(savedMutebykinds.list);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 

@@ -70,32 +70,36 @@
       localStorage.removeItem(Delete_STORAGE_KEY);
     }
     if (savedSettings) {
-      const {
-        relays: savedRelays,
-        useRelaySet: savedRelaySet,
-        pubkey: savedPubkey,
-        showImg: savedShowImg,
-        mute: savedMute,
-        emoji: savedEmoji,
-        mutebykinds: savedMutebykinds,
-      }: LumiSetting = JSON.parse(savedSettings);
-      relays.set(savedRelays);
-      radioGroupSelected.set(savedRelaySet);
-      pubkey.set(savedPubkey);
-      $loginUser = $pubkey;
-      if (savedShowImg) {
-        _showImg.set(savedShowImg);
-      }
-      if (savedMute) {
-        muteList = savedMute;
-      }
-      if (savedEmoji) emojiList = savedEmoji;
-      if (savedMutebykinds?.list) {
-        mutebykindList = {
-          list: JSON.parse(savedMutebykinds.list),
-          updated: savedMutebykinds.updated,
-        };
-        $mutebykinds = mutebykindList.list;
+      try {
+        const {
+          relays: savedRelays,
+          useRelaySet: savedRelaySet,
+          pubkey: savedPubkey,
+          showImg: savedShowImg,
+          mute: savedMute,
+          emoji: savedEmoji,
+          mutebykinds: savedMutebykinds,
+        }: LumiSetting = JSON.parse(savedSettings);
+        relays.set(savedRelays);
+        radioGroupSelected.set(savedRelaySet);
+        pubkey.set(savedPubkey);
+        $loginUser = $pubkey;
+        if (savedShowImg) {
+          _showImg.set(savedShowImg);
+        }
+        if (savedMute) {
+          muteList = savedMute;
+        }
+        if (savedEmoji) emojiList = savedEmoji;
+        if (savedMutebykinds?.list) {
+          mutebykindList = {
+            list: JSON.parse(savedMutebykinds.list),
+            updated: savedMutebykinds.updated,
+          };
+          $mutebykinds = mutebykindList.list;
+        }
+      } catch (error) {
+        console.log(error);
       }
     } else {
       radioGroupSelected.set("0");
@@ -210,13 +214,16 @@
       pubkey.set(savedPubkey);
       muteList = savedMute;
       emojiList = savedEmoji;
-      mutebykindList = savedMutebykinds?.list
-        ? {
-            list: JSON.parse(savedMutebykinds.list),
-            updated: savedMutebykinds.updated,
-          }
-        : undefined;
-
+      try {
+        mutebykindList = savedMutebykinds?.list
+          ? {
+              list: JSON.parse(savedMutebykinds.list),
+              updated: savedMutebykinds.updated,
+            }
+          : undefined;
+      } catch (error) {
+        console.log(error);
+      }
       if (savedShowImg !== undefined) {
         showImg.set(savedShowImg);
       }
