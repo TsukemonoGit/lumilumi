@@ -366,8 +366,7 @@
                 items-center justify-center rounded-full p-1 text-magnum-800
                 hover:bg-magnum-100 focus:shadow-magnum-400"
           on:click={() => {
-            replyText = "";
-            $additionalReplyUsers = [...allPtag];
+            openReplyWindow = false;
           }}
         >
           <X size="20" />
@@ -501,7 +500,19 @@
               <Plus class="size-4" />
             </button>{/if}
         </div>
+
+        <button
+          class="ml-auto inline-flex h-6 w-6 appearance-none
+            items-center justify-center rounded-full p-1 text-magnum-800
+            hover:bg-magnum-100 focus:shadow-magnum-400"
+          on:click={() => {
+            openQuoteWindow = false;
+          }}
+        >
+          <X size="20" />
+        </button>
       </div>
+
       <textarea
         rows="6"
         class="w-[100%] rounded-md bg-neutral-950 mt-1"
