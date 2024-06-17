@@ -5,6 +5,7 @@
   import { app, queryClient } from "$lib/stores/stores";
   import {
     getMetadataFromLocalStorage,
+    relaysReconnectChallenge,
     //relaysReconnectChallenge,
     setRxNostr,
   } from "$lib/func/nostr";
@@ -35,14 +36,14 @@
     }
   });
 
-  // function onVisibilityChange() {
-  //   if (document?.visibilityState === "visible") {
-  //     relaysReconnectChallenge();
-  //   }
-  // }
+  function onVisibilityChange() {
+    if (document?.visibilityState === "visible") {
+      relaysReconnectChallenge();
+    }
+  }
 </script>
 
-<!-- <svelte:document on:visibilitychange={onVisibilityChange} /> -->
+<svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}

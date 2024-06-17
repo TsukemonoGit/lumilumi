@@ -415,13 +415,13 @@ export function useReq2({
 // | "rejected"
 // | "terminated";
 // const reconectableStatus:ConnectionState[]=[];
-// export function relaysReconnectChallenge() {
-//   if (Object.entries(defaultRelays).length == 0) {
-//     return;
-//   }
-//   Object.entries(defaultRelays).forEach(([key, value], index) => {
-//     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
-//       get(app).rxNostr.reconnect(key);
-//     }
-//   });
-// }
+export function relaysReconnectChallenge() {
+  if (Object.entries(defaultRelays).length == 0) {
+    return;
+  }
+  Object.entries(defaultRelays).forEach(([key, value], index) => {
+    if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
+      get(app).rxNostr.reconnect(key);
+    }
+  });
+}

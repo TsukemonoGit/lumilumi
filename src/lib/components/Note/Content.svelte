@@ -3,6 +3,7 @@
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
   import { showImg } from "$lib/stores/stores";
+  import Link from "../Elements/Link.svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -65,26 +66,28 @@
       {/await}
     {:else if part.type === "url" && part.content}
       {#if $showImg && imageRegex.test(part.content)}
-        <img
-          loading="lazy"
-          alt="img"
-          src={part.content}
-          class=" max-w-80 max-h-80 object-contain"
-        />
-      {:else if $showImg && movieRegex.test(part.content)}
-        <video
-          controls
-          src={part.content}
-          class=" object-contain max-w-80 max-h-80"
+        <Link href={part.content}
+          ><img
+            loading="lazy"
+            alt="img"
+            src={part.content}
+            class=" max-w-80 max-h-80 object-contain"
+          /></Link
         >
-          <track default kind="captions" />
-        </video>
+      {:else if $showImg && movieRegex.test(part.content)}
+        <Link href={part.content}
+          ><video
+            controls
+            src={part.content}
+            class=" object-contain max-w-80 max-h-80"
+          >
+            <track default kind="captions" />
+          </video></Link
+        >
       {:else}
-        <a
-          class="underline text-magnum-300 break-all"
-          href={part.content}
-          target="_blank"
-          rel="noopener noreferrer">{part.content}</a
+        <Link
+          className="underline text-magnum-300 break-all"
+          href={part.content}>{part.content}</Link
         >{/if}
     {:else if part.type === "emoji"}
       {#if $showImg}
