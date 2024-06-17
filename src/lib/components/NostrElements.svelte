@@ -117,9 +117,9 @@
             <p>{error}</p>
           </div>
 
-          <div class="max-w-[100vw] break-words box-border overflow-x-clip">
+          <div class="max-w-[100vw] break-words box-border">
             {#each events as event (event.id)}<div
-                class="max-w-[100vw] break-words whitespace-pre-line m-1 box-border overflow-x-clip"
+                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-x-hidden"
               >
                 <Metadata
                   queryKey={["metadata", event.pubkey]}
