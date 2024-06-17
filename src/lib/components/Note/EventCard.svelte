@@ -245,9 +245,11 @@
     {/await}
   {:else}
     <!--その他-->
-    kind:{note.kind}{#if metadata}
-      {profile(metadata)?.name}
-    {/if}
+    <div class="break-all overflow-x-hidden">
+      kind:{note.kind}{#if metadata}
+        {profile(metadata)?.name}
+      {/if}
+    </div>
     <hr />
     {note.tags}
     <hr />

@@ -69,13 +69,16 @@
       ]}
       let:event
     >
-      <div slot="loading" class="text-sm text-neutral-500 flex-inline">
+      <div
+        slot="loading"
+        class="text-sm text-neutral-500 flex-inline break-all"
+      >
         {content}
       </div>
-      <div slot="nodata" class="text-sm text-neutral-500 flex-inline">
+      <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
         {content}
       </div>
-      <div slot="error" class="text-sm text-neutral-500 flex-inline">
+      <div slot="error" class="text-sm text-neutral-500 flex-inline break-all">
         {content}
       </div>
       <EventCard note={event} status="loading" />
