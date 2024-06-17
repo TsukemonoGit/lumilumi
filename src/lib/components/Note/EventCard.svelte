@@ -51,7 +51,10 @@
     const kindtag = tags.find((tag) => tag[0] === "k");
     const kind = kindtag ? Number(kindtag[1]) : undefined;
     return {
-      tag: tags.find((tag) => tag[0] === "e" || tag[0] === "a"),
+      tag: tags
+        .slice()
+        .reverse()
+        .find((tag) => tag[0] === "e" || tag[0] === "a"),
       kind: kind,
     };
   };
