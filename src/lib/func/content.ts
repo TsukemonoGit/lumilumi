@@ -10,7 +10,6 @@ export function parseText(
 }[] {
   const parts = [];
   let remainingText = input;
-  let match;
 
   while (remainingText.length > 0) {
     const nip19Match = remainingText.match(nip19Regex);
