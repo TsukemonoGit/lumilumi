@@ -7,9 +7,11 @@
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import { emojis, showImg } from "$lib/stores/stores";
+  import { contentCheck } from "$lib/func/contentCheck";
 
   let text: string = "";
-
+  let tags: string[][] = [];
+  let cursorPosition: number = 0;
   const {
     elements: {
       trigger,
@@ -28,25 +30,46 @@
   const postNote = async () => {
     console.log(text);
     if (text.trim().length > 0) {
+      const { text: checkedText, tags: checkedTags } = contentCheck(
+        text.trim(),
+        tags
+      );
       const newev: Nostr.EventParameters = {
         kind: 1,
-        content: text.trim(),
+        content: checkedText,
+        tags: checkedTags,
       };
 
-      await publishEvent(newev);
+      publishEvent(newev);
 
       // ダイアログを閉じる
       $open = false;
     }
   };
-  // ダイアログが閉じるときにtextをリセット
+  // ダイアログが閉じるときにtextをリセットtagもリセット
   $: if (!$open) {
     text = "";
+    tags = [];
   }
+
+  const handleTextareaInput = (event: Event) => {
+    const target = event.target as HTMLTextAreaElement;
+    cursorPosition = target.selectionStart;
+  };
 
   let customReaction: string = "";
   let viewCustomEmojis: boolean;
-  const handleClickEmoji = (e: string[]) => {};
+  const handleClickEmoji = (e: string[]) => {
+    const emojiTag = ["emoji", ...e];
+    if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
+      tags.push(emojiTag);
+    }
+    // カーソル位置にテキストを挿入
+    const emojiText = `:${e[0]}:`;
+    text =
+      text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
+    cursorPosition += emojiText.length;
+  };
 </script>
 
 <button
@@ -78,6 +101,8 @@
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800"
           id="note"
           bind:value={text}
+          on:input={handleTextareaInput}
+          on:click={handleTextareaInput}
           placeholder="いま どうしてる？"
         />
       </fieldset>

@@ -1,8 +1,5 @@
-const nip19Regex =
-  /nostr:(((npub|nsec|nprofile|naddr|nevent|note)1[023456789acdefghjklmnpqrstuvwxyz]{58,})|(nrelay1[023456789acdefghjklmnpqrstuvwxyz]{20,}))/;
+import { nip19Regex, urlRegex, emojiRegex } from "./util";
 
-const urlRegex = /(https?:\/\/+[^\s"'<`\]]+[^\s"'<`:\].]+)/;
-const emojiRegex = /(:[^:\s]+:)/;
 export function parseText(
   input: string,
   tags: string[][]

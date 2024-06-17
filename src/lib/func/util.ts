@@ -1,5 +1,11 @@
-export const relayRegex = /^wss?:\/\/\S+$/;
-export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;
+export const relayRegex = /^wss?:\/\/\S+$/g;
+export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/g;
+export const nip19Regex =
+  /nostr:(((npub|nsec|nprofile|naddr|nevent|note)1[023456789acdefghjklmnpqrstuvwxyz]{58,})|(nrelay1[023456789acdefghjklmnpqrstuvwxyz]{20,}))/g;
+
+export const urlRegex = /(https?:\/\/+[^\s"'<`\]]+[^\s"'<`:\].]+)/g;
+export const emojiRegex = /(:[^:\s]+:)/g;
+export const hashtagRegex = /(?<=^|\s)#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu; //(?<hashtag>...) は、名前付きキャプチャグループ
 // RGB 値を計算する関数
 export function calculateColor(hex: string): string {
   if (!hex) {

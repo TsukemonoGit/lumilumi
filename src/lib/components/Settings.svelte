@@ -89,7 +89,7 @@
         muteList = savedMute;
       }
       if (savedEmoji) emojiList = savedEmoji;
-      if (savedMutebykinds) {
+      if (savedMutebykinds?.list) {
         mutebykindList = {
           list: JSON.parse(savedMutebykinds.list),
           updated: savedMutebykinds.updated,
@@ -209,7 +209,7 @@
       pubkey.set(savedPubkey);
       muteList = savedMute;
       emojiList = savedEmoji;
-      mutebykindList = savedMutebykinds
+      mutebykindList = savedMutebykinds?.list
         ? {
             list: JSON.parse(savedMutebykinds.list),
             updated: savedMutebykinds.updated,
