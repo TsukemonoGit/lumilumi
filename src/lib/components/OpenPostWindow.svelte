@@ -3,7 +3,7 @@
   /** Internal helpers */
 
   import { fade } from "svelte/transition";
-  import { X, SquarePen, SmilePlus } from "lucide-svelte";
+  import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import { emojis, showImg } from "$lib/stores/stores";
@@ -27,6 +27,9 @@
     forceVisible: true,
   });
 
+  let onWarning: boolean;
+  let warningText = "";
+
   const postNote = async () => {
     console.log(text);
     if (text.trim().length > 0) {
@@ -34,6 +37,9 @@
         text.trim(),
         tags
       );
+      if (onWarning) {
+        checkedTags.push(["content-warning", warningText]);
+      }
       const newev: Nostr.EventParameters = {
         kind: 1,
         content: checkedText,
@@ -46,10 +52,13 @@
       $open = false;
     }
   };
+
   // ダイアログが閉じるときにtextをリセットtagもリセット
   $: if (!$open) {
     text = "";
     tags = [];
+    warningText = "";
+    onWarning = false;
   }
 
   const handleTextareaInput = (event: Event) => {
@@ -95,7 +104,7 @@
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium">Post Note</h2>
 
-      <fieldset class="mb-4 flex items-center gap-5">
+      <fieldset class="mb-1 flex items-center gap-5">
         <textarea
           class="inline-flex h-24 w-full flex-1 items-center justify-center
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800"
@@ -106,49 +115,69 @@
           placeholder="いま どうしてる？"
         />
       </fieldset>
-
-      <div class="mt-6 flex justify-end gap-4">
-        {#if $emojis && $emojis.length > 0}
-          {#if viewCustomEmojis}
-            <input
-              type="text"
-              class="h-8 w-full rounded-md text-magnum-100 border-2
+      {#if onWarning}
+        <div class="flex">
+          <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+          <input
+            type="text"
+            class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
            'border-neutral-900'}"
-              bind:value={customReaction}
-            />
+            bind:value={warningText}
+          />
+        </div>
+      {:else}<div class="h-4" />{/if}
+      <div class="mt-2 flex justify-between">
+        <button
+          on:click={() => {
+            onWarning = !onWarning;
+          }}
+          class=" h-8 rounded-sm
+                bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+        >
+          <TriangleAlert
+            size="20"
+            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+          />
+        </button>
+        <div class=" flex gap-4">
+          {#if $emojis && $emojis.length > 0}
+            {#if viewCustomEmojis}
+              <input
+                type="text"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+                bind:value={customReaction}
+              />
+            {/if}
+            <button
+              on:click={() => {
+                viewCustomEmojis = !viewCustomEmojis;
+              }}
+              class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+            >
+              <SmilePlus
+                size="20"
+                class={viewCustomEmojis
+                  ? "fill-magnum-700 stroke-magnum-500"
+                  : ""}
+              />
+            </button>
           {/if}
+
           <button
-            on:click={() => {
-              viewCustomEmojis = !viewCustomEmojis;
-            }}
             class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-          >
-            <SmilePlus
-              size="20"
-              class={viewCustomEmojis ? "fill-magnum-700" : ""}
-            />
-          </button>
-        {/if}
-        <button
-          use:melt={$close}
-          class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-        >
-          Cancel
-        </button>
-        <button
-          class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-          on:click={postNote}
-        >
-          Post
-        </button>
+            on:click={postNote}
+          >
+            <Send size="20" />
+          </button>
+        </div>
       </div>
 
       {#if viewCustomEmojis}
         <div
-          class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
+          class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
         >
           {#each $emojis as e, index}
             {#if customReaction === "" || e[0]

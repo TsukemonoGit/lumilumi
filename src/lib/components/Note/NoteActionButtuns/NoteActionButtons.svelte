@@ -7,6 +7,8 @@
     Plus,
     Quote,
     SmilePlus,
+    Send,
+    TriangleAlert,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
@@ -95,18 +97,18 @@
     const root = note.tags.find(
       (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
     );
-    const warning = note.tags.find((item) => item[0] === "content-warning");
+
     let etag = root
       ? [root, ["e", note.id, getRelaysById(note.id)?.[0], "reply"]]
       : [["e", note.id, getRelaysById(note.id)?.[0], "root"]];
-    if (warning) {
-      etag.push(warning);
-    }
 
     const { text: checkedtext, tags: checkedTags } = contentCheck(
       replyText.trim(),
       tags
     );
+    if (onWarning) {
+      checkedTags.push(["content-warning", warningText]);
+    }
     const ev: Nostr.EventParameters = {
       content: checkedtext,
       tags: [["p", note.pubkey], ...replyUsersArray, ...etag, ...checkedTags],
@@ -189,17 +191,14 @@
       tags.push(["p", note.pubkey]);
     }
 
-    const warning = note.tags.find((item) => item[0] === "content-warning");
-    if (warning) {
-      tags.push(warning);
-    }
-
     let { text: checkedtext, tags: checkedTags } = contentCheck(
       replyText.trim(),
       tags
     );
     console.log(checkedTags);
-
+    if (onWarning) {
+      checkedTags.push(["content-warning", warningText]);
+    }
     const ev: Nostr.EventParameters = {
       content: checkedtext,
       tags: checkedTags,
@@ -212,6 +211,19 @@
     tags = [];
     console.log(ev);
   };
+
+  let warningText = "";
+  let onWarning: boolean;
+  $: if (openQuoteWindow || openReplyWindow) {
+    const warning = note.tags.find((item) => item[0] === "content-warning");
+    if (warning) {
+      warningText = warning[1];
+      onWarning = true;
+    } else {
+      warningText = "";
+      onWarning = false;
+    }
+  }
 </script>
 
 <div>
@@ -221,6 +233,7 @@
       <button
         on:click={() => {
           openReplyWindow = !openReplyWindow;
+          replyText = "";
           if (openReplyWindow) {
             openQuoteWindow = false;
           }
@@ -347,54 +360,82 @@
             </div>
           {/each}
         {/if}
+
+        <button
+          class="ml-auto inline-flex h-6 w-6 appearance-none
+                items-center justify-center rounded-full p-1 text-magnum-800
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+          on:click={() => {
+            replyText = "";
+            $additionalReplyUsers = [...allPtag];
+          }}
+        >
+          <X size="20" />
+        </button>
       </div>
       <textarea
         rows="3"
         class="w-[100%] rounded-md bg-neutral-950 mt-1"
         bind:value={replyText}
       />
-
-      <div class=" flex justify-end gap-4">
-        {#if $emojis && $emojis.length > 0}
-          {#if viewCustomEmojis}
-            <input
-              type="text"
-              class="h-8 w-full rounded-md text-magnum-100 border-2
+      {#if onWarning}
+        <div class="flex">
+          <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+          <input
+            type="text"
+            class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
            'border-neutral-900'}"
-              bind:value={customReaction}
-            />
-          {/if}
-          <button
-            on:click={() => {
-              viewCustomEmojis = !viewCustomEmojis;
-            }}
-            class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-          >
-            <SmilePlus
-              size="20"
-              class={viewCustomEmojis ? "fill-magnum-700" : ""}
-            />
-          </button>
-        {/if}
+            bind:value={warningText}
+          />
+        </div>
+      {:else}<div class="h-4" />{/if}
+      <div class="mt-2 flex justify-between">
         <button
-          class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
           on:click={() => {
-            replyText = "";
-            $additionalReplyUsers = [...allPtag];
+            onWarning = !onWarning;
           }}
+          class=" h-8 rounded-sm
+            bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
         >
-          Cancel
+          <TriangleAlert
+            size="20"
+            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+          />
         </button>
-        <button
-          class="inline-flex h-8 items-center justify-center rounded-sm
+        <div class=" flex justify-end gap-4">
+          {#if $emojis && $emojis.length > 0}
+            {#if viewCustomEmojis}
+              <input
+                type="text"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+                bind:value={customReaction}
+              />
+            {/if}
+            <button
+              on:click={() => {
+                viewCustomEmojis = !viewCustomEmojis;
+              }}
+              class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+            >
+              <SmilePlus
+                size="20"
+                class={viewCustomEmojis ? "fill-magnum-700" : ""}
+              />
+            </button>
+          {/if}
+
+          <button
+            class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-          on:click={handleClickReplySend}
-        >
-          Send
-        </button>
+            on:click={handleClickReplySend}
+          >
+            <Send size="20" />
+          </button>
+        </div>
       </div>
+
       {#if viewCustomEmojis}
         <div
           class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
@@ -466,38 +507,62 @@
         class="w-[100%] rounded-md bg-neutral-950 mt-1"
         bind:value={replyText}
       />
-
-      <div class=" flex justify-end gap-4">
-        {#if $emojis && $emojis.length > 0}
-          {#if viewCustomEmojis}
-            <input
-              type="text"
-              class="h-8 w-full rounded-md text-magnum-100 border-2
-           'border-neutral-900'}"
-              bind:value={customReaction}
-            />
-          {/if}
-          <button
-            on:click={() => {
-              viewCustomEmojis = !viewCustomEmojis;
-            }}
-            class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-          >
-            <SmilePlus
-              size="20"
-              class={viewCustomEmojis ? "fill-magnum-700" : ""}
-            />
-          </button>
-        {/if}
-
+      {#if onWarning}
+        <div class="flex">
+          <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+          <input
+            type="text"
+            class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
+         'border-neutral-900'}"
+            bind:value={warningText}
+          />
+        </div>
+      {:else}<div class="h-4" />{/if}
+      <div class="mt-2 flex justify-between">
         <button
-          class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-          on:click={handleClickQuoteSend}
+          on:click={() => {
+            onWarning = !onWarning;
+          }}
+          class=" h-8 rounded-sm
+          bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
         >
-          Send
+          <TriangleAlert
+            size="20"
+            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+          />
         </button>
+        <div class=" flex justify-end gap-4">
+          {#if $emojis && $emojis.length > 0}
+            {#if viewCustomEmojis}
+              <input
+                type="text"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+                bind:value={customReaction}
+              />
+            {/if}
+            <button
+              on:click={() => {
+                viewCustomEmojis = !viewCustomEmojis;
+              }}
+              class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+            >
+              <SmilePlus
+                size="20"
+                class={viewCustomEmojis ? "fill-magnum-700" : ""}
+              />
+            </button>
+          {/if}
+
+          <button
+            class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+            on:click={handleClickQuoteSend}
+          >
+            <Send size="20" />
+          </button>
+        </div>
       </div>
       {#if viewCustomEmojis}
         <div
