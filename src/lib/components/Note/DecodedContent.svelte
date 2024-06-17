@@ -3,6 +3,10 @@
   import Note from "./Note.svelte";
   import UserName from "./UserName.svelte";
   import { Quote } from "lucide-svelte";
+  import LatestEvent from "../NostrMainData/LatestEvent.svelte";
+  import EventCard from "./EventCard.svelte";
+  import Metadata from "../NostrMainData/Metadata.svelte";
+  export let content: string | undefined;
   export let decoded:
     | {
         type: "naddr";
@@ -47,8 +51,60 @@
     />
   </span>
 {:else if decoded.type === "naddr"}
+  <span class="grid grid-cols-[auto_1fr_auto]">
+    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
+    <LatestEvent
+      queryKey={[
+        "naddr",
+        decoded.data.kind,
+        decoded.data.pubkey,
+        decoded.data.identifier,
+      ]}
+      filters={[
+        {
+          kinds: [decoded.data.kind],
+          authors: [decoded.data.pubkey],
+          "#d": [decoded.data.identifier],
+        },
+      ]}
+      let:event
+    >
+      <div slot="loading" class="text-sm text-neutral-500 flex-inline">
+        {content}
+      </div>
+      <div slot="nodata" class="text-sm text-neutral-500 flex-inline">
+        {content}
+      </div>
+      <div slot="error" class="text-sm text-neutral-500 flex-inline">
+        {content}
+      </div>
+      <EventCard note={event} status="loading" />
+      <Metadata
+        queryKey={["metadata", event.pubkey]}
+        pubkey={event.pubkey}
+        let:metadata
+      >
+        <div slot="loading">
+          <EventCard note={event} status="loading" />
+        </div>
+        <div slot="nodata">
+          <EventCard note={event} status="nodata" />
+        </div>
+        <div slot="error">
+          <EventCard note={event} status="error" />
+        </div>
+        <EventCard {metadata} note={event} /></Metadata
+      >
+    </LatestEvent><Quote size="16" class="text-magnum-500 fill-magnum-600" />
+  </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->
+  <span class="text-sm text-neutral-500 flex-inline">
+    <UserName pubhex={decoded.data.pubkey} />
+  </span>
 {:else if decoded.type === "nrelay"}<!---->
+  <span class="text-sm text-neutral-500 flex-inline">
+    {decoded.data}
+  </span>
 {:else if decoded.type === "nsec"}<!---->
 {/if}

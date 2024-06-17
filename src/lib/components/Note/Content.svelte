@@ -61,7 +61,7 @@
     {#if part.type === "nip19"}
       {#await nip19Decode(part.content) then decoded}
         {#if decoded}
-          <DecodedContent {decoded} />
+          <DecodedContent {decoded} content={part.content} />
         {/if}
       {/await}
     {:else if part.type === "url" && part.content}
@@ -71,7 +71,7 @@
             loading="lazy"
             alt="img"
             src={part.content}
-            class=" max-w-80 max-h-80 object-contain"
+            class=" max-w-[min(20rem,100%)] max-h-full object-contain"
           /></Link
         >
       {:else if $showImg && movieRegex.test(part.content)}
@@ -79,7 +79,7 @@
           ><video
             controls
             src={part.content}
-            class=" object-contain max-w-80 max-h-80"
+            class=" object-contain max-w-[min(20rem,100%)] max-h-80"
           >
             <track default kind="captions" />
           </video></Link

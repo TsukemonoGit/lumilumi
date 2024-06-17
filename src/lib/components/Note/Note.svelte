@@ -8,14 +8,19 @@
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
-  <div slot="loading">
-    <p>Loading {nip19.noteEncode(id)}</p>
+  <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
+    Loading {nip19.noteEncode(id)}
   </div>
-  <div slot="nodata">
-    <p>nodata {nip19.noteEncode(id)}</p>
+  <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
+    nodata {nip19.noteEncode(id)}
   </div>
-  <div slot="error" let:error>
-    <p>{error} {nip19.noteEncode(id)}</p>
+  <div
+    slot="error"
+    let:error
+    class="text-sm text-neutral-500 flex-inline break-all"
+  >
+    {error}
+    {nip19.noteEncode(id)}
   </div>
   <Metadata
     queryKey={["metadata", text.pubkey]}
