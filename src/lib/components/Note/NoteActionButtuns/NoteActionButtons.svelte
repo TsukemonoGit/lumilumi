@@ -251,30 +251,27 @@
       </Reposted>
       <!--リアクション-->
       <Reactioned id={note.id} let:event>
-        <div slot="loading">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
-        <div slot="nodata">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
-        <div slot="error">
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        </div>
+        <button slot="loading" on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
+          />
+        </button>
+
+        <button slot="nodata" on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          />
+        </button>
+
+        <button slot="error" on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          />
+        </button>
+
         {#if event === undefined}
           <button on:click={handleClickReaction}>
             <Heart
