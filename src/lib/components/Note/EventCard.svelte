@@ -94,7 +94,7 @@
   };
 </script>
 
-<div class="rounded-md border {noteClass()} ">
+<div class="rounded-md border overflow-hidden {noteClass()} ">
   {#if note.kind === 1}
     <div class={"grid grid-cols-[auto_1fr]"}>
       <div class="p-1">
