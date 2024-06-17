@@ -95,7 +95,7 @@
           loading="lazy"
           alt={part.content}
           src={part.url}
-          class="inline h-[24px] object-contain m-0"
+          class="inline h-[24px] object-contain m-0 overflow-hidden"
         />
       {:else}
         :{part.content}:

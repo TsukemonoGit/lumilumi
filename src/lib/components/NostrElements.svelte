@@ -119,7 +119,7 @@
 
           <div class="max-w-[100vw] break-words box-border">
             {#each events as event (event.id)}<div
-                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-x-hidden"
+                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
               >
                 <Metadata
                   queryKey={["metadata", event.pubkey]}
