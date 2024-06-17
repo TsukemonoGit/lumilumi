@@ -185,7 +185,10 @@
   //quote
   let addusers = false;
   const handleClickQuoteSend = () => {
-    tags = addusers ? [["p", note.pubkey]] : [];
+    if (addusers) {
+      tags.push(["p", note.pubkey]);
+    }
+
     const warning = note.tags.find((item) => item[0] === "content-warning");
     if (warning) {
       tags.push(warning);
