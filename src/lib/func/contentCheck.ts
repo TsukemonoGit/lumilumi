@@ -26,9 +26,9 @@ export function contentCheck(
           break;
         case "nevent":
           if (decoded.data.relays) {
-            newTags.push(["e", decoded.data.id, decoded.data.relays[0]]);
+            newTags.push(["q", decoded.data.id, decoded.data.relays[0]]);
           } else {
-            newTags.push(["e", decoded.data.id]);
+            newTags.push(["q", decoded.data.id]);
           }
           break;
         case "naddr":
@@ -51,7 +51,7 @@ export function contentCheck(
           newTags.push(["p", decoded.data]);
           break;
         case "note":
-          newTags.push(["e", decoded.data]);
+          newTags.push(["q", decoded.data]);
           break;
       }
     } catch (error) {
