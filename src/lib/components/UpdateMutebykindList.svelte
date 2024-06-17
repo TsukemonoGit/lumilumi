@@ -1,18 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import {
-    getDoukiList,
     getMuteByList,
     getMutebykindList,
     getQueryRelays,
-    toMuteList,
   } from "$lib/func/settings";
-  import type { MuteList } from "$lib/types";
   import { formatAbsoluteDate } from "$lib/func/util";
   import Dialog from "./Elements/Dialog.svelte";
   import { nip19 } from "nostr-tools";
-  import { mutebykinds, nowProgress } from "$lib/stores/stores";
-  import { npubEncode } from "nostr-tools/nip19";
+  import { nowProgress } from "$lib/stores/stores";
 
   export let pubkey: string;
   export let mutebykindList:

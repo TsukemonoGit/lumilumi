@@ -1,6 +1,6 @@
 <script lang="ts">
   import { app, defaultRelays } from "$lib/stores/stores";
-  import { MoveUp, MoveDown, Circle } from "lucide-svelte";
+  import { Share2, Circle } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
 
   //ConnectionState
@@ -43,11 +43,30 @@
         return "text-gray-500";
     }
   }
+  $: overallStateColor = getColor(getOverallConnectionState());
+
+  function getOverallConnectionState(): string {
+    if (readRelays && writeRelays) {
+      const relayStates = [...readRelays, ...writeRelays].map(
+        (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
+      );
+      const errorCount = relayStates.filter(
+        (state) =>
+          state === "error" || state === "rejected" || state === "terminated"
+      ).length;
+      const totalRelays = relayStates.length;
+
+      if (errorCount >= totalRelays / 2) {
+        return "error";
+      }
+    }
+    return "connected"; // デフォルトは接続中とする
+  }
 </script>
 
 <Popover bind:open>
   <div class="flex justify-center h-[3em] items-center">
-    <MoveUp size="20" />/<MoveDown size="20" />
+    <Share2 size="20" class={overallStateColor} />
   </div>
   <div slot="popoverContent" class="max-h-80 overflow-x-auto max-w-72">
     <div>

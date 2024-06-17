@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type DefaultRelayConfig } from "rx-nostr";
-  import { getContext, onMount } from "svelte";
+  import { getContext, onDestroy, onMount } from "svelte";
   import { derived, writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
 
@@ -25,6 +25,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
+  import { beforeNavigate } from "$app/navigation";
 
   const relays = writable<DefaultRelayConfig[]>([]);
 
@@ -59,6 +60,8 @@
   const {
     elements: { root: relayInputroot },
   } = createLabel();
+
+  const originalSettings = writable<LumiSetting | null>(null);
 
   // ローカルストレージから設定を読み込む
   onMount(async () => {
@@ -98,6 +101,7 @@
           };
           $mutebykinds = mutebykindList.list;
         }
+        originalSettings.set(JSON.parse(savedSettings));
       } catch (error) {
         console.log(error);
       }
@@ -114,6 +118,9 @@
         console.log(error);
       }
     }
+
+    // ページ離脱時の警告イベントを追加
+    window.addEventListener("beforeunload", handleBeforeUnload);
   });
 
   function addRelay() {
@@ -162,7 +169,7 @@
       return;
     }
     console.log(mutebykindList);
-    const settings = {
+    const settings: LumiSetting = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
       pubkey: $pubkey,
@@ -174,7 +181,7 @@
             list: JSON.stringify(mutebykindList.list),
             updated: mutebykindList.updated,
           }
-        : {},
+        : undefined,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
@@ -194,6 +201,7 @@
     if (mutebykindList) {
       $mutebykinds = mutebykindList.list;
     }
+    originalSettings.set(settings); // 設定を保存後、元の設定としてセット
   }
 
   function cancelSettings() {
@@ -247,6 +255,54 @@
       console.log(error);
     }
   };
+
+  // 設定が変更されたかどうかをチェックする関数
+  function settingsChanged(): boolean {
+    const currentSettings = {
+      relays: $relays,
+      useRelaySet: $radioGroupSelected,
+      pubkey: $pubkey,
+      showImg: $_showImg,
+      mute: muteList,
+      emoji: emojiList,
+      mutebykinds: mutebykindList
+        ? {
+            list: JSON.stringify(mutebykindList.list),
+            updated: mutebykindList.updated,
+          }
+        : {},
+    };
+    return (
+      JSON.stringify(currentSettings) !== JSON.stringify($originalSettings)
+    );
+  }
+
+  // beforeunload イベントのハンドラー
+  function handleBeforeUnload(event: BeforeUnloadEvent) {
+    if (settingsChanged()) {
+      event.preventDefault();
+      event.returnValue =
+        "変更された設定が保存されていません。ページを離れますか？";
+    }
+  }
+
+  // コンポーネントが破棄される時にイベントリスナーを削除
+  onDestroy(() => {
+    if (typeof window !== "undefined") {
+      window?.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+  });
+
+  // ページ離脱時の警告イベント
+  beforeNavigate((event) => {
+    if (settingsChanged()) {
+      if (
+        !confirm("変更された設定が保存されていません。ページを離れますか？")
+      ) {
+        event.cancel();
+      }
+    }
+  });
 </script>
 
 <div class="container flex flex-col gap-3">
@@ -415,13 +471,15 @@
     <div class="text-magnum-200 font-bold text-lg">theme</div>
     <ThemeSwitch />
   </div>
-  <div class="flex flex-row items-start gap-4 mt-4">
+  <div
+    class="border border-magnum-500 rounded-md flex flex-row items-start gap-4 mt-1 justify-center p-2"
+  >
     <button
-      class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      class=" rounded-md bg-magnum-200 px-3 py-2 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
       on:click={saveSettings}>SAVE</button
     >
     <button
-      class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      class=" rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
       on:click={cancelSettings}>CANSEL</button
     >
   </div>

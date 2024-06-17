@@ -12,7 +12,6 @@
   import { QueryObserver } from "@tanstack/svelte-query";
 
   export let id: string;
-  export let req: RxReqBase | undefined = undefined;
   let _result: { data: any; status: any; error: any };
   // afterUpdate(() => {
   //   reactionData = $queryClient.getQueryData([
