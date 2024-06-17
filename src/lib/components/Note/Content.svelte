@@ -95,14 +95,14 @@
           loading="lazy"
           alt={part.content}
           src={part.url}
-          class="inline h-8 object-contain"
+          class="inline h-[24px] object-contain m-0"
         />
       {:else}
         :{part.content}:
       {/if}
     {:else}
       <span
-        class="whitespace-pre-wrap break-words word"
+        class="whitespace-pre-wrap break-words word align-middle"
         style="word-break: break-word;">{part.content}</span
       >
     {/if}

@@ -179,6 +179,7 @@ body {
   background-color: theme("colors.neutral.900");
   color: theme("colors.white");
   min-height: 100vh;
+  line-height: 20px;
 }
 
 @layer components {
