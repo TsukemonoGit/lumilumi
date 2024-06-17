@@ -1,6 +1,13 @@
 <script lang="ts">
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import { app, emojis, loginUser, mutes, showImg } from "$lib/stores/stores";
+  import {
+    app,
+    emojis,
+    loginUser,
+    mutebykinds,
+    mutes,
+    showImg,
+  } from "$lib/stores/stores";
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
@@ -48,6 +55,7 @@
       showImg: savedShowImg,
       mute: savedMute,
       emoji: savedEmoji,
+      mutebykinds: savedMutebykinds,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -67,6 +75,9 @@
     }
     if (savedEmoji) {
       $emojis = savedEmoji.list;
+    }
+    if (savedMutebykinds?.list) {
+      $mutebykinds = JSON.parse(savedMutebykinds.list);
     }
   }
 

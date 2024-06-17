@@ -44,11 +44,13 @@
     ];
     const pk = await getMutebykindList(filters, relays);
     console.log(pk);
-    mutebykindList = {
-      list: await getMuteByList(pk),
-      updated: Math.floor(Date.now() / 1000),
-    };
-    console.log(mutebykindList.list);
+    if (pk.length > 0) {
+      mutebykindList = {
+        list: await getMuteByList(pk),
+        updated: Math.floor(Date.now() / 1000),
+      };
+      console.log(mutebykindList.list);
+    }
     $nowProgress = false;
   }
 </script>

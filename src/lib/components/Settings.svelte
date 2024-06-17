@@ -82,6 +82,7 @@
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
       pubkey.set(savedPubkey);
+      $loginUser = $pubkey;
       if (savedShowImg) {
         _showImg.set(savedShowImg);
       }

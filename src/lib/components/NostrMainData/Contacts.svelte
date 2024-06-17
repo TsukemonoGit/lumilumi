@@ -9,10 +9,7 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import type {
-    AcceptableDefaultRelaysConfig,
-    DefaultRelayConfig,
-  } from "rx-nostr";
+  import type { DefaultRelayConfig } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let pubkey: string;

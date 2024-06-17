@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { useRelaySet } from "$lib/stores/useRelaySet";
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
   import { viewEventIds, loginUser } from "$lib/stores/stores";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type Nostr from "nostr-typedef";
   import type { RxNostr } from "rx-nostr";
-  import { readable } from "svelte/store";
   import { changeEmit } from "$lib/func/reactions";
 
   export let rxNostr: RxNostr | undefined = undefined;

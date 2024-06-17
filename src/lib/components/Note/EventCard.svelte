@@ -110,7 +110,7 @@
           />
         {/if}
       </div>
-      <div>
+      <div class="p-1">
         <div class="flex align-middle">
           {#if metadata}
             <div>
@@ -154,8 +154,11 @@
     </div>
   {:else if note.kind === 6 || note.kind === 16}
     <!--リポスト-->
-    <div class="flex flex-wrap gap-1">
-      <Repeat2 size="20" class=" mt-auto  stroke-magnum-500" />
+    <div class="flex gap-1">
+      <Repeat2
+        size="20"
+        class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
+      />
       <div class="self-center">
         {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
           <UserAvatar
@@ -172,7 +175,7 @@
           />
         {/if}
       </div>
-      <div class="break-all break-words whitespace-pre-line">
+      <div class=" inline-block break-all break-words whitespace-pre-line">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
             class="text-magnum-100 text-sm mt-auto"

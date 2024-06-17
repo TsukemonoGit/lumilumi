@@ -96,4 +96,3 @@ export interface MuteList {
   e: string[];
 }
 export const mutetags = ["p", "t", "word", "e"];
-export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;

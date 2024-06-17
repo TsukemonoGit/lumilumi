@@ -4,14 +4,10 @@
     getDoukiList,
     getNaddrEmojiList,
     getQueryRelays,
-    toMuteList,
   } from "$lib/func/settings";
-  import { nip33Regex, type MuteList } from "$lib/types";
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
   import Dialog from "./Elements/Dialog.svelte";
-  import { nip19 } from "nostr-tools";
   import { nowProgress, showImg } from "$lib/stores/stores";
-  import { now } from "rx-nostr";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;

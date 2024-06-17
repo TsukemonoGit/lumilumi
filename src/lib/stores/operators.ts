@@ -7,10 +7,17 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
-import { loginUser, metadataQueue, queryClient } from "./stores";
+import {
+  loginUser,
+  metadataQueue,
+  mutebykinds,
+  mutes,
+  queryClient,
+} from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import type { QueryKey } from "@tanstack/svelte-query";
+import type { MuteList } from "$lib/types";
 
 export function filterId(
   id: string
@@ -152,4 +159,91 @@ function getTagValue(
 ): string | undefined {
   const tag = eventPacket.event.tags.find((tag) => tag[0] === tagKey);
   return tag ? tag[1] : undefined;
+}
+
+//get(mutes),get(mutebykinds)
+//muteCheck
+export function muteCheck(): OperatorFunction<EventPacket, EventPacket> {
+  return filter((eventPacket) => {
+    // Check if the eventPacket should be muted based on mutes.p
+    if (shouldMuteByP(eventPacket)) {
+      return false;
+    }
+
+    // Check if the eventPacket should be muted based on mutes.word
+    if (shouldMuteByWord(eventPacket)) {
+      return false;
+    }
+
+    // Check if the eventPacket should be muted based on mutes.t
+    if (shouldMuteByT(eventPacket)) {
+      return false;
+    }
+
+    // Check if the eventPacket should be muted based on mutes.e
+    if (shouldMuteByE(eventPacket)) {
+      return false;
+    }
+
+    // Check if the eventPacket should be muted based on mutebykinds
+    if (shouldMuteByKinds(eventPacket)) {
+      return false;
+    }
+
+    // If none of the mute conditions match, allow the eventPacket to pass through
+    return true;
+  });
+}
+
+function shouldMuteByP(eventPacket: EventPacket): boolean {
+  const pMutes = get(mutes).p || [];
+  return pMutes.includes(eventPacket.event.pubkey); // Replace with actual property check
+}
+
+function shouldMuteByWord(eventPacket: EventPacket): boolean {
+  const wordMutes = get(mutes).word || [];
+  //----------------------------------------------------------------------ワードミュートはとりあえずkind:1に限ってみる
+  // Check if any word mute from wordMutes array is included in eventPacket.event.content
+  return (
+    eventPacket.event.kind === 1 &&
+    wordMutes.some((muteWord) => eventPacket.event.content.includes(muteWord))
+  );
+}
+
+function shouldMuteByT(eventPacket: EventPacket): boolean {
+  const tMutes = get(mutes).t || [];
+
+  // Find all tags in eventPacket.event.tags where tag[0] is "t"
+  const tagsWithT = eventPacket.event.tags.filter((tag) => tag[0] === "t");
+
+  // Check if any tag[1] (the value of the tag where tag[0] === "t") is in tMutes
+  return tagsWithT.some((tag) => tMutes.includes(tag[1]));
+}
+
+function shouldMuteByE(eventPacket: EventPacket): boolean {
+  const eMutes = get(mutes).e || [];
+  const tagsWithE = eventPacket.event.tags.filter(
+    (tag) => tag[0] === "e" || tag[0] === "q"
+  );
+  return (
+    eMutes.includes(eventPacket.event.id) ||
+    tagsWithE.some((tag) => eMutes.includes(tag[1]))
+  ); // Replace with actual property check
+}
+
+function shouldMuteByKinds(eventPacket: EventPacket): boolean {
+  const kindsMutes = get(mutebykinds) || [];
+
+  // Implement logic to check if eventPacket.kind and other properties match mutebykinds criteria
+  // Example logic:
+
+  for (const entry of kindsMutes) {
+    if (
+      entry.kind === eventPacket.event.kind &&
+      entry.list.includes(eventPacket.event.pubkey)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }

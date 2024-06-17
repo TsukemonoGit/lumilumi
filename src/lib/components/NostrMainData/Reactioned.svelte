@@ -7,10 +7,8 @@
    */
 
   import type Nostr from "nostr-typedef";
-  import type { EventPacket, RxNostr } from "rx-nostr";
 
   import { queryClient } from "$lib/stores/stores";
-  import { afterUpdate } from "svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
 
   export let id: string;
