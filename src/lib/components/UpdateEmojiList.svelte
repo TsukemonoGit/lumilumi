@@ -78,25 +78,26 @@
     const pkListArray = await Promise.all(
       chunkedFilters.map((chunk) => getNaddrEmojiList(chunk, relays))
     );
+    if (pkListArray.length > 0) {
+      // 各チャンクの結果を結合する
+      pkListArray.flat().forEach((pk) => {
+        if (pk && pk.event) {
+          list = [
+            ...list,
+            ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
+              if (tag === "emoji") {
+                return [...acc, value];
+              } else {
+                return acc;
+              }
+            }, []),
+          ];
+        }
+      });
 
-    // 各チャンクの結果を結合する
-    pkListArray.flat().forEach((pk) => {
-      if (pk && pk.event) {
-        list = [
-          ...list,
-          ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
-            if (tag === "emoji") {
-              return [...acc, value];
-            } else {
-              return acc;
-            }
-          }, []),
-        ];
-      }
-    });
-
-    // console.log(list.length);
-    emojiList = { list: list, updated: Math.floor(Date.now() / 1000) };
+      // console.log(list.length);
+      emojiList = { list: list, updated: Math.floor(Date.now() / 1000) };
+    }
     $nowProgress = false;
   }
 
