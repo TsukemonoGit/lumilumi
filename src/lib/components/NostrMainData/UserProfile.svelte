@@ -47,6 +47,7 @@
               <UserAvatar
                 url={profile.picture}
                 name={profile.name}
+                {pubkey}
                 size={120}
               />
             {:else}

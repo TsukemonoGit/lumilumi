@@ -98,6 +98,7 @@
         {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
           <UserAvatar
             url={profile(metadata)?.picture}
+            pubkey={note.pubkey}
             name={profile(metadata)?.name}
             size={mini ? 20 : 40}
           />
@@ -164,6 +165,7 @@
           <UserAvatar
             url={profile(metadata)?.picture}
             name={profile(metadata)?.name}
+            pubkey={note.pubkey}
             size={20}
           />
         {:else}
@@ -207,6 +209,7 @@
           <UserAvatar
             url={profile(metadata)?.picture}
             name={profile(metadata)?.name}
+            pubkey={note.pubkey}
             size={20}
           />
         {:else}

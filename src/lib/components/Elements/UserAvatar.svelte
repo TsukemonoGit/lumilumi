@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { splitHexColorString } from "$lib/func/util";
   import { createAvatar, melt } from "@melt-ui/svelte";
+  import Avatar from "svelte-boring-avatars";
   export let url: string | undefined;
   export let name: string | undefined;
-
+  export let pubkey: string;
   export let size: number = 40;
   const {
     elements: { image, fallback },
@@ -24,6 +26,11 @@
   <span
     use:melt={$fallback}
     class="text-sm font-medium text-magnum-100 h-full w-full flex items-center justify-center"
-    >{name}
-  </span>
+    ><Avatar
+      {size}
+      name={pubkey}
+      variant="beam"
+      colors={splitHexColorString(pubkey)}
+    /></span
+  >
 </div>
