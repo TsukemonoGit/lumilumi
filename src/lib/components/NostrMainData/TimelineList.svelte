@@ -18,13 +18,15 @@
   $: error = result.error;
   let slicedEvent: Nostr.Event[];
   // Update filters with 'until' field for all items
-  $: if ($data && viewIndex >= 0) {
-    const untilTimestamp = $data[$data.length - 1].event.created_at;
-    filters = filters.map((filter) => ({
-      ...filter,
-      until: untilTimestamp,
-    }));
+  $: if ($data && viewIndex >= 0 && filters) {
+    if (viewIndex + amount > $data.length) {
+      const untilTimestamp = $data[$data.length - 1].event.created_at;
 
+      filters = filters.map((filter) => ({
+        ...filter,
+        until: untilTimestamp,
+      }));
+    }
     slicedEvent = $data
       ?.map(({ event }) => event)
       .slice(viewIndex, viewIndex + amount);
