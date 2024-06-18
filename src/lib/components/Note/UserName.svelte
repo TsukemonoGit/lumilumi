@@ -16,11 +16,17 @@
 </script>
 
 @<Metadata queryKey={["metadata", pubhex]} pubkey={pubhex} let:metadata>
-  <div slot="loading">{nip19.npubEncode(pubhex)}</div>
-  <div slot="nodata">
+  <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
     {nip19.npubEncode(pubhex)}
   </div>
-  <div slot="error" let:error>
+  <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
+    {nip19.npubEncode(pubhex)}
+  </div>
+  <div
+    slot="error"
+    class="text-sm text-neutral-500 flex-inline break-all"
+    let:error
+  >
     {nip19.npubEncode(pubhex)}
   </div>
   {profile(metadata)?.name ?? profile(metadata)?.display_name}

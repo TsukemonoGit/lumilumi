@@ -39,14 +39,22 @@
     {/if} -->
 
     <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
-      <div slot="loading">
-        <p>Loading {nip19.noteEncode(tag[1])}</p>
+      <div
+        slot="loading"
+        class="text-sm text-neutral-500 flex-inline break-all"
+      >
+        Loading {nip19.noteEncode(tag[1])}
       </div>
-      <div slot="nodata">
-        <p>nodata {nip19.noteEncode(tag[1])}</p>
+      <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
+        nodata {nip19.noteEncode(tag[1])}
       </div>
-      <div slot="error" let:error>
-        <p>{error} {nip19.noteEncode(tag[1])}</p>
+      <div
+        slot="error"
+        class="text-sm text-neutral-500 flex-inline break-all"
+        let:error
+      >
+        {error}
+        {nip19.noteEncode(tag[1])}
       </div>
       <Metadata
         queryKey={["metadata", text.pubkey]}
