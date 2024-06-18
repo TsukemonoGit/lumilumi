@@ -1,3 +1,6 @@
+import type { Profile } from "$lib/types";
+import * as Nostr from "nostr-typedef";
+
 export const relayRegex = /^wss?:\/\/\S+$/g;
 //export const nip33RegexG = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/g;
 export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;
@@ -7,6 +10,19 @@ export const nip19Regex =
 export const urlRegex = /(https?:\/\/+[^\s"'<`\]]+[^\s"'<`:\].]+)/g;
 export const emojiRegex = /(:[^:\s]+:)/g;
 export const hashtagRegex = /(?<=^|\s)#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu; //(?<hashtag>...) は、名前付きキャプチャグループ
+
+export const profile = (ev: Nostr.Event): Profile | undefined => {
+  try {
+    return JSON.parse(ev.content);
+  } catch (error) {
+    return undefined;
+  }
+};
+
+export const splitHexColorString = (hexString: string): string[] => {
+  return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
+};
+
 // RGB 値を計算する関数
 export function calculateColor(hex: string): string {
   if (!hex) {

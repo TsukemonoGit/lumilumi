@@ -14,7 +14,19 @@ export function parseText(
   while (remainingText.length > 0) {
     const nip19Match = remainingText.match(nip19Regex);
     const urlMatch = remainingText.match(urlRegex);
-    const emojiMatch = remainingText.match(emojiRegex);
+    let emojiMatch = remainingText.match(emojiRegex);
+
+    // Check if the emoji match is valid (exists in tags)
+    if (emojiMatch) {
+      const emojiContent = emojiMatch[0].slice(1, -1); // Remove surrounding colons
+      const matchingTag = tags.find(
+        (tag) => tag[0] === "emoji" && tag[1] === emojiContent
+      );
+      if (!matchingTag) {
+        // If emoji match is not valid, set emojiMatch to null
+        emojiMatch = null;
+      }
+    }
 
     const nip19Index = nip19Match ? remainingText.indexOf(nip19Match[0]) : -1;
     const urlIndex = urlMatch ? remainingText.indexOf(urlMatch[0]) : -1;
@@ -54,7 +66,7 @@ export function parseText(
       }
       parts.push({ type: "url", content: urlMatch?.[0] });
       remainingText = remainingText.slice(
-        urlIndex + (urlMatch as RegExpMatchArray)[0]?.length
+        urlIndex + (urlMatch as RegExpMatchArray)?.[0].length
       );
     } else {
       // Emoji match is earlier

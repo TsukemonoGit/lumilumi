@@ -16,7 +16,7 @@
   import Avatar from "svelte-boring-avatars";
   import WarningHide1 from "../Elements/WarningHide1.svelte";
   import WarningHide2 from "../Elements/WarningHide2.svelte";
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDate, splitHexColorString } from "$lib/func/util";
   import UserAvatar from "../Elements/UserAvatar.svelte";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
@@ -89,9 +89,6 @@
   const checkContentWarning = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "content-warning");
   };
-  const splitHexColorString = (hexString: string): string[] => {
-    return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
-  };
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
@@ -102,7 +99,7 @@
           <UserAvatar
             url={profile(metadata)?.picture}
             name={profile(metadata)?.name}
-            {mini}
+            size={mini ? 20 : 40}
           />
         {:else}
           <Avatar
@@ -167,7 +164,7 @@
           <UserAvatar
             url={profile(metadata)?.picture}
             name={profile(metadata)?.name}
-            mini={true}
+            size={20}
           />
         {:else}
           <Avatar
@@ -210,7 +207,7 @@
           <UserAvatar
             url={profile(metadata)?.picture}
             name={profile(metadata)?.name}
-            mini={true}
+            size={20}
           />
         {:else}
           <Avatar

@@ -1,18 +1,9 @@
 <script lang="ts">
-  import * as Nostr from "nostr-typedef";
   import { nip19 } from "nostr-tools";
 
-  import type { Profile } from "$lib/types";
   import Metadata from "../NostrMainData/Metadata.svelte";
+  import { profile } from "$lib/func/util";
   export let pubhex: string;
-
-  const profile = (ev: Nostr.Event): Profile | undefined => {
-    try {
-      return JSON.parse(ev.content);
-    } catch (error) {
-      return undefined;
-    }
-  };
 </script>
 
 @<Metadata queryKey={["metadata", pubhex]} pubkey={pubhex} let:metadata>

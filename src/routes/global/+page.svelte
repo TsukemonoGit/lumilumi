@@ -80,17 +80,6 @@
                 </div>{/each}
             </div>
           </TimelineList>
-          <Reactionsforme
-            queryKey={["reaction"]}
-            filters={[
-              {
-                kinds: [7],
-                authors: [pubkey],
-                limit: 5,
-              },
-            ]}
-            req={createRxForwardReq()}
-          />
         </div>
       </SetGlobalRelays>
     </SetDefaultRelays>

@@ -58,7 +58,7 @@
             {
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
-              limit: 20,
+              limit: 30,
             },
             {
               kinds: [
@@ -104,7 +104,7 @@
               </div>{/each}
           </div>
         </TimelineList>
-        <Reactionsforme
+        <!-- <Reactionsforme
           queryKey={["reaction"]}
           filters={[
             {
@@ -114,7 +114,7 @@
             },
           ]}
           req={createRxForwardReq()}
-        />
+        /> -->
       </Contacts>
     </div>
   </SetDefaultRelays>
