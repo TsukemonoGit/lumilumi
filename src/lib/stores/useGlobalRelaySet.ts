@@ -115,7 +115,7 @@ function combineRelays(
   readrelays: DefaultRelayConfig[]
 ): DefaultRelayConfig[] {
   const relayMap = new Map<string, DefaultRelayConfig>();
-
+  // writerelays を relayMap に追加する
   writerelays.forEach((relay, index) => {
     relayMap.set(relay.url, {
       url: relay.url,
@@ -124,10 +124,20 @@ function combineRelays(
     });
   });
 
+  // readrelays を relayMap に追加する
   readrelays.forEach((relay) => {
     const existingRelay = relayMap.get(relay.url);
     if (existingRelay) {
-      relayMap.set(relay.url, { ...existingRelay, read: true });
+      relayMap.set(relay.url, {
+        ...existingRelay,
+        read: true, // 既存の情報がある場合はそのままの read を保持する
+      });
+    } else {
+      relayMap.set(relay.url, {
+        url: relay.url,
+        write: false,
+        read: true, // 既存の情報がない場合は read を true に設定する
+      });
     }
   });
 
