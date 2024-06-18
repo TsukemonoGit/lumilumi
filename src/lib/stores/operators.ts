@@ -68,9 +68,7 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   );
 }
 
-export function scanArray<A extends EventPacket>(
-  amount: number = 100
-): OperatorFunction<A, A[]> {
+export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
     // クエリデータの設定
     if (a.event && a.event.id) {
@@ -81,11 +79,6 @@ export function scanArray<A extends EventPacket>(
     const sorted = [...acc, a].sort(
       (a, b) => b.event.created_at - a.event.created_at
     );
-
-    // amountを超える古い部分を捨てる
-    if (sorted.length > amount) {
-      sorted.length = amount;
-    }
 
     return sorted;
   }, []);

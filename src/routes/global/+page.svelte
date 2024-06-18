@@ -8,6 +8,27 @@
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import EventCard from "$lib/components/Note/EventCard.svelte";
   import { createRxForwardReq } from "rx-nostr";
+  import { SkipForward, Triangle } from "lucide-svelte";
+
+  let amount = 50;
+  let viewIndex = 0;
+
+  const handleScrollToBottom = () => {
+    const lastEvent = document.querySelector(".event-card:last-child");
+    if (lastEvent) {
+      lastEvent.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleNext = () => {
+    viewIndex += 20;
+  };
+
+  const handlePrev = () => {
+    if (viewIndex > 0) {
+      viewIndex = Math.max(viewIndex - 20, 0);
+    }
+  };
 </script>
 
 <svelte:head>
@@ -30,7 +51,6 @@
         <div class="container break-words overflow-x-hidden">
           <TimelineList
             queryKey={["timeline", "feed", "global"]}
-            amount={50}
             filters={[
               {
                 kinds: [1, 6, 16],
@@ -47,6 +67,9 @@
             ]}
             req={createRxForwardReq()}
             let:events
+            {viewIndex}
+            {amount}
+            let:len
           >
             <SetRepoReactions />
             <div slot="loading">
@@ -58,6 +81,19 @@
             </div>
 
             <div class="max-w-[100vw] break-words box-border">
+              {#if viewIndex !== 0}
+                <button
+                  class="w-full bg-magnum-400"
+                  on:click={() => (viewIndex = 0)}
+                  ><SkipForward size={20} class="mx-auto -rotate-90" /></button
+                >
+                <button
+                  class="w-full bg-magnum-400"
+                  on:click={() => handlePrev()}
+                  ><Triangle size={20} class="mx-auto " /></button
+                >
+              {/if}
+
               {#each events as event (event.id)}<div
                   class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
                 >
@@ -79,6 +115,9 @@
                   >
                 </div>{/each}
             </div>
+            <button class="w-full bg-magnum-400" on:click={() => handleNext()}
+              ><Triangle size={20} class="mx-auto rotate-180" /></button
+            >
           </TimelineList>
         </div>
       </SetGlobalRelays>

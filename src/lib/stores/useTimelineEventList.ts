@@ -15,11 +15,11 @@ import type { RxReqBase, ReqResult } from "$lib/types.js";
 
 export function useTimelineEventList(
   queryKey: QueryKey,
-  amount: number,
+
   filters: Nostr.Filter[],
   req?: RxReqBase | undefined
 ): ReqResult<EventPacket[]> {
-  const operator = pipe(uniq(), verify(), scanArray(amount));
+  const operator = pipe(uniq(), verify(), scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<
     EventPacket[]
   >;

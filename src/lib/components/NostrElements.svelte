@@ -1,25 +1,15 @@
 <script lang="ts">
-  /**
-   * @license Apache-2.0
-   * @copyright 2023 Akiomi Kamakura
-   */
-
   import { createRxForwardReq, createRxNostr } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
-
   import Contacts from "./NostrMainData/Contacts.svelte";
-
   import Metadata from "./NostrMainData/Metadata.svelte";
   import EventCard from "./Note/EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
-  import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
-
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
-
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-
+  import { Triangle, SkipForward } from "lucide-svelte";
   const pubkeysIn = (contacts: Nostr.Event) => {
     const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
@@ -30,6 +20,26 @@
     }, []);
     setFollowingList(followingList);
     return followingList;
+  };
+
+  let amount = 50;
+  let viewIndex = 0;
+
+  const handleScrollToBottom = () => {
+    const lastEvent = document.querySelector(".event-card:last-child");
+    if (lastEvent) {
+      lastEvent.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleNext = () => {
+    viewIndex += 20;
+  };
+
+  const handlePrev = () => {
+    if (viewIndex > 0) {
+      viewIndex = Math.max(viewIndex - 20, 0);
+    }
   };
 </script>
 
@@ -53,12 +63,11 @@
 
         <TimelineList
           queryKey={["timeline", "feed", pubkey]}
-          amount={50}
           filters={[
             {
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
-              limit: 30,
+              limit: 70,
             },
             {
               kinds: [
@@ -71,6 +80,9 @@
           ]}
           req={createRxForwardReq()}
           let:events
+          {viewIndex}
+          {amount}
+          let:len
         >
           <SetRepoReactions />
           <div slot="loading">
@@ -82,8 +94,20 @@
           </div>
 
           <div class="max-w-[100vw] break-words box-border">
-            {#each events as event (event.id)}<div
-                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
+            {#if viewIndex !== 0}
+              <button
+                class="w-full bg-magnum-400"
+                on:click={() => (viewIndex = 0)}
+                ><SkipForward size={20} class="mx-auto -rotate-90" /></button
+              >
+              <button class="w-full bg-magnum-400" on:click={() => handlePrev()}
+                ><Triangle size={20} class="mx-auto " /></button
+              >
+            {/if}
+
+            {#each events as event (event.id)}
+              <div
+                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
               >
                 <Metadata
                   queryKey={["metadata", event.pubkey]}
@@ -99,22 +123,16 @@
                   <div slot="error">
                     <EventCard note={event} status="error" />
                   </div>
-                  <EventCard {metadata} note={event} /></Metadata
-                >
-              </div>{/each}
+                  <EventCard {metadata} note={event} />
+                </Metadata>
+              </div>
+            {/each}
           </div>
+
+          <button class="w-full bg-magnum-400" on:click={() => handleNext()}
+            ><Triangle size={20} class="mx-auto rotate-180" /></button
+          >
         </TimelineList>
-        <!-- <Reactionsforme
-          queryKey={["reaction"]}
-          filters={[
-            {
-              kinds: [7],
-              authors: [pubkey],
-              limit: 5,
-            },
-          ]}
-          req={createRxForwardReq()}
-        /> -->
       </Contacts>
     </div>
   </SetDefaultRelays>
