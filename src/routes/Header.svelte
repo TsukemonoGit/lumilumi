@@ -33,7 +33,7 @@
         <a href="/settings">Settings</a>
       </li>
       <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
-        <a href="/settings"><Globe /></a>
+        <a href="/global"><Globe /></a>
       </li>
       <li>
         <RelayStatus />

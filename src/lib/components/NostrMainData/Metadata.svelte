@@ -1,4 +1,5 @@
 <script lang="ts">
+  //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import { app, queryClient } from "$lib/stores/stores";
