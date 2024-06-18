@@ -2,6 +2,7 @@
   import { app, defaultRelays } from "$lib/stores/stores";
   import { Share2, Circle } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
+  import { afterUpdate } from "svelte";
 
   //ConnectionState
   // | "initialized"
@@ -43,25 +44,39 @@
         return "text-gray-500";
     }
   }
-  $: overallStateColor = getColor(getOverallConnectionState());
-
   function getOverallConnectionState(): string {
-    if (readRelays && writeRelays) {
-      const relayStates = [...readRelays, ...writeRelays].map(
-        (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
-      );
-      const errorCount = relayStates.filter(
-        (state) =>
-          state === "error" || state === "rejected" || state === "terminated"
-      ).length;
-      const totalRelays = relayStates.length;
+    const relayStates = [...readRelays, ...writeRelays].map(
+      (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
+    );
 
-      if (errorCount >= totalRelays / 2) {
-        return "error";
+    const stateCount: Record<string, number> = {};
+    relayStates.forEach((state) => {
+      if (state) {
+        stateCount[state] = (stateCount[state] || 0) + 1;
+      }
+    });
+
+    let maxCount = 0;
+    let overallState = "connected"; // デフォルトは接続中とする
+
+    for (const [state, count] of Object.entries(stateCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        overallState = state;
       }
     }
-    return "connected"; // デフォルトは接続中とする
+
+    return overallState;
   }
+  let overallStateColor: string;
+  afterUpdate(() => {
+    if ($app?.rxNostr && $app.rxNostr.getAllRelayStatus()) {
+      overallStateColor =
+        !readRelays || !writeRelays
+          ? getColor("initialized")
+          : getColor(getOverallConnectionState());
+    }
+  });
 </script>
 
 <Popover bind:open>

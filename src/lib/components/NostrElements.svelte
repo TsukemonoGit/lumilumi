@@ -9,17 +9,15 @@
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
 
   import Contacts from "./NostrMainData/Contacts.svelte";
-  import UniqueEventList from "./NostrMainData/UniqueEventList.svelte";
 
   import Metadata from "./NostrMainData/Metadata.svelte";
   import EventCard from "./Note/EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
   import { setFollowingList } from "$lib/func/nostr";
   import Reactionsforme from "./NostrMainData/Reactionsforme.svelte";
-  import { defaultRelays, loginUser } from "$lib/stores/stores";
 
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
-  import { onDestroy } from "svelte";
+
   import TimelineList from "./NostrMainData/TimelineList.svelte";
 
   const pubkeysIn = (contacts: Nostr.Event) => {
@@ -33,40 +31,6 @@
     setFollowingList(followingList);
     return followingList;
   };
-  let viewEvents: Nostr.Event<number>[] = [];
-
-  // const rxNostr = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
-  // const req = createRxForwardReq();
-  let filters: Nostr.Filter[];
-
-  // $: filters = [
-  //   {
-  //     "#e": viewEvents.map((item) => item.id),
-  //     authors: [$loginUser],
-  //     kinds: [7],
-  //   },
-  //   {
-  //     "#e": viewEvents.map((item) => item.id),
-  //     authors: [$loginUser],
-  //     kinds: [6],
-  //   },
-  //   {
-  //     "#e": viewEvents.map((item) => item.id),
-  //     authors: [$loginUser],
-  //     kinds: [16],
-  //   },
-  // ];
-  // $: filters = viewEvents
-  //   .map((item) => ({
-  //     "#e": [item.id],
-  //     authors: [$loginUser],
-  //     kinds: [7, 6, 16],
-  //   }))
-  //   .slice(0, 10);
-
-  // onDestroy(() => {
-  //   rxNostr.dispose();
-  // });
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>

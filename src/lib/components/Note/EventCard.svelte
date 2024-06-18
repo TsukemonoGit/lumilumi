@@ -221,7 +221,7 @@
           />
         {/if}
       </div>
-      <div class="break-all break-words whitespace-pre-line">
+      <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
             class="text-magnum-100 text-sm mt-auto"
