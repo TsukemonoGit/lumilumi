@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { afterNavigate } from "$app/navigation";
+
   //TimelineList.svelte
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus, RxReqBase } from "$lib/types";
@@ -31,6 +33,13 @@
       ?.map(({ event }) => event)
       .slice(viewIndex, viewIndex + amount);
   }
+
+  afterNavigate(() => {
+    viewIndex = 0;
+    if ($data) {
+      slicedEvent = $data?.map(({ event }) => event).slice(0, amount);
+    }
+  });
   // {#if viewIndex + amount < len}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {

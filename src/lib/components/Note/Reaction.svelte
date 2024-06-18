@@ -30,7 +30,13 @@
     {#await getEmoji(event) then emoji}
       {#if emoji}
         {#if $showImg}
-          <img alt={emoji.alt} src={emoji.url} height="20" class="h-[20px]" />
+          <img
+            loading="lazy"
+            alt={emoji.alt}
+            src={emoji.url}
+            height="20"
+            class="h-[20px]"
+          />
         {:else}
           {emoji.alt}
         {/if}{/if}

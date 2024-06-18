@@ -113,7 +113,7 @@
     @apply min-w-[220px] shadow-md shadow-black/30;
   }
   .item {
-    @apply relative h-8 min-h-[24px] select-none rounded-sm pl-6 pr-1;
+    @apply relative h-10 min-h-[24px] select-none rounded-sm pl-6 pr-1;
     @apply z-40 text-magnum-50 outline-none;
     @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
     @apply data-[disabled]:text-neutral-600;

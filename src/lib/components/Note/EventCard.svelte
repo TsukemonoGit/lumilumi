@@ -23,6 +23,7 @@
   import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy, onMount } from "svelte";
   import ProxyTag from "../Elements/ProxyTag.svelte";
+  import UserMenu from "../Elements/UserMenu.svelte";
 
   let currentNoteId: string | undefined = undefined;
 
@@ -38,7 +39,10 @@
     $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
   });
 
-  const profile = (ev: Nostr.Event): Profile | undefined => {
+  const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
+    if (!ev) {
+      return undefined;
+    }
     try {
       return JSON.parse(ev.content);
     } catch (error) {
@@ -101,21 +105,12 @@
     {#if note.kind === 1}
       <div class={"grid grid-cols-[auto_1fr]"}>
         <div class="p-1">
-          {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
-            <UserAvatar
-              url={profile(metadata)?.picture}
-              pubkey={note.pubkey}
-              name={profile(metadata)?.name}
-              size={mini ? 20 : 40}
-            />
-          {:else}
-            <Avatar
-              size={mini ? 20 : 40}
-              name={note.pubkey}
-              variant="beam"
-              colors={splitHexColorString(note.pubkey)}
-            />
-          {/if}
+          <UserMenu
+            pubkey={note.pubkey}
+            name={metadata ? profile(metadata)?.name : undefined}
+            url={metadata ? profile(metadata)?.picture : undefined}
+            size={mini ? 20 : 40}
+          />
         </div>
         <div class="p-1">
           <div class="flex align-middle">
@@ -175,21 +170,12 @@
           class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
         />
         <div class="self-center">
-          {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
-            <UserAvatar
-              url={profile(metadata)?.picture}
-              name={profile(metadata)?.name}
-              pubkey={note.pubkey}
-              size={20}
-            />
-          {:else}
-            <Avatar
-              size={20}
-              name={note.pubkey}
-              variant="beam"
-              colors={splitHexColorString(note.pubkey)}
-            />
-          {/if}
+          <UserMenu
+            pubkey={note.pubkey}
+            name={metadata ? profile(metadata)?.name : undefined}
+            url={metadata ? profile(metadata)?.picture : undefined}
+            size={20}
+          />
         </div>
         <div
           class=" mt-auto inline-block break-all break-words whitespace-pre-line"
@@ -224,21 +210,12 @@
       <div class="flex gap-1">
         <div class="w-fit"><Reaction event={note} /></div>
         <div class="self-center">
-          {#if $showImg && metadata && profile(metadata)?.picture !== undefined}
-            <UserAvatar
-              url={profile(metadata)?.picture}
-              name={profile(metadata)?.name}
-              pubkey={note.pubkey}
-              size={20}
-            />
-          {:else}
-            <Avatar
-              size={20}
-              name={note.pubkey}
-              variant="beam"
-              colors={splitHexColorString(note.pubkey)}
-            />
-          {/if}
+          <UserMenu
+            pubkey={note.pubkey}
+            name={metadata ? profile(metadata)?.name : undefined}
+            url={metadata ? profile(metadata)?.picture : undefined}
+            size={20}
+          />
         </div>
         <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
           {#if metadata}
