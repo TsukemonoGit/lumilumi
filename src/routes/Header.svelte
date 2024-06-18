@@ -4,6 +4,8 @@
   import logo from "$lib/images/favicon.svg";
   import github from "$lib/images/github.svg";
   import { nowProgress } from "$lib/stores/stores";
+
+  import { Globe } from "lucide-svelte";
 </script>
 
 <header>
@@ -29,6 +31,9 @@
         aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
       >
         <a href="/settings">Settings</a>
+      </li>
+      <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
+        <a href="/settings"><Globe /></a>
       </li>
       <li>
         <RelayStatus />

@@ -407,6 +407,17 @@
       >
         NostViewstr で Relaylist (kind:10002) を編集する
       </a>
+      <a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/30002"
+      >
+        NostViewstr で Relay Sets (kind:30002) を編集する (global relay
+        として使用する場合は、IDをglobalとしたリストを作成して、その中にリレーを登録してください)
+      </a>
     {/if}
   </div>
   <!--- 表示設定 --->
