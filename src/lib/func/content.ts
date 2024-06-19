@@ -11,22 +11,20 @@ export function parseText(
   const parts = [];
   let remainingText = input;
 
+  // Create emoji regex from tags
+  const emojiTags = tags
+    .filter((tag) => tag[0] === "emoji")
+    .map((tag) => `:${tag[1]}:`);
+
+  const emojiRegex =
+    emojiTags.length > 0
+      ? new RegExp(`(${emojiTags.join("|")})`, "g")
+      : new RegExp(`(?!x)x`); // Regex that matches nothing
+
   while (remainingText.length > 0) {
     const nip19Match = remainingText.match(nip19Regex);
     const urlMatch = remainingText.match(urlRegex);
-    let emojiMatch = remainingText.match(emojiRegex);
-
-    // Check if the emoji match is valid (exists in tags)
-    if (emojiMatch) {
-      const emojiContent = emojiMatch[0].slice(1, -1); // Remove surrounding colons
-      const matchingTag = tags.find(
-        (tag) => tag[0] === "emoji" && tag[1] === emojiContent
-      );
-      if (!matchingTag) {
-        // If emoji match is not valid, set emojiMatch to null
-        emojiMatch = null;
-      }
-    }
+    const emojiMatch = remainingText.match(emojiRegex);
 
     const nip19Index = nip19Match ? remainingText.indexOf(nip19Match[0]) : -1;
     const urlIndex = urlMatch ? remainingText.indexOf(urlMatch[0]) : -1;

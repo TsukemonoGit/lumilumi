@@ -41,7 +41,5 @@
           {emoji.alt}
         {/if}{/if}
     {/await}
-  {:else}
-    {event.content}
-  {/if}
+  {:else}{event.content}{/if}
 {/if}
