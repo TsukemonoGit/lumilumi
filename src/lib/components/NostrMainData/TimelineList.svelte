@@ -1,5 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
+  import { app, defaultRelays } from "$lib/stores/stores";
 
   //TimelineList.svelte
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -19,6 +20,13 @@
   $: status = result.status;
   $: error = result.error;
   let slicedEvent: Nostr.Event[];
+  let readUrls: string[] = [];
+  $: if ($defaultRelays) {
+    readUrls = Object.values($defaultRelays)
+      .filter((config) => config.read)
+      .map((config) => config.url);
+  }
+  $: console.log(filters);
   // Update filters with 'until' field for all items
   $: if ($data && viewIndex >= 0 && filters) {
     if (viewIndex + amount > $data.length) {
@@ -30,16 +38,15 @@
       }));
     }
     slicedEvent = $data
-      ?.map(({ event }) => event)
+      ?.filter((packet) => readUrls.includes(packet.from)) // デフォルトリレーに含まれるかチェック
+      .map(({ event }) => event)
       .slice(viewIndex, viewIndex + amount);
   }
 
   afterNavigate(() => {
     viewIndex = 0;
-    if ($data) {
-      slicedEvent = $data?.map(({ event }) => event).slice(0, amount);
-    }
   });
+
   // {#if viewIndex + amount < len}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {

@@ -50,19 +50,11 @@
 
         <div class="container break-words overflow-x-hidden">
           <TimelineList
-            queryKey={["timeline", "feed", "global"]}
+            queryKey={["global", "feed", ""]}
             filters={[
               {
                 kinds: [1, 6, 16],
-                limit: 20,
-              },
-              {
-                kinds: [
-                  1 /*リプライ*/, 6 /*kind1のリポスト*/,
-                  /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
-                ],
-                "#p": [pubkey],
-                limit: 5,
+                limit: 50,
               },
             ]}
             req={createRxForwardReq()}

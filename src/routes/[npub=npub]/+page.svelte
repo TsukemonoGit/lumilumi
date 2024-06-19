@@ -53,7 +53,7 @@
           filters={[
             {
               kinds: [1, 6, 16],
-              limit: 40,
+              limit: 50,
               authors: [data.pubkey],
             },
           ]}
