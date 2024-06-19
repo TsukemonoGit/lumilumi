@@ -114,11 +114,12 @@ export const getMetadataFromLocalStorage = (): void => {
   setSavedMetadata(metadata);
   // console.log(metadata);
   Object.keys(metadata).forEach((pubkey) => {
+    //console.log(metadata[pubkey][0]);
     //  console.log(metadata[pubkey]);
 
     get(queryClient).setQueriesData(
-      { queryKey: ["metadata", pubkey] },
-      metadata[pubkey]
+      { queryKey: metadata[pubkey][0] },
+      metadata[pubkey][1]
     );
   });
 
