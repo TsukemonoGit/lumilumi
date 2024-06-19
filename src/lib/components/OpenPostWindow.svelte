@@ -136,7 +136,7 @@
         >
           <TriangleAlert
             size="20"
-            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+            class="stroke-magnum-500 {onWarning ? 'fill-magnum-700 ' : ''}"
           />
         </button>
         <div class=" flex gap-4">
