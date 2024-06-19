@@ -96,12 +96,12 @@
           <div class="max-w-[100vw] break-words box-border">
             {#if viewIndex !== 0}
               <button
-                class="w-full bg-magnum-400 p-1 rounded-sm"
+                class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
                 on:click={() => (viewIndex = 0)}
                 ><SkipForward size={20} class="mx-auto -rotate-90" /></button
               >
               <button
-                class="w-full bg-magnum-400 p-1 rounded-sm"
+                class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
                 on:click={() => handlePrev()}
                 ><Triangle size={20} class="mx-auto " /></button
               >
@@ -133,9 +133,9 @@
           </div>
 
           <button
-            class="w-full bg-magnum-400 p-1 rounded-sm"
+            class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
             on:click={() => handleNext()}
-            ><Triangle size={20} class="mx-auto rotate-180" /></button
+            ><Triangle size={20} class="mx-auto rotate-180 " /></button
           >
         </TimelineList>
       </Contacts>

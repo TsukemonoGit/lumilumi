@@ -75,11 +75,13 @@
           <div class="max-w-[100vw] break-words box-border">
             {#if viewIndex !== 0}
               <button
-                class="w-full bg-magnum-400"
+                class="w-full bg-magnum-400 ring-1 ring-magnum-200"
                 on:click={() => (viewIndex = 0)}
                 ><SkipForward size={20} class="mx-auto -rotate-90" /></button
               >
-              <button class="w-full bg-magnum-400" on:click={() => handlePrev()}
+              <button
+                class="w-full bg-magnum-400 ring-1 ring-magnum-200"
+                on:click={() => handlePrev()}
                 ><Triangle size={20} class="mx-auto " /></button
               >
             {/if}
@@ -105,7 +107,9 @@
                   >
                 </div>{/each}{/if}
           </div>
-          <button class="w-full bg-magnum-400" on:click={() => handleNext()}
+          <button
+            class="w-full bg-magnum-400 ring-1 ring-magnum-200"
+            on:click={() => handleNext()}
             ><Triangle size={20} class="mx-auto rotate-180" /></button
           >
         </TimelineList>
