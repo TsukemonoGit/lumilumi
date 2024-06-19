@@ -45,6 +45,12 @@
 
   afterNavigate(() => {
     viewIndex = 0;
+    if ($data) {
+      slicedEvent = $data
+        ?.filter((packet) => readUrls.includes(packet.from)) // デフォルトリレーに含まれるかチェック
+        .map(({ event }) => event)
+        .slice(viewIndex, viewIndex + amount);
+    }
   });
 
   // {#if viewIndex + amount < len}
