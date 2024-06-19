@@ -20,21 +20,21 @@
   let dialogOpen: any;
 
   const menuTexts =
-  //  profile
-  //   ? [
-  //       { text: "Copy EventID", icon: Copy, num: 3 },
-  //       { text: "Copy Pubkey", icon: Copy, num: 4 },
-  //       { text: "View Json", icon: FileJson2, num: 0 },
-  //       { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
-  //       { text: "Google Translate", icon: Earth, num: 2 },
-  //     ]
-  //   : 
+    //  profile
+    //   ? [
+    //       { text: "Copy EventID", icon: Copy, num: 3 },
+    //       { text: "Copy Pubkey", icon: Copy, num: 4 },
+    //       { text: "View Json", icon: FileJson2, num: 0 },
+    //       { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
+    //       { text: "Google Translate", icon: Earth, num: 2 },
+    //     ]
+    //   :
     [
-        { text: "Copy EventID", icon: Copy, num: 3 },
-        { text: "View Json", icon: FileJson2, num: 0 },
-        { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
-        { text: "Google Translate", icon: Earth, num: 2 },
-      ];
+      { text: "Copy EventID", icon: Copy, num: 3 },
+      { text: "View Json", icon: FileJson2, num: 0 },
+      { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
+      { text: "Google Translate", icon: Earth, num: 2 },
+    ];
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
@@ -83,7 +83,6 @@
           };
         }
         break;
-     
     }
   };
 </script>
@@ -101,15 +100,10 @@
     >
       {JSON.stringify(note, null, 2)}
     </div>
-    {#if metadata}
-      <h2 class="m-0 text-lg font-medium">METADATA</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-      >
-        {JSON.stringify(metadata, null, 2)}
-      </div>
-    {/if}
+
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
-    {getRelaysById(note.id)}
+    <div class="break-words whitespace-pre-wrap">
+      {getRelaysById(note.id).join(", ")}
+    </div>
   </div></Dialog
 >

@@ -9,10 +9,7 @@
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined = undefined;
-  export let status: string | undefined = undefined;
-  export let mini: boolean = false;
+
   import Avatar from "svelte-boring-avatars";
   import WarningHide1 from "../Elements/WarningHide1.svelte";
   import WarningHide2 from "../Elements/WarningHide2.svelte";
@@ -24,6 +21,11 @@
   import { onDestroy, onMount } from "svelte";
   import ProxyTag from "../Elements/ProxyTag.svelte";
   import UserMenu from "../Elements/UserMenu.svelte";
+
+  export let note: Nostr.Event;
+  export let metadata: Nostr.Event | undefined = undefined;
+  export let status: string | undefined = undefined;
+  export let mini: boolean = false;
 
   let currentNoteId: string | undefined = undefined;
 
@@ -105,12 +107,7 @@
     {#if note.kind === 1}
       <div class={"grid grid-cols-[auto_1fr]"}>
         <div class="p-1">
-          <UserMenu
-            pubkey={note.pubkey}
-            name={metadata ? profile(metadata)?.name : undefined}
-            url={metadata ? profile(metadata)?.picture : undefined}
-            size={mini ? 20 : 40}
-          />
+          <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
         </div>
         <div class="p-1">
           <div class="flex align-middle">
@@ -170,12 +167,7 @@
           class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
         />
         <div class="self-center">
-          <UserMenu
-            pubkey={note.pubkey}
-            name={metadata ? profile(metadata)?.name : undefined}
-            url={metadata ? profile(metadata)?.picture : undefined}
-            size={20}
-          />
+          <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
         </div>
         <div
           class=" mt-auto inline-block break-all break-words whitespace-pre-line"
@@ -210,12 +202,7 @@
       <div class="flex gap-1">
         <div class="w-fit"><Reaction event={note} /></div>
         <div class="self-center">
-          <UserMenu
-            pubkey={note.pubkey}
-            name={metadata ? profile(metadata)?.name : undefined}
-            url={metadata ? profile(metadata)?.picture : undefined}
-            size={20}
-          />
+          <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
         </div>
         <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
           {#if metadata}
