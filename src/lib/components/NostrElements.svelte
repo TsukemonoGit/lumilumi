@@ -31,16 +31,6 @@
       lastEvent.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  const handleNext = () => {
-    viewIndex += 20;
-  };
-
-  const handlePrev = () => {
-    if (viewIndex > 0) {
-      viewIndex = Math.max(viewIndex - 20, 0);
-    }
-  };
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
@@ -94,18 +84,6 @@
           </div>
 
           <div class="max-w-[100vw] break-words box-border">
-            {#if viewIndex !== 0}
-              <button
-                class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
-                on:click={() => (viewIndex = 0)}
-                ><SkipForward size={20} class="mx-auto -rotate-90" /></button
-              >
-              <button
-                class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
-                on:click={() => handlePrev()}
-                ><Triangle size={20} class="mx-auto " /></button
-              >
-            {/if}
             {#if events && events.length > 0}
               {#each events as event (event.id)}
                 <div
@@ -131,12 +109,6 @@
               {/each}
             {/if}
           </div>
-
-          <button
-            class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
-            on:click={() => handleNext()}
-            ><Triangle size={20} class="mx-auto rotate-180 " /></button
-          >
         </TimelineList>
       </Contacts>
     </div>

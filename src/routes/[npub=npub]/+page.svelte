@@ -73,18 +73,6 @@
           </div>
 
           <div class="max-w-[100vw] break-words box-border">
-            {#if viewIndex !== 0}
-              <button
-                class="w-full bg-magnum-400 ring-1 ring-magnum-200"
-                on:click={() => (viewIndex = 0)}
-                ><SkipForward size={20} class="mx-auto -rotate-90" /></button
-              >
-              <button
-                class="w-full bg-magnum-400 ring-1 ring-magnum-200"
-                on:click={() => handlePrev()}
-                ><Triangle size={20} class="mx-auto " /></button
-              >
-            {/if}
             {#if events && events.length > 0}
               {#each events as event (event.id)}<div
                   class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
@@ -107,11 +95,6 @@
                   >
                 </div>{/each}{/if}
           </div>
-          <button
-            class="w-full bg-magnum-400 ring-1 ring-magnum-200"
-            on:click={() => handleNext()}
-            ><Triangle size={20} class="mx-auto rotate-180" /></button
-          >
         </TimelineList>
       </div>
     </SetDefaultRelays>

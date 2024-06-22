@@ -202,7 +202,7 @@ export function useReq(
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relay })
-    .pipe(tie, muteCheck(), metadata(queryKey), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
+    .pipe(tie, muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
@@ -327,5 +327,91 @@ export function relaysReconnectChallenge() {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);
     }
+  });
+}
+
+export function usePromiseReq({
+  queryKey,
+  filters,
+  operator,
+  req,
+  initData = [],
+}: UseReqOpts<EventPacket[]>): Promise<EventPacket[]> {
+  const _queryClient = get(queryClient);
+
+  if (!_queryClient) {
+    throw Error("No query client available");
+  }
+
+  const _rxNostr = get(app).rxNostr;
+  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+    console.log("error");
+    throw Error("No default relays available");
+  }
+
+  let _req:
+    | RxReqBase
+    | (RxReq<"backward"> & {
+        emit(
+          filters: Filter | Filter[],
+          options?: {
+            relays: string[];
+          }
+        ): void;
+      });
+
+  if (req) {
+    _req = req;
+  } else {
+    _req = createRxBackwardReq();
+  }
+
+  const status = writable<ReqStatus>("loading");
+  const error = writable<Error>();
+  let accumulatedData: EventPacket[] = [...initData];
+
+  const obs: Observable<EventPacket[]> = _rxNostr
+    .use(_req)
+    .pipe(tie, muteCheck(), metadata(), operator);
+
+  return new Promise<EventPacket[]>((resolve, reject) => {
+    let fulfilled = false;
+
+    const subscription = obs.subscribe({
+      next: (v: EventPacket[]) => {
+        accumulatedData = [...accumulatedData, ...v];
+      },
+
+      complete: () => {
+        status.set("success");
+        if (!fulfilled) {
+          resolve(accumulatedData);
+          fulfilled = true;
+        }
+      },
+
+      error: (e) => {
+        console.error("[rx-nostr]", e);
+        status.set("error");
+        error.set(e);
+
+        if (!fulfilled) {
+          resolve(accumulatedData);
+          fulfilled = true;
+        }
+      },
+    });
+
+    _req.emit(filters);
+
+    // Ensure complete is called even if the observable doesn't emit data
+    setTimeout(() => {
+      if (!fulfilled) {
+        subscription.unsubscribe();
+
+        resolve(accumulatedData);
+        fulfilled = true;
+      }
+    }, 3000); // Timeout after 30 seconds if not completed
   });
 }
