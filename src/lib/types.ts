@@ -1,4 +1,5 @@
 import type { QueryKey } from "@tanstack/svelte-query";
+import type { Filter } from "nostr-typedef";
 import type Nostr from "nostr-typedef";
 import type {
   AcceptableDefaultRelaysConfig,
@@ -7,6 +8,8 @@ import type {
   RxNostr,
   RxReq,
   RxReqController,
+  RxReqOverable,
+  RxReqPipeable,
 } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import type { Readable } from "svelte/store";
@@ -30,7 +33,19 @@ export interface UseReqOpts<A> {
   queryKey: QueryKey;
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
-  req?: RxReqBase;
+  req?:
+    | RxReqBase
+    | (RxReq<"backward"> & {
+        emit(
+          filters: Filter | Filter[],
+          options?:
+            | {
+                relays: string[];
+              }
+            | undefined
+        ): void;
+      } & RxReqOverable &
+        RxReqPipeable);
   initData?: A;
 }
 export interface UseReqOpts2<A> {

@@ -71,7 +71,11 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
 export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
     // クエリデータの設定
-    if (a.event && a.event.id) {
+    if (
+      a.event &&
+      a.event.id &&
+      !get(queryClient).getQueryData(["timeline", a.event.id])
+    ) {
       get(queryClient).setQueryData(["timeline", a.event.id], a);
     }
 
@@ -117,12 +121,13 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
 //   );
 // }
 
-export function metadata(
-  queryKey: QueryKey
-): OperatorFunction<EventPacket, EventPacket> {
+export function metadata(): OperatorFunction<EventPacket, EventPacket> {
   return tap((event: EventPacket) => {
-    if (queryKey[0] === "metadata") {
-      metadataQueue.update((queue) => [...queue, [queryKey, event]]);
+    if (event.event.kind === 0) {
+      metadataQueue.update((queue) => [
+        ...queue,
+        [["metadata", event.event.pubkey], event],
+      ]);
     }
   });
 }

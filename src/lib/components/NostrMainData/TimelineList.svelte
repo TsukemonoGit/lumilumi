@@ -7,14 +7,18 @@
   import type { ReqStatus, RxReqBase } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
+
+  import { loadOlderEvents } from "./timelineList";
+  import { readable } from "svelte/store";
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
   export let req: RxReqBase | undefined = undefined;
   export let viewIndex: number;
   export let amount: number;
-  // TODO: Check if $app.rxNostr is defined
+
   $: result = useTimelineEventList(queryKey, filters, req);
   $: data = result.data;
   $: status = result.status;
@@ -26,17 +30,7 @@
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: console.log(filters);
-  // Update filters with 'until' field for all items
   $: if ($data && viewIndex >= 0 && filters) {
-    if (viewIndex + amount > $data.length) {
-      const untilTimestamp = $data[$data.length - 1].event.created_at;
-
-      filters = filters.map((filter) => ({
-        ...filter,
-        until: untilTimestamp,
-      }));
-    }
     slicedEvent = $data
       ?.filter((packet) => readUrls.includes(packet.from)) // デフォルトリレーに含まれるかチェック
       .map(({ event }) => event)
@@ -61,7 +55,36 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
+
+  const handleNext = async () => {
+    viewIndex += 20;
+    if ($data && $data.length > 1 && $data.length < viewIndex + amount) {
+      const olderEvents = await loadOlderEvents($data, filters, queryKey);
+      if (olderEvents) {
+        result.data = readable(Array.from(new Set([...$data, ...olderEvents])));
+      }
+    }
+  };
+
+  const handlePrev = () => {
+    if (viewIndex > 0) {
+      viewIndex = Math.max(viewIndex - 20, 0);
+    }
+  };
 </script>
+
+{#if viewIndex !== 0}
+  <button
+    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+    on:click={() => (viewIndex = 0)}
+    ><SkipForward size={20} class="mx-auto -rotate-90" /></button
+  >
+  <button
+    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+    on:click={() => handlePrev()}
+    ><Triangle size={20} class="mx-auto " /></button
+  >
+{/if}
 
 {#if $error}
   <slot name="error" error={$error} />
@@ -72,3 +95,8 @@
 {:else}
   <slot name="nodata" />
 {/if}
+<button
+  class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+  on:click={() => handleNext()}
+  ><Triangle size={20} class="mx-auto rotate-180 " /></button
+>
