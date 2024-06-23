@@ -10,28 +10,19 @@
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
 
-  import Avatar from "svelte-boring-avatars";
-  import WarningHide1 from "../Elements/WarningHide1.svelte";
+  //import WarningHide1 from "../Elements/WarningHide1.svelte";
   import WarningHide2 from "../Elements/WarningHide2.svelte";
-  import {
-    formatAbsoluteDate,
-    nip33Regex,
-    splitHexColorString,
-  } from "$lib/func/util";
-  import UserAvatar from "../Elements/UserAvatar.svelte";
+  import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import ProxyTag from "../Elements/ProxyTag.svelte";
   import UserMenu from "../Elements/UserMenu.svelte";
-  import { filterNaddr } from "$lib/stores/operators";
   import LatestEvent from "../NostrMainData/LatestEvent.svelte";
-  import Metadata from "../NostrMainData/Metadata.svelte";
-  import { json } from "@sveltejs/kit";
+
   import Link from "../Elements/Link.svelte";
   import { getRelaysById } from "$lib/func/nostr";
-  import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;

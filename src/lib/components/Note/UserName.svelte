@@ -6,19 +6,21 @@
   export let pubhex: string;
 </script>
 
-@<Metadata queryKey={["metadata", pubhex]} pubkey={pubhex} let:metadata>
-  <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
-    {nip19.npubEncode(pubhex)}
-  </div>
-  <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-    {nip19.npubEncode(pubhex)}
-  </div>
-  <div
-    slot="error"
-    class="text-sm text-neutral-500 flex-inline break-all"
-    let:error
-  >
-    {nip19.npubEncode(pubhex)}
-  </div>
-  {profile(metadata)?.name ?? profile(metadata)?.display_name}
-</Metadata>
+<span class="flex"
+  >@<Metadata queryKey={["metadata", pubhex]} pubkey={pubhex} let:metadata>
+    <span slot="loading" class="text-sm text-neutral-500 inline-flex break-all">
+      {nip19.npubEncode(pubhex)}
+    </span>
+    <span slot="nodata" class="text-sm text-neutral-500 inline-flex break-all">
+      {nip19.npubEncode(pubhex)}
+    </span>
+    <span
+      slot="error"
+      class="text-sm text-neutral-500 inline-flex break-all"
+      let:error
+    >
+      {nip19.npubEncode(pubhex)}
+    </span>
+    {profile(metadata)?.name ?? profile(metadata)?.display_name}
+  </Metadata></span
+>
