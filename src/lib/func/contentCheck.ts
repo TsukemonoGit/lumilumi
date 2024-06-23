@@ -16,7 +16,11 @@ export function contentCheck(
       switch (decoded.type) {
         case "nprofile":
           if (decoded.data.relays) {
-            newTags.push(["p", decoded.data.pubkey, decoded.data.relays[0]]);
+            newTags.push([
+              "p",
+              decoded.data.pubkey,
+              decoded.data.relays[0] ?? "",
+            ]);
           } else {
             newTags.push(["p", decoded.data.pubkey]);
           }
@@ -26,7 +30,11 @@ export function contentCheck(
           break;
         case "nevent":
           if (decoded.data.relays) {
-            newTags.push(["q", decoded.data.id, decoded.data.relays[0]]);
+            newTags.push([
+              "q",
+              decoded.data.id,
+              decoded.data.relays?.[0] ?? "",
+            ]);
           } else {
             newTags.push(["q", decoded.data.id]);
           }
@@ -36,7 +44,7 @@ export function contentCheck(
             newTags.push([
               "a",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-              decoded.data.relays[0],
+              decoded.data.relays?.[0] ?? "",
             ]);
           } else {
             newTags.push([

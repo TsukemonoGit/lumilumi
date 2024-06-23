@@ -50,7 +50,7 @@
     />
   </span>
 {:else if decoded.type === "naddr"}
-  <span class="grid grid-cols-[auto_1fr_auto]">
+  <span class="grid grid-cols-[1fr_auto_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
     <LatestEvent
       queryKey={[
@@ -80,7 +80,6 @@
       <div slot="error" class="text-sm text-neutral-500 flex-inline break-all">
         {content}
       </div>
-      <EventCard note={event} status="loading" />
       <Metadata
         queryKey={["metadata", event.pubkey]}
         pubkey={event.pubkey}

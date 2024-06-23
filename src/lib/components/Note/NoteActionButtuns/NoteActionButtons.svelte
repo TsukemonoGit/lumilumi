@@ -31,6 +31,7 @@
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
   import { emojis, showImg } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
+  import { nip33Regex } from "$lib/func/util";
 
   export let note: Nostr.Event;
 
@@ -41,17 +42,40 @@
   let customReaction: string = "";
   let cursorPosition: number = 0;
 
+  let dtag: string[] | undefined;
+  let atag: string | undefined;
+  $: {
+    if (
+      (note.kind >= 10000 && note.kind < 20000) ||
+      (note.kind >= 30000 && note.kind < 40000) ||
+      note.kind === 0 ||
+      note.kind === 3
+    ) {
+      //atag　で　りぽすと
+      dtag = note.tags.find((tag) => tag[0] === "d");
+      atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+    } else {
+      dtag = undefined;
+      atag = undefined;
+    }
+  }
   // let reaction = writable<string | null>(null);
 
   const handleClickReaction = () => {
     const tmp = "+";
     const ev: Nostr.EventParameters = {
       kind: 7,
-      tags: [
-        ["p", note.pubkey],
-        ["e", note.id],
-        ["k", note.kind.toString()],
-      ],
+      tags: atag
+        ? [
+            ["p", note.pubkey],
+            ["a", atag],
+            ["k", note.kind.toString()],
+          ]
+        : [
+            ["p", note.pubkey],
+            ["e", note.id],
+            ["k", note.kind.toString()],
+          ],
       content: tmp,
     };
     publishEvent(ev);
@@ -87,29 +111,55 @@
 
   let additionalReplyUsers: Writable<string[]> = writable([...allPtag] ?? []);
 
+  //reply
   const handleClickReplySend = () => {
-    const replyUsersArray: string[][] = $additionalReplyUsers.map((user) => [
-      "p",
-      user,
-    ]);
-    const root = note.tags.find(
-      (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
-    );
-
-    let etag = root
-      ? [root, ["e", note.id, getRelaysById(note.id)?.[0], "reply"]]
-      : [["e", note.id, getRelaysById(note.id)?.[0], "root"]];
-
     const { text: checkedtext, tags: checkedTags } = contentCheck(
       replyText.trim(),
       tags
     );
+    checkedTags.push(["p", note.pubkey]);
+    const root = note.tags.find(
+      (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
+    );
+    if (root) {
+      checkedTags.push(root);
+    }
+    const replyUsersArray: string[][] = $additionalReplyUsers.map((user) => [
+      "p",
+      user,
+    ]);
+    checkedTags.push(...replyUsersArray);
+
+    if (atag) {
+      checkedTags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
+    } else {
+      if (root) {
+        checkedTags.push([
+          "e",
+          note.id,
+          getRelaysById(note.id)?.[0] ?? "",
+          "reply",
+        ]);
+      } else {
+        checkedTags.push([
+          "e",
+          note.id,
+          getRelaysById(note.id)?.[0] ?? "",
+          "root",
+        ]);
+      }
+    }
+    // let etag = root
+    //   ? [root, ["e", note.id, getRelaysById(note.id)?.[0], "reply"]]
+    //   : [["e", note.id, getRelaysById(note.id)?.[0], "root"]];
+
     if (onWarning) {
       checkedTags.push(["content-warning", warningText]);
     }
+
     const ev: Nostr.EventParameters = {
       content: checkedtext,
-      tags: [["p", note.pubkey], ...replyUsersArray, ...etag, ...checkedTags],
+      tags: checkedTags,
       kind: 1,
     };
     publishEvent(ev);
@@ -138,15 +188,7 @@
         //repost
         let tags: string[][] = [["p", note.pubkey]];
         //replaceable
-        if (
-          (note.kind >= 10000 && note.kind < 20000) ||
-          (note.kind >= 30000 && note.kind < 40000) ||
-          note.kind === 0 ||
-          note.kind === 3
-        ) {
-          //atag　で　りぽすと
-          const dtag = note.tags.find((tag) => tag[0] === "d");
-          const atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+        if (atag) {
           tags.push(["a", atag]);
         } else {
           tags.push(["e", note.id]);
@@ -171,14 +213,31 @@
         break;
       case 1:
         //Quote
-        replyText = ` nostr:${nevent} `;
+        replyText = atag
+          ? `nostr:${encodeNaddr(atag, nevent)}`
+          : ` nostr:${nevent} `;
         openReplyWindow = false;
         openQuoteWindow = true;
 
         break;
     }
   };
-
+  function encodeNaddr(atag: string, nevent: string): string {
+    const matches = atag.match(nip33Regex);
+    if (!matches) {
+      return nevent;
+    }
+    const naddrAddress: nip19.AddressPointer = {
+      kind: Number(matches[1]),
+      pubkey: matches[2],
+      identifier: matches[3],
+    };
+    try {
+      return nip19.naddrEncode(naddrAddress);
+    } catch (error) {
+      return nevent;
+    }
+  }
   const handleClickEmoji = (e: string[]) => {
     const emojiTag = ["emoji", ...e];
     if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
