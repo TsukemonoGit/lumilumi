@@ -61,9 +61,28 @@
     if ($data && $data.length > 1 && $data.length < viewIndex + amount) {
       const olderEvents = await loadOlderEvents($data, filters, queryKey);
       if (olderEvents) {
+        // すべてのイベントを結合
+        const allEvents = [...$data, ...olderEvents];
+
+        // イベントを作成日の降順でソート
+        allEvents.sort((a, b) => b.event.created_at - a.event.created_at);
+
+        // 一意なイベントを保持するためのオブジェクト
+        const uniqueEventsMap: { [x: string]: boolean } = {};
+
+        // 一意なイベントを配列に保存
+        const uniqueEvents = [];
+        for (const event of allEvents) {
+          if (!uniqueEventsMap[event.event.id]) {
+            uniqueEventsMap[event.event.id] = true;
+            uniqueEvents.push(event);
+          }
+        }
+
+        // 結果を更新
         result = {
           ...result,
-          data: readable(Array.from(new Set([...$data, ...olderEvents]))),
+          data: readable(uniqueEvents),
         };
       }
     }

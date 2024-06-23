@@ -17,12 +17,24 @@ export async function loadOlderEvents(
     if (kind1.length === 0) {
       return [];
     }
-    const untilTimestamp = kind1[kind1.length - 1].event.created_at;
-    const newFilters = filters.map((filter: any) => ({
-      ...filter,
-      limit: 20,
-      until: untilTimestamp,
-    }));
+    const lastEvent = data[data.length - 1];
+
+    const untilTimestamp = lastEvent.event.created_at;
+    //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
+    const newFilters =
+      lastEvent.event.kind === 1
+        ? filters.map((filter: Filter) => ({
+            ...filter,
+            limit: 20,
+            until: untilTimestamp,
+          }))
+        : [
+            {
+              ...filters[0],
+              limit: 20,
+              until: kind1[kind1.length - 1].event.created_at,
+            },
+          ];
     console.log(newFilters);
     const newReq = createRxBackwardReq();
     const operator = pipe(uniq(), verify(), scanArray());
