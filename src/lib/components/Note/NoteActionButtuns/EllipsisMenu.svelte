@@ -16,7 +16,6 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
 
   export let note: Nostr.Event;
-  export let profile: Nostr.Event<number> | undefined;
   let dialogOpen: any;
 
   const menuTexts =

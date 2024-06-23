@@ -34,8 +34,6 @@
 
   export let note: Nostr.Event;
 
-  export let metadata: Nostr.Event | undefined = undefined;
-
   let openReplyWindow: boolean = false;
   let openQuoteWindow: boolean = false;
   let tags: string[][] = [];
@@ -138,23 +136,34 @@
     switch (menuTexts[index].num) {
       case 0:
         //repost
+        let tags: string[][] = [["p", note.pubkey]];
+        //replaceable
+        if (
+          (note.kind >= 10000 && note.kind < 20000) ||
+          (note.kind >= 30000 && note.kind < 40000) ||
+          note.kind === 0 ||
+          note.kind === 3
+        ) {
+          //atag　で　りぽすと
+          const dtag = note.tags.find((tag) => tag[0] === "d");
+          const atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+          tags.push(["a", atag]);
+        } else {
+          tags.push(["e", note.id]);
+        }
+        if (note.kind !== 1) {
+          tags.push(["k", note.kind.toString()]);
+        }
         const ev: Nostr.EventParameters =
           note.kind === 1
             ? {
                 kind: 6,
-                tags: [
-                  ["p", note.pubkey],
-                  ["e", note.id],
-                ],
+                tags: tags,
                 content: "",
               }
             : {
                 kind: 16,
-                tags: [
-                  ["p", note.pubkey],
-                  ["e", note.id],
-                  ["k", note.kind.toString()],
-                ],
+                tags: tags,
                 content: "",
               };
         publishEvent(ev);
@@ -228,79 +237,79 @@
 
 <div>
   <div class="flex justify-between py-0.5 mr-2">
-    {#if note.kind === 1}
-      <!--リプライ-->
-      <button
-        on:click={() => {
-          openReplyWindow = !openReplyWindow;
-          replyText = "";
-          if (openReplyWindow) {
-            openQuoteWindow = false;
-          }
-        }}
-      >
-        <MessageSquare
+    <!-- {#if note.kind === 1} -->
+    <!--リプライ-->
+    <button
+      on:click={() => {
+        openReplyWindow = !openReplyWindow;
+        replyText = "";
+        if (openReplyWindow) {
+          openQuoteWindow = false;
+        }
+      }}
+    >
+      <MessageSquare
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
+          ? 'fill-magnum-700'
+          : ''}"
+      />
+    </button>
+    <!--リポスト-->
+    <Reposted id={note.id} let:event>
+      <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+      <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+      <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+
+      <DropdownMenu {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
+      </DropdownMenu>
+    </Reposted>
+    <!--リアクション-->
+    <Reactioned id={note.id} let:event>
+      <button slot="loading" on:click={handleClickReaction}>
+        <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
-            ? 'fill-magnum-700'
-            : ''}"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
         />
       </button>
-      <!--リポスト-->
-      <Reposted id={note.id} let:event>
-        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
 
-        <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
-        </DropdownMenu>
-      </Reposted>
-      <!--リアクション-->
-      <Reactioned id={note.id} let:event>
-        <button slot="loading" on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
-          />
-        </button>
+      <button slot="nodata" on:click={handleClickReaction}>
+        <Heart
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+        />
+      </button>
 
-        <button slot="nodata" on:click={handleClickReaction}>
+      <button slot="error" on:click={handleClickReaction}>
+        <Heart
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+        />
+      </button>
+
+      {#if event === undefined}
+        <button on:click={handleClickReaction}>
           <Heart
             size="20"
             class="hover:opacity-75 active:opacity-50 text-magnum-500"
           />
         </button>
-
-        <button slot="error" on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500"
-          />
-        </button>
-
-        {#if event === undefined}
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        {:else}
-          <Reaction {event} />
-        {/if}
-      </Reactioned>
-      <!--カスタムリアクション-->
-      <CustomReaction {note} />
-    {/if}
+      {:else}
+        <Reaction {event} />
+      {/if}
+    </Reactioned>
+    <!--カスタムリアクション-->
+    <CustomReaction {note} />
+    <!-- {/if} -->
     <!--メニュー-->
-    <EllipsisMenu {note} profile={metadata} />
+    <EllipsisMenu {note} />
   </div>
 
   <!--replyWindow-->

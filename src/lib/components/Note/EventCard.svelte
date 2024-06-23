@@ -13,7 +13,11 @@
   import Avatar from "svelte-boring-avatars";
   import WarningHide1 from "../Elements/WarningHide1.svelte";
   import WarningHide2 from "../Elements/WarningHide2.svelte";
-  import { formatAbsoluteDate, splitHexColorString } from "$lib/func/util";
+  import {
+    formatAbsoluteDate,
+    nip33Regex,
+    splitHexColorString,
+  } from "$lib/func/util";
   import UserAvatar from "../Elements/UserAvatar.svelte";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
@@ -21,12 +25,19 @@
   import { onDestroy, onMount } from "svelte";
   import ProxyTag from "../Elements/ProxyTag.svelte";
   import UserMenu from "../Elements/UserMenu.svelte";
+  import { filterNaddr } from "$lib/stores/operators";
+  import LatestEvent from "../NostrMainData/LatestEvent.svelte";
+  import Metadata from "../NostrMainData/Metadata.svelte";
+  import { json } from "@sveltejs/kit";
+  import Link from "../Elements/Link.svelte";
+  import { getRelaysById } from "$lib/func/nostr";
+  import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
-
+  const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
 
   $: if (note && note.id !== currentNoteId) {
@@ -100,6 +111,81 @@
   const checkProxy = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "proxy");
   };
+
+  const findClientTag = (
+    note: Nostr.Event
+  ):
+    | {
+        name: string;
+        aTag: string;
+        filter: Nostr.Filter;
+        naddr: string | undefined;
+      }
+    | undefined => {
+    const clientTag = note.tags.find((item) => item[0] === "client");
+    if (!clientTag) {
+      return undefined;
+    }
+    const matches = clientTag[2]?.match(nip33Regex);
+    if (!matches) {
+      return undefined;
+    }
+    const filter: Nostr.Filter = {
+      kinds: [Number(matches[1])],
+      authors: [matches[2]],
+      "#d": [matches[3]],
+      limit: 1,
+    };
+
+    const dtag = note.tags.find((tag) => tag[0] === "d");
+    const naddrAddress: nip19.AddressPointer = {
+      identifier: dtag?.[1] ?? "",
+      kind: note.kind,
+      pubkey: note.pubkey,
+      relays: getRelaysById(note.id),
+    };
+    try {
+      return {
+        name: clientTag[1],
+        aTag: clientTag[2],
+        filter: filter,
+        naddr: nip19.naddrEncode(naddrAddress),
+      };
+    } catch (error) {
+      return {
+        name: clientTag[1],
+        aTag: clientTag[2],
+        filter: filter,
+        naddr: undefined,
+      };
+    }
+  };
+
+  const findWebURL = (
+    tags: string[][],
+    clientData: {
+      name: string;
+      aTag: string;
+      filter: Nostr.Filter;
+      naddr: string | undefined;
+    }
+  ): string[] => {
+    if (!clientData.naddr) return [];
+    const webTag = tags.reduce((acc, [tag, url, nip19]) => {
+      if (tag === "web" && nip19 === "naddr") {
+        return [...acc, url];
+      } else {
+        return acc;
+      }
+    }, []);
+
+    if (webTag.length == 0) {
+      return [];
+    }
+    return webTag.map((item) => {
+      return item.replace(bech32Pattern, clientData.naddr ?? "");
+    });
+  };
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
@@ -156,7 +242,7 @@
             </div>
           {/if}
 
-          <NoteActionButtons {note} {metadata} />
+          <NoteActionButtons {note} />
         </div>
       </div>
     {:else if note.kind === 6 || note.kind === 16}
@@ -188,7 +274,7 @@
           </div>
         {/if}
         <div class="ml-auto mr-2">
-          <NoteActionButtons {note} {metadata} />
+          <NoteActionButtons {note} />
         </div>
       </div>
 
@@ -222,7 +308,7 @@
           </div>
         {/if}
         <div class="ml-auto">
-          <NoteActionButtons {note} {metadata} />
+          <NoteActionButtons {note} />
         </div>
       </div>
 
@@ -233,16 +319,97 @@
       {/await}
     {:else}
       <!--その他-->
-      <div class="break-all overflow-x-hidden">
-        kind:{note.kind}{#if metadata}
-          {profile(metadata)?.name}
+      {#await findClientTag(note) then clientData}
+        {#if !clientData}
+          <div class="break-all overflow-x-hidden">
+            kind:{note.kind}{#if metadata}
+              {profile(metadata)?.name}
+            {/if}
+          </div>
+          <hr />
+          {note.tags}
+          <hr />
+          <Content text={note.content} tags={note.tags} />
+          <NoteActionButtons {note} />
+        {:else}
+          <!---->
+          <LatestEvent
+            filters={[clientData.filter]}
+            queryKey={["naddr", clientData.aTag]}
+            let:event
+          >
+            <div slot="loading">
+              <div class="break-all overflow-x-hidden">
+                kind:{note.kind}{#if metadata}
+                  {profile(metadata)?.name}
+                {/if}
+              </div>
+              <hr />
+              {note.tags}
+              <hr />
+              <Content text={note.content} tags={note.tags} />
+              <NoteActionButtons {note} />
+            </div>
+            <div slot="nodata">
+              <div class="break-all overflow-x-hidden">
+                kind:{note.kind}{#if metadata}
+                  {profile(metadata)?.name}
+                {/if}
+              </div>
+              <hr />
+              {note.tags}
+              <hr />
+              <Content text={note.content} tags={note.tags} />
+              <NoteActionButtons {note} />
+            </div>
+            <div slot="error" let:error>
+              <div class="break-all overflow-x-hidden">
+                kind:{note.kind}{#if metadata}
+                  {profile(metadata)?.name}
+                {/if}
+              </div>
+              <hr />
+              {note.tags}
+              <hr />
+              <Content text={note.content} tags={note.tags} />
+              <NoteActionButtons {note} />
+            </div>
+
+            {#await findWebURL(event.tags, clientData) then urls}
+              <UserMenu
+                pubkey={note.pubkey}
+                bind:metadata
+                size={20}
+              />kind:{note.kind}
+              {#if metadata}
+                @{profile(metadata)?.name}
+              {/if}
+              {#if urls}
+                {#each urls as url}
+                  <div>
+                    <Link
+                      className="underline text-magnum-300 break-all"
+                      href={url}>{url}</Link
+                    >
+                  </div>
+                {/each}
+                <NoteActionButtons {note} />
+              {:else}
+                <div class="break-all overflow-x-hidden">
+                  kind:{note.kind}{#if metadata}
+                    {profile(metadata)?.name}
+                  {/if}
+                </div>
+                <hr />
+                {note.tags}
+                <hr />
+                <Content text={note.content} tags={note.tags} />
+                <NoteActionButtons {note} />
+              {/if}
+            {/await}
+          </LatestEvent>
         {/if}
-      </div>
-      <hr />
-      {note.tags}
-      <hr />
-      <Content text={note.content} tags={note.tags} />
-      <NoteActionButtons {note} {metadata} />
+      {/await}
     {/if}
   {/await}
 </div>

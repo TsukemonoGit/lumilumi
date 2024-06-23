@@ -7,6 +7,7 @@
   import Text from "../NostrMainData/Text.svelte";
   import LatestEvent from "../NostrMainData/LatestEvent.svelte";
   import EventCard from "./EventCard.svelte";
+  import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
   //tagはaかe
   export let tag: string[];
   export let kind: number | undefined;
