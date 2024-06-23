@@ -57,7 +57,7 @@
             {
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
-              limit: 70,
+              limit: 50,
             },
             {
               kinds: [

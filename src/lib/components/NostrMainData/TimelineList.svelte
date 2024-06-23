@@ -61,7 +61,10 @@
     if ($data && $data.length > 1 && $data.length < viewIndex + amount) {
       const olderEvents = await loadOlderEvents($data, filters, queryKey);
       if (olderEvents) {
-        result.data = readable(Array.from(new Set([...$data, ...olderEvents])));
+        result = {
+          ...result,
+          data: readable(Array.from(new Set([...$data, ...olderEvents]))),
+        };
       }
     }
   };

@@ -78,13 +78,13 @@
       {#if filter}
         <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
           <div slot="loading">
-            <p>Loading {nip19.noteEncode(tag[1])}</p>
+            <p>Loading {tag[1]}</p>
           </div>
           <div slot="nodata">
-            <p>nodata {nip19.noteEncode(tag[1])}</p>
+            <p>nodata {tag[1]}</p>
           </div>
           <div slot="error" let:error>
-            <p>{error} {nip19.noteEncode(tag[1])}</p>
+            <p>{error} {tag[1]}</p>
           </div>
           <Metadata
             queryKey={["metadata", event.pubkey]}

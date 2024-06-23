@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "relayMenuText0": "Kind:10002 を使う",
+    "relayMenuText1": "設定したリレーを使う",
+    "toast": {
+      "relayError": "リレーのリストには少なくとも1つの読み取りと書き込み可能なリレーが含まれている必要があります。",
+      "resetData": "設定がリセットされました。"
+    },
+    "beforeUnload": {
+      "message": "変更された設定が保存されていません。ページを離れますか？"
+    },
+    "nostviewstr": {
+      "kind10002": "NostViewstr で Relaylist (kind:10002) を編集する",
+      "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する"
+    },
+    "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
+    "display": {
+      "loadImage": "画像を読み込み表示する"
+    },
+    "douki": {
+      "title": "データの同期"
+    }
+  }
+}

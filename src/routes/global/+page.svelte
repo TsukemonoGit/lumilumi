@@ -50,7 +50,7 @@
 
         <div class="container break-words overflow-x-hidden">
           <TimelineList
-            queryKey={["global", "feed", ""]}
+            queryKey={["global", "feed"]}
             filters={[
               {
                 kinds: [1, 6, 16],

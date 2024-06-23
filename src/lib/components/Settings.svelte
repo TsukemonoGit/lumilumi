@@ -18,7 +18,7 @@
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
   import type { LumiSetting } from "$lib/types";
-
+  import { _ } from "svelte-i18n";
   //  import { promiseRelaySet } from "$lib/stores/promiseRelaySet";
 
   import type { MuteList } from "$lib/types";
@@ -55,7 +55,10 @@
   });
 
   const optionsArr = ["0", "1"];
-  const optionsArrStr = ["kind:10002 を使う", "設定したリレーを使う"];
+  const optionsArrStr = [
+    `${$_("settings.relayMenuText0")}`,
+    `${$_("settings.relayMenuText1")}`,
+  ];
   //inputurl
   const {
     elements: { root: relayInputroot },
@@ -85,7 +88,8 @@
         }: LumiSetting = JSON.parse(savedSettings);
         relays.set(savedRelays);
         radioGroupSelected.set(savedRelaySet);
-        pubkey.set(savedPubkey);
+        // pubkey.set(savedPubkey);
+        inputPubkey = nip19.npubEncode(savedPubkey);
         $loginUser = $pubkey;
         if (savedShowImg) {
           _showImg.set(savedShowImg);
@@ -112,7 +116,7 @@
           window.nostr as Nostr.Nip07.Nostr
         ).getPublicKey();
         if (gotPubkey) {
-          pubkey.set(gotPubkey);
+          //pubkey.set(gotPubkey);
         }
       } catch (error) {
         console.log(error);
@@ -153,17 +157,27 @@
 
         $toastSettings = {
           title: "Error",
-          description:
-            "リレーのリストには少なくとも1つの読み取りと書き込み可能なリレーが含まれている必要があります。",
+          description: `${$_("settings.toast.relayError")}}`,
           color: "bg-red-500",
         };
         return;
       }
     }
-    if (!$pubkey || $pubkey === "") {
+    if (inputPubkey === "") {
       $toastSettings = {
         title: "Error",
         description: "error pubkey",
+        color: "bg-red-500",
+      };
+      return;
+    }
+    try {
+      $pubkey = nip19.decode(inputPubkey).data as string;
+    } catch (error) {
+      console.log(error);
+      $toastSettings = {
+        title: "Error",
+        description: "failed to save pubkey",
         color: "bg-red-500",
       };
       return;
@@ -219,7 +233,8 @@
       }: LumiSetting = JSON.parse(savedSettings);
       relays.set(savedRelays);
       radioGroupSelected.set(savedRelaySet);
-      pubkey.set(savedPubkey);
+      // pubkey.set(savedPubkey);
+      inputPubkey = nip19.npubEncode(savedPubkey);
       muteList = savedMute;
       emojiList = savedEmoji;
       try {
@@ -238,7 +253,7 @@
 
       $toastSettings = {
         title: "Warning",
-        description: "設定がリセットされました。",
+        description: `${$_("settings.toast.resetData")}`,
         color: "bg-orange-500",
       };
     }
@@ -249,7 +264,7 @@
         window.nostr as Nostr.Nip07.Nostr
       ).getPublicKey();
       if (gotPubkey) {
-        pubkey.set(gotPubkey);
+        inputPubkey = nip19.npubEncode(gotPubkey);
       }
     } catch (error) {
       console.log(error);
@@ -289,8 +304,7 @@
   function handleBeforeUnload(event: BeforeUnloadEvent) {
     if (settingsChanged()) {
       event.preventDefault();
-      event.returnValue =
-        "変更された設定が保存されていません。ページを離れますか？";
+      event.returnValue = `${$_("settings.beforeUnload.message")}`;
     }
   }
 
@@ -304,30 +318,35 @@
   // ページ離脱時の警告イベント
   beforeNavigate((event) => {
     if (settingsChanged()) {
-      if (
-        !confirm("変更された設定が保存されていません。ページを離れますか？")
-      ) {
+      if (!confirm(`${$_("settings.beforeUnload.message")}`)) {
         event.cancel();
       }
     }
   });
+
+  let inputPubkey: string = "";
 </script>
 
 <div class="container flex flex-col gap-3">
-  <div class="text-sm opacity-50 break-all">
-    {#if $pubkey !== ""}
-      <div>[pubkey]</div>
-      {nip19.npubEncode($pubkey)}
-    {:else}
-      <button
-        class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickLogin}>Login</button
-      >
-    {/if}
+  <div class="text-sm break-all">
+    <div>[pubkey]</div>
+    <!-- {nip19.npubEncode($pubkey)} -->
+
+    <button
+      class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      on:click={handleClickLogin}>Get Pubkey</button
+    >
+    <input
+      type="text"
+      id="relay"
+      class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
+      placeholder="wss://"
+      bind:value={inputPubkey}
+    />
   </div>
   <!-- ラジオボタン -->
   <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">relay</div>
+    <div class="text-magnum-200 font-bold text-lg">Relay</div>
     <div
       use:melt={$radioGrouproot}
       class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
@@ -405,7 +424,7 @@
           $loginUser
         )}/10002"
       >
-        NostViewstr で Relaylist (kind:10002) を編集する
+        {$_("settings.nostviewstr.kind10002")}
       </a>
       <div class="text-sm ml-4">
         <a
@@ -416,26 +435,29 @@
             $loginUser
           )}/30002"
         >
-          NostViewstr で Relay Sets (kind:30002) を編集する
-        </a> (global relay として使用する場合は、IDをglobalとしたリストを作成して、その中にリレーを登録してください)
+          {$_("settings.nostviewstr.kind30002")}
+        </a>
+        {$_("settings.globalRelay")}
       </div>
     {/if}
   </div>
   <!--- 表示設定 --->
   <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">display</div>
+    <div class="text-magnum-200 font-bold text-lg">Display</div>
     <label>
       <input
         type="checkbox"
         class="rounded-checkbox"
         bind:checked={$_showImg}
       />
-      load and show image
+      {$_("settings.display.loadImage")}
     </label>
   </div>
   <!--- Douki --->
   <div class="border border-magnum-500 rounded-md p-2">
-    <div class=" text-magnum-200 font-bold text-lg">douki</div>
+    <div class=" text-magnum-200 font-bold text-lg">
+      {$_("settings.douki.title")}
+    </div>
     <!--mute-->
     <div class="mt-2">
       <UpdateMuteList bind:pubkey={$pubkey} bind:muteList />

@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "relayMenuText0": "Use kind:10002 relay",
+    "relayMenuText1": "Use the relay you set up.",
+    "toast": {
+      "relayError": "The list of relays must include at least one read and one writeable relay.",
+      "resetData": "Settings have been reset."
+    },
+    "beforeUnload": {
+      "message": "Changed settings are not saved. Would you like to leave the page?"
+    },
+    "nostviewstr": {
+      "kind10002": "Edit Relaylist (kind:10002) in NostViewstr",
+      "kind30002": "Edit Relay Sets (kind:30002) in NostViewstr"
+    },
+    "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
+    "display": {
+      "loadImage": "load and show image"
+    },
+    "douki": {
+      "title": "Sync"
+    }
+  }
+}
