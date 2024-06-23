@@ -237,77 +237,77 @@
 
 <div>
   <div class="flex justify-between py-0.5 mr-2">
-    <!-- {#if note.kind === 1} -->
-    <!--リプライ-->
-    <button
-      on:click={() => {
-        openReplyWindow = !openReplyWindow;
-        replyText = "";
-        if (openReplyWindow) {
-          openQuoteWindow = false;
-        }
-      }}
-    >
-      <MessageSquare
-        size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
-          ? 'fill-magnum-700'
-          : ''}"
-      />
-    </button>
-    <!--リポスト-->
-    <Reposted id={note.id} let:event>
-      <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
-      </DropdownMenu>
-      <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
-      </DropdownMenu>
-      <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
-      </DropdownMenu>
-
-      <DropdownMenu {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
-      </DropdownMenu>
-    </Reposted>
-    <!--リアクション-->
-    <Reactioned id={note.id} let:event>
-      <button slot="loading" on:click={handleClickReaction}>
-        <Heart
+    {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7}
+      <!--リプライ-->
+      <button
+        on:click={() => {
+          openReplyWindow = !openReplyWindow;
+          replyText = "";
+          if (openReplyWindow) {
+            openQuoteWindow = false;
+          }
+        }}
+      >
+        <MessageSquare
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
+            ? 'fill-magnum-700'
+            : ''}"
         />
       </button>
+      <!--リポスト-->
+      <Reposted id={note.id} let:event>
+        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
+        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" />
+        </DropdownMenu>
 
-      <button slot="nodata" on:click={handleClickReaction}>
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500"
-        />
-      </button>
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
+        </DropdownMenu>
+      </Reposted>
+      <!--リアクション-->
+      <Reactioned id={note.id} let:event>
+        <button slot="loading" on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
+          />
+        </button>
 
-      <button slot="error" on:click={handleClickReaction}>
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500"
-        />
-      </button>
-
-      {#if event === undefined}
-        <button on:click={handleClickReaction}>
+        <button slot="nodata" on:click={handleClickReaction}>
           <Heart
             size="20"
             class="hover:opacity-75 active:opacity-50 text-magnum-500"
           />
         </button>
-      {:else}
-        <Reaction {event} />
-      {/if}
-    </Reactioned>
-    <!--カスタムリアクション-->
-    <CustomReaction {note} />
-    <!-- {/if} -->
+
+        <button slot="error" on:click={handleClickReaction}>
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          />
+        </button>
+
+        {#if event === undefined}
+          <button on:click={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            />
+          </button>
+        {:else}
+          <Reaction {event} />
+        {/if}
+      </Reactioned>
+      <!--カスタムリアクション-->
+      <CustomReaction {note} />
+    {/if}
     <!--メニュー-->
     <EllipsisMenu {note} />
   </div>
