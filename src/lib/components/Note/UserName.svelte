@@ -6,7 +6,7 @@
   export let pubhex: string;
 </script>
 
-<span class="flex"
+<span class="inline-flex"
   >@<Metadata queryKey={["metadata", pubhex]} pubkey={pubhex} let:metadata>
     <span slot="loading" class="text-sm text-neutral-500 inline-flex break-all">
       {nip19.npubEncode(pubhex)}
