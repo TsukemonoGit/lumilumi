@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { app, defaultRelays } from "$lib/stores/stores";
+  import { app, defaultRelays, nowProgress } from "$lib/stores/stores";
 
   //TimelineList.svelte
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -57,9 +57,11 @@
 
   const handleNext = async () => {
     if ($data && $data.length > 1 && $data.length < viewIndex + 20 + amount) {
+      $nowProgress = true;
       const older = await loadOlderEvents(slicedEvent, filters, queryKey);
       olderEvents.push(...older);
       updateViewEvent($data);
+      $nowProgress = false;
     }
     viewIndex += 20;
   };
@@ -101,12 +103,14 @@
 
 {#if viewIndex !== 0}
   <button
-    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
     on:click={() => handleClickTop()}
+    disabled={$nowProgress}
     ><SkipForward size={20} class="mx-auto -rotate-90" /></button
   >
   <button
-    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+    disabled={$nowProgress}
+    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
     on:click={() => handlePrev()}
     ><Triangle size={20} class="mx-auto " /></button
   >
@@ -122,7 +126,8 @@
   <slot name="nodata" />
 {/if}
 <button
-  class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200"
+  disabled={$nowProgress}
+  class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
   on:click={() => handleNext()}
   ><Triangle size={20} class="mx-auto rotate-180 " /></button
 >

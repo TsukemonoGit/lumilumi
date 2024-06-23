@@ -88,7 +88,7 @@
         }: LumiSetting = JSON.parse(savedSettings);
         relays.set(savedRelays);
         radioGroupSelected.set(savedRelaySet);
-        // pubkey.set(savedPubkey);
+        pubkey.set(savedPubkey);
         inputPubkey = nip19.npubEncode(savedPubkey);
         $loginUser = $pubkey;
         if (savedShowImg) {
