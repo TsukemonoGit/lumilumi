@@ -7,10 +7,11 @@
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import { onDestroy, onMount } from "svelte";
-  import { nip50relays } from "$lib/func/util";
+
   import NostrMain from "./NostrMain.svelte";
   import { queryClient } from "$lib/stores/stores";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
+  import SetSearchRelays from "./NostrMainData/SetSearchRelays.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -30,13 +31,12 @@
     <div slot="loading">SetRelay loading</div>
     <div slot="error">SetRelay error</div>
     <div slot="nodata">SetRelay nodata</div>
-    {#if relays}
+    <SetSearchRelays defaultRelays={relays} let:searchRelays>
       <div class="container break-words overflow-x-hidden">
         <TimelineList
           queryKey={["search", "feed", filter.toString()]}
           filters={[filter]}
           req={createRxForwardReq()}
-          relays={nip50relays}
           let:events
           {viewIndex}
           {amount}
@@ -79,6 +79,6 @@
           </div>
         </TimelineList>
       </div>
-    {/if}
+    </SetSearchRelays>
   </SetDefaultRelays>
 </NostrMain>
