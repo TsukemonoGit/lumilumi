@@ -196,7 +196,7 @@ export function useReq(
     throw Error();
   }
   // console.log(_rxNostr.getDefaultRelays());
-  console.log(relays);
+
   //  console.log(filters);
   let _req:
     | RxReqBase
