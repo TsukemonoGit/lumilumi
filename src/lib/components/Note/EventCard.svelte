@@ -68,11 +68,9 @@
     };
   };
   const noteClass = () => {
-    const ptag = note.tags.find((tag) => tag[0] === "p");
-
-    return (ptag?.[1] as string) === $loginUser
-      ? "border-magnum-600 bg-magnum-700/20"
-      : "border-magnum-600";
+    const ptag = note.tags.filter((tag) => tag[0] === "p");
+    const user = ptag.find((tag) => tag[1] === $loginUser);
+    return user ? "border-magnum-600 bg-magnum-700/20" : "border-magnum-600";
   };
 
   const replyedEvent = (
@@ -239,7 +237,7 @@
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
       <div class="flex gap-1">
-        <Repeat2
+        <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
           size="20"
           class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
         />
