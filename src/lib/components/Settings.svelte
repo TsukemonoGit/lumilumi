@@ -332,7 +332,7 @@
     <div>[pubkey]</div>
     <!-- {nip19.npubEncode($pubkey)} -->
 
-    <div class="ml-2 gap-1">
+    <div class="ml-2">
       <button
         class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={handleClickLogin}>Get Pubkey</button
@@ -341,7 +341,7 @@
         type="text"
         id="relay"
         class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-        placeholder="wss://"
+        placeholder="npub"
         bind:value={inputPubkey}
       />
     </div>

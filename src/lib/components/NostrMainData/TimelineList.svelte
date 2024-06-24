@@ -1,26 +1,43 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { app, defaultRelays, nowProgress } from "$lib/stores/stores";
-
-  //TimelineList.svelte
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus, RxReqBase } from "$lib/types";
-
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { SkipForward, Triangle } from "lucide-svelte";
+  import { Filter, SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
-
   import { loadOlderEvents } from "./timelineList";
   import { readable } from "svelte/store";
-  import type { EventPacket } from "rx-nostr";
+  import type {
+    AcceptableDefaultRelaysConfig,
+    EventPacket,
+    RxReq,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | RxReqBase
+    | (RxReq<"backward"> & {
+        emit(
+          filters: Filter | Filter[],
+          options?:
+            | {
+                relays: string[];
+              }
+            | undefined
+        ): void;
+      } & RxReqOverable &
+        RxReqPipeable)
+    | undefined = undefined;
   export let viewIndex: number;
   export let amount: number;
+  export let eventFilter: (event: EventPacket) => boolean = () => true; // デフォルトフィルタ
+  export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
 
-  $: result = useTimelineEventList(queryKey, filters, req);
+  $: result = useTimelineEventList(queryKey, filters, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -40,14 +57,14 @@
     viewIndex = 0;
     if ($data) {
       slicedEvent = $data
-        ?.filter((packet) => readUrls.includes(packet.from)) // デフォルトリレーに含まれるかチェック
+        ?.filter(
+          (packet) => readUrls.includes(packet.from) && eventFilter(packet)
+        ) // デフォルトリレーに含まれるかチェック
         .map(({ event }) => event)
         .slice(viewIndex, viewIndex + amount);
     }
   });
 
-  // {#if viewIndex + amount < len}
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
     default: { events: Nostr.Event[]; status: ReqStatus; len: number };
     loading: Record<never, never>;
@@ -73,16 +90,9 @@
   };
 
   function updateViewEvent(data: EventPacket[]) {
-    // すべてのイベントを結合
     const allEvents = [...data, ...olderEvents];
-
-    // イベントを作成日の降順でソート
     allEvents.sort((a, b) => b.event.created_at - a.event.created_at);
-
-    // 一意なイベントを保持するためのオブジェクト
     const uniqueEventsMap: { [x: string]: boolean } = {};
-
-    // 一意なイベントを配列に保存
     const uniqueEvents = [];
     for (const event of allEvents) {
       if (!uniqueEventsMap[event.event.id]) {
@@ -90,12 +100,14 @@
         uniqueEvents.push(event);
       }
     }
-
     slicedEvent = uniqueEvents
-      ?.filter((packet) => readUrls.includes(packet.from)) // デフォルトリレーに含まれるかチェック
+      ?.filter(
+        (packet) => readUrls.includes(packet.from) && eventFilter(packet)
+      ) // デフォルトリレーに含まれるかチェック
       .map(({ event }) => event)
       .slice(viewIndex, viewIndex + amount);
   }
+
   function handleClickTop() {
     viewIndex = 0;
   }
@@ -108,6 +120,7 @@
     disabled={$nowProgress}
     ><SkipForward size={20} class="mx-auto -rotate-90" /></button
   >
+
   <button
     disabled={$nowProgress}
     class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
@@ -125,6 +138,7 @@
 {:else}
   <slot name="nodata" />
 {/if}
+
 <button
   disabled={$nowProgress}
   class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"

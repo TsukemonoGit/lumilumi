@@ -39,17 +39,3 @@
 <section>
   <NostrElements />
 </section>
-
-<style>
-  .svgset {
-    display: flex;
-    gap: 4px;
-  }
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 0.6;
-  }
-</style>

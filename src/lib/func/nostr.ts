@@ -64,7 +64,7 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
 }
 
 // metadataの保存
-let savedMetadata: [QueryKey, unknown][] = [];
+let savedMetadata: [QueryKey, EventPacket][] = [];
 let followingList: string[] = [];
 
 let metadataChanged = false;
@@ -82,7 +82,7 @@ metadataQueue.subscribe((queue) => {
   }
 });
 
-export function setSavedMetadata(data: [QueryKey, unknown][]) {
+export function setSavedMetadata(data: [QueryKey, EventPacket][]) {
   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
   savedMetadata = data;
 }
@@ -91,15 +91,30 @@ export function setFollowingList(data: string[]) {
   followingList = data;
   // console.log(followingList);
 }
-
+export function getFollowingList() {
+  if (followingList.length > 0) {
+    return followingList;
+  } else {
+    console.log("followingList naiyo~");
+  }
+}
 const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
-  if (
-    !savedMetadata.some(
-      ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
-    ) && // まだ保存してない人
-    followingList.includes(data.event.pubkey) // フォローしてる人
-  ) {
-    savedMetadata.push([key, data]);
+  const existingIndex = savedMetadata.findIndex(
+    ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
+  );
+
+  if (followingList.includes(data.event.pubkey)) {
+    if (existingIndex !== -1) {
+      // 既に保存されているデータがある場合、上書きする
+      if (
+        data.event.created_at > savedMetadata[existingIndex][1].event.created_at
+      ) {
+        savedMetadata[existingIndex] = [key, data];
+      }
+    } else {
+      // 保存されていない場合、新しいデータを追加する
+      savedMetadata.push([key, data]);
+    }
     metadataChanged = true;
   }
 };
@@ -168,7 +183,7 @@ export function useReq(
     req,
     initData,
   }: UseReqOpts<EventPacket | EventPacket[]>,
-  relay: string[] | undefined = undefined
+  relays: string[] | undefined = undefined
 ): ReqResult<EventPacket | EventPacket[]> {
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
 
@@ -206,7 +221,7 @@ export function useReq(
   const error = writable<Error>();
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
-    .use(_req, { relays: relay })
+    .use(_req, { relays: relays })
     .pipe(tie, muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,

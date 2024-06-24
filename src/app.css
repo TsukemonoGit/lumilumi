@@ -237,3 +237,18 @@ input[type="checkbox"] {
 
   accent-color: theme("colors.magnum.400");
 }
+section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 0.6;
+}
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px theme("colors.neutral.900") inset !important;
+  -webkit-text-fill-color: theme("colors.neutral.100") !important;
+}
+
+input:-webkit-autofill:focus {
+  caret-color: theme("colors.neutral.100") !important;
+}

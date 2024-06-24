@@ -5,7 +5,7 @@
   import github from "$lib/images/github.svg";
   import { nowProgress } from "$lib/stores/stores";
 
-  import { Globe, Search } from "lucide-svelte";
+  import { Globe, Search, Bell } from "lucide-svelte";
 </script>
 
 <header>
@@ -31,6 +31,13 @@
         aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
       >
         <a href="/settings">Settings</a>
+      </li>
+      <li
+        aria-current={$page.url.pathname === "/notifications"
+          ? "page"
+          : undefined}
+      >
+        <a href="/notifications"><Bell /></a>
       </li>
       <li aria-current={$page.url.pathname === "/search" ? "page" : undefined}>
         <a href="/search"><Search /></a>

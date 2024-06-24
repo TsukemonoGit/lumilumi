@@ -1,15 +1,15 @@
 <script lang="ts">
   import NostrMain from "$lib/components/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import Reactionsforme from "$lib/components/NostrMainData/Reactionsforme.svelte";
-  import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import EventCard from "$lib/components/Note/EventCard.svelte";
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxBackwardReq, createRxForwardReq, now } from "rx-nostr";
   import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
-  import { SkipForward, Triangle } from "lucide-svelte";
+  import { loginUser } from "$lib/stores/stores.js";
+  import { afterNavigate } from "$app/navigation";
+  import { onMount } from "svelte";
   export let data;
 
   let amount = 50;
@@ -46,15 +46,13 @@
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
       <div class="container break-words overflow-x-hidden">
-        <UserProfile pubkey={data.pubkey} />
-
         <TimelineList
-          queryKey={["usertimeline", "feed", data.pubkey]}
+          queryKey={["notifications", "feed"]}
           filters={[
             {
-              kinds: [1, 6, 16],
-              limit: 50,
-              authors: [data.pubkey],
+              kinds: [1, 6, 7, 16, 42],
+              limit: 30,
+              "#p": [pubkey],
             },
           ]}
           req={createRxForwardReq()}
@@ -62,8 +60,8 @@
           {viewIndex}
           {amount}
           let:len
+          eventFilter={(eventpacket) => eventpacket.event.pubkey !== pubkey}
         >
-          <SetRepoReactions />
           <div slot="loading">
             <p>Loading...</p>
           </div>
@@ -100,3 +98,13 @@
     </SetDefaultRelays>
   </NostrMain>
 </section>
+
+<style>
+  section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 0.6;
+  }
+</style>
