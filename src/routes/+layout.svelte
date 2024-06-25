@@ -9,7 +9,7 @@
     queryClient,
   } from "$lib/stores/stores";
   import {
-    getMetadataFromLocalStorage,
+    //    getMetadataFromLocalStorage,
     relaysReconnectChallenge,
     //relaysReconnectChallenge,
     setRxNostr,
@@ -36,7 +36,7 @@
       nostrLogin.init({
         /*options*/
       });
-      getMetadataFromLocalStorage();
+
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
       console.log(theme);
       setTheme(theme);

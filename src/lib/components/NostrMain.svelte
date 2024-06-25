@@ -10,7 +10,11 @@
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
-  import { setRxNostr, setRelays } from "$lib/func/nostr";
+  import {
+    setRxNostr,
+    setRelays,
+    getMetadataFromLocalStorage,
+  } from "$lib/func/nostr";
   import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
@@ -68,6 +72,10 @@
     $loginUser = pubkey;
     if (savedShowImg) {
       $showImg = savedShowImg;
+    }
+    if (!$showImg) {
+      //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。
+      getMetadataFromLocalStorage();
     }
     if (savedMute) {
       $mutes = savedMute.list;

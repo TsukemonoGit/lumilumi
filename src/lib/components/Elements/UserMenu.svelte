@@ -1,21 +1,23 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import {
-    loginUser,
-    showImg,
-    toastSettings,
-    viewEventIds,
-  } from "$lib/stores/stores";
+  import { queryClient, showImg, toastSettings } from "$lib/stores/stores";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "../Elements/UserAvatar.svelte";
-  import { Copy, FileJson2, SquareArrowOutUpRight, User } from "lucide-svelte";
+  import {
+    Copy,
+    FileJson2,
+    SquareArrowOutUpRight,
+    User,
+    RefreshCcw,
+  } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
   import { splitHexColorString } from "$lib/func/util";
   import type { Profile } from "$lib/types";
   import Dialog from "./Dialog.svelte";
   import { getRelaysById } from "$lib/func/nostr";
+  import type { QueryKey } from "@tanstack/svelte-query";
 
   export let pubkey: string;
   export let size: number;
@@ -23,63 +25,57 @@
 
   let dialogOpen: any;
 
-  const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
-    if (!ev) {
-      return undefined;
-    }
+  const getProfile = (ev: Nostr.Event | undefined): Profile | undefined => {
+    if (!ev) return undefined;
     try {
       return JSON.parse(ev.content);
-    } catch (error) {
+    } catch {
       return undefined;
     }
   };
 
-  $: url = profile(metadata)?.picture;
-  $: name = profile(metadata)?.name;
+  $: url = getProfile(metadata)?.picture;
+  $: name = getProfile(metadata)?.name;
+
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
     try {
       encodedPubkey = nip19.npubEncode(pubkey);
-    } catch (error) {
+    } catch {
       encodedPubkey = undefined;
     }
   }
 
-  const menuTexts = metadata
-    ? [
-        { text: "Goto UserPage", icon: User, num: 0 },
-        { text: "Copy Pubkey", icon: Copy, num: 1 },
-        { text: "View Json", icon: FileJson2, num: 2 },
-        { text: "Open in njump", icon: SquareArrowOutUpRight, num: 3 },
-      ]
-    : [
-        { text: "Goto UserPage", icon: User, num: 0 },
-        { text: "Copy Pubkey", icon: Copy, num: 1 },
-        { text: "Open in njump", icon: SquareArrowOutUpRight, num: 3 },
-      ];
+  const baseMenuTexts = [
+    { text: "Goto UserPage", icon: User, num: 0 },
+    { text: "Copy Pubkey", icon: Copy, num: 1 },
+    { text: "Open in njump", icon: SquareArrowOutUpRight, num: 3 },
+    { text: "Update profile", icon: RefreshCcw, num: 4 },
+  ];
+
+  const menuTexts = [
+    ...baseMenuTexts,
+    ...(metadata ? [{ text: "View Json", icon: FileJson2, num: 2 }] : []),
+  ];
 
   const handleSelectItem = async (index: number) => {
-    console.log(menuTexts[index]);
     switch (menuTexts[index].num) {
       case 0:
-        //goto usrPage
         if (encodedPubkey) {
           goto(`/${encodedPubkey}`);
         }
         break;
       case 1:
-        //Copy Pubkey
-
         try {
           if (encodedPubkey) {
             await navigator.clipboard.writeText(encodedPubkey);
             $toastSettings = {
               title: "Success",
-              description: `Copied to clipboard`,
+              description: "Copied to clipboard",
               color: "bg-green-500",
             };
           } else {
-            throw Error;
+            throw new Error("No encoded pubkey");
           }
         } catch (error: any) {
           console.error(error.message);
@@ -89,19 +85,20 @@
             color: "bg-orange-500",
           };
         }
-
         break;
       case 2:
-        //viewJson
         $dialogOpen = true;
         break;
       case 3:
-        //njump
         if (encodedPubkey) {
           const url = `https://njump.me/${encodedPubkey}`;
-
           window.open(url, "_blank", "noreferrer");
         }
+        break;
+      case 4:
+        const key: QueryKey = ["metadata", pubkey];
+        $queryClient.invalidateQueries({ queryKey: key });
+        break;
     }
   };
 </script>
@@ -119,7 +116,6 @@
   {/if}
 </DropdownMenu>
 
-<!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   <div slot="main">
     <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
@@ -128,10 +124,9 @@
     >
       {JSON.stringify(metadata, null, 2)}
     </div>
-
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
       {metadata ? getRelaysById(metadata.id).join(", ") : ""}
     </div>
-  </div></Dialog
->
+  </div>
+</Dialog>
