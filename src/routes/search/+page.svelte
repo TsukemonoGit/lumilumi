@@ -6,7 +6,7 @@
   import { slide } from "svelte/transition";
   import type { Filter } from "nostr-typedef";
   import { getFollowingList } from "$lib/func/nostr";
-  import { npubRegex } from "$lib/func/util";
+  import { nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "$lib/components/SearchResult.svelte";
   import { SvelteComponent, onDestroy } from "svelte";
@@ -76,6 +76,13 @@
 </script>
 
 <section>
+  <h1 class="text-5xl text-orange-600">Search</h1>
+  <div class="container flex gap-2">
+    <div class=" font-medium text-magnum-400">SearchRelays</div>
+    <div class="text-sm">
+      {nip50relays.join(", ")}
+    </div>
+  </div>
   <div class="flex flex-wrap gap-2 container mb-2">
     <div class="flex flex-col items-start justify-center">
       <div class=" font-medium text-magnum-400">keyword</div>

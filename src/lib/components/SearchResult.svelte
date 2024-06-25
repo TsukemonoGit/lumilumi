@@ -18,6 +18,7 @@
   let viewIndex = 0;
 
   onDestroy(() => {
+    //  でりーとしてもreqが残ってるかんじある？
     console.log("Destoroyed");
     //でりーとするときにけしておく
     $queryClient.removeQueries({

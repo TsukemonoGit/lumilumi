@@ -31,20 +31,20 @@
     defaultPlaceholder: now(getLocalTimeZone()),
     maxValue: now(getLocalTimeZone()),
   });
-  export let startTimeUnix: number;
-  export let endTimeUnix: number;
+  export let startTimeUnix: number | undefined;
+  export let endTimeUnix: number | undefined;
   export { startSegment, endSegment };
   $: {
     if (value && $value.start && $value.end) {
       startTimeUnix = Math.floor(
-        $value.start.toDate($value.start.timeZone) / 1000
+        ($value.start as ZonedDateTime).toDate().getTime() / 1000
       );
 
-      endTimeUnix = Math.floor($value.end.toDate($value.end.timeZone) / 1000);
+      endTimeUnix = Math.floor(
+        ($value.end as ZonedDateTime).toDate().getTime() / 1000
+      );
     }
   }
-
-  $: console.log($value);
 </script>
 
 <div class="picker-container">
