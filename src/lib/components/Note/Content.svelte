@@ -56,55 +56,52 @@
   };
 </script>
 
-<div class="">
-  {#each parts as part}
-    {#if part.type === "nip19"}
-      {#await nip19Decode(part.content) then decoded}
-        {#if decoded}
-          <DecodedContent {decoded} content={part.content} />
-        {/if}
-      {/await}
-    {:else if part.type === "url" && part.content}
-      {#if $showImg && imageRegex.test(part.content)}
-        <Link href={part.content}
-          ><img
-            loading="lazy"
-            alt="img"
-            src={part.content}
-            class=" max-w-[min(20rem,100%)] max-h-full object-contain"
-          /></Link
-        >
-      {:else if $showImg && movieRegex.test(part.content)}
-        <Link href={part.content}
-          ><video
-            controls
-            src={part.content}
-            class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-          >
-            <track default kind="captions" />
-          </video></Link
-        >
-      {:else}
-        <Link
-          className="underline text-magnum-300 break-all"
-          href={part.content}>{part.content}</Link
-        >{/if}
-    {:else if part.type === "emoji"}
-      {#if $showImg}
-        <img
-          loading="lazy"
-          alt={part.content}
-          src={part.url}
-          class="inline h-[24px] object-contain m-0 overflow-hidden"
-        />
-      {:else}
-        :{part.content}:
+{#each parts as part}
+  {#if part.type === "nip19"}
+    {#await nip19Decode(part.content) then decoded}
+      {#if decoded}
+        <DecodedContent {decoded} content={part.content} />
       {/if}
-    {:else}
-      <span
-        class="whitespace-pre-wrap break-words word align-middle"
-        style="word-break: break-word;">{part.content}</span
+    {/await}
+  {:else if part.type === "url" && part.content}
+    {#if $showImg && imageRegex.test(part.content)}
+      <Link href={part.content}
+        ><img
+          loading="lazy"
+          alt="img"
+          src={part.content}
+          class=" max-w-[min(20rem,100%)] max-h-full object-contain"
+        /></Link
       >
+    {:else if $showImg && movieRegex.test(part.content)}
+      <Link href={part.content}
+        ><video
+          controls
+          src={part.content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        >
+          <track default kind="captions" />
+        </video></Link
+      >
+    {:else}
+      <Link className="underline text-magnum-300 break-all" href={part.content}
+        >{part.content}</Link
+      >{/if}
+  {:else if part.type === "emoji"}
+    {#if $showImg}
+      <img
+        loading="lazy"
+        alt={part.content}
+        src={part.url}
+        class="inline h-[24px] object-contain m-0 overflow-hidden"
+      />
+    {:else}
+      :{part.content}:
     {/if}
-  {/each}
-</div>
+  {:else}
+    <span
+      class="whitespace-pre-wrap break-words word align-middle"
+      style="word-break: break-word;">{part.content}</span
+    >
+  {/if}
+{/each}

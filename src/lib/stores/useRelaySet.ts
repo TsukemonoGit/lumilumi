@@ -1,18 +1,16 @@
 //useRelaySet.ts
 import type { QueryKey } from "@tanstack/svelte-query";
 import {
-  latest,
   uniq,
   verify,
   type DefaultRelayConfig,
   type EventPacket,
-  type RxNostr,
 } from "rx-nostr";
 import type { RxReqBase, ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
-import { derived, get, writable } from "svelte/store";
+import { derived, get } from "svelte/store";
 import { setRelays, useReq } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
 import { app } from "./stores";

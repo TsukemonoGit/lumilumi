@@ -30,7 +30,7 @@
       return;
     }
     const relays = await getQueryRelays(pubkey);
-    console.log(relays);
+
     if (!relays) {
       return;
     }

@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
 
-  import { Repeat2, TriangleAlert } from "lucide-svelte";
+  import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
   import { loginUser, showImg, viewEventIds } from "$lib/stores/stores";
@@ -207,10 +207,9 @@
           </div>
           <hr />
           {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-            {#if replyID || replyUsers.length > 0}<div class="">
-                <Reply {replyID} {replyUsers} />
-                <hr />
-              </div>
+            {#if replyID || replyUsers.length > 0}
+              <Reply {replyID} {replyUsers} />
+              <hr />
             {/if}
           {/await}
           {#await checkContentWarning(note.tags) then tag}

@@ -1,15 +1,13 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { app, defaultRelays, nowProgress } from "$lib/stores/stores";
+  import { defaultRelays, nowProgress } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { Filter, SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import { loadOlderEvents } from "./timelineList";
-  import { readable } from "svelte/store";
   import type {
-    AcceptableDefaultRelaysConfig,
     EventPacket,
     RxReq,
     RxReqOverable,
@@ -115,7 +113,7 @@
 
 {#if viewIndex !== 0}
   <button
-    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
+    class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
     on:click={() => handleClickTop()}
     disabled={$nowProgress}
     ><SkipForward size={20} class="mx-auto -rotate-90" /></button
@@ -123,7 +121,7 @@
 
   <button
     disabled={$nowProgress}
-    class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
+    class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
     on:click={() => handlePrev()}
     ><Triangle size={20} class="mx-auto " /></button
   >
@@ -141,7 +139,7 @@
 
 <button
   disabled={$nowProgress}
-  class="w-full bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
+  class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
   on:click={() => handleNext()}
   ><Triangle size={20} class="mx-auto rotate-180 " /></button
 >

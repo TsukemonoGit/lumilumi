@@ -13,7 +13,7 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { timeline, uniq, verify } from "rx-nostr";
+import { uniq, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";

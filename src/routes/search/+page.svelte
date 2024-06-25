@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DatePicker from "$lib/components/Elements/DatePicker.svelte";
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, ChevronsUpDown } from "lucide-svelte";
@@ -9,7 +8,7 @@
   import { nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "$lib/components/SearchResult.svelte";
-  import { SvelteComponent, onDestroy } from "svelte";
+  import { SvelteComponent } from "svelte";
   let searchWord: string = "";
   let searchKind: number = 1;
   let searchPubkey: string = "";
@@ -201,5 +200,5 @@
   >
 </section>
 {#if openSearchResult}
-  <SearchResult bind:this={compRef} bind:filter={showFilter} />
+  <SearchResult bind:this={compRef} filter={showFilter} />
 {/if}

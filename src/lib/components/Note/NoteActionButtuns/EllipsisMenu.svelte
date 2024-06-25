@@ -11,7 +11,6 @@
   import * as Nostr from "nostr-typedef";
   import { getRelaysById } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import { metadata } from "$lib/stores/operators";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
 

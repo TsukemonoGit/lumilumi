@@ -12,11 +12,7 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    getRelaysById,
-    promisePublishEvent,
-    publishEvent,
-  } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import type { Profile } from "$lib/types";
@@ -263,7 +259,6 @@
       replyText.trim(),
       tags
     );
-    console.log(checkedTags);
     if (onWarning) {
       checkedTags.push(["content-warning", warningText]);
     }

@@ -1,36 +1,17 @@
 <script lang="ts">
   import NostrMain from "$lib/components/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import Reactionsforme from "$lib/components/NostrMainData/Reactionsforme.svelte";
-  import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import EventCard from "$lib/components/Note/EventCard.svelte";
   import { createRxForwardReq } from "rx-nostr";
   import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
-  import { SkipForward, Triangle } from "lucide-svelte";
+
   export let data;
 
   let amount = 50;
   let viewIndex = 0;
-
-  const handleScrollToBottom = () => {
-    const lastEvent = document.querySelector(".event-card:last-child");
-    if (lastEvent) {
-      lastEvent.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const handleNext = () => {
-    viewIndex += 20;
-  };
-
-  const handlePrev = () => {
-    if (viewIndex > 0) {
-      viewIndex = Math.max(viewIndex - 20, 0);
-    }
-  };
 </script>
 
 <svelte:head>
@@ -41,7 +22,7 @@
   <h1 class="text-5xl text-orange-600">User</h1>
 
   <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
+    <SetDefaultRelays {pubkey} {localRelays}>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
@@ -61,7 +42,6 @@
           let:events
           {viewIndex}
           {amount}
-          let:len
         >
           <SetRepoReactions />
           <div slot="loading">

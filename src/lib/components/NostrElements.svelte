@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq, createRxNostr } from "rx-nostr";
+  import { createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import Contacts from "./NostrMainData/Contacts.svelte";
@@ -9,7 +9,6 @@
   import { setFollowingList } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-  import { Triangle, SkipForward } from "lucide-svelte";
   const pubkeysIn = (contacts: Nostr.Event) => {
     const followingList = contacts.tags.reduce((acc, [tag, value]) => {
       if (tag === "p") {
@@ -24,13 +23,6 @@
 
   let amount = 50;
   let viewIndex = 0;
-
-  const handleScrollToBottom = () => {
-    const lastEvent = document.querySelector(".event-card:last-child");
-    if (lastEvent) {
-      lastEvent.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>

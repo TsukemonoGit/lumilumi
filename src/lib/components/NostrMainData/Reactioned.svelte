@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   /**
    * @license Apache-2.0

@@ -2,7 +2,7 @@
   //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
   import type { ReqStatus, RxReqBase } from "$lib/types";
-  import { app, queryClient } from "$lib/stores/stores";
+  import { app } from "$lib/stores/stores";
   /**
    * @license Apache-2.0
    * @copyright 2023 Akiomi Kamakura

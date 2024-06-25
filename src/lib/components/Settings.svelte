@@ -1,13 +1,12 @@
 <script lang="ts">
   import { type DefaultRelayConfig } from "rx-nostr";
-  import { getContext, onDestroy, onMount } from "svelte";
-  import { derived, writable } from "svelte/store";
+  import { onDestroy, onMount } from "svelte";
+  import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
 
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
-    app,
     emojis,
     loginUser,
     mutes,

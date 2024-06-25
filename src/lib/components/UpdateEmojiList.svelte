@@ -70,7 +70,6 @@
       },
       []
     );
-    console.log(naddrFilters);
 
     const chunkedFilters = chunkArray(naddrFilters, 5);
 

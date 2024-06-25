@@ -7,17 +7,8 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
-import {
-  loginUser,
-  metadataQueue,
-  mutebykinds,
-  mutes,
-  queryClient,
-} from "./stores";
+import { metadataQueue, mutebykinds, mutes, queryClient } from "./stores";
 import { get } from "svelte/store";
-import * as Nostr from "nostr-typedef";
-import type { QueryKey } from "@tanstack/svelte-query";
-import type { MuteList } from "$lib/types";
 
 export function filterId(
   id: string

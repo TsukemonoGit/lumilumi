@@ -5,7 +5,7 @@
 
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
-import type { EventPacket, RxNostr } from "rx-nostr";
+import type { EventPacket } from "rx-nostr";
 import { uniq, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 

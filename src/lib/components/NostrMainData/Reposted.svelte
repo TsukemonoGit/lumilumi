@@ -14,28 +14,9 @@
   export let id: string;
   export let req: RxReqBase | undefined = undefined;
   let _result: { data: any; status: any; error: any };
-  // afterUpdate(() => {
-  //   reactionData = $queryClient.getQueryData([
-  //     "reactions",
-  //     "reaction",
-  //     id,
-  //   ]) as EventPacket;
-  //   repostData = $queryClient.getQueryData([
-  //     "reactions",
-  //     "repost",
-  //     id,
-  //   ]) as EventPacket;
-  //   console.log(reactionData);
-  // });
 
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "repost", id],
-  });
-
-  const unsubscribe2 = observer2.subscribe((result: any) => {
-    if (_result?.status !== "success") {
-      _result = result;
-    }
   });
 
   $: data = _result?.data;

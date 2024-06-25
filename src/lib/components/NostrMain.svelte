@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { QueryClientProvider } from "@tanstack/svelte-query";
   import {
     app,
     emojis,
@@ -11,7 +10,7 @@
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
-  import { setRxNostr, setRelays, setSavedMetadata } from "$lib/func/nostr";
+  import { setRxNostr, setRelays } from "$lib/func/nostr";
   import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { createRxForwardReq, type DefaultRelayConfig } from "rx-nostr";
+  import { createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Metadata from "./NostrMainData/Metadata.svelte";
   import EventCard from "./Note/EventCard.svelte";
-  import { setFollowingList, setRelays } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
 
   import NostrMain from "./NostrMain.svelte";
   import { queryClient } from "$lib/stores/stores";

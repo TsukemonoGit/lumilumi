@@ -5,7 +5,7 @@
 
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { EventPacket, RxNostr } from "rx-nostr";
-import { filterByKind, filterKind, latest, verify } from "rx-nostr";
+import { filterByKind, latest, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { filterPubkey } from "./operators.js";
