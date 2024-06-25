@@ -18,6 +18,7 @@
   let followee: boolean = false;
   let filter: Filter;
   let showFilter: Filter;
+  $: followingList = getFollowingList();
   $: {
     filter = {
       search: searchWord !== "" ? searchWord : undefined,
@@ -25,7 +26,7 @@
       authors: npubRegex.test(searchPubkey)
         ? [getHex(searchPubkey)]
         : followee
-          ? getFollowingList()
+          ? followingList
           : undefined,
       since: !Number.isNaN(searchSince) ? searchSince : undefined,
       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
@@ -94,18 +95,20 @@
         bind:value={searchWord}
       />
     </div>
-
-    <div class="flex flex-col items-start justify-center mt-auto py-2">
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={followee}
-        />
-        only followee
-      </label>
-    </div>
+    {#if followingList !== undefined && followingList.length > 0}
+      <div class="flex flex-col items-start justify-center mt-auto py-2">
+        <label>
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={followee}
+          />
+          only followee
+        </label>
+      </div>
+    {/if}
   </div>
+
   <div use:melt={$root} class=" container relative w-full">
     <div
       class="flex items-center justify-between bg-magnum-900/50 p-1 rounded-md"
