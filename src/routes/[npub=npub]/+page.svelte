@@ -21,12 +21,19 @@
   let compRef2: SvelteComponent;
   let componentKey = 0; // Key to force re-render
   let view: boolean = false;
-  beforeNavigate(() => {});
+  let req = createRxForwardReq();
+  beforeNavigate(() => {
+    if (compRef1) {
+      compRef1.$destroy();
+    }
+  });
   afterNavigate(() => {
     view = false;
+    req = createRxForwardReq(generateRandomId());
+
     setTimeout(() => {
       view = true;
-    }, 10);
+    }, 100);
   });
   $: userPubkey = data.pubkey; // Make pubkey reactive
 </script>
@@ -43,11 +50,15 @@
       <div slot="loading">relayloading</div>
       <div slot="error">relayerror</div>
       <div slot="nodata">relaynodata</div>
-      <div class="container break-words overflow-hidden">
-        {#if userPubkey && view}
+      {#if userPubkey && view}
+        <div
+          class="container break-words overflow-hidden"
+          id={componentKey.toString()}
+        >
           <UserProfile pubkey={userPubkey} />
 
           <TimelineList
+            bind:this={compRef1}
             queryKey={["user", userPubkey]}
             filters={[
               {
@@ -56,7 +67,7 @@
                 authors: [userPubkey],
               },
             ]}
-            req={createRxForwardReq(generateRandomId())}
+            {req}
             let:events
             {viewIndex}
             {amount}
@@ -97,8 +108,8 @@
               {/if}
             </div>
           </TimelineList>
-        {/if}
-      </div>
+        </div>
+      {/if}
     </SetDefaultRelays>
   </NostrMain>
 </section>
