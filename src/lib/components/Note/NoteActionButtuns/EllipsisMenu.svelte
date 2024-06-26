@@ -16,8 +16,10 @@
 
   export let note: Nostr.Event;
   let dialogOpen: any;
-
-  const menuTexts =
+  $: replaceable =
+    (note.kind >= 30000 && note.kind < 40000) ||
+    (note.kind >= 10000 && note.kind < 20000);
+  $: menuTexts =
     //  profile
     //   ? [
     //       { text: "Copy EventID", icon: Copy, num: 3 },
@@ -28,7 +30,7 @@
     //     ]
     //   :
     [
-      { text: "Copy EventID", icon: Copy, num: 3 },
+      { text: `Copy ${replaceable ? "Naddr" : "EventID"}`, icon: Copy, num: 3 },
       { text: "View Json", icon: FileJson2, num: 0 },
       { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
       { text: "Google Translate", icon: Earth, num: 2 },
@@ -41,6 +43,13 @@
       author: note.pubkey,
       kind: note.kind,
     };
+    const naddrpointer: nip19.AddressPointer = {
+      kind: note.kind,
+      identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+      pubkey: note.pubkey,
+      relays: getRelaysById(note.id),
+    };
+    const naddr = nip19.naddrEncode(naddrpointer);
     const nevent = nip19.neventEncode(eventpointer);
     switch (menuTexts[index].num) {
       case 0:
@@ -51,7 +60,7 @@
       case 1:
         //open in njump
 
-        const url = `https://njump.me/${nevent}`;
+        const url = `https://njump.me/${replaceable ? naddr : nevent}`;
 
         window.open(url, "_blank", "noreferrer");
         break;
@@ -66,7 +75,7 @@
       case 3:
         //Copy EventID
         try {
-          await navigator.clipboard.writeText(nevent);
+          await navigator.clipboard.writeText(replaceable ? naddr : nevent);
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
