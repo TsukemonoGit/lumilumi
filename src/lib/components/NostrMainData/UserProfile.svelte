@@ -2,12 +2,89 @@
   import Metadata from "./Metadata.svelte";
   import { profile, splitHexColorString } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { showImg } from "$lib/stores/stores";
+  import { loginUser, showImg } from "$lib/stores/stores";
   import UserAvatar from "../Elements/UserAvatar.svelte";
   import Avatar from "svelte-boring-avatars";
   import Content from "../Note/Content.svelte";
+  import { _ } from "svelte-i18n";
+  import { getFollowingList, usePromiseReq, pubkeysIn } from "$lib/func/nostr";
+  import { queryClient } from "$lib/stores/stores";
+  import {
+    type EventPacket,
+    createRxBackwardReq,
+    uniq,
+    verify,
+  } from "rx-nostr";
+  import { pipe } from "rxjs";
+
+  import * as Nostr from "nostr-typedef";
+  import { scanArray } from "$lib/stores/operators";
+  import { beforeNavigate } from "$app/navigation";
 
   export let pubkey: string;
+  $: isfollowee = isfolloweeFunc();
+  const isfolloweeFunc = (): boolean | undefined => {
+    const list = getFollowingList();
+    if (!list) {
+      return undefined;
+    } else {
+      return list.includes(pubkey);
+    }
+  };
+
+  const handleClickFollow = async () => {
+    if ($loginUser === "") {
+      return;
+    }
+    let kind3Event: EventPacket | undefined = $queryClient.getQueryData([
+      "timeline",
+      "contacts",
+      $loginUser,
+    ]);
+    console.log(kind3Event);
+    if (!kind3Event) {
+      return;
+    }
+    //更新されてるかもしれないからデータ取り直してみる
+    // $queryClient.invalidateQueries({
+    //   queryKey: ["timeline", "contacts", $loginUser],
+    // });
+    // //いつこうしんおわる？
+    // const newKind3Event = $queryClient.getQueryData([
+    //   "timeline",
+    //   "contacts",
+    //   $loginUser,
+    // ]);
+    const newReq = createRxBackwardReq();
+    const operator = pipe(uniq(), verify(), scanArray()); //scanArrayはとりあえずusePromiseReqがそうしてるから
+    const filters = [{ kinds: [3], authors: [$loginUser], limit: 1 }];
+    const newkind3: EventPacket[] = await usePromiseReq({
+      operator: operator,
+      queryKey: ["timeline", "contacts", $loginUser],
+      filters: filters,
+      req: newReq,
+    });
+    if (newkind3.length > 0) {
+      console.log(newkind3[0]);
+      if (newkind3[0].event.created_at > kind3Event.event.created_at) {
+        kind3Event = newkind3[0];
+        pubkeysIn(kind3Event.event); //pubkeyリストを更新する
+        //新しく取ったヤツのほうが新しかったら色々更新する
+      }
+    }
+    isfollowee = isfolloweeFunc();
+    console.log(kind3Event);
+    if (isfollowee) {
+      //フォロー外していいかの確認画面的なの
+      console.log(isfollowee);
+    } else {
+      //フォローする
+
+      console.log(isfollowee);
+    }
+  };
+
+  beforeNavigate(() => {});
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
@@ -59,13 +136,29 @@
               />
             {/if}
           </div>
-          <div class="ml-3 flex flex-col justify-center mt-auto pb-2">
-            <div class="sm:text-xl text-md font-bold">
-              {profile.display_name ?? ""}@{profile.name}
+          <div class="flex flex-row flex-wrap">
+            <div class="ml-3 flex flex-col justify-center mt-auto pb-2">
+              <div class="sm:text-xl text-md font-bold">
+                {profile.display_name ?? ""}@{profile.name}
+              </div>
+              <div class="text-sm text-neutral-500"></div>
+              <div class="text-sm">{profile.nip05}</div>
+              <div class="text-sm">{profile.website}</div>
             </div>
-            <div class="text-sm text-neutral-500"></div>
-            <div class="text-sm">{profile.nip05}</div>
-            <div class="text-sm">{profile.website}</div>
+            {#if isfollowee !== undefined}
+              <div class="flex ml-auto items-end">
+                <button
+                  class=" rounded-full bg-white border border-magnum-700 p-3 break-keep
+              font-medium leading-none text-magnum-700 shadow hover:opacity-75 {isfollowee
+                    ? 'opacity-75'
+                    : ''}"
+                  on:click={handleClickFollow}
+                  >{isfollowee
+                    ? `${$_("user.following")}`
+                    : `${$_("user.follow")}`}</button
+                >
+              </div>
+            {/if}
           </div>
         </div>
 

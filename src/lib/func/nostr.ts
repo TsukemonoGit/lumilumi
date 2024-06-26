@@ -86,7 +86,18 @@ export function setSavedMetadata(data: [QueryKey, EventPacket][]) {
   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
   savedMetadata = data;
 }
-
+export function pubkeysIn(contacts: Nostr.Event) {
+  const followingList = contacts.tags.reduce((acc, [tag, value]) => {
+    if (tag === "p") {
+      return [...acc, value];
+    } else {
+      return acc;
+    }
+  }, []);
+  console.log("set followList");
+  setFollowingList(followingList);
+  return followingList;
+}
 export function setFollowingList(data: string[]) {
   followingList = data;
   // console.log(followingList);
@@ -171,7 +182,7 @@ export const getMetadataFromLocalStorage = (): void => {
 // savedMetadata = savemetadata;
 
 //console.log(savemetadata);
-function generateRandomId(length: number = 6): string {
+export function generateRandomId(length: number = 6): string {
   return Array.from({ length }, () => Math.random().toString(36)[2]).join("");
 }
 
@@ -396,43 +407,31 @@ export function usePromiseReq({
     .pipe(tie, muteCheck(), metadata(), operator);
 
   return new Promise<EventPacket[]>((resolve, reject) => {
-    let fulfilled = false;
+    const timeoutId = setTimeout(() => {
+      subscription.unsubscribe();
+      resolve(accumulatedData);
+    }, 3000); // Timeout after 3 seconds if not completed
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[]) => {
         accumulatedData = [...accumulatedData, ...v];
       },
-
       complete: () => {
         status.set("success");
-        if (!fulfilled) {
-          resolve(accumulatedData);
-          fulfilled = true;
-        }
-      },
 
+        clearTimeout(timeoutId); // Cancel the timeout
+        resolve(accumulatedData);
+      },
       error: (e) => {
         console.error("[rx-nostr]", e);
         status.set("error");
         error.set(e);
 
-        if (!fulfilled) {
-          resolve(accumulatedData);
-          fulfilled = true;
-        }
+        clearTimeout(timeoutId); // Cancel the timeout
+        resolve(accumulatedData);
       },
     });
 
     _req.emit(filters);
-
-    // Ensure complete is called even if the observable doesn't emit data
-    setTimeout(() => {
-      if (!fulfilled) {
-        subscription.unsubscribe();
-
-        resolve(accumulatedData);
-        fulfilled = true;
-      }
-    }, 3000); // Timeout after 30 seconds if not completed
   });
 }

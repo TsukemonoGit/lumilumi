@@ -73,10 +73,10 @@
     if (savedShowImg) {
       $showImg = savedShowImg;
     }
-    if (!$showImg) {
-      //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。
-      getMetadataFromLocalStorage();
-    }
+    // if (!$showImg) {
+    //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
+    getMetadataFromLocalStorage();
+    //}
     if (savedMute) {
       $mutes = savedMute.list;
     }

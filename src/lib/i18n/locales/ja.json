@@ -20,5 +20,9 @@
     "douki": {
       "title": "データの同期"
     }
+  },
+  "user": {
+    "following": "フォロー中",
+    "follow": "フォローする"
   }
 }

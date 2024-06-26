@@ -6,20 +6,9 @@
   import Metadata from "./NostrMainData/Metadata.svelte";
   import EventCard from "./Note/EventCard.svelte";
   import NostrMain from "./NostrMain.svelte";
-  import { setFollowingList } from "$lib/func/nostr";
+  import { setFollowingList, pubkeysIn } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-  const pubkeysIn = (contacts: Nostr.Event) => {
-    const followingList = contacts.tags.reduce((acc, [tag, value]) => {
-      if (tag === "p") {
-        return [...acc, value];
-      } else {
-        return acc;
-      }
-    }, []);
-    setFollowingList(followingList);
-    return followingList;
-  };
 
   let amount = 50;
   let viewIndex = 0;
@@ -33,7 +22,7 @@
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>
 
-    <div class="container break-words overflow-x-hidden">
+    <div class="container break-words overflow-hidden">
       <Contacts
         queryKey={["timeline", "contacts", pubkey]}
         {pubkey}

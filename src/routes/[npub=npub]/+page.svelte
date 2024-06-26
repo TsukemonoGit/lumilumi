@@ -7,11 +7,28 @@
   import EventCard from "$lib/components/Note/EventCard.svelte";
   import { createRxForwardReq } from "rx-nostr";
   import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
-
-  export let data;
+  import type { SvelteComponent } from "svelte";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { generateRandomId } from "$lib/func/nostr";
+  export let data: {
+    pubkey: string;
+  };
 
   let amount = 50;
   let viewIndex = 0;
+
+  let compRef1: SvelteComponent;
+  let compRef2: SvelteComponent;
+  let componentKey = 0; // Key to force re-render
+  let view: boolean = false;
+  beforeNavigate(() => {});
+  afterNavigate(() => {
+    view = false;
+    setTimeout(() => {
+      view = true;
+    }, 10);
+  });
+  $: userPubkey = data.pubkey; // Make pubkey reactive
 </script>
 
 <svelte:head>
@@ -23,59 +40,64 @@
 
   <NostrMain let:pubkey let:localRelays>
     <SetDefaultRelays {pubkey} {localRelays}>
-      <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
-      <div class="container break-words overflow-x-hidden">
-        <UserProfile pubkey={data.pubkey} />
+      <div slot="loading">relayloading</div>
+      <div slot="error">relayerror</div>
+      <div slot="nodata">relaynodata</div>
+      <div class="container break-words overflow-hidden">
+        {#if userPubkey && view}
+          <UserProfile pubkey={userPubkey} />
 
-        <TimelineList
-          queryKey={["usertimeline", "feed", data.pubkey]}
-          filters={[
-            {
-              kinds: [1, 6, 16],
-              limit: 50,
-              authors: [data.pubkey],
-            },
-          ]}
-          req={createRxForwardReq()}
-          let:events
-          {viewIndex}
-          {amount}
-        >
-          <SetRepoReactions />
-          <div slot="loading">
-            <p>Loading...</p>
-          </div>
+          <TimelineList
+            queryKey={["user", userPubkey]}
+            filters={[
+              {
+                kinds: [1, 6, 16],
+                limit: 50,
+                authors: [userPubkey],
+              },
+            ]}
+            req={createRxForwardReq(generateRandomId())}
+            let:events
+            {viewIndex}
+            {amount}
+          >
+            <SetRepoReactions />
+            <div slot="loading">
+              <p>timeline Loading...</p>
+            </div>
 
-          <div slot="error" let:error>
-            <p>{error}</p>
-          </div>
+            <div slot="error" let:error>
+              <p>{error}</p>
+            </div>
 
-          <div class="max-w-[100vw] break-words box-border">
-            {#if events && events.length > 0}
-              {#each events as event (event.id)}<div
-                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
-                >
-                  <Metadata
-                    queryKey={["metadata", event.pubkey]}
-                    pubkey={event.pubkey}
-                    let:metadata
+            <div class="max-w-[100vw] break-words box-border">
+              {#if events && events.length > 0}
+                {#each events as event (event.id)}
+                  <div
+                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
                   >
-                    <div slot="loading">
-                      <EventCard note={event} status="loading" />
-                    </div>
-                    <div slot="nodata">
-                      <EventCard note={event} status="nodata" />
-                    </div>
-                    <div slot="error">
-                      <EventCard note={event} status="error" />
-                    </div>
-                    <EventCard {metadata} note={event} /></Metadata
-                  >
-                </div>{/each}{/if}
-          </div>
-        </TimelineList>
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
+                    >
+                      <div slot="loading">
+                        <EventCard note={event} status="loading" />
+                      </div>
+                      <div slot="nodata">
+                        <EventCard note={event} status="nodata" />
+                      </div>
+                      <div slot="error">
+                        <EventCard note={event} status="error" />
+                      </div>
+                      <EventCard {metadata} note={event} />
+                    </Metadata>
+                  </div>
+                {/each}
+              {/if}
+            </div>
+          </TimelineList>
+        {/if}
       </div>
     </SetDefaultRelays>
   </NostrMain>
