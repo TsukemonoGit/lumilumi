@@ -20,17 +20,10 @@
   import * as Nostr from "nostr-typedef";
   import { scanArray } from "$lib/stores/operators";
   import { beforeNavigate } from "$app/navigation";
+  import { isfolloweeFunc } from "$lib/func/dataUpdate";
 
   export let pubkey: string;
-  $: isfollowee = isfolloweeFunc();
-  const isfolloweeFunc = (): boolean | undefined => {
-    const list = getFollowingList();
-    if (!list) {
-      return undefined;
-    } else {
-      return list.includes(pubkey);
-    }
-  };
+  $: isfollowee = isfolloweeFunc(pubkey);
 
   const handleClickFollow = async () => {
     if ($loginUser === "") {
@@ -72,7 +65,7 @@
         //新しく取ったヤツのほうが新しかったら色々更新する
       }
     }
-    isfollowee = isfolloweeFunc();
+    isfollowee = isfolloweeFunc(pubkey);
     console.log(kind3Event);
     if (isfollowee) {
       //フォロー外していいかの確認画面的なの
@@ -119,7 +112,9 @@
         <div
           class="grid grid-cols-[auto_1fr] w-full align-items-end mt-[-42px] px-0 sm:px-4"
         >
-          <div class="relative z-10 border border-magnum-400 rounded-full">
+          <div
+            class="relative z-10 border border-magnum-400 rounded-full h-fit"
+          >
             {#if $showImg && profile.picture}
               <UserAvatar
                 url={profile.picture}

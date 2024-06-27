@@ -13,7 +13,7 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { uniq, verify } from "rx-nostr";
+import { createUniq, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";
@@ -41,7 +41,18 @@ export function useTimelineEventList(
     | undefined,
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
-  const operator = pipe(uniq(), verify(), scanArray());
+  // イベントID に基づいて重複を排除する
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+
+  const onCache = (packet: EventPacket): void => {
+    //console.log(`${packet.event.id} を初めて観測しました`);
+  };
+  const onHit = (packet: EventPacket): void => {
+    //  console.log(`${packet.event.id} はすでに観測されています`);
+  };
+
+  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+  const operator = pipe(uniq, verify(), scanArray());
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

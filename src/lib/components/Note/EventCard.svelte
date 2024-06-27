@@ -12,7 +12,7 @@
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
   import WarningHide2 from "../Elements/WarningHide2.svelte";
-  import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
+  import { formatAbsoluteDate, nip33Regex, profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
@@ -23,6 +23,7 @@
 
   import Link from "../Elements/Link.svelte";
   import { getRelaysById } from "$lib/func/nostr";
+  import Kind0Note from "./Kind0Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -30,6 +31,10 @@
   export let mini: boolean = false;
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
+
+  // $: replaceable =
+  //   (note.kind >= 30000 && note.kind < 40000) ||
+  //   (note.kind >= 10000 && note.kind < 20000);
 
   $: if (note && note.id !== currentNoteId) {
     $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
@@ -43,16 +48,6 @@
     $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
   });
 
-  const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
-    if (!ev) {
-      return undefined;
-    }
-    try {
-      return JSON.parse(ev.content);
-    } catch (error) {
-      return undefined;
-    }
-  };
   //eかa
   const repostedId = (
     tags: string[][]
@@ -305,6 +300,9 @@
           <RepostedNote {tag} {kind} />
         {/if}
       {/await}
+    {:else if note.kind === 0}
+      <!---->
+      <Kind0Note {note} />
     {:else}
       <!--その他-->
       {#await findClientTag(note) then clientData}
@@ -320,7 +318,7 @@
           <Content text={note.content} tags={note.tags} />
           <NoteActionButtons {note} />
         {:else}
-          <!---->
+          <!--client tag 31990 を さがす　-->
           <LatestEvent
             filters={[clientData.filter]}
             queryKey={["naddr", clientData.aTag]}

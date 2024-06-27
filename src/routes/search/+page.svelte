@@ -109,12 +109,12 @@
   </div>
 
   <div use:melt={$root} class=" container relative w-full">
-    <div
-      class="flex items-center justify-between bg-magnum-900/50 p-1 rounded-md"
+    <button
+      use:melt={$trigger}
+      class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
     >
       <span class="font-semibold text-magnum-400"> Options </span>
       <button
-        use:melt={$trigger}
         class="relative h-8 w-8 place-items-center rounded-md text-sm
         shadow hover:opacity-75 data-[disabled]:cursor-not-allowed
         data-[disabled]:opacity-75 bg-magnum-600"
@@ -128,7 +128,7 @@
           {/if}
         </div>
       </button>
-    </div>
+    </button>
 
     <div>
       {#if $open}

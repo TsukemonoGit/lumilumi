@@ -19,10 +19,10 @@
   onDestroy(() => {
     //  でりーとしてもreqが残ってるかんじある？
     console.log("Destoroyed");
-    //でりーとするときにけしておく
-    $queryClient.removeQueries({
-      queryKey: ["search", "feed", filter.toString()],
-    });
+    // //でりーとするときにけしておく
+    // $queryClient.removeQueries({
+    //   queryKey: ["search", "feed", filter.toString()],
+    // });
   });
 </script>
 
