@@ -59,6 +59,12 @@
         //新しく取ったヤツのほうが新しかったら色々更新する
       }
     }
+    const newKind3Event = $queryClient.getQueryData([
+      "timeline",
+      "contacts",
+      $loginUser,
+    ]);
+    console.log(newKind3Event);
     isfollowee = isfolloweeFunc(pubkey);
     console.log(kind3Event);
     if (isfollowee) {

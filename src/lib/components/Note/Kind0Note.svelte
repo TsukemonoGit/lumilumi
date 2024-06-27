@@ -1,10 +1,9 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import UserMenu from "../Elements/UserMenu.svelte";
-  import { formatAbsoluteDate, profile } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
   import { _ } from "svelte-i18n";
   import Content from "./Content.svelte";
-  import { isfolloweeFunc } from "$lib/func/dataUpdate";
   import FollowButton from "./FollowButton.svelte";
 
   export let note: Nostr.Event;

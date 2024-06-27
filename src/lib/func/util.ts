@@ -30,7 +30,11 @@ export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
 };
 
 export const splitHexColorString = (hexString: string): string[] => {
-  return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
+  if (hexString) {
+    return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
+  } else {
+    return ["#555555"];
+  }
 };
 
 // RGB 値を計算する関数

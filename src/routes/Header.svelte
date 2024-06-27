@@ -1,11 +1,16 @@
-<script>
+<script lang="ts">
   import { page } from "$app/stores";
+  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import RelayStatus from "$lib/components/RelayStatus.svelte";
   import logo from "$lib/images/favicon.svg";
-  import github from "$lib/images/github.svg";
-  import { nowProgress } from "$lib/stores/stores";
+  import { loginUser, nowProgress, queryClient } from "$lib/stores/stores";
 
-  import { Globe, Search, Bell } from "lucide-svelte";
+  import { Globe, Search, Bell, Settings, House } from "lucide-svelte";
+  import type { EventPacket } from "rx-nostr";
+
+  $: metadata = (
+    $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
+  )?.event;
 </script>
 
 <header>
@@ -25,12 +30,12 @@
     </svg>
     <ul>
       <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
-        <a href="/">Home</a>
+        <a href="/"><House /></a>
       </li>
       <li
         aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
       >
-        <a href="/settings">Settings</a>
+        <a href="/settings"><Settings /></a>
       </li>
       <li
         aria-current={$page.url.pathname === "/notifications"
@@ -45,6 +50,9 @@
       <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
         <a href="/global"><Globe /></a>
       </li>
+      <li class="flex px-2">
+        <UserMenu pubkey={$loginUser} {metadata} size={24} />
+      </li>
       <li>
         <RelayStatus />
       </li>
@@ -53,12 +61,6 @@
       <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
     </svg>
   </nav>
-
-  <div class="corner">
-    <a href="https://github.com/TsukemonoGit/lumilumi">
-      <img src={github} alt="GitHub" />
-    </a>
-  </div>
 </header>
 
 <style>

@@ -15,8 +15,8 @@
 		"@melt-ui/pp": "^0.3.2",
 		"@melt-ui/svelte": "^0.81.0",
 		"@neoconfetti/svelte": "^2.2.1",
-		"@sveltejs/adapter-auto": "^3.2.1",
-		"@sveltejs/kit": "^2.5.10",
+		"@sveltejs/adapter-auto": "^3.2.2",
+		"@sveltejs/kit": "^2.5.17",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",
 		"@tailwindcss/typography": "^0.5.13",
 		"@testing-library/svelte": "^5.1.0",
@@ -27,24 +27,24 @@
 		"autoprefixer": "^10.4.19",
 		"postcss": "^8.4.38",
 		"svelte": "^4.2.18",
-		"svelte-check": "^3.8.0",
+		"svelte-check": "^3.8.4",
 		"tailwindcss": "^3.4.4",
 		"tslib": "^2.6.3",
-		"typescript": "^5.4.5",
-		"vite": "^5.2.12",
+		"typescript": "^5.5.2",
+		"vite": "^5.3.1",
 		"vitest": "^1.6.0"
 	},
 	"type": "module",
 	"dependencies": {
-		"@tanstack/svelte-query": "^5.40.1",
-		"lucide-svelte": "^0.390.0",
-		"nostr-login": "^1.4.4",
+		"@tanstack/svelte-query": "^5.48.0",
+		"lucide-svelte": "^0.397.0",
+		"nostr-login": "^1.5.1",
 		"nostr-tools": "^2.7.0",
 		"nostr-typedef": "^0.9.0",
 		"punycode": "^2.3.1",
 		"rx-nostr": "^2.7.3",
 		"svelte-boring-avatars": "^1.2.6",
 		"svelte-i18n": "^4.0.0",
-		"ws": "^8.17.0"
+		"ws": "^8.17.1"
 	}
 }
