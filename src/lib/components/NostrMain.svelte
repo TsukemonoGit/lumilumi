@@ -103,6 +103,6 @@
   </slot>
 {/if}
 
-<div class="fixed right-auto bottom-5 z-10">
+<div class="fixed right-auto left-auto bottom-5 z-10">
   <OpenPostWindow />
 </div>

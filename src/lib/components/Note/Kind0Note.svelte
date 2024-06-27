@@ -5,14 +5,9 @@
   import { _ } from "svelte-i18n";
   import Content from "./Content.svelte";
   import { isfolloweeFunc } from "$lib/func/dataUpdate";
+  import FollowButton from "./FollowButton.svelte";
 
   export let note: Nostr.Event;
-
-  $: isfollowee = isfolloweeFunc(note.pubkey);
-
-  const handleClickFollow = async () => {
-    console.log("mada");
-  };
 </script>
 
 <div class={"grid grid-cols-[auto_1fr]"}>
@@ -28,20 +23,7 @@
         >
       </div>
 
-      {#if isfollowee !== undefined}
-        <div class="flex ml-auto items-end">
-          <button
-            class=" rounded-full bg-white border border-magnum-700 p-3 break-keep
-      font-medium leading-none text-magnum-700 shadow hover:opacity-75 {isfollowee
-              ? 'opacity-75'
-              : ''}"
-            on:click={handleClickFollow}
-            >{isfollowee
-              ? `${$_("user.following")}`
-              : `${$_("user.follow")}`}</button
-          >
-        </div>
-      {/if}
+      <FollowButton pubkey={note.pubkey} />
     </div>
     <hr />
     <div class=" max-h-48 overflow-y-auto">

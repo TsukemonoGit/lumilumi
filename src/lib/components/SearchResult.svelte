@@ -26,59 +26,61 @@
   });
 </script>
 
-<NostrMain let:pubkey let:localRelays>
-  <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
-    <div slot="loading">SetRelay loading</div>
-    <div slot="error">SetRelay error</div>
-    <div slot="nodata">SetRelay nodata</div>
-    <SetSearchRelays defaultRelays={relays} let:searchRelays>
-      <div class="container break-words overflow-x-hidden">
-        <TimelineList
-          queryKey={["search", "feed", filter.toString()]}
-          filters={[filter]}
-          req={createRxForwardReq()}
-          let:events
-          {viewIndex}
-          {amount}
-          let:len
-        >
-          <SetRepoReactions />
-          <div slot="loading">
-            <p>Timeline Loading...</p>
-          </div>
+<section>
+  <NostrMain let:pubkey let:localRelays>
+    <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
+      <div slot="loading">SetRelay loading</div>
+      <div slot="error">SetRelay error</div>
+      <div slot="nodata">SetRelay nodata</div>
+      <SetSearchRelays defaultRelays={relays} let:searchRelays>
+        <div class="container break-words overflow-x-hidden">
+          <TimelineList
+            queryKey={["search", "feed", filter.toString()]}
+            filters={[filter]}
+            req={createRxForwardReq()}
+            let:events
+            {viewIndex}
+            {amount}
+            let:len
+          >
+            <SetRepoReactions />
+            <div slot="loading">
+              <p>Timeline Loading...</p>
+            </div>
 
-          <div slot="error" let:error>
-            <p>{error}</p>
-          </div>
+            <div slot="error" let:error>
+              <p>{error}</p>
+            </div>
 
-          <div class="max-w-[100vw] break-words box-border">
-            {#if events && events.length > 0}
-              {#each events as event (event.id)}
-                <div
-                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
-                >
-                  <Metadata
-                    queryKey={["metadata", event.pubkey]}
-                    pubkey={event.pubkey}
-                    let:metadata
+            <div class="max-w-[100vw] break-words box-border">
+              {#if events && events.length > 0}
+                {#each events as event (event.id)}
+                  <div
+                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
                   >
-                    <div slot="loading">
-                      <EventCard note={event} status="loading" />
-                    </div>
-                    <div slot="nodata">
-                      <EventCard note={event} status="nodata" />
-                    </div>
-                    <div slot="error">
-                      <EventCard note={event} status="error" />
-                    </div>
-                    <EventCard {metadata} note={event} />
-                  </Metadata>
-                </div>
-              {/each}
-            {/if}
-          </div>
-        </TimelineList>
-      </div>
-    </SetSearchRelays>
-  </SetDefaultRelays>
-</NostrMain>
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
+                    >
+                      <div slot="loading">
+                        <EventCard note={event} status="loading" />
+                      </div>
+                      <div slot="nodata">
+                        <EventCard note={event} status="nodata" />
+                      </div>
+                      <div slot="error">
+                        <EventCard note={event} status="error" />
+                      </div>
+                      <EventCard {metadata} note={event} />
+                    </Metadata>
+                  </div>
+                {/each}
+              {/if}
+            </div>
+          </TimelineList>
+        </div>
+      </SetSearchRelays>
+    </SetDefaultRelays>
+  </NostrMain>
+</section>
