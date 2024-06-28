@@ -10,6 +10,8 @@
 
   import { beforeNavigate } from "$app/navigation";
   import FollowButton from "../Note/FollowButton.svelte";
+  import Nip05Check from "./Nip05Check.svelte";
+  import Link from "../Elements/Link.svelte";
 
   export let pubkey: string;
 
@@ -73,8 +75,17 @@
                 {profile.display_name ?? ""}@{profile.name}
               </div>
               <div class="text-sm text-neutral-500"></div>
-              <div class="text-sm">{profile.nip05}</div>
-              <div class="text-sm">{profile.website}</div>
+              {#if profile.nip05}
+                <div class="text-sm flex">
+                  {profile.nip05}<Nip05Check
+                    {pubkey}
+                    nip05Address={profile.nip05}
+                  />
+                </div>{/if}
+              {#if profile.website}<Link
+                  className="text-sm underline text-magnum-300 break-all"
+                  href={profile.website}>{profile.website}</Link
+                >{/if}
             </div>
             <FollowButton {pubkey} />
           </div>

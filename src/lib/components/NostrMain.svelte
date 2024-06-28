@@ -6,6 +6,7 @@
     mutebykinds,
     mutes,
     showImg,
+    showPreview,
   } from "$lib/stores/stores";
   import NostrElements from "./NostrElements.svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -56,6 +57,7 @@
       useRelaySet: savedRelaySet,
       pubkey: savedPubkey,
       showImg: savedShowImg,
+      showPreview: savedShowPreview,
       mute: savedMute,
       emoji: savedEmoji,
       mutebykinds: savedMutebykinds,
@@ -70,19 +72,19 @@
     }
     pubkey = savedPubkey;
     $loginUser = pubkey;
-    if (savedShowImg) {
-      $showImg = savedShowImg;
-    }
+
+    $showImg = savedShowImg ? savedShowImg : false;
+
+    $showPreview = savedShowPreview ? savedShowPreview : false;
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
     getMetadataFromLocalStorage();
     //}
-    if (savedMute) {
-      $mutes = savedMute.list;
-    }
-    if (savedEmoji && savedEmoji.list) {
-      $emojis = savedEmoji.list;
-    }
+
+    $mutes = savedMute ? savedMute.list : undefined;
+
+    $emojis = savedEmoji && savedEmoji.list ? savedEmoji.list : [];
+
     if (savedMutebykinds && savedMutebykinds.list) {
       try {
         $mutebykinds = JSON.parse(savedMutebykinds.list);

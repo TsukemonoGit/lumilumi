@@ -94,6 +94,7 @@ export interface LumiSetting {
   useRelaySet: string;
   pubkey: string;
   showImg?: boolean;
+  showPreview: boolean;
   emoji?: {
     list: string[][];
     updated: number; //最後に同期した日付

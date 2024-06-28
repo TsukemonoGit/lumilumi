@@ -36,9 +36,10 @@ export const toastSettings = writable<{
 export const loginUser = writable<string>();
 
 export const showImg = writable<boolean>(false);
+export const showPreview = writable<boolean>(false);
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
 export const emojis = writable<string[][]>();
-export const mutes = writable<MuteList>();
+export const mutes = writable<MuteList | undefined>();
 export const mutebykinds = writable<{ kind: number; list: string[] }[]>([]);
 export const nowProgress = writable<boolean>(false);
 

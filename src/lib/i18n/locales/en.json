@@ -15,7 +15,8 @@
     },
     "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
-      "loadImage": "load and show image"
+      "loadImage": "load and show image",
+      "preview": "Show preview when creating notes (only when image loading is enabled)"
     },
     "douki": {
       "title": "Sync"

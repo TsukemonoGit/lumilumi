@@ -12,11 +12,7 @@
   //movie
   const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
-  const parts: {
-    type: string;
-    content: string | undefined;
-    url?: string | undefined;
-  }[] = parseText(text, tags);
+  $: parts = parseText(text, tags);
 
   const nip19Decode = (
     content: string | undefined

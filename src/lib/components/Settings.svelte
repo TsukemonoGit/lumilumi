@@ -3,7 +3,6 @@
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
-
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
@@ -12,34 +11,36 @@
     mutes,
     mutebykinds,
     showImg,
+    showPreview,
     toastSettings,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
-  import type { LumiSetting } from "$lib/types";
+  import type { LumiSetting, MuteList } from "$lib/types";
   import { _ } from "svelte-i18n";
-  //  import { promiseRelaySet } from "$lib/stores/promiseRelaySet";
-
-  import type { MuteList } from "$lib/types";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import { beforeNavigate } from "$app/navigation";
-
-  const relays = writable<DefaultRelayConfig[]>([]);
+  import { browser } from "$app/environment";
 
   const STORAGE_KEY = "lumiSetting";
-  const Delete_STORAGE_KEY = "relaySettings";
+  const DELETE_STORAGE_KEY = "relaySettings";
+
+  const relays = writable<DefaultRelayConfig[]>([]);
   const radioGroupSelected = writable("0");
   const pubkey = writable("");
   const _showImg = writable<boolean>(false);
+  const _showPreview = writable<boolean>(false);
+  const originalSettings = writable<LumiSetting | null>(null);
+
   let relayInput: string = "";
   let muteList: { list: MuteList; updated: number } | undefined = undefined;
   let mutebykindList:
     | { list: { kind: number; list: string[] }[]; updated: number }
     | undefined = undefined;
   let emojiList: { list: string[][]; updated: number } | undefined = undefined;
-
+  let inputPubkey = "";
   // ラジオボタン設定
   const {
     elements: {
@@ -52,85 +53,86 @@
     defaultValue: "0",
     value: radioGroupSelected,
   });
-
   const optionsArr = ["0", "1"];
   const optionsArrStr = [
-    `${$_("settings.relayMenuText0")}`,
-    `${$_("settings.relayMenuText1")}`,
+    $_("settings.relayMenuText0"),
+    $_("settings.relayMenuText1"),
   ];
   //inputurl
   const {
     elements: { root: relayInputroot },
   } = createLabel();
 
-  const originalSettings = writable<LumiSetting | null>(null);
-
-  // ローカルストレージから設定を読み込む
   onMount(async () => {
-    const deletesettings = localStorage.getItem(Delete_STORAGE_KEY);
-    let savedSettings = localStorage.getItem(STORAGE_KEY);
-    if (deletesettings) {
-      savedSettings = deletesettings;
-      localStorage.setItem(STORAGE_KEY, savedSettings);
-      localStorage.removeItem(Delete_STORAGE_KEY);
-    }
+    const savedSettings = loadSettings();
     if (savedSettings) {
-      try {
-        const {
-          relays: savedRelays,
-          useRelaySet: savedRelaySet,
-          pubkey: savedPubkey,
-          showImg: savedShowImg,
-          mute: savedMute,
-          emoji: savedEmoji,
-          mutebykinds: savedMutebykinds,
-        }: LumiSetting = JSON.parse(savedSettings);
-        relays.set(savedRelays);
-        radioGroupSelected.set(savedRelaySet);
-        pubkey.set(savedPubkey);
-        inputPubkey = nip19.npubEncode(savedPubkey);
-        $loginUser = $pubkey;
-        if (savedShowImg) {
-          _showImg.set(savedShowImg);
-        }
-        if (savedMute) {
-          muteList = savedMute;
-        }
-        if (savedEmoji) emojiList = savedEmoji;
-        if (savedMutebykinds?.list) {
-          mutebykindList = {
-            list: JSON.parse(savedMutebykinds.list),
-            updated: savedMutebykinds.updated,
-          };
-          $mutebykinds = mutebykindList.list;
-        }
-        originalSettings.set(JSON.parse(savedSettings));
-      } catch (error) {
-        console.log(error);
-      }
+      applySettings(savedSettings);
     } else {
-      radioGroupSelected.set("0");
-      try {
-        const gotPubkey = await (
-          window.nostr as Nostr.Nip07.Nostr
-        ).getPublicKey();
-        if (gotPubkey) {
-          //pubkey.set(gotPubkey);
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      initializeSettings();
     }
-
-    // ページ離脱時の警告イベントを追加
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window?.addEventListener("beforeunload", handleBeforeUnload);
   });
+
+  function loadSettings() {
+    const deleteSettings = localStorage.getItem(DELETE_STORAGE_KEY);
+    let savedSettings = localStorage.getItem(STORAGE_KEY);
+    if (deleteSettings) {
+      savedSettings = deleteSettings;
+      localStorage.setItem(STORAGE_KEY, savedSettings);
+      localStorage.removeItem(DELETE_STORAGE_KEY);
+    }
+    return savedSettings ? JSON.parse(savedSettings) : null;
+  }
+
+  function applySettings(settings: LumiSetting) {
+    const {
+      relays: savedRelays,
+      useRelaySet: savedRelaySet,
+      pubkey: savedPubkey,
+      showImg: savedShowImg,
+      showPreview: savedShowPreview,
+      mute: savedMute,
+      emoji: savedEmoji,
+      mutebykinds: savedMutebykinds,
+    } = settings;
+
+    relays.set(savedRelays);
+    radioGroupSelected.set(savedRelaySet);
+    pubkey.set(savedPubkey);
+    inputPubkey = nip19.npubEncode(savedPubkey);
+    if (savedShowImg) _showImg.set(savedShowImg);
+    if (savedShowPreview) _showPreview.set(savedShowPreview);
+    if (savedMute) muteList = savedMute;
+    if (savedEmoji) emojiList = savedEmoji;
+    if (savedMutebykinds?.list) {
+      mutebykindList = {
+        list: JSON.parse(savedMutebykinds.list),
+        updated: savedMutebykinds.updated,
+      };
+      mutebykinds.set(mutebykindList.list);
+    }
+    originalSettings.set(settings);
+  }
+
+  async function initializeSettings() {
+    radioGroupSelected.set("0");
+    try {
+      const gotPubkey = await (
+        window?.nostr as Nostr.Nip07.Nostr
+      ).getPublicKey();
+      if (gotPubkey) {
+        // pubkey.set(gotPubkey);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   function addRelay() {
     if (!relayInput) return;
     let input = relayInput.trim();
     if (!input.endsWith("/")) {
-      input = input + "/";
+      input += "/";
     }
     if (relayRegex.test(input)) {
       relays.update((current) => [
@@ -147,120 +149,108 @@
 
   function saveSettings() {
     console.log("save");
+    if (isRelaySelectionInvalid()) return;
+    if (!isPubkeyValid()) return;
+
+    const settings: LumiSetting = createCurrentSettings();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+
+    toastSettings.set({
+      title: "Success",
+      description: "設定が保存されました。",
+      color: "bg-green-500",
+    });
+
+    $loginUser = $pubkey;
+    $showImg = $_showImg;
+    $showPreview = $_showPreview;
+    if (muteList) mutes.set(muteList.list);
+    if (emojiList) emojis.set(emojiList.list);
+    if (mutebykindList) mutebykinds.set(mutebykindList.list);
+
+    originalSettings.set(settings);
+  }
+
+  function isRelaySelectionInvalid() {
     if ($radioGroupSelected === "1") {
       const currentRelays = $relays;
       const hasRead = currentRelays.some((relay) => relay.read);
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
-        //console.log("toast");
-
-        $toastSettings = {
+        toastSettings.set({
           title: "Error",
-          description: `${$_("settings.toast.relayError")}}`,
+          description: `${$_("settings.toast.relayError")}`,
           color: "bg-red-500",
-        };
-        return;
+        });
+        return true;
       }
     }
-    if (inputPubkey === "") {
-      $toastSettings = {
+    return false;
+  }
+
+  function isPubkeyValid() {
+    if (!inputPubkey) {
+      toastSettings.set({
         title: "Error",
         description: "error pubkey",
         color: "bg-red-500",
-      };
-      return;
+      });
+      return false;
     }
     try {
-      $pubkey = nip19.decode(inputPubkey).data as string;
+      pubkey.set(nip19.decode(inputPubkey).data as string);
     } catch (error) {
       console.log(error);
-      $toastSettings = {
+      toastSettings.set({
         title: "Error",
         description: "failed to save pubkey",
         color: "bg-red-500",
-      };
-      return;
+      });
+      return false;
     }
-    console.log(mutebykindList);
+    return true;
+  }
+
+  function createCurrentSettings(): LumiSetting {
     const settings: LumiSetting = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
       pubkey: $pubkey,
       showImg: $_showImg,
-      mute: muteList,
-      emoji: emojiList,
-      mutebykinds: mutebykindList
-        ? {
-            list: JSON.stringify(mutebykindList.list),
-            updated: mutebykindList.updated,
-          }
-        : undefined,
+      showPreview: $_showPreview,
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-
-    $toastSettings = {
-      title: "Success",
-      description: "設定が保存されました。",
-      color: "bg-green-500",
-    };
-    $loginUser = $pubkey;
-    $showImg = $_showImg;
-    if (muteList) {
-      $mutes = muteList.list;
+    if (muteList && muteList.updated !== undefined) {
+      settings.mute = muteList;
     }
-    if (emojiList) {
-      $emojis = emojiList.list;
+    if (emojiList && emojiList.updated !== undefined) {
+      settings.emoji = emojiList;
     }
     if (mutebykindList) {
-      $mutebykinds = mutebykindList.list;
+      settings.mutebykinds = {
+        list: JSON.stringify(mutebykindList.list),
+        updated: mutebykindList.updated,
+      };
     }
-    originalSettings.set(settings); // 設定を保存後、元の設定としてセット
+    return settings;
   }
 
   function cancelSettings() {
-    console.log("cansel");
-    const savedSettings = localStorage.getItem(STORAGE_KEY);
+    console.log("cancel");
+    const savedSettings = loadSettings();
     if (savedSettings) {
-      const {
-        relays: savedRelays,
-        useRelaySet: savedRelaySet,
-        pubkey: savedPubkey,
-        showImg: savedShowImg,
-        mute: savedMute,
-        emoji: savedEmoji,
-        mutebykinds: savedMutebykinds,
-      }: LumiSetting = JSON.parse(savedSettings);
-      relays.set(savedRelays);
-      radioGroupSelected.set(savedRelaySet);
-      // pubkey.set(savedPubkey);
-      inputPubkey = nip19.npubEncode(savedPubkey);
-      muteList = savedMute;
-      emojiList = savedEmoji;
-      try {
-        mutebykindList = savedMutebykinds?.list
-          ? {
-              list: JSON.parse(savedMutebykinds.list),
-              updated: savedMutebykinds.updated,
-            }
-          : undefined;
-      } catch (error) {
-        console.log(error);
-      }
-      if (savedShowImg !== undefined) {
-        showImg.set(savedShowImg);
-      }
-
-      $toastSettings = {
+      applySettings(savedSettings);
+      toastSettings.set({
         title: "Warning",
         description: `${$_("settings.toast.resetData")}`,
         color: "bg-orange-500",
-      };
+      });
     }
   }
-  const handleClickLogin = async () => {
+
+  async function handleClickLogin() {
     try {
       const gotPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
+        window?.nostr as Nostr.Nip07.Nostr
       ).getPublicKey();
       if (gotPubkey) {
         inputPubkey = nip19.npubEncode(gotPubkey);
@@ -268,62 +258,42 @@
     } catch (error) {
       console.log(error);
     }
-  };
+  }
 
-  // 設定が変更されたかどうかをチェックする関数
   function settingsChanged(): boolean {
-    let currentSettings: LumiSetting = {
-      relays: $relays,
-      useRelaySet: $radioGroupSelected,
-      pubkey: $pubkey,
-      showImg: $_showImg,
-    };
-    // muteList が定義されていて、updated プロパティが undefined でない場合のみ、mute を含める
-    if (muteList && muteList.updated !== undefined) {
-      currentSettings = { ...currentSettings, mute: muteList };
+    const currentSettings = createCurrentSettings();
+    if ($originalSettings) {
+      return (
+        JSON.stringify($originalSettings) !== JSON.stringify(currentSettings)
+      );
     }
-    if (emojiList && emojiList.list.length > 0) {
-      currentSettings = { ...currentSettings, emoji: emojiList };
-    }
-    if (mutebykindList && mutebykindList.list.length > 0) {
-      currentSettings = {
-        ...currentSettings,
-        mutebykinds: {
-          list: JSON.stringify(mutebykindList.list),
-          updated: mutebykindList.updated,
-        },
-      };
-    }
-    return (
-      JSON.stringify(currentSettings) !== JSON.stringify($originalSettings)
-    );
+    return true;
   }
 
-  // beforeunload イベントのハンドラー
-  function handleBeforeUnload(event: BeforeUnloadEvent) {
+  function handleBeforeUnload(e: BeforeUnloadEvent) {
     if (settingsChanged()) {
-      event.preventDefault();
-      event.returnValue = `${$_("settings.beforeUnload.message")}`;
+      e.preventDefault();
+      e.returnValue = "";
     }
   }
 
-  // コンポーネントが破棄される時にイベントリスナーを削除
   onDestroy(() => {
-    if (typeof window !== "undefined") {
+    if (browser) {
       window?.removeEventListener("beforeunload", handleBeforeUnload);
     }
   });
 
-  // ページ離脱時の警告イベント
-  beforeNavigate((event) => {
+  beforeNavigate(({ cancel }) => {
     if (settingsChanged()) {
-      if (!confirm(`${$_("settings.beforeUnload.message")}`)) {
-        event.cancel();
+      if (
+        !confirm(
+          "You have unsaved changes. Are you sure you want to leave this page?"
+        )
+      ) {
+        cancel();
       }
     }
   });
-
-  let inputPubkey: string = "";
 </script>
 
 <div class="container flex flex-col gap-3">
@@ -445,14 +415,24 @@
   <!--- 表示設定 --->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">Display</div>
-    <label>
-      <input
-        type="checkbox"
-        class="rounded-checkbox"
-        bind:checked={$_showImg}
-      />
-      {$_("settings.display.loadImage")}
-    </label>
+    <div class="flex flex-col gap-2">
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={$_showImg}
+        />
+        {$_("settings.display.loadImage")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={$_showPreview}
+        />
+        {$_("settings.display.preview")}
+      </label>
+    </div>
   </div>
   <!--- Douki --->
   <div class="border border-magnum-500 rounded-md p-2">
