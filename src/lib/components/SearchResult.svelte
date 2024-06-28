@@ -12,6 +12,8 @@
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import SetSearchRelays from "./NostrMainData/SetSearchRelays.svelte";
   import { toRelaySet } from "$lib/stores/useRelaySet";
+
+  import { nip50relays } from "$lib/func/util";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -26,6 +28,7 @@
       defaultRelays={localRelays.length > 0
         ? localRelays
         : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
+      setRelayList={nip50relays}
       let:searchRelays
     >
       <div class="container break-words overflow-x-hidden">
