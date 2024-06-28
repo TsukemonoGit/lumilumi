@@ -28,12 +28,14 @@ export async function loadOlderEvents(
             ...filter,
             limit: 20,
             until: untilTimestamp,
+            since: undefined,
           }))
         : [
             {
               ...filters[0],
               limit: 20,
               until: kind1[kind1.length - 1].created_at,
+              since: undefined,
             },
           ];
     console.log(newFilters);

@@ -98,6 +98,11 @@
     {:else}
       :{part.content}:
     {/if}
+  {:else if part.type === "hashtag"}
+    <a
+      href={`/search?t=${part.content}`}
+      class="underline text-magnum-300 break-all">#{part.content}</a
+    >
   {:else}
     <span
       class="whitespace-pre-wrap break-words word align-middle"

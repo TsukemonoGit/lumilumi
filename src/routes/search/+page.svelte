@@ -8,7 +8,10 @@
   import { nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "$lib/components/SearchResult.svelte";
-  import { SvelteComponent } from "svelte";
+  import { onMount, SvelteComponent } from "svelte";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { page } from "$app/stores";
+
   let searchWord: string = "";
   let searchKind: number = 1;
   let searchPubkey: string = "";
@@ -17,6 +20,31 @@
   let followee: boolean = false;
   let filter: Filter;
   let showFilter: Filter;
+
+  let compRef: SvelteComponent;
+  let openSearchResult: boolean = false;
+
+  afterNavigate(async () => {
+    compRef?.$destroy();
+    const params = $page.url.searchParams;
+    const hashtag = params.get("t");
+    console.log(hashtag);
+    if (hashtag) {
+      filter = {
+        kinds: [1],
+        "#t": [hashtag],
+      };
+
+      handleClickSearch();
+    }
+  });
+
+  beforeNavigate(() => {
+    console.log("destroy");
+
+    compRef?.$destroy();
+  });
+
   $: followingList = getFollowingList();
   $: {
     filter = {
@@ -50,13 +78,12 @@
       return "";
     }
   };
-  let compRef: SvelteComponent;
-  let openSearchResult: boolean = false;
 
   //filterによってイベントを取得して表示する
   //inputをちぇっくしたりする
   const handleClickSearch = () => {
-    showFilter = filter;
+    showFilter = { ...filter, limit: 30 };
+    console.log(showFilter);
     if (openSearchResult) {
       compRef.$destroy();
       openSearchResult = false;

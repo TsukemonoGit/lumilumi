@@ -36,7 +36,7 @@ export function useRelaySet(
   };
 }
 
-function toRelaySet(
+export function toRelaySet(
   value: EventPacket | EventPacket[] | undefined
 ): DefaultRelayConfig[] {
   console.log(value);
