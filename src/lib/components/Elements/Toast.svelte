@@ -46,7 +46,10 @@
                 class="size-1.5 rounded-full {data.color ?? 'bg-green-500'}"
               />
             </h3>
-            <div use:melt={$description(id)}>
+            <div
+              use:melt={$description(id)}
+              class="break-words whitespace-pre-wrap"
+            >
               {data.description}
             </div>
           </div>

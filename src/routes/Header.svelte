@@ -32,11 +32,7 @@
       <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
         <a href="/"><House /></a>
       </li>
-      <li
-        aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
-      >
-        <a href="/settings"><Settings /></a>
-      </li>
+
       <li
         aria-current={$page.url.pathname === "/notifications"
           ? "page"
@@ -50,9 +46,15 @@
       <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
         <a href="/global"><Globe /></a>
       </li>
-      <li class="flex px-2">
-        <UserMenu pubkey={$loginUser} {metadata} size={24} />
+      <li
+        aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
+      >
+        <a href="/settings"><Settings /></a>
       </li>
+      <li class="flex px-2">
+        <UserMenu bind:pubkey={$loginUser} bind:metadata size={24} />
+      </li>
+
       <li>
         <RelayStatus />
       </li>

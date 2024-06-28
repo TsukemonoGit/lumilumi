@@ -63,7 +63,10 @@ export function calculateColor(hex: string): string {
   return `rgb(${r},${g},${b})`;
 }
 
-export function formatAbsoluteDate(unixTime: number): string {
+export function formatAbsoluteDate(
+  unixTime: number,
+  full: boolean = false
+): string {
   const date = new Date(unixTime * 1000);
   const now = new Date();
 
@@ -76,12 +79,12 @@ export function formatAbsoluteDate(unixTime: number): string {
     minute: "2-digit",
   };
 
-  if (!sameDay) {
+  if (full || !sameDay) {
     options.month = "2-digit";
     options.day = "2-digit";
   }
 
-  if (!sameYear) {
+  if (full || !sameYear) {
     options.year = "numeric";
   }
 

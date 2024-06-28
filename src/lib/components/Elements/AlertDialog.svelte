@@ -1,0 +1,74 @@
+<script lang="ts">
+  import { createDialog, melt } from "@melt-ui/svelte";
+  import { X } from "lucide-svelte";
+
+  export let onClickOK: () => void;
+  export let title = "";
+  export let description = "";
+  const {
+    elements: {
+      trigger,
+      overlay,
+      content,
+      title: ttl,
+      description: dsc,
+      close,
+      portalled,
+    },
+    states: { open },
+  } = createDialog({
+    role: "alertdialog",
+    forceVisible: true,
+  });
+  export { open };
+</script>
+
+{#if $open}
+  <div class="" use:melt={$portalled}>
+    <div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" />
+    <div
+      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
+            max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white
+            p-6 shadow-lg"
+      use:melt={$content}
+    >
+      <h2 use:melt={$ttl} class="m-0 text-lg font-medium text-zinc-800">
+        {title}
+      </h2>
+      <p use:melt={$dsc} class="mb-5 mt-2 leading-normal text-zinc-600">
+        {description}
+      </p>
+
+      <div class="mb-4 text-zinc-600">
+        <slot name="main" />
+      </div>
+
+      <div class="mt-6 flex justify-end gap-4">
+        <button
+          use:melt={$close}
+          class="inline-flex h-8 items-center justify-center rounded-[4px]
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+        >
+          Cancel
+        </button>
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-[4px]
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+          on:click={onClickOK}
+        >
+          Continue
+        </button>
+      </div>
+
+      <button
+        use:melt={$close}
+        aria-label="Close"
+        class="absolute right-[10px] top-[10px] inline-flex h-6 w-6
+                appearance-none items-center justify-center rounded-full text-magnum-800
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+      >
+        <X class="size-4" />
+      </button>
+    </div>
+  </div>
+{/if}

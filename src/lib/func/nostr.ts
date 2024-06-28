@@ -38,6 +38,7 @@ import {
   type OkPacketAgainstEvent,
   nip07Signer,
   createRxForwardReq,
+  completeOnTimeout,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
@@ -86,7 +87,7 @@ export function setSavedMetadata(data: [QueryKey, EventPacket][]) {
   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
   savedMetadata = data;
 }
-export function pubkeysIn(contacts: Nostr.Event) {
+export function pubkeysIn(contacts: Nostr.Event): string[] {
   const followingList = contacts.tags.reduce((acc, [tag, value]) => {
     if (tag === "p") {
       return [...acc, value];
@@ -308,7 +309,7 @@ export function publishEvent(ev: Nostr.EventParameters) {
 
 export async function promisePublishEvent(
   ev: Nostr.EventParameters
-): Promise<OkPacketAgainstEvent[]> {
+): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const _rxNostr = get(app).rxNostr;
   const signer = nip07Signer();
   const event = await signer.signEvent(ev);
@@ -337,7 +338,7 @@ export async function promisePublishEvent(
       },
     });
   });
-  return res;
+  return { event: event, res: res };
 }
 
 //ConnectionState
@@ -368,13 +369,7 @@ export function usePromiseReq({
   operator,
   req,
   initData = [],
-}: UseReqOpts<EventPacket[]>): Promise<EventPacket[]> {
-  const _queryClient = get(queryClient);
-
-  if (!_queryClient) {
-    throw Error("No query client available");
-  }
-
+}: UseReqOpts<EventPacket[] | EventPacket>): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("error");
@@ -398,34 +393,38 @@ export function usePromiseReq({
     _req = createRxBackwardReq();
   }
 
-  const status = writable<ReqStatus>("loading");
-  const error = writable<Error>();
-  let accumulatedData: EventPacket[] = [...initData];
+  // 初期データが配列でない場合は、配列に変換
+  let accumulatedData: EventPacket[] = Array.isArray(initData)
+    ? [...initData]
+    : [initData];
 
-  const obs: Observable<EventPacket[]> = _rxNostr
+  const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req)
-    .pipe(tie, muteCheck(), metadata(), operator);
+    .pipe(tie, muteCheck(), metadata(), operator, completeOnTimeout(5000));
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       subscription.unsubscribe();
       resolve(accumulatedData);
-    }, 3000); // Timeout after 3 seconds if not completed
+    }, 10000); // Timeout after 3 seconds if not completed
 
     const subscription = obs.subscribe({
-      next: (v: EventPacket[]) => {
-        accumulatedData = [...accumulatedData, ...v];
+      next: (v: EventPacket[] | EventPacket) => {
+        console.log(v);
+        // 受け取ったデータが配列でない場合、配列に変換して追加
+        if (Array.isArray(v)) {
+          accumulatedData = v;
+        } else {
+          accumulatedData.push(v);
+        }
       },
       complete: () => {
-        status.set("success");
-
         clearTimeout(timeoutId); // Cancel the timeout
         resolve(accumulatedData);
       },
       error: (e) => {
+        console.log(e);
         console.error("[rx-nostr]", e);
-        status.set("error");
-        error.set(e);
 
         clearTimeout(timeoutId); // Cancel the timeout
         resolve(accumulatedData);
