@@ -11,6 +11,7 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
+  import PopupProfileIcon from "$lib/components/NostrElements/AllReactionsElement/PopupProfileIcon.svelte";
   export let data: {
     id: string;
     relays?: string[] | undefined;
@@ -58,7 +59,7 @@
         <div class="border border-magnum-500 rounded-md break-all my-1">
           <div class="font-bold">Repost {kind6.length}</div>
           {#each kind6 as event (event.id)}
-            <div>user:{event.pubkey}</div>
+            <PopupProfileIcon pubkey={event.pubkey} />
           {/each}
         </div>
 
