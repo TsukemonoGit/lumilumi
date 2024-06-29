@@ -7,15 +7,17 @@
   export let events: Nostr.Event[];
 
   const filterEventsByContent = (events: Nostr.Event[], content: string) => {
-    return events.filter((event) => event.content === content);
+    return events.filter((event) => (event.content || "+") === content);
   };
 
   const uniqueContents = [
-    ...new Set(events.map((event) => event.content)),
+    ...new Set(events.map((event) => event.content || "+")),
   ].sort(); // Get unique contents and sort them
 
   const findEvent = (content: string): Nostr.Event => {
-    return events.find((event) => event.content === content) as Nostr.Event;
+    return events.find(
+      (event) => (event.content || "+") === content
+    ) as Nostr.Event;
   };
 </script>
 
@@ -27,15 +29,16 @@
     <div
       class="flex w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
     >
-      <div class="mx-2">
+      <div class="min-w-6 flex justify-center">
         <Reaction event={findEvent(content)} />
       </div>
-
-      {#each filterEventsByContent(events, content) as event (event.id)}
-        {#if event.pubkey}
-          <PopupProfileIcon pubkey={event.pubkey} />
-        {/if}
-      {/each}
+      <div class="flex-wrap px-2 gap-1">
+        {#each filterEventsByContent(events, content) as event (event.id)}
+          {#if event.pubkey}
+            <PopupProfileIcon pubkey={event.pubkey} />
+          {/if}
+        {/each}
+      </div>
     </div>
   {/each}
 </div>

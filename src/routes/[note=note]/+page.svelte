@@ -23,17 +23,17 @@
 </script>
 
 <section>
-  <div class="container">
-    <NostrMain let:pubkey let:localRelays>
-      <SetSearchRelays
-        defaultRelays={localRelays.length > 0
-          ? localRelays
-          : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
-        setRelayList={data.relays !== undefined && data.relays.length > 0
-          ? data.relays
-          : defaultRelays}
-        let:searchRelays
-      >
+  <NostrMain let:pubkey let:localRelays>
+    <SetSearchRelays
+      defaultRelays={localRelays.length > 0
+        ? localRelays
+        : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
+      setRelayList={data.relays !== undefined && data.relays.length > 0
+        ? data.relays
+        : defaultRelays}
+      let:searchRelays
+    >
+      <div class="container break-words overflow-hidden">
         <div>
           <Note id={data.id} />
         </div>
@@ -55,7 +55,7 @@
             class="border border-magnum-500 rounded-md break-all my-1 w-full"
           >
             <div class="font-bold px-1">Repost {kind6.length}</div>
-            <div class="m-2">
+            <div class="px-4 py-1 flex flex-wrap gap-1">
               {#each kind6 as event (event.id)}
                 <PopupProfileIcon pubkey={event.pubkey} />
               {/each}
@@ -105,7 +105,7 @@
             {/each}
           </div>
         </AllReactions>
-      </SetSearchRelays>
-    </NostrMain>
-  </div>
+      </div>
+    </SetSearchRelays>
+  </NostrMain>
 </section>

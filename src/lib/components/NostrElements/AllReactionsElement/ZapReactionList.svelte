@@ -39,14 +39,15 @@
   </div>
   {#each amounts as amount}
     <div
-      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex"
     >
-      ⚡️{amount}
-
-      {#each filterEventsByAmount(events, amount) as event (event.id)}
-        <PopupProfileIcon pubkey={pubkey(event) ?? ""} />
-        {#if event.content !== ""}{event.content}{/if}
-      {/each}
+      ⚡️ <div class="min-w-8 flex justify-center">{amount}</div>
+      <div class="flex-wrap px-2 gap-1">
+        {#each filterEventsByAmount(events, amount) as event (event.id)}
+          <PopupProfileIcon pubkey={pubkey(event) ?? ""} />
+          {#if event.content !== ""}{event.content}{/if}
+        {/each}
+      </div>
     </div>
   {/each}
 </div>
