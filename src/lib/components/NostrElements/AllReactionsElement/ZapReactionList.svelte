@@ -4,6 +4,7 @@
   import { decode } from "light-bolt11-decoder";
   import type { Profile } from "$lib/types";
   import Collapsible from "$lib/components/Elements/Collapsible.svelte";
+  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
 
   export let events: Nostr.Event[];
 
@@ -34,25 +35,18 @@
   };
 </script>
 
-<div class="border border-magnum-500 rounded-md break-all my-1">
-  <Collapsible>
-    <div slot="title" class="font-bold px-1">
-      Zap {events.length}
+<CollapsibleList title="Zap" bind:amount={events.length}>
+  {#each amounts as amount}
+    <div
+      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex"
+    >
+      ⚡️ <div class="min-w-8 flex justify-center">{amount}</div>
+      <div class="flex-wrap px-2 gap-1">
+        {#each filterEventsByAmount(events, amount) as event (event.id)}
+          <PopupProfileIcon pubkey={pubkey(event) ?? ""} />
+          {#if event.content !== ""}{event.content}{/if}
+        {/each}
+      </div>
     </div>
-    <div slot="contentEle">
-      {#each amounts as amount}
-        <div
-          class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex"
-        >
-          ⚡️ <div class="min-w-8 flex justify-center">{amount}</div>
-          <div class="flex-wrap px-2 gap-1">
-            {#each filterEventsByAmount(events, amount) as event (event.id)}
-              <PopupProfileIcon pubkey={pubkey(event) ?? ""} />
-              {#if event.content !== ""}{event.content}{/if}
-            {/each}
-          </div>
-        </div>
-      {/each}
-    </div>
-  </Collapsible>
-</div>
+  {/each}
+</CollapsibleList>

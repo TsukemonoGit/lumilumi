@@ -13,6 +13,7 @@
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import Collapsible from "$lib/components/Elements/Collapsible.svelte";
+  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
 
   export let data: {
     id: string;
@@ -59,37 +60,30 @@
           <ZapReactionList events={kind9735} />
 
           <!--kind1-->
-          <div class="border border-magnum-500 rounded-md break-all my-1">
-            <Collapsible>
-              <div slot="title" class="font-bold px-1">
-                Kind1 {kind1.length}
-              </div>
-              <div slot="contentEle">
-                {#each kind1 as event (event.id)}
-                  <div
-                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
-                  >
-                    <Metadata
-                      queryKey={["metadata", event.pubkey]}
-                      pubkey={event.pubkey}
-                      let:metadata
-                    >
-                      <div slot="loading">
-                        <EventCard note={event} status="loading" />
-                      </div>
-                      <div slot="nodata">
-                        <EventCard note={event} status="nodata" />
-                      </div>
-                      <div slot="error">
-                        <EventCard note={event} status="error" />
-                      </div>
-                      <EventCard {metadata} note={event} />
-                    </Metadata>
+          <CollapsibleList title="Kind1" amount={kind1.length}>
+            {#each kind1 as event (event.id)}
+              <div
+                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+              >
+                <Metadata
+                  queryKey={["metadata", event.pubkey]}
+                  pubkey={event.pubkey}
+                  let:metadata
+                >
+                  <div slot="loading">
+                    <EventCard note={event} status="loading" />
                   </div>
-                {/each}
-              </div></Collapsible
-            >
-          </div>
+                  <div slot="nodata">
+                    <EventCard note={event} status="nodata" />
+                  </div>
+                  <div slot="error">
+                    <EventCard note={event} status="error" />
+                  </div>
+                  <EventCard {metadata} note={event} />
+                </Metadata>
+              </div>
+            {/each}
+          </CollapsibleList>
         </AllReactions>
       </div>
     </SetSearchRelays>
