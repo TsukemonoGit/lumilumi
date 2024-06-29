@@ -6,13 +6,13 @@
   import { defaultRelays } from "$lib/stores/relays";
   import { queryClient } from "$lib/stores/stores";
   import { toRelaySet } from "$lib/stores/useRelaySet";
-  import Content from "$lib/components/NostrElements/Note/Content.svelte";
 
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
-  import PopupProfileIcon from "$lib/components/NostrElements/AllReactionsElement/PopupProfileIcon.svelte";
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
+  import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
+  import Collapsible from "$lib/components/Elements/Collapsible.svelte";
 
   export let data: {
     id: string;
@@ -50,16 +50,7 @@
           <div slot="error">error</div>
 
           <!--kind6-->
-          <div
-            class="border border-magnum-500 rounded-md break-all my-1 w-full"
-          >
-            <div class="font-bold px-1">Repost {kind6.length}</div>
-            <div class="px-4 py-1 flex flex-wrap gap-1">
-              {#each kind6 as event (event.id)}
-                <PopupProfileIcon pubkey={event.pubkey} />
-              {/each}
-            </div>
-          </div>
+          <NoteRepostList events={kind6} />
 
           <!--kind7-->
           <NoteReactionList events={kind7} />
@@ -69,29 +60,35 @@
 
           <!--kind1-->
           <div class="border border-magnum-500 rounded-md break-all my-1">
-            <div class="font-bold px-1">Kind1 {kind1.length}</div>
-            {#each kind1 as event (event.id)}
-              <div
-                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
-              >
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading">
-                    <EventCard note={event} status="loading" />
-                  </div>
-                  <div slot="nodata">
-                    <EventCard note={event} status="nodata" />
-                  </div>
-                  <div slot="error">
-                    <EventCard note={event} status="error" />
-                  </div>
-                  <EventCard {metadata} note={event} />
-                </Metadata>
+            <Collapsible>
+              <div slot="title" class="font-bold px-1">
+                Kind1 {kind1.length}
               </div>
-            {/each}
+              <div slot="contentEle">
+                {#each kind1 as event (event.id)}
+                  <div
+                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+                  >
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
+                    >
+                      <div slot="loading">
+                        <EventCard note={event} status="loading" />
+                      </div>
+                      <div slot="nodata">
+                        <EventCard note={event} status="nodata" />
+                      </div>
+                      <div slot="error">
+                        <EventCard note={event} status="error" />
+                      </div>
+                      <EventCard {metadata} note={event} />
+                    </Metadata>
+                  </div>
+                {/each}
+              </div></Collapsible
+            >
           </div>
         </AllReactions>
       </div>
