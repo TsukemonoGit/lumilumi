@@ -6,6 +6,15 @@ export const nip50relays = [
   "wss://relay.noswhere.com",
   "wss://bostr.nokotaro.com",
 ];
+
+export const mediaUploader = [
+  "https://nostrcheck.me",
+  "https://nostr.build",
+  "https://void.cat",
+  "https://files.sovbit.host",
+  "https://nostpic.com",
+  "https://yabu.me",
+];
 //https://api.nostr.watch/v1/nip/50
 export const relayRegex = /^wss?:\/\/\S+$/g;
 //export const nip33RegexG = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/g;
