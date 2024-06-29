@@ -3,10 +3,12 @@
 
   import { nip33Regex } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
-  import Metadata from "../NostrMainData/Metadata.svelte";
-  import Text from "../NostrMainData/Text.svelte";
-  import LatestEvent from "../NostrMainData/LatestEvent.svelte";
   import EventCard from "./EventCard.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+
+  import Text from "$lib/components/NostrMainData/Text.svelte";
+
   //tagはaかe
   export let tag: string[];
   export let kind: number | undefined;

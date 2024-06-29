@@ -1,6 +1,6 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
-  import Settings from "$lib/components/Settings.svelte";
+  import Settings from "$lib/components/SettingsElements/Settings.svelte";
   import Github from "./Github.svelte";
 </script>
 

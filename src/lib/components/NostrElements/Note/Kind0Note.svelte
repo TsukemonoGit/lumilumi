@@ -1,10 +1,10 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import UserMenu from "../Elements/UserMenu.svelte";
   import { profile } from "$lib/func/util";
   import { _ } from "svelte-i18n";
   import Content from "./Content.svelte";
   import FollowButton from "./FollowButton.svelte";
+  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
 
   export let note: Nostr.Event;
 </script>

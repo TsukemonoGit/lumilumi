@@ -11,19 +11,19 @@
   import Content from "./Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import WarningHide2 from "../Elements/WarningHide2.svelte";
   import { formatAbsoluteDate, nip33Regex, profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy } from "svelte";
-  import ProxyTag from "../Elements/ProxyTag.svelte";
-  import UserMenu from "../Elements/UserMenu.svelte";
-  import LatestEvent from "../NostrMainData/LatestEvent.svelte";
 
-  import Link from "../Elements/Link.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import Kind0Note from "./Kind0Note.svelte";
+  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
+  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
+  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
+  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;

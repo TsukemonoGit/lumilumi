@@ -6,8 +6,8 @@
     getQueryRelays,
   } from "$lib/func/settings";
   import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
-  import Dialog from "./Elements/Dialog.svelte";
   import { nowProgress, showImg } from "$lib/stores/stores";
+  import Dialog from "../Elements/Dialog.svelte";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;

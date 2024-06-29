@@ -20,8 +20,7 @@
   class="hover:opacity-75 active:opacity-50 text-magnum-500"
   use:melt={$trigger}
   aria-label="Update dimensions"
->
-  <slot />
+  ><slot />
   <span class="sr-only">Open Popover</span>
 </button>
 

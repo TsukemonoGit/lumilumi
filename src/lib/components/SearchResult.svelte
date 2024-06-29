@@ -2,18 +2,18 @@
   import { createRxBackwardReq, createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Metadata from "./NostrMainData/Metadata.svelte";
-  import EventCard from "./Note/EventCard.svelte";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import { onDestroy, onMount } from "svelte";
 
-  import NostrMain from "./NostrMain.svelte";
+  import NostrMain from "./NostrMainData/NostrMain.svelte";
   import { queryClient } from "$lib/stores/stores";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import SetSearchRelays from "./NostrMainData/SetSearchRelays.svelte";
   import { toRelaySet } from "$lib/stores/useRelaySet";
 
   import { nip50relays } from "$lib/func/util";
+  import EventCard from "./NostrElements/Note/EventCard.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;

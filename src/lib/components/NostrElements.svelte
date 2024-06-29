@@ -4,11 +4,11 @@
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import Contacts from "./NostrMainData/Contacts.svelte";
   import Metadata from "./NostrMainData/Metadata.svelte";
-  import EventCard from "./Note/EventCard.svelte";
-  import NostrMain from "./NostrMain.svelte";
+  import NostrMain from "./NostrMainData/NostrMain.svelte";
   import { setFollowingList, pubkeysIn } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
+  import EventCard from "./NostrElements/Note/EventCard.svelte";
 
   let amount = 50;
   let viewIndex = 0;

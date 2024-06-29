@@ -8,7 +8,7 @@
   import { publishEvent } from "$lib/func/nostr";
   import { emojis, showImg, showPreview } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
-  import Content from "./Note/Content.svelte";
+  import Content from "./NostrElements/Note/Content.svelte";
 
   let text: string = "";
   let tags: string[][] = [];

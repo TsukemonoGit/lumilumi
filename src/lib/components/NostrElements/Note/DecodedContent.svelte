@@ -3,9 +3,10 @@
   import Note from "./Note.svelte";
   import UserName from "./UserName.svelte";
   import { Quote } from "lucide-svelte";
-  import LatestEvent from "../NostrMainData/LatestEvent.svelte";
   import EventCard from "./EventCard.svelte";
-  import Metadata from "../NostrMainData/Metadata.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+
   export let content: string | undefined;
   export let decoded:
     | {

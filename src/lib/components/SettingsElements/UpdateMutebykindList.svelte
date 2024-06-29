@@ -6,9 +6,9 @@
     getQueryRelays,
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
-  import Dialog from "./Elements/Dialog.svelte";
   import { nip19 } from "nostr-tools";
   import { nowProgress } from "$lib/stores/stores";
+  import Dialog from "../Elements/Dialog.svelte";
 
   export let pubkey: string;
   export let mutebykindList:

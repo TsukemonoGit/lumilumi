@@ -8,8 +8,8 @@
     showImg,
     showPreview,
   } from "$lib/stores/stores";
-  import NostrElements from "./NostrElements.svelte";
-  import OpenPostWindow from "./OpenPostWindow.svelte";
+  import NostrElements from "../NostrElements.svelte";
+  import OpenPostWindow from "../OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
   import {
     setRxNostr,

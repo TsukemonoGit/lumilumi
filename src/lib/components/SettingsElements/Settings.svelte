@@ -4,7 +4,7 @@
   import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
-  import ThemeSwitch from "./Elements/ThemeSwitch/ThemeSwitch.svelte";
+  import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
     emojis,
     loginUser,
@@ -18,11 +18,11 @@
   import { relayRegex } from "$lib/func/util";
   import type { LumiSetting, MuteList } from "$lib/types";
   import { _ } from "svelte-i18n";
-  import UpdateEmojiList from "./UpdateEmojiList.svelte";
-  import UpdateMuteList from "./UpdateMuteList.svelte";
-  import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import { beforeNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
+  import UpdateEmojiList from "./UpdateEmojiList.svelte";
+  import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
+  import UpdateMuteList from "./UpdateMuteList.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const DELETE_STORAGE_KEY = "relaySettings";

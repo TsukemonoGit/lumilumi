@@ -1,15 +1,15 @@
 <script lang="ts">
-  import NostrMain from "$lib/components/NostrMain.svelte";
+  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import EventCard from "$lib/components/Note/EventCard.svelte";
   import { createRxForwardReq } from "rx-nostr";
   import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
   import type { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId } from "$lib/func/nostr";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   export let data: {
     pubkey: string;
   };

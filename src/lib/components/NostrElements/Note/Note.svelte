@@ -1,8 +1,9 @@
 <script lang="ts">
-  import Text from "../NostrMainData/Text.svelte";
-  import Metadata from "../NostrMainData/Metadata.svelte";
   import { nip19 } from "nostr-tools";
   import EventCard from "./EventCard.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+
+  import Text from "$lib/components/NostrMainData/Text.svelte";
   export let id: string;
   export let mini: boolean = false;
 </script>

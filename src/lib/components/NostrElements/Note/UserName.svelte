@@ -1,8 +1,8 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
 
-  import Metadata from "../NostrMainData/Metadata.svelte";
   import { profile } from "$lib/func/util";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   export let pubhex: string;
 </script>
 

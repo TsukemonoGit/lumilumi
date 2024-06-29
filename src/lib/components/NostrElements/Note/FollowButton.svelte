@@ -23,10 +23,10 @@
   import { pipe } from "rxjs";
 
   import * as Nostr from "nostr-typedef";
-  import AlertDialog from "../Elements/AlertDialog.svelte";
   import { writable } from "svelte/store";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
   export let pubkey: string;
 

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import NostrMain from "$lib/components/NostrMain.svelte";
+  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import EventCard from "$lib/components/Note/EventCard.svelte";
   import { createRxForwardReq } from "rx-nostr";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
 
   let amount = 50;
   let viewIndex = 0;

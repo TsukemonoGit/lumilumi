@@ -3,7 +3,7 @@
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
   import { showImg } from "$lib/stores/stores";
-  import Link from "../Elements/Link.svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
 
   export let text: string;
   export let tags: string[][];
