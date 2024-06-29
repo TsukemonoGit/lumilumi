@@ -5,19 +5,35 @@
   import { Check, ChevronDown } from "lucide-svelte";
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  export let defaultValue: string | undefined;
 
+  export let defaultValue: string | undefined;
   export let selectedUploader: string;
-  const options = mediaUploader.map((url) => ({
-    value: new URL(url).hostname,
+
+  const options = mediaUploader.map((url, index) => ({
+    value: url,
+    label: getHostname(url),
   }));
 
+  console.log(defaultValue);
+  console.log(options);
+
+  function getHostname(url: string): string {
+    console.log(url);
+    try {
+      return new URL(url).hostname;
+    } catch (error) {
+      console.error(`Invalid URL: ${url}`);
+      return "Invalid URL";
+    }
+  }
+
   const {
-    elements: { trigger, menu, option, group, groupLabel, label },
-    states: { selectedLabel, open },
+    elements: { trigger, menu, option },
+    states: { selected, selectedLabel, open },
     helpers: { isSelected },
   } = createSelect<string>({
     forceVisible: true,
+
     positioning: {
       placement: "bottom",
       fitViewport: true,
@@ -25,51 +41,43 @@
     },
   });
 
-  $: selectedUploader = $selectedLabel;
-  $: if ($selectedLabel) {
-    localStorage.setItem("uploader", $selectedLabel);
+  $: if ($selected) {
+    selectedUploader = $selected.value;
+    localStorage?.setItem("uploader", selectedUploader);
   }
-  $: console.log($selectedLabel);
-  $: console.log(defaultValue);
-  $: console.log(options[0].value);
 </script>
 
 <div class="flex flex-col gap-1 w-full">
   <button
     class="flex h-8 min-w-[220px] items-center justify-between rounded-lg bg-white px-3 py-2
-  text-magnum-700 shadow transition-opacity hover:opacity-90"
+    text-magnum-700 shadow transition-opacity hover:opacity-90"
     use:melt={$trigger}
     aria-label="Food"
   >
-    {$selectedLabel
-      ? $selectedLabel
-      : defaultValue
-        ? defaultValue
-        : options[0].value}
+    {$selected?.label ?? options[0].label}
     <ChevronDown class="size-5" />
   </button>
   {#if $open}
     <div
-      class=" z-[60] flex max-h-[300px] flex-col
-    overflow-y-auto rounded-lg bg-white p-1
-    shadow focus:!ring-0"
+      class="z-[60] flex max-h-[300px] flex-col
+      overflow-y-auto rounded-lg bg-white p-1
+      shadow focus:!ring-0"
       use:melt={$menu}
       transition:fade={{ duration: 150 }}
     >
       {#each options as item}
         <div
           class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-800
-              hover:bg-magnum-100 focus:z-10
-              focus:text-magnum-700
-              data-[highlighted]:bg-magnum-200 data-[highlighted]:text-magnum-900
-              data-[disabled]:opacity-50"
+          hover:bg-magnum-100 focus:z-10
+          focus:text-magnum-700
+          data-[highlighted]:bg-magnum-200 data-[highlighted]:text-magnum-900
+          data-[disabled]:opacity-50"
           use:melt={$option({ value: item.value })}
         >
           <div class="check {$isSelected(item.value) ? 'block' : 'hidden'}">
             <Check class="size-4" />
           </div>
-
-          {item.value}
+          {item.label}
         </div>
       {/each}
     </div>

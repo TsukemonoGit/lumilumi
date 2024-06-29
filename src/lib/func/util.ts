@@ -1,6 +1,11 @@
 import type { Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
-
+import {
+  readServerConfig,
+  uploadFile,
+  type FileUploadResponse,
+} from "nostr-tools/nip96";
+import { getToken } from "nostr-tools/nip98";
 export const nip50relays = [
   "wss://search.nos.today",
   "wss://relay.noswhere.com",
@@ -98,4 +103,25 @@ export function formatAbsoluteDate(
   }
 
   return date.toLocaleString([], options);
+}
+
+export async function filesUpload(files: FileList, uploader: string) {
+  console.log(files, uploader);
+  let res: FileUploadResponse[] = [];
+  [...files].map(async (file) => {
+    const serverConfig = await readServerConfig(uploader);
+    const header = await getToken(
+      serverConfig.api_url,
+      "POST",
+      (e) => (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+      true
+    );
+    const response: FileUploadResponse = await uploadFile(
+      file,
+      uploader,
+      header
+    );
+    res.push(response);
+  });
+  return res;
 }
