@@ -108,20 +108,33 @@ export function formatAbsoluteDate(
 export async function filesUpload(files: FileList, uploader: string) {
   console.log(files, uploader);
   let res: FileUploadResponse[] = [];
-  [...files].map(async (file) => {
-    const serverConfig = await readServerConfig(uploader);
-    const header = await getToken(
-      serverConfig.api_url,
-      "POST",
-      (e) => (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-      true
-    );
-    const response: FileUploadResponse = await uploadFile(
-      file,
-      uploader,
-      header
-    );
-    res.push(response);
-  });
-  return res;
+  for (const file of files) {
+    try {
+      const serverConfig = await readServerConfig(uploader);
+      console.log(serverConfig);
+      const header = await getToken(
+        serverConfig.api_url,
+        "POST",
+        (e) => (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+        true
+      );
+      console.log(file);
+      console.log(header);
+      console.log(serverConfig.api_url);
+      const response: FileUploadResponse = await uploadFile(
+        file,
+        serverConfig.api_url,
+        header
+      );
+      console.log(response);
+      res.push(response);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      res.push({
+        status: "error",
+        message: "Failed to upload file: " + file.name,
+      } as FileUploadResponse);
+    }
+    return res;
+  }
 }
