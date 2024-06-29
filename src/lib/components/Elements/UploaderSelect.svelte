@@ -54,7 +54,9 @@
     use:melt={$trigger}
     aria-label="Food"
   >
-    {$selected?.label ?? options[0].label}
+    {$selected?.label ?? defaultValue !== undefined
+      ? getHostname(defaultValue ?? "")
+      : options[0].label}
     <ChevronDown class="size-5" />
   </button>
   {#if $open}

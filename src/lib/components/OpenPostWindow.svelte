@@ -1,16 +1,7 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  /** Internal helpers */
-
   import { fade } from "svelte/transition";
-  import {
-    X,
-    SquarePen,
-    SmilePlus,
-    Send,
-    TriangleAlert,
-    Image,
-  } from "lucide-svelte";
+  import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import {
@@ -27,47 +18,37 @@
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
-  let defaultValue: string | undefined;
-  onMount(() => {
-    if (browser) {
-      const tmp = localStorage.getItem("uploader");
-      if (tmp) {
-        defaultValue = tmp;
-      }
-    }
-  });
 
+  let defaultValue: string | undefined;
   let text: string = "";
   let tags: string[][] = [];
   let cursorPosition: number = 0;
-  const {
-    elements: {
-      trigger,
-      overlay,
-      content,
-      title,
-      description,
-      close,
-      portalled,
-    },
-    states: { open },
-  } = createDialog({
-    forceVisible: true,
-  });
-
   let onWarning: boolean;
   let warningText = "";
+  let customReaction: string = "";
+  let viewCustomEmojis: boolean;
+  let selectedUploader: string;
+  let files: FileList | undefined;
+  let fileInput: HTMLInputElement | undefined;
+
+  const { elements, states } = createDialog({ forceVisible: true });
+  const { trigger, overlay, content, close, portalled } = elements;
+  const { open } = states;
+
+  onMount(() => {
+    if (browser) {
+      const tmp = localStorage.getItem("uploader");
+      if (tmp) defaultValue = tmp;
+    }
+  });
 
   const postNote = async () => {
-    console.log(text);
     if (text.trim().length > 0) {
       const { text: checkedText, tags: checkedTags } = contentCheck(
         text.trim(),
         tags
       );
-      if (onWarning) {
-        checkedTags.push(["content-warning", warningText]);
-      }
+      if (onWarning) checkedTags.push(["content-warning", warningText]);
       const newev: Nostr.EventParameters = {
         kind: 1,
         content: checkedText,
@@ -75,67 +56,48 @@
       };
 
       publishEvent(newev);
-
-      // ダイアログを閉じる
       $open = false;
     }
   };
 
-  // ダイアログが閉じるときにtextをリセットtagもリセット
   $: if (!$open) {
+    resetState();
+  }
+
+  const resetState = () => {
     text = "";
     tags = [];
     warningText = "";
     onWarning = false;
     viewCustomEmojis = false;
-  }
+  };
 
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;
     cursorPosition = target.selectionStart;
   };
 
-  let customReaction: string = "";
-  let viewCustomEmojis: boolean;
   const handleClickEmoji = (e: string[]) => {
     const emojiTag = ["emoji", ...e];
     if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
       tags.push(emojiTag);
     }
-    // カーソル位置にテキストを挿入
     const emojiText = `:${e[0]}:`;
     text =
       text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
     cursorPosition += emojiText.length;
   };
 
-  let selectedUploader: string;
-  $: console.log(selectedUploader);
-  $: if (selectedUploader) {
-    defaultValue = selectedUploader;
-  }
-
-  const handleClickImage = () => {};
-  let files: FileList | undefined;
-  let fileInput: HTMLInputElement | undefined;
-  $: console.log(files);
-  $: console.log(fileInput);
-
-  async function onChangeHandler(e: Event): Promise<void> {
-    const _files = (e.target as HTMLInputElement).files;
-    console.log("file data:", _files);
-    if (!_files || _files.length <= 0 || !defaultValue) {
-      return;
-    }
+  const handleFileUpload = async (fileList: FileList) => {
+    if (!fileList || fileList.length <= 0 || !defaultValue) return;
     $nowProgress = true;
     const uploadedURPs: FileUploadResponse[] = await filesUpload(
-      _files,
+      fileList,
       defaultValue
     );
     console.log(uploadedURPs);
-    uploadedURPs.map((data) => {
+    uploadedURPs.forEach((data) => {
       if (data.status === "success") {
-        console.log(data.nip94_event);
         const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
         if (url) {
           text =
@@ -145,6 +107,39 @@
       }
     });
     $nowProgress = false;
+  };
+
+  const onChangeHandler = async (e: Event): Promise<void> => {
+    const _files = (e.target as HTMLInputElement).files;
+    if (_files) {
+      await handleFileUpload(_files);
+    }
+  };
+
+  const paste = async (event: ClipboardEvent) => {
+    console.log("[paste]", event.type, event.clipboardData);
+    if (!event.clipboardData) return;
+
+    const files = [...event.clipboardData.items]
+      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((file): file is File => file !== null);
+
+    const fileList = new DataTransfer();
+    files.forEach((file) => fileList.items.add(file));
+    await handleFileUpload(fileList.files);
+  };
+
+  $: console.log(selectedUploader);
+  $: if (selectedUploader) {
+    defaultValue = selectedUploader;
+  }
+
+  let textarea: HTMLTextAreaElement;
+
+  $: if ($open) {
+    //開いたときにフォーカス
+    textarea?.focus();
   }
 </script>
 
@@ -175,29 +170,28 @@
         >
           <div class="font-medium">preview</div>
           <div
-            class="rounded-md border-magnum-500 border min-h-4 max-h-24 overflow-y-auto"
+            class="content rounded-md border-magnum-500 border min-h-4 max-h-28 overflow-y-auto"
           >
             <Content bind:text bind:tags />
           </div>
         </div>
       {/if}
-      <div
-        class="rounded-md bg-neutral-900
-p-6 shadow-lg"
-      >
+      <div class="rounded-md bg-neutral-900 p-6 shadow-lg">
         <div class="flex flex-row gap-2 mb-2">
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
-          <UploaderSelect {defaultValue} bind:selectedUploader />
+          <UploaderSelect bind:defaultValue bind:selectedUploader />
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
             class="inline-flex h-24 w-full flex-1 items-center justify-center
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800"
             id="note"
+            bind:this={textarea}
             bind:value={text}
             on:input={handleTextareaInput}
             on:click={handleTextareaInput}
+            on:paste={paste}
             placeholder="いま どうしてる？"
           />
         </fieldset>
