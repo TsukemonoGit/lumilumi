@@ -6,6 +6,7 @@
     Ellipsis,
     FileJson2,
     SquareArrowOutUpRight,
+    Notebook,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -13,6 +14,7 @@
   import { nip19 } from "nostr-tools";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import { goto } from "$app/navigation";
 
   export let note: Nostr.Event;
   let dialogOpen: any;
@@ -34,6 +36,7 @@
       { text: "View Json", icon: FileJson2, num: 0 },
       { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
       { text: "Google Translate", icon: Earth, num: 2 },
+      { text: "Goto Note Page", icon: Notebook, num: 4 },
     ];
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index]);
@@ -90,6 +93,9 @@
           };
         }
         break;
+      case 4:
+        //Goto Note page
+        goto(`/${replaceable ? naddr : nevent}`);
     }
   };
 </script>
