@@ -3,12 +3,39 @@
   /** Internal helpers */
 
   import { fade } from "svelte/transition";
-  import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
+  import {
+    X,
+    SquarePen,
+    SmilePlus,
+    Send,
+    TriangleAlert,
+    Image,
+  } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
-  import { emojis, showImg, showPreview } from "$lib/stores/stores";
+  import {
+    emojis,
+    nowProgress,
+    showImg,
+    showPreview,
+  } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import Content from "./NostrElements/Note/Content.svelte";
+  import UploaderSelect from "./Elements/UploaderSelect.svelte";
+  import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import MediaPicker from "./Elements/MediaPicker.svelte";
+  import { filesUpload } from "$lib/func/util";
+  import type { FileUploadResponse } from "nostr-tools/nip96";
+  let defaultValue: string | undefined;
+  onMount(() => {
+    if (browser) {
+      const tmp = localStorage.getItem("uploader");
+      if (tmp) {
+        defaultValue = tmp;
+      }
+    }
+  });
 
   let text: string = "";
   let tags: string[][] = [];
@@ -81,14 +108,52 @@
       text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
     cursorPosition += emojiText.length;
   };
+
+  let selectedUploader: string;
+  $: console.log(selectedUploader);
+  $: if (selectedUploader) {
+    defaultValue = selectedUploader;
+  }
+
+  const handleClickImage = () => {};
+  let files: FileList | undefined;
+  let fileInput: HTMLInputElement | undefined;
+  $: console.log(files);
+  $: console.log(fileInput);
+
+  async function onChangeHandler(e: Event): Promise<void> {
+    const _files = (e.target as HTMLInputElement).files;
+    console.log("file data:", _files);
+    if (!_files || _files.length <= 0 || !defaultValue) {
+      return;
+    }
+    $nowProgress = true;
+    const uploadedURPs: FileUploadResponse[] = await filesUpload(
+      _files,
+      defaultValue
+    );
+    console.log(uploadedURPs);
+    uploadedURPs.map((data) => {
+      if (data.status === "success") {
+        console.log(data.nip94_event);
+        const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+        if (url) {
+          text =
+            text.slice(0, cursorPosition) + url + text.slice(cursorPosition);
+          cursorPosition += url.length;
+        }
+      }
+    });
+    $nowProgress = false;
+  }
 </script>
 
 <button
   use:melt={$trigger}
-  class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3
+  class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3.5
   font-medium leading-none text-magnum-700 shadow hover:opacity-75"
 >
-  <SquarePen />
+  <SquarePen size={28} />
 </button>
 
 {#if $open}
@@ -103,7 +168,7 @@
             max-w-[450px] -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      {#if $showImg && $showPreview}
+      {#if $showImg && $showPreview && text !== ""}
         <div
           class="rounded-md bg-neutral-900
             p-6 shadow-lg mb-4"
@@ -120,8 +185,11 @@
         class="rounded-md bg-neutral-900
 p-6 shadow-lg"
       >
-        <h2 use:melt={$title} class="m-0 text-lg font-medium">Post Note</h2>
+        <div class="flex flex-row gap-2 mb-2">
+          <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
+          <UploaderSelect {defaultValue} bind:selectedUploader />
+        </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
             class="inline-flex h-24 w-full flex-1 items-center justify-center
@@ -144,19 +212,21 @@ p-6 shadow-lg"
             />
           </div>
         {:else}<div class="h-4" />{/if}
+
         <div class="mt-2 flex justify-between">
           <button
             on:click={() => {
               onWarning = !onWarning;
             }}
             class=" h-8 rounded-sm
-                bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+                bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 focus:opacity-50"
           >
             <TriangleAlert
               size="20"
               class="stroke-magnum-500 {onWarning ? 'fill-magnum-700 ' : ''}"
             />
           </button>
+
           <div class=" flex gap-4">
             {#if $emojis && $emojis.length > 0}
               {#if viewCustomEmojis}
@@ -172,7 +242,7 @@ p-6 shadow-lg"
                   viewCustomEmojis = !viewCustomEmojis;
                 }}
                 class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 focus:opacity-50"
               >
                 <SmilePlus
                   size="20"
@@ -185,7 +255,7 @@ p-6 shadow-lg"
 
             <button
               class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 focus:opacity-50"
               on:click={postNote}
             >
               <Send size="20" />
@@ -220,11 +290,11 @@ p-6 shadow-lg"
         <button
           use:melt={$close}
           aria-label="close"
-          class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-magnum-800
+          class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
+                items-center justify-center rounded-full text-magnum-800
                 hover:bg-magnum-100 focus:shadow-magnum-400"
         >
-          <X class="size-4" />
+          <X size={32} />
         </button>
       </div>
     </div>
