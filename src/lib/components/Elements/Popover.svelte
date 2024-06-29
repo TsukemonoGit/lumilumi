@@ -57,6 +57,6 @@
   }
 
   .content {
-    @apply z-20 rounded-[4px] bg-neutral-800 p-2 shadow-md;
+    @apply z-20 rounded-[4px] bg-neutral-800 p-2 shadow-md max-w-[90%];
   }
 </style>

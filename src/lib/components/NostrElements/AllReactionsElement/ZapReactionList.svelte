@@ -34,7 +34,7 @@
 </script>
 
 <div class="border border-magnum-500 rounded-md break-all my-1">
-  <div class="font-bold">
+  <div class="font-bold px-1">
     Zap {events.length}
   </div>
   {#each amounts as amount}

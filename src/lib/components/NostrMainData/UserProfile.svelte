@@ -84,8 +84,8 @@
 
         {#if profile.about}
           <div
-            class="whitespace-pre-wrap break-words max-h-72 overflow-y-auto mx-4 p-2 rounded-sm"
-            style="word-break: break-word;"
+            class="whitespace-pre-wrap break-words overflow-y-auto mx-4 p-2 rounded-sm"
+            style="word-break: break-word; max-height:{bannerHeight}px"
           >
             <Content text={profile.about} tags={metadata.tags} />
           </div>
