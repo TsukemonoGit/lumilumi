@@ -49,7 +49,11 @@ export function useAllReactions(
   const onHit = (packet: EventPacket): void => {
     //  console.log(`${packet.event.id} はすでに観測されています`);
   };
-  const filters = [{ "#e": [id] }, { "#q": [id] }];
+
+  const filters = [
+    { kinds: [1, 6, 7, 9735], "#e": [id] },
+    { kinds: [1, 6, 7, 9735], "#q": [id] },
+  ];
   console.log(filters);
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   const operator = pipe(uniq, verify(), scanArray());

@@ -10,7 +10,7 @@
     return events.filter((event) => (event.content || "+") === content);
   };
 
-  const uniqueContents = [
+  $: uniqueContents = [
     ...new Set(events.map((event) => event.content || "+")),
   ].sort(); // Get unique contents and sort them
 

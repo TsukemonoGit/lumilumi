@@ -20,7 +20,7 @@
     return events.filter((event) => getAmount(event) === amount);
   };
 
-  const amounts = [...new Set(events.map(getAmount))].sort((a, b) => b - a); // Sort amounts in descending order
+  $: amounts = [...new Set(events.map(getAmount))].sort((a, b) => b - a); // Sort amounts in descending order
 
   const pubkey = (event: Nostr.Event): string | undefined => {
     try {

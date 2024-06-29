@@ -27,7 +27,6 @@
       kind6: Nostr.Event[];
       kind7: Nostr.Event[];
       kind9735: Nostr.Event[];
-      other: Nostr.Event[];
       status: ReqStatus;
     };
     loading: Record<never, never>;
@@ -46,15 +45,6 @@
     kind9735={$data
       ?.map(({ event }) => event)
       .filter((event) => event.kind === 9735)}
-    other={$data
-      ?.map(({ event }) => event)
-      .filter(
-        (event) =>
-          event.kind !== 6 &&
-          event.kind !== 7 &&
-          event.kind !== 1 &&
-          event.kind !== 9735
-      )}
     status={$status}
   />
 {:else if $status === "loading"}

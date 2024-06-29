@@ -44,7 +44,6 @@
           let:kind6
           let:kind7
           let:kind9735
-          let:other
         >
           <div slot="loading">loading</div>
           <div slot="nodata">nodata</div>
@@ -74,33 +73,6 @@
             {#each kind1 as event (event.id)}
               <div class="border border-magnum-500 rounded-md break-all my-1">
                 <Content text={event.content} tags={event.tags} />
-              </div>
-            {/each}
-          </div>
-
-          <!--他-->
-          <div class="border border-magnum-500 rounded-md break-all my-1">
-            <div class="font-bold">Other {other.length}</div>
-            {#each other as event (event.id)}
-              <div
-                class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
-              >
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading">
-                    <EventCard note={event} status="loading" />
-                  </div>
-                  <div slot="nodata">
-                    <EventCard note={event} status="nodata" />
-                  </div>
-                  <div slot="error">
-                    <EventCard note={event} status="error" />
-                  </div>
-                  <EventCard {metadata} note={event} />
-                </Metadata>
               </div>
             {/each}
           </div>
