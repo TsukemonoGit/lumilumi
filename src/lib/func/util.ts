@@ -1,11 +1,8 @@
 import type { Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
-import {
-  readServerConfig,
-  uploadFile,
-  type FileUploadResponse,
-} from "nostr-tools/nip96";
+import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
 import { getToken } from "nostr-tools/nip98";
+import { uploadFile } from "./upload";
 export const nip50relays = [
   "wss://search.nos.today",
   "wss://relay.noswhere.com",
@@ -105,7 +102,10 @@ export function formatAbsoluteDate(
   return date.toLocaleString([], options);
 }
 
-export async function filesUpload(files: FileList, uploader: string) {
+export async function filesUpload(
+  files: FileList,
+  uploader: string
+): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
   let res: FileUploadResponse[] = [];
   for (const file of files) {
@@ -115,16 +115,18 @@ export async function filesUpload(files: FileList, uploader: string) {
       const header = await getToken(
         serverConfig.api_url,
         "POST",
-        (e) => (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+        async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
         true
       );
       console.log(file);
       console.log(header);
       console.log(serverConfig.api_url);
+      console.log(file.type);
       const response: FileUploadResponse = await uploadFile(
         file,
         serverConfig.api_url,
-        header
+        header,
+        { content_type: file.type }
       );
       console.log(response);
       res.push(response);
@@ -135,6 +137,6 @@ export async function filesUpload(files: FileList, uploader: string) {
         message: "Failed to upload file: " + file.name,
       } as FileUploadResponse);
     }
-    return res;
   }
+  return res;
 }
