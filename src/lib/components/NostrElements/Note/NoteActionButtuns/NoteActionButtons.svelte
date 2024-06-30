@@ -356,7 +356,7 @@
             />
           </button>
         {:else}
-          <Reaction {event} />
+          <div class=" max-w-[40%]"><Reaction {event} /></div>
         {/if}
       </Reactioned>
       <!--カスタムリアクション-->

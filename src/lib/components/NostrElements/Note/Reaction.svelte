@@ -32,7 +32,7 @@
         {#if $showImg}
           <img
             loading="lazy"
-            alt={emoji.alt}
+            alt={`:${emoji.alt}:`}
             src={emoji.url}
             height="20"
             class="h-[20px] object-contain"

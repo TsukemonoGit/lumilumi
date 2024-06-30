@@ -87,7 +87,7 @@
     {#if $showImg}
       <img
         loading="lazy"
-        alt={part.content}
+        alt={`:${part.content}:`}
         src={part.url}
         class="inline h-[24px] object-contain m-0 overflow-hidden"
       />

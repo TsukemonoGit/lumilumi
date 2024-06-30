@@ -270,7 +270,7 @@
     {:else if note.kind === 7}
       <!--リアクション-->
       <div class="flex gap-1">
-        <div class="w-fit"><Reaction event={note} /></div>
+        <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
         <div class="self-center">
           <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
         </div>
