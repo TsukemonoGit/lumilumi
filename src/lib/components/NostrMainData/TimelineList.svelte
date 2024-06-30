@@ -31,7 +31,7 @@
         RxReqPipeable)
     | undefined = undefined;
   export let viewIndex: number;
-  export let amount: number;
+  export let amount: number; //1ページに表示する量
   export let eventFilter: (event: EventPacket) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
 
@@ -71,14 +71,15 @@
   }
 
   const handleNext = async () => {
-    if ($data && $data.length > 1 && $data.length < viewIndex + 20 + amount) {
+    if ($data && $data.length > 1 && $data.length < viewIndex + 20 + 10) {
+      //新しく表示される最後の予定インデックスよりデータが少なかったらロードする+10は初期#pの方の文の影響が荒れしないように...
       $nowProgress = true;
       const older = await loadOlderEvents(slicedEvent, filters, queryKey);
       olderEvents.push(...older);
       updateViewEvent($data);
       $nowProgress = false;
     }
-    viewIndex += 20;
+    viewIndex += 20; //スライドする量
   };
 
   const handlePrev = () => {

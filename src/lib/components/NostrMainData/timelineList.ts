@@ -7,6 +7,8 @@ import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, verify, type EventPacket } from "rx-nostr";
 import { pipe } from "rxjs";
 import * as Nostr from "nostr-typedef";
+import { get } from "svelte/store";
+import { loginUser } from "$lib/stores/stores";
 
 export async function loadOlderEvents(
   data: Nostr.Event[],
@@ -14,7 +16,13 @@ export async function loadOlderEvents(
   queryKey: QueryKey
 ): Promise<EventPacket[]> {
   if (data && data.length > 1) {
-    const kind1 = data.filter((item) => item.kind == 1);
+    const kind1 = data.filter(
+      (item) =>
+        item.kind === 1 &&
+        !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
+    ); //通知こないたいぷのkind1の最後
+    console.log(kind1.length);
+    console.log(kind1[kind1.length - 1]);
     if (kind1.length === 0) {
       return [];
     }
@@ -33,7 +41,7 @@ export async function loadOlderEvents(
         : [
             {
               ...filters[0],
-              limit: 20,
+              limit: 30,
               until: kind1[kind1.length - 1].created_at,
               since: undefined,
             },

@@ -10,7 +10,7 @@
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
 
-  let amount = 50;
+  let amount = 50; //1ページに表示する量
   let viewIndex = 0;
 </script>
 
