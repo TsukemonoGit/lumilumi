@@ -11,13 +11,15 @@
   import { MessagesSquare } from "lucide-svelte";
   import Text from "$lib/components/NostrMainData/Text.svelte";
   import type { ChannelData } from "$lib/types";
+  import { getRelaysById } from "$lib/func/nostr";
+  import { goto } from "$app/navigation";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
-
+  const size = 18;
   const replyedEvent = (
     tags: string[][]
   ): { replyID: string | undefined; replyUsers: string[] } => {
@@ -52,6 +54,17 @@
       return undefined;
     }
   };
+
+  const handleClickToChannel = () => {
+    if (!heyaId) {
+      return;
+    }
+    const neventPointer: nip19.EventPointer = {
+      id: heyaId,
+      relays: getRelaysById(heyaId),
+    };
+    goto(`/channel/${nip19.neventEncode(neventPointer)}`);
+  };
 </script>
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
@@ -72,18 +85,39 @@
 {/await}
 {#if heyaId}
   <Text queryKey={["timeline", heyaId]} id={heyaId} let:text>
-    <div slot="loading" class="flex justify-end"><MessagesSquare />kind:42</div>
-    <div slot="nodata" class="flex justify-end"><MessagesSquare />kind:42</div>
-    <div slot="error" class="flex justify-end"><MessagesSquare />kind:42</div>
+    <button
+      on:click={handleClickToChannel}
+      slot="loading"
+      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+      ><MessagesSquare {size} class="mr-1" />kind:42</button
+    >
+    <button
+      on:click={handleClickToChannel}
+      slot="nodata"
+      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+      ><MessagesSquare {size} class="mr-1" />kind:42</button
+    >
+    <button
+      on:click={handleClickToChannel}
+      slot="error"
+      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+      ><MessagesSquare {size} class="mr-1" />kind:42</button
+    >
     {#await getContent(text) then channelData}
       {#if channelData}
-        <div class="flex justify-end">
-          <MessagesSquare />{channelData.name}
-        </div>
+        <button
+          on:click={handleClickToChannel}
+          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        >
+          <MessagesSquare {size} class="mr-1" />{channelData.name}
+        </button>
       {:else}
-        <div class="flex justify-end">
-          <MessagesSquare />kind:42
-        </div>
+        <button
+          on:click={handleClickToChannel}
+          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        >
+          <MessagesSquare {size} class="mr-1" />kind:42
+        </button>
       {/if}
     {/await}
   </Text>

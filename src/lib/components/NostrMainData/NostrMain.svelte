@@ -26,6 +26,10 @@
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
   let loading = true; // ローディング状態を追跡する変数を追加
+  export let options: { tags: string[][]; kind?: number } = {
+    tags: [],
+    kind: 1,
+  }; //kind42でのポスト画面とかでたぐを追加する用
 
   onMount(() => {
     initializeRxNostr();
@@ -106,5 +110,5 @@
 {/if}
 
 <div class="fixed right-auto left-auto bottom-5 z-10">
-  <OpenPostWindow />
+  <OpenPostWindow {options} />
 </div>

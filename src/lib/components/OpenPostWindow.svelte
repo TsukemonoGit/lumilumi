@@ -19,9 +19,14 @@
   import { filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
 
+  export let options: { tags: string[][]; kind?: number } = {
+    tags: [],
+    kind: 1,
+  };
+
   let defaultValue: string | undefined;
   let text: string = "";
-  let tags: string[][] = [];
+  let tags: string[][] = options.tags;
   let cursorPosition: number = 0;
   let onWarning: boolean;
   let warningText = "";
@@ -49,8 +54,9 @@
         tags
       );
       if (onWarning) checkedTags.push(["content-warning", warningText]);
+
       const newev: Nostr.EventParameters = {
-        kind: 1,
+        kind: options.kind ?? 1,
         content: checkedText,
         tags: checkedTags,
       };
@@ -66,7 +72,7 @@
 
   const resetState = () => {
     text = "";
-    tags = [];
+    tags = options.tags;
     warningText = "";
     onWarning = false;
     viewCustomEmojis = false;
