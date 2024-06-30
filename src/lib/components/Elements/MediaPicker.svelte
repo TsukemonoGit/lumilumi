@@ -29,14 +29,14 @@
   </div>
   <button
     type="button"
-    class="file-button-btn inline-flex h-8 items-center justify-center rounded-sm
-      bg-zinc-100 px-4 font-medium leading-none text-zinc-600 align-middle my-auto hover:opacity-75 focus:opacity-50"
+    class="file-button-btn inline-flex h-8 items-center justify-center rounded-sm border border-magnum-300
+      bg-zinc-900 px-4 font-medium leading-none text-zinc-100 align-middle my-auto hover:opacity-75 focus:opacity-50"
     disabled={$$restProps.disabled}
     on:click={onButtonClick}
     on:keydown
     on:keyup
     on:keypress
   >
-    <Image size="20" />
+    <Image size="20" class="stroke-magnum-300" />
   </button>
 </div>

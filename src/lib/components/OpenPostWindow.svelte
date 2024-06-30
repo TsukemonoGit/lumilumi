@@ -166,11 +166,11 @@
       {#if $showImg && $showPreview && text !== ""}
         <div
           class="rounded-md bg-neutral-900
-            p-6 shadow-lg mb-4"
+            p-6 pt-3 shadow-lg mb-4"
         >
-          <div class="font-medium">preview</div>
+          <div class="font-medium text-magnum-400">preview</div>
           <div
-            class="content rounded-md border-magnum-500 border min-h-4 max-h-28 overflow-y-auto"
+            class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
           >
             <Content bind:text bind:tags />
           </div>
