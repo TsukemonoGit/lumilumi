@@ -7,6 +7,7 @@
     FileJson2,
     SquareArrowOutUpRight,
     Notebook,
+    Smile,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -15,13 +16,15 @@
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
+  import type { SvelteComponent } from "svelte";
 
   export let note: Nostr.Event;
+
   let dialogOpen: any;
-  $: replaceable =
+  const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000);
-  $: menuTexts =
+  const menuTexts =
     //  profile
     //   ? [
     //       { text: "Copy EventID", icon: Copy, num: 3 },
@@ -38,6 +41,9 @@
       { text: "Google Translate", icon: Earth, num: 2 },
       { text: "Goto Note Page", icon: Notebook, num: 4 },
     ];
+  if (note.kind === 30030) {
+    menuTexts?.push({ text: "Open in emojito", icon: Smile, num: 5 });
+  }
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
@@ -96,6 +102,13 @@
       case 4:
         //Goto Note page
         goto(`/${replaceable ? naddr : nevent}`);
+        break;
+      case 5:
+        //open in emojito
+        const emojito = `https://emojito.meme/a/${naddr}`;
+
+        window.open(emojito, "_blank", "noreferrer");
+        break;
     }
   };
 </script>

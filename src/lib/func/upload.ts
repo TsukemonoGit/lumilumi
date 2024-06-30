@@ -46,9 +46,9 @@ export async function uploadFile(
   try {
     console.log(response);
     const parsedResponse = await response.json();
-    if (!validateFileUploadResponse(parsedResponse)) {
-      throw new Error("Invalid response from the server!");
-    }
+    // if (!validateFileUploadResponse(parsedResponse)) { //Invalidなりがち
+    //   throw new Error("Invalid response from the server!");
+    // }
     return parsedResponse;
   } catch (error) {
     throw new Error("Error parsing JSON response!");

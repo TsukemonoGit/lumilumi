@@ -48,7 +48,7 @@
 
 <div class="flex flex-col gap-1 w-full">
   <button
-    class="flex h-8 min-w-[220px] items-center justify-between rounded-lg bg-zinc-900 px-3 py-2 border border-magnum-300
+    class="flex h-8 items-center justify-between rounded-lg bg-zinc-900 px-3 py-2 border border-magnum-300
     text-magnum-300 shadow transition-opacity hover:opacity-90"
     use:melt={$trigger}
     aria-label="Food"

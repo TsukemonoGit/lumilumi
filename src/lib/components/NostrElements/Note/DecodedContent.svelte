@@ -51,7 +51,7 @@
     />
   </span>
 {:else if decoded.type === "naddr"}
-  <span class="grid grid-cols-[1fr_auto_auto]">
+  <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
     <LatestEvent
       queryKey={[

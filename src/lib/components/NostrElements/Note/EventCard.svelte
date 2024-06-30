@@ -24,6 +24,7 @@
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+  import Kind30030Note from "./Kind30030Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -301,8 +302,15 @@
         {/if}
       {/await}
     {:else if note.kind === 0}
-      <!---->
+      <!--kind0-->
       <Kind0Note {note} />
+    {:else if note.kind === 40}
+      <!--kind42 パブ茶部屋-->
+    {:else if note.kind === 42}
+      <!--kind42 パブ茶コメント-->
+    {:else if note.kind === 30030}
+      <!--kind30030-->
+      <Kind30030Note {note} />
     {:else}
       <!--その他-->
       {#await findClientTag(note) then clientData}
