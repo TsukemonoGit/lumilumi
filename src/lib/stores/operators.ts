@@ -187,12 +187,12 @@ export function muteCheck(): OperatorFunction<EventPacket, EventPacket> {
 }
 
 function shouldMuteByP(eventPacket: EventPacket): boolean {
-  const pMutes = get(mutes).p || [];
+  const pMutes = get(mutes)?.p || [];
   return pMutes.includes(eventPacket.event.pubkey); // Replace with actual property check
 }
 
 function shouldMuteByWord(eventPacket: EventPacket): boolean {
-  const wordMutes = get(mutes).word || [];
+  const wordMutes = get(mutes)?.word || [];
   //----------------------------------------------------------------------ワードミュートはとりあえずkind:1に限ってみる
   // Check if any word mute from wordMutes array is included in eventPacket.event.content
   return (
@@ -202,7 +202,7 @@ function shouldMuteByWord(eventPacket: EventPacket): boolean {
 }
 
 function shouldMuteByT(eventPacket: EventPacket): boolean {
-  const tMutes = get(mutes).t || [];
+  const tMutes = get(mutes)?.t || [];
 
   // Find all tags in eventPacket.event.tags where tag[0] is "t"
   const tagsWithT = eventPacket.event.tags.filter((tag) => tag[0] === "t");
@@ -212,7 +212,7 @@ function shouldMuteByT(eventPacket: EventPacket): boolean {
 }
 
 function shouldMuteByE(eventPacket: EventPacket): boolean {
-  const eMutes = get(mutes).e || [];
+  const eMutes = get(mutes)?.e || [];
   const tagsWithE = eventPacket.event.tags.filter(
     (tag) => tag[0] === "e" || tag[0] === "q"
   );

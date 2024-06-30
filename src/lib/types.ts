@@ -112,3 +112,10 @@ export interface MuteList {
   e: string[];
 }
 export const mutetags = ["p", "t", "word", "e"];
+
+export interface ChannelData {
+  name: string;
+  about?: string;
+  picture?: string;
+  relays?: string;
+}

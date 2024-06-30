@@ -25,6 +25,8 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
+  import Kind42Note from "./Kind42Note.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -176,59 +178,32 @@
 <div class="rounded-md border overflow-hidden {noteClass()} ">
   {#await checkProxy(note.tags) then tag}
     {#if note.kind === 1}
-      <div class={"grid grid-cols-[auto_1fr]"}>
-        <div class="p-1">
-          <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
-        </div>
-        <div class="p-1">
-          <div class="flex align-middle">
-            {#if metadata}
-              <div>
-                {profile(metadata)?.display_name ??
-                  profile(metadata)?.name}<span
-                  class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-                  >@{profile(metadata)?.name}</span
-                >
-              </div>
-            {:else}
-              <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">
-                @{nip19.npubEncode(note.pubkey)}</span
-              >
-            {/if}
-            <div
-              class="inline-flex ml-auto mr-1 text-magnum-100 text-xs mt-auto mb-auto"
-            >
-              {formatAbsoluteDate(note.created_at)}
-            </div>
-          </div>
-          <hr />
-          {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-            {#if replyID || replyUsers.length > 0}
-              <Reply {replyID} {replyUsers} />
-              <hr />
-            {/if}
-          {/await}
-          {#await checkContentWarning(note.tags) then tag}
-            <div class="relative">
-              <div class=" max-h-64 overflow-y-auto">
-                <Content text={note.content} tags={note.tags} />
-              </div>
-              {#if tag}
-                <!-- <WarningHide1 text={tag[1]} /> -->
-                <WarningHide2 text={tag[1]} />
-              {/if}
-            </div>
-          {/await}
-
-          {#if tag}
-            <div class="text-end">
-              <ProxyTag proxyTag={tag} />
-            </div>
+      <NoteTemplate {note} {metadata} {tag}>
+        {#await replyedEvent(note.tags) then { replyID, replyUsers }}
+          {#if replyID || replyUsers.length > 0}
+            <Reply {replyID} {replyUsers} />
+            <hr />
           {/if}
+        {/await}
+        {#await checkContentWarning(note.tags) then tag}
+          <div class="relative">
+            <div class=" max-h-64 overflow-y-auto">
+              <Content text={note.content} tags={note.tags} />
+            </div>
+            {#if tag}
+              <!-- <WarningHide1 text={tag[1]} /> -->
+              <WarningHide2 text={tag[1]} />
+            {/if}
+          </div>
+        {/await}
+        {#if tag}
+          <div class="text-end">
+            <ProxyTag proxyTag={tag} />
+          </div>
+        {/if}
 
-          <NoteActionButtons {note} />
-        </div>
-      </div>
+        <NoteActionButtons {note} />
+      </NoteTemplate>
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
       <div class="flex gap-1">
@@ -308,9 +283,14 @@
       <!--kind42 パブ茶部屋-->
     {:else if note.kind === 42}
       <!--kind42 パブ茶コメント-->
+      <NoteTemplate {note} {metadata} {tag}>
+        <Kind42Note {note} {metadata} /></NoteTemplate
+      >
     {:else if note.kind === 30030}
       <!--kind30030-->
-      <Kind30030Note {note} />
+      <NoteTemplate {note} {metadata} {tag}>
+        <Kind30030Note {note} /></NoteTemplate
+      >
     {:else}
       <!--その他-->
       {#await findClientTag(note) then clientData}

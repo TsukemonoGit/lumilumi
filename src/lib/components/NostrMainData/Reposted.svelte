@@ -18,7 +18,11 @@
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "repost", id],
   });
-
+  const unsubscribe1 = observer2.subscribe((result: any) => {
+    if (_result?.status !== "success") {
+      _result = result;
+    }
+  });
   $: data = _result?.data;
   $: status = _result?.status;
   $: error = _result?.error;

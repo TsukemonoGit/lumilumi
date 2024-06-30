@@ -320,9 +320,8 @@
         <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
           <Repeat2 size="20" />
         </DropdownMenu>
-
         <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" class={event ? "text-magnum-300" : ""} />
+          <Repeat2 size="20" class={event ? "text-magnum-200 " : ""} />
         </DropdownMenu>
       </Reposted>
       <!--リアクション-->
