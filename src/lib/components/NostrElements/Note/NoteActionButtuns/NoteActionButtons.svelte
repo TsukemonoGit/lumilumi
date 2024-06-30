@@ -289,378 +289,376 @@
   }
 </script>
 
-<div>
-  <div class="flex justify-between py-0.5 mr-2">
-    {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7}
-      <!--リプライ-->
-      <button
-        on:click={() => {
-          openReplyWindow = !openReplyWindow;
-          replyText = "";
-          if (openReplyWindow) {
-            openQuoteWindow = false;
-          }
-        }}
-      >
-        <MessageSquare
+<div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden">
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7}
+    <!--リプライ-->
+    <button
+      on:click={() => {
+        openReplyWindow = !openReplyWindow;
+        replyText = "";
+        if (openReplyWindow) {
+          openQuoteWindow = false;
+        }
+      }}
+    >
+      <MessageSquare
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
+          ? 'fill-magnum-700'
+          : ''}"
+      />
+    </button>
+    <!--リポスト-->
+    <Reposted id={note.id} let:event>
+      <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+      <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+      <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" />
+      </DropdownMenu>
+      <DropdownMenu {menuTexts} {handleSelectItem}>
+        <Repeat2 size="20" class={event ? "text-magnum-200 " : ""} />
+      </DropdownMenu>
+    </Reposted>
+    <!--リアクション-->
+    <Reactioned id={note.id} let:event>
+      <button slot="loading" on:click={handleClickReaction}>
+        <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
-            ? 'fill-magnum-700'
-            : ''}"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
         />
       </button>
-      <!--リポスト-->
-      <Reposted id={note.id} let:event>
-        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" />
-        </DropdownMenu>
-        <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="20" class={event ? "text-magnum-200 " : ""} />
-        </DropdownMenu>
-      </Reposted>
-      <!--リアクション-->
-      <Reactioned id={note.id} let:event>
-        <button slot="loading" on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
-          />
-        </button>
 
-        <button slot="nodata" on:click={handleClickReaction}>
+      <button slot="nodata" on:click={handleClickReaction}>
+        <Heart
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+        />
+      </button>
+
+      <button slot="error" on:click={handleClickReaction}>
+        <Heart
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+        />
+      </button>
+
+      {#if event === undefined}
+        <button on:click={handleClickReaction}>
           <Heart
             size="20"
             class="hover:opacity-75 active:opacity-50 text-magnum-500"
           />
         </button>
+      {:else}
+        <div class=" max-w-[40%]"><Reaction {event} /></div>
+      {/if}
+    </Reactioned>
+    <!--カスタムリアクション-->
+    <CustomReaction {note} />
+  {/if}
+  <!--メニュー-->
+  <EllipsisMenu {note} />
+</div>
 
-        <button slot="error" on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500"
-          />
-        </button>
-
-        {#if event === undefined}
-          <button on:click={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500"
-            />
-          </button>
-        {:else}
-          <div class=" max-w-[40%]"><Reaction {event} /></div>
-        {/if}
-      </Reactioned>
-      <!--カスタムリアクション-->
-      <CustomReaction {note} />
-    {/if}
-    <!--メニュー-->
-    <EllipsisMenu {note} />
-  </div>
-
-  <!--replyWindow-->
-  {#if openReplyWindow}
-    <div class="w-[100%] p-2">
-      <div class="flex gap-1">
-        <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
-          @<Metadata
-            queryKey={["metadata", note.pubkey]}
-            pubkey={note.pubkey}
-            let:metadata
+<!--replyWindow-->
+{#if openReplyWindow}
+  <div class="w-[100%] p-2">
+    <div class="flex gap-1">
+      <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+        @<Metadata
+          queryKey={["metadata", note.pubkey]}
+          pubkey={note.pubkey}
+          let:metadata
+        >
+          {metadataName(metadata)}
+        </Metadata>
+      </div>
+      {#if allPtag}
+        {#each allPtag as replyuser, index}
+          <div
+            class=" rounded-md {$additionalReplyUsers.includes(replyuser)
+              ? 'bg-magnum-300'
+              : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
           >
-            {metadataName(metadata)}
-          </Metadata>
-        </div>
-        {#if allPtag}
-          {#each allPtag as replyuser, index}
-            <div
-              class=" rounded-md {$additionalReplyUsers.includes(replyuser)
-                ? 'bg-magnum-300'
-                : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
+            @<Metadata
+              queryKey={["metadata", replyuser]}
+              pubkey={replyuser}
+              let:metadata
             >
-              @<Metadata
-                queryKey={["metadata", replyuser]}
-                pubkey={replyuser}
-                let:metadata
-              >
-                {metadataName(metadata)}
-              </Metadata>
-              {#if $additionalReplyUsers.includes(replyuser)}
-                <button
-                  class=" inline-flex h-6 w-6 appearance-none align-middle
+              {metadataName(metadata)}
+            </Metadata>
+            {#if $additionalReplyUsers.includes(replyuser)}
+              <button
+                class=" inline-flex h-6 w-6 appearance-none align-middle
                    rounded-full p-1 text-magnum-800
                   hover:bg-magnum-100 focus:shadow-magnum-400"
-                  on:click={() => {
-                    additionalReplyUsers.update((users) => {
-                      users.splice(index, 1);
-                      return users;
-                    });
-                  }}
-                >
-                  <X class="size-4" />
-                </button>
-              {:else}<button
-                  class=" inline-flex h-6 w-6 appearance-none align-middle
+                on:click={() => {
+                  additionalReplyUsers.update((users) => {
+                    users.splice(index, 1);
+                    return users;
+                  });
+                }}
+              >
+                <X class="size-4" />
+              </button>
+            {:else}<button
+                class=" inline-flex h-6 w-6 appearance-none align-middle
                rounded-full p-1 text-magnum-800
               hover:bg-magnum-100 focus:shadow-magnum-400"
-                  on:click={() => {
-                    additionalReplyUsers.update((users) => {
-                      users.push(replyuser);
-                      return users;
-                    });
-                  }}
-                >
-                  <Plus class="size-4" />
-                </button>{/if}
-            </div>
-          {/each}
-        {/if}
+                on:click={() => {
+                  additionalReplyUsers.update((users) => {
+                    users.push(replyuser);
+                    return users;
+                  });
+                }}
+              >
+                <Plus class="size-4" />
+              </button>{/if}
+          </div>
+        {/each}
+      {/if}
 
-        <button
-          class="ml-auto inline-flex h-6 w-6 appearance-none
+      <button
+        class="ml-auto inline-flex h-6 w-6 appearance-none
                 items-center justify-center rounded-full p-1 text-magnum-800
                 hover:bg-magnum-100 focus:shadow-magnum-400"
-          on:click={() => {
-            openReplyWindow = false;
-          }}
+        on:click={() => {
+          openReplyWindow = false;
+        }}
+      >
+        <X size="20" />
+      </button>
+    </div>
+    <textarea
+      rows="3"
+      class="w-[100%] rounded-md bg-neutral-950 mt-1"
+      bind:value={replyText}
+    />
+    {#if onWarning}
+      <div class="flex">
+        <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+        <input
+          type="text"
+          class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+          bind:value={warningText}
+        />
+      </div>
+    {:else}<div class="h-4" />{/if}
+    <div class="mt-2 flex justify-between">
+      <button
+        on:click={() => {
+          onWarning = !onWarning;
+        }}
+        class=" h-8 rounded-sm
+            bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+      >
+        <TriangleAlert
+          size="20"
+          class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+        />
+      </button>
+      <div class=" flex justify-end gap-4">
+        {#if $emojis && $emojis.length > 0}
+          {#if viewCustomEmojis}
+            <input
+              type="text"
+              class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+              bind:value={customReaction}
+            />
+          {/if}
+          <button
+            on:click={() => {
+              viewCustomEmojis = !viewCustomEmojis;
+            }}
+            class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+          >
+            <SmilePlus
+              size="20"
+              class={viewCustomEmojis ? "fill-magnum-700" : ""}
+            />
+          </button>
+        {/if}
+
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+          on:click={handleClickReplySend}
         >
-          <X size="20" />
+          <Send size="20" />
         </button>
       </div>
-      <textarea
-        rows="3"
-        class="w-[100%] rounded-md bg-neutral-950 mt-1"
-        bind:value={replyText}
-      />
-      {#if onWarning}
-        <div class="flex">
-          <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
-          <input
-            type="text"
-            class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
-           'border-neutral-900'}"
-            bind:value={warningText}
-          />
-        </div>
-      {:else}<div class="h-4" />{/if}
-      <div class="mt-2 flex justify-between">
-        <button
-          on:click={() => {
-            onWarning = !onWarning;
-          }}
-          class=" h-8 rounded-sm
-            bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-        >
-          <TriangleAlert
-            size="20"
-            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
-          />
-        </button>
-        <div class=" flex justify-end gap-4">
-          {#if $emojis && $emojis.length > 0}
-            {#if viewCustomEmojis}
-              <input
-                type="text"
-                class="h-8 w-full rounded-md text-magnum-100 border-2
-           'border-neutral-900'}"
-                bind:value={customReaction}
-              />
-            {/if}
+    </div>
+
+    {#if viewCustomEmojis}
+      <div
+        class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
+      >
+        {#each $emojis as e, index}
+          {#if customReaction === "" || e[0]
+              .toLowerCase()
+              .includes(customReaction.toLowerCase())}
             <button
-              on:click={() => {
-                viewCustomEmojis = !viewCustomEmojis;
-              }}
-              class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+              on:click={() => handleClickEmoji(e)}
+              class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >
-              <SmilePlus
-                size="20"
-                class={viewCustomEmojis ? "fill-magnum-700" : ""}
-              />
+              {#if $showImg}
+                <img
+                  loading="lazy"
+                  class="h-4 object-contain justify-self-center"
+                  src={e[1]}
+                  alt={e[0]}
+                />{:else}{e[0]}{/if}
             </button>
           {/if}
-
-          <button
-            class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-            on:click={handleClickReplySend}
-          >
-            <Send size="20" />
-          </button>
-        </div>
+        {/each}
       </div>
+    {/if}
+  </div>
+{/if}
 
-      {#if viewCustomEmojis}
-        <div
-          class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
+<!--quoteWindow-->
+{#if openQuoteWindow}
+  <div class="w-[100%] p-2">
+    <div class="flex gap-1">
+      <div
+        class=" rounded-md {addusers
+          ? 'bg-magnum-300'
+          : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
+      >
+        @<Metadata
+          queryKey={["metadata", note.pubkey]}
+          pubkey={note.pubkey}
+          let:metadata
         >
-          {#each $emojis as e, index}
-            {#if customReaction === "" || e[0]
-                .toLowerCase()
-                .includes(customReaction.toLowerCase())}
-              <button
-                on:click={() => handleClickEmoji(e)}
-                class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-              >
-                {#if $showImg}
-                  <img
-                    loading="lazy"
-                    class="h-4 object-contain justify-self-center"
-                    src={e[1]}
-                    alt={e[0]}
-                  />{:else}{e[0]}{/if}
-              </button>
-            {/if}
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-
-  <!--quoteWindow-->
-  {#if openQuoteWindow}
-    <div class="w-[100%] p-2">
-      <div class="flex gap-1">
-        <div
-          class=" rounded-md {addusers
-            ? 'bg-magnum-300'
-            : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
-        >
-          @<Metadata
-            queryKey={["metadata", note.pubkey]}
-            pubkey={note.pubkey}
-            let:metadata
-          >
-            {metadataName(metadata)}
-          </Metadata>
-          {#if addusers}
-            <button
-              class=" inline-flex h-6 w-6 appearance-none align-middle
+          {metadataName(metadata)}
+        </Metadata>
+        {#if addusers}
+          <button
+            class=" inline-flex h-6 w-6 appearance-none align-middle
                    rounded-full p-1 text-magnum-800
                   hover:bg-magnum-100 focus:shadow-magnum-400"
-              on:click={() => {
-                addusers = false;
-              }}
-            >
-              <X class="size-4" />
-            </button>
-          {:else}<button
-              class=" inline-flex h-6 w-6 appearance-none align-middle
+            on:click={() => {
+              addusers = false;
+            }}
+          >
+            <X class="size-4" />
+          </button>
+        {:else}<button
+            class=" inline-flex h-6 w-6 appearance-none align-middle
                rounded-full p-1 text-magnum-800
               hover:bg-magnum-100 focus:shadow-magnum-400"
-              on:click={() => {
-                addusers = true;
-              }}
-            >
-              <Plus class="size-4" />
-            </button>{/if}
-        </div>
+            on:click={() => {
+              addusers = true;
+            }}
+          >
+            <Plus class="size-4" />
+          </button>{/if}
+      </div>
 
-        <button
-          class="ml-auto inline-flex h-6 w-6 appearance-none
+      <button
+        class="ml-auto inline-flex h-6 w-6 appearance-none
             items-center justify-center rounded-full p-1 text-magnum-800
             hover:bg-magnum-100 focus:shadow-magnum-400"
-          on:click={() => {
-            openQuoteWindow = false;
-          }}
+        on:click={() => {
+          openQuoteWindow = false;
+        }}
+      >
+        <X size="20" />
+      </button>
+    </div>
+
+    <textarea
+      rows="6"
+      class="w-[100%] rounded-md bg-neutral-950 mt-1"
+      bind:value={replyText}
+    />
+    {#if onWarning}
+      <div class="flex">
+        <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+        <input
+          type="text"
+          class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
+         'border-neutral-900'}"
+          bind:value={warningText}
+        />
+      </div>
+    {:else}<div class="h-4" />{/if}
+    <div class="mt-2 flex justify-between">
+      <button
+        on:click={() => {
+          onWarning = !onWarning;
+        }}
+        class=" h-8 rounded-sm
+          bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+      >
+        <TriangleAlert
+          size="20"
+          class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
+        />
+      </button>
+      <div class=" flex justify-end gap-4">
+        {#if $emojis && $emojis.length > 0}
+          {#if viewCustomEmojis}
+            <input
+              type="text"
+              class="h-8 w-full rounded-md text-magnum-100 border-2
+           'border-neutral-900'}"
+              bind:value={customReaction}
+            />
+          {/if}
+          <button
+            on:click={() => {
+              viewCustomEmojis = !viewCustomEmojis;
+            }}
+            class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+          >
+            <SmilePlus
+              size="20"
+              class={viewCustomEmojis ? "fill-magnum-700" : ""}
+            />
+          </button>
+        {/if}
+
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-sm
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
+          on:click={handleClickQuoteSend}
         >
-          <X size="20" />
+          <Send size="20" />
         </button>
       </div>
-
-      <textarea
-        rows="6"
-        class="w-[100%] rounded-md bg-neutral-950 mt-1"
-        bind:value={replyText}
-      />
-      {#if onWarning}
-        <div class="flex">
-          <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
-          <input
-            type="text"
-            class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
-         'border-neutral-900'}"
-            bind:value={warningText}
-          />
-        </div>
-      {:else}<div class="h-4" />{/if}
-      <div class="mt-2 flex justify-between">
-        <button
-          on:click={() => {
-            onWarning = !onWarning;
-          }}
-          class=" h-8 rounded-sm
-          bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-        >
-          <TriangleAlert
-            size="20"
-            class="stroke-magnum-300 {onWarning ? 'fill-magnum-700 ' : ''}"
-          />
-        </button>
-        <div class=" flex justify-end gap-4">
-          {#if $emojis && $emojis.length > 0}
-            {#if viewCustomEmojis}
-              <input
-                type="text"
-                class="h-8 w-full rounded-md text-magnum-100 border-2
-           'border-neutral-900'}"
-                bind:value={customReaction}
-              />
-            {/if}
+    </div>
+    {#if viewCustomEmojis}
+      <div
+        class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
+      >
+        {#each $emojis as e, index}
+          {#if customReaction === "" || e[0]
+              .toLowerCase()
+              .includes(customReaction.toLowerCase())}
             <button
-              on:click={() => {
-                viewCustomEmojis = !viewCustomEmojis;
-              }}
-              class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+              on:click={() => handleClickEmoji(e)}
+              class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >
-              <SmilePlus
-                size="20"
-                class={viewCustomEmojis ? "fill-magnum-700" : ""}
-              />
+              {#if $showImg}
+                <img
+                  loading="lazy"
+                  class="h-4 object-contain justify-self-center"
+                  src={e[1]}
+                  alt={e[0]}
+                />{:else}{e[0]}{/if}
             </button>
           {/if}
-
-          <button
-            class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-            on:click={handleClickQuoteSend}
-          >
-            <Send size="20" />
-          </button>
-        </div>
+        {/each}
       </div>
-      {#if viewCustomEmojis}
-        <div
-          class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-48 overflow-y-auto"
-        >
-          {#each $emojis as e, index}
-            {#if customReaction === "" || e[0]
-                .toLowerCase()
-                .includes(customReaction.toLowerCase())}
-              <button
-                on:click={() => handleClickEmoji(e)}
-                class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-              >
-                {#if $showImg}
-                  <img
-                    loading="lazy"
-                    class="h-4 object-contain justify-self-center"
-                    src={e[1]}
-                    alt={e[0]}
-                  />{:else}{e[0]}{/if}
-              </button>
-            {/if}
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
-</div>
+    {/if}
+  </div>
+{/if}

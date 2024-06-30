@@ -1,31 +1,15 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import type { Profile } from "$lib/types";
 
-  import { Repeat2 } from "lucide-svelte";
-  import Reaction from "./Reaction.svelte";
-
-  import { loginUser, showImg, viewEventIds } from "$lib/stores/stores";
+  import { viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
-  import Content from "./Content.svelte";
 
-  //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { formatAbsoluteDate, nip33Regex, profile } from "$lib/func/util";
-  import Reply from "./Reply.svelte";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import RepostedNote from "./RepostedNote.svelte";
+  import { formatAbsoluteDate, profile } from "$lib/func/util";
+
   import { onDestroy } from "svelte";
 
-  import { getRelaysById } from "$lib/func/nostr";
-  import Kind0Note from "./Kind0Note.svelte";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-  import Kind30030Note from "./Kind30030Note.svelte";
-  import Kind42Note from "./Kind42Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -50,137 +34,14 @@
   onDestroy(() => {
     $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
   });
-
-  //eかa
-  const repostedId = (
-    tags: string[][]
-  ): { tag: string[] | undefined; kind: number | undefined } => {
-    const kindtag = tags.find((tag) => tag[0] === "k");
-    const kind = kindtag ? Number(kindtag[1]) : undefined;
-    return {
-      tag: tags
-        .slice()
-        .reverse()
-        .find((tag) => tag[0] === "e" || tag[0] === "a"),
-      kind: kind,
-    };
-  };
-  const noteClass = () => {
-    const ptag = note.tags.filter((tag) => tag[0] === "p");
-    const user = ptag.find((tag) => tag[1] === $loginUser);
-    return user ? "border-magnum-600 bg-magnum-700/20" : "border-magnum-600";
-  };
-
-  const replyedEvent = (
-    tags: string[][]
-  ): { replyID: string | undefined; replyUsers: string[] } => {
-    const users = tags.reduce((acc, [tag, value]) => {
-      if (tag === "p") {
-        return [...acc, value];
-      } else {
-        return acc;
-      }
-    }, []);
-    const IDs = tags?.filter((tag) => tag[0] === "e");
-    const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
-    const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
-    //  console.log(root?.[1]);
-    return {
-      replyUsers: users,
-      replyID: reply ? reply[1] : root ? root[1] : undefined,
-    };
-  };
-
-  const checkContentWarning = (tags: string[][]): string[] | undefined => {
-    return tags.find((item) => item[0] === "content-warning");
-  };
-
-  const checkProxy = (tags: string[][]): string[] | undefined => {
-    return tags.find((item) => item[0] === "proxy");
-  };
-
-  const findClientTag = (
-    note: Nostr.Event
-  ):
-    | {
-        name: string;
-        aTag: string;
-        filter: Nostr.Filter;
-        naddr: string | undefined;
-      }
-    | undefined => {
-    const clientTag = note.tags.find((item) => item[0] === "client");
-    if (!clientTag) {
-      return undefined;
-    }
-    const matches = clientTag[2]?.match(nip33Regex);
-    if (!matches) {
-      return undefined;
-    }
-    const filter: Nostr.Filter = {
-      kinds: [Number(matches[1])],
-      authors: [matches[2]],
-      "#d": [matches[3]],
-      limit: 1,
-    };
-
-    const dtag = note.tags.find((tag) => tag[0] === "d");
-    const naddrAddress: nip19.AddressPointer = {
-      identifier: dtag?.[1] ?? "",
-      kind: note.kind,
-      pubkey: note.pubkey,
-      relays: getRelaysById(note.id),
-    };
-    try {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: nip19.naddrEncode(naddrAddress),
-      };
-    } catch (error) {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: undefined,
-      };
-    }
-  };
-
-  const findWebURL = (
-    tags: string[][],
-    clientData: {
-      name: string;
-      aTag: string;
-      filter: Nostr.Filter;
-      naddr: string | undefined;
-    }
-  ): string[] => {
-    if (!clientData.naddr) return [];
-    const webTag = tags.reduce((acc, [tag, url, nip19]) => {
-      if (tag === "web" && nip19 === "naddr") {
-        return [...acc, url];
-      } else {
-        return acc;
-      }
-    }, []);
-
-    if (webTag.length == 0) {
-      return [];
-    }
-    return webTag.map((item) => {
-      return item.replace(bech32Pattern, clientData.naddr ?? "");
-    });
-  };
 </script>
 
-<div class={"grid grid-cols-[auto_1fr]"}>
+<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden"}>
   <div class="p-1">
     <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
   </div>
-  <div class="p-1">
-    <div class="flex align-middle">
+  <div class="p-1 max-w-full overflow-x-hidden">
+    <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
         <div>
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
@@ -194,7 +55,7 @@
         >
       {/if}
       <div
-        class="inline-flex ml-auto mr-1 text-magnum-100 text-xs mt-auto mb-auto"
+        class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto"
       >
         {formatAbsoluteDate(note.created_at)}
       </div>
