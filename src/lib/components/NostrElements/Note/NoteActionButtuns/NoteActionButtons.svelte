@@ -303,7 +303,7 @@
     >
       <MessageSquare
         size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500 {openReplyWindow
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden {openReplyWindow
           ? 'fill-magnum-700'
           : ''}"
       />
@@ -328,21 +328,21 @@
       <button slot="loading" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
         />
       </button>
 
       <button slot="nodata" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
         />
       </button>
 
       <button slot="error" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
         />
       </button>
 
@@ -350,11 +350,11 @@
         <button on:click={handleClickReaction}>
           <Heart
             size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
           />
         </button>
       {:else}
-        <div class=" max-w-[40%]"><Reaction {event} /></div>
+        <div class="overflow-hidden max-w-[40%]"><Reaction {event} /></div>
       {/if}
     </Reactioned>
     <!--カスタムリアクション-->
