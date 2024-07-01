@@ -26,6 +26,7 @@
   import Kind42Note from "./Kind42Note.svelte";
   import NoteTemplate from "./NoteTemplate.svelte";
   import Kind9735Note from "./Kind9735Note.svelte";
+  import { getRelaysById } from "$lib/func/nostr";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -172,10 +173,6 @@
       return item.replace(bech32Pattern, clientData.naddr ?? "");
     });
   };
-
-  function getRelaysById(id: string): string[] | undefined {
-    throw new Error("Function not implemented.");
-  }
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
