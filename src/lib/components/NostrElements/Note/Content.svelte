@@ -88,7 +88,15 @@
           className="underline text-magnum-300 break-all "
           href={part.content}>{part.content}</Link
         >
-        <OgpCard {contents} url={part.content} />
+        {#if contents.title !== ""}<!--OGP表示はTITLE必須にしておく-->
+          <OgpCard {contents} url={part.content} />
+        {:else}
+          <Link
+            slot="nodata"
+            className="underline text-magnum-300 break-all "
+            href={part.content}>{part.content}</Link
+          >
+        {/if}
       </OGP>
     {:else}
       <Link className="underline text-magnum-300 break-all " href={part.content}
