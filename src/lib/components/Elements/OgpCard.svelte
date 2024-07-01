@@ -21,7 +21,7 @@
         >
           <img
             loading="lazy"
-            class="object-contain max-h-[6rem] max-w-full mt-1"
+            class="object-contain max-h-[6rem] max-w-full"
             src={contents.image}
             alt=""
           />
