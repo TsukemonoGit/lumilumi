@@ -290,7 +290,7 @@
 </script>
 
 <div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden">
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7}
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
     <!--リプライ-->
     <button
       on:click={() => {

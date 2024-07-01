@@ -2,9 +2,8 @@
   import * as Nostr from "nostr-typedef";
   import PopupProfileIcon from "./PopupProfileIcon.svelte";
   import { decode } from "light-bolt11-decoder";
-  import type { Profile } from "$lib/types";
-  import Collapsible from "$lib/components/Elements/Collapsible.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import { Zap } from "lucide-svelte";
 
   export let events: Nostr.Event[];
 
@@ -40,7 +39,8 @@
     <div
       class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex"
     >
-      ⚡️ <div class="min-w-8 flex justify-center">{amount}</div>
+      <Zap class="stroke-orange-400 fill-orange-400" size={20} />
+      <div class="min-w-8 flex justify-center">{amount}</div>
       <div class="flex-wrap px-2 gap-1">
         {#each filterEventsByAmount(events, amount) as event (event.id)}
           <PopupProfileIcon pubkey={pubkey(event) ?? ""} />

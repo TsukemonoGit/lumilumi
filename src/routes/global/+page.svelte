@@ -84,10 +84,6 @@
 </section>
 
 <style>
-  .svgset {
-    display: flex;
-    gap: 4px;
-  }
   section {
     display: flex;
     flex-direction: column;

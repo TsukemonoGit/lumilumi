@@ -27,6 +27,7 @@
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";
   import NoteTemplate from "./NoteTemplate.svelte";
+  import Kind9735Note from "./Kind9735Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -291,6 +292,10 @@
       <NoteTemplate {note} {metadata} {tag} {mini}>
         <Kind30030Note {note} /></NoteTemplate
       >
+    {:else if note.kind === 9735}
+      <!--kind30030-->
+
+      <Kind9735Note {note} />
     {:else}
       <!--その他-->
       {#await findClientTag(note) then clientData}
