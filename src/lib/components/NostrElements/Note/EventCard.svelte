@@ -187,7 +187,7 @@
           {/if}
         {/await}
         {#await checkContentWarning(note.tags) then tag}
-          <div class="relative overflow-x-hidden">
+          <div class="relative overflow-hidden">
             <div class=" max-h-64 overflow-y-auto overflow-x-hidden">
               <Content text={note.content} tags={note.tags} />
             </div>

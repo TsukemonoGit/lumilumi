@@ -80,8 +80,9 @@
         </video></Link
       >
     {:else}
-      <Link className="underline text-magnum-300 break-all" href={part.content}
-        >{part.content}</Link
+      <Link
+        className="underline text-magnum-300 break-all overflow-hidden"
+        href={part.content}>{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
     {#if $showImg}
