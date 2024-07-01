@@ -6,6 +6,7 @@ export type Ogp = {
   title: string;
   image: string;
   description: string;
+  favicon: string;
   memo?: string;
 };
 
@@ -17,6 +18,7 @@ export let isvalidURL = (str: string): boolean => {
     return false;
   }
 };
+
 export const useOgp = (url: string) => {
   const genQueryKey = () => ["useOgp", url] as const;
 
@@ -50,7 +52,7 @@ export const parseOgp = (text: string, urlString: string): Ogp | null => {
 
 export const parseOgpFromDOM = (
   doc: HTMLDocument,
-  urlString: string
+  baseUrl: string
 ): Ogp | null => {
   const props: { [property: string]: string } = {};
 
@@ -62,12 +64,20 @@ export const parseOgpFromDOM = (
     }
   });
 
-  // 画像のURLを絶対パスに変換する処理を追加
-  if (props["og:image"] && props["og:image"].startsWith("./")) {
-    const baseUrl = new URL(urlString);
-    const imageUrl = new URL(props["og:image"], baseUrl);
-    props["og:image"] = imageUrl.toString();
+  // Favicon URLを取得
+  const faviconElement =
+    doc.querySelector('link[rel="icon"]') ||
+    doc.querySelector('link[rel="shortcut icon"]');
+  let faviconUrl = "";
+  if (faviconElement) {
+    const faviconHref = faviconElement.getAttribute("href");
+    if (faviconHref) {
+      faviconUrl = toAbsolutePath(faviconHref, baseUrl);
+    }
   }
+
+  // 画像のURLを絶対パスに変換する処理を追加
+  props["og:image"] = toAbsolutePath(props["og:image"], baseUrl);
 
   if (props["og:title"] != null) {
     return {
@@ -75,7 +85,24 @@ export const parseOgpFromDOM = (
       description: props["og:description"] ?? "",
       image: props["og:image"] ?? "",
       url: props["og:url"] ?? "",
+      favicon: faviconUrl,
     } satisfies Ogp;
   }
   return null;
+};
+
+// 絶対パスに変換する関数
+const toAbsolutePath = (
+  relativePath: string | undefined,
+  baseUrl: string
+): string => {
+  if (
+    relativePath &&
+    (relativePath.startsWith("./") || relativePath.startsWith("/"))
+  ) {
+    const base = new URL(baseUrl);
+    const absoluteUrl = new URL(relativePath, base);
+    return absoluteUrl.toString();
+  }
+  return relativePath ?? "";
 };

@@ -48,19 +48,17 @@
           </div>
         </div>{/if}
       <div class="flex flex-row-reverse ... -my-1">
-        {#if $showImg && contents.image !== ""}
+        {#if $showImg && contents.favicon !== ""}
           <img
             loading="lazy"
             class="object-contain w-5 pl-0.5 pr-0.5"
-            src={contents.image}
+            src={contents.favicon}
             alt=""
           />
         {:else}
-          <Avatar
-            class=" object-contain w-5 pl-0.5 pr-0.5"
-            name={contents.image}
-            variant="beam"
-          />
+          <div class="object-contain w-5 pl-0.5 pr-0.5">
+            <Avatar size={20} name={contents.favicon} variant="beam" />
+          </div>
         {/if}
         <div class="text-xs text-magnum-600">
           {#if contents.memo}
