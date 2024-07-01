@@ -7,8 +7,8 @@
   import { getFollowingList } from "$lib/func/nostr";
   import { nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import SearchResult from "$lib/components/SearchResult.svelte";
-  import { onMount, SvelteComponent } from "svelte";
+  import SearchResult from "./SearchResult.svelte";
+  import { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
 
