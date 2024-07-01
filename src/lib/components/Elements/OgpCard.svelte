@@ -16,10 +16,10 @@
       <div
         class="grid grid-cols-[0.5fr_1.5fr] gap-0.5 divide-x divide-magnum-200"
       >
-        <div class="overflow-hidden max-h-[6rem] flex justify-center ml-1">
+        <div class="overflow-hidden max-h-[8rem] flex justify-center ml-1">
           <img
             loading="lazy"
-            class="object-contain max-h-[6rem] max-w-full"
+            class="object-contain max-h-[8rem] max-w-full"
             src={contents.image}
             alt=""
           />
@@ -29,7 +29,7 @@
             {contents.title}
           </div>
           <div
-            class="line-clamp-4 text-xs text-magnum-300 max-w-full"
+            class="line-clamp-6 text-xs text-magnum-300 max-w-full"
             style="	white-space: pre-wrap; word-break: break-word;"
           >
             {contents.description}
@@ -55,7 +55,7 @@
           {contents.title}
         </div>
         <div
-          class="line-clamp-4 text-xs text-magnum-300 max-w-full"
+          class="line-clamp-6 text-xs text-magnum-300 max-w-full"
           style="	white-space: pre-wrap; word-break: break-word;"
         >
           {contents.description}
