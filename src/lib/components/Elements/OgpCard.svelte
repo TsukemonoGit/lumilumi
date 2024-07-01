@@ -1,9 +1,10 @@
 <script lang="ts">
-  import type { Ogp } from "$lib/func/ogp";
+  import { isvalidURL, type Ogp } from "$lib/func/ogp";
   import { showImg } from "$lib/stores/stores";
   import Avatar from "svelte-boring-avatars";
 
   export let contents: Ogp;
+  export let url: string;
 </script>
 
 <div
@@ -64,7 +65,8 @@
         <div class="text-xs text-magnum-600">
           {#if contents.memo}
             {contents.memo} /
-          {/if}{#if contents.url}{new URL(contents.url).hostname}{/if}
+          {/if}
+          {#if isvalidURL(url)}{new URL(url).hostname}{/if}
         </div>
       </div>
     </div>

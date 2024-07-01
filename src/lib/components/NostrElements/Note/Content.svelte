@@ -88,7 +88,7 @@
           className="underline text-magnum-300 break-all "
           href={part.content}>{part.content}</Link
         >
-        <OgpCard {contents} />
+        <OgpCard {contents} url={part.content} />
       </OGP>
     {:else}
       <Link className="underline text-magnum-300 break-all " href={part.content}
