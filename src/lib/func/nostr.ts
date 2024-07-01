@@ -9,6 +9,7 @@ import {
   defaultRelays,
   metadataQueue,
   queryClient,
+  tieMapStore,
 } from "$lib/stores/stores";
 import type {
   UseReqOpts,
@@ -50,12 +51,6 @@ let rxNostr: RxNostr;
 export function setRxNostr() {
   rxNostr = createRxNostr();
   app.set({ rxNostr: rxNostr });
-}
-
-const [tie, tieMap] = createTie();
-
-export function getRelaysById(id: string): string[] {
-  return Array.from(tieMap.get(id) || []);
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
@@ -235,7 +230,7 @@ export function useReq(
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(tie, muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
+    .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
@@ -362,7 +357,9 @@ export function relaysReconnectChallenge() {
     }
   });
 }
-
+export function getRelaysById(id: string): string[] {
+  return Array.from(get(tieMapStore).get(id) || []);
+}
 export function usePromiseReq({
   queryKey,
   filters,
@@ -400,7 +397,7 @@ export function usePromiseReq({
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req)
-    .pipe(tie, muteCheck(), metadata(), operator, completeOnTimeout(5000));
+    .pipe(muteCheck(), metadata(), operator, completeOnTimeout(5000));
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {

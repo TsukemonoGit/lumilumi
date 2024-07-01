@@ -16,8 +16,8 @@
   import { splitHexColorString } from "$lib/func/util";
   import type { Profile } from "$lib/types";
   import Dialog from "./Dialog.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { getRelaysById } from "$lib/func/nostr";
 
   export let pubkey: string;
   export let size: number;

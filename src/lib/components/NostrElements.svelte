@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createTie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import Contacts from "./NostrMainData/Contacts.svelte";
@@ -9,9 +9,12 @@
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
+  import { tieMapStore } from "$lib/stores/stores";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
+  const [tie, tieMap] = createTie();
+  tieMapStore.set(tieMap);
 </script>
 
 <h1 class="text-5xl text-orange-600">timeline</h1>
@@ -54,6 +57,7 @@
           let:events
           {viewIndex}
           {amount}
+          {tie}
           let:len
         >
           <SetRepoReactions />

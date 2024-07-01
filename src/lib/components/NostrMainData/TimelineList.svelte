@@ -7,13 +7,14 @@
   import { Filter, SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import { loadOlderEvents } from "./timelineList";
-  import type {
-    EventPacket,
-    RxReq,
-    RxReqOverable,
-    RxReqPipeable,
+  import {
+    createTie,
+    type EventPacket,
+    type RxReq,
+    type RxReqOverable,
+    type RxReqPipeable,
   } from "rx-nostr";
-
+  import { type OperatorFunction } from "rxjs";
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
   export let req:
@@ -34,8 +35,14 @@
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: EventPacket) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-
-  $: result = useTimelineEventList(queryKey, filters, req, relays);
+  export let tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >;
+  $: result = useTimelineEventList(queryKey, filters, tie, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

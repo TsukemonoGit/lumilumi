@@ -13,18 +13,26 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { createUniq, verify } from "rx-nostr";
-import { pipe } from "rxjs";
+import { createTie, createUniq, verify } from "rx-nostr";
+import { pipe, type OperatorFunction } from "rxjs";
 
 import { scanArray } from "./operators.js";
 import { useReq } from "$lib/func/nostr.js";
 import type { RxReqBase, ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
+//import { useReq } from "$lib/func/useReq.js";
 
 export function useTimelineEventList(
   queryKey: QueryKey,
 
   filters: Nostr.Filter[],
+  tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >,
   req?:
     | RxReqBase
     | (RxReq<"backward"> & {
@@ -39,6 +47,7 @@ export function useTimelineEventList(
       } & RxReqOverable &
         RxReqPipeable)
     | undefined,
+
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
   // イベントID に基づいて重複を排除する
@@ -52,7 +61,7 @@ export function useTimelineEventList(
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(uniq, verify(), scanArray());
+  const operator = pipe(tie, uniq, verify(), scanArray());
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

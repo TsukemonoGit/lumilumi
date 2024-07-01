@@ -17,7 +17,6 @@
   import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy } from "svelte";
 
-  import { getRelaysById } from "$lib/func/nostr";
   import Kind0Note from "./Kind0Note.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
@@ -174,6 +173,10 @@
       return item.replace(bech32Pattern, clientData.naddr ?? "");
     });
   };
+
+  function getRelaysById(id: string): string[] | undefined {
+    throw new Error("Function not implemented.");
+  }
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">

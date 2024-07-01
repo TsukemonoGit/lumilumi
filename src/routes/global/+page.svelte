@@ -5,11 +5,14 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createTie } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import { tieMapStore } from "$lib/stores/stores";
 
   let amount = 50;
   let viewIndex = 0;
+  const [tie, tieMap] = createTie();
+  tieMapStore.set(tieMap);
 </script>
 
 <svelte:head>
@@ -43,6 +46,7 @@
             {viewIndex}
             {amount}
             let:len
+            {tie}
           >
             <SetRepoReactions />
             <div slot="loading">

@@ -5,7 +5,15 @@
   import logo from "$lib/images/favicon.svg";
   import { loginUser, nowProgress, queryClient } from "$lib/stores/stores";
 
-  import { Globe, Search, Bell, Settings, House } from "lucide-svelte";
+  import {
+    Globe,
+    Search,
+    Bell,
+    Settings,
+    House,
+    Users,
+    MessagesSquare,
+  } from "lucide-svelte";
   import type { EventPacket } from "rx-nostr";
 
   $: metadata = (
@@ -14,17 +22,7 @@
 </script>
 
 <header>
-  <div class="corner">
-    <a href="./">
-      <img
-        src={logo}
-        alt="home"
-        class={$nowProgress ? "transform-rotate" : ""}
-      />
-    </a>
-  </div>
-
-  <nav>
+  <nav class="mx-auto">
     <svg viewBox="0 0 2 3" aria-hidden="true">
       <path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
     </svg>
@@ -39,6 +37,12 @@
           : undefined}
       >
         <a href="/notifications"><Bell /></a>
+      </li>
+      <li aria-current={$page.url.pathname === "/channel" ? "page" : undefined}>
+        <a href="/channel"><MessagesSquare /></a>
+      </li>
+      <li aria-current={$page.url.pathname === "/list" ? "page" : undefined}>
+        <a href="/list"><Users /></a>
       </li>
       <li aria-current={$page.url.pathname === "/search" ? "page" : undefined}>
         <a href="/search"><Search /></a>

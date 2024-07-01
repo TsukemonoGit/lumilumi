@@ -4,12 +4,13 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createTie } from "rx-nostr";
   import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
   import type { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import { tieMapStore } from "$lib/stores/stores";
   export let data: {
     pubkey: string;
   };
@@ -36,6 +37,8 @@
     }, 100);
   });
   $: userPubkey = data.pubkey; // Make pubkey reactive
+  const [tie, tieMap] = createTie();
+  tieMapStore.set(tieMap);
 </script>
 
 <svelte:head>
@@ -71,6 +74,7 @@
             let:events
             {viewIndex}
             {amount}
+            {tie}
           >
             <SetRepoReactions />
             <div slot="loading">

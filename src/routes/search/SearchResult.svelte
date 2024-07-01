@@ -1,25 +1,25 @@
 <script lang="ts">
-  import { createRxBackwardReq, createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createTie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
-  import Metadata from "./NostrMainData/Metadata.svelte";
-  import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
-  import TimelineList from "./NostrMainData/TimelineList.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
+  import SetRepoReactions from "../../lib/components/NostrMainData/SetRepoReactions.svelte";
+  import TimelineList from "../../lib/components/NostrMainData/TimelineList.svelte";
 
-  import NostrMain from "./NostrMainData/NostrMain.svelte";
-  import { queryClient } from "$lib/stores/stores";
-  import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
-  import SetSearchRelays from "./NostrMainData/SetSearchRelays.svelte";
+  import NostrMain from "../../lib/components/NostrMainData/NostrMain.svelte";
+  import { queryClient, tieMapStore } from "$lib/stores/stores";
+  import SetSearchRelays from "../../lib/components/NostrMainData/SetSearchRelays.svelte";
   import { toRelaySet } from "$lib/stores/useRelaySet";
 
   import { nip50relays } from "$lib/func/util";
-  import EventCard from "./NostrElements/Note/EventCard.svelte";
+  import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
   let viewIndex = 0;
 
   $: console.log(filter);
+  const [tie, tieMap] = createTie();
+  tieMapStore.set(tieMap);
 </script>
 
 <section>
@@ -40,6 +40,7 @@
           {viewIndex}
           {amount}
           let:len
+          {tie}
         >
           <SetRepoReactions />
           <div slot="loading">

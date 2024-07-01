@@ -46,3 +46,5 @@ export const nowProgress = writable<boolean>(false);
 export const viewEventIds = writable<string[]>([]);
 
 export const userLocale = writable<string>();
+
+export const tieMapStore = writable<Map<string, Set<string>>>();
