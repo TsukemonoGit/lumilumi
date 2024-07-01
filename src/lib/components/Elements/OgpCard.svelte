@@ -10,7 +10,7 @@
 <div
   class="drop-shadow-md rounded-xl m-1 p-1 border border-magnum-400 hover:opacity-90 z-20 break-all bg-magnum-200"
 >
-  <a class="" href={contents.url} target="_blank">
+  <a class="" href={url} target="_blank">
     <div class="grid grid-rows-[auto_1fr]">
       {#if $showImg && contents.image}
         <div class="grid grid-cols-[0.5fr_1.5fr] gap-0.5">

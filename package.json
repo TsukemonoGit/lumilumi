@@ -46,6 +46,7 @@
 		"rx-nostr": "^2.7.3",
 		"svelte-boring-avatars": "^1.2.6",
 		"svelte-i18n": "^4.0.0",
+		"unfurl.js": "^6.4.0",
 		"ws": "^8.17.1"
 	}
 }
