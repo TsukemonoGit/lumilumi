@@ -6,6 +6,7 @@
   import { createRxForwardReq, createTie } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
+  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   let amount = 50;
   let viewIndex = 0;
   const [tie, tieMap] = createTie();
@@ -48,7 +49,7 @@
           <div slot="error" let:error>
             <p>{error}</p>
           </div>
-
+          <SetRepoReactions />
           <div class="max-w-[100vw] break-words box-border">
             {#if events && events.length > 0}
               {#each events as event (event.id)}<div

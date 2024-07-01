@@ -14,6 +14,7 @@
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import Collapsible from "$lib/components/Elements/Collapsible.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
 
   export let data: {
     id: string;
@@ -34,6 +35,7 @@
         : defaultRelays}
       let:searchRelays
     >
+      <SetRepoReactions />
       <div class="container break-words overflow-hidden">
         <div>
           <Note id={data.id} />
