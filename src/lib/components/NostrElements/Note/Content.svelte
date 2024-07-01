@@ -4,7 +4,9 @@
   import DecodedContent from "./DecodedContent.svelte";
   import { showImg } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-
+  import OGP from "$lib/components/Elements/OGP.svelte";
+  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import { isvalidURL } from "$lib/func/ogp";
   export let text: string;
   export let tags: string[][];
   /** ImageFile_Check_正規表現_パターン */
@@ -79,10 +81,18 @@
           <track default kind="captions" />
         </video></Link
       >
+    {:else if $showImg && isvalidURL(part.content)}
+      <OGP url={part.content} let:contents>
+        <Link
+          slot="nodata"
+          className="underline text-magnum-300 break-all "
+          href={part.content}>{part.content}</Link
+        >
+        <OgpCard {contents} />
+      </OGP>
     {:else}
-      <Link
-        className="underline text-magnum-300 break-all overflow-hidden"
-        href={part.content}>{part.content}</Link
+      <Link className="underline text-magnum-300 break-all " href={part.content}
+        >{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
     {#if $showImg}

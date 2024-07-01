@@ -71,7 +71,7 @@
       []
     );
 
-    const chunkedFilters = chunkArray(naddrFilters, 5);
+    const chunkedFilters = chunkArray(naddrFilters, 4);
 
     // 全てのチャンクを並列で処理する
     const pkListArray = await Promise.all(
