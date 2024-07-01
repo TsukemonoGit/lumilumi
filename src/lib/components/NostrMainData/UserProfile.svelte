@@ -1,10 +1,8 @@
 <script lang="ts">
   import Metadata from "./Metadata.svelte";
-  import { profile, splitHexColorString } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import { showImg } from "$lib/stores/stores";
-  import UserAvatar from "../Elements/UserAvatar.svelte";
-  import Avatar from "svelte-boring-avatars";
   import { _ } from "svelte-i18n";
 
   import { beforeNavigate } from "$app/navigation";

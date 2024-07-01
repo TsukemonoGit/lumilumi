@@ -5,7 +5,7 @@
   import Contacts from "./NostrMainData/Contacts.svelte";
   import Metadata from "./NostrMainData/Metadata.svelte";
   import NostrMain from "./NostrMainData/NostrMain.svelte";
-  import { setFollowingList, pubkeysIn } from "$lib/func/nostr";
+  import { pubkeysIn } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";

@@ -1,17 +1,16 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import type { Profile } from "$lib/types";
 
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import { loginUser, showImg, viewEventIds } from "$lib/stores/stores";
+  import { loginUser, viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { formatAbsoluteDate, nip33Regex, profile } from "$lib/func/util";
+  import { nip33Regex, profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";

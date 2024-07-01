@@ -8,7 +8,6 @@
   import type Nostr from "nostr-typedef";
   import { loadOlderEvents } from "./timelineList";
   import {
-    createTie,
     type EventPacket,
     type RxReq,
     type RxReqOverable,
