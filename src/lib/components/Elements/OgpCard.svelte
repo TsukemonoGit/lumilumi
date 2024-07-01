@@ -12,7 +12,7 @@
 >
   <a class="" href={url} target="_blank">
     <div class="grid grid-rows-[auto_1fr]">
-      {#if $showImg && contents.image}
+      {#if $showImg && contents.image && contents.image !== ""}
         <div class="grid grid-cols-[0.5fr_1.5fr] gap-0.5">
           <div
             class="overflow-hidden relative rounded-xl max-h-[6rem] flex justify-center"

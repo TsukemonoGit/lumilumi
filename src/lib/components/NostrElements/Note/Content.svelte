@@ -88,7 +88,7 @@
           className="underline text-magnum-300 break-all "
           href={part.content}>{part.content}</Link
         >
-        {#if contents.title !== ""}<!--OGP表示はTITLE必須にしておく-->
+        {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
           <OgpCard {contents} url={part.content} />
         {:else}
           <Link
