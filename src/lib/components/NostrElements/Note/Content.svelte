@@ -7,6 +7,7 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { isvalidURL } from "$lib/func/ogp";
+  import { nipRegex } from "$lib/func/util";
   export let text: string;
   export let tags: string[][];
   /** ImageFile_Check_正規表現_パターン */
@@ -117,6 +118,10 @@
     <a
       href={`/search?t=${part.content}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
+    >
+  {:else if part.type === "nip"}
+    <Link className="underline text-magnum-300 break-all" href={part.url ?? ""}
+      >{part.content}</Link
     >
   {:else}
     <span

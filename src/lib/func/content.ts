@@ -1,14 +1,12 @@
-import { nip19Regex, urlRegex, emojiRegex } from "./util";
+import { nip19Regex, urlRegex, emojiRegex, nipRegex } from "./util";
 
-export function parseText(
-  input: string,
-  tags: string[][]
-): {
-  type: string;
+export interface Part {
+  type: "nip19" | "url" | "emoji" | "hashtag" | "nip" | "text";
   content: string | undefined;
   url?: string;
-}[] {
-  const parts = [];
+}
+export function parseText(input: string, tags: string[][]): Part[] {
+  const parts: Part[] = [];
   let remainingText = input;
 
   // Create emoji regex from tags
@@ -35,6 +33,7 @@ export function parseText(
     const urlMatch = remainingText.match(urlRegex);
     const emojiMatch = remainingText.match(emojiRegex);
     const hashtagMatch = remainingText.match(hashtagRegex);
+    const nipMatch = remainingText.match(nipRegex);
 
     const nip19Index = nip19Match ? remainingText.indexOf(nip19Match[0]) : -1;
     const urlIndex = urlMatch ? remainingText.indexOf(urlMatch[0]) : -1;
@@ -42,12 +41,14 @@ export function parseText(
     const hashtagIndex = hashtagMatch
       ? remainingText.indexOf(hashtagMatch[0])
       : -1;
+    const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
       nip19Index === -1 &&
       urlIndex === -1 &&
       emojiIndex === -1 &&
-      hashtagIndex === -1
+      hashtagIndex === -1 &&
+      nipIndex === -1
     ) {
       // No more matches, add the remaining text as a normal text part
       parts.push({ type: "text", content: remainingText });
@@ -58,7 +59,8 @@ export function parseText(
       nip19Index !== -1 &&
       (urlIndex === -1 || nip19Index < urlIndex) &&
       (emojiIndex === -1 || nip19Index < emojiIndex) &&
-      (hashtagIndex === -1 || nip19Index < hashtagIndex)
+      (hashtagIndex === -1 || nip19Index < hashtagIndex) &&
+      (nipIndex === -1 || nip19Index < nipIndex)
     ) {
       // nip19 match is earlier
       if (nip19Index > 0) {
@@ -76,7 +78,8 @@ export function parseText(
       urlIndex !== -1 &&
       (nip19Index === -1 || urlIndex < nip19Index) &&
       (emojiIndex === -1 || urlIndex < emojiIndex) &&
-      (hashtagIndex === -1 || urlIndex < hashtagIndex)
+      (hashtagIndex === -1 || urlIndex < hashtagIndex) &&
+      (nipIndex === -1 || urlIndex < nipIndex)
     ) {
       // URL match is earlier
       if (urlIndex > 0) {
@@ -90,7 +93,8 @@ export function parseText(
       emojiIndex !== -1 &&
       (nip19Index === -1 || emojiIndex < nip19Index) &&
       (urlIndex === -1 || emojiIndex < urlIndex) &&
-      (hashtagIndex === -1 || emojiIndex < hashtagIndex)
+      (hashtagIndex === -1 || emojiIndex < hashtagIndex) &&
+      (nipIndex === -1 || emojiIndex < nipIndex)
     ) {
       // Emoji match is earlier
       if (emojiIndex > 0) {
@@ -122,7 +126,8 @@ export function parseText(
       hashtagIndex !== -1 &&
       (nip19Index === -1 || hashtagIndex < nip19Index) &&
       (urlIndex === -1 || hashtagIndex < urlIndex) &&
-      (emojiIndex === -1 || hashtagIndex < emojiIndex)
+      (emojiIndex === -1 || hashtagIndex < emojiIndex) &&
+      (nipIndex === -1 || hashtagIndex < nipIndex)
     ) {
       // Hashtag match is earlier
       if (hashtagIndex > 0) {
@@ -138,8 +143,31 @@ export function parseText(
       remainingText = remainingText.slice(
         hashtagIndex + (hashtagMatch as RegExpMatchArray)[0].length
       );
+    } else if (
+      nipIndex !== -1 &&
+      (nip19Index === -1 || nipIndex < nip19Index) &&
+      (urlIndex === -1 || nipIndex < urlIndex) &&
+      (hashtagIndex === -1 || nipIndex < hashtagIndex) &&
+      (emojiIndex === -1 || nipIndex < emojiIndex)
+    ) {
+      // nip match is earlier
+      if (nipIndex > 0) {
+        parts.push({
+          type: "text",
+          content: remainingText.slice(0, nipIndex),
+        });
+      }
+      parts.push({
+        type: "nip",
+        content: nipMatch?.[0],
+        url: `https://github.com/nostr-protocol/nips/blob/master/${nipMatch?.[0].slice(
+          4
+        )}.md`, //nip-のぶぶんをはずす
+      });
+      remainingText = remainingText.slice(
+        nipIndex + (nipMatch as RegExpMatchArray)[0].length
+      );
     }
   }
-
   return parts;
 }
