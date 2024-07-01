@@ -8,18 +8,18 @@
 </script>
 
 <div
-  class="drop-shadow-md rounded-xl m-1 p-1 border border-magnum-400 hover:opacity-90 z-20 break-all bg-magnum-200"
+  class="drop-shadow-md rounded-xl m-1 p-1 hover:opacity-90 z-20 break-all bg-magnum-200"
 >
   <a class="" href={url} target="_blank">
     <div class="grid grid-rows-[auto_1fr]">
       {#if $showImg && contents.image && contents.image !== ""}
         <div class="grid grid-cols-[0.5fr_1.5fr] gap-0.5">
           <div
-            class="overflow-hidden relative rounded-xl max-h-[6rem] flex justify-center"
+            class="overflow-hidden relative max-h-[6rem] flex justify-center"
           >
             <img
               loading="lazy"
-              class="object-contain max-h-[6rem] max-w-full"
+              class="object-contain max-h-[6rem] max-w-full mt-1"
               src={contents.image}
               alt=""
             />
