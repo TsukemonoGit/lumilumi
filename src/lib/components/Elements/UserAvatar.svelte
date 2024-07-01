@@ -23,12 +23,12 @@
   <img
     use:melt={$image}
     alt="Avatar"
-    class="object-cover {!square ? 'rounded-full' : ''}"
+    class="relative object-cover {!square ? 'rounded-full' : ''}"
     style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
   />
   <span
     use:melt={$fallback}
-    class="text-sm font-medium text-magnum-100 h-full w-full flex items-center justify-center"
+    class="absolute text-sm font-medium text-magnum-100 h-full w-full flex items-center justify-center"
     ><Avatar
       {size}
       name={pubkey}
