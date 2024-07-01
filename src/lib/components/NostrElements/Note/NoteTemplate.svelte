@@ -40,7 +40,7 @@
   <div class="p-1">
     <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
   </div>
-  <div class="p-1 max-w-full overflow-x-hidden">
+  <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
         <div>
