@@ -1,22 +1,20 @@
-<!-- channel list 10005 を表示する。
-channel list を取得、更新するぼたん。
-リストを選択する。
-ボタン押したらチャンネルページに飛ぶ。 -->
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import Link from "$lib/components/Elements/Link.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
 
   import Text from "$lib/components/NostrMainData/Text.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
+  import { _ } from "svelte-i18n";
 
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
+  //10005がない場合はのりすにとばす？
 </script>
 
 <section class="container">
@@ -29,7 +27,12 @@ channel list を取得、更新するぼたん。
         <ChannelMain queryKey={["kind10005", pubkey]} {pubkey} let:event>
           <div slot="loading">loading</div>
           <div slot="error">error</div>
-          <div slot="nodata">nodata</div>
+          <Link
+            slot="nodata"
+            className="underline text-magnum-300 break-all "
+            href={`https://nostviewstr.vercel.app/${pubkey}/${10005}`}
+            >{$_("nostviewstr.kind10005")}</Link
+          >
           {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
             <Text {id} queryKey={["kind40", id]}>
               <button

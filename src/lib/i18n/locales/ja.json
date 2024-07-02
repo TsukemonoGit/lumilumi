@@ -25,5 +25,8 @@
   "user": {
     "following": "フォロー中",
     "follow": "フォローする"
+  },
+  "nostviewstr": {
+    "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する"
   }
 }

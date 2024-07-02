@@ -1,10 +1,9 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import PopupProfileIcon from "./PopupProfileIcon.svelte";
-  import { decode } from "light-bolt11-decoder";
   import Reaction from "../Note/Reaction.svelte";
-  import Collapsible from "$lib/components/Elements/Collapsible.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   export let events: Nostr.Event[];
 
@@ -34,7 +33,34 @@
       <div class="flex-wrap px-2 gap-1">
         {#each filterEventsByContent(events, content) as event (event.id)}
           {#if event.pubkey}
-            <PopupProfileIcon pubkey={event.pubkey} />
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+              let:metadata
+            >
+              <UserMenu
+                slot="loading"
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+              />
+
+              <UserMenu
+                slot="error"
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+              />
+
+              <UserMenu
+                slot="nodata"
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+              />
+
+              <div><UserMenu pubkey={event.pubkey} {metadata} size={24} /></div>
+            </Metadata>
           {/if}
         {/each}
       </div>

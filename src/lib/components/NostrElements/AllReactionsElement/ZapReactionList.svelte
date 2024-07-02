@@ -1,9 +1,10 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import PopupProfileIcon from "./PopupProfileIcon.svelte";
   import { decode } from "light-bolt11-decoder";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import { Zap } from "lucide-svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
 
   export let events: Nostr.Event[];
 
@@ -43,7 +44,36 @@
       <div class="min-w-8 flex justify-center">{amount}</div>
       <div class="flex-wrap px-2 gap-1">
         {#each filterEventsByAmount(events, amount) as event (event.id)}
-          <PopupProfileIcon pubkey={pubkey(event) ?? ""} />
+          <Metadata
+            queryKey={["metadata", pubkey]}
+            pubkey={pubkey(event) ?? ""}
+            let:metadata
+          >
+            <UserMenu
+              slot="loading"
+              pubkey={pubkey(event) ?? ""}
+              metadata={undefined}
+              size={24}
+            />
+
+            <UserMenu
+              slot="error"
+              pubkey={pubkey(event) ?? ""}
+              metadata={undefined}
+              size={24}
+            />
+
+            <UserMenu
+              slot="nodata"
+              pubkey={pubkey(event) ?? ""}
+              metadata={undefined}
+              size={24}
+            />
+
+            <div>
+              <UserMenu pubkey={pubkey(event) ?? ""} {metadata} size={24} />
+            </div>
+          </Metadata>
           {#if event.content !== ""}{event.content}{/if}
         {/each}
       </div>

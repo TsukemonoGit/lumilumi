@@ -1,3 +1,4 @@
+<!-- tukattenai -->
 <script lang="ts">
   import { decode } from "light-bolt11-decoder";
   import Metadata from "../../NostrMainData/Metadata.svelte";

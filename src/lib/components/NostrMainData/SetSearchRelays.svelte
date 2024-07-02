@@ -1,18 +1,19 @@
 <script lang="ts">
   import { setRelays } from "$lib/func/nostr";
-
   import { loginUser, queryClient } from "$lib/stores/stores";
   import type { DefaultRelayConfig } from "rx-nostr";
 
   export let defaultRelays: DefaultRelayConfig[];
   export let setRelayList: string[];
 
-  console.log(defaultRelays);
-  let searchRelays: DefaultRelayConfig[] = [...defaultRelays];
+  // defaultRelays の中で read が true のものを含むように searchRelays を初期化
+  let searchRelays: DefaultRelayConfig[] = defaultRelays.filter(
+    (relay) => relay.read === true
+  );
   console.log($queryClient.getQueryData(["defaultRelay", $loginUser]));
-  searchRelays.forEach((relay) => (relay.read = false));
+
+  // setRelayList に基づいて searchRelays を更新
   setRelayList.forEach((url) => {
-    // defaultRelays に同じ URL があるかチェック
     const existingRelayIndex = searchRelays.findIndex(
       (relay) => relay.url === url
     );

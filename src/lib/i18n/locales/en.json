@@ -21,5 +21,8 @@
     "douki": {
       "title": "Sync"
     }
+  },
+  "nostviewstr": {
+    "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr"
   }
 }
