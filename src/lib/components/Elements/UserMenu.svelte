@@ -115,7 +115,7 @@
       colors={splitHexColorString(pubkey)}
     />
   {/if}
-  <div slot="popoverContent">
+  <div slot="popoverContent" class="w-[24rem] max-w-full">
     <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
 
     <div

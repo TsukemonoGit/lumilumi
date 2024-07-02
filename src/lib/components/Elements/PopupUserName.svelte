@@ -25,7 +25,7 @@
   export let pubkey: string;
   export let metadata: Nostr.Event | undefined;
   let dialogOpen: any;
-  if (metadata === undefined) {
+  if (metadata === undefined && pubkey) {
     metadata = $queryClient?.getQueryData(["metadata", pubkey]);
   }
   const baseMenuTexts = [
@@ -108,7 +108,7 @@
 
 <Popover>
   <UserName pubhex={pubkey} />
-  <div slot="popoverContent">
+  <div slot="popoverContent" class="w-[24rem] max-w-full">
     <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
 
     <div
