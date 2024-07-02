@@ -156,7 +156,7 @@
     const ev: Nostr.EventParameters = {
       content: checkedtext,
       tags: checkedTags,
-      kind: 1,
+      kind: note.kind === 42 ? 42 : 1,
     };
     publishEvent(ev);
     replyText = "";
