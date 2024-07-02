@@ -28,7 +28,7 @@ export const urlRegex = /(https?:\/\/+[^\s"'<`\]]+[^\s"'<`:\].]+)/g;
 export const emojiRegex = /(:[^:\s]+:)/g;
 export const hashtagRegex = /(?<=^|\s)#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu; //(?<hashtag>...) は、名前付きキャプチャグループ
 export const npubRegex = /^npub\w{59}$/;
-export const nipRegex = /^NIP-([0-9]{2,})/g;
+export const nipRegex = /NIP-([0-9]{2,})/g;
 
 export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   if (!ev) {
