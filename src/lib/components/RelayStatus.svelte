@@ -99,7 +99,7 @@
               <div slot="popoverContent" class="mr-8">
                 {$app.rxNostr.getRelayStatus(relay.url)?.connection}
               </div></Popover
-            ><span class="inline">{relay.url}</span>
+            ><span class="inline w-60">{relay.url}</span>
           </li>
         {/each}
       </ul>
@@ -117,7 +117,7 @@
               <div slot="popoverContent" class="mr-8">
                 {$app.rxNostr.getRelayStatus(relay.url)?.connection}
               </div></Popover
-            ><span class="inline">{relay.url}</span>
+            ><span class="inline w-60">{relay.url}</span>
           </li>
         {/each}
       </ul>
