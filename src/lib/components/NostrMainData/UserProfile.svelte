@@ -58,7 +58,7 @@
               {/if}
             </div>
           </div>
-          <div class="absolute bottom-2 right-2"><FollowButton {pubkey} /></div>
+          <div class="absolute bottom-1 right-2"><FollowButton {pubkey} /></div>
           <div
             class="bg-magnum-800 w-full border-b border-magnum-400"
             style="height:{bannerHeight}px"

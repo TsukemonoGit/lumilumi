@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq } from "rx-nostr";
+  import { createRxForwardReq, createTie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
@@ -10,6 +10,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
+  import { tieMapStore } from "$lib/stores/stores";
 
   export let data: {
     id: string;
@@ -20,6 +21,8 @@
 
   let amount = 50;
   let viewIndex = 0;
+  const [tie, tieMap] = createTie();
+  tieMapStore.set(tieMap);
 </script>
 
 <section>
@@ -48,6 +51,7 @@
           let:events
           {viewIndex}
           {amount}
+          {tie}
           let:len
         >
           <SetRepoReactions />

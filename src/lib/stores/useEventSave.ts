@@ -1,0 +1,18 @@
+import type { QueryKey } from "@tanstack/svelte-query";
+import type { EventPacket, RxNostr } from "rx-nostr";
+import { uniq, verify } from "rx-nostr";
+import { pipe } from "rxjs";
+
+import { useReq } from "$lib/func/nostr.js";
+import type { RxReqBase, ReqResult } from "$lib/types.js";
+
+export function useEventSave(
+  queryKey: QueryKey,
+  id: string,
+
+  req?: RxReqBase | undefined
+): ReqResult<EventPacket> {
+  const filters = [{ ids: [id], limit: 1 }];
+  const operator = pipe(uniq(), verify());
+  return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
+}
