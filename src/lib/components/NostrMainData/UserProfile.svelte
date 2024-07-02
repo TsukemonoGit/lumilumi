@@ -14,8 +14,8 @@
   import Avatar from "svelte-boring-avatars";
 
   export let pubkey: string;
-  export let bannerHeight: number = 224;
-  export let iconSize: number = 120;
+  export let bannerHeight: number = 180;
+  export let iconSize: number = 80;
   beforeNavigate(() => {});
 </script>
 
@@ -35,70 +35,68 @@
   </div>
   {#await profile(metadata) then profile}
     {#if profile}
-      <div class="relative w-full">
-        <div
-          class="bg-magnum-800 w-full border-b border-magnum-400"
-          style="height:{bannerHeight}px"
-        >
-          {#if $showImg && profile.banner}
-            <img
-              src={profile.banner}
-              alt="banner"
-              class="object-cover mx-auto"
-              style="height: 100%;  object-fit: cover; object-position: center;"
-              loading="lazy"
-            />
-          {/if}
-        </div>
-
-        <div
-          class="grid grid-cols-[auto_1fr] w-full align-items-end mt-[-42px] px-0 sm:px-4"
-        >
+      <div class="flex flex-col">
+        <div class="relative w-full">
           <div
-            class="relative z-10 border border-magnum-400 rounded-full flex h-fit"
+            class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
           >
-            {#if $showImg && profile.picture && profile.picture !== ""}
-              <UserAvatar
-                url={profile.picture}
-                name={profile.name ?? ""}
-                {pubkey}
-                size={iconSize}
-              />
-            {:else}
-              <Avatar
-                size={iconSize}
-                name={pubkey}
-                variant="beam"
-                colors={splitHexColorString(pubkey)}
+            <div class="border border-magnum-400 rounded-full">
+              {#if $showImg && profile.picture && profile.picture !== ""}
+                <UserAvatar
+                  url={profile.picture}
+                  name={profile.name ?? ""}
+                  {pubkey}
+                  size={iconSize}
+                />
+              {:else}
+                <Avatar
+                  size={iconSize}
+                  name={pubkey}
+                  variant="beam"
+                  colors={splitHexColorString(pubkey)}
+                />
+              {/if}
+            </div>
+          </div>
+          <div class="absolute bottom-2 right-2"><FollowButton {pubkey} /></div>
+          <div
+            class="bg-magnum-800 w-full border-b border-magnum-400"
+            style="height:{bannerHeight}px"
+          >
+            {#if $showImg && profile.banner}
+              <img
+                src={profile.banner}
+                alt="banner"
+                class="object-cover mx-auto"
+                style="height: 100%;  object-fit: cover; object-position: center;"
+                loading="lazy"
               />
             {/if}
           </div>
-          <div class="flex flex-row flex-wrap">
-            <div class="ml-3 flex flex-col justify-center mt-auto pb-2">
-              <div class="sm:text-xl text-md font-bold">
-                {profile.display_name ?? ""}@{profile.name}
-              </div>
-              <div class="text-sm text-neutral-500"></div>
-              {#if profile.nip05}
-                <div class="text-sm flex">
-                  {profile.nip05}<Nip05Check
-                    {pubkey}
-                    nip05Address={profile.nip05}
-                  />
-                </div>{/if}
-              {#if profile.website}<Link
-                  className="text-sm underline text-magnum-300 break-all"
-                  href={profile.website}>{profile.website}</Link
-                >{/if}
-            </div>
-            <FollowButton {pubkey} />
+        </div>
+
+        <div class=" flex flex-col justify-center mt-auto">
+          <div class="sm:text-xl text-md font-bold break-all">
+            {profile.display_name ?? ""}@{profile.name}
           </div>
+
+          {#if profile.nip05}
+            <div class="text-sm flex break-all">
+              {profile.nip05}<Nip05Check
+                {pubkey}
+                nip05Address={profile.nip05}
+              />
+            </div>{/if}
+          {#if profile.website}<Link
+              className="text-sm underline text-magnum-300 break-all  "
+              href={profile.website}>{profile.website}</Link
+            >{/if}
         </div>
 
         {#if profile.about}
           <div
-            class="whitespace-pre-wrap break-words overflow-y-auto mx-4 p-2 rounded-sm"
-            style="word-break: break-word; max-height:{bannerHeight}px"
+            class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
+            style="word-break: break-word; max-height:{bannerHeight * 1.5}px"
           >
             <Content text={profile.about} tags={metadata.tags} />
           </div>

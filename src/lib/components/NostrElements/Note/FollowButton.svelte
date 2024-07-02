@@ -182,17 +182,15 @@
 </script>
 
 {#if isfollowee !== undefined}
-  <div class="flex ml-auto items-end">
-    <button
-      disabled={$nowProgress}
-      class="rounded-full bg-white border border-magnum-700 p-3 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 opacity-100 {isfollowee
-        ? 'opacity-75'
-        : ''}"
-      on:click={handleClickFollow}
-    >
-      {isfollowee ? `${$_("user.following")}` : `${$_("user.follow")}`}
-    </button>
-  </div>
+  <button
+    disabled={$nowProgress}
+    class="rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 opacity-100 {isfollowee
+      ? 'opacity-75'
+      : ''}"
+    on:click={handleClickFollow}
+  >
+    {isfollowee ? `${$_("user.following")}` : `${$_("user.follow")}`}
+  </button>
 {/if}
 
 <AlertDialog bind:open={dialogOpen} {onClickOK} title="followList の 更新">
