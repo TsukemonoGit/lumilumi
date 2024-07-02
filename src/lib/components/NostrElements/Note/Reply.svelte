@@ -2,6 +2,9 @@
   import { Reply, Minimize2 } from "lucide-svelte";
   import UserName from "./UserName.svelte";
   import Note from "./Note.svelte";
+  import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
+  import Popover from "$lib/components/Elements/Popover.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let replyID: string | undefined;
   export let replyUsers: string[];
@@ -11,10 +14,10 @@
 
 {#if replyUsers.length > 0}
   <div
-    class="text-sm text-neutral-500 flex break-all flex-wrap overflow-x-hidden"
+    class="text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-1"
   >
     {#each replyUsers as user}
-      <UserName pubhex={user} />
+      <PopupUserName pubkey={user} metadata={undefined} />
     {/each}
   </div>
 {/if}

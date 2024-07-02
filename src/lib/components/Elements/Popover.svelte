@@ -16,10 +16,7 @@
   $: sync.open(open, (v) => (open = v));
 </script>
 
-<button
-  class="hover:opacity-75 active:opacity-50 text-magnum-500"
-  use:melt={$trigger}
->
+<button class="hover:opacity-75 active:opacity-50" use:melt={$trigger}>
   <slot></slot>
 </button>
 {#if open}
@@ -51,7 +48,7 @@
 
   .close {
     @apply absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full;
-    @apply text-magnum-900 transition-colors hover:bg-magnum-500/10;
+    @apply text-magnum-900 transition-colors hover:bg-magnum-100/50;
     @apply focus-visible:ring focus-visible:ring-magnum-400 focus-visible:ring-offset-2;
     @apply bg-white p-0 text-sm font-medium;
   }

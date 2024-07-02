@@ -185,7 +185,7 @@
   <div class="flex ml-auto items-end">
     <button
       disabled={$nowProgress}
-      class="rounded-full bg-white border border-magnum-700 p-3 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 {isfollowee
+      class="rounded-full bg-white border border-magnum-700 p-3 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 opacity-100 {isfollowee
         ? 'opacity-75'
         : ''}"
       on:click={handleClickFollow}

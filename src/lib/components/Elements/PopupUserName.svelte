@@ -20,12 +20,14 @@
   import { getRelaysById } from "$lib/func/nostr";
   import Popover from "./Popover.svelte";
   import UserProfile from "../NostrMainData/UserProfile.svelte";
+  import UserName from "../NostrElements/Note/UserName.svelte";
 
   export let pubkey: string;
-  export let size: number;
   export let metadata: Nostr.Event | undefined;
   let dialogOpen: any;
-
+  if (metadata === undefined) {
+    metadata = $queryClient?.getQueryData(["metadata", pubkey]);
+  }
   const baseMenuTexts = [
     { text: "Goto UserPage", icon: User, num: 0 },
     { text: "Copy Pubkey", icon: Copy, num: 1 },
@@ -105,16 +107,7 @@
 </script>
 
 <Popover>
-  {#if $showImg && url && url !== ""}
-    <UserAvatar {url} name={name ?? ""} {pubkey} {size} />
-  {:else}
-    <Avatar
-      {size}
-      name={pubkey}
-      variant="beam"
-      colors={splitHexColorString(pubkey)}
-    />
-  {/if}
+  <UserName pubhex={pubkey} />
   <div slot="popoverContent">
     <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
 
@@ -127,7 +120,7 @@
         <button
           on:click={() => handleSelectItem(num)}
           class="flex text-magnum-400
-     font-medium leading-none hover:bg-magnum-500/25 focus:bg-magnum-700/25 align-middle"
+   font-medium leading-none hover:bg-magnum-500/25 focus:bg-magnum-700/25 align-middle"
           ><div
             class="inline-flex rounded-full text-sm my-auto items-center py-1"
           >

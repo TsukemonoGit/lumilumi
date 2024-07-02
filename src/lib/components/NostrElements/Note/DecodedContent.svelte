@@ -6,6 +6,9 @@
   import EventCard from "./EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+  import Popover from "$lib/components/Elements/Popover.svelte";
+  import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let content: string | undefined;
   export let decoded:
@@ -32,9 +35,10 @@
 </script>
 
 {#if decoded.type === "npub"}
-  <span class="text-sm text-neutral-500 align-middle">
-    <UserName pubhex={decoded.data} /></span
-  >{:else if decoded.type === "nevent"}
+  <PopupUserName
+    pubkey={decoded.data}
+    metadata={undefined}
+  />{:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
     <Note id={decoded.data.id} mini={true} /><Quote
@@ -101,9 +105,7 @@
   </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->
-  <span class="text-sm text-neutral-500 flex-inline">
-    <UserName pubhex={decoded.data.pubkey} />
-  </span>
+  <PopupUserName pubkey={decoded.data.pubkey} metadata={undefined} />
 {:else if decoded.type === "nrelay"}<!---->
   <span class="text-sm text-neutral-500 flex-inline">
     {decoded.data}
