@@ -1,6 +1,6 @@
 <script lang="ts">
   import Metadata from "./Metadata.svelte";
-  import { profile } from "$lib/func/util";
+  import { profile, splitHexColorString } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import { showImg } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
@@ -10,7 +10,8 @@
   import Link from "../Elements/Link.svelte";
   import FollowButton from "../NostrElements/Note/FollowButton.svelte";
   import Content from "../NostrElements/Note/Content.svelte";
-  import UserMenu from "../Elements/UserMenu.svelte";
+  import UserAvatar from "../Elements/UserAvatar.svelte";
+  import Avatar from "svelte-boring-avatars";
 
   export let pubkey: string;
   export let bannerHeight: number = 224;
@@ -56,7 +57,21 @@
           <div
             class="relative z-10 border border-magnum-400 rounded-full flex h-fit"
           >
-            <UserMenu {pubkey} {metadata} size={iconSize} />
+            {#if $showImg && profile.picture && profile.picture !== ""}
+              <UserAvatar
+                url={profile.picture}
+                name={profile.name ?? ""}
+                {pubkey}
+                size={iconSize}
+              />
+            {:else}
+              <Avatar
+                size={iconSize}
+                name={pubkey}
+                variant="beam"
+                colors={splitHexColorString(pubkey)}
+              />
+            {/if}
           </div>
           <div class="flex flex-row flex-wrap">
             <div class="ml-3 flex flex-col justify-center mt-auto pb-2">
