@@ -27,6 +27,9 @@ channel list を取得、更新するぼたん。
       <div slot="nodata">nodata</div>
       <div class="flex flex-col gap-2 max-w-full overflow-x-hidden">
         <ChannelMain queryKey={["kind10005", pubkey]} {pubkey} let:event>
+          <div slot="loading">loading</div>
+          <div slot="error">error</div>
+          <div slot="nodata">nodata</div>
           {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
             <Text {id} queryKey={["kind40", id]}>
               <button
