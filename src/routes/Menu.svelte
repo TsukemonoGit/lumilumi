@@ -24,7 +24,7 @@
 
   const items: {
     Icon: any;
-    link: string;
+    link: string | undefined;
     alt: string;
   }[] = [
     { Icon: House, link: "/", alt: "home" },
@@ -36,7 +36,7 @@
     { Icon: Settings, link: "/settings", alt: "settings" },
     {
       Icon: UserAvatar2,
-      link: $loginUser ? `/${nip19.npubEncode($loginUser)}` : "/",
+      link: undefined,
       alt: "user page",
     },
   ];
@@ -78,10 +78,13 @@
         <ul class="flex flex-wrap w-40">
           {#each items as { Icon, link, alt }}
             <li
-              aria-current={$page.url?.pathname === link ? "page" : undefined}
+              aria-current={$page.url?.pathname ===
+              (link ?? `/${nip19.npubEncode($loginUser)}`)
+                ? "page"
+                : undefined}
             >
               <a
-                href={link}
+                href={link ?? `/${nip19.npubEncode($loginUser)}`}
                 class="item flex justify-center items-center"
                 use:melt={$item}
                 title={alt}
