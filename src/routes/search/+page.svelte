@@ -102,8 +102,12 @@
   };
 </script>
 
+<svelte:head>
+  <title>Lumilumi-Search</title>
+  <meta name="description" content="The Nostr webclient" />
+</svelte:head>
+
 <section>
-  <h1 class="text-5xl text-orange-600">Search</h1>
   <div class="container flex gap-2">
     <div class=" font-medium text-magnum-400">SearchRelays</div>
     <div class="text-sm">

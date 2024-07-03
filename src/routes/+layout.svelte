@@ -23,6 +23,8 @@
   import { pwaInfo } from "virtual:pwa-info";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";
+  import Menu from "./Menu.svelte";
+
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
     // make sure this is called before any
@@ -62,7 +64,9 @@
 </svelte:head>
 <QueryClientProvider client={$queryClient}>
   <Header />
+  <Menu />
   <Toast />
+
   <main>
     <slot />
     {#if $nowProgress}

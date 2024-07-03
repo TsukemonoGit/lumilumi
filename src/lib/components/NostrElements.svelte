@@ -17,8 +17,6 @@
   tieMapStore.set(tieMap);
 </script>
 
-<h1 class="text-5xl text-orange-600">timeline</h1>
-
 <NostrMain let:pubkey let:localRelays>
   <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
     <div slot="loading">loading</div>

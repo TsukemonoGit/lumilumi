@@ -20,6 +20,11 @@
   //10005がない場合はのりすにとばす？
 </script>
 
+<svelte:head>
+  <title>Lumilumi-List</title>
+  <meta name="description" content="The Nostr webclient" />
+</svelte:head>
+
 <section class="container">
   <NostrMain let:pubkey let:localRelays>
     <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>

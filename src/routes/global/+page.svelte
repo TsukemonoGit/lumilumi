@@ -20,8 +20,6 @@
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 <section>
-  <h1 class="text-5xl text-orange-600">Global</h1>
-
   <NostrMain let:pubkey let:localRelays>
     <SetDefaultRelays {pubkey} {localRelays} let:relays>
       <div slot="loading">loading</div>

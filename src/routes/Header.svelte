@@ -15,6 +15,7 @@
     MessagesSquare,
   } from "lucide-svelte";
   import type { EventPacket } from "rx-nostr";
+  import Menu from "./Menu.svelte";
 
   $: metadata = (
     $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
