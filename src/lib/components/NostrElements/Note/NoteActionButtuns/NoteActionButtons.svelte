@@ -9,6 +9,7 @@
     SmilePlus,
     Send,
     TriangleAlert,
+    Zap,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
@@ -28,6 +29,8 @@
   import { emojis, showImg } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import { nip33Regex } from "$lib/func/util";
+
+  import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
 
   export let note: Nostr.Event;
 
@@ -287,6 +290,8 @@
       onWarning = false;
     }
   }
+
+  const handleClickZap = () => {};
 </script>
 
 <div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden">
@@ -362,6 +367,45 @@
     </Reactioned>
     <!--カスタムリアクション-->
     <CustomReaction {note} />
+  {/if}
+
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
+    <Zapped id={note.id} let:event>
+      <button slot="loading" on:click={handleClickZap}>
+        <Zap
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+        />
+      </button>
+
+      <button slot="nodata" on:click={handleClickZap}>
+        <Zap
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+        />
+      </button>
+
+      <button slot="error" on:click={handleClickZap}>
+        <Zap
+          size="20"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+        />
+      </button>
+
+      {#if event === undefined}
+        <button on:click={handleClickZap}>
+          <Zap
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+          />
+        </button>
+      {:else}
+        <Zap
+          size="20"
+          class="text-magnum-500 overflow-hidden fill-magnum-500"
+        />
+      {/if}
+    </Zapped>
   {/if}
   <!--メニュー-->
   <EllipsisMenu {note} />
