@@ -35,10 +35,9 @@
 </script>
 
 {#if decoded.type === "npub"}
-  <PopupUserName
-    pubkey={decoded.data}
-    metadata={undefined}
-  />{:else if decoded.type === "nevent"}
+  <span class="text-magnum-100"
+    ><PopupUserName pubkey={decoded.data} metadata={undefined} /></span
+  >{:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
     <Note id={decoded.data.id} mini={true} /><Quote
@@ -105,7 +104,9 @@
   </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->
-  <PopupUserName pubkey={decoded.data.pubkey} metadata={undefined} />
+  <span class="text-magnum-100"
+    ><PopupUserName pubkey={decoded.data.pubkey} metadata={undefined} /></span
+  >
 {:else if decoded.type === "nrelay"}<!---->
   <span class="text-sm text-neutral-500 flex-inline">
     {decoded.data}

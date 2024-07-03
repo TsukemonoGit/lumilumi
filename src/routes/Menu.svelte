@@ -64,7 +64,7 @@
       use:melt={$trigger}
       aria-label="Update dimensions"
     >
-      <svelte:component this={$currentPageIcon} class="size-5" />
+      <svelte:component this={$currentPageIcon} class="size-6" />
 
       <span class="sr-only">Open Popover</span>
     </button>
@@ -75,11 +75,10 @@
       transition:fly={{ duration: 150, y: -10 }}
     >
       <nav class="p-2">
-        <ul class="flex flex-wrap w-32">
+        <ul class="flex flex-wrap w-40">
           {#each items as { Icon, link, alt }}
             <li
               aria-current={$page.url?.pathname === link ? "page" : undefined}
-              class="w-[32px] h-[32px]"
             >
               <a
                 href={link}
@@ -107,7 +106,7 @@
     @apply min-w-[220px] shadow-md shadow-neutral-900/30;
   }
   .item {
-    @apply relative w-[32px] h-[32px] select-none rounded-sm;
+    @apply relative w-[40px] h-[40px] select-none rounded-sm;
     @apply z-20 text-magnum-900 outline-none;
     @apply data-[highlighted]:bg-magnum-200 data-[highlighted]:text-magnum-900;
     @apply data-[disabled]:text-neutral-300;
