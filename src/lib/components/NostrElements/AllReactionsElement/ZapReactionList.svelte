@@ -70,9 +70,7 @@
               size={24}
             />
 
-            <div>
-              <UserMenu pubkey={pubkey(event) ?? ""} {metadata} size={24} />
-            </div>
+            <UserMenu pubkey={pubkey(event) ?? ""} {metadata} size={24} />
           </Metadata>
           {#if event.content !== ""}{event.content}{/if}
         {/each}

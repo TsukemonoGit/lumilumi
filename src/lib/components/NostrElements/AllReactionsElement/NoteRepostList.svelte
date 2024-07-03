@@ -35,7 +35,7 @@
           size={24}
         />
 
-        <div><UserMenu pubkey={event.pubkey} {metadata} size={24} /></div>
+        <UserMenu pubkey={event.pubkey} {metadata} size={24} />
       </Metadata>
     {/each}
   </div>
