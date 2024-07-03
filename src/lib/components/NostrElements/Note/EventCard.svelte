@@ -34,7 +34,7 @@
   export let mini: boolean = false;
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
-
+  export let displayMenu: boolean = true;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -201,8 +201,8 @@
             <ProxyTag proxyTag={tag} />
           </div>
         {/if}
-
-        <NoteActionButtons {note} />
+        {#if displayMenu}
+          <NoteActionButtons {note} />{/if}
       </NoteTemplate>
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
@@ -233,7 +233,8 @@
           </div>
         {/if}
         <div class="ml-auto mr-2">
-          <NoteActionButtons {note} />
+          {#if displayMenu}
+            <NoteActionButtons {note} />{/if}
         </div>
       </div>
 
@@ -267,7 +268,8 @@
           </div>
         {/if}
         <div class="ml-auto">
-          <NoteActionButtons {note} />
+          {#if displayMenu}
+            <NoteActionButtons {note} />{/if}
         </div>
       </div>
 
@@ -308,7 +310,7 @@
           {note.tags}
           <hr />
           <Content text={note.content} tags={note.tags} />
-          <NoteActionButtons {note} />
+          {#if displayMenu}<NoteActionButtons {note} />{/if}
         {:else}
           <!--client tag 31990 を さがす　-->
           <LatestEvent
@@ -326,7 +328,7 @@
               {note.tags}
               <hr />
               <Content text={note.content} tags={note.tags} />
-              <NoteActionButtons {note} />
+              {#if displayMenu}<NoteActionButtons {note} />{/if}
             </div>
             <div slot="nodata">
               <div class="break-all overflow-x-hidden">
@@ -338,7 +340,7 @@
               {note.tags}
               <hr />
               <Content text={note.content} tags={note.tags} />
-              <NoteActionButtons {note} />
+              {#if displayMenu}<NoteActionButtons {note} />{/if}
             </div>
             <div slot="error" let:error>
               <div class="break-all overflow-x-hidden">
@@ -350,7 +352,7 @@
               {note.tags}
               <hr />
               <Content text={note.content} tags={note.tags} />
-              <NoteActionButtons {note} />
+              {#if displayMenu}<NoteActionButtons {note} />{/if}
             </div>
 
             {#await findWebURL(event.tags, clientData) then urls}
@@ -371,7 +373,7 @@
                     >
                   </div>
                 {/each}
-                <NoteActionButtons {note} />
+                {#if displayMenu}<NoteActionButtons {note} />{/if}
               {:else}
                 <div class="break-all overflow-x-hidden">
                   kind:{note.kind}{#if metadata}
@@ -382,7 +384,7 @@
                 {note.tags}
                 <hr />
                 <Content text={note.content} tags={note.tags} />
-                <NoteActionButtons {note} />
+                {#if displayMenu}<NoteActionButtons {note} />{/if}
               {/if}
             {/await}
           </LatestEvent>

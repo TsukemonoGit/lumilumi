@@ -13,8 +13,12 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
-  import { nip19 } from "nostr-tools";
+  import {
+    getDefaultWriteRelays,
+    getRelaysById,
+    publishEvent,
+  } from "$lib/func/nostr";
+  import { nip19, type EventTemplate } from "nostr-tools";
 
   import type { Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
@@ -26,14 +30,24 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
-  import { emojis, queryClient, showImg } from "$lib/stores/stores";
+  import {
+    app,
+    emojis,
+    nowProgress,
+    queryClient,
+    showImg,
+  } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import { nip33Regex, profile } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard.svelte";
-
+  import { getZapEndpoint, makeZapRequest } from "nostr-tools/nip57";
+  import { onMount } from "svelte";
+  import QRCode from "qrcode";
+  import Popover from "$lib/components/Elements/Popover.svelte";
+  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   export let note: Nostr.Event;
 
   let openReplyWindow: boolean = false;
@@ -292,16 +306,84 @@
       onWarning = false;
     }
   }
-
+  let invoice: string | undefined = undefined;
   let dialogOpen: any;
-  let zapAmount: number;
+  let zapAmount: number = 50;
   let zapComment: string;
+  let invoiceOpen: any;
+
   const handleClickZap = () => {
     $dialogOpen = true;
     //zapの量決めるダイアログ出す
   };
+  onMount(() => {
+    const storagezap = localStorage.getItem("zap");
 
-  const onClickOK = () => {};
+    zapAmount = Number(storagezap);
+  });
+  const onClickOK = async (metadata: Nostr.Event) => {
+    console.log(zapAmount);
+    console.log(zapComment);
+    if (zapAmount <= 0) {
+      //toast dasite
+      $dialogOpen = false;
+      return;
+    }
+
+    const zapEndpoint = await getZapEndpoint(metadata);
+    console.log(zapEndpoint);
+    if (!zapEndpoint) {
+      $dialogOpen = false;
+      return;
+    }
+    $nowProgress = true;
+    const amount = zapAmount * 1000;
+    try {
+      const zapRequest: EventTemplate = makeZapRequest({
+        profile: metadata.pubkey,
+        event: note.id ?? undefined,
+        amount: amount,
+        relays: getDefaultWriteRelays(),
+        comment: zapComment,
+      });
+      const signedRequest = await (
+        window.nostr as Nostr.Nip07.Nostr
+      )?.signEvent(zapRequest);
+      const encoded = encodeURI(JSON.stringify(signedRequest));
+
+      const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
+      console.log("[zap url]", url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error("[zap failed]", await response.text());
+        $nowProgress = false;
+        $dialogOpen = false;
+        return;
+      }
+      const payment = await response.json();
+      const { pr: zapInvoice } = payment;
+      console.log("[zap invoice]", zapInvoice);
+      if (zapInvoice === undefined) {
+        console.error("[zap failed]", payment);
+        $nowProgress = false;
+        $dialogOpen = false;
+        return;
+      }
+      $nowProgress = false;
+      invoice = zapInvoice;
+      $dialogOpen = false;
+      $invoiceOpen = true;
+      //サップの量保存
+      const storage = localStorage.setItem("zap", zapAmount.toString());
+    } catch (error) {
+      $nowProgress = false;
+      console.log(error);
+      $dialogOpen = false;
+    }
+  };
+  $: if (!$invoiceOpen) {
+    invoice = undefined;
+  }
 </script>
 
 <div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden">
@@ -426,23 +508,35 @@
               />
             {/if}
           </Zapped>
-          <AlertDialog bind:open={dialogOpen} {onClickOK} title="Zap">
-            <div slot="main">
-              <EventCard {note} {metadata} />
-              <input
-                type="number"
-                id="amount"
-                class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-                placeholder="amount"
-                bind:value={zapAmount}
-              />
-              <input
-                type="text"
-                id="comment"
-                class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
-                placeholder="comment"
-                bind:value={zapComment}
-              />
+          <AlertDialog
+            bind:open={dialogOpen}
+            onClickOK={() => onClickOK(metadata)}
+            title="Zap"
+          >
+            <div slot="main" class=" text-neutral-200">
+              <div class="rounded-md">
+                <EventCard {note} {metadata} displayMenu={false} />
+              </div>
+              <div class="mt-4 rounded-md">
+                <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+                <input
+                  type="number"
+                  id="amount"
+                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                  placeholder="amount"
+                  bind:value={zapAmount}
+                />
+                <div class="pt-1 text-magnum-300 font-bold text-lg">
+                  comment
+                </div>
+                <input
+                  type="text"
+                  id="comment"
+                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                  placeholder="comment"
+                  bind:value={zapComment}
+                />
+              </div>
             </div></AlertDialog
           >
         {:else}<div class="w-[20px]" />{/if}{/await}</Metadata
@@ -750,3 +844,13 @@
     {/if}
   </div>
 {/if}
+<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice />
+
+<style>
+  input[type="text"] {
+    background-color: rgb(var(--color-neutral-800) / 1);
+  }
+  input[type="number"] {
+    background-color: rgb(var(--color-neutral-800) / 1);
+  }
+</style>

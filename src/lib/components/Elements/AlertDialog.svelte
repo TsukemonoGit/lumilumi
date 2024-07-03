@@ -28,18 +28,18 @@
     <div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" />
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white
+            max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-neutral-800
             p-6 shadow-lg"
       use:melt={$content}
     >
-      <h2 use:melt={$ttl} class="m-0 text-lg font-medium text-zinc-800">
+      <h2 use:melt={$ttl} class="m-0 text-lg font-medium text-zinc-200">
         {title}
       </h2>
-      <p use:melt={$dsc} class="mb-5 mt-2 leading-normal text-zinc-600">
+      <p use:melt={$dsc} class="mb-5 mt-2 leading-normal text-zinc-400">
         {description}
       </p>
 
-      <div class="mb-4 text-zinc-600">
+      <div class="mb-4 text-zinc-200">
         <slot name="main" />
       </div>
 

@@ -58,7 +58,12 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
   defaultRelays.set(rxNostr.getDefaultRelays());
   set3Relays(relays);
 }
-
+export function getDefaultWriteRelays(): string[] {
+  const relays = rxNostr.getDefaultRelays();
+  return Object.values(relays)
+    .filter((config) => config.write)
+    .map((config) => config.url);
+}
 // metadataの保存
 let savedMetadata: [QueryKey, EventPacket][] = [];
 let followingList: string[] = [];

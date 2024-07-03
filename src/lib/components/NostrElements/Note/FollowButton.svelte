@@ -202,17 +202,17 @@
       >
         <ul class="leading-4">
           <li>
-            Created at <span class="font-semibold text-zinc-800"
+            Created at <span class="font-semibold text-zinc-200"
               >{formatAbsoluteDate($beforeKind3?.created_at, true)}</span
             >
           </li>
           <li>
-            List length <span class="font-semibold text-zinc-800"
+            List length <span class="font-semibold text-zinc-200"
               >{$beforeKind3?.tags.length}</span
             >
           </li>
           <li>
-            Followee <span class="font-semibold text-zinc-800"
+            Followee <span class="font-semibold text-zinc-200"
               >{pubkeysIn($beforeKind3).length}</span
             >
           </li>
@@ -227,12 +227,12 @@
       >
         <ul class="leading-4">
           <li>
-            List length <span class="font-semibold text-zinc-800"
+            List length <span class="font-semibold text-magnum-300"
               >{$afterEventParameters?.tags?.length}</span
             >
           </li>
           <li>
-            Followee <span class="font-semibold text-zinc-800"
+            Followee <span class="font-semibold text-magnum-300"
               >{$afterEventParameters?.tags?.reduce((acc, [tag, value]) => {
                 if (tag === "p") {
                   return [...acc, value];
