@@ -24,11 +24,11 @@
 
   $: amounts = [...new Set(events.map(getAmount))].sort((a, b) => b - a); // Sort amounts in descending order
 
-  const pubkey = (event: Nostr.Event): string | undefined => {
+  const zapperEvent = (event: Nostr.Event): Nostr.Event | undefined => {
     try {
       return JSON.parse(
         event.tags.find((tag) => tag[0] === "description")?.[1] ?? ""
-      ).pubkey;
+      );
     } catch (error) {
       return undefined;
     }
@@ -38,41 +38,48 @@
 <CollapsibleList title="Zap" bind:amount={events.length}>
   {#each amounts as amount}
     <div
-      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex"
+      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex items-center align-middle"
     >
       <Zap class="stroke-orange-400 fill-orange-400" size={20} />
       <div class="min-w-8 flex justify-center">{amount}</div>
-      <div class="flex-wrap px-2 gap-1">
+      <div class="flex-wrap px-2 gap-1 items-center">
         {#each filterEventsByAmount(events, amount) as event (event.id)}
-          <Metadata
-            queryKey={["metadata", pubkey(event)]}
-            pubkey={pubkey(event) ?? ""}
-            let:metadata
-          >
-            <UserMenu
-              slot="loading"
-              pubkey={pubkey(event) ?? ""}
-              metadata={undefined}
-              size={24}
-            />
+          {@const zapper = zapperEvent(event)}
+          {#if zapper}
+            <Metadata
+              queryKey={["metadata", zapper?.pubkey]}
+              pubkey={zapper.pubkey ?? ""}
+              let:metadata
+            >
+              <UserMenu
+                slot="loading"
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+              />
 
-            <UserMenu
-              slot="error"
-              pubkey={pubkey(event) ?? ""}
-              metadata={undefined}
-              size={24}
-            />
+              <UserMenu
+                slot="error"
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+              />
 
-            <UserMenu
-              slot="nodata"
-              pubkey={pubkey(event) ?? ""}
-              metadata={undefined}
-              size={24}
-            />
+              <UserMenu
+                slot="nodata"
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+              />
 
-            <UserMenu pubkey={pubkey(event) ?? ""} {metadata} size={24} />
-          </Metadata>
-          {#if event.content !== ""}{event.content}{/if}
+              <UserMenu pubkey={zapper.pubkey ?? ""} {metadata} size={24} />
+            </Metadata>
+            {#if zapper.content !== ""}<div
+                class="inline-flex my-auto break-all"
+              >
+                {zapper.content}
+              </div>{/if}
+          {/if}
         {/each}
       </div>
     </div>
