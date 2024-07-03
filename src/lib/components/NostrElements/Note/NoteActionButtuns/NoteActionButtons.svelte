@@ -26,11 +26,13 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
-  import { emojis, showImg } from "$lib/stores/stores";
+  import { emojis, queryClient, showImg } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
-  import { nip33Regex } from "$lib/func/util";
+  import { nip33Regex, profile } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import EventCard from "../EventCard.svelte";
 
   export let note: Nostr.Event;
 
@@ -291,7 +293,15 @@
     }
   }
 
-  const handleClickZap = () => {};
+  let dialogOpen: any;
+  let zapAmount: number;
+  let zapComment: string;
+  const handleClickZap = () => {
+    $dialogOpen = true;
+    //zapの量決めるダイアログ出す
+  };
+
+  const onClickOK = () => {};
 </script>
 
 <div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden">
@@ -370,42 +380,73 @@
   {/if}
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
-    <Zapped id={note.id} let:event>
-      <button slot="loading" on:click={handleClickZap}>
-        <Zap
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
-        />
-      </button>
+    <Metadata
+      queryKey={["metadata", note.pubkey]}
+      pubkey={note.pubkey}
+      let:metadata
+      ><div slot="loading" class="w-[20px]"></div>
+      <div slot="nodata" class="w-[20px]"></div>
+      <div slot="error" class="w-[20px]"></div>
+      {#await profile(metadata) then prof}
+        {#if prof && prof.lud16}<!--lud16がある人のみ⚡️表示-->
 
-      <button slot="nodata" on:click={handleClickZap}>
-        <Zap
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-        />
-      </button>
+          <Zapped id={note.id} let:event>
+            <button slot="loading" on:click={handleClickZap}>
+              <Zap
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+              />
+            </button>
 
-      <button slot="error" on:click={handleClickZap}>
-        <Zap
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-        />
-      </button>
+            <button slot="nodata" on:click={handleClickZap}>
+              <Zap
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+              />
+            </button>
 
-      {#if event === undefined}
-        <button on:click={handleClickZap}>
-          <Zap
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-          />
-        </button>
-      {:else}
-        <Zap
-          size="20"
-          class="text-magnum-500 overflow-hidden fill-magnum-500"
-        />
-      {/if}
-    </Zapped>
+            <button slot="error" on:click={handleClickZap}>
+              <Zap
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+              />
+            </button>
+
+            {#if event === undefined}
+              <button on:click={handleClickZap}>
+                <Zap
+                  size="20"
+                  class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+                />
+              </button>
+            {:else}
+              <Zap
+                size="20"
+                class="text-magnum-500 overflow-hidden fill-magnum-500"
+              />
+            {/if}
+          </Zapped>
+          <AlertDialog bind:open={dialogOpen} {onClickOK} title="Zap">
+            <div slot="main">
+              <EventCard {note} {metadata} />
+              <input
+                type="number"
+                id="amount"
+                class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
+                placeholder="amount"
+                bind:value={zapAmount}
+              />
+              <input
+                type="text"
+                id="comment"
+                class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
+                placeholder="comment"
+                bind:value={zapComment}
+              />
+            </div></AlertDialog
+          >
+        {:else}<div class="w-[20px]" />{/if}{/await}</Metadata
+    >
   {/if}
   <!--メニュー-->
   <EllipsisMenu {note} />

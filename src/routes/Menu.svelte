@@ -4,8 +4,6 @@
   import {
     AlignJustify,
     Bell,
-    Check,
-    ChevronRight,
     Globe,
     House,
     MessagesSquare,
@@ -13,12 +11,10 @@
     Settings,
     Users,
   } from "lucide-svelte";
-  import { derived, writable } from "svelte/store";
+  import { derived } from "svelte/store";
   import { fly } from "svelte/transition";
-  import { loginUser, queryClient } from "$lib/stores/stores";
-  import type { EventPacket } from "rx-nostr";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
-  import type { SvelteComponent } from "svelte";
+  import { loginUser } from "$lib/stores/stores";
+
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
 
@@ -54,6 +50,20 @@
     const currentItem = items.find((item) => item.link === $page.url?.pathname);
     return currentItem ? currentItem.Icon : AlignJustify;
   });
+
+  let encodedPub: string;
+  $: if ($loginUser) {
+    pubCheck();
+  }
+
+  const pubCheck = () => {
+    try {
+      const pub = nip19.npubEncode($loginUser);
+      if (pub) {
+        encodedPub = pub;
+      }
+    } catch (error) {}
+  };
 </script>
 
 <div class="fixed bottom-5 right-5 z-20">
@@ -79,12 +89,12 @@
           {#each items as { Icon, link, alt }}
             <li
               aria-current={$page.url?.pathname ===
-              (link ?? `/${nip19.npubEncode($loginUser)}`)
+              (link === undefined && $loginUser ? `/${encodedPub}` : link)
                 ? "page"
                 : undefined}
             >
               <a
-                href={link ?? `/${nip19.npubEncode($loginUser)}`}
+                href={link ?? `/${encodedPub}`}
                 class="item flex justify-center items-center"
                 use:melt={$item}
                 title={alt}
