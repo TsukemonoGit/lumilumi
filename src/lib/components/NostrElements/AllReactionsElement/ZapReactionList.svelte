@@ -45,7 +45,7 @@
       <div class="flex-wrap px-2 gap-1">
         {#each filterEventsByAmount(events, amount) as event (event.id)}
           <Metadata
-            queryKey={["metadata", pubkey]}
+            queryKey={["metadata", pubkey(event)]}
             pubkey={pubkey(event) ?? ""}
             let:metadata
           >
