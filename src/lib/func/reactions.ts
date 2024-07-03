@@ -10,6 +10,7 @@ import {
 import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
+import { zapCheck } from "$lib/stores/operators";
 const rxNostr3 = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
 export function set3Relays(relays: any) {
   rxNostr3.setDefaultRelays(relays);
@@ -46,7 +47,9 @@ export function useReq3({
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = rxNostr3.use(req3).pipe(operator);
+  const obs: Observable<EventPacket> = rxNostr3
+    .use(req3)
+    .pipe(operator, zapCheck());
 
   const query = createQuery({
     queryKey: ["reactions"],
@@ -68,6 +71,9 @@ export function useReq3({
               } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
                 //          console.log("[repost]", v);
                 _queryClient.setQueryData(["reactions", "repost", etag[1]], v);
+              } else if (v.event.kind === 9735 && etag) {
+                //          console.log("[repost]", v);
+                _queryClient.setQueryData(["reactions", "zapped", etag[1]], v);
               }
             } else {
               resolve(v);

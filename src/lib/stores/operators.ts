@@ -7,9 +7,15 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
-import { metadataQueue, mutebykinds, mutes, queryClient } from "./stores";
+import {
+  loginUser,
+  metadataQueue,
+  mutebykinds,
+  mutes,
+  queryClient,
+} from "./stores";
 import { get } from "svelte/store";
-
+import * as Nostr from "nostr-typedef";
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
@@ -238,3 +244,28 @@ function shouldMuteByKinds(eventPacket: EventPacket): boolean {
   }
   return false;
 }
+
+export function zapCheck() {
+  return filter((event: EventPacket) => {
+    if (event.event.kind !== 9735) {
+      return true; // kindが9735でない場合はtrueを返す（イベントを通過させる）
+    }
+
+    const pub = pubkey(event.event);
+    if (pub === get(loginUser)) {
+      return true; // kindが9735で、かつpubがget(loginUser)と一致する場合はtrueを返す（イベントを通過させる）
+    } else {
+      return false; // 上記以外の場合はfalseを返す（イベントを通過させない）
+    }
+  });
+}
+
+const pubkey = (event: Nostr.Event): string | undefined => {
+  try {
+    return JSON.parse(
+      event.tags.find((tag) => tag[0] === "description")?.[1] ?? ""
+    ).pubkey;
+  } catch (error) {
+    return undefined;
+  }
+};

@@ -35,7 +35,11 @@
         {
           "#e": $viewEventIds,
           authors: [$loginUser],
-          kinds: [7, 6, 16], // 明示的に種類を指定
+          kinds: [7, 6, 16],
+        },
+        {
+          "#e": $viewEventIds,
+          kinds: [9735],
         },
       ];
 
