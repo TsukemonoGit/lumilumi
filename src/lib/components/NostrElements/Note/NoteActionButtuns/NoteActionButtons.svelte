@@ -308,6 +308,7 @@
           : ''}"
       />
     </button>
+
     <!--リポスト-->
     <Reposted id={note.id} let:event>
       <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
@@ -323,6 +324,8 @@
         <Repeat2 size="20" class={event ? "text-magnum-200 " : ""} />
       </DropdownMenu>
     </Reposted>
+  {/if}
+  {#if note.kind !== 9734}
     <!--リアクション-->
     <Reactioned id={note.id} let:event>
       <button slot="loading" on:click={handleClickReaction}>
