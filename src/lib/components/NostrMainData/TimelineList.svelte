@@ -119,19 +119,27 @@
 </script>
 
 {#if viewIndex !== 0}
-  <button
-    class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
-    on:click={() => handleClickTop()}
-    disabled={$nowProgress}
-    ><SkipForward size={20} class="mx-auto -rotate-90" /></button
-  >
+  <div class="p-1">
+    <button
+      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+      on:click={() => handleClickTop()}
+      disabled={$nowProgress}
+      ><SkipForward
+        size={20}
+        class="mx-auto -rotate-90 stroke-magnum-200 fill-magnum-200"
+      /></button
+    >
 
-  <button
-    disabled={$nowProgress}
-    class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
-    on:click={() => handlePrev()}
-    ><Triangle size={20} class="mx-auto " /></button
-  >
+    <button
+      disabled={$nowProgress}
+      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+      on:click={() => handlePrev()}
+      ><Triangle
+        size={20}
+        class="mx-auto stroke-magnum-200 fill-magnum-200"
+      /></button
+    >
+  </div>
 {/if}
 
 {#if $error}
@@ -143,10 +151,17 @@
 {:else}
   <slot name="nodata" />
 {/if}
-
-<button
-  disabled={$nowProgress}
-  class=" bg-magnum-400 p-1 rounded-sm ring-1 ring-magnum-200 disabled:opacity-25"
-  on:click={() => handleNext()}
-  ><Triangle size={20} class="mx-auto rotate-180 " /></button
->
+<div class="p-1">
+  <button
+    disabled={$nowProgress}
+    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+    on:click={() => handleNext()}
+    ><Triangle
+      size={20}
+      class="rotate-180 stroke-magnum-200 fill-magnum-200"
+    />Load more<Triangle
+      size={20}
+      class="rotate-180 stroke-magnum-200 fill-magnum-200"
+    /></button
+  >
+</div>
