@@ -105,10 +105,12 @@
     uploadedURPs.forEach((data) => {
       if (data.status === "success") {
         const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+
         if (url) {
+          const urln = `\n ${url} \n`;
           text =
-            text.slice(0, cursorPosition) + url + text.slice(cursorPosition);
-          cursorPosition += url.length;
+            text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
+          cursorPosition += urln.length;
         }
       }
     });
