@@ -53,6 +53,7 @@
       return undefined;
     }
   };
+  let imgError: boolean = false;
 </script>
 
 {#each parts as part}
@@ -64,14 +65,18 @@
     {/await}
   {:else if part.type === "url" && part.content}
     {#if $showImg && imageRegex.test(part.content)}
-      <Link href={part.content}
-        ><img
-          loading="lazy"
-          alt="img"
-          src={part.content}
-          class=" max-w-[min(20rem,100%)] max-h-full object-contain"
-        /></Link
-      >
+      {#if !imgError}<Link href={part.content}
+          ><img
+            loading="lazy"
+            alt="img"
+            src={part.content}
+            class=" max-w-[min(20rem,100%)] max-h-full object-contain"
+            on:error={() => (imgError = true)}
+          /></Link
+        >{:else}<Link
+          className="underline text-magnum-300 break-all "
+          href={part.content}>{part.content}</Link
+        >{/if}
     {:else if $showImg && movieRegex.test(part.content)}
       <Link href={part.content}
         ><video
