@@ -121,7 +121,7 @@
 {#if viewIndex !== 0}
   <div class="p-1">
     <button
-      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75 focus:opacity-50"
       on:click={() => handleClickTop()}
       disabled={$nowProgress}
       ><SkipForward
@@ -132,7 +132,7 @@
 
     <button
       disabled={$nowProgress}
-      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75 focus:opacity-50"
       on:click={() => handlePrev()}
       ><Triangle
         size={20}
@@ -154,7 +154,7 @@
 <div class="p-1">
   <button
     disabled={$nowProgress}
-    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1"
+    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75 focus:opacity-50"
     on:click={() => handleNext()}
     ><Triangle
       size={20}
