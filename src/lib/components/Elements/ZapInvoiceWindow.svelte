@@ -6,7 +6,7 @@
   import { fade } from "svelte/transition";
   export let invoice: string | undefined;
   $: url = invoice ? `lightning:${invoice}` : undefined;
-  $: console.log(invoice);
+  // $: console.log(invoice);
   const {
     elements: {
       trigger,

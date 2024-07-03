@@ -539,7 +539,7 @@
               </div>
             </div></AlertDialog
           >
-        {:else}<div class="w-[20px]" />{/if}{/await}</Metadata
+        {:else}<div class="w-[20px] overflow-hidden" />{/if}{/await}</Metadata
     >
   {/if}
   <!--メニュー-->

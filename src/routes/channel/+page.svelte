@@ -61,7 +61,7 @@
                 }}>nodata {nip19.noteEncode(id)}</button
               >
               <button
-                class="text-left w-full border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg"
+                class="text-left w-full border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
                 on:click={() => {
                   handleClickToChannel(id);
                 }}
