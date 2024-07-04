@@ -363,7 +363,7 @@ export function relaysReconnectChallenge() {
   });
 }
 export function getRelaysById(id: string): string[] {
-  return Array.from(get(tieMapStore).get(id) || []);
+  return Array.from(get(tieMapStore)?.get(id) || []);
 }
 export function usePromiseReq({
   queryKey,

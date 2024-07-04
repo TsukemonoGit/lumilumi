@@ -76,6 +76,7 @@
     warningText = "";
     onWarning = false;
     viewCustomEmojis = false;
+    customReaction = "";
   };
 
   const handleTextareaInput = (event: Event) => {
@@ -221,7 +222,7 @@
               onWarning = !onWarning;
             }}
             class=" h-8 rounded-sm
-                bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 focus:opacity-50"
+                bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75"
           >
             <TriangleAlert
               size="20"
