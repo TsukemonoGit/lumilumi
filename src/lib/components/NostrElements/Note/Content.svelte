@@ -114,6 +114,7 @@
         loading="lazy"
         alt={`:${part.content}:`}
         src={part.url}
+        title={`:${part.content}:`}
         class="inline h-[24px] object-contain m-0 overflow-hidden"
       />
     {:else}
