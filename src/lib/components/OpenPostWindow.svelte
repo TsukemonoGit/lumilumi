@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { _ } from "svelte-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
@@ -36,7 +37,10 @@
   let files: FileList | undefined;
   let fileInput: HTMLInputElement | undefined;
 
-  const { elements, states } = createDialog({ forceVisible: true });
+  const { elements, states } = createDialog({
+    forceVisible: true,
+    closeOnOutsideClick: false, //overlay押したときに閉じない
+  });
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
 
@@ -150,6 +154,31 @@
     //開いたときにフォーカス
     textarea?.focus();
   }
+
+  //Close確認用
+  const {
+    elements: {
+      trigger: triggerConfirm,
+      overlay: overlayConfirm,
+      content: contentConfirm,
+      title: titleConfirm,
+      description: descriptionConfirm,
+      close: closeConfirm,
+      portalled: portalledConfirm,
+    },
+    states: { open: openConfirm },
+  } = createDialog({ forceVisible: true, closeOnOutsideClick: false }); //overlay押したときに閉じない});
+
+  // オーバーレイクリック時の処理を追加
+  const handleOverlayClick = (event: MouseEvent) => {
+    if (text.trim().length > 0) {
+      // テキストエリアに入力がある場合、アラートを表示
+      $openConfirm = true;
+    } else {
+      // テキストエリアが空の場合、ダイアログを閉じる
+      $open = false;
+    }
+  };
 </script>
 
 <button
@@ -162,10 +191,11 @@
 
 {#if $open}
   <div use:melt={$portalled}>
-    <div
+    <button
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
+      on:click={handleOverlayClick}
     />
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
@@ -185,7 +215,16 @@
           </div>
         </div>
       {/if}
-      <div class="rounded-md bg-neutral-900 p-6 shadow-lg">
+      <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">
+        <button
+          use:melt={$close}
+          aria-label="close"
+          class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
+                items-center justify-center rounded-full text-magnum-800 bg-magnum-100
+                hover:bg-magnum-100/75 focus:shadow-magnum-400"
+        >
+          <X size={32} />
+        </button>
         <div class="flex flex-row gap-2 mb-2">
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
@@ -290,14 +329,45 @@
             {/each}
           </div>
         {/if}
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if $openConfirm}
+  <div use:melt={$portalledConfirm}>
+    <div use:melt={$overlayConfirm} class="fixed inset-0 z-50 bg-black/50" />
+    <div
+      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
+            max-w-[450px] -translate-x-1/2 -translate-y-1/2 bg-neutral-900 p-2"
+      use:melt={$contentConfirm}
+    >
+      <h2
+        use:melt={$titleConfirm}
+        class="m-0 text-lg font-medium text-magnum-400"
+      >
+        Confirm close
+      </h2>
+      <p use:melt={$descriptionConfirm} class="mb-5 mt-2 leading-normal">
+        {$_("post.confirm")}
+      </p>
+
+      <div class="mt-6 flex justify-end gap-4">
         <button
-          use:melt={$close}
-          aria-label="close"
-          class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
-                items-center justify-center rounded-full text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
+          class="inline-flex h-8 items-center justify-center rounded-[4px] px-4 font-medium leading-none bg-zinc-100 text-zinc-600 hover:opacity-75"
+          use:melt={$closeConfirm}
         >
-          <X size={32} />
+          Cancel
+        </button>
+        <button
+          class="inline-flex h-8 items-center justify-center rounded-[4px]
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75"
+          on:click={() => {
+            open.set(false);
+            openConfirm.set(false);
+          }}
+        >
+          Yes, close
         </button>
       </div>
     </div>

@@ -24,5 +24,8 @@
   },
   "nostviewstr": {
     "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr"
+  },
+  "post": {
+    "confirm": "There is unposted text. Are you sure you want to close?"
   }
 }
