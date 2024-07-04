@@ -1,13 +1,11 @@
 <script lang="ts">
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import { profile } from "$lib/func/util";
-  import { Repeat2, Zap } from "lucide-svelte";
+  import { Zap } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import ZapReactionList from "../AllReactionsElement/ZapReactionList.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { decode } from "light-bolt11-decoder";
   export let note: Nostr.Event;

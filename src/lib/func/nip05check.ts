@@ -1,44 +1,56 @@
 import { createQuery } from "@tanstack/svelte-query";
 import { nip05 } from "nostr-tools";
-import { derived } from "svelte/store";
+import { derived, writable, type Readable, type Writable } from "svelte/store";
+import type { ReqStatus } from "$lib/types";
 
-export type Ogp = {
-  title: string;
-  image: string;
-  description: string;
-  favicon: string;
-  memo?: string;
-};
-
-export let isvalidURL = (str: string): boolean => {
-  try {
-    const url = new URL(str);
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
-  }
-};
-
-export const useNip05Check = (nip05Address: string, pubkey: string) => {
+export const useNip05Check = (
+  nip05Address: string,
+  pubkey: string
+): {
+  data: Readable<boolean | null | undefined>;
+  status: Writable<ReqStatus>;
+  error: Readable<Error>;
+} => {
   const genQueryKey = () => ["nip05", nip05Address] as const;
+  const status = writable<ReqStatus>("loading");
+  const error = writable<Error>();
 
   const query = createQuery({
     queryKey: genQueryKey(),
-    queryFn: () => fetchNip05isValid(nip05Address, pubkey),
-    staleTime: Infinity, // 古くならないから
-    gcTime: 4 * 60 * 60 * 1000, // 4 hour
+    queryFn: async () => {
+      try {
+        const res = await nip05.isValid(pubkey, nip05Address);
+        return res;
+      } catch (e) {
+        throw e;
+      }
+    },
+    staleTime: Infinity,
+    gcTime: 4 * 60 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  return {
-    data: derived(query, ($query) => $query.data, null),
-  };
-};
+  // query のデータが変更されたときに実行される derived ストア
+  const data = derived(
+    query,
+    ($query) => {
+      if ($query.status === "pending") {
+        status.set("loading");
+      } else if ($query.status === "success") {
+        status.set("success");
+      } else if ($query.status === "error") {
+        status.set("error");
+        error.set($query.error);
+      }
+      return $query.data;
+    },
+    null
+  );
 
-export const fetchNip05isValid = async (
-  nip05Address: string,
-  pubkey: string
-): Promise<boolean | null> => {
-  return await nip05.isValid(pubkey, nip05Address);
+  return {
+    data,
+    status,
+    error,
+  };
 };

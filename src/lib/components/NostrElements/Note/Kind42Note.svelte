@@ -1,8 +1,5 @@
 <script lang="ts">
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import { profile, formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import Content from "./Content.svelte";
