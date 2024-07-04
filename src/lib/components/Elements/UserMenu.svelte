@@ -19,7 +19,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { getRelaysById } from "$lib/func/nostr";
   import Popover from "./Popover.svelte";
-  import UserProfile from "../NostrMainData/UserProfile.svelte";
+  import UserProfile from "./UserProfile.svelte";
 
   export let pubkey: string;
   export let size: number;

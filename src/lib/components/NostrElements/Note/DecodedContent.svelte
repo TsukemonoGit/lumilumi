@@ -7,7 +7,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
+  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let content: string | undefined;

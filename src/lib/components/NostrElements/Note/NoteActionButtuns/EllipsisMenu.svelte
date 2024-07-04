@@ -93,7 +93,7 @@
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
-            title: "Warning",
+            title: "Error",
             description: "Failed to copy",
             color: "bg-orange-500",
           };

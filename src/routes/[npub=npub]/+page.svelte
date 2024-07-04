@@ -5,7 +5,7 @@
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, createTie } from "rx-nostr";
-  import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
+  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import type { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId } from "$lib/func/nostr";

@@ -36,6 +36,7 @@
     nowProgress,
     queryClient,
     showImg,
+    toastSettings,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import { nip33Regex, profile } from "$lib/func/util";
@@ -48,6 +49,7 @@
   import QRCode from "qrcode";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
+  import { makeInvoice } from "$lib/func/makeZap";
   export let note: Nostr.Event;
 
   let openReplyWindow: boolean = false;
@@ -321,6 +323,7 @@
 
     zapAmount = Number(storagezap);
   });
+
   const onClickOK = async (metadata: Nostr.Event) => {
     console.log(zapAmount);
     console.log(zapComment);
@@ -330,56 +333,28 @@
       return;
     }
 
-    const zapEndpoint = await getZapEndpoint(metadata);
-    console.log(zapEndpoint);
-    if (!zapEndpoint) {
-      $dialogOpen = false;
-      return;
-    }
     $nowProgress = true;
     const amount = zapAmount * 1000;
-    try {
-      const zapRequest: EventTemplate = makeZapRequest({
-        profile: metadata.pubkey,
-        event: note.id ?? undefined,
-        amount: amount,
-        relays: getDefaultWriteRelays(),
-        comment: zapComment,
-      });
-      const signedRequest = await (
-        window.nostr as Nostr.Nip07.Nostr
-      )?.signEvent(zapRequest);
-      const encoded = encodeURI(JSON.stringify(signedRequest));
-
-      const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
-      console.log("[zap url]", url);
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.error("[zap failed]", await response.text());
-        $nowProgress = false;
-        $dialogOpen = false;
-        return;
-      }
-      const payment = await response.json();
-      const { pr: zapInvoice } = payment;
-      console.log("[zap invoice]", zapInvoice);
-      if (zapInvoice === undefined) {
-        console.error("[zap failed]", payment);
-        $nowProgress = false;
-        $dialogOpen = false;
-        return;
-      }
-      $nowProgress = false;
-      invoice = zapInvoice;
-      $dialogOpen = false;
-      $invoiceOpen = true;
-      //サップの量保存
-      const storage = localStorage.setItem("zap", zapAmount.toString());
-    } catch (error) {
-      $nowProgress = false;
-      console.log(error);
-      $dialogOpen = false;
+    const zapInvoice = await makeInvoice({
+      metadata,
+      id: note.id,
+      amount: amount,
+      comment: zapComment,
+    });
+    if (zapInvoice === null) {
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to zap",
+        color: "bg-red-500",
+      };
+      return;
     }
+    $nowProgress = false;
+    invoice = zapInvoice;
+    $dialogOpen = false;
+    $invoiceOpen = true;
+    //サップの量保存
+    const storage = localStorage.setItem("zap", zapAmount.toString());
   };
   $: if (!$invoiceOpen) {
     invoice = undefined;
@@ -470,7 +445,7 @@
       <div slot="nodata" class="w-[20px]"></div>
       <div slot="error" class="w-[20px]"></div>
       {#await profile(metadata) then prof}
-        {#if prof && prof.lud16}<!--lud16がある人のみ⚡️表示-->
+        {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
 
           <Zapped id={note.id} let:event>
             <button slot="loading" on:click={handleClickZap}>

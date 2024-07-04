@@ -10,7 +10,7 @@
   import type { Profile } from "$lib/types";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { showImg } from "$lib/stores/stores";
-  import UserProfile from "$lib/components/NostrMainData/UserProfile.svelte";
+  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   const size = 20;
   export let pubkey: string;
 

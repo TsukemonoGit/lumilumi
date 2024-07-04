@@ -82,6 +82,7 @@ export interface Profile {
   banner?: string;
   bot?: boolean;
   lud16?: string;
+  lud06?: string;
 }
 declare global {
   interface Window {
