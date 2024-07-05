@@ -36,7 +36,7 @@
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
 
-      <div class=" break-words overflow-hidden">
+      <div class="w-full break-words overflow-hidden">
         <ChannelMetadata id={data.id} />
         <TimelineList
           queryKey={["channel", "feed", data.id]}

@@ -36,7 +36,7 @@
       let:searchRelays
     >
       <SetRepoReactions />
-      <div class=" break-words overflow-hidden">
+      <div class="w-full break-words overflow-hidden">
         <div>
           <Note id={data.id} />
         </div>
