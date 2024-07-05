@@ -8,7 +8,10 @@
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { splitHexColorString } from "$lib/func/util";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import { Ellipsis } from "lucide-svelte";
+  import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
   export let id: string; //kind40 channel id
+  export let handleClickToChannel: () => void;
   let size = 96;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
@@ -27,7 +30,7 @@
     {#if channelData}
       <div class="grid grid-cols-[auto_1fr_auto]">
         <!--がぞう-->
-        <div>
+        <button on:click={handleClickToChannel}>
           {#if $showImg && channelData.picture}
             <UserAvatar
               url={channelData.picture}
@@ -45,15 +48,18 @@
               square={true}
             />
           {/if}
-        </div>
+        </button>
         <!--てきすとたち-->
-        <div class="ml-2">
+        <button
+          class="ml-2 hover:opacity-75 focus:opacity-50 text-start flex flex-col"
+          on:click={handleClickToChannel}
+        >
           <div class="text-xl font-bold text-magnum-400">
             {channelData.name}
           </div>
 
           <div class="text-magnum-100">{channelData.about}</div>
-        </div>
+        </button>
         <Metadata
           queryKey={["metadata", text.pubkey]}
           pubkey={text.pubkey}
@@ -80,7 +86,12 @@
             size={24}
           />
 
-          <div><UserMenu pubkey={text.pubkey} {metadata} size={40} /></div>
+          <div class="flex flex-col justify-between items-center">
+            <UserMenu pubkey={text.pubkey} {metadata} size={40} />
+            <button class="text-magnum-400"
+              ><EllipsisMenu note={text} indexes={[3, 0, 1]} /></button
+            >
+          </div>
         </Metadata>
       </div>
     {/if}

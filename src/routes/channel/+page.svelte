@@ -70,14 +70,14 @@
                   handleClickToChannel(id);
                 }}>nodata {nip19.noteEncode(id)}</button
               >
-              <button
-                class="text-left w-full border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
-                on:click={() => {
-                  handleClickToChannel(id);
-                }}
+              <div
+                class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
               >
-                <ChannelMetadata {id} /></button
-              >
+                <ChannelMetadata
+                  handleClickToChannel={() => handleClickToChannel(id)}
+                  {id}
+                />
+              </div>
             </Text>
           {/each}
         </ChannelMain>

@@ -19,12 +19,12 @@
   import type { SvelteComponent } from "svelte";
 
   export let note: Nostr.Event;
-
+  export let indexes: number[] | undefined = undefined;
   let dialogOpen: any;
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000);
-  const menuTexts =
+  let menuTexts =
     //  profile
     //   ? [
     //       { text: "Copy EventID", icon: Copy, num: 3 },
@@ -44,6 +44,11 @@
   if (note.kind === 30030) {
     menuTexts?.push({ text: "Open in emojito", icon: Smile, num: 5 });
   }
+
+  if (indexes !== undefined) {
+    menuTexts = menuTexts.filter((item) => indexes.includes(item.num));
+  }
+
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
