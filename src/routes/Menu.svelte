@@ -85,7 +85,7 @@
       transition:fly={{ duration: 150, y: -10 }}
     >
       <nav class="p-2">
-        <ul class="flex flex-wrap w-48 h-24 justify-around items-center">
+        <ul class="flex flex-wrap w-32 h-32 justify-around items-center">
           {#each items as { Icon, link, alt }}
             <li
               aria-current={$page.url?.pathname ===

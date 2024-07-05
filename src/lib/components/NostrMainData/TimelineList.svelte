@@ -14,6 +14,9 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { type OperatorFunction } from "rxjs";
+
+  const sift = 40; //スライドする量
+
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
   export let req:
@@ -77,7 +80,7 @@
   }
 
   const handleNext = async () => {
-    if ($data && $data.length > 1 && $data.length < viewIndex + 50 + 20) {
+    if ($data && $data.length > 1 && $data.length < viewIndex + amount + sift) {
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
       const older = await loadOlderEvents(slicedEvent, filters, queryKey);
@@ -85,12 +88,12 @@
       updateViewEvent($data);
       $nowProgress = false;
     }
-    viewIndex += 20; //スライドする量
+    viewIndex += sift; //スライドする量
   };
 
   const handlePrev = () => {
     if (viewIndex > 0) {
-      viewIndex = Math.max(viewIndex - 20, 0);
+      viewIndex = Math.max(viewIndex - sift, 0);
     }
   };
 
