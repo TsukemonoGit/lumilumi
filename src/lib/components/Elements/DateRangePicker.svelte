@@ -5,7 +5,8 @@
   import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-svelte";
   import type { DateValue, ZonedDateTime } from "@internationalized/date";
   import { now, getLocalTimeZone } from "@internationalized/date";
-  import { userLocale } from "$lib/stores/stores";
+
+  import { locale } from "svelte-i18n";
 
   export let title: string;
   const {
@@ -26,7 +27,7 @@
     states: { value, months, headingValue, weekdays, segmentContents, open },
     helpers: { isDateDisabled, isDateUnavailable },
   } = createDateRangePicker({
-    locale: $userLocale ?? undefined,
+    locale: $locale ?? undefined,
     forceVisible: true,
     defaultPlaceholder: now(getLocalTimeZone()),
     maxValue: now(getLocalTimeZone()),

@@ -2,12 +2,7 @@
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
-  import {
-    app,
-    userLocale,
-    nowProgress,
-    queryClient,
-  } from "$lib/stores/stores";
+  import { app, nowProgress, queryClient } from "$lib/stores/stores";
   import {
     //    getMetadataFromLocalStorage,
     relaysReconnectChallenge,
@@ -31,7 +26,6 @@
     // make sure this is called before any
     // window.nostr calls are made
     if (browser) {
-      $userLocale = window.navigator.language;
       if (!$app?.rxNostr) {
         setRxNostr();
       }

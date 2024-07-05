@@ -31,7 +31,7 @@
       setRelayList={nip50relays}
       let:searchRelays
     >
-      <div class=" break-words overflow-x-hidden">
+      <div class="w-full break-words overflow-x-hidden">
         <TimelineList
           queryKey={["search", "feed", JSON.stringify(filter)]}
           filters={[filter]}

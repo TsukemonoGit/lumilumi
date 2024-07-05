@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition";
   import { CalendarDateTime } from "@internationalized/date";
   import { Calendar, ChevronLeft, ChevronRight } from "lucide-svelte";
-  import { userLocale } from "$lib/stores/stores";
+  import { locale } from "svelte-i18n";
   import type { DateValue } from "@internationalized/date";
 
   export let title: string = "Date";
@@ -40,7 +40,7 @@
       new Date().getMonth(),
       new Date().getDate()
     ),
-    locale: $userLocale ?? undefined,
+    locale: $locale ?? undefined,
     minValue: minValue ?? undefined,
     maxValue: maxValue ?? undefined,
   });
