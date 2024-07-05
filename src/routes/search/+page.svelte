@@ -108,13 +108,13 @@
 </svelte:head>
 
 <section>
-  <div class="container flex gap-2">
+  <div class=" flex gap-2">
     <div class=" font-medium text-magnum-400">SearchRelays</div>
     <div class="text-sm">
       {nip50relays.join(", ")}
     </div>
   </div>
-  <div class="flex flex-wrap gap-2 container mb-2">
+  <div class="flex flex-wrap gap-2 mb-2">
     <div class="flex flex-col items-start justify-center">
       <div class=" font-medium text-magnum-400">keyword</div>
       <input
@@ -139,7 +139,7 @@
     {/if}
   </div>
 
-  <div use:melt={$root} class=" container relative w-full">
+  <div use:melt={$root} class="  relative w-full">
     <button
       use:melt={$trigger}
       class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
@@ -166,7 +166,7 @@
         <div
           use:melt={$content}
           transition:slide
-          class="flex gap-2 w-full flex-wrap container"
+          class="flex gap-2 w-full flex-wrap"
         >
           <div class="flex flex-col items-start justify-center">
             <div class=" font-medium text-magnum-400">kind</div>
@@ -217,7 +217,7 @@
       {/if}
     </div>
   </div>
-  <div class="container w-full">
+  <div class=" w-full">
     <div
       class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
     >

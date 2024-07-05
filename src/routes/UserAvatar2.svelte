@@ -12,7 +12,7 @@
   )?.event;
 
   $: url = picture(metadata);
-  const size = 24;
+  export let size = 24;
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {
       return null;

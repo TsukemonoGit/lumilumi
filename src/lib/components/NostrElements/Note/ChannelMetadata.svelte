@@ -11,7 +11,7 @@
   import { Ellipsis } from "lucide-svelte";
   import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
   export let id: string; //kind40 channel id
-  export let handleClickToChannel: () => void;
+  export let handleClickToChannel: (() => void) | undefined = undefined;
   let size = 96;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {

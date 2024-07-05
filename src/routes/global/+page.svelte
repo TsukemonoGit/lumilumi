@@ -30,7 +30,7 @@
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
 
-        <div class="container break-words overflow-hidden">
+        <div class=" break-words overflow-hidden">
           <TimelineList
             queryKey={["global", "feed"]}
             filters={[

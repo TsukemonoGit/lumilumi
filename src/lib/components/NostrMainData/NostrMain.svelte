@@ -23,6 +23,7 @@
 
   const STORAGE_KEY = "lumiSetting";
 
+  export let display: boolean = true;
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
   let loading = true; // ローディング状態を追跡する変数を追加
@@ -109,6 +110,24 @@
   </slot>
 {/if}
 
-<div class="fixed right-auto left-auto bottom-5 z-10">
-  <OpenPostWindow {options} />
-</div>
+{#if display}
+  <div class="postWindow fixed right-auto left-auto bottom-5 z-10">
+    <OpenPostWindow {options} />
+  </div>
+{/if}
+
+<style lang="postcss">
+  @media screen and (max-width: 640px) {
+    .postWindow {
+      /* display: block !important; */
+      @apply fixed right-auto left-auto bottom-5 z-10 h-fit;
+    }
+  }
+  @media screen and (min-width: 641px) {
+    .postWindow {
+      /* display: none !important; */
+      @apply fixed right-auto left-24 top-2 z-10 h-fit;
+      left: max(6.5rem, calc(50% - 630px));
+    }
+  }
+</style>

@@ -24,6 +24,7 @@
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";
   import Menu from "./Menu.svelte";
+  import Sidebar from "./Sidebar.svelte";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
@@ -64,18 +65,23 @@
 </svelte:head>
 <QueryClientProvider client={$queryClient}>
   <Header />
+
   <Menu />
+
   <Toast />
-
-  <main>
-    <slot />
-    {#if $nowProgress}
-      <div class="fixed right-10 bottom-10">
-        <LoadingElement />
-      </div>
-    {/if}
-  </main>
-
+  <div class="container grid grid-cols-[auto_1fr]">
+    <div class="sm:w-52 w-0">
+      <Sidebar />
+    </div>
+    <main>
+      <slot />
+      {#if $nowProgress}
+        <div class="fixed right-10 bottom-10">
+          <LoadingElement />
+        </div>
+      {/if}
+    </main>
+  </div>
   <!-- <footer>
     <p>
       visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit

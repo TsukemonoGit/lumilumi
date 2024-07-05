@@ -141,7 +141,7 @@
   };
 </script>
 
-<section class="container w-full">
+<section class=" w-full">
   {#if newProfile}
     <div
       class="flex flex-col w-full border border-magnum-500 rounded-md overflow-hidden"

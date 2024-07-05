@@ -52,10 +52,7 @@
       <div slot="error">relayerror</div>
       <div slot="nodata">relaynodata</div>
       {#if userPubkey && view}
-        <div
-          class="container break-words overflow-hidden"
-          id={componentKey.toString()}
-        >
+        <div class=" break-words overflow-hidden" id={componentKey.toString()}>
           <UserProfile pubkey={userPubkey} />
 
           <TimelineList
