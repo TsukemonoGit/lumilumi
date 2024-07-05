@@ -17,7 +17,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import type { SvelteComponent } from "svelte";
-
+  import { locale } from "svelte-i18n";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   let dialogOpen: any;
@@ -81,7 +81,7 @@
 
       case 2:
         //Translate
-        const translateUrl = `https://translate.google.com/?sl=auto&op=translate&text=${encodeURIComponent(note.content)}`;
+        const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${encodeURIComponent(note.content)}`;
 
         window.open(translateUrl, "_blank", "noreferrer");
         break;
