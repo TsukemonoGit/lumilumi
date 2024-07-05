@@ -115,7 +115,9 @@
     text-decoration: none;
     transition: color 0.2s linear;
   }
-
+  nav li[aria-current="page"] a {
+    color: theme("colors.magnum.400");
+  }
   .title {
     display: flex;
 
