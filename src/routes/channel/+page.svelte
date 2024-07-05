@@ -29,12 +29,22 @@
       <div slot="nodata">nodata</div>
       <div class="flex flex-col gap-2 max-w-full overflow-x-hidden">
         <ChannelMain queryKey={["kind10005", pubkey]} {pubkey} let:event>
-          <div slot="loading">loading</div>
-          <div slot="error">error</div>
+          <Link
+            slot="loading"
+            className="underline text-magnum-300 break-all "
+            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${10005}`}
+            >{$_("nostviewstr.kind10005")}</Link
+          >
+          <Link
+            slot="error"
+            className="underline text-magnum-300 break-all "
+            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${10005}`}
+            >{$_("nostviewstr.kind10005")}</Link
+          >
           <Link
             slot="nodata"
             className="underline text-magnum-300 break-all "
-            href={`https://nostviewstr.vercel.app/${pubkey}/${10005}`}
+            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${10005}`}
             >{$_("nostviewstr.kind10005")}</Link
           >
           {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}

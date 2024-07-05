@@ -23,7 +23,8 @@
     }
   },
   "nostviewstr": {
-    "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr"
+    "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr",
+    "kind30000": "Edit People sets (kind:30000) in Nostviewstr"
   },
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?"

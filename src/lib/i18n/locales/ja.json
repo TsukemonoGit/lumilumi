@@ -28,7 +28,8 @@
     "profileEdit": "プロフィールの編集"
   },
   "nostviewstr": {
-    "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する"
+    "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する",
+    "kind30000": "NostViewstr で People sets (kind:30000) を編集する"
   },
   "post": {
     "confirm": "投稿されていないテキストがあります。閉じますか？"
