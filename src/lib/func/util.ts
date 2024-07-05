@@ -30,6 +30,9 @@ export const hashtagRegex = /(?<=^|\s)#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu; 
 export const npubRegex = /^npub\w{59}$/;
 export const nipRegex = /NIP-([0-9]{2,})/g;
 
+export const LUD06Regex = /^(LNURL1|lnurl1)[AC-HJ-NP-Z02-9]+$/;
+export const LUD16Regex = /^[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+$/;
+
 export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   if (!ev) {
     return undefined;
@@ -141,3 +144,16 @@ export async function filesUpload(
   }
   return res;
 }
+export const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
+  let str = "";
+  if (isSuccess.length > 0) {
+    str = "OK\n";
+    isSuccess.map((item) => (str += `${item.from}\n`));
+    str += "\n";
+  }
+  if (isFailed.length > 0) {
+    str += "Failed\n";
+    isFailed.map((item) => `${item.from}\n`);
+  }
+  return str;
+};

@@ -27,5 +27,18 @@
   },
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?"
+  },
+  "user": {
+    "profileEdit": "Edit profile"
+  },
+  "profile": {
+    "name": "Name",
+    "display_name": "Display name",
+    "picture": "Picture",
+    "banner": "Banner",
+    "website": "Website",
+    "nip05": "Domain authentication (NIP-05)",
+    "lud": "LNURL address / Lightning address",
+    "about": "About"
   }
 }

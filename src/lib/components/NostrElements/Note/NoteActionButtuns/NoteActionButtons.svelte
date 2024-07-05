@@ -13,11 +13,7 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    getDefaultWriteRelays,
-    getRelaysById,
-    publishEvent,
-  } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19, type EventTemplate } from "nostr-tools";
 
   import type { Profile } from "$lib/types";
@@ -31,10 +27,8 @@
   import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
   import {
-    app,
     emojis,
     nowProgress,
-    queryClient,
     showImg,
     toastSettings,
   } from "$lib/stores/stores";
@@ -44,10 +38,7 @@
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard.svelte";
-  import { getZapEndpoint, makeZapRequest } from "nostr-tools/nip57";
   import { onMount } from "svelte";
-  import QRCode from "qrcode";
-  import Popover from "$lib/components/Elements/Popover.svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { makeInvoice } from "$lib/func/makeZap";
   export let note: Nostr.Event;
@@ -61,6 +52,9 @@
 
   let dtag: string[] | undefined;
   let atag: string | undefined;
+
+  let textareaReply: HTMLTextAreaElement;
+  let textareaQuote: HTMLTextAreaElement;
   $: {
     if (
       (note.kind >= 10000 && note.kind < 20000) ||
@@ -231,8 +225,8 @@
       case 1:
         //Quote
         replyText = atag
-          ? `nostr:${encodeNaddr(atag, nevent)}`
-          : ` nostr:${nevent} `;
+          ? ` nostr:${encodeNaddr(atag, nevent)} \n`
+          : ` nostr:${nevent} \n`;
         openReplyWindow = false;
         openQuoteWindow = true;
 
@@ -298,6 +292,17 @@
 
   let warningText = "";
   let onWarning: boolean;
+
+  $: if (textareaReply) {
+    console.log("textareaReply");
+    textareaReply.focus();
+  }
+  $: if (textareaQuote) {
+    console.log("textareaQuote");
+    setTimeout(() => {
+      textareaQuote.focus();
+    }, 20);
+  }
   $: if (openQuoteWindow || openReplyWindow) {
     const warning = note.tags.find((item) => item[0] === "content-warning");
     if (warning) {
@@ -591,6 +596,7 @@
       </button>
     </div>
     <textarea
+      bind:this={textareaReply}
       rows="3"
       class="w-[100%] rounded-md bg-neutral-950 mt-1"
       bind:value={replyText}
@@ -732,6 +738,7 @@
     </div>
 
     <textarea
+      bind:this={textareaQuote}
       rows="6"
       class="w-[100%] rounded-md bg-neutral-950 mt-1"
       bind:value={replyText}

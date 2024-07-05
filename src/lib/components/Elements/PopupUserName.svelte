@@ -49,9 +49,6 @@
     }
   };
 
-  $: url = getProfile(metadata)?.picture;
-  $: name = getProfile(metadata)?.name;
-
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
     try {

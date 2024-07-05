@@ -22,7 +22,7 @@
             alt=""
           />
         </div>
-        <div class="p-0.5 pl-1 grid grid-rows-[auto_1fr] z-10 w-full">
+        <div class="p-0.5 pl-1 grid grid-rows-[auto_1fr] w-full">
           <div class="line-clamp-2 text-sm font-bold text-magnum-200">
             {contents.title}
           </div>
@@ -48,7 +48,7 @@
           </div>
         </div>
       </div>
-    {:else}<div class="p-0.5 grid grid-rows-[auto_1fr] z-10 w-full">
+    {:else}<div class="p-0.5 grid grid-rows-[auto_1fr] w-full">
         <div class="line-clamp-2 text-sm font-bold text-magnum-200">
           {contents.title}
         </div>

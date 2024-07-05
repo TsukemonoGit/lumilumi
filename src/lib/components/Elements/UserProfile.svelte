@@ -2,7 +2,7 @@
   import Metadata from "../NostrMainData/Metadata.svelte";
   import { profile, splitHexColorString } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { showImg } from "$lib/stores/stores";
+  import { loginUser, showImg } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
   import { beforeNavigate } from "$app/navigation";
@@ -13,6 +13,7 @@
   import UserAvatar from "./UserAvatar.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserZap from "./UserZap.svelte";
+  import ProfileEditButton from "./ProfileEditButton.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -60,7 +61,11 @@
             {/if}
           </div>
         </div>
-        <div class="absolute bottom-1 right-2"><FollowButton {pubkey} /></div>
+        <div class="absolute bottom-1 right-2">
+          {#if $loginUser === pubkey}<ProfileEditButton
+              {metadata}
+            />{:else}<FollowButton {pubkey} />{/if}
+        </div>
         <div
           class="bg-magnum-800 w-full border-b border-magnum-400"
           style="height:{bannerHeight}px"

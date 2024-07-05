@@ -24,7 +24,7 @@
 
   import * as Nostr from "nostr-typedef";
   import { writable } from "svelte/store";
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDate, generateResultMessage } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
@@ -142,20 +142,6 @@
 
     isfollowee = isfolloweeFunc(pubkey);
     resetState();
-  };
-
-  const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
-    let str = "";
-    if (isSuccess.length > 0) {
-      str = "OK\n";
-      isSuccess.map((item) => (str += `${item.from}\n`));
-      str += "\n";
-    }
-    if (isFailed.length > 0) {
-      str += "Failed\n";
-      isFailed.map((item) => `${item.from}\n`);
-    }
-    return str;
   };
 
   const resetState = () => {

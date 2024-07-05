@@ -24,12 +24,23 @@
   },
   "user": {
     "following": "フォロー中",
-    "follow": "フォローする"
+    "follow": "フォローする",
+    "profileEdit": "プロフィールの編集"
   },
   "nostviewstr": {
     "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する"
   },
   "post": {
     "confirm": "投稿されていないテキストがあります。閉じますか？"
+  },
+  "profile": {
+    "display_name": "表示名",
+    "name": "ユーザー名",
+    "picture": "アイコン画像",
+    "banner": "バナー画像",
+    "website": "ウェブサイト",
+    "nip05": "ドメイン証明（NIP-05）",
+    "lud": "LNURLアドレス / ライトニングアドレス",
+    "about": "自己紹介"
   }
 }
