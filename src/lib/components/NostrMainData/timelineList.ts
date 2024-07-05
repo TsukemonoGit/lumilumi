@@ -11,6 +11,7 @@ import { get } from "svelte/store";
 import { loginUser } from "$lib/stores/stores";
 
 export async function loadOlderEvents(
+  sift: number,
   data: Nostr.Event[],
   filters: Filter[],
   queryKey: QueryKey
@@ -34,14 +35,14 @@ export async function loadOlderEvents(
       lastEvent.kind === 1
         ? filters.map((filter: Filter) => ({
             ...filter,
-            limit: 20,
+            limit: sift,
             until: untilTimestamp,
             since: undefined,
           }))
         : [
             {
               ...filters[0],
-              limit: 30,
+              limit: sift,
               until: kind1[kind1.length - 1].created_at,
               since: undefined,
             },
