@@ -677,6 +677,7 @@
                   class="h-4 object-contain justify-self-center"
                   src={e[1]}
                   alt={e[0]}
+                  title={e[0]}
                 />{:else}{e[0]}{/if}
             </button>
           {/if}
@@ -818,6 +819,7 @@
                   class="h-4 object-contain justify-self-center"
                   src={e[1]}
                   alt={e[0]}
+                  title={e[0]}
                 />{:else}{e[0]}{/if}
             </button>
           {/if}
