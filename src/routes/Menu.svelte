@@ -25,10 +25,11 @@
   }[] = [
     { Icon: House, link: "/", alt: "home" },
     { Icon: Bell, link: "/notifications", alt: "notifications" },
-    { Icon: MessagesSquare, link: "/channel", alt: "channel" },
-    { Icon: Users, link: "/list", alt: "list" },
     { Icon: Search, link: "/search", alt: "search" },
     { Icon: Globe, link: "/global", alt: "global" },
+    { Icon: MessagesSquare, link: "/channel", alt: "channel" },
+    { Icon: Users, link: "/list", alt: "list" },
+
     { Icon: Settings, link: "/settings", alt: "settings" },
     {
       Icon: UserAvatar2,

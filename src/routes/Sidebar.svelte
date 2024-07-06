@@ -51,6 +51,13 @@
           ><Bell /><span class="ml-2">Notifications</span></a
         >
       </li>
+      <li aria-current={$page.url.pathname === "/search" ? "page" : undefined}>
+        <a href="/search"><Search /><span class="ml-2">search</span></a>
+      </li>
+
+      <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
+        <a href="/global"><Globe /><span class="ml-2">global</span></a>
+      </li>
       <li aria-current={$page.url.pathname === "/channel" ? "page" : undefined}>
         <a href="/channel"
           ><MessagesSquare /><span class="ml-2">Channel</span></a
@@ -59,12 +66,7 @@
       <li aria-current={$page.url.pathname === "/list" ? "page" : undefined}>
         <a href="/list"><Users /><span class="ml-2">list</span></a>
       </li>
-      <li aria-current={$page.url.pathname === "/search" ? "page" : undefined}>
-        <a href="/search"><Search /><span class="ml-2">search</span></a>
-      </li>
-      <li aria-current={$page.url.pathname === "/global" ? "page" : undefined}>
-        <a href="/global"><Globe /><span class="ml-2">global</span></a>
-      </li>
+
       <li
         aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
       >
