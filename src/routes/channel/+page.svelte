@@ -6,7 +6,6 @@
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
 
-  import Text from "$lib/components/NostrMainData/Text.svelte";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
@@ -48,37 +47,14 @@
             >{$_("nostviewstr.kind10005")}</Link
           >
           {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
-            <Text {id} queryKey={["kind40", id]}>
-              <button
-                class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg"
-                slot="loading"
-                on:click={() => {
-                  handleClickToChannel(id);
-                }}>loading {nip19.noteEncode(id)}</button
-              >
-              <button
-                class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg"
-                slot="error"
-                on:click={() => {
-                  handleClickToChannel(id);
-                }}>error {nip19.noteEncode(id)}</button
-              >
-              <button
-                class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg"
-                slot="nodata"
-                on:click={() => {
-                  handleClickToChannel(id);
-                }}>nodata {nip19.noteEncode(id)}</button
-              >
-              <div
-                class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
-              >
-                <ChannelMetadata
-                  handleClickToChannel={() => handleClickToChannel(id)}
-                  {id}
-                />
-              </div>
-            </Text>
+            <div
+              class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
+            >
+              <ChannelMetadata
+                handleClickToChannel={() => handleClickToChannel(id)}
+                {id}
+              />
+            </div>
           {/each}
         </ChannelMain>
       </div>
