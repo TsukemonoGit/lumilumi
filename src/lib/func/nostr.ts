@@ -9,6 +9,7 @@ import {
   defaultRelays,
   metadataQueue,
   queryClient,
+  showImg,
   tieMapStore,
 } from "$lib/stores/stores";
 import type {
@@ -140,21 +141,23 @@ export const getMetadataFromLocalStorage = (): void => {
   const metadata = JSON.parse(metadataStr);
   setSavedMetadata(metadata);
   // console.log(metadata);
-  Object.keys(metadata).forEach((pubkey) => {
-    //console.log(metadata[pubkey][0]);
-    //  console.log(metadata[pubkey]);
-    // console.log(metadata[pubkey][0]);
-    // console.log(metadata[pubkey][1]);
-    get(queryClient).setQueryData(
-      metadata[pubkey][0],
-      (oldData: any) => metadata[pubkey][1]
-    );
-    // get(queryClient).setQueriesData(
-    //   { queryKey: metadata[pubkey][0] },
-    //   metadata[pubkey][1]
-    // );
-  });
-
+  if (get(showImg) === false) {
+    //画像表示おんのときは新しいの取るから、古いのをセットしない。画像表示しないときは古いの使い回す
+    Object.keys(metadata).forEach((pubkey) => {
+      //console.log(metadata[pubkey][0]);
+      //  console.log(metadata[pubkey]);
+      // console.log(metadata[pubkey][0]);
+      // console.log(metadata[pubkey][1]);
+      get(queryClient).setQueryData(
+        metadata[pubkey][0],
+        (oldData: any) => metadata[pubkey][1]
+      );
+      // get(queryClient).setQueriesData(
+      //   { queryKey: metadata[pubkey][0] },
+      //   metadata[pubkey][1]
+      // );
+    });
+  }
   // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
 };
 // const processMetadataQueue = () => {
