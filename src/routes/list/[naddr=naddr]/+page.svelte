@@ -57,8 +57,9 @@
         } else {
           return pubList;
         }
+      } else {
+        return pubList;
       }
-      return pubList;
     } catch (error) {
       return pubList;
     }
@@ -86,7 +87,7 @@
           <ListUsersCard {pubkeys} />
           <div class="w-full break-words overflow-hidden">
             <TimelineList
-              queryKey={["global", "feed"]}
+              queryKey={["list", "feed", atag]}
               filters={[
                 {
                   kinds: [1, 6, 16],
