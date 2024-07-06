@@ -6,10 +6,10 @@
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
   import { splitHexColorString } from "$lib/func/util";
+  import { onMount } from "svelte";
+  import { QueryObserver } from "@tanstack/svelte-query";
 
-  $: metadata = (
-    $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
-  )?.event;
+  let metadata: Nostr.Event;
 
   $: url = picture(metadata);
   export let size = 24;
@@ -24,6 +24,18 @@
       return null;
     }
   };
+  $: if ($loginUser) {
+    const observer1 = new QueryObserver($queryClient, {
+      queryKey: ["metadata", $loginUser],
+    });
+    const unsubscribe1 = observer1.subscribe((result: any) => {
+      if ($queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket) {
+        metadata = (
+          $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
+        ).event;
+      }
+    });
+  }
 </script>
 
 <div
