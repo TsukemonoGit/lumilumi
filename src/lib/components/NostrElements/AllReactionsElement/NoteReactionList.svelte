@@ -25,7 +25,7 @@
 <CollapsibleList title="Reaction" bind:amount={events.length}>
   {#each uniqueContents as content}
     <div
-      class="flex w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+      class="flex w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
     >
       <div class="min-w-6 flex justify-center">
         <Reaction event={findEvent(content)} />
@@ -59,7 +59,7 @@
                 size={24}
               />
 
-              <div><UserMenu pubkey={event.pubkey} {metadata} size={24} /></div>
+              <UserMenu pubkey={event.pubkey} {metadata} size={24} />
             </Metadata>
           {/if}
         {/each}
