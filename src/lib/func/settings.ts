@@ -266,32 +266,33 @@ export async function getMuteByList(
     const kind = Number(
       packet.event.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
     );
-    let pTags = packet.event.tags
-      .filter((tag) => tag[0] === "p")
-      .map((tag) => tag[1]);
+    if (kind) {
+      let pTags = packet.event.tags
+        .filter((tag) => tag[0] === "p")
+        .map((tag) => tag[1]);
 
-    if (packet.event.content.length > 0) {
-      const privateTags = await decryptContent(packet.event);
-      if (privateTags && privateTags.length > 0) {
-        const ppTags = privateTags
-          .filter((tag: string[]) => tag[0] === "p")
-          .map((tag: string[]) => tag[1]);
-        if (ppTags.length > 0) {
-          pTags = [...pTags, ...ppTags];
+      if (packet.event.content.length > 0) {
+        const privateTags = await decryptContent(packet.event);
+        if (privateTags && privateTags.length > 0) {
+          const ppTags = privateTags
+            .filter((tag: string[]) => tag[0] === "p")
+            .map((tag: string[]) => tag[1]);
+          if (ppTags.length > 0) {
+            pTags = [...pTags, ...ppTags];
+          }
+        }
+      }
+
+      if (pTags.length > 0) {
+        const existingKind = muteByList.findIndex((item) => item.kind === kind);
+        if (existingKind !== -1) {
+          muteByList[existingKind].list.push(...pTags);
+        } else {
+          muteByList.push({ kind, list: pTags });
         }
       }
     }
-
-    if (pTags.length > 0) {
-      const existingKind = muteByList.findIndex((item) => item.kind === kind);
-      if (existingKind !== -1) {
-        muteByList[existingKind].list.push(...pTags);
-      } else {
-        muteByList.push({ kind, list: pTags });
-      }
-    }
   }
-
   return muteByList;
 }
 

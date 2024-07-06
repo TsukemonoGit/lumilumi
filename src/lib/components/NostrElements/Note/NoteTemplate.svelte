@@ -10,6 +10,8 @@
   import { onDestroy } from "svelte";
 
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import { getRelaysById } from "$lib/func/nostr";
+  import { goto } from "$app/navigation";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -34,6 +36,27 @@
   onDestroy(() => {
     $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
   });
+  const replaceable =
+    (note.kind >= 30000 && note.kind < 40000) ||
+    (note.kind >= 10000 && note.kind < 20000);
+  const eventpointer: nip19.EventPointer = {
+    id: note.id,
+    relays: getRelaysById(note.id),
+    author: note.pubkey,
+    kind: note.kind,
+  };
+  const naddrpointer: nip19.AddressPointer = {
+    kind: note.kind,
+    identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+    pubkey: note.pubkey,
+    relays: getRelaysById(note.id),
+  };
+  const naddr = nip19.naddrEncode(naddrpointer);
+  const nevent = nip19.neventEncode(eventpointer);
+  const handleClickToNotepage = () => {
+    //Goto Note page
+    goto(`/${replaceable ? naddr : nevent}`);
+  };
 </script>
 
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden"}>
@@ -54,11 +77,12 @@
           @{nip19.npubEncode(note.pubkey)}</span
         >
       {/if}
-      <div
-        class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto"
+      <button
+        on:click={handleClickToNotepage}
+        class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto hover:underline"
       >
         {formatAbsoluteDate(note.created_at)}
-      </div>
+      </button>
     </div>
     <hr />
     <slot></slot>

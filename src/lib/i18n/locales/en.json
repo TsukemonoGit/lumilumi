@@ -30,7 +30,9 @@
     "confirm": "There is unposted text. Are you sure you want to close?"
   },
   "user": {
-    "profileEdit": "Edit profile"
+    "profileEdit": "Edit profile",
+    "following": "Following",
+    "follow": "Follow"
   },
   "profile": {
     "name": "Name",

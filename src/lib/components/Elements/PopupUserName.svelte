@@ -1,6 +1,11 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { queryClient, showImg, toastSettings } from "$lib/stores/stores";
+  import {
+    nowProgress,
+    queryClient,
+    showImg,
+    toastSettings,
+  } from "$lib/stores/stores";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "../Elements/UserAvatar.svelte";
@@ -96,8 +101,13 @@
         }
         break;
       case 4:
+        $nowProgress = true;
         const key: QueryKey = ["metadata", pubkey];
         $queryClient.invalidateQueries({ queryKey: key });
+        setTimeout(() => {
+          $nowProgress = false;
+        }, 1000);
+
         break;
     }
   };

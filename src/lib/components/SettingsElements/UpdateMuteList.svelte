@@ -4,7 +4,7 @@
   import type { MuteList } from "$lib/types";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
 
   export let pubkey: string;
@@ -22,11 +22,21 @@
       console.log(error);
     }
     if (pubkey === "") {
+      $toastSettings = {
+        title: "Error",
+        description: "pubkey not found ",
+        color: "bg-red-500",
+      };
       return;
     }
     const relays = await getQueryRelays(pubkey);
     console.log(relays);
     if (!relays) {
+      $toastSettings = {
+        title: "Error",
+        description: "relay list not found ",
+        color: "bg-red-500",
+      };
       return;
     }
     $nowProgress = true;

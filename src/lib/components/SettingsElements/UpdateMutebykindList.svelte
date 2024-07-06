@@ -7,7 +7,7 @@
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { nowProgress } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
 
   export let pubkey: string;
@@ -27,11 +27,23 @@
       console.log(error);
     }
     if (pubkey === "") {
+      $toastSettings = {
+        title: "Error",
+        description: "pubkey not found ",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
       return;
     }
     const relays = await getQueryRelays(pubkey);
 
     if (!relays) {
+      $toastSettings = {
+        title: "Error",
+        description: "relay list not found ",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
       return;
     }
     $nowProgress = true;
@@ -46,6 +58,12 @@
         updated: Math.floor(Date.now() / 1000),
       };
       console.log(mutebykindList.list);
+    } else {
+      $toastSettings = {
+        title: "Warning",
+        description: "mute by kind list not found ",
+        color: "bg-red-500",
+      };
     }
     $nowProgress = false;
   }

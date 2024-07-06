@@ -6,7 +6,7 @@
     getQueryRelays,
   } from "$lib/func/settings";
   import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
-  import { nowProgress, showImg } from "$lib/stores/stores";
+  import { nowProgress, showImg, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
 
   export let pubkey: string;
@@ -25,11 +25,21 @@
       console.log(error);
     }
     if (pubkey === "") {
+      $toastSettings = {
+        title: "Error",
+        description: "pubkey not found ",
+        color: "bg-red-500",
+      };
       return;
     }
     const relays = await getQueryRelays(pubkey);
     console.log(relays);
     if (!relays) {
+      $toastSettings = {
+        title: "Error",
+        description: "relay list not found ",
+        color: "bg-red-500",
+      };
       return;
     }
     $nowProgress = true;
