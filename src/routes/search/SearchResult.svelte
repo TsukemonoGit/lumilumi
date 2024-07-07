@@ -56,7 +56,7 @@
               {#each events as event, index (event.id)}
                 <div
                   class="break-words whitespace-pre-line m-1 overflow-hidden {index ===
-                  events.length - 2
+                  events.length - 1
                     ? 'last-visible'
                     : ''} {index === 0 ? 'first-visible' : ''}"
                 >

@@ -101,7 +101,7 @@
       setTimeout(() => {
         //データが更新終わるのを待ってからスライドしてみる
         if (lastVisibleElement) {
-          lastVisibleElement.scrollIntoView(true);
+          lastVisibleElement.scrollIntoView({ block: "end" });
         }
       }, 10);
     }
