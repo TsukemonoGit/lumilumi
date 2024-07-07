@@ -239,6 +239,7 @@
             bind:value={text}
             on:input={handleTextareaInput}
             on:click={handleTextareaInput}
+            on:touchend={handleTextareaInput}
             on:paste={paste}
             placeholder="いま どうしてる？"
           />

@@ -11,7 +11,7 @@ export const relaySearchRelays = [
   "wss://relay.nostr.band",
   "wss://nos.lol",
   //kind:3
-  "wss://relayable.org",
+  // "wss://relayable.org",
 ];
 
 export const defaultRelays = [
@@ -19,7 +19,7 @@ export const defaultRelays = [
   //'wss://relay.nostr.wirednet.jp'
   "wss://relay.nostr.band",
   "wss://nos.lol",
-  "wss://relayable.org",
+  // "wss://relayable.org",
   "wss://nostr.bitcoiner.social",
 ];
 
@@ -27,6 +27,6 @@ export const defaultRelays = [
 export const feedbackRelay = [
   "wss://nos.lol",
   "wss://relay.nostr.wirednet.jp",
-  "wss://relayable.org",
+  // "wss://relayable.org",
   "wss://relay.nostr.band/",
 ];
