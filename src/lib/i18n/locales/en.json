@@ -48,5 +48,21 @@
     "nip05": "Domain authentication (NIP-05)",
     "lud": "LNURL address / Lightning address",
     "about": "About"
+  },
+  "menu": {
+    "json": "View Json",
+    "njump": "Open in njump",
+    "translate": "Google Translate",
+    "note": "Goto Note Page",
+    "emoji": "Open in emojito",
+    "userPage": "Goto UserPage",
+    "updateProfile": "Update profile",
+    "repost": "Repost",
+    "quote": "Quote",
+    "copy": {
+      "pubkey": "Copy pubkey",
+      "note": "Copy noteID",
+      "naddr": "Copy naddr"
+    }
   }
 }

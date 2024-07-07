@@ -25,6 +25,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import Popover from "./Popover.svelte";
   import UserProfile from "./UserProfile.svelte";
+  import { _ } from "svelte-i18n";
 
   export let pubkey: string;
   export let size: number;
@@ -32,15 +33,17 @@
   let dialogOpen: any;
 
   const baseMenuTexts = [
-    { text: "Goto UserPage", icon: User, num: 0 },
-    { text: "Copy Pubkey", icon: Copy, num: 1 },
-    { text: "Open in njump", icon: SquareArrowOutUpRight, num: 3 },
-    { text: "Update profile", icon: RefreshCcw, num: 4 },
+    { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
+    { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
+    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 3 },
+    { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
   ];
 
   const menuTexts = [
     ...baseMenuTexts,
-    ...(metadata ? [{ text: "View Json", icon: FileJson2, num: 2 }] : []),
+    ...(metadata
+      ? [{ text: `${$_("menu.json")}`, icon: FileJson2, num: 2 }]
+      : []),
   ];
 
   const getProfile = (ev: Nostr.Event | undefined): Profile | undefined => {

@@ -17,6 +17,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import type { SvelteComponent } from "svelte";
+  import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
@@ -35,14 +36,18 @@
     //     ]
     //   :
     [
-      { text: `Copy ${replaceable ? "Naddr" : "EventID"}`, icon: Copy, num: 3 },
-      { text: "View Json", icon: FileJson2, num: 0 },
-      { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
-      { text: "Google Translate", icon: Earth, num: 2 },
-      { text: "Goto Note Page", icon: Notebook, num: 4 },
+      {
+        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.note")}`,
+        icon: Copy,
+        num: 3,
+      },
+      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
+      { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
+      { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
     ];
   if (note.kind === 30030) {
-    menuTexts?.push({ text: "Open in emojito", icon: Smile, num: 5 });
+    menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
   }
 
   if (indexes !== undefined) {

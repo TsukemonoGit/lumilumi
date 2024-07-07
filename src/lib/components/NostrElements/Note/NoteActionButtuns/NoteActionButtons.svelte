@@ -41,6 +41,8 @@
   import { onMount } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { makeInvoice } from "$lib/func/makeZap";
+  import { _ } from "svelte-i18n";
+
   export let note: Nostr.Event;
 
   let openReplyWindow: boolean = false;
@@ -181,8 +183,8 @@
   };
 
   const menuTexts = [
-    { text: "Repost", icon: Repeat2, num: 0 },
-    { text: "Quote", icon: Quote, num: 1 },
+    { text: `${$_("menu.repost")}`, icon: Repeat2, num: 0 },
+    { text: `${$_("menu.quote")}`, icon: Quote, num: 1 },
   ];
 
   const handleSelectItem = async (index: number) => {
