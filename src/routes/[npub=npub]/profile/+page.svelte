@@ -190,7 +190,8 @@
           class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
         >
           <div class="border border-magnum-400 rounded-full">
-            {#if $showImg && newProfile.picture && newProfile.picture !== ""}
+            <!--プロフィール編集のときは画像表示モードじゃなくてもプレビューだそう-->
+            {#if newProfile.picture && newProfile.picture !== ""}
               <div
                 class="flex items-center justify-center rounded-full bg-neutral-800 overflow-hidden"
                 style="height: {iconSize}px; width: {iconSize}px;"
@@ -210,7 +211,7 @@
           class="bg-magnum-800 w-full border-b border-magnum-400"
           style="height:{bannerHeight}px"
         >
-          {#if $showImg && newProfile.banner}
+          {#if newProfile.banner}
             <img
               src={newProfile.banner}
               alt="banner"

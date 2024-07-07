@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { nowProgress } from "$lib/stores/stores";
+  import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
   export let metadata: Nostr.Event;
@@ -9,7 +10,7 @@
   const handleClickEdit = () => {
     console.log($page.params);
     console.log($page.url?.pathname);
-    goto(`${$page.url?.pathname}/profile`);
+    goto(`${nip19.npubEncode(metadata.pubkey)}/profile`);
   };
 </script>
 

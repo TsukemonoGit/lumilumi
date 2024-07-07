@@ -7,11 +7,16 @@
   export let pubkey: string;
   export let size: number = 40;
   export let square: boolean = false;
+
   const {
     elements: { image, fallback },
+    options: { src },
   } = createAvatar({
     src: url ?? "",
   });
+  $: if (url) {
+    src.set(url);
+  }
 </script>
 
 <div
