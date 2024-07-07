@@ -2,6 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
+    emojis,
     loginUser,
     nowProgress,
     queryClient,
@@ -29,13 +30,15 @@
   } from "$lib/func/util";
   import { page } from "$app/stores";
   import type { EventTemplate } from "nostr-tools";
+  import { SmilePlus } from "lucide-svelte";
+  import Popover from "$lib/components/Elements/Popover.svelte";
 
   export let data: {
     pubkey: string;
   };
   // const data={pubkey:$page.params.npub};
   console.log(data.pubkey);
-  const bannerHeight = 80;
+  const bannerHeight = 120;
   const iconSize = 40;
   let profile: Profile;
   let metadata: Nostr.Event;
@@ -45,7 +48,7 @@
 
   let newProfile: Profile;
   let lud: string = "";
-
+  let newTags: string[][] = [];
   onMount(async () => {
     $nowProgress = true;
     const data: EventPacket | undefined = $queryClient?.getQueryData(key);
@@ -64,6 +67,7 @@
       console.error("failed to get metadata event");
       return;
     }
+    newTags = metadata.tags;
     try {
       profile = JSON.parse(metadata.content);
       newProfile = { ...profile };
@@ -99,8 +103,17 @@
         return;
       }
     }
+    $nowProgress = true;
+    // newProfileに含まれていない絵文字タグを削除する
+    newTags = newTags.filter((tag) => {
+      if (tag[0] === "emoji") {
+        const emojiText = `:${tag[1]}:`;
+        return newProfile.about?.includes(emojiText);
+      }
+      return true;
+    });
+
     try {
-      $nowProgress = true;
       const content = JSON.stringify(newProfile);
       if (content === "") {
         throw Error;
@@ -108,7 +121,7 @@
       const ev: Nostr.EventParameters = {
         kind: 0,
         content: content,
-        tags: [],
+        tags: newTags,
       };
       const { event, res } = await promisePublishEvent(ev);
       const isSuccess = res.filter((item) => item.ok);
@@ -139,6 +152,29 @@
       return;
     }
   };
+
+  let cursorPosition: number = 0;
+  let customReaction: string = "";
+  let viewCustomEmojis: boolean;
+
+  const handleTextareaInput = (event: Event) => {
+    const target = event.target as HTMLTextAreaElement;
+    cursorPosition = target.selectionStart;
+  };
+
+  const handleClickEmoji = (e: string[]) => {
+    const emojiTag = ["emoji", ...e];
+    if (!newTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
+      newTags.push(emojiTag);
+    }
+    const emojiText = `:${e[0]}:`;
+    newProfile.about =
+      newProfile.about?.slice(0, cursorPosition) +
+      emojiText +
+      newProfile.about?.slice(cursorPosition);
+    cursorPosition += emojiText.length;
+  };
+  let open: any;
 </script>
 
 <section class=" w-full">
@@ -147,24 +183,25 @@
       class="flex flex-col w-full border border-magnum-500 rounded-md overflow-hidden"
     >
       <div class="relative w-full">
+        <div class="absolute top-0 font-bold text-magnum-400 left-1">
+          Preview
+        </div>
         <div
           class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
         >
           <div class="border border-magnum-400 rounded-full">
             {#if $showImg && newProfile.picture && newProfile.picture !== ""}
-              <UserAvatar
-                url={newProfile.picture}
-                name={newProfile.name ?? ""}
-                pubkey={data.pubkey}
-                size={iconSize}
-              />
-            {:else}
-              <Avatar
-                size={iconSize}
-                name={data.pubkey}
-                variant="beam"
-                colors={splitHexColorString(data.pubkey)}
-              />
+              <div
+                class="flex items-center justify-center rounded-full bg-neutral-800 overflow-hidden"
+                style="height: {iconSize}px; width: {iconSize}px;"
+              >
+                <img
+                  alt="Avatar"
+                  class="relative object-cover rounded-full"
+                  style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
+                  src={newProfile.picture}
+                />
+              </div>
             {/if}
           </div>
         </div>
@@ -204,12 +241,13 @@
       {#if newProfile.about}
         <div
           class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
-          style="word-break: break-word; max-height:{bannerHeight * 1.5}px"
+          style="word-break: break-word; max-height:{bannerHeight}px"
         >
-          <!-- <Content text={newProfile.about} tags={metadata.tags} /> -->
+          <Content text={newProfile.about} tags={newTags} />
         </div>
       {/if}
     </div>
+
     <!--ここから-->
     <div class="flex flex-col w-full mt-4">
       <div class="font-bold text-magnum-500">{$_("user.profileEdit")}</div>
@@ -237,7 +275,7 @@
         bind:value={newProfile.picture}
         placeholder="https://example.com/picture.webp"
       />
-      <div class="flex justify-center flex-col items-center text-magnum-400">
+      <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
         preview
         <div
           class="h-24 min-w-24 w-fit max-w-full rounded-md px-3 py-2 border border-magnum-500"
@@ -249,7 +287,7 @@
             alt={""}
           />
         </div>
-      </div>
+      </div> -->
       {$_("profile.banner")}
       <input
         type="text"
@@ -257,7 +295,7 @@
         bind:value={newProfile.banner}
         placeholder="https://example.com/banner.webp"
       />
-      <div class="flex justify-center flex-col items-center text-magnum-400">
+      <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
         preview
         <div
           class="h-24 w-fit min-w-24 max-w-full rounded-md px-3 py-2 border border-magnum-500"
@@ -269,13 +307,46 @@
             alt={""}
           />
         </div>
-      </div>
+      </div> -->
       {$_("profile.about")}
       <textarea
         class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800 mb-2"
         bind:value={newProfile.about}
+        on:input={handleTextareaInput}
+        on:click={handleTextareaInput}
       />
-
+      {#if $emojis && $emojis.length > 0}
+        <div class="w-fit flex self-end">
+          <Popover bind:open>
+            <SmilePlus size="20" />
+            <div slot="popoverContent">
+              <div
+                class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+              >
+                {#each $emojis as e, index}
+                  {#if customReaction === "" || e[0]
+                      .toLowerCase()
+                      .includes(customReaction.toLowerCase())}
+                    <button
+                      on:click={() => handleClickEmoji(e)}
+                      class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                    >
+                      {#if $showImg}
+                        <img
+                          loading="lazy"
+                          class="h-4 object-contain justify-self-center"
+                          src={e[1]}
+                          alt={e[0]}
+                          title={e[0]}
+                        />{:else}{e[0]}{/if}
+                    </button>
+                  {/if}
+                {/each}
+              </div>
+            </div>
+          </Popover>
+        </div>
+      {/if}
       {$_("profile.nip05")}
       <input
         type="text"
