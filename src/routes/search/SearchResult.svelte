@@ -53,9 +53,12 @@
 
           <div class=" break-words">
             {#if events && events.length > 0}
-              {#each events as event (event.id)}
+              {#each events as event, index (event.id)}
                 <div
-                  class="break-words whitespace-pre-line m-1 overflow-hidden"
+                  class="break-words whitespace-pre-line m-1 overflow-hidden {index ===
+                  events.length - 1
+                    ? 'last-visible'
+                    : ''} {index === 0 ? 'first-visible' : ''}"
                 >
                   <Metadata
                     queryKey={["metadata", event.pubkey]}

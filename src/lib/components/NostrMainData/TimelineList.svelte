@@ -84,8 +84,6 @@
   }
 
   const handleNext = async () => {
-    const lastVisibleElement = document?.querySelector(".last-visible");
-
     if ($data && $data.length > 1 && $data.length < viewIndex + amount + sift) {
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
@@ -95,25 +93,37 @@
       $nowProgress = false;
     }
     viewIndex += sift; //スライドする量
-    setTimeout(() => {
-      //データが更新終わるのを待ってからスライドしてみる
-      if (lastVisibleElement) {
-        lastVisibleElement.scrollIntoView(true);
-      }
-    }, 10);
+
+    //スマホではスクロールちゃんとなってたからでかいときだけやる
+    if (window.innerWidth > 640) {
+      //px
+      const lastVisibleElement = document?.querySelector(".last-visible");
+      setTimeout(() => {
+        //データが更新終わるのを待ってからスライドしてみる
+        if (lastVisibleElement) {
+          lastVisibleElement.scrollIntoView(true);
+        }
+      }, 10);
+    }
   };
 
   const handlePrev = () => {
-    const firstVisibleElement = document?.querySelector(".first-visible");
     if (viewIndex > 0) {
       viewIndex = Math.max(viewIndex - sift, 0);
     }
-    setTimeout(() => {
-      //データが更新終わるのを待ってからスライドしてみる
-      if (firstVisibleElement) {
-        firstVisibleElement.scrollIntoView(true);
-      }
-    }, 10);
+
+    //スマホではスクロールちゃんとなってたからでかいときだけやる
+    if (window.innerWidth > 640) {
+      //px
+
+      const firstVisibleElement = document?.querySelector(".first-visible");
+      setTimeout(() => {
+        //データが更新終わるのを待ってからスライドしてみる
+        if (firstVisibleElement) {
+          firstVisibleElement.scrollIntoView(true);
+        }
+      }, 10);
+    }
   };
 
   function updateViewEvent(data: EventPacket[]) {
