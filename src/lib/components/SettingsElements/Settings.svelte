@@ -217,10 +217,16 @@
   }
 
   function createCurrentSettings(): LumiSetting {
+    let pub: string = "";
+    try {
+      pub = nip19.decode(inputPubkey).data as string;
+    } catch (error) {
+      console.log(error);
+    }
     const settings: LumiSetting = {
       relays: $relays,
       useRelaySet: $radioGroupSelected,
-      pubkey: $pubkey,
+      pubkey: pub,
       showImg: $_showImg,
       showPreview: $_showPreview,
       menuleft: $_menu_left,
@@ -272,6 +278,8 @@
       return (
         JSON.stringify($originalSettings) !== JSON.stringify(currentSettings)
       );
+    } else {
+      return false;
     }
     return true;
   }
