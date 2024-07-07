@@ -38,7 +38,7 @@
       <SetRepoReactions />
       <div class="w-full break-words overflow-hidden">
         <div>
-          <Note id={data.id} />
+          <Note id={data.id} maxHeight={undefined} />
         </div>
         <AllReactions
           queryKey={["allreactions", data.id]}

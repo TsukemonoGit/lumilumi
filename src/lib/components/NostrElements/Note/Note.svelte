@@ -6,6 +6,7 @@
   import Text from "$lib/components/NostrMainData/Text.svelte";
   export let id: string;
   export let mini: boolean = false;
+  export let maxHeight: string | undefined = "16rem";
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
@@ -29,14 +30,14 @@
     let:metadata
   >
     <div slot="loading">
-      <EventCard note={text} {mini} />
+      <EventCard note={text} {mini} {maxHeight} />
     </div>
     <div slot="nodata">
-      <EventCard note={text} {mini} />
+      <EventCard note={text} {mini} {maxHeight} />
     </div>
     <div slot="error" let:error>
-      <EventCard note={text} {mini} />
+      <EventCard note={text} {mini} {maxHeight} />
     </div>
-    <EventCard note={text} {metadata} {mini} />
+    <EventCard note={text} {metadata} {mini} {maxHeight} />
   </Metadata>
 </Text>
