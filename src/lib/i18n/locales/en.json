@@ -62,7 +62,8 @@
     "copy": {
       "pubkey": "Copy pubkey",
       "note": "Copy noteID",
-      "naddr": "Copy naddr"
+      "naddr": "Copy naddr",
+      "nevent": "Copy EventID"
     }
   }
 }

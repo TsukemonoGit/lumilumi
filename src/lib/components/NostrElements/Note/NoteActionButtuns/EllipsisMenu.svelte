@@ -37,7 +37,7 @@
     //   :
     [
       {
-        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.note")}`,
+        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
         icon: Copy,
         num: 3,
       },

@@ -62,7 +62,8 @@
     "copy": {
       "pubkey": "公開鍵をコピー",
       "note": "noteID をコピー",
-      "naddr": "naddr をコピー"
+      "naddr": "naddr をコピー",
+      "nevent": "イベントIDをコピー"
     }
   }
 }

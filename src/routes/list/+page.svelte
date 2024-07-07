@@ -9,6 +9,7 @@
 
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
 
   const handleClickToList = (event: Nostr.Event) => {
     const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
@@ -38,7 +39,7 @@
       <div slot="nodata">nodata</div>
       <div class="flex flex-col gap-2 w-full overflow-x-hidden">
         <ListMain queryKey={["kind30000", pubkey]} {pubkey} let:events>
-          <Link
+          <!-- <Link
             slot="loading"
             className="underline text-magnum-300 break-all "
             href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
@@ -55,7 +56,7 @@
             className="underline text-magnum-300 break-all "
             href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
             >{$_("nostviewstr.kind30000")}</Link
-          >
+          > -->
           {@const peopleList = filtered(events)}
           {#if peopleList.length === 0}
             <Link
@@ -74,6 +75,17 @@
             {/each}
           {/if}
         </ListMain>
+        <div
+          class="mb-2 border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
+        >
+          <Link
+            className=" font-semibold text-magnum-300 break-all inline-flex"
+            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
+            >{$_("nostviewstr.kind30000")}<SquareArrowOutUpRight
+              size={16}
+            /></Link
+          >
+        </div>
       </div>
     </SetDefaultRelays>
   </NostrMain>

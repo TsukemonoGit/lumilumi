@@ -20,6 +20,7 @@ export const defaultRelays = [
   "wss://relay.nostr.band",
   "wss://nos.lol",
   // "wss://relayable.org",
+  "wss://bostr.nokotaro.com",
   "wss://nostr.bitcoiner.social",
 ];
 
@@ -28,5 +29,6 @@ export const feedbackRelay = [
   "wss://nos.lol",
   "wss://relay.nostr.wirednet.jp",
   // "wss://relayable.org",
+  "wss://bostr.nokotaro.com",
   "wss://relay.nostr.band/",
 ];
