@@ -15,6 +15,7 @@
   //movie
   const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
+  const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
   $: parts = parseText(text, tags);
 
   const nip19Decode = (
@@ -97,6 +98,15 @@
         >
           <track default kind="captions" />
         </video></Link
+      >{:else if $showImg && checkFileExtension(part.content, audioRegex)}
+      <Link href={part.content}
+        ><audio
+          controls
+          src={part.content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        >
+          <track default kind="captions" />
+        </audio></Link
       >
     {:else if $showImg && isvalidURL(part.content)}
       <OGP url={part.content} let:contents>
