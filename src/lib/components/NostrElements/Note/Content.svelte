@@ -54,6 +54,17 @@
     }
   };
   let imgError: boolean = false;
+
+  // パスから拡張子をチェックする関数
+  const checkFileExtension = (url: string, regex: RegExp): boolean => {
+    try {
+      const urlObj = new URL(url);
+      const path = urlObj.pathname;
+      return regex.test(path);
+    } catch (error) {
+      return false;
+    }
+  };
 </script>
 
 {#each parts as part}
@@ -64,7 +75,7 @@
       {/if}
     {/await}
   {:else if part.type === "url" && part.content}
-    {#if $showImg && imageRegex.test(part.content)}
+    {#if $showImg && checkFileExtension(part.content, imageRegex)}
       {#if !imgError}<Link href={part.content}
           ><img
             loading="lazy"
@@ -77,7 +88,7 @@
           className="underline text-magnum-300 break-all "
           href={part.content}>{part.content}</Link
         >{/if}
-    {:else if $showImg && movieRegex.test(part.content)}
+    {:else if $showImg && checkFileExtension(part.content, movieRegex)}
       <Link href={part.content}
         ><video
           controls
