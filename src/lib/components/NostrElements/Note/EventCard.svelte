@@ -35,7 +35,7 @@
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
-  export let maxHeight: string | undefined = "16rem";
+  export let maxHeight: string = "16rem";
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -191,7 +191,7 @@
       <div class="relative overflow-hidden">
         <div
           class=" overflow-y-auto overflow-x-hidden"
-          style="max-height:{maxHeight}"
+          style="max-height:{maxHeight ?? 'none'}"
         >
           <Content text={note.content} tags={note.tags} />
         </div>
