@@ -11,6 +11,7 @@
   import EventCard from "./NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -70,9 +71,12 @@
 
           <div class="max-w-[100vw] break-words box-border">
             {#if events && events.length > 0}
-              {#each events as event (event.id)}
+              {#each events as event, index (event.id)}
                 <div
-                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card {index ===
+                  events.length - 1
+                    ? 'last-visible'
+                    : ''} {index === 0 ? 'first-visible' : ''}"
                 >
                   <Metadata
                     queryKey={["metadata", event.pubkey]}
