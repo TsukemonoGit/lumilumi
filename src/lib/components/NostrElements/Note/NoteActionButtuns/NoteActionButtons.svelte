@@ -227,9 +227,14 @@
         replyText = atag
           ? ` nostr:${encodeNaddr(atag, nevent)} \n`
           : ` nostr:${nevent} \n`;
+
         openReplyWindow = false;
         openQuoteWindow = true;
-
+        setTimeout(() => {
+          textareaQuote.focus();
+          textareaQuote.selectionEnd = 0;
+          cursorPosition = 0;
+        }, 20);
         break;
     }
   };
@@ -249,6 +254,12 @@
       return nevent;
     }
   }
+
+  const handleTextareaInput = (event: Event) => {
+    const target = event.target as HTMLTextAreaElement;
+    cursorPosition = target.selectionStart;
+  };
+
   const handleClickEmoji = (e: string[]) => {
     const emojiTag = ["emoji", ...e];
     if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
@@ -297,12 +308,7 @@
     console.log("textareaReply");
     textareaReply.focus();
   }
-  $: if (textareaQuote) {
-    console.log("textareaQuote");
-    setTimeout(() => {
-      textareaQuote.focus();
-    }, 20);
-  }
+
   $: if (openQuoteWindow || openReplyWindow) {
     const warning = note.tags.find((item) => item[0] === "content-warning");
     if (warning) {
@@ -600,6 +606,9 @@
       rows="3"
       class="w-[100%] rounded-md bg-neutral-950 mt-1"
       bind:value={replyText}
+      on:input={handleTextareaInput}
+      on:click={handleTextareaInput}
+      on:touchend={handleTextareaInput}
     />
     {#if onWarning}
       <div class="flex">
@@ -743,6 +752,9 @@
       rows="6"
       class="w-[100%] rounded-md bg-neutral-950 mt-1"
       bind:value={replyText}
+      on:input={handleTextareaInput}
+      on:click={handleTextareaInput}
+      on:touchend={handleTextareaInput}
     />
     {#if onWarning}
       <div class="flex">
