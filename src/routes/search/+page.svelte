@@ -11,6 +11,7 @@
   import { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
+  import * as Nostr from "nostr-typedef";
 
   let searchWord: string = "";
   let searchKind: number = 1;
@@ -100,6 +101,17 @@
     searchSince = undefined;
     searchUntil = undefined;
   };
+
+  const handleClickPub = async () => {
+    try {
+      const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      if (pub) {
+        searchPubkey = nip19.npubEncode(pub);
+      }
+    } catch (error) {
+      console.log("failed to get pubkey");
+    }
+  };
 </script>
 
 <svelte:head>
@@ -174,7 +186,7 @@
             <input
               type="number"
               id="kind"
-              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-500 bg-neutral-900 mt-1.5"
+              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900 mt-1.5"
               placeholder="1"
               min="0"
               bind:value={searchKind}
@@ -183,13 +195,21 @@
           <div class="flex flex-col items-start justify-center w-full">
             <div class=" font-medium text-magnum-400">pubkey</div>
 
-            <input
-              type="text"
-              id="npub"
-              class="h-10 w-full max-w-[360px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-              placeholder="npub"
-              bind:value={searchPubkey}
-            />
+            <div
+              class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            >
+              <input
+                type="text"
+                id="npub"
+                class="h-10 max-w-[420px] px-3 py-2 rounded-md"
+                placeholder="npub"
+                bind:value={searchPubkey}
+              /><button
+                on:click={handleClickPub}
+                class="h-10 rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                >Set My Pubkey</button
+              >
+            </div>
           </div>
           <!-- <div class="flex flex-col items-start justify-center">
             <DatePicker

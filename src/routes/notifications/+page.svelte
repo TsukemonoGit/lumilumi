@@ -23,7 +23,7 @@
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
-      <div class=" break-words overflow-x-hidden">
+      <div class="w-full break-words overflow-x-hidden">
         <TimelineList
           queryKey={["notifications", "feed"]}
           filters={[

@@ -311,7 +311,14 @@
         {/if}
       </div>
       <hr />
-      {note.tags}
+      <div
+        class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+      >
+        {#each note.tags as tag}
+          {JSON.stringify(tag)}
+        {/each}
+      </div>
+
       <hr />
       <Content text={note.content} tags={note.tags} />
       {#if displayMenu}<NoteActionButtons {note} />{/if}
@@ -331,7 +338,13 @@
             {/if}
           </div>
           <hr />
-          {note.tags}
+          <div
+            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+          >
+            {#each note.tags as tag}
+              {JSON.stringify(tag)}
+            {/each}
+          </div>
           <hr />
           <Content text={note.content} tags={note.tags} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
@@ -343,7 +356,13 @@
             {/if}
           </div>
           <hr />
-          {note.tags}
+          <div
+            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+          >
+            {#each note.tags as tag}
+              {JSON.stringify(tag)}
+            {/each}
+          </div>
           <hr />
           <Content text={note.content} tags={note.tags} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
@@ -355,12 +374,18 @@
             {/if}
           </div>
           <hr />
-          {note.tags}
+          <div
+            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+          >
+            {#each note.tags as tag}
+              {JSON.stringify(tag)}
+            {/each}
+          </div>
           <hr />
           <Content text={note.content} tags={note.tags} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
-
+        <!--client tag からURLさがすとこ-->
         {#await findWebURL(event.tags, clientData) then urls}
           <UserMenu
             pubkey={note.pubkey}
@@ -380,13 +405,20 @@
             {/each}
             {#if displayMenu}<NoteActionButtons {note} />{/if}
           {:else}
+            <!--client tag から対応したURL見つからなかったところ？-->
             <div class="break-all overflow-x-hidden">
               kind:{note.kind}{#if metadata}
                 {profile(metadata)?.name}
               {/if}
             </div>
             <hr />
-            {note.tags}
+            <div
+              class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+            >
+              {#each note.tags as tag}
+                {JSON.stringify(tag)}
+              {/each}
+            </div>
             <hr />
             <Content text={note.content} tags={note.tags} />
             {#if displayMenu}<NoteActionButtons {note} />{/if}

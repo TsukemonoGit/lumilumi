@@ -31,7 +31,7 @@
       setRelayList={nip50relays}
       let:searchRelays
     >
-      <div class="w-full break-words overflow-x-hidden">
+      <div class="w-full break-words overflow-x-hidden max-w-full">
         <TimelineList
           queryKey={["search", "feed", JSON.stringify(filter)]}
           filters={[filter]}
@@ -51,11 +51,11 @@
             <p>{JSON.stringify(filter)} {error}</p>
           </div>
 
-          <div class="max-w-[100vw] break-words box-border">
+          <div class=" break-words">
             {#if events && events.length > 0}
               {#each events as event (event.id)}
                 <div
-                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+                  class="break-words whitespace-pre-line m-1 overflow-hidden"
                 >
                   <Metadata
                     queryKey={["metadata", event.pubkey]}
