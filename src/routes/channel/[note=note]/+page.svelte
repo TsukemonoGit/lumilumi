@@ -68,7 +68,7 @@
               {#each events as event, index (event.id)}
                 <div
                   class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card {index ===
-                  events.length - 1
+                  events.length - 2
                     ? 'last-visible'
                     : ''} {index === 0 ? 'first-visible' : ''}"
                 >
