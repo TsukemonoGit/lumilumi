@@ -8,10 +8,10 @@
   import { splitHexColorString } from "$lib/func/util";
   import { onMount } from "svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
+  import { writable } from "svelte/store";
 
   let metadata: Nostr.Event;
-
-  $: url = picture(metadata);
+  let url = writable<string>();
   export let size = 24;
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {
@@ -33,6 +33,10 @@
         metadata = (
           $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
         ).event;
+        const tmp = picture(metadata);
+        if (tmp) {
+          url.set(tmp);
+        }
       }
     });
   }
@@ -42,9 +46,9 @@
   style={`width:${size}px;height:${size}px`}
   class="flex justify-center items-center"
 >
-  {#if $showImg && metadata && url && url !== ""}
+  {#if $showImg && metadata && $url && $url !== ""}
     <UserAvatar
-      {url}
+      bind:url={$url}
       name={metadata.pubkey}
       pubkey={metadata.pubkey}
       size={size - 4}

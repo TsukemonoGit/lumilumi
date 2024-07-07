@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { defaultRelays, nowProgress } from "$lib/stores/stores";
+  import { defaultRelays, loginUser, nowProgress } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -14,6 +14,7 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { type OperatorFunction } from "rxjs";
+  import Metadata from "./Metadata.svelte";
 
   const sift = 40; //スライドする量
 
@@ -144,7 +145,9 @@
     >
   </div>
 {/if}
-
+{#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+  <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
+{/if}
 {#if $error}
   <slot name="error" error={$error} />
 {:else if $data && $data?.length > 0}
