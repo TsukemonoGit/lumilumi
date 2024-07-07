@@ -9,6 +9,7 @@
   import { nip19 } from "nostr-tools";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
+  import { _ } from "svelte-i18n";
 
   export let pubkey: string;
   export let mutebykindList:
@@ -74,7 +75,7 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickMuteByKind}>MuteByKind</button
 ><span class="ml-2"
-  >最終更新日時：{mutebykindList
+  >{$_("settings.lastUpdated")}: {mutebykindList
     ? formatAbsoluteDate(mutebykindList?.updated)
     : ""}</span
 >{#if mutebykindList}<button

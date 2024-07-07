@@ -31,6 +31,7 @@
       }
       const nostrLogin = await import("nostr-login");
       nostrLogin.init({
+        //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
       });
 

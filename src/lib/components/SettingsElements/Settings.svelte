@@ -161,7 +161,7 @@
 
     toastSettings.set({
       title: "Success",
-      description: "設定が保存されました。",
+      description: "saved",
       color: "bg-green-500",
     });
 
@@ -466,7 +466,7 @@
           $loginUser
         )}/10000"
       >
-        NostViewstr で MuteList ( kind:10000 ) を編集する
+        {$_("settings.nostviewstr.kind10000")}
       </a>
     {/if}
     <!--mute by kind-->
@@ -481,8 +481,7 @@
         href="https://nostviewstr.vercel.app/{nip19.npubEncode(
           $loginUser
         )}/30007"
-      >
-        NostViewstr で MutebykindList ( kind:30007 ) を編集する
+        >{$_("settings.nostviewstr.kind30007")}
       </a>
     {/if}
     <!--emoji-->
@@ -497,8 +496,7 @@
         href="https://nostviewstr.vercel.app/{nip19.npubEncode(
           $loginUser
         )}/10030"
-      >
-        NostViewstr で EmojiList ( kind:10030 ) を編集する
+        >{$_("settings.nostviewstr.kind10030")}
       </a>
     {/if}
   </div>

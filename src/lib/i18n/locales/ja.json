@@ -11,7 +11,10 @@
     },
     "nostviewstr": {
       "kind10002": "NostViewstr で Relaylist (kind:10002) を編集する",
-      "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する"
+      "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する",
+      "kind10000": "NostViewstr で MuteList ( kind:10000 ) を編集する",
+      "kind30007": "NostViewstr で Mute by kind( kind:30007 ) を編集する",
+      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する"
     },
     "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
     "display": {
@@ -21,7 +24,8 @@
     },
     "douki": {
       "title": "データの同期"
-    }
+    },
+    "lastUpdated": "最終更新日時"
   },
   "user": {
     "following": "フォロー中",

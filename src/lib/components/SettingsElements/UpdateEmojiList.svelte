@@ -8,6 +8,7 @@
   import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
   import { nowProgress, showImg, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
+  import { _ } from "svelte-i18n";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;
@@ -123,7 +124,9 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickEmoji}>Emoji</button
 ><span class="ml-2"
-  >最終更新日時：{emojiList ? formatAbsoluteDate(emojiList?.updated) : ""}</span
+  >{$_("settings.lastUpdated")}: {emojiList
+    ? formatAbsoluteDate(emojiList?.updated)
+    : ""}</span
 >{#if emojiList}<button
     class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button

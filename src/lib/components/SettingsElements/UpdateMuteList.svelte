@@ -6,6 +6,7 @@
   import { nip19 } from "nostr-tools";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
+  import { _ } from "svelte-i18n";
 
   export let pubkey: string;
   export let muteList: { list: MuteList; updated: number } | undefined;
@@ -58,7 +59,9 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickMute}>Mute</button
 ><span class="ml-2"
-  >最終更新日時：{muteList ? formatAbsoluteDate(muteList?.updated) : ""}</span
+  >{$_("settings.lastUpdated")}: {muteList
+    ? formatAbsoluteDate(muteList?.updated)
+    : ""}</span
 >{#if muteList}<button
     class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
