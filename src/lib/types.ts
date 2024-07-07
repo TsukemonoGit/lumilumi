@@ -96,6 +96,7 @@ export interface LumiSetting {
   pubkey: string;
   showImg?: boolean;
   showPreview: boolean;
+  menuleft?: boolean;
   emoji?: {
     list: string[][];
     updated: number; //最後に同期した日付

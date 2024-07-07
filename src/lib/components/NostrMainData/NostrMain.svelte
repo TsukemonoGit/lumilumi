@@ -3,6 +3,7 @@
     app,
     emojis,
     loginUser,
+    menuLeft,
     mutebykinds,
     mutes,
     showImg,
@@ -63,6 +64,7 @@
       pubkey: savedPubkey,
       showImg: savedShowImg,
       showPreview: savedShowPreview,
+      menuleft: savedMenuLeft,
       mute: savedMute,
       emoji: savedEmoji,
       mutebykinds: savedMutebykinds,
@@ -81,8 +83,10 @@
     $showImg = savedShowImg ? savedShowImg : false;
 
     $showPreview = savedShowPreview ? savedShowPreview : false;
+    $menuLeft = savedMenuLeft ? savedMenuLeft : false;
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
+    //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定
     getMetadataFromLocalStorage();
     //}
 
@@ -111,7 +115,7 @@
 {/if}
 
 {#if display}
-  <div class="postWindow fixed right-auto left-auto bottom-5 z-10">
+  <div class="postWindow">
     <OpenPostWindow {options} />
   </div>
 {/if}
@@ -120,7 +124,7 @@
   @media screen and (max-width: 640px) {
     .postWindow {
       /* display: block !important; */
-      @apply fixed right-auto left-auto bottom-5 z-10 h-fit;
+      @apply fixed right-auto left-auto bottom-4 z-10 h-fit;
     }
   }
   @media screen and (min-width: 641px) {

@@ -13,6 +13,7 @@
     showImg,
     showPreview,
     toastSettings,
+    menuLeft,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
@@ -32,6 +33,7 @@
   const pubkey = writable("");
   const _showImg = writable<boolean>(false);
   const _showPreview = writable<boolean>(false);
+  const _menu_left = writable<boolean>(false);
   const originalSettings = writable<LumiSetting | null>(null);
 
   let relayInput: string = "";
@@ -90,6 +92,7 @@
       useRelaySet: savedRelaySet,
       pubkey: savedPubkey,
       showImg: savedShowImg,
+      menuleft: savedMenuLeft,
       showPreview: savedShowPreview,
       mute: savedMute,
       emoji: savedEmoji,
@@ -102,6 +105,7 @@
     inputPubkey = nip19.npubEncode(savedPubkey);
     if (savedShowImg) _showImg.set(savedShowImg);
     if (savedShowPreview) _showPreview.set(savedShowPreview);
+    if (savedMenuLeft) _menu_left.set(savedMenuLeft);
     if (savedMute) muteList = savedMute;
     if (savedEmoji) emojiList = savedEmoji;
     if (savedMutebykinds?.list) {
@@ -164,6 +168,7 @@
     $loginUser = $pubkey;
     $showImg = $_showImg;
     $showPreview = $_showPreview;
+    $menuLeft = $_menu_left;
     if (muteList) mutes.set(muteList.list);
     if (emojiList) emojis.set(emojiList.list);
     if (mutebykindList) mutebykinds.set(mutebykindList.list);
@@ -218,6 +223,7 @@
       pubkey: $pubkey,
       showImg: $_showImg,
       showPreview: $_showPreview,
+      menuleft: $_menu_left,
     };
     if (muteList && muteList.updated !== undefined) {
       settings.mute = muteList;
@@ -431,6 +437,14 @@
           bind:checked={$_showPreview}
         />
         {$_("settings.display.preview")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={$_menu_left}
+        />
+        {$_("settings.display.menu")}
       </label>
     </div>
   </div>

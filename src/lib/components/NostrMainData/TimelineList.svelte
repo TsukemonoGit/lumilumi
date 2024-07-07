@@ -154,7 +154,7 @@
 {:else}
   <slot name="nodata" />
 {/if}
-<div class="p-1 w-full">
+<div class="p-1 w-full mb-16">
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"

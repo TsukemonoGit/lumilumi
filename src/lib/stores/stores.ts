@@ -37,6 +37,7 @@ export const loginUser = writable<string>();
 
 export const showImg = writable<boolean>(false);
 export const showPreview = writable<boolean>(false);
+export const menuLeft = writable<boolean>(false);
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
 export const emojis = writable<string[][]>();
 export const mutes = writable<MuteList | undefined>();

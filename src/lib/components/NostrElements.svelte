@@ -10,6 +10,7 @@
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
+  import { afterNavigate } from "$app/navigation";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;

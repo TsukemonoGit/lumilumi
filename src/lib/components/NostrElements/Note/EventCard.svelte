@@ -173,134 +173,154 @@
       return item.replace(bech32Pattern, clientData.naddr ?? "");
     });
   };
+  $: proxy = checkProxy(note.tags);
+  $: warning = checkContentWarning(note.tags);
+  // const { kind, tag } = repostedId(note.tags);
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
-  {#await checkProxy(note.tags) then tag}
-    {#if note.kind === 1}
-      <NoteTemplate {note} {metadata} {tag} {mini}>
-        {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-          {#if replyID || replyUsers.length > 0}
-            <Reply {replyID} {replyUsers} />
-            <hr />
-          {/if}
-        {/await}
-        {#await checkContentWarning(note.tags) then tag}
-          <div class="relative overflow-hidden">
-            <div class=" max-h-64 overflow-y-auto overflow-x-hidden">
-              <Content text={note.content} tags={note.tags} />
-            </div>
-            {#if tag}
-              <!-- <WarningHide1 text={tag[1]} /> -->
-              <WarningHide2 text={tag[1]} />
-            {/if}
-          </div>
-        {/await}
-        {#if tag}
-          <div class="text-end">
-            <ProxyTag proxyTag={tag} />
-          </div>
+  {#if note.kind === 1}
+    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+      {@const { replyID, replyUsers } = replyedEvent(note.tags)}
+      {#if replyID || replyUsers.length > 0}
+        <Reply {replyID} {replyUsers} />
+        <hr />
+      {/if}
+
+      <div class="relative overflow-hidden">
+        <div class=" max-h-64 overflow-y-auto overflow-x-hidden">
+          <Content text={note.content} tags={note.tags} />
+        </div>
+        {#if warning}
+          <!-- <WarningHide1 text={tag[1]} /> -->
+          <WarningHide2 text={warning[1]} />
         {/if}
+      </div>
+
+      {#if proxy}
+        <div class="text-end">
+          <ProxyTag proxyTag={proxy} />
+        </div>
+      {/if}
+      {#if displayMenu}
+        <NoteActionButtons {note} />{/if}
+    </NoteTemplate>
+  {:else if note.kind === 6 || note.kind === 16}
+    <!--リポスト-->
+    <div class="flex gap-1">
+      <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
+        size="20"
+        class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
+      />
+      <div class="self-center">
+        <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
+      </div>
+      <div
+        class=" mt-auto inline-block break-all break-words whitespace-pre-line"
+      >
+        {#if metadata}
+          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+            class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
+          >
+        {:else}
+          <span class="text-magnum-100 text-sm"
+            >@{nip19.npubEncode(note.pubkey)}</span
+          >
+        {/if}
+      </div>
+      {#if proxy}
+        <div class="text-end">
+          <ProxyTag proxyTag={proxy} />
+        </div>
+      {/if}
+      <div class="ml-auto mr-2">
         {#if displayMenu}
           <NoteActionButtons {note} />{/if}
-      </NoteTemplate>
-    {:else if note.kind === 6 || note.kind === 16}
-      <!--リポスト-->
-      <div class="flex gap-1">
-        <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
-          size="20"
-          class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
-        />
-        <div class="self-center">
-          <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
-        </div>
-        <div
-          class=" mt-auto inline-block break-all break-words whitespace-pre-line"
-        >
-          {#if metadata}
-            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
-            >
-          {:else}
-            <span class="text-magnum-100 text-sm"
-              >@{nip19.npubEncode(note.pubkey)}</span
-            >
-          {/if}
-        </div>
-        {#if tag}
-          <div class="text-end">
-            <ProxyTag proxyTag={tag} />
-          </div>
-        {/if}
-        <div class="ml-auto mr-2">
-          {#if displayMenu}
-            <NoteActionButtons {note} />{/if}
-        </div>
       </div>
-
-      {#await repostedId(note.tags) then { kind, tag }}
-        {#if tag}
-          <RepostedNote {tag} {kind} />
-        {/if}
-      {/await}
-    {:else if note.kind === 7}
-      <!--リアクション-->
-      <div class="flex gap-1">
-        <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
-        <div class="self-center">
-          <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
-        </div>
-        <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
-          {#if metadata}
-            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-magnum-100 text-sm mt-auto"
-              >@{profile(metadata)?.name}</span
-            >
-          {:else}
-            <span class="text-magnum-100 text-sm"
-              >@{nip19.npubEncode(note.pubkey)}</span
-            >
-          {/if}
-        </div>
-        {#if tag}
-          <div class="text-end">
-            <ProxyTag proxyTag={tag} />
-          </div>
-        {/if}
-        <div class="ml-auto">
-          {#if displayMenu}
-            <NoteActionButtons {note} />{/if}
-        </div>
+    </div>
+    <!--リアクションしたノートの情報-->
+    {@const { kind, tag } = repostedId(note.tags)}
+    {#if tag}
+      <RepostedNote {tag} {kind} />
+    {/if}
+  {:else if note.kind === 7}
+    <!--リアクション-->
+    <div class="flex gap-1">
+      <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
+      <div class="self-center">
+        <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
       </div>
-
-      {#await repostedId(note.tags) then { kind, tag }}
-        {#if tag}
-          <RepostedNote {tag} {kind} />
+      <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
+        {#if metadata}
+          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+            class="text-magnum-100 text-sm mt-auto"
+            >@{profile(metadata)?.name}</span
+          >
+        {:else}
+          <span class="text-magnum-100 text-sm"
+            >@{nip19.npubEncode(note.pubkey)}</span
+          >
         {/if}
-      {/await}
-    {:else if note.kind === 0}
-      <!--kind0-->
-      <Kind0Note {note} />
-    {:else if note.kind === 40}
-      <!--kind42 パブ茶部屋-->
-    {:else if note.kind === 42}
-      <!--kind42 パブ茶コメント-->
-      <NoteTemplate {note} {metadata} {tag} {mini}>
-        <Kind42Note {note} {metadata} /></NoteTemplate
-      >
-    {:else if note.kind === 30030}
-      <!--kind30030-->
-      <NoteTemplate {note} {metadata} {tag} {mini}>
-        <Kind30030Note {note} /></NoteTemplate
-      >
-    {:else if note.kind === 9735}
-      <!--kind30030-->
+      </div>
+      {#if proxy}
+        <div class="text-end">
+          <ProxyTag proxyTag={proxy} />
+        </div>
+      {/if}
+      <div class="ml-auto">
+        {#if displayMenu}
+          <NoteActionButtons {note} />{/if}
+      </div>
+    </div>
+    <!--リアクションしたノートの情報（リポストのを使いまわし）-->
+    {@const { kind, tag } = repostedId(note.tags)}
+    {#if tag}
+      <RepostedNote {tag} {kind} />
+    {/if}
+  {:else if note.kind === 0}
+    <!--kind0-->
+    <Kind0Note {note} />
+  {:else if note.kind === 40}
+    <!--kind42 パブ茶部屋-->
+  {:else if note.kind === 42}
+    <!--kind42 パブ茶コメント-->
+    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+      <Kind42Note {note} {metadata} /></NoteTemplate
+    >
+  {:else if note.kind === 30030}
+    <!--kind30030-->
+    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+      <Kind30030Note {note} /></NoteTemplate
+    >
+  {:else if note.kind === 9735}
+    <!--kind9735 zap receipt-->
 
-      <Kind9735Note {note} />
+    <Kind9735Note {note} />
+  {:else}
+    <!--その他-->
+    {@const clientData = findClientTag(note)}
+    {#if !clientData}
+      <!-------client tagがないやつここ-------->
+      <div class="break-all overflow-x-hidden">
+        kind:{note.kind}{#if metadata}
+          {profile(metadata)?.name}
+        {/if}
+      </div>
+      <hr />
+      {note.tags}
+      <hr />
+      <Content text={note.content} tags={note.tags} />
+      {#if displayMenu}<NoteActionButtons {note} />{/if}
+
+      <!--   -->
     {:else}
-      <!--その他-->
-      {#await findClientTag(note) then clientData}
-        {#if !clientData}
+      <!--client tag あったので 31990 を さがす とこたち　-->
+      <LatestEvent
+        filters={[clientData.filter]}
+        queryKey={["naddr", clientData.aTag]}
+        let:event
+      >
+        <div slot="loading">
           <div class="break-all overflow-x-hidden">
             kind:{note.kind}{#if metadata}
               {profile(metadata)?.name}
@@ -311,85 +331,64 @@
           <hr />
           <Content text={note.content} tags={note.tags} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
-        {:else}
-          <!--client tag 31990 を さがす　-->
-          <LatestEvent
-            filters={[clientData.filter]}
-            queryKey={["naddr", clientData.aTag]}
-            let:event
-          >
-            <div slot="loading">
-              <div class="break-all overflow-x-hidden">
-                kind:{note.kind}{#if metadata}
-                  {profile(metadata)?.name}
-                {/if}
-              </div>
-              <hr />
-              {note.tags}
-              <hr />
-              <Content text={note.content} tags={note.tags} />
-              {#if displayMenu}<NoteActionButtons {note} />{/if}
-            </div>
-            <div slot="nodata">
-              <div class="break-all overflow-x-hidden">
-                kind:{note.kind}{#if metadata}
-                  {profile(metadata)?.name}
-                {/if}
-              </div>
-              <hr />
-              {note.tags}
-              <hr />
-              <Content text={note.content} tags={note.tags} />
-              {#if displayMenu}<NoteActionButtons {note} />{/if}
-            </div>
-            <div slot="error" let:error>
-              <div class="break-all overflow-x-hidden">
-                kind:{note.kind}{#if metadata}
-                  {profile(metadata)?.name}
-                {/if}
-              </div>
-              <hr />
-              {note.tags}
-              <hr />
-              <Content text={note.content} tags={note.tags} />
-              {#if displayMenu}<NoteActionButtons {note} />{/if}
-            </div>
+        </div>
+        <div slot="nodata">
+          <div class="break-all overflow-x-hidden">
+            kind:{note.kind}{#if metadata}
+              {profile(metadata)?.name}
+            {/if}
+          </div>
+          <hr />
+          {note.tags}
+          <hr />
+          <Content text={note.content} tags={note.tags} />
+          {#if displayMenu}<NoteActionButtons {note} />{/if}
+        </div>
+        <div slot="error" let:error>
+          <div class="break-all overflow-x-hidden">
+            kind:{note.kind}{#if metadata}
+              {profile(metadata)?.name}
+            {/if}
+          </div>
+          <hr />
+          {note.tags}
+          <hr />
+          <Content text={note.content} tags={note.tags} />
+          {#if displayMenu}<NoteActionButtons {note} />{/if}
+        </div>
 
-            {#await findWebURL(event.tags, clientData) then urls}
-              <UserMenu
-                pubkey={note.pubkey}
-                bind:metadata
-                size={20}
-              />kind:{note.kind}
-              {#if metadata}
-                @{profile(metadata)?.name}
+        {#await findWebURL(event.tags, clientData) then urls}
+          <UserMenu
+            pubkey={note.pubkey}
+            bind:metadata
+            size={20}
+          />kind:{note.kind}
+          {#if metadata}
+            @{profile(metadata)?.name}
+          {/if}
+          {#if urls}
+            {#each urls as url}
+              <div>
+                <Link className="underline text-magnum-300 break-all" href={url}
+                  >{url}</Link
+                >
+              </div>
+            {/each}
+            {#if displayMenu}<NoteActionButtons {note} />{/if}
+          {:else}
+            <div class="break-all overflow-x-hidden">
+              kind:{note.kind}{#if metadata}
+                {profile(metadata)?.name}
               {/if}
-              {#if urls}
-                {#each urls as url}
-                  <div>
-                    <Link
-                      className="underline text-magnum-300 break-all"
-                      href={url}>{url}</Link
-                    >
-                  </div>
-                {/each}
-                {#if displayMenu}<NoteActionButtons {note} />{/if}
-              {:else}
-                <div class="break-all overflow-x-hidden">
-                  kind:{note.kind}{#if metadata}
-                    {profile(metadata)?.name}
-                  {/if}
-                </div>
-                <hr />
-                {note.tags}
-                <hr />
-                <Content text={note.content} tags={note.tags} />
-                {#if displayMenu}<NoteActionButtons {note} />{/if}
-              {/if}
-            {/await}
-          </LatestEvent>
-        {/if}
-      {/await}
+            </div>
+            <hr />
+            {note.tags}
+            <hr />
+            <Content text={note.content} tags={note.tags} />
+            {#if displayMenu}<NoteActionButtons {note} />{/if}
+          {/if}
+        {/await}
+      </LatestEvent>
     {/if}
-  {/await}
+  {/if}
 </div>

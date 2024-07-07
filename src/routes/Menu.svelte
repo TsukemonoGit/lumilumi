@@ -13,7 +13,7 @@
   } from "lucide-svelte";
   import { derived } from "svelte/store";
   import { fly } from "svelte/transition";
-  import { loginUser } from "$lib/stores/stores";
+  import { loginUser, menuLeft } from "$lib/stores/stores";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
@@ -65,9 +65,10 @@
       }
     } catch (error) {}
   };
+  $: menuPosition = $menuLeft ? "left-5" : "right-5";
 </script>
 
-<div class="menuGroup fixed bottom-5 right-5 z-20">
+<div class="menuGroup fixed bottom-5 {menuPosition} z-20">
   <div use:melt={$menubar}>
     <button
       type="button"
