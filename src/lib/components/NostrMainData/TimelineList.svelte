@@ -108,6 +108,7 @@
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
       const older = await loadOlderEvents(sift, slicedEvent, filters, queryKey);
+
       olderEvents.push(...older);
       updateViewEvent($data);
       $nowProgress = false;

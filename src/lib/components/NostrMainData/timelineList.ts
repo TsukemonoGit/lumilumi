@@ -29,7 +29,7 @@ export async function loadOlderEvents(
     }
     const lastEvent = data[data.length - 1];
 
-    const untilTimestamp = lastEvent.created_at;
+    const untilTimestamp = data[data.length - 1].created_at;
     //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
     const newFilters =
       lastEvent.kind === 1
@@ -43,7 +43,7 @@ export async function loadOlderEvents(
             {
               ...filters[0],
               limit: sift,
-              until: kind1[kind1.length - 1].created_at,
+              until: kind1[data.length - 1].created_at,
               since: undefined,
             },
           ];
@@ -56,8 +56,8 @@ export async function loadOlderEvents(
       filters: newFilters,
       req: newReq,
     });
-    console.log(olderEvents);
-    return olderEvents;
+    //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
+    return olderEvents.slice(0, sift);
   }
   return [];
 }

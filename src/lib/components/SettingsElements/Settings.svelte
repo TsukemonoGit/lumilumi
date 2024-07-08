@@ -523,7 +523,7 @@
     >
     <button
       class=" rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-      on:click={cancelSettings}>CANSEL</button
+      on:click={cancelSettings}>CANCEL</button
     >
   </div>
 </div>

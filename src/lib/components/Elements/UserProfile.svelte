@@ -120,7 +120,7 @@
           <Content text={prof.about} tags={metadata.tags} />
         </div>
       {/if}
-      <div class="flex flex-row-reverse gap-1">
+      <!-- <div class="flex flex-row-reverse gap-1">
         <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><FileJson2 /></button
@@ -143,7 +143,7 @@
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><ExternalLink /></button
         >
-      </div>
+      </div> -->
     </div>
   {/if}
 </Metadata>
