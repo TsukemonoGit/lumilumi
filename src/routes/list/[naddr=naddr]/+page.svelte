@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterNavigate } from "$app/navigation";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import ListLinkCard from "$lib/components/NostrElements/Note/ListLinkCard.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
@@ -9,11 +10,13 @@
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import { setTieKey } from "$lib/func/nostr";
   import { loginUser, tieMapStore } from "$lib/stores/stores";
   import { nip04 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
 
   import { createRxForwardReq, createTie } from "rx-nostr";
+  import { onMount } from "svelte";
 
   export let data: {
     identifier: string;
@@ -28,8 +31,14 @@
   console.log(filters);
   let amount = 50;
   let viewIndex = 0;
-  const [tie, tieMap] = createTie();
-  tieMapStore.set(tieMap);
+  const tieKey = "naddr";
+
+  onMount(() => {
+    setTieKey(tieKey);
+  });
+  afterNavigate(() => {
+    setTieKey(tieKey);
+  });
 
   const pubkeyList = async (event: Nostr.Event): Promise<string[]> => {
     const pubList = event.tags
@@ -100,7 +109,7 @@
               {viewIndex}
               {amount}
               let:len
-              {tie}
+              {tieKey}
             >
               <SetRepoReactions />
               <div slot="loading">

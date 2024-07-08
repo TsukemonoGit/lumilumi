@@ -190,7 +190,7 @@
 
       <div class="relative overflow-hidden">
         <div
-          class=" overflow-y-auto overflow-x-hidden"
+          class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
         >
           <Content text={note.content} tags={note.tags} />
@@ -312,7 +312,7 @@
       </div>
       <hr />
       <div
-        class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+        class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
       >
         {#each note.tags as tag}
           {JSON.stringify(tag)}
@@ -339,7 +339,7 @@
           </div>
           <hr />
           <div
-            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
             {#each note.tags as tag}
               {JSON.stringify(tag)}
@@ -357,7 +357,7 @@
           </div>
           <hr />
           <div
-            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
             {#each note.tags as tag}
               {JSON.stringify(tag)}
@@ -375,7 +375,7 @@
           </div>
           <hr />
           <div
-            class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
             {#each note.tags as tag}
               {JSON.stringify(tag)}

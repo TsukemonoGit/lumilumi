@@ -5,18 +5,25 @@
   import Contacts from "./NostrMainData/Contacts.svelte";
   import Metadata from "./NostrMainData/Metadata.svelte";
   import NostrMain from "./NostrMainData/NostrMain.svelte";
-  import { pubkeysIn } from "$lib/func/nostr";
+  import { pubkeysIn, setTieKey } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
+  import { onDestroy, onMount } from "svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
-  const [tie, tieMap] = createTie();
-  tieMapStore.set(tieMap);
+  const tieKey = "timeline";
+
+  onMount(() => {
+    setTieKey(tieKey);
+  });
+  afterNavigate(() => {
+    setTieKey(tieKey);
+  });
 </script>
 
 <NostrMain let:pubkey let:localRelays>
@@ -54,10 +61,10 @@
             },
           ]}
           req={createRxForwardReq()}
+          {tieKey}
           let:events
           {viewIndex}
           {amount}
-          {tie}
           let:len
         >
           <SetRepoReactions />

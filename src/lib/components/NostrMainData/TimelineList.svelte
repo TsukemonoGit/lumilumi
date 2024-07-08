@@ -1,6 +1,11 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { defaultRelays, loginUser, nowProgress } from "$lib/stores/stores";
+  import {
+    defaultRelays,
+    loginUser,
+    nowProgress,
+    tieMapStore,
+  } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -8,6 +13,7 @@
   import type Nostr from "nostr-typedef";
   import { loadOlderEvents } from "./timelineList";
   import {
+    createTie,
     type EventPacket,
     type RxReq,
     type RxReqOverable,
@@ -16,6 +22,7 @@
   import { type OperatorFunction } from "rxjs";
   import Metadata from "./Metadata.svelte";
   import { browser } from "$app/environment";
+  import { setTieKey } from "$lib/func/nostr";
 
   const sift = 40; //スライドする量
 
@@ -39,16 +46,29 @@
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: EventPacket) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  export let tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >;
+  // export let tie: OperatorFunction<
+  //   EventPacket,
+  //   EventPacket & {
+  //     seenOn: Set<string>;
+  //     isNew: boolean;
+  //   }
+  // >;
+  export let tieKey: string;
+  const [tie, tieMap] = createTie();
+  if (!$tieMapStore) {
+    $tieMapStore = { [tieKey]: [tie, tieMap] };
+  } else if (!$tieMapStore[tieKey]) {
+    $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+  }
   // export let lastVisible: Element | null;
 
-  $: result = useTimelineEventList(queryKey, filters, tie, req, relays);
+  $: result = useTimelineEventList(
+    queryKey,
+    filters,
+    $tieMapStore[tieKey][0],
+    req,
+    relays
+  );
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

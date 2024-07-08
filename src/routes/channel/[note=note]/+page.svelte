@@ -1,16 +1,18 @@
 <script lang="ts">
-  import { createRxForwardReq, createTie } from "rx-nostr";
+  import { createRxForwardReq, createTie, tie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { pubkeysIn } from "$lib/func/nostr";
+  import { pubkeysIn, setTieKey } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import { tieMapStore } from "$lib/stores/stores";
+  import { afterNavigate } from "$app/navigation";
+  import { onMount } from "svelte";
 
   export let data: {
     id: string;
@@ -21,8 +23,14 @@
 
   let amount = 50;
   let viewIndex = 0;
-  const [tie, tieMap] = createTie();
-  tieMapStore.set(tieMap);
+  const tieKey = "note";
+
+  onMount(() => {
+    setTieKey(tieKey);
+  });
+  afterNavigate(() => {
+    setTieKey(tieKey);
+  });
 </script>
 
 <section>
@@ -51,7 +59,7 @@
           let:events
           {viewIndex}
           {amount}
-          {tie}
+          {tieKey}
           let:len
         >
           <SetRepoReactions />

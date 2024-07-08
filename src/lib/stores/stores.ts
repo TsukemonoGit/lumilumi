@@ -11,6 +11,7 @@ import {
 } from "rx-nostr";
 import type { MuteList } from "$lib/types";
 import * as Nostr from "nostr-typedef";
+import { type OperatorFunction } from "rxjs";
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -46,4 +47,16 @@ export const nowProgress = writable<boolean>(false);
 
 export const viewEventIds = writable<string[]>([]);
 
-export const tieMapStore = writable<Map<string, Set<string>>>();
+//export const tieMapStore = writable<Map<string, Set<string>>>();
+export const tieMapStore = writable<{
+  [key: string]: [
+    OperatorFunction<
+      EventPacket,
+      EventPacket & {
+        seenOn: Set<string>;
+        isNew: boolean;
+      }
+    >,
+    Map<string, Set<string>>
+  ];
+}>();

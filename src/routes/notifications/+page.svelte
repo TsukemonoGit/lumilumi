@@ -7,10 +7,21 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
+  import { afterNavigate } from "$app/navigation";
+  import { setTieKey } from "$lib/func/nostr";
+  import { onMount } from "svelte";
   let amount = 50;
   let viewIndex = 0;
-  const [tie, tieMap] = createTie();
-  tieMapStore.set(tieMap);
+  // const [tie, tieMap] = createTie();
+  // tieMapStore.set(tieMap);
+  const tieKey = "notifications";
+
+  onMount(() => {
+    setTieKey(tieKey);
+  });
+  afterNavigate(() => {
+    setTieKey(tieKey);
+  });
 </script>
 
 <svelte:head>
@@ -38,7 +49,7 @@
           {viewIndex}
           {amount}
           eventFilter={(eventpacket) => eventpacket.event.pubkey !== pubkey}
-          {tie}
+          {tieKey}
         >
           <div slot="loading">
             <p>Loading...</p>

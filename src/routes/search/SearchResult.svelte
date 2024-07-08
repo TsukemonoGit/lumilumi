@@ -12,14 +12,23 @@
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
+  import { setTieKey } from "$lib/func/nostr";
+  import { afterNavigate } from "$app/navigation";
+  import { onMount } from "svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
   let viewIndex = 0;
 
   $: console.log(filter);
-  const [tie, tieMap] = createTie();
-  tieMapStore.set(tieMap);
+  const tieKey = "search";
+
+  onMount(() => {
+    setTieKey(tieKey);
+  });
+  afterNavigate(() => {
+    setTieKey(tieKey);
+  });
 </script>
 
 <section>
@@ -40,7 +49,7 @@
           {viewIndex}
           {amount}
           let:len
-          {tie}
+          {tieKey}
         >
           <SetRepoReactions />
           <div slot="loading">

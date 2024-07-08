@@ -14,6 +14,17 @@
   import Avatar from "svelte-boring-avatars";
   import UserZap from "./UserZap.svelte";
   import ProfileEditButton from "./ProfileEditButton.svelte";
+  import {
+    BookHeart,
+    Copy,
+    ExternalLink,
+    FileJson2,
+    FolderHeart,
+    Pin,
+    RadioTower,
+    RefreshCcw,
+    Share2,
+  } from "lucide-svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -109,6 +120,30 @@
           <Content text={prof.about} tags={metadata.tags} />
         </div>
       {/if}
+      <div class="flex flex-row-reverse gap-1">
+        <button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><FileJson2 /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><RadioTower /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><BookHeart /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><Pin /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><RefreshCcw /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><Copy /></button
+        ><button
+          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
+          ><ExternalLink /></button
+        >
+      </div>
     </div>
   {/if}
 </Metadata>

@@ -365,8 +365,13 @@ export function relaysReconnectChallenge() {
     }
   });
 }
+let tieKey: string;
+export function setTieKey(key: string) {
+  tieKey = key;
+}
 export function getRelaysById(id: string): string[] {
-  return Array.from(get(tieMapStore)?.get(id) || []);
+  const tieMap: Map<string, Set<string>> = get(tieMapStore)?.[tieKey]?.[1];
+  return Array.from(tieMap?.get(id) || []);
 }
 export function usePromiseReq({
   queryKey,
