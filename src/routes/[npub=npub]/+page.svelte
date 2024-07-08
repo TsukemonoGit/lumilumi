@@ -86,7 +86,7 @@
           <UserProfile pubkey={userPubkey} />
           <div
             use:melt={$root}
-            class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row"}
+            class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500"}
           >
             <div
               use:melt={$list}
@@ -109,7 +109,7 @@
                 </button>
               {/each}
             </div>
-            <div use:melt={$content("post")}>
+            <div use:melt={$content("post")} class="content">
               {#if $value === "post"}
                 <TimelineList
                   queryKey={["user", "post", userPubkey]}
@@ -168,7 +168,7 @@
                 </TimelineList>
               {/if}
             </div>
-            <div use:melt={$content("reactions")}>
+            <div use:melt={$content("reactions")} class="content">
               {#if $value === "reactions"}
                 <TimelineList
                   queryKey={["user", "reactions", userPubkey]}
@@ -228,7 +228,7 @@
                 </TimelineList>
               {/if}
             </div>
-            <div use:melt={$content("pin")} class="min-h-10">
+            <div use:melt={$content("pin")} class="content">
               {#if $value === "pin"}
                 <LatestEvent
                   queryKey={["pin", userPubkey]}
@@ -265,7 +265,7 @@
                 </LatestEvent>
               {/if}
             </div>
-            <div use:melt={$content("relays")} class="min-h-10">
+            <div use:melt={$content("relays")} class="content">
               {#if $value === "relays"}
                 <LatestEvent
                   queryKey={["relays", userPubkey]}
@@ -340,7 +340,7 @@
 
     &[data-state="active"] {
       @apply focus:relative;
-      background-color: theme(colors.neutral.800);
+      background-color: theme(colors.neutral.900);
 
       color: theme("colors.magnum.500");
     }
@@ -382,5 +382,9 @@
     &:focus {
       @apply !ring-green-600;
     }
+  }
+
+  .content {
+    @apply min-h-4;
   }
 </style>

@@ -137,11 +137,11 @@
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><RadioTower /></button
         > -->
-        <button
+        <!-- <button
           on:click={handleClickReactions}
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><BookHeart /></button
-        >
+        > -->
         <!-- <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><Pin /></button
