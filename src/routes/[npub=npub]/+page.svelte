@@ -228,7 +228,7 @@
                 </TimelineList>
               {/if}
             </div>
-            <div use:melt={$content("pin")}>
+            <div use:melt={$content("pin")} class="min-h-10">
               {#if $value === "pin"}
                 <LatestEvent
                   queryKey={["pin", userPubkey]}
@@ -265,7 +265,7 @@
                 </LatestEvent>
               {/if}
             </div>
-            <div use:melt={$content("relays")}>
+            <div use:melt={$content("relays")} class="min-h-10">
               {#if $value === "relays"}
                 <LatestEvent
                   queryKey={["relays", userPubkey]}

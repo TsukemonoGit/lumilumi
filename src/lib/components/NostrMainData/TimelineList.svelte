@@ -4,6 +4,7 @@
     defaultRelays,
     loginUser,
     nowProgress,
+    queryClient,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -89,20 +90,41 @@
 
   onMount(async () => {
     console.log("onMount");
-    $nowProgress = true;
-    const older = await firstLoadOlderEvents(50, filters, queryKey);
+    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
+      ...queryKey,
+      "olderData",
+    ]);
+    if (ev) {
+      olderEvents = ev;
+      updateViewEvent($data);
+    }
 
-    olderEvents.push(...older);
-    updateViewEvent($data);
-    $nowProgress = false;
+    if (olderEvents?.length <= 0) {
+      $nowProgress = true;
+      const older = await firstLoadOlderEvents(50, filters, queryKey);
+
+      olderEvents.push(...older);
+      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
+      updateViewEvent($data);
+      $nowProgress = false;
+    }
   });
 
   afterNavigate(async () => {
     console.log("afterNavigate");
-    if (olderEvents.length <= 0) {
+    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
+      ...queryKey,
+      "olderData",
+    ]);
+    if (ev) {
+      olderEvents = ev;
+      updateViewEvent($data);
+    }
+    if (olderEvents?.length <= 0) {
       const older = await firstLoadOlderEvents(50, filters, queryKey);
 
       olderEvents.push(...older);
+      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
       updateViewEvent($data);
       $nowProgress = false;
     }
@@ -117,7 +139,10 @@
 
   const handleNext = async () => {
     // console.log(length, viewIndex, amount, sift);
-    if (allUniqueEvents.length < viewIndex + amount + sift) {
+    if (
+      !allUniqueEvents ||
+      allUniqueEvents?.length < viewIndex + amount + sift
+    ) {
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
       const older = await loadOlderEvents(
@@ -129,6 +154,7 @@
       );
 
       olderEvents.push(...older);
+      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
     }
     viewIndex += sift; //スライドする量
     updateViewEvent($data);
