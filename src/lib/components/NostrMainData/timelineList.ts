@@ -20,7 +20,8 @@ export async function loadOlderEvents(
   sift: number,
   data: EventPacket[], //Nostr.Event[],
   filters: Filter[],
-  queryKey: QueryKey
+  queryKey: QueryKey,
+  lastfavcheck: boolean
 ): Promise<EventPacket[]> {
   if (data && data.length > 1) {
     const kind1 = data.filter(
@@ -32,15 +33,15 @@ export async function loadOlderEvents(
     ); //通知こないたいぷのkind1の最後
     console.log(kind1.length);
     console.log(kind1[kind1.length - 1]);
-    if (kind1.length === 0) {
+    if (lastfavcheck && kind1.length === 0) {
       return [];
     }
     const lastEvent = data[data.length - 1];
 
     const untilTimestamp = data[data.length - 1].event.created_at;
     //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
-    const newFilters =
-      lastEvent.event.kind === 1
+    const newFilters = lastfavcheck
+      ? lastEvent.event.kind === 1
         ? filters.map((filter: Filter) => ({
             ...filter,
             limit: sift,
@@ -54,7 +55,13 @@ export async function loadOlderEvents(
               until: kind1[data.length - 1].event.created_at,
               since: undefined,
             },
-          ];
+          ]
+      : filters.map((filter: Filter) => ({
+          ...filter,
+          limit: sift,
+          until: untilTimestamp,
+          since: undefined,
+        }));
     console.log(newFilters);
     const newReq = createRxBackwardReq();
     const operator = pipe(uniq(), verify(), scanArray());

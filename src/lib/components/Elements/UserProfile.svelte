@@ -5,7 +5,7 @@
   import { loginUser, showImg } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
-  import { beforeNavigate } from "$app/navigation";
+  import { beforeNavigate, goto } from "$app/navigation";
   import Nip05Check from "../NostrMainData/Nip05Check.svelte";
   import Link from "./Link.svelte";
   import FollowButton from "../NostrElements/Note/FollowButton.svelte";
@@ -30,6 +30,14 @@
   export let bannerHeight: number = 180;
   export let iconSize: number = 80;
   beforeNavigate(() => {});
+
+  const handleClickReactions = () => {
+    try {
+      goto(`/${nip19.npubEncode(pubkey)}/reactions`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
@@ -120,20 +128,25 @@
           <Content text={prof.about} tags={metadata.tags} />
         </div>
       {/if}
-      <!-- <div class="flex flex-row-reverse gap-1">
-        <button
+      <div class="flex flex-row-reverse gap-1">
+        <!-- <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><FileJson2 /></button
-        ><button
+        > -->
+        <!-- <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><RadioTower /></button
-        ><button
+        > -->
+        <button
+          on:click={handleClickReactions}
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><BookHeart /></button
-        ><button
+        >
+        <!-- <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><Pin /></button
-        ><button
+        > -->
+        <!-- <button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><RefreshCcw /></button
         ><button
@@ -142,8 +155,8 @@
         ><button
           class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
           ><ExternalLink /></button
-        >
-      </div> -->
+        > -->
+      </div>
     </div>
   {/if}
 </Metadata>

@@ -29,6 +29,7 @@
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
+  export let lastfavcheck: boolean = true;
   export let req:
     | RxReqBase
     | (RxReq<"backward"> & {
@@ -123,7 +124,8 @@
         sift,
         allUniqueEvents,
         filters,
-        queryKey
+        queryKey,
+        lastfavcheck
       );
 
       olderEvents.push(...older);
