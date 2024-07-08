@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq, createTie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import Contacts from "./NostrMainData/Contacts.svelte";
@@ -49,6 +49,7 @@
               authors: pubkeysIn(contacts),
               kinds: [1, 6, 16],
               limit: 50,
+              since: now(),
             },
             {
               kinds: [
@@ -58,6 +59,7 @@
               ],
               "#p": [pubkey],
               limit: 5,
+              since: now(),
             },
           ]}
           req={createRxForwardReq()}

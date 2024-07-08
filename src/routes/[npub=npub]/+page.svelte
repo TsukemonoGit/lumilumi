@@ -4,7 +4,7 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, createTie, tie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now, tie } from "rx-nostr";
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import { onMount, type SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
@@ -72,6 +72,7 @@
                 kinds: [1, 6, 16],
                 limit: 50,
                 authors: [userPubkey],
+                since: now(),
               },
             ]}
             {req}

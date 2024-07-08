@@ -410,13 +410,13 @@ export function usePromiseReq({
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req)
-    .pipe(muteCheck(), metadata(), operator, completeOnTimeout(5000));
+    .pipe(muteCheck(), metadata(), operator, completeOnTimeout(3000));
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       subscription.unsubscribe();
       resolve(accumulatedData);
-    }, 10000); // Timeout after 3 seconds if not completed
+    }, 5000); // Timeout after 3 seconds if not completed
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {

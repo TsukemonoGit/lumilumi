@@ -15,7 +15,7 @@
   import { nip04 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
 
-  import { createRxForwardReq, createTie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now } from "rx-nostr";
   import { onMount } from "svelte";
 
   export let data: {
@@ -102,6 +102,7 @@
                   kinds: [1, 6, 16],
                   authors: pubkeys,
                   limit: 50,
+                  since: now(),
                 },
               ]}
               req={createRxForwardReq()}

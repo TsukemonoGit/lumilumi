@@ -5,7 +5,7 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, createTie, tie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now, tie } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
@@ -46,6 +46,7 @@
               {
                 kinds: [1, 6, 16],
                 limit: 50,
+                since: now(),
               },
             ]}
             req={createRxForwardReq()}

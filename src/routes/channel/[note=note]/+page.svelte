@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq, createTie, tie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now, tie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
@@ -53,6 +53,7 @@
               "#e": [data.id],
               kinds: [42],
               limit: 50,
+              since: now(),
             },
           ]}
           req={createRxForwardReq()}

@@ -3,7 +3,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, createTie } from "rx-nostr";
+  import { createRxForwardReq, createTie, now } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
@@ -42,6 +42,7 @@
               kinds: [1, 6, 7, 16, 42, 9735],
               limit: 30,
               "#p": [pubkey],
+              since: now(),
             },
           ]}
           req={createRxForwardReq()}
