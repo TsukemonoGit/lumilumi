@@ -365,6 +365,9 @@ export function relaysReconnectChallenge() {
     }
   });
 }
+export function reconnectRelay(url: string) {
+  get(app).rxNostr.reconnect(url);
+}
 let tieKey: string;
 export function setTieKey(key: string) {
   tieKey = key;

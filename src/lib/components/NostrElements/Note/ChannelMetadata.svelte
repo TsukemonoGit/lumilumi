@@ -9,13 +9,13 @@
 </script>
 
 <Text queryKey={["channel", "kind40", id]} {id} let:text>
-  <button slot="loading" on:click={handleClickToChannel}
+  <button slot="loading" on:click={handleClickToChannel} class="break-all"
     >loading {nip19.noteEncode(id)}
   </button>
-  <button slot="nodata" on:click={handleClickToChannel}
+  <button slot="nodata" on:click={handleClickToChannel} class="break-all"
     >nodata {nip19.noteEncode(id)}
   </button>
-  <button slot="error" on:click={handleClickToChannel}
+  <button slot="error" on:click={handleClickToChannel} class="break-all"
     >error {nip19.noteEncode(id)}
   </button>
   <LatestEvent

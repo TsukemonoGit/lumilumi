@@ -1,8 +1,9 @@
 <script lang="ts">
   import { app, defaultRelays } from "$lib/stores/stores";
-  import { Share2, Circle, RadioTower } from "lucide-svelte";
+  import { Share2, Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
   import { afterUpdate } from "svelte";
+  import { reconnectRelay } from "$lib/func/nostr";
 
   //ConnectionState
   // | "initialized"
@@ -69,21 +70,31 @@
     return overallState;
   }
   let overallStateColor: string;
-  afterUpdate(() => {
+  afterUpdate(updateOverallStateColor);
+  function updateOverallStateColor() {
     if ($app?.rxNostr && $app.rxNostr.getAllRelayStatus()) {
       overallStateColor =
         !readRelays || !writeRelays
           ? getColor("initialized")
           : getColor(getOverallConnectionState());
     }
-  });
+  }
+  let disabledButton: string | undefined;
+  const handleClickReconnect = (url: string) => {
+    reconnectRelay(url);
+    disabledButton = url;
+    setTimeout(() => {
+      disabledButton = undefined;
+      updateOverallStateColor(); // 状態を更新
+    }, 3000);
+  };
 </script>
 
 <Popover bind:open>
   <div class="flex justify-center h-[3em] items-center">
     <RadioTower size="20" class={overallStateColor} />
   </div>
-  <div slot="popoverContent" class="max-h-80 overflow-x-auto max-w-72">
+  <div slot="popoverContent" class="max-h-80 overflow-x-auto max-w-80">
     <div>
       <div class="text-magnum-200 font-bold text-lg mt-2">read</div>
       <ul>
@@ -100,6 +111,12 @@
                 {$app.rxNostr.getRelayStatus(relay.url)?.connection}
               </div></Popover
             ><span class="inline w-60">{relay.url}</span>
+            {#if $app.rxNostr.getRelayStatus(relay.url)?.connection === "error"}<button
+                on:click={() => handleClickReconnect(relay.url)}
+                class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
+                disabled={relay.url === disabledButton}
+                ><RefreshCcw class="text-magnum-700 " size={16} /></button
+              >{/if}
           </li>
         {/each}
       </ul>
