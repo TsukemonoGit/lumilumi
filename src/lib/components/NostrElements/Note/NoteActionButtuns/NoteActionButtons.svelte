@@ -236,7 +236,7 @@
           textareaQuote.focus();
           textareaQuote.selectionEnd = 0;
           cursorPosition = 0;
-        }, 20);
+        }, 30);
         break;
     }
   };
@@ -258,6 +258,8 @@
   }
 
   const handleTextareaInput = (event: Event) => {
+    if (textareaQuote) textareaQuote.scrollIntoView({ block: "center" });
+    if (textareaReply) textareaReply.scrollIntoView({ block: "center" }); //TLが流れていかないように龍力があるごとにセンターに
     const target = event.target as HTMLTextAreaElement;
     cursorPosition = target.selectionStart;
   };
@@ -372,6 +374,14 @@
   $: if (!$invoiceOpen) {
     invoice = undefined;
   }
+
+  // const handleTextareaFocus = () => {
+  //   console.log("Focus");
+  //   textareaReply.scrollIntoView({ block: "center" });
+  // };
+  // const handleTextareaBlur = () => {
+  //   console.log("blur");
+  // };
 </script>
 
 <div class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden my-1">
