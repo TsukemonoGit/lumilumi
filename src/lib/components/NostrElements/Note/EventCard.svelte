@@ -88,7 +88,13 @@
     //  console.log(root?.[1]);
     return {
       replyUsers: users,
-      replyID: reply ? reply[1] : root ? root[1] : undefined,
+      replyID: reply
+        ? reply[1]
+        : root
+          ? root[1]
+          : IDs.length > 0
+            ? IDs[IDs.length - 1][1]
+            : undefined,
     };
   };
 
@@ -188,7 +194,7 @@
         <hr />
       {/if}
 
-      <div class="relative overflow-hidden mb-1">
+      <div class="relative overflow-hidden mb-1.5">
         <div
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
