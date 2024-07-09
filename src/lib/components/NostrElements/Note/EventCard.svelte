@@ -188,7 +188,7 @@
         <hr />
       {/if}
 
-      <div class="relative overflow-hidden">
+      <div class="relative overflow-hidden mb-1">
         <div
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
