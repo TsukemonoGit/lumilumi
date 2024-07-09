@@ -34,7 +34,7 @@
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
-      <SetGlobalRelays {pubkey} defaultRelays={relays}>
+      <SetGlobalRelays {pubkey} let:relays>
         <div slot="loading">loading</div>
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>

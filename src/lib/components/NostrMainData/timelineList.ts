@@ -52,7 +52,7 @@ export async function loadOlderEvents(
             {
               ...filters[0],
               limit: sift,
-              until: kind1[data.length - 1].event.created_at,
+              until: kind1[kind1.length - 1].event.created_at,
               since: undefined,
             },
           ]

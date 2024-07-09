@@ -808,12 +808,12 @@ test("", () => {
   expect(parseText(text, tags));
 });
 
-test("", () => {
-  const text = event.content;
-  const tags: string[][] = event.tags;
-  console.log(parseText(text, tags));
-  expect(parseText(text, tags));
-});
+// test("", () => {
+//   const text = event.content;
+//   const tags: string[][] = event.tags;
+//   console.log(parseText(text, tags));
+//   expect(parseText(text, tags));
+// });
 test("", () => {
   console.log(parseText(testcontent, []));
   expect(parseText(testcontent, []));

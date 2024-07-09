@@ -8,16 +8,11 @@
   export let req: RxReqBase | undefined = undefined;
   let relays: DefaultRelayConfig[] | undefined = undefined;
 
-  export let defaultRelays: DefaultRelayConfig[];
   export let pubkey: string;
 
-  $: result = deriveResult(defaultRelays, pubkey, req);
-
-  function deriveResult(
-    localRelays: DefaultRelayConfig[],
-    pubkey: string,
-    req: RxReqBase | undefined
-  ) {
+  $: result = deriveResult(pubkey, req);
+  $: console.log(result);
+  function deriveResult(pubkey: string, req: RxReqBase | undefined) {
     return useGlobalRelaySet(
       ["globalRelay", pubkey],
       [

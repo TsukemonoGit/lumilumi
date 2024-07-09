@@ -94,8 +94,16 @@
       ...queryKey,
       "olderData",
     ]);
+
     if (ev) {
       olderEvents = ev;
+      //olderEventsから、今の時間までのあいだのイベントをとるやつ
+      const newFilters = filters.map((filter: Nostr.Filter) => ({
+        ...filter,
+        since: olderEvents[0].event.created_at,
+      }));
+      const older = await firstLoadOlderEvents(50, newFilters, queryKey);
+
       updateViewEvent($data);
     }
 
@@ -118,6 +126,12 @@
     ]);
     if (ev) {
       olderEvents = ev;
+      //olderEventsから、今の時間までのあいだのイベントをとるやつ
+      const newFilters = filters.map((filter: Nostr.Filter) => ({
+        ...filter,
+        since: olderEvents[0].event.created_at,
+      }));
+      const older = await firstLoadOlderEvents(50, newFilters, queryKey);
       updateViewEvent($data);
     }
     if (olderEvents?.length <= 0) {
