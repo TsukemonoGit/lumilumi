@@ -108,7 +108,13 @@
         since: olderEvents[0].event.created_at,
         until: now(),
       }));
-      const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
+      const older = await firstLoadOlderEvents(
+        0,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
       olderEvents.push(...older);
       updateViewEvent($data);
     }
@@ -125,6 +131,7 @@
         50,
         newFilters,
         queryKey,
+        $tieMapStore[tieKey][0],
         relays
       );
 
@@ -150,7 +157,13 @@
         since: olderEvents[0].event.created_at,
         until: now(),
       }));
-      const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
+      const older = await firstLoadOlderEvents(
+        0,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
       olderEvents.push(...older);
       updateViewEvent($data);
     }
@@ -165,6 +178,7 @@
         50,
         newFilters,
         queryKey,
+        $tieMapStore[tieKey][0],
         relays
       );
 
@@ -196,6 +210,7 @@
         filters,
         queryKey,
         lastfavcheck,
+        $tieMapStore[tieKey][0],
         relays
       );
 

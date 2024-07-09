@@ -373,7 +373,9 @@ export function setTieKey(key: string) {
   tieKey = key;
 }
 export function getRelaysById(id: string): string[] {
+  //console.log(tieMapStore);
   const tieMap: Map<string, Set<string>> = get(tieMapStore)?.[tieKey]?.[1];
+  //console.log(tieMap);
   return Array.from(tieMap?.get(id) || []);
 }
 export function usePromiseReq(

@@ -17,7 +17,7 @@
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
   const tieKey = "timeline";
-
+  setTieKey(tieKey);
   onMount(() => {
     setTieKey(tieKey);
   });

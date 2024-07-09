@@ -32,6 +32,7 @@
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "naddr";
+  setTieKey(tieKey);
 
   onMount(() => {
     setTieKey(tieKey);

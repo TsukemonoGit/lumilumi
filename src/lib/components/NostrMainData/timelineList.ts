@@ -11,7 +11,7 @@ import {
   verify,
   type EventPacket,
 } from "rx-nostr";
-import { pipe } from "rxjs";
+import { pipe, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";
 import { loginUser } from "$lib/stores/stores";
@@ -22,6 +22,13 @@ export async function loadOlderEvents(
   filters: Filter[],
   queryKey: QueryKey,
   lastfavcheck: boolean,
+  tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >,
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   if (data && data.length > 1) {
@@ -65,7 +72,7 @@ export async function loadOlderEvents(
         }));
     console.log(newFilters);
     const newReq = createRxBackwardReq();
-    const operator = pipe(uniq(), verify(), scanArray());
+    const operator = pipe(tie, uniq(), verify(), scanArray());
     const olderEvents = await usePromiseReq(
       {
         operator: operator,
@@ -87,10 +94,17 @@ export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
   queryKey: QueryKey,
+  tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >,
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
-  const operator = pipe(uniq(), verify(), scanArray());
+  const operator = pipe(tie, uniq(), verify(), scanArray());
   const olderEvents = await usePromiseReq(
     {
       operator: operator,

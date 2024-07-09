@@ -25,6 +25,7 @@
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "global";
+  setTieKey(tieKey);
   onMount(() => {
     setTieKey(tieKey);
   });
