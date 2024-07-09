@@ -21,7 +21,8 @@ export async function loadOlderEvents(
   data: EventPacket[], //Nostr.Event[],
   filters: Filter[],
   queryKey: QueryKey,
-  lastfavcheck: boolean
+  lastfavcheck: boolean,
+  relays: string[] | undefined
 ): Promise<EventPacket[]> {
   if (data && data.length > 1) {
     const kind1 = data.filter(
@@ -65,12 +66,15 @@ export async function loadOlderEvents(
     console.log(newFilters);
     const newReq = createRxBackwardReq();
     const operator = pipe(uniq(), verify(), scanArray());
-    const olderEvents = await usePromiseReq({
-      operator: operator,
-      queryKey: queryKey,
-      filters: newFilters,
-      req: newReq,
-    });
+    const olderEvents = await usePromiseReq(
+      {
+        operator: operator,
+        queryKey: queryKey,
+        filters: newFilters,
+        req: newReq,
+      },
+      relays
+    );
     //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
     return olderEvents
       .sort((a, b) => b.event.created_at - a.event.created_at)
@@ -82,28 +86,22 @@ export async function loadOlderEvents(
 export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
-  queryKey: QueryKey
+  queryKey: QueryKey,
+  relays: string[] | undefined
 ): Promise<EventPacket[]> {
-  const untilTimestamp = now();
-  //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
-  const newFilters = filters.map((filter: Filter) => ({
-    ...filter,
-    limit: sift,
-    until: untilTimestamp,
-    since: undefined,
-  }));
-
-  console.log(newFilters);
   const newReq = createRxBackwardReq();
   const operator = pipe(uniq(), verify(), scanArray());
-  const olderEvents = await usePromiseReq({
-    operator: operator,
-    queryKey: queryKey,
-    filters: newFilters,
-    req: newReq,
-  });
+  const olderEvents = await usePromiseReq(
+    {
+      operator: operator,
+      queryKey: queryKey,
+      filters: filters,
+      req: newReq,
+    },
+    relays
+  );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
   return olderEvents
     .sort((a, b) => b.event.created_at - a.event.created_at)
-    .slice(0, sift);
+    .slice(0, sift === 0 ? undefined : sift);
 }

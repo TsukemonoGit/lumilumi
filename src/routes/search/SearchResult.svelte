@@ -6,7 +6,7 @@
   import TimelineList from "../../lib/components/NostrMainData/TimelineList.svelte";
 
   import NostrMain from "../../lib/components/NostrMainData/NostrMain.svelte";
-  import { queryClient, tieMapStore } from "$lib/stores/stores";
+  import { app, queryClient, tieMapStore } from "$lib/stores/stores";
   import SetSearchRelays from "../../lib/components/NostrMainData/SetSearchRelays.svelte";
   import { toRelaySet } from "$lib/stores/useRelaySet";
 
@@ -14,7 +14,7 @@
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
   import { setTieKey } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -29,6 +29,13 @@
   afterNavigate(() => {
     setTieKey(tieKey);
   });
+  onDestroy(() => {
+    $queryClient.cancelQueries({
+      queryKey: ["search"],
+    });
+    $queryClient.removeQueries({ queryKey: ["search"] });
+    console.log("cancelQueries");
+  });
 </script>
 
 <section>
@@ -42,7 +49,7 @@
     >
       <div class="w-full break-words overflow-x-hidden max-w-full">
         <TimelineList
-          queryKey={["search", "feed", JSON.stringify(filter)]}
+          queryKey={["search", JSON.stringify(filter)]}
           filters={[filter]}
           req={createRxForwardReq()}
           let:events

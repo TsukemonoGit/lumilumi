@@ -8,14 +8,13 @@
   import { createRxForwardReq, createTie, now, tie } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
 
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "global";
-
   onMount(() => {
     setTieKey(tieKey);
   });
@@ -55,6 +54,7 @@
             {amount}
             let:len
             {tieKey}
+            {relays}
           >
             <SetRepoReactions />
             <div slot="loading">
