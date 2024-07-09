@@ -101,6 +101,7 @@
     if (ev) {
       console.log(ev);
       olderEvents = ev;
+      updateViewEvent($data);
       //olderEventsから、今の時間までのあいだのイベントをとるやつ
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
@@ -142,6 +143,7 @@
     ]);
     if (ev) {
       olderEvents = ev;
+      updateViewEvent($data);
       //olderEventsから、今の時間までのあいだのイベントをとるやつ
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,

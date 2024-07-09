@@ -15,6 +15,7 @@
   import { setTieKey } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
+  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -40,13 +41,17 @@
 
 <section>
   <NostrMain let:pubkey let:localRelays>
-    <SetSearchRelays
+    <!-- <SetSearchRelays
       defaultRelays={localRelays.length > 0
         ? localRelays
         : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
       setRelayList={nip50relays}
       let:searchRelays
-    >
+    > -->
+    <SetDefaultRelays {pubkey} {localRelays}>
+      <div slot="loading">loading</div>
+      <div slot="error">error</div>
+      <div slot="nodata">nodata</div>
       <div class="w-full break-words overflow-x-hidden max-w-full">
         <TimelineList
           queryKey={["search", JSON.stringify(filter)]}
@@ -57,6 +62,7 @@
           {amount}
           let:len
           {tieKey}
+          relays={nip50relays}
         >
           <SetRepoReactions />
           <div slot="loading">
@@ -98,6 +104,6 @@
           </div>
         </TimelineList>
       </div>
-    </SetSearchRelays>
+    </SetDefaultRelays>
   </NostrMain>
 </section>
