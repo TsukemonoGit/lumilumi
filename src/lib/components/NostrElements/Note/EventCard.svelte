@@ -211,7 +211,7 @@
     </NoteTemplate>
   {:else if note.kind === 6 || note.kind === 16}
     <!--リポスト-->
-    <div class="flex gap-1">
+    <div class="flex gap-1 items-center">
       <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
         size="20"
         class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
@@ -219,9 +219,7 @@
       <div class="self-center">
         <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
       </div>
-      <div
-        class=" mt-auto inline-block break-all break-words whitespace-pre-line"
-      >
+      <div class=" inline-block break-all break-words whitespace-pre-line">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
             class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
@@ -249,12 +247,12 @@
     {/if}
   {:else if note.kind === 7}
     <!--リアクション-->
-    <div class="flex gap-1">
+    <div class="flex gap-1 items-center">
       <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
       <div class="self-center">
         <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
       </div>
-      <div class="break-all break-words whitespace-pre-line mt-auto mb-auto">
+      <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
             class="text-magnum-100 text-sm mt-auto"

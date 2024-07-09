@@ -47,7 +47,7 @@
       pubkey={zapRequestEvent.pubkey}
       let:metadata
     >
-      <div class="flex gap-1">
+      <div class="flex gap-1 items-center align-middle">
         <Zap
           class="min-w-[20px] mt-auto mb-auto  stroke-orange-400 fill-orange-400"
           size={20}
@@ -56,9 +56,7 @@
         <div class="self-center">
           <UserMenu pubkey={zapRequestEvent.pubkey} {metadata} size={20} />
         </div>
-        <div
-          class=" mt-auto inline-block break-all break-words whitespace-pre-line"
-        >
+        <div class="inline-block break-all break-words whitespace-pre-line">
           {#if metadata}
             {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
               class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
