@@ -6,7 +6,6 @@
   import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
 
   export let req: RxReqBase | undefined = undefined;
-  let relays: DefaultRelayConfig[] | undefined = undefined;
 
   export let pubkey: string;
 
@@ -28,7 +27,7 @@
 
   interface $$Slots {
     default: {
-      relays: DefaultRelayConfig[];
+      relays: string[];
       status: ReqStatus;
     };
     loading: Record<never, never>;
@@ -37,9 +36,7 @@
   }
 </script>
 
-{#if relays}
-  <slot {relays} status="success" />
-{:else if $error}
+{#if $error}
   <slot name="error" error={$error} />
 {:else if $data && $data.length > 0}
   <slot relays={$data} status={$status ?? "error"} />

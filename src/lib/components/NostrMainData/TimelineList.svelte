@@ -15,6 +15,9 @@
   import { firstLoadOlderEvents, loadOlderEvents } from "./timelineList";
   import {
     createTie,
+    now,
+    type AcceptableDefaultRelaysConfig,
+    type DefaultRelayConfig,
     type EventPacket,
     type RxReq,
     type RxReqOverable,
@@ -24,7 +27,7 @@
   import Metadata from "./Metadata.svelte";
   import { browser } from "$app/environment";
   import { setTieKey } from "$lib/func/nostr";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   const sift = 40; //スライドする量
 
@@ -96,20 +99,41 @@
     ]);
 
     if (ev) {
+      console.log(ev);
       olderEvents = ev;
+      updateViewEvent($data);
       //olderEventsから、今の時間までのあいだのイベントをとるやつ
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: olderEvents[0].event.created_at,
+        until: now(),
       }));
-      const older = await firstLoadOlderEvents(50, newFilters, queryKey);
-
+      const older = await firstLoadOlderEvents(
+        0,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
+      olderEvents.push(...older);
       updateViewEvent($data);
     }
 
     if (olderEvents?.length <= 0) {
       $nowProgress = true;
-      const older = await firstLoadOlderEvents(50, filters, queryKey);
+      const newFilters = filters.map((filter: Nostr.Filter) => ({
+        ...filter,
+        since: undefined,
+        until: now(),
+        limit: 50,
+      }));
+      const older = await firstLoadOlderEvents(
+        50,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
 
       olderEvents.push(...older);
       $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
@@ -126,16 +150,37 @@
     ]);
     if (ev) {
       olderEvents = ev;
+      updateViewEvent($data);
       //olderEventsから、今の時間までのあいだのイベントをとるやつ
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: olderEvents[0].event.created_at,
+        until: now(),
       }));
-      const older = await firstLoadOlderEvents(50, newFilters, queryKey);
+      const older = await firstLoadOlderEvents(
+        0,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
+      olderEvents.push(...older);
       updateViewEvent($data);
     }
     if (olderEvents?.length <= 0) {
-      const older = await firstLoadOlderEvents(50, filters, queryKey);
+      const newFilters = filters.map((filter: Nostr.Filter) => ({
+        ...filter,
+        since: undefined,
+        until: now(),
+        limit: 50,
+      }));
+      const older = await firstLoadOlderEvents(
+        50,
+        newFilters,
+        queryKey,
+        $tieMapStore[tieKey][0],
+        relays
+      );
 
       olderEvents.push(...older);
       $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
@@ -164,7 +209,9 @@
         allUniqueEvents,
         filters,
         queryKey,
-        lastfavcheck
+        lastfavcheck,
+        $tieMapStore[tieKey][0],
+        relays
       );
 
       olderEvents.push(...older);
@@ -232,6 +279,10 @@
   function handleClickTop() {
     viewIndex = 0;
   }
+
+  onDestroy(() => {
+    console.log("test");
+  });
 </script>
 
 {#if viewIndex !== 0}

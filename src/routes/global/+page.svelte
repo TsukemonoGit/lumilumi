@@ -5,17 +5,26 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, createTie, now, tie } from "rx-nostr";
+  import {
+    createRxForwardReq,
+    createTie,
+    filterKind,
+    now,
+    tie,
+  } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { tieMapStore } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { nip19 } from "nostr-tools";
+  import { _ } from "svelte-i18n";
 
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "global";
-
   onMount(() => {
     setTieKey(tieKey);
   });
@@ -38,7 +47,12 @@
         <div slot="loading">loading</div>
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
-
+        <div class=" flex gap-2">
+          <div class="w-full font-medium text-magnum-400">GlobalRelays</div>
+          <div class="text-sm">
+            {relays.join(", ")}
+          </div>
+        </div>
         <div class="w-full break-words overflow-hidden">
           <TimelineList
             queryKey={["global", "feed"]}
@@ -55,6 +69,7 @@
             {amount}
             let:len
             {tieKey}
+            {relays}
           >
             <SetRepoReactions />
             <div slot="loading">
@@ -95,6 +110,17 @@
         </div>
       </SetGlobalRelays>
     </SetDefaultRelays>
+    <div
+      class="mb-16 w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
+    >
+      <Link
+        className="font-semibold text-magnum-300 break-all inline-flex"
+        href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30002}`}
+        >{$_("settings.nostviewstr.kind30002")}<SquareArrowOutUpRight
+          size={16}
+        /></Link
+      >
+    </div>
   </NostrMain>
 </section>
 

@@ -21,11 +21,11 @@ export function useGlobalRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
   req?: RxReqBase | undefined
-): ReqResult<DefaultRelayConfig[]> | undefined {
+): any {
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
     setRelays(relaySearchRelays);
   }
-  const operator = pipe(verify(), uniq(), scanArray());
+  const operator = pipe(verify(), uniq(), latest());
   const reqResult = useReq({ queryKey, filters, operator, req });
 
   const transformedData = derived(reqResult.data, ($data) =>
@@ -38,7 +38,7 @@ export function useGlobalRelaySet(
     error: reqResult.error,
   };
 }
-
+let stringListRelays: string[];
 function toGlobalRelaySet(
   value: EventPacket | EventPacket[] | undefined
 ): DefaultRelayConfig[] {
@@ -47,46 +47,52 @@ function toGlobalRelaySet(
   if (!value) {
     return [];
   } else if (Array.isArray(value)) {
-    let writerelays: DefaultRelayConfig[] = Object.values(
-      get(app).rxNostr.getDefaultRelays()
-    );
-    let readrelays: DefaultRelayConfig[] = Object.values(
-      get(app).rxNostr.getDefaultRelays()
-    );
+    return value[0].event.tags
+      .filter((tag: string[]) => tag[0] === "relay")
+      .map((tag: any[]) => tag[1]);
+    // let writerelays: DefaultRelayConfig[] = Object.values(
+    //   get(app).rxNostr.getDefaultRelays()
+    // );
+    // let readrelays: DefaultRelayConfig[] = Object.values(
+    //   get(app).rxNostr.getDefaultRelays()
+    // );
 
-    value.forEach((packet) => {
-      //  if (packet.event.kind === 10002) {
-      //   writerelays = setRelaysByKind10002(packet.event);
-      // } else if (packet.event.kind === 30002) {
-      readrelays = setReadRelaysByKind30002(packet.event);
-      //  }
-    });
+    // value.forEach((packet) => {
+    //   //  if (packet.event.kind === 10002) {
+    //   //   writerelays = setRelaysByKind10002(packet.event);
+    //   // } else if (packet.event.kind === 30002) {
+    //   readrelays = setReadRelaysByKind30002(packet.event);
+    //   //  }
+    // });
 
-    const combinedRelays = combineRelays(writerelays, readrelays);
-    setRelays(combinedRelays);
-    console.log(get(app).rxNostr.getDefaultRelays());
-    return combinedRelays;
+    // const combinedRelays = combineRelays(writerelays, readrelays);
+    // //  setRelays(combinedRelays);
+    // console.log(get(app).rxNostr.getDefaultRelays());
+    // return combinedRelays;
   } else {
-    let writerelays: DefaultRelayConfig[] = Object.values(
-      get(app).rxNostr.getDefaultRelays()
-    );
-    let readrelays: DefaultRelayConfig[] = Object.values(
-      get(app).rxNostr.getDefaultRelays()
-    );
+    return value.event.tags
+      .filter((tag: string[]) => tag[0] === "relay")
+      .map((tag: any[]) => tag[1]);
+    // let writerelays: DefaultRelayConfig[] = Object.values(
+    //   get(app).rxNostr.getDefaultRelays()
+    // );
+    // let readrelays: DefaultRelayConfig[] = Object.values(
+    //   get(app).rxNostr.getDefaultRelays()
+    // );
 
-    //if (value.event.kind === 10002) {
-    //writerelays = setRelaysByKind10002(value.event);
-    // } else if (value.event.kind === 30002) {
-    const kind30002 = setReadRelaysByKind30002(value.event);
-    //  }
-    console.log(kind30002);
-    if (kind30002.length > 0) {
-      readrelays = kind30002;
-    }
-    const combinedRelays = combineRelays(writerelays, readrelays);
-    setRelays(combinedRelays);
-    console.log(combinedRelays);
-    return combinedRelays;
+    // //if (value.event.kind === 10002) {
+    // //writerelays = setRelaysByKind10002(value.event);
+    // // } else if (value.event.kind === 30002) {
+    // const kind30002 = setReadRelaysByKind30002(value.event);
+    // //  }
+    // console.log(kind30002);
+    // if (kind30002.length > 0) {
+    //   readrelays = kind30002;
+    // }
+    // const combinedRelays = combineRelays(writerelays, readrelays);
+    // //setRelays(combinedRelays);
+    // console.log(combinedRelays);
+    // return combinedRelays;
   }
 }
 

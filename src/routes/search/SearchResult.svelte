@@ -6,7 +6,7 @@
   import TimelineList from "../../lib/components/NostrMainData/TimelineList.svelte";
 
   import NostrMain from "../../lib/components/NostrMainData/NostrMain.svelte";
-  import { queryClient, tieMapStore } from "$lib/stores/stores";
+  import { app, queryClient, tieMapStore } from "$lib/stores/stores";
   import SetSearchRelays from "../../lib/components/NostrMainData/SetSearchRelays.svelte";
   import { toRelaySet } from "$lib/stores/useRelaySet";
 
@@ -14,7 +14,8 @@
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
   import { setTieKey } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
+  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -29,20 +30,31 @@
   afterNavigate(() => {
     setTieKey(tieKey);
   });
+  onDestroy(() => {
+    $queryClient.cancelQueries({
+      queryKey: ["search"],
+    });
+    $queryClient.removeQueries({ queryKey: ["search"] });
+    console.log("cancelQueries");
+  });
 </script>
 
 <section>
   <NostrMain let:pubkey let:localRelays>
-    <SetSearchRelays
+    <!-- <SetSearchRelays
       defaultRelays={localRelays.length > 0
         ? localRelays
         : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
       setRelayList={nip50relays}
       let:searchRelays
-    >
+    > -->
+    <SetDefaultRelays {pubkey} {localRelays}>
+      <div slot="loading">loading</div>
+      <div slot="error">error</div>
+      <div slot="nodata">nodata</div>
       <div class="w-full break-words overflow-x-hidden max-w-full">
         <TimelineList
-          queryKey={["search", "feed", JSON.stringify(filter)]}
+          queryKey={["search", JSON.stringify(filter)]}
           filters={[filter]}
           req={createRxForwardReq()}
           let:events
@@ -50,6 +62,7 @@
           {amount}
           let:len
           {tieKey}
+          relays={nip50relays}
         >
           <SetRepoReactions />
           <div slot="loading">
@@ -91,6 +104,6 @@
           </div>
         </TimelineList>
       </div>
-    </SetSearchRelays>
+    </SetDefaultRelays>
   </NostrMain>
 </section>

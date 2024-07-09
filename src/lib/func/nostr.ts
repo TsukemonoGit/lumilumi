@@ -373,16 +373,21 @@ export function setTieKey(key: string) {
   tieKey = key;
 }
 export function getRelaysById(id: string): string[] {
+  //console.log(tieMapStore);
   const tieMap: Map<string, Set<string>> = get(tieMapStore)?.[tieKey]?.[1];
+  //console.log(tieMap);
   return Array.from(tieMap?.get(id) || []);
 }
-export function usePromiseReq({
-  queryKey,
-  filters,
-  operator,
-  req,
-  initData = [],
-}: UseReqOpts<EventPacket[] | EventPacket>): Promise<EventPacket[]> {
+export function usePromiseReq(
+  {
+    queryKey,
+    filters,
+    operator,
+    req,
+    initData = [],
+  }: UseReqOpts<EventPacket[] | EventPacket>,
+  relays: string[] | undefined
+): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("error");
@@ -412,7 +417,7 @@ export function usePromiseReq({
     : [initData];
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
-    .use(_req)
+    .use(_req, { relays: relays })
     .pipe(muteCheck(), metadata(), operator, completeOnTimeout(3000));
 
   return new Promise<EventPacket[]>((resolve, reject) => {
