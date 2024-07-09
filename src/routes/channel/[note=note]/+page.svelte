@@ -24,7 +24,6 @@
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "note";
-  setTieKey(tieKey);
   onMount(() => {
     setTieKey(tieKey);
   });
