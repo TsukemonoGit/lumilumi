@@ -47,14 +47,13 @@
         <div slot="loading">loading</div>
         <div slot="error">error</div>
         <div slot="nodata">nodata</div>
-
-        <div class="w-full break-words overflow-hidden">
-          <div class=" flex gap-2">
-            <div class=" font-medium text-magnum-400">GlobalRelays</div>
-            <div class="text-sm">
-              {relays.join(", ")}
-            </div>
+        <div class=" flex gap-2">
+          <div class="w-full font-medium text-magnum-400">GlobalRelays</div>
+          <div class="text-sm">
+            {relays.join(", ")}
           </div>
+        </div>
+        <div class="w-full break-words overflow-hidden">
           <TimelineList
             queryKey={["global", "feed"]}
             filters={[
