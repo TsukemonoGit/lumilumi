@@ -32,3 +32,11 @@ test("hashtag", () => {
     ],
   });
 });
+test("hashtag", () => {
+  const text = "test";
+  const tags: string[][] = [["emoji", "test", "url"]];
+  expect(contentCheck(text, tags)).toStrictEqual({
+    text: text,
+    tags: [],
+  });
+});

@@ -7,6 +7,18 @@ export function contentCheck(
 ): { text: string; tags: string[][] } {
   let newTags = [...tags];
 
+  // 絵文字タグを抽出
+  const emojiTag = tags
+    .filter((tag) => tag[0] === "emoji")
+    .map((tag) => tag[1]);
+
+  // 絵文字タグをテキスト内でチェックし、含まれていない場合に削除
+  emojiTag.forEach((emoji) => {
+    if (!text.includes(`:${emoji}:`)) {
+      newTags = newTags.filter((tag) => tag[0] !== "emoji" || tag[1] !== emoji);
+    }
+  });
+
   // Process NIP-19 matches
 
   const nip19Matches = text.matchAll(nip19Regex);
