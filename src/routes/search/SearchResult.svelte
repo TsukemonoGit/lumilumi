@@ -31,11 +31,11 @@
     setTieKey(tieKey);
   });
   onDestroy(() => {
-    $queryClient.cancelQueries({
-      queryKey: ["search"],
-    });
-    $queryClient.removeQueries({ queryKey: ["search"] });
-    console.log("cancelQueries");
+    // $queryClient.cancelQueries({
+    //   queryKey: ["search"],
+    // });
+    // $queryClient.removeQueries({ queryKey: ["search"] });
+    //console.log("cancelQueries");
   });
 </script>
 
