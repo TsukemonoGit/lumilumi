@@ -199,10 +199,12 @@ function shouldMuteByP(eventPacket: EventPacket): boolean {
 
 function shouldMuteByWord(eventPacket: EventPacket): boolean {
   const wordMutes = get(mutes)?.word || [];
-  //----------------------------------------------------------------------ワードミュートはとりあえずkind:1に限ってみる
+  //----------------------------------------------------------------------ワードミュートはとりあえずkind:1,7,42に限ってみる
   // Check if any word mute from wordMutes array is included in eventPacket.event.content
   return (
-    eventPacket.event.kind === 1 &&
+    (eventPacket.event.kind === 1 ||
+      eventPacket.event.kind === 7 ||
+      eventPacket.event.kind === 42) &&
     wordMutes.some((muteWord) => eventPacket.event.content.includes(muteWord))
   );
 }

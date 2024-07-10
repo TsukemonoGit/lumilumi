@@ -48,9 +48,7 @@
       return;
     }
     $nowProgress = true;
-    const filters: Nostr.Filter[] = [
-      { limit: 1, kinds: [30007], authors: [pubkey] },
-    ];
+    const filters: Nostr.Filter[] = [{ kinds: [30007], authors: [pubkey] }];
     const pk = await getMutebykindList(filters, relays);
     console.log(pk);
     if (pk.length > 0) {
