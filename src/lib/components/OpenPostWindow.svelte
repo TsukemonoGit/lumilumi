@@ -27,7 +27,7 @@
 
   let defaultValue: string | undefined;
   let text: string = "";
-  let tags: string[][] = options.tags;
+  let tags: string[][] = [...options.tags];
   let cursorPosition: number = 0;
   let onWarning: boolean;
   let warningText = "";
@@ -76,7 +76,7 @@
 
   const resetState = () => {
     text = "";
-    tags = options.tags;
+    tags = [...options.tags];
     warningText = "";
     onWarning = false;
     viewCustomEmojis = false;
@@ -116,12 +116,26 @@
           text =
             text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
           cursorPosition += urln.length;
+
+          //imetaをたぐにいれる
+          if (data.nip94_event) {
+            tags.push(convertMetaTags(data.nip94_event));
+          }
         }
       }
     });
     $nowProgress = false;
   };
-
+  // ドラッグ&ドロップのイベントハンドラ
+  const handleDrop = async (event: DragEvent) => {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      await handleFileUpload(event.dataTransfer.files);
+    }
+  };
+  const handleDragOver = (event: DragEvent) => {
+    event.preventDefault();
+  };
   const onChangeHandler = async (e: Event): Promise<void> => {
     const _files = (e.target as HTMLInputElement).files;
     if (_files) {
@@ -152,6 +166,8 @@
 
   $: if ($open) {
     //開いたときにフォーカス
+
+    console.log(tags);
     textarea?.focus();
   }
 
@@ -178,6 +194,20 @@
       // テキストエリアが空の場合、ダイアログを閉じる
       $open = false;
     }
+  };
+
+  const convertMetaTags = (event: {
+    tags: [string, string][];
+    content: string;
+  }): string[] => {
+    let newTag = ["imeta"];
+    event.tags.map((tag) => {
+      if (tag.length > 1 && tag[1].trim() !== "") {
+        newTag.push(`${tag[0]} ${tag[1]}`);
+      }
+    });
+
+    return newTag;
   };
 </script>
 
@@ -241,6 +271,8 @@
             on:click={handleTextareaInput}
             on:touchend={handleTextareaInput}
             on:paste={paste}
+            on:drop={handleDrop}
+            on:dragover={handleDragOver}
             placeholder="いま どうしてる？"
           />
         </fieldset>
