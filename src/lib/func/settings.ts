@@ -42,7 +42,7 @@ export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
   await new Promise<void>((resolve) => {
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), scanArray(), completeOnTimeout(2000))
+      .pipe(verify(), uniq(), scanArray(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -80,11 +80,11 @@ export async function getDoukiList(
       subscription.unsubscribe();
       rxNostr.dispose();
       resolve(res);
-    }, 4000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
+    }, 5000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), latest(), completeOnTimeout(2000))
+      .pipe(verify(), uniq(), latest(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -231,11 +231,11 @@ export async function getMutebykindList(
       subscription.unsubscribe();
       rxNostr.dispose();
       resolve(res);
-    }, 4000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
+    }, 5000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), latestbyId(), completeOnTimeout(2000))
+      .pipe(verify(), uniq(), latestbyId(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
