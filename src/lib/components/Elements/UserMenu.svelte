@@ -54,9 +54,9 @@
       return undefined;
     }
   };
-
-  $: url = getProfile(metadata)?.picture;
-  $: name = getProfile(metadata)?.name;
+  $: profile = getProfile(metadata);
+  $: url = profile?.picture;
+  $: name = profile?.name;
 
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
@@ -159,7 +159,24 @@
     >
       {JSON.stringify(metadata, null, 2)}
     </div>
-    <h2 class="m-0 text-lg font-medium">Seen on</h2>
+    <h2 class="mt-1 text-lg font-medium">User Data</h2>
+    <div
+      class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
+    >
+      {#if profile}
+        {#each Object.entries(profile) as [data, index]}
+          <div class="flex flex-col py-1">
+            <div class="font-bold whitespace-pre-wrap break-wards">
+              {data}
+            </div>
+            <div class="ml-2 whitespace-pre-wrap break-all">
+              {profile[data]}
+            </div>
+          </div>
+        {/each}
+      {/if}
+    </div>
+    <h2 class="mt-1 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
       {metadata ? getRelaysById(metadata.id).join(", ") : ""}
     </div>

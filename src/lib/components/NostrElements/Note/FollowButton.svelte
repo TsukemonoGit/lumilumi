@@ -155,12 +155,15 @@
     const operator = pipe(verify(), latest());
     const filters = [{ kinds: [3], authors: [$loginUser], limit: 1 }];
 
-    const newkind3: EventPacket[] = await usePromiseReq({
-      operator,
-      queryKey: ["timeline", "contacts", $loginUser],
-      filters,
-      req: newReq,
-    });
+    const newkind3: EventPacket[] = await usePromiseReq(
+      {
+        operator,
+        queryKey: ["timeline", "contacts", $loginUser],
+        filters,
+        req: newReq,
+      },
+      undefined
+    );
     console.log("length", newkind3.length);
     console.log("list", newkind3);
     return newkind3;
