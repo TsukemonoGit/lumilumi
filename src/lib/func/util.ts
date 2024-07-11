@@ -189,3 +189,11 @@ export const relayInfoFun = async (
     return fetchInfo;
   }
 };
+
+export function formatUrl(url: string) {
+  let httpsUrl = url.startsWith("wss://")
+    ? url.replace(/^wss:/, "https:")
+    : url.replace(/^ws:/, "http:");
+
+  return httpsUrl.endsWith("/") ? httpsUrl : httpsUrl + "/";
+}

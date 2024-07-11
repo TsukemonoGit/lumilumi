@@ -1,7 +1,7 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { getRelaysById } from "$lib/func/nostr";
-  import { relayInfoFun } from "$lib/func/util";
+  import { formatUrl, relayInfoFun } from "$lib/func/util";
   import { relaysById, showImg } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import { afterUpdate } from "svelte";
@@ -37,11 +37,8 @@
               {size}
             />
           {:else if $showImg && imageLoaded}
-            {@const httpsUrl = url.startsWith("wss://")
-              ? url.replace(/^wss:/, "https:")
-              : url.replace(/^ws:/, "http:")}
             <UserAvatar
-              url={httpsUrl + "favicon.ico"}
+              url={formatUrl(url) + "favicon.ico"}
               name={url ?? ""}
               pubkey={undefined}
               {size}

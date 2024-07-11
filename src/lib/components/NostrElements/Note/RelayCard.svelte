@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import { relayInfoFun } from "$lib/func/util";
+  import { formatUrl, relayInfoFun } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import { Ellipsis, FileJson2 } from "lucide-svelte";
   import { type Nip11 } from "nostr-typedef";
@@ -11,10 +11,6 @@
   export let url: string;
   export let write: boolean;
   export let read: boolean;
-
-  $: httpsUrl = url.startsWith("wss://")
-    ? url.replace(/^wss:/, "https:")
-    : url.replace(/^ws:/, "http:");
 
   let imageLoaded = true;
   let dialogOpen: any;
@@ -41,7 +37,7 @@
           />
         {:else if $showImg && imageLoaded}
           <UserAvatar
-            url={httpsUrl + "favicon.ico"}
+            url={formatUrl(url) + "favicon.ico"}
             name={url ?? ""}
             pubkey={undefined}
             {size}
@@ -81,7 +77,7 @@
           <div class="flex w-fit">
             <a
               class="underline break-all"
-              href={httpsUrl}
+              href={formatUrl(url)}
               rel="external noreferrer"
               target="_blank">{url}</a
             >
