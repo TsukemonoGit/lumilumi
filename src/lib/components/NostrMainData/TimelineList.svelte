@@ -286,12 +286,11 @@
   });
 
   afterUpdate(() => {
-    console.log("relaysById update");
+    $relaysById = {}; //表示されてないID情報とかいらないから一回全部消そう
+    //console.log("relaysById update");
     if (slicedEvent?.length > 0) {
       slicedEvent.map((event) => {
-        $relaysById = $relaysById
-          ? { ...$relaysById, [event.id]: getRelaysById(event.id) }
-          : { [event.id]: getRelaysById(event.id) };
+        $relaysById = { ...$relaysById, [event.id]: getRelaysById(event.id) };
       });
     }
   });
