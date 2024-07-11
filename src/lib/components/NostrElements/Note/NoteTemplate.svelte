@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { viewEventIds } from "$lib/stores/stores";
+  import { showRelayIcon, viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
 
@@ -12,6 +12,7 @@
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
+  import SeenonIcons from "./SeenonIcons.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -60,9 +61,14 @@
 </script>
 
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden"}>
-  <div class="p-1">
-    <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
+  <div class="grid grid-rows-[auto_1fr] p-1">
+    <div>
+      <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
+    </div>
+    {#if $showRelayIcon}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   </div>
+
   <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}

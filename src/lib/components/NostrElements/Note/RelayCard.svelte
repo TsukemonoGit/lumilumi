@@ -1,9 +1,12 @@
 <script lang="ts">
   import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
+  import { relayInfoFun } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import { Ellipsis, FileJson2 } from "lucide-svelte";
   import { type Nip11 } from "nostr-typedef";
   import { Nip11Registry } from "rx-nostr";
+  import Avatar from "svelte-boring-avatars";
 
   export let url: string;
   export let write: boolean;
@@ -13,22 +16,12 @@
     ? url.replace(/^wss:/, "https:")
     : url.replace(/^ws:/, "http:");
 
-  const relayInfoFun = async (): Promise<Nip11.RelayInfo | undefined> => {
-    const relayInfo = Nip11Registry.get(url);
-    if (relayInfo) {
-      //	console.log(relayInfo);
-      return relayInfo;
-    } else {
-      const fetchInfo = await Nip11Registry.fetch(url);
-      //	console.log(fetchInfo);
-      return fetchInfo;
-    }
-  };
   let imageLoaded = true;
   let dialogOpen: any;
+  let size = 48;
 </script>
 
-{#await relayInfoFun()}
+{#await relayInfoFun(url)}
   {url} read:{read} write:{write}
 {:then relayInfo}
   {#if !relayInfo}
@@ -40,22 +33,21 @@
         class="w-12 h-12 rounded-full bg-zinc-800 text-center flex items-center justify-center text-lg"
       >
         {#if $showImg && relayInfo.icon}
-          <img
-            loading="lazy"
-            src={relayInfo.icon}
-            class="w-12 h-12 rounded-full"
-            alt="relay Icon"
+          <UserAvatar
+            url={relayInfo.icon}
+            name={url ?? ""}
+            pubkey={undefined}
+            {size}
           />
         {:else if $showImg && imageLoaded}
-          <img
-            loading="lazy"
-            src={httpsUrl + "favicon.ico"}
-            on:error={() => (imageLoaded = false)}
-            class="w-12 h-12 rounded-full"
-            alt="relay favicon"
+          <UserAvatar
+            url={httpsUrl + "favicon.ico"}
+            name={url ?? ""}
+            pubkey={undefined}
+            {size}
           />
-        {:else if relayInfo.name}
-          {relayInfo.name[0]}
+        {:else}
+          <Avatar {size} name={url} variant="beam" />
         {/if}
       </div>
       <!-- title-description -->
@@ -74,7 +66,7 @@
                 RW
               {:else if read}
                 R
-              {:else}
+              {:else if write}
                 W
               {/if}
             </div>
@@ -88,7 +80,7 @@
           </div>
           <div class="flex w-fit">
             <a
-              class="underline"
+              class="underline break-all"
               href={httpsUrl}
               rel="external noreferrer"
               target="_blank">{url}</a
@@ -97,9 +89,14 @@
         </div>
         <!--description-->
         <div class="">
-          <div class="my-2">{relayInfo.description ?? ""}</div>
+          <div
+            class="my-2 whitespace-pre-wrap break-words"
+            style="word-break: break-word;"
+          >
+            {relayInfo.description ?? ""}
+          </div>
           {#if relayInfo.supported_nips}
-            <div class="w-full">
+            <div class="w-full flex-wrap flex">
               NIPs:
               {#each relayInfo.supported_nips as nip}
                 <a

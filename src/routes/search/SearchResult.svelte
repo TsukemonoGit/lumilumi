@@ -12,7 +12,7 @@
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
-  import { setTieKey } from "$lib/func/nostr";
+  import { generateRandomId, setTieKey } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
@@ -54,7 +54,7 @@
       <div slot="nodata">nodata</div>
       <div class="w-full break-words overflow-x-hidden max-w-full">
         <TimelineList
-          queryKey={["search", JSON.stringify(filter)]}
+          queryKey={["search", generateRandomId(4)]}
           filters={[filter]}
           req={createRxForwardReq()}
           let:events

@@ -3,6 +3,8 @@ import * as Nostr from "nostr-typedef";
 import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
 import { getToken } from "nostr-tools/nip98";
 import { uploadFile } from "./upload";
+import { Nip11Registry } from "rx-nostr";
+import type { Nip11 } from "nostr-typedef";
 export const nip50relays = [
   "wss://search.nos.today",
   "wss://relay.noswhere.com",
@@ -172,4 +174,18 @@ export const convertMetaTags = (event: {
   });
 
   return newTag;
+};
+
+export const relayInfoFun = async (
+  url: string
+): Promise<Nip11.RelayInfo | undefined> => {
+  const relayInfo = Nip11Registry.get(url);
+  if (relayInfo) {
+    //	console.log(relayInfo);
+    return relayInfo;
+  } else {
+    const fetchInfo = await Nip11Registry.fetch(url);
+    //	console.log(fetchInfo);
+    return fetchInfo;
+  }
 };

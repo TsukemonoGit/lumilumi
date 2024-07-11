@@ -79,3 +79,4 @@ export let openPostWindow:
   | undefined;
 
 export const uploader = writable<string>();
+export const showRelayIcon = writable<boolean>(false);

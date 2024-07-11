@@ -4,7 +4,7 @@
   import Avatar from "svelte-boring-avatars";
   export let url: string | undefined;
   export let name: string | undefined;
-  export let pubkey: string;
+  export let pubkey: string | undefined;
   export let size: number = 40;
   export let square: boolean = false;
 
@@ -20,7 +20,7 @@
 </script>
 
 <div
-  class="flex items-center justify-center {!square
+  class="relative flex items-center justify-center {!square
     ? 'rounded-full'
     : ''} bg-neutral-800 overflow-hidden"
   style="height: {size}px; width: {size}px;"
@@ -28,15 +28,15 @@
   <img
     use:melt={$image}
     alt="Avatar"
-    class="relative object-cover {!square ? 'rounded-full' : ''}"
+    class=" object-cover {!square ? 'rounded-full' : ''}"
     style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
   />
-  <span use:melt={$fallback} class="absolute overflow-hidden"
+  <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
     ><Avatar
       {size}
-      name={pubkey}
+      {name}
       variant="beam"
-      colors={splitHexColorString(pubkey)}
+      colors={pubkey ? splitHexColorString(pubkey) : undefined}
       {square}
     /></span
   >
