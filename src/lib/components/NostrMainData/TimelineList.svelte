@@ -5,7 +5,7 @@
     loginUser,
     nowProgress,
     queryClient,
-    relaysById,
+    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -72,7 +72,6 @@
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
-  let slicedEvent: Nostr.Event[];
   let readUrls: string[] = [];
   let olderEvents: EventPacket[] = [];
   $: if ($defaultRelays) {
@@ -260,13 +259,13 @@
     }
     allUniqueEvents = uniqueEvents;
     // console.log(viewIndex);
-    slicedEvent = uniqueEvents
+    $slicedEvent = uniqueEvents
       // ?.filter(
       //   (packet) => readUrls.includes(packet.from) && eventFilter(packet)
       // ) // デフォルトリレーに含まれるかチェック
       .map(({ event }) => event)
       .slice(viewIndex, viewIndex + amount);
-    //  console.log(slicedEvent);
+    //  console.log($slicedEvent);
   }
 
   function handleClickTop() {
@@ -275,16 +274,6 @@
 
   onDestroy(() => {
     console.log("test");
-  });
-
-  afterUpdate(() => {
-    $relaysById = {}; //表示されてないID情報とかいらないから一回全部消そう
-    //console.log("relaysById update");
-    if (slicedEvent?.length > 0) {
-      slicedEvent.map((event) => {
-        $relaysById = { ...$relaysById, [event.id]: getRelaysById(event.id) };
-      });
-    }
   });
 </script>
 
@@ -316,8 +305,8 @@
 {/if}
 {#if $error}
   <slot name="error" error={$error} />
-{:else if slicedEvent && slicedEvent?.length > 0}
-  <slot events={slicedEvent} status={$status} len={$data?.length ?? 0} />
+{:else if $slicedEvent && $slicedEvent?.length > 0}
+  <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} />
 {:else if $status === "loading"}
   <slot name="loading" />
 {:else}

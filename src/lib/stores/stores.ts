@@ -80,4 +80,4 @@ export let openPostWindow:
 
 export const uploader = writable<string>();
 export const showRelayIcon = writable<boolean>(false);
-export const relaysById = writable<{ [id: string]: string[] }>();
+export const slicedEvent = writable<Nostr.Event[]>();
