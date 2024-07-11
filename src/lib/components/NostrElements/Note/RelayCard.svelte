@@ -1,5 +1,7 @@
 <script lang="ts">
+  import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { showImg } from "$lib/stores/stores";
+  import { Ellipsis, FileJson2 } from "lucide-svelte";
   import { type Nip11 } from "nostr-typedef";
   import { Nip11Registry } from "rx-nostr";
 
@@ -23,6 +25,7 @@
     }
   };
   let imageLoaded = true;
+  let dialogOpen: any;
 </script>
 
 {#await relayInfoFun()}
@@ -34,7 +37,7 @@
     <!--ICON そのた-->
     <div class="pl-1 grid grid-cols-[auto_1fr] gap-1.5">
       <div
-        class="w-12 h-12 rounded-full variant-filled-surface text-center flex items-center justify-center text-lg"
+        class="w-12 h-12 rounded-full bg-zinc-800 text-center flex items-center justify-center text-lg"
       >
         {#if $showImg && relayInfo.icon}
           <img
@@ -60,7 +63,9 @@
         <div>
           <div class="flex items-center gap-1">
             <!--titleとR/W-->
-            <div class=" h5">{relayInfo.name}</div>
+            <div class="text-md text-magnum-100 font-bold">
+              {relayInfo.name}
+            </div>
 
             <div
               class="h-fit border border-primary-400 break-keep text-xs font-bold w-8 text-center"
@@ -73,10 +78,17 @@
                 W
               {/if}
             </div>
+            <div class="ml-auto">
+              <button
+                class="text-magnum-400 hover:opacity-75 active:opacity-50 p-1"
+                on:click={() => ($dialogOpen = true)}
+                ><FileJson2 size="20" /></button
+              >
+            </div>
           </div>
           <div class="flex w-fit">
             <a
-              class="anchor"
+              class="underline"
               href={httpsUrl}
               rel="external noreferrer"
               target="_blank">{url}</a
@@ -85,13 +97,13 @@
         </div>
         <!--description-->
         <div class="">
-          <div>{relayInfo.description}</div>
+          <div class="my-2">{relayInfo.description ?? ""}</div>
           {#if relayInfo.supported_nips}
             <div class="w-full">
               NIPs:
               {#each relayInfo.supported_nips as nip}
                 <a
-                  class="px-1 whitespace-nowrap"
+                  class="px-1 whitespace-nowrap text-magnum-400 font-semibold"
                   rel="external noreferrer"
                   target="_blank"
                   href={"https://github.com/nostr-protocol/nips/blob/master/" +
@@ -101,7 +113,8 @@
               {/each}
             </div>
           {/if}
-          {#if relayInfo.limitation?.max_content_length}
+
+          <!-- {#if relayInfo.limitation?.max_content_length}
             <div>
               Max content length: <span class="break-keep"
                 >{new Intl.NumberFormat().format(
@@ -118,9 +131,19 @@
                 )}</span
               >
             </div>
-          {/if}
+          {/if} -->
         </div>
       </div>
     </div>
+    <Dialog bind:open={dialogOpen}>
+      <div slot="main">
+        <h2 class="m-0 text-lg font-medium">Relay Information</h2>
+        <div
+          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+        >
+          {JSON.stringify(relayInfo, null, 2)}
+        </div>
+      </div></Dialog
+    >
   {/if}
 {/await}

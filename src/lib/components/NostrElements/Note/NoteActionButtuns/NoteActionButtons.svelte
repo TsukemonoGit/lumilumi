@@ -242,10 +242,10 @@
         openReplyWindow = false;
         openQuoteWindow = true;
         setTimeout(() => {
-          textareaQuote.focus();
           textareaQuote.selectionEnd = 0;
           cursorPosition = 0;
-        }, 30);
+          textareaQuote.focus();
+        }, 60);
         break;
     }
   };
@@ -440,7 +440,7 @@
               textareaQuote.selectionEnd = cursorPosition;
               textareaQuote?.focus();
             }
-          }, 10);
+          }, 20);
         }
       }
     });
@@ -718,7 +718,7 @@
     <textarea
       bind:this={textareaReply}
       rows="3"
-      class="w-[100%] rounded-md bg-neutral-950 mt-1"
+      class="w-[100%] rounded-md bg-neutral-950 mt-1 border border-magnum-300"
       bind:value={replyText}
       on:input={handleTextareaInput}
       on:click={handleTextareaInput}
@@ -876,7 +876,7 @@
     <textarea
       bind:this={textareaQuote}
       rows="6"
-      class="w-[100%] rounded-md bg-neutral-950 mt-1"
+      class="w-[100%] rounded-md bg-neutral-950 mt-1 border border-magnum-300"
       bind:value={replyText}
       on:input={handleTextareaInput}
       on:click={handleTextareaInput}
