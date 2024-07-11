@@ -714,11 +714,7 @@
         <X size="20" />
       </button>
     </div>
-    <div class="flex flex-row gap-2 mb-2">
-      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
-      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
-    </div>
     <textarea
       bind:this={textareaReply}
       rows="3"
@@ -733,6 +729,11 @@
       on:drop={handleDrop}
       on:dragover={handleDragOver}
     />
+    <div class="flex flex-row gap-2 my-2">
+      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
+
+      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+    </div>
     {#if onWarning}
       <div class="flex">
         <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
@@ -871,11 +872,7 @@
         <X size="20" />
       </button>
     </div>
-    <div class="flex flex-row gap-2 mb-2">
-      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
-      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
-    </div>
     <textarea
       bind:this={textareaQuote}
       rows="6"
@@ -890,6 +887,11 @@
       on:drop={handleDrop}
       on:dragover={handleDragOver}
     />
+    <div class="flex flex-row gap-2 my-2">
+      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
+
+      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+    </div>
     {#if onWarning}
       <div class="flex">
         <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
