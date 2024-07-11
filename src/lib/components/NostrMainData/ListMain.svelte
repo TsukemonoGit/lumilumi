@@ -1,7 +1,6 @@
 <script lang="ts">
   import { useReplaceableEventList } from "$lib/stores/useReplaceableEventList";
-  import { useUniqueEventList } from "$lib/stores/useUniqueEventList";
-  import type { RxReqBase, ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

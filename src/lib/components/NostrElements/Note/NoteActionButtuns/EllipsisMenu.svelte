@@ -16,7 +16,6 @@
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
-  import type { SvelteComponent } from "svelte";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   export let note: Nostr.Event;

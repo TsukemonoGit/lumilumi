@@ -12,7 +12,6 @@
   import { goto } from "$app/navigation";
 
   export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];

@@ -4,8 +4,6 @@
   import { formatUrl, relayInfoFun } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import { Ellipsis, FileJson2 } from "lucide-svelte";
-  import { type Nip11 } from "nostr-typedef";
-  import { Nip11Registry } from "rx-nostr";
   import Avatar from "svelte-boring-avatars";
 
   export let url: string;
@@ -54,18 +52,19 @@
             <div class="text-md text-magnum-100 font-bold">
               {relayInfo.name}
             </div>
-
-            <div
-              class="h-fit border border-primary-400 break-keep text-xs font-bold w-8 text-center"
-            >
-              {#if read && write}
-                RW
-              {:else if read}
-                R
-              {:else if write}
-                W
-              {/if}
-            </div>
+            {#if read || write}
+              <div
+                class="h-fit border border-primary-400 break-keep text-xs font-bold w-8 text-center"
+              >
+                {#if read && write}
+                  RW
+                {:else if read}
+                  R
+                {:else}
+                  W
+                {/if}
+              </div>
+            {/if}
             <div class="ml-auto">
               <button
                 class="text-magnum-400 hover:opacity-75 active:opacity-50 p-1"

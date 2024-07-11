@@ -2,7 +2,6 @@ import { muteCheck, metadata } from "$lib/stores/operators";
 import { app } from "$lib/stores/stores";
 import type { UseReqOpts, ReqResult, RxReqBase, ReqStatus } from "$lib/types";
 import { useQueryClient, createQuery } from "@tanstack/svelte-query";
-import type { Filter } from "nostr-tools";
 import {
   type EventPacket,
   type RxReq,

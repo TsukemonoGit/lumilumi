@@ -568,77 +568,75 @@
       ><div slot="loading" class="w-[20px]"></div>
       <div slot="nodata" class="w-[20px]"></div>
       <div slot="error" class="w-[20px]"></div>
-      {#await profile(metadata) then prof}
-        {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
+      {@const prof = profile(metadata)}
+      {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
 
-          <Zapped id={note.id} let:event>
-            <button slot="loading" on:click={handleClickZap}>
-              <Zap
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
-              />
-            </button>
+        <Zapped id={note.id} let:event>
+          <button slot="loading" on:click={handleClickZap}>
+            <Zap
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+            />
+          </button>
 
-            <button slot="nodata" on:click={handleClickZap}>
+          <button slot="nodata" on:click={handleClickZap}>
+            <Zap
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+            />
+          </button>
+
+          <button slot="error" on:click={handleClickZap}>
+            <Zap
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+            />
+          </button>
+
+          {#if event === undefined}
+            <button on:click={handleClickZap}>
               <Zap
                 size="20"
                 class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
               />
             </button>
-
-            <button slot="error" on:click={handleClickZap}>
-              <Zap
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+          {:else}
+            <Zap
+              size="20"
+              class="text-magnum-500 overflow-hidden fill-magnum-500"
+            />
+          {/if}
+        </Zapped>
+        <AlertDialog
+          bind:open={dialogOpen}
+          onClickOK={() => onClickOK(metadata)}
+          title="Zap"
+        >
+          <div slot="main" class=" text-neutral-200">
+            <div class="rounded-md">
+              <EventCard {note} {metadata} displayMenu={false} />
+            </div>
+            <div class="mt-4 rounded-md">
+              <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+              <input
+                type="number"
+                id="amount"
+                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                placeholder="amount"
+                bind:value={zapAmount}
               />
-            </button>
-
-            {#if event === undefined}
-              <button on:click={handleClickZap}>
-                <Zap
-                  size="20"
-                  class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-                />
-              </button>
-            {:else}
-              <Zap
-                size="20"
-                class="text-magnum-500 overflow-hidden fill-magnum-500"
+              <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
+              <input
+                type="text"
+                id="comment"
+                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                placeholder="comment"
+                bind:value={zapComment}
               />
-            {/if}
-          </Zapped>
-          <AlertDialog
-            bind:open={dialogOpen}
-            onClickOK={() => onClickOK(metadata)}
-            title="Zap"
-          >
-            <div slot="main" class=" text-neutral-200">
-              <div class="rounded-md">
-                <EventCard {note} {metadata} displayMenu={false} />
-              </div>
-              <div class="mt-4 rounded-md">
-                <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
-                <input
-                  type="number"
-                  id="amount"
-                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
-                  placeholder="amount"
-                  bind:value={zapAmount}
-                />
-                <div class="pt-1 text-magnum-300 font-bold text-lg">
-                  comment
-                </div>
-                <input
-                  type="text"
-                  id="comment"
-                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
-                  placeholder="comment"
-                  bind:value={zapComment}
-                />
-              </div>
-            </div></AlertDialog
-          >
-        {:else}<div class="w-[20px] overflow-hidden" />{/if}{/await}</Metadata
+            </div>
+          </div></AlertDialog
+        >
+      {:else}<div class="w-[20px] overflow-hidden" />{/if}</Metadata
     >
   {/if}
   <!--メニュー-->

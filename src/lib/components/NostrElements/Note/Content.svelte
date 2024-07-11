@@ -7,7 +7,6 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { isvalidURL } from "$lib/func/ogp";
-  import { nipRegex } from "$lib/func/util";
   export let text: string;
   export let tags: string[][];
   /** ImageFile_Check_正規表現_パターン */

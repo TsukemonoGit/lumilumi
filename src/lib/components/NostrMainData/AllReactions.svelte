@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useAllReactions } from "$lib/stores/useAllReactions";
-  import type { RxReqBase, ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

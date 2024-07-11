@@ -1,10 +1,8 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
   import { relaysById, showImg } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
-  import { afterUpdate } from "svelte";
   import Avatar from "svelte-boring-avatars";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";

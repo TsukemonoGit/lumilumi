@@ -293,7 +293,7 @@
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini}>
-      <Kind42Note {note} {metadata} /></NoteTemplate
+      <Kind42Note {note} /></NoteTemplate
     >
   {:else if note.kind === 30030}
     <!--kind30030-->

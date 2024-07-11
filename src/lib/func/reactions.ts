@@ -1,12 +1,7 @@
 import { app, queryClient } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import {
-  createRxNostr,
-  createRxForwardReq,
-  type EventPacket,
-  createRxBackwardReq,
-} from "rx-nostr";
+import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";

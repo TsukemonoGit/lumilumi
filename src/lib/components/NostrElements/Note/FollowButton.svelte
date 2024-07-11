@@ -5,20 +5,13 @@
     pubkeysIn,
     promisePublishEvent,
   } from "$lib/func/nostr";
-  import { scanArray } from "$lib/stores/operators";
   import {
     loginUser,
     nowProgress,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import {
-    type EventPacket,
-    createRxBackwardReq,
-    latest,
-    uniq,
-    verify,
-  } from "rx-nostr";
+  import { type EventPacket, createRxBackwardReq, latest } from "rx-nostr";
   import { _ } from "svelte-i18n";
   import { pipe } from "rxjs";
 
