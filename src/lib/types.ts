@@ -7,14 +7,14 @@ import type {
   EventPacket,
   RxNostr,
   RxReq,
-  RxReqController,
+  RxReqEmittable,
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import type { Readable } from "svelte/store";
 
-export type RxReqBase = RxReq & RxReqController;
+export type RxReqBase = RxReq;
 
 export type ReqStatus = "loading" | "success" | "error";
 
@@ -34,18 +34,14 @@ export interface UseReqOpts<A> {
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
   req?:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
-        RxReqPipeable);
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
+
   initData?: A;
 }
 export interface UseReqOpts2<A> {

@@ -11,7 +11,11 @@ import { get, writable, derived } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { zapCheck } from "$lib/stores/operators";
-const rxNostr3 = createRxNostr({ connectionStrategy: "aggressive" }); //reaction repost用
+import { verifier } from "rx-nostr-crypto";
+const rxNostr3 = createRxNostr({
+  verifier: verifier,
+  connectionStrategy: "aggressive",
+}); //reaction repost用
 export function set3Relays(relays: any) {
   rxNostr3.setDefaultRelays(relays);
 }

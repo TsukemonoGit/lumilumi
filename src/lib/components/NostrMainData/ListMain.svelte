@@ -5,9 +5,23 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
+  import type {
+    RxReq,
+    RxReqEmittable,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
   export let queryKey: QueryKey;
   export let pubkey: string;
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
   $: result = useReplaceableEventList(queryKey, pubkey, 30000, req);
   $: data = result.data;
   $: status = result.status;

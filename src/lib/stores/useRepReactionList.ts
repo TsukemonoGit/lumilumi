@@ -10,7 +10,7 @@ export function useRepReactionList(
   filters: Nostr.Filter[],
   req?: RxReqBase | undefined
 ) {
-  const operator = pipe(verify());
+  const operator = pipe();
   return useReq3({
     rxNostr,
 

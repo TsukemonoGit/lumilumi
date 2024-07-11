@@ -72,7 +72,7 @@ export async function loadOlderEvents(
         }));
     console.log(newFilters);
     const newReq = createRxBackwardReq();
-    const operator = pipe(tie, uniq(), verify(), scanArray());
+    const operator = pipe(tie, uniq(), scanArray());
     const olderEvents = await usePromiseReq(
       {
         operator: operator,
@@ -104,7 +104,7 @@ export async function firstLoadOlderEvents(
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
-  const operator = pipe(tie, uniq(), verify(), scanArray());
+  const operator = pipe(tie, uniq(), scanArray());
   const olderEvents = await usePromiseReq(
     {
       operator: operator,

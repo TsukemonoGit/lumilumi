@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { type DefaultRelayConfig } from "rx-nostr";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
@@ -25,6 +24,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
+  import type { DefaultRelayConfig } from "rx-nostr";
 
   const STORAGE_KEY = "lumiSetting";
   const DELETE_STORAGE_KEY = "relaySettings";

@@ -3,9 +3,23 @@
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import { readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
-  import { type DefaultRelayConfig } from "rx-nostr";
+  import {
+    type DefaultRelayConfig,
+    type RxReq,
+    type RxReqEmittable,
+    type RxReqOverable,
+    type RxReqPipeable,
+  } from "rx-nostr";
 
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
   let relays: DefaultRelayConfig[] | undefined = undefined;
 
   export let localRelays: DefaultRelayConfig[];
@@ -16,7 +30,15 @@
   function deriveResult(
     localRelays: DefaultRelayConfig[],
     pubkey: string,
-    req: RxReqBase | undefined
+    req:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+      | undefined
   ) {
     if (!localRelays || localRelays.length <= 0) {
       return useRelaySet(

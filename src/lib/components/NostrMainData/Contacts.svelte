@@ -2,18 +2,28 @@
   import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
   import type { ReqStatus, RxReqBase } from "$lib/types";
-  /**
-   * @license Apache-2.0
-   * @copyright 2023 Akiomi Kamakura
-   */
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import type { DefaultRelayConfig } from "rx-nostr";
+  import type {
+    DefaultRelayConfig,
+    RxReq,
+    RxReqEmittable,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let pubkey: string;
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
   export let relays: DefaultRelayConfig[] | undefined = undefined;
   // TODO: Check if $app.rxNostr is defined
   if (relays && relays.length > 0 && $app?.rxNostr) {

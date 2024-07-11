@@ -5,7 +5,13 @@
 
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
-import type { EventPacket } from "rx-nostr";
+import type {
+  EventPacket,
+  RxReq,
+  RxReqEmittable,
+  RxReqOverable,
+  RxReqPipeable,
+} from "rx-nostr";
 import { uniq, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 
@@ -16,9 +22,17 @@ import type { RxReqBase, ReqResult } from "$lib/types.js";
 export function useUniqueEventList(
   queryKey: QueryKey,
   filters: Nostr.Filter[],
-  req?: RxReqBase | undefined
+  req?:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined
 ): ReqResult<EventPacket[]> {
-  const operator = pipe(uniq(), verify(), scanArray());
+  const operator = pipe(uniq(), scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<
     EventPacket[]
   >;

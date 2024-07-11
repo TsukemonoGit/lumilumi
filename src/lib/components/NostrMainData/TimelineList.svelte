@@ -17,16 +17,13 @@
   import {
     createTie,
     now,
-    type AcceptableDefaultRelaysConfig,
-    type DefaultRelayConfig,
     type EventPacket,
     type RxReq,
+    type RxReqEmittable,
     type RxReqOverable,
     type RxReqPipeable,
   } from "rx-nostr";
-  import { type OperatorFunction } from "rxjs";
   import Metadata from "./Metadata.svelte";
-  import { browser } from "$app/environment";
   import { getRelaysById, setTieKey } from "$lib/func/nostr";
   import { afterUpdate, onDestroy, onMount } from "svelte";
 
@@ -36,18 +33,13 @@
   export let filters: Nostr.Filter[];
   export let lastfavcheck: boolean = true;
   export let req:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
         RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量

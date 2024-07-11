@@ -10,6 +10,7 @@ import type {
   EventPacket,
   RxNostr,
   RxReq,
+  RxReqEmittable,
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
@@ -34,18 +35,13 @@ export function useTimelineEventList(
     }
   >,
   req?:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
         RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined,
 
   relays?: string[] | undefined
@@ -61,7 +57,7 @@ export function useTimelineEventList(
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(tie, uniq, verify(), scanArray());
+  const operator = pipe(tie, uniq, scanArray());
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

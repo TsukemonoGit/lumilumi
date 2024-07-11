@@ -4,7 +4,14 @@
  */
 
 import type { QueryKey } from "@tanstack/svelte-query";
-import type { EventPacket, RxNostr } from "rx-nostr";
+import type {
+  EventPacket,
+  RxNostr,
+  RxReq,
+  RxReqEmittable,
+  RxReqOverable,
+  RxReqPipeable,
+} from "rx-nostr";
 import { filterByKind, latest, verify } from "rx-nostr";
 import { pipe } from "rxjs";
 
@@ -17,14 +24,22 @@ export function useReplaceableEvent(
   queryKey: QueryKey,
   pubkey: string,
   kind: number,
-  req?: RxReqBase | undefined
+  req?:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined
 ): ReqResult<EventPacket> {
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
   const operator = pipe(
     filterByKind(kind),
     filterPubkey(pubkey),
-    verify(),
+
     latest()
   );
   return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;

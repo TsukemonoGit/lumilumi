@@ -5,6 +5,10 @@ import {
   verify,
   type DefaultRelayConfig,
   type EventPacket,
+  type RxReq,
+  type RxReqEmittable,
+  type RxReqOverable,
+  type RxReqPipeable,
 } from "rx-nostr";
 import type { RxReqBase, ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
@@ -20,12 +24,20 @@ import { scanArray } from "./operators";
 export function useGlobalRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
-  req?: RxReqBase | undefined
+  req?:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined
 ): any {
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
     setRelays(relaySearchRelays);
   }
-  const operator = pipe(verify(), uniq(), latest());
+  const operator = pipe(uniq(), latest());
   const reqResult = useReq({ queryKey, filters, operator, req });
 
   const transformedData = derived(reqResult.data, ($data) =>

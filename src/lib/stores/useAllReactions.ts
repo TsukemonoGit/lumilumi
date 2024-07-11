@@ -10,6 +10,7 @@ import type {
   EventPacket,
   RxNostr,
   RxReq,
+  RxReqEmittable,
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
@@ -26,19 +27,13 @@ export function useAllReactions(
 
   id: string,
   req?:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
         RxReqPipeable)
-    | undefined
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
 ): ReqResult<EventPacket[]> {
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -56,7 +51,7 @@ export function useAllReactions(
   ];
   console.log(filters);
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(uniq, verify(), scanArray());
+  const operator = pipe(uniq, scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<
     EventPacket[]
   >;

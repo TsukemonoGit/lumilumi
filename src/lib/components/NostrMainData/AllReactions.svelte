@@ -1,18 +1,27 @@
 <script lang="ts">
   import { useAllReactions } from "$lib/stores/useAllReactions";
-  import { useEvent } from "$lib/stores/useEvent";
   import type { RxReqBase, ReqStatus } from "$lib/types";
-  /**
-   * @license Apache-2.0
-   * @copyright 2023 Akiomi Kamakura
-   */
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
+  import type {
+    RxReq,
+    RxReqEmittable,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let id: string;
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
 
   // TODO: Check if $app.rxNostr is defined
   $: result = useAllReactions(queryKey, id, req);

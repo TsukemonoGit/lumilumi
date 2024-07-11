@@ -53,7 +53,10 @@
     $nowProgress = true;
     const data: EventPacket | undefined = $queryClient?.getQueryData(key);
 
-    const ev = await usePromiseReq({ queryKey: key, filters, operator });
+    const ev = await usePromiseReq(
+      { queryKey: key, filters, operator },
+      undefined
+    );
     console.log(ev);
     if (ev && ev.length > 0) {
       if (data && data.event.created_at > ev[0].event.created_at) {

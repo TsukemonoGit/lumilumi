@@ -8,10 +8,24 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
+  import type {
+    RxReq,
+    RxReqEmittable,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
 
   // TODO: Check if $app.rxNostr is defined
   $: result = useUniqueEventList(queryKey, filters, req);

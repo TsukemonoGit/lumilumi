@@ -41,16 +41,18 @@ import {
   nip07Signer,
   createRxForwardReq,
   completeOnTimeout,
+  type RxReqEmittable,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
+import { verifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
-  rxNostr = createRxNostr();
+  rxNostr = createRxNostr({ verifier });
   app.set({ rxNostr: rxNostr });
 }
 
@@ -214,18 +216,13 @@ export function useReq(
 
   //  console.log(filters);
   let _req:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
-        RxReqPipeable);
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
 
   if (req) {
     _req = req;
@@ -395,22 +392,19 @@ export function usePromiseReq(
   }
 
   let _req:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?: {
-            relays: string[];
-          }
-        ): void;
-      });
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
 
   if (req) {
     _req = req;
   } else {
     _req = createRxBackwardReq();
   }
-
   // 初期データが配列でない場合は、配列に変換
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]

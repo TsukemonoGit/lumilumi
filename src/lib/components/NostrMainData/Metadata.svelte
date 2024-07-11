@@ -3,17 +3,27 @@
   import { useMetadata } from "$lib/stores/useMetadata";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import { app } from "$lib/stores/stores";
-  /**
-   * @license Apache-2.0
-   * @copyright 2023 Akiomi Kamakura
-   */
 
   import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
+  import type {
+    RxReq,
+    RxReqEmittable,
+    RxReqOverable,
+    RxReqPipeable,
+  } from "rx-nostr";
 
   export let queryKey: QueryKey;
   export let pubkey: string;
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
 
   $: result = useMetadata($app.rxNostr, queryKey, pubkey, req);
   $: data = result.data;

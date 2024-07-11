@@ -1,13 +1,10 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
   import Note from "./Note.svelte";
-  import UserName from "./UserName.svelte";
   import { Quote } from "lucide-svelte";
   import EventCard from "./EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let content: string | undefined;

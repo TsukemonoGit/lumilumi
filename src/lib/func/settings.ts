@@ -20,6 +20,7 @@ import {
   type DefaultRelayConfig,
   type EventPacket,
 } from "rx-nostr";
+import { verifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
 
 export function setTheme(theme: Theme) {
@@ -35,14 +36,14 @@ export function setTheme(theme: Theme) {
 }
 
 export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr();
+  const rxNostr = createRxNostr({ verifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relaySearchRelays);
   let res: EventPacket[] = [];
   await new Promise<void>((resolve) => {
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), scanArray(), completeOnTimeout(3000))
+      .pipe(uniq(), scanArray(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -70,7 +71,7 @@ export async function getDoukiList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket> {
-  const rxNostr = createRxNostr();
+  const rxNostr = createRxNostr({ verifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -84,7 +85,7 @@ export async function getDoukiList(
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), latest(), completeOnTimeout(3000))
+      .pipe(uniq(), latest(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -181,7 +182,7 @@ export async function getNaddrEmojiList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr();
+  const rxNostr = createRxNostr({ verifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -190,13 +191,7 @@ export async function getNaddrEmojiList(
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(
-        verify(),
-        uniq(),
-        latestEachNaddr(),
-        scanArray(),
-        completeOnTimeout(3000)
-      )
+      .pipe(uniq(), latestEachNaddr(), scanArray(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -221,7 +216,7 @@ export async function getMutebykindList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr();
+  const rxNostr = createRxNostr({ verifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -235,7 +230,7 @@ export async function getMutebykindList(
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(verify(), uniq(), latestbyId(), completeOnTimeout(3000))
+      .pipe(uniq(), latestbyId(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);

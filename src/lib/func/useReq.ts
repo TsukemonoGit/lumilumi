@@ -6,6 +6,7 @@ import type { Filter } from "nostr-tools";
 import {
   type EventPacket,
   type RxReq,
+  type RxReqEmittable,
   type RxReqOverable,
   type RxReqPipeable,
   createRxBackwardReq,
@@ -94,19 +95,13 @@ export async function fetchNostrEvent(
 
   //  console.log(filters);
   let _req:
-    | RxReqBase
-    | (RxReq<"backward"> & {
-        emit(
-          filters: Filter | Filter[],
-          options?:
-            | {
-                relays: string[];
-              }
-            | undefined
-        ): void;
-      } & RxReqOverable &
-        RxReqPipeable);
-
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
   if (req) {
     _req = req;
   } else {

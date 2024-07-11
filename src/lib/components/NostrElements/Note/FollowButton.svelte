@@ -152,7 +152,7 @@
 
   async function updateKind3(): Promise<EventPacket[]> {
     const newReq = createRxBackwardReq();
-    const operator = pipe(verify(), latest());
+    const operator = pipe(latest());
     const filters = [{ kinds: [3], authors: [$loginUser], limit: 1 }];
 
     const newkind3: EventPacket[] = await usePromiseReq(

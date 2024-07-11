@@ -2,16 +2,41 @@
   import type { ReqStatus, RxReqBase } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
-  import { type DefaultRelayConfig } from "rx-nostr";
+  import {
+    type DefaultRelayConfig,
+    type RxReq,
+    type RxReqEmittable,
+    type RxReqOverable,
+    type RxReqPipeable,
+  } from "rx-nostr";
   import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
 
-  export let req: RxReqBase | undefined = undefined;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
 
   export let pubkey: string;
 
   $: result = deriveResult(pubkey, req);
   $: console.log(result);
-  function deriveResult(pubkey: string, req: RxReqBase | undefined) {
+  function deriveResult(
+    pubkey: string,
+    req:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+      | undefined
+  ) {
     return useGlobalRelaySet(
       ["globalRelay", pubkey],
       [
