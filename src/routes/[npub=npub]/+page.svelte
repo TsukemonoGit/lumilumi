@@ -10,7 +10,6 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId, setTieKey } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import { tieMapStore } from "$lib/stores/stores";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
@@ -243,14 +242,14 @@
                   let:event
                 >
                   <SetRepoReactions />
-                  <div slot="loading">
+                  <div slot="loading" class="p-1">
                     <p>pin Loading...</p>
                   </div>
 
-                  <div slot="error" let:error>
+                  <div slot="error" class="p-1" let:error>
                     <p>{error}</p>
                   </div>
-                  <div slot="nodata">
+                  <div slot="nodata" class="p-1">
                     <p>nodata</p>
                   </div>
                   <div class="max-w-[100vw] break-words box-border">
@@ -279,12 +278,15 @@
                   {req}
                   let:event
                 >
-                  <div slot="loading">
-                    <p>pin Loading...</p>
+                  <div slot="loading" class="p-1">
+                    <p>relays Loading...</p>
                   </div>
 
-                  <div slot="error" let:error>
+                  <div slot="error" class="p-1" let:error>
                     <p>{error}</p>
+                  </div>
+                  <div slot="nodata" class="p-1">
+                    <p>relays Loading...</p>
                   </div>
 
                   <div class="max-w-[100vw] break-words">
