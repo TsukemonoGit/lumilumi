@@ -8,6 +8,7 @@
     mutes,
     showImg,
     showPreview,
+    openPostWindow,
   } from "$lib/stores/stores";
   import NostrElements from "../NostrElements.svelte";
   import OpenPostWindow from "../OpenPostWindow.svelte";
@@ -116,7 +117,7 @@
 
 {#if display}
   <div class="postWindow">
-    <OpenPostWindow {options} />
+    <OpenPostWindow {options} open={openPostWindow} />
   </div>
 {/if}
 

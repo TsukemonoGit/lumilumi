@@ -38,7 +38,7 @@
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard.svelte";
-  import { onMount } from "svelte";
+  import { afterUpdate, onMount } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
@@ -308,11 +308,20 @@
   let warningText = "";
   let onWarning: boolean;
 
-  $: if (textareaReply) {
-    console.log("textareaReply");
-    textareaReply.focus();
-  }
-
+  // $: if (textareaReply) {
+  //   console.log("textareaReply");
+  //   textareaReply.focus();
+  // }
+  afterUpdate(() => {
+    //textareaが開いていて、テキストエリアがアクティブの場合真ん中に固定
+    if (
+      (textareaReply && document.activeElement === textareaReply) ||
+      (textareaQuote && document.activeElement === textareaQuote)
+    ) {
+      textareaReply?.focus();
+      textareaQuote?.focus();
+    }
+  });
   $: if (openQuoteWindow || openReplyWindow) {
     const warning = note.tags.find((item) => item[0] === "content-warning");
     if (warning) {

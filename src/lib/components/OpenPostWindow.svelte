@@ -20,9 +20,10 @@
   import { filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
 
-  export let options: { tags: string[][]; kind?: number } = {
+  export let options: { tags: string[][]; kind?: number; content?: string } = {
     tags: [],
     kind: 1,
+    content: "",
   };
 
   let defaultValue: string | undefined;
@@ -43,7 +44,7 @@
   });
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
-
+  export { open };
   onMount(() => {
     if (browser) {
       const tmp = localStorage.getItem("uploader");
@@ -75,7 +76,7 @@
   }
 
   const resetState = () => {
-    text = "";
+    text = options.content ?? "";
     tags = [...options.tags];
     warningText = "";
     onWarning = false;
