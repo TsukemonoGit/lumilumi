@@ -27,13 +27,7 @@ export function useTimelineEventList(
   queryKey: QueryKey,
 
   filters: Nostr.Filter[],
-  tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >,
+
   req?:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -57,7 +51,7 @@ export function useTimelineEventList(
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(tie, uniq, scanArray());
+  const operator = pipe(uniq, scanArray());
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

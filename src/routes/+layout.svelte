@@ -2,7 +2,13 @@
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
-  import { app, nowProgress, queryClient, uploader } from "$lib/stores/stores";
+  import {
+    app,
+    nowProgress,
+    queryClient,
+    slicedEvent,
+    uploader,
+  } from "$lib/stores/stores";
   import {
     //    getMetadataFromLocalStorage,
     relaysReconnectChallenge,
@@ -20,6 +26,7 @@
   import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";
   import Menu from "./Menu.svelte";
   import Sidebar from "./Sidebar.svelte";
+  import { afterNavigate } from "$app/navigation";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
@@ -49,6 +56,10 @@
       relaysReconnectChallenge();
     }
   }
+  afterNavigate(() => {
+    //ページが変わったらリセット
+    $slicedEvent = [];
+  });
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />

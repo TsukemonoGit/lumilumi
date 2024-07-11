@@ -232,10 +232,14 @@ export function useReq(
 
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
-
-  const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
-    .use(_req, { relays: relays })
-    .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
+  const tie = get(tieMapStore)?.[tieKey]?.[0];
+  const obs: Observable<EventPacket | EventPacket[]> = tie
+    ? _rxNostr
+        .use(_req, { relays: relays })
+        .pipe(tie, muteCheck(), metadata(), operator)
+    : _rxNostr
+        .use(_req, { relays: relays })
+        .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
@@ -409,10 +413,15 @@ export function usePromiseReq(
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]
     : [initData];
+  const tie = get(tieMapStore)?.[tieKey]?.[0];
 
-  const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
-    .use(_req, { relays: relays })
-    .pipe(muteCheck(), metadata(), operator, completeOnTimeout(3000));
+  const obs: Observable<EventPacket[] | EventPacket> = tie
+    ? _rxNostr
+        .use(_req, { relays: relays })
+        .pipe(tie, muteCheck(), metadata(), operator, completeOnTimeout(3000))
+    : _rxNostr
+        .use(_req, { relays: relays })
+        .pipe(muteCheck(), metadata(), operator, completeOnTimeout(3000));
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {

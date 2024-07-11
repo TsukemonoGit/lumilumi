@@ -22,13 +22,7 @@ export async function loadOlderEvents(
   filters: Filter[],
   queryKey: QueryKey,
   lastfavcheck: boolean,
-  tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >,
+
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   if (data && data.length > 1) {
@@ -72,7 +66,7 @@ export async function loadOlderEvents(
         }));
     console.log(newFilters);
     const newReq = createRxBackwardReq();
-    const operator = pipe(tie, uniq(), scanArray());
+    const operator = pipe(uniq(), scanArray());
     const olderEvents = await usePromiseReq(
       {
         operator: operator,
@@ -94,17 +88,11 @@ export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
   queryKey: QueryKey,
-  tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >,
+
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
-  const operator = pipe(tie, uniq(), scanArray());
+  const operator = pipe(uniq(), scanArray());
   const olderEvents = await usePromiseReq(
     {
       operator: operator,
