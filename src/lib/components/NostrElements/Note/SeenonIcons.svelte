@@ -2,7 +2,7 @@
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { relayInfoFun } from "$lib/func/util";
-  import { showImg } from "$lib/stores/stores";
+  import { relaysById, showImg } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import { afterUpdate } from "svelte";
   import Avatar from "svelte-boring-avatars";
@@ -13,18 +13,17 @@
   export let width: number;
   let imageLoaded = true;
 
-  let relays = getRelaysById(id);
-  afterUpdate(() => {
-    relays = getRelaysById(id);
-  });
   let size = 16;
   let viewAll = false;
 </script>
 
-<div class="flex flex-wrap gap-1 align-baseline h-fit" style="width:{width}px ">
-  {#each viewAll ? relays : relays.slice(0, 2) as url}
-    <Popover>
-      <button>
+{#if $relaysById?.[id]?.length > 0}
+  <div
+    class="flex flex-wrap gap-1 align-baseline h-fit"
+    style="width:{width}px "
+  >
+    {#each viewAll ? $relaysById[id] : $relaysById[id].slice(0, 2) as url}
+      <Popover>
         {#await relayInfoFun(url)}
           <Avatar {size} name={url} variant="beam" />
         {:then relayInfo}
@@ -50,31 +49,38 @@
           {:else}
             <Avatar {size} name={url} variant="beam" />
           {/if}
-        {/await}</button
+        {/await}
+        <div slot="popoverContent" class="max-w-[90%]">
+          <RelayCard {url} write={false} read={false} />
+        </div>
+      </Popover>
+    {/each}
+    {#if !viewAll && $relaysById[id]?.length > 2}
+      <button
+        style="width:{width}px "
+        on:click={() => {
+          viewAll = true;
+        }}
+        class="hover:opacity-75 active:opacity-50 border border-zinc-600 rounded-sm flex justify-center"
       >
-      <div slot="popoverContent" class="max-w-[90%]">
-        <RelayCard {url} write={false} read={false} />
-      </div>
-    </Popover>
-  {/each}
-  {#if !viewAll && relays.length > 2}
-    <button
-      style="width:{width}px "
-      on:click={() => (viewAll = true)}
-      class="hover:opacity-75 active:opacity-50 border border-zinc-600 rounded-sm flex justify-center"
-    >
-      <Triangle
-        size={size - 2}
-        class="rotate-180 text-zinc-600 fill-zinc-600"
-      /></button
-    >
-  {:else if viewAll && relays.length > 2}
-    <button
-      style="width:{width}px "
-      on:click={() => (viewAll = false)}
-      class="hover:opacity-75 active:opacity-50 border mx-0.5 border-zinc-600 rounded-sm flex justify-center"
-    >
-      <Triangle size={size - 2} class=" text-zinc-600 fill-zinc-600" /></button
-    >
-  {/if}
-</div>
+        <Triangle
+          size={size - 2}
+          class="rotate-180 text-zinc-600 fill-zinc-600"
+        /></button
+      >
+    {:else if viewAll && $relaysById[id]?.length > 2}
+      <button
+        style="width:{width}px "
+        on:click={() => {
+          viewAll = false;
+        }}
+        class="hover:opacity-75 active:opacity-50 border mx-0.5 border-zinc-600 rounded-sm flex justify-center"
+      >
+        <Triangle
+          size={size - 2}
+          class=" text-zinc-600 fill-zinc-600"
+        /></button
+      >
+    {/if}
+  </div>
+{/if}

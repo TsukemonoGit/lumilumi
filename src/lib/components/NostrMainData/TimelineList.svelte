@@ -5,6 +5,7 @@
     loginUser,
     nowProgress,
     queryClient,
+    relaysById,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -26,8 +27,8 @@
   import { type OperatorFunction } from "rxjs";
   import Metadata from "./Metadata.svelte";
   import { browser } from "$app/environment";
-  import { setTieKey } from "$lib/func/nostr";
-  import { onDestroy, onMount } from "svelte";
+  import { getRelaysById, setTieKey } from "$lib/func/nostr";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
 
   const sift = 40; //スライドする量
 
@@ -282,6 +283,17 @@
 
   onDestroy(() => {
     console.log("test");
+  });
+
+  afterUpdate(() => {
+    console.log("relaysById update");
+    if (slicedEvent?.length > 0) {
+      slicedEvent.map((event) => {
+        $relaysById = $relaysById
+          ? { ...$relaysById, [event.id]: getRelaysById(event.id) }
+          : { [event.id]: getRelaysById(event.id) };
+      });
+    }
   });
 </script>
 
