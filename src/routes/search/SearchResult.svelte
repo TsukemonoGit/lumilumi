@@ -65,14 +65,12 @@
           relays={nip50relays}
         >
           <SetRepoReactions />
-          <div slot="loading">
-            <p>{JSON.stringify(filter)} loading</p>
-          </div>
+          <div slot="loading">loading</div>
 
           <div slot="error" let:error>
-            <p>{JSON.stringify(filter)} {error}</p>
+            {error}
           </div>
-
+          <div slot="nodata">nodata</div>
           <div class=" break-words">
             {#if events && events.length > 0}
               {#each events as event, index (event.id)}
