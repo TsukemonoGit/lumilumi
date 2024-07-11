@@ -312,12 +312,10 @@
   //   console.log("textareaReply");
   //   textareaReply.focus();
   // }
+  let fix: boolean = false;
   afterUpdate(() => {
     //textareaが開いていて、テキストエリアがアクティブの場合真ん中に固定
-    if (
-      (textareaReply && document.activeElement === textareaReply) ||
-      (textareaQuote && document.activeElement === textareaQuote)
-    ) {
+    if (fix) {
       textareaReply?.focus();
       textareaQuote?.focus();
     }
@@ -632,6 +630,8 @@
       on:input={handleTextareaInput}
       on:click={handleTextareaInput}
       on:touchend={handleTextareaInput}
+      on:blur={() => (fix = false)}
+      on:focus={() => (fix = true)}
     />
     {#if onWarning}
       <div class="flex">
@@ -778,6 +778,8 @@
       on:input={handleTextareaInput}
       on:click={handleTextareaInput}
       on:touchend={handleTextareaInput}
+      on:blur={() => (fix = false)}
+      on:focus={() => (fix = true)}
     />
     {#if onWarning}
       <div class="flex">
