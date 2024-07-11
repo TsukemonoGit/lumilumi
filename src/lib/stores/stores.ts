@@ -77,3 +77,5 @@ export let openPostWindow:
       destroy?: (() => void) | undefined;
     }
   | undefined;
+
+export const uploader = writable<string>();

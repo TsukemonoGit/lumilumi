@@ -2,7 +2,7 @@
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
-  import { app, nowProgress, queryClient } from "$lib/stores/stores";
+  import { app, nowProgress, queryClient, uploader } from "$lib/stores/stores";
   import {
     //    getMetadataFromLocalStorage,
     relaysReconnectChallenge,
@@ -38,6 +38,9 @@
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
       console.log(theme);
       setTheme(theme);
+
+      const tmp = localStorage.getItem("uploader");
+      if (tmp) $uploader = tmp;
     }
   });
 

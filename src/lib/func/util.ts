@@ -159,3 +159,17 @@ export const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
   }
   return str;
 };
+
+export const convertMetaTags = (event: {
+  tags: [string, string][];
+  content: string;
+}): string[] => {
+  let newTag = ["imeta"];
+  event.tags.map((tag) => {
+    if (tag.length > 1 && tag[1].trim() !== "") {
+      newTag.push(`${tag[0]} ${tag[1]}`);
+    }
+  });
+
+  return newTag;
+};

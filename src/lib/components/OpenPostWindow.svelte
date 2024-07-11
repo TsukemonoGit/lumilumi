@@ -10,6 +10,7 @@
     nowProgress,
     showImg,
     showPreview,
+    uploader,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import Content from "./NostrElements/Note/Content.svelte";
@@ -17,7 +18,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { filesUpload } from "$lib/func/util";
+  import { convertMetaTags, filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
 
   export let options: { tags: string[][]; kind?: number; content?: string } = {
@@ -26,7 +27,6 @@
     content: "",
   };
 
-  let defaultValue: string | undefined;
   let text: string = "";
   let tags: string[][] = [...options.tags];
   let cursorPosition: number = 0;
@@ -45,12 +45,6 @@
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
   export { open };
-  onMount(() => {
-    if (browser) {
-      const tmp = localStorage.getItem("uploader");
-      if (tmp) defaultValue = tmp;
-    }
-  });
 
   const postNote = async () => {
     if (text.trim().length > 0) {
@@ -101,11 +95,11 @@
   };
 
   const handleFileUpload = async (fileList: FileList) => {
-    if (!fileList || fileList.length <= 0 || !defaultValue) return;
+    if (!fileList || fileList.length <= 0 || !$uploader) return;
     $nowProgress = true;
     const uploadedURPs: FileUploadResponse[] = await filesUpload(
       fileList,
-      defaultValue
+      $uploader
     );
     console.log(uploadedURPs);
     uploadedURPs.forEach((data) => {
@@ -113,15 +107,20 @@
         const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
 
         if (url) {
-          const urln = `\n ${url} \n`;
+          const len = text.length; //ULR入れる前のカーソルの場所にカーソルおく
+          const urln = `\n${url}`;
           text =
             text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
-          cursorPosition += urln.length;
+          cursorPosition = len;
 
           //imetaをたぐにいれる
           if (data.nip94_event) {
             tags.push(convertMetaTags(data.nip94_event));
           }
+          setTimeout(() => {
+            textarea.selectionEnd = cursorPosition;
+            textarea.focus();
+          }, 10);
         }
       }
     });
@@ -160,7 +159,7 @@
 
   $: console.log(selectedUploader);
   $: if (selectedUploader) {
-    defaultValue = selectedUploader;
+    $uploader = selectedUploader;
   }
 
   let textarea: HTMLTextAreaElement;
@@ -195,20 +194,6 @@
       // テキストエリアが空の場合、ダイアログを閉じる
       $open = false;
     }
-  };
-
-  const convertMetaTags = (event: {
-    tags: [string, string][];
-    content: string;
-  }): string[] => {
-    let newTag = ["imeta"];
-    event.tags.map((tag) => {
-      if (tag.length > 1 && tag[1].trim() !== "") {
-        newTag.push(`${tag[0]} ${tag[1]}`);
-      }
-    });
-
-    return newTag;
   };
 </script>
 
@@ -259,7 +244,7 @@
         <div class="flex flex-row gap-2 mb-2">
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
-          <UploaderSelect bind:defaultValue bind:selectedUploader />
+          <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea

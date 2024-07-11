@@ -31,9 +31,15 @@
     nowProgress,
     showImg,
     toastSettings,
+    uploader,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
-  import { nip33Regex, profile } from "$lib/func/util";
+  import {
+    convertMetaTags,
+    filesUpload,
+    nip33Regex,
+    profile,
+  } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -42,6 +48,9 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
+  import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
+  import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
+  import type { FileUploadResponse } from "nostr-tools/nip96";
 
   export let note: Nostr.Event;
 
@@ -389,6 +398,85 @@
   // const handleTextareaBlur = () => {
   //   console.log("blur");
   // };
+
+  let selectedUploader: string;
+  let files: FileList | undefined;
+  let fileInput: HTMLInputElement | undefined;
+
+  const handleFileUpload = async (fileList: FileList) => {
+    if (!fileList || fileList.length <= 0 || !$uploader) return;
+    $nowProgress = true;
+    const uploadedURPs: FileUploadResponse[] = await filesUpload(
+      fileList,
+      $uploader
+    );
+    console.log(uploadedURPs);
+    uploadedURPs.forEach((data) => {
+      if (data.status === "success") {
+        const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+
+        if (url) {
+          const len = replyText.length;
+          console.log(len);
+          const urln = `\n${url}`;
+          replyText =
+            replyText.slice(0, cursorPosition) +
+            urln +
+            replyText.slice(cursorPosition);
+          cursorPosition = len;
+
+          //cursorPosition += urln.length;
+
+          //imetaをたぐにいれる
+          if (data.nip94_event) {
+            tags.push(convertMetaTags(data.nip94_event));
+          }
+          setTimeout(() => {
+            if (openReplyWindow) {
+              textareaReply.selectionEnd = cursorPosition;
+              textareaReply?.focus();
+            }
+            if (openQuoteWindow) {
+              textareaQuote.selectionEnd = cursorPosition;
+              textareaQuote?.focus();
+            }
+          }, 10);
+        }
+      }
+    });
+
+    $nowProgress = false;
+  };
+  // ドラッグ&ドロップのイベントハンドラ
+  const handleDrop = async (event: DragEvent) => {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      await handleFileUpload(event.dataTransfer.files);
+    }
+  };
+  const handleDragOver = (event: DragEvent) => {
+    event.preventDefault();
+  };
+  const onChangeHandler = async (e: Event): Promise<void> => {
+    const _files = (e.target as HTMLInputElement).files;
+    if (_files) {
+      await handleFileUpload(_files);
+    }
+  };
+
+  const paste = async (event: ClipboardEvent) => {
+    console.log("[paste]", event.type, event.clipboardData);
+    if (!event.clipboardData) return;
+
+    const files = [...event.clipboardData.items]
+      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter((file): file is File => file !== null);
+
+    const fileList = new DataTransfer();
+    files.forEach((file) => fileList.items.add(file));
+    await handleFileUpload(fileList.files);
+  };
 </script>
 
 <div
@@ -399,9 +487,13 @@
     <button
       on:click={() => {
         openReplyWindow = !openReplyWindow;
+
         replyText = "";
         if (openReplyWindow) {
           openQuoteWindow = false;
+          setTimeout(() => {
+            textareaReply?.focus();
+          }, 20);
         }
       }}
     >
@@ -622,6 +714,11 @@
         <X size="20" />
       </button>
     </div>
+    <div class="flex flex-row gap-2 mb-2">
+      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
+
+      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+    </div>
     <textarea
       bind:this={textareaReply}
       rows="3"
@@ -632,6 +729,9 @@
       on:touchend={handleTextareaInput}
       on:blur={() => (fix = false)}
       on:focus={() => (fix = true)}
+      on:paste={paste}
+      on:drop={handleDrop}
+      on:dragover={handleDragOver}
     />
     {#if onWarning}
       <div class="flex">
@@ -665,6 +765,8 @@
               class="h-8 w-full rounded-md text-magnum-100 border-2
            'border-neutral-900'}"
               bind:value={customReaction}
+              on:blur={() => (fix = false)}
+              on:focus={() => (fix = true)}
             />
           {/if}
           <button
@@ -769,7 +871,11 @@
         <X size="20" />
       </button>
     </div>
+    <div class="flex flex-row gap-2 mb-2">
+      <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
+      <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+    </div>
     <textarea
       bind:this={textareaQuote}
       rows="6"
@@ -780,6 +886,9 @@
       on:touchend={handleTextareaInput}
       on:blur={() => (fix = false)}
       on:focus={() => (fix = true)}
+      on:paste={paste}
+      on:drop={handleDrop}
+      on:dragover={handleDragOver}
     />
     {#if onWarning}
       <div class="flex">
@@ -813,6 +922,8 @@
               class="h-8 w-full rounded-md text-magnum-100 border-2
            'border-neutral-900'}"
               bind:value={customReaction}
+              on:blur={() => (fix = false)}
+              on:focus={() => (fix = true)}
             />
           {/if}
           <button
