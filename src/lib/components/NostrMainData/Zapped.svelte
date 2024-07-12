@@ -13,7 +13,7 @@
     queryKey: ["reactions", "zapped", id],
   });
   const unsubscribe1 = observer2.subscribe((result: any) => {
-    if (_result?.status !== "success") {
+    if (result?.data) {
       _result = result;
     }
   });

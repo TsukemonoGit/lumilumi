@@ -1,11 +1,6 @@
 <script lang="ts">
   import type { ReqStatus, RxReqBase } from "$lib/types";
 
-  /**
-   * @license Apache-2.0
-   * @copyright 2023 Akiomi Kamakura
-   */
-
   import type Nostr from "nostr-typedef";
 
   import { queryClient } from "$lib/stores/stores";
@@ -19,7 +14,7 @@
     queryKey: ["reactions", "repost", id],
   });
   const unsubscribe1 = observer2.subscribe((result: any) => {
-    if (_result?.status !== "success") {
+    if (result?.data) {
       _result = result;
     }
   });

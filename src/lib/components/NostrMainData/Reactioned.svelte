@@ -31,7 +31,7 @@
     queryKey: ["reactions", "reaction", id],
   });
   const unsubscribe1 = observer1.subscribe((result: any) => {
-    if (_result?.status !== "success") {
+    if (result?.data) {
       _result = result;
     }
   });
