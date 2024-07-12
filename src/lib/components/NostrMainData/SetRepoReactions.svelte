@@ -15,38 +15,45 @@
 
   let lastUpdateTimestamp = Date.now() + 1000; // 初回は余裕を持たせる
   const updateInterval = 1000; // 1秒（ミリ秒）
-  result = useRepReactionList(rxNostr, filters, req);
-  $: if ($viewEventIds) {
+  let timeoutId: NodeJS.Timeout | undefined = undefined;
+
+  function debounceUpdate() {
     const currentTimestamp = Date.now();
-    if (currentTimestamp - lastUpdateTimestamp > updateInterval) {
-      // const eValues: string[] = $viewEvents.reduce((acc: string[], item) => {
-      //   if ([7, 6, 16].includes(item.kind)) {
-      //     const tag = item.tags.find((tag) => tag[0] === "e");
-      //     if (tag) {
-      //       acc.push(tag[1]);
-      //     }
-      //   } else {
-      //     acc.push(item.id);
-      //   }
-      //   return acc;
-      // }, []);
+    const timeSinceLastUpdate = currentTimestamp - lastUpdateTimestamp;
 
-      filters = [
-        {
-          "#e": $viewEventIds,
-          authors: [$loginUser],
-          kinds: [7, 6, 16],
-        },
-        {
-          "#e": $viewEventIds,
-          kinds: [9735],
-        },
-      ];
-
-      lastUpdateTimestamp = currentTimestamp;
-      changeEmit(filters);
+    if (timeSinceLastUpdate >= updateInterval) {
+      performUpdate();
+    } else if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        performUpdate();
+      }, updateInterval - timeSinceLastUpdate);
     }
   }
+
+  function performUpdate() {
+    filters = [
+      {
+        "#e": $viewEventIds,
+        authors: [$loginUser],
+        kinds: [7, 6, 16],
+      },
+      {
+        "#e": $viewEventIds,
+        kinds: [9735],
+      },
+    ];
+
+    changeEmit(filters);
+    lastUpdateTimestamp = Date.now();
+    //実行されたらID削除
+    timeoutId = undefined;
+  }
+
+  $: if ($viewEventIds) {
+    debounceUpdate();
+  }
+
+  result = useRepReactionList(rxNostr, filters, req);
 
   $: data = result?.data;
   $: status = result?.status;
