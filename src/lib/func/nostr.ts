@@ -130,6 +130,9 @@ const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
       // 保存されていない場合、新しいデータを追加する
       savedMetadata.push([key, data]);
     }
+    get(queryClient).setQueryData(key, (oldData: any) => data, {
+      updatedAt: Infinity,
+    });
     metadataChanged = true;
   }
 };
@@ -152,7 +155,8 @@ export const getMetadataFromLocalStorage = (): void => {
       // console.log(metadata[pubkey][1]);
       get(queryClient).setQueryData(
         metadata[pubkey][0],
-        (oldData: any) => metadata[pubkey][1]
+        (oldData: any) => metadata[pubkey][1],
+        { updatedAt: Infinity }
       );
       // get(queryClient).setQueriesData(
       //   { queryKey: metadata[pubkey][0] },

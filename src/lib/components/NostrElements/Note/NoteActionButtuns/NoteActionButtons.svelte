@@ -27,6 +27,7 @@
   import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
   import {
+    defaultReaction,
     emojis,
     nowProgress,
     showImg,
@@ -98,8 +99,11 @@
             ["e", note.id],
             ["k", note.kind.toString()],
           ],
-      content: tmp,
+      content: $defaultReaction?.content ?? "+",
     };
+    if ($defaultReaction?.tag?.length > 0) {
+      ev.tags?.push($defaultReaction?.tag);
+    }
     publishEvent(ev);
   };
 

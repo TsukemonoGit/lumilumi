@@ -14,6 +14,7 @@
     toastSettings,
     menuLeft,
     showRelayIcon,
+    defaultReaction,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { relayRegex } from "$lib/func/util";
@@ -26,9 +27,9 @@
   import UpdateMuteList from "./UpdateMuteList.svelte";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { Save } from "lucide-svelte";
+  import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
 
   const STORAGE_KEY = "lumiSetting";
-  const DELETE_STORAGE_KEY = "relaySettings";
 
   const relays = writable<DefaultRelayConfig[]>([]);
   const radioGroupSelected = writable("0");
@@ -45,6 +46,10 @@
     | { list: { kind: number; list: string[] }[]; updated: number }
     | undefined = undefined;
   let emojiList: { list: string[][]; updated: number } | undefined = undefined;
+  let _defaultReaction: { content: string; tag: string[] } = {
+    content: "+",
+    tag: [],
+  };
   let inputPubkey = "";
   // ラジオボタン設定
   const {
@@ -70,6 +75,7 @@
 
   onMount(async () => {
     const savedSettings = loadSettings();
+    console.log(savedSettings);
     if (savedSettings) {
       applySettings(savedSettings);
     } else {
@@ -79,13 +85,8 @@
   });
 
   function loadSettings() {
-    const deleteSettings = localStorage.getItem(DELETE_STORAGE_KEY);
     let savedSettings = localStorage.getItem(STORAGE_KEY);
-    if (deleteSettings) {
-      savedSettings = deleteSettings;
-      localStorage.setItem(STORAGE_KEY, savedSettings);
-      localStorage.removeItem(DELETE_STORAGE_KEY);
-    }
+
     return savedSettings ? JSON.parse(savedSettings) : null;
   }
 
@@ -101,18 +102,26 @@
       mute: savedMute,
       emoji: savedEmoji,
       mutebykinds: savedMutebykinds,
+      defaultReaction: savedDefaultReaction,
     } = settings;
-
     relays.set(savedRelays);
     radioGroupSelected.set(savedRelaySet);
     pubkey.set(savedPubkey);
     inputPubkey = nip19.npubEncode(savedPubkey);
-    if (savedShowImg) _showImg.set(savedShowImg);
+    if (savedShowImg) {
+      _showImg.set(savedShowImg);
+      $showImg = savedShowImg;
+    }
     if (savedShowPreview) _showPreview.set(savedShowPreview);
     if (savedMenuLeft) _menu_left.set(savedMenuLeft);
     if (savedShowRelayIcon) _showRelayIcon.set(savedShowRelayIcon);
+
     if (savedMute) muteList = savedMute;
-    if (savedEmoji) emojiList = savedEmoji;
+
+    if (savedEmoji) {
+      emojiList = savedEmoji;
+      $emojis = emojiList.list;
+    }
     if (savedMutebykinds?.list) {
       mutebykindList = {
         list: JSON.parse(savedMutebykinds.list),
@@ -120,15 +129,16 @@
       };
       mutebykinds.set(mutebykindList.list);
     }
+    if (savedDefaultReaction) _defaultReaction = savedDefaultReaction;
     originalSettings.set(settings);
   }
 
   async function initializeSettings() {
     //設定がまだないとき
-
-    const nostrLogin = await import("nostr-login");
-    await nostrLogin.init({});
-
+    if (browser) {
+      const nostrLogin = await import("nostr-login");
+      await nostrLogin.init({});
+    }
     radioGroupSelected.set("0");
     try {
       const gotPubkey = await (
@@ -182,9 +192,11 @@
     $menuLeft = $_menu_left;
     $showRelayIcon = $_showRelayIcon;
     if (muteList) mutes.set(muteList.list);
-    if (emojiList) emojis.set(emojiList.list);
+    if (emojiList) {
+      emojis.set(emojiList.list);
+    }
     if (mutebykindList) mutebykinds.set(mutebykindList.list);
-
+    if (_defaultReaction) defaultReaction.set(_defaultReaction);
     originalSettings.set(settings);
   }
 
@@ -243,6 +255,7 @@
       showPreview: $_showPreview,
       menuleft: $_menu_left,
       showRelayIcon: $_showRelayIcon,
+      defaultReaction: _defaultReaction,
     };
     if (muteList && muteList.updated !== undefined) {
       settings.mute = muteList;
@@ -321,6 +334,23 @@
       }
     }
   });
+
+  let emojiTag: string[] | undefined;
+  let customString: string | undefined;
+
+  $: if (emojiTag && emojiTag.length > 0) {
+    console.log(emojiTag);
+    _defaultReaction = {
+      content: `:${emojiTag[0]}:`,
+      tag: ["emoji", ...emojiTag],
+    };
+  }
+  const handleClickOk = () => {
+    console.log(customString);
+    if (customString) {
+      _defaultReaction = { content: customString, tag: [] };
+    }
+  };
 </script>
 
 <div class=" flex flex-col gap-3">
@@ -438,6 +468,29 @@
         {$_("settings.globalRelay")}
       </div>
     {/if}
+  </div>
+  <!--投稿の設定-->
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">Default Reaction</div>
+    <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
+      <CustomReaction
+        note={undefined}
+        {handleClickOk}
+        bind:emoji={emojiTag}
+        bind:customReaction={customString}
+      />{#if _defaultReaction.tag.length > 0}
+        {#if $showImg}
+          <img
+            loading="lazy"
+            class="h-4 object-contain justify-self-center"
+            src={_defaultReaction.tag[2]}
+            alt={_defaultReaction.tag[1]}
+            title={_defaultReaction.tag[1]}
+          />{:else}{_defaultReaction.tag[1]}{/if}
+      {:else if _defaultReaction.content}
+        {_defaultReaction.content}
+      {/if}
+    </div>
   </div>
   <!--- 表示設定 --->
   <div class="border border-magnum-500 rounded-md p-2">

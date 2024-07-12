@@ -103,6 +103,7 @@ export interface LumiSetting {
     updated: number; //最終同期日時};
   };
   mutebykinds?: { list: string; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
+  defaultReaction: { content: string; tag: string[] };
 }
 export interface MuteList {
   p: string[];

@@ -6,7 +6,7 @@
   import * as Nostr from "nostr-typedef";
   import punycode from "punycode/punycode";
 
-  export let note: Nostr.Event;
+  export let note: Nostr.Event | undefined;
 
   const regexSymbolWithCombiningMarks = /(\P{Mark})(\p{Mark}+)/gu;
 
@@ -21,10 +21,14 @@
     return punycode.ucs2.decode(stripped).length;
   };
 
-  let customReaction: string = "";
+  export let customReaction: string = "";
+  export let emoji: string[] = [];
+  export let handleClickOk: any | undefined = undefined;
+
   let customReactionError: boolean = false;
   let customReactionErrorMessage: string = "";
   let open: boolean;
+
   const handleClickCustomReaction = () => {
     const textLen = countSymbolsIgnoringCombiningMarks(customReaction);
 
@@ -37,7 +41,10 @@
       }, 3000);
       return;
     }
-
+    if (!note) {
+      handleClickOk();
+      return;
+    }
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: [
@@ -53,6 +60,11 @@
   };
 
   const handleClickEmoji = (e: string[]) => {
+    emoji = e;
+    if (!note) {
+      return;
+    }
+
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: [
