@@ -16,6 +16,7 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
+  import { Pin } from "lucide-svelte";
 
   export let data: {
     pubkey: string;
@@ -56,7 +57,7 @@
   const triggers = [
     { id: "post", title: "Post" },
     { id: "reactions", title: "Reactions" },
-    { id: "pin", title: "Pin" },
+    // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relays" },
   ];
 
@@ -110,6 +111,39 @@
             </div>
             <div use:melt={$content("post")} class="content">
               {#if $value === "post"}
+                <LatestEvent
+                  queryKey={["pin", userPubkey]}
+                  filters={[
+                    {
+                      kinds: [10001],
+                      limit: 1,
+                      authors: [userPubkey],
+                    },
+                  ]}
+                  let:event
+                >
+                  <!-- <SetRepoReactions />
+                  <div slot="loading" class="p-1">
+                    <p>pin Loading...</p>
+                  </div>
+
+                  <div slot="error" class="p-1" let:error>
+                    <p>{error}</p>
+                  </div>
+                  <div slot="nodata" class="p-1">
+                    <p>nodata</p>
+                  </div> -->
+
+                  <div class="max-w-[100vw] break-words box-border">
+                    {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
+                      <div
+                        class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
+                      >
+                        <Pin class="-rotate-45 text-magnum-400" /><Note {id} />
+                      </div>
+                    {/each}
+                  </div>
+                </LatestEvent>
                 <TimelineList
                   queryKey={["user", "post", userPubkey]}
                   filters={[
@@ -227,7 +261,7 @@
                 </TimelineList>
               {/if}
             </div>
-            <div use:melt={$content("pin")} class="content">
+            <!-- <div use:melt={$content("pin")} class="content">
               {#if $value === "pin"}
                 <LatestEvent
                   queryKey={["pin", userPubkey]}
@@ -261,9 +295,8 @@
                       </div>
                     {/each}
                   </div>
-                </LatestEvent>
-              {/if}
-            </div>
+                </LatestEvent>{/if}
+            </div> -->
             <div use:melt={$content("relays")} class="content">
               {#if $value === "relays"}
                 <LatestEvent
@@ -275,7 +308,6 @@
                       authors: [userPubkey],
                     },
                   ]}
-                  {req}
                   let:event
                 >
                   <div slot="loading" class="p-1">

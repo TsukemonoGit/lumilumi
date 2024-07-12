@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import {
     defaultRelays,
     loginUser,
@@ -82,7 +82,9 @@
   $: if ($data && viewIndex >= 0 && olderEvents) {
     updateViewEvent($data);
   }
-
+  beforeNavigate(() => {
+    $slicedEvent = [];
+  });
   onMount(async () => {
     console.log("onMount");
     const ev: EventPacket[] | undefined = $queryClient.getQueryData([
