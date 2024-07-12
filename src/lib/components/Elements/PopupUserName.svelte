@@ -96,7 +96,8 @@
       case 4:
         $nowProgress = true;
         const key: QueryKey = ["metadata", pubkey];
-        $queryClient.invalidateQueries({ queryKey: key });
+        $queryClient.refetchQueries({ queryKey: key });
+
         setTimeout(() => {
           $nowProgress = false;
         }, 1000);
