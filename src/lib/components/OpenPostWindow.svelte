@@ -157,7 +157,6 @@
     await handleFileUpload(fileList.files);
   };
 
-  $: console.log(selectedUploader);
   $: if (selectedUploader) {
     $uploader = selectedUploader;
   }

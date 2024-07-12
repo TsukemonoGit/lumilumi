@@ -18,6 +18,26 @@ export function contentCheck(
       newTags = newTags.filter((tag) => tag[0] !== "emoji" || tag[1] !== emoji);
     }
   });
+  // 画像タグを抽出
+  const imetaURLRegex = /url\s(.*[^\s])/;
+  const imetaTag = tags.filter((tag) => tag[0] === "imeta");
+  // URL 部分を抽出
+  const imetaURLs = imetaTag
+    .map((tag) => tag.find((item) => imetaURLRegex.test(item)))
+    .filter((urlTag): urlTag is string => !!urlTag)
+    .map((urlTag) => {
+      const match = imetaURLRegex.exec(urlTag);
+      return match ? match[1] : null;
+    })
+    .filter((url): url is string => !!url);
+  // 画像をテキスト内でチェックし、含まれていない場合に削除
+  imetaURLs.forEach((url) => {
+    if (!text.includes(url)) {
+      newTags = newTags.filter(
+        (tag) => tag[0] !== "imeta" || !tag.find((item) => item.includes(url))
+      );
+    }
+  });
 
   // Process NIP-19 matches
 

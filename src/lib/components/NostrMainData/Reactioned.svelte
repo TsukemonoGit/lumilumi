@@ -33,8 +33,9 @@
   });
   const unsubscribe1 = observer1.subscribe((result: any) => {
     if (
-      !_result ||
+      !_result?.data ||
       (result?.data &&
+        result.data.event &&
         result.data.event.created_at > _result.data.event.created_at)
     ) {
       _result = result;
