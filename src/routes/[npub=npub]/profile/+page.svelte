@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
     emojis,
@@ -29,7 +29,7 @@
     splitHexColorString,
   } from "$lib/func/util";
   import { page } from "$app/stores";
-  import type { EventTemplate } from "nostr-tools";
+  import { nip19, type EventTemplate } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
 
@@ -50,17 +50,23 @@
   let lud: string = "";
   let newTags: string[][] = [];
   onMount(async () => {
+    if (!$queryClient) {
+      console.log("error");
+      return;
+    }
     $nowProgress = true;
-    const data: EventPacket | undefined = $queryClient?.getQueryData(key);
-
+    const queryData: EventPacket | undefined = $queryClient.getQueryData(key);
+    if (queryData) {
+      metadata = queryData.event;
+    }
     const ev = await usePromiseReq(
       { queryKey: key, filters, operator },
       undefined
     );
     console.log(ev);
     if (ev && ev.length > 0) {
-      if (data && data.event.created_at > ev[0].event.created_at) {
-        metadata = data.event;
+      if (queryData && queryData.event.created_at > ev[0].event.created_at) {
+        metadata = queryData.event;
       } else {
         metadata = ev[0].event;
       }
@@ -68,6 +74,16 @@
     //metadata = sample2;
     if (!metadata) {
       console.error("failed to get metadata event");
+      $nowProgress = false;
+
+      $toastSettings = {
+        title: "Warning",
+        description: `failed to get metadata event`,
+        color: "bg-orange-500",
+      };
+      setTimeout(() => {
+        goto(`/${nip19.npubEncode(data.pubkey)}`);
+      });
       return;
     }
     newTags = metadata.tags;
