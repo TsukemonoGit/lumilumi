@@ -33,11 +33,8 @@
     // make sure this is called before any
     // window.nostr calls are made
     if (browser) {
-      if (!$app?.rxNostr) {
-        setRxNostr();
-      }
       const nostrLogin = await import("nostr-login");
-      nostrLogin.init({
+      await nostrLogin.init({
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
       });
@@ -48,6 +45,9 @@
 
       const tmp = localStorage.getItem("uploader");
       if (tmp) $uploader = tmp;
+      if (!$app?.rxNostr) {
+        setRxNostr();
+      }
     }
   });
 

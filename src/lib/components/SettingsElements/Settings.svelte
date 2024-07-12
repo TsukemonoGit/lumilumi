@@ -25,6 +25,7 @@
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
   import type { DefaultRelayConfig } from "rx-nostr";
+  import { Save } from "lucide-svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const DELETE_STORAGE_KEY = "relaySettings";
@@ -123,17 +124,23 @@
   }
 
   async function initializeSettings() {
+    //設定がまだないとき
+
+    const nostrLogin = await import("nostr-login");
+    await nostrLogin.init({});
+
     radioGroupSelected.set("0");
     try {
       const gotPubkey = await (
         window?.nostr as Nostr.Nip07.Nostr
       ).getPublicKey();
       if (gotPubkey) {
-        // pubkey.set(gotPubkey);
+        inputPubkey = nip19.npubEncode(gotPubkey);
       }
     } catch (error) {
       console.log(error);
     }
+    originalSettings.set(null);
   }
 
   function addRelay() {
@@ -278,16 +285,16 @@
     }
   }
 
+  //変更があったらtrue
   function settingsChanged(): boolean {
     const currentSettings = createCurrentSettings();
-    if ($originalSettings) {
+    if ($originalSettings !== null) {
       return (
         JSON.stringify($originalSettings) !== JSON.stringify(currentSettings)
       );
     } else {
-      return false;
+      return true;
     }
-    return true;
   }
 
   function handleBeforeUnload(e: BeforeUnloadEvent) {
@@ -529,14 +536,14 @@
     <ThemeSwitch />
   </div>
   <div
-    class="border border-magnum-500 rounded-md flex flex-row items-start gap-4 mt-1 justify-center p-2"
+    class="border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
     <button
-      class=" rounded-md bg-magnum-200 px-3 py-2 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
-      on:click={saveSettings}>SAVE</button
+      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50"
+      on:click={saveSettings}><Save />SAVE</button
     >
     <button
-      class=" rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
       on:click={cancelSettings}>CANCEL</button
     >
   </div>
