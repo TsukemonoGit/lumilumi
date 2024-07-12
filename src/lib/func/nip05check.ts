@@ -26,7 +26,7 @@ export const useNip05Check = (
       }
     },
     staleTime: Infinity,
-    gcTime: 4 * 60 * 60 * 1000,
+    gcTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
