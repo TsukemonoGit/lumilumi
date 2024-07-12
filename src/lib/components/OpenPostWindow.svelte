@@ -167,7 +167,6 @@
   $: if ($open) {
     //開いたときにフォーカス
 
-    console.log(tags);
     textarea?.focus();
   }
 

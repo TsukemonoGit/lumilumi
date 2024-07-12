@@ -5,15 +5,20 @@
 
   import { queryClient } from "$lib/stores/stores";
   import { QueryObserver } from "@tanstack/svelte-query";
+  import type { EventPacket } from "rx-nostr";
 
   export let id: string;
-  let _result: { data: any; status: any; error: any };
+  let _result: { data: EventPacket; status: any; error: any };
 
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", id],
   });
   const unsubscribe1 = observer2.subscribe((result: any) => {
-    if (result?.data) {
+    if (
+      !_result ||
+      (result?.data &&
+        result.data.event.created_at > _result.data.event.created_at)
+    ) {
       _result = result;
     }
   });
