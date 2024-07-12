@@ -8,10 +8,11 @@
     SquareArrowOutUpRight,
     Notebook,
     Smile,
+    Radio,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
@@ -44,6 +45,7 @@
       { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
       { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
       { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+      { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
     ];
   if (note.kind === 30030) {
     menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
@@ -117,6 +119,11 @@
         const emojito = `https://emojito.meme/a/${naddr}`;
 
         window.open(emojito, "_blank", "noreferrer");
+        break;
+
+      case 6:
+        //broadcast
+        publishEvent(note);
         break;
     }
   };

@@ -59,6 +59,7 @@
       <button
         style="width:{width}px "
         on:click={() => {
+          relays = getRelaysById(id);
           viewAll = true;
         }}
         class="hover:opacity-75 active:opacity-50 border border-zinc-600 rounded-sm flex justify-center"

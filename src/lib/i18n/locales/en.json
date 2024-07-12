@@ -65,6 +65,7 @@
       "note": "Copy noteID",
       "naddr": "Copy naddr",
       "nevent": "Copy EventID"
-    }
+    },
+    "broadcast": "broadcast"
   }
 }

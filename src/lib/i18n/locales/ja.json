@@ -65,6 +65,7 @@
       "note": "noteID をコピー",
       "naddr": "naddr をコピー",
       "nevent": "イベントIDをコピー"
-    }
+    },
+    "broadcast": "ブロードキャスト"
   }
 }
