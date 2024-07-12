@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toastSettings } from "$lib/stores/stores";
+  import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -124,6 +124,10 @@
       case 6:
         //broadcast
         publishEvent(note);
+        setTimeout(() => {
+          slicedEvent.update((value) => value);
+          console.log("こうしんしたよ");
+        }, 1000);
         break;
     }
   };
