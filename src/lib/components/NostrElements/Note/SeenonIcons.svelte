@@ -7,6 +7,7 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
   import { getRelaysById } from "$lib/func/nostr";
+  import { onMount } from "svelte";
 
   export let id: string;
   export let width: number;
@@ -17,6 +18,12 @@
   let relays: string[] = [];
   slicedEvent.subscribe(() => {
     relays = getRelaysById(id);
+  });
+  onMount(() => {
+    //でてすぐはちょっとしかリレーないから１秒後にもっかい取得し直してみる
+    setTimeout(() => {
+      relays = getRelaysById(id);
+    }, 1000);
   });
 </script>
 
@@ -59,7 +66,6 @@
       <button
         style="width:{width}px "
         on:click={() => {
-          relays = getRelaysById(id);
           viewAll = true;
         }}
         class="hover:opacity-75 active:opacity-50 border border-zinc-600 rounded-sm flex justify-center"

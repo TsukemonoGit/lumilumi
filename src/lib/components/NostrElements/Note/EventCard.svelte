@@ -14,7 +14,7 @@
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
