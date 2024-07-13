@@ -79,6 +79,11 @@
     open = false;
     customReaction = "";
   };
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      handleClickCustomReaction();
+    }
+  }
 </script>
 
 <Popover bind:open>
@@ -90,6 +95,7 @@
         class="h-10 w-32 rounded-md px-3 py-2 text-magnum-100 border
              {customReactionError ? 'border-red-500' : 'border-neutral-900'}"
         bind:value={customReaction}
+        on:keydown={handleKeyDown}
       />
       <button
         on:click={handleClickCustomReaction}
