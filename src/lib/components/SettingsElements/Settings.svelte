@@ -64,7 +64,7 @@
     const savedSettings = loadSettings();
     console.log(savedSettings);
     if (savedSettings) {
-      settings = savedSettings;
+      settings = { ...settings, ...savedSettings };
       inputPubkey = nip19.npubEncode(settings.pubkey);
     } else {
       initializeSettings();
@@ -78,9 +78,9 @@
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
     $showRelayIcon = settings.showRelayIcon;
-    $mutes = settings.mute?.list ?? undefined;
-    $emojis = settings.emoji?.list ?? [];
-    $mutebykinds = settings.mutebykinds?.list ?? [];
+    $mutes = settings.mute.list;
+    $emojis = settings.emoji.list;
+    $mutebykinds = settings.mutebykinds?.list;
     $defaultReaction = settings.defaultReaction;
     $selectedRelayset = settings.useRelaySet;
     originalSettings.set({ ...settings });
