@@ -1,4 +1,4 @@
-import type { Profile } from "$lib/types";
+import type { LumiSetting, Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
 import { getToken } from "nostr-tools/nip98";
@@ -197,3 +197,28 @@ export function formatUrl(url: string) {
 
   return httpsUrl.endsWith("/") ? httpsUrl : httpsUrl + "/";
 }
+export const initSettings: LumiSetting = {
+  relays: [],
+  useRelaySet: "0",
+  pubkey: "",
+  showPreview: false,
+  defaultReaction: {
+    content: "+",
+    tag: [],
+  },
+  showImg: false,
+  menuleft: false,
+  showRelayIcon: false,
+  emoji: {
+    list: [],
+    updated: 0,
+  },
+  mute: {
+    list: { p: [], word: [], t: [], e: [] },
+    updated: 0,
+  },
+  mutebykinds: {
+    list: [],
+    updated: 0,
+  },
+};

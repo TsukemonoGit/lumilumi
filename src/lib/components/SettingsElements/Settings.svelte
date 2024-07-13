@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
@@ -17,7 +17,7 @@
     defaultReaction,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
-  import { relayRegex } from "$lib/func/util";
+  import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
   import type { LumiSetting, MuteList } from "$lib/types";
   import { _ } from "svelte-i18n";
   import { beforeNavigate } from "$app/navigation";
@@ -28,29 +28,12 @@
   import type { DefaultRelayConfig } from "rx-nostr";
   import { Save } from "lucide-svelte";
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
-
+  let ischange = false;
   const STORAGE_KEY = "lumiSetting";
-
-  const relays = writable<DefaultRelayConfig[]>([]);
-  const radioGroupSelected = writable("0");
-  const pubkey = writable("");
-  const _showImg = writable<boolean>(false);
-  const _showPreview = writable<boolean>(false);
-  const _menu_left = writable<boolean>(false);
-  const _showRelayIcon = writable<boolean>(false);
+  let settings: LumiSetting = { ...initSettings };
   const originalSettings = writable<LumiSetting | null>(null);
 
-  let relayInput: string = "";
-  let muteList: { list: MuteList; updated: number } | undefined = undefined;
-  let mutebykindList:
-    | { list: { kind: number; list: string[] }[]; updated: number }
-    | undefined = undefined;
-  let emojiList: { list: string[][]; updated: number } | undefined = undefined;
-  let _defaultReaction: { content: string; tag: string[] } = {
-    content: "+",
-    tag: [],
-  };
-  let inputPubkey = "";
+  const selectedRelayset = writable<string>();
   // ラジオボタン設定
   const {
     elements: {
@@ -60,9 +43,13 @@
     },
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
-    defaultValue: "0",
-    value: radioGroupSelected,
+    defaultValue: settings.useRelaySet,
+    value: selectedRelayset,
   });
+  $: if ($selectedRelayset && $selectedRelayset.trim() !== "") {
+    console.log($selectedRelayset);
+    settings.useRelaySet = $selectedRelayset;
+  }
   const optionsArr = ["0", "1"];
   const optionsArrStr = [
     $_("settings.relayMenuText0"),
@@ -77,10 +64,22 @@
     const savedSettings = loadSettings();
     console.log(savedSettings);
     if (savedSettings) {
-      applySettings(savedSettings);
+      settings = savedSettings;
+      inputPubkey = nip19.npubEncode(settings.pubkey);
     } else {
       initializeSettings();
     }
+    $loginUser = settings.pubkey;
+    $showImg = settings.showImg;
+    $showPreview = settings.showPreview;
+    $menuLeft = settings.menuleft;
+    $showRelayIcon = settings.showRelayIcon;
+    $mutes = settings.mute.list;
+    $emojis = settings.emoji.list;
+    $mutebykinds = settings.mutebykinds.list;
+    $defaultReaction = settings.defaultReaction;
+    $selectedRelayset = settings.useRelaySet;
+    originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
 
@@ -90,56 +89,13 @@
     return savedSettings ? JSON.parse(savedSettings) : null;
   }
 
-  function applySettings(settings: LumiSetting) {
-    const {
-      relays: savedRelays,
-      useRelaySet: savedRelaySet,
-      pubkey: savedPubkey,
-      showImg: savedShowImg,
-      menuleft: savedMenuLeft,
-      showRelayIcon: savedShowRelayIcon,
-      showPreview: savedShowPreview,
-      mute: savedMute,
-      emoji: savedEmoji,
-      mutebykinds: savedMutebykinds,
-      defaultReaction: savedDefaultReaction,
-    } = settings;
-    relays.set(savedRelays);
-    radioGroupSelected.set(savedRelaySet);
-    pubkey.set(savedPubkey);
-    inputPubkey = nip19.npubEncode(savedPubkey);
-    if (savedShowImg) {
-      _showImg.set(savedShowImg);
-      $showImg = savedShowImg;
-    }
-    if (savedShowPreview) _showPreview.set(savedShowPreview);
-    if (savedMenuLeft) _menu_left.set(savedMenuLeft);
-    if (savedShowRelayIcon) _showRelayIcon.set(savedShowRelayIcon);
-
-    if (savedMute) muteList = savedMute;
-
-    if (savedEmoji) {
-      emojiList = savedEmoji;
-      $emojis = emojiList.list;
-    }
-    if (savedMutebykinds?.list) {
-      mutebykindList = {
-        list: JSON.parse(savedMutebykinds.list),
-        updated: savedMutebykinds.updated,
-      };
-      mutebykinds.set(mutebykindList.list);
-    }
-    if (savedDefaultReaction) _defaultReaction = savedDefaultReaction;
-    originalSettings.set(settings);
-  }
-
   async function initializeSettings() {
     //設定がまだないとき
     if (browser) {
       const nostrLogin = await import("nostr-login");
       await nostrLogin.init({});
     }
-    radioGroupSelected.set("0");
+
     try {
       const gotPubkey = await (
         window?.nostr as Nostr.Nip07.Nostr
@@ -150,9 +106,8 @@
     } catch (error) {
       console.log(error);
     }
-    originalSettings.set(null);
   }
-
+  let relayInput: string = "";
   function addRelay() {
     if (!relayInput) return;
     let input = relayInput.trim();
@@ -160,16 +115,16 @@
       input += "/";
     }
     if (relayRegex.test(input)) {
-      relays.update((current) => [
-        ...current,
+      settings.relays = [
+        ...settings.relays,
         { url: input, read: true, write: true },
-      ]);
+      ];
       relayInput = "";
     }
   }
 
   function removeRelay(index: number) {
-    relays.update((current) => current.filter((_, i) => i !== index));
+    settings.relays.filter((_, i) => i !== index);
   }
 
   function saveSettings() {
@@ -177,7 +132,7 @@
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return;
 
-    const settings: LumiSetting = createCurrentSettings();
+    createCurrentSettings();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
     toastSettings.set({
@@ -186,23 +141,22 @@
       color: "bg-green-500",
     });
 
-    $loginUser = $pubkey;
-    $showImg = $_showImg;
-    $showPreview = $_showPreview;
-    $menuLeft = $_menu_left;
-    $showRelayIcon = $_showRelayIcon;
-    if (muteList) mutes.set(muteList.list);
-    if (emojiList) {
-      emojis.set(emojiList.list);
-    }
-    if (mutebykindList) mutebykinds.set(mutebykindList.list);
-    if (_defaultReaction) defaultReaction.set(_defaultReaction);
-    originalSettings.set(settings);
+    $loginUser = settings.pubkey;
+    $showImg = settings.showImg;
+    $showPreview = settings.showPreview;
+    $menuLeft = settings.menuleft;
+    $showRelayIcon = settings.showRelayIcon;
+    $mutes = settings.mute.list;
+    $emojis = settings.emoji.list;
+    $mutebykinds = settings.mutebykinds.list;
+    $defaultReaction = settings.defaultReaction;
+
+    originalSettings.set({ ...settings });
   }
 
   function isRelaySelectionInvalid() {
-    if ($radioGroupSelected === "1") {
-      const currentRelays = $relays;
+    if (settings.useRelaySet === "1") {
+      const currentRelays = settings.relays;
       const hasRead = currentRelays.some((relay) => relay.read);
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
@@ -218,16 +172,16 @@
   }
 
   function isPubkeyValid() {
-    if (!inputPubkey) {
+    if (!npubRegex.test(inputPubkey)) {
       toastSettings.set({
         title: "Error",
-        description: "error pubkey",
+        description: `${$_("settings.toast.pubkeyError")}`,
         color: "bg-red-500",
       });
       return false;
     }
     try {
-      pubkey.set(nip19.decode(inputPubkey).data as string);
+      settings.pubkey = nip19.decode(inputPubkey).data as string;
     } catch (error) {
       console.log(error);
       toastSettings.set({
@@ -240,43 +194,25 @@
     return true;
   }
 
-  function createCurrentSettings(): LumiSetting {
+  let inputPubkey: string;
+
+  function createCurrentSettings() {
     let pub: string = "";
     try {
       pub = nip19.decode(inputPubkey).data as string;
+      settings.pubkey = pub;
     } catch (error) {
       console.log(error);
     }
-    const settings: LumiSetting = {
-      relays: $relays,
-      useRelaySet: $radioGroupSelected,
-      pubkey: pub,
-      showImg: $_showImg,
-      showPreview: $_showPreview,
-      menuleft: $_menu_left,
-      showRelayIcon: $_showRelayIcon,
-      defaultReaction: _defaultReaction,
-    };
-    if (muteList && muteList.updated !== undefined) {
-      settings.mute = muteList;
-    }
-    if (emojiList && emojiList.updated !== undefined) {
-      settings.emoji = emojiList;
-    }
-    if (mutebykindList) {
-      settings.mutebykinds = {
-        list: JSON.stringify(mutebykindList.list),
-        updated: mutebykindList.updated,
-      };
-    }
-    return settings;
   }
 
   function cancelSettings() {
     console.log("cancel");
     const savedSettings = loadSettings();
+    settings = { ...initSettings };
     if (savedSettings) {
-      applySettings(savedSettings);
+      settings = savedSettings;
+      inputPubkey = nip19.npubEncode(settings.pubkey);
       toastSettings.set({
         title: "Warning",
         description: `${$_("settings.toast.resetData")}`,
@@ -300,14 +236,38 @@
 
   //変更があったらtrue
   function settingsChanged(): boolean {
-    const currentSettings = createCurrentSettings();
-    if ($originalSettings !== null) {
-      return (
-        JSON.stringify($originalSettings) !== JSON.stringify(currentSettings)
-      );
-    } else {
+    const changedFields: string[] = [];
+    if (!$originalSettings) {
       return true;
     }
+    const currentSettings = { ...settings };
+    try {
+      currentSettings.pubkey = nip19.decode(inputPubkey).data as string;
+    } catch (error) {
+      return true;
+    }
+    console.log("currentSettings", currentSettings);
+    console.log("$originalSettings", $originalSettings);
+    // オリジナル設定のプロパティをループ
+    for (const key in $originalSettings) {
+      if ($originalSettings.hasOwnProperty(key) && key in currentSettings) {
+        if (
+          $originalSettings[key as keyof LumiSetting] !==
+          currentSettings[key as keyof LumiSetting]
+        ) {
+          changedFields.push(key as keyof LumiSetting);
+        }
+      } else {
+        return true;
+      }
+    }
+
+    if (changedFields.length > 0) {
+      console.log("Changed fields:", changedFields);
+      return true;
+    }
+
+    return false;
   }
 
   function handleBeforeUnload(e: BeforeUnloadEvent) {
@@ -340,7 +300,7 @@
 
   $: if (emojiTag && emojiTag.length > 0) {
     console.log(emojiTag);
-    _defaultReaction = {
+    settings.defaultReaction = {
       content: `:${emojiTag[0]}:`,
       tag: ["emoji", ...emojiTag],
     };
@@ -348,7 +308,7 @@
   const handleClickOk = () => {
     console.log(customString);
     if (customString) {
-      _defaultReaction = { content: customString, tag: [] };
+      settings.defaultReaction = { content: customString, tag: [] };
     }
   };
 </script>
@@ -406,9 +366,9 @@
 
     <!-- リレー設定 -->
 
-    {#if $radioGroupSelected === "1"}
+    {#if settings.useRelaySet === "1"}
       <div class="w-fit ml-8">
-        {#each $relays as relay, index}
+        {#each settings.relays as relay, index}
           <hr />
           <div class="flex gap-4 my-1">
             <div>{relay.url}</div>
@@ -478,17 +438,17 @@
         {handleClickOk}
         bind:emoji={emojiTag}
         bind:customReaction={customString}
-      />{#if _defaultReaction.tag.length > 0}
+      />{#if settings.defaultReaction.tag.length > 0}
         {#if $showImg}
           <img
             loading="lazy"
             class="h-4 object-contain justify-self-center"
-            src={_defaultReaction.tag[2]}
-            alt={_defaultReaction.tag[1]}
-            title={_defaultReaction.tag[1]}
-          />{:else}{_defaultReaction.tag[1]}{/if}
-      {:else if _defaultReaction.content}
-        {_defaultReaction.content}
+            src={settings.defaultReaction.tag[2]}
+            alt={settings.defaultReaction.tag[1]}
+            title={settings.defaultReaction.tag[1]}
+          />{:else}{settings.defaultReaction.tag[1]}{/if}
+      {:else if settings.defaultReaction.content}
+        {settings.defaultReaction.content}
       {/if}
     </div>
   </div>
@@ -500,7 +460,7 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
-          bind:checked={$_showImg}
+          bind:checked={settings.showImg}
         />
         {$_("settings.display.loadImage")}
       </label>
@@ -508,7 +468,7 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
-          bind:checked={$_showPreview}
+          bind:checked={settings.showPreview}
         />
         {$_("settings.display.preview")}
       </label>
@@ -516,7 +476,7 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
-          bind:checked={$_menu_left}
+          bind:checked={settings.menuleft}
         />
         {$_("settings.display.menu")}
       </label>
@@ -524,7 +484,7 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
-          bind:checked={$_showRelayIcon}
+          bind:checked={settings.showRelayIcon}
         />
         {$_("settings.display.showRelayIcon")}
       </label>
@@ -537,7 +497,10 @@
     </div>
     <!--mute-->
     <div class="mt-2">
-      <UpdateMuteList bind:pubkey={$pubkey} bind:muteList />
+      <UpdateMuteList
+        bind:pubkey={settings.pubkey}
+        bind:muteList={settings.mute}
+      />
     </div>
     {#if $loginUser}
       <a
@@ -553,7 +516,10 @@
     {/if}
     <!--mute by kind-->
     <div class="mt-2">
-      <UpdateMutebykindList bind:pubkey={$pubkey} bind:mutebykindList />
+      <UpdateMutebykindList
+        bind:pubkey={settings.pubkey}
+        bind:mutebykindList={settings.mutebykinds}
+      />
     </div>
     {#if $loginUser}
       <a
@@ -568,7 +534,10 @@
     {/if}
     <!--emoji-->
     <div class="mt-4">
-      <UpdateEmojiList bind:pubkey={$pubkey} bind:emojiList />
+      <UpdateEmojiList
+        bind:pubkey={settings.pubkey}
+        bind:emojiList={settings.emoji}
+      />
     </div>
     {#if $loginUser}
       <a

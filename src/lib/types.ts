@@ -90,19 +90,19 @@ export interface LumiSetting {
   relays: DefaultRelayConfig[];
   useRelaySet: string;
   pubkey: string;
-  showImg?: boolean;
+  showImg: boolean;
   showPreview: boolean;
-  menuleft?: boolean;
-  showRelayIcon?: boolean;
-  emoji?: {
+  menuleft: boolean;
+  showRelayIcon: boolean;
+  emoji: {
     list: string[][];
     updated: number; //最後に同期した日付
   };
-  mute?: {
+  mute: {
     list: MuteList;
     updated: number; //最終同期日時};
   };
-  mutebykinds?: { list: string; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
+  mutebykinds: { list: { kind: number; list: string[] }[]; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
   defaultReaction: { content: string; tag: string[] };
 }
 export interface MuteList {

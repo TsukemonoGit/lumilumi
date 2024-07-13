@@ -4,7 +4,8 @@
     "relayMenuText1": "Use relays you set up.",
     "toast": {
       "relayError": "The list of relays must include at least one read and one writeable relay.",
-      "resetData": "Settings have been reset."
+      "resetData": "Settings have been reset.",
+      "pubkeyError": "Check the pubkey you entered"
     },
     "beforeUnload": {
       "message": "Changed settings are not saved. Would you like to leave the page?"
