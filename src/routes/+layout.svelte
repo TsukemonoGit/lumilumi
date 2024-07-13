@@ -21,6 +21,7 @@
   import { setTheme } from "$lib/func/settings";
   import type { Theme } from "$lib/types";
   import Toast from "$lib/components/Elements/Toast.svelte";
+  //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";

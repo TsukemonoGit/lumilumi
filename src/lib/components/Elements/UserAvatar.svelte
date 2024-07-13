@@ -34,7 +34,7 @@
   <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
     ><Avatar
       {size}
-      {name}
+      name={pubkey}
       variant="beam"
       colors={pubkey ? splitHexColorString(pubkey) : undefined}
       {square}

@@ -324,7 +324,12 @@
       </div>
 
       <hr />
-      <Content text={note.content} tags={note.tags} />
+      <div
+        class="mt-0.5 overflow-y-auto overflow-x-hidden"
+        style="max-height:{maxHeight ?? 'none'}"
+      >
+        <Content text={note.content} tags={note.tags} />
+      </div>
       {#if displayMenu}<NoteActionButtons {note} />{/if}
 
       <!--   -->

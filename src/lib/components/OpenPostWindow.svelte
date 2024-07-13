@@ -260,7 +260,7 @@
           aria-label="close"
           class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
                 items-center justify-center rounded-full text-magnum-800 bg-magnum-100
-                hover:bg-magnum-100/75 focus:shadow-magnum-400"
+                hover:bg-magnum-100/75 active:shadow-magnum-400"
         >
           <X size={32} />
         </button>
@@ -326,7 +326,7 @@
                   viewCustomEmojis = !viewCustomEmojis;
                 }}
                 class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 focus:opacity-50"
+                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
               >
                 <SmilePlus
                   size="20"
@@ -339,7 +339,7 @@
 
             <button
               class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 focus:opacity-50"
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50"
               on:click={postNote}
             >
               <Send size="20" />
