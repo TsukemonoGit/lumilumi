@@ -677,8 +677,8 @@
             {#if $additionalReplyUsers.includes(replyuser)}
               <button
                 class=" inline-flex h-6 w-6 appearance-none align-middle
-                   rounded-full p-1 text-magnum-800
-                  hover:bg-magnum-100 focus:shadow-magnum-400"
+                   rounded-full p-1 text-magnum-800 bg-magnum-100
+                  hover:bg-magnum-300 focus:shadow-magnum-400"
                 on:click={() => {
                   additionalReplyUsers.update((users) => {
                     users.splice(index, 1);
@@ -707,8 +707,9 @@
 
       <button
         class="ml-auto inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
+                items-center justify-center rounded-full p-1 text-magnum-800 bg-magnum-100
+                  hover:bg-magnum-300
+                 focus:shadow-magnum-400"
         on:click={() => {
           openReplyWindow = false;
         }}
@@ -843,8 +844,8 @@
         {#if addusers}
           <button
             class=" inline-flex h-6 w-6 appearance-none align-middle
-                   rounded-full p-1 text-magnum-800
-                  hover:bg-magnum-100 focus:shadow-magnum-400"
+                   rounded-full p-1 text-magnum-800 bg-magnum-100
+                  hover:bg-magnum-300 focus:shadow-magnum-400"
             on:click={() => {
               addusers = false;
             }}
@@ -865,8 +866,9 @@
 
       <button
         class="ml-auto inline-flex h-6 w-6 appearance-none
-            items-center justify-center rounded-full p-1 text-magnum-800
-            hover:bg-magnum-100 focus:shadow-magnum-400"
+            items-center justify-center rounded-full p-1 text-magnum-800 bg-magnum-100
+                  hover:bg-magnum-300
+           focus:shadow-magnum-400"
         on:click={() => {
           openQuoteWindow = false;
         }}

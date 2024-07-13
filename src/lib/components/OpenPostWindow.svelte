@@ -200,12 +200,19 @@
     }
   };
   const keyboardShortcut = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && $open === true) {
       // Esc キーが押された場合
       $open = false;
       return;
     }
-    if (event.key === "n" && $open === false) {
+
+    const activeElement = document.activeElement;
+    if (
+      event.key === "n" &&
+      $open === false &&
+      !(activeElement instanceof HTMLInputElement) &&
+      !(activeElement instanceof HTMLTextAreaElement)
+    ) {
       $open = true;
       return;
     }

@@ -111,20 +111,20 @@
       }
     }
   }
-  let openPostWindow: {
-    update: (
-      updater: import("svelte/store").Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: import("svelte/store").Subscriber<boolean>,
-      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-    ): import("svelte/store").Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  // let openPostWindow: {
+  //   update: (
+  //     updater: import("svelte/store").Updater<boolean>,
+  //     sideEffect?: ((newValue: boolean) => void) | undefined
+  //   ) => void;
+  //   set: (this: void, value: boolean) => void;
+  //   subscribe(
+  //     this: void,
+  //     run: import("svelte/store").Subscriber<boolean>,
+  //     invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+  //   ): import("svelte/store").Unsubscriber;
+  //   get: () => boolean;
+  //   destroy?: (() => void) | undefined;
+  // };
 
   //$: console.log($queryClient.getQueriesData(filter));
 </script>

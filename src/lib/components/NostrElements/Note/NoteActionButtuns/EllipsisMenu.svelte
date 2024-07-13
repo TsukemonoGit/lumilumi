@@ -56,7 +56,7 @@
   }
 
   const handleSelectItem = async (index: number) => {
-    console.log(menuTexts[index]);
+    //  console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: getRelaysById(note.id),
