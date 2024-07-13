@@ -30,7 +30,7 @@
       {#if $showImg && channelData.picture}
         <UserAvatar
           url={channelData.picture}
-          name={channelData.name ?? ""}
+          name={id}
           pubkey={id}
           {size}
           square={true}

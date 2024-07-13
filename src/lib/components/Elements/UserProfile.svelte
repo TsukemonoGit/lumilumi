@@ -66,7 +66,7 @@
             {#if $showImg && prof.picture && prof.picture !== ""}
               <UserAvatar
                 url={prof.picture}
-                name={prof.name ?? ""}
+                name={pubkey}
                 {pubkey}
                 size={iconSize}
               />

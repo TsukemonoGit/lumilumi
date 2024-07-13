@@ -118,7 +118,7 @@
 
 <Popover>
   {#if $showImg && url && url !== ""}
-    <UserAvatar {url} name={name ?? ""} {pubkey} {size} />
+    <UserAvatar url={pubkey} name={pubkey} {pubkey} {size} />
   {:else}
     <Avatar
       {size}
