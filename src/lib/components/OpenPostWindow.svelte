@@ -44,7 +44,6 @@
   });
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
-  export { open };
 
   const postNote = async () => {
     if (text.trim().length > 0) {
@@ -193,8 +192,27 @@
       $open = false;
     }
   };
+
+  // キーボードショートカットの処理
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === "Enter") {
+      postNote();
+    }
+  };
+  const keyboardShortcut = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      // Esc キーが押された場合
+      $open = false;
+      return;
+    }
+    if (event.key === "n" && $open === false) {
+      $open = true;
+      return;
+    }
+  };
 </script>
 
+<svelte:window on:keyup={keyboardShortcut} on:keydown={handleKeyDown} />
 <button
   use:melt={$trigger}
   class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3.5

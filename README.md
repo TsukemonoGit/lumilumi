@@ -53,3 +53,11 @@ https://github.com/akiomik/nosvelte
 - settings
 
 - profile
+
+#### キーボードショートカット
+
+- n キーで ノート入力画面を開く
+
+- ノート入力画面で
+  - Ctrl+Enter キー で投稿
+  - Esc キー で入力画面を閉じる

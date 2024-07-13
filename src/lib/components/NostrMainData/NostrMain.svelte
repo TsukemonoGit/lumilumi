@@ -8,7 +8,6 @@
     mutes,
     showImg,
     showPreview,
-    openPostWindow,
     showRelayIcon,
     defaultReaction,
   } from "$lib/stores/stores";
@@ -106,12 +105,26 @@
 
     if (savedMutebykinds && savedMutebykinds.list) {
       try {
-        $mutebykinds = JSON.parse(savedMutebykinds.list);
+        $mutebykinds = savedMutebykinds.list;
       } catch (error) {
         console.log(error);
       }
     }
   }
+  let openPostWindow: {
+    update: (
+      updater: import("svelte/store").Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: import("svelte/store").Subscriber<boolean>,
+      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+    ): import("svelte/store").Unsubscriber;
+    get: () => boolean;
+    destroy?: (() => void) | undefined;
+  };
 
   //$: console.log($queryClient.getQueriesData(filter));
 </script>
@@ -126,7 +139,7 @@
 
 {#if display}
   <div class="postWindow">
-    <OpenPostWindow {options} open={openPostWindow} />
+    <OpenPostWindow {options} />
   </div>
 {/if}
 
