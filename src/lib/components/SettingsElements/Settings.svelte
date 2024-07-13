@@ -69,14 +69,18 @@
     } else {
       initializeSettings();
     }
+    settings.defaultReaction = settings.defaultReaction ?? {
+      content: "+",
+      tag: [],
+    };
     $loginUser = settings.pubkey;
     $showImg = settings.showImg;
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
     $showRelayIcon = settings.showRelayIcon;
-    $mutes = settings.mute.list;
-    $emojis = settings.emoji.list;
-    $mutebykinds = settings.mutebykinds.list;
+    $mutes = settings.mute?.list ?? undefined;
+    $emojis = settings.emoji?.list ?? [];
+    $mutebykinds = settings.mutebykinds?.list ?? [];
     $defaultReaction = settings.defaultReaction;
     $selectedRelayset = settings.useRelaySet;
     originalSettings.set({ ...settings });
@@ -438,7 +442,7 @@
         {handleClickOk}
         bind:emoji={emojiTag}
         bind:customReaction={customString}
-      />{#if settings.defaultReaction.tag.length > 0}
+      />{#if settings.defaultReaction?.tag?.length > 0}
         {#if $showImg}
           <img
             loading="lazy"
@@ -447,7 +451,7 @@
             alt={settings.defaultReaction.tag[1]}
             title={settings.defaultReaction.tag[1]}
           />{:else}{settings.defaultReaction.tag[1]}{/if}
-      {:else if settings.defaultReaction.content}
+      {:else if settings.defaultReaction?.content}
         {settings.defaultReaction.content}
       {/if}
     </div>
