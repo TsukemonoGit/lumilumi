@@ -60,4 +60,4 @@ https://github.com/akiomik/nosvelte
 
 - ノート入力画面で
   - Ctrl+Enter キー で投稿
-  - Esc キー で入力画面を閉じる
+  - Esc キー( 多分 2 回入力くらい) で入力画面を閉じる

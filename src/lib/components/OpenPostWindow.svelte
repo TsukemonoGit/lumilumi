@@ -41,6 +41,8 @@
   const { elements, states } = createDialog({
     forceVisible: true,
     closeOnOutsideClick: false, //overlay押したときに閉じない
+
+    escapeBehavior: "ignore",
   });
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
@@ -83,7 +85,7 @@
   };
 
   const handleClickEmoji = (e: string[]) => {
-    const emojiTag = ["emoji", ...e];
+    const emojiTag: string[] = ["emoji", ...e];
     if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
       tags.push(emojiTag);
     }
@@ -164,8 +166,10 @@
 
   $: if ($open) {
     //開いたときにフォーカス
-
-    textarea?.focus();
+    if (textarea) {
+      textarea.focus();
+      textareaFocus = true;
+    }
   }
 
   //Close確認用
@@ -180,7 +184,10 @@
       portalled: portalledConfirm,
     },
     states: { open: openConfirm },
-  } = createDialog({ forceVisible: true, closeOnOutsideClick: false }); //overlay押したときに閉じない});
+  } = createDialog({
+    forceVisible: true,
+    closeOnOutsideClick: false,
+  }); //overlay押したときに閉じない});
 
   // オーバーレイクリック時の処理を追加
   const handleOverlayClick = (event: MouseEvent) => {
@@ -199,14 +206,19 @@
       postNote();
     }
   };
+
+  let textareaFocus = false;
   const keyboardShortcut = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && $open === true) {
-      // Esc キーが押された場合
-      $open = false;
-      return;
+    event.preventDefault();
+    const activeElement = document.activeElement;
+    if ($open === true && event.key === "Escape") {
+      if (textareaFocus) {
+        textareaFocus = false;
+      } else {
+        $open = false;
+      }
     }
 
-    const activeElement = document.activeElement;
     if (
       event.key === "n" &&
       $open === false &&
@@ -276,6 +288,9 @@
             id="note"
             bind:this={textarea}
             bind:value={text}
+            on:focus={() => {
+              textareaFocus = true;
+            }}
             on:input={handleTextareaInput}
             on:click={handleTextareaInput}
             on:touchend={handleTextareaInput}
