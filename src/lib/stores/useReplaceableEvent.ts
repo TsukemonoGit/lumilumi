@@ -36,11 +36,6 @@ export function useReplaceableEvent(
 ): ReqResult<EventPacket> {
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
-  const operator = pipe(
-    filterByKind(kind),
-    filterPubkey(pubkey),
-
-    latest()
-  );
+  const operator = pipe(latest());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
 }
