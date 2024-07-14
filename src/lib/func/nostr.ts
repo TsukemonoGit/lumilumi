@@ -125,14 +125,20 @@ const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
         data.event.created_at > savedMetadata[existingIndex][1].event.created_at
       ) {
         savedMetadata[existingIndex] = [key, data];
+        get(queryClient).setQueryData(key, (oldData: any) => data);
+      } else {
+        //保存されてるMetadataの方をクエリーにセットしてみる
+        get(queryClient).setQueryData(
+          key,
+          (oldData: any) => savedMetadata[existingIndex][1]
+        );
       }
     } else {
       // 保存されていない場合、新しいデータを追加する
       savedMetadata.push([key, data]);
+      get(queryClient).setQueryData(key, (oldData: any) => data);
     }
-    get(queryClient).setQueryData(key, (oldData: any) => data, {
-      updatedAt: Infinity,
-    });
+    //get(queryClient).setQueryData(key, (oldData: any) => data);
     metadataChanged = true;
   }
 };
