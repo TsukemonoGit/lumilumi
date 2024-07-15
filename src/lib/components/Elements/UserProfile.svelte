@@ -5,7 +5,6 @@
   import { loginUser, showImg } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
-  import { beforeNavigate, goto } from "$app/navigation";
   import Nip05Check from "../NostrMainData/Nip05Check.svelte";
   import Link from "./Link.svelte";
   import FollowButton from "../NostrElements/Note/FollowButton.svelte";
@@ -14,30 +13,12 @@
   import Avatar from "svelte-boring-avatars";
   import UserZap from "./UserZap.svelte";
   import ProfileEditButton from "./ProfileEditButton.svelte";
-  import {
-    BookHeart,
-    Copy,
-    ExternalLink,
-    FileJson2,
-    FolderHeart,
-    Pin,
-    RadioTower,
-    RefreshCcw,
-    Share2,
-  } from "lucide-svelte";
+
+  import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
   export let iconSize: number = 80;
-  beforeNavigate(() => {});
-
-  const handleClickReactions = () => {
-    try {
-      goto(`/${nip19.npubEncode(pubkey)}/reactions`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
@@ -106,9 +87,11 @@
           <div class="sm:text-xl text-md font-bold break-all">
             {prof.display_name ?? ""}@{prof.name}
           </div>
-          {#if prof.lud16 || prof.lud06}
-            <div class=" w-fit"><UserZap {metadata} /></div>
-          {/if}
+          <div class="flex ml-auto gap-2">
+            {#if prof.lud16 || prof.lud06}
+              <div class=" w-fit"><UserZap {metadata} /></div>
+            {/if}<UserPofileEllipsis {metadata} {prof} />
+          </div>
         </div>
         {#if prof.nip05}
           <div class="text-sm flex break-all">
