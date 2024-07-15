@@ -287,7 +287,7 @@
     {/if}
   {:else if note.kind === 0}
     <!--kind0-->
-    <Kind0Note {note} />
+    <Kind0Note {note} {proxy} />
   {:else if note.kind === 40}
     <!--kind42 パブ茶部屋-->
   {:else if note.kind === 42}

@@ -5,8 +5,10 @@
   import Content from "./Content.svelte";
   import FollowButton from "./FollowButton.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
   export let note: Nostr.Event;
+  export let proxy: string[] | undefined = undefined;
 </script>
 
 <div class={"grid grid-cols-[auto_1fr]"}>
@@ -21,12 +23,18 @@
           >@{profile(note)?.name}</span
         >
       </div>
-
-      <FollowButton pubkey={note.pubkey} />
+      <div class="ml-auto">
+        <FollowButton pubkey={note.pubkey} />
+      </div>
     </div>
     <hr />
     <div class=" max-h-48 overflow-y-auto">
       <Content text={profile(note)?.about ?? ""} tags={note.tags} />
     </div>
+    {#if proxy}
+      <div class="text-end">
+        <ProxyTag proxyTag={proxy} />
+      </div>
+    {/if}
   </div>
 </div>
