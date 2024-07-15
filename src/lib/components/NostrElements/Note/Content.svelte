@@ -69,9 +69,11 @@
 
 {#each parts as part}
   {#if part.type === "nip19"}
-    {#await nip19Decode(part.content) then decoded}
+    {#await nip19Decode(part.url) then decoded}
       {#if decoded}
         <DecodedContent {decoded} content={part.content} />
+      {:else}
+        {part.content}
       {/if}
     {/await}
   {:else if part.type === "url" && part.content}

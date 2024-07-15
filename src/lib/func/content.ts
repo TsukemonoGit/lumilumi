@@ -111,7 +111,11 @@ export function parseText(input: string, tags: string[][]): Part[] {
 
     switch (type) {
       case "nip19":
-        parts.push({ type: "nip19", content: match?.[0].slice(6) }); // Remove "nostr:" prefix
+        parts.push({
+          type: "nip19",
+          content: match?.[0],
+          url: match?.[0].slice(6),
+        }); // Remove "nostr:" prefix
         break;
       case "url":
         parts.push({ type: "url", content: match?.[0] });
