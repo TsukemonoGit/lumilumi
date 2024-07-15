@@ -15,7 +15,8 @@
       "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する",
       "kind10000": "NostViewstr で MuteList ( kind:10000 ) を編集する",
       "kind30007": "NostViewstr で Mute by kind( kind:30007 ) を編集する",
-      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する"
+      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する",
+      "kind10001": "Pinを編集"
     },
     "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
     "display": {
@@ -66,8 +67,14 @@
       "pubkey": "公開鍵をコピー",
       "note": "noteID をコピー",
       "naddr": "naddr をコピー",
-      "nevent": "イベントIDをコピー"
+      "nevent": "イベントIDをコピー",
+      "relayURL": "リレーURLをコピー"
     },
-    "broadcast": "ブロードキャスト"
+    "broadcast": "ブロードキャスト",
+    "open": {
+      "relayHtml": "リレーのサイトを開く"
+    },
+    "nostr-watch": "nostr.watch で開く",
+    "nostrrr": "Nostrrr で開く"
   }
 }

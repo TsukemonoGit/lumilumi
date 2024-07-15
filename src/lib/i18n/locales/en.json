@@ -15,7 +15,8 @@
       "kind30002": "Edit Relay Sets (kind:30002) in NostViewstr",
       "kind10000": "Edit Mute list (kind:10000) in NostViewstr",
       "kind30007": "Edit Mute by kind (kind:30007) in NostViewstr",
-      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr"
+      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr",
+      "kind10001": "Edit Pin"
     },
     "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
@@ -66,8 +67,14 @@
       "pubkey": "Copy pubkey",
       "note": "Copy noteID",
       "naddr": "Copy naddr",
-      "nevent": "Copy EventID"
+      "nevent": "Copy EventID",
+      "relayURL": "Copy relayURL"
     },
-    "broadcast": "broadcast"
+    "broadcast": "broadcast",
+    "open": {
+      "relayHtml": "Open relay site"
+    },
+    "nostr-watch": "Open in nostr.watch",
+    "nostrrr": "Open in Nostrrr"
   }
 }

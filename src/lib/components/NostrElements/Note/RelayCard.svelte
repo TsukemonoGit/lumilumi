@@ -1,10 +1,19 @@
 <script lang="ts">
   import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
-  import { showImg } from "$lib/stores/stores";
-  import { Ellipsis, FileJson2 } from "lucide-svelte";
+  import { showImg, toastSettings } from "$lib/stores/stores";
+  import {
+    Copy,
+    Ellipsis,
+    ExternalLink,
+    FileJson2,
+    SquareArrowOutUpRight,
+  } from "lucide-svelte";
+  import { nip19 } from "nostr-tools";
   import Avatar from "svelte-boring-avatars";
+  import { _ } from "svelte-i18n";
 
   export let url: string;
   export let write: boolean;
@@ -13,6 +22,93 @@
   let imageLoaded = true;
   let dialogOpen: any;
   let size = 48;
+
+  let menuTexts = [
+    { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
+    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+    {
+      text: `${$_("menu.open.relayHtml")}`,
+      icon: SquareArrowOutUpRight,
+      num: 4,
+    },
+
+    { text: `${$_("menu.nostr-watch")}`, icon: SquareArrowOutUpRight, num: 1 },
+    { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
+  ];
+
+  const handleSelectItem = async (index: number) => {
+    try {
+      const encodedrelay = nip19.nrelayEncode(url);
+      const hostname = new URL(url).hostname;
+
+      switch (menuTexts[index].num) {
+        case 0:
+          //view json
+          $dialogOpen = true;
+          break;
+
+        case 1:
+          //nostrWatch
+
+          window.open(
+            `https://nostr.watch/relay/${hostname}`,
+            "_blank",
+            "noreferrer"
+          );
+          //`https://nostrrr.com/relay/${html.hostname}`,
+          // `https://nostr.watch/relay/${html.hostname}`,
+          //const njumpURL = `https://njump.me/${encodedrelay}`;
+
+          //  window.open(njumpURL, "_blank", "noreferrer");
+          break;
+        case 2:
+          //nostrrr
+
+          window.open(
+            `https://nostrrr.com/relay/${hostname}`,
+            "_blank",
+            "noreferrer"
+          );
+          //`https://nostrrr.com/relay/${html.hostname}`,
+          // `https://nostr.watch/relay/${html.hostname}`,
+          //const njumpURL = `https://njump.me/${encodedrelay}`;
+
+          //  window.open(njumpURL, "_blank", "noreferrer");
+          break;
+        case 3:
+          //Copy relayURL
+          try {
+            await navigator.clipboard.writeText(url);
+            $toastSettings = {
+              title: "Success",
+              description: `Copied to clipboard`,
+              color: "bg-green-500",
+            };
+          } catch (error: any) {
+            console.error(error.message);
+            $toastSettings = {
+              title: "Error",
+              description: "Failed to copy",
+              color: "bg-orange-500",
+            };
+          }
+          break;
+        case 4:
+          //open relay site
+
+          window.open(formatUrl(url), "_blank", "noreferrer");
+
+          break;
+      }
+    } catch (error) {
+      console.log("relay encode error");
+      $toastSettings = {
+        title: "Error",
+        description: "relay encode error",
+        color: "bg-orange-500",
+      };
+    }
+  };
 </script>
 
 {#await relayInfoFun(url)}
@@ -66,21 +162,17 @@
               </div>
             {/if}
             <div class="ml-auto">
-              <button
-                class="text-magnum-400 hover:opacity-75 active:opacity-50 p-1"
-                on:click={() => ($dialogOpen = true)}
-                ><FileJson2 size="20" /></button
-              >
+              <DropdownMenu {menuTexts} {handleSelectItem}>
+                <div
+                  class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
+                >
+                  <Ellipsis />
+                </div>
+              </DropdownMenu>
             </div>
           </div>
-          <div class="flex w-fit">
-            <a
-              class="underline break-all"
-              href={formatUrl(url)}
-              rel="external noreferrer"
-              target="_blank">{url}</a
-            >
-          </div>
+
+          {url}
         </div>
         <!--description-->
         <div class="">

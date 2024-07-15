@@ -15,6 +15,7 @@
   import ProfileEditButton from "./ProfileEditButton.svelte";
 
   import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
+  import { ExternalLink, Pin } from "lucide-svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -61,10 +62,21 @@
             {/if}
           </div>
         </div>
-        <div class="absolute bottom-1 right-2">
-          {#if $loginUser === pubkey}<ProfileEditButton
-              {metadata}
-            />{:else}<FollowButton {pubkey} />{/if}
+        <div class="absolute bottom-1 right-2 flex flex-col gap-1">
+          {#if $loginUser === pubkey}<a
+              class="rounded-full p-1 bg-white border border-magnum-700 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 flex items-center active:opacity-50 justify-center gap-1"
+              target="_blank"
+              title={`Nostviewstr ${$_("settings.nostviewstr.kind10001")}`}
+              rel="noopener noreferrer"
+              href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+                $loginUser
+              )}/10001"
+              ><Pin class="w-5 rotate-45 " />{$_(
+                "settings.nostviewstr.kind10001"
+              )}<ExternalLink class="w-4 " />
+            </a><ProfileEditButton {metadata} />{:else}<FollowButton
+              {pubkey}
+            />{/if}
         </div>
         <div
           class="bg-magnum-800 w-full border-b border-magnum-400"
