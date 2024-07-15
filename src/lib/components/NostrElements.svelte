@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createRxForwardReq, createTie, now } from "rx-nostr";
+  import { createRxForwardReq, now } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import SetDefaultRelays from "./NostrMainData/SetDefaultRelays.svelte";
   import Contacts from "./NostrMainData/Contacts.svelte";
@@ -9,10 +9,9 @@
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
-  import { tieMapStore } from "$lib/stores/stores";
+  import { showReactioninTL } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { browser } from "$app/environment";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -43,24 +42,33 @@
 
         <TimelineList
           queryKey={["timeline", "feed", pubkey]}
-          filters={[
-            {
-              authors: pubkeysIn(contacts),
-              kinds: [1, 6, 16],
-              limit: 50,
-              since: now(),
-            },
-            {
-              kinds: [
-                1 /*リプライ*/, 6 /*kind1のリポスト*/,
-                /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
-                9735 /*zap receipt**/,
-              ],
-              "#p": [pubkey],
-              limit: 5,
-              since: now(),
-            },
-          ]}
+          filters={$showReactioninTL //とりあえず通知をTLに流したくないときは フィルターから外してみる
+            ? [
+                {
+                  authors: pubkeysIn(contacts),
+                  kinds: [1, 6, 16],
+                  limit: 50,
+                  since: now(),
+                },
+                {
+                  kinds: [
+                    1 /*リプライ*/, 6 /*kind1のリポスト*/,
+                    /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
+                    9735 /*zap receipt**/,
+                  ],
+                  "#p": [pubkey],
+                  limit: 5,
+                  since: now(),
+                },
+              ]
+            : [
+                {
+                  authors: pubkeysIn(contacts),
+                  kinds: [1, 6, 16],
+                  limit: 50,
+                  since: now(),
+                },
+              ]}
           req={createRxForwardReq()}
           {tieKey}
           let:events

@@ -85,3 +85,7 @@ export const defaultReaction = writable<{ content: string; tag: string[] }>({
   content: "+",
   tag: [],
 });
+
+export const showReactioninTL = writable<boolean>(true);
+
+export const nostrWalletConnect = writable<string>("");

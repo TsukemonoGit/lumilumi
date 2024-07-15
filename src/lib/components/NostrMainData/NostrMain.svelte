@@ -10,6 +10,8 @@
     showPreview,
     showRelayIcon,
     defaultReaction,
+    nostrWalletConnect,
+    showReactioninTL,
   } from "$lib/stores/stores";
   import NostrElements from "../NostrElements.svelte";
   import OpenPostWindow from "../OpenPostWindow.svelte";
@@ -73,6 +75,8 @@
       emoji: savedEmoji,
       mutebykinds: savedMutebykinds,
       defaultReaction: savedDefaultReaction,
+      showReactioninTL: savedReactionTL,
+      nostrWalletConnect: savedNostrWalletConnect,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -93,6 +97,8 @@
     $defaultReaction = savedDefaultReaction
       ? savedDefaultReaction
       : { content: "+", tag: [] };
+    $showReactioninTL = savedReactionTL ?? true;
+    $nostrWalletConnect = savedNostrWalletConnect ?? "";
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
     //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定

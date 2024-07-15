@@ -94,6 +94,8 @@ export interface LumiSetting {
   showPreview: boolean;
   menuleft: boolean;
   showRelayIcon: boolean;
+  showReactioninTL: boolean;
+  nostrWalletConnect: string;
   emoji: {
     list: string[][];
     updated: number; //最後に同期した日付

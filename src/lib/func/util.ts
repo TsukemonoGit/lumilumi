@@ -221,4 +221,6 @@ export const initSettings: LumiSetting = {
     list: [],
     updated: 0,
   },
+  showReactioninTL: true,
+  nostrWalletConnect: "",
 };

@@ -15,6 +15,8 @@
     menuLeft,
     showRelayIcon,
     defaultReaction,
+    showReactioninTL,
+    nostrWalletConnect,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -25,12 +27,14 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import type { DefaultRelayConfig } from "rx-nostr";
   import { Save } from "lucide-svelte";
+
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
-  let ischange = false;
+
   const STORAGE_KEY = "lumiSetting";
+
   let settings: LumiSetting = { ...initSettings };
+
   const originalSettings = writable<LumiSetting | null>(null);
 
   const selectedRelayset = writable<string>();
@@ -83,6 +87,9 @@
     $mutebykinds = settings.mutebykinds?.list;
     $defaultReaction = settings.defaultReaction;
     $selectedRelayset = settings.useRelaySet;
+    $showReactioninTL = settings.showReactioninTL;
+    $nostrWalletConnect = settings.nostrWalletConnect;
+
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -154,6 +161,8 @@
     $emojis = settings.emoji.list;
     $mutebykinds = settings.mutebykinds.list;
     $defaultReaction = settings.defaultReaction;
+    $showReactioninTL = settings.showReactioninTL;
+    $nostrWalletConnect = settings.nostrWalletConnect;
 
     originalSettings.set({ ...settings });
   }
@@ -492,6 +501,14 @@
         />
         {$_("settings.display.showRelayIcon")}
       </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showReactioninTL}
+        />
+        {$_("settings.display.showReactioninTL")}
+      </label>
     </div>
   </div>
   <!--- Douki --->
@@ -555,7 +572,17 @@
       </a>
     {/if}
   </div>
-
+  <!-- NWC 設定 -->
+  <div class="border border-magnum-500 rounded-md p-2">
+    <div class="text-magnum-200 font-bold text-lg">NWC</div>
+    <input
+      type="text"
+      id="relay"
+      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+      placeholder="入れてもまだ何もならないインプット欄"
+      bind:value={settings.nostrWalletConnect}
+    />
+  </div>
   <!-- Theme 設定 -->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">theme</div>
