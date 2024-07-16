@@ -241,17 +241,28 @@
         break;
       case 1:
         //Quote
-        replyText = atag
-          ? ` nostr:${encodeNaddr(atag, nevent)} \n`
-          : ` nostr:${nevent} \n`;
 
-        openReplyWindow = false;
-        openQuoteWindow = true;
-        setTimeout(() => {
-          textareaQuote.selectionEnd = 0;
-          cursorPosition = 0;
-          textareaQuote.focus();
-        }, 60);
+        const options: AdditionalPostOptions = {
+          tags: [],
+          content: atag
+            ? ` nostr:${encodeNaddr(atag, nevent)} \n`
+            : ` nostr:${nevent} \n`,
+          defaultUsers: [],
+          addableUserList: [note.pubkey],
+        };
+        $additionalPostOptions = options;
+        $postWindowOpen = true;
+        // replyText = atag
+        //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
+        //   : ` nostr:${nevent} \n`;
+
+        // openReplyWindow = false;
+        // openQuoteWindow = true;
+        // setTimeout(() => {
+        //   textareaQuote.selectionEnd = 0;
+        //   cursorPosition = 0;
+        //   textareaQuote.focus();
+        // }, 60);
         break;
     }
   };

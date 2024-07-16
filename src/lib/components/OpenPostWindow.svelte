@@ -75,7 +75,6 @@
   let additionalReplyUsers: Writable<string[]> = writable([]);
 
   $: if ($postWindowOpen) {
-    $open = true;
     console.log($additionalPostOptions);
     if ($additionalPostOptions) {
       initOptions = {
@@ -87,30 +86,36 @@
       };
       tags = initOptions.tags;
       text = initOptions.content ?? "";
+
       if (initOptions.addableUserList) {
         $additionalReplyUsers = [...initOptions.addableUserList];
       }
       $additionalPostOptions = undefined;
     }
+
+    $open = true;
     $postWindowOpen = false;
   }
 
-  open.subscribe(async () => {
-    if ($open) {
-      if (!metadata) {
-        metadata = (
-          $queryClient.getQueryData(["metadata", $loginUser]) as EventPacket
-        )?.event;
-      }
-      // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      // metadata = $queryClient.getQueryData(["metadata", pubkey]);
-      // console.log(metadata);
-      if (textarea) {
-        textarea.focus();
-        textareaFocus = true;
-      }
+  $: if ($open) {
+    if (!metadata) {
+      metadata = (
+        $queryClient.getQueryData(["metadata", $loginUser]) as EventPacket
+      )?.event;
     }
-  });
+    // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+    // metadata = $queryClient.getQueryData(["metadata", pubkey]);
+    // console.log(metadata);
+
+    if (textarea) {
+      textarea.focus();
+      textareaFocus = true;
+      textarea.selectionEnd = 0;
+      textarea.scroll({
+        top: 0,
+      });
+    }
+  }
 
   $: if (!$open) {
     resetState();
@@ -325,11 +330,11 @@
       on:click={handleOverlayClick}
     />
     <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2"
+      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[720px]
+            max-w-[90vw] -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      {#if initOptions.tags.length > 0 || ($showImg && $showPreview)}
+      {#if initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview)}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
@@ -370,7 +375,7 @@
 
           <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
         </div>
-        <div class="flex gap-1">
+        <div class="flex gap-1 mb-0.5">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
               @<Metadata
