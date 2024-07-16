@@ -25,28 +25,18 @@
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000);
-  let menuTexts =
-    //  profile
-    //   ? [
-    //       { text: "Copy EventID", icon: Copy, num: 3 },
-    //       { text: "Copy Pubkey", icon: Copy, num: 4 },
-    //       { text: "View Json", icon: FileJson2, num: 0 },
-    //       { text: "Open in njump", icon: SquareArrowOutUpRight, num: 1 },
-    //       { text: "Google Translate", icon: Earth, num: 2 },
-    //     ]
-    //   :
-    [
-      {
-        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
-        icon: Copy,
-        num: 3,
-      },
-      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-      { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-      { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
-      { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    ];
+  let menuTexts = [
+    {
+      text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
+      icon: Copy,
+      num: 3,
+    },
+    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
+    { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
+    { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+    { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
+  ];
   if (note.kind === 30030) {
     menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
   }

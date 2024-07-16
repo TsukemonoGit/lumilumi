@@ -11,6 +11,10 @@
     showImg,
     showPreview,
     uploader,
+    postWindowOpen,
+    additionalPostOptions,
+    queryClient,
+    loginUser,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import Content from "./NostrElements/Note/Content.svelte";
@@ -20,14 +24,23 @@
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { convertMetaTags, filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
+  import type {
+    DefaultPostOptions,
+    AdditionalPostOptions,
+    MargePostOptions,
+  } from "$lib/types";
+  import EventCard from "./NostrElements/Note/EventCard.svelte";
+  import { now, type EventPacket } from "rx-nostr";
+  import { writable } from "svelte/store";
+  //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 
-  export let options: { tags: string[][]; kind?: number; content?: string } = {
+  export let options: DefaultPostOptions = {
     tags: [],
     kind: 1,
     content: "",
   };
 
-  let text: string = "";
+  let text: string = options.content ?? "";
   let tags: string[][] = [...options.tags];
   let cursorPosition: number = 0;
   let onWarning: boolean;
@@ -37,7 +50,7 @@
   let selectedUploader: string;
   let files: FileList | undefined;
   let fileInput: HTMLInputElement | undefined;
-
+  let initOptions: MargePostOptions = { ...options };
   const { elements, states } = createDialog({
     forceVisible: true,
     closeOnOutsideClick: false, //overlay押したときに閉じない
@@ -46,6 +59,48 @@
   });
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
+
+  $: console.log(initOptions.tags);
+  let metadata: Nostr.Event | undefined = undefined;
+  $: if ($postWindowOpen) {
+    $open = true;
+    console.log($additionalPostOptions);
+    if ($additionalPostOptions) {
+      initOptions = {
+        ...options,
+        tags: [...options.tags, ...$additionalPostOptions.tags], // タグをコピー
+        content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
+        addableUserList: $additionalPostOptions.addableUserList,
+        defaultUsers: $additionalPostOptions.defaultUsers,
+      };
+      tags = initOptions.tags;
+      text = initOptions.content ?? "";
+      $additionalPostOptions = undefined;
+    }
+    $postWindowOpen = false;
+  }
+
+  open.subscribe(async () => {
+    if ($open) {
+      if (!metadata) {
+        metadata = (
+          $queryClient.getQueryData(["metadata", $loginUser]) as EventPacket
+        )?.event;
+      }
+      // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      // //開いたときにフォーカス
+      // metadata = $queryClient.getQueryData(["metadata", pubkey]);
+      // console.log(metadata);
+      if (textarea) {
+        textarea.focus();
+        textareaFocus = true;
+      }
+    }
+  });
+
+  $: if (!$open) {
+    resetState();
+  }
 
   const postNote = async () => {
     if (text.trim().length > 0) {
@@ -65,10 +120,6 @@
       $open = false;
     }
   };
-
-  $: if (!$open) {
-    resetState();
-  }
 
   const resetState = () => {
     text = options.content ?? "";
@@ -164,14 +215,6 @@
 
   let textarea: HTMLTextAreaElement;
 
-  $: if ($open) {
-    //開いたときにフォーカス
-    if (textarea) {
-      textarea.focus();
-      textareaFocus = true;
-    }
-  }
-
   //Close確認用
   const {
     elements: {
@@ -253,17 +296,30 @@
             max-w-[450px] -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      {#if $showImg && $showPreview && text !== ""}
+      {#if initOptions.tags.length > 0 || ($showImg && $showPreview)}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
         >
           <div class="font-medium text-magnum-400">preview</div>
-          <div
+          <EventCard
+            {metadata}
+            note={{
+              sig: "",
+              id: "",
+              pubkey: $loginUser,
+              content: text,
+              tags: tags,
+              kind: options.kind ?? 1,
+              created_at: now(),
+            }}
+            displayMenu={false}
+          />
+          <!-- <div
             class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
           >
             <Content bind:text bind:tags />
-          </div>
+          </div> -->
         </div>
       {/if}
       <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">

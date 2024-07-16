@@ -16,7 +16,7 @@
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19, type EventTemplate } from "nostr-tools";
 
-  import type { Profile } from "$lib/types";
+  import type { AdditionalPostOptions, Profile } from "$lib/types";
   import { writable, type Writable } from "svelte/store";
 
   import EllipsisMenu from "./EllipsisMenu.svelte";
@@ -33,6 +33,8 @@
     showImg,
     toastSettings,
     uploader,
+    postWindowOpen,
+    additionalPostOptions,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import {
@@ -481,6 +483,42 @@
     files.forEach((file) => fileList.items.add(file));
     await handleFileUpload(fileList.files);
   };
+
+  const onClickReplyIcon = () => {
+    let tags: string[][] = [];
+    tags.push(["p", note.pubkey]);
+    const root = note.tags.find(
+      (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
+    );
+
+    if (atag) {
+      tags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
+    } else {
+      if (root) {
+        tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "reply"]);
+      } else {
+        tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "root"]);
+      }
+    }
+
+    const options: AdditionalPostOptions = {
+      tags: tags,
+      content: "",
+      defaultUsers: [note.pubkey],
+      addableUserList: allPtag,
+    };
+    $additionalPostOptions = options;
+    $postWindowOpen = true;
+    // openReplyWindow = !openReplyWindow;
+
+    // replyText = "";
+    // if (openReplyWindow) {
+    //   openQuoteWindow = false;
+    //   setTimeout(() => {
+    //     textareaReply?.focus();
+    //   }, 20);
+    // }
+  };
 </script>
 
 <div
@@ -490,15 +528,7 @@
     <!--リプライ-->
     <button
       on:click={() => {
-        openReplyWindow = !openReplyWindow;
-
-        replyText = "";
-        if (openReplyWindow) {
-          openQuoteWindow = false;
-          setTimeout(() => {
-            textareaReply?.focus();
-          }, 20);
-        }
+        onClickReplyIcon();
       }}
     >
       <MessageSquare

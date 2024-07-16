@@ -187,7 +187,7 @@
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
   {#if note.kind === 1}
-    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
       {@const { replyID, replyUsers } = replyedEvent(note.tags)}
       {#if replyID || replyUsers.length > 0}
         <Reply {replyID} {replyUsers} />
@@ -256,7 +256,12 @@
     <div class="flex gap-1 items-center">
       <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
       <div class="self-center">
-        <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
+        <UserMenu
+          pubkey={note.pubkey}
+          bind:metadata
+          size={20}
+          displayMenu={false}
+        />
       </div>
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -292,12 +297,12 @@
     <!--kind42 パブ茶部屋-->
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
       <Kind42Note {note} /></NoteTemplate
     >
   {:else if note.kind === 30030}
     <!--kind30030-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
       <Kind30030Note {note} /></NoteTemplate
     >
   {:else if note.kind === 9735}
@@ -400,6 +405,7 @@
             pubkey={note.pubkey}
             bind:metadata
             size={20}
+            displayMenu={false}
           />kind:{note.kind}
           {#if metadata}
             @{profile(metadata)?.name}
