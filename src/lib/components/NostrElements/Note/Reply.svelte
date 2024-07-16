@@ -23,12 +23,12 @@
 {#if replyID}
   {#if !loadNote}
     <button
-      class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-x-hidden"
+      class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
       on:click={() => (loadNote = true)}><Reply size="20" />replied</button
     >
   {:else}
     <button
-      class="my-1 flex items-center w-fit px-2 rounded-md bg-magnum-100 font-medium text-magnum-600 hover:opacity-75 active:opacity-50 overflow-x-hidden max-w-full"
+      class="my-1 flex items-center w-fit px-2 rounded-md bg-magnum-100 font-medium text-magnum-600 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
