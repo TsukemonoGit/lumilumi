@@ -69,7 +69,7 @@
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
 
-  $: console.log(initOptions.tags);
+  //$: console.log(initOptions.tags);
   let metadata: Nostr.Event | undefined = undefined;
 
   let additionalReplyUsers: Writable<string[]> = writable([]);
@@ -408,10 +408,9 @@
                      rounded-full p-1 text-magnum-800 bg-magnum-100
                     hover:bg-magnum-300 focus:shadow-magnum-400"
                     on:click={() => {
-                      additionalReplyUsers.update((users) => {
-                        users.splice(index, 1);
-                        return users;
-                      });
+                      $additionalReplyUsers = $additionalReplyUsers.filter(
+                        (user) => user !== replyuser
+                      );
                     }}
                   >
                     <X class="size-4" />
