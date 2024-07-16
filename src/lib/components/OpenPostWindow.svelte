@@ -2,7 +2,14 @@
   import { _ } from "svelte-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
-  import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
+  import {
+    X,
+    SquarePen,
+    SmilePlus,
+    Send,
+    TriangleAlert,
+    Plus,
+  } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import {
@@ -28,10 +35,12 @@
     DefaultPostOptions,
     AdditionalPostOptions,
     MargePostOptions,
+    Profile,
   } from "$lib/types";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
   import { now, type EventPacket } from "rx-nostr";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
+  import Metadata from "./NostrMainData/Metadata.svelte";
   //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 
   export let options: DefaultPostOptions = {
@@ -62,6 +71,9 @@
 
   $: console.log(initOptions.tags);
   let metadata: Nostr.Event | undefined = undefined;
+
+  let additionalReplyUsers: Writable<string[]> = writable([]);
+
   $: if ($postWindowOpen) {
     $open = true;
     console.log($additionalPostOptions);
@@ -75,6 +87,9 @@
       };
       tags = initOptions.tags;
       text = initOptions.content ?? "";
+      if (initOptions.addableUserList) {
+        $additionalReplyUsers = [...initOptions.addableUserList];
+      }
       $additionalPostOptions = undefined;
     }
     $postWindowOpen = false;
@@ -88,7 +103,6 @@
         )?.event;
       }
       // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      // //開いたときにフォーカス
       // metadata = $queryClient.getQueryData(["metadata", pubkey]);
       // console.log(metadata);
       if (textarea) {
@@ -102,6 +116,19 @@
     resetState();
   }
 
+  const metadataName = (ev: Nostr.Event): string => {
+    try {
+      const profile: Profile = JSON.parse(ev.content);
+      if (profile.name) {
+        return profile.name;
+      } else {
+        return "";
+      }
+    } catch (error) {
+      return "";
+    }
+  };
+
   const postNote = async () => {
     if (text.trim().length > 0) {
       const { text: checkedText, tags: checkedTags } = contentCheck(
@@ -109,7 +136,12 @@
         tags
       );
       if (onWarning) checkedTags.push(["content-warning", warningText]);
-
+      if ($additionalReplyUsers.length > 0) {
+        const replyUsersArray: string[][] = $additionalReplyUsers.map(
+          (user) => ["p", user]
+        );
+        checkedTags.push(...replyUsersArray);
+      }
       const newev: Nostr.EventParameters = {
         kind: options.kind ?? 1,
         content: checkedText,
@@ -128,6 +160,7 @@
     onWarning = false;
     viewCustomEmojis = false;
     customReaction = "";
+    $additionalReplyUsers = [];
   };
 
   const handleTextareaInput = (event: Event) => {
@@ -336,6 +369,63 @@
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
           <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+        </div>
+        <div class="flex gap-1">
+          {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
+            <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+              @<Metadata
+                queryKey={["metadata", initOptions.defaultUsers[0]]}
+                pubkey={initOptions.defaultUsers[0]}
+                let:metadata
+              >
+                {metadataName(metadata)}
+              </Metadata>
+            </div>
+          {/if}
+          {#if initOptions.addableUserList}
+            {#each initOptions.addableUserList as replyuser, index}
+              <div
+                class=" rounded-md {$additionalReplyUsers.includes(replyuser)
+                  ? 'bg-magnum-300'
+                  : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
+              >
+                @<Metadata
+                  queryKey={["metadata", replyuser]}
+                  pubkey={replyuser}
+                  let:metadata
+                >
+                  {metadataName(metadata)}
+                </Metadata>
+                {#if $additionalReplyUsers.includes(replyuser)}
+                  <button
+                    class=" inline-flex h-6 w-6 appearance-none align-middle
+                     rounded-full p-1 text-magnum-800 bg-magnum-100
+                    hover:bg-magnum-300 focus:shadow-magnum-400"
+                    on:click={() => {
+                      additionalReplyUsers.update((users) => {
+                        users.splice(index, 1);
+                        return users;
+                      });
+                    }}
+                  >
+                    <X class="size-4" />
+                  </button>
+                {:else}<button
+                    class=" inline-flex h-6 w-6 appearance-none align-middle
+                 rounded-full p-1 text-magnum-800
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+                    on:click={() => {
+                      additionalReplyUsers.update((users) => {
+                        users.push(replyuser);
+                        return users;
+                      });
+                    }}
+                  >
+                    <Plus class="size-4" />
+                  </button>{/if}
+              </div>
+            {/each}
+          {/if}
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
