@@ -71,7 +71,7 @@
         {displayMenu}
       />
     </div>
-    {#if $showRelayIcon}
+    {#if $showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   </div>
 
