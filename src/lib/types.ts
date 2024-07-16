@@ -135,6 +135,7 @@ export interface AdditionalPostOptions {
   content: string;
   addableUserList: string[];
   defaultUsers: string[];
+  warningText: string | undefined;
 }
 export interface MargePostOptions {
   tags: string[][];
@@ -142,4 +143,5 @@ export interface MargePostOptions {
   content?: string;
   addableUserList?: string[];
   defaultUsers?: string[];
+  warningText?: string | undefined;
 }

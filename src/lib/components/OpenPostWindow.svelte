@@ -83,12 +83,17 @@
         content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
         addableUserList: $additionalPostOptions.addableUserList,
         defaultUsers: $additionalPostOptions.defaultUsers,
+        warningText: $additionalPostOptions.warningText,
       };
       tags = initOptions.tags;
       text = initOptions.content ?? "";
 
       if (initOptions.addableUserList) {
         $additionalReplyUsers = [...initOptions.addableUserList];
+      }
+      if (initOptions.warningText !== undefined) {
+        warningText = initOptions.warningText;
+        onWarning = true;
       }
       $additionalPostOptions = undefined;
     }

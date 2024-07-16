@@ -67,6 +67,8 @@
   let dtag: string[] | undefined;
   let atag: string | undefined;
 
+  $: warning = note.tags.find((item) => item[0] === "content-warning");
+
   let textareaReply: HTMLTextAreaElement;
   let textareaQuote: HTMLTextAreaElement;
   $: {
@@ -249,6 +251,7 @@
             : ` nostr:${nevent} \n`,
           defaultUsers: [],
           addableUserList: [note.pubkey],
+          warningText: warning ? warning[1] : undefined,
         };
         $additionalPostOptions = options;
         $postWindowOpen = true;
@@ -517,6 +520,7 @@
       content: "",
       defaultUsers: [note.pubkey],
       addableUserList: allPtag,
+      warningText: warning ? warning[1] : undefined,
     };
     $additionalPostOptions = options;
     $postWindowOpen = true;
