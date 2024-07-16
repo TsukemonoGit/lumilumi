@@ -187,7 +187,7 @@
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
   {#if note.kind === 1}
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       {@const { replyID, replyUsers } = replyedEvent(note.tags)}
       {#if replyID || replyUsers.length > 0}
         <Reply {replyID} {replyUsers} />
@@ -297,12 +297,12 @@
     <!--kind42 パブ茶部屋-->
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       <Kind42Note {note} /></NoteTemplate
     >
   {:else if note.kind === 30030}
     <!--kind30030-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} displayMenu={false}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       <Kind30030Note {note} /></NoteTemplate
     >
   {:else if note.kind === 9735}
