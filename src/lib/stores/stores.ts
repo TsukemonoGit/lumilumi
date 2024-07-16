@@ -9,7 +9,7 @@ import {
   type EventPacket,
   type DefaultRelayConfig,
 } from "rx-nostr";
-import type { MuteList } from "$lib/types";
+import type { AdditionalPostOptions, MuteList } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
 const config: QueryClientConfig = {
@@ -89,3 +89,8 @@ export const defaultReaction = writable<{ content: string; tag: string[] }>({
 export const showReactioninTL = writable<boolean>(true);
 
 export const nostrWalletConnect = writable<string>("");
+
+export const postWindowOpen = writable<boolean>();
+export const additionalPostOptions = writable<
+  AdditionalPostOptions | undefined
+>(); //投稿したあとでundefinedにする

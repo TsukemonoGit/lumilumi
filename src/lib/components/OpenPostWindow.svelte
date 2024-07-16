@@ -2,7 +2,14 @@
   import { _ } from "svelte-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
-  import { X, SquarePen, SmilePlus, Send, TriangleAlert } from "lucide-svelte";
+  import {
+    X,
+    SquarePen,
+    SmilePlus,
+    Send,
+    TriangleAlert,
+    Plus,
+  } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { publishEvent } from "$lib/func/nostr";
   import {
@@ -11,6 +18,10 @@
     showImg,
     showPreview,
     uploader,
+    postWindowOpen,
+    additionalPostOptions,
+    queryClient,
+    loginUser,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import Content from "./NostrElements/Note/Content.svelte";
@@ -20,14 +31,25 @@
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { convertMetaTags, filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
+  import type {
+    DefaultPostOptions,
+    AdditionalPostOptions,
+    MargePostOptions,
+    Profile,
+  } from "$lib/types";
+  import EventCard from "./NostrElements/Note/EventCard.svelte";
+  import { now, type EventPacket } from "rx-nostr";
+  import { writable, type Writable } from "svelte/store";
+  import Metadata from "./NostrMainData/Metadata.svelte";
+  //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 
-  export let options: { tags: string[][]; kind?: number; content?: string } = {
+  export let options: DefaultPostOptions = {
     tags: [],
     kind: 1,
     content: "",
   };
 
-  let text: string = "";
+  let text: string = options.content ?? "";
   let tags: string[][] = [...options.tags];
   let cursorPosition: number = 0;
   let onWarning: boolean;
@@ -37,7 +59,7 @@
   let selectedUploader: string;
   let files: FileList | undefined;
   let fileInput: HTMLInputElement | undefined;
-
+  let initOptions: MargePostOptions = { ...options };
   const { elements, states } = createDialog({
     forceVisible: true,
     closeOnOutsideClick: false, //overlay押したときに閉じない
@@ -47,6 +69,76 @@
   const { trigger, overlay, content, close, portalled } = elements;
   const { open } = states;
 
+  //$: console.log(initOptions.tags);
+  let metadata: Nostr.Event | undefined = undefined;
+
+  let additionalReplyUsers: Writable<string[]> = writable([]);
+
+  $: if ($postWindowOpen) {
+    console.log($additionalPostOptions);
+    if ($additionalPostOptions) {
+      initOptions = {
+        ...options,
+        tags: [...options.tags, ...$additionalPostOptions.tags], // タグをコピー
+        content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
+        addableUserList: $additionalPostOptions.addableUserList,
+        defaultUsers: $additionalPostOptions.defaultUsers,
+        warningText: $additionalPostOptions.warningText,
+      };
+      tags = initOptions.tags;
+      text = initOptions.content ?? "";
+
+      if (initOptions.addableUserList) {
+        $additionalReplyUsers = [...initOptions.addableUserList];
+      }
+      if (initOptions.warningText !== undefined) {
+        warningText = initOptions.warningText;
+        onWarning = true;
+      }
+      $additionalPostOptions = undefined;
+    }
+
+    $open = true;
+    $postWindowOpen = false;
+  }
+
+  $: if ($open) {
+    if (!metadata) {
+      metadata = (
+        $queryClient.getQueryData(["metadata", $loginUser]) as EventPacket
+      )?.event;
+    }
+    // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+    // metadata = $queryClient.getQueryData(["metadata", pubkey]);
+    // console.log(metadata);
+
+    if (textarea) {
+      textarea.focus();
+      textareaFocus = true;
+      textarea.selectionEnd = 0;
+      textarea.scroll({
+        top: 0,
+      });
+    }
+  }
+
+  $: if (!$open) {
+    resetState();
+  }
+
+  const metadataName = (ev: Nostr.Event): string => {
+    try {
+      const profile: Profile = JSON.parse(ev.content);
+      if (profile.name) {
+        return profile.name;
+      } else {
+        return "";
+      }
+    } catch (error) {
+      return "";
+    }
+  };
+
   const postNote = async () => {
     if (text.trim().length > 0) {
       const { text: checkedText, tags: checkedTags } = contentCheck(
@@ -54,7 +146,12 @@
         tags
       );
       if (onWarning) checkedTags.push(["content-warning", warningText]);
-
+      if ($additionalReplyUsers.length > 0) {
+        const replyUsersArray: string[][] = $additionalReplyUsers.map(
+          (user) => ["p", user]
+        );
+        checkedTags.push(...replyUsersArray);
+      }
       const newev: Nostr.EventParameters = {
         kind: options.kind ?? 1,
         content: checkedText,
@@ -66,10 +163,6 @@
     }
   };
 
-  $: if (!$open) {
-    resetState();
-  }
-
   const resetState = () => {
     text = options.content ?? "";
     tags = [...options.tags];
@@ -77,6 +170,8 @@
     onWarning = false;
     viewCustomEmojis = false;
     customReaction = "";
+    $additionalReplyUsers = [];
+    initOptions = { ...options };
   };
 
   const handleTextareaInput = (event: Event) => {
@@ -164,14 +259,6 @@
 
   let textarea: HTMLTextAreaElement;
 
-  $: if ($open) {
-    //開いたときにフォーカス
-    if (textarea) {
-      textarea.focus();
-      textareaFocus = true;
-    }
-  }
-
   //Close確認用
   const {
     elements: {
@@ -249,21 +336,34 @@
       on:click={handleOverlayClick}
     />
     <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2"
+      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[720px]
+            max-w-[90vw] -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      {#if $showImg && $showPreview && text !== ""}
+      {#if initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview)}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
         >
           <div class="font-medium text-magnum-400">preview</div>
-          <div
+          <EventCard
+            {metadata}
+            note={{
+              sig: "",
+              id: "",
+              pubkey: $loginUser,
+              content: text,
+              tags: tags,
+              kind: options.kind ?? 1,
+              created_at: now(),
+            }}
+            displayMenu={false}
+          />
+          <!-- <div
             class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
           >
             <Content bind:text bind:tags />
-          </div>
+          </div> -->
         </div>
       {/if}
       <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">
@@ -280,6 +380,62 @@
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
           <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+        </div>
+        <div class="flex gap-1 mb-0.5">
+          {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
+            <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+              @<Metadata
+                queryKey={["metadata", initOptions.defaultUsers[0]]}
+                pubkey={initOptions.defaultUsers[0]}
+                let:metadata
+              >
+                {metadataName(metadata)}
+              </Metadata>
+            </div>
+          {/if}
+          {#if initOptions.addableUserList}
+            {#each initOptions.addableUserList as replyuser, index}
+              <div
+                class=" rounded-md {$additionalReplyUsers.includes(replyuser)
+                  ? 'bg-magnum-300'
+                  : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
+              >
+                @<Metadata
+                  queryKey={["metadata", replyuser]}
+                  pubkey={replyuser}
+                  let:metadata
+                >
+                  {metadataName(metadata)}
+                </Metadata>
+                {#if $additionalReplyUsers.includes(replyuser)}
+                  <button
+                    class=" inline-flex h-6 w-6 appearance-none align-middle
+                     rounded-full p-1 text-magnum-800 bg-magnum-100
+                    hover:bg-magnum-300 focus:shadow-magnum-400"
+                    on:click={() => {
+                      $additionalReplyUsers = $additionalReplyUsers.filter(
+                        (user) => user !== replyuser
+                      );
+                    }}
+                  >
+                    <X class="size-4" />
+                  </button>
+                {:else}<button
+                    class=" inline-flex h-6 w-6 appearance-none align-middle
+                 rounded-full p-1 text-magnum-800
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+                    on:click={() => {
+                      additionalReplyUsers.update((users) => {
+                        users.push(replyuser);
+                        return users;
+                      });
+                    }}
+                  >
+                    <Plus class="size-4" />
+                  </button>{/if}
+              </div>
+            {/each}
+          {/if}
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea

@@ -121,3 +121,27 @@ export interface ChannelData {
   picture?: string;
   relays?: string;
 }
+
+export interface DefaultPostOptions {
+  tags: string[][];
+  kind?: number;
+  content?: string;
+}
+
+//リプライとかクオテとかの文中にnostr:~~をいれておくとか、リプユーザーを追加とか削除とか
+//kindはどちらももとのkindのまま
+export interface AdditionalPostOptions {
+  tags: string[][];
+  content: string;
+  addableUserList: string[];
+  defaultUsers: string[];
+  warningText: string | undefined;
+}
+export interface MargePostOptions {
+  tags: string[][];
+  kind?: number;
+  content?: string;
+  addableUserList?: string[];
+  defaultUsers?: string[];
+  warningText?: string | undefined;
+}

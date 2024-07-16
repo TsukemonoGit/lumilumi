@@ -30,6 +30,8 @@
   export let pubkey: string;
   export let size: number;
   export let metadata: Nostr.Event | undefined;
+  export let displayMenu: boolean = true;
+
   let dialogOpen: any;
 
   const baseMenuTexts = [
@@ -56,7 +58,6 @@
   };
   $: profile = getProfile(metadata);
   $: url = profile?.picture;
-  $: name = profile?.name;
 
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
@@ -116,7 +117,7 @@
   };
 </script>
 
-<Popover>
+{#if !displayMenu}
   {#if $showImg && url && url !== ""}
     <UserAvatar {url} name={pubkey} {pubkey} {size} />
   {:else}
@@ -127,58 +128,71 @@
       colors={splitHexColorString(pubkey)}
     />
   {/if}
-  <div slot="popoverContent" class="w-[24rem] max-w-full">
-    <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
+{:else}
+  <Popover>
+    {#if $showImg && url && url !== ""}
+      <UserAvatar {url} name={pubkey} {pubkey} {size} />
+    {:else}
+      <Avatar
+        {size}
+        name={pubkey}
+        variant="beam"
+        colors={splitHexColorString(pubkey)}
+      />
+    {/if}
+    <div slot="popoverContent" class="w-[24rem] max-w-full">
+      <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
 
-    <div
-      class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md mt-2"
-    >
-      <div class="text-zinc-300 font-bold pl-2 text-md py-2">User Menu</div>
+      <div
+        class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md mt-2"
+      >
+        <div class="text-zinc-300 font-bold pl-2 text-md py-2">User Menu</div>
 
-      {#each menuTexts as { icon: Icon, text, num }}
-        <button
-          on:click={() => handleSelectItem(num)}
-          class="flex text-magnum-400
+        {#each menuTexts as { icon: Icon, text, num }}
+          <button
+            on:click={() => handleSelectItem(num)}
+            class="flex text-magnum-400
      font-medium leading-none hover:bg-magnum-500/25 focus:bg-magnum-700/25 align-middle"
-          ><div
-            class="inline-flex rounded-full text-sm my-auto items-center py-1"
+            ><div
+              class="inline-flex rounded-full text-sm my-auto items-center py-1"
+            >
+              <Icon class="mx-2 my-auto" />{text}
+            </div></button
           >
-            <Icon class="mx-2 my-auto" />{text}
-          </div></button
-        >
-      {/each}
-    </div>
-  </div></Popover
->
-
-<Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(metadata, null, 2)}
-    </div>
-    <h2 class="mt-1 text-lg font-medium">User Data</h2>
-    <div
-      class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
-    >
-      {#if profile}
-        {#each Object.entries(profile) as [data, index]}
-          <div class="flex flex-col py-1">
-            <div class="font-bold whitespace-pre-wrap break-wards">
-              {data}
-            </div>
-            <div class="ml-2 whitespace-pre-wrap break-all">
-              {profile[data]}
-            </div>
-          </div>
         {/each}
-      {/if}
+      </div>
+    </div></Popover
+  >
+
+  <Dialog bind:open={dialogOpen}>
+    <div slot="main">
+      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      >
+        {JSON.stringify(metadata, null, 2)}
+      </div>
+      <h2 class="mt-1 text-lg font-medium">User Data</h2>
+      <div
+        class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
+      >
+        {#if profile}
+          {#each Object.entries(profile) as [data, index]}
+            <div class="flex flex-col py-1">
+              <div class="font-bold whitespace-pre-wrap break-wards">
+                {data}
+              </div>
+              <div class="ml-2 whitespace-pre-wrap break-all">
+                {profile[data]}
+              </div>
+            </div>
+          {/each}
+        {/if}
+      </div>
+      <h2 class="mt-1 text-lg font-medium">Seen on</h2>
+      <div class="break-words whitespace-pre-wrap">
+        {metadata ? getRelaysById(metadata.id).join(", ") : ""}
+      </div>
     </div>
-    <h2 class="mt-1 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {metadata ? getRelaysById(metadata.id).join(", ") : ""}
-    </div>
-  </div>
-</Dialog>
+  </Dialog>
+{/if}

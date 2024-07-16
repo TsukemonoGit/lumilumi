@@ -19,9 +19,9 @@
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
   export let tag: string[] | undefined;
-  const bech32Pattern = /<bech32>/;
+  //const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
-
+  export let displayMenu: boolean = true;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -56,6 +56,7 @@
   const nevent = nip19.neventEncode(eventpointer);
   const handleClickToNotepage = () => {
     //Goto Note page
+
     goto(`/${replaceable ? naddr : nevent}`);
   };
 </script>
@@ -63,7 +64,12 @@
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden"}>
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
-      <UserMenu pubkey={note.pubkey} bind:metadata size={mini ? 20 : 40} />
+      <UserMenu
+        pubkey={note.pubkey}
+        bind:metadata
+        size={mini ? 20 : 40}
+        {displayMenu}
+      />
     </div>
     {#if $showRelayIcon}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
@@ -83,12 +89,14 @@
           @{nip19.npubEncode(note.pubkey)}</span
         >
       {/if}
-      <button
-        on:click={handleClickToNotepage}
-        class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto hover:underline"
-      >
-        {formatAbsoluteDate(note.created_at)}
-      </button>
+      {#if displayMenu}
+        <button
+          on:click={handleClickToNotepage}
+          class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto hover:underline"
+        >
+          {formatAbsoluteDate(note.created_at)}
+        </button>
+      {/if}
     </div>
     <hr />
     <slot></slot>
