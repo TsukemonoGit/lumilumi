@@ -166,6 +166,7 @@
     viewCustomEmojis = false;
     customReaction = "";
     $additionalReplyUsers = [];
+    initOptions = { ...options };
   };
 
   const handleTextareaInput = (event: Event) => {
