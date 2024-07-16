@@ -6,7 +6,8 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
-
+  import UserName from "./UserName.svelte";
+  export let displayMenu: boolean;
   export let content: string | undefined;
   export let decoded:
     | {
@@ -33,12 +34,15 @@
 
 {#if decoded.type === "npub"}
   <span class="text-magnum-100"
-    ><PopupUserName pubkey={decoded.data} metadata={undefined} /></span
+    >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
+        pubkey={decoded.data}
+        metadata={undefined}
+      />{/if}</span
   >
 {:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data.id} mini={true} /><Quote
+    <Note id={decoded.data.id} mini={true} {displayMenu} /><Quote
       size="16"
       class="text-magnum-500 fill-magnum-600"
     />
@@ -46,7 +50,7 @@
 {:else if decoded.type === "note"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data} mini={true} /><Quote
+    <Note id={decoded.data} mini={true} {displayMenu} /><Quote
       size="16"
       class="text-magnum-500 fill-magnum-600"
     />
@@ -88,22 +92,27 @@
         let:metadata
       >
         <div slot="loading">
-          <EventCard note={event} status="loading" />
+          <EventCard note={event} {displayMenu} status="loading" />
         </div>
         <div slot="nodata">
-          <EventCard note={event} status="nodata" />
+          <EventCard note={event} {displayMenu} status="nodata" />
         </div>
         <div slot="error">
-          <EventCard note={event} status="error" />
+          <EventCard note={event} {displayMenu} status="error" />
         </div>
-        <EventCard {metadata} note={event} /></Metadata
+        <EventCard {metadata} {displayMenu} note={event} /></Metadata
       >
     </LatestEvent><Quote size="16" class="text-magnum-500 fill-magnum-600" />
   </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->
   <span class="text-magnum-100"
-    ><PopupUserName pubkey={decoded.data.pubkey} metadata={undefined} /></span
+    >{#if !displayMenu}<UserName
+        pubhex={decoded.data.pubkey}
+      />{:else}<PopupUserName
+        pubkey={decoded.data.pubkey}
+        metadata={undefined}
+      />{/if}</span
   >
 {:else if decoded.type === "nrelay"}<!---->
   <span class="text-sm text-neutral-500 flex-inline">

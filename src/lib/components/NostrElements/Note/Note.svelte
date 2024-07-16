@@ -7,6 +7,7 @@
   export let id: string;
   export let mini: boolean = false;
   export let maxHeight: string = "16rem";
+  export let displayMenu: boolean;
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
@@ -38,6 +39,6 @@
     <div slot="error" let:error>
       <EventCard note={text} {mini} {maxHeight} />
     </div>
-    <EventCard note={text} {metadata} {mini} {maxHeight} />
+    <EventCard note={text} {metadata} {mini} {maxHeight} {displayMenu} />
   </Metadata>
 </Text>

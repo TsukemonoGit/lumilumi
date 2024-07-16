@@ -2,10 +2,11 @@
   import { Reply, Minimize2 } from "lucide-svelte";
   import Note from "./Note.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
+  import UserName from "./UserName.svelte";
 
   export let replyID: string | undefined;
   export let replyUsers: string[];
-
+  export let displayMenu: boolean;
   let loadNote = false;
 </script>
 
@@ -14,7 +15,8 @@
     class="text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-1 max-h-24 overflow-y-auto"
   >
     {#each replyUsers as user}
-      <PopupUserName pubkey={user} metadata={undefined} />
+      {#if !displayMenu}<UserName pubhex={user} />{:else}
+        <PopupUserName pubkey={user} metadata={undefined} />{/if}
     {/each}
   </div>
 {/if}
@@ -30,7 +32,7 @@
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
-    <Note id={replyID} mini={true} />
+    <Note id={replyID} mini={true} {displayMenu} />
     <!-- <button
         class=" ml-auto my-1 flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={() => (loadNote = false)}><Minimize2 size="20" />hide</button

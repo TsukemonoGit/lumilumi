@@ -9,6 +9,7 @@
   import { isvalidURL } from "$lib/func/ogp";
   export let text: string;
   export let tags: string[][];
+  export let displayMenu: boolean;
   /** ImageFile_Check_正規表現_パターン */
   const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
   //movie
@@ -71,7 +72,7 @@
   {#if part.type === "nip19"}
     {#await nip19Decode(part.url) then decoded}
       {#if decoded}
-        <DecodedContent {decoded} content={part.content} />
+        <DecodedContent {decoded} content={part.content} {displayMenu} />
       {:else}
         {part.content}
       {/if}

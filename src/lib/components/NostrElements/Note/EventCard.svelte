@@ -190,7 +190,7 @@
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       {@const { replyID, replyUsers } = replyedEvent(note.tags)}
       {#if replyID || replyUsers.length > 0}
-        <Reply {replyID} {replyUsers} />
+        <Reply {replyID} {replyUsers} {displayMenu} />
         <hr />
       {/if}
 
@@ -199,7 +199,7 @@
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
         >
-          <Content text={note.content} tags={note.tags} />
+          <Content text={note.content} tags={note.tags} {displayMenu} />
         </div>
         {#if warning}
           <!-- <WarningHide1 text={tag[1]} /> -->
@@ -223,7 +223,7 @@
         class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
       />
       <div class="self-center">
-        <UserMenu pubkey={note.pubkey} bind:metadata size={20} />
+        <UserMenu pubkey={note.pubkey} bind:metadata size={20} {displayMenu} />
       </div>
       <div class=" inline-block break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -256,12 +256,7 @@
     <div class="flex gap-1 items-center">
       <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
       <div class="self-center">
-        <UserMenu
-          pubkey={note.pubkey}
-          bind:metadata
-          size={20}
-          displayMenu={false}
-        />
+        <UserMenu pubkey={note.pubkey} bind:metadata size={20} {displayMenu} />
       </div>
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -333,7 +328,7 @@
         class="mt-0.5 overflow-y-auto overflow-x-hidden"
         style="max-height:{maxHeight ?? 'none'}"
       >
-        <Content text={note.content} tags={note.tags} />
+        <Content text={note.content} tags={note.tags} {displayMenu} />
       </div>
       {#if displayMenu}<NoteActionButtons {note} />{/if}
 
@@ -360,7 +355,7 @@
             {/each}
           </div>
           <hr />
-          <Content text={note.content} tags={note.tags} />
+          <Content text={note.content} tags={note.tags} {displayMenu} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <div slot="nodata">
@@ -378,7 +373,7 @@
             {/each}
           </div>
           <hr />
-          <Content text={note.content} tags={note.tags} />
+          <Content text={note.content} tags={note.tags} {displayMenu} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <div slot="error" let:error>
@@ -396,7 +391,7 @@
             {/each}
           </div>
           <hr />
-          <Content text={note.content} tags={note.tags} />
+          <Content text={note.content} tags={note.tags} {displayMenu} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <!--client tag からURLさがすとこ-->
@@ -435,7 +430,7 @@
               {/each}
             </div>
             <hr />
-            <Content text={note.content} tags={note.tags} />
+            <Content text={note.content} tags={note.tags} {displayMenu} />
             {#if displayMenu}<NoteActionButtons {note} />{/if}
           {/if}
         {/await}
