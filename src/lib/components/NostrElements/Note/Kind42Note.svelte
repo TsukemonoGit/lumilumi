@@ -11,6 +11,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
 
+  export let displayMenu: boolean;
   export let note: Nostr.Event;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
@@ -65,14 +66,14 @@
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
   {#if replyID || replyUsers.length > 0}
-    <Reply {replyID} {replyUsers} />
+    <Reply {replyID} {replyUsers} {displayMenu} />
     <hr />
   {/if}
 {/await}
 {#await checkContentWarning(note.tags) then tag}
   <div class="relative">
     <div class=" max-h-64 overflow-y-auto overflow-x-auto">
-      <Content text={note.content} tags={note.tags} />
+      <Content text={note.content} tags={note.tags} {displayMenu} />
     </div>
     {#if tag}
       <WarningHide2 text={tag[1]} />
@@ -118,4 +119,5 @@
     {/await}
   </Text>
 {/if}
-<NoteActionButtons {note} />
+{#if displayMenu}
+  <NoteActionButtons {note} />{/if}

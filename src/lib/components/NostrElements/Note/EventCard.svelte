@@ -290,10 +290,13 @@
     <Kind0Note {note} {proxy} />
   {:else if note.kind === 40}
     <!--kind42 パブ茶部屋-->
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
+      <Kind42Note {note} {displayMenu} /></NoteTemplate
+    >
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
-      <Kind42Note {note} /></NoteTemplate
+      <Kind42Note {note} {displayMenu} /></NoteTemplate
     >
   {:else if note.kind === 30030}
     <!--kind30030-->
