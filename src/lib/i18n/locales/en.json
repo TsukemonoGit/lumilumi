@@ -75,6 +75,7 @@
       "relayHtml": "Open relay site"
     },
     "nostr-watch": "Open in nostr.watch",
-    "nostrrr": "Open in Nostrrr"
+    "nostrrr": "Open in Nostrrr",
+    "copylink": "Copy link"
   }
 }

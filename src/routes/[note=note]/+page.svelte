@@ -33,12 +33,11 @@
       setRelayList={data.relays !== undefined && data.relays.length > 0
         ? data.relays
         : defaultRelays}
-      let:searchRelays
     >
       <SetRepoReactions />
       <div class="w-full break-words overflow-hidden">
         <div>
-          <Note id={data.id} maxHeight={"none"} />
+          <Note id={data.id} maxHeight={"none"} displayMenu={true} />
         </div>
         <AllReactions
           queryKey={["allreactions", data.id]}

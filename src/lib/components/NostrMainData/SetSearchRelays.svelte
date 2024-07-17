@@ -7,11 +7,11 @@
 
   export let defaultRelays: DefaultRelayConfig[];
   export let setRelayList: string[];
-
+  let loading = true;
   // defaultRelays の中で write が true のものを含むように searchRelays を初期化
-  let searchRelays: DefaultRelayConfig[] = defaultRelays.filter(
-    (relay) => relay.write === true
-  );
+  // let searchRelays: DefaultRelayConfig[] = defaultRelays.filter(
+  //   (relay) => relay.write === true
+  // );
   onMount(() => {
     setSearchRelay();
   });
@@ -29,7 +29,12 @@
     } else {
       //デフォリレーがあるときはそれ使うことにする。どうせデフォリレーの中の何個かが入ったSeenonがneventの中に入ってるだけだし
     }
+    loading = false;
   }
 </script>
 
-<slot {searchRelays} />
+{#if loading}
+  <!---->
+{:else}
+  <slot />
+{/if}

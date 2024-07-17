@@ -9,6 +9,7 @@
     Notebook,
     Smile,
     Radio,
+    Link,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -19,6 +20,7 @@
   import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
+  import { page } from "$app/stores";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   let dialogOpen: any;
@@ -34,8 +36,9 @@
     { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
     { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
     { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-    { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+    // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
+    { text: `${$_("menu.copylink")}`, icon: Link, num: 7 },
   ];
   if (note.kind === 30030) {
     menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
@@ -118,6 +121,26 @@
           slicedEvent.update((value) => value);
           console.log("こうしんしたよ");
         }, 1000);
+        break;
+      case 7:
+        //Copy link
+        try {
+          await navigator.clipboard.writeText(
+            `${$page.url.origin}/${replaceable ? naddr : nevent}`
+          );
+          $toastSettings = {
+            title: "Success",
+            description: `Copied to clipboard`,
+            color: "bg-green-500",
+          };
+        } catch (error: any) {
+          console.error(error.message);
+          $toastSettings = {
+            title: "Error",
+            description: "Failed to copy",
+            color: "bg-orange-500",
+          };
+        }
         break;
     }
   };
