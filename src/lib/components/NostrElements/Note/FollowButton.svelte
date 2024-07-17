@@ -32,7 +32,26 @@
   const handleClickFollow = async () => {
     console.log("mada");
     if ($loginUser === "") return;
-
+    try {
+      const signPubkey = await (
+        window.nostr as Nostr.Nip07.Nostr
+      )?.getPublicKey();
+      if ($loginUser !== signPubkey) {
+        $toastSettings = {
+          title: "Error",
+          description: "login pubkey ≠ sign pubkey",
+          color: "bg-red-500",
+        };
+        return;
+      }
+    } catch (error) {
+      $toastSettings = {
+        title: "Error",
+        description: "failed to get sign pubkey",
+        color: "bg-red-500",
+      };
+      return;
+    }
     const followState = isfolloweeFunc(pubkey);
     let kind3Event: EventPacket | undefined = $queryClient.getQueryData([
       "timeline",
@@ -88,6 +107,7 @@
         content: $beforeKind3.content,
         tags: tags,
         kind: 3,
+        pubkey: $beforeKind3.pubkey,
       };
     } else {
       // 最新イベントでもフォローされてない状態だからフォローする

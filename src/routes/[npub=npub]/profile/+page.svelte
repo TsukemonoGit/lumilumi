@@ -49,9 +49,32 @@
   let newProfile: Profile;
   let lud: string = "";
   let newTags: string[][] = [];
+  let isError = false;
   onMount(async () => {
     if (!$queryClient) {
       console.log("error");
+      return;
+    }
+    try {
+      const signPubkey = await (
+        window.nostr as Nostr.Nip07.Nostr
+      )?.getPublicKey();
+      if (data.pubkey !== signPubkey) {
+        $toastSettings = {
+          title: "Error",
+          description: "login pubkey ≠ sign pubkey",
+          color: "bg-red-500",
+        };
+        isError = true;
+        return;
+      }
+    } catch (error) {
+      $toastSettings = {
+        title: "Error",
+        description: "failed to get sign pubkey",
+        color: "bg-red-500",
+      };
+      isError = true;
       return;
     }
     $nowProgress = true;
@@ -141,6 +164,7 @@
         kind: 0,
         content: content,
         tags: newTags,
+        pubkey: data.pubkey,
       };
       const { event, res } = await promisePublishEvent(ev);
       const isSuccess = res.filter((item) => item.ok);
@@ -197,7 +221,9 @@
 </script>
 
 <section class=" w-full">
-  {#if newProfile}
+  {#if isError}
+    error
+  {:else if newProfile}
     <div
       class="flex flex-col w-full border border-magnum-500 rounded-md overflow-hidden"
     >
@@ -263,7 +289,7 @@
           class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
           style="word-break: break-word; max-height:{bannerHeight}px"
         >
-          <Content text={newProfile.about} tags={newTags} />
+          <Content text={newProfile.about} tags={newTags} displayMenu={true} />
         </div>
       {/if}
     </div>
