@@ -25,7 +25,7 @@
 </script>
 
 <NostrMain let:pubkey let:localRelays>
-  <SetDefaultRelays {pubkey} {localRelays} let:relays let:status>
+  <SetDefaultRelays {pubkey} {localRelays} let:status>
     <div slot="loading">loading</div>
     <div slot="error">error</div>
     <div slot="nodata">nodata</div>

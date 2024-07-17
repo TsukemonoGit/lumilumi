@@ -33,7 +33,7 @@
 </svelte:head>
 <section>
   <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays {pubkey} {localRelays} let:relays>
+    <SetDefaultRelays {pubkey} {localRelays}>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>

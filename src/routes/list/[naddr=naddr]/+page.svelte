@@ -76,80 +76,72 @@
 </script>
 
 <section class="container">
-  <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays {pubkey} {localRelays} let:relays>
-      <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
+  <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
+    <div slot="loading">loading</div>
+    <div slot="error">error</div>
+    <div slot="nodata">nodata</div>
+    <div class="w-full flex justify-between">
+      <ListLinkCard {event} />
+    </div>
 
-      <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
-        <div slot="loading">loading</div>
-        <div slot="error">error</div>
-        <div slot="nodata">nodata</div>
-        <div class="w-full flex justify-between">
-          <ListLinkCard {event} />
-        </div>
+    {#await pubkeyList(event)}
+      waiting decrypt list
+    {:then pubkeys}
+      <ListUsersCard {pubkeys} />
+      <div class="w-full break-words overflow-hidden">
+        <TimelineList
+          queryKey={["list", "feed", atag]}
+          filters={[
+            {
+              kinds: [1, 6, 16],
+              authors: pubkeys,
+              limit: 50,
+              since: now(),
+            },
+          ]}
+          req={createRxForwardReq()}
+          let:events
+          {viewIndex}
+          {amount}
+          let:len
+          {tieKey}
+        >
+          <SetRepoReactions />
+          <div slot="loading">
+            <p>Loading...</p>
+          </div>
 
-        {#await pubkeyList(event)}
-          waiting decrypt list
-        {:then pubkeys}
-          <ListUsersCard {pubkeys} />
-          <div class="w-full break-words overflow-hidden">
-            <TimelineList
-              queryKey={["list", "feed", atag]}
-              filters={[
-                {
-                  kinds: [1, 6, 16],
-                  authors: pubkeys,
-                  limit: 50,
-                  since: now(),
-                },
-              ]}
-              req={createRxForwardReq()}
-              let:events
-              {viewIndex}
-              {amount}
-              let:len
-              {tieKey}
-            >
-              <SetRepoReactions />
-              <div slot="loading">
-                <p>Loading...</p>
-              </div>
+          <div slot="error" let:error>
+            <p>{error}</p>
+          </div>
 
-              <div slot="error" let:error>
-                <p>{error}</p>
-              </div>
-
-              <div class="max-w-[100vw] break-words box-border">
-                {#if events && events.length > 0}
-                  {#each events as event, index (event.id)}<div
-                      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
-                      events.length - 1
-                        ? 'last-visible'
-                        : ''} {index === 0 ? 'first-visible' : ''}"
-                    >
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard note={event} status="loading" />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard note={event} status="nodata" />
-                        </div>
-                        <div slot="error">
-                          <EventCard note={event} status="error" />
-                        </div>
-                        <EventCard {metadata} note={event} /></Metadata
-                      >
-                    </div>{/each}{/if}
-              </div>
-            </TimelineList>
-          </div>{/await}</LatestEvent
-      >
-    </SetDefaultRelays>
-  </NostrMain>
+          <div class="max-w-[100vw] break-words box-border">
+            {#if events && events.length > 0}
+              {#each events as event, index (event.id)}<div
+                  class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
+                  events.length - 1
+                    ? 'last-visible'
+                    : ''} {index === 0 ? 'first-visible' : ''}"
+                >
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                    let:metadata
+                  >
+                    <div slot="loading">
+                      <EventCard note={event} status="loading" />
+                    </div>
+                    <div slot="nodata">
+                      <EventCard note={event} status="nodata" />
+                    </div>
+                    <div slot="error">
+                      <EventCard note={event} status="error" />
+                    </div>
+                    <EventCard {metadata} note={event} /></Metadata
+                  >
+                </div>{/each}{/if}
+          </div>
+        </TimelineList>
+      </div>{/await}</LatestEvent
+  >
 </section>

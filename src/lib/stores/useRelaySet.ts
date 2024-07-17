@@ -17,7 +17,7 @@ import { pipe } from "rxjs";
 import { derived, get } from "svelte/store";
 import { setRelays, useReq } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app } from "./stores";
+import { app, queryClient } from "./stores";
 import { scanArray } from "./operators";
 import * as Nostr from "nostr-typedef";
 export function useRelaySet(

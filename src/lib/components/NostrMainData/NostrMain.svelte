@@ -12,6 +12,8 @@
     defaultReaction,
     nostrWalletConnect,
     showReactioninTL,
+    defaultRelays,
+    queryClient,
   } from "$lib/stores/stores";
   import NostrElements from "../NostrElements.svelte";
   import OpenPostWindow from "../OpenPostWindow.svelte";
@@ -39,7 +41,10 @@
   }; //kind42でのポスト画面とかでたぐを追加する用
 
   onMount(() => {
+    console.log($defaultRelays);
+    console.log($queryClient?.getQueryData(["defaultRelay", $loginUser]));
     initializeRxNostr();
+
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
 
     if (savedSettings) {
@@ -50,7 +55,9 @@
         goto("/settings");
       }
     }
+
     loading = false; // 初期化処理が完了したらローディングを終了
+    console.log($defaultRelays);
   });
 
   function initializeRxNostr() {
