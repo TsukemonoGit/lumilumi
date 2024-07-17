@@ -22,6 +22,7 @@
     additionalPostOptions,
     queryClient,
     loginUser,
+    toastSettings,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
   import Content from "./NostrElements/Note/Content.svelte";
@@ -101,13 +102,11 @@
     $open = true;
     $postWindowOpen = false;
   }
-
+  let signPubkey: string;
   $: if ($open) {
-    if (!metadata) {
-      metadata = (
-        $queryClient.getQueryData(["metadata", $loginUser]) as EventPacket
-      )?.event;
-    }
+    //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
+    signPubkeyCheck();
+
     // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
     // metadata = $queryClient.getQueryData(["metadata", pubkey]);
     // console.log(metadata);
@@ -121,7 +120,26 @@
       });
     }
   }
+  async function signPubkeyCheck() {
+    try {
+      const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      if (pub) {
+        console.log(pub);
+        signPubkey = pub;
 
+        metadata = (
+          $queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
+        )?.event;
+      }
+    } catch (error) {
+      $toastSettings = {
+        title: "Error",
+        description: "failed to get sign pubkey",
+        color: "bg-red-500",
+      };
+      return;
+    }
+  }
   $: if (!$open) {
     resetState();
   }
@@ -340,7 +358,7 @@
             max-w-[90vw] -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      {#if initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview)}
+      {#if signPubkey && (initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview))}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
@@ -351,7 +369,7 @@
             note={{
               sig: "",
               id: "",
-              pubkey: $loginUser,
+              pubkey: signPubkey,
               content: text,
               tags: tags,
               kind: options.kind ?? 1,
