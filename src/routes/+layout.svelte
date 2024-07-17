@@ -63,6 +63,15 @@
     //ページが変わったらリセット
     $slicedEvent = [];
   });
+
+  export let data:
+    | {
+        id: string;
+        relays?: string[] | undefined;
+        kind?: number | undefined;
+        author?: string | undefined;
+      }
+    | undefined;
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -77,7 +86,7 @@
 </svelte:head>
 <QueryClientProvider client={$queryClient}>
   <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays {pubkey} {localRelays}>
+    <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
