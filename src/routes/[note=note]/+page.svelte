@@ -17,6 +17,8 @@
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { setRelays } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
+  import { onMount } from "svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   export let data: {
     id: string;
@@ -34,10 +36,6 @@
       setRelays(data.relays);
     }
   });
-
-  function onMount(arg0: () => void) {
-    throw new Error("Function not implemented.");
-  }
 </script>
 
 <section>
@@ -95,3 +93,11 @@
     </AllReactions>
   </div>
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>

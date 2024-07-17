@@ -10,6 +10,7 @@
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setTieKey } from "$lib/func/nostr";
   import { loginUser, tieMapStore } from "$lib/stores/stores";
   import { nip04 } from "nostr-tools";
@@ -145,3 +146,11 @@
       </div>{/await}</LatestEvent
   >
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>

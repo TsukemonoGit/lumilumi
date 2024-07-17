@@ -17,6 +17,7 @@
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
   import { Pin } from "lucide-svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   export let data: {
     pubkey: string;
@@ -339,6 +340,14 @@
     </div>
   {/if}
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
 
 <style lang="postcss">
   .trigger {

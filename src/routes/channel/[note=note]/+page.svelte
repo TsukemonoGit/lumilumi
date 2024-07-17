@@ -13,6 +13,7 @@
   import { defaultRelays, tieMapStore } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   export let data: {
     id: string;
@@ -99,3 +100,7 @@
     </TimelineList>
   </div>
 </section>
+
+<div class="postWindow">
+  <OpenPostWindow options={{ tags: [["e", data.id, "", "root"]], kind: 42 }} />
+</div>

@@ -15,6 +15,7 @@
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import { _ } from "svelte-i18n";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   let amount = 50;
   let viewIndex = 0;
@@ -111,6 +112,14 @@
     >
   </div>
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
 
 <style>
   section {
