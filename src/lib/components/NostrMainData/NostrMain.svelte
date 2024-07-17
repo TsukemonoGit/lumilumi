@@ -126,9 +126,7 @@
 {#if loading}
   <slot name="loading" />
 {:else}
-  <slot {pubkey} {localRelays}>
-    <NostrElements />
-  </slot>
+  <slot {pubkey} {localRelays}></slot>
 {/if}
 
 {#if display}
