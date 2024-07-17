@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { loginUser, queryClient } from "$lib/stores/stores";
   import { useLatestEvent } from "$lib/stores/useLatestEvent";
 
   import type { ReqStatus } from "$lib/types";

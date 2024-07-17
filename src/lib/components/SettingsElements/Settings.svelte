@@ -164,7 +164,10 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
 
+    //リレーの設定やり直すためにリロードする
+
     originalSettings.set({ ...settings });
+    location.reload();
   }
 
   function isRelaySelectionInvalid() {

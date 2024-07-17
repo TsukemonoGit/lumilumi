@@ -4,6 +4,7 @@
 
   import {
     app,
+    loginUser,
     nowProgress,
     queryClient,
     slicedEvent,

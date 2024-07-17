@@ -258,7 +258,7 @@ input:-webkit-autofill:focus {
 @media screen and (max-width: 640px) {
   .postWindow {
     /* display: block !important; */
-    @apply fixed left-[50%] bottom-4 z-10 h-fit;
+    @apply fixed left-[50%] bottom-4 z-10 h-fit -translate-x-1/2;
   }
 }
 @media screen and (min-width: 641px) {
