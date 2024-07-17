@@ -29,7 +29,8 @@
     "douki": {
       "title": "データの同期"
     },
-    "lastUpdated": "最終更新日時"
+    "lastUpdated": "最終更新日時",
+    "refleshPage": "設定が更新されました。\n変更を適用するためにページをリロードします。"
   },
   "user": {
     "following": "フォロー中",

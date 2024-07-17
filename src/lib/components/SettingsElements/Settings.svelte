@@ -17,6 +17,7 @@
     defaultReaction,
     showReactioninTL,
     nostrWalletConnect,
+    nowProgress,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -145,10 +146,10 @@
 
     createCurrentSettings();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-
+    $nowProgress = true;
     toastSettings.set({
       title: "Success",
-      description: "saved",
+      description: $_("settings.refleshPage"),
       color: "bg-green-500",
     });
 
@@ -168,6 +169,7 @@
 
     originalSettings.set({ ...settings });
     location.reload();
+    $nowProgress = false;
   }
 
   function isRelaySelectionInvalid() {
