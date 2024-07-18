@@ -103,7 +103,7 @@
         <main>
           <slot />
           {#if $nowProgress}
-            <div class="fixed right-10 bottom-10">
+            <div class="fixed right-10 bottom-20">
               <LoadingElement />
             </div>
           {/if}

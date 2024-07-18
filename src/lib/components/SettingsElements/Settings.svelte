@@ -331,7 +331,7 @@
   };
 </script>
 
-<div class=" flex flex-col gap-3">
+<div class=" flex flex-col gap-3 mb-10">
   <div class="text-sm break-all">
     <div>[pubkey]</div>
     <!-- {nip19.npubEncode($pubkey)} -->

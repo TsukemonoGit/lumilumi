@@ -85,7 +85,20 @@
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-
+  $: console.log($status);
+  $: if (
+    ($status === "success" && !$data) ||
+    ($data !== undefined && $data.length <= 0)
+  ) {
+    //ノーデータだったときにデフォルトリレーをセット
+    setRelays(defaultRelays);
+    //適当にデータ返しておこう
+    result = {
+      data: readable(defaultRelays),
+      status: readable("success" as ReqStatus),
+      error: readable(undefined),
+    };
+  }
   interface $$Slots {
     default: {
       relays: DefaultRelayConfig[];

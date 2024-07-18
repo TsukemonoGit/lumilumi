@@ -340,7 +340,7 @@
 <button
   use:melt={$trigger}
   class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3.5
-  font-medium leading-none text-magnum-700 shadow hover:opacity-75"
+  font-medium leading-none text-magnum-700 shadow hover:opacity-75 z-30"
 >
   <SquarePen size={28} />
 </button>

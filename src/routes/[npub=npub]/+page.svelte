@@ -32,6 +32,7 @@
 
   afterNavigate(() => {
     view = false;
+    setTieKey(tieKey);
     req = createRxForwardReq(generateRandomId());
 
     setTimeout(() => {
@@ -43,9 +44,7 @@
 
   onMount(() => {
     setTieKey(tieKey);
-  });
-  afterNavigate(() => {
-    setTieKey(tieKey);
+    view = true;
   });
 
   const {

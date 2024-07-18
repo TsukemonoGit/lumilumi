@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { writable } from "svelte/store";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   let metadata: Nostr.Event;
   let url = writable<string>();
@@ -24,43 +25,76 @@
       return null;
     }
   };
-  $: if ($loginUser) {
-    const observer1 = new QueryObserver($queryClient, {
-      queryKey: ["metadata", $loginUser],
-    });
-    const unsubscribe1 = observer1.subscribe((result: any) => {
-      if ($queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket) {
-        metadata = (
-          $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
-        ).event;
-        const tmp = picture(metadata);
-        if (tmp) {
-          url.set(tmp);
-        }
-      }
-    });
-  }
+  // $: if ($loginUser) {
+  //   const observer1 = new QueryObserver($queryClient, {
+  //     queryKey: ["metadata", $loginUser],
+  //   });
+  //   const unsubscribe1 = observer1.subscribe((result: any) => {
+  //     if ($queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket) {
+  //       metadata = (
+  //         $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
+  //       ).event;
+  //       const tmp = picture(metadata);
+  //       if (tmp) {
+  //         url.set(tmp);
+  //       }
+  //     }
+  //   });
+  // }
 </script>
 
-<div
-  style={`width:${size}px;height:${size}px`}
-  class="flex justify-center items-center"
->
-  {#if $showImg && metadata && $url && $url !== ""}
-    <UserAvatar
-      bind:url={$url}
-      name={metadata.pubkey}
-      pubkey={metadata.pubkey}
-      size={size - 4}
-    />
-  {:else if metadata}
-    <Avatar
-      size={size - 4}
-      name={metadata.pubkey}
-      variant="beam"
-      colors={splitHexColorString(metadata.pubkey)}
-    />
-  {:else}
-    <Avatar size={size - 4} name={"noname"} variant="beam" />
-  {/if}
-</div>
+{#if $loginUser}
+  <div class="my-auto">
+    <Metadata
+      queryKey={["metadata", $loginUser]}
+      pubkey={$loginUser}
+      let:metadata
+    >
+      <div slot="loading">
+        <Avatar
+          size={size - 4}
+          name={$loginUser}
+          variant="beam"
+          colors={splitHexColorString($loginUser)}
+        />
+      </div>
+      <div slot="nodata">
+        <Avatar
+          size={size - 4}
+          name={$loginUser}
+          variant="beam"
+          colors={splitHexColorString($loginUser)}
+        />
+      </div>
+      <div slot="error">
+        <Avatar
+          size={size - 4}
+          name={$loginUser}
+          variant="beam"
+          colors={splitHexColorString($loginUser)}
+        />
+      </div>
+      {@const url = picture(metadata)}
+      <div
+        style={`width:${size}px;height:${size}px`}
+        class="flex justify-center items-center"
+      >
+        {#if $showImg && metadata && url && url !== ""}
+          <UserAvatar
+            {url}
+            name={metadata.pubkey}
+            pubkey={metadata.pubkey}
+            size={size - 4}
+          />
+        {:else}
+          <Avatar
+            size={size - 4}
+            name={$loginUser}
+            variant="beam"
+            colors={splitHexColorString($loginUser)}
+          />
+        {/if}
+      </div></Metadata
+    >
+  </div>
+{/if}

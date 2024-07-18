@@ -31,11 +31,11 @@
     { Icon: Users, link: "/list", alt: "list" },
 
     { Icon: Settings, link: "/settings", alt: "settings" },
-    {
-      Icon: UserAvatar2,
-      link: undefined,
-      alt: "user page",
-    },
+    // {
+    //   Icon: UserAvatar2,
+    //   link: undefined,
+    //   alt: "user page",
+    // },
   ];
   const {
     elements: { menubar },
@@ -66,47 +66,55 @@
     } catch (error) {}
   };
   $: menuPosition = $menuLeft ? "left-5" : "right-5";
+  $: menuPosition2 = $menuLeft ? "right-5" : "left-5";
 </script>
 
-<div class="menuGroup fixed bottom-5 {menuPosition} z-20">
-  <div use:melt={$menubar}>
-    <button
-      type="button"
-      class="trigger"
-      use:melt={$trigger}
-      aria-label="Update dimensions"
+<div class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-white">
+  <div class="fixed {menuPosition2} h-full mt-2">
+    <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
+      <UserAvatar2 size={40} /></a
     >
-      <svelte:component this={$currentPageIcon} class="size-6" />
+  </div>
+  <div class="fixed {menuPosition} mt-1">
+    <div use:melt={$menubar}>
+      <button
+        type="button"
+        class="trigger"
+        use:melt={$trigger}
+        aria-label="Update dimensions"
+      >
+        <svelte:component this={$currentPageIcon} class="size-6" />
 
-      <span class="sr-only">Open Popover</span>
-    </button>
+        <span class="sr-only">Open Popover</span>
+      </button>
 
-    <div
-      class=" menu"
-      use:melt={$menu}
-      transition:fly={{ duration: 150, y: -10 }}
-    >
-      <nav class="p-2">
-        <ul class="flex flex-wrap w-32 h-32 justify-around items-center">
-          {#each items as { Icon, link, alt }}
-            <li
-              aria-current={$page.url?.pathname ===
-              (link === undefined && $loginUser ? `/${encodedPub}` : link)
-                ? "page"
-                : undefined}
-            >
-              <a
-                href={link ?? `/${encodedPub}`}
-                class="item flex justify-center items-center"
-                use:melt={$item}
-                title={alt}
+      <div
+        class=" menu"
+        use:melt={$menu}
+        transition:fly={{ duration: 150, y: -10 }}
+      >
+        <nav class="p-2">
+          <ul class="flex flex-wrap w-32 h-32 justify-around items-center">
+            {#each items as { Icon, link, alt }}
+              <li
+                aria-current={$page.url?.pathname ===
+                (link === undefined && $loginUser ? `/${encodedPub}` : link)
+                  ? "page"
+                  : undefined}
               >
-                <svelte:component this={Icon} />
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </nav>
+                <a
+                  href={link ?? `/${encodedPub}`}
+                  class="item flex justify-center items-center"
+                  use:melt={$item}
+                  title={alt}
+                >
+                  <svelte:component this={Icon} />
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 </div>
