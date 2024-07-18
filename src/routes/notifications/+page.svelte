@@ -10,6 +10,7 @@
   import { afterNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -84,6 +85,14 @@
     </TimelineList>
   </div>
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
 
 <style>
   section {

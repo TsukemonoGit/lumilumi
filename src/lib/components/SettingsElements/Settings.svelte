@@ -153,17 +153,17 @@
       color: "bg-green-500",
     });
 
-    $loginUser = settings.pubkey;
-    $showImg = settings.showImg;
-    $showPreview = settings.showPreview;
-    $menuLeft = settings.menuleft;
-    $showRelayIcon = settings.showRelayIcon;
-    $mutes = settings.mute.list;
-    $emojis = settings.emoji.list;
-    $mutebykinds = settings.mutebykinds.list;
-    $defaultReaction = settings.defaultReaction;
-    $showReactioninTL = settings.showReactioninTL;
-    $nostrWalletConnect = settings.nostrWalletConnect;
+    // $loginUser = settings.pubkey;
+    // $showImg = settings.showImg;
+    // $showPreview = settings.showPreview;
+    // $menuLeft = settings.menuleft;
+    // $showRelayIcon = settings.showRelayIcon;
+    // $mutes = settings.mute.list;
+    // $emojis = settings.emoji.list;
+    // $mutebykinds = settings.mutebykinds.list;
+    // $defaultReaction = settings.defaultReaction;
+    // $showReactioninTL = settings.showReactioninTL;
+    // $nostrWalletConnect = settings.nostrWalletConnect;
 
     //リレーの設定やり直すためにリロードする
 

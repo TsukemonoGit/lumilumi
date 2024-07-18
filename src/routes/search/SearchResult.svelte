@@ -16,6 +16,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -91,3 +92,11 @@
     </TimelineList>
   </div>
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
