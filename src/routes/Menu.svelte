@@ -70,12 +70,12 @@
 </script>
 
 <div class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-white">
-  <div class="fixed {menuPosition2} h-full mt-2">
+  <div class="absolute {menuPosition2} h-full mt-2">
     <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
       <UserAvatar2 size={40} /></a
     >
   </div>
-  <div class="fixed {menuPosition} mt-1">
+  <div class="absolute {menuPosition} mt-1">
     <div use:melt={$menubar}>
       <button
         type="button"
