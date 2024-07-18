@@ -42,7 +42,7 @@
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
       });
-
+      await nostrLogin.launch();
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
       console.log(theme);
       setTheme(theme);
