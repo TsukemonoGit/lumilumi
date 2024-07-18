@@ -13,3 +13,4 @@ vite.config.ts.timestamp-*
 src/routes/api/datastore.ts
 src/routes/api/setOtp
 src/routes/api/getOtp
+/.vscode
