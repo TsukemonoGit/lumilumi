@@ -10,6 +10,8 @@
     type RxReqOverable,
     type RxReqPipeable,
   } from "rx-nostr";
+  import { setRelays } from "$lib/func/nostr";
+  import { defaultRelays } from "$lib/stores/relays";
 
   export let req:
     | (RxReq<"backward"> &
@@ -21,11 +23,33 @@
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   let relays: DefaultRelayConfig[] | undefined = undefined;
-
+  export let paramRelays: string[] | undefined;
   export let localRelays: DefaultRelayConfig[];
   export let pubkey: string;
+  console.log(pubkey);
+  $: result = pubkey ? deriveResult(localRelays, pubkey, req) : setLoadRelays();
 
-  $: result = deriveResult(localRelays, pubkey, req);
+  //個々に来た段階でpubkeyがないってことは設定がないで、homeに来てたら設定に飛ぶから、それ以外のnoteのページとかに直できたときだから、
+  //paramにリレーが設定されてたらそれを使ってなかったらなんか適当にデフォルトリレーセットしよう
+  function setLoadRelays() {
+    if (paramRelays) {
+      setRelays(paramRelays);
+      //適当にデータ返しておこう
+      return {
+        data: readable(paramRelays),
+        status: readable("success" as ReqStatus),
+        error: readable(undefined),
+      };
+    } else {
+      setRelays(defaultRelays);
+      //適当にデータ返しておこう
+      return {
+        data: readable(defaultRelays),
+        status: readable("success" as ReqStatus),
+        error: readable(undefined),
+      };
+    }
+  }
 
   function deriveResult(
     localRelays: DefaultRelayConfig[],
@@ -61,7 +85,20 @@
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-
+  $: console.log($status);
+  $: if (
+    ($status === "success" && !$data) ||
+    ($data !== undefined && $data.length <= 0)
+  ) {
+    //ノーデータだったときにデフォルトリレーをセット
+    setRelays(defaultRelays);
+    //適当にデータ返しておこう
+    result = {
+      data: readable(defaultRelays),
+      status: readable("success" as ReqStatus),
+      error: readable(undefined),
+    };
+  }
   interface $$Slots {
     default: {
       relays: DefaultRelayConfig[];

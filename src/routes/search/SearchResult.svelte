@@ -16,6 +16,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -40,68 +41,62 @@
 </script>
 
 <section>
-  <NostrMain let:pubkey let:localRelays>
-    <!-- <SetSearchRelays
-      defaultRelays={localRelays.length > 0
-        ? localRelays
-        : toRelaySet($queryClient.getQueryData(["defaultRelay", pubkey]))}
-      setRelayList={nip50relays}
-      let:searchRelays
-    > -->
-    <SetDefaultRelays {pubkey} {localRelays}>
+  <div class="w-full break-words overflow-x-hidden max-w-full">
+    <TimelineList
+      queryKey={["search", generateRandomId(4)]}
+      filters={[filter]}
+      req={createRxForwardReq()}
+      let:events
+      {viewIndex}
+      {amount}
+      let:len
+      {tieKey}
+      relays={nip50relays}
+    >
+      <SetRepoReactions />
       <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
-      <div class="w-full break-words overflow-x-hidden max-w-full">
-        <TimelineList
-          queryKey={["search", generateRandomId(4)]}
-          filters={[filter]}
-          req={createRxForwardReq()}
-          let:events
-          {viewIndex}
-          {amount}
-          let:len
-          {tieKey}
-          relays={nip50relays}
-        >
-          <SetRepoReactions />
-          <div slot="loading">loading</div>
 
-          <div slot="error" let:error>
-            {error}
-          </div>
-          <div slot="nodata">nodata</div>
-          <div class=" break-words">
-            {#if events && events.length > 0}
-              {#each events as event, index (event.id)}
-                <div
-                  class="break-words whitespace-pre-line m-1 overflow-hidden {index ===
-                  events.length - 1
-                    ? 'last-visible'
-                    : ''} {index === 0 ? 'first-visible' : ''}"
-                >
-                  <Metadata
-                    queryKey={["metadata", event.pubkey]}
-                    pubkey={event.pubkey}
-                    let:metadata
-                  >
-                    <div slot="loading">
-                      <EventCard note={event} status="loading" />
-                    </div>
-                    <div slot="nodata">
-                      <EventCard note={event} status="nodata" />
-                    </div>
-                    <div slot="error">
-                      <EventCard note={event} status="error" />
-                    </div>
-                    <EventCard {metadata} note={event} />
-                  </Metadata>
-                </div>
-              {/each}
-            {/if}
-          </div>
-        </TimelineList>
+      <div slot="error" let:error>
+        {error}
       </div>
-    </SetDefaultRelays>
-  </NostrMain>
+      <div slot="nodata">nodata</div>
+      <div class=" break-words">
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <div
+              class="break-words whitespace-pre-line m-1 overflow-hidden {index ===
+              events.length - 1
+                ? 'last-visible'
+                : ''} {index === 0 ? 'first-visible' : ''}"
+            >
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading">
+                  <EventCard note={event} status="loading" />
+                </div>
+                <div slot="nodata">
+                  <EventCard note={event} status="nodata" />
+                </div>
+                <div slot="error">
+                  <EventCard note={event} status="error" />
+                </div>
+                <EventCard {metadata} note={event} />
+              </Metadata>
+            </div>
+          {/each}
+        {/if}
+      </div>
+    </TimelineList>
+  </div>
 </section>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>

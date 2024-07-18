@@ -12,6 +12,8 @@
     defaultReaction,
     nostrWalletConnect,
     showReactioninTL,
+    defaultRelays,
+    queryClient,
   } from "$lib/stores/stores";
   import NostrElements from "../NostrElements.svelte";
   import OpenPostWindow from "../OpenPostWindow.svelte";
@@ -29,17 +31,15 @@
 
   const STORAGE_KEY = "lumiSetting";
 
-  export let display: boolean = true;
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
   let loading = true; // ローディング状態を追跡する変数を追加
-  export let options: { tags: string[][]; kind?: number } = {
-    tags: [],
-    kind: 1,
-  }; //kind42でのポスト画面とかでたぐを追加する用
 
   onMount(() => {
+    console.log($defaultRelays);
+    console.log($queryClient?.getQueryData(["defaultRelay", $loginUser]));
     initializeRxNostr();
+
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
 
     if (savedSettings) {
@@ -50,7 +50,9 @@
         goto("/settings");
       }
     }
+
     loading = false; // 初期化処理が完了したらローディングを終了
+    console.log($defaultRelays);
   });
 
   function initializeRxNostr() {
@@ -128,25 +130,3 @@
 {:else}
   <slot {pubkey} {localRelays}></slot>
 {/if}
-
-{#if display}
-  <div class="postWindow">
-    <OpenPostWindow {options} />
-  </div>
-{/if}
-
-<style lang="postcss">
-  @media screen and (max-width: 640px) {
-    .postWindow {
-      /* display: block !important; */
-      @apply fixed right-auto left-auto bottom-4 z-10 h-fit;
-    }
-  }
-  @media screen and (min-width: 641px) {
-    .postWindow {
-      /* display: none !important; */
-      @apply fixed right-auto left-24 top-2 z-10 h-fit;
-      left: max(6.5rem, calc(50% - 630px));
-    }
-  }
-</style>

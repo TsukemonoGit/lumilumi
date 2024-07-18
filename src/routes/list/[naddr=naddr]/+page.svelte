@@ -10,8 +10,9 @@
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { setTieKey } from "$lib/func/nostr";
-  import { loginUser, tieMapStore } from "$lib/stores/stores";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { setRelays, setTieKey } from "$lib/func/nostr";
+  import { defaultRelays, loginUser, tieMapStore } from "$lib/stores/stores";
   import { nip04 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
 
@@ -32,12 +33,27 @@
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "naddr";
-
+  let loading = true;
   onMount(() => {
     setTieKey(tieKey);
+    if ($defaultRelays) {
+      setRelays($defaultRelays);
+    } else if (!$defaultRelays && data.relays) {
+      setRelays(data.relays);
+    }
+    loading = false;
   });
   afterNavigate(() => {
+    console.log($defaultRelays);
+    console.log(atag);
+    console.log(filters);
     setTieKey(tieKey);
+    if ($defaultRelays) {
+      setRelays($defaultRelays);
+    } else if (!$defaultRelays && data.relays) {
+      setRelays(data.relays);
+    }
+    loading = false;
   });
 
   const pubkeyList = async (event: Nostr.Event): Promise<string[]> => {
@@ -75,81 +91,85 @@
   };
 </script>
 
-<section class="container">
-  <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays {pubkey} {localRelays} let:relays>
+{#if loading}
+  loading
+{:else}
+  <section class="container">
+    <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
+      <div class="w-full flex justify-between">
+        <ListLinkCard {event} />
+      </div>
 
-      <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
-        <div slot="loading">loading</div>
-        <div slot="error">error</div>
-        <div slot="nodata">nodata</div>
-        <div class="w-full flex justify-between">
-          <ListLinkCard {event} />
-        </div>
+      {#await pubkeyList(event)}
+        waiting decrypt list
+      {:then pubkeys}
+        <ListUsersCard {pubkeys} />
+        <div class="w-full break-words overflow-hidden">
+          <TimelineList
+            queryKey={["list", "feed", atag]}
+            filters={[
+              {
+                kinds: [1, 6, 16],
+                authors: pubkeys,
+                limit: 50,
+                since: now(),
+              },
+            ]}
+            req={createRxForwardReq()}
+            let:events
+            {viewIndex}
+            {amount}
+            let:len
+            {tieKey}
+          >
+            <SetRepoReactions />
+            <div slot="loading">
+              <p>Loading...</p>
+            </div>
 
-        {#await pubkeyList(event)}
-          waiting decrypt list
-        {:then pubkeys}
-          <ListUsersCard {pubkeys} />
-          <div class="w-full break-words overflow-hidden">
-            <TimelineList
-              queryKey={["list", "feed", atag]}
-              filters={[
-                {
-                  kinds: [1, 6, 16],
-                  authors: pubkeys,
-                  limit: 50,
-                  since: now(),
-                },
-              ]}
-              req={createRxForwardReq()}
-              let:events
-              {viewIndex}
-              {amount}
-              let:len
-              {tieKey}
-            >
-              <SetRepoReactions />
-              <div slot="loading">
-                <p>Loading...</p>
-              </div>
+            <div slot="error" let:error>
+              <p>{error}</p>
+            </div>
 
-              <div slot="error" let:error>
-                <p>{error}</p>
-              </div>
-
-              <div class="max-w-[100vw] break-words box-border">
-                {#if events && events.length > 0}
-                  {#each events as event, index (event.id)}<div
-                      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
-                      events.length - 1
-                        ? 'last-visible'
-                        : ''} {index === 0 ? 'first-visible' : ''}"
+            <div class="max-w-[100vw] break-words box-border">
+              {#if events && events.length > 0}
+                {#each events as event, index (event.id)}<div
+                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
+                    events.length - 1
+                      ? 'last-visible'
+                      : ''} {index === 0 ? 'first-visible' : ''}"
+                  >
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
                     >
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard note={event} status="loading" />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard note={event} status="nodata" />
-                        </div>
-                        <div slot="error">
-                          <EventCard note={event} status="error" />
-                        </div>
-                        <EventCard {metadata} note={event} /></Metadata
-                      >
-                    </div>{/each}{/if}
-              </div>
-            </TimelineList>
-          </div>{/await}</LatestEvent
-      >
-    </SetDefaultRelays>
-  </NostrMain>
-</section>
+                      <div slot="loading">
+                        <EventCard note={event} status="loading" />
+                      </div>
+                      <div slot="nodata">
+                        <EventCard note={event} status="nodata" />
+                      </div>
+                      <div slot="error">
+                        <EventCard note={event} status="error" />
+                      </div>
+                      <EventCard {metadata} note={event} /></Metadata
+                    >
+                  </div>{/each}{/if}
+            </div>
+          </TimelineList>
+        </div>{/await}</LatestEvent
+    >
+  </section>
+  <div class="postWindow">
+    <OpenPostWindow
+      options={{
+        tags: [],
+        kind: 1,
+      }}
+    />
+  </div>
+{/if}

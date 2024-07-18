@@ -1,6 +1,7 @@
 //useRelaySet.ts
 import type { QueryKey } from "@tanstack/svelte-query";
 import {
+  completeOnTimeout,
   uniq,
   verify,
   type DefaultRelayConfig,
@@ -17,7 +18,7 @@ import { pipe } from "rxjs";
 import { derived, get } from "svelte/store";
 import { setRelays, useReq } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app } from "./stores";
+import { app, queryClient } from "./stores";
 import { scanArray } from "./operators";
 import * as Nostr from "nostr-typedef";
 export function useRelaySet(
@@ -36,7 +37,7 @@ export function useRelaySet(
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
     setRelays(relaySearchRelays);
   }
-  const operator = pipe(uniq(), scanArray());
+  const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
   const reqResult = useReq({ queryKey, filters, operator, req });
 
   const transformedData = derived(reqResult.data, ($data) => toRelaySet($data));

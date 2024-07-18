@@ -17,6 +17,7 @@
     defaultReaction,
     showReactioninTL,
     nostrWalletConnect,
+    nowProgress,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -145,10 +146,10 @@
 
     createCurrentSettings();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-
+    $nowProgress = true;
     toastSettings.set({
       title: "Success",
-      description: "saved",
+      description: $_("settings.refleshPage"),
       color: "bg-green-500",
     });
 
@@ -164,7 +165,11 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
 
+    //リレーの設定やり直すためにリロードするリロードしてくださいを出す
+
     originalSettings.set({ ...settings });
+    //  location.reload();
+    $nowProgress = false;
   }
 
   function isRelaySelectionInvalid() {
@@ -326,7 +331,7 @@
   };
 </script>
 
-<div class=" flex flex-col gap-3">
+<div class=" flex flex-col gap-3 mb-10">
   <div class="text-sm break-all">
     <div>[pubkey]</div>
     <!-- {nip19.npubEncode($pubkey)} -->

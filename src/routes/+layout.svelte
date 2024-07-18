@@ -4,6 +4,7 @@
 
   import {
     app,
+    loginUser,
     nowProgress,
     queryClient,
     slicedEvent,
@@ -28,6 +29,8 @@
   import Menu from "./Menu.svelte";
   import Sidebar from "./Sidebar.svelte";
   import { afterNavigate } from "$app/navigation";
+  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
+  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
   onMount(async () => {
@@ -39,7 +42,7 @@
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
       });
-
+      //await nostrLogin.launch();
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
       console.log(theme);
       setTheme(theme);
@@ -61,6 +64,15 @@
     //ページが変わったらリセット
     $slicedEvent = [];
   });
+
+  export let data:
+    | {
+        id: string;
+        relays?: string[] | undefined;
+        kind?: number | undefined;
+        author?: string | undefined;
+      }
+    | undefined;
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -74,27 +86,34 @@
   {/each}
 </svelte:head>
 <QueryClientProvider client={$queryClient}>
-  <Header />
+  <NostrMain let:pubkey let:localRelays>
+    <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
+      <div slot="loading">loading</div>
+      <div slot="error">error</div>
+      <div slot="nodata">nodata</div>
+      <Header />
 
-  <Menu />
+      <Menu />
 
-  <Toast />
-  <div class="container grid grid-cols-[auto_1fr]">
-    <div class="sm:w-52 w-0">
-      <Sidebar />
-    </div>
-    <main>
-      <slot />
-      {#if $nowProgress}
-        <div class="fixed right-10 bottom-10">
-          <LoadingElement />
+      <Toast />
+      <div class="container grid grid-cols-[auto_1fr]">
+        <div class="sm:w-52 w-0">
+          <Sidebar />
         </div>
-      {/if}
-    </main>
-  </div>
-  <!-- <footer>
+        <main>
+          <slot />
+          {#if $nowProgress}
+            <div class="fixed right-10 bottom-20">
+              <LoadingElement />
+            </div>
+          {/if}
+        </main>
+      </div>
+      <!-- <footer>
     <p>
       visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
     </p>
   </footer> -->
+    </SetDefaultRelays>
+  </NostrMain>
 </QueryClientProvider>
