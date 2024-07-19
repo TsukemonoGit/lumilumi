@@ -14,74 +14,86 @@ import {
 import { pipe, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";
-import { loginUser } from "$lib/stores/stores";
+import { loginUser, slicedEvent } from "$lib/stores/stores";
 
 export async function loadOlderEvents(
   sift: number,
-  data: EventPacket[], //Nostr.Event[],
   filters: Filter[],
   queryKey: QueryKey,
   lastfavcheck: boolean,
 
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
-  if (data && data.length > 1) {
-    const kind1 = data.filter(
-      (item) =>
-        item.event.kind === 1 &&
-        !item.event.tags.find(
-          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
-        )
-    ); //通知こないたいぷのkind1の最後
-    console.log(kind1.length);
-    console.log(kind1[kind1.length - 1]);
-    if (lastfavcheck && kind1.length === 0) {
-      return [];
-    }
-    const lastEvent = data[data.length - 1];
+  //console.log(get(slicedEvent));
+  if (!get(slicedEvent) || get(slicedEvent).length < 0) {
+    console.log("sliced eventがないから古いイベントトルの失敗");
+    return [];
+  }
 
-    const untilTimestamp = data[data.length - 1].event.created_at;
-    //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
-    const newFilters = lastfavcheck
-      ? lastEvent.event.kind === 1
-        ? filters.map((filter: Filter) => ({
-            ...filter,
-            limit: sift,
-            until: untilTimestamp,
-            since: undefined,
-          }))
-        : [
-            {
-              ...filters[0],
-              limit: sift,
-              until: kind1[kind1.length - 1].event.created_at,
-              since: undefined,
-            },
-          ]
-      : filters.map((filter: Filter) => ({
+  const kind1 = get(slicedEvent).filter(
+    (item) =>
+      item.kind === 1 &&
+      !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
+  );
+  console.log(kind1);
+  // if (data && data.length > 1) {
+  //   const kind1 = data.filter(
+  //     (item) =>
+  //       item.event.kind === 1 &&
+  //       !item.event.tags.find(
+  //         (tag) => tag[0] === "p" && tag[1] === get(loginUser)
+  //       )
+  //   ); //通知こないたいぷのkind1の最後
+  // console.log(kind1.length);
+  //   console.log(kind1[kind1.length - 1]);
+  // if (lastfavcheck && kind1.length === 0) {
+  //   return [];
+  // }
+  const lastEvent = get(slicedEvent)[get(slicedEvent).length - 1];
+  console.log(lastEvent);
+  const untilTimestamp =
+    get(slicedEvent)[get(slicedEvent).length - 1].created_at;
+  console.log(untilTimestamp);
+  //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
+  const newFilters = lastfavcheck
+    ? lastEvent.kind === 1
+      ? filters.map((filter: Filter) => ({
           ...filter,
           limit: sift,
           until: untilTimestamp,
           since: undefined,
-        }));
-    console.log(newFilters);
-    const newReq = createRxBackwardReq();
-    const operator = pipe(uniq(), scanArray());
-    const olderEvents = await usePromiseReq(
-      {
-        operator: operator,
-        queryKey: queryKey,
-        filters: newFilters,
-        req: newReq,
-      },
-      relays
-    );
-    //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-    return olderEvents
-      .sort((a, b) => b.event.created_at - a.event.created_at)
-      .slice(0, sift);
-  }
-  return [];
+        }))
+      : [
+          {
+            ...filters[0],
+            limit: sift,
+            until: kind1[kind1.length - 1].created_at,
+            since: undefined,
+          },
+        ]
+    : filters.map((filter: Filter) => ({
+        ...filter,
+        limit: sift,
+        until: untilTimestamp,
+        since: undefined,
+      }));
+  console.log(newFilters);
+  const newReq = createRxBackwardReq();
+  const operator = pipe(uniq(), scanArray());
+  const olderEvents = await usePromiseReq(
+    {
+      operator: operator,
+      queryKey: queryKey,
+      filters: newFilters,
+      req: newReq,
+    },
+    relays
+  );
+  //console.log(olderEvents);
+  //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
+  return olderEvents
+    .sort((a, b) => b.event.created_at - a.event.created_at)
+    .slice(0, sift);
 }
 
 export async function firstLoadOlderEvents(

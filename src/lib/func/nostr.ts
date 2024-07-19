@@ -417,6 +417,7 @@ export function usePromiseReq(
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]
     : [initData];
+  console.log(accumulatedData);
   const tie = get(tieMapStore)?.[tieKey]?.[0];
 
   const obs: Observable<EventPacket[] | EventPacket> = tie
@@ -435,7 +436,7 @@ export function usePromiseReq(
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {
-        //   console.log(v);
+        //console.log(v);
         // 受け取ったデータが配列でない場合、配列に変換して追加
         if (Array.isArray(v)) {
           accumulatedData = v;
