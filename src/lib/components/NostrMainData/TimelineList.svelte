@@ -73,20 +73,42 @@
   $: status = result.status;
   $: error = result.error;
   let readUrls: string[] = [];
-  let olderEvents: EventPacket[] = [];
   $: if ($defaultRelays) {
     readUrls = Object.values($defaultRelays)
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: if ($data && viewIndex >= 0 && olderEvents) {
+  $: if ($data && viewIndex >= 0) {
     updateViewEvent($data);
   }
   beforeNavigate(() => {
     $slicedEvent = [];
   });
+
+  let isOnMount = false;
   onMount(async () => {
-    console.log("onMount");
+    if (!isOnMount) {
+      console.log("onMount");
+      $nowProgress = true;
+      isOnMount = true;
+      await init();
+      isOnMount = false;
+      $nowProgress = false;
+    }
+  });
+
+  afterNavigate(async () => {
+    if (!isOnMount) {
+      console.log("afterNavigate");
+      $nowProgress = true;
+      isOnMount = true;
+      await init();
+      isOnMount = false;
+      $nowProgress = false;
+    }
+  });
+
+  async function init() {
     const ev: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
@@ -94,21 +116,25 @@
 
     if (ev) {
       console.log(ev);
-      olderEvents = ev;
+
       updateViewEvent($data);
       //olderEventsから、今の時間までのあいだのイベントをとるやつ
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
-        since: olderEvents[0].event.created_at,
+        since: ev[0].event.created_at,
         until: now(),
       }));
       const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-      olderEvents.push(...older);
+      if (older.length > 0) {
+        $queryClient.setQueryData(
+          [...queryKey, "olderData"],
+          [...ev, ...older]
+        );
+      }
       updateViewEvent($data);
     }
 
-    if (olderEvents?.length <= 0) {
-      $nowProgress = true;
+    if (!ev || ev?.length <= 0) {
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
@@ -122,52 +148,20 @@
         relays
       );
 
-      olderEvents.push(...older);
-      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
-      updateViewEvent($data);
-      $nowProgress = false;
-    }
-  });
+      if (older.length > 0) {
+        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
+          ...queryKey,
+          "olderData",
+        ]);
 
-  afterNavigate(async () => {
-    console.log("afterNavigate");
-    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
-    if (ev) {
-      olderEvents = ev;
-      updateViewEvent($data);
-      //olderEventsから、今の時間までのあいだのイベントをとるやつ
-      const newFilters = filters.map((filter: Nostr.Filter) => ({
-        ...filter,
-        since: olderEvents[0].event.created_at,
-        until: now(),
-      }));
-      const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-      olderEvents.push(...older);
-      updateViewEvent($data);
+        $queryClient.setQueryData(
+          [...queryKey, "olderData"],
+          [...(olddata ?? []), ...older]
+        );
+        updateViewEvent($data);
+      }
     }
-    if (olderEvents?.length <= 0) {
-      const newFilters = filters.map((filter: Nostr.Filter) => ({
-        ...filter,
-        since: undefined,
-        until: now(),
-        limit: 50,
-      }));
-      const older = await firstLoadOlderEvents(
-        50,
-        newFilters,
-        queryKey,
-        relays
-      );
-
-      olderEvents.push(...older);
-      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
-      updateViewEvent($data);
-      $nowProgress = false;
-    }
-  });
+  }
 
   interface $$Slots {
     default: { events: Nostr.Event[]; status: ReqStatus; len: number };
@@ -186,15 +180,21 @@
       $nowProgress = true;
       const older = await loadOlderEvents(
         sift,
-        allUniqueEvents,
         filters,
         queryKey,
         lastfavcheck,
         relays
       );
-
-      olderEvents.push(...older);
-      $queryClient.setQueryData([...queryKey, "olderData"], olderEvents);
+      console.log(older);
+      if (older.length > 0) {
+        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
+          [...queryKey, "olderData"]
+        );
+        $queryClient.setQueryData(
+          [...queryKey, "olderData"],
+          [...(olderdatas ?? []), ...older]
+        );
+      }
     }
     viewIndex += sift; //スライドする量
     updateViewEvent($data);
@@ -217,7 +217,7 @@
     if (viewIndex > 0) {
       viewIndex = Math.max(viewIndex - sift, 0);
     }
-
+    updateViewEvent($data);
     //スマホではスクロールちゃんとなってたからでかいときだけやる
     if (window.innerWidth > 640) {
       //px
@@ -233,7 +233,13 @@
   };
 
   function updateViewEvent(data: EventPacket[] | undefined) {
-    const allEvents = data ? [...data, ...olderEvents] : olderEvents;
+    const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
+      ...queryKey,
+      "olderData",
+    ]); //なんかデータ消えるからクエリーから取る
+
+    const allEvents =
+      data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
     // console.log(allEvents);
     allEvents.sort((a, b) => b.event.created_at - a.event.created_at);
     const uniqueEventsMap: { [x: string]: boolean } = {};
@@ -257,6 +263,7 @@
 
   function handleClickTop() {
     viewIndex = 0;
+    updateViewEvent($data);
   }
 
   onDestroy(() => {

@@ -25,7 +25,7 @@
 
   let amount = 50;
   let viewIndex = 0;
-
+  let viewIndex1 = 0;
   let componentKey = 0; // Key to force re-render
   let view: boolean = false;
   let req = createRxForwardReq();
@@ -213,7 +213,7 @@
               ]}
               {req}
               let:events
-              {viewIndex}
+              viewIndex={viewIndex1}
               {amount}
               {tieKey}
               lastfavcheck={false}
@@ -381,21 +381,6 @@
       background-color: theme(colors.neutral.900);
 
       color: theme("colors.magnum.500");
-    }
-  }
-
-  input {
-    height: theme(spacing.8);
-    flex-shrink: 0;
-    flex-grow: 1;
-    border-radius: theme(borderRadius.md);
-    border: 1px solid theme(colors.neutral.200);
-    padding-inline: theme(spacing[2.5]);
-    line-height: 1;
-    color: theme(colors.neutral.900);
-
-    &:focus {
-      border-color: theme(colors.magnum.400);
     }
   }
 

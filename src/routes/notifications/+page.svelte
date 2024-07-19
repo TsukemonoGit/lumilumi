@@ -47,6 +47,7 @@
       {amount}
       eventFilter={(eventpacket) => eventpacket.event.pubkey !== $loginUser}
       {tieKey}
+      lastfavcheck={false}
     >
       <div slot="loading">
         <p>Loading...</p>
