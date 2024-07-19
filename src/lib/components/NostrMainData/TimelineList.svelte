@@ -78,7 +78,7 @@
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: if ($data && viewIndex >= 0) {
+  $: if (($data && viewIndex >= 0) || !$nowProgress) {
     updateViewEvent($data);
   }
   beforeNavigate(() => {
@@ -118,20 +118,21 @@
       console.log(ev);
 
       updateViewEvent($data);
-      //olderEventsから、今の時間までのあいだのイベントをとるやつ
-      const newFilters = filters.map((filter: Nostr.Filter) => ({
-        ...filter,
-        since: ev[0].event.created_at,
-        until: now(),
-      }));
-      const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-      if (older.length > 0) {
-        $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...ev, ...older]
-        );
-      }
-      updateViewEvent($data);
+
+      //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
+      //   const newFilters = filters.map((filter: Nostr.Filter) => ({
+      //     ...filter,
+      //     since: ev[0].event.created_at,
+      //     until: now(),
+      //   }));
+      //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
+      //   if (older.length > 0) {
+      //     $queryClient.setQueryData(
+      //       [...queryKey, "olderData"],
+      //       [...ev, ...older]
+      //     );
+      //   }
+      //   updateViewEvent($data);
     }
 
     if (!ev || ev?.length <= 0) {
@@ -236,29 +237,22 @@
     const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
-    ]); //なんかデータ消えるからクエリーから取る
-
-    const allEvents =
+    ]);
+    console.log("test");
+    allUniqueEvents =
       data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
-    // console.log(allEvents);
-    allEvents.sort((a, b) => b.event.created_at - a.event.created_at);
-    const uniqueEventsMap: { [x: string]: boolean } = {};
-    const uniqueEvents = [];
-    for (const event of allEvents) {
-      if (!uniqueEventsMap[event.event.id]) {
-        uniqueEventsMap[event.event.id] = true;
-        uniqueEvents.push(event);
-      }
-    }
-    allUniqueEvents = uniqueEvents;
-    // console.log(viewIndex);
-    $slicedEvent = uniqueEvents
-      // ?.filter(
-      //   (packet) => readUrls.includes(packet.from) && eventFilter(packet)
-      // ) // デフォルトリレーに含まれるかチェック
-      .map(({ event }) => event)
-      .slice(viewIndex, viewIndex + amount);
-    //  console.log($slicedEvent);
+    // const uniqueEvents = Array.from(
+    //   new Map(allEvents.map((event) => [event.event.id, event])).values()
+    // ).sort((a, b) => b.event.created_at - a.event.created_at);
+
+    slicedEvent.update((value) =>
+      allUniqueEvents
+        .filter(eventFilter)
+        .map(({ event }) => event)
+        .slice(viewIndex, viewIndex + amount)
+    );
+
+    console.log($slicedEvent);
   }
 
   function handleClickTop() {
