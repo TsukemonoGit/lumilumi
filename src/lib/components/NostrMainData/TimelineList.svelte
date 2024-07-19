@@ -239,14 +239,16 @@
       "olderData",
     ]);
     console.log("test");
-    allUniqueEvents =
+    const allEvents =
       data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
-    // const uniqueEvents = Array.from(
-    //   new Map(allEvents.map((event) => [event.event.id, event])).values()
-    // ).sort((a, b) => b.event.created_at - a.event.created_at);
+    const uniqueEvents = Array.from(
+      new Map(allEvents.map((event) => [event.event.id, event])).values()
+    ).sort((a, b) => b.event.created_at - a.event.created_at);
+
+    allUniqueEvents = uniqueEvents;
 
     slicedEvent.update((value) =>
-      allUniqueEvents
+      uniqueEvents
         .filter(eventFilter)
         .map(({ event }) => event)
         .slice(viewIndex, viewIndex + amount)
