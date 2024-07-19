@@ -191,7 +191,7 @@ export async function getNaddrEmojiList(
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(uniq(), latestEachNaddr(), scanArray(), completeOnTimeout(3000))
+      .pipe(uniq(), latestEachNaddr(), scanArray(), completeOnTimeout(5000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
