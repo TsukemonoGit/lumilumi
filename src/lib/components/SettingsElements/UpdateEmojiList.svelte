@@ -5,7 +5,11 @@
     getNaddrEmojiList,
     getQueryRelays,
   } from "$lib/func/settings";
-  import { formatAbsoluteDate, nip33Regex } from "$lib/func/util";
+  import {
+    emojiShortcodeRegex,
+    formatAbsoluteDate,
+    nip33Regex,
+  } from "$lib/func/util";
   import { nowProgress, showImg, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
@@ -49,9 +53,9 @@
     ];
     const pk = await getDoukiList(filters, relays);
     // console.log(event);
-    list = pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
-      if (tag === "emoji") {
-        return [...acc, value];
+    list = pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+        return [...acc, [shortcode, url]];
       } else {
         return acc;
       }
@@ -94,13 +98,16 @@
         if (pk && pk.event) {
           list = [
             ...list,
-            ...pk.event.tags.reduce((acc: string[][], [tag, ...value]) => {
-              if (tag === "emoji") {
-                return [...acc, value];
-              } else {
-                return acc;
-              }
-            }, []),
+            ...pk.event.tags.reduce(
+              (acc: string[][], [tag, shortcode, url]) => {
+                if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+                  return [...acc, [shortcode, url]];
+                } else {
+                  return acc;
+                }
+              },
+              []
+            ),
           ];
         }
       });

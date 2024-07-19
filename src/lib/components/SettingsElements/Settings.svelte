@@ -31,6 +31,7 @@
   import { Save } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
+  import Link from "../Elements/Link.svelte";
 
   const STORAGE_KEY = "lumiSetting";
 
@@ -565,6 +566,16 @@
         bind:emojiList={settings.emoji}
       />
     </div>
+    <div
+      class="border rounded-md border-magnum-400 p-1 m-2 before:content-['*']"
+    >
+      {$_("settings.emoji.notes")}
+      <Link
+        className="underline text-magnum-300"
+        href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
+        >(NIP-30)</Link
+      >
+    </div>
     {#if $loginUser}
       <a
         class="underline text-magnum-300 break-all ml-4 text-sm"
@@ -578,7 +589,7 @@
     {/if}
   </div>
   <!-- NWC 設定 -->
-  <div class="border border-magnum-500 rounded-md p-2">
+  <!-- <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">NWC</div>
     <input
       type="text"
@@ -587,7 +598,7 @@
       placeholder="入れてもまだ何もならないインプット欄"
       bind:value={settings.nostrWalletConnect}
     />
-  </div>
+  </div> -->
   <!-- Theme 設定 -->
   <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">theme</div>

@@ -28,6 +28,7 @@ export const nip19Regex =
 
 export const urlRegex = /(https?:\/\/+[^\s"'<`\]]+[^\s"'<`:\].]+)/g;
 export const emojiRegex = /(:[^:\s]+:)/g;
+export const emojiShortcodeRegex = /^[a-zA-Z0-9_]+$/;
 //export const hashtagRegex = /(?<=^|\s)#(?<hashtag>[\p{Letter}\p{Number}_]+)/gu; //(?<hashtag>...) は、名前付きキャプチャグループ
 export const hashtagRegex =
   /#(?<hashtag>[a-zA-Z\p{XID_Continue}\p{Extended_Pictographic}\p{Emoji_Component}_+-][^#﹟＃\s]+)/gu; //#﹟＃ってかいてあるけど#だけでよくない？https://unicode.org/reports/tr31/#R8-1
