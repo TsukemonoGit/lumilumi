@@ -57,6 +57,7 @@
       {viewIndex}
       {amount}
       {tieKey}
+      lastfavcheck={false}
       let:len
     >
       <SetRepoReactions />
