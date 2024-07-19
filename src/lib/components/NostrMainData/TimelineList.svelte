@@ -89,18 +89,22 @@
   onMount(async () => {
     if (!isOnMount) {
       console.log("onMount");
+      $nowProgress = true;
       isOnMount = true;
       await init();
       isOnMount = false;
+      $nowProgress = false;
     }
   });
 
   afterNavigate(async () => {
     if (!isOnMount) {
       console.log("afterNavigate");
+      $nowProgress = true;
       isOnMount = true;
       await init();
       isOnMount = false;
+      $nowProgress = false;
     }
   });
 
@@ -131,7 +135,6 @@
     }
 
     if (!ev || ev?.length <= 0) {
-      $nowProgress = true;
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
@@ -157,7 +160,6 @@
         );
         updateViewEvent($data);
       }
-      $nowProgress = false;
     }
   }
 
