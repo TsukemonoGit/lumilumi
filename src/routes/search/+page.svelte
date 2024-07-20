@@ -246,7 +246,7 @@
     </div>
   </div>
   <button
-    class=" rounded-md bg-magnum-200 px-3 py-2 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
+    class=" rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50"
     on:click={handleClickSearch}>Search</button
   >
 </section>
