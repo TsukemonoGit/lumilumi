@@ -28,7 +28,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save } from "lucide-svelte";
+  import { Save, X } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -136,8 +136,8 @@
     }
   }
 
-  function removeRelay(index: number) {
-    settings.relays.filter((_, i) => i !== index);
+  function removeRelay(url: string) {
+    settings.relays = settings.relays.filter((relay) => relay.url !== url);
   }
 
   function saveSettings() {
@@ -399,7 +399,10 @@
               <input type="checkbox" bind:checked={relay.write} />
               write
             </label>
-            <button on:click={() => removeRelay(index)}>✕</button>
+            <button
+              class="hover:opacity-75 active:opacity-50"
+              on:click={() => removeRelay(relay.url)}><X /></button
+            >
           </div>
           <hr />
         {/each}
