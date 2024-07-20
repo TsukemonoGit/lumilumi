@@ -13,7 +13,6 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { Filter, SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
-  import { firstLoadOlderEvents, loadOlderEvents } from "./timelineList";
   import {
     createTie,
     now,
@@ -23,9 +22,14 @@
     type RxReqOverable,
     type RxReqPipeable,
   } from "rx-nostr";
-  import Metadata from "./Metadata.svelte";
   import { getRelaysById, setTieKey } from "$lib/func/nostr";
   import { afterUpdate, onDestroy, onMount } from "svelte";
+  import {
+    firstLoadOlderEvents,
+    loadOlderEvents,
+  } from "$lib/components/NostrMainData/timelineList";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import { readable } from "svelte/store";
 
   const sift = 40; //スライドする量
 
@@ -53,28 +57,31 @@
   //   }
   // >;
 
-  export let tieKey: string | undefined = undefined;
-  const [tie, tieMap] = createTie();
-  $: if (!tieKey || tieKey) {
-    setTieKey(tieKey ?? "undefined");
-    if (!tieKey) {
-      //$tieMapStore = { undefined: undefined };
-    } else if (!$tieMapStore) {
-      $tieMapStore = { [tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
-    }
-  }
   // export let lastVisible: Element | null;
   let allUniqueEvents: EventPacket[];
 
-  $: result = useTimelineEventList(
-    queryKey,
-    filters,
+  //sinceとuntilは両方undefinedか、両方値あり。
+  //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
+  const reqFilters = filters.map((filter: Nostr.Filter) => ({
+    ...filter,
+    since: filter.since === undefined ? now() : filter.since,
 
-    req,
-    relays
-  );
+    limit: 50,
+  }));
+  $: result =
+    filters[0].since === undefined
+      ? useTimelineEventList(
+          queryKey,
+          reqFilters,
+
+          req,
+          relays
+        )
+      : {
+          data: undefined,
+          status: readable("loading" as ReqStatus),
+          error: undefined,
+        };
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -116,6 +123,7 @@
   });
 
   async function init() {
+    setTieKey("undefined");
     const ev: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
@@ -145,7 +153,7 @@
     if (!ev || ev?.length <= 0) {
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
-        since: undefined,
+
         until: filter.until === undefined ? now() : filter.until,
         limit: 50,
       }));

@@ -17,6 +17,7 @@
   import { onDestroy, onMount } from "svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import SearchResultList from "./SearchResultList.svelte";
   export let filter: Nostr.Filter;
 
   let amount = 50;
@@ -42,8 +43,8 @@
 
 <section>
   <div class="w-full break-words overflow-x-hidden max-w-full">
-    <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて-->
-    <TimelineList
+    <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
+    <SearchResultList
       queryKey={["search", generateRandomId(4)]}
       filters={[filter]}
       req={createRxForwardReq()}
@@ -89,7 +90,7 @@
           {/each}
         {/if}
       </div>
-    </TimelineList>
+    </SearchResultList>
   </div>
 </section>
 <div class="postWindow">

@@ -95,7 +95,7 @@
     pubkey = savedPubkey;
     $loginUser = pubkey;
 
-    $showImg = savedShowImg ? savedShowImg : false;
+    $showImg = savedShowImg ? savedShowImg : true;
 
     $showPreview = savedShowPreview ? savedShowPreview : false;
     $menuLeft = savedMenuLeft ? savedMenuLeft : false;
