@@ -53,9 +53,8 @@
     searchSince = params.get("s") ? Number(params.get("s")) : undefined;
     searchUntil = params.get("u") ? Number(params.get("u")) : undefined;
     followee = params.get("f") === "true";
-
+    //kindはデフォ値があるから含めない
     if (
-      searchKind ||
       searchHashtag ||
       searchWord ||
       searchPubkey ||
