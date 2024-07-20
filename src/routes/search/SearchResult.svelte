@@ -23,13 +23,13 @@
   let viewIndex = 0;
 
   $: console.log(filter);
-  const tieKey = "search";
+  // const tieKey = "search";
 
   onMount(() => {
-    setTieKey(tieKey);
+    setTieKey("undefined");
   });
   afterNavigate(() => {
-    setTieKey(tieKey);
+    setTieKey("undefined");
   });
   onDestroy(() => {
     // $queryClient.cancelQueries({
@@ -50,7 +50,6 @@
       {viewIndex}
       {amount}
       let:len
-      {tieKey}
       relays={nip50relays}
     >
       <SetRepoReactions />
@@ -59,7 +58,7 @@
       <div slot="error" let:error>
         {error}
       </div>
-      <div slot="nodata">nodata</div>
+
       <div class=" break-words">
         {#if events && events.length > 0}
           {#each events as event, index (event.id)}

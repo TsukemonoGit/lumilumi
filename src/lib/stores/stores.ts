@@ -50,16 +50,18 @@ export const viewEventIds = writable<string[]>([]);
 
 //export const tieMapStore = writable<Map<string, Set<string>>>();
 export const tieMapStore = writable<{
-  [key: string]: [
-    OperatorFunction<
-      EventPacket,
-      EventPacket & {
-        seenOn: Set<string>;
-        isNew: boolean;
-      }
-    >,
-    Map<string, Set<string>>
-  ];
+  [key: string]:
+    | [
+        OperatorFunction<
+          EventPacket,
+          EventPacket & {
+            seenOn: Set<string>;
+            isNew: boolean;
+          }
+        >,
+        Map<string, Set<string>>
+      ]
+    | undefined;
 }>();
 
 // export let openPostWindow:

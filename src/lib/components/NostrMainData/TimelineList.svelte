@@ -53,12 +53,17 @@
   //   }
   // >;
 
-  export let tieKey: string;
+  export let tieKey: string | undefined = undefined;
   const [tie, tieMap] = createTie();
-  if (!$tieMapStore) {
-    $tieMapStore = { [tieKey]: [tie, tieMap] };
-  } else if (!$tieMapStore[tieKey]) {
-    $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+  $: if (!tieKey || tieKey) {
+    setTieKey(tieKey ?? "undefined");
+    if (!tieKey) {
+      $tieMapStore = { undefined: undefined };
+    } else if (!$tieMapStore) {
+      $tieMapStore = { [tieKey]: [tie, tieMap] };
+    } else if (!$tieMapStore?.[tieKey]) {
+      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+    }
   }
   // export let lastVisible: Element | null;
   let allUniqueEvents: EventPacket[];
