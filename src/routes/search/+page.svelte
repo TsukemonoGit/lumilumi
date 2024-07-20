@@ -201,7 +201,7 @@
               <input
                 type="text"
                 id="npub"
-                class="h-10 max-w-[420px] px-3 py-2 rounded-md"
+                class="h-10 px-3 py-2 rounded-md"
                 placeholder="npub"
                 bind:value={searchPubkey}
               /><button
