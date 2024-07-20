@@ -60,7 +60,7 @@
       <div slot="error" let:error>
         {error}
       </div>
-
+      <div slot="nodata">nodata</div>
       <div class=" break-words">
         {#if events && events.length > 0}
           {#each events as event, index (event.id)}
