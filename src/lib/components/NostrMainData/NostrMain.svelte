@@ -48,6 +48,9 @@
       if ($page.url.pathname === "/") {
         //ホームに居るときだけ設定ないときは設定に飛ばす
         goto("/settings");
+      } else {
+        //設定なし。閲覧モードのときは画像表示してみる
+        $showImg = true;
       }
     }
 
@@ -95,7 +98,7 @@
     pubkey = savedPubkey;
     $loginUser = pubkey;
 
-    $showImg = savedShowImg ? savedShowImg : true;
+    $showImg = savedShowImg ? savedShowImg : false;
 
     $showPreview = savedShowPreview ? savedShowPreview : false;
     $menuLeft = savedMenuLeft ? savedMenuLeft : false;
