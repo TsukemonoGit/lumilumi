@@ -35,7 +35,7 @@
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  export let lastfavcheck: boolean = true;
+  let lastfavcheck: boolean = false;
   export let req:
     | (RxReq<"backward"> &
         RxReqEmittable<{
