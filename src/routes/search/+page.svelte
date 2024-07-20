@@ -26,7 +26,7 @@
   let openSearchResult: boolean = false;
 
   afterNavigate(async () => {
-    compRef?.$destroy();
+    openSearchResult = false;
     const params = $page.url.searchParams;
     const hashtag = params.get("t");
     console.log(hashtag);
@@ -42,8 +42,8 @@
 
   beforeNavigate(() => {
     console.log("destroy");
-
-    compRef?.$destroy();
+    openSearchResult = false;
+    // compRef?.$destroy();
   });
 
   $: followingList = getFollowingList();

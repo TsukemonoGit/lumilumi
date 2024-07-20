@@ -60,8 +60,7 @@ export const tieMapStore = writable<{
           }
         >,
         Map<string, Set<string>>
-      ]
-    | undefined;
+      ];
 }>();
 
 // export let openPostWindow:

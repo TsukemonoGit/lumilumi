@@ -58,7 +58,7 @@
   $: if (!tieKey || tieKey) {
     setTieKey(tieKey ?? "undefined");
     if (!tieKey) {
-      $tieMapStore = { undefined: undefined };
+      //$tieMapStore = { undefined: undefined };
     } else if (!$tieMapStore) {
       $tieMapStore = { [tieKey]: [tie, tieMap] };
     } else if (!$tieMapStore?.[tieKey]) {
