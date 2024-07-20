@@ -144,7 +144,7 @@
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
-        until: now(),
+        until: filter.until === undefined ? now() : filter.until,
         limit: 50,
       }));
       const older = await firstLoadOlderEvents(
