@@ -74,6 +74,7 @@
         author?: string | undefined;
       }
     | undefined;
+  $: console.log($page);
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -82,6 +83,18 @@
   <meta prefix="og:https://ogp.me/ns#" />
   <meta property="og:title" content="Lumilumi" />
   <meta property="og:image" content={`${$page.url.origin}/ogp.png`} />
+  <meta
+    property="og:description"
+    content={$page.route.id === "/"
+      ? "the nostr client"
+      : $page.route.id?.includes("/channel")
+        ? "channel"
+        : $page.route.id?.includes("/list")
+          ? "list"
+          : $page.route.id === "/[npub=npub]"
+            ? "User"
+            : "the nostr client"}
+  />
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
