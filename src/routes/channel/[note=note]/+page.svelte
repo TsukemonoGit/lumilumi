@@ -71,6 +71,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Lumilumi-Channel</title>
+  <meta name="description" content="The Nostr webclient" />
+</svelte:head>
 <section>
   <div class="w-full break-words overflow-hidden">
     <ChannelMetadata id={data.id} />{#if since}

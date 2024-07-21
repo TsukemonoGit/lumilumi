@@ -121,6 +121,10 @@
   };
 </script>
 
+<svelte:head>
+  <title>Lumilumi-List</title>
+  <meta name="description" content="The Nostr webclient" />
+</svelte:head>
 {#if loading}
   loading
 {:else}
