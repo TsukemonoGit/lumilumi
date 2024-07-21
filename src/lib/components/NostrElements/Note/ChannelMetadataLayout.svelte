@@ -14,7 +14,7 @@
   export let event: Nostr.Event; //40か41
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
-      return JSON.parse(event.content) as ChannelData;
+      return JSON.parse(text.content) as ChannelData;
     } catch (error) {
       return undefined;
     }

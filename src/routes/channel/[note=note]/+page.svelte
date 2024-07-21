@@ -20,7 +20,8 @@
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
+  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
+  import type { ChannelData } from "$lib/types";
 
   export let data: {
     id: string;
@@ -69,13 +70,48 @@
       since = ev[0].event.created_at;
     }
   }
+  const observer0 = new QueryObserver($queryClient, {
+    queryKey: ["channel", "kind40", data.id],
+  });
+  const observer1 = new QueryObserver($queryClient, {
+    queryKey: ["channel", "kind41", data.id],
+  });
+  let kind40: Nostr.Event;
+  let kind41: Nostr.Event;
+  const unsubscribe0 = observer0.subscribe((result: any) => {
+    console.log(result);
+    if (result.data) {
+      kind40 = result.data.event;
+    }
+  });
+  const unsubscribe1 = observer1.subscribe((result: any) => {
+    console.log(result);
+    if (result.data) {
+      kind41 = result.data?.event;
+    }
+  });
+  const getContent = (text: Nostr.Event): ChannelData | undefined => {
+    try {
+      return JSON.parse(text.content) as ChannelData;
+    } catch (error) {
+      return undefined;
+    }
+  };
+  let description: string;
+  $: kind41ChannelData = getContent(kind41);
+  $: kind40ChannelData = getContent(kind40);
+  $: description = kind41ChannelData
+    ? `name:${kind41ChannelData.name}\nabout${kind41ChannelData.about}`
+    : kind40ChannelData
+      ? `name:${kind40ChannelData.name}\nabout${kind40ChannelData.about}`
+      : `channel`;
 </script>
 
 <svelte:head>
   <title>Lumilumi-Channel</title>
   <meta property="og:title" content="Lumilumi-Channel" />
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content={description} />
+  <meta name="description" content={description} />
 </svelte:head>
 <section>
   <div class="w-full break-words overflow-hidden">
