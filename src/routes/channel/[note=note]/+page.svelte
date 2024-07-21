@@ -73,6 +73,8 @@
 
 <svelte:head>
   <title>Lumilumi-Channel</title>
+  <meta property="og:title" content="Lumilumi-Channel" />
+  <meta property="og:description" content="The Nostr webclient" />
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 <section>

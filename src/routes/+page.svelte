@@ -4,6 +4,8 @@
 
 <svelte:head>
   <title>Lumilumi-Home</title>
+  <meta property="og:title" content="Lumilumi-Home" />
+  <meta property="og:description" content="The Nostr webclient" />
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 

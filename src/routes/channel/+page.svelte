@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Note</title>
+  <title>Lumilumi-Channel</title>
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 {#if $loginUser}

@@ -147,6 +147,8 @@
 
 <svelte:head>
   <title>Lumilumi-Search</title>
+  <meta property="og:title" content="Lumilumi-Search" />
+  <meta property="og:description" content="The Nostr webclient" />
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 

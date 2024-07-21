@@ -38,6 +38,13 @@
   });
 </script>
 
+<svelte:head>
+  <title>Lumilumi-Note</title>
+  <meta property="og:title" content="Lumilumi-Note" />
+  <meta property="og:description" content="The Nostr webclient" />
+  <meta name="description" content="The Nostr webclient" />
+</svelte:head>
+
 <section>
   <SetRepoReactions />
   <div class="w-full break-words overflow-hidden">

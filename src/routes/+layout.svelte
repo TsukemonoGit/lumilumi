@@ -77,6 +77,9 @@
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
+  <meta property="og:title" content="Lumilumi" />
+
+  <meta property="og:image" content="./ogp.png" />
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />

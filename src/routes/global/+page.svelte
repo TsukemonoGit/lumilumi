@@ -58,6 +58,8 @@
 
 <svelte:head>
   <title>Lumilumi-Global</title>
+  <meta property="og:title" content="Lumilumi-Global" />
+  <meta property="og:description" content="The Nostr webclient" />
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 <section>

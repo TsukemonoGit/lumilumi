@@ -5,8 +5,10 @@
 </script>
 
 <svelte:head>
-  <title>lumilumi-Setting</title>
-  <meta name="description" content="Lumi Setting" />
+  <title>Lumilumi-Setting</title>
+  <meta property="og:title" content="Lumilumi-settings" />
+  <meta property="og:description" content="The Nostr webclient" />
+  <meta name="description" content="Lumilumi Setting" />
 </svelte:head>
 <Settings />
 <div class="flex justify-center mt-2 mb-32">

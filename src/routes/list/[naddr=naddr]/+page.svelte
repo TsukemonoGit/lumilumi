@@ -123,6 +123,8 @@
 
 <svelte:head>
   <title>Lumilumi-List</title>
+  <meta property="og:title" content="Lumilumi-list" />
+  <meta property="og:description" content="The Nostr webclient" />
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 {#if loading}
