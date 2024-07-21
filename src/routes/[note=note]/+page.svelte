@@ -40,9 +40,8 @@
 
 <svelte:head>
   <title>Lumilumi-Note</title>
-  <meta property="og:title" content="Lumilumi-Note" />
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content="Note" />
+  <meta name="description" content="Note" />
 </svelte:head>
 
 <section>

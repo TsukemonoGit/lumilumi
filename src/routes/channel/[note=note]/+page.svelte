@@ -109,7 +109,6 @@
 
 <svelte:head>
   <title>Lumilumi-Channel</title>
-  <meta property="og:title" content="Lumilumi-Channel" />
   <meta property="og:description" content={description} />
   <meta name="description" content={description} />
 </svelte:head>

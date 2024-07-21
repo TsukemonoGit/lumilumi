@@ -30,7 +30,8 @@
 
 <svelte:head>
   <title>Lumilumi-Channel</title>
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content="Channel" />
+  <meta name="description" content="Channel" />
 </svelte:head>
 {#if $loginUser}
   <section class="container">

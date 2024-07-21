@@ -58,9 +58,8 @@
 
 <svelte:head>
   <title>Lumilumi-Global</title>
-  <meta property="og:title" content="Lumilumi-Global" />
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content="Global" />
+  <meta name="description" content="Global" />
 </svelte:head>
 <section>
   <SetGlobalRelays pubkey={$loginUser} let:relays>

@@ -78,10 +78,10 @@
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
-  <meta prefix="og: https://ogp.me/ns#" /><meta
-    property="og:image"
-    content={`${$page.url.origin}/ogp.png`}
-  />
+  <title>Lumilumi</title>
+  <meta prefix="og:https://ogp.me/ns#" />
+  <meta property="og:title" content="Lumilumi" />
+  <meta property="og:image" content={`${$page.url.origin}/ogp.png`} />
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />

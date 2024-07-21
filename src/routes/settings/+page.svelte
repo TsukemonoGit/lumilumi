@@ -6,9 +6,8 @@
 
 <svelte:head>
   <title>Lumilumi-Setting</title>
-  <meta property="og:title" content="Lumilumi-settings" />
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="Lumilumi Setting" />
+  <meta property="og:description" content="Setting" />
+  <meta name="description" content="Setting" />
 </svelte:head>
 <Settings />
 <div class="flex justify-center mt-2 mb-32">

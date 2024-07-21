@@ -61,9 +61,8 @@
 
 <svelte:head>
   <title>Lumilumi-Notifications</title>
-  <meta property="og:title" content="Lumilumi-Notifications" />
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content="Notifications" />
+  <meta name="description" content="Notifications" />
 </svelte:head>
 <section>
   <div class="w-full break-words overflow-x-hidden">

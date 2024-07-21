@@ -37,8 +37,8 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-List</title>
-  <meta name="description" content="The Nostr webclient" />
+  <title>Lumilumi-List</title><meta property="og:description" content="List" />
+  <meta name="description" content="List" />
 </svelte:head>
 {#if $loginUser}
   <section class="container">
