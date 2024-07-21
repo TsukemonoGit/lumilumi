@@ -332,7 +332,7 @@
   };
 </script>
 
-<div class=" flex flex-col gap-3 mb-10">
+<div class=" flex flex-col gap-3">
   <div class="text-sm break-all">
     <div>[pubkey]</div>
     <!-- {nip19.npubEncode($pubkey)} -->
@@ -607,15 +607,18 @@
     <div class="text-magnum-200 font-bold text-lg">theme</div>
     <ThemeSwitch />
   </div>
+</div>
+
+<div class=" fixed sm:bottom-5 bottom-16 right-5 z-1">
   <div
-    class="border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
+    class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
     <button
-      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50"
+      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
       on:click={saveSettings}><Save />SAVE</button
     >
     <button
-      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
+      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
       on:click={cancelSettings}>CANCEL</button
     >
   </div>

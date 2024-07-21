@@ -120,7 +120,7 @@
           class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
           style="word-break: break-word; max-height:{bannerHeight * 1.5}px"
         >
-          <Content text={prof.about} tags={metadata.tags} />
+          <Content text={prof.about} tags={metadata.tags} displayMenu={true} />
         </div>
       {/if}
       <div class="flex flex-row-reverse gap-1">
