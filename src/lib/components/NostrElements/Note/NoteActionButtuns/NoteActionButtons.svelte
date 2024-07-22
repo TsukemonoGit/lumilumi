@@ -83,7 +83,7 @@
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
 
-  let replyText: string;
+  //let replyText: string;
 
   //https://translate.google.com/?sl=auto&op=translate&text={0}
   //https://www.deepl.com/translator?share=generic#auto/auto/{0}
@@ -258,6 +258,7 @@
       tags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
     } else {
       if (root) {
+        tags.push(root);
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "reply"]);
       } else {
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "root"]);
