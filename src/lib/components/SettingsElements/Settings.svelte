@@ -462,7 +462,7 @@
       >
         {$_("settings.nostviewstr.kind10002")}
       </a>
-      <div class="text-sm ml-4 flex gap-2">
+      <div class="text-sm ml-4 flex flex-wrap gap-2">
         <a
           class="underline text-magnum-300 break-all"
           target="_blank"
@@ -473,10 +473,12 @@
         >
           {$_("settings.nostviewstr.kind30002")}
         </a>
-        {$_("settings.globalRelay")}<button
-          class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-          on:click={onClickglobalImageOpen}><Image /></button
-        >
+        <div class="flex">
+          {$_("settings.globalRelay")}<button
+            class="inline-flex mt-auto rounded-md px-2 bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
+            on:click={onClickglobalImageOpen}><Image /></button
+          >
+        </div>
       </div>
     {/if}
   </div>
@@ -581,7 +583,7 @@
       />
     </div>
     {#if $loginUser}
-      <div class="flex flex-wrap gap-2 items-center">
+      <div class="flex gap-2 items-center">
         <a
           class="underline text-magnum-300 break-all ml-4 text-sm"
           target="_blank"
