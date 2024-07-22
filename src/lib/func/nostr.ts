@@ -80,10 +80,10 @@ metadataQueue.subscribe((queue) => {
   }
 });
 
-export function setSavedMetadata(data: [QueryKey, EventPacket][]) {
-  // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
-  savedMetadata = data;
-}
+// export function setSavedMetadata(data: [QueryKey, EventPacket][]) {
+//   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
+//   savedMetadata = data;
+// }
 export function pubkeysIn(contacts: Nostr.Event): string[] {
   const followingList = contacts.tags.reduce((acc, [tag, value]) => {
     if (tag === "p") {
@@ -108,7 +108,13 @@ export function getFollowingList() {
   }
 }
 const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
-  const existingIndex = savedMetadata.findIndex(
+  // まず、現在のローカルストレージのデータを取得
+  const metadataStr = localStorage.getItem("metadata");
+  let currentMetadata: [QueryKey, EventPacket][] = metadataStr
+    ? JSON.parse(metadataStr)
+    : [];
+
+  const existingIndex = currentMetadata.findIndex(
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
@@ -116,66 +122,95 @@ const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
-        data.event.created_at > savedMetadata[existingIndex][1].event.created_at
+        data.event.created_at >
+        currentMetadata[existingIndex][1].event.created_at
       ) {
-        savedMetadata[existingIndex] = [key, data];
+        //新しいデータだったら上書き
+        currentMetadata[existingIndex] = [key, data];
         get(queryClient).setQueryData(key, (oldData: any) => data);
       } else {
-        //保存されてるMetadataの方をクエリーにセットしてみる
+        //古いデータだったら保存されてる方を返す
+        // 保存されているメタデータの方をクエリにセット（？）
         get(queryClient).setQueryData(
           key,
-          (oldData: any) => savedMetadata[existingIndex][1]
+          (oldData: any) => currentMetadata[existingIndex][1]
         );
       }
     } else {
       // 保存されていない場合、新しいデータを追加する
-      savedMetadata.push([key, data]);
+      currentMetadata.push([key, data]);
       get(queryClient).setQueryData(key, (oldData: any) => data);
     }
-    //get(queryClient).setQueryData(key, (oldData: any) => data);
+    // 更新されたデータをローカルストレージに保存
+    localStorage.setItem("metadata", JSON.stringify(currentMetadata));
+    savedMetadata = currentMetadata;
     metadataChanged = true;
   }
 };
 
-export const getMetadataFromLocalStorage = (): void => {
+export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
   const metadataStr = localStorage.getItem("metadata");
   if (!metadataStr) {
     return;
   }
 
-  const metadata = JSON.parse(metadataStr);
-  setSavedMetadata(metadata);
-  // console.log(metadata);
-  if (get(showImg) === false) {
-    //画像表示おんのときは新しいの取るから、古いのをセットしない。画像表示しないときは古いの使い回す
-    Object.keys(metadata).forEach((pubkey) => {
-      //console.log(metadata[pubkey][0]);
-      //  console.log(metadata[pubkey]);
-      // console.log(metadata[pubkey][0]);
-      // console.log(metadata[pubkey][1]);
-      get(queryClient).setQueryData(
-        metadata[pubkey][0],
-        (oldData: any) => metadata[pubkey][1],
-        { updatedAt: Infinity }
-      );
-      // get(queryClient).setQueriesData(
-      //   { queryKey: metadata[pubkey][0] },
-      //   metadata[pubkey][1]
-      // );
-    });
-  }
-  // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
+  const metadata: [QueryKey, EventPacket][] = JSON.parse(metadataStr);
+  // console.log(
+  //   metadata.find(
+  //     ([key, _]) =>
+  //       JSON.stringify(key) ===
+  //       JSON.stringify([
+  //         "metadata",
+  //         "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
+  //       ])
+  //   )
+  // );
+  // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
+  const result = metadata.find(
+    ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
+  );
+
+  return result ? result[1] : undefined;
 };
-// const processMetadataQueue = () => {
-//   while (get(metadataQueue).length > 0) {
-//     const [key, data] = get(metadataQueue).shift()!;
-//     saveMetadataToLocalStorage(key, data);
+// export const getMetadataFromLocalStorage = (): void => {
+//   const metadataStr = localStorage.getItem("metadata");
+//   if (!metadataStr) {
+//     return;
 //   }
-//   if (metadataChanged) {
-//     localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
-//     metadataChanged = false;
+
+//   const metadata = JSON.parse(metadataStr);
+//   setSavedMetadata(metadata);
+//   // console.log(metadata);
+//   if (get(showImg) === false) {
+//     //画像表示おんのときは新しいの取るから、古いのをセットしない。画像表示しないときは古いの使い回す
+//     Object.keys(metadata).forEach((pubkey) => {
+//       //console.log(metadata[pubkey][0]);
+//       //  console.log(metadata[pubkey]);
+//       // console.log(metadata[pubkey][0]);
+//       // console.log(metadata[pubkey][1]);
+//       get(queryClient).setQueryData(
+//         metadata[pubkey][0],
+//         (oldData: any) => metadata[pubkey][1],
+//         { updatedAt: Infinity }
+//       );
+//       // get(queryClient).setQueriesData(
+//       //   { queryKey: metadata[pubkey][0] },
+//       //   metadata[pubkey][1]
+//       // );
+//     });
 //   }
-// };
+//   // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
+//};
+const processMetadataQueue = () => {
+  while (get(metadataQueue).length > 0) {
+    const [key, data] = get(metadataQueue).shift()!;
+    saveMetadataToLocalStorage(key, data);
+  }
+  if (metadataChanged) {
+    localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
+    metadataChanged = false;
+  }
+};
 
 // Set an interval to process the queue periodically
 //setInterval(processMetadataQueue, 1000);
@@ -204,7 +239,10 @@ export function useReq(
     req,
     initData,
   }: UseReqOpts<EventPacket | EventPacket[]>,
-  relays: string[] | undefined = undefined
+  relays: string[] | undefined = undefined,
+  staleTime: number = Infinity,
+  initialDataUpdatedAt: number | undefined = undefined,
+  refetchInterval: number = Infinity
 ): ReqResult<EventPacket | EventPacket[]> {
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
 
@@ -246,6 +284,10 @@ export function useReq(
         .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
   const query = createQuery({
     queryKey: queryKey,
+    staleTime: staleTime,
+    initialData: initData,
+    initialDataUpdatedAt: initialDataUpdatedAt,
+    refetchInterval: refetchInterval,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;

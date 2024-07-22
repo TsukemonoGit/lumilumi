@@ -28,7 +28,21 @@ export function useMetadata(
         RxReqOverable &
         RxReqPipeable)
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined
+    | undefined,
+  initData?: EventPacket | EventPacket[] | undefined,
+  staleTime: number = Infinity,
+  initialDataUpdatedAt: number | undefined = undefined,
+  refetchInterval: number = Infinity
 ): ReqResult<EventPacket> {
-  return useReplaceableEvent(rxNostr, queryKey, pubkey, 0, req);
+  return useReplaceableEvent(
+    rxNostr,
+    queryKey,
+    pubkey,
+    0,
+    req,
+    initData,
+    staleTime,
+    initialDataUpdatedAt,
+    refetchInterval
+  );
 }

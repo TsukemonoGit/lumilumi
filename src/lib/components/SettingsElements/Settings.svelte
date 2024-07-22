@@ -28,10 +28,11 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X } from "lucide-svelte";
+  import { Save, X, Image } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
+  import Dialog from "../Elements/Dialog.svelte";
 
   const STORAGE_KEY = "lumiSetting";
 
@@ -330,6 +331,31 @@
       settings.defaultReaction = { content: customString, tag: [] };
     }
   };
+
+  let open: {
+    update: (
+      updater: import("svelte/store").Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: import("svelte/store").Subscriber<boolean>,
+      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+    ): import("svelte/store").Unsubscriber;
+    get: () => boolean;
+    destroy?: (() => void) | undefined;
+  };
+
+  let displayimage = writable<string>();
+  const onClickglobalImageOpen = () => {
+    $displayimage = "./relaysetglobal.webp";
+    $open = true;
+  };
+  const onClickkindImageOpen = () => {
+    $displayimage = "./mutebykind.webp";
+    $open = true;
+  };
 </script>
 
 <div class=" flex flex-col gap-3">
@@ -436,7 +462,7 @@
       >
         {$_("settings.nostviewstr.kind10002")}
       </a>
-      <div class="text-sm ml-4">
+      <div class="text-sm ml-4 flex gap-2">
         <a
           class="underline text-magnum-300 break-all"
           target="_blank"
@@ -447,7 +473,10 @@
         >
           {$_("settings.nostviewstr.kind30002")}
         </a>
-        {$_("settings.globalRelay")}
+        {$_("settings.globalRelay")}<button
+          class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
+          on:click={onClickglobalImageOpen}><Image /></button
+        >
       </div>
     {/if}
   </div>
@@ -552,16 +581,22 @@
       />
     </div>
     {#if $loginUser}
-      <a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
-        )}/30007"
-        >{$_("settings.nostviewstr.kind30007")}
-      </a>
+      <div class="flex flex-wrap gap-2 items-center">
+        <a
+          class="underline text-magnum-300 break-all ml-4 text-sm"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+            $loginUser
+          )}/30007"
+          >{$_("settings.nostviewstr.kind30007")}
+        </a><button
+          class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
+          on:click={onClickkindImageOpen}><Image /></button
+        >
+      </div>
     {/if}
+
     <!--emoji-->
     <div class="mt-4">
       <UpdateEmojiList
@@ -623,3 +658,9 @@
     >
   </div>
 </div>
+
+<Dialog bind:open
+  ><div slot="main" class="flex w-full justify-center">
+    <img alt="relaySttGlobal" class="" src={$displayimage} />
+  </div></Dialog
+>

@@ -32,10 +32,26 @@ export function useReplaceableEvent(
         RxReqOverable &
         RxReqPipeable)
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined
+    | undefined,
+  initData?: EventPacket | EventPacket[] | undefined,
+  staleTime: number = Infinity,
+  initialDataUpdatedAt: number | undefined = undefined,
+  refetchInterval: number = Infinity
 ): ReqResult<EventPacket> {
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
   const operator = pipe(latest());
-  return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
+  return useReq(
+    {
+      queryKey,
+      filters,
+      operator,
+      req,
+      initData,
+    },
+    undefined,
+    staleTime,
+    initialDataUpdatedAt,
+    refetchInterval
+  ) as ReqResult<EventPacket>;
 }

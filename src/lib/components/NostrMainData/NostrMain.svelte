@@ -18,11 +18,7 @@
   import NostrElements from "../NostrElements.svelte";
   import OpenPostWindow from "../OpenPostWindow.svelte";
   import { goto } from "$app/navigation";
-  import {
-    setRxNostr,
-    setRelays,
-    getMetadataFromLocalStorage,
-  } from "$lib/func/nostr";
+  import { setRxNostr, setRelays } from "$lib/func/nostr";
   import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
@@ -111,7 +107,7 @@
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
     //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定
-    getMetadataFromLocalStorage();
+    // getMetadataFromLocalStorage();
     //}
 
     $mutes = savedMute ? savedMute.list : undefined;

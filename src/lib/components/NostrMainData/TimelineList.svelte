@@ -87,7 +87,7 @@
   $: if (($data && viewIndex >= 0) || !$nowProgress) {
     updateViewEvent($data);
   }
-  $: console.log($data);
+  //$: console.log($data);
   beforeNavigate(() => {
     $slicedEvent = [];
   });
@@ -260,7 +260,7 @@
         .slice(viewIndex, viewIndex + amount)
     );
 
-    console.log($slicedEvent);
+    //console.log($slicedEvent);
   }
 
   function handleClickTop() {

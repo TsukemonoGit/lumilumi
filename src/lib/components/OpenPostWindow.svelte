@@ -103,7 +103,7 @@
     $postWindowOpen = false;
   }
   let signPubkey: string;
-  $: if ($open) {
+  $: if ($open === true) {
     //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
     signPubkeyCheck();
 
@@ -121,6 +121,10 @@
     }
   }
   async function signPubkeyCheck() {
+    if ($nowProgress) {
+      return;
+    }
+    $nowProgress = true;
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pub) {
@@ -137,8 +141,8 @@
         description: "failed to get sign pubkey",
         color: "bg-red-500",
       };
-      return;
     }
+    $nowProgress = false;
   }
   $: if (!$open) {
     resetState();
