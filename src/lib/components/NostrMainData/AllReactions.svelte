@@ -23,13 +23,11 @@
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
-  // TODO: Check if $app.rxNostr is defined
   $: result = useAllReactions(queryKey, id, req);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
     default: {
       kind1: Nostr.Event[];

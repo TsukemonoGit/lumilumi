@@ -318,44 +318,44 @@
       </DropdownMenu>
     </Reposted>
   {/if}
-  {#if note.kind !== 9734}
-    <!--リアクション-->
-    <Reactioned id={note.id} let:event>
-      <button slot="loading" on:click={handleClickReaction}>
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
-        />
-      </button>
+  <!-- {#if note.kind !== 9734} -->
+  <!--リアクション-->
+  <Reactioned id={note.id} let:event>
+    <button slot="loading" on:click={handleClickReaction}>
+      <Heart
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+      />
+    </button>
 
-      <button slot="nodata" on:click={handleClickReaction}>
+    <button slot="nodata" on:click={handleClickReaction}>
+      <Heart
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+      />
+    </button>
+
+    <button slot="error" on:click={handleClickReaction}>
+      <Heart
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+      />
+    </button>
+
+    {#if event === undefined}
+      <button on:click={handleClickReaction}>
         <Heart
           size="20"
           class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
         />
       </button>
-
-      <button slot="error" on:click={handleClickReaction}>
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-        />
-      </button>
-
-      {#if event === undefined}
-        <button on:click={handleClickReaction}>
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
-          />
-        </button>
-      {:else}
-        <div class="overflow-hidden max-w-[40%]"><Reaction {event} /></div>
-      {/if}
-    </Reactioned>
-    <!--カスタムリアクション-->
-    <CustomReaction {note} />
-  {/if}
+    {:else}
+      <div class="overflow-hidden max-w-[40%]"><Reaction {event} /></div>
+    {/if}
+  </Reactioned>
+  <!--カスタムリアクション-->
+  <CustomReaction {note} />
+  <!-- {/if} -->
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
     <Metadata

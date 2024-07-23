@@ -35,7 +35,7 @@
       {
         "#e": $viewEventIds,
         authors: [$loginUser],
-        kinds: [7, 6, 16],
+        kinds: [7, 6, 16, 9734], //ザップへのリアクションを追加
       },
       {
         "#e": $viewEventIds,
