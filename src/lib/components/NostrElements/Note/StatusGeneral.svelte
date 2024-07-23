@@ -15,7 +15,7 @@
     ]);
     if (res) {
       data = res;
-      console.log(data);
+      //console.log(data);
     }
   }
 
