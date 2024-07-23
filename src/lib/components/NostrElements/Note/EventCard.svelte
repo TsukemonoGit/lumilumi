@@ -303,11 +303,41 @@
     <!--kind0-->
     <Kind0Note {note} {proxy} {displayMenu} />
   {:else if note.kind === 40}
-    <!--kind42 パブ茶部屋-->
-    <ChannelMetadata
-      handleClickToChannel={() => handleClickToChannel(note.id)}
-      id={note.id}
-    />
+    <!--kind40 パブ茶部屋-->
+    <LatestEvent
+      queryKey={["channel", "kind41", note.id]}
+      filters={[
+        { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
+      ]}
+      let:event
+    >
+      <div slot="loading">
+        <ChannelMetadataLayout
+          handleClickToChannel={() => handleClickToChannel(note.id)}
+          id={note.id}
+          event={note}
+        />
+      </div>
+      <div slot="nodata">
+        <ChannelMetadataLayout
+          handleClickToChannel={() => handleClickToChannel(note.id)}
+          id={note.id}
+          event={note}
+        />
+      </div>
+      <div slot="error">
+        <ChannelMetadataLayout
+          handleClickToChannel={() => handleClickToChannel(note.id)}
+          id={note.id}
+          event={note}
+        />
+      </div>
+      <ChannelMetadataLayout
+        handleClickToChannel={() => handleClickToChannel(note.id)}
+        id={note.id}
+        {event}
+      />
+    </LatestEvent>
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>

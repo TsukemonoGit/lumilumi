@@ -5,6 +5,7 @@
   import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
+  import { setTieKey } from "$lib/func/nostr";
   import { loginUser, toastSettings } from "$lib/stores/stores";
   import { SquareArrowOutUpRight } from "lucide-svelte";
 
@@ -15,6 +16,7 @@
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
+  setTieKey("undefined");
   afterNavigate(() => {
     if (!$loginUser) {
       $toastSettings = {
