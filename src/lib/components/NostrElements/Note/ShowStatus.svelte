@@ -14,9 +14,9 @@
     <div slot="error">error</div> -->
 
     {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
-    <div class="flex gap-2 flex-wrap items-center">
+    <div class="flex gap-2 items-center">
       {#if link !== ""}
-        <TrendingUp class="h-[16px] w-[16px]" /><a
+        <TrendingUp class="min-w-[16px] min-[16px] w-[16px]" /><a
           class="underline"
           target="_blank"
           rel="noopener noreferrer"
@@ -33,8 +33,8 @@
     <div slot="nodata">nodata</div>
     <div slot="error">error</div> -->
     {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
-    <div class="flex gap-2 flex-wrap items-center">
-      {#if link !== ""}<Music class="h-[16px] w-[16px]" /><a
+    <div class="flex gap-2 items-center">
+      {#if link !== ""}<Music class="min-w-[16px] min-[16px] w-[16px]" /><a
           class="underline"
           target="_blank"
           rel="noopener noreferrer"
