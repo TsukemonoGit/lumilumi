@@ -5,21 +5,21 @@
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import punycode from "punycode/punycode";
-
+  import split from "graphemesplit";
   export let note: Nostr.Event | undefined;
 
-  const regexSymbolWithCombiningMarks = /(\P{Mark})(\p{Mark}+)/gu;
+  // const regexSymbolWithCombiningMarks = /(\P{Mark})(\p{Mark}+)/gu;
 
-  const countSymbolsIgnoringCombiningMarks = (string: string) => {
-    const stripped = string.replace(
-      regexSymbolWithCombiningMarks,
-      ($0: any, symbol: any, combiningMarks: any) => {
-        return symbol;
-      }
-    );
+  // const countSymbolsIgnoringCombiningMarks = (string: string) => {
+  //   const stripped = string.replace(
+  //     regexSymbolWithCombiningMarks,
+  //     ($0: any, symbol: any, combiningMarks: any) => {
+  //       return symbol;
+  //     }
+  //   );
 
-    return punycode.ucs2.decode(stripped).length;
-  };
+  //   return punycode.ucs2.decode(stripped).length;
+  // };
 
   export let customReaction: string = "";
   export let emoji: string[] = [];
@@ -30,7 +30,7 @@
   let open: boolean;
 
   const handleClickCustomReaction = () => {
-    const textLen = countSymbolsIgnoringCombiningMarks(customReaction);
+    const textLen = split(customReaction).length; //countSymbolsIgnoringCombiningMarks(customReaction);
 
     if (textLen !== 1) {
       customReactionError = true;
