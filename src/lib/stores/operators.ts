@@ -71,15 +71,17 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
     if (
       a.event &&
       a.event.id &&
+      a.event.kind !== 30315 &&
       !get(queryClient).getQueryData(["timeline", a.event.id])
     ) {
       get(queryClient).setQueryData(["timeline", a.event.id], a);
     }
 
     // 新しい順にソート
-    const sorted = [...acc, a].sort(
-      (a, b) => b.event.created_at - a.event.created_at
-    );
+    const sorted =
+      a.event.kind !== 30315
+        ? [...acc, a]
+        : [...acc].sort((a, b) => b.event.created_at - a.event.created_at);
 
     return sorted;
   }, []);
@@ -128,7 +130,36 @@ export function metadata(): OperatorFunction<EventPacket, EventPacket> {
     }
   });
 }
-
+export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
+  return tap((packet: EventPacket) => {
+    if (packet.event.kind === 30315) {
+      const dtag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
+      if (dtag) {
+        const pre: EventPacket | undefined = get(queryClient).getQueryData([
+          "userStatus",
+          dtag,
+          packet.event.pubkey,
+        ]);
+        if (!pre || packet.event.created_at > pre.event.created_at) {
+          get(queryClient).setQueryData(
+            ["userStatus", dtag, packet.event.pubkey],
+            packet
+          );
+        }
+        // console.log(
+        //   "key:",
+        //   ["userStatus", dtag, packet.event.pubkey],
+        //   "data:",
+        //   get(queryClient).getQueryData([
+        //     "userStatus",
+        //     dtag,
+        //     packet.event.pubkey,
+        //   ])
+        // );
+      }
+    }
+  });
+}
 export function latestbyId<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return pipe(
     scan((acc: Map<string, A>, eventPacket: A) => {

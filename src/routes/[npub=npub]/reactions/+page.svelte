@@ -1,13 +1,8 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import {
-    promisePublishEvent,
-    setTieKey,
-    usePromiseReq,
-  } from "$lib/func/nostr";
+  import { setTieKey } from "$lib/func/nostr";
 
   import { onMount } from "svelte";
-  import { pipe } from "rxjs";
   import {
     createRxForwardReq,
     latest,
@@ -20,8 +15,6 @@
   import { _ } from "svelte-i18n";
 
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";

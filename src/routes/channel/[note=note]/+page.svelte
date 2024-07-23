@@ -8,20 +8,16 @@
   } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { pubkeysIn, setRelays, setTieKey } from "$lib/func/nostr";
+  import { setRelays, setTieKey } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
-  import { defaultRelays, queryClient, tieMapStore } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
-  import type { ChannelData } from "$lib/types";
+  import { type QueryKey } from "@tanstack/svelte-query";
 
   export let data: {
     id: string;

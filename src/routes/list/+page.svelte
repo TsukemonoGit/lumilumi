@@ -9,6 +9,9 @@
   import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { loginUser, toastSettings } from "$lib/stores/stores";
+  import { setTieKey } from "$lib/func/nostr";
+
+  setTieKey("undefined");
 
   const handleClickToList = (event: Nostr.Event) => {
     const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
@@ -48,24 +51,6 @@
         pubkey={$loginUser}
         let:events
       >
-        <!-- <Link
-            slot="loading"
-            className="underline text-magnum-300 break-all "
-            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
-            >{$_("nostviewstr.kind30000")}</Link
-          >
-          <Link
-            slot="error"
-            className="underline text-magnum-300 break-all "
-            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
-            >{$_("nostviewstr.kind30000")}</Link
-          >
-          <Link
-            slot="nodata"
-            className="underline text-magnum-300 break-all "
-            href={`https://nostviewstr.vercel.app/${nip19.npubEncode(pubkey)}/${30000}`}
-            >{$_("nostviewstr.kind30000")}</Link
-          > -->
         {@const peopleList = filtered(events)}
         {#if peopleList.length === 0}
           <Link

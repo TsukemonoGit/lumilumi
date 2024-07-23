@@ -95,6 +95,7 @@ export interface LumiSetting {
   menuleft: boolean;
   showRelayIcon: boolean;
   showReactioninTL: boolean;
+  showUserStatus: boolean;
   nostrWalletConnect: string;
   emoji: {
     list: string[][];

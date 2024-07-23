@@ -1,12 +1,6 @@
-/**
- * @license Apache-2.0
- * @copyright 2023 Akiomi Kamakura
- */
-
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
 import type {
-  AcceptableDefaultRelaysConfig,
   EventPacket,
   RxNostr,
   RxReq,
@@ -17,10 +11,9 @@ import type {
 import { createTie, createUniq, verify } from "rx-nostr";
 import { pipe, type OperatorFunction } from "rxjs";
 
-import { scanArray } from "./operators.js";
+import { scanArray, userStatus } from "./operators.js";
 import { useReq } from "$lib/func/nostr.js";
-import type { RxReqBase, ReqResult } from "$lib/types.js";
-import type { Filter } from "nostr-typedef";
+import type { ReqResult } from "$lib/types.js";
 //import { useReq } from "$lib/func/useReq.js";
 
 export function useTimelineEventList(
@@ -51,7 +44,7 @@ export function useTimelineEventList(
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(uniq, scanArray());
+  const operator = pipe(uniq, userStatus(), scanArray());
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

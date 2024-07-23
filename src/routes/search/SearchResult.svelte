@@ -3,19 +3,12 @@
   import * as Nostr from "nostr-typedef";
   import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
   import SetRepoReactions from "../../lib/components/NostrMainData/SetRepoReactions.svelte";
-  import TimelineList from "../../lib/components/NostrMainData/TimelineList.svelte";
-
-  import NostrMain from "../../lib/components/NostrMainData/NostrMain.svelte";
-  import { app, queryClient, tieMapStore } from "$lib/stores/stores";
-  import SetSearchRelays from "../../lib/components/NostrMainData/SetSearchRelays.svelte";
-  import { toRelaySet } from "$lib/stores/useRelaySet";
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
   import { generateRandomId, setTieKey } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
   export let filter: Nostr.Filter;

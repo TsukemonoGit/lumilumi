@@ -7,7 +7,12 @@
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
-  import { loginUser, queryClient, showReactioninTL } from "$lib/stores/stores";
+  import {
+    loginUser,
+    queryClient,
+    showReactioninTL,
+    showUserStatus,
+  } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -49,6 +54,39 @@
       since = ev[0].event.created_at;
     }
   }
+
+  const makeFilters = (contacts: Nostr.Event<number>): Nostr.Filter[] => {
+    const filters: Nostr.Filter[] = [
+      {
+        authors: pubkeysIn(contacts),
+        kinds: [1, 6, 16],
+        limit: 50,
+        since: since,
+      },
+    ];
+
+    if ($showReactioninTL) {
+      filters.push({
+        kinds: [
+          1 /*リプライ*/, 6 /*kind1のリポスト*/,
+          /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
+          9735 /*zap receipt**/,
+        ],
+        "#p": [$loginUser],
+        limit: 5,
+        since: since,
+      });
+    } //とりあえず通知をTLに流したくないときは フィルターから外してみる
+
+    if ($showUserStatus) {
+      filters.push({
+        kinds: [30315],
+        authors: pubkeysIn(contacts),
+      });
+    }
+    console.log(filters);
+    return filters;
+  };
 </script>
 
 <div class="w-full break-words overflow-hidden">
@@ -63,33 +101,7 @@
     {#if since}
       <TimelineList
         queryKey={timelineQuery}
-        filters={$showReactioninTL //とりあえず通知をTLに流したくないときは フィルターから外してみる
-          ? [
-              {
-                authors: pubkeysIn(contacts),
-                kinds: [1, 6, 16],
-                limit: 50,
-                since: since,
-              },
-              {
-                kinds: [
-                  1 /*リプライ*/, 6 /*kind1のリポスト*/,
-                  /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
-                  9735 /*zap receipt**/,
-                ],
-                "#p": [$loginUser],
-                limit: 5,
-                since: since,
-              },
-            ]
-          : [
-              {
-                authors: pubkeysIn(contacts),
-                kinds: [1, 6, 16],
-                limit: 50,
-                since: since,
-              },
-            ]}
+        filters={makeFilters(contacts)}
         req={createRxForwardReq()}
         {tieKey}
         let:events

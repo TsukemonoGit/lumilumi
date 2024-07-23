@@ -18,6 +18,7 @@
     showReactioninTL,
     nostrWalletConnect,
     nowProgress,
+    showUserStatus,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -92,7 +93,7 @@
     $selectedRelayset = settings.useRelaySet;
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
-
+    $showUserStatus = settings.showUserStatus;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -166,7 +167,7 @@
     $defaultReaction = settings.defaultReaction;
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
-
+    $showUserStatus = settings.showUserStatus;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -548,6 +549,14 @@
           bind:checked={settings.showReactioninTL}
         />
         {$_("settings.display.showReactioninTL")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showUserStatus}
+        />
+        {$_("settings.display.showUserStatus")}
       </label>
     </div>
   </div>

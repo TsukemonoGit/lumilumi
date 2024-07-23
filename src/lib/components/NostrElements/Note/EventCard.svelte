@@ -4,7 +4,7 @@
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import { loginUser, viewEventIds } from "$lib/stores/stores";
+  import { loginUser, showUserStatus, viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -30,6 +30,7 @@
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
   import { goto } from "$app/navigation";
   import ChannelMetadata from "./ChannelMetadata.svelte";
+  import ShowStatus from "./ShowStatus.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -202,6 +203,7 @@
 <div class="rounded-md border overflow-hidden {noteClass()} ">
   {#if note.kind === 1}
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
+      {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
       {@const { replyID, replyUsers } = replyedEvent(note.tags)}
       {#if replyID || replyUsers.length > 0}
         <Reply {replyID} {replyUsers} {displayMenu} />

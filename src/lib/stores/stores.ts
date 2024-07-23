@@ -12,7 +12,6 @@ import {
 import type { AdditionalPostOptions, MuteList } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
-import type { SvelteComponent } from "svelte";
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -96,3 +95,4 @@ export const postWindowOpen = writable<boolean>();
 export const additionalPostOptions = writable<
   AdditionalPostOptions | undefined
 >(); //投稿したあとでundefinedにする
+export const showUserStatus = writable<boolean>();

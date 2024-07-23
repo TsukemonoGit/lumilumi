@@ -24,7 +24,8 @@
       "preview": "Show preview when creating notes (only when image loading is enabled)",
       "menu": "Display the menu button on the left side.",
       "showRelayIcon": "Relay information is displayed under the icon",
-      "showReactioninTL": "Stream your reactions to Timeline"
+      "showReactioninTL": "Stream your reactions to Timeline",
+      "showUserStatus": "show user status"
     },
     "douki": {
       "title": "Sync"
