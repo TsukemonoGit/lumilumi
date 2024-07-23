@@ -22,7 +22,7 @@
 </script>
 
 {#if event}
-  {#if event.content === "+"}
+  {#if event.content === "+" || event.content === ""}
     🧡
   {:else if event.content === "-"}
     👎️
