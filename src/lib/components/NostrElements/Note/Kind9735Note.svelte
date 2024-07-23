@@ -22,22 +22,22 @@
       return undefined;
     }
   };
-  //IDのイベント購読にリクエストのIDを含める
-  $: if (zapRequestEvent && zapRequestEvent.id !== currentNoteId) {
-    $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
-    if (!$viewEventIds.includes(zapRequestEvent.id)) {
-      $viewEventIds.push(zapRequestEvent.id);
-    }
-    currentNoteId = zapRequestEvent.id;
-  }
+  // //IDのイベント購読にリクエストのIDを含める//なんやかんやでZAPへのリアクションはなし
+  // $: if (zapRequestEvent && zapRequestEvent.id !== currentNoteId) {
+  //   $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
+  //   if (!$viewEventIds.includes(zapRequestEvent.id)) {
+  //     $viewEventIds.push(zapRequestEvent.id);
+  //   }
+  //   currentNoteId = zapRequestEvent.id;
+  // }
 
-  onDestroy(() => {
-    if (zapRequestEvent) {
-      $viewEventIds = $viewEventIds.filter(
-        (item: string) => item !== zapRequestEvent.id
-      );
-    }
-  });
+  // onDestroy(() => {
+  //   if (zapRequestEvent) {
+  //     $viewEventIds = $viewEventIds.filter(
+  //       (item: string) => item !== zapRequestEvent.id
+  //     );
+  //   }
+  // });
   function zapedId(tags: Nostr.Tag.Any[]): {
     kind: number | undefined;
     tag: string[];
