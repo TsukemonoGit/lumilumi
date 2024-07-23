@@ -27,6 +27,9 @@
   import NoteTemplate from "./NoteTemplate.svelte";
   import Kind9735Note from "./Kind9735Note.svelte";
   import { getRelaysById } from "$lib/func/nostr";
+  import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
+  import { goto } from "$app/navigation";
+  import ChannelMetadata from "./ChannelMetadata.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -183,6 +186,17 @@
   $: proxy = checkProxy(note.tags);
   $: warning = checkContentWarning(note.tags);
   // const { kind, tag } = repostedId(note.tags);
+
+  const handleClickToChannel = (id: string) => {
+    if (!id) {
+      return;
+    }
+    const neventPointer: nip19.EventPointer = {
+      id: id,
+      relays: getRelaysById(id),
+    };
+    goto(`/channel/${nip19.neventEncode(neventPointer)}`);
+  };
 </script>
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
@@ -290,9 +304,10 @@
     <Kind0Note {note} {proxy} {displayMenu} />
   {:else if note.kind === 40}
     <!--kind42 パブ茶部屋-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
-      <Kind42Note {note} {displayMenu} /></NoteTemplate
-    >
+    <ChannelMetadata
+      handleClickToChannel={() => handleClickToChannel(note.id)}
+      id={note.id}
+    />
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
