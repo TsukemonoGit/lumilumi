@@ -2,10 +2,8 @@
   import { app, defaultRelays, relayStateMap } from "$lib/stores/stores";
   import { Share2, Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
-  import { afterUpdate } from "svelte";
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl } from "$lib/func/util";
-  import type { ConnectionState } from "rx-nostr";
 
   //ConnectionState
   // | "initialized"

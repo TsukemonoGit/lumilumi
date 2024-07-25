@@ -44,7 +44,7 @@
   <meta name="description" content="Note" />
 </svelte:head>
 
-<section>
+<section class="mb-20">
   <SetRepoReactions />
   <div class="w-full break-words overflow-hidden">
     <div>

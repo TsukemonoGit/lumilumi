@@ -9,6 +9,7 @@
     queryClient,
     slicedEvent,
     uploader,
+    verifier,
   } from "$lib/stores/stores";
   import {
     //    getMetadataFromLocalStorage,
@@ -32,8 +33,23 @@
   import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import { page } from "$app/stores";
+  import workerUrl from "$lib/worker?worker&url";
+  import {
+    createNoopClient,
+    createVerificationServiceClient,
+  } from "rx-nostr-crypto";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
+
+  //https://github.com/penpenpng/rx-nostr/pull/138
+  const verificationClient = browser
+    ? createVerificationServiceClient({
+        worker: new Worker(workerUrl, { type: "module" }),
+      })
+    : createNoopClient();
+  verificationClient.start();
+  $verifier = verificationClient.verifier;
+
   onMount(async () => {
     // make sure this is called before any
     // window.nostr calls are made

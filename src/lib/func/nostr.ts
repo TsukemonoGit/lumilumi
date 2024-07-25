@@ -6,6 +6,7 @@ import {
   relayStateMap,
   showImg,
   tieMapStore,
+  verifier,
 } from "$lib/stores/stores";
 import type {
   UseReqOpts,
@@ -43,14 +44,14 @@ import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
-import { verifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
   if (get(app)?.rxNostr) {
     return;
   }
-  rxNostr = createRxNostr({ verifier });
+  rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   app.set({ rxNostr: rxNostr });
 
   rxNostr.createConnectionStateObservable().subscribe((packet) => {

@@ -9,10 +9,12 @@ import {
   type EventPacket,
   type DefaultRelayConfig,
   type ConnectionState,
+  type EventVerifier,
 } from "rx-nostr";
 import type { AdditionalPostOptions, MuteList } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
+
 const config: QueryClientConfig = {
   defaultOptions: {
     queries: {
@@ -100,3 +102,4 @@ export const showUserStatus = writable<boolean>();
 export const relayStateMap = writable<Map<string, ConnectionState>>(
   new Map<string, ConnectionState>()
 );
+export const verifier = writable<EventVerifier>();

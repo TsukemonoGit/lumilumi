@@ -1,6 +1,6 @@
 import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
-import { loginUser, queryClient } from "$lib/stores/stores";
+import { loginUser, queryClient, verifier } from "$lib/stores/stores";
 import {
   setRelaysByKind10002,
   setRelaysByKind3,
@@ -20,7 +20,7 @@ import {
   type DefaultRelayConfig,
   type EventPacket,
 } from "rx-nostr";
-import { verifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
 
 export function setTheme(theme: Theme) {
@@ -36,7 +36,7 @@ export function setTheme(theme: Theme) {
 }
 
 export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier });
+  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relaySearchRelays);
   let res: EventPacket[] = [];
@@ -71,7 +71,7 @@ export async function getDoukiList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket> {
-  const rxNostr = createRxNostr({ verifier });
+  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -182,7 +182,7 @@ export async function getNaddrEmojiList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier });
+  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -216,7 +216,7 @@ export async function getMutebykindList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier });
+  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 

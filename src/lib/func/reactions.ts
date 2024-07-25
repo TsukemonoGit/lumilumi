@@ -1,19 +1,32 @@
-import { app, queryClient } from "$lib/stores/stores";
+import { app, queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
+import {
+  createRxNostr,
+  createRxForwardReq,
+  type EventPacket,
+  type RxNostr,
+} from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { zapCheck } from "$lib/stores/operators";
-import { verifier } from "rx-nostr-crypto";
+import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
-const rxNostr3 = createRxNostr({
-  verifier: verifier,
-  connectionStrategy: "aggressive",
-}); //reaction repost用
+let rxNostr3: RxNostr;
+
+// const rxNostr3 = createRxNostr({
+//   verifier: get(verifier) ?? cryptoVerifier,
+//   connectionStrategy: "aggressive",
+// }); //reaction repost用
 
 export function set3Relays(relays: any) {
+  if (!rxNostr3) {
+    rxNostr3 = createRxNostr({
+      verifier: get(verifier) ?? cryptoVerifier,
+      connectionStrategy: "aggressive",
+    }); //reaction repost用
+  }
   rxNostr3.setDefaultRelays(relays);
 }
 
