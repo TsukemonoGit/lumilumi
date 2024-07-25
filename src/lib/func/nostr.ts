@@ -412,11 +412,11 @@ export async function promisePublishEvent(
 // | "terminated";
 // const reconectableStatus:ConnectionState[]=[];
 export function relaysReconnectChallenge() {
-  if (Object.entries(defaultRelays).length == 0) {
+  if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
   //これわざわざエラーのときってしなくてもエラーとリジェクトの時いがいりコネクトされないらしい
-  Object.entries(defaultRelays).forEach(([key, value], index) => {
+  Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);
     }
