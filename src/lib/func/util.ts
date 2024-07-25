@@ -224,4 +224,7 @@ export const initSettings: LumiSetting = {
   },
   showReactioninTL: true,
   nostrWalletConnect: "",
+  showUserStatus: false,
 };
+
+export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");

@@ -314,6 +314,17 @@
     if (event.ctrlKey && event.key === "Enter") {
       postNote();
     }
+    // 矢印キーが押された場合にのみカーソル位置を更新
+    if (
+      ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)
+    ) {
+      setTimeout(() => {
+        // setTimeoutしないと古いカーソル位置を取得する可能性があるらしい
+        //setTimeout を使って次のイベントループサイクルにカーソル位置の更新を延期
+        //確実に最新のカーソル位置が cursorPosition に反映されるようになります。
+        cursorPosition = textarea.selectionStart;
+      }, 0);
+    }
   };
 
   let textareaFocus = false;

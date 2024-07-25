@@ -3,6 +3,7 @@ import {
   defaultRelays,
   metadataQueue,
   queryClient,
+  relayStateMap,
   showImg,
   tieMapStore,
 } from "$lib/stores/stores";
@@ -46,8 +47,16 @@ import { verifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
+  if (get(app)?.rxNostr) {
+    return;
+  }
   rxNostr = createRxNostr({ verifier });
   app.set({ rxNostr: rxNostr });
+
+  rxNostr.createConnectionStateObservable().subscribe((packet) => {
+    //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
+    relayStateMap.update((value) => value.set(packet.from, packet.state));
+  });
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
@@ -406,6 +415,7 @@ export function relaysReconnectChallenge() {
   if (Object.entries(defaultRelays).length == 0) {
     return;
   }
+  //これわざわざエラーのときってしなくてもエラーとリジェクトの時いがいりコネクトされないらしい
   Object.entries(defaultRelays).forEach(([key, value], index) => {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);

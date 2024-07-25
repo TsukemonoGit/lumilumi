@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { app, defaultRelays } from "$lib/stores/stores";
+  import { app, defaultRelays, relayStateMap } from "$lib/stores/stores";
   import { Share2, Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
   import { afterUpdate } from "svelte";
   import { reconnectRelay } from "$lib/func/nostr";
+  import { cleanRelayUrl } from "$lib/func/util";
+  import type { ConnectionState } from "rx-nostr";
 
   //ConnectionState
   // | "initialized"
@@ -45,47 +47,83 @@
         return "text-gray-500";
     }
   }
-  function getOverallConnectionState(): string {
-    const relayStates = [...readRelays, ...writeRelays].map(
-      (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
+  let overallStateColor: string;
+
+  // allStatus 内の state を設定する関数
+  function setAllStatusState() {
+    const allStatus = [...readRelays, ...writeRelays].map((relay) =>
+      $relayStateMap.get(cleanRelayUrl(relay.url))
     );
 
     const stateCount: Record<string, number> = {};
-    relayStates.forEach((state) => {
+    allStatus.forEach((state) => {
+      // console.log(state);
       if (state) {
         stateCount[state] = (stateCount[state] || 0) + 1;
       }
     });
 
     let maxCount = 0;
-    let overallState = "connected"; // デフォルトは接続中とする
+    let overallState = "initialized"; // デフォルトは接続中とする
 
     for (const [state, count] of Object.entries(stateCount)) {
+      //  console.log(state);
       if (count > maxCount) {
         maxCount = count;
         overallState = state;
       }
     }
 
-    return overallState;
+    overallStateColor = getColor(overallState);
+    //console.log(overallStateColor);
   }
-  let overallStateColor: string;
-  afterUpdate(updateOverallStateColor);
-  function updateOverallStateColor() {
-    if ($app?.rxNostr && $app.rxNostr.getAllRelayStatus()) {
-      overallStateColor =
-        !readRelays || !writeRelays
-          ? getColor("initialized")
-          : getColor(getOverallConnectionState());
+
+  $: if ($relayStateMap) {
+    if (readRelays?.length > 0 || writeRelays?.length > 0) {
+      setAllStatusState();
     }
   }
+  // function getOverallConnectionState(): string {
+  //   const relayStates = [...readRelays, ...writeRelays].map(
+  //     (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
+  //   );
+
+  //   const stateCount: Record<string, number> = {};
+  //   relayStates.forEach((state) => {
+  //     if (state) {
+  //       stateCount[state] = (stateCount[state] || 0) + 1;
+  //     }
+  //   });
+
+  //   let maxCount = 0;
+  //   let overallState = "connected"; // デフォルトは接続中とする
+
+  //   for (const [state, count] of Object.entries(stateCount)) {
+  //     if (count > maxCount) {
+  //       maxCount = count;
+  //       overallState = state;
+  //     }
+  //   }
+
+  //   return overallState;
+  // }
+  // let overallStateColor: string;
+  // afterUpdate(updateOverallStateColor);
+  // function updateOverallStateColor() {
+  //   if ($app?.rxNostr && $app.rxNostr.getAllRelayStatus()) {
+  //     overallStateColor =
+  //       !readRelays || !writeRelays
+  //         ? getColor("initialized")
+  //         : getColor(getOverallConnectionState());
+  //   }
+  // }
   let disabledButton: string | undefined;
   const handleClickReconnect = (url: string) => {
     reconnectRelay(url);
     disabledButton = url;
     setTimeout(() => {
       disabledButton = undefined;
-      updateOverallStateColor(); // 状態を更新
+      //updateOverallStateColor(); // 状態を更新
     }, 3000);
   };
 </script>
@@ -99,22 +137,23 @@
       <div class="text-magnum-200 font-bold text-lg mt-2">read</div>
       <ul>
         {#each readRelays as relay, index}
+          {@const relayUrl = cleanRelayUrl(relay.url)}
           <li class="flex align-middle items-center break-all">
             <Popover>
               <Circle
                 size="20"
                 class="{getColor(
-                  $app.rxNostr.getRelayStatus(relay.url)?.connection
+                  $relayStateMap.get(relayUrl)
                 )} fill-current  min-w-[20px] mr-1"
               />
               <div slot="popoverContent" class="mr-8">
-                {$app.rxNostr.getRelayStatus(relay.url)?.connection}
+                {$relayStateMap.get(relayUrl)}
               </div></Popover
-            ><span class="inline w-60">{relay.url}</span>
-            {#if $app.rxNostr.getRelayStatus(relay.url)?.connection === "error"}<button
-                on:click={() => handleClickReconnect(relay.url)}
+            ><span class="inline w-60">{relayUrl}</span>
+            {#if $relayStateMap.get(relayUrl) === "error"}<button
+                on:click={() => handleClickReconnect(relayUrl)}
                 class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
-                disabled={relay.url === disabledButton}
+                disabled={relayUrl === disabledButton}
                 ><RefreshCcw class="text-magnum-700 " size={16} /></button
               >{/if}
           </li>
@@ -123,18 +162,19 @@
       <div class="text-magnum-200 font-bold text-lg">write</div>
       <ul>
         {#each writeRelays as relay, index}
+          {@const relayUrl = cleanRelayUrl(relay.url)}
           <li class="flex align-middle items-center break-all">
             <Popover>
               <Circle
                 size="20"
                 class="{getColor(
-                  $app.rxNostr.getRelayStatus(relay.url)?.connection
+                  $relayStateMap.get(relayUrl)
                 )} fill-current  min-w-[20px] mr-1"
               />
               <div slot="popoverContent" class="mr-8">
-                {$app.rxNostr.getRelayStatus(relay.url)?.connection}
+                {$relayStateMap.get(relayUrl)}
               </div></Popover
-            ><span class="inline w-60">{relay.url}</span>
+            ><span class="inline w-60">{relayUrl}</span>
           </li>
         {/each}
       </ul>
