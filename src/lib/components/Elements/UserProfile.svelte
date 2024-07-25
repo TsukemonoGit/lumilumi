@@ -2,7 +2,7 @@
   import Metadata from "../NostrMainData/Metadata.svelte";
   import { profile, splitHexColorString } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { loginUser, showImg } from "$lib/stores/stores";
+  import { loginUser, showImg, showUserStatus } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
   import Nip05Check from "../NostrMainData/Nip05Check.svelte";
@@ -16,6 +16,7 @@
 
   import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
   import { ExternalLink, Pin } from "lucide-svelte";
+  import ShowStatus from "../NostrElements/Note/ShowStatus.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -113,6 +114,8 @@
             className="text-sm underline text-magnum-300 break-all  "
             href={prof.website}>{prof.website}</Link
           >{/if}
+
+        {#if $showUserStatus}<ShowStatus {pubkey} />{/if}
       </div>
 
       {#if prof.about}
