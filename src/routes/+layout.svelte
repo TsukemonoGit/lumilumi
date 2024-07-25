@@ -4,19 +4,13 @@
 
   import {
     app,
-    loginUser,
     nowProgress,
     queryClient,
     slicedEvent,
     uploader,
     verifier,
   } from "$lib/stores/stores";
-  import {
-    //    getMetadataFromLocalStorage,
-    relaysReconnectChallenge,
-    //relaysReconnectChallenge,
-    setRxNostr,
-  } from "$lib/func/nostr";
+  import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
@@ -51,6 +45,25 @@
   $verifier = verificationClient.verifier;
 
   onMount(async () => {
+    //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#auto-update
+    if (pwaInfo) {
+      // @ts-ignore
+      const { registerSW } = await import("virtual:pwa-register");
+      registerSW({
+        immediate: true,
+        onRegistered(r: any) {
+          // uncomment following code if you want check for updates
+          // r && setInterval(() => {
+          //    console.log('Checking for sw update')
+          //    r.update()
+          // }, 20000 /* 20s for testing purposes */)
+          console.log(`SW Registered: ${r}`);
+        },
+        onRegisterError(error: any) {
+          console.log("SW registration error", error);
+        },
+      });
+    }
     // make sure this is called before any
     // window.nostr calls are made
     if (browser) {
@@ -119,6 +132,7 @@
     <link {...link} />
   {/each}
 </svelte:head>
+
 <QueryClientProvider client={$queryClient}>
   <NostrMain let:pubkey let:localRelays>
     <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
