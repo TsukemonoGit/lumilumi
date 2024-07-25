@@ -29,7 +29,17 @@ export function set3Relays(relays: any) {
   }
   rxNostr3.setDefaultRelays(relays);
 }
-
+export function rxNostr3RelaysReconnectChallenge() {
+  const relays = rxNostr3.getDefaultRelays();
+  if (relays && Object.entries(relays).length > 0) {
+    Object.entries(relays).forEach(([key, value], index) => {
+      if (rxNostr3.getRelayStatus(key)?.connection === "error") {
+        console.log(key);
+        rxNostr3.reconnect(key);
+      }
+    });
+  }
+}
 const req3 = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {

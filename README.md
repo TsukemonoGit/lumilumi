@@ -8,15 +8,23 @@ https://github.com/akiomik/nosvelte
 
 ## 特徴
 
-- kind:10000 の Mute、kind:30007 の Mute by kind に対応。
-
+- kind:10000 の Mute、kind:30007 の Mute by kind に対応
+- kind:10030 custom emoji に対応
 - 通信量が気になる方のための、画像を表示しない、のモード
 
   - nip05 のチェックをしない
   - アイコンを表示しない
+
+    npub をもとに生成した boring avatar ( https://github.com/boringdesigners/boring-avatars )を表示
+
   - OGP を取得しない
   - カスタム絵文字を表示しない
-  - metadata を更新しない (メタデータはフォロー分だけキャッシュしてます)
+
+    short code で表示
+
+  - metadata を更新しない
+
+    メタデータはフォロー分だけキャッシュしてます
 
 ## 各種設定
 
@@ -43,6 +51,8 @@ https://github.com/akiomik/nosvelte
 - 各ノートのユーザーアイコンの下にどのリレーから受信したのかを表示する ON/OFF
 
 - 自分へのリアクションを TL に流す ON/OFF
+
+- userStatus を表示する ON/OFF ( kind: 30315 identifier: general, music )
 
 ### データの同期
 
@@ -78,7 +88,26 @@ https://github.com/akiomik/nosvelte
 
 - settings
 
+- edit ststus ( kind: 30315 の identifier: general )
+
 - profile
+
+  login user のユーザーページに移動
+
+  ユーザーページでは、
+
+  - ポスト
+  - リアクション
+  - リレーリスト ( kind:10002 )
+
+    - Nip11 の情報が閲覧可能
+
+    - 対応 NIPs はクリックすると該当する NIP のページに移動できる。
+
+    - nostr.watch で開く
+    - Nostrrr で開く
+
+  が閲覧できる
 
 #### キーボードショートカット
 
@@ -87,3 +116,11 @@ https://github.com/akiomik/nosvelte
 - ノート入力画面で
   - Ctrl+Enter キー で投稿
   - Esc キー( 多分 2 回入力くらい) で入力画面を閉じる
+
+### 他
+
+- 翻訳機能
+- ブロードキャスト機能
+- ZAP
+
+など

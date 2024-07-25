@@ -43,7 +43,7 @@ import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
-import { set3Relays } from "./reactions";
+import { rxNostr3RelaysReconnectChallenge, set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;
@@ -422,6 +422,7 @@ export function relaysReconnectChallenge() {
       get(app).rxNostr.reconnect(key);
     }
   });
+  rxNostr3RelaysReconnectChallenge();
 }
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
