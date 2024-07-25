@@ -11,10 +11,15 @@
     House,
     Users,
     MessagesSquare,
+    TrendingUp,
   } from "lucide-svelte";
   import type { EventPacket } from "rx-nostr";
   import { nip19 } from "nostr-tools";
   import UserAvatar2 from "./UserAvatar2.svelte";
+  import EditUserStatus from "$lib/components/EditUserStatus.svelte";
+  import { melt } from "@melt-ui/svelte";
+  import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
+  import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
 
   $: metadata = (
     $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
@@ -33,6 +38,31 @@
       }
     } catch (error) {}
   };
+  let trigger: MeltElement<
+    [
+      {
+        update: (
+          updater: import("svelte/store").Updater<boolean>,
+          sideEffect?: ((newValue: boolean) => void) | undefined
+        ) => void;
+        set: (this: void, value: boolean) => void;
+        subscribe(
+          this: void,
+          run: import("svelte/store").Subscriber<boolean>,
+          invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+        ): import("svelte/store").Unsubscriber;
+        get: () => boolean;
+        destroy?: (() => void) | undefined;
+      },
+    ],
+    (node: HTMLElement) => MeltActionReturn<any>,
+    ([$open]: [boolean]) => {
+      readonly "aria-haspopup": "dialog";
+      readonly "aria-expanded": boolean;
+      readonly type: "button";
+    },
+    string
+  >;
 </script>
 
 <div class="sidebar fixed top-24 bottom-12">
@@ -72,6 +102,11 @@
       >
         <a href="/settings"><Settings /><span class="ml-2">settings</span></a>
       </li>
+      <li>
+        {#if $trigger}<button use:melt={$trigger}
+            ><TrendingUp /><span class="ml-2">Edit status</span></button
+          >{/if}
+      </li>
       <li
         aria-current={$page.url.pathname === `/${encodedPub}`
           ? "page"
@@ -87,6 +122,7 @@
     <img src={logo} alt="logo" width={40} /><span class="ml-2">Lumilumi</span>
   </div>
 </div>
+<EditUserStatus bind:trigger />
 
 <style>
   @media screen and (max-width: 640px) {
@@ -117,6 +153,19 @@
     text-decoration: none;
     transition: color 0.2s linear;
   }
+
+  nav button {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    color: theme("colors.magnum.50");
+    font-weight: 700;
+    font-size: var(--text-xl);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: color 0.2s linear;
+  }
   nav li[aria-current="page"] a {
     color: theme("colors.magnum.400");
   }
@@ -134,6 +183,9 @@
     transition: color 0.2s linear;
   }
   a:hover {
+    color: theme("colors.magnum.400");
+  }
+  button:hover {
     color: theme("colors.magnum.400");
   }
 </style>

@@ -9,6 +9,7 @@
     MessagesSquare,
     Search,
     Settings,
+    TrendingUp,
     Users,
   } from "lucide-svelte";
   import { derived } from "svelte/store";
@@ -17,6 +18,9 @@
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
+  import EditUserStatus from "$lib/components/EditUserStatus.svelte";
+  import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
+  import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
 
   const items: {
     Icon: any;
@@ -67,6 +71,31 @@
   };
   $: menuPosition = $menuLeft ? "left-5" : "right-5";
   $: menuPosition2 = $menuLeft ? "right-5" : "left-5";
+  let editStatustrigger: MeltElement<
+    [
+      {
+        update: (
+          updater: import("svelte/store").Updater<boolean>,
+          sideEffect?: ((newValue: boolean) => void) | undefined
+        ) => void;
+        set: (this: void, value: boolean) => void;
+        subscribe(
+          this: void,
+          run: import("svelte/store").Subscriber<boolean>,
+          invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+        ): import("svelte/store").Unsubscriber;
+        get: () => boolean;
+        destroy?: (() => void) | undefined;
+      },
+    ],
+    (node: HTMLElement) => MeltActionReturn<any>,
+    ([$open]: [boolean]) => {
+      readonly "aria-haspopup": "dialog";
+      readonly "aria-expanded": boolean;
+      readonly type: "button";
+    },
+    string
+  >;
 </script>
 
 <div class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-white">
@@ -112,12 +141,20 @@
                 </a>
               </li>
             {/each}
+            <li>
+              {#if $editStatustrigger}<button
+                  use:melt={$item}
+                  use:melt={$editStatustrigger}
+                  class="item flex justify-center"><TrendingUp /></button
+                >{/if}
+            </li>
           </ul>
         </nav>
       </div>
     </div>
   </div>
 </div>
+<EditUserStatus bind:trigger={editStatustrigger} />
 
 <style lang="postcss">
   .menuGroup {
