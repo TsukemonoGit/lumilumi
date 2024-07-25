@@ -521,7 +521,7 @@
                 <input
                   type="text"
                   class="h-8 w-full rounded-md text-magnum-100 border-2
-            border-neutral-900"
+            border-magnum-400"
                   bind:value={customReaction}
                 />
               {/if}
