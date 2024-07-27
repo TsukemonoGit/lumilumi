@@ -38,12 +38,17 @@ import {
   createRxForwardReq,
   completeOnTimeout,
   type RxReqEmittable,
+  type RxReqStrategy,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
-import { rxNostr3RelaysReconnectChallenge, set3Relays } from "./reactions";
+import {
+  rxNostr3ReccoctRelay,
+  rxNostr3RelaysReconnectChallenge,
+  set3Relays,
+} from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;
@@ -237,6 +242,12 @@ const processMetadataQueue = () => {
 // savedMetadata = savemetadata;
 
 //console.log(savemetadata);
+
+// RxReqのフォワードリクエストかどうかを判別する型ガード関数
+function isForwardReq(req: any) {
+  return req?.over === undefined;
+}
+
 export function generateRandomId(length: number = 6): string {
   return Array.from({ length }, () => Math.random().toString(36)[2]).join("");
 }
@@ -268,6 +279,7 @@ export function useReq(
 
   //  console.log(filters);
   let _req:
+    | RxReqStrategy
     | (RxReq<"backward"> &
         RxReqEmittable<{
           relays: string[];
@@ -319,7 +331,8 @@ export function useReq(
             status.set("error");
             error.set(e);
 
-            if (!fulfilled) {
+            if (!fulfilled && !isForwardReq(_req)) {
+              console.log("fulfilled");
               reject(e);
               fulfilled = true;
             }
@@ -420,12 +433,14 @@ export function relaysReconnectChallenge() {
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);
+      rxNostr3ReccoctRelay(key);
     }
   });
-  rxNostr3RelaysReconnectChallenge();
+  //rxNostr3RelaysReconnectChallenge();
 }
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
+  rxNostr3ReccoctRelay(url);
 }
 let tieKey: string;
 export function setTieKey(key: string) {
