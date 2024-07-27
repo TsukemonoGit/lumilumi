@@ -38,6 +38,7 @@ import {
   createRxForwardReq,
   completeOnTimeout,
   type RxReqEmittable,
+  type RxReqStrategy,
 } from "rx-nostr";
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
@@ -237,6 +238,12 @@ const processMetadataQueue = () => {
 // savedMetadata = savemetadata;
 
 //console.log(savemetadata);
+
+// RxReqのフォワードリクエストかどうかを判別する型ガード関数
+function isForwardReq(req: any) {
+  return req?.over === undefined;
+}
+
 export function generateRandomId(length: number = 6): string {
   return Array.from({ length }, () => Math.random().toString(36)[2]).join("");
 }
@@ -268,6 +275,7 @@ export function useReq(
 
   //  console.log(filters);
   let _req:
+    | RxReqStrategy
     | (RxReq<"backward"> &
         RxReqEmittable<{
           relays: string[];
@@ -319,7 +327,8 @@ export function useReq(
             status.set("error");
             error.set(e);
 
-            if (!fulfilled) {
+            if (!fulfilled && !isForwardReq(_req)) {
+              console.log("fulfilled");
               reject(e);
               fulfilled = true;
             }

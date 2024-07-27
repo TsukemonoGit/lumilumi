@@ -91,15 +91,12 @@ export function useReq3({
                 v
               );
             }
-            //       } else {
-            //        resolve(v);
-            //         fulfilled = true;
-            //      }
+            // } else {
+            //   resolve(v);
+            //   fulfilled = true;
+            // }
           },
-          complete: () => {
-            console.log("[rxNostr3]Complete");
-            status.set("success");
-          },
+          complete: () => status.set("success"),
           error: (e) => {
             console.error("[rx-nostr3]", e);
             status.set("error");
@@ -113,7 +110,7 @@ export function useReq3({
         });
         obs.pipe(filterByKinds([6, 16])).subscribe({
           next: (v: EventPacket) => {
-            //     if (fulfilled) {
+            //  if (fulfilled) {
             const etags = v.event.tags.filter((item) => item[0] === "e");
 
             if (etags.length > 0) {
@@ -127,10 +124,7 @@ export function useReq3({
             //   fulfilled = true;
             // }
           },
-          complete: () => {
-            console.log("[rxNostr3]Complete");
-            status.set("success");
-          },
+          complete: () => status.set("success"),
           error: (e) => {
             console.error("[rx-nostr3]", e);
             status.set("error");
@@ -144,7 +138,7 @@ export function useReq3({
         });
         obs.pipe(filterByKind(9735)).subscribe({
           next: (v: EventPacket) => {
-            // if (fulfilled) {
+            //    if (fulfilled) {
             const etags = v.event.tags.filter((item) => item[0] === "e");
 
             if (etags.length > 0) {
@@ -158,10 +152,7 @@ export function useReq3({
             //   fulfilled = true;
             // }
           },
-          complete: () => {
-            console.log("[rxNostr3]Complete");
-            status.set("success");
-          },
+          complete: () => status.set("success"),
           error: (e) => {
             console.error("[rx-nostr3]", e);
             status.set("error");
