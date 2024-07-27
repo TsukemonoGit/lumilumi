@@ -34,9 +34,8 @@ export function useRelaySet(
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<DefaultRelayConfig[]> | undefined {
-  if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
-    setRelays(relaySearchRelays);
-  }
+  setRelays(relaySearchRelays);
+
   const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
   const reqResult = useReq({ queryKey, filters, operator, req });
 

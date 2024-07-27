@@ -19,6 +19,7 @@
     nostrWalletConnect,
     nowProgress,
     showUserStatus,
+    queryClient,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -29,7 +30,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image } from "lucide-svelte";
+  import { Save, X, Image, RotateCw } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -147,7 +148,6 @@
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return;
 
-    createCurrentSettings();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     $nowProgress = true;
     toastSettings.set({
@@ -155,8 +155,23 @@
       description: $_("settings.refleshPage"),
       color: "bg-green-500",
     });
+    // console.log($selectedRelayset);
+    // console.log(settings.useRelaySet);
+    // console.log($loginUser);
+    // console.log($originalSettings?.pubkey);
+    // if (
+    //   ($originalSettings?.pubkey &&
+    //     settings.pubkey !== $originalSettings?.pubkey) ||
+    //   settings?.useRelaySet !== $originalSettings?.useRelaySet ||
+    //   JSON.stringify($originalSettings?.relays) !==
+    //     JSON.stringify(settings.relays)
+    // ) {
+    //   reloadWithoutWarning();
+
+    // }
 
     $loginUser = settings.pubkey;
+    $selectedRelayset = settings.useRelaySet;
     $showImg = settings.showImg;
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
@@ -216,16 +231,6 @@
   }
 
   let inputPubkey: string;
-
-  function createCurrentSettings() {
-    let pub: string = "";
-    try {
-      pub = nip19.decode(inputPubkey).data as string;
-      settings.pubkey = pub;
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   function cancelSettings() {
     console.log("cancel");
@@ -291,21 +296,29 @@
     return false;
   }
 
+  let shouldReload = false;
+  // リロード前にフラグを設定してイベントリスナーを無効にする関数
+  function reloadWithoutWarning() {
+    shouldReload = true;
+    location.reload();
+  }
+
   function handleBeforeUnload(e: BeforeUnloadEvent) {
-    if (settingsChanged()) {
+    if (!shouldReload && settingsChanged()) {
       e.preventDefault();
       e.returnValue = "";
     }
   }
 
   onDestroy(() => {
-    if (browser) {
+    console.log(shouldReload);
+    if (browser && !shouldReload) {
       window?.removeEventListener("beforeunload", handleBeforeUnload);
     }
   });
 
   beforeNavigate(({ cancel }) => {
-    if (settingsChanged()) {
+    if (settingsChanged() && !shouldReload) {
       if (
         !confirm(
           "You have unsaved changes. Are you sure you want to leave this page?"
@@ -481,7 +494,7 @@
           >
         </div>
       </div>
-    {/if}
+      <div class="text-magnum-600 mt-2">※{$_("settings.relay")}</div>{/if}
   </div>
   <!--投稿の設定-->
   <div class="border border-magnum-500 rounded-md p-2">
@@ -659,6 +672,11 @@
   <div
     class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
+    <button
+      class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
+      on:click={reloadWithoutWarning}><RotateCw /></button
+    >
+
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
       on:click={saveSettings}><Save />SAVE</button

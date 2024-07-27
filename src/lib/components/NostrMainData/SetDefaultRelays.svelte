@@ -12,6 +12,7 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
+  import { loginUser } from "$lib/stores/stores";
 
   export let req:
     | (RxReq<"backward"> &
@@ -27,7 +28,11 @@
   export let localRelays: DefaultRelayConfig[];
   export let pubkey: string;
   console.log(pubkey);
-  $: result = pubkey ? deriveResult(localRelays, pubkey, req) : setLoadRelays();
+  $: result = pubkey
+    ? deriveResult(localRelays, pubkey, req)
+    : $loginUser
+      ? deriveResult(localRelays, $loginUser, req)
+      : setLoadRelays();
 
   //個々に来た段階でpubkeyがないってことは設定がないで、homeに来てたら設定に飛ぶから、それ以外のnoteのページとかに直できたときだから、
   //paramにリレーが設定されてたらそれを使ってなかったらなんか適当にデフォルトリレーセットしよう
