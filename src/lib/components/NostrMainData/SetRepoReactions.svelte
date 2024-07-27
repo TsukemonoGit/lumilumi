@@ -71,8 +71,16 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
+
+  //なんかたまにリアクション取得されないときの対策でビジブル変わったときにフィルター再設置してみる
+  function onVisibilityChange() {
+    if (document?.visibilityState === "visible") {
+      debounceUpdate();
+    }
+  }
 </script>
 
+<svelte:document on:visibilitychange={onVisibilityChange} />
 {#if $error}
   <slot name="error" {error} />
 {:else if $data}
