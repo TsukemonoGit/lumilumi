@@ -42,6 +42,10 @@ export function rxNostr3RelaysReconnectChallenge() {
     });
   }
 }
+
+export function rxNostr3ReccoctRelay(url: string) {
+  rxNostr3.reconnect(url);
+}
 const req3 = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {

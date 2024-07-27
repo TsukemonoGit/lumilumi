@@ -495,7 +495,7 @@
             <input
               type="text"
               class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
-            border-neutral-900"
+            border-magnum-400"
               bind:value={warningText}
             />
           </div>
