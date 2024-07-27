@@ -433,9 +433,10 @@ export function relaysReconnectChallenge() {
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);
+      rxNostr3ReccoctRelay(key);
     }
   });
-  rxNostr3RelaysReconnectChallenge();
+  //rxNostr3RelaysReconnectChallenge();
 }
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
