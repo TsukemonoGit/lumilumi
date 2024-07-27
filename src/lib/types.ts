@@ -53,8 +53,6 @@ export interface UseReqOpts2<A> {
   initData?: A;
 }
 export interface UseReqOpts3<A> {
-  rxNostr: RxNostr | undefined;
-
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
   req?: RxReqBase;

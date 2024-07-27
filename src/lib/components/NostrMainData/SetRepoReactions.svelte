@@ -6,7 +6,7 @@
   import type { RxNostr } from "rx-nostr";
   import { changeEmit } from "$lib/func/reactions";
 
-  export let rxNostr: RxNostr | undefined = undefined;
+  // export let rxNostr: RxNostr | undefined = undefined;
   export let req: RxReqBase | undefined = undefined;
   //export let events: Nostr.Event<number>[];
 
@@ -53,7 +53,7 @@
     debounceUpdate();
   }
 
-  result = useRepReactionList(rxNostr, filters, req);
+  result = useRepReactionList(filters, req);
 
   $: data = result?.data;
   $: status = result?.status;

@@ -6,6 +6,8 @@ import {
   createRxForwardReq,
   type EventPacket,
   type RxNostr,
+  filterByKind,
+  filterByKinds,
 } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";
@@ -48,7 +50,6 @@ export function changeEmit(filters: Nostr.Filter[]) {
 }
 
 export function useReq3({
-  rxNostr,
   operator,
   filters,
   req,
@@ -77,37 +78,99 @@ export function useReq3({
     queryKey: ["reactions"],
     queryFn: (): Promise<EventPacket> => {
       return new Promise((resolve, reject) => {
-        let fulfilled = false;
+        // let fulfilled = false;
 
-        obs.subscribe({
+        obs.pipe(filterByKind(7)).subscribe({
           next: (v: EventPacket) => {
-            if (fulfilled) {
-              const etag = v.event.tags.find((item) => item[0] === "e");
-              if (v.event.kind === 7 && etag) {
-                _queryClient.setQueryData(
-                  ["reactions", "reaction", etag[1]],
-                  v
-                );
-              } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-                _queryClient.setQueryData(["reactions", "repost", etag[1]], v);
-              } else if (v.event.kind === 9735 && etag) {
-                _queryClient.setQueryData(["reactions", "zapped", etag[1]], v);
-              }
-            } else {
-              resolve(v);
-              fulfilled = true;
+            //  if (fulfilled) {
+            const etags = v.event.tags.filter((item) => item[0] === "e");
+
+            if (etags.length > 0) {
+              _queryClient.setQueryData(
+                ["reactions", "reaction", etags[etags.length - 1][1]],
+                v
+              );
             }
+            //       } else {
+            //        resolve(v);
+            //         fulfilled = true;
+            //      }
           },
-          complete: () => status.set("success"),
+          complete: () => {
+            console.log("[rxNostr3]Complete");
+            status.set("success");
+          },
           error: (e) => {
-            console.error("[rx-nostr]", e);
+            console.error("[rx-nostr3]", e);
             status.set("error");
             error.set(e);
 
-            if (!fulfilled) {
-              reject(e);
-              fulfilled = true;
+            // if (!fulfilled) {
+            //   reject(e);
+            //   fulfilled = true;
+            // }
+          },
+        });
+        obs.pipe(filterByKinds([6, 16])).subscribe({
+          next: (v: EventPacket) => {
+            //     if (fulfilled) {
+            const etags = v.event.tags.filter((item) => item[0] === "e");
+
+            if (etags.length > 0) {
+              _queryClient.setQueryData(
+                ["reactions", "repost", etags[etags.length - 1][1]],
+                v
+              );
             }
+            // } else {
+            //   resolve(v);
+            //   fulfilled = true;
+            // }
+          },
+          complete: () => {
+            console.log("[rxNostr3]Complete");
+            status.set("success");
+          },
+          error: (e) => {
+            console.error("[rx-nostr3]", e);
+            status.set("error");
+            error.set(e);
+
+            // if (!fulfilled) {
+            //   reject(e);
+            //   fulfilled = true;
+            // }
+          },
+        });
+        obs.pipe(filterByKind(9735)).subscribe({
+          next: (v: EventPacket) => {
+            // if (fulfilled) {
+            const etags = v.event.tags.filter((item) => item[0] === "e");
+
+            if (etags.length > 0) {
+              _queryClient.setQueryData(
+                ["reactions", "zapped", etags[etags.length - 1][1]],
+                v
+              );
+            }
+            // } else {
+            //   resolve(v);
+            //   fulfilled = true;
+            // }
+          },
+          complete: () => {
+            console.log("[rxNostr3]Complete");
+            status.set("success");
+          },
+          error: (e) => {
+            console.error("[rx-nostr3]", e);
+            status.set("error");
+            error.set(e);
+
+            // if (!fulfilled) {
+            //   reject(e);
+            //   fulfilled = true;
+            // }
           },
         });
       });
