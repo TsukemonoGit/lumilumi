@@ -44,11 +44,7 @@ import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
-import {
-  rxNostr3ReccoctRelay,
-  rxNostr3RelaysReconnectChallenge,
-  set3Relays,
-} from "./reactions";
+import { rxNostr3ReccoctRelay, set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
 let rxNostr: RxNostr;

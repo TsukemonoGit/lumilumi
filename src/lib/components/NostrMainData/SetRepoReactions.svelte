@@ -16,17 +16,23 @@
   let lastUpdateTimestamp = Date.now() + 1000; // 初回は余裕を持たせる
   const updateInterval = 1000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
-
+  let updating = false;
   function debounceUpdate() {
-    const currentTimestamp = Date.now();
-    const timeSinceLastUpdate = currentTimestamp - lastUpdateTimestamp;
+    if (updating) {
+      return;
+    } else {
+      updating = true;
+      const currentTimestamp = Date.now();
+      const timeSinceLastUpdate = currentTimestamp - lastUpdateTimestamp;
 
-    if (timeSinceLastUpdate >= updateInterval) {
-      performUpdate();
-    } else if (!timeoutId) {
-      timeoutId = setTimeout(() => {
+      if (timeSinceLastUpdate >= updateInterval) {
         performUpdate();
-      }, updateInterval - timeSinceLastUpdate);
+      } else if (!timeoutId) {
+        timeoutId = setTimeout(() => {
+          performUpdate();
+        }, updateInterval - timeSinceLastUpdate);
+      }
+      updating = false;
     }
   }
 

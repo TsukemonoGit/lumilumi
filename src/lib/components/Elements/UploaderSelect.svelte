@@ -14,8 +14,8 @@
     label: getHostname(url),
   }));
 
-  console.log(defaultValue);
-  console.log(options);
+  // console.log(defaultValue);
+  //console.log(options);
 
   function getHostname(url: string): string {
     try {

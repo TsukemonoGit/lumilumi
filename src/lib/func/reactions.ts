@@ -1,6 +1,6 @@
 import { app, queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
-import { createQuery } from "@tanstack/svelte-query";
+import { createQuery, QueryClient } from "@tanstack/svelte-query";
 import {
   createRxNostr,
   createRxForwardReq,
@@ -30,17 +30,6 @@ export function set3Relays(relays: any) {
     }); //reaction repost用
   }
   rxNostr3.setDefaultRelays(relays);
-}
-export function rxNostr3RelaysReconnectChallenge() {
-  const relays = rxNostr3.getDefaultRelays();
-  if (relays && Object.entries(relays).length > 0) {
-    Object.entries(relays).forEach(([key, value], index) => {
-      if (rxNostr3.getRelayStatus(key)?.connection === "error") {
-        console.log(key);
-        rxNostr3.reconnect(key);
-      }
-    });
-  }
 }
 
 export function rxNostr3ReccoctRelay(url: string) {
@@ -82,90 +71,27 @@ export function useReq3({
     queryKey: ["reactions"],
     queryFn: (): Promise<EventPacket> => {
       return new Promise((resolve, reject) => {
-        // let fulfilled = false;
+        let fulfilled = false;
 
-        obs.pipe(filterByKind(7)).subscribe({
+        obs.subscribe({
           next: (v: EventPacket) => {
-            //  if (fulfilled) {
-            const etags = v.event.tags.filter((item) => item[0] === "e");
-
-            if (etags.length > 0) {
-              _queryClient.setQueryData(
-                ["reactions", "reaction", etags[etags.length - 1][1]],
-                v
-              );
+            if (fulfilled) {
+              handleEvent(v, _queryClient);
+            } else {
+              resolve(v);
+              fulfilled = true;
             }
-            // } else {
-            //   resolve(v);
-            //   fulfilled = true;
-            // }
           },
           complete: () => status.set("success"),
           error: (e) => {
-            console.error("[rx-nostr3]", e);
+            console.error("[rx-nostr]", e);
             status.set("error");
             error.set(e);
 
-            // if (!fulfilled) {
-            //   reject(e);
-            //   fulfilled = true;
-            // }
-          },
-        });
-        obs.pipe(filterByKinds([6, 16])).subscribe({
-          next: (v: EventPacket) => {
-            //  if (fulfilled) {
-            const etags = v.event.tags.filter((item) => item[0] === "e");
-
-            if (etags.length > 0) {
-              _queryClient.setQueryData(
-                ["reactions", "repost", etags[etags.length - 1][1]],
-                v
-              );
+            if (!fulfilled) {
+              reject(e);
+              fulfilled = true;
             }
-            // } else {
-            //   resolve(v);
-            //   fulfilled = true;
-            // }
-          },
-          complete: () => status.set("success"),
-          error: (e) => {
-            console.error("[rx-nostr3]", e);
-            status.set("error");
-            error.set(e);
-
-            // if (!fulfilled) {
-            //   reject(e);
-            //   fulfilled = true;
-            // }
-          },
-        });
-        obs.pipe(filterByKind(9735)).subscribe({
-          next: (v: EventPacket) => {
-            //    if (fulfilled) {
-            const etags = v.event.tags.filter((item) => item[0] === "e");
-
-            if (etags.length > 0) {
-              _queryClient.setQueryData(
-                ["reactions", "zapped", etags[etags.length - 1][1]],
-                v
-              );
-            }
-            // } else {
-            //   resolve(v);
-            //   fulfilled = true;
-            // }
-          },
-          complete: () => status.set("success"),
-          error: (e) => {
-            console.error("[rx-nostr3]", e);
-            status.set("error");
-            error.set(e);
-
-            // if (!fulfilled) {
-            //   reject(e);
-            //   fulfilled = true;
-            // }
           },
         });
       });
@@ -191,4 +117,15 @@ export function useReq3({
       }
     }),
   };
+}
+
+function handleEvent(v: EventPacket, _queryClient: QueryClient) {
+  const etag = v.event.tags.find((item) => item[0] === "e");
+  if (v.event.kind === 7 && etag) {
+    _queryClient.setQueryData(["reactions", "reaction", etag[1]], v);
+  } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
+    _queryClient.setQueryData(["reactions", "repost", etag[1]], v);
+  } else if (v.event.kind === 9735 && etag) {
+    _queryClient.setQueryData(["reactions", "zapped", etag[1]], v);
+  }
 }
