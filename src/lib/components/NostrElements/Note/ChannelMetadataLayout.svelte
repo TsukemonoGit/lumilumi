@@ -10,6 +10,7 @@
   import ChannelEllipsisMenu from "./ChannelEllipsisMenu.svelte";
   export let id: string; //40
   export let handleClickToChannel: (() => void) | undefined = undefined;
+  export let linkButtonTitle: string;
   let size = 96;
   export let event: Nostr.Event; //40か41
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
@@ -25,12 +26,13 @@
 {#if channelData}
   <div class="grid grid-cols-[1fr_auto]">
     <button
+      title={linkButtonTitle}
       class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"
       on:click={handleClickToChannel}
     >
       <!--がぞう-->
 
-      <div>
+      <div class="relative">
         {#if $showImg && channelData.picture}
           <UserAvatar
             url={channelData.picture}
@@ -48,6 +50,11 @@
             square={true}
           />
         {/if}
+        <div
+          class="absolute text-xs bottom-0 left-1 align-bottom text-magnum-900 dark:text-magnum-100 font-semibold bg-black/40 px-0.5"
+        >
+          kind:{event.kind}
+        </div>
       </div>
       <!--てきすとたち-->
       <div class="ml-2 text-start flex flex-col">

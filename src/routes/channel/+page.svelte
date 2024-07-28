@@ -28,6 +28,7 @@
       goto("/settings");
     }
   });
+  let linkButton: HTMLButtonElement;
 </script>
 
 <svelte:head>
@@ -68,6 +69,7 @@
             <ChannelMetadata
               handleClickToChannel={() => handleClickToChannel(id)}
               {id}
+              linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
             />
           </div>
         {/each}

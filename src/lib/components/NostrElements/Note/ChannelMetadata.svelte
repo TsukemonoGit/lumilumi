@@ -6,6 +6,7 @@
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
   export let id: string; //kind40 channel id
   export let handleClickToChannel: (() => void) | undefined = undefined;
+  export let linkButtonTitle: string;
 </script>
 
 <Text queryKey={["channel", "kind40", id]} {id} let:text>
@@ -24,14 +25,34 @@
     let:event
   >
     <div slot="loading">
-      <ChannelMetadataLayout {handleClickToChannel} {id} event={text} />
+      <ChannelMetadataLayout
+        {handleClickToChannel}
+        {id}
+        {linkButtonTitle}
+        event={text}
+      />
     </div>
     <div slot="nodata">
-      <ChannelMetadataLayout {handleClickToChannel} {id} event={text} />
+      <ChannelMetadataLayout
+        {handleClickToChannel}
+        {id}
+        {linkButtonTitle}
+        event={text}
+      />
     </div>
     <div slot="error">
-      <ChannelMetadataLayout {handleClickToChannel} {id} event={text} />
+      <ChannelMetadataLayout
+        {handleClickToChannel}
+        {id}
+        {linkButtonTitle}
+        event={text}
+      />
     </div>
-    <ChannelMetadataLayout {handleClickToChannel} {id} {event} />
+    <ChannelMetadataLayout
+      {handleClickToChannel}
+      {id}
+      {linkButtonTitle}
+      {event}
+    />
   </LatestEvent>
 </Text>

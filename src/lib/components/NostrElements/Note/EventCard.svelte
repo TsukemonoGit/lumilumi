@@ -316,6 +316,7 @@
     >
       <div slot="loading">
         <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
           handleClickToChannel={() => handleClickToChannel(note.id)}
           id={note.id}
           event={note}
@@ -323,6 +324,7 @@
       </div>
       <div slot="nodata">
         <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
           handleClickToChannel={() => handleClickToChannel(note.id)}
           id={note.id}
           event={note}
@@ -330,12 +332,14 @@
       </div>
       <div slot="error">
         <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
           handleClickToChannel={() => handleClickToChannel(note.id)}
           id={note.id}
           event={note}
         />
       </div>
       <ChannelMetadataLayout
+        linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
         {event}

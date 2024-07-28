@@ -7,7 +7,7 @@
   export let pubkey: string | undefined;
   export let size: number = 40;
   export let square: boolean = false;
-
+  export let title: string = "";
   const {
     elements: { image, fallback },
     options: { src },
@@ -20,6 +20,7 @@
 </script>
 
 <div
+  {title}
   class="relative flex items-center justify-center {!square
     ? 'rounded-full'
     : ''} bg-neutral-800 overflow-hidden"

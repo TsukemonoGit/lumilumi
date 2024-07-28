@@ -26,6 +26,7 @@
   import Popover from "./Popover.svelte";
   import UserProfile from "./UserProfile.svelte";
   import { _ } from "svelte-i18n";
+  import { writable } from "svelte/store";
 
   export let pubkey: string;
   export let size: number;
@@ -58,7 +59,10 @@
   };
   $: profile = getProfile(metadata);
   $: url = profile?.picture;
-
+  const title = writable<string>("");
+  $: if (profile && profile.name) {
+    $title = `@${profile.name}`;
+  }
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
     try {
@@ -118,8 +122,9 @@
 </script>
 
 {#if !displayMenu}
+  <!-- <div title={$title}> -->
   {#if $showImg && url && url !== ""}
-    <UserAvatar {url} name={pubkey} {pubkey} {size} />
+    <UserAvatar {url} name={pubkey} {pubkey} {size} title={$title} />
   {:else}
     <Avatar
       {size}
@@ -128,10 +133,11 @@
       colors={splitHexColorString(pubkey)}
     />
   {/if}
+  <!-- </div> -->
 {:else}
   <Popover>
     {#if $showImg && url && url !== ""}
-      <UserAvatar {url} name={pubkey} {pubkey} {size} />
+      <UserAvatar {url} name={pubkey} {pubkey} {size} title={$title} />
     {:else}
       <Avatar
         {size}
