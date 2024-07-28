@@ -2,14 +2,10 @@
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
-    Earth,
     Ellipsis,
     FileJson2,
     SquareArrowOutUpRight,
-    Notebook,
-    Smile,
     Radio,
-    Link,
     Share,
   } from "lucide-svelte";
 
@@ -18,12 +14,15 @@
   import { nip19 } from "nostr-tools";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
-  import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
+  export let listData: {
+    dtag: string | undefined;
+    title: string | undefined;
+    description: string | undefined;
+  };
 
   let dialogOpen: any;
 
@@ -107,8 +106,8 @@
       case 7:
         //share link
         const shareData = {
-          //title: "",
-          //text: "lumilumi",
+          title: `【${listData.title ?? listData.dtag ?? "list"}】`,
+          text: listData.description ?? undefined,
           url: `${$page.url.origin}/list/${naddr}`,
         };
         try {
@@ -118,14 +117,14 @@
           // );
           $toastSettings = {
             title: "Success",
-            description: `Copied to clipboard`,
+            description: `shared successfully`,
             color: "bg-green-500",
           };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
             title: "Error",
-            description: "Failed to copy",
+            description: "Failed to share",
             color: "bg-orange-500",
           };
         }

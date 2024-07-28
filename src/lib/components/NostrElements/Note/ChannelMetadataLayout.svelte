@@ -94,7 +94,7 @@
       <div class="flex flex-col justify-between items-center">
         <UserMenu pubkey={event.pubkey} {metadata} size={40} />
         <button class="text-magnum-400"
-          ><ChannelEllipsisMenu note={event} /></button
+          ><ChannelEllipsisMenu note={event} {channelData} /></button
         >
       </div>
     </Metadata>

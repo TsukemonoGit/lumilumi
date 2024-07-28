@@ -92,6 +92,11 @@
       />
       <UserMenu pubkey={event.pubkey} {metadata} size={40} /></Metadata
     >
-    <button class="text-magnum-400"><ListEllipsisMenu note={event} /> </button>
+    <button class="text-magnum-400"
+      ><ListEllipsisMenu
+        note={event}
+        listData={{ dtag: dtag, title: title, description: description }}
+      />
+    </button>
   </div>
 </div>
