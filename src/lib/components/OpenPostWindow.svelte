@@ -25,16 +25,14 @@
     toastSettings,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
-  import Content from "./NostrElements/Note/Content.svelte";
+
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
-  import { onMount } from "svelte";
-  import { browser } from "$app/environment";
+
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { convertMetaTags, filesUpload } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
     DefaultPostOptions,
-    AdditionalPostOptions,
     MargePostOptions,
     Profile,
   } from "$lib/types";

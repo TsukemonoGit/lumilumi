@@ -138,14 +138,14 @@
           // );
           $toastSettings = {
             title: "Success",
-            description: `Copied to clipboard`,
+            description: `shared successfully`,
             color: "bg-green-500",
           };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
             title: "Error",
-            description: "Failed to copy",
+            description: "Failed to share",
             color: "bg-orange-500",
           };
         }

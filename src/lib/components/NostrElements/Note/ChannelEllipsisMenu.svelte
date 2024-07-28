@@ -22,8 +22,11 @@
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
+  import type { ChannelData } from "$lib/types";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
+  export let channelData: ChannelData;
+
   let dialogOpen: any;
 
   let menuTexts = [
@@ -121,8 +124,8 @@
       case 7:
         //Share link
         const shareData = {
-          //title: "",
-          //text: "lumilumi",
+          title: `【channel】${channelData.name}`,
+          text: channelData.about,
           url: `${$page.url.origin}/channel/${nevent}`,
         };
         try {
@@ -132,14 +135,14 @@
           // );
           $toastSettings = {
             title: "Success",
-            description: `Copied to clipboard`,
+            description: `shared successfully`,
             color: "bg-green-500",
           };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
             title: "Error",
-            description: "Failed to copy",
+            description: "Failed to share",
             color: "bg-orange-500",
           };
         }

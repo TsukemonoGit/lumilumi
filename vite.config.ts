@@ -21,6 +21,17 @@ export default defineConfig({
         scope: "/",
         display: "standalone",
         theme_color: "#ffffff",
+        //Web Share Target API//共有ボタン押したときに一覧に表示されるようにする
+        //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
+        share_target: {
+          action: "/post",
+          method: "GET",
+          params: {
+            title: "title",
+            text: "text",
+            url: "url",
+          },
+        },
       },
       injectRegister: "auto", //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
 
