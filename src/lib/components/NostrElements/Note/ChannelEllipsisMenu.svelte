@@ -124,7 +124,7 @@
       case 7:
         //Share link
         const shareData = {
-          title: `【channel】${channelData.name}`,
+          title: `【Channel】${channelData.name}`,
           text: channelData.about,
           url: `${$page.url.origin}/channel/${nevent}`,
         };

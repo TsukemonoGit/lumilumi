@@ -18,6 +18,7 @@
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
+  import { nip19 } from "nostr-tools";
 
   export let data: {
     id: string;
@@ -75,7 +76,10 @@
 </svelte:head>
 <section>
   <div class="w-full break-words overflow-hidden">
-    <ChannelMetadata id={data.id} />{#if since}
+    <ChannelMetadata
+      id={data.id}
+      linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+    />{#if since}
       <TimelineList
         queryKey={timelineQuery}
         filters={[

@@ -30,7 +30,7 @@
   console.log(pubkey);
   $: result = pubkey
     ? deriveResult(localRelays, pubkey, req)
-    : $loginUser
+    : $loginUser !== ""
       ? deriveResult(localRelays, $loginUser, req)
       : setLoadRelays();
 
