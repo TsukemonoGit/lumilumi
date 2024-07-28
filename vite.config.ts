@@ -20,7 +20,7 @@ export default defineConfig({
         start_url: "/",
         scope: "/",
         display: "standalone",
-        theme_color: "#ffffff",
+        theme_color: "##bd5711",
         //Web Share Target API//共有ボタン押したときに一覧に表示されるようにする
         //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
         share_target: {
