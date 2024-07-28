@@ -335,7 +335,7 @@
                   </div>
                 </LatestEvent>{/if}
             </div> -->
-        <div use:melt={$content("relays")} class="content">
+        <div use:melt={$content("relays")} class="content mb-20">
           {#if $value === "relays"}
             <LatestEvent
               queryKey={["relays", userPubkey]}
