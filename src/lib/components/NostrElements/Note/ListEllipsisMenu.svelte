@@ -106,7 +106,7 @@
       case 7:
         //share link
         const shareData = {
-          title: `【${listData.title ?? listData.dtag ?? "list"}】`,
+          title: `【list】${listData.title ?? listData.dtag ?? ""}`,
           text: listData.description ?? undefined,
           url: `${$page.url.origin}/list/${naddr}`,
         };
