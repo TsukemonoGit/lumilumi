@@ -109,7 +109,7 @@
 <svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
   <title>Lumilumi</title>
-  <meta prefix="og:https://ogp.me/ns#" />
+
   <meta property="og:title" content="Lumilumi" />
   <meta property="og:image" content={`${$page.url.origin}/ogp.png`} />
   <meta
