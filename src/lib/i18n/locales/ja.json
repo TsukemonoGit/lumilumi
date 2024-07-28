@@ -81,7 +81,8 @@
       "relayHtml": "リレーのサイトを開く"
     },
     "nostr-watch": "nostr.watch で開く",
-    "nostrrr": "Nostrrr で開く"
+    "nostrrr": "Nostrrr で開く",
+    "sharelink": "リンクの共有"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。"

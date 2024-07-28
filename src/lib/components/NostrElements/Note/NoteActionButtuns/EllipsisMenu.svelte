@@ -10,6 +10,7 @@
     Smile,
     Radio,
     Link,
+    Share,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -38,7 +39,7 @@
     { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
     // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    { text: `${$_("menu.copylink")}`, icon: Link, num: 7 },
+    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
   ];
   if (note.kind === 30030) {
     menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
@@ -123,11 +124,18 @@
         }, 1000);
         break;
       case 7:
-        //Copy link
+        //Share link
+        const shareData = {
+          //title: "",
+          //text: "lumilumi",
+          url: `${$page.url.origin}/${replaceable ? naddr : nevent}`,
+        };
+
         try {
-          await navigator.clipboard.writeText(
-            `${$page.url.origin}/${replaceable ? naddr : nevent}`
-          );
+          await navigator.share(shareData);
+          // await navigator.clipboard.writeText(
+          //   `${$page.url.origin}/${replaceable ? naddr : nevent}`
+          // );
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,

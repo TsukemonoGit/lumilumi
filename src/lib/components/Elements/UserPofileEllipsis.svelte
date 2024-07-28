@@ -9,6 +9,7 @@
     Notebook,
     Radio,
     RefreshCcw,
+    Share,
     SquareArrowOutUpRight,
   } from "lucide-svelte";
   import { _ } from "svelte-i18n";
@@ -31,7 +32,7 @@
     { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
 
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    { text: `${$_("menu.copylink")}`, icon: Link, num: 7 },
+    { text: `${$_("menu.copylink")}`, icon: Share, num: 7 },
   ];
 
   const handleSelectItem = async (index: number) => {
@@ -76,11 +77,18 @@
 
         break;
       case 7:
-        //Copy link
+        //Share link
+        const shareData = {
+          //title: "",
+          //text: "lumilumi",
+          url: `${$page.url.origin}/${encodedPub}`,
+        };
+
         try {
-          await navigator.clipboard.writeText(
-            `${$page.url.origin}/${encodedPub}`
-          );
+          // await navigator.clipboard.writeText(
+          //   `${$page.url.origin}/${encodedPub}`
+          // );
+          await navigator.share(shareData);
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,

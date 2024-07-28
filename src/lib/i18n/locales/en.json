@@ -82,7 +82,8 @@
     },
     "nostr-watch": "Open in nostr.watch",
     "nostrrr": "Open in Nostrrr",
-    "copylink": "Copy link"
+    "copylink": "Copy link",
+    "sharelink": "Share Link"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey."
