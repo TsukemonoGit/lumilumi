@@ -32,7 +32,7 @@
     { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
 
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    { text: `${$_("menu.copylink")}`, icon: Share, num: 7 },
+    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
   ];
 
   const handleSelectItem = async (index: number) => {
