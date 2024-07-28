@@ -31,6 +31,7 @@
   import { goto } from "$app/navigation";
   import ChannelMetadata from "./ChannelMetadata.svelte";
   import ShowStatus from "./ShowStatus.svelte";
+  import ListLinkCard from "./ListLinkCard.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -345,6 +346,8 @@
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       <Kind42Note {note} {displayMenu} /></NoteTemplate
     >
+  {:else if note.kind === 30000}
+    <ListLinkCard event={note} />
   {:else if note.kind === 30030}
     <!--kind30030-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>

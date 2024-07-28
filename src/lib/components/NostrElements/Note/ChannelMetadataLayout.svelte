@@ -23,38 +23,41 @@
 </script>
 
 {#if channelData}
-  <div class="grid grid-cols-[auto_1fr_auto]">
-    <!--がぞう-->
-    <button on:click={handleClickToChannel}>
-      {#if $showImg && channelData.picture}
-        <UserAvatar
-          url={channelData.picture}
-          name={id}
-          pubkey={id}
-          {size}
-          square={true}
-        />
-      {:else}
-        <Avatar
-          {size}
-          name={id}
-          variant="beam"
-          colors={splitHexColorString(id)}
-          square={true}
-        />
-      {/if}
-    </button>
-    <!--てきすとたち-->
+  <div class="grid grid-cols-[1fr_auto]">
     <button
-      class="ml-2 hover:opacity-75 focus:opacity-50 text-start flex flex-col"
+      class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"
       on:click={handleClickToChannel}
     >
-      <div class="text-xl font-bold text-magnum-400">
-        {channelData.name}
-      </div>
+      <!--がぞう-->
 
-      <div class="text-magnum-100">{channelData.about}</div>
-    </button>
+      <div>
+        {#if $showImg && channelData.picture}
+          <UserAvatar
+            url={channelData.picture}
+            name={id}
+            pubkey={id}
+            {size}
+            square={true}
+          />
+        {:else}
+          <Avatar
+            {size}
+            name={id}
+            variant="beam"
+            colors={splitHexColorString(id)}
+            square={true}
+          />
+        {/if}
+      </div>
+      <!--てきすとたち-->
+      <div class="ml-2 text-start flex flex-col">
+        <div class="text-xl font-bold text-magnum-400">
+          {channelData.name}
+        </div>
+
+        <div class="text-magnum-100">{channelData.about}</div>
+      </div></button
+    >
     <Metadata
       queryKey={["metadata", event.pubkey]}
       pubkey={event.pubkey}

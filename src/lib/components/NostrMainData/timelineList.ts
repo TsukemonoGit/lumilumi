@@ -30,12 +30,11 @@ export async function loadOlderEvents(
     return [];
   }
 
-  const kind1 = get(slicedEvent).filter(
+  const notReactionEvent = get(slicedEvent).filter(
     (item) =>
-      item.kind === 1 &&
       !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
   );
-  console.log(kind1);
+  console.log(notReactionEvent);
   // if (data && data.length > 1) {
   //   const kind1 = data.filter(
   //     (item) =>
@@ -56,21 +55,28 @@ export async function loadOlderEvents(
   console.log(untilTimestamp);
   //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
   const newFilters = lastfavcheck
-    ? lastEvent.kind === 1
-      ? filters.map((filter: Filter) => ({
-          ...filter,
-          limit: sift,
-          until: untilTimestamp,
-          since: undefined,
-        }))
-      : [
-          {
-            ...filters[0],
+    ? !lastEvent.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser)) //ラストがリアクションをTLに表示するためのフィルターではない場合
+      ? filters
+          .filter(
+            (filter: Filter) => !filter.kinds || !filter.kinds.includes(30315)
+          )
+          .map((filter: Filter) => ({
+            ...filter,
             limit: sift,
-            until: kind1[kind1.length - 1].created_at,
+            until: untilTimestamp,
             since: undefined,
-          },
-        ]
+          }))
+      : filters
+          .filter(
+            (filter: Filter) =>
+              !filter["#p"] && (!filter.kinds || !filter.kinds.includes(30315))
+          )
+          .map((filter: Filter) => ({
+            ...filter,
+            limit: sift,
+            until: notReactionEvent[notReactionEvent.length - 1].created_at,
+            since: undefined,
+          }))
     : filters.map((filter: Filter) => ({
         ...filter,
         limit: sift,
