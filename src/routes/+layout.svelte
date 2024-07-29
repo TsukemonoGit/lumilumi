@@ -111,7 +111,7 @@
   <title>Lumilumi</title>
 
   <meta property="og:title" content="Lumilumi" />
-  <meta property="og:image" content={`${$page.url.origin}/ogp.png`} />
+  <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
   <meta
     property="og:description"
     content={$page.route.id === "/"
