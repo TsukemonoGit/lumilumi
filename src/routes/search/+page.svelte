@@ -12,7 +12,7 @@
   import { get } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import { nowProgress } from "$lib/stores/stores";
-  import type { SvelteComponent } from "svelte";
+  import { onMount, type SvelteComponent } from "svelte";
 
   let searchWord = "";
   let searchKind = 1;
@@ -42,9 +42,22 @@
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     history.pushState({}, "", newUrl);
   }
-
-  afterNavigate(async () => {
+  let isMount = false;
+  afterNavigate(() => {
     openSearchResult = false;
+    if (!isMount) {
+      isMount = true;
+      init();
+    }
+  });
+  onMount(() => {
+    if (!isMount) {
+      isMount = true;
+      init();
+    }
+  });
+
+  async function init() {
     const params = get(page).url.searchParams;
     searchHashtag = params.get("t") ?? undefined;
     searchWord = params.get("q") ?? "";
@@ -65,7 +78,8 @@
       showFilter = { ...filter, limit: 50 };
       handleClickSearch();
     }
-  });
+    isMount = false;
+  }
 
   beforeNavigate(() => {
     openSearchResult = false;
