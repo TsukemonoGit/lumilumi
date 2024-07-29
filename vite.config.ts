@@ -32,6 +32,12 @@ export default defineConfig({
             url: "url",
           },
         },
+        protocol_handlers: [
+          {
+            protocol: "web+nostr", //https://developer.mozilla.org/ja/docs/Web/Manifest/protocol_handlers
+            url: "/%s",
+          },
+        ],
       },
       injectRegister: "auto", //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
 
