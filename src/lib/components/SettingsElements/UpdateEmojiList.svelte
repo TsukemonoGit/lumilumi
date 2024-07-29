@@ -13,6 +13,7 @@
   import { nowProgress, showImg, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
+  import type { EventPacket } from "rx-nostr";
 
   export let pubkey: string;
   export let emojiList: { list: string[][]; updated: number } | undefined;
@@ -93,8 +94,29 @@
       chunkedFilters.map((chunk) => getNaddrEmojiList(chunk, relays))
     );
     if (pkListArray.length > 0) {
+      //重複しないように整える
+
+      // フラット化して一つの配列にする
+      const flattenedList = pkListArray.flat();
+
+      // dtag をキーとして最新のイベントをマップに格納
+      const latestEventsMap = new Map<string, EventPacket>();
+
+      flattenedList.forEach((packet) => {
+        const dTag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
+        if (dTag) {
+          const existingEvent = latestEventsMap.get(dTag);
+          if (
+            !existingEvent ||
+            packet.event.created_at > existingEvent.event.created_at
+          ) {
+            latestEventsMap.set(dTag, packet);
+          }
+        }
+      });
+
       // 各チャンクの結果を結合する
-      pkListArray.flat().forEach((pk) => {
+      latestEventsMap.forEach((pk) => {
         if (pk && pk.event) {
           list = [
             ...list,
