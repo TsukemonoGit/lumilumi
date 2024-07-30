@@ -219,7 +219,9 @@
 </script>
 
 {#if thread && replyID}
-  <ReplyThread {replyID} {displayMenu} {depth} />
+  <div class="border-b border-magnum-800">
+    <ReplyThread {replyID} {displayMenu} {depth} />
+  </div>
 {/if}
 
 <div class="{noteClass()} ">
