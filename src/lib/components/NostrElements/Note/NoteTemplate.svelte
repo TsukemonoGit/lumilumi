@@ -94,7 +94,7 @@
       {#if displayMenu}
         <button
           on:click={handleClickToNotepage}
-          class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs mt-auto mb-auto hover:underline"
+          class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
           {formatAbsoluteDate(note.created_at)}
         </button>

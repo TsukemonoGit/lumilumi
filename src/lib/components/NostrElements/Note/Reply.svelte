@@ -33,7 +33,7 @@
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
-    <div class="border rounded-md border-magnum-600/25">
+    <div class="border rounded-md border-magnum-600/30">
       <Note id={replyID} mini={true} {displayMenu} depth={depth + 1} />
     </div>
 
