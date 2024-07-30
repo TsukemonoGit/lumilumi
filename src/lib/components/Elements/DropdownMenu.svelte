@@ -17,7 +17,7 @@
 
 <button
   type="button"
-  class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
   use:melt={$trigger}
   aria-label="Update dimensions"
   ><slot />
@@ -122,7 +122,7 @@
   .trigger {
     @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-black;
     @apply text-magnum-50 transition-colors hover:bg-black/90;
-    @apply data-[highlighted]:ring-magnum-500 data-[highlighted]:ring-offset-2 !important;
+    @apply data-[highlighted]:ring-magnum-500/75 data-[highlighted]:ring-offset-2 !important;
     @apply p-0 text-sm font-medium  data-[highlighted]:outline-none;
   }
   .check {

@@ -289,7 +289,12 @@
           class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
           style="word-break: break-word; max-height:{bannerHeight}px"
         >
-          <Content text={newProfile.about} tags={newTags} displayMenu={true} />
+          <Content
+            text={newProfile.about}
+            tags={newTags}
+            displayMenu={true}
+            depth={0}
+          />
         </div>
       {/if}
     </div>

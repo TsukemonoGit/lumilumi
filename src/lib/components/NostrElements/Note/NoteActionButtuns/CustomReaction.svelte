@@ -87,7 +87,7 @@
 </script>
 
 <Popover bind:open>
-  <SmilePlus size="20" class="stroke-magnum-500" />
+  <SmilePlus size="20" class="stroke-magnum-500/75" />
   <div slot="popoverContent">
     <div class="flex gap-1 pr-8 pl-2 max-w-80">
       <input

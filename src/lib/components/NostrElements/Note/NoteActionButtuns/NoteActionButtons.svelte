@@ -298,23 +298,23 @@
     >
       <MessageSquare
         size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden "
+        class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
       />
     </button>
 
     <!--リポスト-->
     <Reposted id={note.id} let:event>
       <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
+        <Repeat2 size="21" />
       </DropdownMenu>
       <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
+        <Repeat2 size="21" />
       </DropdownMenu>
       <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" />
+        <Repeat2 size="21" />
       </DropdownMenu>
       <DropdownMenu {menuTexts} {handleSelectItem}>
-        <Repeat2 size="20" class={event ? "text-magnum-200 " : ""} />
+        <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
       </DropdownMenu>
     </Reposted>
   {/if}
@@ -324,21 +324,21 @@
       <button slot="loading" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
         />
       </button>
 
       <button slot="nodata" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
         />
       </button>
 
       <button slot="error" on:click={handleClickReaction}>
         <Heart
           size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
         />
       </button>
 
@@ -346,7 +346,7 @@
         <button on:click={handleClickReaction}>
           <Heart
             size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
           />
         </button>
       {:else}
@@ -372,21 +372,21 @@
           <button slot="loading" on:click={handleClickZap}>
             <Zap
               size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500 mt-auto overflow-hidden"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
             />
           </button>
 
           <button slot="nodata" on:click={handleClickZap}>
             <Zap
               size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
             />
           </button>
 
           <button slot="error" on:click={handleClickZap}>
             <Zap
               size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
             />
           </button>
 
@@ -394,13 +394,13 @@
             <button on:click={handleClickZap}>
               <Zap
                 size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500 overflow-hidden"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
               />
             </button>
           {:else}
             <Zap
               size="20"
-              class="text-magnum-500 overflow-hidden fill-magnum-500"
+              class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
             />
           {/if}
         </Zapped>
@@ -418,7 +418,7 @@
               <input
                 type="number"
                 id="amount"
-                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
                 placeholder="amount"
                 bind:value={zapAmount}
               />
@@ -426,7 +426,7 @@
               <input
                 type="text"
                 id="comment"
-                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
                 placeholder="comment"
                 bind:value={zapComment}
               />
