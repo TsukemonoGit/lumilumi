@@ -218,7 +218,6 @@
 
 {#if thread && replyID}
   <ReplyThread {replyID} {displayMenu} {depth} />
-  <hr />
 {/if}
 
 <div class="rounded-md border overflow-hidden {noteClass()} ">
