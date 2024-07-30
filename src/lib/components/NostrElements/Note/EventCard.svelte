@@ -368,7 +368,7 @@
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
-      <Kind42Note {note} {displayMenu} /></NoteTemplate
+      <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
     >
   {:else if note.kind === 30000}
     <ListLinkCard event={note} />

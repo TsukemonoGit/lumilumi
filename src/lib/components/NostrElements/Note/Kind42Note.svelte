@@ -13,6 +13,7 @@
 
   export let displayMenu: boolean;
   export let note: Nostr.Event;
+  export let depth: number;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
@@ -66,7 +67,7 @@
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
   {#if replyID || replyUsers.length > 0}
-    <Reply {replyID} {replyUsers} {displayMenu} />
+    <Reply {replyID} {replyUsers} {displayMenu} depth={depth + 1} />
     <hr />
   {/if}
 {/await}
