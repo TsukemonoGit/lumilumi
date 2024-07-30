@@ -377,19 +377,21 @@
             p-6 pt-3 shadow-lg mb-4"
         >
           <div class="font-medium text-magnum-400">preview</div>
-          <EventCard
-            {metadata}
-            note={{
-              sig: "",
-              id: "",
-              pubkey: signPubkey,
-              content: text,
-              tags: tags,
-              kind: options.kind ?? 1,
-              created_at: now(),
-            }}
-            displayMenu={false}
-          />
+          <div class="border border-magnum-500 rounded-md">
+            <EventCard
+              {metadata}
+              note={{
+                sig: "",
+                id: "",
+                pubkey: signPubkey,
+                content: text,
+                tags: tags,
+                kind: options.kind ?? 1,
+                created_at: now(),
+              }}
+              displayMenu={false}
+            />
+          </div>
           <!-- <div
             class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
           >
