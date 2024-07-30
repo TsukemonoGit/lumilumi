@@ -83,7 +83,7 @@
     // return depth === 0
     //   ? `border-magnum-600 ${ret}`
     //   : `border-magnum-900 ${ret}`;
-    return user ? `border-l-2 border-magnum-700 ${baseClass}` : baseClass;
+    return user ? `bg-magnum-700/10 ${baseClass}` : `${baseClass}`; //bg-magnum-700/20
   };
 
   const replyedEvent = (

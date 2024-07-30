@@ -169,7 +169,7 @@
                   </div> -->
 
               <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
               >
                 {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
                   <div
@@ -211,7 +211,7 @@
                 </div>
 
                 <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
                 >
                   {#if events && events.length > 0}
                     {#each events.filter( (event) => [1, 6, 16].includes(event.kind) ) as event, index (event.id)}
@@ -273,7 +273,7 @@
               </div>
 
               <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
               >
                 {#if events && events.length > 0}
                   {#each events as event, index (event.id)}
@@ -367,7 +367,7 @@
               </div>
 
               <div
-                class="max-w-[100vw] break-words divide-y divide-magnum-600/25"
+                class="max-w-[100vw] break-words divide-y divide-magnum-600/30"
               >
                 {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
                   <div class=" overflow-hidden p-1">

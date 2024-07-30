@@ -98,7 +98,9 @@
             <p>{error}</p>
           </div>
 
-          <div class="max-w-[100vw] break-words box-border">
+          <div
+            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+          >
             {#if events && events.length > 0}
               {#each events as event, index (event.id)}<div
                   class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
