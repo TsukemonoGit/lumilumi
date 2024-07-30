@@ -226,7 +226,7 @@
 
 <div class="{noteClass()} ">
   {#if note.kind === 1}
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
       {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
       <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
       {#if !thread && (replyID || replyUsers.length > 0)}
@@ -382,14 +382,14 @@
     </LatestEvent>
   {:else if note.kind === 42}
     <!--kind42 パブ茶コメント-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
       <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
     >
   {:else if note.kind === 30000}
     <ListLinkCard event={note} {depth} />
   {:else if note.kind === 30030}
     <!--kind30030-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
+    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
       <Kind30030Note {note} /></NoteTemplate
     >
   {:else if note.kind === 9735}

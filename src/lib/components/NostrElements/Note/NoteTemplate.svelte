@@ -19,6 +19,7 @@
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
   export let tag: string[] | undefined;
+  export let depth: number;
   //const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
@@ -61,7 +62,7 @@
   };
 </script>
 
-<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden"}>
+<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden mt-1"}>
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
       <UserMenu
@@ -69,6 +70,7 @@
         bind:metadata
         size={mini ? 20 : 40}
         {displayMenu}
+        {depth}
       />
     </div>
     {#if $showRelayIcon && displayMenu}
