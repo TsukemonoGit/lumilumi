@@ -168,7 +168,9 @@
                     <p>nodata</p>
                   </div> -->
 
-              <div class="max-w-[100vw] break-words box-border">
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-800"
+              >
                 {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
                   <div
                     class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
