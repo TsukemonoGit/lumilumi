@@ -19,6 +19,7 @@
           pubkey={event.pubkey}
           metadata={undefined}
           size={24}
+          depth={0}
         />
 
         <UserMenu
@@ -26,6 +27,7 @@
           pubkey={event.pubkey}
           metadata={undefined}
           size={24}
+          depth={0}
         />
 
         <UserMenu
@@ -33,9 +35,10 @@
           pubkey={event.pubkey}
           metadata={undefined}
           size={24}
+          depth={0}
         />
 
-        <UserMenu pubkey={event.pubkey} {metadata} size={24} />
+        <UserMenu pubkey={event.pubkey} {metadata} size={24} depth={0} />
       </Metadata>
     {/each}
   </div>

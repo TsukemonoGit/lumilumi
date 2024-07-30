@@ -10,6 +10,7 @@
   export let text: string;
   export let tags: string[][];
   export let displayMenu: boolean;
+  export let depth: number;
   /** ImageFile_Check_正規表現_パターン */
   const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
   //movie
@@ -72,7 +73,12 @@
   {#if part.type === "nip19"}
     {#await nip19Decode(part.url) then decoded}
       {#if decoded}
-        <DecodedContent {decoded} content={part.content} {displayMenu} />
+        <DecodedContent
+          {decoded}
+          content={part.content}
+          {displayMenu}
+          depth={depth + 1}
+        />
       {:else}
         {part.content}
       {/if}

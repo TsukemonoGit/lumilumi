@@ -8,10 +8,8 @@
   import RepostedNote from "./RepostedNote.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { decode } from "light-bolt11-decoder";
-  import { viewEventIds } from "$lib/stores/stores";
-  import { onDestroy } from "svelte";
   export let note: Nostr.Event;
-  let currentNoteId: string | undefined = undefined;
+  export let depth: number;
   $: zapRequestEvent = kind9734(note);
   const kind9734 = (event: Nostr.Event): Nostr.Event | undefined => {
     try {
@@ -71,7 +69,12 @@
       />{amount}
 
       <div class="self-center">
-        <UserMenu pubkey={zapRequestEvent.pubkey} {metadata} size={20} />
+        <UserMenu
+          pubkey={zapRequestEvent.pubkey}
+          {metadata}
+          size={20}
+          {depth}
+        />
       </div>
       <div class="inline-block break-all break-words whitespace-pre-line">
         {#if metadata}

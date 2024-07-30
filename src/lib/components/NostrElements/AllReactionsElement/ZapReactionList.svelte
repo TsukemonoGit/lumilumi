@@ -38,7 +38,7 @@
 <CollapsibleList title="Zap" bind:amount={events.length}>
   {#each amounts as amount}
     <div
-      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card flex items-center align-middle"
+      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card flex items-center align-middle"
     >
       <Zap class="stroke-orange-400 fill-orange-400" size={20} />
       <div class="min-w-8 flex justify-center">{amount}</div>

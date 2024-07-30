@@ -48,7 +48,13 @@
   <SetRepoReactions />
   <div class="w-full break-words overflow-hidden">
     <div>
-      <Note id={data.id} maxHeight={"none"} displayMenu={true} />
+      <Note
+        id={data.id}
+        maxHeight={"none"}
+        displayMenu={true}
+        thread={true}
+        depth={0}
+      />
     </div>
     <AllReactions
       queryKey={["allreactions", data.id]}
@@ -75,7 +81,7 @@
       <CollapsibleList title="Kind1" amount={kind1.length}>
         {#each kind1 as event (event.id)}
           <div
-            class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+            class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
           >
             <Metadata
               queryKey={["metadata", event.pubkey]}
@@ -83,15 +89,15 @@
               let:metadata
             >
               <div slot="loading">
-                <EventCard note={event} status="loading" />
+                <EventCard note={event} status="loading" depth={0} />
               </div>
               <div slot="nodata">
-                <EventCard note={event} status="nodata" />
+                <EventCard note={event} status="nodata" depth={0} />
               </div>
               <div slot="error">
-                <EventCard note={event} status="error" />
+                <EventCard note={event} status="error" depth={0} />
               </div>
-              <EventCard {metadata} note={event} />
+              <EventCard {metadata} note={event} depth={0} />
             </Metadata>
           </div>
         {/each}

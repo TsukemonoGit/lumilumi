@@ -39,6 +39,7 @@
   const verificationClient = browser
     ? createVerificationServiceClient({
         worker: new Worker(workerUrl, { type: "module" }),
+        timeout: 600000,
       })
     : createNoopClient();
   verificationClient.start();

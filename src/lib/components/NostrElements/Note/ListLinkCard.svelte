@@ -9,7 +9,7 @@
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
   export let event: Nostr.Event;
-
+  export let depth: number;
   const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
   const title = event.tags.find((tag) => tag[0] === "title")?.[1];
   const description = event.tags.find((tag) => tag[0] === "description")?.[1];
@@ -77,20 +77,23 @@
         pubkey={event.pubkey}
         metadata={undefined}
         size={40}
+        {depth}
       />
       <UserMenu
         slot="nodata"
         pubkey={event.pubkey}
         metadata={undefined}
         size={40}
+        {depth}
       />
       <UserMenu
         slot="error"
         pubkey={event.pubkey}
         metadata={undefined}
         size={40}
+        {depth}
       />
-      <UserMenu pubkey={event.pubkey} {metadata} size={40} /></Metadata
+      <UserMenu pubkey={event.pubkey} {metadata} size={40} {depth} /></Metadata
     >
     <button class="text-magnum-400"
       ><ListEllipsisMenu

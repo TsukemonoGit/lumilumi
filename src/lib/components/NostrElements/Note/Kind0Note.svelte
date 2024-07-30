@@ -9,11 +9,12 @@
   export let displayMenu: boolean;
   export let note: Nostr.Event;
   export let proxy: string[] | undefined = undefined;
+  export let depth: number;
 </script>
 
 <div class={"grid grid-cols-[auto_1fr]"}>
   <div class="p-1">
-    <UserMenu pubkey={note.pubkey} bind:metadata={note} size={40} />
+    <UserMenu pubkey={note.pubkey} bind:metadata={note} size={40} {depth} />
   </div>
   <div class="p-1">
     <div class="flex align-middle">
@@ -27,12 +28,13 @@
         <FollowButton pubkey={note.pubkey} />
       </div>
     </div>
-    <hr />
+    <!--<hr />-->
     <div class=" max-h-48 overflow-y-auto">
       <Content
         text={profile(note)?.about ?? ""}
         tags={note.tags}
         {displayMenu}
+        {depth}
       />
     </div>
     {#if proxy}

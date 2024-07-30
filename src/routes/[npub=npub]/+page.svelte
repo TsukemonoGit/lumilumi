@@ -117,7 +117,7 @@
       class="w-full break-words overflow-hidden"
       id={componentKey.toString()}
     >
-      <UserProfile pubkey={userPubkey} />
+      <UserProfile pubkey={userPubkey} depth={0} />
       <div
         use:melt={$root}
         class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500"}
@@ -168,7 +168,9 @@
                     <p>nodata</p>
                   </div> -->
 
-              <div class="max-w-[100vw] break-words box-border">
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+              >
                 {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
                   <div
                     class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
@@ -176,6 +178,7 @@
                     <Pin class="-rotate-45 text-magnum-400" /><Note
                       {id}
                       displayMenu={true}
+                      depth={0}
                     />
                   </div>
                 {/each}
@@ -207,11 +210,13 @@
                   <p>{error}</p>
                 </div>
 
-                <div class="max-w-[100vw] break-words box-border">
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+                >
                   {#if events && events.length > 0}
                     {#each events.filter( (event) => [1, 6, 16].includes(event.kind) ) as event, index (event.id)}
                       <div
-                        class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
+                        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                         events.length - 1
                           ? 'last-visible'
                           : ''} {index === 0 ? 'first-visible' : ''}"
@@ -267,11 +272,13 @@
                 <p>{error}</p>
               </div>
 
-              <div class="max-w-[100vw] break-words box-border">
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/25"
+              >
                 {#if events && events.length > 0}
                   {#each events as event, index (event.id)}
                     <div
-                      class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden {index ===
+                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                       events.length - 1
                         ? 'last-visible'
                         : ''} {index === 0 ? 'first-visible' : ''}"
@@ -359,11 +366,11 @@
                 <p>relays Loading...</p>
               </div>
 
-              <div class="max-w-[100vw] break-words">
+              <div
+                class="max-w-[100vw] break-words divide-y divide-magnum-600/25"
+              >
                 {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
-                  <div
-                    class="rounded-md border overflow-hidden border-magnum-600 my-1"
-                  >
+                  <div class=" overflow-hidden p-1">
                     <RelayCard
                       {url}
                       read={!rw || rw === "read" ? true : false}

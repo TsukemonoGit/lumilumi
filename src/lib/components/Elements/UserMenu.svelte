@@ -32,6 +32,7 @@
   export let size: number;
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean = true;
+  export let depth: number;
 
   let dialogOpen: any;
 
@@ -147,7 +148,7 @@
       />
     {/if}
     <div slot="popoverContent" class="w-[24rem] max-w-full">
-      <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
+      <UserProfile {pubkey} bannerHeight={80} iconSize={60} {depth} />
 
       <div
         class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md mt-2"

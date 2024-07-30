@@ -9,6 +9,7 @@
   import UserName from "./UserName.svelte";
   export let displayMenu: boolean;
   export let content: string | undefined;
+  export let depth: number;
   export let decoded:
     | {
         type: "naddr";
@@ -41,68 +42,77 @@
   >
 {:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data.id} mini={true} {displayMenu} /><Quote
-      size="16"
-      class="text-magnum-500 fill-magnum-600"
-    />
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
+    <div class="border rounded-md border-magnum-600/25">
+      <Note id={decoded.data.id} mini={true} {displayMenu} {depth} />
+    </div>
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
   </span>
 {:else if decoded.type === "note"}
   <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <Note id={decoded.data} mini={true} {displayMenu} /><Quote
-      size="16"
-      class="text-magnum-500 fill-magnum-600"
-    />
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
+    <div class="border rounded-md border-magnum-600/25">
+      <Note id={decoded.data} mini={true} {displayMenu} {depth} />
+    </div>
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
   </span>
 {:else if decoded.type === "naddr"}
   <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="16" class="text-magnum-500 fill-magnum-600" />
-    <LatestEvent
-      queryKey={[
-        "naddr",
-        decoded.data.kind,
-        decoded.data.pubkey,
-        decoded.data.identifier,
-      ]}
-      filters={[
-        {
-          kinds: [decoded.data.kind],
-          authors: [decoded.data.pubkey],
-          "#d": [decoded.data.identifier],
-        },
-      ]}
-      let:event
-    >
-      <div
-        slot="loading"
-        class="text-sm text-neutral-500 flex-inline break-all"
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
+    <div class="border rounded-md border-magnum-600/25">
+      <LatestEvent
+        queryKey={[
+          "naddr",
+          decoded.data.kind,
+          decoded.data.pubkey,
+          decoded.data.identifier,
+        ]}
+        filters={[
+          {
+            kinds: [decoded.data.kind],
+            authors: [decoded.data.pubkey],
+            "#d": [decoded.data.identifier],
+          },
+        ]}
+        let:event
       >
-        {content}
-      </div>
-      <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-        {content}
-      </div>
-      <div slot="error" class="text-sm text-neutral-500 flex-inline break-all">
-        {content}
-      </div>
-      <Metadata
-        queryKey={["metadata", event.pubkey]}
-        pubkey={event.pubkey}
-        let:metadata
-      >
-        <div slot="loading">
-          <EventCard note={event} {displayMenu} status="loading" />
+        <div
+          slot="loading"
+          class="text-sm text-neutral-500 flex-inline break-all"
+        >
+          {content}
         </div>
-        <div slot="nodata">
-          <EventCard note={event} {displayMenu} status="nodata" />
+        <div
+          slot="nodata"
+          class="text-sm text-neutral-500 flex-inline break-all"
+        >
+          {content}
         </div>
-        <div slot="error">
-          <EventCard note={event} {displayMenu} status="error" />
+        <div
+          slot="error"
+          class="text-sm text-neutral-500 flex-inline break-all"
+        >
+          {content}
         </div>
-        <EventCard {metadata} {displayMenu} note={event} /></Metadata
-      >
-    </LatestEvent><Quote size="16" class="text-magnum-500 fill-magnum-600" />
+        <Metadata
+          queryKey={["metadata", event.pubkey]}
+          pubkey={event.pubkey}
+          let:metadata
+        >
+          <div slot="loading">
+            <EventCard note={event} {displayMenu} status="loading" />
+          </div>
+          <div slot="nodata">
+            <EventCard note={event} {displayMenu} status="nodata" />
+          </div>
+          <div slot="error">
+            <EventCard note={event} {displayMenu} status="error" />
+          </div>
+          <EventCard {metadata} {displayMenu} note={event} /></Metadata
+        >
+      </LatestEvent>
+    </div>
+    <Quote size="16" class="text-magnum-500 fill-magnum-500" />
   </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->

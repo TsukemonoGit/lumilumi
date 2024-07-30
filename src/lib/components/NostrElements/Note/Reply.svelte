@@ -7,6 +7,7 @@
   export let replyID: string | undefined;
   export let replyUsers: string[];
   export let displayMenu: boolean;
+  export let depth: number;
   let loadNote = false;
 </script>
 
@@ -32,7 +33,10 @@
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
-    <Note id={replyID} mini={true} {displayMenu} />
+    <div class="border rounded-md border-magnum-600/25">
+      <Note id={replyID} mini={true} {displayMenu} depth={depth + 1} />
+    </div>
+
     <!-- <button
         class=" ml-auto my-1 flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={() => (loadNote = false)}><Minimize2 size="20" />hide</button

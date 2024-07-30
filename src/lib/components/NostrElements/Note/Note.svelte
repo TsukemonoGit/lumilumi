@@ -8,6 +8,8 @@
   export let mini: boolean = false;
   export let maxHeight: string = "16rem";
   export let displayMenu: boolean;
+  export let thread: boolean = false;
+  export let depth: number;
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
@@ -31,14 +33,22 @@
     let:metadata
   >
     <div slot="loading">
-      <EventCard note={text} {mini} {maxHeight} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
     </div>
     <div slot="nodata">
-      <EventCard note={text} {mini} {maxHeight} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
     </div>
     <div slot="error" let:error>
-      <EventCard note={text} {mini} {maxHeight} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
     </div>
-    <EventCard note={text} {metadata} {mini} {maxHeight} {displayMenu} />
+    <EventCard
+      note={text}
+      {metadata}
+      {mini}
+      {maxHeight}
+      {thread}
+      {displayMenu}
+      {depth}
+    />
   </Metadata>
 </Text>
