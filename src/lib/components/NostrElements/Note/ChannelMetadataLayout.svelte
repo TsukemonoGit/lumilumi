@@ -75,6 +75,7 @@
         pubkey={event.pubkey}
         metadata={undefined}
         size={24}
+        depth={0}
       />
 
       <UserMenu
@@ -82,6 +83,7 @@
         pubkey={event.pubkey}
         metadata={undefined}
         size={24}
+        depth={0}
       />
 
       <UserMenu
@@ -89,10 +91,11 @@
         pubkey={event.pubkey}
         metadata={undefined}
         size={24}
+        depth={0}
       />
 
       <div class="flex flex-col justify-between items-center">
-        <UserMenu pubkey={event.pubkey} {metadata} size={40} />
+        <UserMenu pubkey={event.pubkey} {metadata} size={40} depth={0} />
         <button class="text-magnum-400"
           ><ChannelEllipsisMenu note={event} {channelData} /></button
         >

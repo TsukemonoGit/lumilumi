@@ -84,6 +84,6 @@
     </Metadata>
   </div>
   <div slot="popoverContent">
-    <UserProfile {pubkey} bannerHeight={80} iconSize={60} />
+    <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} />
   </div>
 </Popover>

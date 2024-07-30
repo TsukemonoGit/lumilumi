@@ -74,10 +74,12 @@
       kind: kind,
     };
   };
+
+  const baseClass = " overflow-hidden pb-1";
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
     const user = ptag.find((tag) => tag[1] === $loginUser);
-    let ret = user ? " bg-magnum-700/20" : "border-magnum-600";
+    let ret = `${baseClass} ${user ? " bg-magnum-700/20" : "border-magnum-800"}`;
     return depth === 0
       ? `border-magnum-600 ${ret}`
       : `border-magnum-900 ${ret}`;
@@ -220,14 +222,14 @@
   <ReplyThread {replyID} {displayMenu} {depth} />
 {/if}
 
-<div class="rounded-md border overflow-hidden {noteClass()} ">
+<div class="{noteClass()} ">
   {#if note.kind === 1}
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
       <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
       {#if !thread && (replyID || replyUsers.length > 0)}
         <Reply {replyID} {replyUsers} {displayMenu} {depth} />
-        <hr />
+        <!--<hr />-->
       {/if}
 
       <div class="relative overflow-hidden mb-1.5">
@@ -235,7 +237,7 @@
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
         >
-          <Content text={note.content} tags={note.tags} {displayMenu} />
+          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
         </div>
         {#if warning}
           <!-- <WarningHide1 text={tag[1]} /> -->
@@ -253,13 +255,19 @@
     </NoteTemplate>
   {:else if note.kind === 6 || note.kind === 16}
     <!--リポスト-->
-    <div class="flex gap-1 items-center">
+    <div class="flex gap-1 items-center bg-magnum-800/25">
       <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
         size="20"
         class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
       />
       <div class="self-center">
-        <UserMenu pubkey={note.pubkey} bind:metadata size={20} {displayMenu} />
+        <UserMenu
+          pubkey={note.pubkey}
+          bind:metadata
+          size={20}
+          {displayMenu}
+          {depth}
+        />
       </div>
       <div class=" inline-block break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -289,10 +297,16 @@
     {/if}
   {:else if note.kind === 7}
     <!--リアクション-->
-    <div class="flex gap-1 items-center">
+    <div class="flex gap-1 items-center bg-magnum-800/50">
       <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
       <div class="self-center">
-        <UserMenu pubkey={note.pubkey} bind:metadata size={20} {displayMenu} />
+        <UserMenu
+          pubkey={note.pubkey}
+          bind:metadata
+          size={20}
+          {displayMenu}
+          {depth}
+        />
       </div>
       <div class="break-all break-words whitespace-pre-line">
         {#if metadata}
@@ -323,7 +337,7 @@
     {/if}
   {:else if note.kind === 0}
     <!--kind0-->
-    <Kind0Note {note} {proxy} {displayMenu} />
+    <Kind0Note {note} {proxy} {displayMenu} {depth} />
   {:else if note.kind === 40}
     <!--kind40 パブ茶部屋-->
     <LatestEvent
@@ -370,7 +384,7 @@
       <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
     >
   {:else if note.kind === 30000}
-    <ListLinkCard event={note} />
+    <ListLinkCard event={note} {depth} />
   {:else if note.kind === 30030}
     <!--kind30030-->
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
@@ -379,7 +393,7 @@
   {:else if note.kind === 9735}
     <!--kind9735 zap receipt-->
 
-    <Kind9735Note {note} />
+    <Kind9735Note {note} {depth} />
   {:else}
     <!--その他-->
     {@const clientData = findClientTag(note)}
@@ -390,7 +404,7 @@
           {profile(metadata)?.name}
         {/if}
       </div>
-      <hr />
+      <!--<hr />-->
       <div
         class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
       >
@@ -399,12 +413,12 @@
         {/each}
       </div>
 
-      <hr />
+      <!--<hr />-->
       <div
         class="mt-0.5 overflow-y-auto overflow-x-hidden"
         style="max-height:{maxHeight ?? 'none'}"
       >
-        <Content text={note.content} tags={note.tags} {displayMenu} />
+        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
       </div>
       {#if displayMenu}<NoteActionButtons {note} />{/if}
 
@@ -422,7 +436,7 @@
               {profile(metadata)?.name}
             {/if}
           </div>
-          <hr />
+          <!--<hr />-->
           <div
             class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
@@ -430,8 +444,8 @@
               {JSON.stringify(tag)}
             {/each}
           </div>
-          <hr />
-          <Content text={note.content} tags={note.tags} {displayMenu} />
+          <!--<hr />-->
+          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <div slot="nodata">
@@ -440,7 +454,7 @@
               {profile(metadata)?.name}
             {/if}
           </div>
-          <hr />
+          <!--<hr />-->
           <div
             class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
@@ -448,8 +462,8 @@
               {JSON.stringify(tag)}
             {/each}
           </div>
-          <hr />
-          <Content text={note.content} tags={note.tags} {displayMenu} />
+          <!--<hr />-->
+          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <div slot="error" let:error>
@@ -458,7 +472,7 @@
               {profile(metadata)?.name}
             {/if}
           </div>
-          <hr />
+          <!--<hr />-->
           <div
             class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
           >
@@ -466,8 +480,8 @@
               {JSON.stringify(tag)}
             {/each}
           </div>
-          <hr />
-          <Content text={note.content} tags={note.tags} {displayMenu} />
+          <!--<hr />-->
+          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
           {#if displayMenu}<NoteActionButtons {note} />{/if}
         </div>
         <!--client tag からURLさがすとこ-->
@@ -477,6 +491,7 @@
             bind:metadata
             size={20}
             displayMenu={false}
+            {depth}
           />kind:{note.kind}
           {#if metadata}
             @{profile(metadata)?.name}
@@ -497,7 +512,7 @@
                 {profile(metadata)?.name}
               {/if}
             </div>
-            <hr />
+            <!--<hr />-->
             <div
               class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
             >
@@ -505,8 +520,13 @@
                 {JSON.stringify(tag)}
               {/each}
             </div>
-            <hr />
-            <Content text={note.content} tags={note.tags} {displayMenu} />
+            <!--<hr />-->
+            <Content
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+            />
             {#if displayMenu}<NoteActionButtons {note} />{/if}
           {/if}
         {/await}

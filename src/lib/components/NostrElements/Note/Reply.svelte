@@ -33,7 +33,10 @@
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
-    <Note id={replyID} mini={true} {displayMenu} depth={depth + 1} />
+    <div class="border rounded-md border-magnum-800">
+      <Note id={replyID} mini={true} {displayMenu} depth={depth + 1} />
+    </div>
+
     <!-- <button
         class=" ml-auto my-1 flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         on:click={() => (loadNote = false)}><Minimize2 size="20" />hide</button

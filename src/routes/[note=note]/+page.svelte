@@ -81,7 +81,7 @@
       <CollapsibleList title="Kind1" amount={kind1.length}>
         {#each kind1 as event (event.id)}
           <div
-            class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden event-card"
+            class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
           >
             <Metadata
               queryKey={["metadata", event.pubkey]}

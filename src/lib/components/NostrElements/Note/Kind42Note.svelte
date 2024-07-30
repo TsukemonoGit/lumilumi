@@ -68,13 +68,13 @@
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
   {#if replyID || replyUsers.length > 0}
     <Reply {replyID} {replyUsers} {displayMenu} depth={depth + 1} />
-    <hr />
+    <!--<hr />-->
   {/if}
 {/await}
 {#await checkContentWarning(note.tags) then tag}
   <div class="relative">
     <div class=" max-h-64 overflow-y-auto overflow-x-auto">
-      <Content text={note.content} tags={note.tags} {displayMenu} />
+      <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
     </div>
     {#if tag}
       <WarningHide2 text={tag[1]} />

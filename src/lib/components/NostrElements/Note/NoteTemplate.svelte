@@ -98,7 +98,7 @@
         </button>
       {/if}
     </div>
-    <hr />
+    <!--<hr />-->
     <slot></slot>
   </div>
 </div>
