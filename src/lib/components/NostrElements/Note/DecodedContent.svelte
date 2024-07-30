@@ -43,7 +43,7 @@
 {:else if decoded.type === "nevent"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-500" />
-    <div class="border rounded-md border-magnum-800">
+    <div class="border rounded-md border-magnum-600/25">
       <Note id={decoded.data.id} mini={true} {displayMenu} {depth} />
     </div>
     <Quote size="16" class="text-magnum-500 fill-magnum-500" />
@@ -51,7 +51,7 @@
 {:else if decoded.type === "note"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-500" />
-    <div class="border rounded-md border-magnum-800">
+    <div class="border rounded-md border-magnum-600/25">
       <Note id={decoded.data} mini={true} {displayMenu} {depth} />
     </div>
     <Quote size="16" class="text-magnum-500 fill-magnum-500" />
@@ -59,7 +59,7 @@
 {:else if decoded.type === "naddr"}
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="16" class="text-magnum-500 fill-magnum-500" />
-    <div class="border rounded-md border-magnum-800">
+    <div class="border rounded-md border-magnum-600/25">
       <LatestEvent
         queryKey={[
           "naddr",

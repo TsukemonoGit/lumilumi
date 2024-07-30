@@ -79,7 +79,7 @@
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
     const user = ptag.find((tag) => tag[1] === $loginUser);
-    let ret = `${baseClass} ${user ? " bg-magnum-700/20" : "border-magnum-800"}`;
+    let ret = `${baseClass} ${user ? " bg-magnum-700/20" : "border-magnum-600/25"}`;
     return depth === 0
       ? `border-magnum-600 ${ret}`
       : `border-magnum-900 ${ret}`;
@@ -219,7 +219,7 @@
 </script>
 
 {#if thread && replyID}
-  <div class="border-b border-magnum-800">
+  <div class="border-b border-magnum-600/25">
     <ReplyThread {replyID} {displayMenu} {depth} />
   </div>
 {/if}
