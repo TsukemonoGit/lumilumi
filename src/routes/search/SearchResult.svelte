@@ -54,11 +54,11 @@
         {error}
       </div>
       <div slot="nodata">nodata</div>
-      <div class=" break-words">
+      <div class=" break-words divide-y divide-magnum-600/30">
         {#if events && events.length > 0}
           {#each events as event, index (event.id)}
             <div
-              class="break-words whitespace-pre-line m-1 overflow-hidden {index ===
+              class="break-words whitespace-pre-line overflow-hidden {index ===
               events.length - 1
                 ? 'last-visible'
                 : ''} {index === 0 ? 'first-visible' : ''}"

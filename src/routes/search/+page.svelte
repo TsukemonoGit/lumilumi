@@ -92,7 +92,8 @@
     searchWord ||
     searchPubkey ||
     searchSince ||
-    searchUntil
+    searchUntil ||
+    followee
   ) {
     createFilter();
   }
