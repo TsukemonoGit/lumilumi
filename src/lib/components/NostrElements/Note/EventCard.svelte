@@ -32,6 +32,7 @@
   import ChannelMetadata from "./ChannelMetadata.svelte";
   import ShowStatus from "./ShowStatus.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
+  import ReplyThread from "./ReplyThread.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -41,6 +42,8 @@
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
   export let maxHeight: string = "16rem";
+  export let thread: boolean = false;
+  export let depth: number = 0;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -74,7 +77,10 @@
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
     const user = ptag.find((tag) => tag[1] === $loginUser);
-    return user ? "border-magnum-600 bg-magnum-700/20" : "border-magnum-600";
+    let ret = user ? " bg-magnum-700/20" : "border-magnum-600";
+    return depth === 0
+      ? `border-magnum-600 ${ret}`
+      : `border-magnum-900 ${ret}`;
   };
 
   const replyedEvent = (
@@ -188,7 +194,16 @@
   $: proxy = checkProxy(note.tags);
   $: warning = checkContentWarning(note.tags);
   // const { kind, tag } = repostedId(note.tags);
-
+  let replyID: string | undefined;
+  let replyUsers: string[];
+  $: if (note && note.kind === 1 && note.tags.length > 0) {
+    const res = replyedEvent(note.tags);
+    replyID = res.replyID;
+    replyUsers = res.replyUsers;
+  } else {
+    replyID = undefined;
+    replyUsers = [];
+  }
   const handleClickToChannel = (id: string) => {
     if (!id) {
       return;
@@ -201,13 +216,18 @@
   };
 </script>
 
+{#if thread && replyID}
+  <ReplyThread {replyID} {displayMenu} {depth} />
+  <hr />
+{/if}
+
 <div class="rounded-md border overflow-hidden {noteClass()} ">
   {#if note.kind === 1}
     <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu}>
       {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
-      {@const { replyID, replyUsers } = replyedEvent(note.tags)}
-      {#if replyID || replyUsers.length > 0}
-        <Reply {replyID} {replyUsers} {displayMenu} />
+      <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+      {#if !thread && (replyID || replyUsers.length > 0)}
+        <Reply {replyID} {replyUsers} {displayMenu} {depth} />
         <hr />
       {/if}
 
