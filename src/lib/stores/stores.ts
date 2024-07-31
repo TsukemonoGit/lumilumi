@@ -103,3 +103,5 @@ export const relayStateMap = writable<Map<string, ConnectionState>>(
   new Map<string, ConnectionState>()
 );
 export const verifier = writable<EventVerifier>();
+
+export const relayIconErrorStore = writable<string[]>([]);

@@ -1,7 +1,11 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
-  import { slicedEvent, showImg } from "$lib/stores/stores";
+  import {
+    slicedEvent,
+    showImg,
+    relayIconErrorStore,
+  } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import Avatar from "svelte-boring-avatars";
   import Popover from "$lib/components/Elements/Popover.svelte";
@@ -11,7 +15,6 @@
 
   export let id: string;
   export let width: number;
-  let imageLoaded = true;
 
   let size = 16;
   let viewAll = false;
@@ -25,6 +28,12 @@
       relays = getRelaysById(id);
     }, 1000);
   });
+
+  const handleStateError = (url: string) => {
+    if (!$relayIconErrorStore.includes(url)) {
+      $relayIconErrorStore.push(url);
+    }
+  };
 </script>
 
 {#if relays.length > 0}
@@ -46,12 +55,13 @@
               pubkey={undefined}
               {size}
             />
-          {:else if $showImg && imageLoaded}
+          {:else if $showImg && !$relayIconErrorStore.includes(url)}
             <UserAvatar
               url={formatUrl(url) + "favicon.ico"}
               name={url ?? ""}
               pubkey={undefined}
               {size}
+              handleStateError={() => handleStateError(url)}
             />
           {:else}
             <Avatar {size} name={url} variant="beam" />

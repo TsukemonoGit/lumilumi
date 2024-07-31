@@ -1,6 +1,6 @@
 <script lang="ts">
   import { splitHexColorString } from "$lib/func/util";
-  import { createAvatar, melt } from "@melt-ui/svelte";
+  import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
   import Avatar from "svelte-boring-avatars";
   export let url: string | undefined;
   export let name: string | undefined;
@@ -8,11 +8,23 @@
   export let size: number = 40;
   export let square: boolean = false;
   export let title: string = "";
+  export let handleStateError = () => {};
+  export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
+    curr,
+    next,
+  }) => {
+    if (next === "error") {
+      handleStateError();
+    }
+    return next;
+  };
+
   const {
     elements: { image, fallback },
     options: { src },
   } = createAvatar({
     src: url ?? "",
+    onLoadingStatusChange: handleState,
   });
   $: if (url) {
     src.set(url);
