@@ -256,7 +256,7 @@
     slicedEvent.update((value) =>
       uniqueEvents
         .filter(eventFilter)
-        .filter((event) => event.event.created_at <= now()) // 未来のイベントを除外
+        .filter((event) => event.event.created_at <= now() + 10) // 未来のイベントを除外 ちょっとだけ許容
         .map(({ event }) => event)
         .slice(viewIndex, viewIndex + amount)
     );
