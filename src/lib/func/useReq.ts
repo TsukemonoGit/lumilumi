@@ -109,8 +109,8 @@ export async function fetchNostrEvent(
 
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
-
+    .pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
+  //muteCheck(),
   return new Promise((resolve, reject) => {
     let fulfilled = false;
 

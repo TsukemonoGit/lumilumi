@@ -294,12 +294,8 @@ export function useReq(
   const error = writable<Error>();
   const tie = get(tieMapStore)?.[tieKey]?.[0];
   const obs: Observable<EventPacket | EventPacket[]> = tie
-    ? _rxNostr
-        .use(_req, { relays: relays })
-        .pipe(tie, muteCheck(), metadata(), operator)
-    : _rxNostr
-        .use(_req, { relays: relays })
-        .pipe(muteCheck(), metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる
+    ? _rxNostr.use(_req, { relays: relays }).pipe(tie, metadata(), operator) //muteCheck(),
+    : _rxNostr.use(_req, { relays: relays }).pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる//muteCheck(),
   const query = createQuery({
     queryKey: queryKey,
     staleTime: staleTime,
@@ -490,10 +486,10 @@ export function usePromiseReq(
   const obs: Observable<EventPacket[] | EventPacket> = tie
     ? _rxNostr
         .use(_req, { relays: relays })
-        .pipe(tie, muteCheck(), metadata(), operator, completeOnTimeout(3000))
+        .pipe(tie, metadata(), operator, completeOnTimeout(3000)) // muteCheck(),
     : _rxNostr
         .use(_req, { relays: relays })
-        .pipe(muteCheck(), metadata(), operator, completeOnTimeout(3000));
+        .pipe(metadata(), operator, completeOnTimeout(3000)); //muteCheck(),
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {

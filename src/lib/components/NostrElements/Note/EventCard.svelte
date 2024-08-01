@@ -33,6 +33,7 @@
   import ShowStatus from "./ShowStatus.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
   import ReplyThread from "./ReplyThread.svelte";
+  import { muteCheck } from "$lib/func/muteCheck";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -44,10 +45,11 @@
   export let maxHeight: string = "16rem";
   export let thread: boolean = false;
   export let depth: number = 0;
+  let viewMuteEvent = false;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
-
+  $: muteType = muteCheck(note);
   $: if (note && note.id !== currentNoteId) {
     $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
     if (!$viewEventIds.includes(note.id)) {
@@ -219,297 +221,235 @@
   };
 </script>
 
-{#if thread && replyID}
-  <div class="border-b border-magnum-600/30">
-    <ReplyThread {replyID} {displayMenu} {depth} />
-  </div>
+{#if muteType !== "null" && depth >= 1}
+  <button
+    class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+    on:click={() => (viewMuteEvent = !viewMuteEvent)}
+  >
+    {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
+  </button>
 {/if}
+{#if muteType === "null" || viewMuteEvent}
+  {#if thread && replyID}
+    <div class="border-b border-magnum-600/30">
+      <ReplyThread {replyID} {displayMenu} {depth} />
+    </div>
+  {/if}
 
-<div class="{noteClass()} ">
-  {#if note.kind === 1}
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
-      {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
-      <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
-      {#if !thread && (replyID || replyUsers.length > 0)}
-        <Reply {replyID} {replyUsers} {displayMenu} {depth} />
-        <!--<hr />-->
+  <div class="{noteClass()} ">
+    {#if note.kind === 1}
+      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+        {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
+        <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+        {#if !thread && (replyID || replyUsers.length > 0)}
+          <Reply {replyID} {replyUsers} {displayMenu} {depth} />
+          <!--<hr />-->
+        {/if}
+
+        <div class="relative overflow-hidden mb-1.5">
+          <div
+            class="mt-0.5 overflow-y-auto overflow-x-hidden"
+            style="max-height:{maxHeight ?? 'none'}"
+          >
+            <Content
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+            />
+          </div>
+          {#if warning}
+            <!-- <WarningHide1 text={tag[1]} /> -->
+            <WarningHide2 text={warning[1]} />
+          {/if}
+        </div>
+
+        {#if proxy}
+          <div class="text-end">
+            <ProxyTag proxyTag={proxy} />
+          </div>
+        {/if}
+        {#if displayMenu}
+          <NoteActionButtons {note} />{/if}
+      </NoteTemplate>
+    {:else if note.kind === 6 || note.kind === 16}
+      <!--リポスト-->
+      <div class="flex gap-1 items-center bg-magnum-800/25">
+        <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
+          size="20"
+          class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
+        />
+        <div class="self-center">
+          <UserMenu
+            pubkey={note.pubkey}
+            bind:metadata
+            size={20}
+            {displayMenu}
+            {depth}
+          />
+        </div>
+        <div class=" inline-block break-all break-words whitespace-pre-line">
+          {#if metadata}
+            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+              class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
+            >
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+        </div>
+        {#if proxy}
+          <div class="text-end">
+            <ProxyTag proxyTag={proxy} />
+          </div>
+        {/if}
+        <div class="ml-auto mr-2">
+          {#if displayMenu}
+            <NoteActionButtons {note} />{/if}
+        </div>
+      </div>
+      <!--リアクションしたノートの情報-->
+      {@const { kind, tag } = repostedId(note.tags)}
+      {#if tag}
+        <RepostedNote {tag} {kind} depth={depth + 1} />
       {/if}
+    {:else if note.kind === 7}
+      <!--リアクション-->
+      <div class="flex gap-1 items-center bg-magnum-800/25">
+        <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
+        <div class="self-center">
+          <UserMenu
+            pubkey={note.pubkey}
+            bind:metadata
+            size={20}
+            {displayMenu}
+            {depth}
+          />
+        </div>
+        <div class="break-all break-words whitespace-pre-line">
+          {#if metadata}
+            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+              class="text-magnum-100 text-sm mt-auto"
+              >@{profile(metadata)?.name}</span
+            >
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+        </div>
+        {#if proxy}
+          <div class="text-end">
+            <ProxyTag proxyTag={proxy} />
+          </div>
+        {/if}
+        <div class="ml-auto">
+          {#if displayMenu}
+            <NoteActionButtons {note} />{/if}
+        </div>
+      </div>
+      <!--リアクションしたノートの情報（リポストのを使いまわし）-->
+      {@const { kind, tag } = repostedId(note.tags)}
+      {#if tag}
+        <RepostedNote {tag} {kind} depth={depth + 1} />
+      {/if}
+    {:else if note.kind === 0}
+      <!--kind0-->
+      <Kind0Note {note} {proxy} {displayMenu} {depth} />
+    {:else if note.kind === 40}
+      <!--kind40 パブ茶部屋-->
+      <LatestEvent
+        queryKey={["channel", "kind41", note.id]}
+        filters={[
+          { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
+        ]}
+        let:event
+      >
+        <div slot="loading">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+          />
+        </div>
+        <div slot="nodata">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+          />
+        </div>
+        <div slot="error">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+          />
+        </div>
+        <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+          handleClickToChannel={() => handleClickToChannel(note.id)}
+          id={note.id}
+          {event}
+        />
+      </LatestEvent>
+    {:else if note.kind === 42}
+      <!--kind42 パブ茶コメント-->
+      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+        <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
+      >
+    {:else if note.kind === 30000}
+      <ListLinkCard event={note} {depth} />
+    {:else if note.kind === 30030}
+      <!--kind30030-->
+      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+        <Kind30030Note {note} /></NoteTemplate
+      >
+    {:else if note.kind === 9735}
+      <!--kind9735 zap receipt-->
 
-      <div class="relative overflow-hidden mb-1.5">
+      <Kind9735Note {note} {depth} />
+    {:else}
+      <!--その他-->
+      {@const clientData = findClientTag(note)}
+      {#if !clientData}
+        <!-------client tagがないやつここ-------->
+        <div class="break-all overflow-x-hidden">
+          kind:{note.kind}{#if metadata}
+            {profile(metadata)?.name}
+          {/if}
+        </div>
+        <!--<hr />-->
+        <div
+          class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
+        >
+          {#each note.tags as tag}
+            {JSON.stringify(tag)}
+          {/each}
+        </div>
+
+        <!--<hr />-->
         <div
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
         >
           <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
         </div>
-        {#if warning}
-          <!-- <WarningHide1 text={tag[1]} /> -->
-          <WarningHide2 text={warning[1]} />
-        {/if}
-      </div>
+        {#if displayMenu}<NoteActionButtons {note} />{/if}
 
-      {#if proxy}
-        <div class="text-end">
-          <ProxyTag proxyTag={proxy} />
-        </div>
-      {/if}
-      {#if displayMenu}
-        <NoteActionButtons {note} />{/if}
-    </NoteTemplate>
-  {:else if note.kind === 6 || note.kind === 16}
-    <!--リポスト-->
-    <div class="flex gap-1 items-center bg-magnum-800/25">
-      <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
-        size="20"
-        class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
-      />
-      <div class="self-center">
-        <UserMenu
-          pubkey={note.pubkey}
-          bind:metadata
-          size={20}
-          {displayMenu}
-          {depth}
-        />
-      </div>
-      <div class=" inline-block break-all break-words whitespace-pre-line">
-        {#if metadata}
-          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
-          >
-        {:else}
-          <span class="text-magnum-100 text-sm"
-            >@{nip19.npubEncode(note.pubkey)}</span
-          >
-        {/if}
-      </div>
-      {#if proxy}
-        <div class="text-end">
-          <ProxyTag proxyTag={proxy} />
-        </div>
-      {/if}
-      <div class="ml-auto mr-2">
-        {#if displayMenu}
-          <NoteActionButtons {note} />{/if}
-      </div>
-    </div>
-    <!--リアクションしたノートの情報-->
-    {@const { kind, tag } = repostedId(note.tags)}
-    {#if tag}
-      <RepostedNote {tag} {kind} />
-    {/if}
-  {:else if note.kind === 7}
-    <!--リアクション-->
-    <div class="flex gap-1 items-center bg-magnum-800/25">
-      <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
-      <div class="self-center">
-        <UserMenu
-          pubkey={note.pubkey}
-          bind:metadata
-          size={20}
-          {displayMenu}
-          {depth}
-        />
-      </div>
-      <div class="break-all break-words whitespace-pre-line">
-        {#if metadata}
-          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-magnum-100 text-sm mt-auto"
-            >@{profile(metadata)?.name}</span
-          >
-        {:else}
-          <span class="text-magnum-100 text-sm"
-            >@{nip19.npubEncode(note.pubkey)}</span
-          >
-        {/if}
-      </div>
-      {#if proxy}
-        <div class="text-end">
-          <ProxyTag proxyTag={proxy} />
-        </div>
-      {/if}
-      <div class="ml-auto">
-        {#if displayMenu}
-          <NoteActionButtons {note} />{/if}
-      </div>
-    </div>
-    <!--リアクションしたノートの情報（リポストのを使いまわし）-->
-    {@const { kind, tag } = repostedId(note.tags)}
-    {#if tag}
-      <RepostedNote {tag} {kind} />
-    {/if}
-  {:else if note.kind === 0}
-    <!--kind0-->
-    <Kind0Note {note} {proxy} {displayMenu} {depth} />
-  {:else if note.kind === 40}
-    <!--kind40 パブ茶部屋-->
-    <LatestEvent
-      queryKey={["channel", "kind41", note.id]}
-      filters={[
-        { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
-      ]}
-      let:event
-    >
-      <div slot="loading">
-        <ChannelMetadataLayout
-          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-          handleClickToChannel={() => handleClickToChannel(note.id)}
-          id={note.id}
-          event={note}
-        />
-      </div>
-      <div slot="nodata">
-        <ChannelMetadataLayout
-          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-          handleClickToChannel={() => handleClickToChannel(note.id)}
-          id={note.id}
-          event={note}
-        />
-      </div>
-      <div slot="error">
-        <ChannelMetadataLayout
-          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-          handleClickToChannel={() => handleClickToChannel(note.id)}
-          id={note.id}
-          event={note}
-        />
-      </div>
-      <ChannelMetadataLayout
-        linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-        handleClickToChannel={() => handleClickToChannel(note.id)}
-        id={note.id}
-        {event}
-      />
-    </LatestEvent>
-  {:else if note.kind === 42}
-    <!--kind42 パブ茶コメント-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
-      <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
-    >
-  {:else if note.kind === 30000}
-    <ListLinkCard event={note} {depth} />
-  {:else if note.kind === 30030}
-    <!--kind30030-->
-    <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
-      <Kind30030Note {note} /></NoteTemplate
-    >
-  {:else if note.kind === 9735}
-    <!--kind9735 zap receipt-->
-
-    <Kind9735Note {note} {depth} />
-  {:else}
-    <!--その他-->
-    {@const clientData = findClientTag(note)}
-    {#if !clientData}
-      <!-------client tagがないやつここ-------->
-      <div class="break-all overflow-x-hidden">
-        kind:{note.kind}{#if metadata}
-          {profile(metadata)?.name}
-        {/if}
-      </div>
-      <!--<hr />-->
-      <div
-        class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-      >
-        {#each note.tags as tag}
-          {JSON.stringify(tag)}
-        {/each}
-      </div>
-
-      <!--<hr />-->
-      <div
-        class="mt-0.5 overflow-y-auto overflow-x-hidden"
-        style="max-height:{maxHeight ?? 'none'}"
-      >
-        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-      </div>
-      {#if displayMenu}<NoteActionButtons {note} />{/if}
-
-      <!--   -->
-    {:else}
-      <!--client tag あったので 31990 を さがす とこたち　-->
-      <LatestEvent
-        filters={[clientData.filter]}
-        queryKey={["naddr", clientData.aTag]}
-        let:event
-      >
-        <div slot="loading">
-          <div class="break-all overflow-x-hidden">
-            kind:{note.kind}{#if metadata}
-              {profile(metadata)?.name}
-            {/if}
-          </div>
-          <!--<hr />-->
-          <div
-            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-          >
-            {#each note.tags as tag}
-              {JSON.stringify(tag)}
-            {/each}
-          </div>
-          <!--<hr />-->
-          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-          {#if displayMenu}<NoteActionButtons {note} />{/if}
-        </div>
-        <div slot="nodata">
-          <div class="break-all overflow-x-hidden">
-            kind:{note.kind}{#if metadata}
-              {profile(metadata)?.name}
-            {/if}
-          </div>
-          <!--<hr />-->
-          <div
-            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-          >
-            {#each note.tags as tag}
-              {JSON.stringify(tag)}
-            {/each}
-          </div>
-          <!--<hr />-->
-          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-          {#if displayMenu}<NoteActionButtons {note} />{/if}
-        </div>
-        <div slot="error" let:error>
-          <div class="break-all overflow-x-hidden">
-            kind:{note.kind}{#if metadata}
-              {profile(metadata)?.name}
-            {/if}
-          </div>
-          <!--<hr />-->
-          <div
-            class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-          >
-            {#each note.tags as tag}
-              {JSON.stringify(tag)}
-            {/each}
-          </div>
-          <!--<hr />-->
-          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-          {#if displayMenu}<NoteActionButtons {note} />{/if}
-        </div>
-        <!--client tag からURLさがすとこ-->
-        {#await findWebURL(event.tags, clientData) then urls}
-          <UserMenu
-            pubkey={note.pubkey}
-            bind:metadata
-            size={20}
-            displayMenu={false}
-            {depth}
-          />kind:{note.kind}
-          {#if metadata}
-            @{profile(metadata)?.name}
-          {/if}
-          {#if urls}
-            {#each urls as url}
-              <div>
-                <Link className="underline text-magnum-300 break-all" href={url}
-                  >{url}</Link
-                >
-              </div>
-            {/each}
-            {#if displayMenu}<NoteActionButtons {note} />{/if}
-          {:else}
-            <!--client tag から対応したURL見つからなかったところ？-->
+        <!--   -->
+      {:else}
+        <!--client tag あったので 31990 を さがす とこたち　-->
+        <LatestEvent
+          filters={[clientData.filter]}
+          queryKey={["naddr", clientData.aTag]}
+          let:event
+        >
+          <div slot="loading">
             <div class="break-all overflow-x-hidden">
               kind:{note.kind}{#if metadata}
                 {profile(metadata)?.name}
@@ -517,7 +457,7 @@
             </div>
             <!--<hr />-->
             <div
-              class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
             >
               {#each note.tags as tag}
                 {JSON.stringify(tag)}
@@ -531,9 +471,102 @@
               {depth}
             />
             {#if displayMenu}<NoteActionButtons {note} />{/if}
-          {/if}
-        {/await}
-      </LatestEvent>
+          </div>
+          <div slot="nodata">
+            <div class="break-all overflow-x-hidden">
+              kind:{note.kind}{#if metadata}
+                {profile(metadata)?.name}
+              {/if}
+            </div>
+            <!--<hr />-->
+            <div
+              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
+            >
+              {#each note.tags as tag}
+                {JSON.stringify(tag)}
+              {/each}
+            </div>
+            <!--<hr />-->
+            <Content
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+            />
+            {#if displayMenu}<NoteActionButtons {note} />{/if}
+          </div>
+          <div slot="error" let:error>
+            <div class="break-all overflow-x-hidden">
+              kind:{note.kind}{#if metadata}
+                {profile(metadata)?.name}
+              {/if}
+            </div>
+            <!--<hr />-->
+            <div
+              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
+            >
+              {#each note.tags as tag}
+                {JSON.stringify(tag)}
+              {/each}
+            </div>
+            <!--<hr />-->
+            <Content
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+            />
+            {#if displayMenu}<NoteActionButtons {note} />{/if}
+          </div>
+          <!--client tag からURLさがすとこ-->
+          {#await findWebURL(event.tags, clientData) then urls}
+            <UserMenu
+              pubkey={note.pubkey}
+              bind:metadata
+              size={20}
+              displayMenu={false}
+              {depth}
+            />kind:{note.kind}
+            {#if metadata}
+              @{profile(metadata)?.name}
+            {/if}
+            {#if urls}
+              {#each urls as url}
+                <div>
+                  <Link
+                    className="underline text-magnum-300 break-all"
+                    href={url}>{url}</Link
+                  >
+                </div>
+              {/each}
+              {#if displayMenu}<NoteActionButtons {note} />{/if}
+            {:else}
+              <!--client tag から対応したURL見つからなかったところ？-->
+              <div class="break-all overflow-x-hidden">
+                kind:{note.kind}{#if metadata}
+                  {profile(metadata)?.name}
+                {/if}
+              </div>
+              <!--<hr />-->
+              <div
+                class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
+              >
+                {#each note.tags as tag}
+                  {JSON.stringify(tag)}
+                {/each}
+              </div>
+              <!--<hr />-->
+              <Content
+                text={note.content}
+                tags={note.tags}
+                {displayMenu}
+                {depth}
+              />
+              {#if displayMenu}<NoteActionButtons {note} />{/if}
+            {/if}
+          {/await}
+        </LatestEvent>
+      {/if}
     {/if}
-  {/if}
-</div>
+  </div>
+{/if}
