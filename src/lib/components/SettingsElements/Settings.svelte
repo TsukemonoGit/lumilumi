@@ -494,7 +494,7 @@
           >
         </div>
       </div>
-      <div class="text-magnum-600 mt-2">※{$_("settings.relay")}</div>{/if}
+      <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
   </div>
   <!--投稿の設定-->
   <div class="border border-magnum-500 rounded-md p-2">

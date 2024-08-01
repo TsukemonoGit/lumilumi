@@ -12,7 +12,7 @@
   //tagはaかe
   export let tag: string[];
   export let kind: number | undefined;
-
+  export let depth: number;
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);
@@ -64,15 +64,15 @@
         let:metadata
       >
         <div slot="loading">
-          <EventCard note={text} />
+          <EventCard note={text} {depth} />
         </div>
         <div slot="nodata">
-          <EventCard note={text} />
+          <EventCard note={text} {depth} />
         </div>
         <div slot="error" let:error>
-          <EventCard note={text} />
+          <EventCard note={text} {depth} />
         </div>
-        <EventCard note={text} {metadata} />
+        <EventCard note={text} {metadata} {depth} />
       </Metadata>
     </Text>
   {:else if tag[0] === "a"}
@@ -94,15 +94,15 @@
             let:metadata
           >
             <div slot="loading">
-              <EventCard note={event} />
+              <EventCard note={event} {depth} />
             </div>
             <div slot="nodata">
-              <EventCard note={event} />
+              <EventCard note={event} {depth} />
             </div>
             <div slot="error" let:error>
-              <EventCard note={event} />
+              <EventCard note={event} {depth} />
             </div>
-            <EventCard note={event} {metadata} />
+            <EventCard note={event} {metadata} {depth} />
           </Metadata>
         </LatestEvent>
       {/if}
