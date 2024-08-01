@@ -34,6 +34,7 @@
   import ListLinkCard from "./ListLinkCard.svelte";
   import ReplyThread from "./ReplyThread.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
+  import { page } from "$app/stores";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -46,10 +47,39 @@
   export let thread: boolean = false;
   export let depth: number = 0;
   let viewMuteEvent = false;
+
+  $: paramNoteId = $page.params.note
+    ? getIDbyParam($page.params.note)
+    : undefined;
+
+  function getIDbyParam(str: string) {
+    const { type, data } = nip19.decode(str);
+    if (type === "note") {
+      return data as string;
+    } else if (type === "nevent") {
+      return data.id;
+    } else {
+      console.log(data);
+    }
+  }
+
+  $: paramPubkey = $page.params.npub
+    ? getPubkeybyParam($page.params.npub)
+    : undefined;
+  function getPubkeybyParam(str: string) {
+    const { type, data } = nip19.decode(str);
+    if (type === "npub") {
+      return data as string;
+    } else if (type === "nprofile") {
+      return data.pubkey;
+    } else {
+      console.log(data);
+    }
+  }
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
-  $: muteType = muteCheck(note);
+  $: muteType = muteCheck(note, { pubkey: paramPubkey, id: paramNoteId });
   $: if (note && note.id !== currentNoteId) {
     $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
     if (!$viewEventIds.includes(note.id)) {
