@@ -4,15 +4,9 @@
   import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import {
-    createRxForwardReq,
-    createTie,
-    now,
-    tie,
-    type EventPacket,
-  } from "rx-nostr";
+  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
-  import { onMount, type SvelteComponent } from "svelte";
+  import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId, setTieKey } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
@@ -24,8 +18,9 @@
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
   import { Pin } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
+
   import { queryClient } from "$lib/stores/stores";
+  import * as Nostr from "nostr-typedef";
   export let data: {
     pubkey: string;
   };
@@ -36,7 +31,12 @@
   let componentKey = 0; // Key to force re-render
   let view: boolean = false;
   let req = createRxForwardReq();
-
+  const excludeKind1 = (event: Nostr.Event) => {
+    return event.kind === 1 && event.pubkey === data.pubkey;
+  };
+  const excludeKind7 = (event: Nostr.Event) => {
+    return event.kind === 7 && event.pubkey === data.pubkey;
+  };
   afterNavigate(() => {
     view = false;
     setTieKey(tieKey);
@@ -229,15 +229,31 @@
                           let:metadata
                         >
                           <div slot="loading">
-                            <EventCard note={event} status="loading" />
+                            <EventCard
+                              note={event}
+                              status="loading"
+                              excludefunc={excludeKind1}
+                            />
                           </div>
                           <div slot="nodata">
-                            <EventCard note={event} status="nodata" />
+                            <EventCard
+                              note={event}
+                              status="nodata"
+                              excludefunc={excludeKind1}
+                            />
                           </div>
                           <div slot="error">
-                            <EventCard note={event} status="error" />
+                            <EventCard
+                              note={event}
+                              status="error"
+                              excludefunc={excludeKind1}
+                            />
                           </div>
-                          <EventCard {metadata} note={event} />
+                          <EventCard
+                            {metadata}
+                            note={event}
+                            excludefunc={excludeKind1}
+                          />
                         </Metadata>
                       </div>
                     {/each}
@@ -291,15 +307,31 @@
                         let:metadata
                       >
                         <div slot="loading">
-                          <EventCard note={event} status="loading" />
+                          <EventCard
+                            note={event}
+                            status="loading"
+                            excludefunc={excludeKind7}
+                          />
                         </div>
                         <div slot="nodata">
-                          <EventCard note={event} status="nodata" />
+                          <EventCard
+                            note={event}
+                            status="nodata"
+                            excludefunc={excludeKind7}
+                          />
                         </div>
                         <div slot="error">
-                          <EventCard note={event} status="error" />
+                          <EventCard
+                            note={event}
+                            status="error"
+                            excludefunc={excludeKind7}
+                          />
                         </div>
-                        <EventCard {metadata} note={event} />
+                        <EventCard
+                          {metadata}
+                          note={event}
+                          excludefunc={excludeKind7}
+                        />
                       </Metadata>
                     </div>
                   {/each}

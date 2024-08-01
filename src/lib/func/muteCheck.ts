@@ -8,23 +8,10 @@ export type MuteCheck =
   | "event"
   | "kind"
   | "null";
-export function muteCheck(
-  event: Nostr.Event,
-  {
-    pubkey,
-    id,
-  }: {
-    pubkey: string | undefined;
-    id: string | undefined;
-  }
-): MuteCheck {
-  //そのノートのページを閲覧してるときはミュートしない
-  if (event.id === id) {
-    return "null";
-  }
+export function muteCheck(event: Nostr.Event): MuteCheck {
   if (get(mutes)) {
     // Check if the event should be muted based on mutes.p
-    if (shouldMuteByP(event, { pubkey, id })) {
+    if (shouldMuteByP(event)) {
       return "pubkey";
     }
 
@@ -45,7 +32,7 @@ export function muteCheck(
   }
 
   // Check if the event should be muted based on mutebykinds
-  if (shouldMuteByKinds(event, { pubkey, id })) {
+  if (shouldMuteByKinds(event)) {
     return "kind";
   }
 
@@ -53,19 +40,7 @@ export function muteCheck(
   return "null";
 }
 
-function shouldMuteByP(
-  event: Nostr.Event,
-  {
-    pubkey,
-    id,
-  }: {
-    pubkey: string | undefined;
-    id: string | undefined;
-  }
-): boolean {
-  if (event.pubkey === pubkey) {
-    return false;
-  }
+function shouldMuteByP(event: Nostr.Event): boolean {
   const pMutes = get(mutes)?.p || [];
 
   return pMutes.includes(event.pubkey); // Replace with actual property check
@@ -100,19 +75,7 @@ function shouldMuteByE(event: Nostr.Event): boolean {
   ); // Replace with actual property check
 }
 
-function shouldMuteByKinds(
-  event: Nostr.Event,
-  {
-    pubkey,
-    id,
-  }: {
-    pubkey: string | undefined;
-    id: string | undefined;
-  }
-): boolean {
-  if (event.pubkey === pubkey) {
-    return false;
-  }
+function shouldMuteByKinds(event: Nostr.Event): boolean {
   const kindsMutes = get(mutebykinds) || [];
 
   // Implement logic to check if event.kind and other properties match mutebykinds criteria

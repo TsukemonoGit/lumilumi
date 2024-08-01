@@ -29,7 +29,6 @@
   import { getRelaysById } from "$lib/func/nostr";
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
   import { goto } from "$app/navigation";
-  import ChannelMetadata from "./ChannelMetadata.svelte";
   import ShowStatus from "./ShowStatus.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
   import ReplyThread from "./ReplyThread.svelte";
@@ -46,8 +45,8 @@
   export let maxHeight: string = "16rem";
   export let thread: boolean = false;
   export let depth: number = 0;
-  let viewMuteEvent = false;
-
+  export let viewMuteEvent = false;
+  export let excludefunc = (event: Nostr.Event) => false;
   $: paramNoteId = $page.params.note
     ? getIDbyParam($page.params.note)
     : undefined;
@@ -63,23 +62,11 @@
     }
   }
 
-  $: paramPubkey = $page.params.npub
-    ? getPubkeybyParam($page.params.npub)
-    : undefined;
-  function getPubkeybyParam(str: string) {
-    const { type, data } = nip19.decode(str);
-    if (type === "npub") {
-      return data as string;
-    } else if (type === "nprofile") {
-      return data.pubkey;
-    } else {
-      console.log(data);
-    }
-  }
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
-  $: muteType = muteCheck(note, { pubkey: paramPubkey, id: paramNoteId });
+  $: muteType =
+    paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
   $: if (note && note.id !== currentNoteId) {
     $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
     if (!$viewEventIds.includes(note.id)) {
