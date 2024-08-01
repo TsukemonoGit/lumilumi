@@ -18,6 +18,7 @@ export function muteCheck(
     id: string | undefined;
   }
 ): MuteCheck {
+  //そのノートのページを閲覧してるときはミュートしない
   if (event.id === id) {
     return "null";
   }

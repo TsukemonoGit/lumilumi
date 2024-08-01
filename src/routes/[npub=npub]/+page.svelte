@@ -71,7 +71,9 @@
     }
     view = true;
   });
-
+  beforeNavigate(() => {
+    $value = "post";
+  });
   async function init() {
     since = undefined;
     setTieKey(tieKey);
