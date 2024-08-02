@@ -128,7 +128,7 @@
         </div>
 
         <ul
-          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
+          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-10"
         >
           <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
             <a href="/" use:melt={$close}
