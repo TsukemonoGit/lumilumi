@@ -120,14 +120,16 @@
         opacity: 1,
       }}
     >
-      <nav class="h-full overflow-hidden justify-between flex flex-col">
+      <nav class="h-full justify-between flex flex-col my-2 overflow-hidden">
         <div class="title">
           <img src={logo} alt="logo" width={40} /><span class="ml-2"
             >Lumilumi</span
           >
         </div>
 
-        <ul class="flex flex-col gap-6 overflow-y-auto max-h-full justify-end">
+        <ul
+          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
+        >
           <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
             <a href="/" use:melt={$close}
               ><House /><span class="ml-2">Home</span></a
@@ -216,14 +218,6 @@
     }
   }
 
-  .menu {
-    @apply z-10 flex max-h-[300px]  flex-col shadow-lg shadow-neutral-900/30;
-    @apply rounded-md bg-white p-1 lg:max-h-none;
-    @apply ring-0 !important;
-  }
-  .subMenu {
-    @apply min-w-[220px] shadow-md shadow-neutral-900/30;
-  }
   .item {
     @apply relative w-[40px] h-[40px] select-none rounded-sm;
     @apply z-20 text-magnum-900 outline-none;
@@ -238,29 +232,6 @@
     @apply text-magnum-900 transition-colors hover:bg-white/90 data-[highlighted]:outline-none;
     @apply overflow-visible data-[highlighted]:bg-magnum-200 data-[highlighted]:ring-magnum-400 !important;
     @apply text-sm font-medium leading-none focus:z-30 focus:ring;
-  }
-  .check {
-    @apply absolute left-2 top-1/2 text-magnum-500;
-    translate: 0 calc(-50% + 1px);
-  }
-
-  .dot {
-    @apply h-[4.75px] w-[4.75px] rounded-full bg-magnum-900;
-  }
-
-  .separator {
-    @apply m-[5px] h-[1px] bg-magnum-200;
-  }
-
-  .rightSlot {
-    @apply ml-auto pl-5;
-  }
-
-  .check {
-    @apply absolute left-0 inline-flex w-6 items-center justify-center;
-  }
-  .text {
-    @apply pl-6 text-xs leading-6 text-neutral-600;
   }
 
   nav a {
