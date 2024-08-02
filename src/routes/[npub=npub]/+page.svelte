@@ -175,12 +175,12 @@
               >
                 {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
                   <div
-                    class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
+                    class="max-w-full break-words whitespace-pre-line box-border overflow-hidden"
                   >
                     <Pin class="-rotate-45 text-magnum-400" /><Note
                       {id}
                       displayMenu={true}
-                      depth={0}
+                      depth={1}
                     />
                   </div>
                 {/each}

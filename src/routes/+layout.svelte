@@ -32,6 +32,7 @@
     createNoopClient,
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
+  import { mediaUploader } from "$lib/func/util";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
@@ -79,7 +80,7 @@
       setTheme(theme);
 
       const tmp = localStorage.getItem("uploader");
-      if (tmp) $uploader = tmp;
+      $uploader = tmp ?? mediaUploader[0];
       if (!$app?.rxNostr) {
         setRxNostr();
       }
