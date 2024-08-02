@@ -368,7 +368,7 @@
     />
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[720px]
-            max-w-[90vw] -translate-x-1/2 -translate-y-1/2"
+            max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
       {#if signPubkey && (initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview))}
