@@ -104,7 +104,7 @@
 <!-- </div> -->
 
 {#if $open}
-  <div class="" use:melt={$portalled}>
+  <div use:melt={$portalled}>
     <div
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
@@ -112,7 +112,7 @@
     />
     <div
       use:melt={$content}
-      class="fixed left-0 top-0 z-50 h-screen w-full max-w-[250px] bg-neutral-900 p-6
+      class="fixed left-0 top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
             shadow-lg focus:outline-none"
       transition:fly={{
         x: -350,
