@@ -25,7 +25,8 @@
       "menu": "menuボタンを左側に表示する",
       "showRelayIcon": "アイコンの下にリレー情報を表示する",
       "showReactioninTL": "自分へのリアクションをTLに流す",
-      "showUserStatus": "ユーザーステータスを表示する"
+      "showUserStatus": "ユーザーステータスを表示する",
+      "banner": "右側のアカウントバナーを非表示にする"
     },
     "douki": {
       "title": "データの同期"

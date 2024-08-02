@@ -127,9 +127,8 @@
 </script>
 
 <Popover bind:open>
-  <div class="flex justify-center h-[3em] items-center">
-    <RadioTower size="20" class={overallStateColor} />
-  </div>
+  <RadioTower size="20" class={overallStateColor} />
+
   <div slot="popoverContent" class="max-h-80 overflow-x-auto max-w-80">
     <div>
       <div class="text-magnum-200 font-bold text-lg mt-2">read</div>

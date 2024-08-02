@@ -9,6 +9,7 @@
     slicedEvent,
     uploader,
     verifier,
+    noBanner,
   } from "$lib/stores/stores";
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
@@ -46,6 +47,8 @@
   verificationClient.start();
   $verifier = verificationClient.verifier;
 
+  let nlBanner: HTMLElement | null = null;
+
   onMount(async () => {
     //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#auto-update
     if (pwaInfo) {
@@ -68,7 +71,7 @@
     }
     // make sure this is called before any
     // window.nostr calls are made
-    if (browser) {
+    if (browser && !nlBanner) {
       const nostrLogin = await import("nostr-login");
       await nostrLogin.init({
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
@@ -84,6 +87,10 @@
       if (!$app?.rxNostr) {
         setRxNostr();
       }
+      nlBanner = document.getElementsByTagName(
+        "nl-banner"
+      )?.[0] as HTMLElement | null;
+      if (nlBanner) console.log(nlBanner);
     }
   });
 
@@ -106,6 +113,12 @@
       }
     | undefined;
   $: console.log($page);
+
+  $: if ($noBanner && nlBanner) {
+    nlBanner.style.display = "none";
+  } else if (nlBanner) {
+    nlBanner.style.display = "";
+  }
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -150,7 +163,7 @@
         <div class="sm:w-52 w-0">
           <Sidebar />
         </div>
-        <main>
+        <main class="mt-8">
           <slot />
           {#if $nowProgress}
             <div class="fixed right-10 bottom-20">

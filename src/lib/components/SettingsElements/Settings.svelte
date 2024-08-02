@@ -19,11 +19,11 @@
     nostrWalletConnect,
     nowProgress,
     showUserStatus,
-    queryClient,
+    noBanner,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
-  import type { LumiSetting, MuteList } from "$lib/types";
+  import type { LumiSetting } from "$lib/types";
   import { _ } from "svelte-i18n";
   import { beforeNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
@@ -95,6 +95,7 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
+    $noBanner = settings.noBanner;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -183,6 +184,7 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
+    $noBanner = settings.noBanner;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -570,6 +572,14 @@
           bind:checked={settings.showUserStatus}
         />
         {$_("settings.display.showUserStatus")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.noBanner}
+        />
+        {$_("settings.display.banner")}
       </label>
     </div>
   </div>

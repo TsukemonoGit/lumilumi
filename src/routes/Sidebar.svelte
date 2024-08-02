@@ -65,7 +65,7 @@
   >;
 </script>
 
-<div class="sidebar fixed top-24 bottom-12">
+<div class="sidebar fixed top-28 bottom-12">
   <nav class="h-full overflow-hidden">
     <ul class="flex flex-col gap-6 overflow-y-auto max-h-full">
       <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
