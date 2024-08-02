@@ -34,7 +34,7 @@
 </script>
 
 {#if decoded.type === "npub"}
-  <span class="text-magnum-100"
+  <span class="text-magnum-100 align-middle"
     >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
         pubkey={decoded.data}
         metadata={undefined}
@@ -116,7 +116,7 @@
   </span>
   <!---->
 {:else if decoded.type === "nprofile"}<!---->
-  <span class="text-magnum-100"
+  <span class="text-magnum-100 align-middle"
     >{#if !displayMenu}<UserName
         pubhex={decoded.data.pubkey}
       />{:else}<PopupUserName
