@@ -27,19 +27,18 @@
   {:else if event.content === "-"}
     👎️
   {:else if /^:.*:$/.test(event.content)}
-    {#await getEmoji(event) then emoji}
-      {#if emoji}
-        {#if $showImg}
-          <img
-            loading="lazy"
-            alt={`:${emoji.alt}:`}
-            src={emoji.url}
-            height="20"
-            class="h-[20px] object-contain"
-          />
-        {:else}
-          {emoji.alt}
-        {/if}{/if}
-    {/await}
+    {@const emoji = getEmoji(event)}
+    {#if emoji}
+      {#if $showImg}
+        <img
+          loading="lazy"
+          alt={`:${emoji.alt}:`}
+          src={emoji.url}
+          height="20"
+          class="h-[20px] object-contain"
+        />
+      {:else}
+        {emoji.alt}
+      {/if}{/if}
   {:else}{event.content}{/if}
 {/if}

@@ -289,7 +289,7 @@
 <div
   class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
 >
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734}
     <!--リプライ-->
     <button
       on:click={() => {
@@ -357,7 +357,7 @@
     <CustomReaction {note} />
   {/if}
 
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 9734}
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734}
     <Metadata
       queryKey={["metadata", note.pubkey]}
       pubkey={note.pubkey}

@@ -34,6 +34,7 @@
   import ReplyThread from "./ReplyThread.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
+  import ReactionWebsite from "./ReactionWebsite.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -371,6 +372,9 @@
       {#if tag}
         <RepostedNote {tag} {kind} depth={depth + 1} />
       {/if}
+    {:else if note.kind === 17}
+      <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
+      <ReactionWebsite {note} {metadata} {displayMenu} {depth} {proxy} />
     {:else if note.kind === 0}
       <!--kind0-->
       <Kind0Note {note} {proxy} {displayMenu} {depth} />

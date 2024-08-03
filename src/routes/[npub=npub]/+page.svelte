@@ -268,7 +268,7 @@
               queryKey={["user", "reactions", userPubkey]}
               filters={[
                 {
-                  kinds: [7],
+                  kinds: [7, 17],
                   limit: 50,
                   authors: [userPubkey],
                   since: now(),
