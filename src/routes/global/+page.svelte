@@ -5,7 +5,7 @@
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
@@ -15,6 +15,7 @@
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import Settei from "./Settei.svelte";
 
   let amount = 50;
   let viewIndex = 0;
@@ -52,6 +53,24 @@
       since = ev[0].event.created_at;
     }
   }
+  //let isView = true;
+  //let compRef: TimelineList;
+  const handleReload = () => {
+    // compRef.$destroy();
+    // isView = false;
+    // $queryClient.refetchQueries({
+    //   queryKey: ["globalRelay", $loginUser],
+    // });
+
+    $toastSettings = {
+      title: "info",
+      description: "reload to set new relay list",
+      color: "bg-green-500",
+    };
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+  };
 </script>
 
 <svelte:head>
@@ -59,17 +78,20 @@
   <meta property="og:description" content="Global" />
   <meta name="description" content="Global" />
 </svelte:head>
+
 <section>
   <SetGlobalRelays pubkey={$loginUser} let:relays>
-    <div slot="loading">loading</div>
-    <div slot="error">error</div>
-    <div slot="nodata">nodata</div>
-    <div class="w-full flex gap-2">
-      <div class=" font-medium text-magnum-400">GlobalRelays</div>
-      <div class="text-sm">
-        {relays.join(", ")}
-      </div>
+    <div class="w-full break-words overflow-hidden" slot="loading">
+      <Settei relays={[]} {handleReload} />
     </div>
+    <div class="w-full break-words overflow-hidden" slot="error">
+      <Settei relays={[]} {handleReload} />
+    </div>
+    <div class="w-full break-words overflow-hidden" slot="nodata">
+      <Settei relays={[]} {handleReload} />
+    </div>
+    <Settei {relays} {handleReload} />
+
     <div class="w-full break-words overflow-hidden">
       {#if since}
         <TimelineList
@@ -130,7 +152,7 @@
     </div>
   </SetGlobalRelays>
 
-  <div
+  <!-- <div
     class="mb-16 w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
   >
     <Link
@@ -140,8 +162,9 @@
         size={16}
       /></Link
     >
-  </div>
+  </div> -->
 </section>
+
 <div class="postWindow">
   <OpenPostWindow
     options={{
