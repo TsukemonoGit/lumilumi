@@ -62,7 +62,7 @@
   };
 </script>
 
-<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden mt-1"}>
+<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden my-1"}>
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
       <UserMenu

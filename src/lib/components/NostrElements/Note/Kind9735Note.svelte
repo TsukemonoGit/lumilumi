@@ -8,9 +8,21 @@
   import RepostedNote from "./RepostedNote.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { decode } from "light-bolt11-decoder";
+  import { muteCheck } from "$lib/func/muteCheck";
+
   export let note: Nostr.Event;
   export let depth: number;
+  export let excludefunc = (event: Nostr.Event) => false;
+
+  let viewMuteEvent: boolean;
   $: zapRequestEvent = kind9734(note);
+
+  $: muteType = !zapRequestEvent
+    ? "null"
+    : excludefunc(zapRequestEvent)
+      ? "null"
+      : muteCheck(zapRequestEvent);
+
   const kind9734 = (event: Nostr.Event): Nostr.Event | undefined => {
     try {
       return JSON.parse(
@@ -57,46 +69,57 @@
 </script>
 
 {#if zapRequestEvent !== undefined}
-  <Metadata
-    queryKey={["metadata", zapRequestEvent.pubkey]}
-    pubkey={zapRequestEvent.pubkey}
-    let:metadata
-  >
-    <div class="flex gap-1 items-center align-middle">
-      <Zap
-        class="min-w-[20px] mt-auto mb-auto  stroke-orange-400 fill-orange-400"
-        size={20}
-      />{amount}
+  {#if muteType !== "null" && depth >= 1}
+    <button
+      class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+      on:click={() => (viewMuteEvent = !viewMuteEvent)}
+    >
+      {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
+    </button>
+  {/if}
 
-      <div class="self-center">
-        <UserMenu
-          pubkey={zapRequestEvent.pubkey}
-          {metadata}
+  {#if muteType === "null" || viewMuteEvent}
+    <Metadata
+      queryKey={["metadata", zapRequestEvent.pubkey]}
+      pubkey={zapRequestEvent.pubkey}
+      let:metadata
+    >
+      <div class="flex gap-1 items-center align-middle">
+        <Zap
+          class="min-w-[20px] mt-auto mb-auto  stroke-orange-400 fill-orange-400"
           size={20}
-          {depth}
-        />
-      </div>
-      <div class="inline-block break-all break-words whitespace-pre-line">
-        {#if metadata}
-          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
-          >
-        {:else}
-          <span class="text-magnum-100 text-sm"
-            >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span
-          >
-        {/if}
-      </div>
+        />{amount}
 
-      <div class="ml-auto mr-2">
-        <NoteActionButtons note={zapRequestEvent} />
+        <div class="self-center">
+          <UserMenu
+            pubkey={zapRequestEvent.pubkey}
+            {metadata}
+            size={20}
+            {depth}
+          />
+        </div>
+        <div class="inline-block break-all break-words whitespace-pre-line">
+          {#if metadata}
+            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
+              class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
+            >
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span
+            >
+          {/if}
+        </div>
+
+        <div class="ml-auto mr-2">
+          <NoteActionButtons note={zapRequestEvent} />
+        </div>
       </div>
-    </div>
-    <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
-    {#await zapedId(note.tags) then { kind, tag }}
-      {#if tag}
-        <RepostedNote {tag} kind={undefined} />
-      {/if}
-    {/await}
-  </Metadata>
+      <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
+      {#await zapedId(note.tags) then { kind, tag }}
+        {#if tag}
+          <RepostedNote {tag} kind={undefined} {depth} />
+        {/if}
+      {/await}
+    </Metadata>
+  {/if}
 {/if}

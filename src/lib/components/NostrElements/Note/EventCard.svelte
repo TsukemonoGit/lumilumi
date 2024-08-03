@@ -66,6 +66,7 @@
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
+
   $: muteType =
     paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
   $: if (note && note.id !== currentNoteId) {
@@ -95,7 +96,7 @@
     };
   };
 
-  const baseClass = " overflow-hidden pb-1";
+  const baseClass = " overflow-hidden ";
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
     const user = ptag.find((tag) => tag[1] === $loginUser);
@@ -433,7 +434,7 @@
     {:else if note.kind === 9735}
       <!--kind9735 zap receipt-->
 
-      <Kind9735Note {note} {depth} />
+      <Kind9735Note {note} {depth} {excludefunc} />
     {:else}
       <!--その他-->
       {@const clientData = findClientTag(note)}
