@@ -9,9 +9,9 @@
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { Filter, SkipForward, Triangle } from "lucide-svelte";
+  import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import { firstLoadOlderEvents, loadOlderEvents } from "./timelineList";
   import {
@@ -24,8 +24,8 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { getRelaysById, setTieKey } from "$lib/func/nostr";
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { setTieKey } from "$lib/func/nostr";
+  import { onDestroy, onMount } from "svelte";
 
   const sift = 40; //スライドする量
 
