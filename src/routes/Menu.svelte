@@ -121,14 +121,8 @@
       }}
     >
       <nav class="h-full justify-between flex flex-col my-2 overflow-hidden">
-        <div class="title">
-          <img src={logo} alt="logo" width={40} /><span class="ml-2"
-            >Lumilumi</span
-          >
-        </div>
-
         <ul
-          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-6"
+          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
         >
           <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
             <a href="/" use:melt={$close}
@@ -202,6 +196,15 @@
               ><UserAvatar2 size={32} /><span class="ml-2">profile</span>
             </a>
           </li> -->
+          <li
+            aria-current={$page.url?.pathname === "/about" ? "page" : undefined}
+          >
+            <a href="/about" use:melt={$close}
+              ><img src={logo} alt="logo" width={40} /><span class="ml-2"
+                >about</span
+              ></a
+            >
+          </li>
         </ul>
       </nav>
     </div>

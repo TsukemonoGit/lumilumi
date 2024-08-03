@@ -499,7 +499,7 @@ export function usePromiseReq(
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {
-        //console.log(v);
+        console.log(v);
         // 受け取ったデータが配列でない場合、配列に変換して追加
         if (Array.isArray(v)) {
           accumulatedData = v;

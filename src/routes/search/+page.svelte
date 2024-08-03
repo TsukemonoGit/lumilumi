@@ -9,7 +9,7 @@
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/stores";
-  import { get } from "svelte/store";
+  import { get, writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import { nowProgress } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
@@ -21,8 +21,8 @@
   let searchUntil: number | undefined;
   let searchHashtag: string | undefined;
   let followee = false;
-  let filter: Nostr.Filter;
-  let showFilter: Nostr.Filter;
+  const filters: Writable<Nostr.Filter[]> = writable([]);
+  let showFilters: Nostr.Filter[];
 
   let compRef: SvelteComponent;
   let openSearchResult = false;
@@ -75,7 +75,9 @@
       searchUntil
     ) {
       createFilter();
-      showFilter = { ...filter, limit: 50 };
+      showFilters = $filters.map((filter) => {
+        return { ...filter, limit: 50 };
+      });
       handleClickSearch();
     }
     isMount = false;
@@ -113,24 +115,71 @@
   }
 
   function createFilter() {
-    filter = {
-      search: searchWord || undefined,
-      kinds: [searchKind],
-      authors: npubRegex.test(searchPubkey)
-        ? [getHex(searchPubkey)]
-        : followee
-          ? followingList
-          : undefined,
-      since: !Number.isNaN(searchSince) ? searchSince : undefined,
-      until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-      "#t": searchHashtag ? [searchHashtag] : [],
-    };
+    $filters = [
+      {
+        search: searchWord || undefined,
+        kinds: [searchKind],
+        authors: npubRegex.test(searchPubkey)
+          ? [getHex(searchPubkey)]
+          : followee
+            ? followingList
+            : undefined,
+        since: !Number.isNaN(searchSince) ? searchSince : undefined,
+        until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
+        "#t": searchHashtag ? [searchHashtag] : [],
+      },
+    ];
+
+    //  const chank = 100;
+    //if (!followee || !followingList || followingList?.length < chank) {
+    //   $filters = [
+    //     {
+    //       search: searchWord || undefined,
+    //       kinds: [searchKind],
+    //       authors: npubRegex.test(searchPubkey)
+    //         ? [getHex(searchPubkey)]
+    //         : followee
+    //           ? followingList
+    //           : undefined,
+    //       since: !Number.isNaN(searchSince) ? searchSince : undefined,
+    //       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
+    //       "#t": searchHashtag ? [searchHashtag] : [],
+    //     },
+    //   ];
+    // } else if (followee && followingList && followingList.length > chank) {
+    //   $filters = [];
+    //   const splitFollowingList: string[][] = followingList.reduce<string[][]>(
+    //     (acc, curr, index) => {
+    //       if (index % chank === 0) acc.push([]);
+    //       acc[acc.length - 1].push(curr);
+    //       return acc;
+    //     },
+    //     []
+    //   );
+
+    //   splitFollowingList.forEach((listSegment) => {
+    //     $filters.push({
+    //       search: searchWord || undefined,
+    //       kinds: [searchKind],
+    //       authors: npubRegex.test(searchPubkey)
+    //         ? [getHex(searchPubkey)]
+    //         : followee
+    //           ? listSegment
+    //           : undefined,
+    //       since: !Number.isNaN(searchSince) ? searchSince : undefined,
+    //       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
+    //       "#t": searchHashtag ? [searchHashtag] : [],
+    //     });
+    //   });
+    // }
   }
 
   function handleClickSearch() {
     $nowProgress = true;
     updateQueryParams();
-    showFilter = { ...filter, limit: 50 };
+    showFilters = $filters.map((filter) => {
+      return { ...filter, limit: 50 };
+    });
 
     if (openSearchResult) {
       openSearchResult = false;
@@ -191,6 +240,7 @@
             type="checkbox"
             class="rounded-checkbox"
             bind:checked={followee}
+            on:change={createFilter}
           />
           only followee
         </label>
@@ -286,8 +336,10 @@
     <div
       class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
     >
-      <div class="font-semibold text-magnum-400">Filter</div>
-      {JSON.stringify(filter, null, 2)}
+      <div class="font-semibold text-magnum-400">Filters</div>
+      {#each $filters as filter}
+        {JSON.stringify(filter, null, 2)}
+      {/each}
     </div>
   </div>
   <button
@@ -297,5 +349,5 @@
   >
 </section>
 {#if openSearchResult}
-  <SearchResult bind:this={compRef} filter={showFilter} />
+  <SearchResult bind:this={compRef} filters={showFilters} />
 {/if}

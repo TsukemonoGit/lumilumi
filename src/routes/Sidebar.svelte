@@ -12,6 +12,7 @@
     Users,
     MessagesSquare,
     TrendingUp,
+    Smile,
   } from "lucide-svelte";
   import type { EventPacket } from "rx-nostr";
   import { nip19 } from "nostr-tools";
@@ -20,10 +21,6 @@
   import { melt } from "@melt-ui/svelte";
   import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
   import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
-
-  $: metadata = (
-    $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
-  )?.event;
 
   let encodedPub: string;
   $: if ($loginUser) {
@@ -67,7 +64,7 @@
 
 <div class="sidebar fixed top-28 bottom-12">
   <nav class="h-full overflow-hidden">
-    <ul class="flex flex-col gap-6 overflow-y-auto max-h-full">
+    <ul class="flex flex-col gap-6 overflow-y-auto h-full">
       <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
         <a href="/"><House /><span class="ml-2">Home</span></a>
       </li>
@@ -98,9 +95,13 @@
       </li>
 
       <li
-        aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
+        aria-current={$page.url.pathname === `/${encodedPub}`
+          ? "page"
+          : undefined}
       >
-        <a href="/settings"><Settings /><span class="ml-2">settings</span></a>
+        <a href={`/${encodedPub}`}
+          ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
+        </a>
       </li>
       <li>
         {#if $trigger}<button use:melt={$trigger}
@@ -108,19 +109,24 @@
           >{/if}
       </li>
       <li
-        aria-current={$page.url.pathname === `/${encodedPub}`
-          ? "page"
-          : undefined}
+        aria-current={$page.url.pathname === "/settings" ? "page" : undefined}
       >
-        <a href={`/${encodedPub}`}
-          ><UserAvatar2 size={32} /><span class="ml-2">profile</span>
+        <a href="/settings"><Settings /><span class="ml-2">settings</span></a>
+      </li>
+      <li
+        class=" mt-auto"
+        aria-current={$page.url.pathname === `/about` ? "page" : undefined}
+      >
+        <a href={`/about`}>
+          <img src={logo} alt="logo" width={40} /><span class="ml-2">about</span
+          >
         </a>
       </li>
     </ul>
   </nav>
-  <div class="title mt-auto">
+  <!-- <div class="title mt-auto">
     <img src={logo} alt="logo" width={40} /><span class="ml-2">Lumilumi</span>
-  </div>
+  </div> -->
 </div>
 <EditUserStatus bind:trigger />
 
@@ -129,16 +135,6 @@
     .sidebar {
       display: none;
     }
-  }
-
-  svg {
-    width: 2em;
-    height: 3em;
-    display: block;
-  }
-
-  path {
-    fill: var(--background);
   }
 
   nav a {

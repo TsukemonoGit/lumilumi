@@ -6,9 +6,11 @@ import { uploadFile } from "./upload";
 import { Nip11Registry } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 export const nip50relays = [
+  //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
-  "wss://relay.noswhere.com",
+  // "wss://relay.noswhere.com", //クソ長フィルターのとき（only foloweeのとき）nodataになる /let chank = 100;だと結果出てくる
   "wss://bostr.nokotaro.com",
+  "wss://nostr.wine", //クソながフィルターでも返ってくるけどなんかデータがぬけぬけかも？
 ];
 
 export const mediaUploader = [

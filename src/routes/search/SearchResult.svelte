@@ -11,12 +11,12 @@
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
-  export let filter: Nostr.Filter;
+  export let filters: Nostr.Filter[];
 
   let amount = 50;
   let viewIndex = 0;
 
-  $: console.log(filter);
+  $: console.log(filters);
   // const tieKey = "search";
 
   onMount(() => {
@@ -39,7 +39,7 @@
     <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
     <SearchResultList
       queryKey={["search", generateRandomId(4)]}
-      filters={[filter]}
+      {filters}
       req={createRxForwardReq()}
       let:events
       {viewIndex}

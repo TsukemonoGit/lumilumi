@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-svelte";
 import { derived } from "svelte/store";
+import Logo from "$lib/images/favicon.svg";
+
 export const items: {
   Icon: any;
   link: string;
