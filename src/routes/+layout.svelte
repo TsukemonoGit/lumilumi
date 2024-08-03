@@ -77,6 +77,7 @@
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
       });
+
       //await nostrLogin.launch();
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
       console.log(theme);
@@ -91,6 +92,9 @@
         "nl-banner"
       )?.[0] as HTMLElement | null;
       if (nlBanner) console.log(nlBanner);
+    }
+    if ($noBanner && nlBanner) {
+      nlBanner.style.display = "none";
     }
   });
 
