@@ -1,16 +1,10 @@
 <script lang="ts">
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
+
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import {
-    createRxForwardReq,
-    createTie,
-    now,
-    type EventPacket,
-  } from "rx-nostr";
+  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import { loginUser, queryClient, tieMapStore } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { afterNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";

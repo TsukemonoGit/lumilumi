@@ -56,9 +56,11 @@
   }
 
   const makeFilters = (contacts: Nostr.Event<number>): Nostr.Filter[] => {
+    console.log(contacts);
+    const pubkeyList = pubkeysIn(contacts, $loginUser);
     const filters: Nostr.Filter[] = [
       {
-        authors: pubkeysIn(contacts),
+        authors: pubkeyList,
         kinds: [1, 6, 16],
         limit: 50,
         since: since,
@@ -81,7 +83,7 @@
     if ($showUserStatus) {
       filters.push({
         kinds: [30315],
-        authors: pubkeysIn(contacts),
+        authors: pubkeyList,
       });
     }
     console.log(filters);

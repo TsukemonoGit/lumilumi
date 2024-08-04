@@ -95,15 +95,22 @@ metadataQueue.subscribe((queue) => {
 //   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
 //   savedMetadata = data;
 // }
-export function pubkeysIn(contacts: Nostr.Event): string[] {
+export function pubkeysIn(
+  contacts: Nostr.Event,
+  pubkey: string | undefined = undefined
+): string[] {
   const followingList = contacts.tags.reduce((acc, [tag, value]) => {
-    if (tag === "p") {
+    if (tag === "p" && !acc.includes(value)) {
       return [...acc, value];
     } else {
       return acc;
     }
   }, []);
-  console.log("set followList");
+
+  if (pubkey && !followingList.includes(pubkey)) {
+    followingList.push(pubkey);
+  }
+
   setFollowingList(followingList);
   return followingList;
 }
