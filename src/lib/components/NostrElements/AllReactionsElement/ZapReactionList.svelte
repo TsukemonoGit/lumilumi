@@ -33,7 +33,7 @@
     return events.filter((event) => getAmount(event) === amount);
   };
 
-  $: amounts = [...new Set(events.map((event) => getAmount(event) ?? 0))].sort(
+  $: amounts = [...new Set(events.map((event) => getAmount(event) ?? -1))].sort(
     (a, b) => b - a
   ); // Sort amounts in descending order
 
@@ -56,7 +56,9 @@
       class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card flex items-center align-middle"
     >
       <Zap class="stroke-orange-400 fill-orange-400" size={20} />
-      <div class="min-w-8 flex justify-center">{amount}</div>
+      <div class="min-w-8 flex justify-center">
+        {amount === -1 ? "invalid event" : amount}
+      </div>
       <div class="flex flex-wrap px-2 gap-1 items-center">
         {#each filterEventsByAmount(events, amount) as event (event.id)}
           {@const zapper = zapperEvent(event)}

@@ -24,12 +24,14 @@
       : muteCheck(zapRequestEvent);
 
   const kind9734 = (event: Nostr.Event): Nostr.Event | undefined => {
+    const desc = event.tags.find((tag) => tag[0] === "description");
+    if (!desc || desc.length <= 1) {
+      return;
+    }
     try {
-      return JSON.parse(
-        event.tags.find((tag) => tag[0] === "description")?.[1] ?? ""
-      );
+      return JSON.parse(desc[1]);
     } catch (error) {
-      return undefined;
+      return;
     }
   };
   // //IDのイベント購読にリクエストのIDを含める//なんやかんやでZAPへのリアクションはなし
@@ -58,17 +60,35 @@
       tag: etag ? (etag as string[]) : ([] as string[]),
     };
   }
+  let amount: number | undefined;
+  $: if (note) {
+    amount = getAmount(note);
+  }
+  const getAmount = (note: Nostr.Event): number | undefined => {
+    const bolt11 = note.tags.find((tag) => tag[0] === "bolt11");
+    if (!bolt11 || bolt11.length <= 1) {
+      return;
+    }
+    try {
+      const decoded = decode(bolt11[1]);
 
-  const amount = Math.floor(
-    Number(
-      decode(
-        note.tags.find((tag) => tag[0] === "bolt11")?.[1] ?? ""
-      )?.sections.find((item) => item.name === "amount")?.value
-    ) / 1000
-  );
+      if (decoded) {
+        const num = decoded.sections.find(
+          (item) => item.name === "amount"
+        )?.value;
+
+        if (num) {
+          return Math.floor(Number(num) / 1000);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
 </script>
 
-{#if zapRequestEvent !== undefined}
+{#if zapRequestEvent !== undefined && amount !== undefined}
   {#if muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
