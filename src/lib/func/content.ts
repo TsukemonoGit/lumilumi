@@ -108,46 +108,75 @@ export function parseText(input: string, tags: string[][]): Part[] {
     if (index > 0) {
       parts.push({ type: "text", content: remainingText.slice(0, index) });
     }
+    if (match) {
+      switch (type) {
+        case "nip19":
+          parts.push({
+            type: "nip19",
+            content: match[0],
+            url: match[0].slice(6),
+          }); // Remove "nostr:" prefix
+          break;
+        case "url":
+          const url = match[0];
+          const lastUnpairedParenIndex = url.split("").reduce(
+            (acc, char, index) => {
+              if (char === "(") acc.openParenCount++;
+              if (char === ")") acc.closeParenCount++;
+              if (
+                acc.closeParenCount > acc.openParenCount &&
+                acc.index === url.length
+              ) {
+                acc.index = index;
+              }
+              return acc;
+            },
+            { openParenCount: 0, closeParenCount: 0, index: url.length }
+          ).index;
 
-    switch (type) {
-      case "nip19":
-        parts.push({
-          type: "nip19",
-          content: match?.[0],
-          url: match?.[0].slice(6),
-        }); // Remove "nostr:" prefix
-        break;
-      case "url":
-        parts.push({ type: "url", content: match?.[0] });
-        break;
-      case "emoji":
-        const emojiContent = match?.[0].slice(1, -1); // Remove surrounding colons
-        const matchingTag = tags.find(
-          (tag) => tag[0] === "emoji" && tag[1] === emojiContent
-        );
-        parts.push({
-          type: "emoji",
-          url: matchingTag ? matchingTag[2] : undefined,
-          content: emojiContent,
-        });
-        break;
-      case "hashtag":
-        parts.push({ type: "hashtag", content: match?.[0].slice(1) }); // Remove leading '#'
-        break;
-      case "nip":
-        parts.push({
-          type: "nip",
-          content: match?.[0],
-          url: `https://github.com/nostr-protocol/nips/blob/master/${match?.[0].slice(
-            4
-          )}.md`, // Remove "nip-" prefix
-        });
-        break;
+          // If there's an unpaired closing parenthesis, split the URL and text
+          if (lastUnpairedParenIndex < url.length) {
+            parts.push({
+              type: "url",
+              content: url.slice(0, lastUnpairedParenIndex),
+            });
+            parts.push({
+              type: "text",
+              content: url.slice(lastUnpairedParenIndex),
+            });
+          } else {
+            parts.push({ type: "url", content: url });
+          }
+          break;
+        case "emoji":
+          const emojiContent = match[0].slice(1, -1); // Remove surrounding colons
+          const matchingTag = tags.find(
+            (tag) => tag[0] === "emoji" && tag[1] === emojiContent
+          );
+          parts.push({
+            type: "emoji",
+            url: matchingTag ? matchingTag[2] : undefined,
+            content: emojiContent,
+          });
+          break;
+        case "hashtag":
+          parts.push({ type: "hashtag", content: match[0].slice(1) }); // Remove leading '#'
+          break;
+        case "nip":
+          parts.push({
+            type: "nip",
+            content: match[0],
+            url: `https://github.com/nostr-protocol/nips/blob/master/${match?.[0].slice(
+              4
+            )}.md`, // Remove "nip-" prefix
+          });
+          break;
+      }
+
+      remainingText = remainingText.slice(
+        index + (match as RegExpMatchArray)[0].length
+      );
     }
-
-    remainingText = remainingText.slice(
-      index + (match as RegExpMatchArray)[0].length
-    );
   }
 
   return parts;
