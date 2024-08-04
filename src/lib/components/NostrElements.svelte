@@ -24,6 +24,7 @@
   let isOnMount = false;
   let since: number | undefined = undefined;
   const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];
+
   onMount(() => {
     if (!isOnMount) {
       isOnMount = true;
@@ -56,7 +57,7 @@
   }
 
   const makeFilters = (contacts: Nostr.Event<number>): Nostr.Filter[] => {
-    console.log(contacts);
+    //console.log(contacts);
     const pubkeyList = pubkeysIn(contacts, $loginUser);
     const filters: Nostr.Filter[] = [
       {
