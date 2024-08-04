@@ -1,6 +1,35 @@
-<script>
+<script lang="ts">
+  import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
+  import { toastSettings } from "$lib/stores/stores";
   import Github from "../settings/Github.svelte";
+
+  const handleClickShare = async () => {
+    //share link
+    const shareData = {
+      title: `LUMILUMI the NOSTR client`,
+      //  text:  undefined,
+      url: $page.url.origin,
+    };
+    try {
+      await navigator.share(shareData);
+      // await navigator.clipboard.writeText(
+      //   `${$page.url.origin}/channel/${nevent}`
+      // );
+      $toastSettings = {
+        title: "Success",
+        description: `shared successfully`,
+        color: "bg-green-500",
+      };
+    } catch (error: any) {
+      console.error(error.message);
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to share",
+        color: "bg-orange-500",
+      };
+    }
+  };
 </script>
 
 <svelte:head>
@@ -31,6 +60,15 @@
         >
           @mono
         </Link>
+      </div>
+    </li>
+    <li>
+      <div class="list">Share</div>
+      <div class="item">
+        <button
+          on:click={handleClickShare}
+          class="bg-magnum-500 rounded-md px-2 py-1">{$page.url.origin}</button
+        >
       </div>
     </li>
   </ul>

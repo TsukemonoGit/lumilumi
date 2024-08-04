@@ -4,6 +4,11 @@
   export let props: { [key: string]: any } = {};
 </script>
 
-<a class={className} {href} target="_blank" rel="noopener noreferrer" {...props}
-  ><slot /></a
+<a
+  class={className}
+  {href}
+  title={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  {...props}><slot /></a
 >

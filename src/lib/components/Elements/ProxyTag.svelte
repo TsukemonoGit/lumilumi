@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MessagesSquare, AtSign, MessageCircle } from "lucide-svelte";
+  import { MessageCircle } from "lucide-svelte";
   import Link from "./Link.svelte";
 
   export let proxyTag: string[];

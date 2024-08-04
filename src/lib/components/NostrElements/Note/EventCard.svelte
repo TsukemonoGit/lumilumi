@@ -4,7 +4,12 @@
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import { loginUser, showUserStatus, viewEventIds } from "$lib/stores/stores";
+  import {
+    loginUser,
+    showImg,
+    showUserStatus,
+    viewEventIds,
+  } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -35,6 +40,8 @@
   import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "./ReactionWebsite.svelte";
+  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import OGP from "$lib/components/Elements/OGP.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -554,12 +561,27 @@
             {/if}
             {#if urls}
               {#each urls as url}
-                <div>
+                {#if $showImg}
+                  <OGP {url} let:contents>
+                    <Link
+                      slot="nodata"
+                      className="underline text-magnum-300 break-all "
+                      href={url}>{url}</Link
+                    >
+                    {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+                      <OgpCard {contents} {url} />
+                    {:else}
+                      <Link
+                        className="underline text-magnum-300 break-all"
+                        href={url}>{url}</Link
+                      >
+                    {/if}
+                  </OGP>
+                {:else}
                   <Link
                     className="underline text-magnum-300 break-all"
                     href={url}>{url}</Link
-                  >
-                </div>
+                  >{/if}
               {/each}
               {#if displayMenu}<NoteActionButtons {note} />{/if}
             {:else}
