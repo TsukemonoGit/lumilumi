@@ -54,6 +54,15 @@
     ];
     const pk = await getDoukiList(filters, relays);
     // console.log(event);
+    if (!pk) {
+      $toastSettings = {
+        title: "Warning",
+        description: "emoji list not found",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
+      return;
+    }
     list = pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
       if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
         return [...acc, [shortcode, url]];
