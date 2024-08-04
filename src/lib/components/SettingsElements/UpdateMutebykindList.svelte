@@ -51,7 +51,7 @@
     const filters: Nostr.Filter[] = [{ kinds: [30007], authors: [pubkey] }];
     const pk = await getMutebykindList(filters, relays);
     console.log(pk);
-    if (pk.length > 0) {
+    if (pk && pk.length > 0) {
       mutebykindList = {
         list: await getMuteByList(pk),
         updated: Math.floor(Date.now() / 1000),
