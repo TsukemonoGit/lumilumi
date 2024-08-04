@@ -64,7 +64,7 @@
               on:click={() => handleClickToList(event)}
               class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
             >
-              <ListLinkCard {event} /></button
+              <ListLinkCard {event} depth={0} /></button
             >
           {/each}
         {/if}
