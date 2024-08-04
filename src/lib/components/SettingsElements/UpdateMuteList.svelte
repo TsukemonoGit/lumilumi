@@ -46,10 +46,21 @@
     ];
     const pk = await getDoukiList(filters, relays);
     // console.log(event);
-    muteList = {
-      list: await toMuteList(pk.event),
-      updated: Math.floor(Date.now() / 1000),
-    };
+
+    console.log(pk);
+    if (pk) {
+      muteList = {
+        list: await toMuteList(pk.event),
+        updated: Math.floor(Date.now() / 1000),
+      };
+    } else {
+      $toastSettings = {
+        title: "Warning",
+        description: "mute list not found ",
+        color: "bg-red-500",
+      };
+    }
+
     $nowProgress = false;
   }
 </script>
