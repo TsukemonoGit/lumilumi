@@ -38,12 +38,14 @@
   ); // Sort amounts in descending order
 
   const zapperEvent = (event: Nostr.Event): Nostr.Event | undefined => {
+    const desc = event.tags.find((tag) => tag[0] === "description");
+    if (!desc || desc.length <= 1) {
+      return;
+    }
     try {
-      return JSON.parse(
-        event.tags.find((tag) => tag[0] === "description")?.[1] ?? ""
-      );
+      return JSON.parse(desc[1]);
     } catch (error) {
-      return undefined;
+      return;
     }
   };
 </script>
