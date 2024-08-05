@@ -72,11 +72,13 @@
             -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
         on:click|stopPropagation={goToPrev}><ChevronLeft /></button
       >
+
       <button
         class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
             -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
         on:click|stopPropagation={goToNext}><ChevronRight /></button
       >{/if}
+
     <button
       use:melt={$close}
       aria-label="close"
@@ -86,5 +88,10 @@
     >
       <X />
     </button>
+    <div
+      class="fixed bottom-0 right-0 z-50 text-neutral-800 px-1 bg-neutral-100/50"
+    >
+      {currentIndex + 1}/{images.length}
+    </div>
   </div>
 {/if}

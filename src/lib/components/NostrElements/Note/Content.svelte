@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { parseText, type Part } from "$lib/func/content";
+  import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
   import { showImg } from "$lib/stores/stores";
@@ -7,7 +7,6 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
-  import { createDialog } from "@melt-ui/svelte";
 
   export let text: string;
   export let tags: string[][];
