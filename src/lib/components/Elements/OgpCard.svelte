@@ -11,7 +11,7 @@
 <div
   class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-200 overflow-hidden"
 >
-  <a class="" href={url} target="_blank">
+  <a class="" href={url} title={url} target="_blank" rel="noopener noreferrer">
     {#if $showImg && contents.image && contents.image !== ""}
       <div class="grid grid-cols-[0.5fr_1.5fr] divide-x divide-magnum-200">
         <div class="overflow-hidden max-h-[8rem] flex justify-center">

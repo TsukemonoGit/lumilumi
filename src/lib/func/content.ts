@@ -1,15 +1,51 @@
 import { nip19Regex, urlRegex, nipRegex, emojiRegex } from "./util";
 
 export interface Part {
-  type: "nip19" | "url" | "emoji" | "hashtag" | "nip" | "text";
+  type:
+    | "nip19"
+    | "url"
+    | "emoji"
+    | "hashtag"
+    | "nip"
+    | "text"
+    | "image"
+    | "audio"
+    | "movie";
   content: string | undefined;
   url?: string;
+  number?: number;
 }
+/** ImageFile_Check_正規表現_パターン */
+const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
+//movie
+const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
+
+const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
+
+// パスから拡張子をチェックする関数
+const checkFileExtension = (url: string): Part["type"] => {
+  try {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+
+    if (imageRegex.test(path)) {
+      return "image";
+    } else if (movieRegex.test(path)) {
+      return "movie";
+    } else if (audioRegex.test(path)) {
+      return "audio";
+    } else {
+      return "url";
+    }
+  } catch (error) {
+    return "text";
+  }
+};
 
 export function parseText(input: string, tags: string[][]): Part[] {
   const parts: Part[] = [];
   let remainingText = input;
-
+  let mediaNum = 0;
   // Create emoji set from tags
   const emojiSet = new Set(
     tags
@@ -135,18 +171,51 @@ export function parseText(input: string, tags: string[][]): Part[] {
           ).index;
 
           // If there's an unpaired closing parenthesis, split the URL and text
-          if (lastUnpairedParenIndex < url.length) {
+          const { urlPart, textPart } =
+            lastUnpairedParenIndex < url.length
+              ? {
+                  urlPart: url.slice(0, lastUnpairedParenIndex),
+                  textPart: url.slice(lastUnpairedParenIndex),
+                }
+              : { urlPart: url, textPart: undefined };
+
+          const urlType = checkFileExtension(urlPart);
+          if (
+            urlType === "image" ||
+            urlType === "audio" ||
+            urlType === "movie"
+          ) {
             parts.push({
-              type: "url",
-              content: url.slice(0, lastUnpairedParenIndex),
+              type: urlType,
+              content: urlPart,
+              number: mediaNum,
             });
+            mediaNum++;
+          } else {
+            parts.push({
+              type: urlType,
+              content: urlPart,
+            });
+          }
+
+          if (textPart) {
             parts.push({
               type: "text",
-              content: url.slice(lastUnpairedParenIndex),
+              content: urlPart,
             });
-          } else {
-            parts.push({ type: "url", content: url });
           }
+          // if (lastUnpairedParenIndex < url.length) {
+          //   parts.push({
+          //     type: "url",
+          //     content: url.slice(0, lastUnpairedParenIndex),
+          //   });
+          //   parts.push({
+          //     type: "text",
+          //     content: url.slice(lastUnpairedParenIndex),
+          //   });
+          // } else {
+          //   parts.push({ type: "url", content: url });
+          // }
           break;
         case "emoji":
           const emojiContent = match[0].slice(1, -1); // Remove surrounding colons

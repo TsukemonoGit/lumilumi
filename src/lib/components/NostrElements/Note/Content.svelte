@@ -1,23 +1,37 @@
 <script lang="ts">
-  import { parseText } from "$lib/func/content";
+  import { parseText, type Part } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
   import { showImg } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import { isvalidURL } from "$lib/func/ogp";
+  import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
+
   export let text: string;
   export let tags: string[][];
   export let displayMenu: boolean;
   export let depth: number;
-  /** ImageFile_Check_正規表現_パターン */
-  const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
-  //movie
-  const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
-  const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
-  $: parts = parseText(text, tags);
+  const parts = parseText(text, tags);
+
+  const mediaList = parts.filter(
+    (part) =>
+      part.type === "image" || part.type === "movie" || part.type === "audio"
+  );
+  const mediaURLList = mediaList.map((media) => media.content ?? "");
+
+  let showModal = false;
+
+  let modalIndex = 0;
+  const openModal = (index: number) => {
+    modalIndex = index;
+    showModal = true;
+  };
+
+  const closeModal = () => {
+    showModal = false;
+  };
 
   const nip19Decode = (
     content: string | undefined
@@ -56,18 +70,15 @@
     }
   };
   let imgError: boolean = false;
-
-  // パスから拡張子をチェックする関数
-  const checkFileExtension = (url: string, regex: RegExp): boolean => {
-    try {
-      const urlObj = new URL(url);
-      const path = urlObj.pathname;
-      return regex.test(path);
-    } catch (error) {
-      return false;
-    }
-  };
 </script>
+
+{#if showModal}
+  <MediaDisplay
+    images={mediaURLList}
+    currentIndex={modalIndex}
+    onClose={closeModal}
+  />
+{/if}
 
 {#each parts as part}
   {#if part.type === "nip19"}
@@ -83,59 +94,76 @@
         {part.content}
       {/if}
     {/await}
-  {:else if part.type === "url" && part.content}
-    {#if $showImg && checkFileExtension(part.content, imageRegex)}
-      {#if !imgError}<Link href={part.content}
+  {:else if part.type === "image" && part.content}
+    {#if $showImg}
+      {#if !imgError}<button
+          class="w-fit h-fit"
+          on:click={() => openModal(part.number ?? 0)}
           ><img
             loading="lazy"
             alt="img"
             src={part.content}
             class=" max-w-[min(20rem,100%)] max-h-full object-contain"
             on:error={() => (imgError = true)}
-          /></Link
+          /></button
         >{:else}<Link
           className="underline text-magnum-300 break-all "
           href={part.content}>{part.content}</Link
         >{/if}
-    {:else if $showImg && checkFileExtension(part.content, movieRegex)}
-      <Link href={part.content}
+    {:else}
+      <Link className="underline text-magnum-300 break-all " href={part.content}
+        >{part.content}</Link
+      >{/if}
+  {:else if part.type === "movie"}
+    {#if $showImg}
+      <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
         ><video
           controls
           src={part.content}
           class=" object-contain max-w-[min(20rem,100%)] max-h-80"
         >
           <track default kind="captions" />
-        </video></Link
-      >{:else if $showImg && checkFileExtension(part.content, audioRegex)}
-      <Link href={part.content}
+        </video></button
+      >{:else}
+      <Link
+        className="underline text-magnum-300 break-all "
+        href={part.content ?? ""}>{part.content}</Link
+      >{/if}{:else if part.type === "audio"}
+    {#if $showImg}
+      <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
         ><audio
           controls
           src={part.content}
           class=" object-contain max-w-[min(20rem,100%)] max-h-80"
         >
           <track default kind="captions" />
-        </audio></Link
-      >
-    {:else if $showImg && isvalidURL(part.content)}
-      <OGP url={part.content} let:contents>
+        </audio></button
+      >{:else}
+      <Link
+        className="underline text-magnum-300 break-all "
+        href={part.content ?? ""}>{part.content}</Link
+      >{/if}
+  {:else if part.type === "url"}{#if $showImg}
+      <OGP url={part.content ?? ""} let:contents>
         <Link
           slot="nodata"
           className="underline text-magnum-300 break-all "
-          href={part.content}>{part.content}</Link
+          href={part.content ?? ""}>{part.content}</Link
         >
         {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-          <OgpCard {contents} url={part.content} />
+          <OgpCard {contents} url={part.content ?? ""} />
         {:else}
           <Link
             slot="nodata"
             className="underline text-magnum-300 break-all "
-            href={part.content}>{part.content}</Link
+            href={part.content ?? ""}>{part.content ?? ""}</Link
           >
         {/if}
       </OGP>
     {:else}
-      <Link className="underline text-magnum-300 break-all " href={part.content}
-        >{part.content}</Link
+      <Link
+        className="underline text-magnum-300 break-all "
+        href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
     {#if $showImg}
