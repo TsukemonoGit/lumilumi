@@ -1,10 +1,12 @@
 <!-- src/lib/components/Modal.svelte -->
 <script lang="ts">
+  import type { Part } from "$lib/func/content";
+  import { createDialog, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
+  import { fade } from "svelte/transition";
 
-  export let images: string[] = [];
+  export let images: Part[] = [];
   export let currentIndex: number = 0;
-  export let onClose: () => void = () => {};
 
   const goToNext = () => {
     currentIndex = (currentIndex + 1) % images.length;
@@ -13,73 +15,76 @@
   const goToPrev = () => {
     currentIndex = (currentIndex - 1 + images.length) % images.length;
   };
+
+  const {
+    elements: {
+      trigger,
+      overlay,
+      content,
+      title,
+      description,
+      close,
+      portalled,
+    },
+    states: { open },
+  } = createDialog({
+    forceVisible: true,
+  });
+  export { open };
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="modal" on:click={onClose}>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="modal-content" on:click|stopPropagation>
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <img src={images[currentIndex]} class="modal-image" />
-  </div>
-  {#if images.length > 1}
-    <button class="prev" on:click|stopPropagation={goToPrev}
-      ><ChevronLeft /></button
+{#if $open}
+  <div class="" use:melt={$portalled}>
+    <div
+      use:melt={$overlay}
+      class="fixed inset-0 z-50 bg-black/50"
+      transition:fade={{ duration: 150 }}
+    />
+    <div
+      class="fixed left-1/2 top-1/2 z-50 max-h-[100vh] max-w-[100vw]
+             -translate-x-1/2 -translate-y-1/2
+            "
+      use:melt={$content}
     >
-    <button class="next" on:click|stopPropagation={goToNext}
-      ><ChevronRight /></button
-    >{/if}
-  <button class="close" on:click|stopPropagation={onClose}><X /></button>
-</div>
-
-<style>
-  .modal {
-    z-index: 50;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-content {
-    position: relative;
-    max-width: 100vw;
-    max-height: 100vh;
-  }
-  .modal-image {
-    max-width: 100vw;
-    max-height: 100vh;
-    object-fit: contain;
-  }
-  .prev,
-  .next,
-  .close {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 0.5em;
-    border-radius: 100%;
-  }
-  .prev {
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .next {
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .close {
-    top: 10px;
-    right: 10px;
-  }
-</style>
+      <!-- {#if images[currentIndex].type === "image"} -->
+      <img
+        alt=""
+        src={images[currentIndex].content}
+        class="max-h-[100vh] max-w-[100vw] object-contain"
+      />
+      <!-- {:else if images[currentIndex].type === "movie"}<video
+          controls
+          src={images[currentIndex].content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        >
+          <track default kind="captions" />
+        </video>{:else if images[currentIndex].type === "audio"}<audio
+          controls
+          src={images[currentIndex].content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        >
+          <track default kind="captions" />
+        </audio>{/if} -->
+    </div>
+    {#if images.length > 1}
+      <button
+        class="fixed left-1 top-1/2 z-50 bg-neutral-100/75
+            -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
+        on:click|stopPropagation={goToPrev}><ChevronLeft /></button
+      >
+      <button
+        class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
+            -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
+        on:click|stopPropagation={goToNext}><ChevronRight /></button
+      >{/if}
+    <button
+      use:melt={$close}
+      aria-label="close"
+      class="fixed z-50 right-4 top-4 inline-flex p-1appearance-none
+                items-center justify-center rounded-full p-1 text-magnum-800 bg-magnum-100/70
+                hover:bg-magnum-100 focus:shadow-magnum-400"
+    >
+      <X />
+    </button>
+  </div>
+{/if}

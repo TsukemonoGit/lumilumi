@@ -181,9 +181,10 @@ export function parseText(input: string, tags: string[][]): Part[] {
 
           const urlType = checkFileExtension(urlPart);
           if (
-            urlType === "image" ||
-            urlType === "audio" ||
-            urlType === "movie"
+            urlType === "image"
+            //||
+            // urlType === "audio" ||
+            //  urlType === "movie"
           ) {
             parts.push({
               type: urlType,

@@ -7,6 +7,7 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
+  import { createDialog } from "@melt-ui/svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -15,22 +16,29 @@
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseText(text, tags);
 
+  //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   $: mediaList = parts.filter(
-    (part) =>
-      part.type === "image" || part.type === "movie" || part.type === "audio"
+    (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
   );
-  $: mediaURLList = mediaList.map((media) => media.content ?? "");
 
-  let showModal = false;
+  let showModal: {
+    update: (
+      updater: import("svelte/store").Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: import("svelte/store").Subscriber<boolean>,
+      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+    ): import("svelte/store").Unsubscriber;
+    get: () => boolean;
+  };
 
   let modalIndex = 0;
   const openModal = (index: number) => {
     modalIndex = index;
-    showModal = true;
-  };
-
-  const closeModal = () => {
-    showModal = false;
+    if (showModal) $showModal = true;
   };
 
   const nip19Decode = (
@@ -72,13 +80,11 @@
   let imgError: boolean = false;
 </script>
 
-{#if showModal}
-  <MediaDisplay
-    images={mediaURLList}
-    currentIndex={modalIndex}
-    onClose={closeModal}
-  />
-{/if}
+<MediaDisplay
+  bind:open={showModal}
+  images={mediaList}
+  bind:currentIndex={modalIndex}
+/>
 
 {#each parts as part}
   {#if part.type === "nip19"}
@@ -116,29 +122,38 @@
       >{/if}
   {:else if part.type === "movie"}
     {#if $showImg}
-      <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
-        ><video
-          controls
-          src={part.content}
-          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        >
-          <track default kind="captions" />
-        </video></button
-      >{:else}
+      <!-- <button
+        class="w-fit h-fit"
+        on:click|stopPropagation={() => openModal(part.number ?? 0)}
+      > -->
+      <video
+        controls
+        src={part.content}
+        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+      >
+        <track default kind="captions" />
+      </video>
+      <!-- </button> -->
+    {:else}
       <Link
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
-      <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
-        ><audio
-          controls
-          src={part.content}
-          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        >
-          <track default kind="captions" />
-        </audio></button
-      >{:else}
+      <!-- <button
+        class="w-fit h-fit"
+        on:click|stopPropagation={() => openModal(part.number ?? 0)}
+        > -->
+      <audio
+        controls
+        src={part.content}
+        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+      >
+        <track default kind="captions" />
+      </audio>
+      <!-- </button
+      > -->
+    {:else}
       <Link
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
