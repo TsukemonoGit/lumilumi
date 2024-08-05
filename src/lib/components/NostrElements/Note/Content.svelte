@@ -12,14 +12,14 @@
   export let tags: string[][];
   export let displayMenu: boolean;
   export let depth: number;
+  //プレビューにも使ってるからconstだとだめ
+  $: parts = parseText(text, tags);
 
-  const parts = parseText(text, tags);
-
-  const mediaList = parts.filter(
+  $: mediaList = parts.filter(
     (part) =>
       part.type === "image" || part.type === "movie" || part.type === "audio"
   );
-  const mediaURLList = mediaList.map((media) => media.content ?? "");
+  $: mediaURLList = mediaList.map((media) => media.content ?? "");
 
   let showModal = false;
 
