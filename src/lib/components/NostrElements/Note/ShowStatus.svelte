@@ -49,7 +49,6 @@
         </div>
         <div
           class="truncate line-clamp-2 max-w-full"
-          title={event.content}
           style="	white-space: pre-wrap; word-break: break-word;"
         >
           {event.content}
@@ -97,9 +96,9 @@
           />
         </div>
         <!-- <Music class=" min-w-[16px] h-[16px] w-[16px]" /> -->
+        <!--  title={event.content.trim() !== "" ? event.content.trim() : "link"}タイトルにフル文章入れようかと思ったけどリンクとごっちゃになるからやめよう-->
         <div
           class="truncate line-clamp-2 max-w-full"
-          title={event.content.trim() !== "" ? event.content.trim() : "link"}
           style="	white-space: pre-wrap; word-break: break-word;"
         >
           {event.content.trim() !== "" ? event.content.trim() : "link"}
