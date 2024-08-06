@@ -163,11 +163,9 @@
       <Menu />
 
       <Toast />
-      <div class="container grid grid-cols-[auto_1fr]">
-        <div class="sm:w-52 w-0">
-          <Sidebar />
-        </div>
-        <main class="mt-8">
+      <div class="container">
+        <!-- grid grid-cols-[auto_1fr]-->
+        <main class="sm:ml-52 ml-0 mt-8">
           <slot />
           {#if $nowProgress}
             <div class="fixed right-10 bottom-20">
@@ -175,6 +173,9 @@
             </div>
           {/if}
         </main>
+        <div class="fixed lift-0 top-0 sm:w-52 w-0">
+          <Sidebar />
+        </div>
       </div>
       <!-- <footer>
     <p>

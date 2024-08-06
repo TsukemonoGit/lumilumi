@@ -207,17 +207,17 @@
     updateViewEvent($data);
     $nowProgress = false;
     // console.log(viewIndex);
-    //スマホではスクロールちゃんとなってたからでかいときだけやる
-    if (window.innerWidth > 640) {
-      //px
-      const lastVisibleElement = document?.querySelector(".last-visible");
-      setTimeout(() => {
-        //データが更新終わるのを待ってからスライドしてみる
-        if (lastVisibleElement) {
-          lastVisibleElement.scrollIntoView({ block: "end" });
-        }
-      }, 10);
-    }
+    // //スマホではスクロールちゃんとなってたからでかいときだけやる
+    // if (window.innerWidth > 640) {
+    //   //px
+    //   const lastVisibleElement = document?.querySelector(".last-visible");
+    //   setTimeout(() => {
+    //     //データが更新終わるのを待ってからスライドしてみる
+    //     if (lastVisibleElement) {
+    //       lastVisibleElement.scrollIntoView({ block: "end" });
+    //     }
+    //   }, 10);
+    // }
   };
 
   const handlePrev = () => {
@@ -225,18 +225,18 @@
       viewIndex = Math.max(viewIndex - sift, 0);
     }
     updateViewEvent($data);
-    //スマホではスクロールちゃんとなってたからでかいときだけやる
-    if (window.innerWidth > 640) {
-      //px
+    // //スマホではスクロールちゃんとなってたからでかいときだけやる
+    // if (window.innerWidth > 640) {
+    //   //px
 
-      const firstVisibleElement = document?.querySelector(".first-visible");
-      setTimeout(() => {
-        //データが更新終わるのを待ってからスライドしてみる
-        if (firstVisibleElement) {
-          firstVisibleElement.scrollIntoView(true);
-        }
-      }, 10);
-    }
+    //   const firstVisibleElement = document?.querySelector(".first-visible");
+    //   setTimeout(() => {
+    //     //データが更新終わるのを待ってからスライドしてみる
+    //     if (firstVisibleElement) {
+    //       firstVisibleElement.scrollIntoView(true);
+    //     }
+    //   }, 10);
+    // }
   };
 
   function updateViewEvent(data: EventPacket[] | undefined) {
