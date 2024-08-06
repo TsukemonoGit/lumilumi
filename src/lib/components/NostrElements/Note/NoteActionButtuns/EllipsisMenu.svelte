@@ -24,6 +24,9 @@
   import { page } from "$app/stores";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
+  export let TriggerIcon = Ellipsis;
+  export let iconSize = 20;
+  export let iconClass = "";
   let dialogOpen: any;
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
@@ -155,7 +158,7 @@
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
-  <Ellipsis size="20" />
+  <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
 
 <!--JSON no Dialog-->

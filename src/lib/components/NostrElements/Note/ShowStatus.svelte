@@ -3,6 +3,7 @@
   import { Music, TrendingUp } from "lucide-svelte";
   import StatusGeneral from "./StatusGeneral.svelte";
   import StatusMusic from "./StatusMusic.svelte";
+  import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
 
   export let pubkey: string;
 </script>
@@ -16,7 +17,15 @@
     {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
     <div class="flex gap-1 items-center">
       {#if link !== ""}
-        <TrendingUp class="min-w-[16px] min-[16px] w-[16px]" /><a
+        <div class=" min-w-[16px] flex items-center justify-center">
+          <EllipsisMenu
+            TriggerIcon={TrendingUp}
+            note={event}
+            iconSize={16}
+            iconClass="text-zinc-500"
+          />
+        </div>
+        <a
           class="underline"
           target="_blank"
           rel="noopener noreferrer"
@@ -30,7 +39,14 @@
           </div></a
         >
       {:else if event.content.trim() !== ""}
-        <TrendingUp class=" min-w-[16px] h-[16px] w-[16px]" />
+        <div class=" min-w-[16px] flex items-center justify-center">
+          <EllipsisMenu
+            TriggerIcon={TrendingUp}
+            note={event}
+            iconSize={16}
+            iconClass="text-zinc-500"
+          />
+        </div>
         <div
           class="truncate line-clamp-2 max-w-full"
           title={event.content}
@@ -47,7 +63,17 @@
     <div slot="error">error</div> -->
     {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
     <div class="flex gap-1 items-center">
-      {#if link !== ""}<Music class=" min-w-[16px] min-[16px] w-[16px]" /><a
+      {#if link !== ""}<div
+          class=" min-w-[16px] flex items-center justify-center"
+        >
+          <EllipsisMenu
+            TriggerIcon={Music}
+            note={event}
+            iconSize={16}
+            iconClass="text-zinc-500"
+          />
+        </div>
+        <a
           class="underline"
           target="_blank"
           rel="noopener noreferrer"
@@ -60,8 +86,17 @@
             {event.content ?? "link"}
           </div></a
         >
-      {:else if event.content.trim() !== ""}
-        <Music class=" min-w-[16px] h-[16px] w-[16px]" />
+      {:else if event.content.trim() !== ""}<div
+          class=" min-w-[16px] flex items-center justify-center"
+        >
+          <EllipsisMenu
+            TriggerIcon={Music}
+            note={event}
+            iconSize={16}
+            iconClass="text-zinc-500 "
+          />
+        </div>
+        <!-- <Music class=" min-w-[16px] h-[16px] w-[16px]" /> -->
         <div
           class="truncate line-clamp-2 max-w-full"
           title={event.content.trim() !== "" ? event.content.trim() : "link"}
