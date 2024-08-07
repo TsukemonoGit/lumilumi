@@ -150,9 +150,13 @@
   {#each pwaAssetsHead.links as link}
     <link {...link} />
   {/each}
-  <link
+  <!-- <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/default-theme.css"
+  /> -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/makibishi-component@VERSION/dist/reset.css"
   />
   <script
     type="module"
