@@ -274,9 +274,9 @@
       </div>
       <div class="grid grid-cols-[1fr_auto] w-full gap-1 mb-1">
         <div>
-          <div class="text-lg font-bold text-magnum-400">
+          <h1 class="text-lg font-bold text-magnum-400">
             {title ?? "notitle"}
-          </div>
+          </h1>
           {#if description}
             <div class=" text-neutral-300/80">{description}</div>{/if}
         </div>
@@ -287,9 +287,10 @@
             class="max-w-16 object-contain max-h-16"
           />{/if}
       </div>
-
-      <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-      {#if displayMenu}<NoteActionButtons {note} />{/if}
+      <div class="rounded-md border border-magnum-400/50 mt-4 p-1">
+        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+        {#if displayMenu}<NoteActionButtons {note} />{/if}
+      </div>
     </div>
   </div>
 {/if}

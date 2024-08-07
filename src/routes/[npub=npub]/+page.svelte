@@ -171,7 +171,7 @@
                   </div> -->
 
               <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30"
               >
                 {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
                   <div
