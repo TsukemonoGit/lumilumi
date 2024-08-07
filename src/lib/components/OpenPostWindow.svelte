@@ -75,10 +75,14 @@
 
   $: if ($postWindowOpen) {
     console.log($additionalPostOptions);
+
     if ($additionalPostOptions) {
+      // タグをコピー//チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
+
       initOptions = {
         ...options,
-        tags: [...options.tags, ...$additionalPostOptions.tags], // タグをコピー
+        tags: [...options.tags, ...$additionalPostOptions.tags],
+
         content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
         addableUserList: $additionalPostOptions.addableUserList,
         defaultUsers: $additionalPostOptions.defaultUsers,

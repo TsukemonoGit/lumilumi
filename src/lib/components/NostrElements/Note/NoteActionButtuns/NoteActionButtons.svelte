@@ -250,6 +250,7 @@
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
     tags.push(["p", note.pubkey]);
+
     const root = note.tags.find(
       (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
     );
@@ -258,7 +259,10 @@
       tags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
     } else {
       if (root) {
-        tags.push(root);
+        if (note.kind !== 42) {
+          //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
+          tags.push(root);
+        }
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "reply"]);
       } else {
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "root"]);
