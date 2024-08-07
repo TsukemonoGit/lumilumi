@@ -42,6 +42,8 @@
   import ReactionWebsite from "./ReactionWebsite.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
+  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
+  import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -443,16 +445,16 @@
 
       <Kind9735Note {note} {depth} {excludefunc} />
     {:else}
-      <!--その他-->
+      <!-- その他
       {@const clientData = findClientTag(note)}
       {#if !clientData}
-        <!-------client tagがないやつここ-------->
+     client tagがないやつここ
         <div class="break-all overflow-x-hidden">
           kind:{note.kind}{#if metadata}
             {profile(metadata)?.name}
           {/if}
         </div>
-        <!--<hr />-->
+      
         <div
           class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
         >
@@ -461,7 +463,7 @@
           {/each}
         </div>
 
-        <!--<hr />-->
+       
         <div
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
@@ -470,9 +472,9 @@
         </div>
         {#if displayMenu}<NoteActionButtons {note} />{/if}
 
-        <!--   -->
+        
       {:else}
-        <!--client tag あったので 31990 を さがす とこたち　-->
+       client tag あったので 31990 を さがす とこたち
         <LatestEvent
           filters={[clientData.filter]}
           queryKey={["naddr", clientData.aTag]}
@@ -484,7 +486,7 @@
                 {profile(metadata)?.name}
               {/if}
             </div>
-            <!--<hr />-->
+          
             <div
               class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
             >
@@ -492,7 +494,7 @@
                 {JSON.stringify(tag)}
               {/each}
             </div>
-            <!--<hr />-->
+           
             <Content
               text={note.content}
               tags={note.tags}
@@ -507,7 +509,7 @@
                 {profile(metadata)?.name}
               {/if}
             </div>
-            <!--<hr />-->
+           
             <div
               class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
             >
@@ -515,7 +517,7 @@
                 {JSON.stringify(tag)}
               {/each}
             </div>
-            <!--<hr />-->
+          
             <Content
               text={note.content}
               tags={note.tags}
@@ -530,7 +532,7 @@
                 {profile(metadata)?.name}
               {/if}
             </div>
-            <!--<hr />-->
+           
             <div
               class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
             >
@@ -538,7 +540,7 @@
                 {JSON.stringify(tag)}
               {/each}
             </div>
-            <!--<hr />-->
+            
             <Content
               text={note.content}
               tags={note.tags}
@@ -547,7 +549,7 @@
             />
             {#if displayMenu}<NoteActionButtons {note} />{/if}
           </div>
-          <!--client tag からURLさがすとこ-->
+          client tag からURLさがすとこ
           {#await findWebURL(event.tags, clientData) then urls}
             <UserMenu
               pubkey={note.pubkey}
@@ -568,7 +570,7 @@
                       className="underline text-magnum-300 break-all "
                       href={url}>{url}</Link
                     >
-                    {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+                    {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから
                       <OgpCard {contents} {url} />
                     {:else}
                       <Link
@@ -585,13 +587,13 @@
               {/each}
               {#if displayMenu}<NoteActionButtons {note} />{/if}
             {:else}
-              <!--client tag から対応したURL見つからなかったところ？-->
+             client tag から対応したURL見つからなかったところ？
               <div class="break-all overflow-x-hidden">
                 kind:{note.kind}{#if metadata}
                   {profile(metadata)?.name}
                 {/if}
               </div>
-              <!--<hr />-->
+             
               <div
                 class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
               >
@@ -599,7 +601,7 @@
                   {JSON.stringify(tag)}
                 {/each}
               </div>
-              <!--<hr />-->
+             
               <Content
                 text={note.content}
                 tags={note.tags}
@@ -609,8 +611,53 @@
               {#if displayMenu}<NoteActionButtons {note} />{/if}
             {/if}
           {/await}
-        </LatestEvent>
-      {/if}
-    {/if}
+        </LatestEvent>-->
+      {@const title = note.tags.find(
+        (tag) => tag[0] === "title" && tag.length > 1
+      )?.[1]}
+      {@const description = note.tags.find(
+        (tag) =>
+          (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
+      )?.[1]}
+      {@const image = note.tags.find(
+        (tag) => tag[0] === "image" && tag.length > 1
+      )?.[1]}
+      <div class=" break-all overflow-x-hidden gap-4 p-1">
+        <div class="flex gap-1 w-fit">
+          {#if metadata}
+            <div>
+              <UserMenu
+                pubkey={note.pubkey}
+                bind:metadata
+                size={20}
+                {displayMenu}
+                {depth}
+              />
+            </div>
+            <div class="text-magnum-100 text-sm">
+              @{profile(metadata)?.name}
+            </div>
+            <div class="text-neutral-300/50 text-sm">kind:{note.kind}</div>
+          {/if}
+        </div>
+        <div class="grid grid-cols-[1fr_auto] w-full gap-1">
+          <div>
+            <div class="text-lg font-bold text-magnum-400">
+              {title ?? "notitle"}
+            </div>
+            {#if description}
+              <div class=" text-neutral-300/80">{description}</div>{/if}
+          </div>
+          {#if image && $showImg}
+            <img
+              src={image}
+              alt=""
+              class="max-w-16 object-contain max-h-16"
+            />{/if}
+        </div>
+
+        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+        {#if displayMenu}<NoteActionButtons {note} />{/if}
+      </div>{/if}
   </div>
 {/if}

@@ -5,29 +5,16 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import ListUsersCard from "$lib/components/NostrMainData/ListUsersCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
-  import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
+
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays, setTieKey } from "$lib/func/nostr";
-  import {
-    defaultRelays,
-    loginUser,
-    queryClient,
-    tieMapStore,
-  } from "$lib/stores/stores";
+  import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nip04 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    createRxForwardReq,
-    createTie,
-    now,
-    type EventPacket,
-  } from "rx-nostr";
+  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import { onMount } from "svelte";
 
   export let data: {
