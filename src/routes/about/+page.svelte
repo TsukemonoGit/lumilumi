@@ -65,11 +65,11 @@
     </li>
   </ul>
 
-  <div class="flex gap-2 mt-20 mb-4">
+  <div class="flex gap-2 mt-20 mb-4 flex-wrap justify-center">
     <makibishi-component url={$page.url.origin} hide-reaction-list={true}
     ></makibishi-component>
     <button
-      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-32 flex justify-center items-center hover:opacity-75 active:opacity-50"
+      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-32 flex justify-center items-center hover:opacity-75 active:opacity-50 h-[32px]"
       data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
       data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
       data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
@@ -79,7 +79,7 @@
 
     <button
       on:click={handleClickShare}
-      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-24 flex justify-center items-center hover:opacity-75 active:opacity-50"
+      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-24 flex justify-center items-center hover:opacity-75 active:opacity-50 h-[32px]"
       >share<Share size="20" /></button
     >
   </div>
