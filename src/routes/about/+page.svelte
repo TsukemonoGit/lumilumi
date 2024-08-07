@@ -2,6 +2,7 @@
   import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import { toastSettings } from "$lib/stores/stores";
+  import { Share } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
 
   const handleClickShare = async () => {
@@ -62,16 +63,26 @@
         </Link>
       </div>
     </li>
-    <li>
-      <div class="list">Share</div>
-      <div class="item">
-        <button
-          on:click={handleClickShare}
-          class="bg-magnum-500 rounded-md px-2 py-1">{$page.url.origin}</button
-        >
-      </div>
-    </li>
   </ul>
+
+  <div class="flex gap-2 mt-20 mb-4">
+    <makibishi-component url={$page.url.origin} hide-reaction-list={true}
+    ></makibishi-component>
+    <button
+      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-32 flex justify-center items-center hover:opacity-75 active:opacity-50"
+      data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
+      data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
+      data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
+    >
+      Zap⚡️@mono
+    </button>
+
+    <button
+      on:click={handleClickShare}
+      class="text-magnum-300 gap-1 border border-magnum-600 bg-magnum-900/20 rounded-lg w-24 flex justify-center items-center hover:opacity-75 active:opacity-50"
+      >share<Share size="20" /></button
+    >
+  </div>
 </section>
 
 <style lang="postcss">

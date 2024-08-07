@@ -150,6 +150,18 @@
   {#each pwaAssetsHead.links as link}
     <link {...link} />
   {/each}
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/default-theme.css"
+  />
+  <script
+    type="module"
+    src="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/makibishi-component.js"
+  ></script>
+  <script
+    type="module"
+    src="https://cdn.jsdelivr.net/npm/nostr-zap@1.0.1"
+  ></script>
 </svelte:head>
 
 <QueryClientProvider client={$queryClient}>
