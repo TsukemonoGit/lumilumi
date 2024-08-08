@@ -28,7 +28,6 @@
       goto("/settings");
     }
   });
-  let linkButton: HTMLButtonElement;
 </script>
 
 <svelte:head>
