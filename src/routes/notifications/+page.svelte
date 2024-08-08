@@ -91,29 +91,31 @@
           class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
         >
           {#if events && events.length > 0}
-            {#each events as event, index (event.id)}<div
+            {#each events as event, index (event.id)}
+              <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                 events.length - 1
                   ? 'last-visible'
                   : ''} {index === 0 ? 'first-visible' : ''}"
+              > -->
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
               >
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading">
-                    <EventCard note={event} status="loading" />
-                  </div>
-                  <div slot="nodata">
-                    <EventCard note={event} status="nodata" />
-                  </div>
-                  <div slot="error">
-                    <EventCard note={event} status="error" />
-                  </div>
-                  <EventCard {metadata} note={event} /></Metadata
-                >
-              </div>{/each}{/if}
+                <div slot="loading">
+                  <EventCard note={event} status="loading" />
+                </div>
+                <div slot="nodata">
+                  <EventCard note={event} status="nodata" />
+                </div>
+                <div slot="error">
+                  <EventCard note={event} status="error" />
+                </div>
+                <EventCard {metadata} note={event} /></Metadata
+              >
+              <!-- </div> -->
+            {/each}{/if}
         </div>
       </TimelineList>{/if}
   </div>

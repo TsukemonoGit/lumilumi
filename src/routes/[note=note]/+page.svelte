@@ -46,64 +46,68 @@
 
 <section class="mb-20">
   <SetRepoReactions />
-  <div class="w-full break-words overflow-hidden">
-    <div>
-      <Note
-        id={data.id}
-        maxHeight={"none"}
-        displayMenu={true}
-        thread={true}
-        depth={0}
-      />
-    </div>
-    <AllReactions
-      queryKey={["allreactions", data.id]}
+  <div
+    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+  >
+    <Note
       id={data.id}
-      let:kind1
-      let:kind6
-      let:kind7
-      let:kind9735
-    >
-      <div slot="loading">loading</div>
-      <div slot="nodata">nodata</div>
-      <div slot="error">error</div>
-
-      <!--kind6-->
-      <NoteRepostList events={kind6} />
-
-      <!--kind7-->
-      <NoteReactionList events={kind7} />
-
-      <!--zap レシート-->
-      <ZapReactionList events={kind9735} />
-
-      <!--kind1-->
-      <CollapsibleList title="Kind1" amount={kind1.length}>
-        {#each kind1 as event (event.id)}
-          <div
-            class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
-          >
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-              let:metadata
-            >
-              <div slot="loading">
-                <EventCard note={event} status="loading" depth={0} />
-              </div>
-              <div slot="nodata">
-                <EventCard note={event} status="nodata" depth={0} />
-              </div>
-              <div slot="error">
-                <EventCard note={event} status="error" depth={0} />
-              </div>
-              <EventCard {metadata} note={event} depth={0} />
-            </Metadata>
-          </div>
-        {/each}
-      </CollapsibleList>
-    </AllReactions>
+      maxHeight={"none"}
+      displayMenu={true}
+      thread={true}
+      depth={0}
+    />
   </div>
+  <AllReactions
+    queryKey={["allreactions", data.id]}
+    id={data.id}
+    let:kind1
+    let:kind6
+    let:kind7
+    let:kind9735
+  >
+    <div slot="loading">loading</div>
+    <div slot="nodata">nodata</div>
+    <div slot="error">error</div>
+
+    <!--kind6-->
+    <NoteRepostList events={kind6} />
+
+    <!--kind7-->
+    <NoteReactionList events={kind7} />
+
+    <!--zap レシート-->
+    <ZapReactionList events={kind9735} />
+
+    <!--kind1-->
+    <CollapsibleList title="Kind1" amount={kind1.length}>
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+      >
+        {#each kind1 as event (event.id)}
+          <!-- <div
+            class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
+          > -->
+          <Metadata
+            queryKey={["metadata", event.pubkey]}
+            pubkey={event.pubkey}
+            let:metadata
+          >
+            <div slot="loading">
+              <EventCard note={event} status="loading" depth={0} />
+            </div>
+            <div slot="nodata">
+              <EventCard note={event} status="nodata" depth={0} />
+            </div>
+            <div slot="error">
+              <EventCard note={event} status="error" depth={0} />
+            </div>
+            <EventCard {metadata} note={event} depth={0} />
+          </Metadata>
+          <!-- </div> -->
+        {/each}
+      </div>
+    </CollapsibleList>
+  </AllReactions>
 </section>
 <div class="postWindow">
   <OpenPostWindow

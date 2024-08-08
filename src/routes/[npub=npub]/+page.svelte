@@ -217,45 +217,45 @@
                 >
                   {#if events && events.length > 0}
                     {#each events.filter( (event) => [1, 6, 16].includes(event.kind) ) as event, index (event.id)}
-                      <div
+                      <!-- <div
                         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                         events.length - 1
                           ? 'last-visible'
                           : ''} {index === 0 ? 'first-visible' : ''}"
+                      > -->
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                        let:metadata
                       >
-                        <Metadata
-                          queryKey={["metadata", event.pubkey]}
-                          pubkey={event.pubkey}
-                          let:metadata
-                        >
-                          <div slot="loading">
-                            <EventCard
-                              note={event}
-                              status="loading"
-                              excludefunc={excludeKind1}
-                            />
-                          </div>
-                          <div slot="nodata">
-                            <EventCard
-                              note={event}
-                              status="nodata"
-                              excludefunc={excludeKind1}
-                            />
-                          </div>
-                          <div slot="error">
-                            <EventCard
-                              note={event}
-                              status="error"
-                              excludefunc={excludeKind1}
-                            />
-                          </div>
+                        <div slot="loading">
                           <EventCard
-                            {metadata}
                             note={event}
+                            status="loading"
                             excludefunc={excludeKind1}
                           />
-                        </Metadata>
-                      </div>
+                        </div>
+                        <div slot="nodata">
+                          <EventCard
+                            note={event}
+                            status="nodata"
+                            excludefunc={excludeKind1}
+                          />
+                        </div>
+                        <div slot="error">
+                          <EventCard
+                            note={event}
+                            status="error"
+                            excludefunc={excludeKind1}
+                          />
+                        </div>
+                        <EventCard
+                          {metadata}
+                          note={event}
+                          excludefunc={excludeKind1}
+                        />
+                      </Metadata>
+                      <!-- </div> -->
                     {/each}
                   {/if}
                 </div>
@@ -295,45 +295,45 @@
               >
                 {#if events && events.length > 0}
                   {#each events as event, index (event.id)}
-                    <div
+                    <!-- <div
                       class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                       events.length - 1
                         ? 'last-visible'
                         : ''} {index === 0 ? 'first-visible' : ''}"
+                    > -->
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
                     >
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard
-                            note={event}
-                            status="loading"
-                            excludefunc={excludeKind7}
-                          />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard
-                            note={event}
-                            status="nodata"
-                            excludefunc={excludeKind7}
-                          />
-                        </div>
-                        <div slot="error">
-                          <EventCard
-                            note={event}
-                            status="error"
-                            excludefunc={excludeKind7}
-                          />
-                        </div>
+                      <div slot="loading">
                         <EventCard
-                          {metadata}
                           note={event}
+                          status="loading"
                           excludefunc={excludeKind7}
                         />
-                      </Metadata>
-                    </div>
+                      </div>
+                      <div slot="nodata">
+                        <EventCard
+                          note={event}
+                          status="nodata"
+                          excludefunc={excludeKind7}
+                        />
+                      </div>
+                      <div slot="error">
+                        <EventCard
+                          note={event}
+                          status="error"
+                          excludefunc={excludeKind7}
+                        />
+                      </div>
+                      <EventCard
+                        {metadata}
+                        note={event}
+                        excludefunc={excludeKind7}
+                      />
+                    </Metadata>
+                    <!-- </div> -->
                   {/each}
                 {/if}
               </div>

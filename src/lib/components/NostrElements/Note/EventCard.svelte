@@ -259,9 +259,9 @@
 {/if}
 {#if muteType === "null" || viewMuteEvent}
   {#if thread && replyID}
-    <div class="border-b border-magnum-600/30">
-      <ReplyThread {replyID} {displayMenu} {depth} />
-    </div>
+    <!-- <div class="border-b border-magnum-600/30"> -->
+    <ReplyThread {replyID} {displayMenu} {depth} />
+    <!-- </div> -->
   {/if}
 
   <article class="{noteClass()} ">
