@@ -5,7 +5,7 @@
 
   import { nip19 } from "nostr-tools";
 
-  import { formatAbsoluteDate, profile } from "$lib/func/util";
+  import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
   import { onDestroy } from "svelte";
 
@@ -96,7 +96,9 @@
           on:click={handleClickToNotepage}
           class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
-          {formatAbsoluteDate(note.created_at)}
+          <time datetime={datetime(note.created_at)}
+            >{formatAbsoluteDate(note.created_at)}</time
+          >
         </button>
       {/if}
     </div>

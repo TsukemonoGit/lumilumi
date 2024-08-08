@@ -374,9 +374,9 @@
   };
 </script>
 
-<div class=" flex flex-col gap-3">
-  <div class="text-sm break-all">
-    <div>[pubkey]</div>
+<form class=" flex flex-col gap-3">
+  <fieldset class="text-sm break-all">
+    <legend>[pubkey]</legend>
     <!-- {nip19.npubEncode($pubkey)} -->
 
     <div class="ml-2">
@@ -392,10 +392,10 @@
         bind:value={inputPubkey}
       />
     </div>
-  </div>
+  </fieldset>
   <!-- ラジオボタン -->
-  <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">Relay</div>
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">Relay</legend>
     <div
       use:melt={$radioGrouproot}
       class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
@@ -497,10 +497,10 @@
         </div>
       </div>
       <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
-  </div>
+  </fieldset>
   <!--投稿の設定-->
-  <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">Default Reaction</div>
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">Default Reaction</legend>
     <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
       <CustomReaction
         note={undefined}
@@ -520,10 +520,10 @@
         {settings.defaultReaction.content}
       {/if}
     </div>
-  </div>
+  </fieldset>
   <!--- 表示設定 --->
-  <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">Display</div>
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">Display</legend>
     <div class="flex flex-col gap-2">
       <label>
         <input
@@ -582,12 +582,12 @@
         {$_("settings.display.banner")}
       </label>
     </div>
-  </div>
+  </fieldset>
   <!--- Douki --->
-  <div class="border border-magnum-500 rounded-md p-2">
-    <div class=" text-magnum-200 font-bold text-lg">
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class=" text-magnum-200 font-bold text-lg">
       {$_("settings.douki.title")}
-    </div>
+    </legend>
     <!--mute-->
     <div class="mt-2">
       <UpdateMuteList
@@ -659,7 +659,7 @@
         >{$_("settings.nostviewstr.kind10030")}
       </a>
     {/if}
-  </div>
+  </fieldset>
   <!-- NWC 設定 -->
   <!-- <div class="border border-magnum-500 rounded-md p-2">
     <div class="text-magnum-200 font-bold text-lg">NWC</div>
@@ -672,11 +672,11 @@
     />
   </div> -->
   <!-- Theme 設定 -->
-  <div class="border border-magnum-500 rounded-md p-2">
-    <div class="text-magnum-200 font-bold text-lg">theme</div>
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">theme</legend>
     <ThemeSwitch />
-  </div>
-</div>
+  </fieldset>
+</form>
 
 <div class=" fixed sm:bottom-5 bottom-16 right-5 z-1">
   <div

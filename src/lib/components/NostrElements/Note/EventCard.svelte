@@ -264,7 +264,7 @@
     </div>
   {/if}
 
-  <div class="{noteClass()} ">
+  <article class="{noteClass()} ">
     {#if note.kind === 1}
       <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
@@ -659,5 +659,5 @@
         <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
         {#if displayMenu}<NoteActionButtons {note} />{/if}
       </div>{/if}
-  </div>
+  </article>
 {/if}

@@ -113,6 +113,12 @@ export function formatAbsoluteDate(
   return date.toLocaleString([], options);
 }
 
+export function datetime(unixtime: number) {
+  const time = new Date(unixtime * 1000);
+
+  return time.toISOString();
+}
+
 export async function filesUpload(
   files: FileList,
   uploader: string

@@ -253,7 +253,7 @@
     </div>
   {/if}
 
-  <div class="{noteClass()} w-full">
+  <article class="{noteClass()} w-full">
     <div class=" break-all overflow-x-hidden gap-4 p-1">
       <div class="flex gap-1 w-fit">
         {#if metadata}
@@ -274,9 +274,9 @@
       </div>
       <div class="grid grid-cols-[1fr_auto] w-full gap-1 mb-1">
         <div>
-          <h1 class="text-lg font-bold text-magnum-400">
+          <h2 class="text-lg font-bold text-magnum-400">
             {title ?? "notitle"}
-          </h1>
+          </h2>
           {#if description}
             <div class=" text-neutral-300/80">{description}</div>{/if}
         </div>
@@ -292,5 +292,5 @@
         {#if displayMenu}<NoteActionButtons {note} />{/if}
       </div>
     </div>
-  </div>
+  </article>
 {/if}

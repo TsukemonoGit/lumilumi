@@ -17,7 +17,11 @@
 
   import * as Nostr from "nostr-typedef";
   import { writable } from "svelte/store";
-  import { formatAbsoluteDate, generateResultMessage } from "$lib/func/util";
+  import {
+    datetime,
+    formatAbsoluteDate,
+    generateResultMessage,
+  } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
@@ -204,8 +208,10 @@
       >
         <ul class="leading-4">
           <li>
-            Created at <span class="font-semibold text-zinc-200"
-              >{formatAbsoluteDate($beforeKind3?.created_at, true)}</span
+            Created at <time
+              class="font-semibold text-magnum-300"
+              datetime={datetime($beforeKind3?.created_at)}
+              >{formatAbsoluteDate($beforeKind3?.created_at, true)}</time
             >
           </li>
           <li>
