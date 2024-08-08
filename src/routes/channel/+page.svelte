@@ -38,7 +38,7 @@
 </svelte:head>
 {#if $loginUser}
   <section class="container">
-    <div class="flex flex-col gap-2 max-w-full overflow-x-hidden">
+    <div class="flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
       <ChannelMain
         queryKey={["kind10005", $loginUser]}
         pubkey={$loginUser}

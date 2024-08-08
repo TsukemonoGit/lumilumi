@@ -47,7 +47,7 @@
 <section class="mb-20">
   <SetRepoReactions />
   <div
-    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
   >
     <Note
       id={data.id}
@@ -81,7 +81,7 @@
     <!--kind1-->
     <CollapsibleList title="Kind1" amount={kind1.length}>
       <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
         {#each kind1 as event (event.id)}
           <!-- <div

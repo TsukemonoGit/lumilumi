@@ -121,7 +121,7 @@
           </div>
 
           <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30"
+            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
           >
             {#if events && events.length > 0}
               {#each events as event, index (event.id)}
