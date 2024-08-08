@@ -150,80 +150,80 @@
     return tags.find((item) => item[0] === "proxy");
   };
 
-  const findClientTag = (
-    note: Nostr.Event
-  ):
-    | {
-        name: string;
-        aTag: string;
-        filter: Nostr.Filter;
-        naddr: string | undefined;
-      }
-    | undefined => {
-    const clientTag = note.tags.find((item) => item[0] === "client");
-    if (!clientTag) {
-      return undefined;
-    }
-    const matches = clientTag[2]?.match(nip33Regex);
-    if (!matches) {
-      return undefined;
-    }
-    const filter: Nostr.Filter = {
-      kinds: [Number(matches[1])],
-      authors: [matches[2]],
-      "#d": [matches[3]],
-      limit: 1,
-    };
+  // const findClientTag = (
+  //   note: Nostr.Event
+  // ):
+  //   | {
+  //       name: string;
+  //       aTag: string;
+  //       filter: Nostr.Filter;
+  //       naddr: string | undefined;
+  //     }
+  //   | undefined => {
+  //   const clientTag = note.tags.find((item) => item[0] === "client");
+  //   if (!clientTag) {
+  //     return undefined;
+  //   }
+  //   const matches = clientTag[2]?.match(nip33Regex);
+  //   if (!matches) {
+  //     return undefined;
+  //   }
+  //   const filter: Nostr.Filter = {
+  //     kinds: [Number(matches[1])],
+  //     authors: [matches[2]],
+  //     "#d": [matches[3]],
+  //     limit: 1,
+  //   };
 
-    const dtag = note.tags.find((tag) => tag[0] === "d");
-    const naddrAddress: nip19.AddressPointer = {
-      identifier: dtag?.[1] ?? "",
-      kind: note.kind,
-      pubkey: note.pubkey,
-      relays: getRelaysById(note.id),
-    };
-    try {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: nip19.naddrEncode(naddrAddress),
-      };
-    } catch (error) {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: undefined,
-      };
-    }
-  };
+  //   const dtag = note.tags.find((tag) => tag[0] === "d");
+  //   const naddrAddress: nip19.AddressPointer = {
+  //     identifier: dtag?.[1] ?? "",
+  //     kind: note.kind,
+  //     pubkey: note.pubkey,
+  //     relays: getRelaysById(note.id),
+  //   };
+  //   try {
+  //     return {
+  //       name: clientTag[1],
+  //       aTag: clientTag[2],
+  //       filter: filter,
+  //       naddr: nip19.naddrEncode(naddrAddress),
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       name: clientTag[1],
+  //       aTag: clientTag[2],
+  //       filter: filter,
+  //       naddr: undefined,
+  //     };
+  //   }
+  // };
 
-  const findWebURL = (
-    tags: string[][],
-    clientData: {
-      name: string;
-      aTag: string;
-      filter: Nostr.Filter;
-      naddr: string | undefined;
-    }
-  ): string[] => {
-    if (!clientData.naddr) return [];
-    const webTag = tags.reduce((acc, [tag, url, nip19]) => {
-      if (tag === "web" && nip19 === "naddr") {
-        return [...acc, url];
-      } else {
-        return acc;
-      }
-    }, []);
+  // const findWebURL = (
+  //   tags: string[][],
+  //   clientData: {
+  //     name: string;
+  //     aTag: string;
+  //     filter: Nostr.Filter;
+  //     naddr: string | undefined;
+  //   }
+  // ): string[] => {
+  //   if (!clientData.naddr) return [];
+  //   const webTag = tags.reduce((acc, [tag, url, nip19]) => {
+  //     if (tag === "web" && nip19 === "naddr") {
+  //       return [...acc, url];
+  //     } else {
+  //       return acc;
+  //     }
+  //   }, []);
 
-    if (webTag.length == 0) {
-      return [];
-    }
-    return webTag.map((item) => {
-      return item.replace(bech32Pattern, clientData.naddr ?? "");
-    });
-  };
+  //   if (webTag.length == 0) {
+  //     return [];
+  //   }
+  //   return webTag.map((item) => {
+  //     return item.replace(bech32Pattern, clientData.naddr ?? "");
+  //   });
+  // };
   $: proxy = checkProxy(note.tags);
   $: warning = checkContentWarning(note.tags);
   // const { kind, tag } = repostedId(note.tags);
