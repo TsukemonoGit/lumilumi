@@ -77,6 +77,7 @@
     }
   };
   let imgError: boolean = false;
+  let imgLoad: boolean = false;
 </script>
 
 <MediaDisplay
@@ -87,37 +88,37 @@
 
 {#each parts as part}
   {#if part.type === "nip19"}
-    {#await nip19Decode(part.url) then decoded}
-      {#if decoded}
-        <DecodedContent
-          {decoded}
-          content={part.content}
-          {displayMenu}
-          depth={depth + 1}
-        />
-      {:else}
-        {part.content}
-      {/if}
-    {/await}
+    {@const decoded = nip19Decode(part.url)}
+    {#if decoded}
+      <DecodedContent
+        {decoded}
+        content={part.content}
+        {displayMenu}
+        depth={depth + 1}
+      />
+    {:else}
+      {part.content}
+    {/if}
   {:else if part.type === "image" && part.content}
-    {#if $showImg}
-      {#if !imgError}<button
-          class="w-fit h-fit"
-          on:click={() => openModal(part.number ?? 0)}
+    {#if $showImg && !imgError}
+      <div>
+        <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
           ><img
             loading="lazy"
             alt="img"
             src={part.content}
-            class=" max-w-[min(20rem,100%)] max-h-full object-contain"
+            class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
+            on:load={() => (imgLoad = true)}
             on:error={() => (imgError = true)}
           /></button
-        >{:else}<Link
-          className="underline text-magnum-300 break-all "
-          href={part.content}>{part.content}</Link
-        >{/if}
-    {:else}
-      <Link className="underline text-magnum-300 break-all " href={part.content}
-        >{part.content}</Link
+        >{#if !imgLoad}<Link
+            className="underline text-magnum-300 break-all "
+            href={part.content}>{part.content}</Link
+          >
+        {/if}
+      </div>{:else}<Link
+        className="underline text-magnum-300 break-all "
+        href={part.content}>{part.content}</Link
       >{/if}
   {:else if part.type === "movie"}
     {#if $showImg}
@@ -180,14 +181,17 @@
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
-    {#if $showImg}
+    {#if $showImg && !imgError}
       <img
         loading="lazy"
         alt={`:${part.content}:`}
         src={part.url}
         title={`:${part.content}:`}
         class="inline h-[24px] object-contain m-0 overflow-hidden"
+        on:load={() => (imgLoad = true)}
+        on:error={() => (imgError = true)}
       />
+      {#if !imgLoad}:{part.content}:{/if}
     {:else}
       :{part.content}:
     {/if}

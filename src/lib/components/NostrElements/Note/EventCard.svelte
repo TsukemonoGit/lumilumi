@@ -52,7 +52,7 @@
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
-  export let maxHeight: string = "16rem";
+  export let maxHeight: string = "24rem";
   export let thread: boolean = false;
   export let depth: number = 0;
   export let viewMuteEvent = false;

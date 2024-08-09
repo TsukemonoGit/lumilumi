@@ -6,7 +6,7 @@
   import Text from "$lib/components/NostrMainData/Text.svelte";
   export let id: string;
   export let mini: boolean = false;
-  export let maxHeight: string = "16rem";
+  export let maxHeight: string = "24rem";
   export let displayMenu: boolean;
   export let thread: boolean = false;
   export let depth: number;
