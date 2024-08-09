@@ -19,6 +19,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { sortEvents } from "nostr-tools";
 
   export let data: {
     id: string;
@@ -83,7 +84,7 @@
       <div
         class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
-        {#each kind1 as event (event.id)}
+        {#each sortEvents(kind1).reverse() as event (event.id)}
           <!-- <div
             class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
           > -->

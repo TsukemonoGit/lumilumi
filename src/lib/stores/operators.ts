@@ -16,6 +16,7 @@ import {
 } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
+import { sortEventPackets } from "$lib/func/util";
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
@@ -79,9 +80,7 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
 
     // 新しい順にソート
     const sorted =
-      a.event.kind !== 30315
-        ? [...acc, a]
-        : [...acc].sort((a, b) => b.event.created_at - a.event.created_at);
+      a.event.kind !== 30315 ? sortEventPackets([...acc, a]) : [...acc]; //.sort((a, b) => b.event.created_at - a.event.created_at);
 
     return sorted;
   }, []);

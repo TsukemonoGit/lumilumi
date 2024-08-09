@@ -75,7 +75,7 @@
         let:events
         {viewIndex}
         {amount}
-        eventFilter={(eventpacket) => eventpacket.event.pubkey !== $loginUser}
+        eventFilter={(event) => event.pubkey !== $loginUser}
         {tieKey}
         lastfavcheck={false}
       >

@@ -3,7 +3,7 @@ import * as Nostr from "nostr-typedef";
 import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
 import { getToken } from "nostr-tools/nip98";
 import { uploadFile } from "./upload";
-import { Nip11Registry } from "rx-nostr";
+import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
@@ -237,3 +237,12 @@ export const initSettings: LumiSetting = {
 };
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");
+
+export function sortEventPackets<A extends EventPacket>(events: A[]): A[] {
+  return events.sort((a: A, b: A): number => {
+    if (a.event.created_at !== b.event.created_at) {
+      return b.event.created_at - a.event.created_at;
+    }
+    return a.event.id.localeCompare(b.event.id);
+  });
+}

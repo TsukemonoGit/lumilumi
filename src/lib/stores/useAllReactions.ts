@@ -6,21 +6,18 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
 import type {
-  AcceptableDefaultRelaysConfig,
   EventPacket,
-  RxNostr,
   RxReq,
   RxReqEmittable,
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { createUniq, verify } from "rx-nostr";
+import { createUniq } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";
 import { useReq } from "$lib/func/nostr.js";
-import type { RxReqBase, ReqResult } from "$lib/types.js";
-import type { Filter } from "nostr-typedef";
+import type { ReqResult } from "$lib/types.js";
 
 export function useAllReactions(
   queryKey: QueryKey,

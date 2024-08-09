@@ -30,6 +30,7 @@
   } from "$lib/components/NostrMainData/timelineList";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { readable } from "svelte/store";
+  import { sortEvents } from "nostr-tools";
 
   const sift = 40; //スライドする量
 
@@ -47,7 +48,7 @@
     | undefined = undefined;
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量
-  export let eventFilter: (event: EventPacket) => boolean = () => true; // デフォルトフィルタ
+  export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
   // export let tie: OperatorFunction<
   //   EventPacket,
@@ -58,7 +59,7 @@
   // >;
 
   // export let lastVisible: Element | null;
-  let allUniqueEvents: EventPacket[];
+  let allUniqueEvents: Nostr.Event[];
 
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
@@ -256,16 +257,20 @@
     console.log("test");
     const allEvents =
       data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
-    const uniqueEvents = Array.from(
-      new Map(allEvents.map((event) => [event.event.id, event])).values()
-    ).sort((a, b) => b.event.created_at - a.event.created_at);
+    const uniqueEvents = sortEvents(
+      Array.from(
+        new Map(
+          allEvents.map((event) => [event.event.id, event.event])
+        ).values()
+      )
+    );
 
     allUniqueEvents = uniqueEvents;
 
     slicedEvent.update((value) =>
       uniqueEvents
         .filter(eventFilter)
-        .map(({ event }) => event)
+
         .slice(viewIndex, viewIndex + amount)
     );
 

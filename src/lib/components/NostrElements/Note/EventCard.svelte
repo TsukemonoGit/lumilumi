@@ -655,8 +655,12 @@
               class="max-w-16 object-contain max-h-16"
             />{/if}
         </div>
-
-        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+        <div
+          class="mt-0.5 overflow-y-auto overflow-x-hidden"
+          style="max-height:{maxHeight ?? 'none'}"
+        >
+          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+        </div>
         {#if displayMenu}<NoteActionButtons {note} />{/if}
       </div>{/if}
   </article>
