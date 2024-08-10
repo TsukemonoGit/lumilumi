@@ -184,6 +184,7 @@
   {:else if part.type === "emoji"}
     {#if $showImg && !imgError}
       <img
+        height="24"
         loading="lazy"
         alt={`:${part.content}:`}
         src={part.url}

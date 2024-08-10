@@ -118,15 +118,13 @@
         aria-current={$page.url.pathname === `/about` ? "page" : undefined}
       >
         <a href={`/about`}>
-          <img src={logo} alt="logo" width={40} /><span class="ml-2">about</span
+          <img src={logo} alt="logo" width={40} height={40} /><span class="ml-2"
+            >about</span
           >
         </a>
       </li>
     </ul>
   </nav>
-  <!-- <div class="title mt-auto">
-    <img src={logo} alt="logo" width={40} /><span class="ml-2">Lumilumi</span>
-  </div> -->
 </div>
 <EditUserStatus bind:trigger />
 
