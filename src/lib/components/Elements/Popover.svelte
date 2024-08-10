@@ -4,6 +4,7 @@
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
   export let open = false;
+  export let ariaLabel: string;
 
   const {
     elements: { trigger, content, arrow, close },
@@ -16,7 +17,11 @@
   $: sync.open(open, (v) => (open = v));
 </script>
 
-<button class="hover:opacity-75 active:opacity-50" use:melt={$trigger}>
+<button
+  class="hover:opacity-75 active:opacity-50"
+  aria-label={ariaLabel}
+  use:melt={$trigger}
+>
   <slot></slot>
 </button>
 {#if open}

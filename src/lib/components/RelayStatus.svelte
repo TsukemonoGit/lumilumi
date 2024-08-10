@@ -126,7 +126,7 @@
   };
 </script>
 
-<Popover bind:open>
+<Popover bind:open ariaLabel={"relays status"}>
   <RadioTower size="20" class={overallStateColor} />
 
   <div slot="popoverContent" class="max-h-80 overflow-x-auto max-w-80">
@@ -136,7 +136,7 @@
         {#each readRelays as relay, index}
           {@const relayUrl = cleanRelayUrl(relay.url)}
           <li class="flex align-middle items-center break-all">
-            <Popover>
+            <Popover ariaLabel={`${relay.url} status`}>
               <Circle
                 size="20"
                 class="{getColor(
@@ -161,7 +161,7 @@
         {#each writeRelays as relay, index}
           {@const relayUrl = cleanRelayUrl(relay.url)}
           <li class="flex align-middle items-center break-all">
-            <Popover>
+            <Popover ariaLabel={`${relay.url} status`}>
               <Circle
                 size="20"
                 class="{getColor(

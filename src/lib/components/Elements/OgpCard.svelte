@@ -25,6 +25,8 @@
       <figure class=" overflow-hidden flex items-center justify-center">
         <img
           loading="lazy"
+          height="128"
+          width="128"
           class="object-contain max-h-[8rem] max-w-full overflow-hidden"
           src={contents.image}
           alt=""
@@ -43,6 +45,8 @@
         </p>
         <div class="flex flex-row-reverse">
           <img
+            width="20"
+            height="20"
             loading="lazy"
             class="object-contain w-5 pl-0.5 pr-0.5"
             src={contents.favicon}

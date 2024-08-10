@@ -530,6 +530,7 @@
                 />
               {/if}
               <button
+                aria-label="open custom emoji list"
                 on:click={() => {
                   viewCustomEmojis = !viewCustomEmojis;
                 }}
@@ -546,6 +547,7 @@
             {/if}
 
             <button
+              aria-label="post note"
               class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50"
               on:click={postNote}
@@ -564,6 +566,7 @@
                   .toLowerCase()
                   .includes(customReaction.toLowerCase())}
                 <button
+                  aria-label={`Select emoji ${e[0]}`}
                   on:click={() => handleClickEmoji(e)}
                   class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                 >

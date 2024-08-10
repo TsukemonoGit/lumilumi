@@ -91,5 +91,10 @@
   },
   "list": {
     "settingswarning": "To view the list page, you need to set up a pubkey"
+  },
+  "alia": {
+    "label": {
+      "image": "Enlarge image"
+    }
   }
 }

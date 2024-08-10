@@ -296,6 +296,7 @@
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734}
     <!--リプライ-->
     <button
+      aria-label="reply"
       on:click={() => {
         onClickReplyIcon();
       }}
@@ -325,21 +326,29 @@
   {#if note.kind !== 9734}
     <!--リアクション-->
     <Reactioned id={note.id} let:event>
-      <button slot="loading" on:click={handleClickReaction}>
+      <button
+        aria-label="reaction"
+        slot="loading"
+        on:click={handleClickReaction}
+      >
         <Heart
           size="20"
           class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
         />
       </button>
 
-      <button slot="nodata" on:click={handleClickReaction}>
+      <button
+        aria-label="reaction"
+        slot="nodata"
+        on:click={handleClickReaction}
+      >
         <Heart
           size="20"
           class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
         />
       </button>
 
-      <button slot="error" on:click={handleClickReaction}>
+      <button aria-label="reaction" slot="error" on:click={handleClickReaction}>
         <Heart
           size="20"
           class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
@@ -347,7 +356,7 @@
       </button>
 
       {#if event === undefined}
-        <button on:click={handleClickReaction}>
+        <button aria-label="reaction" on:click={handleClickReaction}>
           <Heart
             size="20"
             class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
@@ -373,21 +382,21 @@
       {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
 
         <Zapped id={note.id} let:event>
-          <button slot="loading" on:click={handleClickZap}>
+          <button slot="loading" on:click={handleClickZap} aria-label="zap">
             <Zap
               size="20"
               class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
             />
           </button>
 
-          <button slot="nodata" on:click={handleClickZap}>
+          <button aria-label="zap" slot="nodata" on:click={handleClickZap}>
             <Zap
               size="20"
               class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
             />
           </button>
 
-          <button slot="error" on:click={handleClickZap}>
+          <button aria-label="zap" slot="error" on:click={handleClickZap}>
             <Zap
               size="20"
               class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
@@ -395,7 +404,7 @@
           </button>
 
           {#if event === undefined}
-            <button on:click={handleClickZap}>
+            <button aria-label="zap" on:click={handleClickZap}>
               <Zap
                 size="20"
                 class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"

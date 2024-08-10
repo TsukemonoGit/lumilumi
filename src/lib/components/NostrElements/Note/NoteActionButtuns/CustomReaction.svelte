@@ -86,7 +86,7 @@
   }
 </script>
 
-<Popover bind:open>
+<Popover bind:open ariaLabel="Open emoji picker">
   <SmilePlus size="20" class="stroke-magnum-500/75" />
   <div slot="popoverContent">
     <div class="flex gap-1 pr-8 pl-2 max-w-80">
@@ -96,8 +96,10 @@
              {customReactionError ? 'border-red-500' : 'border-neutral-900'}"
         bind:value={customReaction}
         on:keydown={handleKeyDown}
+        aria-label="Enter custom reaction"
       />
       <button
+        aria-label="Submit custom reaction"
         on:click={handleClickCustomReaction}
         class="flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
       >
@@ -113,6 +115,7 @@
               .toLowerCase()
               .includes(customReaction.toLowerCase())}
             <button
+              aria-label={`Select emoji ${e[0]}`}
               on:click={() => handleClickEmoji(e)}
               class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >

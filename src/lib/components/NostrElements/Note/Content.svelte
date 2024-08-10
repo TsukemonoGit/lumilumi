@@ -6,6 +6,7 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import { _ } from "svelte-i18n";
 
   export let text: string;
   export let tags: string[][];
@@ -88,9 +89,14 @@
   {:else if part.type === "image" && part.content}
     {#if $showImg && !imgError}
       <div>
-        <button class="w-fit h-fit" on:click={() => openModal(part.number ?? 0)}
+        <button
+          class="w-fit h-fit"
+          aria-label={$_("alia.label.image")}
+          on:click={() => openModal(part.number ?? 0)}
           ><img
             loading="lazy"
+            width="288"
+            height="288"
             alt="img"
             src={part.content}
             class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
@@ -98,11 +104,13 @@
             on:error={() => (imgError = true)}
           /></button
         >{#if !imgLoad}<Link
+            props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all "
             href={part.content}>{part.content}</Link
           >
         {/if}
       </div>{:else}<Link
+        props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content}>{part.content}</Link
       >{/if}
@@ -113,6 +121,7 @@
         on:click|stopPropagation={() => openModal(part.number ?? 0)}
       > -->
       <video
+        aria-label="video contents"
         controls
         src={part.content}
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
@@ -122,6 +131,7 @@
       <!-- </button> -->
     {:else}
       <Link
+        props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "audio"}
@@ -131,6 +141,7 @@
         on:click|stopPropagation={() => openModal(part.number ?? 0)}
         > -->
       <audio
+        aria-label="audio contents"
         controls
         src={part.content}
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
@@ -141,12 +152,14 @@
       > -->
     {:else}
       <Link
+        props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "url"}{#if $showImg}
       <OGP url={part.content ?? ""} let:contents>
         <Link
+          props={{ "aria-label": `External Links: ${part.url}` }}
           slot="nodata"
           className="underline text-magnum-300 break-all "
           href={part.content ?? ""}>{part.content}</Link
@@ -155,6 +168,7 @@
           <OgpCard {contents} url={part.content ?? ""} />
         {:else}
           <Link
+            props={{ "aria-label": `External Links: ${part.url}` }}
             slot="nodata"
             className="underline text-magnum-300 break-all "
             href={part.content ?? ""}>{part.content ?? ""}</Link
@@ -163,6 +177,7 @@
       </OGP>
     {:else}
       <Link
+        props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
@@ -183,12 +198,15 @@
     {/if}
   {:else if part.type === "hashtag"}
     <a
+      aria-label={"Search for events containing the hashtag"}
       href={`/search?t=${part.content}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
     >
   {:else if part.type === "nip"}
-    <Link className="underline text-magnum-300 break-all" href={part.url ?? ""}
-      >{part.content}</Link
+    <Link
+      props={{ "aria-label": `External Links: ${part.url}` }}
+      className="underline text-magnum-300 break-all"
+      href={part.url ?? ""}>{part.content}</Link
     >
   {:else}
     <span
