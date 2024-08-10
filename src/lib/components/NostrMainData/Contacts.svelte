@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
   import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
   import type { ReqStatus, RxReqBase } from "$lib/types";
@@ -12,6 +13,7 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
+  import { onMount } from "svelte";
 
   export let queryKey: QueryKey;
   export let pubkey: string;
@@ -25,7 +27,22 @@
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   export let relays: DefaultRelayConfig[] | undefined = undefined;
-  // TODO: Check if $app.rxNostr is defined
+
+  let storageKind3: Nostr.Event;
+  let kind3key = "kind3";
+  onMount(() => {
+    if (browser) {
+      const tmp = localStorage.getItem(kind3key);
+      if (tmp) {
+        try {
+          storageKind3 = JSON.parse(tmp) as Nostr.Event;
+        } catch (error) {
+          console.log("parse error");
+        }
+      }
+    }
+  });
+  let kind3Data: Nostr.Event;
   if (relays && relays.length > 0 && $app?.rxNostr) {
     $app?.rxNostr.setDefaultRelays(relays);
   }
@@ -36,7 +53,14 @@
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-
+  $: if ($data) {
+    if (storageKind3 && storageKind3.created_at > $data.event.created_at) {
+      kind3Data = storageKind3;
+    } else if ($data.event) {
+      kind3Data = $data.event;
+      localStorage.setItem(kind3key, JSON.stringify(kind3Data));
+    }
+  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
     default: { contacts: Nostr.Event; status: ReqStatus };
@@ -48,8 +72,8 @@
 
 {#if $error}
   <slot name="error" error={$error} />
-{:else if $data}
-  <slot contacts={$data?.event} status={$status ?? "error"} />
+{:else if kind3Data}
+  <slot contacts={kind3Data} status={$status ?? "error"} />
 {:else if $status === "loading"}
   <slot name="loading" />
 {:else}
