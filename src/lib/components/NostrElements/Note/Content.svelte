@@ -2,11 +2,10 @@
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
-  import { showImg } from "$lib/stores/stores";
+  import { showImg, viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -20,24 +19,11 @@
     (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
   );
 
-  let showModal: {
-    update: (
-      updater: import("svelte/store").Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: import("svelte/store").Subscriber<boolean>,
-      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-    ): import("svelte/store").Unsubscriber;
-    get: () => boolean;
-  };
-
-  let modalIndex = 0;
+  //let modalIndex = 0;
   const openModal = (index: number) => {
-    modalIndex = index;
-    if (showModal) $showModal = true;
+    // modalIndex = index;
+    // if (showModal) $showModal = true;
+    $viewMediaModal = { index: index, mediaList: mediaList };
   };
 
   const nip19Decode = (
@@ -80,11 +66,11 @@
   let imgLoad: boolean = false;
 </script>
 
-<MediaDisplay
+<!-- <MediaDisplay
   bind:open={showModal}
   images={mediaList}
   bind:currentIndex={modalIndex}
-/>
+/> -->
 
 {#each parts as part}
   {#if part.type === "nip19"}

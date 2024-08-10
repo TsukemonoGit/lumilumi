@@ -10,6 +10,7 @@
     uploader,
     verifier,
     noBanner,
+    viewMediaModal,
   } from "$lib/stores/stores";
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
@@ -34,6 +35,8 @@
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
   import { mediaUploader } from "$lib/func/util";
+  import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
+  import type { Part } from "$lib/func/content";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
@@ -123,6 +126,32 @@
   } else if (nlBanner) {
     nlBanner.style.display = "";
   }
+
+  let showModal: {
+    update: (
+      updater: import("svelte/store").Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: import("svelte/store").Subscriber<boolean>,
+      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
+    ): import("svelte/store").Unsubscriber;
+    get: () => boolean;
+  };
+  let modalIndex: number;
+  let mediaList: Part[];
+  viewMediaModal.subscribe((e) => {
+    console.log(e);
+    if ($viewMediaModal) {
+      modalIndex = $viewMediaModal.index;
+      mediaList = $viewMediaModal.mediaList;
+      setTimeout(() => {
+        $showModal = true;
+      }, 0);
+    }
+  });
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -179,6 +208,11 @@
       <Menu />
 
       <Toast />
+      <MediaDisplay
+        bind:open={showModal}
+        bind:images={mediaList}
+        bind:currentIndex={modalIndex}
+      />
       <div class="container">
         <!-- grid grid-cols-[auto_1fr]-->
         <main class="sm:ml-52 ml-0 mt-8">

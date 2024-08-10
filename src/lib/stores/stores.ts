@@ -14,6 +14,7 @@ import {
 import type { AdditionalPostOptions, MuteList } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
+import type { Part } from "$lib/func/content";
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -106,3 +107,4 @@ export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);
 export const noBanner = writable<boolean>(false);
+export const viewMediaModal = writable<{ index: number; mediaList: Part[] }>();
