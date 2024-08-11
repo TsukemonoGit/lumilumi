@@ -24,7 +24,7 @@
 </script>
 
 {#if channelData}
-  <div class="grid grid-cols-[1fr_auto]">
+  <div class="w-full grid grid-cols-[1fr_auto]">
     <button
       title={linkButtonTitle}
       class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"

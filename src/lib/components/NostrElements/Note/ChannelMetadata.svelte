@@ -23,7 +23,7 @@
     filters={[{ kinds: [41], authors: [text.pubkey], limit: 1, "#e": [id] }]}
     let:event
   >
-    <div slot="loading">
+    <div slot="loading" class="w-full">
       <ChannelMetadataLayout
         {handleClickToChannel}
         {id}
@@ -31,7 +31,7 @@
         event={text}
       />
     </div>
-    <div slot="nodata">
+    <div slot="nodata" class="w-full">
       <ChannelMetadataLayout
         {handleClickToChannel}
         {id}
@@ -39,7 +39,7 @@
         event={text}
       />
     </div>
-    <div slot="error">
+    <div slot="error" class="w-full">
       <ChannelMetadataLayout
         {handleClickToChannel}
         {id}
