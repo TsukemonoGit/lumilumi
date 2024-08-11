@@ -4,15 +4,9 @@ import { usePromiseReq } from "$lib/func/nostr";
 import { scanArray } from "$lib/stores/operators";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
-import {
-  createRxBackwardReq,
-  now,
-  uniq,
-  verify,
-  type EventPacket,
-} from "rx-nostr";
-import { pipe, type OperatorFunction } from "rxjs";
-import * as Nostr from "nostr-typedef";
+import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
+import { pipe } from "rxjs";
+//import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";
 import { loginUser, slicedEvent } from "$lib/stores/stores";
 

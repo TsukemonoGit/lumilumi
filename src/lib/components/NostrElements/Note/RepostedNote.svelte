@@ -89,13 +89,13 @@
         pubkey={event.pubkey}
         let:metadata
       >
-        <div slot="loading">
+        <div slot="loading" class="w-full">
           <EventCard note={event} {depth} />
         </div>
-        <div slot="nodata">
+        <div slot="nodata" class="w-full">
           <EventCard note={event} {depth} />
         </div>
-        <div slot="error" let:error>
+        <div slot="error" class="w-full" let:error>
           <EventCard note={event} {depth} />
         </div>
         <EventCard note={event} {metadata} {depth} />

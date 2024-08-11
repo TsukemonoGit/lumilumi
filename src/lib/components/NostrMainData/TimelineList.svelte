@@ -280,25 +280,26 @@
 </script>
 
 {#if viewIndex !== 0}
-  <button
-    class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    on:click={() => handleClickTop()}
-    disabled={$nowProgress}
-    ><SkipForward
-      size={20}
-      class="mx-auto -rotate-90 stroke-magnum-100 fill-magnum-100"
-    /></button
-  >
-
-  <button
-    disabled={$nowProgress}
-    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    on:click={() => handlePrev()}
-    ><Triangle
-      size={20}
-      class="mx-auto stroke-magnum-100 fill-magnum-100"
-    /></button
-  >
+  <div class=" w-full">
+    <button
+      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      on:click={() => handleClickTop()}
+      disabled={$nowProgress}
+      ><SkipForward
+        size={20}
+        class="mx-auto -rotate-90 stroke-magnum-100 fill-magnum-100"
+      /></button
+    >
+    <button
+      disabled={$nowProgress}
+      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      on:click={() => handlePrev()}
+      ><Triangle
+        size={20}
+        class="mx-auto stroke-magnum-100 fill-magnum-100"
+      /></button
+    >
+  </div>
 {/if}
 {#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />

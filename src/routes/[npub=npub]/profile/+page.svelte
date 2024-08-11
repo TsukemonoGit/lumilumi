@@ -194,7 +194,6 @@
 
   let cursorPosition: number = 0;
   let customReaction: string = "";
-  let viewCustomEmojis: boolean;
 
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;

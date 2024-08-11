@@ -68,7 +68,7 @@
 {#if loading}
   loading
 {:else}
-  <section class="container mb-20">
+  <section class="container">
     <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
@@ -79,13 +79,13 @@
         pubkey={event.pubkey}
         let:metadata
       >
-        <div slot="loading">
+        <div slot="loading" class="w-full">
           <EventCardNaddr note={event} />
         </div>
-        <div slot="nodata">
+        <div slot="nodata" class="w-full">
           <EventCardNaddr note={event} />
         </div>
-        <div slot="error">
+        <div slot="error" class="w-full">
           <EventCardNaddr note={event} />
         </div>
         <EventCardNaddr {metadata} note={event} />

@@ -87,7 +87,8 @@
     "sharelink": "Share Link"
   },
   "channel": {
-    "settingswarning": "To view the channel page, you need to set up a pubkey."
+    "settingswarning": "To view the channel page, you need to set up a pubkey.",
+    "global": "goto Global Channel Feed"
   },
   "list": {
     "settingswarning": "To view the list page, you need to set up a pubkey"

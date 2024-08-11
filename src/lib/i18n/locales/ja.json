@@ -86,7 +86,8 @@
     "sharelink": "リンクの共有"
   },
   "channel": {
-    "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。"
+    "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
+    "global": "Globalチャンネルフィードへ"
   },
   "list": {
     "settingswarning": "リストページを閲覧するには、公開鍵の設定が必要です。"

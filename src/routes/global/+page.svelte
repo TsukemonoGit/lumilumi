@@ -79,13 +79,13 @@
 
 <section class="w-full break-words overflow-hidden">
   <SetGlobalRelays pubkey={$loginUser} let:relays>
-    <div slot="loading">
+    <div slot="loading" class="w-full">
       <Settei relays={[]} {handleReload} />
     </div>
-    <div slot="error">
+    <div slot="error" class="w-full">
       <Settei relays={[]} {handleReload} />
     </div>
-    <div slot="nodata">
+    <div slot="nodata" class="w-full">
       <Settei relays={[]} {handleReload} />
     </div>
     <Settei {relays} {handleReload} />
@@ -133,13 +133,13 @@
                 pubkey={event.pubkey}
                 let:metadata
               >
-                <div slot="loading">
+                <div slot="loading" class="w-full">
                   <EventCard note={event} />
                 </div>
-                <div slot="nodata">
+                <div slot="nodata" class="w-full">
                   <EventCard note={event} />
                 </div>
-                <div slot="error">
+                <div slot="error" class="w-full">
                   <EventCard note={event} />
                 </div>
                 <EventCard {metadata} note={event} /></Metadata

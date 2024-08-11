@@ -259,7 +259,7 @@
     <!-- </div> -->
   {/if}
 
-  <article class="{noteClass()} ">
+  <article class="{noteClass()} w-full">
     {#if note.kind === 1}
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
