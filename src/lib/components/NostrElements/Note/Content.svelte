@@ -82,10 +82,7 @@
         content={part.content}
         {displayMenu}
         depth={depth + 1}
-      />
-    {:else}
-      {part.content}
-    {/if}
+      />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
     {#if $showImg && !imgError}
       <div>
@@ -107,8 +104,7 @@
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all "
             href={part.content}>{part.content}</Link
-          >
-        {/if}
+          >{/if}
       </div>{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
@@ -125,12 +121,10 @@
         controls
         src={part.content}
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        ><track default kind="captions" /></video
       >
-        <track default kind="captions" />
-      </video>
       <!-- </button> -->
-    {:else}
-      <Link
+    {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
@@ -145,13 +139,11 @@
         controls
         src={part.content}
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+        ><track default kind="captions" /></audio
       >
-        <track default kind="captions" />
-      </audio>
       <!-- </button
       > -->
-    {:else}
-      <Link
+    {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
@@ -182,8 +174,7 @@
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
-    {#if $showImg && !imgError}
-      <img
+    {#if $showImg && !imgError}<img
         height="24"
         loading="lazy"
         alt={`:${part.content}:`}
@@ -192,11 +183,7 @@
         class="inline h-[24px] object-contain m-0 overflow-hidden"
         on:load={() => (imgLoad = true)}
         on:error={() => (imgError = true)}
-      />
-      {#if !imgLoad}:{part.content}:{/if}
-    {:else}
-      :{part.content}:
-    {/if}
+      />{#if !imgLoad}:{part.content}:{/if}{:else}:{part.content}:{/if}
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}

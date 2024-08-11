@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
   import { Music, TrendingUp } from "lucide-svelte";
   import StatusGeneral from "./StatusGeneral.svelte";
   import StatusMusic from "./StatusMusic.svelte";

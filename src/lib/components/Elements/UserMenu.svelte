@@ -136,7 +136,7 @@
   {/if}
   <!-- </div> -->
 {:else}
-  <Popover>
+  <Popover ariaLabel="user profile">
     {#if $showImg && url && url !== ""}
       <UserAvatar {url} name={pubkey} {pubkey} {size} title={$title} />
     {:else}

@@ -7,7 +7,6 @@
   import {
     Copy,
     Ellipsis,
-    ExternalLink,
     FileJson2,
     SquareArrowOutUpRight,
   } from "lucide-svelte";

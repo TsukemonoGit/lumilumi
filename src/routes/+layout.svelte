@@ -185,7 +185,7 @@
   /> -->
   <link
     rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/makibishi-component@VERSION/dist/reset.css"
+    href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/reset.css"
   />
   <script
     type="module"

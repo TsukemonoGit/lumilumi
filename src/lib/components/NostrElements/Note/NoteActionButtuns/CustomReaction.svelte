@@ -4,7 +4,6 @@
   import { emojis, showImg } from "$lib/stores/stores";
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import punycode from "punycode/punycode";
   import split from "graphemesplit";
   export let note: Nostr.Event | undefined;
 

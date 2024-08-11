@@ -394,6 +394,7 @@
                 created_at: now(),
               }}
               displayMenu={false}
+              maxHeight={"10rem"}
             />
           </div>
           <!-- <div

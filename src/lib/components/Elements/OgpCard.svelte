@@ -5,6 +5,8 @@
 
   export let contents: Ogp;
   export let url: string;
+
+  let imageURL = contents.image;
 </script>
 
 <!--bg-magnum-200 text-magnum-800  text-magnum-700 drop-shadow-md-->
@@ -18,7 +20,7 @@
   target="_blank"
   rel="noopener noreferrer"
 >
-  {#if $showImg && contents.image && contents.image !== ""}
+  {#if $showImg && imageURL && imageURL !== ""}
     <blockquote
       class="grid grid-cols-[0.5fr_1.5fr] divide-x divide-magnum-200 w-full"
     >
@@ -28,8 +30,9 @@
           height="128"
           width="128"
           class="object-contain max-h-[8rem] max-w-full overflow-hidden"
-          src={contents.image}
+          src={imageURL}
           alt=""
+          on:error={() => (imageURL = "")}
         />
       </figure>
 
@@ -72,12 +75,7 @@
         {contents.description}
       </p>
       <div class="flex flex-row-reverse">
-        <Avatar
-          class="object-contain w-5 pl-0.5 pr-0.5"
-          size={20}
-          name={contents.favicon}
-          variant="beam"
-        />
+        <Avatar size={20} name={contents.favicon} variant="beam" />
 
         <p class="text-xs text-magnum-200">
           {#if contents.memo}

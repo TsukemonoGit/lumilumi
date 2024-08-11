@@ -102,7 +102,7 @@
   };
 </script>
 
-<Popover>
+<Popover ariaLabel="user profile">
   <UserName pubhex={pubkey} />
   <div slot="popoverContent" class="w-[24rem] max-w-full">
     <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} />

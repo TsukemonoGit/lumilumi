@@ -15,17 +15,16 @@
   import Content from "./Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { nip33Regex, profile } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";
@@ -40,16 +39,12 @@
   import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "./ReactionWebsite.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import OGP from "$lib/components/Elements/OGP.svelte";
-  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
-  import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
   export let status: string | undefined = undefined;
   export let mini: boolean = false;
-  const bech32Pattern = /<bech32>/;
+
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
   export let maxHeight: string = "24rem";

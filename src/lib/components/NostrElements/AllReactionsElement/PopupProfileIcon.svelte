@@ -32,7 +32,7 @@
   null,
   2
 )} {JSON.stringify(event.tags, null, 2)}-->
-<Popover>
+<Popover ariaLabel="user profile">
   <div class="inline-flex">
     <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
       <div slot="loading">

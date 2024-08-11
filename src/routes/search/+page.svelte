@@ -7,7 +7,7 @@
   import { nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
   import { page } from "$app/stores";
   import { get, writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
@@ -40,7 +40,7 @@
     followee ? params.set("f", String(followee)) : params.delete("f");
 
     const newUrl = `${window.location.pathname}?${params.toString()}`;
-    history.pushState({}, "", newUrl);
+    pushState(newUrl, {});
   }
   let isMount = false;
   afterNavigate(() => {

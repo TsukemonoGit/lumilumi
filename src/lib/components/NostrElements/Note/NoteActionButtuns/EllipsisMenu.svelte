@@ -6,10 +6,8 @@
     Ellipsis,
     FileJson2,
     SquareArrowOutUpRight,
-    Notebook,
     Smile,
     Radio,
-    Link,
     Share,
   } from "lucide-svelte";
 

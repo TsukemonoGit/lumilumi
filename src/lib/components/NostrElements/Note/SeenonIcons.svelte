@@ -42,7 +42,7 @@
     style="width:{width}px "
   >
     {#each viewAll ? relays : relays.slice(0, 2) as url}
-      <Popover>
+      <Popover ariaLabel="relay Info">
         {#await relayInfoFun(url)}
           <Avatar {size} name={url} variant="beam" />
         {:then relayInfo}

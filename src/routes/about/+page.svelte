@@ -38,7 +38,7 @@
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 <!-- <h1 class="title my-4">ABOUT</h1> -->
-<section class="border border-magnum-500 rounded-md h-full my-4">
+<section class="border border-magnum-500 rounded-md h-full my-4 mx-2">
   <h1 class="title my-4 text-center">lumilumi the nostr client</h1>
   <ul>
     <li>
