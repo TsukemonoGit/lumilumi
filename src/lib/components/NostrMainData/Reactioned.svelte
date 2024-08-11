@@ -9,24 +9,11 @@
 
   export let id: string;
   let _result: { data: EventPacket; status: any; error: any };
-  // afterUpdate(() => {
-  //   reactionData = $queryClient.getQueryData([
-  //     "reactions",
-  //     "reaction",
-  //     id,
-  //   ]) as EventPacket;
-  //   repostData = $queryClient.getQueryData([
-  //     "reactions",
-  //     "repost",
-  //     id,
-  //   ]) as EventPacket;
-  //   console.log(reactionData);
-  // });
 
   const observer1 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "reaction", id],
   });
-  const unsubscribe1 = observer1.subscribe((result: any) => {
+  observer1.subscribe((result: any) => {
     if (
       !_result?.data ||
       (result?.data &&

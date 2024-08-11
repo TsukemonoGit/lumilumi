@@ -1,11 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import {
-    nowProgress,
-    queryClient,
-    showImg,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     FileJson2,

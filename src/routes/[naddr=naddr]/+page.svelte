@@ -21,9 +21,9 @@
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
-  console.log(filters);
-  let amount = 50;
-  let viewIndex = 0;
+  //console.log(filters);
+  //let amount = 50;
+  //let viewIndex = 0;
   const tieKey = "naddr";
   let loading = true;
 
@@ -80,15 +80,15 @@
         let:metadata
       >
         <div slot="loading">
-          <EventCardNaddr note={event} status="loading" maxHeight={"none"} />
+          <EventCardNaddr note={event} />
         </div>
         <div slot="nodata">
-          <EventCardNaddr note={event} status="nodata" maxHeight={"none"} />
+          <EventCardNaddr note={event} />
         </div>
         <div slot="error">
-          <EventCardNaddr note={event} status="error" maxHeight={"none"} />
+          <EventCardNaddr note={event} />
         </div>
-        <EventCardNaddr {metadata} note={event} maxHeight={"none"} />
+        <EventCardNaddr {metadata} note={event} />
       </Metadata>
     </LatestEvent>
   </section>

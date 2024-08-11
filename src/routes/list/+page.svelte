@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto, onNavigate } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
   import ListLinkCard from "$lib/components/NostrElements/Note/ListLinkCard.svelte";
   import ListMain from "$lib/components/NostrMainData/ListMain.svelte";

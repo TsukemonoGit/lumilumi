@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { createDialog, createMenubar, melt } from "@melt-ui/svelte";
+  import { createDialog, melt } from "@melt-ui/svelte";
   import {
     AlignJustify,
     Bell,
@@ -11,7 +11,6 @@
     Settings,
     TrendingUp,
     Users,
-    X,
   } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
   import { loginUser, menuLeft } from "$lib/stores/stores";

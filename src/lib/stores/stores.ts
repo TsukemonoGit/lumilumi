@@ -3,7 +3,7 @@ import {
   type QueryClientConfig,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { get, writable } from "svelte/store";
+import { writable } from "svelte/store";
 import {
   type RxNostr,
   type EventPacket,

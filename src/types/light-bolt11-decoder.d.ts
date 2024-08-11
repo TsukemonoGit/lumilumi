@@ -15,7 +15,7 @@ declare module "light-bolt11-decoder" {
     initial_routing_sync: string;
     option_upfront_shutdown_script: string;
     gossip_queries: string;
-    var_onion_optin: string;
+    var_onion_option: string;
     gossip_queries_ex: string;
     option_static_remotekey: string;
     payment_secret: string;

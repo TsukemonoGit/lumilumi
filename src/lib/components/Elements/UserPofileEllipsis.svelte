@@ -2,11 +2,8 @@
   import * as Nostr from "nostr-typedef";
   import {
     Copy,
-    Earth,
     Ellipsis,
     FileJson2,
-    Link,
-    Notebook,
     Radio,
     RefreshCcw,
     Share,

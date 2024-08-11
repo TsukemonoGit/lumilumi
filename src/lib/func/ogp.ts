@@ -1,5 +1,5 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { derived, readable } from "svelte/store";
+import { derived } from "svelte/store";
 import type { Metadata } from "unfurl.js/dist/types";
 
 export type Ogp = {

@@ -1,7 +1,7 @@
 <script lang="ts">
   //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
   import { app, showImg } from "$lib/stores/stores";
 
   import { type QueryKey } from "@tanstack/svelte-query";

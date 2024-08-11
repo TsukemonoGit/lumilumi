@@ -1,10 +1,4 @@
-/**
- * @license Apache-2.0
- * @copyright 2023 Akiomi Kamakura
- */
-
 import type { QueryKey } from "@tanstack/svelte-query";
-import type Nostr from "nostr-typedef";
 import type {
   EventPacket,
   RxReq,

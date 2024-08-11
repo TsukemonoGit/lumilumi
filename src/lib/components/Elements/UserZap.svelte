@@ -4,9 +4,6 @@
   import AlertDialog from "./AlertDialog.svelte";
   import { profile } from "$lib/func/util";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
-  import { getZapEndpoint, makeZapRequest } from "nostr-tools/nip57";
-  import type { EventTemplate } from "nostr-tools";
-  import { getDefaultWriteRelays } from "$lib/func/nostr";
   import ZapInvoiceWindow from "./ZapInvoiceWindow.svelte";
   import { makeInvoice } from "$lib/func/makeZap";
   export let metadata: Nostr.Event;

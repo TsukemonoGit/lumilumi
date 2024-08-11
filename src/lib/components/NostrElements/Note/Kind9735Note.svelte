@@ -160,7 +160,7 @@
           <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
 
           {#if zappedId.tag.length > 0}
-            <RepostedNote tag={zappedId.tag} kind={zappedId.kind} {depth} />
+            <RepostedNote tag={zappedId.tag} {depth} />
           {/if}
         </Metadata>
       {/if}

@@ -21,7 +21,6 @@
     postWindowOpen,
     additionalPostOptions,
     queryClient,
-    loginUser,
     toastSettings,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
@@ -355,6 +354,7 @@
 
 <svelte:window on:keyup={keyboardShortcut} on:keydown={handleKeyDown} />
 <button
+  title="open post window"
   use:melt={$trigger}
   class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3.5
   font-medium leading-none text-magnum-700 shadow hover:opacity-75 z-30"

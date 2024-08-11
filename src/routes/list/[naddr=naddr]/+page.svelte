@@ -174,13 +174,13 @@
                       let:metadata
                     >
                       <div slot="loading">
-                        <EventCard note={event} status="loading" />
+                        <EventCard note={event} />
                       </div>
                       <div slot="nodata">
-                        <EventCard note={event} status="nodata" />
+                        <EventCard note={event} />
                       </div>
                       <div slot="error">
-                        <EventCard note={event} status="error" />
+                        <EventCard note={event} />
                       </div>
                       <EventCard {metadata} note={event} /></Metadata
                     >

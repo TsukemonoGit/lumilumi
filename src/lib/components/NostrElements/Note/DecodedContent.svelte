@@ -100,13 +100,13 @@
           let:metadata
         >
           <div slot="loading">
-            <EventCard note={event} {displayMenu} status="loading" />
+            <EventCard note={event} {displayMenu} />
           </div>
           <div slot="nodata">
-            <EventCard note={event} {displayMenu} status="nodata" />
+            <EventCard note={event} {displayMenu} />
           </div>
           <div slot="error">
-            <EventCard note={event} {displayMenu} status="error" />
+            <EventCard note={event} {displayMenu} />
           </div>
           <EventCard {metadata} {displayMenu} note={event} /></Metadata
         >

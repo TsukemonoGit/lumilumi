@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import logo from "$lib/images/favicon.svg";
-  import { loginUser, nowProgress, queryClient } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
 
   import {
     Globe,
@@ -12,9 +12,8 @@
     Users,
     MessagesSquare,
     TrendingUp,
-    Smile,
   } from "lucide-svelte";
-  import type { EventPacket } from "rx-nostr";
+
   import { nip19 } from "nostr-tools";
   import UserAvatar2 from "./UserAvatar2.svelte";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";

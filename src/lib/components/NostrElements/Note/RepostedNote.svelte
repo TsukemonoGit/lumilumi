@@ -11,7 +11,7 @@
 
   //tagはaかe
   export let tag: string[];
-  export let kind: number | undefined;
+  //export let kind: number | undefined;
   export let depth: number;
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);

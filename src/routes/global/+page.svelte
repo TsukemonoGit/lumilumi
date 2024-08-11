@@ -9,9 +9,7 @@
   import { afterNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import { SquareArrowOutUpRight } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
+
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -137,13 +135,13 @@
                   let:metadata
                 >
                   <div slot="loading">
-                    <EventCard note={event} status="loading" />
+                    <EventCard note={event} />
                   </div>
                   <div slot="nodata">
-                    <EventCard note={event} status="nodata" />
+                    <EventCard note={event} />
                   </div>
                   <div slot="error">
-                    <EventCard note={event} status="error" />
+                    <EventCard note={event} />
                   </div>
                   <EventCard {metadata} note={event} /></Metadata
                 >

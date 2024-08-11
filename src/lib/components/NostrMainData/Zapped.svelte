@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
 
@@ -13,7 +13,7 @@
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", id],
   });
-  const unsubscribe1 = observer2.subscribe((result: any) => {
+  observer2.subscribe((result: any) => {
     if (
       !_result?.data ||
       (result?.data &&

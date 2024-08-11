@@ -1,7 +1,5 @@
 <script lang="ts">
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
@@ -229,25 +227,13 @@
                         let:metadata
                       >
                         <div slot="loading">
-                          <EventCard
-                            note={event}
-                            status="loading"
-                            excludefunc={excludeKind1}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind1} />
                         </div>
                         <div slot="nodata">
-                          <EventCard
-                            note={event}
-                            status="nodata"
-                            excludefunc={excludeKind1}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind1} />
                         </div>
                         <div slot="error">
-                          <EventCard
-                            note={event}
-                            status="error"
-                            excludefunc={excludeKind1}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind1} />
                         </div>
                         <EventCard
                           {metadata}
@@ -307,25 +293,13 @@
                       let:metadata
                     >
                       <div slot="loading">
-                        <EventCard
-                          note={event}
-                          status="loading"
-                          excludefunc={excludeKind7}
-                        />
+                        <EventCard note={event} excludefunc={excludeKind7} />
                       </div>
                       <div slot="nodata">
-                        <EventCard
-                          note={event}
-                          status="nodata"
-                          excludefunc={excludeKind7}
-                        />
+                        <EventCard note={event} excludefunc={excludeKind7} />
                       </div>
                       <div slot="error">
-                        <EventCard
-                          note={event}
-                          status="error"
-                          excludefunc={excludeKind7}
-                        />
+                        <EventCard note={event} excludefunc={excludeKind7} />
                       </div>
                       <EventCard
                         {metadata}
@@ -340,42 +314,7 @@
             </TimelineList>
           {/if}
         </div>
-        <!-- <div use:melt={$content("pin")} class="content">
-              {#if $value === "pin"}
-                <LatestEvent
-                  queryKey={["pin", userPubkey]}
-                  filters={[
-                    {
-                      kinds: [10001],
-                      limit: 1,
-                      authors: [userPubkey],
-                    },
-                  ]}
-                  {req}
-                  let:event
-                >
-                  <SetRepoReactions />
-                  <div slot="loading" class="p-1">
-                    <p>pin Loading...</p>
-                  </div>
 
-                  <div slot="error" class="p-1" let:error>
-                    <p>{error}</p>
-                  </div>
-                  <div slot="nodata" class="p-1">
-                    <p>nodata</p>
-                  </div>
-                  <div class="max-w-[100vw] break-words box-border">
-                    {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
-                      <div
-                        class="max-w-full break-words whitespace-pre-line m-1 box-border overflow-hidden"
-                      >
-                        <Note {id} />
-                      </div>
-                    {/each}
-                  </div>
-                </LatestEvent>{/if}
-            </div> -->
         <div use:melt={$content("relays")} class="content mb-20">
           {#if $value === "relays"}
             <LatestEvent

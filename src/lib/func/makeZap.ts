@@ -5,10 +5,7 @@ import { getDefaultWriteRelays } from "./nostr";
 import { bech32 } from "@scure/base";
 import { type QueryKey } from "@tanstack/svelte-query";
 import { get } from "svelte/store";
-import { loginUser, queryClient } from "$lib/stores/stores";
-import { verifyEvent } from "nostr-tools";
-import { decode } from "light-bolt11-decoder";
-import type { EventPacket } from "rx-nostr";
+import { queryClient } from "$lib/stores/stores";
 
 export interface InvoiceProp {
   metadata: Nostr.Event;

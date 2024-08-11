@@ -74,6 +74,7 @@
     {/each}
     {#if !viewAll && relays.length > 2}
       <button
+        title="more"
         style="width:{width}px "
         on:click={() => {
           viewAll = true;
@@ -87,6 +88,7 @@
       >
     {:else if viewAll && relays.length > 2}
       <button
+        title="less"
         style="width:{width}px "
         on:click={() => {
           viewAll = false;

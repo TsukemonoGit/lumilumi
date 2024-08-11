@@ -4,24 +4,16 @@ import {
   metadataQueue,
   queryClient,
   relayStateMap,
-  showImg,
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
-import type {
-  UseReqOpts,
-  ReqResult,
-  RxReqBase,
-  ReqStatus,
-  UseReqOpts2,
-  UseReqOpts3,
-} from "$lib/types";
+import type { UseReqOpts, ReqResult, ReqStatus } from "$lib/types";
 import {
   useQueryClient,
   createQuery,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import type { Filter } from "nostr-typedef";
+
 import {
   type EventPacket,
   type RxReq,
@@ -29,13 +21,10 @@ import {
   type RxReqPipeable,
   createRxBackwardReq,
   createRxNostr,
-  type DefaultRelayConfig,
   type AcceptableDefaultRelaysConfig,
   type RxNostr,
-  createTie,
   type OkPacketAgainstEvent,
   nip07Signer,
-  createRxForwardReq,
   completeOnTimeout,
   type RxReqEmittable,
   type RxReqStrategy,
@@ -43,7 +32,7 @@ import {
 import { writable, derived, get } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { metadata, muteCheck, scanArray } from "$lib/stores/operators";
+import { metadata } from "$lib/stores/operators";
 import { rxNostr3ReccoctRelay, set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 

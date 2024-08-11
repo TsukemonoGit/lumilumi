@@ -16,9 +16,9 @@
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
-  export let status: string | undefined = undefined;
+  //export let status: string | undefined = undefined;
   export let mini: boolean = false;
-  export let tag: string[] | undefined;
+  //export let tag: string[] | undefined;
   export let depth: number;
   //const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;

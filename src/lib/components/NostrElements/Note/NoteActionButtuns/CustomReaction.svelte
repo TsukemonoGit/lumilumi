@@ -7,19 +7,6 @@
   import split from "graphemesplit";
   export let note: Nostr.Event | undefined;
 
-  // const regexSymbolWithCombiningMarks = /(\P{Mark})(\p{Mark}+)/gu;
-
-  // const countSymbolsIgnoringCombiningMarks = (string: string) => {
-  //   const stripped = string.replace(
-  //     regexSymbolWithCombiningMarks,
-  //     ($0: any, symbol: any, combiningMarks: any) => {
-  //       return symbol;
-  //     }
-  //   );
-
-  //   return punycode.ucs2.decode(stripped).length;
-  // };
-
   export let customReaction: string = "";
   export let emoji: string[] = [];
   export let handleClickOk: any | undefined = undefined;

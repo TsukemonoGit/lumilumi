@@ -4,8 +4,8 @@
   import { ChevronDown, X } from "lucide-svelte";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
-  import { promisePublishEvent, publishEvent } from "$lib/func/nostr";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { promisePublishEvent } from "$lib/func/nostr";
   export let relays: string[];
   export let handleReload;
   const newRelays = writable<string[]>([...relays]);

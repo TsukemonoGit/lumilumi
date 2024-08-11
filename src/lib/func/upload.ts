@@ -1,5 +1,4 @@
 import {
-  validateFileUploadResponse,
   type FileUploadResponse,
   type OptionalFormDataFields,
 } from "nostr-tools/nip96";

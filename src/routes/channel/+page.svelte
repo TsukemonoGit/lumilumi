@@ -3,14 +3,12 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
   import { setTieKey } from "$lib/func/nostr";
   import { loginUser, toastSettings } from "$lib/stores/stores";
   import { SquareArrowOutUpRight } from "lucide-svelte";
 
   import { nip19 } from "nostr-tools";
-  import * as Nostr from "nostr-typedef";
+  //import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
 
   const handleClickToChannel = (id: string) => {

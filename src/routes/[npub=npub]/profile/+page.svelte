@@ -3,7 +3,6 @@
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
     emojis,
-    loginUser,
     nowProgress,
     queryClient,
     showImg,
@@ -15,21 +14,18 @@
   import { pipe } from "rxjs";
   import { latest, uniq, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
-  import { samplemetadata, sample2 } from "./data";
+  //import { samplemetadata, sample2 } from "./data";
   import { _ } from "svelte-i18n";
-  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
-  import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import Avatar from "svelte-boring-avatars";
+
   import Link from "$lib/components/Elements/Link.svelte";
   import Content from "$lib/components/NostrElements/Note/Content.svelte";
   import {
     generateResultMessage,
     LUD06Regex,
     LUD16Regex,
-    splitHexColorString,
   } from "$lib/func/util";
-  import { page } from "$app/stores";
-  import { nip19, type EventTemplate } from "nostr-tools";
+
+  import { nip19 } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
 
@@ -368,7 +364,7 @@
       />
       {#if $emojis && $emojis.length > 0}
         <div class="w-fit flex self-end">
-          <Popover bind:open>
+          <Popover bind:open ariaLabel="custom emoji">
             <SmilePlus size="20" />
             <div slot="popoverContent">
               <div

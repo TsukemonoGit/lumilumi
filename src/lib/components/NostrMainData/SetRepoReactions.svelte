@@ -1,9 +1,9 @@
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import { viewEventIds, loginUser, queryClient } from "$lib/stores/stores";
+  import { viewEventIds, loginUser } from "$lib/stores/stores";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type Nostr from "nostr-typedef";
-  import type { RxNostr } from "rx-nostr";
+
   import { changeEmit } from "$lib/func/reactions";
 
   // export let rxNostr: RxNostr | undefined = undefined;

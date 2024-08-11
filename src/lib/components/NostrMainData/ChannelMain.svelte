@@ -1,7 +1,7 @@
 <script lang="ts">
   import { app } from "$lib/stores/stores";
   import { useReplaceableEvent } from "$lib/stores/useReplaceableEvent";
-  import type { RxReqBase, ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

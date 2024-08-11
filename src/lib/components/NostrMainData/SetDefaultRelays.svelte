@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
   import { readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
   import {

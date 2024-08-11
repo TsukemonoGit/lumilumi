@@ -2,14 +2,10 @@
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
-    Earth,
     Ellipsis,
     FileJson2,
     SquareArrowOutUpRight,
-    Notebook,
-    Smile,
     Radio,
-    Link,
     Share,
   } from "lucide-svelte";
 
@@ -18,7 +14,6 @@
   import { nip19 } from "nostr-tools";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";

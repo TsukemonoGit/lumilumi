@@ -1,12 +1,6 @@
 <script lang="ts">
-  import {
-    createRxForwardReq,
-    createTie,
-    now,
-    tie,
-    type EventPacket,
-  } from "rx-nostr";
-  import * as Nostr from "nostr-typedef";
+  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
+  //import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
@@ -124,13 +118,13 @@
                 let:metadata
               >
                 <div slot="loading">
-                  <EventCard note={event} status="loading" />
+                  <EventCard note={event} />
                 </div>
                 <div slot="nodata">
-                  <EventCard note={event} status="nodata" />
+                  <EventCard note={event} />
                 </div>
                 <div slot="error">
-                  <EventCard note={event} status="error" />
+                  <EventCard note={event} />
                 </div>
                 <EventCard {metadata} note={event} />
               </Metadata>

@@ -1,4 +1,4 @@
-import { nip19Regex, urlRegex, nipRegex, emojiRegex } from "./util";
+import { nip19Regex, urlRegex, nipRegex } from "./util";
 
 export interface Part {
   type:

@@ -6,7 +6,6 @@
     showImg,
     toastSettings,
   } from "$lib/stores/stores";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "../Elements/UserAvatar.svelte";
   import {

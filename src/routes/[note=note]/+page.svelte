@@ -1,11 +1,8 @@
 <script lang="ts">
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
   import AllReactions from "$lib/components/NostrMainData/AllReactions.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import SetSearchRelays from "$lib/components/NostrMainData/SetSearchRelays.svelte";
 
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
-  import { toRelaySet } from "$lib/stores/useRelaySet";
+  import { defaultRelays } from "$lib/stores/stores";
 
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
@@ -93,13 +90,13 @@
             let:metadata
           >
             <div slot="loading">
-              <EventCard note={event} status="loading" depth={0} />
+              <EventCard note={event} depth={0} />
             </div>
             <div slot="nodata">
-              <EventCard note={event} status="nodata" depth={0} />
+              <EventCard note={event} depth={0} />
             </div>
             <div slot="error">
-              <EventCard note={event} status="error" depth={0} />
+              <EventCard note={event} depth={0} />
             </div>
             <EventCard {metadata} note={event} depth={0} />
           </Metadata>

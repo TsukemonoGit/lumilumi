@@ -1,18 +1,17 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import { loginUser, queryClient, showImg } from "$lib/stores/stores";
-  import type { EventPacket } from "rx-nostr";
+  import { loginUser, showImg } from "$lib/stores/stores";
+
   import Avatar from "svelte-boring-avatars";
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
   import { splitHexColorString } from "$lib/func/util";
-  import { onMount } from "svelte";
-  import { QueryObserver } from "@tanstack/svelte-query";
+
   import { writable } from "svelte/store";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
-  let metadata: Nostr.Event;
-  let url = writable<string>();
+  //let metadata: Nostr.Event;
+  //let url = writable<string>();
   export let size = 24;
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {

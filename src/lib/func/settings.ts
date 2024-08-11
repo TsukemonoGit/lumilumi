@@ -1,13 +1,9 @@
 import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { loginUser, queryClient, verifier } from "$lib/stores/stores";
-import {
-  setRelaysByKind10002,
-  setRelaysByKind3,
-} from "$lib/stores/useRelaySet";
-import type { MuteList, Theme, ToastData } from "$lib/types";
+import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+import type { MuteList, Theme } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
-import { nip04 } from "nostr-tools";
 import type { Filter } from "nostr-typedef";
 import * as Nostr from "nostr-typedef";
 import {
@@ -16,7 +12,6 @@ import {
   createRxNostr,
   latest,
   uniq,
-  verify,
   type DefaultRelayConfig,
   type EventPacket,
 } from "rx-nostr";

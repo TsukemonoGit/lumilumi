@@ -1,18 +1,14 @@
 import { page } from "$app/stores";
 import {
-  AlignJustify,
   Bell,
   Globe,
   House,
   MessagesSquare,
   Search,
   Settings,
-  TrendingUp,
   Users,
-  X,
 } from "lucide-svelte";
 import { derived } from "svelte/store";
-import Logo from "$lib/images/favicon.svg";
 
 export const items: {
   Icon: any;

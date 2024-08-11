@@ -42,7 +42,7 @@
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
-  export let status: string | undefined = undefined;
+  //export let status: string | undefined = undefined;
   export let mini: boolean = false;
 
   let currentNoteId: string | undefined = undefined;
@@ -261,7 +261,7 @@
 
   <article class="{noteClass()} ">
     {#if note.kind === 1}
-      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
         <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
         {#if !thread && (replyID || replyUsers.length > 0)}
@@ -335,7 +335,7 @@
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} {kind} depth={depth + 1} />
+        <RepostedNote {tag} depth={depth + 1} />
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -375,7 +375,7 @@
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} {kind} depth={depth + 1} />
+        <RepostedNote {tag} depth={depth + 1} />
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
@@ -425,14 +425,14 @@
       </LatestEvent>
     {:else if note.kind === 42}
       <!--kind42 パブ茶コメント-->
-      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
         <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
       >
     {:else if note.kind === 30000}
       <ListLinkCard event={note} {depth} />
     {:else if note.kind === 30030}
       <!--kind30030-->
-      <NoteTemplate {note} {metadata} tag={proxy} {mini} {displayMenu} {depth}>
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
         <Kind30030Note {note} /></NoteTemplate
       >
     {:else if note.kind === 9735}

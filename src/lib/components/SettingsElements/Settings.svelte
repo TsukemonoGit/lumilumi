@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { writable, type Writable } from "svelte/store";
+  import { writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";

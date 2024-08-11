@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { browser } from "$app/environment";
   import { mediaUploader } from "$lib/func/util";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { Check, ChevronDown } from "lucide-svelte";
-  import { onMount } from "svelte";
   import { fade } from "svelte/transition";
 
   export let defaultValue: string | undefined;

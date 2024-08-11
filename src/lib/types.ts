@@ -1,5 +1,4 @@
 import type { QueryKey } from "@tanstack/svelte-query";
-import type { Filter } from "nostr-typedef";
 import type Nostr from "nostr-typedef";
 import type {
   AcceptableDefaultRelaysConfig,

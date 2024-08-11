@@ -10,7 +10,7 @@
 {#if !$showImg}
   <CircleMinus {size} class="ml-1 inline-flex text-gray-400 my-auto" />
 {:else}
-  <UseNip05Check {pubkey} {nip05Address} let:nip05 let:status>
+  <UseNip05Check {pubkey} {nip05Address} let:nip05>
     <Loader
       slot="loading"
       {size}

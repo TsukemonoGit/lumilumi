@@ -2,7 +2,7 @@
   import { browser } from "$app/environment";
   import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";

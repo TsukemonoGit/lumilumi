@@ -1,8 +1,3 @@
-/**
- * @license Apache-2.0
- * @copyright 2023 Akiomi Kamakura
- */
-
 import type { QueryKey } from "@tanstack/svelte-query";
 import type {
   EventPacket,
@@ -13,7 +8,7 @@ import type {
   RxReqPipeable,
 } from "rx-nostr";
 
-import type { RxReqBase, ReqResult } from "$lib/types.js";
+import type { ReqResult } from "$lib/types.js";
 import { useReplaceableEvent } from "./useReplaceableEvent";
 
 export function useContacts(

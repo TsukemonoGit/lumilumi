@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
 
@@ -8,13 +8,13 @@
   import type { EventPacket } from "rx-nostr";
 
   export let id: string;
-  export let req: RxReqBase | undefined = undefined;
+  //export let req: RxReqBase | undefined = undefined;
   let _result: { data: EventPacket; status: any; error: any };
 
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "repost", id],
   });
-  const unsubscribe1 = observer2.subscribe((result: any) => {
+  observer2.subscribe((result: any) => {
     if (
       !_result?.data ||
       (result?.data &&

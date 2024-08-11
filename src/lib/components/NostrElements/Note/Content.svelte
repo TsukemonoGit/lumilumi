@@ -112,10 +112,6 @@
       >{/if}
   {:else if part.type === "movie"}
     {#if $showImg}
-      <!-- <button
-        class="w-fit h-fit"
-        on:click|stopPropagation={() => openModal(part.number ?? 0)}
-      > -->
       <video
         aria-label="video contents"
         controls
@@ -123,17 +119,12 @@
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
         ><track default kind="captions" /></video
       >
-      <!-- </button> -->
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
-      <!-- <button
-        class="w-fit h-fit"
-        on:click|stopPropagation={() => openModal(part.number ?? 0)}
-        > -->
       <audio
         aria-label="audio contents"
         controls
@@ -141,8 +132,6 @@
         class=" object-contain max-w-[min(20rem,100%)] max-h-80"
         ><track default kind="captions" /></audio
       >
-      <!-- </button
-      > -->
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "

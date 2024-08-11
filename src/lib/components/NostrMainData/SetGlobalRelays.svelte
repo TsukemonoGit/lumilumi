@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
   import {
-    type DefaultRelayConfig,
     type RxReq,
     type RxReqEmittable,
     type RxReqOverable,

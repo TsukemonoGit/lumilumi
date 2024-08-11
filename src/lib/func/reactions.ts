@@ -1,4 +1,4 @@
-import { app, queryClient, verifier } from "$lib/stores/stores";
+import { queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery, QueryClient } from "@tanstack/svelte-query";
 import {
@@ -6,8 +6,6 @@ import {
   createRxForwardReq,
   type EventPacket,
   type RxNostr,
-  filterByKind,
-  filterByKinds,
 } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";

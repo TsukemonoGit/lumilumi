@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/NostrMainData/Text.svelte";
   import { nip19 } from "nostr-tools";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";

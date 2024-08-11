@@ -2,7 +2,6 @@ import type { QueryKey } from "@tanstack/svelte-query";
 import {
   latest,
   uniq,
-  verify,
   type DefaultRelayConfig,
   type EventPacket,
   type RxReq,
@@ -10,7 +9,6 @@ import {
   type RxReqOverable,
   type RxReqPipeable,
 } from "rx-nostr";
-import type { RxReqBase, ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
@@ -18,7 +16,6 @@ import { derived, get } from "svelte/store";
 import { setRelays, useReq } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
 import { app } from "./stores";
-import { scanArray } from "./operators";
 
 //今設定されてるdefaultRelayConfigのreadだけ30002で上書きする
 export function useGlobalRelaySet(
@@ -50,7 +47,6 @@ export function useGlobalRelaySet(
     error: reqResult.error,
   };
 }
-let stringListRelays: string[];
 function toGlobalRelaySet(
   value: EventPacket | EventPacket[] | undefined
 ): DefaultRelayConfig[] {

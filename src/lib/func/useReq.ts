@@ -1,6 +1,6 @@
-import { muteCheck, metadata } from "$lib/stores/operators";
+import { metadata } from "$lib/stores/operators";
 import { app } from "$lib/stores/stores";
-import type { UseReqOpts, ReqResult, RxReqBase, ReqStatus } from "$lib/types";
+import type { UseReqOpts, ReqResult, ReqStatus } from "$lib/types";
 import { useQueryClient, createQuery } from "@tanstack/svelte-query";
 import {
   type EventPacket,
@@ -9,11 +9,10 @@ import {
   type RxReqOverable,
   type RxReqPipeable,
   createRxBackwardReq,
-  tie,
 } from "rx-nostr";
 import { get, writable, derived, type Writable } from "svelte/store";
 import { generateRandomId } from "./nostr";
-import { pipe, type Observable } from "rxjs";
+import { type Observable } from "rxjs";
 
 export function useReq(
   {

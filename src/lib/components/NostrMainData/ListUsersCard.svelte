@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Nostr from "nostr-typedef";
+  //import * as Nostr from "nostr-typedef";
   import UserMenu from "../Elements/UserMenu.svelte";
   import Metadata from "./Metadata.svelte";
   export let pubkeys: string[];

@@ -2,7 +2,6 @@
 <script lang="ts">
   import Metadata from "../../NostrMainData/Metadata.svelte";
 
-  import * as Nostr from "nostr-typedef";
   import Avatar from "svelte-boring-avatars";
   import { splitHexColorString } from "$lib/func/util";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
@@ -27,11 +26,6 @@
   };
 </script>
 
-<!-- {JSON.stringify(
-  decode(event.tags.find((tag) => tag[0] === "bolt11")?.[1] ?? ""),
-  null,
-  2
-)} {JSON.stringify(event.tags, null, 2)}-->
 <Popover ariaLabel="user profile">
   <div class="inline-flex">
     <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>

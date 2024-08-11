@@ -2,10 +2,10 @@
   import { afterNavigate } from "$app/navigation";
   import { setRelays } from "$lib/func/nostr";
   import { loginUser, queryClient } from "$lib/stores/stores";
-  import type { DefaultRelayConfig } from "rx-nostr";
+  //import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
 
-  export let defaultRelays: DefaultRelayConfig[];
+  //export let defaultRelays: DefaultRelayConfig[];
   export let setRelayList: string[];
   let loading = true;
   // defaultRelays の中で write が true のものを含むように searchRelays を初期化

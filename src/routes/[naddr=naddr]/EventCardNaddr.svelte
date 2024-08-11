@@ -1,51 +1,26 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { Repeat2 } from "lucide-svelte";
-
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import OGP from "$lib/components/Elements/OGP.svelte";
-  import { goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import ChannelMetadataLayout from "$lib/components/NostrElements/Note/ChannelMetadataLayout.svelte";
   import Content from "$lib/components/NostrElements/Note/Content.svelte";
-  import Kind0Note from "$lib/components/NostrElements/Note/Kind0Note.svelte";
-  import Kind30030Note from "$lib/components/NostrElements/Note/Kind30030Note.svelte";
-  import Kind42Note from "$lib/components/NostrElements/Note/Kind42Note.svelte";
-  import Kind9735Note from "$lib/components/NostrElements/Note/Kind9735Note.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/Note/ListLinkCard.svelte";
   import NoteActionButtons from "$lib/components/NostrElements/Note/NoteActionButtuns/NoteActionButtons.svelte";
-  import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
-  import ReactionWebsite from "$lib/components/NostrElements/Note/ReactionWebsite.svelte";
   import ReplyThread from "$lib/components/NostrElements/Note/ReplyThread.svelte";
-  import RepostedNote from "$lib/components/NostrElements/Note/RepostedNote.svelte";
-  import ShowStatus from "$lib/components/NostrElements/Note/ShowStatus.svelte";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { nip33Regex, profile } from "$lib/func/util";
-  import {
-    viewEventIds,
-    loginUser,
-    showUserStatus,
-    showImg,
-  } from "$lib/stores/stores";
+  import { viewEventIds, loginUser, showImg } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { onDestroy } from "svelte";
   import { muteCheck } from "$lib/func/muteCheck";
-  import Reply from "$lib/components/NostrElements/Note/Reply.svelte";
-  import Reaction from "$lib/components/NostrElements/Note/Reaction.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
-  export let status: string | undefined = undefined;
-  export let mini: boolean = false;
+
+  //export let mini: boolean = false;
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
   export let displayMenu: boolean = true;
-  export let maxHeight: string = "16rem";
+  //export let maxHeight: string = "16rem";
   export let thread: boolean = false;
   export let depth: number = 0;
   export let viewMuteEvent = false;
@@ -83,20 +58,20 @@
     $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
   });
 
-  //eかa
-  const repostedId = (
-    tags: string[][]
-  ): { tag: string[] | undefined; kind: number | undefined } => {
-    const kindtag = tags.find((tag) => tag[0] === "k");
-    const kind = kindtag ? Number(kindtag[1]) : undefined;
-    return {
-      tag: tags
-        .slice()
-        .reverse()
-        .find((tag) => tag[0] === "e" || tag[0] === "a"),
-      kind: kind,
-    };
-  };
+  // //eかa
+  // const repostedId = (
+  //   tags: string[][]
+  // ): { tag: string[] | undefined; kind: number | undefined } => {
+  //   const kindtag = tags.find((tag) => tag[0] === "k");
+  //   const kind = kindtag ? Number(kindtag[1]) : undefined;
+  //   return {
+  //     tag: tags
+  //       .slice()
+  //       .reverse()
+  //       .find((tag) => tag[0] === "e" || tag[0] === "a"),
+  //     kind: kind,
+  //   };
+  // };
 
   const baseClass = " overflow-hidden ";
   const noteClass = () => {
@@ -143,82 +118,82 @@
     return tags.find((item) => item[0] === "proxy");
   };
 
-  const findClientTag = (
-    note: Nostr.Event
-  ):
-    | {
-        name: string;
-        aTag: string;
-        filter: Nostr.Filter;
-        naddr: string | undefined;
-      }
-    | undefined => {
-    const clientTag = note.tags.find((item) => item[0] === "client");
-    if (!clientTag) {
-      return undefined;
-    }
-    const matches = clientTag[2]?.match(nip33Regex);
-    if (!matches) {
-      return undefined;
-    }
-    const filter: Nostr.Filter = {
-      kinds: [Number(matches[1])],
-      authors: [matches[2]],
-      "#d": [matches[3]],
-      limit: 1,
-    };
+  // const findClientTag = (
+  //   note: Nostr.Event
+  // ):
+  //   | {
+  //       name: string;
+  //       aTag: string;
+  //       filter: Nostr.Filter;
+  //       naddr: string | undefined;
+  //     }
+  //   | undefined => {
+  //   const clientTag = note.tags.find((item) => item[0] === "client");
+  //   if (!clientTag) {
+  //     return undefined;
+  //   }
+  //   const matches = clientTag[2]?.match(nip33Regex);
+  //   if (!matches) {
+  //     return undefined;
+  //   }
+  //   const filter: Nostr.Filter = {
+  //     kinds: [Number(matches[1])],
+  //     authors: [matches[2]],
+  //     "#d": [matches[3]],
+  //     limit: 1,
+  //   };
 
-    const dtag = note.tags.find((tag) => tag[0] === "d");
-    const naddrAddress: nip19.AddressPointer = {
-      identifier: dtag?.[1] ?? "",
-      kind: note.kind,
-      pubkey: note.pubkey,
-      relays: getRelaysById(note.id),
-    };
-    try {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: nip19.naddrEncode(naddrAddress),
-      };
-    } catch (error) {
-      return {
-        name: clientTag[1],
-        aTag: clientTag[2],
-        filter: filter,
-        naddr: undefined,
-      };
-    }
-  };
+  //   const dtag = note.tags.find((tag) => tag[0] === "d");
+  //   const naddrAddress: nip19.AddressPointer = {
+  //     identifier: dtag?.[1] ?? "",
+  //     kind: note.kind,
+  //     pubkey: note.pubkey,
+  //     relays: getRelaysById(note.id),
+  //   };
+  //   try {
+  //     return {
+  //       name: clientTag[1],
+  //       aTag: clientTag[2],
+  //       filter: filter,
+  //       naddr: nip19.naddrEncode(naddrAddress),
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       name: clientTag[1],
+  //       aTag: clientTag[2],
+  //       filter: filter,
+  //       naddr: undefined,
+  //     };
+  //   }
+  // };
 
-  const findWebURL = (
-    tags: string[][],
-    clientData: {
-      name: string;
-      aTag: string;
-      filter: Nostr.Filter;
-      naddr: string | undefined;
-    }
-  ): string[] => {
-    if (!clientData.naddr) return [];
-    const webTag = tags.reduce((acc, [tag, url, nip19]) => {
-      if (tag === "web" && nip19 === "naddr") {
-        return [...acc, url];
-      } else {
-        return acc;
-      }
-    }, []);
+  // const findWebURL = (
+  //   tags: string[][],
+  //   clientData: {
+  //     name: string;
+  //     aTag: string;
+  //     filter: Nostr.Filter;
+  //     naddr: string | undefined;
+  //   }
+  // ): string[] => {
+  //   if (!clientData.naddr) return [];
+  //   const webTag = tags.reduce((acc, [tag, url, nip19]) => {
+  //     if (tag === "web" && nip19 === "naddr") {
+  //       return [...acc, url];
+  //     } else {
+  //       return acc;
+  //     }
+  //   }, []);
 
-    if (webTag.length == 0) {
-      return [];
-    }
-    return webTag.map((item) => {
-      return item.replace(bech32Pattern, clientData.naddr ?? "");
-    });
-  };
-  $: proxy = checkProxy(note.tags);
-  $: warning = checkContentWarning(note.tags);
+  //   if (webTag.length == 0) {
+  //     return [];
+  //   }
+  //   return webTag.map((item) => {
+  //     return item.replace(bech32Pattern, clientData.naddr ?? "");
+  //   });
+  // };
+  // $: proxy = checkProxy(note.tags);
+  // $: warning = checkContentWarning(note.tags);
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
   let replyUsers: string[];

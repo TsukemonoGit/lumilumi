@@ -6,15 +6,13 @@
     nowProgress,
     queryClient,
     slicedEvent,
-    tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
-  import type { ReqStatus, RxReqBase } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { Filter, SkipForward, Triangle } from "lucide-svelte";
+  import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import {
-    createTie,
     now,
     type EventPacket,
     type RxReq,
@@ -22,8 +20,8 @@
     type RxReqOverable,
     type RxReqPipeable,
   } from "rx-nostr";
-  import { getRelaysById, setTieKey } from "$lib/func/nostr";
-  import { afterUpdate, onDestroy, onMount } from "svelte";
+  import { setTieKey } from "$lib/func/nostr";
+  import { onDestroy, onMount } from "svelte";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
