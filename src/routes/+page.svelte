@@ -9,6 +9,6 @@
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 
-<section>
+<section class="w-full break-words overflow-hidden">
   <NostrElements />
 </section>

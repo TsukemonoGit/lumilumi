@@ -70,7 +70,7 @@
         {/if}
       </ListMain>
       <div
-        class="mb-16 border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
+        class=" border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
       >
         <Link
           className=" font-semibold text-magnum-300 break-all inline-flex"

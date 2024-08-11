@@ -68,72 +68,70 @@
   <meta property="og:description" content="Channel" />
   <meta name="description" content="Channel" />
 </svelte:head>
-<section>
-  <div class="w-full break-words overflow-hidden">
-    <ChannelMetadata
-      id={data.id}
-      linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
-    />{#if since}
-      <TimelineList
-        queryKey={timelineQuery}
-        filters={[
-          {
-            "#e": [data.id],
-            kinds: [42],
-            limit: 50,
-            since: since,
-          },
-        ]}
-        req={createRxForwardReq()}
-        let:events
-        {viewIndex}
-        {amount}
-        {tieKey}
-        lastfavcheck={false}
-        let:len
+<section class="w-full break-words overflow-hidden">
+  <ChannelMetadata
+    id={data.id}
+    linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+  />{#if since}
+    <TimelineList
+      queryKey={timelineQuery}
+      filters={[
+        {
+          "#e": [data.id],
+          kinds: [42],
+          limit: 50,
+          since: since,
+        },
+      ]}
+      req={createRxForwardReq()}
+      let:events
+      {viewIndex}
+      {amount}
+      {tieKey}
+      lastfavcheck={false}
+      let:len
+    >
+      <SetRepoReactions />
+      <div slot="loading">
+        <p>Loading...</p>
+      </div>
+
+      <div slot="error" let:error>
+        <p>{error}</p>
+      </div>
+
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
-        <SetRepoReactions />
-        <div slot="loading">
-          <p>Loading...</p>
-        </div>
-
-        <div slot="error" let:error>
-          <p>{error}</p>
-        </div>
-
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <!-- <div
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card {index ===
                 events.length - 1
                   ? 'last-visible'
                   : ''} {index === 0 ? 'first-visible' : ''}"
               > -->
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading">
-                  <EventCard note={event} />
-                </div>
-                <div slot="nodata">
-                  <EventCard note={event} />
-                </div>
-                <div slot="error">
-                  <EventCard note={event} />
-                </div>
-                <EventCard {metadata} note={event} />
-              </Metadata>
-              <!-- </div> -->
-            {/each}
-          {/if}
-        </div>
-      </TimelineList>{/if}
-  </div>
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+              let:metadata
+            >
+              <div slot="loading">
+                <EventCard note={event} />
+              </div>
+              <div slot="nodata">
+                <EventCard note={event} />
+              </div>
+              <div slot="error">
+                <EventCard note={event} />
+              </div>
+              <EventCard {metadata} note={event} />
+            </Metadata>
+            <!-- </div> -->
+          {/each}
+        {/if}
+      </div>
+    </TimelineList>{/if}
 </section>
 
 <div class="postWindow">

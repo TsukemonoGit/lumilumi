@@ -92,67 +92,66 @@
   };
 </script>
 
-<div class="w-full break-words overflow-hidden">
-  <Contacts
-    queryKey={["timeline", "contacts", $loginUser]}
-    pubkey={$loginUser}
-    let:contacts
-    let:status
-    ><div slot="loading">loading</div>
-    <div slot="error">error</div>
-    <div slot="nodata">nodata</div>
-    {#if since}
-      <TimelineList
-        queryKey={timelineQuery}
-        filters={makeFilters(contacts)}
-        req={createRxForwardReq()}
-        {tieKey}
-        let:events
-        {viewIndex}
-        {amount}
-        let:len
+<Contacts
+  queryKey={["timeline", "contacts", $loginUser]}
+  pubkey={$loginUser}
+  let:contacts
+  let:status
+  ><div slot="loading">loading</div>
+  <div slot="error">error</div>
+  <div slot="nodata">nodata</div>
+  {#if since}
+    <TimelineList
+      queryKey={timelineQuery}
+      filters={makeFilters(contacts)}
+      req={createRxForwardReq()}
+      {tieKey}
+      let:events
+      {viewIndex}
+      {amount}
+      let:len
+    >
+      <SetRepoReactions />
+      <div slot="loading">
+        <p>Loading...</p>
+      </div>
+
+      <div slot="error" let:error>
+        <p>{error}</p>
+      </div>
+
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
-        <SetRepoReactions />
-        <div slot="loading">
-          <p>Loading...</p>
-        </div>
-
-        <div slot="error" let:error>
-          <p>{error}</p>
-        </div>
-
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <!-- <div
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card "
               > -->
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading">
-                  <EventCard note={event} />
-                </div>
-                <div slot="nodata">
-                  <EventCard note={event} />
-                </div>
-                <div slot="error">
-                  <EventCard note={event} />
-                </div>
-                <EventCard {metadata} note={event} />
-              </Metadata>
-              <!-- </div> -->
-            {/each}
-          {/if}
-        </div>
-      </TimelineList>
-    {/if}
-  </Contacts>
-</div>
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+              let:metadata
+            >
+              <div slot="loading">
+                <EventCard note={event} />
+              </div>
+              <div slot="nodata">
+                <EventCard note={event} />
+              </div>
+              <div slot="error">
+                <EventCard note={event} />
+              </div>
+              <EventCard {metadata} note={event} />
+            </Metadata>
+            <!-- </div> -->
+          {/each}
+        {/if}
+      </div>
+    </TimelineList>
+  {/if}
+</Contacts>
+
 <div class="postWindow">
   <OpenPostWindow
     options={{

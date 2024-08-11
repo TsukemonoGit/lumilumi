@@ -216,7 +216,7 @@
   let open: any;
 </script>
 
-<section class=" w-full mb-20">
+<section class=" w-full">
   {#if isError}
     error
   {:else if newProfile}

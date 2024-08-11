@@ -140,84 +140,63 @@
         {/if}
       </div>
       <!-- title-description -->
-      <div class="grid grid-rows-[auto_auto] gap-1">
-        <div>
-          <div class="flex items-center gap-1">
-            <!--titleとR/W-->
-            <div class="text-md text-magnum-100 font-bold">
-              {relayInfo.name}
+
+      <div>
+        <!--titleとR/W ...-->
+        <div class="flex items-center gap-1">
+          <div class="text-md text-magnum-100 font-bold">
+            {relayInfo.name}
+          </div>
+          {#if read || write}
+            <div
+              class="h-fit border border-primary-400 break-keep text-xs font-bold w-8 text-center"
+            >
+              {#if read && write}
+                RW
+              {:else if read}
+                R
+              {:else}
+                W
+              {/if}
             </div>
-            {#if read || write}
+          {/if}
+          <div class="ml-auto">
+            <DropdownMenu {menuTexts} {handleSelectItem}>
               <div
-                class="h-fit border border-primary-400 break-keep text-xs font-bold w-8 text-center"
+                class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
               >
-                {#if read && write}
-                  RW
-                {:else if read}
-                  R
-                {:else}
-                  W
-                {/if}
+                <Ellipsis />
               </div>
-            {/if}
-            <div class="ml-auto">
-              <DropdownMenu {menuTexts} {handleSelectItem}>
-                <div
-                  class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
-                >
-                  <Ellipsis />
-                </div>
-              </DropdownMenu>
-            </div>
+            </DropdownMenu>
           </div>
-
-          {url}
         </div>
-        <!--description-->
-        <div class="">
-          <div
-            class="my-2 whitespace-pre-wrap break-words"
-            style="word-break: break-word;"
-          >
-            {relayInfo.description ?? ""}
+
+        {url}
+
+        <div
+          class="my-2 whitespace-pre-wrap break-words"
+          style="word-break: break-word;"
+        >
+          {relayInfo.description ?? ""}
+        </div>
+        {#if relayInfo.supported_nips}
+          <div class="w-full flex-wrap flex">
+            NIPs:
+            {#each relayInfo.supported_nips as nip}
+              <a
+                class="px-1 whitespace-nowrap text-magnum-400 font-semibold"
+                rel="external noreferrer"
+                target="_blank"
+                href={"https://github.com/nostr-protocol/nips/blob/master/" +
+                  nip.toString().padStart(2, "0") +
+                  ".md"}>{nip}</a
+              >
+            {/each}
           </div>
-          {#if relayInfo.supported_nips}
-            <div class="w-full flex-wrap flex">
-              NIPs:
-              {#each relayInfo.supported_nips as nip}
-                <a
-                  class="px-1 whitespace-nowrap text-magnum-400 font-semibold"
-                  rel="external noreferrer"
-                  target="_blank"
-                  href={"https://github.com/nostr-protocol/nips/blob/master/" +
-                    nip.toString().padStart(2, "0") +
-                    ".md"}>{nip}</a
-                >
-              {/each}
-            </div>
-          {/if}
-
-          <!-- {#if relayInfo.limitation?.max_content_length}
-            <div>
-              Max content length: <span class="break-keep"
-                >{new Intl.NumberFormat().format(
-                  relayInfo.limitation.max_content_length
-                )}</span
-              >
-            </div>
-          {/if}
-          {#if relayInfo.limitation?.max_event_tags}
-            <div>
-              Max event tags: <span class="break-keep"
-                >{new Intl.NumberFormat().format(
-                  relayInfo.limitation.max_event_tags
-                )}</span
-              >
-            </div>
-          {/if} -->
-        </div>
+        {/if}
       </div>
     </div>
+
     <Dialog bind:open={dialogOpen}>
       <div slot="main">
         <h2 class="m-0 text-lg font-medium">Relay Information</h2>

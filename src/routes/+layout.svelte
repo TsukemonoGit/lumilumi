@@ -215,7 +215,7 @@
       />
       <div class="container">
         <!-- grid grid-cols-[auto_1fr]-->
-        <main class="sm:ml-52 ml-0 mt-8">
+        <main class="sm:ml-52 ml-0 mt-8 sm:mb-2 mb-20">
           <slot />
           {#if $nowProgress}
             <div class="fixed right-10 bottom-20">

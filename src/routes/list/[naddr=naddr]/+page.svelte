@@ -116,7 +116,7 @@
 {#if loading}
   loading
 {:else}
-  <section class="container">
+  <section class="container w-full break-words overflow-hidden">
     <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
       <div slot="loading">loading</div>
       <div slot="error">error</div>
@@ -129,66 +129,66 @@
         waiting decrypt list
       {:then pubkeys}
         <ListUsersCard {pubkeys} />
-        <div class="w-full break-words overflow-hidden">
-          {#if since}
-            <TimelineList
-              queryKey={timelineQuery}
-              filters={[
-                {
-                  kinds: [1, 6, 16],
-                  authors: pubkeys,
-                  limit: 50,
-                  since: since,
-                },
-              ]}
-              req={createRxForwardReq()}
-              let:events
-              {viewIndex}
-              {amount}
-              let:len
-              {tieKey}
+
+        {#if since}
+          <TimelineList
+            queryKey={timelineQuery}
+            filters={[
+              {
+                kinds: [1, 6, 16],
+                authors: pubkeys,
+                limit: 50,
+                since: since,
+              },
+            ]}
+            req={createRxForwardReq()}
+            let:events
+            {viewIndex}
+            {amount}
+            let:len
+            {tieKey}
+          >
+            <SetRepoReactions />
+            <div slot="loading">
+              <p>Loading...</p>
+            </div>
+
+            <div slot="error" let:error>
+              <p>{error}</p>
+            </div>
+
+            <div
+              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >
-              <SetRepoReactions />
-              <div slot="loading">
-                <p>Loading...</p>
-              </div>
-
-              <div slot="error" let:error>
-                <p>{error}</p>
-              </div>
-
-              <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-              >
-                {#if events && events.length > 0}
-                  {#each events as event, index (event.id)}
-                    <!-- <div
+              {#if events && events.length > 0}
+                {#each events as event, index (event.id)}
+                  <!-- <div
                       class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                       events.length - 1
                         ? 'last-visible'
                         : ''} {index === 0 ? 'first-visible' : ''}"
                     > -->
-                    <Metadata
-                      queryKey={["metadata", event.pubkey]}
-                      pubkey={event.pubkey}
-                      let:metadata
-                    >
-                      <div slot="loading">
-                        <EventCard note={event} />
-                      </div>
-                      <div slot="nodata">
-                        <EventCard note={event} />
-                      </div>
-                      <div slot="error">
-                        <EventCard note={event} />
-                      </div>
-                      <EventCard {metadata} note={event} /></Metadata
-                    >
-                    <!-- </div> -->
-                  {/each}{/if}
-              </div>
-            </TimelineList>{/if}
-        </div>{/await}</LatestEvent
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                    let:metadata
+                  >
+                    <div slot="loading">
+                      <EventCard note={event} />
+                    </div>
+                    <div slot="nodata">
+                      <EventCard note={event} />
+                    </div>
+                    <div slot="error">
+                      <EventCard note={event} />
+                    </div>
+                    <EventCard {metadata} note={event} /></Metadata
+                  >
+                  <!-- </div> -->
+                {/each}{/if}
+            </div>
+          </TimelineList>{/if}
+      {/await}</LatestEvent
     >
   </section>
   <div class="postWindow">

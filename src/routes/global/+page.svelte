@@ -77,92 +77,78 @@
   <meta name="description" content="Global" />
 </svelte:head>
 
-<section>
+<section class="w-full break-words overflow-hidden">
   <SetGlobalRelays pubkey={$loginUser} let:relays>
-    <div class="w-full break-words overflow-hidden" slot="loading">
+    <div slot="loading">
       <Settei relays={[]} {handleReload} />
     </div>
-    <div class="w-full break-words overflow-hidden" slot="error">
+    <div slot="error">
       <Settei relays={[]} {handleReload} />
     </div>
-    <div class="w-full break-words overflow-hidden" slot="nodata">
+    <div slot="nodata">
       <Settei relays={[]} {handleReload} />
     </div>
     <Settei {relays} {handleReload} />
 
-    <div class="w-full break-words overflow-hidden">
-      {#if since}
-        <TimelineList
-          queryKey={timelineQuery}
-          filters={[
-            {
-              kinds: [1, 6, 16],
-              limit: 50,
-              since: since,
-            },
-          ]}
-          req={createRxForwardReq()}
-          let:events
-          {viewIndex}
-          {amount}
-          let:len
-          {tieKey}
-          {relays}
+    {#if since}
+      <TimelineList
+        queryKey={timelineQuery}
+        filters={[
+          {
+            kinds: [1, 6, 16],
+            limit: 50,
+            since: since,
+          },
+        ]}
+        req={createRxForwardReq()}
+        let:events
+        {viewIndex}
+        {amount}
+        let:len
+        {tieKey}
+        {relays}
+      >
+        <SetRepoReactions />
+        <div slot="loading">
+          <p>Loading...</p>
+        </div>
+
+        <div slot="error" let:error>
+          <p>{error}</p>
+        </div>
+
+        <div
+          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >
-          <SetRepoReactions />
-          <div slot="loading">
-            <p>Loading...</p>
-          </div>
-
-          <div slot="error" let:error>
-            <p>{error}</p>
-          </div>
-
-          <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-          >
-            {#if events && events.length > 0}
-              {#each events as event, index (event.id)}
-                <!-- <div
+          {#if events && events.length > 0}
+            {#each events as event, index (event.id)}
+              <!-- <div
                   class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                   events.length - 1
                     ? 'last-visible'
                     : ''} {index === 0 ? 'first-visible' : ''}"
                 > -->
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading">
-                    <EventCard note={event} />
-                  </div>
-                  <div slot="nodata">
-                    <EventCard note={event} />
-                  </div>
-                  <div slot="error">
-                    <EventCard note={event} />
-                  </div>
-                  <EventCard {metadata} note={event} /></Metadata
-                >
-                <!-- </div> -->
-              {/each}{/if}
-          </div>
-        </TimelineList>{/if}
-    </div>
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading">
+                  <EventCard note={event} />
+                </div>
+                <div slot="nodata">
+                  <EventCard note={event} />
+                </div>
+                <div slot="error">
+                  <EventCard note={event} />
+                </div>
+                <EventCard {metadata} note={event} /></Metadata
+              >
+              <!-- </div> -->
+            {/each}{/if}
+        </div>
+      </TimelineList>{/if}
   </SetGlobalRelays>
-
-  <!-- <div
-    class="mb-16 w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
-  >
-    <Link
-      className="font-semibold text-magnum-300 break-all inline-flex"
-      href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30002}`}
-      >{$_("settings.nostviewstr.kind30002")}<SquareArrowOutUpRight
-        size={16}
-      /></Link
-    >
-  </div> -->
 </section>
 
 <div class="postWindow">

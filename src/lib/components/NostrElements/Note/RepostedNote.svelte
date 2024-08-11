@@ -34,78 +34,72 @@
   };
 </script>
 
-<div class="px-2">
-  {#if tag[0] === "e"}
-    <!-- {#if kind}
+{#if tag[0] === "e"}
+  <!-- {#if kind}
       {kind}
     {/if} -->
 
-    <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
-      <div
-        slot="loading"
-        class="text-sm text-neutral-500 flex-inline break-all"
-      >
-        Loading {nip19.noteEncode(tag[1])}
+  <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
+    <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
+      Loading {nip19.noteEncode(tag[1])}
+    </div>
+    <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
+      nodata {nip19.noteEncode(tag[1])}
+    </div>
+    <div
+      slot="error"
+      class="text-sm text-neutral-500 flex-inline break-all"
+      let:error
+    >
+      {error}
+      {nip19.noteEncode(tag[1])}
+    </div>
+    <Metadata
+      queryKey={["metadata", text.pubkey]}
+      pubkey={text.pubkey}
+      let:metadata
+    >
+      <div slot="loading">
+        <EventCard note={text} {depth} />
       </div>
-      <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-        nodata {nip19.noteEncode(tag[1])}
+      <div slot="nodata">
+        <EventCard note={text} {depth} />
       </div>
-      <div
-        slot="error"
-        class="text-sm text-neutral-500 flex-inline break-all"
-        let:error
-      >
-        {error}
-        {nip19.noteEncode(tag[1])}
+      <div slot="error" let:error>
+        <EventCard note={text} {depth} />
+      </div>
+      <EventCard note={text} {metadata} {depth} />
+    </Metadata>
+  </Text>
+{:else if tag[0] === "a"}
+  {@const filter = naddrFilter()}
+  {#if filter}
+    <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
+      <div slot="loading">
+        <p>Loading {tag[1]}</p>
+      </div>
+      <div slot="nodata">
+        <p>nodata {tag[1]}</p>
+      </div>
+      <div slot="error" let:error>
+        <p>{error} {tag[1]}</p>
       </div>
       <Metadata
-        queryKey={["metadata", text.pubkey]}
-        pubkey={text.pubkey}
+        queryKey={["metadata", event.pubkey]}
+        pubkey={event.pubkey}
         let:metadata
       >
         <div slot="loading">
-          <EventCard note={text} {depth} />
+          <EventCard note={event} {depth} />
         </div>
         <div slot="nodata">
-          <EventCard note={text} {depth} />
+          <EventCard note={event} {depth} />
         </div>
         <div slot="error" let:error>
-          <EventCard note={text} {depth} />
+          <EventCard note={event} {depth} />
         </div>
-        <EventCard note={text} {metadata} {depth} />
+        <EventCard note={event} {metadata} {depth} />
       </Metadata>
-    </Text>
-  {:else if tag[0] === "a"}
-    {#await naddrFilter() then filter}
-      {#if filter}
-        <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
-          <div slot="loading">
-            <p>Loading {tag[1]}</p>
-          </div>
-          <div slot="nodata">
-            <p>nodata {tag[1]}</p>
-          </div>
-          <div slot="error" let:error>
-            <p>{error} {tag[1]}</p>
-          </div>
-          <Metadata
-            queryKey={["metadata", event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <div slot="loading">
-              <EventCard note={event} {depth} />
-            </div>
-            <div slot="nodata">
-              <EventCard note={event} {depth} />
-            </div>
-            <div slot="error" let:error>
-              <EventCard note={event} {depth} />
-            </div>
-            <EventCard note={event} {metadata} {depth} />
-          </Metadata>
-        </LatestEvent>
-      {/if}
-    {/await}
+    </LatestEvent>
   {/if}
-</div>
+{/if}
