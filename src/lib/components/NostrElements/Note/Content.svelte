@@ -85,6 +85,11 @@
       />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
     {#if $showImg && !imgError}
+      {#if !imgLoad}<Link
+          props={{ "aria-label": `External Links: ${part.url}` }}
+          className="underline text-magnum-300 break-all "
+          href={part.content}>{part.content}</Link
+        >{/if}
       <div>
         <button
           class="w-fit h-fit"
@@ -100,11 +105,7 @@
             on:load={() => (imgLoad = true)}
             on:error={() => (imgError = true)}
           /></button
-        >{#if !imgLoad}<Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
-            className="underline text-magnum-300 break-all "
-            href={part.content}>{part.content}</Link
-          >{/if}
+        >
       </div>{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
@@ -163,7 +164,7 @@
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "emoji"}
-    {#if $showImg && !imgError}<img
+    {#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
         alt={`:${part.content}:`}
@@ -172,7 +173,7 @@
         class="inline h-[24px] object-contain m-0 overflow-hidden"
         on:load={() => (imgLoad = true)}
         on:error={() => (imgError = true)}
-      />{#if !imgLoad}:{part.content}:{/if}{:else}:{part.content}:{/if}
+      />{:else}:{part.content}:{/if}
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
