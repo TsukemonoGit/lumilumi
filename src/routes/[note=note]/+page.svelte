@@ -15,7 +15,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { sortEvents } from "nostr-tools";
+  import { sortEvents } from "$lib/func/util";
 
   export let data: {
     id: string;

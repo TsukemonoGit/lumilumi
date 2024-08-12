@@ -28,7 +28,7 @@
   } from "$lib/components/NostrMainData/timelineList";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { readable } from "svelte/store";
-  import { sortEvents } from "nostr-tools";
+  import { sortEvents } from "$lib/func/util";
 
   const sift = 40; //スライドする量
 

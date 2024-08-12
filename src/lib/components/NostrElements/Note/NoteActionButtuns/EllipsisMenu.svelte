@@ -9,6 +9,7 @@
     Smile,
     Radio,
     Share,
+    NotepadText,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -30,6 +31,11 @@
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000);
   let menuTexts = [
+    {
+      text: $_("menu.copy.text"),
+      icon: NotepadText,
+      num: 8,
+    },
     {
       text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
       icon: Copy,
@@ -147,6 +153,25 @@
           $toastSettings = {
             title: "Error",
             description: "Failed to share",
+            color: "bg-orange-500",
+          };
+        }
+        break;
+
+      case 8:
+        //Copy text
+        try {
+          await navigator.clipboard.writeText(note.content);
+          $toastSettings = {
+            title: "Success",
+            description: `Copied to clipboard`,
+            color: "bg-green-500",
+          };
+        } catch (error: any) {
+          console.error(error.message);
+          $toastSettings = {
+            title: "Error",
+            description: "Failed to copy",
             color: "bg-orange-500",
           };
         }

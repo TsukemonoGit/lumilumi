@@ -91,9 +91,7 @@ export async function loadOlderEvents(
   );
   //console.log(olderEvents);
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-  return olderEvents
-    .sort((a, b) => b.event.created_at - a.event.created_at)
-    .slice(0, sift);
+  return olderEvents.slice(0, sift);
 }
 
 export async function firstLoadOlderEvents(
@@ -115,7 +113,5 @@ export async function firstLoadOlderEvents(
     relays
   );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-  return olderEvents
-    .sort((a, b) => b.event.created_at - a.event.created_at)
-    .slice(0, sift === 0 ? undefined : sift);
+  return olderEvents.slice(0, sift === 0 ? undefined : sift);
 }

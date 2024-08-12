@@ -74,6 +74,8 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
     }
 
     // 新しい順にソート
+
+    //insertEventPacketIntoDescendingList(acc, a)にしてみてたけどなんかめっちゃ遅くなったからソートに戻す
     const sorted =
       a.event.kind !== 30315 ? sortEventPackets([...acc, a]) : [...acc]; //.sort((a, b) => b.event.created_at - a.event.created_at);
 

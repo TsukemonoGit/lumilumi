@@ -75,7 +75,8 @@
       "note": "Copy noteID",
       "naddr": "Copy naddr",
       "nevent": "Copy EventID",
-      "relayURL": "Copy relayURL"
+      "relayURL": "Copy relayURL",
+      "text": "Copy text"
     },
     "broadcast": "broadcast",
     "open": {

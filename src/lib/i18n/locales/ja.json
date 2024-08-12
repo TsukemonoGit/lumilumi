@@ -75,7 +75,8 @@
       "note": "noteID をコピー",
       "naddr": "naddr をコピー",
       "nevent": "イベントIDをコピー",
-      "relayURL": "リレーURLをコピー"
+      "relayURL": "リレーURLをコピー",
+      "text": "テキストをコピー"
     },
     "broadcast": "ブロードキャスト",
     "open": {

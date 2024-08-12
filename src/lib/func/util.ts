@@ -5,6 +5,7 @@ import { getToken } from "nostr-tools/nip98";
 import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
+import { binarySearch } from "nostr-tools/utils";
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
@@ -243,6 +244,45 @@ export function sortEventPackets<A extends EventPacket>(events: A[]): A[] {
     if (a.event.created_at !== b.event.created_at) {
       return b.event.created_at - a.event.created_at;
     }
-    return a.event.id.localeCompare(b.event.id);
+    return b.event.id.localeCompare(a.event.id);
   });
+}
+export function sortEvents(events: Nostr.Event[]): Nostr.Event[] {
+  return events.sort((a: Nostr.Event, b: Nostr.Event): number => {
+    if (a.created_at !== b.created_at) {
+      return b.created_at - a.created_at;
+    }
+    return b.id.localeCompare(a.id);
+  });
+}
+//新しいのが上
+export function insertEventPacketIntoDescendingList<A extends EventPacket>(
+  sortedArray: A[],
+  eventPacket: A
+): A[] {
+  const [idx, found] = binarySearch(sortedArray, (b: A) => {
+    if (eventPacket.event.id === b.event.id) return 0;
+    if (eventPacket.event.created_at === b.event.created_at) return -1;
+    return b.event.created_at - eventPacket.event.created_at;
+  });
+  if (!found) {
+    sortedArray.splice(idx, 0, eventPacket);
+  }
+  return sortedArray;
+}
+
+//新しいのが下
+export function insertEventPacketIntoAscendingList(
+  sortedArray: EventPacket[],
+  eventPacket: EventPacket
+): EventPacket[] {
+  const [idx, found] = binarySearch(sortedArray, (b) => {
+    if (eventPacket.event.id === b.event.id) return 0;
+    if (eventPacket.event.created_at === b.event.created_at) return -1;
+    return eventPacket.event.created_at - b.event.created_at;
+  });
+  if (!found) {
+    sortedArray.splice(idx, 0, eventPacket);
+  }
+  return sortedArray;
 }

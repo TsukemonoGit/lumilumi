@@ -26,7 +26,7 @@
   import Metadata from "./Metadata.svelte";
   import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
-  import { sortEvents } from "nostr-tools";
+  import { sortEvents } from "$lib/func/util";
 
   const sift = 40; //スライドする量
 
