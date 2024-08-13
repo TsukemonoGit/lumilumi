@@ -86,6 +86,21 @@
             limit: 50,
             since: since,
           },
+          {
+            kinds: [16],
+            "#k": ["42"],
+            limit: 20,
+
+            since: since,
+          },
+          {
+            kinds: [7],
+            "#k": ["42"],
+            "#p": [$loginUser],
+            limit: 20,
+
+            since: since,
+          },
         ]}
         req={createRxForwardReq()}
         let:events
