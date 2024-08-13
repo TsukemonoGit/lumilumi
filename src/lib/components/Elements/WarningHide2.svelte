@@ -19,7 +19,10 @@
 </script>
 
 <div
-  class="bgColor absolute top-0 left-0 w-full h-full flex bg-magnum-600 pointer-events-none"
+  class="bgColor absolute top-0 left-0 w-full h-full flex bg-magnum-600 {$value[0] >=
+  50
+    ? 'pointer-events-none'
+    : ''}"
   style=" opacity:{1 - $value[0] / 100}"
 >
   <div class=" flex flex-auto justify-center items-center w-hull">
