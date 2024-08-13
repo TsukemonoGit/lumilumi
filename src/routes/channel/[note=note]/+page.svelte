@@ -7,7 +7,7 @@
   import { setRelays, setTieKey } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -80,6 +80,21 @@
           "#e": [data.id],
           kinds: [42],
           limit: 50,
+          since: since,
+        },
+        {
+          kinds: [16],
+          "#k": ["42"],
+          limit: 20,
+
+          since: since,
+        },
+        {
+          kinds: [7],
+          "#k": ["42"],
+          "#p": [$loginUser],
+          limit: 20,
+
           since: since,
         },
       ]}
