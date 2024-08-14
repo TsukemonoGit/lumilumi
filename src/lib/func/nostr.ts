@@ -477,7 +477,8 @@ export function usePromiseReq(
     ? [...initData]
     : [initData];
   console.log(accumulatedData);
-  const tie = get(tieMapStore)?.[tieKey]?.[0];
+  const tie =
+    tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
 
   const obs: Observable<EventPacket[] | EventPacket> = tie
     ? _rxNostr
