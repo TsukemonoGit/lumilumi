@@ -118,7 +118,7 @@ export function useReq3({
 }
 
 function handleEvent(v: EventPacket, _queryClient: QueryClient) {
-  const etag = v.event.tags.find((item) => item[0] === "e");
+  const etag = v.event.tags.findLast((item) => item[0] === "e");
   if (v.event.kind === 7 && etag) {
     _queryClient.setQueryData(["reactions", "reaction", etag[1]], v);
   } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
