@@ -255,7 +255,7 @@
         window?.nostr as Nostr.Nip07.Nostr
       ).getPublicKey();
       if (gotPubkey) {
-        inputPubkey = gotPubkey;
+        inputPubkey = nip19.npubEncode(gotPubkey);
       }
     } catch (error) {
       console.log(error);
