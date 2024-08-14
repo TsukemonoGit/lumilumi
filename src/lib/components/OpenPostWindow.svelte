@@ -71,6 +71,7 @@
   let metadata: Nostr.Event | undefined = undefined;
 
   let additionalReplyUsers: Writable<string[]> = writable([]);
+  let clickEscape: number = 0;
 
   $: if ($postWindowOpen) {
     console.log($additionalPostOptions);
@@ -107,14 +108,14 @@
   $: if ($open === true) {
     //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
     signPubkeyCheck();
-
+    clickEscape = 0;
     // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
     // metadata = $queryClient.getQueryData(["metadata", pubkey]);
     // console.log(metadata);
 
     if (textarea) {
       textarea.focus();
-      textareaFocus = true;
+
       textarea.selectionEnd = 0;
       textarea.scroll({
         top: 0,
@@ -328,14 +329,13 @@
     }
   };
 
-  let textareaFocus = false;
   const keyboardShortcut = (event: KeyboardEvent) => {
     event.preventDefault();
     const activeElement = document.activeElement;
     if ($open === true && event.key === "Escape") {
-      if (textareaFocus) {
-        textareaFocus = false;
-      } else {
+      clickEscape++;
+      if (clickEscape >= 2) {
+        clickEscape = 0;
         $open = false;
       }
     }
@@ -482,15 +482,30 @@
             id="note"
             bind:this={textarea}
             bind:value={text}
-            on:focus={() => {
-              textareaFocus = true;
+            on:input={(e) => {
+              handleTextareaInput(e);
+              clickEscape = 0;
             }}
-            on:input={handleTextareaInput}
-            on:click={handleTextareaInput}
-            on:touchend={handleTextareaInput}
-            on:paste={paste}
-            on:drop={handleDrop}
-            on:dragover={handleDragOver}
+            on:click={(e) => {
+              handleTextareaInput(e);
+              clickEscape = 0;
+            }}
+            on:touchend={(e) => {
+              handleTextareaInput(e);
+              clickEscape = 0;
+            }}
+            on:paste={(e) => {
+              paste(e);
+              clickEscape = 0;
+            }}
+            on:drop={(e) => {
+              handleDrop(e);
+              clickEscape = 0;
+            }}
+            on:dragover={(e) => {
+              handleDragOver(e);
+              clickEscape = 0;
+            }}
             placeholder="いま どうしてる？"
           />
         </fieldset>
