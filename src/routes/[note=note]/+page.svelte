@@ -12,11 +12,10 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { sortEvents } from "$lib/func/util";
-  import { init } from "svelte-i18n";
 
   export let data: {
     id: string;
