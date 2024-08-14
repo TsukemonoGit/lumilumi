@@ -23,7 +23,7 @@
 
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "note";
+  const tieKey = "undefined";
 
   let isOnMount = false;
   let since: number | undefined = undefined;
@@ -90,8 +90,7 @@
           since: since,
         },
         {
-          kinds: [7],
-          "#k": ["42"],
+          kinds: [7], //   "#k": ["42"],
           "#p": [$loginUser],
           "#e": [data.id],
           limit: 20,
