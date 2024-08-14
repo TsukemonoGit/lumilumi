@@ -255,7 +255,7 @@
         window?.nostr as Nostr.Nip07.Nostr
       ).getPublicKey();
       if (gotPubkey) {
-        inputPubkey = nip19.npubEncode(gotPubkey);
+        inputPubkey = gotPubkey;
       }
     } catch (error) {
       console.log(error);
@@ -329,6 +329,7 @@
         cancel();
       }
     }
+    shouldReload = false;
   });
 
   let emojiTag: string[] | undefined;
@@ -504,6 +505,8 @@
     <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
       <CustomReaction
         note={undefined}
+        root={undefined}
+        atag={undefined}
         {handleClickOk}
         bind:emoji={emojiTag}
         bind:customReaction={customString}

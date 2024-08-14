@@ -37,7 +37,9 @@
   let atag: string | undefined;
 
   $: warning = note.tags.find((item) => item[0] === "content-warning");
-
+  $: root = note.tags.find(
+    (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
+  ) as string[] | undefined;
   let textareaReply: HTMLTextAreaElement;
   let textareaQuote: HTMLTextAreaElement;
   $: {
@@ -58,20 +60,19 @@
   // let reaction = writable<string | null>(null);
 
   const handleClickReaction = () => {
-    const tmp = "+";
+    const tags: string[][] = root ? [root] : [];
+    if (atag) {
+      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
+    } else {
+      tags.push(
+        ["p", note.pubkey],
+        ["e", note.id],
+        ["k", note.kind.toString()]
+      );
+    }
     const ev: Nostr.EventParameters = {
       kind: 7,
-      tags: atag
-        ? [
-            ["p", note.pubkey],
-            ["a", atag],
-            ["k", note.kind.toString()],
-          ]
-        : [
-            ["p", note.pubkey],
-            ["e", note.id],
-            ["k", note.kind.toString()],
-          ],
+      tags: tags,
       content: $defaultReaction?.content ?? "+",
     };
     if ($defaultReaction?.tag?.length > 0) {
@@ -367,7 +368,7 @@
       {/if}
     </Reactioned>
     <!--カスタムリアクション-->
-    <CustomReaction {note} />
+    <CustomReaction {note} {root} {atag} />
   {/if}
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734}

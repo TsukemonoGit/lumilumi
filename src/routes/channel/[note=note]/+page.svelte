@@ -93,6 +93,7 @@
           kinds: [7],
           "#k": ["42"],
           "#p": [$loginUser],
+          "#e": [data.id],
           limit: 20,
 
           since: since,
@@ -105,6 +106,12 @@
       {tieKey}
       lastfavcheck={false}
       let:len
+      eventFilter={(event) =>
+        (event.kind === 42 &&
+          event.tags.find(
+            (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id
+          ) !== undefined) ||
+        event.kind !== 42}
     >
       <SetRepoReactions />
       <div slot="loading">

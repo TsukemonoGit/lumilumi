@@ -63,6 +63,15 @@
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
+  $: channelLink = getChannelLink(heyaId);
+  function getChannelLink(heyaId: string | undefined): string {
+    if (!heyaId) return "";
+    try {
+      return `/channel/${nip19.noteEncode(heyaId)}`;
+    } catch (error) {
+      return "";
+    }
+  }
 </script>
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
@@ -84,18 +93,21 @@
 {#if heyaId}
   <Text queryKey={["timeline", heyaId]} id={heyaId} let:text>
     <button
+      title={channelLink}
       on:click={handleClickToChannel}
       slot="loading"
       class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
       ><MessagesSquare {size} class="mr-1" />kind:42</button
     >
     <button
+      title={channelLink}
       on:click={handleClickToChannel}
       slot="nodata"
       class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
       ><MessagesSquare {size} class="mr-1" />kind:42</button
     >
     <button
+      title={channelLink}
       on:click={handleClickToChannel}
       slot="error"
       class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
@@ -104,6 +116,7 @@
     {#await getContent(text) then channelData}
       {#if channelData}
         <button
+          title={channelLink}
           on:click={handleClickToChannel}
           class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
         >
@@ -111,6 +124,7 @@
         </button>
       {:else}
         <button
+          title={channelLink}
           on:click={handleClickToChannel}
           class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
         >

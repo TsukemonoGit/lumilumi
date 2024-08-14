@@ -12,10 +12,11 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { afterNavigate } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { sortEvents } from "$lib/func/util";
+  import { init } from "svelte-i18n";
 
   export let data: {
     id: string;
@@ -23,15 +24,28 @@
     kind?: number | undefined;
     author?: string | undefined;
   };
+
+  let isMount = false;
   onMount(() => {
-    if (!$defaultRelays && data.relays) {
-      setRelays(data.relays);
-    }
+    init();
   });
   afterNavigate(() => {
+    init();
+  });
+
+  function init() {
+    if (isMount) {
+      return;
+    }
+    isMount = true;
     if (!$defaultRelays && data.relays) {
       setRelays(data.relays);
     }
+
+    isMount = false;
+  }
+  onDestroy(() => {
+    console.log("destroy");
   });
 </script>
 

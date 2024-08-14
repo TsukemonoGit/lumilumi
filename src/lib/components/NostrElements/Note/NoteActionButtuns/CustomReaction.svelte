@@ -7,6 +7,9 @@
   import split from "graphemesplit";
   export let note: Nostr.Event | undefined;
 
+  export let root: string[] | undefined;
+  export let atag: string | undefined;
+
   export let customReaction: string = "";
   export let emoji: string[] = [];
   export let handleClickOk: any | undefined = undefined;
@@ -31,13 +34,21 @@
       handleClickOk();
       return;
     }
-    const ev: Nostr.EventParameters = {
-      kind: 7,
-      tags: [
+
+    const tags: string[][] = root ? [root] : [];
+    if (atag) {
+      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
+    } else {
+      tags.push(
         ["p", note.pubkey],
         ["e", note.id],
-        ["k", note.kind.toString()],
-      ],
+        ["k", note.kind.toString()]
+      );
+    }
+
+    const ev: Nostr.EventParameters = {
+      kind: 7,
+      tags: tags,
       content: customReaction,
     };
     publishEvent(ev);
