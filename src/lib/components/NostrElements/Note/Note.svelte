@@ -10,6 +10,7 @@
   export let displayMenu: boolean;
   export let thread: boolean = false;
   export let depth: number;
+  export let repostable: boolean;
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text>
@@ -33,13 +34,13 @@
     let:metadata
   >
     <div slot="loading">
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
     </div>
     <div slot="nodata">
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
     </div>
     <div slot="error" let:error>
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} />
+      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
     </div>
     <EventCard
       note={text}
@@ -49,6 +50,7 @@
       {thread}
       {displayMenu}
       {depth}
+      {repostable}
     />
   </Metadata>
 </Text>

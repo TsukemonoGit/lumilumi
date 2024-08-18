@@ -14,6 +14,7 @@
   export let displayMenu: boolean;
   export let note: Nostr.Event;
   export let depth: number;
+  export let repostable: boolean;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
@@ -76,14 +77,26 @@
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
   {#if replyID || replyUsers.length > 0}
-    <Reply {replyID} {replyUsers} {displayMenu} depth={depth + 1} />
+    <Reply
+      {replyID}
+      {replyUsers}
+      {displayMenu}
+      depth={depth + 1}
+      {repostable}
+    />
     <!--<hr />-->
   {/if}
 {/await}
 {#await checkContentWarning(note.tags) then tag}
   <div class="relative">
     <div class=" max-h-64 overflow-y-auto overflow-x-auto">
-      <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+      <Content
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
     </div>
     {#if tag}
       <WarningHide2 text={tag[1]} />
@@ -135,4 +148,4 @@
   </Text>
 {/if}
 {#if displayMenu}
-  <NoteActionButtons {note} />{/if}
+  <NoteActionButtons {note} {repostable} />{/if}

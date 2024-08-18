@@ -394,6 +394,7 @@
                 created_at: now(),
               }}
               displayMenu={false}
+              repostable={false}
               maxHeight={"10rem"}
             />
           </div>

@@ -9,6 +9,8 @@
 
   import Text from "$lib/components/NostrMainData/Text.svelte";
 
+  export let repostable: boolean;
+
   //tagはaかe
   export let tag: string[];
   //export let kind: number | undefined;
@@ -60,15 +62,15 @@
       let:metadata
     >
       <div slot="loading">
-        <EventCard note={text} {depth} />
+        <EventCard note={text} {depth} {repostable} />
       </div>
       <div slot="nodata">
-        <EventCard note={text} {depth} />
+        <EventCard note={text} {depth} {repostable} />
       </div>
       <div slot="error" let:error>
-        <EventCard note={text} {depth} />
+        <EventCard note={text} {depth} {repostable} />
       </div>
-      <EventCard note={text} {metadata} {depth} />
+      <EventCard note={text} {metadata} {depth} {repostable} />
     </Metadata>
   </Text>
 {:else if tag[0] === "a"}
@@ -90,15 +92,15 @@
         let:metadata
       >
         <div slot="loading" class="w-full">
-          <EventCard note={event} {depth} />
+          <EventCard note={event} {depth} {repostable} />
         </div>
         <div slot="nodata" class="w-full">
-          <EventCard note={event} {depth} />
+          <EventCard note={event} {depth} {repostable} />
         </div>
         <div slot="error" class="w-full" let:error>
-          <EventCard note={event} {depth} />
+          <EventCard note={event} {depth} {repostable} />
         </div>
-        <EventCard note={event} {metadata} {depth} />
+        <EventCard note={event} {metadata} {depth} {repostable} />
       </Metadata>
     </LatestEvent>
   {/if}

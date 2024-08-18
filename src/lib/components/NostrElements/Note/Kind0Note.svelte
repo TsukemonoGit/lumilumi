@@ -10,6 +10,7 @@
   export let note: Nostr.Event;
   export let proxy: string[] | undefined = undefined;
   export let depth: number;
+  export let repostable: boolean;
 </script>
 
 <div class={"grid grid-cols-[auto_1fr]"}>
@@ -35,6 +36,7 @@
         tags={note.tags}
         {displayMenu}
         {depth}
+        {repostable}
       />
     </div>
     {#if proxy}

@@ -3,6 +3,7 @@
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   export let note: Nostr.Event;
+  export let repostable: boolean;
 
   $: dtag = note?.tags?.find((tag) => tag[0] === "d")?.[1];
   $: title = note?.tags?.find((tag) => tag[0] === "title")?.[1];
@@ -30,5 +31,5 @@
       {/if}
     {/each}
   </div>
-  <NoteActionButtons {note} />
+  <NoteActionButtons {note} {repostable} />
 </div>

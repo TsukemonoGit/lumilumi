@@ -32,7 +32,7 @@
   import { _ } from "svelte-i18n";
 
   export let note: Nostr.Event;
-
+  export let repostable: boolean;
   let dtag: string[] | undefined;
   let atag: string | undefined;
 
@@ -309,21 +309,28 @@
     </button>
 
     <!--リポスト-->
-    <Reposted id={note.id} let:event>
-      <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="21" />
-      </DropdownMenu>
-      <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="21" />
-      </DropdownMenu>
-      <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-        <Repeat2 size="21" />
-      </DropdownMenu>
-      <DropdownMenu {menuTexts} {handleSelectItem}>
-        <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
-      </DropdownMenu>
-    </Reposted>
+    {#if repostable}
+      <Reposted id={note.id} let:event>
+        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="21" />
+        </DropdownMenu>
+
+        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="21" />
+        </DropdownMenu>
+        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+          <Repeat2 size="21" />
+        </DropdownMenu>
+        <DropdownMenu {menuTexts} {handleSelectItem}>
+          <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
+        </DropdownMenu>
+      </Reposted>
+    {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
+        <Quote size="20" class={"stroke-magnum-500/75"} />
+      </button>
+    {/if}
   {/if}
+
   {#if note.kind !== 9734}
     <!--リアクション-->
     <Reactioned id={note.id} let:event>
@@ -425,7 +432,12 @@
         >
           <div slot="main" class=" text-neutral-200">
             <div class="rounded-md">
-              <EventCard {note} {metadata} displayMenu={false} />
+              <EventCard
+                {note}
+                {metadata}
+                displayMenu={false}
+                repostable={false}
+              />
             </div>
             <div class="mt-4 rounded-md">
               <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>

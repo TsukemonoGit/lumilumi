@@ -12,6 +12,7 @@
   export let tags: string[][];
   export let displayMenu: boolean;
   export let depth: number;
+  export let repostable: boolean;
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseText(text, tags);
 
@@ -82,6 +83,7 @@
         content={part.content}
         {displayMenu}
         depth={depth + 1}
+        {repostable}
       />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
     {#if $showImg && !imgError}

@@ -10,6 +10,7 @@
   export let displayMenu: boolean;
   export let content: string | undefined;
   export let depth: number;
+  export let repostable: boolean;
   export let decoded:
     | {
         type: "naddr";
@@ -44,7 +45,13 @@
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
     <div class="border rounded-md border-magnum-600/30">
-      <Note id={decoded.data.id} mini={true} {displayMenu} {depth} />
+      <Note
+        id={decoded.data.id}
+        mini={true}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
     </div>
     <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
   </span>
@@ -52,7 +59,7 @@
   <span class="grid grid-cols-[auto_1fr_auto]">
     <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
     <div class="border rounded-md border-magnum-600/30">
-      <Note id={decoded.data} mini={true} {displayMenu} {depth} />
+      <Note id={decoded.data} mini={true} {displayMenu} {depth} {repostable} />
     </div>
     <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
   </span>
@@ -100,15 +107,20 @@
           let:metadata
         >
           <div slot="loading">
-            <EventCard note={event} {displayMenu} />
+            <EventCard note={event} {displayMenu} {repostable} />
           </div>
           <div slot="nodata">
-            <EventCard note={event} {displayMenu} />
+            <EventCard note={event} {displayMenu} {repostable} />
           </div>
           <div slot="error">
-            <EventCard note={event} {displayMenu} />
+            <EventCard note={event} {displayMenu} {repostable} />
           </div>
-          <EventCard {metadata} {displayMenu} note={event} /></Metadata
+          <EventCard
+            {metadata}
+            {displayMenu}
+            note={event}
+            {repostable}
+          /></Metadata
         >
       </LatestEvent>
     </div>

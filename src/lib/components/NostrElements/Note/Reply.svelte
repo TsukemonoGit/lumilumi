@@ -8,6 +8,7 @@
   export let replyUsers: string[];
   export let displayMenu: boolean;
   export let depth: number;
+  export let repostable: boolean;
   let loadNote = false;
 </script>
 
@@ -34,7 +35,13 @@
       ><Minimize2 size="20" class="mr-1" /> hide</button
     >
     <div class="border rounded-md border-magnum-600/30">
-      <Note id={replyID} mini={true} {displayMenu} depth={depth + 1} />
+      <Note
+        id={replyID}
+        mini={true}
+        {displayMenu}
+        depth={depth + 1}
+        {repostable}
+      />
     </div>
 
     <!-- <button

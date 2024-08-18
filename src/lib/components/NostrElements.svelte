@@ -134,15 +134,15 @@
               let:metadata
             >
               <div slot="loading" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={true} />
               </div>
               <div slot="nodata" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={true} />
               </div>
               <div slot="error" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={true} />
               </div>
-              <EventCard {metadata} note={event} />
+              <EventCard {metadata} note={event} repostable={true} />
             </Metadata>
             <!-- </div> -->
           {/each}

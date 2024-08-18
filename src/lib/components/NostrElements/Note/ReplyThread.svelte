@@ -4,6 +4,7 @@
   export let replyID: string | undefined;
   export let displayMenu: boolean;
   export let depth: number;
+  export let repostable: boolean;
 </script>
 
 {#if replyID}
@@ -13,5 +14,6 @@
     {displayMenu}
     thread={true}
     depth={depth + 1}
+    {repostable}
   />
 {/if}

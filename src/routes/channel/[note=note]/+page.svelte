@@ -20,7 +20,10 @@
     kind?: number | undefined;
     author?: string | undefined;
   };
-
+  //チャンネルでのリポストって誰に向けて見せたくてリポストしてるのかわからんくて扱いにくいから
+  //引用だけにしてみる
+  //Globalのチャンネルフィードにはkind16リポストk=16を表示することにしてみる。
+  //repostable={false}チャンネル部屋ではリポストできないようにしてみる（kindで判断じゃなくてチャンネル部屋にいるときだけだけどダイジョブ？？？）
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "undefined";
@@ -82,13 +85,13 @@
           limit: 50,
           since: since,
         },
-        {
-          kinds: [16],
-          "#k": ["42"],
-          limit: 20,
+        // {
+        //   kinds: [16],
+        //   "#k": ["42"],
+        //   limit: 20,
 
-          since: since,
-        },
+        //   since: since,
+        // },
         {
           kinds: [7], //   "#k": ["42"],
           "#p": [$loginUser],
@@ -138,15 +141,15 @@
               let:metadata
             >
               <div slot="loading" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={false} />
               </div>
               <div slot="nodata" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={false} />
               </div>
               <div slot="error" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} repostable={false} />
               </div>
-              <EventCard {metadata} note={event} />
+              <EventCard {metadata} note={event} repostable={false} />
             </Metadata>
             <!-- </div> -->
           {/each}

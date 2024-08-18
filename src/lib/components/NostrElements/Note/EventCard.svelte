@@ -52,6 +52,9 @@
   export let depth: number = 0;
   export let viewMuteEvent = false;
   export let excludefunc = (event: Nostr.Event) => false;
+
+  export let repostable: boolean = true;
+
   $: paramNoteId = $page.params.note
     ? getIDbyParam($page.params.note)
     : undefined;
@@ -255,7 +258,7 @@
 {#if muteType === "null" || viewMuteEvent}
   {#if thread && replyID}
     <!-- <div class="border-b border-magnum-600/30"> -->
-    <ReplyThread {replyID} {displayMenu} {depth} />
+    <ReplyThread {replyID} {displayMenu} {depth} {repostable} />
     <!-- </div> -->
   {/if}
 
@@ -265,7 +268,7 @@
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
         <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
         {#if !thread && (replyID || replyUsers.length > 0)}
-          <Reply {replyID} {replyUsers} {displayMenu} {depth} />
+          <Reply {replyID} {replyUsers} {displayMenu} {depth} {repostable} />
           <!--<hr />-->
         {/if}
 
@@ -279,6 +282,7 @@
               tags={note.tags}
               {displayMenu}
               {depth}
+              {repostable}
             />
           </div>
           {#if warning}
@@ -293,7 +297,7 @@
           </div>
         {/if}
         {#if displayMenu}
-          <NoteActionButtons {note} />{/if}
+          <NoteActionButtons {note} {repostable} />{/if}
       </NoteTemplate>
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
@@ -329,13 +333,13 @@
         {/if}
         <div class="ml-auto mr-2">
           {#if displayMenu}
-            <NoteActionButtons {note} />{/if}
+            <NoteActionButtons {note} {repostable} />{/if}
         </div>
       </div>
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} depth={depth + 1} />
+        <RepostedNote {tag} depth={depth + 1} {repostable} />
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -369,20 +373,20 @@
         {/if}
         <div class="ml-auto">
           {#if displayMenu}
-            <NoteActionButtons {note} />{/if}
+            <NoteActionButtons {note} {repostable} />{/if}
         </div>
       </div>
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} depth={depth + 1} />
+        <RepostedNote {tag} depth={depth + 1} {repostable} />
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
       <ReactionWebsite {note} {metadata} {displayMenu} {depth} {proxy} />
     {:else if note.kind === 0}
       <!--kind0-->
-      <Kind0Note {note} {proxy} {displayMenu} {depth} />
+      <Kind0Note {note} {proxy} {displayMenu} {depth} {repostable} />
     {:else if note.kind === 40}
       <!--kind40 パブ茶部屋-->
       <LatestEvent
@@ -426,19 +430,19 @@
     {:else if note.kind === 42}
       <!--kind42 パブ茶コメント-->
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        <Kind42Note {note} {displayMenu} {depth} /></NoteTemplate
+        <Kind42Note {note} {displayMenu} {depth} {repostable} /></NoteTemplate
       >
     {:else if note.kind === 30000}
       <ListLinkCard event={note} {depth} />
     {:else if note.kind === 30030}
       <!--kind30030-->
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        <Kind30030Note {note} /></NoteTemplate
+        <Kind30030Note {note} {repostable} /></NoteTemplate
       >
     {:else if note.kind === 9735}
       <!--kind9735 zap receipt-->
 
-      <Kind9735Note {note} {depth} {excludefunc} />
+      <Kind9735Note {note} {depth} {excludefunc} {repostable} />
     {:else}
       <!-- その他
       {@const clientData = findClientTag(note)}
@@ -654,9 +658,15 @@
           class="mt-0.5 overflow-y-auto overflow-x-hidden"
           style="max-height:{maxHeight ?? 'none'}"
         >
-          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
+          <Content
+            text={note.content}
+            tags={note.tags}
+            {displayMenu}
+            {depth}
+            {repostable}
+          />
         </div>
-        {#if displayMenu}<NoteActionButtons {note} />{/if}
+        {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
       </div>{/if}
   </article>
 {/if}

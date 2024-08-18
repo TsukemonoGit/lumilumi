@@ -16,6 +16,7 @@
   export let note: Nostr.Event;
   export let depth: number;
   export let excludefunc = (event: Nostr.Event) => false;
+  export let repostable: boolean;
 
   let viewMuteEvent: boolean;
   //kind9734の取得と検証
@@ -154,13 +155,13 @@
             </div>
 
             <div class="ml-auto mr-2">
-              <NoteActionButtons note={zapRequestEvent} />
+              <NoteActionButtons note={zapRequestEvent} {repostable} />
             </div>
           </div>
           <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
 
           {#if zappedId.tag.length > 0}
-            <RepostedNote tag={zappedId.tag} {depth} />
+            <RepostedNote tag={zappedId.tag} {depth} {repostable} />
           {/if}
         </Metadata>
       {/if}
