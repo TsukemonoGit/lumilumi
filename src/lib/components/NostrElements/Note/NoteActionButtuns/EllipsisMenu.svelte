@@ -10,6 +10,7 @@
     Radio,
     Share,
     NotepadText,
+    Tv,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -48,8 +49,15 @@
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
     { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
   ];
+
+  //30030 emojitoリンク
   if (note.kind === 30030) {
     menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
+  }
+
+  //30311 zap.streamリンク
+  if (note.kind === 30311) {
+    menuTexts?.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
   }
 
   if (indexes !== undefined) {
@@ -175,6 +183,12 @@
             color: "bg-orange-500",
           };
         }
+        break;
+      case 9:
+        //open in zap.stream
+        const zapStream = `https://zap.stream/${naddr}`;
+
+        window.open(zapStream, "_blank", "noreferrer");
         break;
     }
   };

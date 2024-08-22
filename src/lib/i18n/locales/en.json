@@ -85,7 +85,8 @@
     "nostr-watch": "Open in nostr.watch",
     "nostrrr": "Open in Nostrrr",
     "copylink": "Copy link",
-    "sharelink": "Share Link"
+    "sharelink": "Share Link",
+    "stream": "Open in zap.stream"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",

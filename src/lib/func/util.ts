@@ -122,7 +122,8 @@ export function datetime(unixtime: number) {
 
 export async function filesUpload(
   files: FileList,
-  uploader: string
+  uploader: string,
+  signal: AbortSignal // 新たに signal を受け取る
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
   let res: FileUploadResponse[] = [];
@@ -144,20 +145,30 @@ export async function filesUpload(
         file,
         serverConfig.api_url,
         header,
-        { content_type: file.type }
+        { content_type: file.type },
+        signal // signal を渡す
       );
       console.log(response);
       res.push(response);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      res.push({
-        status: "error",
-        message: "Failed to upload file: " + file.name,
-      } as FileUploadResponse);
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        console.log("Upload aborted:", file.name);
+        res.push({
+          status: "error",
+          message: "Upload aborted: " + file.name,
+        } as FileUploadResponse);
+      } else {
+        console.error("Error uploading file:", error);
+        res.push({
+          status: "error",
+          message: "Failed to upload file: " + file.name,
+        } as FileUploadResponse);
+      }
     }
   }
   return res;
 }
+
 export const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
   let str = "";
   if (isSuccess.length > 0) {

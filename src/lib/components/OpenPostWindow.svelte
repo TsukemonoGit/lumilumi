@@ -146,7 +146,14 @@
     }
     $nowProgress = false;
   }
+
+  // アップロードキャンセル用のコントローラーを作成
+  let uploadAbortController: AbortController | null = null;
+
   $: if (!$open) {
+    if (uploadAbortController) {
+      uploadAbortController.abort(); // アップロードを中断
+    }
     resetState();
   }
 
@@ -217,34 +224,53 @@
   const handleFileUpload = async (fileList: FileList) => {
     if (!fileList || fileList.length <= 0 || !$uploader) return;
     $nowProgress = true;
-    const uploadedURPs: FileUploadResponse[] = await filesUpload(
-      fileList,
-      $uploader
-    );
-    console.log(uploadedURPs);
-    uploadedURPs.forEach((data) => {
-      if (data.status === "success") {
-        const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+    // 既存のアップロードがある場合はキャンセルする
+    if (uploadAbortController) {
+      uploadAbortController.abort();
+    }
 
-        if (url) {
-          const len = text.length; //ULR入れる前のカーソルの場所にカーソルおく
-          const urln = `\n${url}`;
-          text =
-            text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
-          cursorPosition = len;
+    // 新しいアップロード用のAbortControllerを作成
+    uploadAbortController = new AbortController();
 
-          //imetaをたぐにいれる
-          if (data.nip94_event) {
-            tags.push(convertMetaTags(data.nip94_event));
+    try {
+      const uploadedURPs: FileUploadResponse[] = await filesUpload(
+        fileList,
+        $uploader,
+        uploadAbortController.signal // アップロード中断のシグナルを渡す
+      );
+      console.log(uploadedURPs);
+
+      uploadedURPs.forEach((data) => {
+        if (data.status === "success") {
+          const url = data.nip94_event?.tags.find(
+            (tag) => tag[0] === "url"
+          )?.[1];
+
+          if (url) {
+            const len = text.length; //ULR入れる前のカーソルの場所にカーソルおく
+            const urln = `\n${url}`;
+            text =
+              text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
+            cursorPosition = len;
+
+            // imetaをタグに入れる
+            if (data.nip94_event) {
+              tags.push(convertMetaTags(data.nip94_event));
+            }
+
+            setTimeout(() => {
+              textarea.selectionEnd = cursorPosition;
+              textarea.focus();
+            }, 10);
           }
-          setTimeout(() => {
-            textarea.selectionEnd = cursorPosition;
-            textarea.focus();
-          }, 10);
         }
-      }
-    });
-    $nowProgress = false;
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      $nowProgress = false;
+      uploadAbortController = null;
+    }
   };
   // ドラッグ&ドロップのイベントハンドラ
   const handleDrop = async (event: DragEvent) => {

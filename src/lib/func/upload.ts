@@ -7,7 +7,8 @@ export async function uploadFile(
   file: File,
   serverApiUrl: string,
   nip98AuthorizationHeader: string,
-  optionalFormDataFields?: OptionalFormDataFields
+  optionalFormDataFields?: OptionalFormDataFields,
+  signal?: AbortSignal // signal を追加
 ): Promise<FileUploadResponse> {
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
@@ -18,13 +19,16 @@ export async function uploadFile(
       }
     });
   formData.append("file", file);
+
   const response = await fetch(serverApiUrl, {
     method: "POST",
     headers: {
       Authorization: nip98AuthorizationHeader,
     },
     body: formData,
+    signal, // signal を追加して fetch リクエストに渡す
   });
+
   if (response.ok === false) {
     if (response.status === 413) {
       throw new Error("File too large!");
@@ -42,6 +46,7 @@ export async function uploadFile(
     }
     throw new Error("Unknown error in uploading file!");
   }
+
   try {
     console.log(response);
     const parsedResponse = await response.json();

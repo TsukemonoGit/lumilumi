@@ -84,7 +84,8 @@
     },
     "nostr-watch": "nostr.watch で開く",
     "nostrrr": "Nostrrr で開く",
-    "sharelink": "リンクの共有"
+    "sharelink": "リンクの共有",
+    "stream": "zap.streamで開く"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
