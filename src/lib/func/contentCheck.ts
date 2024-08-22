@@ -107,7 +107,7 @@ export function contentCheck(
   //hashtag
   const hashtagMatches = text.matchAll(hashtagRegex);
   const hashtags = [...hashtagMatches]
-    .map((match) => ["t", match.groups?.hashtag])
+    .map((match) => ["t", match.groups?.hashtag.toLowerCase()])
     .filter((x): x is string[] => x !== undefined);
   newTags.push(...Array.from(new Set(hashtags)));
 

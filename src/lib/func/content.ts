@@ -55,11 +55,15 @@ export function parseText(input: string, tags: string[][]): Part[] {
   );
 
   // Create hashtag set for exact matching
-  const hashtagSet = new Set(
+  //lowercaseにして重複削除
+  const lowerHashtagSet = new Set(
     tags
       .filter((tag) => tag[0] === "t")
-      .map((tag) => `#${tag[1]}`)
-      .sort((a, b) => b.length - a.length)
+      .map((tag) => `#${tag[1].toLowerCase()}`) // lowercaseに変換
+  );
+
+  const hashtagSet = Array.from(lowerHashtagSet).sort(
+    (a, b) => b.length - a.length
   );
 
   const findEmojiIndex = (
@@ -85,10 +89,14 @@ export function parseText(input: string, tags: string[][]): Part[] {
     let earliestIndex = -1;
     let foundHashtag = "";
     hashtagSet.forEach((hashtag) => {
-      const index = text.indexOf(hashtag);
+      const lowerCaseText = text.toLowerCase();
+      const index = lowerCaseText.indexOf(hashtag);
+
       if (index !== -1 && (earliestIndex === -1 || index < earliestIndex)) {
         earliestIndex = index;
-        foundHashtag = hashtag;
+        // 元のテキストから一致部分を取得
+        foundHashtag = text.slice(index, index + hashtag.length);
+        // console.log(foundHashtag);
       }
     });
     return earliestIndex !== -1
@@ -230,7 +238,11 @@ export function parseText(input: string, tags: string[][]): Part[] {
           });
           break;
         case "hashtag":
-          parts.push({ type: "hashtag", content: match[0].slice(1) }); // Remove leading '#'
+          parts.push({
+            type: "hashtag",
+            content: match[0].slice(1),
+            url: match[0].slice(1).toLowerCase(),
+          }); // Remove leading '#'
           break;
         case "nip":
           parts.push({

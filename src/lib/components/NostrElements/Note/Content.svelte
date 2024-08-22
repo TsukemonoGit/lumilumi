@@ -179,7 +179,7 @@
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.content}`}
+      href={`/search?t=${part.url}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
     >
   {:else if part.type === "nip"}

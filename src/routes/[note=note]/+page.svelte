@@ -46,6 +46,7 @@
   onDestroy(() => {
     console.log("destroy");
   });
+  const repostable = true;
 </script>
 
 <svelte:head>
@@ -65,6 +66,7 @@
       displayMenu={true}
       thread={true}
       depth={0}
+      {repostable}
     />
   </div>
   <AllReactions
@@ -103,15 +105,15 @@
             let:metadata
           >
             <div slot="loading">
-              <EventCard note={event} depth={0} />
+              <EventCard note={event} depth={0} {repostable} />
             </div>
             <div slot="nodata">
-              <EventCard note={event} depth={0} />
+              <EventCard note={event} depth={0} {repostable} />
             </div>
             <div slot="error">
-              <EventCard note={event} depth={0} />
+              <EventCard note={event} depth={0} {repostable} />
             </div>
-            <EventCard {metadata} note={event} depth={0} />
+            <EventCard {metadata} note={event} depth={0} {repostable} />
           </Metadata>
           <!-- </div> -->
         {/each}

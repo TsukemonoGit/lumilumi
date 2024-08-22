@@ -104,6 +104,7 @@
       return;
     }
     const zapPubkey = await getZapLNURLPubkey(metadata);
+
     return zapPubkey === note.pubkey;
   }
 </script>
@@ -155,7 +156,7 @@
             </div>
 
             <div class="ml-auto mr-2">
-              <NoteActionButtons note={zapRequestEvent} {repostable} />
+              <NoteActionButtons {note} {repostable} />
             </div>
           </div>
           <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
@@ -165,6 +166,11 @@
           {/if}
         </Metadata>
       {/if}
+    {:else}
+      <div class="text-magnum-200">Invalid kind:9735 Event</div>
+      <div class="ml-auto mr-2">
+        <NoteActionButtons {note} {repostable} />
+      </div>
     {/if}
   {/await}
 {/if}

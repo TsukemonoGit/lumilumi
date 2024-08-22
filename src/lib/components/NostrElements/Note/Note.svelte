@@ -13,7 +13,7 @@
   export let repostable: boolean;
 </script>
 
-<Text queryKey={["timeline", id]} {id} let:text>
+<Text queryKey={["timeline", id]} {id} let:text let:status>
   <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
     Loading {nip19.noteEncode(id)}
   </div>
@@ -25,7 +25,6 @@
     let:error
     class="text-sm text-neutral-500 flex-inline break-all"
   >
-    {error}
     {nip19.noteEncode(id)}
   </div>
   <Metadata
