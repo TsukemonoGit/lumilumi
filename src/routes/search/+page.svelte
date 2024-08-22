@@ -15,7 +15,7 @@
   import { onMount, type SvelteComponent } from "svelte";
 
   let searchWord = "";
-  let searchKind = 1;
+  let searchKind: number | undefined = undefined;
   let searchPubkey = "";
   let searchSince: number | undefined;
   let searchUntil: number | undefined;
@@ -58,10 +58,13 @@
   });
 
   async function init() {
-    const params = get(page).url.searchParams;
+    // const params = get(page).url.searchParams;
+    const params = new URLSearchParams(window.location.search);
+    console.log(params);
+
     searchHashtag = params.get("t") ?? undefined;
     searchWord = params.get("q") ?? "";
-    searchKind = params.get("k") !== null ? Number(params.get("k")) : 1;
+    searchKind = params.get("k") !== null ? Number(params.get("k")) : undefined;
     searchPubkey = params.get("p") ?? "";
     searchSince = params.get("s") ? Number(params.get("s")) : undefined;
     searchUntil = params.get("u") ? Number(params.get("u")) : undefined;
@@ -78,6 +81,8 @@
       showFilters = $filters.map((filter) => {
         return { ...filter, limit: 50 };
       });
+      console.log(showFilters);
+
       handleClickSearch();
     }
     isMount = false;
@@ -118,7 +123,7 @@
     $filters = [
       {
         search: searchWord || undefined,
-        kinds: [searchKind],
+
         authors: npubRegex.test(searchPubkey)
           ? [getHex(searchPubkey)]
           : followee
@@ -129,7 +134,9 @@
         "#t": searchHashtag ? [searchHashtag] : [],
       },
     ];
-
+    if (searchKind) {
+      $filters[0].kinds = [searchKind];
+    }
     //  const chank = 100;
     //if (!followee || !followingList || followingList?.length < chank) {
     //   $filters = [
@@ -185,9 +192,11 @@
       openSearchResult = false;
       setTimeout(() => {
         openSearchResult = true;
-      }, 10);
+      }, 0);
     } else {
-      openSearchResult = true;
+      setTimeout(() => {
+        openSearchResult = true;
+      }, 0);
     }
     $nowProgress = false;
   }
@@ -349,5 +358,5 @@
   >
 </section>
 {#if openSearchResult}
-  <SearchResult bind:this={compRef} filters={showFilters} />
+  <SearchResult bind:this={compRef} bind:filters={showFilters} />
 {/if}
