@@ -36,7 +36,7 @@ export function rxNostr3ReccoctRelay(url: string) {
 const req3 = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {
-  console.log(filters);
+  //  console.log(filters);
   req3.emit(filters);
 }
 
@@ -50,7 +50,7 @@ export function useReq3({
   status: Readable<ReqStatus>;
   error: Readable<Error>;
 } {
-  console.log(filters);
+  //console.log(filters);
 
   const _queryClient = get(queryClient);
 
