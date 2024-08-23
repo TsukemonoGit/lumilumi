@@ -255,7 +255,7 @@ export function sortEventPackets<A extends EventPacket>(events: A[]): A[] {
     if (a.event.created_at !== b.event.created_at) {
       return b.event.created_at - a.event.created_at;
     }
-    return b.event.id.localeCompare(a.event.id);
+    return a.event.id.localeCompare(b.event.id);
   });
 }
 export function sortEvents(events: Nostr.Event[]): Nostr.Event[] {
@@ -263,7 +263,7 @@ export function sortEvents(events: Nostr.Event[]): Nostr.Event[] {
     if (a.created_at !== b.created_at) {
       return b.created_at - a.created_at;
     }
-    return b.id.localeCompare(a.id);
+    return a.id.localeCompare(b.id);
   });
 }
 //新しいのが上
