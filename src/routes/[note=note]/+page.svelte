@@ -119,57 +119,59 @@
         </Metadata>
 
         <!--noteのkindが40の場合はチャンネルページに飛ばすのでノート詠み込まれたあとでAllReactions取得するようにする-->
-        <AllReactions
-          queryKey={["allreactions", data.id]}
-          id={data.id}
-          let:kind1
-          let:kind6
-          let:kind7
-          let:kind9735
-        >
-          <div slot="loading">loading</div>
-          <div slot="nodata">nodata</div>
-          <div slot="error">error</div>
+        <div>
+          <AllReactions
+            queryKey={["allreactions", data.id]}
+            id={data.id}
+            let:kind1
+            let:kind6
+            let:kind7
+            let:kind9735
+          >
+            <div slot="loading">loading</div>
+            <div slot="nodata">nodata</div>
+            <div slot="error">error</div>
 
-          <!--kind6-->
-          <NoteRepostList events={kind6} />
+            <!--kind6-->
+            <NoteRepostList events={kind6} />
 
-          <!--kind7-->
-          <NoteReactionList events={kind7} />
+            <!--kind7-->
+            <NoteReactionList events={kind7} />
 
-          <!--zap レシート-->
-          <ZapReactionList events={kind9735} />
+            <!--zap レシート-->
+            <ZapReactionList events={kind9735} />
 
-          <!--kind1,42-->
-          <CollapsibleList title="Kind1,42" amount={kind1.length}>
-            <div
-              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-            >
-              {#each sortEvents(kind1).reverse() as event (event.id)}
-                <!-- <div
+            <!--kind1,42-->
+            <CollapsibleList title="Kind1,42" amount={kind1.length}>
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              >
+                {#each sortEvents(kind1).reverse() as event (event.id)}
+                  <!-- <div
             class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
           > -->
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading">
-                    <EventCard note={event} depth={0} {repostable} />
-                  </div>
-                  <div slot="nodata">
-                    <EventCard note={event} depth={0} {repostable} />
-                  </div>
-                  <div slot="error">
-                    <EventCard note={event} depth={0} {repostable} />
-                  </div>
-                  <EventCard {metadata} note={event} depth={0} {repostable} />
-                </Metadata>
-                <!-- </div> -->
-              {/each}
-            </div>
-          </CollapsibleList>
-        </AllReactions>
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                    let:metadata
+                  >
+                    <div slot="loading">
+                      <EventCard note={event} depth={0} {repostable} />
+                    </div>
+                    <div slot="nodata">
+                      <EventCard note={event} depth={0} {repostable} />
+                    </div>
+                    <div slot="error">
+                      <EventCard note={event} depth={0} {repostable} />
+                    </div>
+                    <EventCard {metadata} note={event} depth={0} {repostable} />
+                  </Metadata>
+                  <!-- </div> -->
+                {/each}
+              </div>
+            </CollapsibleList>
+          </AllReactions>
+        </div>
       {/await}
     </Text>
   </div>
