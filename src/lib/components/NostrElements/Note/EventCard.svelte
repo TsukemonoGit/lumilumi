@@ -227,7 +227,11 @@
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
   let replyUsers: string[];
-  $: if (note && note.kind === 1 && note.tags.length > 0) {
+  $: if (
+    note &&
+    (note.kind === 1 || note.kind === 42) &&
+    note.tags.length > 0
+  ) {
     const res = replyedEvent(note.tags);
     replyID = res.replyID;
     replyUsers = res.replyUsers;
@@ -299,6 +303,18 @@
         {#if displayMenu}
           <NoteActionButtons {note} {repostable} />{/if}
       </NoteTemplate>
+    {:else if note.kind === 42}
+      <!--kind42 パブ茶コメント-->
+
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
+        <Kind42Note
+          {note}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {thread}
+        /></NoteTemplate
+      >
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
       <div class="flex gap-1 items-center bg-magnum-800/25">
@@ -427,11 +443,6 @@
           {event}
         />
       </LatestEvent>
-    {:else if note.kind === 42}
-      <!--kind42 パブ茶コメント-->
-      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        <Kind42Note {note} {displayMenu} {depth} {repostable} /></NoteTemplate
-      >
     {:else if note.kind === 30000}
       <ListLinkCard event={note} {depth} />
     {:else if note.kind === 30030}

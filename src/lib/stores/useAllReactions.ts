@@ -37,8 +37,8 @@ export function useAllReactions(
   };
 
   const filters = [
-    { kinds: [1, 6, 7, 9735], "#e": [id] },
-    { kinds: [1, 6, 7, 9735], "#q": [id] },
+    { kinds: [1, 42, 6, 7, 9735], "#e": [id] },
+    { kinds: [1, 42, 6, 7, 9735], "#q": [id] },
   ];
   console.log(filters);
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });

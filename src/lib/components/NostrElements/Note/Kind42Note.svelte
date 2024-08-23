@@ -11,6 +11,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
 
+  export let thread: boolean;
   export let displayMenu: boolean;
   export let note: Nostr.Event;
   export let depth: number;
@@ -76,7 +77,7 @@
 </script>
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
-  {#if replyID || replyUsers.length > 0}
+  {#if !thread && (replyID || replyUsers.length > 0)}
     <Reply
       {replyID}
       {replyUsers}
