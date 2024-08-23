@@ -29,7 +29,7 @@
   //  $open = true;
 
   open.subscribe(async (value) => {
-    console.log(value);
+    // console.log(value);
     if (value && !$nowProgress) {
       $nowProgress = true;
       try {

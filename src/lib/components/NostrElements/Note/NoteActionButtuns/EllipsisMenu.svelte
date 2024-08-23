@@ -11,6 +11,7 @@
     Share,
     NotepadText,
     Tv,
+    MessagesSquare,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";

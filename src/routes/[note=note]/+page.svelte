@@ -12,10 +12,14 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { sortEvents } from "$lib/func/util";
+
+  import Text from "$lib/components/NostrMainData/Text.svelte";
+  import { nip19 } from "nostr-tools";
+  import * as Nostr from "nostr-typedef";
 
   export let data: {
     id: string;
@@ -47,6 +51,17 @@
     console.log("destroy");
   });
   const repostable = true;
+
+  const maxHeight = "none";
+  const displayMenu = true;
+  const thread = true;
+  const depth = 0;
+
+  const checkNoteKind = (ev: Nostr.Event) => {
+    if (ev.kind === 40) {
+      goto(`/channel/${nip19.noteEncode(ev.id)}`);
+    }
+  };
 </script>
 
 <svelte:head>
@@ -60,66 +75,104 @@
   <div
     class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
   >
-    <Note
-      id={data.id}
-      maxHeight={"none"}
-      displayMenu={true}
-      thread={true}
-      depth={0}
-      {repostable}
-    />
-  </div>
-  <AllReactions
-    queryKey={["allreactions", data.id]}
-    id={data.id}
-    let:kind1
-    let:kind6
-    let:kind7
-    let:kind9735
-  >
-    <div slot="loading">loading</div>
-    <div slot="nodata">nodata</div>
-    <div slot="error">error</div>
-
-    <!--kind6-->
-    <NoteRepostList events={kind6} />
-
-    <!--kind7-->
-    <NoteReactionList events={kind7} />
-
-    <!--zap レシート-->
-    <ZapReactionList events={kind9735} />
-
-    <!--kind1,42-->
-    <CollapsibleList title="Kind1,42" amount={kind1.length}>
+    <Text queryKey={["timeline", data.id]} id={data.id} let:text let:status>
       <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        slot="loading"
+        class="text-sm text-neutral-500 flex-inline break-all"
       >
-        {#each sortEvents(kind1).reverse() as event (event.id)}
-          <!-- <div
+        Loading {nip19.noteEncode(data.id)}
+      </div>
+      <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
+        nodata {nip19.noteEncode(data.id)}
+      </div>
+      <div
+        slot="error"
+        let:error
+        class="text-sm text-neutral-500 flex-inline break-all"
+      >
+        {nip19.noteEncode(data.id)}
+      </div>
+      {#await checkNoteKind(text) then}
+        <Metadata
+          queryKey={["metadata", text.pubkey]}
+          pubkey={text.pubkey}
+          let:metadata
+        >
+          <div slot="loading">
+            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+          </div>
+          <div slot="nodata">
+            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+          </div>
+          <div slot="error" let:error>
+            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+          </div>
+          <EventCard
+            note={text}
+            {metadata}
+            {maxHeight}
+            {thread}
+            {displayMenu}
+            {depth}
+            {repostable}
+          />
+        </Metadata>
+
+        <!--noteのkindが40の場合はチャンネルページに飛ばすのでノート詠み込まれたあとでAllReactions取得するようにする-->
+        <AllReactions
+          queryKey={["allreactions", data.id]}
+          id={data.id}
+          let:kind1
+          let:kind6
+          let:kind7
+          let:kind9735
+        >
+          <div slot="loading">loading</div>
+          <div slot="nodata">nodata</div>
+          <div slot="error">error</div>
+
+          <!--kind6-->
+          <NoteRepostList events={kind6} />
+
+          <!--kind7-->
+          <NoteReactionList events={kind7} />
+
+          <!--zap レシート-->
+          <ZapReactionList events={kind9735} />
+
+          <!--kind1,42-->
+          <CollapsibleList title="Kind1,42" amount={kind1.length}>
+            <div
+              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            >
+              {#each sortEvents(kind1).reverse() as event (event.id)}
+                <!-- <div
             class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
           > -->
-          <Metadata
-            queryKey={["metadata", event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <div slot="loading">
-              <EventCard note={event} depth={0} {repostable} />
+                <Metadata
+                  queryKey={["metadata", event.pubkey]}
+                  pubkey={event.pubkey}
+                  let:metadata
+                >
+                  <div slot="loading">
+                    <EventCard note={event} depth={0} {repostable} />
+                  </div>
+                  <div slot="nodata">
+                    <EventCard note={event} depth={0} {repostable} />
+                  </div>
+                  <div slot="error">
+                    <EventCard note={event} depth={0} {repostable} />
+                  </div>
+                  <EventCard {metadata} note={event} depth={0} {repostable} />
+                </Metadata>
+                <!-- </div> -->
+              {/each}
             </div>
-            <div slot="nodata">
-              <EventCard note={event} depth={0} {repostable} />
-            </div>
-            <div slot="error">
-              <EventCard note={event} depth={0} {repostable} />
-            </div>
-            <EventCard {metadata} note={event} depth={0} {repostable} />
-          </Metadata>
-          <!-- </div> -->
-        {/each}
-      </div>
-    </CollapsibleList>
-  </AllReactions>
+          </CollapsibleList>
+        </AllReactions>
+      {/await}
+    </Text>
+  </div>
 </section>
 <div class="postWindow">
   <OpenPostWindow
