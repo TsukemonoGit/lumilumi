@@ -105,7 +105,7 @@
   </div>
 {/await}
 {#if heyaId}
-  <Text queryKey={["timeline", heyaId]} id={heyaId} let:text>
+  <Text queryKey={["channel", "kind40", heyaId]} id={heyaId} let:text>
     <button
       title={channelLink}
       on:click={handleClickToChannel}
