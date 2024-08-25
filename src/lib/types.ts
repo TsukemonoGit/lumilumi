@@ -135,10 +135,11 @@ export interface AdditionalPostOptions {
   addableUserList: string[];
   defaultUsers: string[];
   warningText: string | undefined;
+  kind?: number | undefined;
 }
 export interface MargePostOptions {
   tags: string[][];
-  kind?: number;
+  kind: number;
   content?: string;
   addableUserList?: string[];
   defaultUsers?: string[];

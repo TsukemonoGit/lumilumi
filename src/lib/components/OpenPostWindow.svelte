@@ -57,7 +57,7 @@
   let selectedUploader: string;
   let files: FileList | undefined;
   let fileInput: HTMLInputElement | undefined;
-  let initOptions: MargePostOptions = { ...options };
+  let initOptions: MargePostOptions = { ...options, kind: options.kind ?? 1 };
   const { elements, states } = createDialog({
     forceVisible: true,
     closeOnOutsideClick: false, //overlay押したときに閉じない
@@ -77,12 +77,28 @@
     console.log($additionalPostOptions);
 
     if ($additionalPostOptions) {
-      // タグをコピー//チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
+      // タグをコピー
 
       initOptions = {
         ...options,
-        tags: [...options.tags, ...$additionalPostOptions.tags],
+        kind: $additionalPostOptions.kind ?? options.kind ?? 1,
+        //チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
+        tags: (() => {
+          const combinedTags = options.tags.concat($additionalPostOptions.tags);
+          let hasRoot = false;
 
+          return combinedTags.filter((tag) => {
+            // "root"タグを含む場合の処理
+            if (tag.includes("root")) {
+              if (!hasRoot) {
+                hasRoot = true; // 最初の"root"タグは保持
+                return true;
+              }
+              return false; // 2つ目以降の"root"タグは除外
+            }
+            return true; // root以外のタグはそのまま
+          });
+        })(),
         content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
         addableUserList: $additionalPostOptions.addableUserList,
         defaultUsers: $additionalPostOptions.defaultUsers,
@@ -184,7 +200,7 @@
         checkedTags.push(...replyUsersArray);
       }
       const newev: Nostr.EventParameters = {
-        kind: options.kind ?? 1,
+        kind: initOptions.kind,
         content: checkedText,
         tags: checkedTags,
       };
@@ -202,7 +218,7 @@
     viewCustomEmojis = false;
     customReaction = "";
     $additionalReplyUsers = [];
-    initOptions = { ...options };
+    initOptions = { ...options, kind: options.kind ?? 1 };
   };
 
   const handleTextareaInput = (event: Event) => {
@@ -416,7 +432,7 @@
                 pubkey: signPubkey,
                 content: text,
                 tags: tags,
-                kind: options.kind ?? 1,
+                kind: initOptions.kind,
                 created_at: now(),
               }}
               displayMenu={false}

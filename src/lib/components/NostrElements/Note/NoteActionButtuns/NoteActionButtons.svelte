@@ -260,10 +260,10 @@
       tags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
     } else {
       if (root) {
-        if (note.kind !== 42) {
-          //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
-          tags.push(root);
-        }
+        // if (note.kind !== 42) {
+        //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
+        tags.push(root);
+        // }
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "reply"]);
       } else {
         tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "root"]);
@@ -271,6 +271,7 @@
     }
 
     const options: AdditionalPostOptions = {
+      kind: note.kind === 42 ? 42 : 1,
       tags: tags,
       content: "",
       defaultUsers: [note.pubkey],
