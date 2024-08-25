@@ -140,32 +140,26 @@
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
-  {:else if part.type === "url"}{#if $showImg}
-      <OGP url={part.content ?? ""} let:contents>
-        <Link
+  {:else if part.type === "url"}{#if $showImg}<OGP
+        url={part.content ?? ""}
+        let:contents
+        ><Link
           props={{ "aria-label": `External Links: ${part.url}` }}
           slot="nodata"
           className="underline text-magnum-300 break-all "
           href={part.content ?? ""}>{part.content}</Link
-        >
-        {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-          <OgpCard {contents} url={part.content ?? ""} />
-        {:else}
-          <Link
+        >{#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+          <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             slot="nodata"
             className="underline text-magnum-300 break-all "
             href={part.content ?? ""}>{part.content ?? ""}</Link
-          >
-        {/if}
-      </OGP>
-    {:else}
-      <Link
+          >{/if}</OGP
+      >{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
-      >{/if}
-  {:else if part.type === "emoji"}
+      >{/if}{:else if part.type === "emoji"}
     {#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
@@ -187,11 +181,8 @@
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all"
       href={part.url ?? ""}>{part.content}</Link
-    >
-  {:else}
-    <span
-      class="whitespace-pre-wrap break-words word align-middle"
+    >{:else}<span
+      class="whitespace-pre-wrap break-words word"
       style="word-break: break-word;">{part.content}</span
-    >
-  {/if}
+    >{/if}
 {/each}

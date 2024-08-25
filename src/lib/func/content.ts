@@ -164,35 +164,29 @@ export function parseText(input: string, tags: string[][]): Part[] {
         case "url":
           const url = match[0];
           const lastUnpairedParenIndex = url.split("").reduce(
-            (acc, char, index) => {
+            (acc, char, idx) => {
               if (char === "(") acc.openParenCount++;
               if (char === ")") acc.closeParenCount++;
               if (
                 acc.closeParenCount > acc.openParenCount &&
                 acc.index === url.length
               ) {
-                acc.index = index;
+                acc.index = idx;
               }
               return acc;
             },
             { openParenCount: 0, closeParenCount: 0, index: url.length }
           ).index;
 
-          // If there's an unpaired closing parenthesis, split the URL and text
-          const { urlPart, textPart } =
-            lastUnpairedParenIndex < url.length
-              ? {
-                  urlPart: url.slice(0, lastUnpairedParenIndex),
-                  textPart: url.slice(lastUnpairedParenIndex),
-                }
-              : { urlPart: url, textPart: undefined };
+          // Split the URL into its proper parts
+          const urlPart = url.slice(0, lastUnpairedParenIndex);
+          const textPart = url.slice(lastUnpairedParenIndex);
 
           const urlType = checkFileExtension(urlPart);
           if (
-            urlType === "image"
-            //||
-            // urlType === "audio" ||
-            //  urlType === "movie"
+            urlType === "image" ||
+            urlType === "audio" ||
+            urlType === "movie"
           ) {
             parts.push({
               type: urlType,
@@ -210,21 +204,9 @@ export function parseText(input: string, tags: string[][]): Part[] {
           if (textPart) {
             parts.push({
               type: "text",
-              content: urlPart,
+              content: textPart,
             });
           }
-          // if (lastUnpairedParenIndex < url.length) {
-          //   parts.push({
-          //     type: "url",
-          //     content: url.slice(0, lastUnpairedParenIndex),
-          //   });
-          //   parts.push({
-          //     type: "text",
-          //     content: url.slice(lastUnpairedParenIndex),
-          //   });
-          // } else {
-          //   parts.push({ type: "url", content: url });
-          // }
           break;
         case "emoji":
           const emojiContent = match[0].slice(1, -1); // Remove surrounding colons
