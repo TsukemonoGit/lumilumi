@@ -20,6 +20,7 @@
     nowProgress,
     showUserStatus,
     noBanner,
+    showKind16,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -96,6 +97,7 @@
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
     $noBanner = settings.noBanner;
+    $showKind16 = settings.showKind16;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -185,6 +187,7 @@
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
     $noBanner = settings.noBanner;
+    $showKind16 = settings.showKind16;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -575,6 +578,14 @@
           bind:checked={settings.showUserStatus}
         />
         {$_("settings.display.showUserStatus")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showKind16}
+        />
+        {$_("settings.display.showKind16")}
       </label>
       <label>
         <input

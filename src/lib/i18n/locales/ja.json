@@ -26,7 +26,8 @@
       "showRelayIcon": "アイコンの下にリレー情報を表示する",
       "showReactioninTL": "自分へのリアクションをTLに流す",
       "showUserStatus": "ユーザーステータスを表示する",
-      "banner": "右側のアカウントバナーを非表示にする"
+      "banner": "右側のアカウントバナーを非表示にする",
+      "showKind16": "kind16(kind1以外のリポスト)を表示する"
     },
     "douki": {
       "title": "データの同期"

@@ -16,6 +16,7 @@
     queryClient,
     showUserStatus,
     noBanner,
+    showKind16,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -85,6 +86,7 @@
       nostrWalletConnect: savedNostrWalletConnect,
       showUserStatus: savedShowUserStatus,
       noBanner: savedNobanner,
+      showKind16: savedShowKind16,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -114,7 +116,7 @@
     //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定
     // getMetadataFromLocalStorage();
     //}
-
+    $showKind16 = savedShowKind16;
     $mutes = savedMute ? savedMute.list : undefined;
 
     $emojis = savedEmoji && savedEmoji.list ? savedEmoji.list : [];

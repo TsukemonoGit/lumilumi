@@ -10,6 +10,7 @@
   import {
     loginUser,
     queryClient,
+    showKind16,
     showReactioninTL,
     showUserStatus,
   } from "$lib/stores/stores";
@@ -59,10 +60,14 @@
   const makeFilters = (contacts: Nostr.Event<number>): Nostr.Filter[] => {
     //console.log(contacts);
     const pubkeyList = pubkeysIn(contacts, $loginUser);
+    const kinds = [1, 6];
+    if ($showKind16) {
+      kinds.push(16);
+    }
     const filters: Nostr.Filter[] = [
       {
         authors: pubkeyList,
-        kinds: [1, 6, 16],
+        kinds: kinds,
         limit: 50,
         since: since,
       },

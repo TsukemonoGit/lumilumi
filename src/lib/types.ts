@@ -105,6 +105,7 @@ export interface LumiSetting {
   mutebykinds: { list: { kind: number; list: string[] }[]; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
   defaultReaction: { content: string; tag: string[] };
   noBanner: boolean;
+  showKind16: boolean;
 }
 export interface MuteList {
   p: string[];
