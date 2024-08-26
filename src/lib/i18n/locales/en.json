@@ -101,5 +101,9 @@
     "label": {
       "image": "Enlarge image"
     }
+  },
+  "about": {
+    "houkoku": "Bug Reports",
+    "share": "Share"
   }
 }
