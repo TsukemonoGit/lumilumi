@@ -8,7 +8,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
@@ -30,24 +30,23 @@
 
   let isOnMount = false;
   let since: number | undefined = undefined;
-  const timelineQuery: QueryKey = ["channel", "feed", data.id];
+  $: timelineQuery = ["channel", "feed", data.id]; //部屋から部屋に移動したときにconstだとだめだった
   onMount(() => {
     if (!isOnMount) {
       isOnMount = true;
       init();
-
-      isOnMount = false;
     }
   });
   afterNavigate(() => {
     if (!isOnMount) {
       isOnMount = true;
       init();
-
-      isOnMount = false;
     }
   });
-
+  let view = false;
+  beforeNavigate(() => {
+    view = false;
+  });
   async function init() {
     since = undefined;
     setTieKey(tieKey);
@@ -63,6 +62,8 @@
     } else {
       since = ev[0].event.created_at;
     }
+    isOnMount = false;
+    view = true;
   }
 </script>
 
@@ -71,93 +72,94 @@
   <meta property="og:description" content="Channel" />
   <meta name="description" content="Channel" />
 </svelte:head>
-<section class="w-full break-words overflow-hidden">
-  <ChannelMetadata
-    id={data.id}
-    linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
-  />{#if since}
-    <TimelineList
-      queryKey={timelineQuery}
-      filters={[
-        {
-          "#e": [data.id],
-          kinds: [42],
-          limit: 50,
-          since: since,
-        },
-        // {
-        //   kinds: [16],
-        //   "#k": ["42"],
-        //   limit: 20,
+{#if view}
+  <section class="w-full break-words overflow-hidden">
+    <ChannelMetadata
+      id={data.id}
+      linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+    />{#if since}
+      <TimelineList
+        queryKey={timelineQuery}
+        filters={[
+          {
+            "#e": [data.id],
+            kinds: [42],
+            limit: 50,
+            since: since,
+          },
+          // {
+          //   kinds: [16],
+          //   "#k": ["42"],
+          //   limit: 20,
 
-        //   since: since,
-        // },
-        {
-          kinds: [7], //   "#k": ["42"],
-          "#p": [$loginUser],
-          "#e": [data.id],
-          limit: 20,
+          //   since: since,
+          // },
+          {
+            kinds: [7], //   "#k": ["42"],
+            "#p": [$loginUser],
+            "#e": [data.id],
+            limit: 20,
 
-          since: since,
-        },
-      ]}
-      req={createRxForwardReq()}
-      let:events
-      {viewIndex}
-      {amount}
-      {tieKey}
-      lastfavcheck={false}
-      let:len
-      eventFilter={(event) =>
-        (event.kind === 42 &&
-          event.tags.find(
-            (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id
-          ) !== undefined) ||
-        event.kind !== 42}
-    >
-      <SetRepoReactions />
-      <div slot="loading">
-        <p>Loading...</p>
-      </div>
-
-      <div slot="error" let:error>
-        <p>{error}</p>
-      </div>
-
-      <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            since: since,
+          },
+        ]}
+        req={createRxForwardReq()}
+        let:events
+        {viewIndex}
+        {amount}
+        {tieKey}
+        lastfavcheck={false}
+        let:len
+        eventFilter={(event) =>
+          (event.kind === 42 &&
+            event.tags.find(
+              (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id
+            ) !== undefined) ||
+          event.kind !== 42}
       >
-        {#if events && events.length > 0}
-          {#each events as event, index (event.id)}
-            <!-- <div
+        <SetRepoReactions />
+        <div slot="loading">
+          <p>Loading...</p>
+        </div>
+
+        <div slot="error" let:error>
+          <p>{error}</p>
+        </div>
+
+        <div
+          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        >
+          {#if events && events.length > 0}
+            {#each events as event, index (event.id)}
+              <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card {index ===
                 events.length - 1
                   ? 'last-visible'
                   : ''} {index === 0 ? 'first-visible' : ''}"
               > -->
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-              let:metadata
-            >
-              <div slot="loading" class="w-full">
-                <EventCard note={event} repostable={false} />
-              </div>
-              <div slot="nodata" class="w-full">
-                <EventCard note={event} repostable={false} />
-              </div>
-              <div slot="error" class="w-full">
-                <EventCard note={event} repostable={false} />
-              </div>
-              <EventCard {metadata} note={event} repostable={false} />
-            </Metadata>
-            <!-- </div> -->
-          {/each}
-        {/if}
-      </div>
-    </TimelineList>{/if}
-</section>
-
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading" class="w-full">
+                  <EventCard note={event} repostable={false} />
+                </div>
+                <div slot="nodata" class="w-full">
+                  <EventCard note={event} repostable={false} />
+                </div>
+                <div slot="error" class="w-full">
+                  <EventCard note={event} repostable={false} />
+                </div>
+                <EventCard {metadata} note={event} repostable={false} />
+              </Metadata>
+              <!-- </div> -->
+            {/each}
+          {/if}
+        </div>
+      </TimelineList>{/if}
+  </section>
+{/if}
 <div class="postWindow">
   <OpenPostWindow options={{ tags: [["e", data.id, "", "root"]], kind: 42 }} />
 </div>

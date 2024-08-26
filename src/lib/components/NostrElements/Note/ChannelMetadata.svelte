@@ -8,7 +8,8 @@
   export let linkButtonTitle: string;
 </script>
 
-<Text queryKey={["channel", "kind40", id]} {id} let:text>
+<!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->
+<Text queryKey={["timeline", id]} {id} let:text>
   <button slot="loading" on:click={handleClickToChannel} class="break-all"
     >loading {nip19.noteEncode(id)}
   </button>
