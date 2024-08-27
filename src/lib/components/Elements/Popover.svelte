@@ -5,7 +5,6 @@
   import { fade } from "svelte/transition";
   export let open = false;
   export let ariaLabel: string;
-
   const {
     elements: { trigger, content, arrow, close },
     states,

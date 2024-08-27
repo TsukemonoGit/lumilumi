@@ -129,6 +129,7 @@
             tags={metadata.tags}
             displayMenu={true}
             {depth}
+            repostable={false}
           />
         </div>
       {/if}

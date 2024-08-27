@@ -43,30 +43,34 @@
   >
     {#each viewAll ? relays : relays.slice(0, 2) as url}
       <Popover ariaLabel="relay Info">
-        {#await relayInfoFun(url)}
-          <Avatar {size} name={url} variant="beam" />
-        {:then relayInfo}
-          {#if !relayInfo}
+        <div title={url}>
+          {#await relayInfoFun(url)}
             <Avatar {size} name={url} variant="beam" />
-          {:else if $showImg && relayInfo.icon}
-            <UserAvatar
-              url={relayInfo.icon}
-              name={url ?? ""}
-              pubkey={undefined}
-              {size}
-            />
-          {:else if $showImg && !$relayIconErrorStore.includes(url)}
-            <UserAvatar
-              url={formatUrl(url) + "favicon.ico"}
-              name={url ?? ""}
-              pubkey={undefined}
-              {size}
-              handleStateError={() => handleStateError(url)}
-            />
-          {:else}
-            <Avatar {size} name={url} variant="beam" />
-          {/if}
-        {/await}
+          {:then relayInfo}
+            {#if !relayInfo}
+              <Avatar {size} name={url} variant="beam" />
+            {:else if $showImg && relayInfo.icon}
+              <UserAvatar
+                url={relayInfo.icon}
+                name={url ?? ""}
+                pubkey={undefined}
+                title={url}
+                {size}
+              />
+            {:else if $showImg && !$relayIconErrorStore.includes(url)}
+              <UserAvatar
+                url={formatUrl(url) + "favicon.ico"}
+                name={url ?? ""}
+                pubkey={undefined}
+                {size}
+                handleStateError={() => handleStateError(url)}
+                title={url}
+              />
+            {:else}
+              <Avatar {size} name={url} variant="beam" />
+            {/if}
+          {/await}
+        </div>
         <div slot="popoverContent" class="max-w-[90%]">
           <RelayCard {url} write={false} read={false} />
         </div>
