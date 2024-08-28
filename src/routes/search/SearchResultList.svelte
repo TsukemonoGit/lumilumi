@@ -211,21 +211,25 @@
         );
       }
     }
-    viewIndex += sift; //スライドする量
+    // console.log(allUniqueEvents?.length);
+    if (allUniqueEvents?.length >= viewIndex + amount) {
+      //表示量のイベントなかったらスライドしない
+      viewIndex += sift; //スライドする量
+    }
     updateViewEvent($data);
     $nowProgress = false;
     // console.log(viewIndex);
     //スマホではスクロールちゃんとなってたからでかいときだけやる
-    if (window.innerWidth > 640) {
-      //px
-      const lastVisibleElement = document?.querySelector(".last-visible");
-      setTimeout(() => {
-        //データが更新終わるのを待ってからスライドしてみる
-        if (lastVisibleElement) {
-          lastVisibleElement.scrollIntoView({ block: "end" });
-        }
-      }, 10);
-    }
+    // if (window.innerWidth > 640) {
+    //   //px
+    //   const lastVisibleElement = document?.querySelector(".last-visible");
+    //   setTimeout(() => {
+    //     //データが更新終わるのを待ってからスライドしてみる
+    //     if (lastVisibleElement) {
+    //       lastVisibleElement.scrollIntoView({ block: "end" });
+    //     }
+    //   }, 10);
+    // }
   };
 
   const handlePrev = () => {

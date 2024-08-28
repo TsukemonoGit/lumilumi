@@ -204,7 +204,12 @@
         );
       }
     }
-    viewIndex += sift; //スライドする量
+    //console.log(allUniqueEvents?.length);
+    if (allUniqueEvents?.length >= viewIndex + amount) {
+      //表示量のイベントなかったらスライドしない
+      viewIndex += sift; //スライドする量
+    }
+
     updateViewEvent($data);
     $nowProgress = false;
     // console.log(viewIndex);
