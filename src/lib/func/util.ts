@@ -246,6 +246,7 @@ export const initSettings: LumiSetting = {
   nostrWalletConnect: "",
   showUserStatus: false,
   noBanner: false,
+  showKind16: false,
 };
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");

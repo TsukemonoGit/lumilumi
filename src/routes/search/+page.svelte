@@ -20,6 +20,7 @@
   let searchSince: number | undefined;
   let searchUntil: number | undefined;
   let searchHashtag: string | undefined;
+  let searchPubkeyTo: string = "";
   let followee = false;
   const filters: Writable<Nostr.Filter[]> = writable([]);
   let showFilters: Nostr.Filter[];
@@ -30,11 +31,12 @@
   function updateQueryParams() {
     const params = new URLSearchParams(window.location.search);
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
-    searchWord ? params.set("q", searchWord) : params.delete("q");
+    searchWord ? params.set("word", searchWord) : params.delete("word");
     searchKind !== undefined
       ? params.set("k", String(searchKind))
       : params.delete("k");
-    searchPubkey ? params.set("p", searchPubkey) : params.delete("p");
+    searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
+    searchPubkeyTo ? params.set("p", searchPubkey) : params.delete("p");
     searchSince ? params.set("s", String(searchSince)) : params.delete("s");
     searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
     followee ? params.set("f", String(followee)) : params.delete("f");
@@ -63,9 +65,10 @@
     console.log(params);
 
     searchHashtag = params.get("t") ?? undefined;
-    searchWord = params.get("q") ?? "";
+    searchWord = params.get("word") ?? "";
     searchKind = params.get("k") !== null ? Number(params.get("k")) : undefined;
-    searchPubkey = params.get("p") ?? "";
+    searchPubkey = params.get("author") ?? "";
+    searchPubkeyTo = params.get("p") ?? "";
     searchSince = params.get("s") ? Number(params.get("s")) : undefined;
     searchUntil = params.get("u") ? Number(params.get("u")) : undefined;
     followee = params.get("f") === "true";
@@ -74,6 +77,7 @@
       searchHashtag ||
       searchWord ||
       searchPubkey ||
+      searchPubkeyTo ||
       searchSince ||
       searchUntil
     ) {
@@ -98,6 +102,7 @@
     searchHashtag ||
     searchWord ||
     searchPubkey ||
+    searchPubkeyTo ||
     searchSince ||
     searchUntil ||
     followee
@@ -132,6 +137,7 @@
         since: !Number.isNaN(searchSince) ? searchSince : undefined,
         until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
         "#t": searchHashtag ? [searchHashtag] : [],
+        "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
       },
     ];
     if (searchKind) {
@@ -206,11 +212,15 @@
     searchUntil = undefined;
   }
 
-  async function handleClickPub() {
+  async function handleClickPub(str: string) {
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pub) {
-        searchPubkey = nip19.npubEncode(pub);
+        if (str === "author") {
+          searchPubkey = nip19.npubEncode(pub);
+        } else {
+          searchPubkeyTo = nip19.npubEncode(pub);
+        }
       }
     } catch (error) {
       console.log("failed to get pubkey");
@@ -296,7 +306,7 @@
             />
           </div>
           <div class="flex flex-col items-start justify-center w-full">
-            <div class="font-medium text-magnum-400">pubkey</div>
+            <div class="font-medium text-magnum-400">from</div>
             <div
               class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
             >
@@ -307,7 +317,25 @@
                 placeholder="npub"
                 bind:value={searchPubkey}
               /><button
-                on:click={handleClickPub}
+                on:click={() => handleClickPub("author")}
+                class="h-10 rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                >Set My Pubkey</button
+              >
+            </div>
+          </div>
+          <div class="flex flex-col items-start justify-center w-full">
+            <div class="font-medium text-magnum-400">to</div>
+            <div
+              class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            >
+              <input
+                type="text"
+                id="npub"
+                class="h-10 px-3 py-2 rounded-md"
+                placeholder="npub"
+                bind:value={searchPubkeyTo}
+              /><button
+                on:click={() => handleClickPub("p")}
                 class="h-10 rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
                 >Set My Pubkey</button
               >

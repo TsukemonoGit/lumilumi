@@ -66,9 +66,6 @@
   //   defaultValue: "all",
   // });
 
-  let className = "";
-  export { className as class };
-
   const triggers = [
     // { id: "all", title: "all" }, // <p> を削除し、単なる文字列として扱う
 
@@ -225,14 +222,6 @@
 </div>
 
 <style lang="postcss">
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 0.6;
-  }
-
   .toggle-item {
     display: flex;
     align-items: center;
@@ -263,21 +252,6 @@
       @apply focus:relative;
       background-color: theme("colors.magnum.700");
       color: theme("colors.magnum.100");
-    }
-  }
-
-  input {
-    height: theme(spacing.8);
-    flex-shrink: 0;
-    flex-grow: 1;
-    border-radius: theme(borderRadius.md);
-    border: 1px solid theme(colors.neutral.200);
-    padding-inline: theme(spacing[2.5]);
-    line-height: 1;
-    color: theme(colors.neutral.900);
-
-    &:focus {
-      border-color: theme(colors.magnum.400);
     }
   }
 
