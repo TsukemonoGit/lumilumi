@@ -10,11 +10,13 @@
 </script>
 
 <div class="flex flex-col w-full">
-  <div class="flex flex-row justify-between">
-    <div>kind:30030</div>
-    <div>
-      <span class="text-sm">{dtag}</span>
-      <span class="text-magnum-400 font-bold">{title}</span>
+  <div class="flex flex-row gap-1">
+    <div class="text-sm">Emoji set:</div>
+    <div
+      class="text-magnum-400 font-bold whitespace-pre-wrap break-words word truncate line-clamp-2"
+      style="word-break: break-word;"
+    >
+      {title ?? dtag}
     </div>
   </div>
   <div class="flex gap-1 flex-wrap">

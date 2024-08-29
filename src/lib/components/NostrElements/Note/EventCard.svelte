@@ -15,7 +15,7 @@
   import Content from "./Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { profile } from "$lib/func/util";
+  import { eventKinds, profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
@@ -622,9 +622,9 @@
             {/if}
           {/await}
         </LatestEvent>-->
-      {@const title = note.tags.find(
-        (tag) => tag[0] === "title" && tag.length > 1
-      )?.[1]}
+      {@const title =
+        note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
+        eventKinds.get(note.kind)?.en}
       {@const description = note.tags.find(
         (tag) =>
           (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
