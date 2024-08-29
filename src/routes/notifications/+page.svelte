@@ -230,7 +230,7 @@
     user-select: none;
 
     border-radius: 0;
-    background-color: theme("colors.magnum.900");
+    background-color: theme("colors.neutral.800");
 
     color: theme("colors.magnum.200");
     font-weight: 500;
