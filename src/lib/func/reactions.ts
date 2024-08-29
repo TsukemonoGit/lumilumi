@@ -31,7 +31,7 @@ export function set3Relays(relays: any) {
 }
 
 export function rxNostr3ReccoctRelay(url: string) {
-  rxNostr3.reconnect(url);
+  rxNostr3?.reconnect(url);
 }
 const req3 = createRxForwardReq();
 

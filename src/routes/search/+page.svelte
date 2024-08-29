@@ -4,15 +4,17 @@
   import { X, ChevronsUpDown } from "lucide-svelte";
   import { slide } from "svelte/transition";
   import { getFollowingList } from "$lib/func/nostr";
-  import { nip50relays, npubRegex } from "$lib/func/util";
+  import { eventKinds, nip50relays, npubRegex } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
-  import { page } from "$app/stores";
+
   import { get, writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import { nowProgress } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
+  import KindSelect from "./KindSelect.svelte";
+  import { locale } from "svelte-i18n";
 
   let searchWord = "";
   let searchKind: number | undefined = undefined;
@@ -140,7 +142,7 @@
         "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
       },
     ];
-    if (searchKind) {
+    if (searchKind !== undefined && searchKind !== null) {
       $filters[0].kinds = [searchKind];
     }
     //  const chank = 100;
@@ -226,6 +228,15 @@
       console.log("failed to get pubkey");
     }
   }
+
+  const getKindLabel = (
+    kind: number | undefined,
+    locale: string | null | undefined
+  ) => {
+    if (kind === undefined) return "";
+    const kindData = eventKinds.get(kind);
+    return kindData ? (locale === "ja" ? kindData.ja : kindData.en) : "";
+  };
 </script>
 
 <svelte:head>
@@ -296,14 +307,18 @@
         >
           <div class="flex flex-col items-start justify-center">
             <div class="font-medium text-magnum-400">kind</div>
-            <input
-              type="number"
-              id="kind"
-              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900 mt-1.5"
-              placeholder="1"
-              min="0"
-              bind:value={searchKind}
-            />
+            <div class="flex align-middle mt-1.5 gap-1 items-center">
+              <input
+                type="number"
+                id="kind"
+                class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900"
+                placeholder="1"
+                min="0"
+                bind:value={searchKind}
+              />
+              <KindSelect bind:selectedKind={searchKind} />
+              {getKindLabel(searchKind, $locale)}
+            </div>
           </div>
           <div class="flex flex-col items-start justify-center w-full">
             <div class="font-medium text-magnum-400">from</div>
@@ -318,7 +333,7 @@
                 bind:value={searchPubkey}
               /><button
                 on:click={() => handleClickPub("author")}
-                class="h-10 rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
                 >Set My Pubkey</button
               >
             </div>
@@ -336,7 +351,7 @@
                 bind:value={searchPubkeyTo}
               /><button
                 on:click={() => handleClickPub("p")}
-                class="h-10 rounded-md bg-magnum-600 px-3 py-2 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
                 >Set My Pubkey</button
               >
             </div>
