@@ -70,7 +70,7 @@
   <meta name="description" content="Note" />
 </svelte:head>
 
-<section>
+<section class="mb-20">
   <SetRepoReactions />
   <div
     class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
