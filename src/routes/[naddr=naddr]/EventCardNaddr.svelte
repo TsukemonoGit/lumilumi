@@ -7,7 +7,7 @@
   import NoteActionButtons from "$lib/components/NostrElements/Note/NoteActionButtuns/NoteActionButtons.svelte";
   import ReplyThread from "$lib/components/NostrElements/Note/ReplyThread.svelte";
   import { getRelaysById } from "$lib/func/nostr";
-  import { nip33Regex, profile } from "$lib/func/util";
+  import { eventKinds, nip33Regex, profile } from "$lib/func/util";
   import { viewEventIds, loginUser, showImg } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { onDestroy } from "svelte";
@@ -15,7 +15,7 @@
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
-
+  export let repostable: boolean;
   //export let mini: boolean = false;
   const bech32Pattern = /<bech32>/;
   let currentNoteId: string | undefined = undefined;
@@ -205,7 +205,9 @@
     replyID = undefined;
     replyUsers = [];
   }
-  $: title = note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1];
+  $: title =
+    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
+    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
   $: description = note.tags.find(
     (tag) =>
       (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
@@ -224,7 +226,7 @@
 {#if muteType === "null" || viewMuteEvent}
   {#if thread && replyID}
     <!-- <div class="border-b border-magnum-600/30"> -->
-    <ReplyThread {replyID} {displayMenu} {depth} />
+    <ReplyThread {replyID} {displayMenu} {depth} {repostable} />
     <!-- </div> -->
   {/if}
 
@@ -244,14 +246,17 @@
           <div class="text-magnum-100 text-sm">
             @{profile(metadata)?.name}
           </div>
-          <div class="text-neutral-300/50 text-sm">kind:{note.kind}</div>
+          <div class="text-neutral-300/50 text-sm">
+            {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
+          </div>
         {/if}
       </div>
       <div class="grid grid-cols-[1fr_auto] w-full gap-1 mb-1">
         <div>
-          <h2 class="text-lg font-bold text-magnum-400">
-            {title ?? "notitle"}
-          </h2>
+          {#if title}
+            <h2 class="text-lg font-bold text-magnum-400">
+              {title}
+            </h2>{/if}
           {#if description}
             <div class=" text-neutral-300/80">{description}</div>{/if}
         </div>
@@ -263,8 +268,14 @@
           />{/if}
       </div>
       <div class="rounded-md border border-magnum-400/50 mt-4 p-1">
-        <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-        {#if displayMenu}<NoteActionButtons {note} />{/if}
+        <Content
+          text={note.content}
+          tags={note.tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+        />
+        {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
       </div>
     </div>
   </article>

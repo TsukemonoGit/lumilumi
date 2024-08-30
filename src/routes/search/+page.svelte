@@ -138,10 +138,16 @@
             : undefined,
         since: !Number.isNaN(searchSince) ? searchSince : undefined,
         until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-        "#t": searchHashtag ? [searchHashtag] : [],
-        "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
+        // "#t": searchHashtag ? [searchHashtag] : [],
+        // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
       },
     ];
+    if (searchHashtag) {
+      $filters[0] = { ...$filters[0], "#t": [searchHashtag] };
+    }
+    if (npubRegex.test(searchPubkeyTo)) {
+      $filters[0] = { ...$filters[0], "#p": [getHex(searchPubkeyTo)] };
+    }
     if (searchKind !== undefined && searchKind !== null) {
       $filters[0].kinds = [searchKind];
     }

@@ -7,6 +7,8 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import UserName from "./UserName.svelte";
+  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   export let displayMenu: boolean;
   export let content: string | undefined;
   export let depth: number;
@@ -85,21 +87,27 @@
       >
         <div
           slot="loading"
-          class="text-sm text-neutral-500 flex-inline break-all"
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
         >
-          {content}
+          {content}{#if displayMenu}<EllipsisMenuNaddr
+              naddr={content?.slice(6)}
+            />{/if}
         </div>
         <div
           slot="nodata"
-          class="text-sm text-neutral-500 flex-inline break-all"
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
         >
-          {content}
+          {content}{#if displayMenu}<EllipsisMenuNaddr
+              naddr={content?.slice(6)}
+            />{/if}
         </div>
         <div
           slot="error"
-          class="text-sm text-neutral-500 flex-inline break-all"
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
         >
-          {content}
+          {content}{#if displayMenu}<EllipsisMenuNaddr
+              naddr={content?.slice(6)}
+            />{/if}
         </div>
         <Metadata
           queryKey={["metadata", event.pubkey]}

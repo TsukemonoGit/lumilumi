@@ -599,6 +599,28 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Bookmark sets",
     },
   ],
+  [
+    30004,
+    {
+      ja: "記事のキュレーションセット",
+      en: "Article Curation Sets",
+    },
+  ],
+  [
+    30005,
+    {
+      ja: "ビデオのキュレーションセット",
+      en: "Video Curation Sets",
+    },
+  ],
+  //
+  [
+    30007,
+    {
+      ja: "Kind別ミュートセット",
+      en: "Kind mute sets",
+    },
+  ],
   //
   //んあ～～～～～～
   //
@@ -607,14 +629,14 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     30023,
     {
       ja: "記事",
-      en: "	Long-form Content	",
+      en: "	Long-form Content",
     },
   ],
   [
     30024,
     {
       ja: "記事の草稿",
-      en: "Draft Long-form Content	",
+      en: "Draft Long-form Content",
     },
   ],
   //
@@ -623,7 +645,15 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     30030,
     {
       ja: "絵文字セット",
-      en: "Emoji sets	",
+      en: "Emoji sets",
+    },
+  ],
+
+  [
+    30315,
+    {
+      ja: "ユーザーステータス",
+      en: "User Statuses",
     },
   ],
 ]);

@@ -12,6 +12,7 @@
     NotepadText,
     Tv,
     MessagesSquare,
+    Squirrel,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -31,7 +32,9 @@
   let dialogOpen: any;
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000);
+    (note.kind >= 10000 && note.kind < 20000) ||
+    note.kind === 0 ||
+    note.kind === 3;
   let menuTexts = [
     {
       text: $_("menu.copy.text"),
@@ -60,7 +63,14 @@
   if (note.kind === 30311) {
     menuTexts?.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
   }
-
+  //replaceable のすとびうあのリンク
+  if (replaceable) {
+    menuTexts?.push({
+      text: `${$_("menu.nostviewstr")}`,
+      icon: Squirrel,
+      num: 10,
+    });
+  }
   if (indexes !== undefined) {
     menuTexts = menuTexts.filter((item) => indexes.includes(item.num));
   }
@@ -190,6 +200,12 @@
         const zapStream = `https://zap.stream/${naddr}`;
 
         window.open(zapStream, "_blank", "noreferrer");
+        break;
+      case 10:
+        //open in nostviewer
+        const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
+
+        window.open(nostviewer, "_blank", "noreferrer");
         break;
     }
   };

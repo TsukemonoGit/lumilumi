@@ -40,7 +40,9 @@
   });
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000);
+    (note.kind >= 10000 && note.kind < 20000) ||
+    note.kind === 0 ||
+    note.kind === 3;
   const eventpointer: nip19.EventPointer = {
     id: note.id,
     relays: getRelaysById(note.id),

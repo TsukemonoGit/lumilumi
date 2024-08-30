@@ -1,9 +1,9 @@
 <script lang="ts">
   import { eventKinds } from "$lib/func/util";
-  import { createDropdownMenu, createSelect, melt } from "@melt-ui/svelte";
-  import { Check, ChevronDown } from "lucide-svelte";
+  import { createDropdownMenu, melt } from "@melt-ui/svelte";
+  import { ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
-  import { fade, fly } from "svelte/transition";
+  import { fly } from "svelte/transition";
 
   export let selectedKind: number | undefined;
   const {
@@ -47,7 +47,7 @@
 <style lang="postcss">
   .menu {
     @apply z-40 flex max-h-[min(100vh,400px)] min-w-[240px] flex-col shadow-lg overflow-y-auto cursor-pointer;
-    @apply rounded-md bg-neutral-800 border border-neutral-700 p-1  lg:max-h-none;
+    @apply rounded-md bg-neutral-800 border border-neutral-700 p-1;
     @apply ring-0 !important;
   }
   .trigger {

@@ -624,7 +624,7 @@
         </LatestEvent>-->
       {@const title =
         note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
-        eventKinds.get(note.kind)?.en}
+        note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]}
       {@const description = note.tags.find(
         (tag) =>
           (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
@@ -647,14 +647,17 @@
             <div class="text-magnum-100 text-sm">
               @{profile(metadata)?.name}
             </div>
-            <div class="text-neutral-300/50 text-sm">kind:{note.kind}</div>
+            <div class="text-neutral-300/50 text-sm">
+              {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
+            </div>
           {/if}
         </div>
         <div class="grid grid-cols-[1fr_auto] w-full gap-1">
           <div>
-            <div class="text-lg font-bold text-magnum-400">
-              {title ?? "notitle"}
-            </div>
+            {#if title}
+              <div class="text-lg font-bold text-magnum-400">
+                {title}
+              </div>{/if}
             {#if description}
               <div class=" text-neutral-300/80">{description}</div>{/if}
           </div>
