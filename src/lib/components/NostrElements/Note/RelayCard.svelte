@@ -10,7 +10,6 @@
     FileJson2,
     SquareArrowOutUpRight,
   } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
   import Avatar from "svelte-boring-avatars";
   import { _ } from "svelte-i18n";
 
@@ -37,7 +36,7 @@
 
   const handleSelectItem = async (index: number) => {
     try {
-      const encodedrelay = nip19.nrelayEncode(url);
+      //const encodedrelay = nip19.nrelayEncode(url);
       const hostname = new URL(url).hostname;
 
       switch (menuTexts[index].num) {

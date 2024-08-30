@@ -17,6 +17,7 @@
   import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
   import { ExternalLink, Pin } from "lucide-svelte";
   import ShowStatus from "../NostrElements/Note/ShowStatus.svelte";
+  import EllipsisMenuNote from "../NostrElements/Note/NoteActionButtuns/EllipsisMenuNote.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -25,18 +26,30 @@
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
-  <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
-    {nip19.npubEncode(pubkey)}
+  <div
+    slot="loading"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+  >
+    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
+      notestr={nip19.npubEncode(pubkey)}
+    />
   </div>
-  <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-    {nip19.npubEncode(pubkey)}
+  <div
+    slot="nodata"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+  >
+    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
+      notestr={nip19.npubEncode(pubkey)}
+    />
   </div>
   <div
     slot="error"
-    class="text-sm text-neutral-500 flex-inline break-all"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
     let:error
   >
-    {nip19.npubEncode(pubkey)}
+    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
+      notestr={nip19.npubEncode(pubkey)}
+    />
   </div>
   {@const prof = profile(metadata)}
 

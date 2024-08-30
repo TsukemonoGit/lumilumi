@@ -179,6 +179,7 @@
                       {id}
                       displayMenu={true}
                       depth={1}
+                      repostable={true}
                     />
                   </div>
                 {/each}

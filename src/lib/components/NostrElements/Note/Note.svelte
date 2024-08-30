@@ -4,6 +4,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   import Text from "$lib/components/NostrMainData/Text.svelte";
+  import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   export let id: string;
   export let mini: boolean = false;
   export let maxHeight: string = "24rem";
@@ -14,18 +15,30 @@
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text let:status>
-  <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
-    Loading {nip19.noteEncode(id)}
+  <div
+    slot="loading"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+  >
+    Loading {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
+        notestr={nip19.noteEncode(id)}
+      />{/if}
   </div>
-  <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-    nodata {nip19.noteEncode(id)}
+  <div
+    slot="nodata"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+  >
+    nodata {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
+        notestr={nip19.noteEncode(id)}
+      />{/if}
   </div>
   <div
     slot="error"
     let:error
-    class="text-sm text-neutral-500 flex-inline break-all"
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
   >
-    {nip19.noteEncode(id)}
+    {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
+        notestr={nip19.noteEncode(id)}
+      />{/if}
   </div>
   <Metadata
     queryKey={["metadata", text.pubkey]}

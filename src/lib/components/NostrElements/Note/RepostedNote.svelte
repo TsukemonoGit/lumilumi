@@ -1,13 +1,15 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
 
-  import { nip33Regex } from "$lib/func/util";
+  import { nip33Regex, parseNaddr } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
   import EventCard from "./EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
 
   import Text from "$lib/components/NostrMainData/Text.svelte";
+  import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
+  import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
 
   export let repostable: boolean;
 
@@ -34,6 +36,15 @@
     }
     return undefined;
   };
+
+  const encodeNaddr = (tag: string[]) => {
+    const address = parseNaddr(tag);
+    try {
+      return nip19.naddrEncode(address);
+    } catch (error) {
+      return undefined;
+    }
+  };
 </script>
 
 {#if tag[0] === "e"}
@@ -42,19 +53,30 @@
     {/if} -->
 
   <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
-    <div slot="loading" class="text-sm text-neutral-500 flex-inline break-all">
-      Loading {nip19.noteEncode(tag[1])}
+    <div
+      slot="loading"
+      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    >
+      Loading {nip19.noteEncode(tag[1])}<EllipsisMenuNote
+        notestr={nip19.noteEncode(tag[1])}
+      />
     </div>
-    <div slot="nodata" class="text-sm text-neutral-500 flex-inline break-all">
-      nodata {nip19.noteEncode(tag[1])}
+    <div
+      slot="nodata"
+      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    >
+      nodata {nip19.noteEncode(tag[1])}<EllipsisMenuNote
+        notestr={nip19.noteEncode(tag[1])}
+      />
     </div>
     <div
       slot="error"
-      class="text-sm text-neutral-500 flex-inline break-all"
+      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       let:error
     >
-      {error}
-      {nip19.noteEncode(tag[1])}
+      {nip19.noteEncode(tag[1])}<EllipsisMenuNote
+        notestr={nip19.noteEncode(tag[1])}
+      />
     </div>
     <Metadata
       queryKey={["metadata", text.pubkey]}
@@ -75,16 +97,17 @@
   </Text>
 {:else if tag[0] === "a"}
   {@const filter = naddrFilter()}
+  {@const encodedNaddr = encodeNaddr(tag)}
   {#if filter}
     <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
       <div slot="loading">
-        <p>Loading {tag[1]}</p>
+        Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
       <div slot="nodata">
-        <p>nodata {tag[1]}</p>
+        nodata {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
       <div slot="error" let:error>
-        <p>{error} {tag[1]}</p>
+        {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
       <Metadata
         queryKey={["metadata", event.pubkey]}

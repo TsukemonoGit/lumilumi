@@ -6,6 +6,7 @@ import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch } from "nostr-tools/utils";
+import type { nip19 } from "nostr-tools";
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
@@ -667,3 +668,22 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
   },
 ],
 */
+
+export function parseNaddr(tag: string[]): nip19.AddressPointer {
+  const [, reference, relay] = tag; // 配列の2番目の要素を取り出す
+  const [kind, pubkey, ...identifierParts] = reference.split(":"); // referenceをコロンで分割, identifierの中に:が含まれる可能性がある
+  const identifier = identifierParts.join(":"); // identifierの部分を結合する
+  //console.log(identifier);
+  return relay !== undefined && relay !== ""
+    ? {
+        kind: Number(kind),
+        pubkey: pubkey,
+        identifier: identifier ?? "",
+        relays: [relay],
+      }
+    : {
+        kind: Number(kind),
+        pubkey: pubkey,
+        identifier: identifier ?? "",
+      };
+}
