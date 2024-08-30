@@ -77,11 +77,16 @@
           decoded.data.identifier,
         ]}
         filters={[
-          {
-            kinds: [decoded.data.kind],
-            authors: [decoded.data.pubkey],
-            "#d": [decoded.data.identifier],
-          },
+          decoded.data.identifier !== ""
+            ? {
+                kinds: [decoded.data.kind],
+                authors: [decoded.data.pubkey],
+                "#d": [decoded.data.identifier],
+              }
+            : {
+                kinds: [decoded.data.kind],
+                authors: [decoded.data.pubkey],
+              },
         ]}
         let:event
       >

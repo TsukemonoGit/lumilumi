@@ -657,6 +657,18 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "User Statuses",
     },
   ],
+  //
+
+  //
+  //
+
+  [
+    31990,
+    {
+      ja: "アプリ情報",
+      en: "Handler information",
+    },
+  ],
 ]);
 /*
 
@@ -687,3 +699,10 @@ export function parseNaddr(tag: string[]): nip19.AddressPointer {
         identifier: identifier ?? "",
       };
 }
+
+//https://github.com/TsukemonoGit/NostViewstr/blob/3981eac66c5ec51afa38069a6981410b5a42bc16/src/lib/kind.ts
+export const nostviewstrable = [
+  3, 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10015, 10030,
+  10096, 10101, 10102, 30000, 30001, 30002, 30003, 30004, 30007, 30008, 30015,
+  30030,
+];

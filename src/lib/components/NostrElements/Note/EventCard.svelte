@@ -39,6 +39,10 @@
   import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "./ReactionWebsite.svelte";
+  import type { Ogp } from "$lib/func/ogp";
+  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import OtherKindNote from "./OtherKindNote.svelte";
+  import Kind31990Note from "./Kind31990Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -249,6 +253,25 @@
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
+
+  const get31990Ogp = (
+    ev: Nostr.Event
+  ): { ogp: Ogp; url: string } | undefined => {
+    try {
+      const data = JSON.parse(ev.content);
+      return {
+        ogp: {
+          title: data.name,
+          image: data.banner,
+          description: data.about,
+          favicon: data.picture,
+        } as Ogp,
+        url: data.website,
+      };
+    } catch (error) {
+      return undefined;
+    }
+  };
 </script>
 
 {#if muteType !== "null" && depth >= 1}
@@ -454,6 +477,27 @@
       <!--kind9735 zap receipt-->
 
       <Kind9735Note {note} {depth} {excludefunc} {repostable} />
+    {:else if note.kind === 31990}
+      {@const data = get31990Ogp(note)}
+      {#if !data}
+        <OtherKindNote
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+        />
+      {:else}
+        <Kind31990Note
+          {note}
+          {data}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+        />
+      {/if}
     {:else}
       <!-- その他
       {@const clientData = findClientTag(note)}
@@ -622,65 +666,13 @@
             {/if}
           {/await}
         </LatestEvent>-->
-      {@const title =
-        note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
-        note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]}
-      {@const description = note.tags.find(
-        (tag) =>
-          (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-      )?.[1]}
-      {@const image = note.tags.find(
-        (tag) => tag[0] === "image" && tag.length > 1
-      )?.[1]}
-      <div class=" break-all overflow-x-hidden gap-4 p-1">
-        <div class="flex gap-1 w-fit">
-          {#if metadata}
-            <div>
-              <UserMenu
-                pubkey={note.pubkey}
-                bind:metadata
-                size={20}
-                {displayMenu}
-                {depth}
-              />
-            </div>
-            <div class="text-magnum-100 text-sm">
-              @{profile(metadata)?.name}
-            </div>
-            <div class="text-neutral-300/50 text-sm">
-              {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
-            </div>
-          {/if}
-        </div>
-        <div class="grid grid-cols-[1fr_auto] w-full gap-1">
-          <div>
-            {#if title}
-              <div class="text-lg font-bold text-magnum-400">
-                {title}
-              </div>{/if}
-            {#if description}
-              <div class=" text-neutral-300/80">{description}</div>{/if}
-          </div>
-          {#if image && $showImg}
-            <img
-              src={image}
-              alt=""
-              class="max-w-16 object-contain max-h-16"
-            />{/if}
-        </div>
-        <div
-          class="mt-0.5 overflow-y-auto overflow-x-hidden"
-          style="max-height:{maxHeight ?? 'none'}"
-        >
-          <Content
-            text={note.content}
-            tags={note.tags}
-            {displayMenu}
-            {depth}
-            {repostable}
-          />
-        </div>
-        {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
-      </div>{/if}
+      <OtherKindNote
+        {note}
+        {metadata}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {maxHeight}
+      />{/if}
   </article>
 {/if}

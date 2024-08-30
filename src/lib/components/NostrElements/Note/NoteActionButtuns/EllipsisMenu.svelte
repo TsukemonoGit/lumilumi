@@ -13,6 +13,7 @@
     Tv,
     MessagesSquare,
     Squirrel,
+    Layers,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -24,6 +25,7 @@
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
+  import { nostviewstrable } from "$lib/func/util";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   export let TriggerIcon = Ellipsis;
@@ -63,8 +65,12 @@
   if (note.kind === 30311) {
     menuTexts?.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
   }
+  //31990 App Managerリンク
+  if (note.kind === 31990) {
+    menuTexts?.push({ text: `${$_("menu.nostrapp")}`, icon: Layers, num: 11 });
+  }
   //replaceable のすとびうあのリンク
-  if (replaceable) {
+  if (nostviewstrable.includes(note.kind)) {
     menuTexts?.push({
       text: `${$_("menu.nostviewstr")}`,
       icon: Squirrel,
@@ -206,6 +212,12 @@
         const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
 
         window.open(nostviewer, "_blank", "noreferrer");
+        break;
+      case 11:
+        //open in nostviewer
+        const nostrapp = `https://nostrapp.link/a/${naddr}`;
+
+        window.open(nostrapp, "_blank", "noreferrer");
         break;
     }
   };
