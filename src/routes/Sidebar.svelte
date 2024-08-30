@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import logo from "$lib/images/favicon.svg";
-  import { loginUser } from "$lib/stores/stores";
+  import { loginUser, showImg } from "$lib/stores/stores";
 
   import {
     Globe,
@@ -117,8 +117,16 @@
         aria-current={$page.url.pathname === `/about` ? "page" : undefined}
       >
         <a href={`/about`}>
-          <img src={logo} alt="logo" width={40} height={40} /><span class="ml-2"
-            >about</span
+          {#if $showImg}
+            <img
+              src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
+              alt="lumi"
+              width={80}
+              height={80}
+            />
+          {:else}
+            <img src={logo} alt="logo" width={40} height={40} />{/if}<span
+            class="ml-2">about</span
           >
         </a>
       </li>

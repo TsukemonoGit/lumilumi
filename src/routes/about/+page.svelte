@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { toastSettings } from "$lib/stores/stores";
+  import { showImg, toastSettings } from "$lib/stores/stores";
   import { Share } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
   import { _ } from "svelte-i18n";
-
+  import logo from "$lib/images/favicon.svg";
   const handleClickShare = async () => {
     //share link
     const shareData = {
@@ -32,6 +32,7 @@
       };
     }
   };
+  let loadImage: boolean = false;
 </script>
 
 <svelte:head>
@@ -39,11 +40,11 @@
   <meta name="description" content="The Nostr webclient" />
 </svelte:head>
 <!-- <h1 class="title my-4">ABOUT</h1> -->
-<section class="border border-magnum-500 rounded-md h-full my-4 mx-2">
+<section class="border border-magnum-500 rounded-md h-full my-4 mx-2 p-2">
   <h1 class="title my-4 text-center">lumilumi the nostr client</h1>
   <ul>
     <li>
-      <div class="list">source code</div>
+      <div class="list">Source code</div>
       <div class="item">
         <Link
           href="https://github.com/TsukemonoGit/lumilumi"
@@ -54,7 +55,7 @@
       </div>
     </li>
     <li>
-      <div class="list">author</div>
+      <div class="list">Author</div>
       <div class="item">
         <Link
           href="https://lumilumi.vercel.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
@@ -62,6 +63,40 @@
         >
           @mono
         </Link>
+      </div>
+    </li>
+    <li>
+      <div class="list">Mascot of lumilumi</div>
+      <div class="item">
+        Illustration by <a
+          class="underline"
+          href="/npub1e09suzmq9mp6nt0ud9ttl03790qjx70wzwlc2pwwghcusvwju54qs0c800"
+        >
+          @stok</a
+        >
+        <div class=" flex flex-wrap whitespace-pre-wrap">
+          {#if $showImg || loadImage}
+            <img
+              class="object-contain"
+              src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
+              alt="lumi"
+              width={400}
+              height={400}
+            />
+            <img
+              class="object-contain"
+              src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/a901eda273d942c943c5328750204d73094f66116848cd13e31aa182a9088ff4.webp"
+              alt="lumi"
+              width={400}
+              height={400}
+            />
+          {:else}
+            <button
+              class="my-2 flex items-center w-fit px-2 py-1 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
+              on:click={() => (loadImage = true)}>load images</button
+            >
+          {/if}
+        </div>
       </div>
     </li>
     <li>

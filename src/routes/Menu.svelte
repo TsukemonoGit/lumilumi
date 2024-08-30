@@ -13,7 +13,7 @@
     Users,
   } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
-  import { loginUser, menuLeft } from "$lib/stores/stores";
+  import { loginUser, menuLeft, showImg } from "$lib/stores/stores";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
@@ -199,7 +199,15 @@
             aria-current={$page.url?.pathname === "/about" ? "page" : undefined}
           >
             <a href="/about" use:melt={$close}
-              ><img src={logo} alt="logo" width={40} height={40} /><span
+              >{#if $showImg}
+                <img
+                  src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
+                  alt="lumi"
+                  width={80}
+                  height={80}
+                />
+              {:else}
+                <img src={logo} alt="logo" width={40} height={40} />{/if}<span
                 class="ml-2">about</span
               ></a
             >
