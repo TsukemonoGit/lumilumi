@@ -46,7 +46,7 @@
       "olderData",
     ]);
     if (!ev || ev.length <= 0) {
-      since = now();
+      since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
     } else {
       since = ev[0].event.created_at;
     }

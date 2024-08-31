@@ -147,7 +147,8 @@
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
-        until: filter.until === undefined ? now() : filter.until,
+        until:
+          filter.until === undefined ? filter.since ?? now() : filter.until,
         limit: 50,
       }));
       const older = await firstLoadOlderEvents(
@@ -156,7 +157,7 @@
         queryKey,
         relays
       );
-
+      console.log("first older", older);
       if (older.length > 0) {
         const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
           ...queryKey,
@@ -250,9 +251,12 @@
       ...queryKey,
       "olderData",
     ]);
-    console.log("test");
-    const allEvents =
-      data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
+    // console.log("updateViewEvent");
+    const allEvents = data ?? [];
+    if (olderdatas) {
+      allEvents.push(...olderdatas);
+    }
+
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(
