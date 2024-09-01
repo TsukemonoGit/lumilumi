@@ -83,9 +83,7 @@
     debounceUpdate();
   }
 
-  $: if ($queryClient !== undefined || $queryClient !== null) {
-    result = useRepReactionList();
-  }
+  result = useRepReactionList();
 
   $: data = result?.data;
   $: status = result?.status;

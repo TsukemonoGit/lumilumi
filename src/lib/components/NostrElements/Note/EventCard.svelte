@@ -119,7 +119,7 @@
       (item: string[]) => item !== currentNoteTag
     );
   });
-  $: console.log($viewEventIds);
+  // $: console.log($viewEventIds);
   //eかa
   const repostedId = (
     tags: string[][]
