@@ -26,6 +26,7 @@ export async function loadOlderEvents(
 
   const notReactionEvent = get(slicedEvent).filter(
     (item) =>
+      item.pubkey !== get(loginUser) ||
       !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
   );
   console.log(notReactionEvent);

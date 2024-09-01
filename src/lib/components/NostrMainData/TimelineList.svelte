@@ -188,7 +188,7 @@
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
       const older = await loadOlderEvents(
-        sift,
+        viewIndex + amount - allUniqueEvents?.length + sift, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
         filters,
         queryKey,
         lastfavcheck,
@@ -206,7 +206,8 @@
       }
     }
     //console.log(allUniqueEvents?.length);
-    if (allUniqueEvents?.length >= viewIndex + amount) {
+    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
+      //４０にしてても39とかになって微妙に足りてない時がある（なんで？）から
       //表示量のイベントなかったらスライドしない
       viewIndex += sift; //スライドする量
     }

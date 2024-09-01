@@ -72,9 +72,7 @@
       <LatestEvent
         queryKey={[
           "naddr",
-          decoded.data.kind,
-          decoded.data.pubkey,
-          decoded.data.identifier,
+          `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
         ]}
         filters={[
           decoded.data.identifier !== ""

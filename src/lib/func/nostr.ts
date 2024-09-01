@@ -476,7 +476,7 @@ export function usePromiseReq(
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]
     : [initData];
-  console.log(accumulatedData);
+  //console.log(accumulatedData);
   const tie =
     tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
 
