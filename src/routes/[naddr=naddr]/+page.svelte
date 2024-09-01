@@ -80,15 +80,15 @@
         let:metadata
       >
         <div slot="loading" class="w-full">
-          <EventCardNaddr note={event} />
+          <EventCardNaddr note={event} repostable={true} />
         </div>
         <div slot="nodata" class="w-full">
-          <EventCardNaddr note={event} />
+          <EventCardNaddr note={event} repostable={true} />
         </div>
         <div slot="error" class="w-full">
-          <EventCardNaddr note={event} />
+          <EventCardNaddr note={event} repostable={true} />
         </div>
-        <EventCardNaddr {metadata} note={event} />
+        <EventCardNaddr {metadata} note={event} repostable={true} />
       </Metadata>
     </LatestEvent>
   </section>

@@ -308,10 +308,9 @@
         class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
       />
     </button>
-
     <!--リポスト-->
     {#if repostable}
-      <Reposted id={note.id} let:event>
+      <Reposted id={atag ?? note.id} let:event>
         <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
           <Repeat2 size="21" />
         </DropdownMenu>
@@ -334,7 +333,7 @@
 
   {#if note.kind !== 9734 && note.kind !== 9735}
     <!--リアクション-->
-    <Reactioned id={note.id} let:event>
+    <Reactioned id={atag ?? note.id} let:event>
       <button
         aria-label="reaction"
         slot="loading"
@@ -390,7 +389,7 @@
       {@const prof = profile(metadata)}
       {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
 
-        <Zapped id={note.id} let:event>
+        <Zapped id={atag ?? note.id} let:event>
           <button slot="loading" on:click={handleClickZap} aria-label="zap">
             <Zap
               size="20"

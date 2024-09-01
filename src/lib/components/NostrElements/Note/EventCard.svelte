@@ -4,12 +4,7 @@
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import {
-    loginUser,
-    showImg,
-    showUserStatus,
-    viewEventIds,
-  } from "$lib/stores/stores";
+  import { loginUser, showUserStatus, viewEventIds } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -40,7 +35,6 @@
   import { page } from "$app/stores";
   import ReactionWebsite from "./ReactionWebsite.svelte";
   import type { Ogp } from "$lib/func/ogp";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import OtherKindNote from "./OtherKindNote.svelte";
   import Kind31990Note from "./Kind31990Note.svelte";
 
@@ -49,7 +43,7 @@
   //export let status: string | undefined = undefined;
   export let mini: boolean = false;
 
-  let currentNoteId: string | undefined = undefined;
+  let currentNoteTag: string[] | undefined = undefined;
   export let displayMenu: boolean = true;
   export let maxHeight: string = "24rem";
   export let thread: boolean = false;
@@ -58,6 +52,21 @@
   export let excludefunc = (event: Nostr.Event) => false;
 
   export let repostable: boolean = true;
+  let atag: string | undefined;
+  $: {
+    if (
+      (note.kind >= 10000 && note.kind < 20000) ||
+      (note.kind >= 30000 && note.kind < 40000) ||
+      note.kind === 0 ||
+      note.kind === 3
+    ) {
+      //atag　で　りぽすと
+      const dtag = note.tags.find((tag) => tag[0] === "d");
+      atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+    } else {
+      atag = undefined;
+    }
+  }
 
   $: paramNoteId = $page.params.note
     ? getIDbyParam($page.params.note)
@@ -80,16 +89,27 @@
 
   $: muteType =
     paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
-  $: if (note && note.id !== currentNoteId) {
-    $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
-    if (!$viewEventIds.includes(note.id)) {
-      $viewEventIds.push(note.id);
+  $: if (atag && atag !== currentNoteTag?.[1]) {
+    currentNoteTag = ["a", atag];
+    $viewEventIds = $viewEventIds.filter(
+      (item) => item[1] !== currentNoteTag?.[1]
+    );
+    if (!$viewEventIds.includes(["a", atag])) {
+      $viewEventIds.push(["a", atag]);
     }
-    currentNoteId = note.id;
+  } else if (atag === undefined && note && note.id !== currentNoteTag?.[1]) {
+    currentNoteTag = ["e", note.id];
+    $viewEventIds = $viewEventIds.filter(
+      (item) => item[1] !== currentNoteTag?.[1]
+    );
+    if (!$viewEventIds.includes(["e", note.id])) {
+      $viewEventIds.push(["e", note.id]);
+    }
   }
-
   onDestroy(() => {
-    $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
+    $viewEventIds = $viewEventIds.filter(
+      (item: string[]) => item !== currentNoteTag
+    );
   });
 
   //eかa

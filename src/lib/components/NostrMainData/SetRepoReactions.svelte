@@ -17,6 +17,13 @@
   const updateInterval = 1000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
+
+  $: etagList = $viewEventIds
+    .filter((tag) => tag[0] === "e")
+    .map((tag) => tag[1]);
+  $: atagList = $viewEventIds
+    .filter((tag) => tag[0] === "a")
+    .map((tag) => tag[1]);
   function debounceUpdate() {
     if (updating) {
       return;
@@ -39,16 +46,28 @@
   function performUpdate() {
     filters = [
       {
-        "#e": $viewEventIds,
+        "#e": etagList,
         authors: [$loginUser],
         kinds: [7, 6, 16],
       },
       {
-        "#e": $viewEventIds,
+        "#e": etagList,
         kinds: [9735],
       },
     ];
-
+    if (atagList.length > 0) {
+      filters.push(
+        {
+          "#a": atagList,
+          authors: [$loginUser],
+          kinds: [7, 6, 16],
+        },
+        {
+          "#a": atagList,
+          kinds: [9735],
+        }
+      );
+    }
     changeEmit(filters);
     lastUpdateTimestamp = Date.now();
     //実行されたらID削除

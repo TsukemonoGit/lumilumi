@@ -49,7 +49,7 @@ export const mutes = writable<MuteList | undefined>();
 export const mutebykinds = writable<{ kind: number; list: string[] }[]>([]);
 export const nowProgress = writable<boolean>(false);
 
-export const viewEventIds = writable<string[]>([]);
+export const viewEventIds = writable<string[][]>([]);
 
 //export const tieMapStore = writable<Map<string, Set<string>>>();
 export const tieMapStore = writable<{

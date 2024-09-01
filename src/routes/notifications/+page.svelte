@@ -52,7 +52,7 @@
       "olderData",
     ]);
     if (!ev || ev.length <= 0) {
-      since = now();
+      since = now() - 15 * 60;
     } else {
       since = ev[0].event.created_at;
     }

@@ -11,7 +11,7 @@
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
-  import { setRelays } from "$lib/func/nostr";
+  import { setRelays, setTieKey } from "$lib/func/nostr";
   import { afterNavigate, goto } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";

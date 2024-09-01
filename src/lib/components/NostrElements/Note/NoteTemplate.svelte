@@ -1,13 +1,11 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { showRelayIcon, viewEventIds } from "$lib/stores/stores";
+  import { showRelayIcon } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
-
-  import { onDestroy } from "svelte";
 
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import { getRelaysById } from "$lib/func/nostr";
@@ -21,23 +19,12 @@
   //export let tag: string[] | undefined;
   export let depth: number;
   //const bech32Pattern = /<bech32>/;
-  let currentNoteId: string | undefined = undefined;
+
   export let displayMenu: boolean = true;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
 
-  $: if (note && note.id !== currentNoteId) {
-    $viewEventIds = $viewEventIds.filter((item) => item !== currentNoteId);
-    if (!$viewEventIds.includes(note.id)) {
-      $viewEventIds.push(note.id);
-    }
-    currentNoteId = note.id;
-  }
-
-  onDestroy(() => {
-    $viewEventIds = $viewEventIds.filter((item: string) => item !== note.id);
-  });
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000) ||
