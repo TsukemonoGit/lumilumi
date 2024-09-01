@@ -202,7 +202,7 @@
                 {amount}
                 {tieKey}
               >
-                <SetRepoReactions />
+                <!-- <SetRepoReactions /> -->
                 <div slot="loading">
                   <p>timeline Loading...</p>
                 </div>
@@ -268,7 +268,7 @@
               {tieKey}
               lastfavcheck={false}
             >
-              <SetRepoReactions />
+              <!-- <SetRepoReactions /> -->
               <div slot="loading">
                 <p>timeline Loading...</p>
               </div>

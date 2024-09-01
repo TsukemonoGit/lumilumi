@@ -184,7 +184,7 @@
         <div slot="error" let:error>
           <p>{error}</p>
         </div>
-        <SetRepoReactions />
+        <!-- <SetRepoReactions /> -->
         <div
           class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >

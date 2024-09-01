@@ -117,7 +117,7 @@
             ) !== undefined) ||
           event.kind !== 42}
       >
-        <SetRepoReactions />
+        <!-- <SetRepoReactions /> -->
         <div slot="loading">
           <p>Loading...</p>
         </div>

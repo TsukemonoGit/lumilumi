@@ -108,7 +108,7 @@
         {tieKey}
         {relays}
       >
-        <SetRepoReactions />
+        <!-- <SetRepoReactions /> -->
         <div slot="loading">
           <p>Loading...</p>
         </div>

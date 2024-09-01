@@ -48,7 +48,7 @@
         let:len
         relays={nip50relays}
       >
-        <SetRepoReactions />
+        <!-- <SetRepoReactions /> -->
         <div slot="loading">loading</div>
 
         <div slot="error" let:error>

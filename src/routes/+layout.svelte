@@ -37,6 +37,7 @@
   import { mediaUploader } from "$lib/func/util";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
   import type { Part } from "$lib/func/content";
+  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
@@ -204,7 +205,7 @@
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
       <Header />
-
+      <SetRepoReactions />
       <Menu />
 
       <Toast />
