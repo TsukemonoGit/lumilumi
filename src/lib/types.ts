@@ -52,10 +52,7 @@ export interface UseReqOpts2<A> {
   initData?: A;
 }
 export interface UseReqOpts3<A> {
-  filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
-  req?: RxReqBase;
-  initData?: A;
 }
 export type Theme = "light" | "dark" | "system";
 export type ToastData = {

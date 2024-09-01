@@ -89,7 +89,10 @@
 
   $: muteType =
     paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
-  $: if (atag && atag !== currentNoteTag?.[1]) {
+  $: if (
+    atag &&
+    (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
+  ) {
     currentNoteTag = ["a", atag];
     $viewEventIds = $viewEventIds.filter(
       (item) => item[1] !== currentNoteTag?.[1]
@@ -97,7 +100,12 @@
     if (!$viewEventIds.includes(["a", atag])) {
       $viewEventIds.push(["a", atag]);
     }
-  } else if (atag === undefined && note && note.id !== currentNoteTag?.[1]) {
+  } else if (
+    atag === undefined &&
+    note &&
+    note.id !== "" && //プレビュー画面もEventCardを使っていてnote.idが""になってるからそれを除くため！！
+    (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
+  ) {
     currentNoteTag = ["e", note.id];
     $viewEventIds = $viewEventIds.filter(
       (item) => item[1] !== currentNoteTag?.[1]
@@ -111,7 +119,7 @@
       (item: string[]) => item !== currentNoteTag
     );
   });
-
+  $: console.log($viewEventIds);
   //eかa
   const repostedId = (
     tags: string[][]

@@ -1,13 +1,14 @@
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import { viewEventIds, loginUser } from "$lib/stores/stores";
+  import { viewEventIds, loginUser, queryClient } from "$lib/stores/stores";
   import type { ReqStatus, RxReqBase } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
+  import { onMount } from "svelte";
 
   // export let rxNostr: RxNostr | undefined = undefined;
-  export let req: RxReqBase | undefined = undefined;
+
   //export let events: Nostr.Event<number>[];
 
   let filters: Nostr.Filter[] = [];
@@ -44,17 +45,21 @@
   }
 
   function performUpdate() {
-    filters = [
-      {
-        "#e": etagList,
-        authors: [$loginUser],
-        kinds: [7, 6, 16],
-      },
-      {
-        "#e": etagList,
-        kinds: [9735],
-      },
-    ];
+    if ((etagList.length <= 0 && atagList.length <= 0) || !$loginUser) return;
+    filters =
+      etagList.length > 0
+        ? [
+            {
+              "#e": etagList,
+              authors: [$loginUser],
+              kinds: [7, 6, 16],
+            },
+            {
+              "#e": etagList,
+              kinds: [9735],
+            },
+          ]
+        : [];
     if (atagList.length > 0) {
       filters.push(
         {
@@ -78,7 +83,9 @@
     debounceUpdate();
   }
 
-  result = useRepReactionList(filters, req);
+  $: if ($queryClient !== undefined || $queryClient !== null) {
+    result = useRepReactionList();
+  }
 
   $: data = result?.data;
   $: status = result?.status;

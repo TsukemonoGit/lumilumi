@@ -40,12 +40,7 @@ export function changeEmit(filters: Nostr.Filter[]) {
   req3.emit(filters);
 }
 
-export function useReq3({
-  operator,
-  filters,
-  req,
-  initData,
-}: UseReqOpts3<EventPacket>): {
+export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
   data: Readable<EventPacket | undefined>;
   status: Readable<ReqStatus>;
   error: Readable<Error>;
@@ -97,7 +92,7 @@ export function useReq3({
   });
 
   return {
-    data: derived(query, ($query) => $query.data, initData),
+    data: derived(query, ($query) => $query.data, undefined),
     status: derived([query, status], ([$query, $status]) => {
       if ($query.isSuccess) {
         return "success";
