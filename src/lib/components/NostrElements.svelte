@@ -116,7 +116,7 @@
       {amount}
       let:len
     >
-      <SetRepoReactions />
+      <!-- <SetRepoReactions /> -->
       <div slot="loading">
         <p>Loading...</p>
       </div>
