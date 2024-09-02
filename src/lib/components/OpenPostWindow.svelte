@@ -265,8 +265,12 @@
           if (url) {
             const len = text.length; //ULR入れる前のカーソルの場所にカーソルおく
             const urln = `\n${url}`;
-            text =
-              text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
+            setTimeout(() => {
+              text =
+                text.slice(0, cursorPosition) +
+                urln +
+                text.slice(cursorPosition);
+            }, 5); //すぐURLいれると画像見つかりません画像になることあるからちょっと待つ
             cursorPosition = len;
 
             // imetaをタグに入れる
