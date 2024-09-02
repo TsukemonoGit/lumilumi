@@ -5,6 +5,7 @@
   import { eventKinds, profile } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import Markdown from "./Markdown.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean;
@@ -57,13 +58,21 @@
     class="mt-0.5 overflow-y-auto overflow-x-hidden"
     style="max-height:{maxHeight ?? 'none'}"
   >
-    <Content
-      text={note.content}
-      tags={note.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-    />
+    {#if note.kind === 30023}
+      <Markdown
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />{:else}
+      <Content
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />{/if}
   </div>
   {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
 </div>

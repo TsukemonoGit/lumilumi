@@ -11,6 +11,7 @@
   import { nip19 } from "nostr-tools";
   import { onDestroy } from "svelte";
   import { muteCheck } from "$lib/func/muteCheck";
+  import Markdown from "$lib/components/NostrElements/Note/Markdown.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -291,13 +292,23 @@
           />{/if}
       </div>
       <div class="rounded-md border border-magnum-400/50 mt-4 p-1">
-        <Content
-          text={note.content}
-          tags={note.tags}
-          {displayMenu}
-          {depth}
-          {repostable}
-        />
+        {#if note.kind === 30023}
+          <Markdown
+            text={note.content}
+            tags={note.tags}
+            {displayMenu}
+            {depth}
+            {repostable}
+          />
+        {:else}
+          <Content
+            text={note.content}
+            tags={note.tags}
+            {displayMenu}
+            {depth}
+            {repostable}
+          />
+        {/if}
         {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
       </div>
     </div>
