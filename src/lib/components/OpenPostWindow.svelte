@@ -278,7 +278,7 @@
             }
 
             // 500ms待機するPromise //image not foundになるのを避けるため
-            await delay(500);
+            await delay(1000);
             text =
               text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
             cursorPosition = len;
