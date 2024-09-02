@@ -270,7 +270,7 @@
                 text.slice(0, cursorPosition) +
                 urln +
                 text.slice(cursorPosition);
-            }, 100); //すぐURLいれると画像見つかりません画像になることあるからちょっと待つ
+            }, 1000); //すぐURLいれると画像見つかりません画像になることあるからちょっと待つ
             cursorPosition = len;
 
             // imetaをタグに入れる
