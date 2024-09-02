@@ -237,9 +237,13 @@
     cursorPosition += emojiText.length;
   };
 
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   const handleFileUpload = async (fileList: FileList) => {
     if (!fileList || fileList.length <= 0 || !$uploader) return;
     $nowProgress = true;
+
     // 既存のアップロードがある場合はキャンセルする
     if (uploadAbortController) {
       uploadAbortController.abort();
@@ -254,40 +258,46 @@
         $uploader,
         uploadAbortController.signal // アップロード中断のシグナルを渡す
       );
+
       console.log(uploadedURPs);
 
-      uploadedURPs.forEach((data) => {
+      // 非同期処理を待つPromise配列
+      const promises = uploadedURPs.map(async (data) => {
         if (data.status === "success") {
           const url = data.nip94_event?.tags.find(
             (tag) => tag[0] === "url"
           )?.[1];
 
           if (url) {
-            const len = text.length; //ULR入れる前のカーソルの場所にカーソルおく
+            const len = text.length; // ULR入れる前のカーソルの場所にカーソルおく
             const urln = `\n${url}`;
-            setTimeout(() => {
-              text =
-                text.slice(0, cursorPosition) +
-                urln +
-                text.slice(cursorPosition);
-            }, 1000); //すぐURLいれると画像見つかりません画像になることあるからちょっと待つ
-            cursorPosition = len;
 
             // imetaをタグに入れる
             if (data.nip94_event) {
               tags.push(convertMetaTags(data.nip94_event));
             }
 
-            setTimeout(() => {
-              textarea.selectionEnd = cursorPosition;
-              textarea.focus();
-            }, 10);
+            // 500ms待機するPromise //image not foundになるのを避けるため
+            await delay(500);
+            text =
+              text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
+            cursorPosition = len;
+
+            // さらに10ms待機するPromise //確実にテキスト挿入完了してから次の処理をするため
+            await delay(10);
+
+            textarea.selectionEnd = cursorPosition;
+            textarea.focus();
           }
         }
       });
+
+      // すべての非同期処理が完了するのを待つ
+      await Promise.all(promises);
     } catch (error) {
       console.log(error);
     } finally {
+      // 非同期処理がすべて完了した後に実行
       $nowProgress = false;
       uploadAbortController = null;
     }
