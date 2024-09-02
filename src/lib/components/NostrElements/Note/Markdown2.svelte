@@ -7,7 +7,6 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { _ } from "svelte-i18n";
-  import Markdown2 from "./Markdown2.svelte";
   import Content from "./Content.svelte";
 
   export let text: string;
@@ -88,10 +87,30 @@
         {repostable}
       />{:else}{part.content}{/if}
   {:else if part.type === "horizontal"}
-    <hr />{:else if part.type === "unorderedList"}
+    <hr />
+  {:else if part.type === "bold"}
+    <b
+      ><Content
+        text={part.content ?? ""}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      /></b
+    >
+  {:else if part.type === "header" && part.number}
+    <div class="header-{part.number}">
+      <Content
+        text={part.content ?? ""}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
+    </div>{:else if part.type === "unorderedList"}
     <ul>
       <li>
-        <Markdown2
+        <Content
           text={part.content ?? ""}
           {tags}
           {displayMenu}
@@ -100,39 +119,6 @@
         />
       </li>
     </ul>
-  {:else if part.type === "table"}
-    <table class="markdown-table">
-      <thead>
-        <tr>
-          {#each part.headers ?? [] as header}
-            <th class="table-header">{header}</th>
-          {/each}
-        </tr>
-      </thead>
-      <tbody>
-        {#each part.rows ?? [] as row}
-          <tr>
-            {#each row as cell}
-              <td class="table-cell"
-                ><Markdown2
-                  text={cell}
-                  {tags}
-                  {displayMenu}
-                  {depth}
-                  {repostable}
-                /></td
-              >
-            {/each}
-          </tr>
-        {/each}
-      </tbody>
-    </table>
-  {:else if part.type === "bold"}
-    <b>{part.content}</b>
-  {:else if part.type === "header" && part.number}
-    <div class="header-{part.number}">
-      {part.content}
-    </div>
   {:else if part.type === "image" && part.content && part.url}
     {#if $showImg && !imgError}
       {#if !imgLoad}<Link
@@ -214,14 +200,10 @@
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all"
       href={part.url ?? ""}>{part.content}</Link
-    >{:else}
-    <Content
-      text={part.content ?? ""}
-      {tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-    />
+    >{:else}<span
+      class="whitespace-pre-wrap break-words word"
+      style="word-break: break-word;">{part.content}</span
+    >
   {/if}
 {/each}
 
@@ -240,31 +222,6 @@
 
   .header-4 {
     @apply text-lg font-medium mb-2;
-  }
-  /* テーブル全体のスタイル */
-  .markdown-table {
-    width: 100%;
-    border-collapse: collapse; /* ボーダーを重ねて表示しない */
-    margin: 20px 0;
-  }
-
-  /* ヘッダーセルのスタイル */
-  .table-header {
-    background-color: theme(colors.neutral.600);
-    text-align: left;
-    padding: 8px;
-    border-bottom: 2px solid theme(colors.neutral.700);
-  }
-
-  /* ボディセルのスタイル */
-  .table-cell {
-    padding: 8px;
-    border-bottom: 1px solid theme(colors.neutral.700);
-  }
-
-  /* テーブル行のスタイル */
-  tr:nth-child(even) {
-    background-color: theme(colors.neutral.800);
   }
   ul {
     list-style-type: disc; /* リストアイコンを表示 */
