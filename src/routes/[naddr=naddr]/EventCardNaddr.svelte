@@ -280,7 +280,7 @@
       <div class="grid grid-cols-[1fr_auto] w-full gap-1 mb-1">
         <div>
           {#if title}
-            <h2 class="text-lg font-bold text-magnum-400">
+            <h2 class="text-2xl font-bold text-magnum-400 my-1">
               {title}
             </h2>{/if}
           {#if description}
