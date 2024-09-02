@@ -15,7 +15,8 @@ export interface Part {
     | "bold"
     | "header"
     | "table"
-    | "unorderedList";
+    | "unorderedList"
+    | "quote";
   content: string | undefined;
   url?: string;
   number?: number;
@@ -40,6 +41,7 @@ const headerRegex = /^(#{1,4})\s+(.*)$/im;
 const tableRegex = /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n)*)$/ims;
 // 順序なしリストの正規表現
 const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
+const quoteRegex = /^(>>?)\s+(.*)$/im;
 // パスから拡張子をチェックする関数
 const checkFileExtension = (url: string): Part["type"] => {
   try {
@@ -329,6 +331,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    const quoteMatch = remainingText.match(quoteRegex); // 順序なしリストのマッチ
     const unorderedListMatch = remainingText.match(unorderedListRegex); // 順序なしリストのマッチ
 
     // テーブルのマッチ
@@ -348,6 +351,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
+    const quoteIndex = quoteMatch ? remainingText.indexOf(quoteMatch[0]) : -1;
     const unorderedListIndex = unorderedListMatch
       ? remainingText.indexOf(unorderedListMatch[0])
       : -1;
@@ -374,6 +378,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      quoteIndex === -1 &&
       unorderedListIndex === -1 &&
       tableIndex === -1 &&
       headerIndex === -1 &&
@@ -393,6 +398,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      {
+        type: "quote",
+        index: quoteIndex,
+        match: quoteMatch,
+      },
       {
         type: "unorderedList",
         index: unorderedListIndex,
@@ -448,6 +458,13 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "quote":
+          // リスト項目から `- `、`* `、`+ ` を削除し、リストとして処理する
+          parts.push({
+            type: "quote",
+            content: match[2],
+          });
+          break;
         case "unorderedList":
           // リスト項目から `- `、`* `、`+ ` を削除し、リストとして処理する
           parts.push({

@@ -88,7 +88,16 @@
         {repostable}
       />{:else}{part.content}{/if}
   {:else if part.type === "horizontal"}
-    <hr />{:else if part.type === "unorderedList"}
+    <hr />{:else if part.type === "quote"}
+    <blockquote>
+      <Content
+        text={part.content ?? ""}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
+    </blockquote>{:else if part.type === "unorderedList"}
     <ul>
       <li>
         <Markdown2
@@ -130,8 +139,14 @@
   {:else if part.type === "bold"}
     <b>{part.content}</b>
   {:else if part.type === "header" && part.number}
-    <div class="header-{part.number}">
-      {part.content}
+    <div class="header-{part.number} mt-4">
+      <Markdown2
+        text={part.content ?? ""}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
     </div>
   {:else if part.type === "image" && part.content && part.url}
     {#if $showImg && !imgError}
@@ -273,5 +288,33 @@
 
   li {
     margin-bottom: 0.5em; /* 各リストアイテムの下にスペースを追加 */
+  }
+  blockquote {
+    padding: 1em;
+    margin: 1em 0;
+    border-left: 5px solid rgb(var(--color-magnum-500) / 1); /* 引用の左側にカラーテーマに基づくライン */
+    background-color: rgb(
+      var(--color-neutral-800) / 1
+    ); /* 背景色をカラーテーマに基づく */
+    color: rgb(
+      var(--color-neutral-50) / 1
+    ); /* テキスト色をカラーテーマに基づく */
+    font-style: italic;
+    quotes: "“" "”" "‘" "’";
+  }
+
+  blockquote::before {
+    content: open-quote;
+    font-size: 2em;
+    color: rgb(var(--color-magnum-500) / 1); /* カラーテーマに基づく */
+    margin-right: 0.25em;
+  }
+
+  blockquote p {
+    margin: 0;
+  }
+
+  blockquote::after {
+    content: close-quote;
   }
 </style>
