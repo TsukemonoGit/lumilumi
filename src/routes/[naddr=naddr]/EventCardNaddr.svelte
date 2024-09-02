@@ -255,7 +255,9 @@
   {/if}
 
   <article class="{noteClass()} w-full">
-    <div class=" break-all overflow-x-hidden gap-4 p-1">
+    <div
+      class=" break-all overflow-x-hidden gap-4 p-1 rounded-md border border-magnum-400/50"
+    >
       <div class="flex gap-1 w-fit">
         {#if metadata}
           <div>
@@ -278,20 +280,22 @@
       <div class="grid grid-cols-[1fr_auto] w-full gap-1 mb-1">
         <div>
           {#if title}
-            <h2 class="text-lg font-bold text-magnum-400">
+            <h2 class="text-2xl font-bold text-magnum-400 my-1">
               {title}
             </h2>{/if}
           {#if description}
-            <div class=" text-neutral-300/80">{description}</div>{/if}
+            <div class="mx-2 text-sm text-neutral-300/80">
+              {description}
+            </div>{/if}
         </div>
         {#if image && $showImg}
           <img
             src={image}
             alt=""
-            class="max-w-16 object-contain max-h-16"
+            class="max-w-24 object-contain max-h-16"
           />{/if}
       </div>
-      <div class="rounded-md border border-magnum-400/50 mt-4 p-1">
+      <div class=" mt-6 p-1">
         {#if note.kind === 30023}
           <Markdown
             text={note.content}

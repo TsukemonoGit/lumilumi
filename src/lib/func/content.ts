@@ -13,10 +13,14 @@ export interface Part {
     | "movie"
     | "horizontal"
     | "bold"
-    | "header";
+    | "header"
+    | "table"
+    | "unorderedList";
   content: string | undefined;
   url?: string;
   number?: number;
+  headers?: string[];
+  rows?: string[][];
 }
 /** ImageFile_Check_正規表現_パターン */
 const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
@@ -33,6 +37,9 @@ const markdownHorizontalRuleRegex = /^-{4,}\s*$/m; // 水平線の正規表現
 const boldTextRegex = /\*\*(.*?)\*\*/im;
 const headerRegex = /^(#{1,4})\s+(.*)$/im;
 
+const tableRegex = /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n)*)$/ims;
+// 順序なしリストの正規表現
+const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
 // パスから拡張子をチェックする関数
 const checkFileExtension = (url: string): Part["type"] => {
   try {
@@ -322,6 +329,10 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    const unorderedListMatch = remainingText.match(unorderedListRegex); // 順序なしリストのマッチ
+
+    // テーブルのマッチ
+    const tableMatch = remainingText.match(tableRegex);
     const headerMatch = remainingText.match(headerRegex);
     const boldMatch = remainingText.match(boldTextRegex); // 太字のマッチ
     const markdownLinkMatch = remainingText.match(markdownLinkRegex); // Markdownリンクのマッチ
@@ -337,7 +348,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
+    const unorderedListIndex = unorderedListMatch
+      ? remainingText.indexOf(unorderedListMatch[0])
+      : -1;
 
+    const tableIndex = tableMatch ? remainingText.indexOf(tableMatch[0]) : -1;
     const headerIndex = headerMatch
       ? remainingText.indexOf(headerMatch[0])
       : -1;
@@ -359,6 +374,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      unorderedListIndex === -1 &&
+      tableIndex === -1 &&
       headerIndex === -1 &&
       boldIndex === -1 &&
       nip19Index === -1 &&
@@ -376,6 +393,12 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      {
+        type: "unorderedList",
+        index: unorderedListIndex,
+        match: unorderedListMatch,
+      },
+      { type: "table", index: tableIndex, match: tableMatch }, // テーブルのマッチ
       {
         type: "header",
         index: headerIndex,
@@ -425,6 +448,33 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "unorderedList":
+          // リスト項目から `- `、`* `、`+ ` を削除し、リストとして処理する
+          parts.push({
+            type: "unorderedList",
+            content: match[0].replace(/^\s*[-*+]\s/, ""),
+          });
+          break;
+        case "table":
+          // テーブル処理
+          console.log(match);
+          const [, headerRow, dataRows] = match;
+          const headers = headerRow
+            .slice(1, -1)
+            .split("|")
+            .map((h) => h.trim());
+          const rows = dataRows
+            .split("\n") // Split text into lines
+            .map(
+              (line) =>
+                line
+                  .split("|") // Split each line by '|'
+                  .map((cell) => cell.trim()) // Trim whitespace from each cell
+                  .filter((cell) => cell.length > 0) // Remove empty cells
+            );
+
+          parts.push({ content: "", type: "table", headers, rows });
+          break;
         case "header":
           const headerLevel = match[1].length; // ヘッダーのレベルを取得
           parts.push({
