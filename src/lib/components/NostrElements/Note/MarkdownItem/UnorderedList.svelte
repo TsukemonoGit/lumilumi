@@ -61,7 +61,7 @@
   /* ベースのリストスタイル */
   ul {
     list-style-type: disc; /* デフォルトのリストアイコン */
-    margin-left: 1.5em; /* 左のマージンを追加 */
+    margin-left: 1em; /* 左のマージンを追加 */
     padding-left: 1em; /* パディングを追加してアイコンとテキストの距離を調整 */
   }
 
@@ -72,12 +72,12 @@
   /* ネストされたリストのスタイル */
   ul ul {
     list-style-type: circle; /* 内側のリストアイコン */
-    margin-left: 1em; /* ネストリストの左マージンを増加 */
+    margin-left: 0em; /* ネストリストの左マージンを増加 */
   }
 
   ul ul ul {
     list-style-type: square; /* さらにネストされたリストアイコン */
-    margin-left: 1em; /* さらにネストリストの左マージンを増加 */
+    margin-left: 0em; /* さらにネストリストの左マージンを増加 */
   }
 
   /* 必要に応じて追加の階層スタイルをここに追加 */
