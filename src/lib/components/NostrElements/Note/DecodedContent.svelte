@@ -40,16 +40,10 @@
   let hasLoaded = writable(false);
   let element: HTMLDivElement;
 
-  function loadContent() {
-    // コンテンツの読み込みロジック
-    console.log("Content is being loaded");
-  }
-
   onMount(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         if (!$hasLoaded) {
-          loadContent();
           hasLoaded.set(true); // 一度だけコンテンツを読み込む
         }
       }
