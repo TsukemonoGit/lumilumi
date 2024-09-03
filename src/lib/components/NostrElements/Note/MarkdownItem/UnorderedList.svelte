@@ -9,7 +9,7 @@
   export let repostable;
   export let tags;
   export let openModal;
-  console.log(part);
+  //  console.log(part);
 </script>
 
 <ul>

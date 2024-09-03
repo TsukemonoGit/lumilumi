@@ -543,7 +543,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     if (match) {
       switch (type) {
         case "markdownLinkWithImage": // 画像リンクの処理
-          console.log(match);
+          // console.log(match);
           parts.push({
             type: "imageLink",
             content: match[1], // altテキスト
@@ -552,7 +552,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           });
           break;
         case "codeBlock":
-          console.log(match);
+          //console.log(match);
           parts.push({
             type: "codeBlock",
             content: match[1],
