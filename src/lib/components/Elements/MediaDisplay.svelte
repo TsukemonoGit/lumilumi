@@ -49,7 +49,7 @@
       <!-- {#if images[currentIndex].type === "image"} -->
       <img
         alt=""
-        src={images[currentIndex].content}
+        src={images[currentIndex].url}
         class="max-h-[100vh] max-w-[100vw] object-contain"
       />
       <!-- {:else if images[currentIndex].type === "movie"}<video
