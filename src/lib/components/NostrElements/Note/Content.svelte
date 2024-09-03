@@ -182,7 +182,7 @@
       className="underline text-magnum-300 break-all"
       href={part.url ?? ""}>{part.content}</Link
     >{:else}<span
-      class="whitespace-pre-wrap break-words word"
+      class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
     >{/if}
 {/each}

@@ -331,9 +331,11 @@
     background-color: theme(colors.neutral.800); /* ダークテーマ背景色 */
     border-radius: 8px; /* 角を丸くする */
     padding: 8px 16px; /* 内側に余白を作る */
-    overflow-x: auto; /* 横スクロールを可能にする */
+
     font-family: "Courier New", Courier, monospace; /* 等幅フォントを使用 */
     margin: 1em 0;
+    @apply whitespace-pre-wrap break-words overflow-x-auto;
+    word-break: break-word;
   }
 
   /* コード内のスタイル */
