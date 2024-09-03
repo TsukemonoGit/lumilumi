@@ -227,10 +227,6 @@
     margin-right: 0.25em;
   }
 
-  blockquote p {
-    margin: 0;
-  }
-
   blockquote::after {
     content: close-quote;
   }

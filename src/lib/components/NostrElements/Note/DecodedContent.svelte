@@ -7,8 +7,10 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import UserName from "./UserName.svelte";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
+  import { onMount } from "svelte";
+  import { writable } from "svelte/store";
   export let displayMenu: boolean;
   export let content: string | undefined;
   export let depth: number;
@@ -34,122 +36,165 @@
         type: "nrelay" | "npub" | "note";
         data: string;
       };
+
+  let hasLoaded = writable(false);
+  let element: HTMLDivElement;
+
+  function loadContent() {
+    // コンテンツの読み込みロジック
+    console.log("Content is being loaded");
+  }
+
+  onMount(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!$hasLoaded) {
+          loadContent();
+          hasLoaded.set(true); // 一度だけコンテンツを読み込む
+        }
+      }
+    });
+
+    if (element) {
+      observer.observe(element);
+    }
+
+    return () => {
+      if (element) {
+        observer.unobserve(element);
+      }
+    };
+  });
 </script>
 
-{#if decoded.type === "npub"}
-  <span class="text-magnum-100 align-middle"
-    >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
-        pubkey={decoded.data}
-        metadata={undefined}
-      />{/if}</span
-  >
-{:else if decoded.type === "nevent"}
-  <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-    <div class="border rounded-md border-magnum-600/30">
-      <Note
-        id={decoded.data.id}
-        mini={true}
-        {displayMenu}
-        {depth}
-        {repostable}
-      />
-    </div>
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-  </span>
-{:else if decoded.type === "note"}
-  <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-    <div class="border rounded-md border-magnum-600/30">
-      <Note id={decoded.data} mini={true} {displayMenu} {depth} {repostable} />
-    </div>
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-  </span>
-{:else if decoded.type === "naddr"}
-  <span class="grid grid-cols-[auto_1fr_auto]">
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-    <div class="border rounded-md border-magnum-600/30">
-      <LatestEvent
-        queryKey={[
-          "naddr",
-          `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-        ]}
-        filters={[
-          decoded.data.identifier !== ""
-            ? {
-                kinds: [decoded.data.kind],
-                authors: [decoded.data.pubkey],
-                "#d": [decoded.data.identifier],
-              }
-            : {
-                kinds: [decoded.data.kind],
-                authors: [decoded.data.pubkey],
-              },
-        ]}
-        let:event
+<div bind:this={element} class="some-class">
+  {#if $hasLoaded}
+    {#if decoded.type === "npub"}
+      <span class="text-magnum-100 align-middle"
+        >{#if !displayMenu}<UserName
+            pubhex={decoded.data}
+          />{:else}<PopupUserName
+            pubkey={decoded.data}
+            metadata={undefined}
+          />{/if}</span
       >
-        <div
-          slot="loading"
-          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-        >
-          {content}{#if displayMenu}<EllipsisMenuNaddr
-              naddr={content?.slice(6)}
-            />{/if}
-        </div>
-        <div
-          slot="nodata"
-          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-        >
-          {content}{#if displayMenu}<EllipsisMenuNaddr
-              naddr={content?.slice(6)}
-            />{/if}
-        </div>
-        <div
-          slot="error"
-          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-        >
-          {content}{#if displayMenu}<EllipsisMenuNaddr
-              naddr={content?.slice(6)}
-            />{/if}
-        </div>
-        <Metadata
-          queryKey={["metadata", event.pubkey]}
-          pubkey={event.pubkey}
-          let:metadata
-        >
-          <div slot="loading">
-            <EventCard note={event} {displayMenu} {repostable} />
-          </div>
-          <div slot="nodata">
-            <EventCard note={event} {displayMenu} {repostable} />
-          </div>
-          <div slot="error">
-            <EventCard note={event} {displayMenu} {repostable} />
-          </div>
-          <EventCard
-            {metadata}
+    {:else if decoded.type === "nevent"}
+      <span class="grid grid-cols-[auto_1fr_auto]">
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+        <div class="border rounded-md border-magnum-600/30">
+          <Note
+            id={decoded.data.id}
+            mini={true}
             {displayMenu}
-            note={event}
+            {depth}
             {repostable}
-          /></Metadata
-        >
-      </LatestEvent>
-    </div>
-    <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-  </span>
-  <!---->
-{:else if decoded.type === "nprofile"}<!---->
-  <span class="text-magnum-100 align-middle"
-    >{#if !displayMenu}<UserName
-        pubhex={decoded.data.pubkey}
-      />{:else}<PopupUserName
-        pubkey={decoded.data.pubkey}
-        metadata={undefined}
-      />{/if}</span
-  >
-{:else if decoded.type === "nrelay"}<!---->
-  <span class="text-sm text-neutral-500 flex-inline">
-    {decoded.data}
-  </span>
-{:else if decoded.type === "nsec"}<!---->
-{/if}
+          />
+        </div>
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      </span>
+    {:else if decoded.type === "note"}
+      <span class="grid grid-cols-[auto_1fr_auto]">
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+        <div class="border rounded-md border-magnum-600/30">
+          <Note
+            id={decoded.data}
+            mini={true}
+            {displayMenu}
+            {depth}
+            {repostable}
+          />
+        </div>
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      </span>
+    {:else if decoded.type === "naddr"}
+      <span class="grid grid-cols-[auto_1fr_auto]">
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+        <div class="border rounded-md border-magnum-600/30">
+          <LatestEvent
+            queryKey={[
+              "naddr",
+              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+            ]}
+            filters={[
+              decoded.data.identifier !== ""
+                ? {
+                    kinds: [decoded.data.kind],
+                    authors: [decoded.data.pubkey],
+                    "#d": [decoded.data.identifier],
+                  }
+                : {
+                    kinds: [decoded.data.kind],
+                    authors: [decoded.data.pubkey],
+                  },
+            ]}
+            let:event
+          >
+            <div
+              slot="loading"
+              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+            >
+              {content}{#if displayMenu}<EllipsisMenuNaddr
+                  naddr={content?.slice(6)}
+                />{/if}
+            </div>
+            <div
+              slot="nodata"
+              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+            >
+              {content}{#if displayMenu}<EllipsisMenuNaddr
+                  naddr={content?.slice(6)}
+                />{/if}
+            </div>
+            <div
+              slot="error"
+              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+            >
+              {content}{#if displayMenu}<EllipsisMenuNaddr
+                  naddr={content?.slice(6)}
+                />{/if}
+            </div>
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+              let:metadata
+            >
+              <div slot="loading">
+                <EventCard note={event} {displayMenu} {repostable} />
+              </div>
+              <div slot="nodata">
+                <EventCard note={event} {displayMenu} {repostable} />
+              </div>
+              <div slot="error">
+                <EventCard note={event} {displayMenu} {repostable} />
+              </div>
+              <EventCard
+                {metadata}
+                {displayMenu}
+                note={event}
+                {repostable}
+              /></Metadata
+            >
+          </LatestEvent>
+        </div>
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      </span>
+      <!---->
+    {:else if decoded.type === "nprofile"}<!---->
+      <span class="text-magnum-100 align-middle"
+        >{#if !displayMenu}<UserName
+            pubhex={decoded.data.pubkey}
+          />{:else}<PopupUserName
+            pubkey={decoded.data.pubkey}
+            metadata={undefined}
+          />{/if}</span
+      >
+    {:else if decoded.type === "nrelay"}<!---->
+      <span class="text-sm text-neutral-500 flex-inline">
+        {decoded.data}
+      </span>
+    {:else if decoded.type === "nsec"}<!---->
+    {/if}
+  {:else}
+    {content}
+  {/if}
+</div>
