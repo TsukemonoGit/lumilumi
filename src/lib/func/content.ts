@@ -16,7 +16,8 @@ export interface Part {
     | "header"
     | "table"
     | "unorderedList"
-    | "quote";
+    | "quote"
+    | "codeBlock";
   content: string | undefined;
   url?: string;
   number?: number;
@@ -42,6 +43,8 @@ const tableRegex = /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n)*)$/ims;
 // 順序なしリストの正規表現
 const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
 const quoteRegex = /^(>>?)\s+(.*)$/im;
+const codeBlockRegex = /```([\s\S]*?)```/m;
+
 // パスから拡張子をチェックする関数
 const checkFileExtension = (url: string): Part["type"] => {
   try {
@@ -331,6 +334,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    const codeBlockMatch = remainingText.match(codeBlockRegex);
     const quoteMatch = remainingText.match(quoteRegex); // 順序なしリストのマッチ
     const unorderedListMatch = remainingText.match(unorderedListRegex); // 順序なしリストのマッチ
 
@@ -351,6 +355,10 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
+
+    const codeBlockIndex = codeBlockMatch
+      ? remainingText.indexOf(codeBlockMatch[0])
+      : -1;
     const quoteIndex = quoteMatch ? remainingText.indexOf(quoteMatch[0]) : -1;
     const unorderedListIndex = unorderedListMatch
       ? remainingText.indexOf(unorderedListMatch[0])
@@ -378,6 +386,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      codeBlockIndex === -1 &&
       quoteIndex === -1 &&
       unorderedListIndex === -1 &&
       tableIndex === -1 &&
@@ -398,6 +407,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      {
+        type: "codeBlock",
+        index: codeBlockIndex,
+        match: codeBlockMatch,
+      },
       {
         type: "quote",
         index: quoteIndex,
@@ -458,8 +472,14 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "codeBlock":
+          console.log(match);
+          parts.push({
+            type: "codeBlock",
+            content: match[1],
+          });
+          break;
         case "quote":
-          // リスト項目から `- `、`* `、`+ ` を削除し、リストとして処理する
           parts.push({
             type: "quote",
             content: match[2],
@@ -474,7 +494,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           break;
         case "table":
           // テーブル処理
-          console.log(match);
+
           const [, headerRow, dataRows] = match;
           const headers = headerRow
             .slice(1, -1)

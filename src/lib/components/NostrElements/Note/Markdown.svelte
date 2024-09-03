@@ -87,8 +87,9 @@
         depth={depth + 1}
         {repostable}
       />{:else}{part.content}{/if}
-  {:else if part.type === "horizontal"}
-    <hr />{:else if part.type === "quote"}
+  {:else if part.type === "horizontal"}<hr
+    />{:else if part.type === "codeBlock"}
+    <pre><code>{part.content}</code></pre>{:else if part.type === "quote"}
     <blockquote>
       <Content
         text={part.content ?? ""}
@@ -137,7 +138,15 @@
       </tbody>
     </table>
   {:else if part.type === "bold"}
-    <b>{part.content}</b>
+    <b
+      ><Markdown2
+        text={part.content ?? ""}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      /></b
+    >
   {:else if part.type === "header" && part.number}
     <div class="header-{part.number} mt-4">
       <Markdown2
@@ -316,5 +325,20 @@
 
   blockquote::after {
     content: close-quote;
+  }
+  /* コードブロック全体のスタイル */
+  pre {
+    background-color: theme(colors.neutral.800); /* ダークテーマ背景色 */
+    border-radius: 8px; /* 角を丸くする */
+    padding: 8px 16px; /* 内側に余白を作る */
+    overflow-x: auto; /* 横スクロールを可能にする */
+    font-family: "Courier New", Courier, monospace; /* 等幅フォントを使用 */
+    margin: 1em 0;
+  }
+
+  /* コード内のスタイル */
+  code {
+    color: theme(colors.neutral.100); /* コードの文字色（明るめの白色） */
+    font-size: 14px; /* 文字サイズを調整 */
   }
 </style>
