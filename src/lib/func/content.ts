@@ -40,7 +40,9 @@ const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
 const boldTextRegex = /\*\*(.*?)\*\*/im;
 const headerRegex = /^(#{1,4})\s+(.*)$/im;
 
-const tableRegex = /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n)*)$/ims;
+const tableRegex =
+  /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n?)*)$/ims;
+
 // 順序なしリストの正規表現
 // const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
 //const unorderedListRegex = /^(?:[-*+]\s.*(?:\n(?:\s*[-*+]\s.*))*)$/m;
@@ -543,10 +545,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           // テーブル処理
 
           const [, headerRow, dataRows] = match;
-          const headers = headerRow
-            .slice(1, -1)
-            .split("|")
-            .map((h) => h.trim());
+          const headers = headerRow.split("|").map((h) => h.trim());
+          console.log(headers);
           const rows = dataRows
             .split("\n") // Split text into lines
             .map(
