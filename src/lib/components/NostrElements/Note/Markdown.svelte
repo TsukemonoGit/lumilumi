@@ -157,12 +157,12 @@
         {repostable}
       />
     </div>
-  {:else if part.type === "image" && part.content && part.url}
+  {:else if part.type === "image" && part.url}
     {#if $showImg && !imgError}
       {#if !imgLoad}<Link
           props={{ "aria-label": `External Links: ${part.url}` }}
           className="underline text-magnum-300 break-all "
-          href={part.url}>{part.content}</Link
+          href={part.url}>{part.content ?? part.url}</Link
         >{/if}
       <div>
         <button

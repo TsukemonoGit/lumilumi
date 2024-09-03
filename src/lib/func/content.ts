@@ -33,7 +33,7 @@ const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
 //
 const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // リンクの正規表現
-const markdownImageRegex = /!\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
+const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
 const markdownHorizontalRuleRegex = /^-{4,}\s*$/m; // 水平線の正規表現
 
 const boldTextRegex = /\*\*(.*?)\*\*/im;
