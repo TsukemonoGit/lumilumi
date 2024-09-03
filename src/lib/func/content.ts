@@ -38,7 +38,7 @@ const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像�
 const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
 
 const boldTextRegex = /\*\*(.*?)\*\*/im;
-const headerRegex = /^(#{1,4})\s+(.*)$/im;
+const headerRegex = /^(#{1,5})\s+(.*)$/im;
 
 const tableRegex =
   /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n?)*)$/ims;

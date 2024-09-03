@@ -125,7 +125,14 @@
 {:else if part.type === "url"}<Link
     props={{ "aria-label": `External Links: ${part.url}` }}
     className="underline text-magnum-300 break-all "
-    href={part.url ?? ""}>{part.content}</Link
+    href={part.url ?? ""}
+    ><Markdown
+      text={part.content ?? part.url ?? ""}
+      {tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+    /></Link
   >{:else if part.type === "emoji"}
   {#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
       height="24"
@@ -172,9 +179,11 @@
   }
 
   .header-4 {
+    @apply text-lg font-semibold mb-2;
+  }
+  .header-5 {
     @apply text-lg font-medium mb-2;
   }
-
   blockquote {
     padding: 1em;
     margin: 1em 0;
