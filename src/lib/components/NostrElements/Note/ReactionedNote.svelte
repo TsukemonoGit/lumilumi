@@ -80,15 +80,18 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <Content
-      text={text.content ?? ""}
-      tags={text.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-    />
-    {#if displayMenu}
-      <NoteActionButtons note={text} {repostable} />{/if}
+    <div class="mx-2 my-1">
+      <Content
+        text={text.content ?? ""}
+        tags={text.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+      />
+
+      {#if displayMenu}
+        <NoteActionButtons note={text} {repostable} />{/if}
+    </div>
   </Text>
 {:else if tag[0] === "a"}
   {@const filter = naddrFilter()}
