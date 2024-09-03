@@ -12,6 +12,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import Markdown from "./Markdown.svelte";
 
   export let repostable: boolean;
   export let displayMenu: boolean;
@@ -81,14 +82,22 @@
       />
     </div>
     <div class="mx-2 my-1 text-sm opacity-70">
-      <Content
-        text={text.content ?? ""}
-        tags={text.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-      />
-
+      {#if text.kind === 30023}<Markdown
+          text={text.content ?? ""}
+          tags={text.tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+        />
+      {:else}
+        <Content
+          text={text.content ?? ""}
+          tags={text.tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+        />
+      {/if}
       {#if displayMenu}
         <NoteActionButtons note={text} {repostable} />{/if}
     </div>

@@ -4,7 +4,6 @@
   import { _ } from "svelte-i18n";
   import Content from "./Content.svelte";
   import DecodedContent from "./DecodedContent.svelte";
-  import Markdown2 from "./Markdown2.svelte";
   import { nip19Decode } from "$lib/func/util";
   import Link from "$lib/components/Elements/Link.svelte";
   import UnorderedList from "./MarkdownItem/UnorderedList.svelte";

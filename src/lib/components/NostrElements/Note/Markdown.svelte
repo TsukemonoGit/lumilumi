@@ -1,14 +1,7 @@
 <script lang="ts">
-  import { parseMarkdownText, parseText } from "$lib/func/content";
-  import { nip19 } from "nostr-tools";
-  import DecodedContent from "./DecodedContent.svelte";
-  import { showImg, viewMediaModal } from "$lib/stores/stores";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import OGP from "$lib/components/Elements/OGP.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import { parseMarkdownText } from "$lib/func/content";
+  import { viewMediaModal } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
-  import Markdown2 from "./Markdown2.svelte";
-  import Content from "./Content.svelte";
   import ContentBlock from "./ContentBlock.svelte";
 
   export let text: string;
