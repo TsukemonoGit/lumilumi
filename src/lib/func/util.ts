@@ -6,7 +6,7 @@ import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch } from "nostr-tools/utils";
-import type { nip19 } from "nostr-tools";
+import { nip19 } from "nostr-tools";
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
@@ -707,3 +707,40 @@ export const nostviewstrable = [
   //30008, ばっじ
   30015, 30030,
 ];
+
+export const nip19Decode = (
+  content: string | undefined
+):
+  | { type: "naddr"; data: nip19.AddressPointer }
+  | { type: "nevent"; data: nip19.EventPointer }
+  | { type: "nprofile"; data: nip19.ProfilePointer }
+  | { type: "nsec"; data: Uint8Array }
+  | { type: "nrelay" | "npub" | "note"; data: string }
+  | undefined => {
+  if (content === undefined) {
+    return undefined;
+  }
+  // console.log(content);
+  try {
+    const decoded: nip19.DecodeResult = nip19.decode(content);
+    if (decoded.type === "naddr") {
+      return {
+        type: decoded.type,
+        data: decoded.data as nip19.AddressPointer,
+      };
+    } else if (decoded.type === "nevent") {
+      return { type: decoded.type, data: decoded.data as nip19.EventPointer };
+    } else if (decoded.type === "nprofile") {
+      return {
+        type: decoded.type,
+        data: decoded.data as nip19.ProfilePointer,
+      };
+    } else if (decoded.type === "nsec") {
+      return { type: decoded.type, data: decoded.data as Uint8Array };
+    } else {
+      return { type: decoded.type, data: decoded.data as string };
+    }
+  } catch (error) {
+    return undefined;
+  }
+};

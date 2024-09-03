@@ -23,6 +23,7 @@ export interface Part {
   number?: number;
   headers?: string[];
   rows?: string[][];
+  list?: Part[];
 }
 /** ImageFile_Check_正規表現_パターン */
 const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
@@ -34,14 +35,17 @@ const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 //
 const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // リンクの正規表現
 const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
-const markdownHorizontalRuleRegex = /^-{4,}\s*$/m; // 水平線の正規表現
+const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
 
 const boldTextRegex = /\*\*(.*?)\*\*/im;
 const headerRegex = /^(#{1,4})\s+(.*)$/im;
 
 const tableRegex = /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n)*)$/ims;
 // 順序なしリストの正規表現
-const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
+// const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
+//const unorderedListRegex = /^(?:[-*+]\s.*(?:\n(?:\s*[-*+]\s.*))*)$/m;
+const unorderedListRegex = /^(?:\s*[-*+]\s.+(?:\n(?:\s*[-*+]\s.+)*)*)$/m; // 入れ子を含む順序なしリスト
+
 const quoteRegex = /^(>>?)\s+(.*)$/im;
 const codeBlockRegex = /```([\s\S]*?)```/m;
 
@@ -64,6 +68,50 @@ const checkFileExtension = (url: string): Part["type"] => {
     return "text";
   }
 };
+
+export function parseUnorderedList(text: string): Part[] {
+  const lines = text.split("\n");
+  const stack: Part[] = [];
+  const rootParts: Part[] = [];
+
+  lines.forEach((line) => {
+    const match = line.match(/^\s*([-*+])\s(.*)$/);
+    console.log(match);
+    if (match) {
+      const [_, bullet, itemText] = match;
+      const level = Math.floor((line.match(/\s/g) || []).length / 2);
+      console.log(level);
+      console.log(itemText.trim());
+      const listItem: Part = {
+        type: "unorderedList",
+        content: itemText.trim(),
+        list: [],
+      };
+
+      if (level === 0) {
+        rootParts.push(listItem);
+        stack.length = 0; // Reset stack for new top-level list
+        stack.push(listItem);
+      } else {
+        // Adjust stack to the correct level
+        while (stack.length > level) {
+          stack.pop();
+        }
+
+        const parentList = stack[stack.length - 1];
+        if (parentList) {
+          if (!parentList.list) {
+            parentList.list = [];
+          }
+          parentList.list.push(listItem);
+          stack.push(listItem);
+        }
+      }
+    }
+  });
+
+  return rootParts;
+}
 
 export function parseText(input: string, tags: string[][]): Part[] {
   const parts: Part[] = [];
@@ -486,11 +534,10 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           });
           break;
         case "unorderedList":
-          // リスト項目から `- `、`* `、`+ ` を削除し、リストとして処理する
-          parts.push({
-            type: "unorderedList",
-            content: match[0].replace(/^\s*[-*+]\s/, ""),
-          });
+          // リスト全体を検出し、項目を分割
+
+          const listParts = parseUnorderedList(match[0]);
+          listParts.forEach((part) => parts.push(part));
           break;
         case "table":
           // テーブル処理

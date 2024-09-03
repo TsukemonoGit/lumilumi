@@ -1,6 +1,12 @@
 // sum.test.js
 import { expect, test } from "vitest";
-import { parseText } from "./content";
+import { parseText, parseUnorderedList } from "./content";
+
+test("parseUnorderedList", () => {
+  const text =
+    "- test\n  - tes\n  - t\n- test\n  - test\n  - test\n    - test\n    - test\n  - test\n- test";
+  console.log("parseUnorderedList", parseUnorderedList(text));
+});
 
 const testcontent =
   "lnbc200u1png5z54pp5chs5g354nd83t99ltnhdul8acaywsal9rdczeeu6tl43nega3jtsdz29pjxjumrda6kuar9vs5jqmn0wd68ytnzw45kcepqxycyw62zypskgepqdahzqum5daexzem9yqcqzzsxqrrsssp5u0jl5c3xwar6kzv9k73fpaeckxpn84lu3t3vkfjer39n9n8cgprs9qxpqysgq4vf56c827rhleyyn6eyadunmlyq25kscvrxamvax7xajg7n75td88zjl0dl0r2q8505eavyh8y3ycc3slfwehzncwe9av6g8qytm8xgphg4y60";
