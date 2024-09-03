@@ -80,7 +80,7 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <div class="mx-2 my-1">
+    <div class="mx-2 my-1 text-sm opacity-70">
       <Content
         text={text.content ?? ""}
         tags={text.tags}
