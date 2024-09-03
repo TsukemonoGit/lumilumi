@@ -4,7 +4,7 @@ import { parseText, parseUnorderedList } from "./content";
 
 test("parseUnorderedList", () => {
   const text =
-    "- test\n  - tes\n  - t\n- test\n  - test\n  - test\n    - test\n    - test\n  - test\n- test";
+    "| [![Breviarios contra la posmodernidad: Bosquejo de ideas para una era en disolución](https://hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/imgs/Breviarios_posmodernidad_wi_hu15547439386874453064.webp)](https://www.hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/) |\n|:---:|\n| [Weltanschauung Italia, _Breviarios contra la posmodernidad: Bosquejo de ideas para una era en disolución_, Hipérbola Janus, 2023](https://www.hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/)";
   console.log("parseUnorderedList", parseUnorderedList(text));
 });
 

@@ -9,6 +9,7 @@
   import UnorderedList from "./MarkdownItem/UnorderedList.svelte";
   import Table from "./MarkdownItem/Table.svelte";
   import Markdown from "./Markdown.svelte";
+  import { ExternalLink } from "lucide-svelte";
 
   export let part: Part;
   export let displayMenu;
@@ -67,6 +68,27 @@
       {repostable}
     />
   </div>
+{:else if part.type === "imageLink" && part.url}
+  <Link
+    props={{ "aria-label": `External Links: ${part.url}` }}
+    className="hover:opacity-70 flex underline text-magnum-300 break-all "
+    href={part.url}
+  >
+    {#if $showImg && !imgError}
+      {#if !imgLoad}{part.content}{/if}
+      <div class="w-fit h-fit">
+        <img
+          loading="lazy"
+          width="288"
+          height="288"
+          alt="img"
+          src={part.imageUrl}
+          class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
+          on:load={() => (imgLoad = true)}
+          on:error={() => (imgError = true)}
+        />
+      </div>{:else}{part.content}{/if}<ExternalLink size={20} /></Link
+  >
 {:else if part.type === "image" && part.url}
   {#if $showImg && !imgError}
     {#if !imgLoad}<Link

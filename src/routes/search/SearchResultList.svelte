@@ -194,7 +194,7 @@
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       $nowProgress = true;
       const older = await loadOlderEvents(
-        sift,
+        viewIndex + amount - allUniqueEvents?.length + sift,
         filters,
         queryKey,
         lastfavcheck,
@@ -212,7 +212,7 @@
       }
     }
     // console.log(allUniqueEvents?.length);
-    if (allUniqueEvents?.length >= viewIndex + amount) {
+    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
       //表示量のイベントなかったらスライドしない
       viewIndex += sift; //スライドする量
     }
@@ -258,7 +258,7 @@
     ]);
     console.log("test");
     const allEvents =
-      data && olderdatas ? [...data, ...olderdatas] : olderdatas ?? [];
+      data && olderdatas ? [...data, ...olderdatas] : (olderdatas ?? []);
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(

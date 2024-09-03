@@ -17,13 +17,15 @@ export interface Part {
     | "table"
     | "unorderedList"
     | "quote"
-    | "codeBlock";
+    | "codeBlock"
+    | "imageLink";
   content: string | undefined;
   url?: string;
   number?: number;
   headers?: string[];
   rows?: string[][];
   list?: Part[];
+  imageUrl?: string;
 }
 /** ImageFile_Check_正規表現_パターン */
 const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
@@ -33,6 +35,9 @@ const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
 //
+
+const markdownLinkWithImageRegex =
+  /\[!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)\]\((https?:\/\/[^\s)]+)\)/i; // 画像リンクの正規表現
 const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // リンクの正規表現
 const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
 const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
@@ -384,6 +389,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    // 画像リンクのマッチ
+    const markdownLinkWithImageMatch = remainingText.match(
+      markdownLinkWithImageRegex
+    );
+
     const codeBlockMatch = remainingText.match(codeBlockRegex);
     const quoteMatch = remainingText.match(quoteRegex); // 順序なしリストのマッチ
     const unorderedListMatch = remainingText.match(unorderedListRegex); // 順序なしリストのマッチ
@@ -392,8 +402,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const tableMatch = remainingText.match(tableRegex);
     const headerMatch = remainingText.match(headerRegex);
     const boldMatch = remainingText.match(boldTextRegex); // 太字のマッチ
-    const markdownLinkMatch = remainingText.match(markdownLinkRegex); // Markdownリンクのマッチ
     const markdownImageMatch = remainingText.match(markdownImageRegex); // Markdownリンクのマッチ
+    const markdownLinkMatch = remainingText.match(markdownLinkRegex); // Markdownリンクのマッチ
 
     const horizontalRuleMatch = remainingText.match(
       markdownHorizontalRuleRegex
@@ -405,7 +415,9 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
-
+    const markdownLinkWithImageIndex = markdownLinkWithImageMatch
+      ? remainingText.indexOf(markdownLinkWithImageMatch[0])
+      : -1;
     const codeBlockIndex = codeBlockMatch
       ? remainingText.indexOf(codeBlockMatch[0])
       : -1;
@@ -419,12 +431,13 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
       ? remainingText.indexOf(headerMatch[0])
       : -1;
     const boldIndex = boldMatch ? remainingText.indexOf(boldMatch[0]) : -1;
-    const markdownLinkIndex = markdownLinkMatch
-      ? remainingText.indexOf(markdownLinkMatch[0])
-      : -1; // Markdownリンクのインデックス
     const markdownImageIndex = markdownImageMatch
       ? remainingText.indexOf(markdownImageMatch[0])
       : -1; // Markdownリンクのインデックス
+    const markdownLinkIndex = markdownLinkMatch
+      ? remainingText.indexOf(markdownLinkMatch[0])
+      : -1; // Markdownリンクのインデックス
+
     const horizontalRuleIndex = horizontalRuleMatch
       ? remainingText.indexOf(horizontalRuleMatch[0])
       : -1; // 水平線のインデックス
@@ -436,6 +449,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      markdownLinkWithImageIndex === -1 &&
       codeBlockIndex === -1 &&
       quoteIndex === -1 &&
       unorderedListIndex === -1 &&
@@ -443,8 +457,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
       headerIndex === -1 &&
       boldIndex === -1 &&
       nip19Index === -1 &&
-      markdownLinkIndex === -1 &&
       markdownImageIndex === -1 &&
+      markdownLinkIndex === -1 &&
       horizontalRuleIndex === -1 &&
       urlIndex === -1 &&
       emojiIndex === -1 &&
@@ -457,6 +471,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      {
+        type: "markdownLinkWithImage",
+        index: markdownLinkWithImageIndex,
+        match: markdownLinkWithImageMatch,
+      },
       {
         type: "codeBlock",
         index: codeBlockIndex,
@@ -484,15 +503,16 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
         match: boldMatch,
       },
       {
-        type: "markdownLink",
-        index: markdownLinkIndex,
-        match: markdownLinkMatch,
-      }, // Markdownリンクのマッチ
-      {
         type: "markdownImage",
         index: markdownImageIndex,
         match: markdownImageMatch,
       }, // Markdownリンクのマッチ
+      {
+        type: "markdownLink",
+        index: markdownLinkIndex,
+        match: markdownLinkMatch,
+      }, // Markdownリンクのマッチ
+
       {
         type: "horizontalRule",
         index: horizontalRuleIndex,
@@ -522,6 +542,15 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "markdownLinkWithImage": // 画像リンクの処理
+          console.log(match);
+          parts.push({
+            type: "imageLink",
+            content: match[1], // altテキスト
+            url: match[3], // リンクURL
+            imageUrl: match[2], // 画像URL
+          });
+          break;
         case "codeBlock":
           console.log(match);
           parts.push({

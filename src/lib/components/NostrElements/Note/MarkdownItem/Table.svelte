@@ -13,7 +13,15 @@
   <thead>
     <tr>
       {#each part.headers ?? [] as header}
-        <th class="table-header">{header}</th>
+        <th class="table-header"
+          ><Markdown
+            text={header}
+            {tags}
+            {displayMenu}
+            {depth}
+            {repostable}
+          /></th
+        >
       {/each}
     </tr>
   </thead>
