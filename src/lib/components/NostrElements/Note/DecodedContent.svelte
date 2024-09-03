@@ -11,6 +11,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import { onMount } from "svelte";
   import { writable } from "svelte/store";
+  import viewport from "$lib/func/useViewportAction";
   export let displayMenu: boolean;
   export let content: string | undefined;
   export let depth: number;
@@ -37,44 +38,24 @@
         data: string;
       };
 
-  let hasLoaded = writable(false);
-  let element: HTMLDivElement;
-
-  onMount(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        if (!$hasLoaded) {
-          hasLoaded.set(true); // 一度だけコンテンツを読み込む
-        }
-      }
-    });
-
-    if (element) {
-      observer.observe(element);
-    }
-
-    return () => {
-      if (element) {
-        observer.unobserve(element);
-      }
-    };
-  });
+  let hasLoaded = false;
+  const handleEnterViewport = () => {
+    hasLoaded = true;
+  };
 </script>
 
-<div bind:this={element} class="some-class">
-  {#if $hasLoaded}
-    {#if decoded.type === "npub"}
-      <span class="text-magnum-100 align-middle"
+<div use:viewport on:enterViewport={handleEnterViewport} class="inline">
+  {#if hasLoaded}{#if decoded.type === "npub"}<span
+        class="text-magnum-100 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data}
           />{:else}<PopupUserName
             pubkey={decoded.data}
             metadata={undefined}
           />{/if}</span
-      >
-    {:else if decoded.type === "nevent"}
-      <span class="grid grid-cols-[auto_1fr_auto]">
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      >{:else if decoded.type === "nevent"}<span
+        class="grid grid-cols-[auto_1fr_auto]"
+        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
         <div class="border rounded-md border-magnum-600/30">
           <Note
             id={decoded.data.id}
@@ -84,11 +65,10 @@
             {repostable}
           />
         </div>
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      </span>
-    {:else if decoded.type === "note"}
-      <span class="grid grid-cols-[auto_1fr_auto]">
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
+      >{:else if decoded.type === "note"}<span
+        class="grid grid-cols-[auto_1fr_auto]"
+        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
         <div class="border rounded-md border-magnum-600/30">
           <Note
             id={decoded.data}
@@ -98,11 +78,10 @@
             {repostable}
           />
         </div>
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      </span>
-    {:else if decoded.type === "naddr"}
-      <span class="grid grid-cols-[auto_1fr_auto]">
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
+      >{:else if decoded.type === "naddr"}<span
+        class="grid grid-cols-[auto_1fr_auto]"
+        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
         <div class="border rounded-md border-magnum-600/30">
           <LatestEvent
             queryKey={[
@@ -171,10 +150,8 @@
           </LatestEvent>
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      </span>
-      <!---->
-    {:else if decoded.type === "nprofile"}<!---->
-      <span class="text-magnum-100 align-middle"
+      </span>{:else if decoded.type === "nprofile"}<span
+        class="text-magnum-100 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data.pubkey}
           />{:else}<PopupUserName
@@ -182,13 +159,7 @@
             metadata={undefined}
           />{/if}</span
       >
-    {:else if decoded.type === "nrelay"}<!---->
-      <span class="text-sm text-neutral-500 flex-inline">
-        {decoded.data}
-      </span>
-    {:else if decoded.type === "nsec"}<!---->
-    {/if}
-  {:else}
-    {content}
-  {/if}
+    {:else if decoded.type === "nrelay"}<span
+        class="text-sm text-neutral-500 flex-inline">{decoded.data}</span
+      >{:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
 </div>

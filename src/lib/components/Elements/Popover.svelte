@@ -17,23 +17,18 @@
 </script>
 
 <button
-  class="hover:opacity-75 active:opacity-50"
+  class="hover:opacity-75 active:opacity-50 w-fit"
   aria-label={ariaLabel}
-  use:melt={$trigger}
->
-  <slot></slot>
-</button>
-{#if open}
-  <div use:melt={$content} transition:fade={{ duration: 100 }} class="content">
+  use:melt={$trigger}><slot /></button
+>{#if open}<div
+    use:melt={$content}
+    transition:fade={{ duration: 100 }}
+    class="content"
+  >
     <div use:melt={$arrow}></div>
-    <div class="flex flex-col gap-2.5">
-      <slot name="popoverContent"></slot>
-    </div>
-    <button class="close" use:melt={$close}>
-      <X class="size-4" />
-    </button>
-  </div>
-{/if}
+    <div class="flex flex-col gap-2.5"><slot name="popoverContent"></slot></div>
+    <button class="close" use:melt={$close}> <X class="size-4" /></button>
+  </div>{/if}
 
 <style lang="postcss">
   .input {

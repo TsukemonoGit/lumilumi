@@ -74,9 +74,9 @@
   bind:currentIndex={modalIndex}
 /> -->
 
-{#each parts as part}
-  {#if part.type === "nip19"}
-    {@const decoded = nip19Decode(part.url)}
+{#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
+      part.url
+    )}
     {#if decoded}
       <DecodedContent
         {decoded}
@@ -184,5 +184,4 @@
     >{:else}<span
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
-    >{/if}
-{/each}
+    >{/if}{/each}

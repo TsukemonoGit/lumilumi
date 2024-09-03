@@ -97,11 +97,10 @@
   };
 </script>
 
-<Popover ariaLabel="user profile">
-  <UserName pubhex={pubkey} />
+<Popover ariaLabel="user profile"
+  ><UserName pubhex={pubkey} />
   <div slot="popoverContent" class="w-[24rem] max-w-full">
     <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} />
-
     <div
       class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md mt-2"
     >

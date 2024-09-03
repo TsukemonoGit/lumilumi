@@ -20,9 +20,8 @@
   class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
   use:melt={$trigger}
   aria-label="Update dimensions"
-  ><slot />
-  <span class="sr-only">Open Popover</span>
-</button>
+  ><slot /><span class="sr-only">Open Popover</span></button
+>
 
 {#if $open}
   <div use:melt={$overlay} class="fixed inset-0 z-40" />

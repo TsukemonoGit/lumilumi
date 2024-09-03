@@ -103,12 +103,12 @@ export function parseUnorderedList(text: string): Part[] {
 
   lines.forEach((line) => {
     const match = line.match(/^\s*([-*+])\s(.*)$/);
-    console.log(match);
+    //console.log(match);
     if (match) {
       const [_, bullet, itemText] = match;
       const level = Math.floor((line.match(/\s/g) || []).length / 2);
-      console.log(level);
-      console.log(itemText.trim());
+      // console.log(level);
+      // console.log(itemText.trim());
       const listItem: Part = {
         type: "unorderedList",
         content: itemText.trim(),
