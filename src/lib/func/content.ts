@@ -1,4 +1,5 @@
-import { nip19Regex, urlRegex, nipRegex } from "./util";
+import { nip19 } from "nostr-tools";
+import { nip19Regex, urlRegex, nipRegex, parseNaddr } from "./util";
 
 export interface Part {
   type:
@@ -34,6 +35,8 @@ const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
 const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
+//旧引用
+const numberRegex = /(#\[\d+\])/i;
 //
 
 const markdownLinkWithImageRegex =
@@ -73,6 +76,23 @@ const checkFileExtension = (url: string): Part["type"] => {
     }
   } catch (error) {
     return "text";
+  }
+};
+
+const numberQuoteEncode = (text: string, tags: string[][]): string => {
+  try {
+    const num = parseInt(text.slice(2, -1));
+    const tag = tags[num];
+    if (tag[0] === "e") {
+      return nip19.noteEncode(tag[1]);
+    } else if (tag[0] === "a") {
+      return nip19.naddrEncode(parseNaddr(tag));
+    } else if (tag[0] === "p") {
+      return nip19.npubEncode(tag[1]);
+    }
+    return "";
+  } catch (error) {
+    return "";
   }
 };
 
@@ -183,12 +203,16 @@ export function parseText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    const numberMatch = remainingText.match(numberRegex);
     const nip19Match = remainingText.match(nip19Regex);
     const urlMatch = remainingText.match(urlRegex);
     const emojiResult = findEmojiIndex(remainingText);
     const hashtagResult = findHashtagIndex(remainingText);
     const nipMatch = remainingText.match(nipRegex);
 
+    const numberIndex = numberMatch
+      ? remainingText.indexOf(numberMatch[0])
+      : -1;
     const nip19Index = nip19Match ? remainingText.indexOf(nip19Match[0]) : -1;
     const urlIndex = urlMatch ? remainingText.indexOf(urlMatch[0]) : -1;
     const emojiIndex = emojiResult ? emojiResult.index : -1;
@@ -196,6 +220,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      numberIndex === -1 &&
       nip19Index === -1 &&
       urlIndex === -1 &&
       emojiIndex === -1 &&
@@ -208,6 +233,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      { type: "number", index: numberIndex, match: numberMatch },
       { type: "nip19", index: nip19Index, match: nip19Match },
       { type: "url", index: urlIndex, match: urlMatch },
       {
@@ -232,6 +258,13 @@ export function parseText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "number":
+          parts.push({
+            type: "nip19",
+            content: match[0],
+            url: numberQuoteEncode(match[0], tags),
+          }); // Remove "nostr:" prefix
+          break;
         case "nip19":
           parts.push({
             type: "nip19",
