@@ -14,6 +14,7 @@
     MessagesSquare,
     Squirrel,
     Layers,
+    Notebook,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -51,7 +52,7 @@
     { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
     { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
     { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-    // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+    { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
     { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
     { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
   ];

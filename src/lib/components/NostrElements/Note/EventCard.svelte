@@ -37,6 +37,7 @@
   import type { Ogp } from "$lib/func/ogp";
   import OtherKindNote from "./OtherKindNote.svelte";
   import Kind31990Note from "./Kind31990Note.svelte";
+  import ReactionedNote from "./ReactionedNote.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -446,7 +447,7 @@
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} depth={depth + 1} {repostable} />
+        <ReactionedNote {tag} depth={depth + 1} {repostable} {displayMenu} />
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
