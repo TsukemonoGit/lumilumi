@@ -450,7 +450,8 @@ export function usePromiseReq(
     req,
     initData = [],
   }: UseReqOpts<EventPacket[] | EventPacket>,
-  relays: string[] | undefined
+  relays: string[] | undefined,
+  timeout: number | undefined = 4000
 ): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
@@ -483,16 +484,16 @@ export function usePromiseReq(
   const obs: Observable<EventPacket[] | EventPacket> = tie
     ? _rxNostr
         .use(_req, { relays: relays })
-        .pipe(tie, metadata(), operator, completeOnTimeout(4000)) // muteCheck(),
+        .pipe(tie, metadata(), operator, completeOnTimeout(timeout)) // muteCheck(),
     : _rxNostr
         .use(_req, { relays: relays })
-        .pipe(metadata(), operator, completeOnTimeout(4000)); //muteCheck(),
+        .pipe(metadata(), operator, completeOnTimeout(timeout)); //muteCheck(),
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       subscription.unsubscribe();
       resolve(accumulatedData);
-    }, 15000); // Timeout after 3 seconds if not completed
+    }, timeout + 5000); // Timeout after 3 seconds if not completed
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {
