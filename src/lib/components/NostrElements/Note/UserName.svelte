@@ -16,6 +16,8 @@
       slot="error"
       class="text-sm text-neutral-500 inline-flex break-all"
       let:error>{nip19.npubEncode(pubhex)}</span
-    >{profile(metadata)?.name ?? profile(metadata)?.display_name}</Metadata
+    >{profile(metadata)?.name && profile(metadata)?.name !== ""
+      ? profile(metadata)?.name
+      : profile(metadata)?.display_name}</Metadata
   ></span
 >

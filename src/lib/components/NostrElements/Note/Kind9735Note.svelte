@@ -146,7 +146,9 @@
               {#if metadata}
                 {profile(metadata)?.display_name ?? profile(metadata)?.name}
                 <span class="text-magnum-100 text-sm"
-                  >@{profile(metadata)?.name}</span
+                  >@{profile(metadata)?.name && profile(metadata)?.name !== ""
+                    ? profile(metadata)?.name
+                    : profile(metadata)?.display_name}</span
                 >
               {:else}
                 <span class="text-magnum-100 text-sm"

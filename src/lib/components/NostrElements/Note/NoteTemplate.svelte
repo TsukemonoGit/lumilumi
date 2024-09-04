@@ -72,7 +72,9 @@
         <div>
           {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
             class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-            >@{profile(metadata)?.name}</span
+            >@{profile(metadata)?.name && profile(metadata)?.name !== ""
+              ? profile(metadata)?.name
+              : profile(metadata)?.display_name}</span
           >
         </div>
       {:else}

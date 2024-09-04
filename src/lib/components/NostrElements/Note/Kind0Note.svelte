@@ -22,7 +22,9 @@
       <div>
         {profile(note)?.display_name ?? profile(note)?.name}<span
           class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-          >@{profile(note)?.name}</span
+          >@{profile(note)?.name && profile(note)?.name !== ""
+            ? profile(note)?.name
+            : profile(note)?.display_name}</span
         >
       </div>
       <div class="ml-auto">

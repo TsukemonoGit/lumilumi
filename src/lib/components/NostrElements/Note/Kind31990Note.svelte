@@ -30,7 +30,9 @@
         />
       </div>
       <div class="text-magnum-100 text-sm">
-        @{profile(metadata)?.name}
+        @{profile(metadata)?.name && profile(metadata)?.name !== ""
+          ? profile(metadata)?.name
+          : profile(metadata)?.display_name}
       </div>
       <div class="text-neutral-300/50 text-sm">
         {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
