@@ -76,11 +76,11 @@ export async function getDoukiList(
       subscription.unsubscribe();
       rxNostr.dispose();
       resolve(res);
-    }, 5000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
+    }, 7000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(uniq(), latest(), completeOnTimeout(3000))
+      .pipe(uniq(), latest(), completeOnTimeout(4000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -221,11 +221,11 @@ export async function getMutebykindList(
       subscription.unsubscribe();
       rxNostr.dispose();
       resolve(res);
-    }, 5000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
+    }, 7000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(uniq(), latestbyId(), completeOnTimeout(3000))
+      .pipe(uniq(), latestbyId(), completeOnTimeout(4000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
