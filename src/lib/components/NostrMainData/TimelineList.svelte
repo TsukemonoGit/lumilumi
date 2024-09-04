@@ -144,18 +144,19 @@
     }
 
     if (!ev || ev?.length <= 0) {
+      console.log(readUrls);
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
         until:
-          filter.until === undefined ? filter.since ?? now() : filter.until,
+          filter.until === undefined ? (filter.since ?? now()) : filter.until,
         limit: 50,
       }));
       const older = await firstLoadOlderEvents(
         50,
         newFilters,
         queryKey,
-        relays
+        readUrls
       );
       console.log("first older", older);
       if (older.length > 0) {
