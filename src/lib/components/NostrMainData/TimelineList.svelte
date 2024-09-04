@@ -144,7 +144,6 @@
     }
 
     if (!ev || ev?.length <= 0) {
-      console.log(readUrls);
       const newFilters = filters.map((filter: Nostr.Filter) => ({
         ...filter,
         since: undefined,
@@ -152,24 +151,26 @@
           filter.until === undefined ? (filter.since ?? now()) : filter.until,
         limit: 50,
       }));
-      const older = await firstLoadOlderEvents(
-        50,
-        newFilters,
-        queryKey,
-        readUrls
-      );
-      console.log("first older", older);
-      if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
-          ...queryKey,
-          "olderData",
-        ]);
-
-        $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...(olddata ?? []), ...older]
+      setTimeout(async () => {
+        const older = await firstLoadOlderEvents(
+          50,
+          newFilters,
+          queryKey,
+          relays
         );
-      }
+        console.log("first older", older);
+        if (older.length > 0) {
+          const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
+            ...queryKey,
+            "olderData",
+          ]);
+
+          $queryClient.setQueryData(
+            [...queryKey, "olderData"],
+            [...(olddata ?? []), ...older]
+          );
+        }
+      }, 100); //しょっぱなでリレー繋がり終わってないから少ない説
     }
   }
 
