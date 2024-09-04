@@ -184,17 +184,20 @@
     relayStateMap: Map<string, string>,
     maxWaitTime: number
   ) {
+    const normalizeUrl = (url: string) => url.replace(/\/$/, ""); // Function to remove trailing slash
+    const normalizedReadUrls = readUrls.map(normalizeUrl); // Normalize all URLs in readUrls
+
     const targetPercentage = 0.8; // 80%
     const startTime = Date.now();
 
     // Function to count the number of connected relays, excluding those with error status
     const countConnected = () => {
-      const filteredUrls = readUrls.filter(
-        (url) => relayStateMap.get(url) !== "error"
+      const filteredUrls = normalizedReadUrls.filter(
+        (url) => relayStateMap.get(normalizeUrl(url)) !== "error"
       );
       const targetCount = Math.ceil(filteredUrls.length * targetPercentage);
       const connectedCount = filteredUrls.filter(
-        (url) => relayStateMap.get(url) === "connected"
+        (url) => relayStateMap.get(normalizeUrl(url)) === "connected"
       ).length;
       return { connectedCount, targetCount };
     };
@@ -221,7 +224,7 @@
       console.log(
         `Waiting for connections... (${connectedCount}/${targetCount})`
       );
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking again
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 1 second before checking again
     }
   }
 
