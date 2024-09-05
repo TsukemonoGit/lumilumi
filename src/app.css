@@ -254,7 +254,7 @@ input:-webkit-autofill:focus {
 .contentBlock ul {
   list-style-type: disc; /* デフォルトのリストアイコン */
 
-  padding-left: 1.2em; /* パディングを追加してアイコンとテキストの距離を調整 */
+  padding-left: 1.5em; /* パディングを追加してアイコンとテキストの距離を調整 */
 }
 
 .contentBlock li {
@@ -275,7 +275,7 @@ input:-webkit-autofill:focus {
 
 .contentBlock ol {
   list-style-type: decimal; /* Use decimal numbering */
-  padding-left: 1.2em; /* Adjust indentation */
+  padding-left: 1.5em; /* Adjust indentation */
 }
 .contentBlock ol ol {
   list-style-type: lower-alpha; /* さらに内側のリストアイコン（小文字のローマ数字） */

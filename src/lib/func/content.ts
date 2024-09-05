@@ -152,10 +152,10 @@ export function parseOrderedList(text: string): Part[] {
 
   const stack: Part[] = [];
   const rootParts: Part[] = [];
-  console.log("lines", lines);
+  //console.log("lines", lines);
   lines.forEach((line) => {
     const match = line.match(/^\s*(\d+)\.\s(.*)$/);
-    console.log(match);
+    //console.log(match);
     if (match) {
       const [_, bullet, itemText] = match;
       // Calculate level by counting leading spaces before the number
@@ -227,7 +227,7 @@ function splitLists(text: string): string[] {
   const trimmedParts = parts.map((part) =>
     part.replace(/^(?:\s*[-*+]\s|\d+\.\s)/, "")
   );
-  console.log(parts);
+  //console.log(parts);
   return trimmedParts;
 }
 
@@ -715,7 +715,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           break;
         case "unorderedList":
           // リスト全体を検出し、項目を分割
-          console.log(splitLists(match[0]));
+          //console.log(splitLists(match[0]));
           parts.push({
             type: "unorderedList",
             content: match[0],
@@ -724,7 +724,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           break;
         case "orderedList":
           // リスト全体を検出し、項目を分割
-          console.log(splitLists(match[0]));
+          // console.log(splitLists(match[0]));
           parts.push({
             type: "orderedList",
             content: match[0],
