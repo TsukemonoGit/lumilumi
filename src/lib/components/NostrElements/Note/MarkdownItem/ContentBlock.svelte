@@ -239,6 +239,9 @@
 
   blockquote::after {
     content: close-quote;
+    font-size: 2em;
+    color: rgb(var(--color-magnum-500) / 1);
+    margin-left: 0.25em;
   }
   /* コードブロック全体のスタイル */
   pre {
