@@ -252,10 +252,9 @@ input:-webkit-autofill:focus {
 }
 
 .contentBlock ul {
-  list-style-position: inside;
   list-style-type: disc; /* デフォルトのリストアイコン */
 
-  padding-left: 0.5em; /* パディングを追加してアイコンとテキストの距離を調整 */
+  padding-left: 1.2em; /* パディングを追加してアイコンとテキストの距離を調整 */
 }
 
 .contentBlock li {
@@ -288,5 +287,11 @@ input:-webkit-autofill:focus {
   font-weight: bold; /* Make the list marker (number) bold */
 }
 .contentBlock ol li {
+  padding-left: 0.5em;
+}
+.contentBlock ol ul {
+  padding-left: 0.5em;
+}
+.contentBlock ul ol {
   padding-left: 0.5em;
 }

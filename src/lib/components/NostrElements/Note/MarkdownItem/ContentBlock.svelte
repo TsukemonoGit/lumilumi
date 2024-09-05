@@ -18,7 +18,7 @@
   export let repostable;
   export let tags;
   export let openModal;
-
+  export let nolist: boolean;
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
 
   let imgError: boolean = false;
@@ -45,7 +45,7 @@
       {depth}
       {repostable}
     />
-  </blockquote>{:else if part.type === "unorderedList"}
+  </blockquote>{:else if !nolist && part.type === "unorderedList"}
   <div class="contentBlock">
     <UnorderedList
       {part}
@@ -55,13 +55,13 @@
       {repostable}
       {openModal}
     />
-  </div>{:else if part.type === "orderedList"}
+  </div>{:else if !nolist && part.type === "orderedList"}
   <div class="contentBlock">
     <OrderedList {part} {tags} {displayMenu} {depth} {repostable} />
   </div>
 {:else if part.type === "table"}
   <Table {part} {tags} {displayMenu} {depth} {repostable} />
-{:else if part.type === "italic"}
+{:else if part.type === "italic"}<!--文頭に - とか数字とかこないから-->
   <em
     ><Markdown
       text={part.content ?? ""}
@@ -69,9 +69,10 @@
       {displayMenu}
       {depth}
       {repostable}
+      nolist={true}
     /></em
   >
-{:else if part.type === "bold"}
+{:else if part.type === "bold"}<!--**で囲まれてると文頭に - とか数字とかこないから-->
   <b
     ><Markdown
       text={part.content ?? ""}
@@ -79,6 +80,7 @@
       {displayMenu}
       {depth}
       {repostable}
+      nolist={true}
     /></b
   >
 {:else if part.type === "header" && part.number}
@@ -172,6 +174,7 @@
     className="underline text-magnum-300 break-all "
     href={part.url ?? ""}
     ><Markdown
+      {nolist}
       text={part.content ?? part.url ?? ""}
       {tags}
       {displayMenu}

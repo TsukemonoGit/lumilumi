@@ -9,6 +9,7 @@
   export let displayMenu: boolean;
   export let depth: number;
   export let repostable: boolean;
+  export let nolist: boolean = false;
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseMarkdownText(text, tags);
 
@@ -32,5 +33,13 @@
 /> -->
 
 {#each parts as part}
-  <ContentBlock {part} {repostable} {depth} {displayMenu} {tags} {openModal} />
+  <ContentBlock
+    {part}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {openModal}
+    {nolist}
+  />
 {/each}

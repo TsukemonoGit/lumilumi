@@ -9,8 +9,6 @@
   import UserName from "./UserName.svelte";
 
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import { onMount } from "svelte";
-  import { writable } from "svelte/store";
   import viewport from "$lib/func/useViewportAction";
   export let displayMenu: boolean;
   export let content: string | undefined;
