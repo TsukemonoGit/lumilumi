@@ -12,7 +12,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import Markdown from "./Markdown.svelte";
+  import Markdown from "./MarkdownItem/Markdown.svelte";
 
   export let repostable: boolean;
   export let displayMenu: boolean;

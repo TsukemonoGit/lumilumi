@@ -13,6 +13,7 @@ export interface Part {
     | "audio"
     | "movie"
     | "horizontal"
+    | "italic"
     | "bold"
     | "header"
     | "table"
@@ -45,8 +46,10 @@ const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // リンク�
 const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
 const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
 
-const boldTextRegex = /\*\*(.*?)\*\*/im;
-const headerRegex = /^(#{1,5})\s+(.*)$/im;
+const boldTextRegex = /\*\*(.*?)\*\*/im; //strong
+
+const italicTextRegex = /\*(.*?)\*/im; //italic
+const headerRegex = /^(#{1,5})\s+(.*)$/im; //header
 
 const tableRegex =
   /^\|(.+?)\|\r?\n\|[-:| ]+\|\r?\n((?:\|(?:.+?)\|\r?\n?)*)$/ims;
@@ -359,6 +362,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
   return parts;
 }
 
+//markdown
 export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   const parts: Part[] = [];
   let remainingText = input;
@@ -434,7 +438,10 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     // テーブルのマッチ
     const tableMatch = remainingText.match(tableRegex);
     const headerMatch = remainingText.match(headerRegex);
+
     const boldMatch = remainingText.match(boldTextRegex); // 太字のマッチ
+    const italicMatch = remainingText.match(italicTextRegex); // イタリックのマッチ
+
     const markdownImageMatch = remainingText.match(markdownImageRegex); // Markdownリンクのマッチ
     const markdownLinkMatch = remainingText.match(markdownLinkRegex); // Markdownリンクのマッチ
 
@@ -448,6 +455,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
+
     const markdownLinkWithImageIndex = markdownLinkWithImageMatch
       ? remainingText.indexOf(markdownLinkWithImageMatch[0])
       : -1;
@@ -463,7 +471,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const headerIndex = headerMatch
       ? remainingText.indexOf(headerMatch[0])
       : -1;
+
     const boldIndex = boldMatch ? remainingText.indexOf(boldMatch[0]) : -1;
+    const italicIndex = italicMatch
+      ? remainingText.indexOf(italicMatch[0])
+      : -1;
     const markdownImageIndex = markdownImageMatch
       ? remainingText.indexOf(markdownImageMatch[0])
       : -1; // Markdownリンクのインデックス
@@ -489,6 +501,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
       tableIndex === -1 &&
       headerIndex === -1 &&
       boldIndex === -1 &&
+      italicIndex === -1 &&
       nip19Index === -1 &&
       markdownImageIndex === -1 &&
       markdownLinkIndex === -1 &&
@@ -530,10 +543,16 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
         index: headerIndex,
         match: headerMatch,
       },
+
       {
         type: "bold",
         index: boldIndex,
         match: boldMatch,
+      },
+      {
+        type: "italic",
+        index: italicIndex,
+        match: italicMatch,
       },
       {
         type: "markdownImage",
@@ -629,9 +648,16 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
             content: match[2],
           });
           break;
+
         case "bold":
           parts.push({
             type: "bold",
+            content: match[1],
+          });
+          break;
+        case "italic":
+          parts.push({
+            type: "italic",
             content: match[1],
           });
           break;

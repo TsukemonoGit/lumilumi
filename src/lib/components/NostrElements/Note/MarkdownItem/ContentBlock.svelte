@@ -2,12 +2,12 @@
   import type { Part } from "$lib/func/content";
   import { showImg, viewMediaModal } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
-  import Content from "./Content.svelte";
-  import DecodedContent from "./DecodedContent.svelte";
+  import Content from "../Content.svelte";
+  import DecodedContent from "../DecodedContent.svelte";
   import { nip19Decode } from "$lib/func/util";
   import Link from "$lib/components/Elements/Link.svelte";
-  import UnorderedList from "./MarkdownItem/UnorderedList.svelte";
-  import Table from "./MarkdownItem/Table.svelte";
+  import UnorderedList from "./UnorderedList.svelte";
+  import Table from "./Table.svelte";
   import Markdown from "./Markdown.svelte";
   import { ExternalLink } from "lucide-svelte";
 
@@ -48,6 +48,16 @@
   <UnorderedList {part} {tags} {displayMenu} {depth} {repostable} {openModal} />
 {:else if part.type === "table"}
   <Table {part} {tags} {displayMenu} {depth} {repostable} />
+{:else if part.type === "italic"}
+  <em
+    ><Markdown
+      text={part.content ?? ""}
+      {tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+    /></em
+  >
 {:else if part.type === "bold"}
   <b
     ><Markdown

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Part } from "$lib/func/content";
-  import ContentBlock from "../ContentBlock.svelte";
-  import Markdown from "../Markdown.svelte";
+  import ContentBlock from "./ContentBlock.svelte";
+  import Markdown from "./Markdown.svelte";
 
   export let part: Part;
   export let displayMenu;

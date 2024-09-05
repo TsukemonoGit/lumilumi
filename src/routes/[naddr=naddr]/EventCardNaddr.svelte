@@ -11,7 +11,7 @@
   import { nip19 } from "nostr-tools";
   import { onDestroy } from "svelte";
   import { muteCheck } from "$lib/func/muteCheck";
-  import Markdown from "$lib/components/NostrElements/Note/Markdown.svelte";
+  import Markdown from "$lib/components/NostrElements/Note/MarkdownItem/Markdown.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
