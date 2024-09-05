@@ -187,46 +187,87 @@
     const normalizeUrl = (url: string) => url.replace(/\/$/, ""); // Function to remove trailing slash
     const normalizedReadUrls = readUrls.map(normalizeUrl); // Normalize all URLs in readUrls
 
-    const targetPercentage = 0.8; // 80%
     const startTime = Date.now();
 
-    // Function to count the number of connected relays, excluding those with error status
-    const countConnected = () => {
-      const filteredUrls = normalizedReadUrls.filter(
-        (url) => relayStateMap.get(normalizeUrl(url)) !== "error"
-      );
-      const targetCount = Math.ceil(filteredUrls.length * targetPercentage);
-      const connectedCount = filteredUrls.filter(
-        (url) => relayStateMap.get(normalizeUrl(url)) === "connected"
-      ).length;
-      return { connectedCount, targetCount };
+    // Function to check how many relays are not in 'initialize' or 'connecting' state
+    const countFinalStateRelays = () => {
+      return normalizedReadUrls.filter((url) => {
+        const state = relayStateMap.get(normalizeUrl(url));
+        return state !== "initialize" && state !== "connecting";
+      }).length;
     };
 
-    // Wait until the number of connected relays reaches the target count or maxWaitTime is exceeded
+    // Wait until all relays are in a final state or maxWaitTime is exceeded
     while (true) {
-      const { connectedCount, targetCount } = countConnected();
+      const finalStateCount = countFinalStateRelays();
+      const totalRelays = normalizedReadUrls.length;
 
-      if (connectedCount >= targetCount) {
-        console.log(
-          `Reached ${connectedCount} connected relays out of ${targetCount}. Proceeding...`
-        );
+      console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
+
+      if (finalStateCount === totalRelays) {
+        console.log("All relays are in a final state. Proceeding...");
         break;
       }
 
       const elapsedTime = Date.now() - startTime;
       if (elapsedTime >= maxWaitTime) {
-        console.log(
-          `Maximum wait time exceeded. Proceeding with ${connectedCount} connected relays.`
-        );
+        console.log("Maximum wait time exceeded. Proceeding...");
         break;
       }
 
-      console.log(
-        `Waiting for connections... (${connectedCount}/${targetCount})`
-      );
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 1 second before checking again
+      //console.log("Waiting for all relays to reach a final state...");
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 500ms before checking again
     }
   }
+
+  // async function waitForConnections(
+  //   readUrls: string[],
+  //   relayStateMap: Map<string, string>,
+  //   maxWaitTime: number
+  // ) {
+  //   const normalizeUrl = (url: string) => url.replace(/\/$/, ""); // Function to remove trailing slash
+  //   const normalizedReadUrls = readUrls.map(normalizeUrl); // Normalize all URLs in readUrls
+
+  //   const targetPercentage = 0.8; // 80%
+  //   const startTime = Date.now();
+
+  //   // Function to count the number of connected relays, excluding those with error status
+  //   const countConnected = () => {
+  //     const filteredUrls = normalizedReadUrls.filter(
+  //       (url) => relayStateMap.get(normalizeUrl(url)) !== "error"
+  //     );
+  //     const targetCount = Math.ceil(filteredUrls.length * targetPercentage);
+  //     const connectedCount = filteredUrls.filter(
+  //       (url) => relayStateMap.get(normalizeUrl(url)) === "connected"
+  //     ).length;
+  //     return { connectedCount, targetCount };
+  //   };
+
+  //   // Wait until the number of connected relays reaches the target count or maxWaitTime is exceeded
+  //   while (true) {
+  //     const { connectedCount, targetCount } = countConnected();
+
+  //     if (connectedCount >= targetCount) {
+  //       console.log(
+  //         `Reached ${connectedCount} connected relays out of ${targetCount}. Proceeding...`
+  //       );
+  //       break;
+  //     }
+
+  //     const elapsedTime = Date.now() - startTime;
+  //     if (elapsedTime >= maxWaitTime) {
+  //       console.log(
+  //         `Maximum wait time exceeded. Proceeding with ${connectedCount} connected relays.`
+  //       );
+  //       break;
+  //     }
+
+  //     console.log(
+  //       `Waiting for connections... (${connectedCount}/${targetCount})`
+  //     );
+  //     await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 1 second before checking again
+  //   }
+  // }
 
   interface $$Slots {
     default: { events: Nostr.Event[]; status: ReqStatus; len: number };
