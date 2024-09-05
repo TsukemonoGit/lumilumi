@@ -10,6 +10,7 @@
   import Table from "./Table.svelte";
   import Markdown from "./Markdown.svelte";
   import { ExternalLink } from "lucide-svelte";
+  import OrderedList from "./OrderedList.svelte";
 
   export let part: Part;
   export let displayMenu;
@@ -45,7 +46,19 @@
       {repostable}
     />
   </blockquote>{:else if part.type === "unorderedList"}
-  <UnorderedList {part} {tags} {displayMenu} {depth} {repostable} {openModal} />
+  <div class="contentBlock">
+    <UnorderedList
+      {part}
+      {tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {openModal}
+    />
+  </div>{:else if part.type === "orderedList"}
+  <div class="contentBlock">
+    <OrderedList {part} {tags} {displayMenu} {depth} {repostable} />
+  </div>
 {:else if part.type === "table"}
   <Table {part} {tags} {displayMenu} {depth} {repostable} />
 {:else if part.type === "italic"}

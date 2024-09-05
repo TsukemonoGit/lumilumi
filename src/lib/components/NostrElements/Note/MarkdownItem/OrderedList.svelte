@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { Part } from "$lib/func/content";
-  import ContentBlock from "./ContentBlock.svelte";
+  import { parseOrderedList, type Part } from "$lib/func/content";
   import Markdown from "./Markdown.svelte";
 
   export let part: Part;
@@ -8,12 +7,13 @@
   export let depth;
   export let repostable;
   export let tags;
-  export let openModal;
-  $: console.log(part);
+  console.log(part);
+  // const list = part?.content ? parseOrderedList(part?.content ?? "") : [];
+  // console.log(list);
 </script>
 
 {#if part.headers && part.headers.length > 0}
-  <ul>
+  <ol>
     {#each part.headers as li}
       {#if li}
         <li>
@@ -21,5 +21,5 @@
         </li>
       {/if}
     {/each}
-  </ul>
+  </ol>
 {/if}

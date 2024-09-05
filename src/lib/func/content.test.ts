@@ -1,11 +1,27 @@
 // sum.test.js
 import { expect, test } from "vitest";
-import { parseText, parseUnorderedList } from "./content";
+import { parseMarkdownText, parseText, parseUnorderedList } from "./content";
 
-test("parseUnorderedList", () => {
-  const text =
-    "| [![Breviarios contra la posmodernidad: Bosquejo de ideas para una era en disolución](https://hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/imgs/Breviarios_posmodernidad_wi_hu15547439386874453064.webp)](https://www.hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/) |\n|:---:|\n| [Weltanschauung Italia, _Breviarios contra la posmodernidad: Bosquejo de ideas para una era en disolución_, Hipérbola Janus, 2023](https://www.hiperbolajanus.com/libros/breviarios-posmodernidad-weltanschauung-italia/)";
-  console.log("parseUnorderedList", parseUnorderedList(text));
+test("", () => {
+  const ev = {
+    id: "8204796f8b9b9c1312c9fc1e79e7fc1b143b0e67c68978c774a4ecda0cc3d1a6",
+    pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
+    created_at: 1725535843,
+    kind: 30023,
+    tags: [
+      ["d", "test"],
+      ["title", "test"],
+      [
+        "emoji",
+        "nan",
+        "https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp",
+      ],
+    ],
+    content:
+      "- 1:nan:\n  - **2**\n  - 2[irorio絵文字](https://nostviewstr.vercel.app/naddr1qvzqqqr4fcpzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qyvhwumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5hszrnhwden5te0dehhxtnvdakz7qgewaehxw309ahx7umywf5hvefwv9c8qtmjv4kxz7f0qyshwumn8ghj7mn0wd68yttjv4kxz7fddfczumt0vd6xzmn99e3k7mf0qy08wumn8ghj7mn0wd68ytnrdakhq6tvv5kk2unjdaezumn9wshsz9nhwden5te0dehhxarj9ejxzarp9e5xzatn9uq3xamnwvaz7tmwdaehgu3w0f3xgtn8vuhsz8nhwden5te0deex2mrp0ykk5upwvvkhxar9d3kxzu3wdejhgtcpzfmhxue69uhhytntda4xjunp9e5k7tcpy9mhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qtcpr9mhxue69uhhyetvv9ujumt0d4hhxarj9ecxjmnt9uq3vamnwvaz7tmjv4kxz7fwd4hhxarj9ec82c30qyt8wumn8ghj7un9d3shjtnd09khgtnrv9ekztcpremhxue69uhhyetvv9ujumn0wd68ytnhd9ex2erwv46zu6ns9uq36amnwvaz7tmnwf68yetvv9ujucedwd6x2mrvv9ezumn9wshszrnhwden5te009skyafwd4jj7qqxd9ex76tjduya383p)\n- 1nostr:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw\n  - 2\n  - 2\n    - 3\n    - 3\n  - 2\n- 1\n|1|2|\n|--|--|\n|test|:nan:|\n![nan](https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp)---\n\n### :nan: **:nan:**\n\n1. 1\n2. 2\n   - tet\n   - tes\n3. 3\n   1. 1\n   2. 2",
+    sig: "5588c7f947d442e28da7432a28ac0df2d4915bddbd5b065c2f2ea45c959adbf403430ad7bea28ecbf97379e28ac42cd28c725ae5bf0dd4f586447719322984cc",
+  };
+  console.log("parseUnorderedList", parseMarkdownText(ev.content, ev.tags));
 });
 
 const testcontent =

@@ -18,6 +18,7 @@ export interface Part {
     | "header"
     | "table"
     | "unorderedList"
+    | "orderedList"
     | "quote"
     | "codeBlock"
     | "imageLink";
@@ -57,7 +58,10 @@ const tableRegex =
 // 順序なしリストの正規表現
 // const unorderedListRegex = /^(\s*[-*+]\s.+)$/m; // 行頭の -、*、+ で始まる項目をキャッチ
 //const unorderedListRegex = /^(?:[-*+]\s.*(?:\n(?:\s*[-*+]\s.*))*)$/m;
-const unorderedListRegex = /^(?:\s*[-*+]\s.+(?:\n(?:\s*[-*+]\s.+)*)*)$/m; // 入れ子を含む順序なしリスト
+const unorderedListRegex =
+  /^(?:\s*[-*+]\s.+(?:\n(?:(?:\d+\.|\s*[-*+])\s.+)*)*)$/m; // 入れ子を含む順序なしリスト
+const orderedListRegex =
+  /^(?:\s*\d+\.\s.+(?:\n(?:\s*(?:\d+\.|\s*[-*+])\s.+)*)*)$/gm;
 
 const quoteRegex = /^(>>?)\s+(.*)$/im;
 const codeBlockRegex = /```([\s\S]*?)```/m;
@@ -141,6 +145,90 @@ export function parseUnorderedList(text: string): Part[] {
   });
 
   return rootParts;
+}
+
+export function parseOrderedList(text: string): Part[] {
+  const lines = text.split("\n");
+
+  const stack: Part[] = [];
+  const rootParts: Part[] = [];
+  console.log("lines", lines);
+  lines.forEach((line) => {
+    const match = line.match(/^\s*(\d+)\.\s(.*)$/);
+    console.log(match);
+    if (match) {
+      const [_, bullet, itemText] = match;
+      // Calculate level by counting leading spaces before the number
+      const leadingSpaces = line.match(/^\s*/)?.[0].length || 0;
+      const level = leadingSpaces / 2; // Assuming each level of indentation is 2 spaces
+
+      // console.log(level);
+      // console.log(itemText.trim());
+      const listItem: Part = {
+        type: "orderedList",
+        content: itemText.trim(),
+        list: [],
+      };
+
+      if (level === 0) {
+        rootParts.push(listItem);
+        stack.length = 0; // Reset stack for new top-level list
+        stack.push(listItem);
+      } else {
+        // Adjust stack to the correct level
+        while (stack.length > level) {
+          stack.pop();
+        }
+
+        const parentList = stack[stack.length - 1];
+        if (parentList) {
+          if (!parentList.list) {
+            parentList.list = [];
+          }
+          parentList.list.push(listItem);
+          stack.push(listItem);
+        }
+      }
+    }
+  });
+
+  return rootParts;
+}
+
+function splitLists(text: string): string[] {
+  const lines = text.split("\n");
+  const parts: string[] = [];
+  let currentPart = "";
+  let initialIndentation: number | null = null;
+
+  lines.forEach((line) => {
+    // 行頭の空白の量を取得
+    const indentation = line.search(/\S|$/);
+
+    // 初回のインデント設定
+    if (initialIndentation === null && line.trim() !== "") {
+      initialIndentation = indentation;
+    }
+
+    // インデントが変わった場合、部分を分割
+    if (indentation === initialIndentation && currentPart.trim() !== "") {
+      parts.push(currentPart.trim());
+      currentPart = "";
+    }
+
+    // 現在の行をcurrentPartに追加
+    currentPart += line + "\n";
+  });
+
+  // 最後の部分を追加
+  if (currentPart.trim() !== "") {
+    parts.push(currentPart.trim());
+  }
+  const trimmedParts = parts.map((part) =>
+    part.replace(/^(?:\s*[-*+]\s|\d+\.\s)/, "")
+  );
+  console.log(parts);
+  return trimmedParts;
 }
 
 export function parseText(input: string, tags: string[][]): Part[] {
@@ -434,6 +522,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const codeBlockMatch = remainingText.match(codeBlockRegex);
     const quoteMatch = remainingText.match(quoteRegex); // 順序なしリストのマッチ
     const unorderedListMatch = remainingText.match(unorderedListRegex); // 順序なしリストのマッチ
+    const orderedListMatch = remainingText.match(orderedListRegex); // 順序なしリストのマッチ
 
     // テーブルのマッチ
     const tableMatch = remainingText.match(tableRegex);
@@ -466,7 +555,9 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const unorderedListIndex = unorderedListMatch
       ? remainingText.indexOf(unorderedListMatch[0])
       : -1;
-
+    const orderedListIndex = orderedListMatch
+      ? remainingText.indexOf(orderedListMatch[0])
+      : -1;
     const tableIndex = tableMatch ? remainingText.indexOf(tableMatch[0]) : -1;
     const headerIndex = headerMatch
       ? remainingText.indexOf(headerMatch[0])
@@ -498,6 +589,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
       codeBlockIndex === -1 &&
       quoteIndex === -1 &&
       unorderedListIndex === -1 &&
+      orderedListIndex === -1 &&
       tableIndex === -1 &&
       headerIndex === -1 &&
       boldIndex === -1 &&
@@ -536,6 +628,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
         type: "unorderedList",
         index: unorderedListIndex,
         match: unorderedListMatch,
+      },
+      {
+        type: "orderedList",
+        index: orderedListIndex,
+        match: orderedListMatch,
       },
       { type: "table", index: tableIndex, match: tableMatch }, // テーブルのマッチ
       {
@@ -618,16 +715,32 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           break;
         case "unorderedList":
           // リスト全体を検出し、項目を分割
-
-          const listParts = parseUnorderedList(match[0]);
-          listParts.forEach((part) => parts.push(part));
+          console.log(splitLists(match[0]));
+          parts.push({
+            type: "unorderedList",
+            content: match[0],
+            headers: splitLists(match[0]),
+          });
+          break;
+        case "orderedList":
+          // リスト全体を検出し、項目を分割
+          console.log(splitLists(match[0]));
+          parts.push({
+            type: "orderedList",
+            content: match[0],
+            headers: splitLists(match[0]),
+          });
+          // break;
+          // console.log("orderedList", match);
+          // const orderedlistParts = parseOrderedList(match[0]);
+          // orderedlistParts.forEach((part) => parts.push(part));
           break;
         case "table":
           // テーブル処理
 
           const [, headerRow, dataRows] = match;
           const headers = headerRow.split("|").map((h) => h.trim());
-          console.log(headers);
+          //  console.log(headers);
           const rows = dataRows
             .split("\n") // Split text into lines
             .map(
