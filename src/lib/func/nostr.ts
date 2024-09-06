@@ -433,7 +433,7 @@ export function reconnectRelay(url: string) {
 let tieKey: string;
 export function setTieKey(key: string) {
   tieKey = key;
-  console.log(tieKey);
+  // console.log(tieKey);
 }
 export function getRelaysById(id: string): string[] {
   //console.log(tieMapStore);
