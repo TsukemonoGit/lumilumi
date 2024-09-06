@@ -12,7 +12,8 @@
   } from "rx-nostr";
 
   export let queryKey: QueryKey;
-  export let id: string;
+  export let id: string | undefined = undefined;
+  export let atag: string | undefined = undefined;
   export let req:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -23,7 +24,7 @@
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
-  $: result = useAllReactions(queryKey, id, req);
+  $: result = useAllReactions(queryKey, id, atag, req);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

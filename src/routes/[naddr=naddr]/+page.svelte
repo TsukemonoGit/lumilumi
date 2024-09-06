@@ -10,6 +10,13 @@
 
   import { onMount } from "svelte";
   import EventCardNaddr from "./EventCardNaddr.svelte";
+  import AllReactions from "$lib/components/NostrMainData/AllReactions.svelte";
+  import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
+  import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
+  import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
+  import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
+  import { sortEvents } from "$lib/func/util";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
 
   export let data: {
     identifier: string;
@@ -17,7 +24,7 @@
     kind: number;
     relays?: string[] | undefined;
   };
-  const atag = `${data.kind}:${data.pubkey}${data.identifier}`;
+  const atag = `${data.kind}:${data.pubkey}:${data.identifier}`;
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
@@ -90,6 +97,63 @@
         </div>
         <EventCardNaddr {metadata} note={event} repostable={true} />
       </Metadata>
+
+      <AllReactions
+        queryKey={["allreactions", atag]}
+        {atag}
+        let:kind1
+        let:kind6
+        let:kind7
+        let:kind9735
+      >
+        <div slot="loading">loading</div>
+        <div slot="nodata">nodata</div>
+        <div slot="error">error</div>
+
+        <!--kind6-->
+        <NoteRepostList events={kind6} />
+
+        <!--kind7-->
+        <NoteReactionList events={kind7} />
+
+        <!--zap レシート-->
+        <ZapReactionList events={kind9735} />
+
+        <!--kind1,42-->
+        <CollapsibleList title="Kind1,42" amount={kind1.length}>
+          <div
+            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+          >
+            {#each sortEvents(kind1).reverse() as event (event.id)}
+              <!-- <div
+          class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
+        > -->
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading">
+                  <EventCard note={event} depth={0} repostable={true} />
+                </div>
+                <div slot="nodata">
+                  <EventCard note={event} depth={0} repostable={true} />
+                </div>
+                <div slot="error">
+                  <EventCard note={event} depth={0} repostable={true} />
+                </div>
+                <EventCard
+                  {metadata}
+                  note={event}
+                  depth={0}
+                  repostable={true}
+                />
+              </Metadata>
+              <!-- </div> -->
+            {/each}
+          </div>
+        </CollapsibleList>
+      </AllReactions>
     </LatestEvent>
   </section>
   <div class="postWindow">

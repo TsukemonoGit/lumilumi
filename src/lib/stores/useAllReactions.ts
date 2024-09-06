@@ -16,7 +16,8 @@ import type { ReqResult } from "$lib/types.js";
 export function useAllReactions(
   queryKey: QueryKey,
 
-  id: string,
+  id: string | undefined,
+  atag: string | undefined,
   req?:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -36,10 +37,15 @@ export function useAllReactions(
     //  console.log(`${packet.event.id} はすでに観測されています`);
   };
 
-  const filters = [
-    { kinds: [1, 42, 6, 7, 9735], "#e": [id] },
-    { kinds: [1, 42, 6, 7, 9735], "#q": [id] },
-  ];
+  const filters =
+    atag !== undefined
+      ? [{ kinds: [1, 42, 6, 7, 9735], "#a": [atag] }]
+      : id !== undefined
+      ? [
+          { kinds: [1, 42, 6, 7, 9735], "#e": [id] },
+          { kinds: [1, 42, 6, 7, 9735], "#q": [id] },
+        ]
+      : [];
   console.log(filters);
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   const operator = pipe(uniq, scanArray());
