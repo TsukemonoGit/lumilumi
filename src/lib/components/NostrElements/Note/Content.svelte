@@ -90,7 +90,7 @@
       {#if !imgLoad}<Link
           props={{ "aria-label": `External Links: ${part.url}` }}
           className="underline text-magnum-300 break-all "
-          href={part.content}>{part.content}</Link
+          href={part.url ?? ""}>{part.content}</Link
         >{/if}
       <div>
         <button
