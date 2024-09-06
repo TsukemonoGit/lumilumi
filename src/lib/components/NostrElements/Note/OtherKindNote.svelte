@@ -5,7 +5,7 @@
   import { eventKinds, profile } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import Markdown from "./MarkdownItem/Markdown.svelte";
+  import Markdown from "../MarkdownItem/Markdown.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean;

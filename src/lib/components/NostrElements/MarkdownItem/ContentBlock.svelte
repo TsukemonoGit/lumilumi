@@ -2,8 +2,8 @@
   import type { Part } from "$lib/func/content";
   import { showImg, viewMediaModal } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
-  import Content from "../Content.svelte";
-  import DecodedContent from "../DecodedContent.svelte";
+  import Content from "../Note/Content.svelte";
+  import DecodedContent from "../Note/DecodedContent.svelte";
   import { nip19Decode } from "$lib/func/util";
   import Link from "$lib/components/Elements/Link.svelte";
   import UnorderedList from "./UnorderedList.svelte";
@@ -36,8 +36,20 @@
       {repostable}
     />{:else}{part.content}{/if}
 {:else if part.type === "horizontal"}<hr />{:else if part.type === "codeBlock"}
-  <pre><code>{part.content}</code
-    ></pre>{:else if !nolist && part.type === "quote"}
+  <pre><code>{part.content}</code></pre>{:else if part.type === "footnoteDef"}
+  {part.number}. {part.content}<a
+    href="#footnote-ref-{part.number}"
+    id="footnote-def-{part.number}"
+    class="footnote-def">↩</a
+  >
+{:else if part.type === "footnoteRef"}
+  <a
+    href="#footnote-def-{part.number}"
+    id="footnote-ref-{part.number}"
+    class="footnote-ref"
+  >
+    <sup>{part.content}</sup>
+  </a>{:else if !nolist && part.type === "quote"}
   <blockquote class={`quote-depth-${part.number}`}>
     <Content
       text={part.content ?? ""}
@@ -288,5 +300,16 @@
   /* 深さ4以上の引用 */
   .quote-depth-4 {
     border-left-color: rgb(var(--color-magnum-200) / 1); /* 最も明るい色 */
+  }
+
+  .footnote-def {
+    text-decoration: underline;
+    font-size: 0.9em;
+    color: theme(colors.magnum.400);
+  }
+
+  .footnote-ref {
+    font-size: 0.9em;
+    color: theme(colors.magnum.400);
   }
 </style>
