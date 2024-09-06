@@ -9,12 +9,13 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
-  namespace svelte.JSX {
-    interface HTMLAttributes<T> {
-      // カスタムイベントを追加
-      onenterViewport?: (event: CustomEvent) => void;
-      onexitViewport?: (event: CustomEvent) => void;
-    }
+}
+
+/// <reference types="svelte" />
+
+declare namespace svelte.JSX {
+  interface HTMLAttributes<T> {
+    onenterViewport?: (event: CustomEvent) => void;
   }
 }
 

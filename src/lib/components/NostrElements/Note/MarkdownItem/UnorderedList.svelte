@@ -8,7 +8,6 @@
   export let depth;
   export let repostable;
   export let tags;
-  export let openModal;
   //$: console.log(part);
 </script>
 

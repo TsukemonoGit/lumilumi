@@ -11,7 +11,7 @@
   import { muteCheck } from "$lib/func/muteCheck";
   import { loginUser, queryClient } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
-  import { getZapLNURLPubkey } from "$lib/func/makeZap";
+  import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -34,24 +34,6 @@
     : excludefunc(zapRequestEvent)
       ? "null"
       : muteCheck(zapRequestEvent);
-
-  function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
-    //description tag を持たなければならない
-    const descriptionTag = event.tags.find((tag) => tag[0] === "description");
-    if (!descriptionTag || descriptionTag.length <= 1) {
-      return;
-    }
-    try {
-      const kind9734 = JSON.parse(descriptionTag[1]);
-      //kind9734の検証
-      if (verifyEvent(kind9734)) {
-        return kind9734;
-      }
-    } catch (error) {
-      console.error("Error parsing description tag:", error);
-      return;
-    }
-  }
 
   function extractZappedId(tags: Nostr.Tag.Any[]): {
     kind: number | undefined;

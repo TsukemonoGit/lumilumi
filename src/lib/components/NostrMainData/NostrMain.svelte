@@ -17,6 +17,7 @@
     showUserStatus,
     noBanner,
     showKind16,
+    onlyFollowee,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -37,6 +38,11 @@
     console.log($defaultRelays);
     console.log($queryClient?.getQueryData(["defaultRelay", $loginUser]));
     initializeRxNostr();
+
+    const followee = localStorage.getItem("onlyFollowee");
+    if (followee === "true") {
+      $onlyFollowee = true;
+    }
 
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
 

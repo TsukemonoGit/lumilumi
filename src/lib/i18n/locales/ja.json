@@ -106,5 +106,8 @@
   "about": {
     "houkoku": "バグ報告",
     "share": "共有"
+  },
+  "notifications": {
+    "onlyFollowee": "フォロイーのみ"
   }
 }

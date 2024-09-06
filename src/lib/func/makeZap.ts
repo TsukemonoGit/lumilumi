@@ -1,4 +1,4 @@
-import type { EventTemplate } from "nostr-tools";
+import { verifyEvent, type EventTemplate } from "nostr-tools";
 import { getZapEndpoint, makeZapRequest } from "nostr-tools/nip57";
 import * as Nostr from "nostr-typedef";
 import { getDefaultWriteRelays } from "./nostr";
@@ -104,4 +104,22 @@ export async function fetchZapLNURLPubkey(
   }
 
   return null;
+}
+
+export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
+  //description tag を持たなければならない
+  const descriptionTag = event.tags.find((tag) => tag[0] === "description");
+  if (!descriptionTag || descriptionTag.length <= 1) {
+    return;
+  }
+  try {
+    const kind9734 = JSON.parse(descriptionTag[1]);
+    //kind9734の検証
+    if (verifyEvent(kind9734)) {
+      return kind9734;
+    }
+  } catch (error) {
+    console.error("Error parsing description tag:", error);
+    return;
+  }
 }

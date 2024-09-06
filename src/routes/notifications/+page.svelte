@@ -1,22 +1,19 @@
 <script lang="ts">
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { loginUser, queryClient } from "$lib/stores/stores";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import { afterNavigate } from "$app/navigation";
   import { setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { createTabs, createToggleGroup, melt } from "@melt-ui/svelte";
+  import { createToggleGroup, melt } from "@melt-ui/svelte";
   import { crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
   import * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
-  import NotificationList from "./NotificationList.svelte";
+  import NotificationFilter from "./NotificationFilter.svelte";
+  import FolloweeFilteredNotificationList from "./FolloweeFilteredNotificationList.svelte";
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -86,31 +83,7 @@
     duration: 250,
     easing: cubicInOut,
   });
-  // 複数の選択に対応したフィルタリングロジック
-  const getFilteredEvents = (
-    events: Nostr.Event[],
-    selectedStates: string | string[] | undefined
-  ): Nostr.Event[] => {
-    if (!selectedStates || typeof selectedStates === "string") return events;
-    return events.filter((event) => {
-      return selectedStates.some((state) => {
-        switch (state) {
-          case "reply":
-            return event.kind === 1;
-          case "reaction":
-            return event.kind === 7;
-          case "repost":
-            return event.kind === 6 || event.kind === 16;
-          case "zap":
-            return event.kind === 9735;
-          case "other":
-            return event.kind === 42;
-          default:
-            return false;
-        }
-      });
-    });
-  };
+
   $: console.log($value); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
   const handleClickAll = () => {
@@ -127,6 +100,7 @@
   <meta name="description" content="Notifications" />
 </svelte:head>
 <section>
+  <NotificationFilter />
   <div class="w-full break-words overflow-x-hidden">
     <div use:melt={$root} class=" flex items-center">
       <button
@@ -188,26 +162,7 @@
         <div
           class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >
-          {#if events && events.length > 0}
-            {#each getFilteredEvents(events, $value) as event, index (event.id)}
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading" class="w-full">
-                  <EventCard note={event} />
-                </div>
-                <div slot="nodata" class="w-full">
-                  <EventCard note={event} />
-                </div>
-                <div slot="error" class="w-full">
-                  <EventCard note={event} />
-                </div>
-                <EventCard {metadata} note={event} /></Metadata
-              >
-            {/each}
-          {/if}
+          <FolloweeFilteredNotificationList {events} {value} />
         </div>
       </TimelineList>{/if}
   </div>

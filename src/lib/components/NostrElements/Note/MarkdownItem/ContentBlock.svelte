@@ -48,14 +48,7 @@
     />
   </blockquote>{:else if !nolist && part.type === "unorderedList"}
   <div class="contentBlock">
-    <UnorderedList
-      {part}
-      {tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {openModal}
-    />
+    <UnorderedList {part} {tags} {displayMenu} {depth} {repostable} />
   </div>{:else if !nolist && part.type === "orderedList"}
   <div class="contentBlock">
     <OrderedList {part} {tags} {displayMenu} {depth} {repostable} />

@@ -107,5 +107,8 @@
   "about": {
     "houkoku": "Bug Reports",
     "share": "Share"
+  },
+  "notifications": {
+    "onlyFollowee": "only followee"
   }
 }

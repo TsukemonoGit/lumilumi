@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
   import Metadata from "./NostrMainData/Metadata.svelte";
-  import { pubkeysIn, setTieKey } from "$lib/func/nostr";
+  import { getFollowingList, pubkeysIn, setTieKey } from "$lib/func/nostr";
   import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "./NostrMainData/TimelineList.svelte";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
@@ -18,6 +18,8 @@
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { extractKind9734 } from "$lib/func/makeZap";
+  import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -95,6 +97,25 @@
     console.log(filters);
     return filters;
   };
+
+  export const getFollowFilteredEvents = (
+    events: Nostr.Event[],
+    onlyFollowee: boolean
+  ) => {
+    const followee = getFollowingList();
+    if (onlyFollowee && followee) {
+      return events.filter((event) => {
+        if (event.kind !== 9735) {
+          return followee.includes(event.pubkey);
+        } else {
+          const kind9734 = extractKind9734(event);
+          return kind9734 && followee.includes(kind9734.pubkey);
+        }
+      });
+    } else {
+      return events;
+    }
+  };
 </script>
 
 <Contacts
@@ -128,30 +149,7 @@
       <div
         class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
-        {#if events && events.length > 0}
-          {#each events as event, index (event.id)}
-            <!-- <div
-                class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card "
-              > -->
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-              let:metadata
-            >
-              <div slot="loading" class="w-full">
-                <EventCard note={event} repostable={true} />
-              </div>
-              <div slot="nodata" class="w-full">
-                <EventCard note={event} repostable={true} />
-              </div>
-              <div slot="error" class="w-full">
-                <EventCard note={event} repostable={true} />
-              </div>
-              <EventCard {metadata} note={event} repostable={true} />
-            </Metadata>
-            <!-- </div> -->
-          {/each}
-        {/if}
+        <FolloweeFilteredEventList {events} />
       </div>
     </TimelineList>
   {/if}

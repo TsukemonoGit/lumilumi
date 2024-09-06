@@ -109,3 +109,4 @@ export const relayIconErrorStore = writable<string[]>([]);
 export const noBanner = writable<boolean>(false);
 export const viewMediaModal = writable<{ index: number; mediaList: Part[] }>();
 export const showKind16 = writable<boolean>(false);
+export const onlyFollowee = writable<boolean>(false);
