@@ -4,22 +4,30 @@
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   export let note: Nostr.Event;
   export let repostable: boolean;
-
+  export let maxHeight: string;
   $: dtag = note?.tags?.find((tag) => tag[0] === "d")?.[1];
   $: title = note?.tags?.find((tag) => tag[0] === "title")?.[1];
+  $: description = note.tags.find(
+    (tag) =>
+      (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
+  )?.[1];
+  $: image = note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1];
 </script>
 
 <div class="flex flex-col w-full">
-  <div class="flex flex-row gap-1">
-    <div class="text-sm">Emoji set:</div>
-    <div
-      class="text-magnum-400 font-bold whitespace-pre-wrap break-words word truncate line-clamp-2"
-      style="word-break: break-word;"
-    >
-      {title ?? dtag}
+  <div class="grid grid-cols-[1fr_auto] w-full gap-1">
+    <div>
+      Emoji set: {#if title}
+        <span class="text-lg font-bold text-magnum-400">
+          {title}
+        </span>{/if}
+      {#if description}
+        <div class=" text-neutral-300/80">{description}</div>{/if}
     </div>
+    {#if image && $showImg}
+      <img src={image} alt="" class="max-w-16 object-contain max-h-16" />{/if}
   </div>
-  <div class="flex gap-1 flex-wrap">
+  <div class="flex gap-1 flex-wrap" style="max-height:{maxHeight ?? 'none'}">
     {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
       {#if $showImg}
         <img

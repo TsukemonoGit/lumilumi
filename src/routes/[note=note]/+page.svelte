@@ -72,13 +72,11 @@
 
 <section class="mb-20">
   <!-- <SetRepoReactions /> -->
-  <div
-    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-  >
+  <div class="max-w-[100vw] break-words box-border w-full">
     <Text queryKey={["timeline", data.id]} id={data.id} let:text let:status>
       <div
         slot="loading"
-        class="text-sm text-neutral-500 flex-inline break-all"
+        class=" w-full text-sm text-neutral-500 flex-inline break-all"
       >
         Loading {nip19.noteEncode(data.id)}
       </div>
@@ -88,7 +86,7 @@
       <div
         slot="error"
         let:error
-        class="text-sm text-neutral-500 flex-inline break-all"
+        class=" w-full text-sm text-neutral-500 flex-inline break-all"
       >
         {nip19.noteEncode(data.id)}
       </div>
@@ -98,24 +96,38 @@
           pubkey={text.pubkey}
           let:metadata
         >
-          <div slot="loading">
+          <div
+            slot="loading"
+            class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          >
             <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
           </div>
-          <div slot="nodata">
+          <div
+            slot="nodata"
+            class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          >
             <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
           </div>
-          <div slot="error" let:error>
+          <div
+            slot="error"
+            class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+            let:error
+          >
             <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
           </div>
-          <EventCard
-            note={text}
-            {metadata}
-            {maxHeight}
-            {thread}
-            {displayMenu}
-            {depth}
-            {repostable}
-          />
+          <div
+            class="divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+          >
+            <EventCard
+              note={text}
+              {metadata}
+              {maxHeight}
+              {thread}
+              {displayMenu}
+              {depth}
+              {repostable}
+            />
+          </div>
         </Metadata>
 
         <!--noteのkindが40の場合はチャンネルページに飛ばすのでノート詠み込まれたあとでAllReactions取得するようにする-->

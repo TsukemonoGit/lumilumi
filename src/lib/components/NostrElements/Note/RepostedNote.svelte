@@ -12,7 +12,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
 
   export let repostable: boolean;
-
+  export let maxHeight: string;
   //tagはaかe
   export let tag: string[];
   //export let kind: number | undefined;
@@ -84,15 +84,15 @@
       let:metadata
     >
       <div slot="loading">
-        <EventCard note={text} {depth} {repostable} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} />
       </div>
       <div slot="nodata">
-        <EventCard note={text} {depth} {repostable} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} />
       </div>
       <div slot="error" let:error>
-        <EventCard note={text} {depth} {repostable} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} />
       </div>
-      <EventCard note={text} {metadata} {depth} {repostable} />
+      <EventCard note={text} {metadata} {depth} {repostable} {maxHeight} />
     </Metadata>
   </Text>
 {:else if tag[0] === "a"}
@@ -115,15 +115,15 @@
         let:metadata
       >
         <div slot="loading" class="w-full">
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {maxHeight} />
         </div>
         <div slot="nodata" class="w-full">
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {maxHeight} />
         </div>
         <div slot="error" class="w-full" let:error>
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {maxHeight} />
         </div>
-        <EventCard note={event} {metadata} {depth} {repostable} />
+        <EventCard note={event} {metadata} {depth} {repostable} {maxHeight} />
       </Metadata>
     </LatestEvent>
   {/if}

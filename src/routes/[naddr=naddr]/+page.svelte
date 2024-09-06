@@ -9,7 +9,6 @@
   import * as Nostr from "nostr-typedef";
 
   import { onMount } from "svelte";
-  import EventCardNaddr from "./EventCardNaddr.svelte";
   import AllReactions from "$lib/components/NostrMainData/AllReactions.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
@@ -36,7 +35,7 @@
 
   let isOnMount = false;
   let since: number | undefined = undefined;
-
+  const maxHeight = "none";
   onMount(() => {
     if (!isOnMount) {
       isOnMount = true;
@@ -86,6 +85,42 @@
         pubkey={event.pubkey}
         let:metadata
       >
+        <div
+          slot="loading"
+          class=" w-full ivide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+        >
+          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+        </div>
+        <div
+          slot="nodata"
+          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+        >
+          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+        </div>
+        <div
+          slot="error"
+          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+        >
+          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+        </div>
+        <div
+          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+        >
+          <EventCard
+            {metadata}
+            note={event}
+            depth={0}
+            repostable={true}
+            {maxHeight}
+          />
+        </div>
+      </Metadata>
+
+      <!-- <Metadata
+        queryKey={["metadata", event.pubkey]}
+        pubkey={event.pubkey}
+        let:metadata
+      >
         <div slot="loading" class="w-full">
           <EventCardNaddr note={event} repostable={true} />
         </div>
@@ -96,7 +131,7 @@
           <EventCardNaddr note={event} repostable={true} />
         </div>
         <EventCardNaddr {metadata} note={event} repostable={true} />
-      </Metadata>
+      </Metadata> -->
 
       <AllReactions
         queryKey={["allreactions", atag]}
@@ -140,7 +175,12 @@
                   <EventCard note={event} depth={0} repostable={true} />
                 </div>
                 <div slot="error">
-                  <EventCard note={event} depth={0} repostable={true} />
+                  <EventCard
+                    note={event}
+                    depth={0}
+                    repostable={true}
+                    {maxHeight}
+                  />
                 </div>
                 <EventCard
                   {metadata}

@@ -407,7 +407,7 @@
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} depth={depth + 1} {repostable} />
+        <RepostedNote {tag} depth={depth + 1} {repostable} {maxHeight} />
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -500,12 +500,12 @@
     {:else if note.kind === 30030}
       <!--kind30030-->
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        <Kind30030Note {note} {repostable} /></NoteTemplate
+        <Kind30030Note {note} {repostable} {maxHeight} /></NoteTemplate
       >
     {:else if note.kind === 9735}
       <!--kind9735 zap receipt-->
 
-      <Kind9735Note {note} {depth} {excludefunc} {repostable} />
+      <Kind9735Note {note} {depth} {excludefunc} {repostable} {maxHeight} />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
       {#if !data}
