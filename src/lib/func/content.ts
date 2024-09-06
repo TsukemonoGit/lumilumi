@@ -21,7 +21,9 @@ export interface Part {
     | "orderedList"
     | "quote"
     | "codeBlock"
-    | "imageLink";
+    | "imageLink"
+    | "footnoteRef"
+    | "footnoteDef";
   content: string | undefined;
   url?: string;
   number?: number;
@@ -65,6 +67,12 @@ const orderedListRegex =
 
 const quoteRegex = /^(>(\s*>)*)\s+(.*)$/im;
 const codeBlockRegex = /```([\s\S]*?)```/m;
+
+// 注釈マーク（`[^1]` 形式）を検出するための正規表現
+const footnoteRefRegex = /\[\^(\d+)\](?!:)/i;
+
+// 注釈定義部分（`[^1]: 注釈内容` 形式）を検出するための正規表現
+const footnoteDefRegex = /^[^\S\r\n]*\[\^(\d+)\]:\s*(.+)/m;
 
 // パスから拡張子をチェックする関数
 const checkFileExtension = (url: string): Part["type"] => {
@@ -511,6 +519,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
   };
 
   while (remainingText.length > 0) {
+    const footnoteRefMatch = remainingText.match(footnoteRefRegex);
+    const footnoteDefMatch = remainingText.match(footnoteDefRegex);
     // 画像リンクのマッチ
     const markdownLinkWithImageMatch = remainingText.match(
       markdownLinkWithImageRegex
@@ -541,6 +551,12 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipMatch = remainingText.match(nipRegex);
 
     //
+    const footnoteRefIndex = footnoteRefMatch
+      ? remainingText.indexOf(footnoteRefMatch[0])
+      : -1;
+    const footnoteDefIndex = footnoteDefMatch
+      ? remainingText.indexOf(footnoteDefMatch[0])
+      : -1;
 
     const markdownLinkWithImageIndex = markdownLinkWithImageMatch
       ? remainingText.indexOf(markdownLinkWithImageMatch[0])
@@ -582,6 +598,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
 
     if (
+      footnoteRefIndex === -1 &&
+      footnoteDefIndex === -1 &&
       markdownLinkWithImageIndex === -1 &&
       codeBlockIndex === -1 &&
       quoteIndex === -1 &&
@@ -606,6 +624,17 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
 
     const earliestMatch = [
+      {
+        type: "footnoteRef",
+        index: footnoteRefIndex,
+        match: footnoteRefMatch,
+      },
+      {
+        type: "footnoteDef",
+        index: footnoteDefIndex,
+        match: footnoteDefMatch,
+      },
+
       {
         type: "markdownLinkWithImage",
         index: markdownLinkWithImageIndex,
@@ -688,6 +717,26 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     }
     if (match) {
       switch (type) {
+        case "footnoteRef":
+          console.log("footnoteRef", match);
+
+          console.log(match[1]);
+          parts.push({
+            type: "footnoteRef",
+            content: `[${match[1]}]`,
+            number: Number(match[1]),
+          });
+          break;
+        case "footnoteDef":
+          console.log(match);
+
+          parts.push({
+            type: "footnoteDef",
+            content: match[2],
+            number: Number(match[1]),
+          });
+          break;
+
         case "markdownLinkWithImage": // 画像リンクの処理
           // console.log(match);
           parts.push({
