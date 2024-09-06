@@ -385,11 +385,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
           const textPart = url.slice(lastUnpairedParenIndex);
 
           const urlType = checkFileExtension(urlPart);
-          if (
-            urlType === "image" ||
-            urlType === "audio" ||
-            urlType === "movie"
-          ) {
+          if (urlType === "image") {
             parts.push({
               type: urlType,
               content: urlPart,
@@ -398,6 +394,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
             });
             mediaNum++;
           } else {
+            //|| urlType === "audio" || urlType === "movie"
             parts.push({
               type: urlType,
               url: urlPart,
