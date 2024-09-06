@@ -36,8 +36,9 @@
       {repostable}
     />{:else}{part.content}{/if}
 {:else if part.type === "horizontal"}<hr />{:else if part.type === "codeBlock"}
-  <pre><code>{part.content}</code></pre>{:else if part.type === "quote"}
-  <blockquote>
+  <pre><code>{part.content}</code
+    ></pre>{:else if !nolist && part.type === "quote"}
+  <blockquote class={`quote-depth-${part.number}`}>
     <Content
       text={part.content ?? ""}
       {tags}
@@ -275,5 +276,24 @@
   code {
     color: theme(colors.neutral.100); /* コードの文字色（明るめの白色） */
     font-size: 14px; /* 文字サイズを調整 */
+  }
+  /* 深さ1の引用 */
+  .quote-depth-1 {
+    border-left-color: rgb(var(--color-magnum-500) / 1); /* 基本の色 */
+  }
+
+  /* 深さ2の引用 */
+  .quote-depth-2 {
+    border-left-color: rgb(var(--color-magnum-400) / 1); /* 少し明るい色 */
+  }
+
+  /* 深さ3の引用 */
+  .quote-depth-3 {
+    border-left-color: rgb(var(--color-magnum-300) / 1); /* さらに明るい色 */
+  }
+
+  /* 深さ4以上の引用 */
+  .quote-depth-4 {
+    border-left-color: rgb(var(--color-magnum-200) / 1); /* 最も明るい色 */
   }
 </style>

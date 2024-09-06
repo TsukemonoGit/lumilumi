@@ -63,7 +63,7 @@ const unorderedListRegex =
 const orderedListRegex =
   /^(?:\s*\d+\.\s.+(?:\n(?:\s*(?:\d+\.|\s*[-*+])\s.+)*)*)$/gm;
 
-const quoteRegex = /^(>>?)\s+(.*)$/im;
+const quoteRegex = /^(>(\s*>)*)\s+(.*)$/im;
 const codeBlockRegex = /```([\s\S]*?)```/m;
 
 // パスから拡張子をチェックする関数
@@ -708,9 +708,12 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           });
           break;
         case "quote":
+          const greaterThanCount = (match[1].match(/>/g) || []).length;
+
           parts.push({
             type: "quote",
-            content: match[2],
+            content: match[match.length - 1],
+            number: greaterThanCount,
           });
           break;
         case "unorderedList":

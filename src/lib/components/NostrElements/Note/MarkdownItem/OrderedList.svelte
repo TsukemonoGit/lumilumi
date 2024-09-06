@@ -7,7 +7,7 @@
   export let depth;
   export let repostable;
   export let tags;
-  console.log(part);
+  //console.log(part);
   // const list = part?.content ? parseOrderedList(part?.content ?? "") : [];
   // console.log(list);
 </script>
