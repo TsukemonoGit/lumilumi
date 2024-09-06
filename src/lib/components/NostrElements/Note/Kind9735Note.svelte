@@ -18,6 +18,7 @@
   export let excludefunc = (event: Nostr.Event) => false;
   export let repostable: boolean;
   export let maxHeight: string;
+  export let displayMenu: boolean;
   let viewMuteEvent: boolean;
   //kind9734の取得と検証
   const zapRequestEvent = extractKind9734(note);
@@ -146,7 +147,13 @@
           <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
 
           {#if zappedId.tag.length > 0}
-            <RepostedNote tag={zappedId.tag} {depth} {repostable} {maxHeight} />
+            <RepostedNote
+              tag={zappedId.tag}
+              {depth}
+              {repostable}
+              {maxHeight}
+              {displayMenu}
+            />
           {/if}
         </Metadata>
       {/if}

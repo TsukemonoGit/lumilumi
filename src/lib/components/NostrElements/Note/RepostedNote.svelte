@@ -10,7 +10,7 @@
   import Text from "$lib/components/NostrMainData/Text.svelte";
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
-
+  export let displayMenu: boolean;
   export let repostable: boolean;
   export let maxHeight: string;
   //tagはaかe
@@ -84,15 +84,22 @@
       let:metadata
     >
       <div slot="loading">
-        <EventCard note={text} {depth} {repostable} {maxHeight} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
       </div>
       <div slot="nodata">
-        <EventCard note={text} {depth} {repostable} {maxHeight} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
       </div>
       <div slot="error" let:error>
-        <EventCard note={text} {depth} {repostable} {maxHeight} />
+        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
       </div>
-      <EventCard note={text} {metadata} {depth} {repostable} {maxHeight} />
+      <EventCard
+        note={text}
+        {metadata}
+        {depth}
+        {repostable}
+        {maxHeight}
+        {displayMenu}
+      />
     </Metadata>
   </Text>
 {:else if tag[0] === "a"}
@@ -115,15 +122,40 @@
         let:metadata
       >
         <div slot="loading" class="w-full">
-          <EventCard note={event} {depth} {repostable} {maxHeight} />
+          <EventCard
+            note={event}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+          />
         </div>
         <div slot="nodata" class="w-full">
-          <EventCard note={event} {depth} {repostable} {maxHeight} />
+          <EventCard
+            note={event}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+          />
         </div>
         <div slot="error" class="w-full" let:error>
-          <EventCard note={event} {depth} {repostable} {maxHeight} />
+          <EventCard
+            note={event}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+          />
         </div>
-        <EventCard note={event} {metadata} {depth} {repostable} {maxHeight} />
+        <EventCard
+          note={event}
+          {metadata}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+        />
       </Metadata>
     </LatestEvent>
   {/if}

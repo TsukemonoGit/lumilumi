@@ -407,7 +407,13 @@
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote {tag} depth={depth + 1} {repostable} {maxHeight} />
+        <RepostedNote
+          {tag}
+          depth={depth + 1}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+        />
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -446,8 +452,17 @@
       </div>
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
-      {#if tag}
-        <ReactionedNote {tag} depth={depth + 1} {repostable} {displayMenu} />
+      {#if tag}{#if $page.route.id === "/" || $page.route.id === "/notifications"}<!--タイムラインと通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
+          <ReactionedNote {tag} depth={depth + 1} {repostable} {displayMenu} />
+        {:else}
+          <RepostedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {maxHeight}
+          />
+        {/if}
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
@@ -505,7 +520,14 @@
     {:else if note.kind === 9735}
       <!--kind9735 zap receipt-->
 
-      <Kind9735Note {note} {depth} {excludefunc} {repostable} {maxHeight} />
+      <Kind9735Note
+        {note}
+        {depth}
+        {excludefunc}
+        {repostable}
+        {maxHeight}
+        {displayMenu}
+      />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
       {#if !data}

@@ -57,7 +57,7 @@
   {/if}
   <div class="ml-auto">
     {#if displayMenu}
-      <NoteActionButtons {note} />{/if}
+      <NoteActionButtons {note} repostable={false} />{/if}
   </div>
 </div>
 <!--リアクションしたノートの情報（リポストのを使いまわし）-->
