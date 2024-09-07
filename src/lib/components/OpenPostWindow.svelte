@@ -259,8 +259,10 @@
             color: "bg-red-500",
           };
         }
+      } else {
+        //成功したときだけ閉じる
+        $open = false;
       }
-      $open = false;
       $nowProgress = false;
     }
   };
