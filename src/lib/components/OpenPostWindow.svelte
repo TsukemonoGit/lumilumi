@@ -557,6 +557,7 @@
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
+            disabled={$nowProgress}
             class="inline-flex h-24 w-full flex-1 items-center justify-center
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800"
             id="note"
