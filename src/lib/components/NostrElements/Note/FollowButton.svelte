@@ -137,8 +137,8 @@
     );
     console.log(res);
 
-    const isSuccess = res.filter((item) => item.ok);
-    const isFailed = res.filter((item) => !item.ok);
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
     let str = generateResultMessage(isSuccess, isFailed);
     console.log(str);

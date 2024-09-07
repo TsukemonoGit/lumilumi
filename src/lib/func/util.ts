@@ -170,16 +170,20 @@ export async function filesUpload(
   return res;
 }
 
-export const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
+export const generateResultMessage = (
+  isSuccess: string[],
+  isFailed: string[]
+) => {
   let str = "";
   if (isSuccess.length > 0) {
     str = "OK\n";
-    isSuccess.map((item) => (str += `${item.from}\n`));
+    isSuccess.map((item) => (str += `${item}\n`));
     str += "\n";
   }
+  console.log(isFailed);
   if (isFailed.length > 0) {
     str += "Failed\n";
-    isFailed.map((item) => `${item.from}\n`);
+    isFailed.map((item) => (str += `${item}\n`));
   }
   return str;
 };

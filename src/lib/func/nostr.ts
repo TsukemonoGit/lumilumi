@@ -367,23 +367,46 @@ export function publishEvent(ev: Nostr.EventParameters) {
     );
   });
 }
-
-export async function promisePublishEvent(
-  ev: Nostr.EventParameters
+export async function promisePublishSignedEvent(
+  event: Nostr.Event
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const _rxNostr = get(app).rxNostr;
-  const signer = nip07Signer();
-  const event = await signer.signEvent(ev);
-  //署名の時間がタイムアウトカウントされないように先に署名
-  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+  if (Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
     console.log("error");
-    throw Error();
+    throw new Error("No default relays found.");
   }
-  const res = await new Promise<OkPacketAgainstEvent[]>((resolve) => {
-    let res: OkPacketAgainstEvent[] = [];
-    setTimeout(() => {
-      resolve(res);
-    }, 2000);
+
+  return new Promise<OkPacketAgainstEvent[]>((resolve) => {
+    let results: OkPacketAgainstEvent[] = [];
+    let elapsedTime = 0;
+    const interval = 500;
+    const maxWaitingTime = 3000;
+
+    const checkRelays = () => {
+      const defaultRelays = Object.keys(_rxNostr.getDefaultRelays());
+
+      // 成功したリレーが1つもないかチェック
+      const hasSuccess = results.some((packet) => packet.ok);
+
+      // 送信成功も失敗も受信していないリレーが存在するかチェック
+      const pendingRelays = defaultRelays.filter(
+        (relay) => !results.some((packet) => packet.from === relay)
+      );
+      console.log("未応答のリレー:", pendingRelays.length);
+      if (
+        !hasSuccess &&
+        pendingRelays.length > 0 &&
+        elapsedTime < maxWaitingTime
+      ) {
+        elapsedTime += interval;
+        setTimeout(checkRelays, interval);
+      } else {
+        resolve(results);
+      }
+    };
+
+    // 1秒ごとにチェック、最大3秒待つ
+    setTimeout(checkRelays, interval);
 
     _rxNostr.send(event).subscribe({
       next: (packet) => {
@@ -392,14 +415,19 @@ export async function promisePublishEvent(
             packet.ok ? "成功" : "失敗"
           } しました。`
         );
-        res.push(packet);
+        results.push(packet);
       },
-      complete: () => {
-        resolve(res);
-      },
+      complete: () => resolve(results),
     });
-  });
-  return { event: event, res: res };
+  }).then((res) => ({ event, res }));
+}
+export async function promisePublishEvent(
+  ev: Nostr.EventParameters
+): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
+  const signer = nip07Signer();
+  const event = await signer.signEvent(ev);
+
+  return promisePublishSignedEvent(event);
 }
 
 //ConnectionState

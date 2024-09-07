@@ -219,7 +219,7 @@
         <main class="sm:ml-52 ml-0 mt-8 sm:mb-2 mb-20">
           <slot />
           {#if $nowProgress}
-            <div class="fixed right-10 bottom-20">
+            <div class="fixed right-10 bottom-20 z-[99]">
               <LoadingElement />
             </div>
           {/if}
