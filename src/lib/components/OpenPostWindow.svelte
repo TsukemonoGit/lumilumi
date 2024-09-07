@@ -14,6 +14,7 @@
   import {
     getDefaultWriteRelays,
     promisePublishEvent,
+    promisePublishSignedEvent,
     publishEvent,
   } from "$lib/func/nostr";
   import {
@@ -44,7 +45,7 @@
     Profile,
   } from "$lib/types";
   import EventCard from "./NostrElements/Note/EventCard.svelte";
-  import { now, type EventPacket } from "rx-nostr";
+  import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
   import Metadata from "./NostrMainData/Metadata.svelte";
   //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -213,10 +214,11 @@
         content: checkedText,
         tags: checkedTags,
       };
-
+      const signer = nip07Signer();
+      const event = await signer.signEvent(newev);
       //publishEvent(newev);
 
-      const { event: ev, res } = await promisePublishEvent(newev);
+      const { event: ev, res } = await promisePublishSignedEvent(event);
       console.log(res);
 
       const isSuccessRelays: string[] = res
@@ -226,7 +228,7 @@
         .filter((item) => !item.ok)
         .map((item) => normalizeRelayURL(item.from));
 
-      let str = generateResultMessage(isSuccessRelays, isFailedRelays);
+      // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
 
       const writeRelays = getDefaultWriteRelays();
 
@@ -235,17 +237,30 @@
           !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
       );
       console.log(pendingRelays);
-      if (pendingRelays.length > 0) {
-        str = str + `\nPending\n${pendingRelays.join("\n")}`;
+      // if (pendingRelays.length > 0) {
+      //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
+      // }
+      // $toastSettings = {
+      //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
+      //   description: str,
+      //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
+      // };
+      if (isSuccessRelays.length <= 0) {
+        //再送チャレンジ
+        const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
+
+        const isSuccessRelays2: string[] = res2
+          .filter((item) => item.ok)
+          .map((item) => normalizeRelayURL(item.from));
+        if (isSuccessRelays2.length <= 0) {
+          $toastSettings = {
+            title: "Failed",
+            description: "failed to publish",
+            color: "bg-red-500",
+          };
+        }
       }
-      $toastSettings = {
-        title: isSuccessRelays.length > 0 ? "Success" : "Failed",
-        description: str,
-        color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
-      if (isSuccessRelays.length > 0) {
-        $open = false;
-      }
+      $open = false;
       $nowProgress = false;
     }
   };
@@ -577,8 +592,8 @@
           {/if}
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
+          <!-- disabled={$nowProgress} 関係ない処理の実行中でdisabledになってるのいや-->
           <textarea
-            disabled={$nowProgress}
             class="inline-flex h-24 w-full flex-1 items-center justify-center
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800 disabled:opacity-20"
             id="note"

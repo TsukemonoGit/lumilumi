@@ -367,14 +367,10 @@ export function publishEvent(ev: Nostr.EventParameters) {
     );
   });
 }
-
-export async function promisePublishEvent(
-  ev: Nostr.EventParameters
+export async function promisePublishSignedEvent(
+  event: Nostr.Event
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const _rxNostr = get(app).rxNostr;
-  const signer = nip07Signer();
-  const event = await signer.signEvent(ev);
-
   if (Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
     console.log("error");
     throw new Error("No default relays found.");
@@ -383,6 +379,7 @@ export async function promisePublishEvent(
   return new Promise<OkPacketAgainstEvent[]>((resolve) => {
     let results: OkPacketAgainstEvent[] = [];
     let elapsedTime = 0;
+    const interval = 500;
     const maxWaitingTime = 3000;
 
     const checkRelays = () => {
@@ -401,15 +398,15 @@ export async function promisePublishEvent(
         pendingRelays.length > 0 &&
         elapsedTime < maxWaitingTime
       ) {
-        elapsedTime += 1000;
-        setTimeout(checkRelays, 1000);
+        elapsedTime += interval;
+        setTimeout(checkRelays, interval);
       } else {
         resolve(results);
       }
     };
 
     // 1秒ごとにチェック、最大3秒待つ
-    setTimeout(checkRelays, 1000);
+    setTimeout(checkRelays, interval);
 
     _rxNostr.send(event).subscribe({
       next: (packet) => {
@@ -423,6 +420,14 @@ export async function promisePublishEvent(
       complete: () => resolve(results),
     });
   }).then((res) => ({ event, res }));
+}
+export async function promisePublishEvent(
+  ev: Nostr.EventParameters
+): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
+  const signer = nip07Signer();
+  const event = await signer.signEvent(ev);
+
+  return promisePublishSignedEvent(event);
 }
 
 //ConnectionState
