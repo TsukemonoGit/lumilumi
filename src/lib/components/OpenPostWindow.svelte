@@ -11,7 +11,7 @@
     Plus,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import { publishEvent } from "$lib/func/nostr";
+  import { promisePublishEvent, publishEvent } from "$lib/func/nostr";
   import {
     emojis,
     nowProgress,
@@ -28,7 +28,11 @@
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { convertMetaTags, filesUpload } from "$lib/func/util";
+  import {
+    convertMetaTags,
+    filesUpload,
+    generateResultMessage,
+  } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
     DefaultPostOptions,
@@ -187,6 +191,7 @@
   };
 
   const postNote = async () => {
+    $nowProgress = true;
     if (text.trim().length > 0) {
       const { text: checkedText, tags: checkedTags } = contentCheck(
         text.trim(),
@@ -205,8 +210,26 @@
         tags: checkedTags,
       };
 
-      publishEvent(newev);
-      $open = false;
+      //publishEvent(newev);
+
+      const { event: ev, res } = await promisePublishEvent(newev);
+      console.log(res);
+
+      const isSuccess = res.filter((item) => item.ok);
+      const isFailed = res.filter((item) => !item.ok);
+
+      let str = generateResultMessage(isSuccess, isFailed);
+      console.log(str);
+
+      $toastSettings = {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: str,
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      };
+      if (isSuccess.length > 0) {
+        $open = false;
+      }
+      $nowProgress = false;
     }
   };
 

@@ -2,7 +2,7 @@
   import logo from "$lib/images/favicon.svg";
 </script>
 
-<img src={logo} alt="home" class={"transform-rotate"} />
+<img src={logo} alt="home" class={"transform-rotate "} />
 
 <style>
   .transform-rotate {

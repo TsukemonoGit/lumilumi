@@ -177,9 +177,10 @@ export const generateResultMessage = (isSuccess: any[], isFailed: any[]) => {
     isSuccess.map((item) => (str += `${item.from}\n`));
     str += "\n";
   }
+  console.log(isFailed);
   if (isFailed.length > 0) {
     str += "Failed\n";
-    isFailed.map((item) => `${item.from}\n`);
+    isFailed.map((item) => (str += `${item.from}\n`));
   }
   return str;
 };
