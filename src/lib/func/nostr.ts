@@ -374,16 +374,42 @@ export async function promisePublishEvent(
   const _rxNostr = get(app).rxNostr;
   const signer = nip07Signer();
   const event = await signer.signEvent(ev);
-  //署名の時間がタイムアウトカウントされないように先に署名
-  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+
+  if (Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
     console.log("error");
-    throw Error();
+    throw new Error("No default relays found.");
   }
-  const res = await new Promise<OkPacketAgainstEvent[]>((resolve) => {
-    let res: OkPacketAgainstEvent[] = [];
-    setTimeout(() => {
-      resolve(res);
-    }, 2000);
+
+  return new Promise<OkPacketAgainstEvent[]>((resolve) => {
+    let results: OkPacketAgainstEvent[] = [];
+    let waitingTime = 2000;
+    const maxWaitingTime = 3000;
+
+    const checkRelays = () => {
+      const defaultRelays = Object.keys(_rxNostr.getDefaultRelays());
+
+      // 成功したリレーが1つもないかチェック
+      const hasSuccess = results.some((packet) => packet.ok);
+
+      // 送信成功も失敗も受信していないリレーが存在するかチェック
+      const pendingRelays = defaultRelays.filter(
+        (relay) => !results.some((packet) => packet.from === relay)
+      );
+
+      if (
+        !hasSuccess &&
+        pendingRelays.length > 0 &&
+        waitingTime < maxWaitingTime
+      ) {
+        waitingTime += 1000;
+        setTimeout(checkRelays, 1000);
+      } else {
+        resolve(results);
+      }
+    };
+
+    // 初期の2秒待機後にチェック
+    setTimeout(checkRelays, waitingTime);
 
     _rxNostr.send(event).subscribe({
       next: (packet) => {
@@ -392,14 +418,11 @@ export async function promisePublishEvent(
             packet.ok ? "成功" : "失敗"
           } しました。`
         );
-        res.push(packet);
+        results.push(packet);
       },
-      complete: () => {
-        resolve(res);
-      },
+      complete: () => resolve(results),
     });
-  });
-  return { event: event, res: res };
+  }).then((res) => ({ event, res }));
 }
 
 //ConnectionState
