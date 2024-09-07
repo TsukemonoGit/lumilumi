@@ -11,7 +11,11 @@
     Plus,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import { promisePublishEvent, publishEvent } from "$lib/func/nostr";
+  import {
+    getDefaultWriteRelays,
+    promisePublishEvent,
+    publishEvent,
+  } from "$lib/func/nostr";
   import {
     emojis,
     nowProgress,
@@ -215,24 +219,41 @@
       const { event: ev, res } = await promisePublishEvent(newev);
       console.log(res);
 
-      const isSuccess = res.filter((item) => item.ok);
-      const isFailed = res.filter((item) => !item.ok);
+      const isSuccessRelays: string[] = res
+        .filter((item) => item.ok)
+        .map((item) => normalizeRelayURL(item.from));
+      const isFailedRelays = res
+        .filter((item) => !item.ok)
+        .map((item) => normalizeRelayURL(item.from));
 
-      let str = generateResultMessage(isSuccess, isFailed);
-      console.log(str);
+      let str = generateResultMessage(isSuccessRelays, isFailedRelays);
 
+      const writeRelays = getDefaultWriteRelays();
+
+      const pendingRelays = writeRelays.filter(
+        (relay) =>
+          !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
+      );
+      console.log(pendingRelays);
+      if (pendingRelays.length > 0) {
+        str = str + `\nPending\n${pendingRelays.join("\n")}`;
+      }
       $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
+        title: isSuccessRelays.length > 0 ? "Success" : "Failed",
         description: str,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
       };
-      if (isSuccess.length > 0) {
+      if (isSuccessRelays.length > 0) {
         $open = false;
       }
       $nowProgress = false;
     }
   };
 
+  //末尾に"/"をつける
+  const normalizeRelayURL = (str: string) => {
+    return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
+  };
   const resetState = () => {
     text = options.content ?? "";
     tags = [...options.tags];

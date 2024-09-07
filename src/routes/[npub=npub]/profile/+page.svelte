@@ -163,8 +163,8 @@
         pubkey: data.pubkey,
       };
       const { event, res } = await promisePublishEvent(ev);
-      const isSuccess = res.filter((item) => item.ok);
-      const isFailed = res.filter((item) => !item.ok);
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+      const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
       let str = generateResultMessage(isSuccess, isFailed);
       console.log(str);
@@ -289,6 +289,7 @@
             tags={newTags}
             displayMenu={true}
             depth={0}
+            repostable={true}
           />
         </div>
       {/if}

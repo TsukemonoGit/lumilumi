@@ -382,7 +382,7 @@ export async function promisePublishEvent(
 
   return new Promise<OkPacketAgainstEvent[]>((resolve) => {
     let results: OkPacketAgainstEvent[] = [];
-    let waitingTime = 2000;
+    let elapsedTime = 0;
     const maxWaitingTime = 3000;
 
     const checkRelays = () => {
@@ -395,21 +395,21 @@ export async function promisePublishEvent(
       const pendingRelays = defaultRelays.filter(
         (relay) => !results.some((packet) => packet.from === relay)
       );
-
+      console.log("未応答のリレー:", pendingRelays.length);
       if (
         !hasSuccess &&
         pendingRelays.length > 0 &&
-        waitingTime < maxWaitingTime
+        elapsedTime < maxWaitingTime
       ) {
-        waitingTime += 1000;
+        elapsedTime += 1000;
         setTimeout(checkRelays, 1000);
       } else {
         resolve(results);
       }
     };
 
-    // 初期の2秒待機後にチェック
-    setTimeout(checkRelays, waitingTime);
+    // 1秒ごとにチェック、最大3秒待つ
+    setTimeout(checkRelays, 1000);
 
     _rxNostr.send(event).subscribe({
       next: (packet) => {
