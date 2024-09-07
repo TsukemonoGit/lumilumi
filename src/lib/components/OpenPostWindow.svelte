@@ -559,7 +559,7 @@
           <textarea
             disabled={$nowProgress}
             class="inline-flex h-24 w-full flex-1 items-center justify-center
-                    rounded-sm border border-solid p-2 leading-none bg-neutral-800"
+                    rounded-sm border border-solid p-2 leading-none bg-neutral-800 disabled:opacity-20"
             id="note"
             bind:this={textarea}
             bind:value={text}
