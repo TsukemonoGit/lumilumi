@@ -194,8 +194,9 @@
       return "";
     }
   };
-
+  let isPosting: boolean = false;
   const postNote = async () => {
+    isPosting = true;
     $nowProgress = true;
     if (text.trim().length > 0) {
       const { text: checkedText, tags: checkedTags } = contentCheck(
@@ -264,6 +265,7 @@
         $open = false;
       }
       $nowProgress = false;
+      isPosting = false;
     }
   };
 
@@ -594,8 +596,8 @@
           {/if}
         </div>
         <fieldset class="mb-1 flex items-center gap-5">
-          <!-- disabled={$nowProgress} 関係ない処理の実行中でdisabledになってるのいや-->
           <textarea
+            disabled={isPosting}
             class="inline-flex h-24 w-full flex-1 items-center justify-center
                     rounded-sm border border-solid p-2 leading-none bg-neutral-800 disabled:opacity-20"
             id="note"
