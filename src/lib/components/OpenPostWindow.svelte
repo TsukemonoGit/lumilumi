@@ -665,9 +665,10 @@
             {/if}
 
             <button
+              disabled={$nowProgress}
               aria-label="post note"
               class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50"
+                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-20"
               on:click={postNote}
             >
               <Send size="20" />
