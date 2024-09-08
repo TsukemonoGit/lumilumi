@@ -293,6 +293,7 @@
         description: "Failed to zap",
         color: "bg-red-500",
       };
+      $nowProgress = false;
       return;
     }
     $nowProgress = false;
