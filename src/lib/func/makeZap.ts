@@ -12,12 +12,14 @@ export interface InvoiceProp {
   id?: string;
   amount: number;
   comment: string;
+  zapRelays: string[];
 }
 export async function makeInvoice({
   metadata,
   id,
   amount, //1000かけたやつをいれる
   comment,
+  zapRelays,
 }: InvoiceProp): Promise<string | null> {
   try {
     const zapEndpoint = await getZapEndpoint(metadata);
@@ -30,7 +32,7 @@ export async function makeInvoice({
       profile: metadata.pubkey,
       event: id ?? null,
       amount: amount,
-      relays: getDefaultWriteRelays(),
+      relays: zapRelays,
       comment: comment,
     });
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(

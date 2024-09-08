@@ -479,7 +479,7 @@ export function usePromiseReq(
     initData = [],
   }: UseReqOpts<EventPacket[] | EventPacket>,
   relays: string[] | undefined,
-  timeout: number | undefined = 4000
+  timeout: number | undefined = 3000
 ): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
