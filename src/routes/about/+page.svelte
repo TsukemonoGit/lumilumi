@@ -78,11 +78,18 @@
           {#if $showImg || loadImage}
             <img
               class="object-contain"
-              src="https://i.imgur.com/lhDLiS0.png"
+              src="https://stok33.github.io/illust/lumis.webp"
               alt="lumi"
               width={400}
               height={400}
             />
+            <!-- <img
+              class="object-contain"
+              src="https://i.imgur.com/lhDLiS0.png"
+              alt="lumi"
+              width={400}
+              height={400}
+            /> -->
             <!-- <img
               class="object-contain"
               src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
