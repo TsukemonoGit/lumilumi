@@ -38,6 +38,7 @@
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
   import type { Part } from "$lib/func/content";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
+  import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
 
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
@@ -208,7 +209,7 @@
       <SetRepoReactions />
       <Menu />
 
-      <Toast />
+      <Toast /><ReactionToast />
       <MediaDisplay
         bind:open={showModal}
         bind:images={mediaList}

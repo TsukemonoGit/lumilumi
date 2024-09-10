@@ -201,7 +201,7 @@
         syutokusururyou,
         filters,
         queryKey,
-        lastfavcheck,
+        // lastfavcheck,
         relays
       );
       console.log(older);

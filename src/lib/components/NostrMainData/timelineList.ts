@@ -14,7 +14,7 @@ export async function loadOlderEvents(
   sift: number,
   filters: Filter[],
   queryKey: QueryKey,
-  lastfavcheck: boolean,
+  // lastfavcheck: boolean,
 
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
@@ -24,12 +24,12 @@ export async function loadOlderEvents(
     return [];
   }
 
-  const notReactionEvent = get(slicedEvent).filter(
-    (item) =>
-      item.pubkey !== get(loginUser) ||
-      !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
-  );
-  console.log(notReactionEvent);
+  // const notReactionEvent = get(slicedEvent).filter(
+  //   (item) =>
+  //     item.pubkey !== get(loginUser) ||
+  //     !item.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser))
+  // );
+  // console.log(notReactionEvent);
   // if (data && data.length > 1) {
   //   const kind1 = data.filter(
   //     (item) =>
@@ -45,39 +45,17 @@ export async function loadOlderEvents(
   // }
   const lastEvent = get(slicedEvent)[get(slicedEvent).length - 1];
   console.log(lastEvent);
-  const untilTimestamp =
-    get(slicedEvent)[get(slicedEvent).length - 1].created_at;
+  const untilTimestamp = lastEvent.created_at;
   console.log(untilTimestamp);
   //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
-  const newFilters = lastfavcheck
-    ? !lastEvent.tags.find((tag) => tag[0] === "p" && tag[1] === get(loginUser)) //ラストがリアクションをTLに表示するためのフィルターではない場合
-      ? filters
-          .filter(
-            (filter: Filter) => !filter.kinds || !filter.kinds.includes(30315)
-          )
-          .map((filter: Filter) => ({
-            ...filter,
-            limit: sift,
-            until: untilTimestamp,
-            since: undefined,
-          }))
-      : filters
-          .filter(
-            (filter: Filter) =>
-              !filter["#p"] && (!filter.kinds || !filter.kinds.includes(30315))
-          )
-          .map((filter: Filter) => ({
-            ...filter,
-            limit: sift,
-            until: notReactionEvent[notReactionEvent.length - 1].created_at,
-            since: undefined,
-          }))
-    : filters.map((filter: Filter) => ({
-        ...filter,
-        limit: sift,
-        until: untilTimestamp,
-        since: undefined,
-      }));
+  //filterごとにlimitついてるから、filtersじゃなくてfilterごとに数取ってsliceシテってしないといけない。
+  //けどなんか大変そうだから最初のフィルターだけにしよう
+  const newFilters = {
+    ...filters[0],
+    limit: sift,
+    until: untilTimestamp,
+    since: undefined,
+  };
   console.log(newFilters);
   const newReq = createRxBackwardReq();
   const operator = pipe(uniq(), scanArray());
@@ -85,15 +63,16 @@ export async function loadOlderEvents(
     {
       operator: operator,
       queryKey: queryKey,
-      filters: newFilters,
+      filters: [newFilters],
       req: newReq,
     },
     relays
   );
   //console.log(olderEvents);
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-  console.log("olderEvents", olderEvents.length);
+
   console.log("sift", sift);
+  console.log("olderEvents", olderEvents.length);
   return olderEvents.slice(0, sift);
 }
 
@@ -104,6 +83,7 @@ export async function firstLoadOlderEvents(
 
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
+  //filterごとにlimitついてるから、filtersじゃなくてfilterごとに数取ってsliceシテってしないといけない。
   const newReq = createRxBackwardReq();
   const operator = pipe(uniq(), scanArray());
   const olderEvents = await usePromiseReq(
@@ -113,10 +93,12 @@ export async function firstLoadOlderEvents(
       filters: filters,
       req: newReq,
     },
-    relays
+    relays,
+    4000
   );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-  console.log("olderEvents.length", olderEvents.length);
+
   console.log("sift", sift);
+  console.log("olderEvents.length", olderEvents.length);
   return olderEvents.slice(0, sift === 0 ? undefined : sift);
 }

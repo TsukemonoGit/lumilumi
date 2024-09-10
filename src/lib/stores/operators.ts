@@ -1,5 +1,5 @@
 import type { EventPacket } from "rx-nostr";
-import { latestEach } from "rx-nostr";
+import { createUniq, latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
@@ -7,11 +7,14 @@ import {
   metadataQueue,
   mutebykinds,
   mutes,
+  onlyFollowee,
   queryClient,
+  reactionToast,
 } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
+import { getFollowingList } from "$lib/func/nostr";
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
@@ -298,3 +301,85 @@ const pubkey = (event: Nostr.Event): string | undefined => {
     return undefined;
   }
 };
+
+export function reactionCheck() {
+  return filter((packet: EventPacket) => {
+    const followList = getFollowingList();
+    if (
+      packet.event.kind === 1 ||
+      packet.event.kind === 6 ||
+      packet.event.kind === 16
+    ) {
+      //自分のpubがtagsに入っていてもリアクションとして取得したものじゃない可能性があるkind
+
+      if (
+        packet.event.pubkey !== get(loginUser) &&
+        packet.event.tags.find(
+          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
+        )
+      ) {
+        //自分の投稿への反応
+
+        if (followList && followList.includes(packet.event.pubkey)) {
+          console.log("includes", packet.event);
+          //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
+          setReactionEvent(packet);
+
+          console.log(get(reactionToast));
+          return true;
+        } else {
+          //自分の投稿への反応のうちフォロー外からのものはリアクションとして通知するだけでTLには流さない
+          if (!get(onlyFollowee)) {
+            //フォロー外の通知ONのときだけ追加
+            setReactionEvent(packet);
+          }
+          return false;
+        }
+      } else {
+        //自分のPが含まれない普通の投稿だからそのまま流す
+        return true;
+      }
+    } else {
+      if (
+        packet.event.pubkey !== get(loginUser) &&
+        packet.event.tags.find(
+          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
+        )
+      ) {
+        //TLには流れないものたちのうち自分へのリアクション
+
+        if (followList && followList.includes(packet.event.pubkey)) {
+          //自分の投稿への反応のうちフォロイーからのもの
+          setReactionEvent(packet);
+        } else {
+          //自分の投稿への反応のうちフォロー外からのもの
+          if (!get(onlyFollowee)) {
+            //フォロー外の通知ONのときだけ追加
+            setReactionEvent(packet);
+          }
+        }
+      }
+
+      return false;
+    }
+  });
+}
+
+const observedEvents = new Set<string>();
+function setReactionEvent(packet: EventPacket) {
+  //重複チェク
+  //未観測の場合のみ追加
+
+  if (observedEvents.has(packet.event.id)) {
+    return; // 既に観測されている場合は何もしない
+  }
+
+  // 未観測の場合のみ追加
+  observedEvents.add(packet.event.id);
+
+  reactionToast.set({
+    title: "",
+    description: JSON.stringify(packet.event),
+    color: "",
+  });
+}

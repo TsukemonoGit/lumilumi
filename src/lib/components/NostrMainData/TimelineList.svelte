@@ -33,7 +33,7 @@
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  export let lastfavcheck: boolean = true;
+  // export let lastfavcheck: boolean = true;
   export let req:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -54,7 +54,7 @@
   //     isNew: boolean;
   //   }
   // >;
-
+  export let reaCheck = false;
   export let tieKey: string | undefined = undefined;
   const [tie, tieMap] = createTie();
   $: if (!tieKey || tieKey) {
@@ -70,13 +70,7 @@
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
 
-  $: result = useTimelineEventList(
-    queryKey,
-    filters,
-
-    req,
-    relays
-  );
+  $: result = useTimelineEventList(queryKey, filters, reaCheck, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -145,13 +139,22 @@
     }
 
     if (!ev || ev?.length <= 0) {
-      const newFilters = filters.map((filter: Nostr.Filter) => ({
-        ...filter,
+      // const newFilters = filters.map((filter: Nostr.Filter) => ({
+      //   ...filter,
+      //   since: undefined,
+      //   until:
+      //     filter.until === undefined ? (filter.since ?? now()) : filter.until,
+      //   limit: 50,
+      // }));
+      const newFilters = {
+        ...filters[0],
         since: undefined,
         until:
-          filter.until === undefined ? (filter.since ?? now()) : filter.until,
+          filters[0].until === undefined
+            ? (filters[0].since ?? now())
+            : filters[0].until,
         limit: 50,
-      }));
+      };
       console.log(readUrls);
 
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
@@ -161,7 +164,7 @@
 
       const older = await firstLoadOlderEvents(
         50,
-        newFilters,
+        [newFilters],
         queryKey,
         relays
       );
@@ -292,7 +295,7 @@
         syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
         filters,
         queryKey,
-        lastfavcheck,
+        //lastfavcheck,
         relays
       );
       console.log(older);

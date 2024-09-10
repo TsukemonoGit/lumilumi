@@ -70,7 +70,6 @@
       {
         authors: pubkeyList,
         kinds: kinds,
-        limit: 50,
         since: since,
       },
     ];
@@ -78,12 +77,11 @@
     if ($showReactioninTL) {
       filters.push({
         kinds: [
-          1 /*リプライ*/, 6 /*kind1のリポスト*/,
+          42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
           /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
           9735 /*zap receipt**/,
         ],
         "#p": [$loginUser],
-        limit: 5,
         since: since,
       });
     } //とりあえず通知をTLに流したくないときは フィルターから外してみる
@@ -135,6 +133,7 @@
       let:events
       {viewIndex}
       {amount}
+      reaCheck={$showReactioninTL}
       let:len
     >
       <!-- <SetRepoReactions /> -->
