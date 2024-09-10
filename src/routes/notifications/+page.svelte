@@ -138,7 +138,7 @@
         filters={[
           {
             kinds: [1, 6, 7, 16, 42, 9735],
-            limit: 30,
+
             "#p": [$loginUser],
             since: since,
           },
