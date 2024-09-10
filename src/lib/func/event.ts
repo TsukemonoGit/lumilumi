@@ -60,24 +60,24 @@ export function extractAmount(
 ): number | undefined {
   //bolt11 tag を持たなければならない
   const bolt11Tag = note.tags.find((tag) => tag[0] === "bolt11");
-  console.log(bolt11Tag);
+  //console.log(bolt11Tag);
   if (!bolt11Tag || bolt11Tag.length <= 1) {
     return;
   }
   try {
     const decoded = decode(bolt11Tag[1]);
-    console.log(decoded);
+    //console.log(decoded);
     if (decoded) {
       const amountSection = decoded.sections.find(
         (section) => section.name === "amount"
       )?.value;
-      console.log("zapRequestEvent", zapRequestEvent);
-      console.log("amountSection", amountSection);
+      //  console.log("zapRequestEvent", zapRequestEvent);
+      // console.log("amountSection", amountSection);
 
       const requestAmount = zapRequestEvent?.tags.find(
         (tag) => tag[0] === "amount"
       )?.[1];
-      console.log("requestAmount", requestAmount);
+      // console.log("requestAmount", requestAmount);
       //`zapレシート`の`bolt11`タグに含まれる`invoiceAmount`は（存在する場合には）`zapリクエスト`の`amount`タグと等しくなければならない
       //https://github.com/nostr-protocol/nips/blob/master/57.md
       //ある場合にのみイコールなのが必須
