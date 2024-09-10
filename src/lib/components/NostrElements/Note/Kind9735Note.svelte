@@ -2,17 +2,16 @@
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import { profile } from "$lib/func/util";
   import { Zap } from "lucide-svelte";
-  import { nip19, verifyEvent } from "nostr-tools";
+  import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { decode } from "light-bolt11-decoder";
   import { muteCheck } from "$lib/func/muteCheck";
   import { loginUser, queryClient } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
-  import { extractZappedId } from "$lib/func/event";
+  import { extractAmount, extractZappedId } from "$lib/func/event";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -29,45 +28,13 @@
     tag: string[];
   } = extractZappedId(note.tags);
 
-  const amount: number | undefined = extractAmount(note);
+  const amount: number | undefined = extractAmount(note, zapRequestEvent);
 
   const muteType = !zapRequestEvent
     ? "null"
     : excludefunc(zapRequestEvent)
       ? "null"
       : muteCheck(zapRequestEvent);
-
-  //https://scrapbox.io/nostr/NIP-57
-  function extractAmount(note: Nostr.Event): number | undefined {
-    //bolt11 tag を持たなければならない
-    const bolt11Tag = note.tags.find((tag) => tag[0] === "bolt11");
-    if (!bolt11Tag || bolt11Tag.length <= 1) {
-      return;
-    }
-    try {
-      const decoded = decode(bolt11Tag[1]);
-      if (decoded) {
-        const amountSection = decoded.sections.find(
-          (section) => section.name === "amount"
-        )?.value;
-
-        const requestAmount = zapRequestEvent?.tags.find(
-          (tag) => tag[0] === "amount"
-        )?.[1];
-
-        //`zapレシート`の`bolt11`タグに含まれる`invoiceAmount`は（存在する場合には）`zapリクエスト`の`amount`タグと等しくなければならない
-        if (amountSection !== requestAmount) {
-          return undefined;
-        }
-        if (amountSection) {
-          return Math.floor(Number(amountSection) / 1000);
-        }
-      }
-    } catch (error) {
-      console.error("Error decoding bolt11 tag:", error);
-      return;
-    }
-  }
 
   async function check9735(note: Nostr.Event): Promise<boolean | undefined> {
     //受け取る側のウォレットのpubkeyを取得する

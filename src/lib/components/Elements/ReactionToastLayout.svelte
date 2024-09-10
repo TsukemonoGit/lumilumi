@@ -2,9 +2,15 @@
   import { Repeat, Reply, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import Reaction from "../NostrElements/Note/Reaction.svelte";
-  import { extractZappedId, replyedEvent, repostedId } from "$lib/func/event";
+  import {
+    extractAmount,
+    extractZappedId,
+    replyedEvent,
+    repostedId,
+  } from "$lib/func/event";
   import ReactionToastContent from "../NostrElements/Note/ReactionToastContent.svelte";
   import UserName from "../NostrElements/Note/UserName.svelte";
+  import { extractKind9734 } from "$lib/func/makeZap";
   export let event: Nostr.Event;
 
   $: handledTag = getHandledTag(event);
@@ -27,16 +33,20 @@
 </script>
 
 {#if handledTag}
-  <div class="flex grid-cols-[auto_1fr] items-center">
+  <div class="flex items-center gap-1">
     {#if event.kind === 6 || event.kind === 16}
-      <Repeat class="text-magnum-400" />
+      <Repeat class="text-magnum-400" /><UserName pubhex={event.pubkey} />
     {:else if event.kind === 7}
-      <Reaction {event} />
+      <Reaction {event} /><UserName pubhex={event.pubkey} />
     {:else if event.kind === 9735}
-      <Zap class="text-magnum-400" />
+      {@const zapRequest = extractKind9734(event)}
+      {@const zapAmount = extractAmount(event, zapRequest)}
+      <Zap class="text-magnum-400" />{zapAmount}{#if zapRequest}<UserName
+          pubhex={zapRequest.pubkey}
+        />{zapRequest.content}{/if}
     {:else}
-      <Reply class="text-magnum-400" />
-    {/if}<UserName pubhex={event.pubkey} />
+      <Reply class="text-magnum-400" /><UserName pubhex={event.pubkey} />
+    {/if}
   </div>
   <div class="px-2 w-full"><ReactionToastContent tag={handledTag} /></div>
 {/if}
