@@ -70,7 +70,6 @@
       {
         authors: pubkeyList,
         kinds: kinds,
-        limit: 50,
         since: since,
       },
     ];
@@ -83,7 +82,6 @@
           9735 /*zap receipt**/,
         ],
         "#p": [$loginUser],
-        limit: 5,
         since: since,
       });
     } //とりあえず通知をTLに流したくないときは フィルターから外してみる
@@ -135,6 +133,7 @@
       let:events
       {viewIndex}
       {amount}
+      reaCheck={$showReactioninTL}
       let:len
     >
       <!-- <SetRepoReactions /> -->

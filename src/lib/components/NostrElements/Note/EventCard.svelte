@@ -38,6 +38,7 @@
   import OtherKindNote from "./OtherKindNote.svelte";
   import Kind31990Note from "./Kind31990Note.svelte";
   import ReactionedNote from "./ReactionedNote.svelte";
+  import { replyedEvent, repostedId } from "$lib/func/event";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -122,19 +123,6 @@
   });
   // $: console.log($viewEventIds);
   //eかa
-  const repostedId = (
-    tags: string[][]
-  ): { tag: string[] | undefined; kind: number | undefined } => {
-    const kindtag = tags.find((tag) => tag[0] === "k");
-    const kind = kindtag ? Number(kindtag[1]) : undefined;
-    return {
-      tag: tags
-        .slice()
-        .reverse()
-        .find((tag) => tag[0] === "e" || tag[0] === "a"),
-      kind: kind,
-    };
-  };
 
   const baseClass = " overflow-hidden ";
   const noteClass = () => {
@@ -145,32 +133,6 @@
     //   ? `border-magnum-600 ${ret}`
     //   : `border-magnum-900 ${ret}`;
     return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`; //border-l-2 border-magnum-700 //bg-magnum-700/10
-  };
-
-  const replyedEvent = (
-    tags: string[][]
-  ): { replyID: string | undefined; replyUsers: string[] } => {
-    const users = tags.reduce((acc, [tag, value]) => {
-      if (tag === "p") {
-        return [...acc, value];
-      } else {
-        return acc;
-      }
-    }, []);
-    const IDs = tags?.filter((tag) => tag[0] === "e");
-    const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
-    const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
-    //  console.log(root?.[1]);
-    return {
-      replyUsers: users,
-      replyID: reply
-        ? reply[1]
-        : root
-          ? root[1]
-          : IDs.length > 0
-            ? IDs[IDs.length - 1][1]
-            : undefined,
-    };
   };
 
   const checkContentWarning = (tags: string[][]): string[] | undefined => {

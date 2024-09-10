@@ -10,16 +10,17 @@ import type {
 import { createUniq } from "rx-nostr";
 import { pipe } from "rxjs";
 
-import { scanArray, userStatus } from "./operators.js";
+import { reactionCheck, scanArray, userStatus } from "./operators.js";
 import { useReq } from "$lib/func/nostr.js";
 import type { ReqResult } from "$lib/types.js";
+
 //import { useReq } from "$lib/func/useReq.js";
 
 export function useTimelineEventList(
   queryKey: QueryKey,
 
   filters: Nostr.Filter[],
-
+  reaCheck: boolean,
   req?:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -43,7 +44,12 @@ export function useTimelineEventList(
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(uniq, userStatus(), scanArray());
+
+  const operator = reaCheck
+    ? pipe(uniq, userStatus(), reactionCheck(), scanArray())
+    : pipe(uniq, userStatus(), scanArray());
+  //フィルターに自分へのリプライを取得するフィルターが含まれているか
+
   return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
     EventPacket[]
   >;

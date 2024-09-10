@@ -521,7 +521,7 @@ export function usePromiseReq(
     const timeoutId = setTimeout(() => {
       subscription.unsubscribe();
       resolve(accumulatedData);
-    }, timeout + 5000); // Timeout after 3 seconds if not completed
+    }, timeout + 10000); // Timeout after 3 seconds if not completed
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {

@@ -8,35 +8,35 @@
   import { writable } from "svelte/store";
 
   export let events: Nostr.Event<number>[];
-  const followFilteredEvents = writable<Nostr.Event[]>();
+  // const followFilteredEvents = writable<Nostr.Event[]>();
 
-  export const getFollowFilteredEvents = (
-    events: Nostr.Event[],
-    onlyFollowee: boolean
-  ) => {
-    if (!$showReactioninTL) {
-      return events;
-    }
-    const followee = getFollowingList();
-    if (onlyFollowee && followee) {
-      return events.filter((event) => {
-        if (event.kind !== 9735) {
-          return followee.includes(event.pubkey);
-        } else {
-          const kind9734 = extractKind9734(event);
-          return kind9734 && followee.includes(kind9734.pubkey);
-        }
-      });
-    } else {
-      return events;
-    }
-  };
+  // export const getFollowFilteredEvents = (
+  //   events: Nostr.Event[],
+  //   onlyFollowee: boolean
+  // ) => {
+  //   if (!$showReactioninTL) {
+  //     return events;
+  //   }
+  //   const followee = getFollowingList();
+  //   if (onlyFollowee && followee) {
+  //     return events.filter((event) => {
+  //       if (event.kind !== 9735) {
+  //         return followee.includes(event.pubkey);
+  //       } else {
+  //         const kind9734 = extractKind9734(event);
+  //         return kind9734 && followee.includes(kind9734.pubkey);
+  //       }
+  //     });
+  //   } else {
+  //     return events;
+  //   }
+  // };
 
-  $: $followFilteredEvents = getFollowFilteredEvents(events, $onlyFollowee);
+  // $: $followFilteredEvents = getFollowFilteredEvents(events, $onlyFollowee);
 </script>
 
-{#if $followFilteredEvents && $followFilteredEvents.length > 0}
-  {#each $followFilteredEvents as event, index (event.id)}
+{#if events && events.length > 0}
+  {#each events as event, index (event.id)}
     <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card "
               > -->

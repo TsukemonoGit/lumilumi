@@ -12,6 +12,7 @@
   import { loginUser, queryClient } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
+  import { extractZappedId } from "$lib/func/event";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -36,16 +37,6 @@
       ? "null"
       : muteCheck(zapRequestEvent);
 
-  function extractZappedId(tags: Nostr.Tag.Any[]): {
-    kind: number | undefined;
-    tag: string[];
-  } {
-    const eTag = tags?.find((tag) => tag[0] === "e");
-    return {
-      kind: undefined,
-      tag: eTag ? (eTag as string[]) : [],
-    };
-  }
   //https://scrapbox.io/nostr/NIP-57
   function extractAmount(note: Nostr.Event): number | undefined {
     //bolt11 tag を持たなければならない
