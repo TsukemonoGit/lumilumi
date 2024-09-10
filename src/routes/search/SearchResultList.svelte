@@ -192,9 +192,13 @@
       allUniqueEvents?.length < viewIndex + amount + sift
     ) {
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
+      //500
       $nowProgress = true;
+      const syutokusururyou =
+        viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
+      //limitで最大何個くらいまで取れるんだろうの最小値//500件くらいじゃなかったっけ(リレーによる)
       const older = await loadOlderEvents(
-        viewIndex + amount - allUniqueEvents?.length + sift,
+        syutokusururyou,
         filters,
         queryKey,
         lastfavcheck,

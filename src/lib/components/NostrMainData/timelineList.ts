@@ -92,6 +92,8 @@ export async function loadOlderEvents(
   );
   //console.log(olderEvents);
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
+  console.log("olderEvents", olderEvents.length);
+  console.log("sift", sift);
   return olderEvents.slice(0, sift);
 }
 
@@ -114,5 +116,7 @@ export async function firstLoadOlderEvents(
     relays
   );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
+  console.log("olderEvents.length", olderEvents.length);
+  console.log("sift", sift);
   return olderEvents.slice(0, sift === 0 ? undefined : sift);
 }
