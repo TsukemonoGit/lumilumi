@@ -340,8 +340,6 @@ export function reactionCheck() {
         return true;
       }
     } else {
-      //TLには流れないものたち//mainTLのみを想定（kind42TLを考えてない）
-
       if (
         packet.event.pubkey !== get(loginUser) &&
         packet.event.tags.find(
