@@ -2,11 +2,11 @@
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
-  import Metadata from "./NostrMainData/Metadata.svelte";
+
   import { getFollowingList, pubkeysIn, setTieKey } from "$lib/func/nostr";
-  import SetRepoReactions from "./NostrMainData/SetRepoReactions.svelte";
+
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-  import EventCard from "./NostrElements/Note/EventCard.svelte";
+
   import {
     loginUser,
     queryClient,
@@ -20,6 +20,10 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/makeZap";
   import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
+  import Link from "./Elements/Link.svelte";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { nip19 } from "nostr-tools";
+  import { _ } from "svelte-i18n";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -138,11 +142,19 @@
     >
       <!-- <SetRepoReactions /> -->
       <div slot="loading">
-        <p>Loading...</p>
+        <Link
+          className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
+          href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/3`}
+          >{$_("nostviewstr.kind3")}<SquareArrowOutUpRight size={16} /></Link
+        >
       </div>
 
       <div slot="error" let:error>
-        <p>{error}</p>
+        <Link
+          className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
+          href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/3`}
+          >{$_("nostviewstr.kind3")}<SquareArrowOutUpRight size={16} /></Link
+        >
       </div>
 
       <div

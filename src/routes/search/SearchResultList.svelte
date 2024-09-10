@@ -69,13 +69,7 @@
   }));
   $: result =
     filters[0].since === undefined
-      ? useTimelineEventList(
-          queryKey,
-          reqFilters,
-
-          req,
-          relays
-        )
+      ? useTimelineEventList(queryKey, reqFilters, false, req, relays)
       : {
           data: undefined,
           status: readable("loading" as ReqStatus),

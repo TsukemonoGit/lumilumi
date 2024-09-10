@@ -149,7 +149,6 @@
         {amount}
         eventFilter={(event) => event.pubkey !== $loginUser}
         {tieKey}
-        lastfavcheck={false}
       >
         <div slot="loading">
           <p>Loading...</p>

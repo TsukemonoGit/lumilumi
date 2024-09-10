@@ -9,7 +9,7 @@
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
 
-  import { get, writable, type Writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import { nowProgress } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
