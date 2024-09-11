@@ -178,7 +178,7 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
-
+  let untilTime: number;
   const handleNext = async () => {
     // console.log(length, viewIndex, amount, sift);
     if (
@@ -195,7 +195,7 @@
         syutokusururyou,
         filters,
         queryKey,
-        // lastfavcheck,
+        untilTime,
         relays
       );
       console.log(older);
@@ -257,6 +257,11 @@
     console.log("test");
     const allEvents =
       data && olderdatas ? [...data, ...olderdatas] : (olderdatas ?? []);
+
+    untilTime =
+      allEvents.length > 0
+        ? allEvents[allEvents.length - 1].event.created_at
+        : now();
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(
@@ -265,13 +270,10 @@
       )
     );
 
-    allUniqueEvents = uniqueEvents;
+    allUniqueEvents = uniqueEvents.filter(eventFilter);
 
     slicedEvent.update((value) =>
-      uniqueEvents
-        .filter(eventFilter)
-
-        .slice(viewIndex, viewIndex + amount)
+      allUniqueEvents.slice(viewIndex, viewIndex + amount)
     );
 
     console.log($slicedEvent);

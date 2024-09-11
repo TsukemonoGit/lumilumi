@@ -4,6 +4,7 @@
     defaultRelays,
     loginUser,
     nowProgress,
+    onlyFollowee,
     queryClient,
     relayStateMap,
     slicedEvent,
@@ -296,6 +297,7 @@
         filters,
         queryKey,
         //lastfavcheck,
+        untilTime,
         relays
       );
       console.log(older);
@@ -350,8 +352,8 @@
     //   }, 10);
     // }
   };
-
-  function updateViewEvent(data: EventPacket[] | undefined) {
+  let untilTime: number;
+  export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
     const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
@@ -361,7 +363,10 @@
     if (olderdatas) {
       allEvents.push(...olderdatas);
     }
-
+    untilTime =
+      allEvents.length > 0
+        ? allEvents[allEvents.length - 1].event.created_at
+        : now();
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(
@@ -370,18 +375,16 @@
       )
     ); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
-    allUniqueEvents = uniqueEvents;
+    allUniqueEvents = uniqueEvents
+      .filter(eventFilter)
+      .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
     slicedEvent.update((value) =>
-      uniqueEvents
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10) // 未来のイベントを除外 ちょっとだけ許容
-
-        .slice(viewIndex, viewIndex + amount)
+      allUniqueEvents.slice(viewIndex, viewIndex + amount)
     );
 
     //console.log($slicedEvent);
-  }
+  };
 
   function handleClickTop() {
     viewIndex = 0;

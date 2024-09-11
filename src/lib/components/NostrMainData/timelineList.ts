@@ -15,7 +15,7 @@ export async function loadOlderEvents(
   filters: Filter[],
   queryKey: QueryKey,
   // lastfavcheck: boolean,
-
+  until: number,
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   //console.log(get(slicedEvent));
@@ -43,17 +43,17 @@ export async function loadOlderEvents(
   // if (lastfavcheck && kind1.length === 0) {
   //   return [];
   // }
-  const lastEvent = get(slicedEvent)[get(slicedEvent).length - 1];
-  console.log(lastEvent);
-  const untilTimestamp = lastEvent.created_at;
-  console.log(untilTimestamp);
+  // const lastEvent = get(slicedEvent)[get(slicedEvent).length - 1];
+  // console.log(lastEvent);
+  // const untilTimestamp = lastEvent.created_at;
+  // console.log(untilTimestamp);
   //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
   //filterごとにlimitついてるから、filtersじゃなくてfilterごとに数取ってsliceシテってしないといけない。
   //けどなんか大変そうだから最初のフィルターだけにしよう
   const newFilters = {
     ...filters[0],
     limit: sift,
-    until: untilTimestamp,
+    until: until,
     since: undefined,
   };
   console.log(newFilters);
