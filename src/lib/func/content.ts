@@ -44,7 +44,7 @@ const numberRegex = /(#\[\d+\])/i;
 //
 
 const markdownLinkWithImageRegex =
-  /\[!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)\]\((https?:\/\/[^\s)]+)\)/i; // 画像リンクの正規表現
+  /\[\s*!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)\]\((https?:\/\/[^\s)]+)\)/i; // 画像リンクの正規表現
 const markdownLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/i; // リンクの正規表現
 const markdownImageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/i; // 画像の正規表現
 const markdownHorizontalRuleRegex = /^-{3,}\s*$/m; // 水平線の正規表現
