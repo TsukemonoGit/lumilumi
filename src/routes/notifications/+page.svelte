@@ -13,8 +13,10 @@
   import * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
-  import FolloweeFilteredNotificationList from "./FolloweeFilteredNotificationList.svelte";
+
   import { extractKind9734 } from "$lib/func/makeZap";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -133,7 +135,7 @@
     return filterSelectedStates(event);
   };
   //tabの選択状況によってのフィルターもTimelineListの中でやろうかと思ったけどnext🔻押したときの挙動がー（allではにページ目だけど他のとこではまだ一ページ目でなんとかかんとかとか）だからやめておく
-  //filterしたあとの長さで考えたらへんになるね
+  //filterしたあとの長さで考えたらへんになるねと思ったけどなんとかなったかも
   const filterSelectedStates = (event: Nostr.Event): boolean => {
     if (!$value || typeof $value === "string") return true;
 
@@ -156,7 +158,6 @@
   };
   let updateViewEvent: any;
   $: if ($value || $onlyFollowee) {
-    console.log(updateViewEvent);
     if (updateViewEvent) {
       updateViewEvent();
     }
@@ -231,7 +232,26 @@
         <div
           class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >
-          <FolloweeFilteredNotificationList {events} {value} />
+          {#if events && events.length > 0}
+            {#each events as event, index (event.id)}
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+                let:metadata
+              >
+                <div slot="loading" class="w-full">
+                  <EventCard note={event} />
+                </div>
+                <div slot="nodata" class="w-full">
+                  <EventCard note={event} />
+                </div>
+                <div slot="error" class="w-full">
+                  <EventCard note={event} />
+                </div>
+                <EventCard {metadata} note={event} /></Metadata
+              >
+            {/each}
+          {/if}
         </div>
       </TimelineList>{/if}
   </div>
