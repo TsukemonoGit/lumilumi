@@ -29,7 +29,8 @@
   export let relays: DefaultRelayConfig[] | undefined = undefined;
 
   let storageKind3: Nostr.Event;
-  let kind3key = "kind3";
+  // let kind3key = "kind3";
+  let kind3key = `kind3-${pubkey}`; // New format by pubkey
   onMount(() => {
     if (browser) {
       const tmp = localStorage.getItem(kind3key);
@@ -61,7 +62,7 @@
       localStorage.setItem(kind3key, JSON.stringify(kind3Data));
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   interface $$Slots {
     default: { contacts: Nostr.Event; status: ReqStatus };
     loading: Record<never, never>;
