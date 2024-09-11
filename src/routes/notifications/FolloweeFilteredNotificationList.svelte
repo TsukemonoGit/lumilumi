@@ -28,26 +28,26 @@
     destroy?: (() => void) | undefined;
   };
 
-  export const getFollowFilteredEvents = (
-    events: Nostr.Event[],
-    onlyFollowee: boolean
-  ) => {
-    const followee = getFollowingList();
-    if (onlyFollowee && followee) {
-      return events.filter((event) => {
-        if (event.kind !== 9735) {
-          return followee.includes(event.pubkey);
-        } else {
-          const kind9734 = extractKind9734(event);
-          return kind9734 && followee.includes(kind9734.pubkey);
-        }
-      });
-    } else {
-      return events;
-    }
-  };
+  // export const getFollowFilteredEvents = (
+  //   events: Nostr.Event[],
+  //   onlyFollowee: boolean
+  // ) => {
+  //   const followee = getFollowingList();
+  //   if (onlyFollowee && followee) {
+  //     return events.filter((event) => {
+  //       if (event.kind !== 9735) {
+  //         return followee.includes(event.pubkey);
+  //       } else {
+  //         const kind9734 = extractKind9734(event);
+  //         return kind9734 && followee.includes(kind9734.pubkey);
+  //       }
+  //     });
+  //   } else {
+  //     return events;
+  //   }
+  // };
 
-  $: $followFilteredEvents = getFollowFilteredEvents(events, $onlyFollowee);
+  // $: $followFilteredEvents = getFollowFilteredEvents(events, $onlyFollowee);
 
   // 複数の選択に対応したフィルタリングロジック
   const getFilteredEvents = (
@@ -76,8 +76,8 @@
   };
 </script>
 
-{#if $followFilteredEvents && $followFilteredEvents.length > 0}
-  {#each getFilteredEvents($followFilteredEvents, $value) as event, index (event.id)}
+{#if events && events.length > 0}
+  {#each events as event, index (event.id)}
     <Metadata
       queryKey={["metadata", event.pubkey]}
       pubkey={event.pubkey}

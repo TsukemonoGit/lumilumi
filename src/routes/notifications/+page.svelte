@@ -1,9 +1,9 @@
 <script lang="ts">
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { setTieKey } from "$lib/func/nostr";
+  import { getFollowingList, setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -14,6 +14,7 @@
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
   import FolloweeFilteredNotificationList from "./FolloweeFilteredNotificationList.svelte";
+  import { extractKind9734 } from "$lib/func/makeZap";
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -92,6 +93,74 @@
   const handleClickNone = () => {
     value.set([]);
   };
+
+  export const getFollowFilteredEvents = (
+    events: Nostr.Event[],
+    onlyFollowee: boolean
+  ) => {
+    const followee = getFollowingList();
+    if (onlyFollowee && followee) {
+      return events.filter((event) => {
+        if (event.kind !== 9735) {
+          return followee.includes(event.pubkey);
+        } else {
+          const kind9734 = extractKind9734(event);
+          return kind9734 && followee.includes(kind9734.pubkey);
+        }
+      });
+    } else {
+      return events;
+    }
+  };
+
+  let notifilter = (event: Nostr.Event): boolean => {
+    if (event.pubkey === $loginUser) {
+      return false;
+    }
+    const followee = getFollowingList();
+    if ($onlyFollowee && followee) {
+      //フォロイーのみ
+      if (event.kind !== 9735) {
+        if (!followee.includes(event.pubkey)) return false;
+      } else {
+        const kind9734 = extractKind9734(event);
+        if (kind9734 !== undefined && !followee.includes(kind9734.pubkey)) {
+          return false;
+        }
+      }
+    }
+    //  return true;
+    return filterSelectedStates(event);
+  };
+  //tabの選択状況によってのフィルターもTimelineListの中でやろうかと思ったけどnext🔻押したときの挙動がー（allではにページ目だけど他のとこではまだ一ページ目でなんとかかんとかとか）だからやめておく
+  //filterしたあとの長さで考えたらへんになるね
+  const filterSelectedStates = (event: Nostr.Event): boolean => {
+    if (!$value || typeof $value === "string") return true;
+
+    return $value.some((state) => {
+      switch (state) {
+        case "reply":
+          return event.kind === 1;
+        case "reaction":
+          return event.kind === 7;
+        case "repost":
+          return event.kind === 6 || event.kind === 16;
+        case "zap":
+          return event.kind === 9735;
+        case "other":
+          return event.kind === 42;
+        default:
+          return false;
+      }
+    });
+  };
+  let updateViewEvent: any;
+  $: if ($value || $onlyFollowee) {
+    console.log(updateViewEvent);
+    if (updateViewEvent) {
+      updateViewEvent();
+    }
+  }
 </script>
 
 <svelte:head>
@@ -147,12 +216,13 @@
         let:events
         {viewIndex}
         {amount}
-        eventFilter={(event) => event.pubkey !== $loginUser}
+        bind:eventFilter={notifilter}
         {tieKey}
+        bind:updateViewEvent
       >
-        <div slot="loading">
+        <!-- <div slot="loading">
           <p>Loading...</p>
-        </div>
+        </div> -->
 
         <div slot="error" let:error>
           <p>{error}</p>
