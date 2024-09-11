@@ -29,8 +29,9 @@
   export let relays: DefaultRelayConfig[] | undefined = undefined;
 
   let storageKind3: Nostr.Event;
-  // let kind3key = "kind3";
+
   let kind3key = `kind3-${pubkey}`; // New format by pubkey
+  let oldKind3key = "kind3";
   onMount(() => {
     if (browser) {
       const tmp = localStorage.getItem(kind3key);
@@ -40,6 +41,12 @@
         } catch (error) {
           console.log("parse error");
         }
+      }
+
+      //旧形式のデータを削除
+      const oldTmp = localStorage.getItem(oldKind3key);
+      if (oldTmp) {
+        localStorage.removeItem(oldKind3key);
       }
     }
   });
