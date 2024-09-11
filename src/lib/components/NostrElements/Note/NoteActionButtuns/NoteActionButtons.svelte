@@ -36,9 +36,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
-  import { latest, uniq, type EventPacket } from "rx-nostr";
-  import type { QueryKey } from "@tanstack/svelte-query";
-  import { pipe } from "rxjs";
+
   export let note: Nostr.Event;
   export let repostable: boolean;
   let dtag: string[] | undefined;

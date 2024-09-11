@@ -199,7 +199,11 @@
   </button>
 {/if}
 
-<AlertDialog bind:open={dialogOpen} {onClickOK} title="followList の 更新">
+<AlertDialog
+  bind:open={dialogOpen}
+  {onClickOK}
+  title={$_("user.followList.update")}
+>
   <div slot="main">
     <div class="text-magnum-500 font-bold text-lg mt-2">Before</div>
     {#if $beforeKind3}

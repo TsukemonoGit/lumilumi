@@ -748,3 +748,10 @@ export const nip19Decode = (
     return undefined;
   }
 };
+export async function awaitInterval(time: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}

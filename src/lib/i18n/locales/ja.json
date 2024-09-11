@@ -42,7 +42,10 @@
   "user": {
     "following": "フォロー中",
     "follow": "フォローする",
-    "profileEdit": "プロフィールの編集"
+    "profileEdit": "プロフィールの編集",
+    "followList": {
+      "update": "followList の 更新"
+    }
   },
   "nostviewstr": {
     "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する",
@@ -110,5 +113,10 @@
   },
   "notifications": {
     "onlyFollowee": "フォロイーのみ"
+  },
+  "create_kind3": {
+    "message": "フォローリストが見つかりません。下記ボタンをクリックしてフォローリストを新規作成してください",
+    "create": "フォローリストを新規作成",
+    "newMessage": "フォローリストがすでに存在する場合、リセットされますが、新しく作成してもよろしいですか？\n作成後リロードします"
   }
 }

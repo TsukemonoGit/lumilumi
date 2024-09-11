@@ -24,6 +24,8 @@
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import { _ } from "svelte-i18n";
+  import { awaitInterval } from "$lib/func/util";
+  import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -125,9 +127,13 @@
   pubkey={$loginUser}
   let:contacts
   let:status
-  ><div slot="loading">loading</div>
-  <div slot="error">error</div>
-  <div slot="nodata">nodata</div>
+>
+  <div slot="loading">
+    {#await awaitInterval(5000) then}
+      <MakeNewKind3 />{/await}
+  </div>
+  <div slot="error"><MakeNewKind3 /></div>
+  <div slot="nodata"><MakeNewKind3 /></div>
   {#if since}
     <TimelineList
       queryKey={timelineQuery}
@@ -141,21 +147,9 @@
       let:len
     >
       <!-- <SetRepoReactions /> -->
-      <div slot="loading">
-        <Link
-          className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
-          href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/3`}
-          >{$_("nostviewstr.kind3")}<SquareArrowOutUpRight size={16} /></Link
-        >
-      </div>
+      <div slot="loading">loading</div>
 
-      <div slot="error" let:error>
-        <Link
-          className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
-          href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/3`}
-          >{$_("nostviewstr.kind3")}<SquareArrowOutUpRight size={16} /></Link
-        >
-      </div>
+      <div slot="error" let:error>error</div>
 
       <div
         class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"

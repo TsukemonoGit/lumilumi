@@ -353,12 +353,17 @@
     // }
   };
   let untilTime: number;
+  let updating: boolean = false;
   export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
+    if (updating) {
+      return;
+    }
+    updating = true;
     const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);
-    // console.log("updateViewEvent");
+    console.log("updateViewEvent");
     const allEvents = data ?? [];
     if (olderdatas) {
       allEvents.push(...olderdatas);
@@ -382,7 +387,7 @@
     slicedEvent.update((value) =>
       allUniqueEvents.slice(viewIndex, viewIndex + amount)
     );
-
+    updating = false;
     //console.log($slicedEvent);
   };
 
