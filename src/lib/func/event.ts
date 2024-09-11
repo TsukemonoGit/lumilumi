@@ -1,5 +1,4 @@
 import { decode } from "light-bolt11-decoder";
-import { nip19, verifyEvent } from "nostr-tools";
 import * as Nostr from "nostr-typedef";
 
 export const repostedId = (

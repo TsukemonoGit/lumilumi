@@ -34,7 +34,7 @@
   import EventCard from "../EventCard.svelte";
   import { afterUpdate, onMount } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { makeInvoice } from "$lib/func/makeZap";
+  import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
   import { latest, uniq, type EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -232,54 +232,8 @@
     $nowProgress = true;
     const amount = zapAmount * 1000;
     //相手のリレーリストを取得
-    let queryRelay: EventPacket | undefined = $queryClient.getQueryData([
-      "relays",
-      metadata.pubkey,
-    ]);
-    if (!queryRelay) {
-      const relayData = await usePromiseReq(
-        {
-          queryKey: ["relays", metadata.pubkey] as QueryKey,
-          filters: [
-            {
-              kinds: [10002],
-              limit: 1,
-              authors: [metadata.pubkey],
-            },
-          ],
-          operator: pipe(latest(), uniq()),
-          req: undefined,
-        },
-        undefined
-      );
-      if (relayData.length > 0) {
-        $queryClient.setQueryData(
-          ["relays", metadata.pubkey],
-          (oldData: any) => relayData[0]
-        );
-        queryRelay = relayData[0];
-        console.log($queryClient.getQueryData(["relays", metadata.pubkey]));
-      }
-    }
+    const zapRelays = await getZapRelay(metadata.pubkey);
 
-    const readRelay: string[] | undefined = queryRelay?.event.tags.reduce(
-      (acc: string[], tag: string[]) => {
-        if (tag[0] === "r" && tag.length === 2) {
-          return [...acc, tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`];
-        } else if (tag.length > 2 && tag[2] === "read") {
-          return [...acc, tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`];
-        } else {
-          return acc;
-        }
-      },
-      [] // 初期値を空の配列に設定
-    );
-
-    console.log("readRelay", readRelay);
-    const myRelays = getDefaultWriteRelays();
-    console.log("myRelays", myRelays);
-    const zapRelays = Array.from(new Set([...(readRelay ?? []), ...myRelays]));
-    console.log("zapRelays", zapRelays);
     const zapInvoice = await makeInvoice({
       metadata,
       id: note.id,

@@ -5,7 +5,7 @@
   import { profile } from "$lib/func/util";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import ZapInvoiceWindow from "./ZapInvoiceWindow.svelte";
-  import { makeInvoice } from "$lib/func/makeZap";
+  import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
   export let metadata: Nostr.Event;
   let invoice: string | undefined = undefined;
   let dialogOpen: any;
@@ -24,11 +24,13 @@
     }
     $nowProgress = true;
     const amount = zapAmount * 1000;
+    const zapRelays = await getZapRelay(metadata.pubkey);
     const zapInvoice = await makeInvoice({
       metadata,
       id: undefined,
       amount: amount,
       comment: zapComment,
+      zapRelays: zapRelays,
     });
     if (zapInvoice === null) {
       $toastSettings = {
