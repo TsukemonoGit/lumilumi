@@ -18,6 +18,7 @@
   import { ExternalLink, Pin } from "lucide-svelte";
   import ShowStatus from "../NostrElements/Note/ShowStatus.svelte";
   import EllipsisMenuNote from "../NostrElements/Note/NoteActionButtuns/EllipsisMenuNote.svelte";
+  import ReplyToUserButton from "./ReplyToUserButton.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -115,6 +116,7 @@
             {prof.display_name ?? ""}@{prof.name}
           </div>
           <div class="flex ml-auto gap-2">
+            <ReplyToUserButton {metadata} />
             {#if prof.lud16 || prof.lud06}
               <div class=" w-fit"><UserZap {metadata} /></div>
             {/if}<UserPofileEllipsis {metadata} {prof} />

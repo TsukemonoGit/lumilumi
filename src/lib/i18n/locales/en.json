@@ -94,7 +94,8 @@
     "stream": "Open in zap.stream",
     "channel": "Open channel",
     "nostviewstr": "Open in nostviewstr",
-    "nostrapp": "Open in App Manager"
+    "nostrapp": "Open in App Manager",
+    "mention": "Send Mention"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",

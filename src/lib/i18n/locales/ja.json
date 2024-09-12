@@ -93,7 +93,8 @@
     "stream": "zap.streamで開く",
     "channel": "チャンネルを開く",
     "nostviewstr": "のすとびうあ で開く",
-    "nostrapp": "App Manager で開く"
+    "nostrapp": "App Manager で開く",
+    "mention": "メンションを送る"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
