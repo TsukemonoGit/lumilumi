@@ -28,8 +28,8 @@
 
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
-    $queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });
     unsubscribe();
+    $queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });
   });
 
   $: data = _result?.data;

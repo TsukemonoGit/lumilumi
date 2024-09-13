@@ -26,8 +26,8 @@
   });
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
-    $queryClient.removeQueries({ queryKey: ["reactions", "reaction", id] });
     unsubscribe();
+    $queryClient.removeQueries({ queryKey: ["reactions", "reaction", id] });
   });
   $: data = _result?.data;
   $: status = _result?.status;
