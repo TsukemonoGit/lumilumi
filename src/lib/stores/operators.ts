@@ -15,6 +15,7 @@ import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
 import { getFollowingList } from "$lib/func/nostr";
+
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {

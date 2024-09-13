@@ -6,6 +6,7 @@
   import { queryClient } from "$lib/stores/stores";
   import { QueryObserver } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
+  import { onDestroy } from "svelte";
 
   export let id: string;
   let _result: { data: EventPacket; status: any; error: any };
@@ -13,7 +14,7 @@
   const observer1 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "reaction", id],
   });
-  observer1.subscribe((result: any) => {
+  const unsubscribe = observer1.subscribe((result: any) => {
     if (
       !_result?.data ||
       (result?.data &&
@@ -22,6 +23,11 @@
     ) {
       _result = result;
     }
+  });
+  // Cleanup the subscription when the component is destroyed
+  onDestroy(() => {
+    $queryClient.removeQueries({ queryKey: ["reactions", "reaction", id] });
+    unsubscribe();
   });
   $: data = _result?.data;
   $: status = _result?.status;

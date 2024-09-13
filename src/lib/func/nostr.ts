@@ -298,6 +298,7 @@ export function useReq(
     initialData: initData,
     initialDataUpdatedAt: initialDataUpdatedAt,
     refetchInterval: refetchInterval,
+    gcTime: 2 * 60 * 60 * 1000, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;

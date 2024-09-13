@@ -1,6 +1,10 @@
 import { queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
-import { createQuery, QueryClient } from "@tanstack/svelte-query";
+import {
+  createQuery,
+  QueryClient,
+  type QueryKey,
+} from "@tanstack/svelte-query";
 import {
   createRxNostr,
   createRxForwardReq,
@@ -62,6 +66,8 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
 
   const query = createQuery({
     queryKey: ["reactions"],
+    // gcTime: 1 * 60 * 60 * 1000, //1h
+    //staleTime: Infinity,
     queryFn: (): Promise<EventPacket> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
