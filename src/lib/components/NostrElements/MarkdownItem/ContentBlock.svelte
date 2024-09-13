@@ -49,15 +49,14 @@
     class="footnote-ref"
   >
     <sup>{part.content}</sup>
-  </a>{:else if !nolist && part.type === "quote"}
+  </a>{:else if !nolist && part.type === "quote" && part.headers}
   <blockquote class={`quote-depth-${part.number}`}>
-    <Content
-      text={part.content ?? ""}
-      {tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-    />
+    {#each part.headers as list, index}
+      <Markdown text={list ?? ""} {tags} {displayMenu} {depth} {repostable} />
+      {#if index < part.headers.length - 1}
+        <br />
+      {/if}
+    {/each}
   </blockquote>{:else if !nolist && part.type === "unorderedList"}
   <div class="contentBlock">
     <UnorderedList {part} {tags} {displayMenu} {depth} {repostable} />
@@ -209,7 +208,9 @@
     props={{ "aria-label": `External Links: ${part.url}` }}
     className="underline text-magnum-300 break-all"
     href={part.url ?? ""}>{part.content}</Link
-  >{:else}
+  >
+{:else if part.type === "explicitLineBreak"}
+  <br />{:else}
   <Content
     text={part.content ?? ""}
     {tags}
@@ -239,7 +240,7 @@
     @apply text-lg font-medium mb-2;
   }
   blockquote {
-    padding: 1em;
+    padding: 0.5em 1.5em;
     margin: 1em 0;
     border-left: 5px solid rgb(var(--color-magnum-500) / 1); /* 引用の左側にカラーテーマに基づくライン */
     background-color: rgb(
@@ -250,20 +251,27 @@
     ); /* テキスト色をカラーテーマに基づく */
     font-style: italic;
     quotes: "“" "”" "‘" "’";
+    line-height: 1.5;
+    position: relative; /* 擬似要素の位置を調整するために必要 */
   }
 
   blockquote::before {
     content: open-quote;
     font-size: 2em;
     color: rgb(var(--color-magnum-500) / 1); /* カラーテーマに基づく */
-    margin-right: 0.25em;
+    position: absolute;
+    left: 0.2em;
+    top: 0; /* 上端に合わせる */
+    line-height: 1; /* 行間の影響を受けないようにする */
   }
 
   blockquote::after {
     content: close-quote;
     font-size: 2em;
     color: rgb(var(--color-magnum-500) / 1);
-    margin-left: 0.25em;
+    position: absolute;
+    padding-left: 0.2em;
+    bottom: 0; /* 上端に合わせる */
   }
   /* コードブロック全体のスタイル */
   pre {

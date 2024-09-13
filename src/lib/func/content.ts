@@ -23,7 +23,8 @@ export interface Part {
     | "codeBlock"
     | "imageLink"
     | "footnoteRef"
-    | "footnoteDef";
+    | "footnoteDef"
+    | "explicitLineBreak";
   content: string | undefined;
   url?: string;
   number?: number;
@@ -65,7 +66,8 @@ const unorderedListRegex =
 const orderedListRegex =
   /^(?:\s*\d+\.\s.+(?:\n(?:\s*(?:\d+\.|\s*[-*+])\s.+)*)*)$/gm;
 
-const quoteRegex = /^(>(\s*>)*)\s+(.*)$/im;
+const quoteRegex = /^((>(\s*>)*)\s+(.*)\s*)+$/im;
+
 const codeBlockRegex = /```([\s\S]*?)```/m;
 
 // 注釈マーク（`[^1]` 形式）を検出するための正規表現
@@ -73,6 +75,7 @@ const footnoteRefRegex = /\[\^(\d+)\](?!:)/i;
 
 // 注釈定義部分（`[^1]: 注釈内容` 形式）を検出するための正規表現
 const footnoteDefRegex = /^[^\S\r\n]*\[\^(\d+)\]:\s*(.+)/m;
+const explicitLineBreak = /\\\n/m;
 
 // パスから拡張子をチェックする関数
 const checkFileExtension = (url: string): Part["type"] => {
@@ -202,6 +205,20 @@ export function parseOrderedList(text: string): Part[] {
 
   return rootParts;
 }
+
+const extractQuotes = (input: string): string[] => {
+  //const quoteRegex = /^\s*>(.*)$/gm;
+  const quoteRegex = /^(?:[ ]*>[ ]?(.*?))(?:\\\n|\n|$)/gm;
+  const result: string[] = [];
+  console.log(input.match(quoteRegex));
+  // 引用行を正規表現でマッチさせ、マッチごとに処理
+  let match;
+  while ((match = quoteRegex.exec(input)) !== null) {
+    result.push(match[1]); // マッチした部分から引用符を除いて配列に追加
+  }
+
+  return result;
+};
 
 function splitLists(text: string): string[] {
   const lines = text.split("\n");
@@ -550,6 +567,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const hashtagResult = findHashtagIndex(remainingText);
     const nipMatch = remainingText.match(nipRegex);
 
+    const explicitLineBreakMatch = remainingText.match(explicitLineBreak);
     //
     const footnoteRefIndex = footnoteRefMatch
       ? remainingText.indexOf(footnoteRefMatch[0])
@@ -596,7 +614,9 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     const emojiIndex = emojiResult ? emojiResult.index : -1;
     const hashtagIndex = hashtagResult ? hashtagResult.index : -1;
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
-
+    const explicitLineBreakIndex = explicitLineBreakMatch
+      ? remainingText.indexOf(explicitLineBreakMatch[0])
+      : -1;
     if (
       footnoteRefIndex === -1 &&
       footnoteDefIndex === -1 &&
@@ -616,7 +636,8 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
       urlIndex === -1 &&
       emojiIndex === -1 &&
       hashtagIndex === -1 &&
-      nipIndex === -1
+      nipIndex === -1 &&
+      explicitLineBreakIndex === -1
     ) {
       // No more matches, add the remaining text as a normal text part
       parts.push({ type: "text", content: remainingText });
@@ -706,6 +727,11 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
         match: hashtagResult ? [hashtagResult.hashtag] : null,
       },
       { type: "nip", index: nipIndex, match: nipMatch },
+      {
+        type: "explicitLineBreak",
+        index: explicitLineBreakIndex,
+        match: explicitLineBreakMatch,
+      },
     ]
       .filter(({ index }) => index !== -1)
       .sort((a, b) => a.index - b.index)[0];
@@ -720,7 +746,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
         case "footnoteRef":
           console.log("footnoteRef", match);
 
-          console.log(match[1]);
+          // console.log(match[1]);
           parts.push({
             type: "footnoteRef",
             content: `[${match[1]}]`,
@@ -728,7 +754,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
           });
           break;
         case "footnoteDef":
-          console.log(match);
+          //  console.log(match);
 
           parts.push({
             type: "footnoteDef",
@@ -758,8 +784,9 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
 
           parts.push({
             type: "quote",
-            content: match[match.length - 1],
+            content: match[0],
             number: greaterThanCount,
+            headers: extractQuotes(match[0]),
           });
           break;
         case "unorderedList":
@@ -925,6 +952,12 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
             url: `https://github.com/nostr-protocol/nips/blob/master/${match?.[0].slice(
               4
             )}.md`, // Remove "nip-" prefix
+          });
+          break;
+        case "explicitLineBreak":
+          parts.push({
+            type: "explicitLineBreak",
+            content: match[0],
           });
           break;
       }
