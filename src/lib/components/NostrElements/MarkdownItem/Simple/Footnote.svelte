@@ -55,12 +55,6 @@
 {/if}
 
 <style lang="postcss">
-  .footnote-def {
-    text-decoration: underline;
-    font-size: 0.9em;
-    color: theme(colors.magnum.400);
-  }
-
   .footnote-ref {
     font-size: 0.9em;
     color: theme(colors.magnum.400);

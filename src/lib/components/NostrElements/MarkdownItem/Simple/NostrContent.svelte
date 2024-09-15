@@ -3,8 +3,6 @@
   import { nip19 } from "nostr-tools";
   import { showImg, viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-  import OGP from "$lib/components/Elements/OGP.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { _ } from "svelte-i18n";
   import DecodedContent from "../../Note/DecodedContent.svelte";
 

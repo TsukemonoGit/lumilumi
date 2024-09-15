@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
-  import Content from "../../Note/Content.svelte";
   import { transformTokens } from "$lib/func/markdown";
 
   export let part: Token;
@@ -20,7 +19,7 @@
 
 {#if part.children && children}
   {#if part.tag === "h1"}
-    <h1 class="text-3xl font-semibold leading-normal tracking-normal my-3">
+    <h1 class="text-4xl font-semibold leading-normal tracking-normal my-3">
       {#each children as child}
         <SimpleContentBlock
           part={child}
@@ -34,7 +33,7 @@
       {/each}
     </h1>
   {:else if part.tag === "h2"}
-    <h2 class="text-2xl font-medium leading-normal tracking-normal my-3">
+    <h2 class="text-3xl font-semibold leading-normal tracking-normal my-3">
       {#each children as child}
         <SimpleContentBlock
           part={child}
@@ -48,7 +47,7 @@
       {/each}
     </h2>
   {:else if part.tag === "h3"}
-    <h3 class="text-xl font-medium leading-relaxed tracking-normal my-2">
+    <h3 class="text-2xl font-semibold leading-relaxed tracking-normal my-2">
       {#each children as child}
         <SimpleContentBlock
           part={child}
@@ -62,7 +61,7 @@
       {/each}
     </h3>
   {:else if part.tag === "h4"}
-    <h4 class="text-lg font-normal leading-relaxed tracking-normal my-2">
+    <h4 class="text-xl font-semibold leading-relaxed tracking-normal my-2">
       {#each children as child}
         <SimpleContentBlock
           part={child}
@@ -76,7 +75,7 @@
       {/each}
     </h4>
   {:else if part.tag === "h5"}
-    <h5 class="text-base font-normal leading-relaxed tracking-wide my-2">
+    <h5 class="text-lg font-semibold leading-relaxed tracking-wide my-2">
       {#each children as child}
         <SimpleContentBlock
           part={child}
@@ -90,7 +89,7 @@
       {/each}
     </h5>
   {:else if part.tag === "h6"}
-    <h6 class="text-sm font-light leading-relaxed tracking-wide my-1">
+    <h6 class="text-base font-semibold leading-relaxed tracking-wide my-1">
       {#each children as child}
         <SimpleContentBlock
           part={child}

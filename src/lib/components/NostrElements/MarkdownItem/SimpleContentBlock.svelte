@@ -152,15 +152,7 @@
 {:else if part.type === "softbreak"}
   <!---->
 {:else if part.type === "footnote_ref"}
-  <FootnoteRef
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-  />
+  <FootnoteRef {part} />
 {:else if part.type === "footnote_block"}
   <FootnoteBlock
     {part}

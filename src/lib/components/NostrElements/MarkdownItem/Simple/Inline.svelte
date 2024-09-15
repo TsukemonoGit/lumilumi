@@ -19,17 +19,25 @@
 </script>
 
 <!-- {part.content}//こんてんとをまとめてまたmarkdownにつっこむと<p>最終的に全部で囲まれてしまうのでやれない</p> -->
-{#if children}
-  {#each children as child}
-    <SimpleContentBlock
-      part={child}
+<span>
+  {#if children}
+    {#each children as child}
+      <SimpleContentBlock
+        part={child}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {tags}
+        {openModal}
+        {nolist}
+      />{/each}
+  {:else}
+    <NostrContent
+      text={part.content}
       {repostable}
       {depth}
       {displayMenu}
       {tags}
-      {openModal}
-      {nolist}
-    />{/each}
-{:else}
-  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
-{/if}
+    />
+  {/if}
+</span>
