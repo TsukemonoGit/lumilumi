@@ -263,9 +263,8 @@ input:-webkit-autofill:focus {
 
 /* ネストされたリストのスタイル */
 .contentBlock ul ul {
-  margin-left: 1em; /* 左のマージンを追加 */
   list-style-type: circle; /* 内側のリストアイコン */
-  margin-left: 0em; /* ネストリストの左マージンを増加 */
+  margin-left: 0em;
 }
 
 .contentBlock ul ul ul {
@@ -275,7 +274,7 @@ input:-webkit-autofill:focus {
 
 .contentBlock ol {
   list-style-type: decimal; /* Use decimal numbering */
-  padding-left: 1.5em; /* Adjust indentation */
+  padding-left: 2em; /* Adjust indentation */
 }
 .contentBlock ol ol {
   list-style-type: lower-alpha; /* さらに内側のリストアイコン（小文字のローマ数字） */

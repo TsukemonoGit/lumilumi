@@ -42,7 +42,7 @@
   images={mediaList}
   bind:currentIndex={modalIndex}
 /> -->
-<article>
+<article class="contentBlock">
   {#if parts}
     {#each parts as token}
       <SimpleContentBlock
