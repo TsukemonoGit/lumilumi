@@ -41,7 +41,7 @@ const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
 //旧引用
-const numberRegex = /(#\[\d+\])/i;
+export const numberRegex = /(#\[\d+\])/i;
 //
 
 const markdownLinkWithImageRegex =
@@ -97,7 +97,7 @@ const checkFileExtension = (url: string): Part["type"] => {
   }
 };
 
-const numberQuoteEncode = (text: string, tags: string[][]): string => {
+export const numberQuoteEncode = (text: string, tags: string[][]): string => {
   try {
     const num = parseInt(text.slice(2, -1));
     const tag = tags[num];

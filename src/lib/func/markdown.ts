@@ -1,4 +1,6 @@
 import type { Token } from "markdown-it/index.js";
+import { numberQuoteEncode, numberRegex, type Part } from "./content";
+import { nip19Regex, urlRegex, nipRegex } from "./util";
 
 // トークンのタイプから `_open` または `_close` を抽出
 function getTokenTypeWithoutSuffix(token: Token): string {

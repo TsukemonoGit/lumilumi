@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
-  import Content from "../../Note/Content.svelte";
   import { transformTokens } from "$lib/func/markdown";
+  import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;
   export let displayMenu;
@@ -43,7 +43,7 @@
                 class="footnote-def mx-1">[{child2.meta.id}]</a
               >{/if}{/each}
         {:else}
-          <Content
+          <NostrContent
             text={part.content}
             {repostable}
             {depth}

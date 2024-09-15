@@ -22,6 +22,7 @@
   import CodeInline from "./Simple/CodeInline.svelte";
   import FootnoteRef from "./Simple/FootnoteRef.svelte";
   import FootnoteBlock from "./Simple/FootnoteBlock.svelte";
+  import NostrContent from "./Simple/NostrContent.svelte";
   export let part: Token;
   export let displayMenu;
   export let depth;
@@ -153,7 +154,7 @@
     {openModal}
     {nolist}
   />
-{:else if part.type === "text"}<Content
+{:else if part.type === "text"}<NostrContent
     text={part.content}
     {repostable}
     {depth}
@@ -197,7 +198,7 @@
     class="footnote-def mx-1">[{part.meta.id}]</a
   >
 {:else}<b>{part.type}</b>
-  <Content text={part.content} {repostable} {depth} {displayMenu} {tags} />
+  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
 {/if}
 
 <style lang="postcss">

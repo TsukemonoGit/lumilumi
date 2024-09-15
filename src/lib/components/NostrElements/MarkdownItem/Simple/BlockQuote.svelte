@@ -2,7 +2,7 @@
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
-  import Content from "../../Note/Content.svelte";
+  import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;
   export let displayMenu;
@@ -16,7 +16,7 @@
   let children: Token[];
   $: if (part.children) {
     children = transformTokens(part.children);
-    // console.log("[blockquote]", children);
+    //console.log("[blockquote]", children);
   }
 </script>
 
@@ -34,14 +34,20 @@
           {nolist}
         />{/each}
     {:else}
-      <Content text={part.content} {repostable} {depth} {displayMenu} {tags} />
+      <NostrContent
+        text={part.content}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {tags}
+      />
     {/if}
   </blockquote>
 {/if}
 
 <style lang="postcss">
   blockquote {
-    padding: 0.5em 1.5em;
+    padding: 0.1em 1.5em;
     margin: 1em 0;
     border-left: 5px solid rgb(var(--color-magnum-500) / 1); /* 引用の左側にカラーテーマに基づくライン */
     background-color: rgb(

@@ -3,6 +3,7 @@
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import Content from "../../Note/Content.svelte";
+  import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;
   export let displayMenu;
@@ -18,7 +19,7 @@
   }
 </script>
 
-<p>
+<p class="my-2">
   {#if part.children && children}
     {#each children as child}
       <SimpleContentBlock
@@ -31,6 +32,12 @@
         {nolist}
       />{/each}
   {:else}
-    <Content text={part.content} {repostable} {depth} {displayMenu} {tags} />
+    <NostrContent
+      text={part.content}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+    />
   {/if}
 </p>

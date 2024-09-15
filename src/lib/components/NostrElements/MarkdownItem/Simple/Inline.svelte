@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
-  import Content from "../../Note/Content.svelte";
   import { transformTokens } from "$lib/func/markdown";
+  import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;
   export let displayMenu;
@@ -31,5 +31,5 @@
       {nolist}
     />{/each}
 {:else}
-  <Content text={part.content} {repostable} {depth} {displayMenu} {tags} />
+  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
 {/if}
