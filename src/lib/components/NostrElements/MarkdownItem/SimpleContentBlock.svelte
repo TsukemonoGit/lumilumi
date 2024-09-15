@@ -23,6 +23,7 @@
   import FootnoteRef from "./Simple/FootnoteRef.svelte";
   import FootnoteBlock from "./Simple/FootnoteBlock.svelte";
   import NostrContent from "./Simple/NostrContent.svelte";
+  import Mark from "./Simple/Mark.svelte";
   export let part: Token;
   export let displayMenu;
   export let depth;
@@ -171,6 +172,12 @@
     id="footnote-def-{part.meta.id}"
     class="footnote-def mx-1">[{part.meta.id}]</a
   >
+{:else if part.type === "sub"}
+  <sub>{part.content}</sub>
+{:else if part.type === "sup"}
+  <sup>{part.content}</sup>
+{:else if part.type === "mark"}
+  <Mark {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
 {:else}<b>{part.type}</b>
   <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
 {/if}

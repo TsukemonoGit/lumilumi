@@ -8,6 +8,9 @@
   import Content from "../Note/Content.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import markdownItFootnote from "markdown-it-footnote";
+  import markdownItSub from "markdown-it-sub";
+  import markdownItSup from "markdown-it-sup";
+  import markdownItMark from "markdown-it-mark";
   export let text: string;
   export let tags: string[][];
   export let displayMenu: boolean;
@@ -18,7 +21,12 @@
   const md = markdownit();
 
   //プレビューにも使ってるからconstだとだめ
-  $: tokens = md.use(markdownItFootnote).parse(text, {});
+  $: tokens = md
+    .use(markdownItFootnote)
+    .use(markdownItSub)
+    .use(markdownItSup)
+    .use(markdownItMark)
+    .parse(text, {});
   $: parts = transformTokens(tokens);
 
   //let modalIndex = 0;

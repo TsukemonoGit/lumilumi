@@ -9,13 +9,12 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
-}
+  /// <reference types="svelte" />
 
-/// <reference types="svelte" />
-
-declare namespace svelte.JSX {
-  interface HTMLAttributes<T> {
-    onenterViewport?: (event: CustomEvent) => void;
+  declare namespace svelte.JSX {
+    interface HTMLAttributes<T> {
+      onenterViewport?: (event: CustomEvent) => void;
+    }
   }
 }
 
