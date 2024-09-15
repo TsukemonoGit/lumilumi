@@ -16,14 +16,16 @@
     children = transformTokens(part.children);
     // console.log(children);
   }
-  $: href = part.attrs?.find((attr) => attr[0] === "href")?.[1];
+  $: url = part.attrs?.find((attr) => attr[0] === "href")?.[1];
+  $: href = url?.startsWith("nostr:") ? `./${url.slice(6)}` : url;
 </script>
 
 <a
   class="underline text-magnum-300 break-all"
-  href={href?.startsWith("nostr:") ? `./${href.slice(6)}` : href}
+  {href}
   target="_blank"
   rel="noopener noreferrer"
+  title={href}
 >
   {#if part.children && children}
     {#each children as child}
