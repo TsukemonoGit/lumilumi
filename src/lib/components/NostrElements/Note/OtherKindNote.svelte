@@ -6,6 +6,7 @@
   import { showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import Markdown from "../MarkdownItem/Markdown.svelte";
+  import SimpleMarkdown from "../MarkdownItem/SimpleMarkdown.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean;
@@ -61,7 +62,7 @@
     style="max-height:{maxHeight ?? 'none'}"
   >
     {#if note.kind === 30023}
-      <Markdown
+      <SimpleMarkdown
         text={note.content}
         tags={note.tags}
         {displayMenu}
