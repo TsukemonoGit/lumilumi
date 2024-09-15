@@ -82,7 +82,7 @@
       />
     </div>
     <div class="mx-2 my-1 text-sm opacity-70">
-      {#if text.kind === 30023}<Markdown
+      {#if text.kind === 30023 || text.kind === 30024}<Markdown
           text={text.content ?? ""}
           tags={text.tags}
           {displayMenu}

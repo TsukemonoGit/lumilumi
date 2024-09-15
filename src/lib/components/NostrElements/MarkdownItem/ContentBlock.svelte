@@ -2,7 +2,6 @@
   import type { Part } from "$lib/func/content";
   import { showImg, viewMediaModal } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
-  import Content from "../Note/Content.svelte";
   import DecodedContent from "../Note/DecodedContent.svelte";
   import { nip19Decode } from "$lib/func/util";
   import Link from "$lib/components/Elements/Link.svelte";
@@ -11,6 +10,7 @@
   import Markdown from "./Markdown.svelte";
   import { ExternalLink } from "lucide-svelte";
   import OrderedList from "./OrderedList.svelte";
+  import NostrContent from "./Simple/NostrContent.svelte";
 
   export let part: Part;
   export let displayMenu;
@@ -211,7 +211,7 @@
   >
 {:else if part.type === "explicitLineBreak"}
   <br />{:else}
-  <Content
+  <NostrContent
     text={part.content ?? ""}
     {tags}
     {displayMenu}

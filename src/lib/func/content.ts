@@ -41,7 +41,7 @@ const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
 //旧引用
-const numberRegex = /(#\[\d+\])/i;
+export const numberRegex = /(#\[\d+\])/i;
 //
 
 const markdownLinkWithImageRegex =
@@ -66,7 +66,7 @@ const unorderedListRegex =
 const orderedListRegex =
   /^(?:\s*\d+\.\s.+(?:\n(?:\s*(?:\d+\.|\s*[-*+])\s.+)*)*)$/gm;
 
-const quoteRegex = /^((>(\s*>)*)\s+(.*)\s*)+$/im;
+const quoteRegex = /^((>(\s*>)*)+( .+)\s*)+$/im;
 
 const codeBlockRegex = /```([\s\S]*?)```/m;
 
@@ -97,7 +97,7 @@ const checkFileExtension = (url: string): Part["type"] => {
   }
 };
 
-const numberQuoteEncode = (text: string, tags: string[][]): string => {
+export const numberQuoteEncode = (text: string, tags: string[][]): string => {
   try {
     const num = parseInt(text.slice(2, -1));
     const tag = tags[num];
@@ -209,15 +209,15 @@ export function parseOrderedList(text: string): Part[] {
 const extractQuotes = (input: string): string[] => {
   //const quoteRegex = /^\s*>(.*)$/gm;
   const quoteRegex = /^(?:[ ]*>[ ]?(.*?))(?:\\\n|\n|$)/gm;
-  const result: string[] = [];
-  console.log(input.match(quoteRegex));
-  // 引用行を正規表現でマッチさせ、マッチごとに処理
-  let match;
-  while ((match = quoteRegex.exec(input)) !== null) {
-    result.push(match[1]); // マッチした部分から引用符を除いて配列に追加
-  }
 
-  return result;
+  const match = input.match(quoteRegex);
+  // console.log(match);
+  // 引用行を正規表現でマッチさせ、マッチごとに処理
+  return (
+    match
+      ?.map((match) => match.replace(/>+\s/, ""))
+      .map((match) => match.replace(/[^\n]\n/, "")) ?? [input]
+  );
 };
 
 function splitLists(text: string): string[] {
@@ -744,7 +744,7 @@ export function parseMarkdownText(input: string, tags: string[][]): Part[] {
     if (match) {
       switch (type) {
         case "footnoteRef":
-          console.log("footnoteRef", match);
+          // console.log("footnoteRef", match);
 
           // console.log(match[1]);
           parts.push({
