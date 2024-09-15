@@ -2,6 +2,7 @@
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
+  import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;
   export let displayMenu;
@@ -38,10 +39,13 @@
               />
             {/each}
           {:else if child.content}
-            {child.content}
-          {:else}
-            <!-- 子が無い場合のフォールバック -->
-            <span>Empty list item</span>
+            <NostrContent
+              text={child.content}
+              {repostable}
+              {depth}
+              {displayMenu}
+              {tags}
+            />
           {/if}
         </li>
       {:else}

@@ -30,10 +30,6 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
-  //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-
-  let imgError: boolean = false;
-  let imgLoad: boolean = false;
 </script>
 
 {#if part.type === "heading"}
@@ -60,12 +56,11 @@
   />
   <!---->
 {:else if part.type === "code_block"}
-  <CodeBlock {part} />{:else if part.type === "code_inline"}
+  <CodeBlock {part} />
+{:else if part.type === "code_inline"}
   <CodeInline {part} />
-  <!---->
 {:else if part.type === "fence"}
   <Fence {part} />
-  <!---->
 {:else if part.type === "table"}
   <Table
     {part}
@@ -76,7 +71,6 @@
     {openModal}
     {nolist}
   />
-  <!---->
 {:else if part.type === "blockquote"}
   <BlockQuote
     {part}
@@ -97,7 +91,7 @@
     {openModal}
     {nolist}
   />
-  <!---->{:else if part.type === "bullet_list"}
+{:else if part.type === "bullet_list"}
   <BulletList
     {part}
     {repostable}
@@ -107,7 +101,7 @@
     {openModal}
     {nolist}
   />
-  <!---->{:else if part.type === "list_item"}
+{:else if part.type === "list_item"}
   <ListItem
     {part}
     {repostable}
@@ -116,7 +110,8 @@
     {tags}
     {openModal}
     {nolist}
-  />{:else if part.type === "inline"}
+  />
+{:else if part.type === "inline"}
   <Inline
     {part}
     {repostable}
@@ -125,17 +120,12 @@
     {tags}
     {openModal}
     {nolist}
-  />{:else if part.type === "link"}
-  <Link
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-  />{:else if part.type === "image"}
-  <Image {part} />{:else if part.type === "strong"}
+  />
+{:else if part.type === "link"}
+  <Link {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
+{:else if part.type === "image"}
+  <Image {part} />
+{:else if part.type === "strong"}
   <Strong
     {part}
     {repostable}
@@ -144,7 +134,8 @@
     {tags}
     {openModal}
     {nolist}
-  />{:else if part.type === "s"}
+  />
+{:else if part.type === "s"}
   <Strikethrough
     {part}
     {repostable}
@@ -154,21 +145,11 @@
     {openModal}
     {nolist}
   />
-{:else if part.type === "text"}<NostrContent
-    text={part.content}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-  />{:else if part.type === "em"}<Em
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-  />{:else if part.type === "softbreak"}
+{:else if part.type === "text"}
+  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
+{:else if part.type === "em"}
+  <Em {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
+{:else if part.type === "softbreak"}
   <!---->
 {:else if part.type === "footnote_ref"}
   <FootnoteRef
@@ -191,7 +172,8 @@
     {nolist}
   />
 {:else if part.type === "footnote"}
-  {part.content}{:else if part.type === "footnote_anchor"}
+  {part.content}
+{:else if part.type === "footnote_anchor"}
   <a
     href="#footnote-ref-{part.meta.id}"
     id="footnote-def-{part.meta.id}"

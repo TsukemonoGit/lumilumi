@@ -52,7 +52,14 @@
           />
         {/if}
       </li>{/each}
-  </ul>{/if}
+  </ul>{:else}
+  <NostrContent
+    text={part.content}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+  />{/if}
 
 <style lang="postcss">
   .footnote-def {

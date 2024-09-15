@@ -20,11 +20,6 @@
   //プレビューにも使ってるからconstだとだめ
   $: tokens = md.use(markdownItFootnote).parse(text, {});
   $: parts = transformTokens(tokens);
-  $: console.log(parts);
-  //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  // $: mediaList = parts.filter(
-  //   (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-  // );
 
   //let modalIndex = 0;
   const openModal = (index: number) => {

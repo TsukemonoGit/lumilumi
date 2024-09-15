@@ -40,7 +40,16 @@
             {openModal}
             {nolist}
           />{/if}
-      {/each}{/if}{/each}
+      {/each}
+    {:else}
+      <NostrContent
+        text={child.content}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {tags}
+      />
+    {/if}{/each}
 {:else}
   <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
 {/if}

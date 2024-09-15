@@ -52,7 +52,9 @@
           {title}
         </div>{/if}
       {#if description}
-        <div class=" text-neutral-300/80">{description}</div>{/if}
+        <div class=" text-neutral-300/80 max-h-40 overflow-y-auto">
+          {description}
+        </div>{/if}
     </div>
     {#if image && $showImg}
       <img src={image} alt="" class="max-w-16 object-contain max-h-16" />{/if}
@@ -61,7 +63,7 @@
     class="mt-0.5 overflow-y-auto overflow-x-hidden"
     style="max-height:{maxHeight ?? 'none'}"
   >
-    {#if note.kind === 30023}
+    {#if note.kind === 30023 || note.kind === 30024}
       <SimpleMarkdown
         text={note.content}
         tags={note.tags}

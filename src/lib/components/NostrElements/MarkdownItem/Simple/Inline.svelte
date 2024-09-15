@@ -19,7 +19,7 @@
 </script>
 
 <!-- {part.content}//こんてんとをまとめてまたmarkdownにつっこむと<p>最終的に全部で囲まれてしまうのでやれない</p> -->
-{#if part.children && children}
+{#if children}
   {#each children as child}
     <SimpleContentBlock
       part={child}
