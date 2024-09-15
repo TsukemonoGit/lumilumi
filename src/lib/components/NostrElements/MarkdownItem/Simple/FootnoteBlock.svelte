@@ -20,7 +20,7 @@
 </script>
 
 {#if children}
-  <hr class=" my-2" />
+  <hr class=" my-4" />
   <div class="text-lg font-bold my-2">Footnotes</div>
   <ul>
     {#each children as child}

@@ -46,7 +46,7 @@
     {nolist}
   />
 {:else if part.type === "hr"}
-  <hr class="my-2" />
+  <hr class="my-4" />
 {:else if part.type === "paragraph"}
   <Paragraph
     {part}
@@ -196,7 +196,7 @@
     id="footnote-def-{part.meta.id}"
     class="footnote-def mx-1">[{part.meta.id}]</a
   >
-{:else}{part.type}
+{:else}<b>{part.type}</b>
   <Content text={part.content} {repostable} {depth} {displayMenu} {tags} />
 {/if}
 
