@@ -102,3 +102,44 @@ export async function firstLoadOlderEvents(
   console.log("olderEvents.length", olderEvents.length);
   return olderEvents.slice(0, sift === 0 ? undefined : sift);
 }
+
+export async function waitForConnections(
+  readUrls: string[],
+  relayStateMap: Map<string, string>,
+  maxWaitTime: number
+) {
+  const normalizeUrl = (url: string) => url.replace(/\/$/, ""); // Function to remove trailing slash
+  const normalizedReadUrls = readUrls.map(normalizeUrl); // Normalize all URLs in readUrls
+
+  const startTime = Date.now();
+
+  // Function to check how many relays are not in 'initialize' or 'connecting' state
+  const countFinalStateRelays = () => {
+    return normalizedReadUrls.filter((url) => {
+      const state = relayStateMap.get(normalizeUrl(url));
+      return state !== "initialize" && state !== "connecting";
+    }).length;
+  };
+
+  // Wait until all relays are in a final state or maxWaitTime is exceeded
+  while (true) {
+    const finalStateCount = countFinalStateRelays();
+    const totalRelays = normalizedReadUrls.length;
+
+    console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
+
+    if (finalStateCount === totalRelays) {
+      console.log("All relays are in a final state. Proceeding...");
+      break;
+    }
+
+    const elapsedTime = Date.now() - startTime;
+    if (elapsedTime >= maxWaitTime) {
+      console.log("Maximum wait time exceeded. Proceeding...");
+      break;
+    }
+
+    //console.log("Waiting for all relays to reach a final state...");
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 500ms before checking again
+  }
+}

@@ -13,7 +13,7 @@
   let children: Token[];
   $: if (part.children) {
     children = transformTokens(part.children);
-    console.log("[head]", children);
+    // console.log("[head]", children);
   }
 </script>
 

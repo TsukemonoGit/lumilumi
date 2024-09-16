@@ -4,17 +4,28 @@
   import { X, ChevronsUpDown } from "lucide-svelte";
   import { slide } from "svelte/transition";
   import { getFollowingList } from "$lib/func/nostr";
-  import { eventKinds, nip50relays, npubRegex } from "$lib/func/util";
+  import {
+    awaitInterval,
+    eventKinds,
+    nip50relays,
+    npubRegex,
+  } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
 
   import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
-  import { nowProgress } from "$lib/stores/stores";
+  import {
+    app,
+    defaultRelays,
+    nowProgress,
+    relayStateMap,
+  } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
   import KindSelect from "./KindSelect.svelte";
   import { locale } from "svelte-i18n";
+  import { waitForConnections } from "$lib/components/NostrMainData/timelineList";
 
   let searchWord = "";
   let searchKind: number | undefined = undefined;
@@ -60,7 +71,26 @@
       init();
     }
   });
+  let readUrls: string[];
+  $: if ($defaultRelays) {
+    readUrls = Object.values($defaultRelays)
+      .filter((config) => config.read)
+      .map((config) => config.url);
+  }
 
+  async function waitForDefaultRelays(maxWaitTime: number) {
+    const interval = 100; // 100ms ごとにチェック
+    let waitedTime = 0;
+
+    while (!$defaultRelays || Object.keys($defaultRelays).length === 0) {
+      if (waitedTime >= maxWaitTime) {
+        return;
+      }
+      await awaitInterval(interval);
+      waitedTime += interval;
+    }
+    return;
+  }
   async function init() {
     // const params = get(page).url.searchParams;
     const params = new URLSearchParams(window.location.search);
@@ -83,11 +113,13 @@
       searchSince ||
       searchUntil
     ) {
+      await waitForDefaultRelays(2000);
+
       createFilter();
       showFilters = $filters.map((filter) => {
         return { ...filter, limit: 50 };
       });
-      console.log(showFilters);
+      console.log("showFilters", showFilters);
 
       handleClickSearch();
     }
