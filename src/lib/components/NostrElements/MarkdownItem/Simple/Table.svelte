@@ -16,10 +16,10 @@
   // トークンが存在する場合に変換を行い、子トークンを取得
   $: if (part?.children && Array.isArray(part.children)) {
     children = transformTokens(part.children);
-    // console.log("[table_transform]", children);
+    console.log("[table_transform]", children);
   }
 
-  // console.log("[table]", part);
+  console.log("[table]", part);
 </script>
 
 <table class="markdown-table">
@@ -33,14 +33,23 @@
 
             {#each theadChildren as theadChild}
               {#if theadChild.type === "tr"}
-                <tr>
+                <tr
+                  style={theadChild.attrs?.find(
+                    (attr) => attr[0] === "style"
+                  )?.[1] ?? ""}
+                >
                   {#if theadChild.children}
                     {@const theadChildren2 = transformTokens(
                       theadChild.children
                     )}
                     {#each theadChildren2 as theadChild2}
                       {#if theadChild2.type === "th"}
-                        <th class="table-header">
+                        <th
+                          class="table-header"
+                          style={theadChild2.attrs?.find(
+                            (attr) => attr[0] === "style"
+                          )?.[1] ?? ""}
+                        >
                           {#if theadChild2.children && Array.isArray(theadChild2.children)}
                             {#each transformTokens(theadChild2.children) as thContent}
                               <SimpleContentBlock
@@ -71,11 +80,20 @@
             {@const tbodyChildren = transformTokens(child.children)}
             {#each tbodyChildren as tbodyRow}
               {#if tbodyRow.type === "tr"}
-                <tr>
+                <tr
+                  style={tbodyRow.attrs?.find(
+                    (attr) => attr[0] === "style"
+                  )?.[1] ?? ""}
+                >
                   {#if tbodyRow.children}
                     {#each transformTokens(tbodyRow.children) as tbodyCell}
                       {#if tbodyCell.type === "td"}
-                        <td class="table-cell">
+                        <td
+                          class="table-cell"
+                          style={tbodyCell.attrs?.find(
+                            (attr) => attr[0] === "style"
+                          )?.[1] ?? ""}
+                        >
                           {#if tbodyCell.children && Array.isArray(child.children)}
                             {#each transformTokens(tbodyCell.children) as tdContent}
                               <SimpleContentBlock
