@@ -16,10 +16,10 @@
   // トークンが存在する場合に変換を行い、子トークンを取得
   $: if (part?.children && Array.isArray(part.children)) {
     children = transformTokens(part.children);
-    console.log("[table_transform]", children);
+    //  console.log("[table_transform]", children);
   }
 
-  console.log("[table]", part);
+  // console.log("[table]", part);
 </script>
 
 <table class="markdown-table">

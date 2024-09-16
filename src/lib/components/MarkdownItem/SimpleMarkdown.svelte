@@ -5,7 +5,6 @@
   import ContentBlock from "./ContentBlock.svelte";
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
   import markdownit from "markdown-it";
-  import Content from "../Note/Content.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import markdownItFootnote from "markdown-it-footnote";
   import markdownItSub from "markdown-it-sub";

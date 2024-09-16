@@ -13,9 +13,9 @@
     border-radius: 8px; /* 角を丸くする */
     padding: 2px 8px; /* 内側に余白を作る */
 
-    font-family: "Courier New", Courier, monospace; /* 等幅フォントを使用 */
+    /*  font-family: "Courier New", Courier, monospace; 等幅フォントを使用 */
     margin: 1em 0;
-    @apply whitespace-pre-wrap break-words overflow-x-auto;
+    @apply whitespace-pre-wrap break-words overflow-x-auto font-mono;
     word-break: break-word;
   }
 

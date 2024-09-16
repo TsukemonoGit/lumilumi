@@ -12,7 +12,8 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import Markdown from "../MarkdownItem/Markdown.svelte";
+  import Markdown from "$lib/components/MarkdownItem/Markdown.svelte";
+  import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
 
   export let repostable: boolean;
   export let displayMenu: boolean;
@@ -82,7 +83,7 @@
       />
     </div>
     <div class="mx-2 my-1 text-sm opacity-70">
-      {#if text.kind === 30023 || text.kind === 30024}<Markdown
+      {#if text.kind === 30023 || text.kind === 30024}<SimpleMarkdown
           text={text.content ?? ""}
           tags={text.tags}
           {displayMenu}

@@ -2,7 +2,6 @@
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
-  import Content from "../../Note/Content.svelte";
   import NostrContent from "./NostrContent.svelte";
 
   export let part: Token;

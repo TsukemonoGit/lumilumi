@@ -4,7 +4,7 @@
   import { showImg, viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import { _ } from "svelte-i18n";
-  import DecodedContent from "../../Note/DecodedContent.svelte";
+  import DecodedContent from "$lib/components/NostrElements/Note/DecodedContent.svelte";
 
   export let text: string;
   export let tags: string[][];

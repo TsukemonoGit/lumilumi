@@ -58,6 +58,27 @@ export default {
           "Liberation Mono",
           "monospace",
         ],
+        title: [
+          "Roboto",
+          "Oxygen",
+          "Fira Sans",
+
+          "sans-serif",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+
+          "Ubuntu",
+          "Cantarell",
+
+          "Droid Sans",
+          "Helvetica Neue",
+          "Arial",
+
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+        ],
       },
       typography: (theme) => ({
         DEFAULT: {

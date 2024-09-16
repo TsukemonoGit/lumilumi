@@ -1,6 +1,5 @@
 <script lang="ts">
   import { _ } from "svelte-i18n";
-  import Content from "../Note/Content.svelte";
 
   import BlockQuote from "./Simple/BlockQuote.svelte";
   import BulletList from "./Simple/BulletList.svelte";
@@ -17,7 +16,6 @@
   import Image from "./Simple/Image.svelte";
   import Strong from "./Simple/Strong.svelte";
   import Strikethrough from "./Simple/Strikethrough.svelte";
-  import TextMarkdown from "./Simple/TextMarkdown.svelte";
   import Em from "./Simple/Em.svelte";
   import CodeInline from "./Simple/CodeInline.svelte";
   import FootnoteRef from "./Simple/FootnoteRef.svelte";
