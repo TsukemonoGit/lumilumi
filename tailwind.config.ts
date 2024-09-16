@@ -59,14 +59,17 @@ export default {
           "monospace",
         ],
         title: [
+          "Georgia",
+          "Segoe UI",
+          "sans-serif",
+
+          "serif",
           "Roboto",
           "Oxygen",
           "Fira Sans",
 
-          "sans-serif",
           "-apple-system",
           "BlinkMacSystemFont",
-          "Segoe UI",
 
           "Ubuntu",
           "Cantarell",
