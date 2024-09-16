@@ -77,6 +77,7 @@
         <div class=" flex flex-wrap whitespace-pre-wrap">
           {#if $showImg || loadImage}
             <img
+              loading="lazy"
               class="object-contain"
               src="https://stok33.github.io/illust/lumis.webp"
               alt="lumi"

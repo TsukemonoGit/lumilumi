@@ -714,6 +714,6 @@
 
 <Dialog bind:open
   ><div slot="main" class="flex w-full justify-center">
-    <img alt="relaySttGlobal" class="" src={$displayimage} />
+    <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />
   </div></Dialog
 >

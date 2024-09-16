@@ -57,7 +57,12 @@
         </div>{/if}
     </div>
     {#if image && $showImg}
-      <img src={image} alt="" class="max-w-16 object-contain max-h-16" />{/if}
+      <img
+        loading="lazy"
+        src={image}
+        alt=""
+        class="max-w-16 object-contain max-h-16"
+      />{/if}
   </div>
   <div
     class="mt-0.5 overflow-y-auto overflow-x-hidden"

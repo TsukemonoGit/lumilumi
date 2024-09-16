@@ -201,15 +201,20 @@
             <a href="/about" use:melt={$close}
               >{#if $showImg}
                 <img
+                  loading="lazy"
                   src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
                   alt="lumi"
                   width={80}
                   height={80}
                 />
               {:else}
-                <img src={logo} alt="logo" width={40} height={40} />{/if}<span
-                class="ml-2">about</span
-              ></a
+                <img
+                  loading="lazy"
+                  src={logo}
+                  alt="logo"
+                  width={40}
+                  height={40}
+                />{/if}<span class="ml-2">about</span></a
             >
           </li>
         </ul>

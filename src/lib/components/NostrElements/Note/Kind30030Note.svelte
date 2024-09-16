@@ -23,7 +23,12 @@
         <div class=" text-neutral-300/80">{description}</div>{/if}
     </div>
     {#if image && $showImg}
-      <img src={image} alt="" class="max-w-16 object-contain max-h-16" />{/if}
+      <img
+        loading="lazy"
+        src={image}
+        alt=""
+        class="max-w-16 object-contain max-h-16"
+      />{/if}
   </div>
   <div class="flex gap-1 flex-wrap" style="max-height:{maxHeight ?? 'none'}">
     {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}

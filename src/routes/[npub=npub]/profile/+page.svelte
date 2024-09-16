@@ -237,6 +237,7 @@
                 style="height: {iconSize}px; width: {iconSize}px;"
               >
                 <img
+                  loading="lazy"
                   alt="Avatar"
                   class="relative object-cover rounded-full"
                   style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
