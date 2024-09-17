@@ -7,6 +7,7 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { _ } from "svelte-i18n";
+  import ContentImage from "./content/ContentImage.svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -64,6 +65,7 @@
       return undefined;
     }
   };
+
   let imgError: boolean = false;
   let imgLoad: boolean = false;
 </script>
@@ -86,33 +88,7 @@
         {repostable}
       />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
-    {#if $showImg && !imgError}
-      {#if !imgLoad}<Link
-          props={{ "aria-label": `External Links: ${part.url}` }}
-          className="underline text-magnum-300 break-all "
-          href={part.url ?? ""}>{part.content}</Link
-        >{/if}
-      <div>
-        <button
-          class="w-fit h-fit"
-          aria-label={$_("alia.label.image")}
-          on:click={() => openModal(part.number ?? 0)}
-          ><img
-            loading="lazy"
-            width="288"
-            height="288"
-            alt="img"
-            src={part.content}
-            class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
-            on:load={() => (imgLoad = true)}
-            on:error={() => (imgError = true)}
-          /></button
-        >
-      </div>{:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
-        href={part.content}>{part.content}</Link
-      >{/if}
+    <ContentImage {part} {openModal} />
   {:else if part.type === "movie"}
     {#if $showImg}
       <video
