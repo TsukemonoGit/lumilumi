@@ -75,7 +75,7 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <div class="mx-2 my-1 text-sm">
+    <div class="mx-2 text-sm">
       <Content
         text={text.content.length < 40
           ? (text.content ?? "")

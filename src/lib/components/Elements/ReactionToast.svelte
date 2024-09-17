@@ -31,7 +31,7 @@
 </script>
 
 <div
-  class="fixed right-0 top-0 z-[99] m-4 flex flex-col items-end gap-2 md:bottom-0 md:top-auto"
+  class="fixed right-0 top-0 z-[99] max-h-24 flex flex-col items-end gap-1 md:bottom-0 md:top-auto"
   use:portal
 >
   {#each $toasts as { id, data } (id)}
@@ -42,16 +42,16 @@
       animate:flip={{ duration: 500 }}
       in:fly={{ duration: 150, x: "100%" }}
       out:fly={{ duration: 150, x: "100%" }}
-      class="rounded-lg bg-neutral-800 text-white shadow-md"
+      class="rounded-lg bg-neutral-800 text-white shadow-md p-1"
     >
       <div
-        class="relative flex flex-col w-[24rem] max-w-[calc(100vw-2rem)] gap-2 p-5"
+        class="relative flex flex-col w-[24rem] max-w-[calc(100vw-2rem)] gap-1 text-sm"
       >
         {#if event}
           <ReactionToastLayout {event} />
         {/if}<button
           use:melt={$close(id)}
-          class="absolute right-4 top-4 grid size-6 place-items-center rounded-full text-magnum-500
+          class="absolute right-1 top-1 grid size-6 place-items-center rounded-full text-magnum-500
           hover:bg-magnum-900/50"
         >
           <X class="size-4" />
