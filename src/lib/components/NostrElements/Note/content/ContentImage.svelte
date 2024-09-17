@@ -35,6 +35,6 @@
     >
   </div>{:else}
   <button
-    class=" rounded-md border font-semibold border-magnum-600 p-1 m-1 hover:opacity-75 active:opacity-50"
+    class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50"
     on:click={() => (view = true)}>View Image</button
   >{/if}
