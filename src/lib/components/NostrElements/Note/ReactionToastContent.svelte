@@ -11,6 +11,7 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
 
+  const contentLen = 40;
   //tagはaかe
   export let tag: string[];
 
@@ -77,9 +78,9 @@
     </div>
     <div class="mx-2 text-sm">
       <Content
-        text={text.content.length < 40
+        text={text.content.length < contentLen
           ? (text.content ?? "")
-          : `${text.content.slice(0, 40)}...`}
+          : `${text.content.slice(0, contentLen)}...`}
         tags={text.tags}
         displayMenu={false}
         depth={0}
@@ -103,9 +104,9 @@
       </div>
 
       <Content
-        text={event.content.length < 50
+        text={event.content.length < contentLen
           ? (event.content ?? "")
-          : `${event.content.slice(0, 50)}...`}
+          : `${event.content.slice(0, contentLen)}...`}
         tags={event.tags}
         displayMenu={false}
         depth={0}

@@ -45,7 +45,7 @@
       class="rounded-lg bg-neutral-800 text-white shadow-md p-1"
     >
       <div
-        class="relative flex flex-col w-[24rem] max-w-[calc(100vw-2rem)] gap-1 text-sm"
+        class="relative flex flex-col w-[16rem] max-w-[calc(100vw-2rem)] gap-1 text-sm"
       >
         {#if event}
           <ReactionToastLayout {event} />
