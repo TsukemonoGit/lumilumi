@@ -150,7 +150,11 @@
         case "zap":
           return event.kind === 9735;
         case "other":
-          return event.kind === 42;
+          return (
+            event.kind === 42 || event.kind === 4 //||
+            //  event.kind === 14 ||
+            //  event.kind === 1059
+          );
         default:
           return false;
       }
@@ -207,7 +211,9 @@
         queryKey={timelineQuery}
         filters={[
           {
-            kinds: [1, 6, 7, 16, 42, 9735],
+            kinds: [
+              1, 6, 7, 16, 42, 9735, 4 /**初代DM*/,
+            ] /** 2代目DM 14? ,  三代目DM 1059 pに自分のpubが入ってくるわけじゃないからこれではこうどくできないよ*/,
 
             "#p": [$loginUser],
             since: since,
