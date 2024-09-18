@@ -65,9 +65,9 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
     .pipe(operator, zapCheck());
 
   const query = createQuery({
-    queryKey: ["reactions"],
-    // gcTime: 1 * 60 * 60 * 1000, //1h
-    //staleTime: Infinity,
+    queryKey: ["reactions"], //TLに表示されているノートたちへのリアクションの監視だからinfinity?
+    gcTime: Infinity,
+    staleTime: Infinity,
     queryFn: (): Promise<EventPacket> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;

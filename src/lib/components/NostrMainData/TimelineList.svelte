@@ -12,7 +12,7 @@
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus } from "$lib/types";
-  import type { QueryKey } from "@tanstack/svelte-query";
+  import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import {
@@ -33,7 +33,6 @@
   import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
-
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
@@ -61,7 +60,18 @@
   // >;
   export let reaCheck = false;
   export let tieKey: string | undefined = undefined;
+
+  const query = createQuery({
+    queryKey: [...queryKey, "olderData"],
+    queryFn: undefined,
+    staleTime: Infinity, // 4 hour
+    gcTime: Infinity, // 4 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+
   const [tie, tieMap] = createTie();
+
   $: if (!tieKey || tieKey) {
     setTieKey(tieKey ?? "undefined");
     if (!tieKey) {
