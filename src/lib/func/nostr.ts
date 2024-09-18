@@ -7,7 +7,7 @@ import {
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
-import type { UseReqOpts, ReqResult, ReqStatus } from "$lib/types";
+import type { UseReqOpts, ReqResult, ReqStatus, UseQueryOpt } from "$lib/types";
 import {
   useQueryClient,
   createQuery,
@@ -253,9 +253,12 @@ export function useReq(
     initData,
   }: UseReqOpts<EventPacket | EventPacket[]>,
   relays: string[] | undefined = undefined,
-  staleTime: number = Infinity,
-  initialDataUpdatedAt: number | undefined = undefined,
-  refetchInterval: number = Infinity
+  { staleTime, gcTime, initialDataUpdatedAt, refetchInterval }: UseQueryOpt = {
+    staleTime: 2 * 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+    initialDataUpdatedAt: undefined,
+    refetchInterval: Infinity,
+  }
 ): ReqResult<EventPacket | EventPacket[]> {
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
 
@@ -298,7 +301,7 @@ export function useReq(
     initialData: initData,
     initialDataUpdatedAt: initialDataUpdatedAt,
     refetchInterval: refetchInterval,
-    gcTime: 2 * 60 * 60 * 1000, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
+    gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;

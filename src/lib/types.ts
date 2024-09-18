@@ -143,3 +143,9 @@ export interface MargePostOptions {
   defaultUsers?: string[];
   warningText?: string | undefined;
 }
+export interface UseQueryOpt {
+  staleTime: number;
+  gcTime: number;
+  initialDataUpdatedAt: number | undefined;
+  refetchInterval: number;
+}

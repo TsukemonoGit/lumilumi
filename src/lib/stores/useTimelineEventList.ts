@@ -50,7 +50,10 @@ export function useTimelineEventList(
     : pipe(uniq, userStatus(), scanArray());
   //フィルターに自分へのリプライを取得するフィルターが含まれているか
 
-  return useReq({ queryKey, filters, operator, req }, relays) as ReqResult<
-    EventPacket[]
-  >;
+  return useReq({ queryKey, filters, operator, req }, relays, {
+    staleTime: Infinity,
+    gcTime: Infinity,
+    initialDataUpdatedAt: undefined,
+    refetchInterval: Infinity,
+  }) as ReqResult<EventPacket[]>;
 }

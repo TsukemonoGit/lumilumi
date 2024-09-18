@@ -44,8 +44,6 @@ export function useReplaceableEvent(
       initData,
     },
     undefined,
-    staleTime,
-    initialDataUpdatedAt,
-    refetchInterval
+    { staleTime, gcTime: staleTime, initialDataUpdatedAt, refetchInterval }
   ) as ReqResult<EventPacket>;
 }
