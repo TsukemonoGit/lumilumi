@@ -345,40 +345,48 @@
   };
   let untilTime: number;
   let updating: boolean = false;
+  let timeoutId: NodeJS.Timeout | null = null;
   export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
     if (updating) {
       return;
     }
-    updating = true;
-    const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
-    console.log("updateViewEvent");
-    const allEvents = data ?? [];
-    if (olderdatas) {
-      allEvents.push(...olderdatas);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
-    untilTime =
-      allEvents.length > 0
-        ? allEvents[allEvents.length - 1].event.created_at
-        : now();
-    const uniqueEvents = sortEvents(
-      Array.from(
-        new Map(
-          allEvents.map((event) => [event.event.id, event.event])
-        ).values()
-      )
-    ); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
-    allUniqueEvents = uniqueEvents
-      .filter(eventFilter)
-      .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+    timeoutId = setTimeout(() => {
+      updating = true;
 
-    slicedEvent.update((value) =>
-      allUniqueEvents.slice(viewIndex, viewIndex + amount)
-    );
-    updating = false;
+      const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]);
+      console.log("updateViewEvent");
+      const allEvents = data ?? [];
+      if (olderdatas) {
+        allEvents.push(...olderdatas);
+      }
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+      const uniqueEvents = sortEvents(
+        Array.from(
+          new Map(
+            allEvents.map((event) => [event.event.id, event.event])
+          ).values()
+        )
+      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+
+      allUniqueEvents = uniqueEvents
+        .filter(eventFilter)
+        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+
+      slicedEvent.update((value) =>
+        allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      );
+      updating = false;
+    }, 100); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
   };
 
