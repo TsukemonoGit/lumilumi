@@ -178,19 +178,19 @@
     if (searchKind !== undefined && searchKind !== null) {
       $filters[0].kinds = [searchKind];
     }
-    const chunk = 100;
-    if (
-      followee &&
-      followingList !== undefined &&
-      followingList.length > chunk
-    ) {
-      const splitList = splitArray(followingList, chunk);
-      // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
-      $filters = splitList.map((list) => ({
-        ...$filters[0], // $filters[0] のその他のデータを維持
-        authors: list, // authors を分割されたリストに置き換える
-      }));
-    }
+    // const chunk = 100;
+    // if (
+    //   followee &&
+    //   followingList !== undefined &&
+    //   followingList.length > chunk
+    // ) {
+    //   const splitList = splitArray(followingList, chunk);
+    //   // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
+    //   $filters = splitList.map((list) => ({
+    //     ...$filters[0], // $filters[0] のその他のデータを維持
+    //     authors: list, // authors を分割されたリストに置き換える
+    //   }));
+    // }
   }
 
   function handleClickSearch() {
