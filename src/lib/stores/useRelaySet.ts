@@ -36,7 +36,12 @@ export function useRelaySet(
   setRelays(relaySearchRelays);
 
   const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
-  const reqResult = useReq({ queryKey, filters, operator, req });
+  const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
+    staleTime: Infinity,
+    gcTime: Infinity,
+    initialDataUpdatedAt: undefined,
+    refetchInterval: Infinity,
+  });
 
   const transformedData = derived(reqResult.data, ($data) => toRelaySet($data));
 

@@ -1,5 +1,5 @@
 import type { EventPacket } from "rx-nostr";
-import { createUniq, latestEach } from "rx-nostr";
+import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
@@ -15,6 +15,7 @@ import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
 import { getFollowingList } from "$lib/func/nostr";
+import { createQuery, type QueryKey } from "@tanstack/svelte-query";
 
 export function filterId(
   id: string
@@ -67,14 +68,24 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
 
 export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
+    const queryKey: QueryKey = ["timeline", a.event.id];
     // クエリデータの設定
     if (
       a.event &&
       a.event.id &&
       a.event.kind !== 30315 &&
-      !get(queryClient).getQueryData(["timeline", a.event.id])
+      !get(queryClient).getQueryData(queryKey)
     ) {
-      get(queryClient).setQueryData(["timeline", a.event.id], a);
+      // if (get(queryClient)) {
+      //   createQuery({
+      //     queryKey: queryKey,
+      //     staleTime: 2 * 60 * 60 * 1000,
+      //     gcTime: 2 * 60 * 60 * 1000,
+      //     initialDataUpdatedAt: undefined,
+      //     refetchInterval: Infinity,
+      //     queryFn: () => a,
+      //   });}
+      get(queryClient).setQueryData(queryKey, a);
     }
 
     // 新しい順にソート
