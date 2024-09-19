@@ -13,7 +13,10 @@
   export let repostable: boolean;
 </script>
 
-<div class={"grid grid-cols-[auto_1fr]"}>
+<div
+  class="grid grid-cols-[auto_1fr] whitespace-pre-wrap break-words"
+  style="word-break: break-word;"
+>
   <div class="p-1">
     <UserMenu pubkey={note.pubkey} bind:metadata={note} size={40} {depth} />
   </div>
