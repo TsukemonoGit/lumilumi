@@ -1,31 +1,30 @@
 <script lang="ts">
-  import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
-  import { createCollapsible, melt } from "@melt-ui/svelte";
-  import { X, ChevronsUpDown } from "lucide-svelte";
-  import { slide } from "svelte/transition";
-  import { getFollowingList } from "$lib/func/nostr";
+  import { getFollowingList, promisePublishEvent } from "$lib/func/nostr";
   import {
     awaitInterval,
-    eventKinds,
+    generateResultMessage,
     nip50relays,
     npubRegex,
+    splitArray,
   } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
-
+  import SearchDescription from "./SearchDescription.svelte";
   import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import {
-    app,
     defaultRelays,
+    loginUser,
     nowProgress,
-    relayStateMap,
+    queryClient,
+    toastSettings,
   } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
-  import KindSelect from "./KindSelect.svelte";
-  import { locale } from "svelte-i18n";
-  import { waitForConnections } from "$lib/components/NostrMainData/timelineList";
+  import SetSearchRelays from "$lib/components/NostrMainData/SetSearchRelays.svelte";
+  import Settei from "../global/Settei.svelte";
+  import SearchOption from "./SearchOption.svelte";
+  import { _ } from "svelte-i18n";
 
   let searchWord = "";
   let searchKind: number | undefined = undefined;
@@ -91,6 +90,7 @@
     }
     return;
   }
+
   async function init() {
     // const params = get(page).url.searchParams;
     const params = new URLSearchParams(window.location.search);
@@ -144,11 +144,6 @@
     createFilter();
   }
 
-  const {
-    elements: { root, content, trigger },
-    states: { open },
-  } = createCollapsible({ forceVisible: true });
-
   function getHex(str: string): string {
     try {
       return nip19.decode(str).data as string;
@@ -183,47 +178,18 @@
     if (searchKind !== undefined && searchKind !== null) {
       $filters[0].kinds = [searchKind];
     }
-    //  const chank = 100;
-    //if (!followee || !followingList || followingList?.length < chank) {
-    //   $filters = [
-    //     {
-    //       search: searchWord || undefined,
-    //       kinds: [searchKind],
-    //       authors: npubRegex.test(searchPubkey)
-    //         ? [getHex(searchPubkey)]
-    //         : followee
-    //           ? followingList
-    //           : undefined,
-    //       since: !Number.isNaN(searchSince) ? searchSince : undefined,
-    //       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-    //       "#t": searchHashtag ? [searchHashtag] : [],
-    //     },
-    //   ];
-    // } else if (followee && followingList && followingList.length > chank) {
-    //   $filters = [];
-    //   const splitFollowingList: string[][] = followingList.reduce<string[][]>(
-    //     (acc, curr, index) => {
-    //       if (index % chank === 0) acc.push([]);
-    //       acc[acc.length - 1].push(curr);
-    //       return acc;
-    //     },
-    //     []
-    //   );
-
-    //   splitFollowingList.forEach((listSegment) => {
-    //     $filters.push({
-    //       search: searchWord || undefined,
-    //       kinds: [searchKind],
-    //       authors: npubRegex.test(searchPubkey)
-    //         ? [getHex(searchPubkey)]
-    //         : followee
-    //           ? listSegment
-    //           : undefined,
-    //       since: !Number.isNaN(searchSince) ? searchSince : undefined,
-    //       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-    //       "#t": searchHashtag ? [searchHashtag] : [],
-    //     });
-    //   });
+    // const chunk = 100;
+    // if (
+    //   followee &&
+    //   followingList !== undefined &&
+    //   followingList.length > chunk
+    // ) {
+    //   const splitList = splitArray(followingList, chunk);
+    //   // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
+    //   $filters = splitList.map((list) => ({
+    //     ...$filters[0], // $filters[0] のその他のデータを維持
+    //     authors: list, // authors を分割されたリストに置き換える
+    //   }));
     // }
   }
 
@@ -252,28 +218,45 @@
     searchUntil = undefined;
   }
 
-  async function handleClickPub(str: string) {
-    try {
-      const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      if (pub) {
-        if (str === "author") {
-          searchPubkey = nip19.npubEncode(pub);
-        } else {
-          searchPubkeyTo = nip19.npubEncode(pub);
-        }
-      }
-    } catch (error) {
-      console.log("failed to get pubkey");
-    }
-  }
+  const handleReload = () => {
+    console.log("reload");
+  };
 
-  const getKindLabel = (
-    kind: number | undefined,
-    locale: string | null | undefined
-  ) => {
-    if (kind === undefined) return "";
-    const kindData = eventKinds.get(kind);
-    return kindData ? (locale === "ja" ? kindData.ja : kindData.en) : "";
+  const onClickSave = async (relays: string[]) => {
+    console.log("save");
+    $nowProgress = true;
+    console.log(relays);
+    const newTags: string[][] = [];
+    relays.map((relay) => newTags.push(["relay", relay]));
+    console.log(newTags);
+    const { event, res } = await promisePublishEvent({
+      content: "",
+      tags: newTags,
+      kind: 10007,
+    });
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+
+    let str = generateResultMessage(isSuccess, isFailed);
+    console.log(str);
+
+    $toastSettings = {
+      title: isSuccess.length > 0 ? "Success" : "Failed",
+      description: str,
+      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+    };
+    $queryClient.refetchQueries({
+      queryKey: ["searchRelay", $loginUser],
+    });
+    if (isSuccess.length > 0) {
+      handleReload();
+    }
+    // if (isSuccess.length > 0) {
+    //   $queryClient.refetchQueries({
+    //     queryKey: key,
+    //   });
+    // }
+    $nowProgress = false;
   };
 </script>
 
@@ -284,160 +267,73 @@
 </svelte:head>
 
 <section>
-  <div class="flex gap-2">
-    <div class="font-medium text-magnum-400">SearchRelays</div>
-    <div class="text-sm">
-      {nip50relays.join(", ")}
-    </div>
-  </div>
-  <div class="flex flex-wrap gap-2 mb-2">
-    <div class="flex flex-col items-start justify-center">
-      <div class="font-medium text-magnum-400">keyword</div>
-      <input
-        type="text"
-        id="word"
-        class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-        placeholder=""
-        bind:value={searchWord}
-      />
-    </div>
-    {#if followingList !== undefined && followingList.length > 0}
-      <div class="flex flex-col items-start justify-center mt-auto py-2">
-        <label>
-          <input
-            type="checkbox"
-            class="rounded-checkbox"
-            bind:checked={followee}
-            on:change={createFilter}
-          />
-          only followee
-        </label>
+  {#if $loginUser}
+    <SetSearchRelays pubkey={$loginUser} let:relays>
+      <div slot="loading" class="w-full">
+        <Settei
+          title={"Search"}
+          relays={nip50relays}
+          {onClickSave}
+          Description={SearchDescription}
+        />
       </div>
-    {/if}
-  </div>
-
-  <div use:melt={$root} class="relative w-full">
-    <button
-      use:melt={$trigger}
-      class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
-    >
-      <span class="font-semibold text-magnum-400">Options</span>
-      <button
-        class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600"
-        aria-label="Toggle"
-      >
-        <div class="justify-center flex">
-          {#if $open}
-            <X class="size-5" />
-          {:else}
-            <ChevronsUpDown class="size-5" />
-          {/if}
-        </div>
-      </button>
-    </button>
-
-    <div>
-      {#if $open}
-        <div
-          use:melt={$content}
-          transition:slide
-          class="flex gap-2 w-full flex-wrap"
-        >
-          <div class="flex flex-col items-start justify-center">
-            <div class="font-medium text-magnum-400">kind</div>
-            <div class="flex align-middle mt-1.5 gap-1 items-center">
-              <input
-                type="number"
-                id="kind"
-                class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900"
-                placeholder="1"
-                min="0"
-                bind:value={searchKind}
-              />
-              <KindSelect bind:selectedKind={searchKind} />
-              {getKindLabel(searchKind, $locale)}
-            </div>
-          </div>
-          <div class="flex flex-col items-start justify-center w-full">
-            <div class="font-medium text-magnum-400">from</div>
-            <div
-              class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
-            >
-              <input
-                type="text"
-                id="npub"
-                class="h-10 px-3 py-2 rounded-md"
-                placeholder="npub"
-                bind:value={searchPubkey}
-              /><button
-                on:click={() => handleClickPub("author")}
-                class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
-                >Set My Pubkey</button
-              >
-            </div>
-          </div>
-          <div class="flex flex-col items-start justify-center w-full">
-            <div class="font-medium text-magnum-400">to</div>
-            <div
-              class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
-            >
-              <input
-                type="text"
-                id="npub"
-                class="h-10 px-3 py-2 rounded-md"
-                placeholder="npub"
-                bind:value={searchPubkeyTo}
-              /><button
-                on:click={() => handleClickPub("p")}
-                class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
-                >Set My Pubkey</button
-              >
-            </div>
-          </div>
-          <div class="flex flex-col items-start justify-center w-full">
-            <div class="font-medium text-magnum-400">hashtag</div>
-
-            <input
-              type="text"
-              id="hashtag"
-              class="h-10 w-full px-3 py-2 rounded-md border border-magnum-600"
-              placeholder="hashtag"
-              bind:value={searchHashtag}
-            />
-          </div>
-          <div class="flex flex-row items-start justify-center">
-            <DateRangePicker
-              bind:startTimeUnix={searchSince}
-              bind:endTimeUnix={searchUntil}
-              title={"Date"}
-            />
-            <button
-              on:click={resetValue}
-              class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
-            >
-              <X class="size-5" /></button
-            >
-          </div>
-        </div>
+      <div slot="error" class="w-full">
+        <Settei
+          title={"Search"}
+          relays={nip50relays}
+          {onClickSave}
+          Description={SearchDescription}
+        />
+      </div>
+      <div slot="nodata" class="w-full">
+        <Settei
+          title={"Search"}
+          relays={nip50relays}
+          {onClickSave}
+          Description={SearchDescription}
+        />
+      </div>
+      {#if relays.length > 0}
+        <Settei
+          title={"Search"}
+          {relays}
+          {onClickSave}
+          Description={SearchDescription}
+        />{/if}<SearchOption
+        bind:followingList
+        bind:searchKind
+        bind:searchHashtag
+        bind:searchWord
+        bind:searchPubkey
+        bind:searchPubkeyTo
+        bind:searchSince
+        bind:searchUntil
+        bind:followee
+        {handleClickSearch}
+        {createFilter}
+        {resetValue}
+        {filters}
+      />
+      {#if openSearchResult}
+        <SearchResult bind:this={compRef} bind:filters={showFilters} {relays} />
       {/if}
-    </div>
-  </div>
-  <div class="w-full">
-    <div
-      class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
-    >
-      <div class="font-semibold text-magnum-400">Filters</div>
-      {#each $filters as filter}
-        {JSON.stringify(filter, null, 2)}
-      {/each}
-    </div>
-  </div>
-  <button
-    class="rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    disabled={$nowProgress}
-    on:click={handleClickSearch}>Search</button
-  >
+      <!-- <div class="flex gap-2">
+        <div class="font-medium text-magnum-400">SearchRelays</div>
+        <div class="text-sm">
+          {nip50relays.join(", ")}
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <div class="flex flex-col items-start justify-center">
+          <div class="font-medium text-magnum-400">keyword</div>
+          <input
+            type="text"
+            id="word"
+            class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
+            placeholder=""
+            bind:value={searchWord}
+          />
+        </div> -->
+    </SetSearchRelays>
+  {/if}
 </section>
-{#if openSearchResult}
-  <SearchResult bind:this={compRef} bind:filters={showFilters} />
-{/if}

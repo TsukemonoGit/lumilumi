@@ -120,5 +120,13 @@
     "create": "Create new Follow List",
     "newMessage": "If a follow list already exists, it will be reset. Is it okay to create a new one?\nThe page will reload after creation.",
     "message": "The follow list could not be found. Please click the button below to create a new follow list."
+  },
+  "relay": {
+    "description": {
+      "global": "Use relay set with dtag of kind:30002 as global.",
+      "search": "Use kind:10007 (search relay).",
+      "search2": "If kind:10007 is not found, use default relay settings.",
+      "search3": "Please set up relays that has search function."
+    }
   }
 }

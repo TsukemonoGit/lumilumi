@@ -34,7 +34,7 @@ export function useGlobalRelaySet(
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
     setRelays(relaySearchRelays);
   }
-  const operator = pipe(uniq(), latest());
+  const operator = pipe(latest());
   const reqResult = useReq({ queryKey, filters, operator, req });
 
   const transformedData = derived(reqResult.data, ($data) =>

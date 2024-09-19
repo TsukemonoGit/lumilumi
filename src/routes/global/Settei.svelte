@@ -1,14 +1,18 @@
 <script lang="ts">
-  import { generateResultMessage, relayRegex } from "$lib/func/util";
+  import { relayRegex } from "$lib/func/util";
   import { createAccordion, melt } from "@melt-ui/svelte";
   import { ChevronDown, X } from "lucide-svelte";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
-  import { promisePublishEvent } from "$lib/func/nostr";
-  export let relays: string[];
-  export let handleReload;
-  const newRelays = writable<string[]>([...relays]);
+  import { toastSettings } from "$lib/stores/stores";
+
+  import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
+  export let relays: string[] = [];
+  export let title: string;
+  export let Description;
+  export let onClickSave: (relays: string[]) => void;
+
+  const newRelays = writable<string[]>([...(relays ?? [])]);
   $: if (relays) {
     $newRelays = [...relays];
   }
@@ -50,40 +54,12 @@
       a.length === b.length && a.every((value, index) => value === b[index])
     );
   }
+
   const handleClickSave = async () => {
     if (arraysEqual($newRelays, relays)) {
       return;
     }
-    $nowProgress = true;
-    console.log($newRelays);
-    const newTags = [["d", "global"]];
-    $newRelays.map((relay) => newTags.push(["relay", relay]));
-    console.log(newTags);
-    const { event, res } = await promisePublishEvent({
-      content: "",
-      tags: newTags,
-      kind: 30002,
-    });
-    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
-
-    let str = generateResultMessage(isSuccess, isFailed);
-    console.log(str);
-
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
-    if (isSuccess.length > 0) {
-      handleReload();
-    }
-    // if (isSuccess.length > 0) {
-    //   $queryClient.refetchQueries({
-    //     queryKey: key,
-    //   });
-    // }
-    $nowProgress = false;
+    onClickSave($newRelays);
   };
 </script>
 
@@ -97,30 +73,29 @@
       class="flex flex-1 cursor-pointer items-center justify-between bg-neutral-800 py-2 text-base font-medium leading-none text-magnum-300 transition-colors hover:bg-neutral-800 focus:!ring-0 focus-visible:text-magnum-800 rounded-xl text-ellipsis
     w-full"
     >
-      GlobalRelays<ChevronDown />
+      {title}Relays<ChevronDown />
     </button>
   </h2>
   {#if $isSelected("item-1")}
     <div
-      class="content overflow-hidden bg-neutral-800 text-sm text-neutral-100 p-2"
+      class="content overflow-hidden bg-neutral-800 text-sm text-neutral-100"
       use:melt={$content("item-1")}
       transition:slide
     >
       <div
         id="item-1"
         class="overflow-hidden transition-colors first:rounded-t-xl
-            last:rounded-b-xl"
+            last:rounded-b-xl p-2"
       >
-        <div class=" font-medium text-magnum-400">GlobalRelays</div>
         <button
           class="rounded-md bg-magnum-700 px-2 py-1 font-bold hover:opacity-75 active:opacity-50"
           on:click={() => ($newRelays = relays)}>RESET</button
         >
         <div class="text-sm p-1">
           {#each $newRelays as relay}
-            <div class="flex items-center gap-2">
-              {relay}<button
-                class="rounded-full bg-magnum-700 hover:opacity-75 active:opacity-50"
+            <div class="flex items-center gap-1">
+              <RelayStatusColor {relay} />{relay}<button
+                class="ml-1 rounded-full bg-magnum-700 hover:opacity-75 active:opacity-50"
                 on:click={() => removeRelay(relay)}><X /></button
               >
             </div>
@@ -138,6 +113,8 @@
           on:click={handleClickSave}>SAVE</button
         >
       </div>
+      <hr />
+      <div class=" font-medium text-magnum-400 p-2"><Description /></div>
     </div>
   {/if}
 </div>

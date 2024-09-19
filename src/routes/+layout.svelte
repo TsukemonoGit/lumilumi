@@ -39,7 +39,7 @@
   import type { Part } from "$lib/func/content";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
-  // import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+  //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
   //https://github.com/penpenpng/rx-nostr/pull/138

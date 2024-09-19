@@ -33,6 +33,10 @@
   import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import { pipe } from "rxjs";
+  import { createUniq } from "rx-nostr/src";
+
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
@@ -82,10 +86,24 @@
       $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
     }
   }
+
+  // イベントID に基づいて重複を排除する
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+
+  const onCache = (packet: EventPacket): void => {
+    //console.log(`${packet.event.id} を初めて観測しました`);
+  };
+  const onHit = (packet: EventPacket): void => {
+    //  console.log(`${packet.event.id} はすでに観測されています`);
+  };
+
+  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-
-  $: result = useTimelineEventList(queryKey, filters, reaCheck, req, relays);
+  $: operator = reaCheck
+    ? pipe(uniq, userStatus(), reactionCheck(), scanArray())
+    : pipe(uniq, userStatus(), scanArray());
+  $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -327,40 +345,48 @@
   };
   let untilTime: number;
   let updating: boolean = false;
+  let timeoutId: NodeJS.Timeout | null = null;
   export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
     if (updating) {
       return;
     }
-    updating = true;
-    const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
-    console.log("updateViewEvent");
-    const allEvents = data ?? [];
-    if (olderdatas) {
-      allEvents.push(...olderdatas);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
-    untilTime =
-      allEvents.length > 0
-        ? allEvents[allEvents.length - 1].event.created_at
-        : now();
-    const uniqueEvents = sortEvents(
-      Array.from(
-        new Map(
-          allEvents.map((event) => [event.event.id, event.event])
-        ).values()
-      )
-    ); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
-    allUniqueEvents = uniqueEvents
-      .filter(eventFilter)
-      .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+    timeoutId = setTimeout(() => {
+      updating = true;
 
-    slicedEvent.update((value) =>
-      allUniqueEvents.slice(viewIndex, viewIndex + amount)
-    );
-    updating = false;
+      const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]);
+      console.log("updateViewEvent");
+      const allEvents = data ?? [];
+      if (olderdatas) {
+        allEvents.push(...olderdatas);
+      }
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+      const uniqueEvents = sortEvents(
+        Array.from(
+          new Map(
+            allEvents.map((event) => [event.event.id, event.event])
+          ).values()
+        )
+      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+
+      allUniqueEvents = uniqueEvents
+        .filter(eventFilter)
+        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+
+      slicedEvent.update((value) =>
+        allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      );
+      updating = false;
+    }, 100); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
   };
 

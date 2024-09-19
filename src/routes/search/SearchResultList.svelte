@@ -13,6 +13,7 @@
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import {
+    createUniq,
     now,
     type EventPacket,
     type RxReq,
@@ -29,6 +30,8 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { readable } from "svelte/store";
   import { sortEvents } from "$lib/func/util";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import { pipe } from "rxjs";
 
   const sift = 40; //スライドする量
 
@@ -59,6 +62,18 @@
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
 
+  // イベントID に基づいて重複を排除する
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+
+  const onCache = (packet: EventPacket): void => {
+    //console.log(`${packet.event.id} を初めて観測しました`);
+  };
+  const onHit = (packet: EventPacket): void => {
+    //  console.log(`${packet.event.id} はすでに観測されています`);
+  };
+
+  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+  const operator = pipe(uniq, userStatus(), reactionCheck(), scanArray());
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
   const reqFilters = filters.map((filter: Nostr.Filter) => ({
@@ -69,7 +84,7 @@
   }));
   $: result =
     filters[0].since === undefined
-      ? useTimelineEventList(queryKey, reqFilters, false, req, relays)
+      ? useTimelineEventList(queryKey, reqFilters, operator, req, relays)
       : {
           data: undefined,
           status: readable("loading" as ReqStatus),

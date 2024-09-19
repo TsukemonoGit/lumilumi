@@ -3,7 +3,8 @@
   import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
   import { reconnectRelay } from "$lib/func/nostr";
-  import { cleanRelayUrl } from "$lib/func/util";
+  import { cleanRelayUrl, getColor } from "$lib/func/util";
+  import RelayStatusColor from "./RelayStatusColor.svelte";
 
   //ConnectionState
   // | "initialized"
@@ -24,27 +25,6 @@
     : [];
   let open: boolean;
 
-  function getColor(state: string | undefined): string {
-    switch (state) {
-      case "initialized":
-        return "text-gray-500";
-      case "connecting":
-        return "text-blue-500";
-      case "connected":
-        return "text-green-500";
-      case "waiting-for-retrying":
-      case "retrying":
-        return "text-yellow-500";
-      case "dormant":
-        return "text-purple-500";
-      case "error":
-      case "rejected":
-      case "terminated":
-        return "text-red-500";
-      default:
-        return "text-gray-500";
-    }
-  }
   let overallStateColor: string;
 
   // allStatus 内の state を設定する関数
@@ -136,17 +116,9 @@
         {#each readRelays as relay, index}
           {@const relayUrl = cleanRelayUrl(relay.url)}
           <li class="flex align-middle items-center break-all">
-            <Popover ariaLabel={`${relay.url} status`}>
-              <Circle
-                size="20"
-                class="{getColor(
-                  $relayStateMap.get(relayUrl)
-                )} fill-current  min-w-[20px] mr-1"
-              />
-              <div slot="popoverContent" class="mr-8">
-                {$relayStateMap.get(relayUrl)}
-              </div></Popover
-            ><span class="inline w-60">{relayUrl}</span>
+            <RelayStatusColor relay={relay.url} /><span class="inline w-60"
+              >{relayUrl}</span
+            >
             {#if $relayStateMap.get(relayUrl) === "error"}<button
                 on:click={() => handleClickReconnect(relayUrl)}
                 class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
