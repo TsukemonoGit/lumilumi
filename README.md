@@ -26,6 +26,10 @@ https://github.com/akiomik/nosvelte
 
     メタデータはフォロー分だけキャッシュしてます
 
+  - NIP-19入りの記事（kind:30023）も割とちゃんと見れる
+
+  - global用リレー(kind:30002 の global)、検索用リレー( kind:10007 )が設定できる
+
 ## 各種設定
 
 ### リレー設定
@@ -72,7 +76,9 @@ https://github.com/akiomik/nosvelte
 - notifications
 - search
 
-  nip50 に対応したリレーから３リレー選んでいて、そのリレーから結果を取得
+  kind:10007 search relays から取得
+
+  kind:10007が存在しない場合は nip50 に対応した３つのリレーから結果を取得
 
 - global
 
