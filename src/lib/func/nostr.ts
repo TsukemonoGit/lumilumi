@@ -291,10 +291,16 @@ export function useReq(
 
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
-  const tie = get(tieMapStore)?.[tieKey]?.[0];
-  const obs: Observable<EventPacket | EventPacket[]> = tie
-    ? _rxNostr.use(_req, { relays: relays }).pipe(tie, metadata(), operator) //muteCheck(),
-    : _rxNostr.use(_req, { relays: relays }).pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる//muteCheck(),
+  //const tie = get(tieMapStore)?.[tieKey]?.[0];
+  // const obs: Observable<EventPacket | EventPacket[]> = tie
+  //   ? _rxNostr.use(_req, { relays: relays }).pipe(tie, metadata(), operator) //muteCheck(),
+  //   : _rxNostr.use(_req, { relays: relays }).pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる//muteCheck(),
+
+  //一定時間立って削除したデータの再取得できるように
+  const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
+    .use(_req, { relays: relays })
+    .pipe(metadata(), operator);
+
   const query = createQuery({
     queryKey: queryKey,
     staleTime: staleTime,
