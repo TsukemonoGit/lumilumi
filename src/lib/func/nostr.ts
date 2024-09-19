@@ -450,6 +450,7 @@ export function relaysReconnectChallenge() {
     return;
   }
   //これわざわざエラーのときってしなくてもエラーとリジェクトの時いがいりコネクトされないらしい
+  //------------------------------------------------------------------------　default relays🦌リコネクトできないから要修正
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
     if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
       get(app).rxNostr.reconnect(key);
@@ -513,13 +514,16 @@ export function usePromiseReq(
   const tie =
     tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
 
-  const obs: Observable<EventPacket[] | EventPacket> = tie
-    ? _rxNostr
-        .use(_req, { relays: relays })
-        .pipe(tie, metadata(), operator, completeOnTimeout(timeout)) // muteCheck(),
-    : _rxNostr
-        .use(_req, { relays: relays })
-        .pipe(metadata(), operator, completeOnTimeout(timeout)); //muteCheck(),
+  const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
+    .use(_req, { relays: relays })
+    .pipe(metadata(), operator, completeOnTimeout(timeout));
+  // tie
+  //   ? _rxNostr
+  //       .use(_req, { relays: relays })
+  //       .pipe(tie, metadata(), operator, completeOnTimeout(timeout)) // muteCheck(),
+  //   : _rxNostr
+  //       .use(_req, { relays: relays })
+  //       .pipe(metadata(), operator, completeOnTimeout(timeout)); //muteCheck(),
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {

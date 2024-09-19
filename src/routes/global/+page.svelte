@@ -1,19 +1,25 @@
 <script lang="ts">
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
+  import {
+    loginUser,
+    nowProgress,
+    queryClient,
+    toastSettings,
+  } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { setTieKey } from "$lib/func/nostr";
+  import { promisePublishEvent, setTieKey } from "$lib/func/nostr";
   import { onMount } from "svelte";
 
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import Settei from "./Settei.svelte";
+  import { generateResultMessage } from "$lib/func/util";
+  import GlobalDescription from "./GlobalDescription.svelte";
 
   let amount = 50;
   let viewIndex = 0;
@@ -69,6 +75,39 @@
       location.reload();
     }, 1000);
   };
+
+  const onClickSave = async (relays: string[]) => {
+    $nowProgress = true;
+    console.log(relays);
+    const newTags = [["d", "global"]];
+    relays.map((relay) => newTags.push(["relay", relay]));
+    console.log(newTags);
+    const { event, res } = await promisePublishEvent({
+      content: "",
+      tags: newTags,
+      kind: 30002,
+    });
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+
+    let str = generateResultMessage(isSuccess, isFailed);
+    console.log(str);
+
+    $toastSettings = {
+      title: isSuccess.length > 0 ? "Success" : "Failed",
+      description: str,
+      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+    };
+    if (isSuccess.length > 0) {
+      handleReload();
+    }
+    // if (isSuccess.length > 0) {
+    //   $queryClient.refetchQueries({
+    //     queryKey: key,
+    //   });
+    // }
+    $nowProgress = false;
+  };
 </script>
 
 <svelte:head>
@@ -80,15 +119,35 @@
 <section class="w-full break-words overflow-hidden">
   <SetGlobalRelays pubkey={$loginUser} let:relays>
     <div slot="loading" class="w-full">
-      <Settei relays={[]} {handleReload} />
+      <Settei
+        title={"Global"}
+        relays={[]}
+        {onClickSave}
+        Description={GlobalDescription}
+      />
     </div>
     <div slot="error" class="w-full">
-      <Settei relays={[]} {handleReload} />
+      <Settei
+        title={"Global"}
+        relays={[]}
+        {onClickSave}
+        Description={GlobalDescription}
+      />
     </div>
     <div slot="nodata" class="w-full">
-      <Settei relays={[]} {handleReload} />
+      <Settei
+        title={"Global"}
+        relays={[]}
+        {onClickSave}
+        Description={GlobalDescription}
+      />
     </div>
-    <Settei {relays} {handleReload} />
+    <Settei
+      title={"Global"}
+      {relays}
+      {onClickSave}
+      Description={GlobalDescription}
+    />
 
     {#if since}
       <TimelineList

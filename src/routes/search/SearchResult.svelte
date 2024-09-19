@@ -11,18 +11,22 @@
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
+  import { defaultRelays } from "$lib/stores/stores";
   export let filters: Nostr.Filter[];
 
   let amount = 50;
   let viewIndex = 0;
+  export let relays: string[];
 
   $: console.log(filters);
   // const tieKey = "search";
 
   onMount(() => {
+    console.log("relays", relays);
     setTieKey("undefined");
   });
   afterNavigate(() => {
+    console.log("relays", relays);
     setTieKey("undefined");
   });
   onDestroy(() => {
@@ -34,7 +38,7 @@
   });
 </script>
 
-{#if filters}
+{#if filters && Object.values($defaultRelays).length > 0}
   <section>
     <div class="w-full break-words overflow-x-hidden max-w-full">
       <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
@@ -46,7 +50,7 @@
         {viewIndex}
         {amount}
         let:len
-        relays={nip50relays}
+        relays={relays.length > 0 ? relays : nip50relays}
       >
         <!-- <SetRepoReactions /> -->
         <div slot="loading">loading</div>

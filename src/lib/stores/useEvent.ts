@@ -28,6 +28,6 @@ export function useEvent(
     | undefined
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
-  const operator = pipe(filterId(id), uniq());
+  const operator = pipe();
   return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
 }

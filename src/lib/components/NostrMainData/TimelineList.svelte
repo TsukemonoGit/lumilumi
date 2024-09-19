@@ -33,6 +33,10 @@
   import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import { pipe } from "rxjs";
+  import { createUniq } from "rx-nostr/src";
+
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
@@ -82,10 +86,24 @@
       $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
     }
   }
+
+  // イベントID に基づいて重複を排除する
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+
+  const onCache = (packet: EventPacket): void => {
+    //console.log(`${packet.event.id} を初めて観測しました`);
+  };
+  const onHit = (packet: EventPacket): void => {
+    //  console.log(`${packet.event.id} はすでに観測されています`);
+  };
+
+  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-
-  $: result = useTimelineEventList(queryKey, filters, reaCheck, req, relays);
+  $: operator = reaCheck
+    ? pipe(uniq, userStatus(), reactionCheck(), scanArray())
+    : pipe(uniq, userStatus(), scanArray());
+  $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

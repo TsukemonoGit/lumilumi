@@ -755,3 +755,34 @@ export async function awaitInterval(time: number): Promise<void> {
     }, time);
   });
 }
+
+export function splitArray<T>(array: T[], chunkSize: number): T[][] {
+  return array.reduce((acc, _, index) => {
+    if (index % chunkSize === 0) {
+      acc.push(array.slice(index, index + chunkSize));
+    }
+    return acc;
+  }, [] as T[][]);
+}
+
+export function getColor(state: string | undefined): string {
+  switch (state) {
+    case "initialized":
+      return "text-gray-500";
+    case "connecting":
+      return "text-blue-500";
+    case "connected":
+      return "text-green-500";
+    case "waiting-for-retrying":
+    case "retrying":
+      return "text-yellow-500";
+    case "dormant":
+      return "text-purple-500";
+    case "error":
+    case "rejected":
+    case "terminated":
+      return "text-red-500";
+    default:
+      return "text-gray-500";
+  }
+}

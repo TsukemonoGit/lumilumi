@@ -1,40 +1,70 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { setRelays } from "$lib/func/nostr";
-  import { loginUser, queryClient } from "$lib/stores/stores";
-  //import type { DefaultRelayConfig } from "rx-nostr";
-  import { onMount } from "svelte";
+  //SetSearchRelays.svelte
+  import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
+  import type { ReqStatus } from "$lib/types";
 
-  //export let defaultRelays: DefaultRelayConfig[];
-  export let setRelayList: string[];
-  let loading = true;
-  // defaultRelays の中で write が true のものを含むように searchRelays を初期化
-  // let searchRelays: DefaultRelayConfig[] = defaultRelays.filter(
-  //   (relay) => relay.write === true
-  // );
-  onMount(() => {
-    setSearchRelay();
-  });
+  import type Nostr from "nostr-typedef";
+  import {
+    type RxReq,
+    type RxReqEmittable,
+    type RxReqOverable,
+    type RxReqPipeable,
+  } from "rx-nostr";
 
-  afterNavigate(() => {
-    setSearchRelay();
-  });
-  function setSearchRelay() {
-    const defaultRelays = $queryClient.getQueryData([
-      "defaultRelay",
-      $loginUser,
-    ]);
-    if (!defaultRelays) {
-      setRelays(setRelayList);
-    } else {
-      //デフォリレーがあるときはそれ使うことにする。どうせデフォリレーの中の何個かが入ったSeenonがneventの中に入ってるだけだし
-    }
-    loading = false;
+  export let req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+    | undefined = undefined;
+
+  export let pubkey: string;
+
+  $: result = deriveResult(pubkey, req);
+  $: console.log(result);
+  function deriveResult(
+    pubkey: string,
+    req:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+      | undefined
+  ) {
+    return useGlobalRelaySet(
+      ["searchRelay", pubkey],
+      [{ authors: [pubkey], kinds: [10007], limit: 1 }] as Nostr.Filter[],
+      req
+    );
+  }
+
+  $: data = result?.data;
+  $: status = result?.status;
+  $: error = result?.error;
+  $: console.log($data);
+  interface $$Slots {
+    default: {
+      relays: string[];
+      status: ReqStatus;
+    };
+    loading: Record<never, never>;
+    error: { error: Error };
+    nodata: Record<never, never>;
   }
 </script>
 
-{#if loading}
-  <!---->
+{#if $error}
+  <slot name="error" error={$error} />
+{:else if $data && $data.length > 0}
+  <slot relays={$data} status={$status ?? "error"} />
+{:else if $status === "loading"}
+  <slot name="loading" />
 {:else}
-  <slot />
+  <slot name="nodata" />
 {/if}

@@ -5,7 +5,7 @@
   import { locale } from "svelte-i18n";
   import { fly } from "svelte/transition";
 
-  export let selectedKind: number | undefined;
+  export let selectedKind: number | undefined = undefined;
   const {
     elements: { trigger, menu, item, separator, arrow },
 
