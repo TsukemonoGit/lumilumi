@@ -26,9 +26,9 @@ https://github.com/akiomik/nosvelte
 
     メタデータはフォロー分だけキャッシュしてます
 
-  - NIP-19入りの記事（kind:30023）も割とちゃんと見れる
+- NIP-19入りの記事（kind:30023）も割とちゃんと見れる
 
-  - global用リレー(kind:30002 の global)、検索用リレー( kind:10007 )が設定できる
+- global用リレー(kind:30002 の global)、検索用リレー( kind:10007 )が設定できる
 
 ## 各種設定
 
