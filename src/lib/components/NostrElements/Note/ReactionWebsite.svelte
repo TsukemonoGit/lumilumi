@@ -38,6 +38,7 @@
       size={20}
       {displayMenu}
       {depth}
+      {tieKey}
     />
   </div>
   <div class="break-all break-words whitespace-pre-line">

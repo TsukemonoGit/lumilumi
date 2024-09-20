@@ -28,6 +28,7 @@
           size={20}
           {displayMenu}
           {depth}
+          {tieKey}
         />
       </div>
       <div class="text-magnum-100 text-sm">

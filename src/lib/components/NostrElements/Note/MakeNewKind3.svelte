@@ -1,17 +1,11 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
   import { _ } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
-  import { nip19 } from "nostr-tools";
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+
+  import { loginUser, nowProgress, toastSettings } from "$lib/stores/stores";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import { promisePublishSignedEvent, publishEvent } from "$lib/func/nostr";
-  import { nip07Signer, now, type OkPacketAgainstEvent } from "rx-nostr";
+  import { promisePublishSignedEvent } from "$lib/func/nostr";
+  import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
 
   const handleClickCreateKind3 = () => {
     //つくっていいかがめんだしておｋでかきこむ

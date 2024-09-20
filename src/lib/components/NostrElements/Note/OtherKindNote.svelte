@@ -69,6 +69,7 @@
           size={20}
           {displayMenu}
           {depth}
+          {tieKey}
         />
       </div>
       <div class="text-magnum-100 text-sm">
@@ -121,6 +122,7 @@
         {displayMenu}
         {depth}
         {repostable}
+        {tieKey}
       />{:else}
       <Content
         text={note.content}
@@ -128,6 +130,7 @@
         {displayMenu}
         {depth}
         {repostable}
+        {tieKey}
       />{/if}
   </div>
   {#if displayMenu}<NoteActionButtons {note} {repostable} {tieKey} />{/if}

@@ -17,6 +17,8 @@
   export let tag: string[];
   //export let kind: number | undefined;
   export let depth: number;
+  export let tieKey: string | undefined;
+
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);
@@ -84,13 +86,34 @@
       let:metadata
     >
       <div slot="loading">
-        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
+        <EventCard
+          note={text}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+        />
       </div>
       <div slot="nodata">
-        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
+        <EventCard
+          note={text}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+        />
       </div>
       <div slot="error" let:error>
-        <EventCard note={text} {depth} {repostable} {maxHeight} {displayMenu} />
+        <EventCard
+          note={text}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+        />
       </div>
       <EventCard
         note={text}
@@ -99,6 +122,7 @@
         {repostable}
         {maxHeight}
         {displayMenu}
+        {tieKey}
       />
     </Metadata>
   </Text>
@@ -128,6 +152,7 @@
             {repostable}
             {maxHeight}
             {displayMenu}
+            {tieKey}
           />
         </div>
         <div slot="nodata" class="w-full">
@@ -137,6 +162,7 @@
             {repostable}
             {maxHeight}
             {displayMenu}
+            {tieKey}
           />
         </div>
         <div slot="error" class="w-full" let:error>
@@ -146,6 +172,7 @@
             {repostable}
             {maxHeight}
             {displayMenu}
+            {tieKey}
           />
         </div>
         <EventCard
@@ -155,6 +182,7 @@
           {repostable}
           {maxHeight}
           {displayMenu}
+          {tieKey}
         />
       </Metadata>
     </LatestEvent>

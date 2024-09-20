@@ -80,6 +80,7 @@
         metadata={undefined}
         size={40}
         {depth}
+        {tieKey}
       />
       <UserMenu
         slot="nodata"
@@ -87,6 +88,7 @@
         metadata={undefined}
         size={40}
         {depth}
+        {tieKey}
       />
       <UserMenu
         slot="error"
@@ -94,8 +96,15 @@
         metadata={undefined}
         size={40}
         {depth}
+        {tieKey}
       />
-      <UserMenu pubkey={event.pubkey} {metadata} size={40} {depth} /></Metadata
+      <UserMenu
+        pubkey={event.pubkey}
+        {metadata}
+        size={40}
+        {depth}
+        {tieKey}
+      /></Metadata
     >
     <button class="text-magnum-400"
       ><ListEllipsisMenu
