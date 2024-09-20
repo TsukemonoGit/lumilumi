@@ -4,7 +4,6 @@
     defaultRelays,
     loginUser,
     nowProgress,
-    onlyFollowee,
     queryClient,
     relayStateMap,
     slicedEvent,
@@ -384,7 +383,7 @@
         allUniqueEvents.slice(viewIndex, viewIndex + amount)
       );
       updating = false;
-    }, 100); // 連続で実行されるのを防ぐ
+    }, 50); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
   };
 

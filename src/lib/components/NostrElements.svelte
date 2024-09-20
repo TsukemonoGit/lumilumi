@@ -20,9 +20,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/makeZap";
   import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
-  import Link from "./Elements/Link.svelte";
-  import { SquareArrowOutUpRight } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
+
   import { _ } from "svelte-i18n";
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
