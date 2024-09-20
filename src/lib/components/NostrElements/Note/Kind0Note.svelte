@@ -11,6 +11,7 @@
   export let proxy: string[] | undefined = undefined;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
 </script>
 
 <div
@@ -18,7 +19,13 @@
   style="word-break: break-word;"
 >
   <div class="p-1">
-    <UserMenu pubkey={note.pubkey} bind:metadata={note} size={40} {depth} />
+    <UserMenu
+      pubkey={note.pubkey}
+      bind:metadata={note}
+      size={40}
+      {depth}
+      {tieKey}
+    />
   </div>
   <div class="p-1">
     <div class="flex align-middle">
@@ -42,6 +49,7 @@
         {displayMenu}
         {depth}
         {repostable}
+        {tieKey}
       />
     </div>
     {#if proxy}

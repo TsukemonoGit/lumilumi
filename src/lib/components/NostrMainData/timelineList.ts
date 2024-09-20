@@ -5,7 +5,7 @@ import { scanArray } from "$lib/stores/operators";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
-import { pipe } from "rxjs";
+import { pipe, type OperatorFunction } from "rxjs";
 //import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";
 import { loginUser, slicedEvent } from "$lib/stores/stores";
@@ -16,6 +16,13 @@ export async function loadOlderEvents(
   queryKey: QueryKey,
   // lastfavcheck: boolean,
   until: number,
+  tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >,
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   //console.log(get(slicedEvent));
@@ -58,7 +65,7 @@ export async function loadOlderEvents(
   };
   console.log(newFilters);
   const newReq = createRxBackwardReq();
-  const operator = pipe(uniq(), scanArray());
+  const operator = pipe(tie, uniq(), scanArray());
   const olderEvents = await usePromiseReq(
     {
       operator: operator,
@@ -80,12 +87,18 @@ export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
   queryKey: QueryKey,
-
+  tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >,
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   //filterごとにlimitついてるから、filtersじゃなくてfilterごとに数取ってsliceシテってしないといけない。
   const newReq = createRxBackwardReq();
-  const operator = pipe(uniq(), scanArray());
+  const operator = pipe(tie, uniq(), scanArray());
   const olderEvents = await usePromiseReq(
     {
       operator: operator,

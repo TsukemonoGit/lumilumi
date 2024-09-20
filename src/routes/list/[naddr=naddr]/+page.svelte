@@ -9,7 +9,7 @@
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { setRelays, setTieKey } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import * as Nostr from "nostr-typedef";
@@ -55,7 +55,7 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     if ($defaultRelays) {
       setRelays($defaultRelays);
     } else if (!$defaultRelays && data.relays) {
@@ -122,7 +122,7 @@
       <div slot="error">error</div>
       <div slot="nodata">nodata</div>
       <div class="w-full flex justify-between">
-        <ListLinkCard {event} depth={0} />
+        <ListLinkCard {event} depth={0} {tieKey} />
       </div>
 
       {#await pubkeyList(event)}
@@ -173,15 +173,15 @@
                     let:metadata
                   >
                     <div slot="loading" class="w-full">
-                      <EventCard note={event} />
+                      <EventCard note={event} {tieKey} />
                     </div>
                     <div slot="nodata" class="w-full">
-                      <EventCard note={event} />
+                      <EventCard note={event} {tieKey} />
                     </div>
                     <div slot="error" class="w-full">
-                      <EventCard note={event} />
+                      <EventCard note={event} {tieKey} />
                     </div>
-                    <EventCard {metadata} note={event} /></Metadata
+                    <EventCard {metadata} note={event} {tieKey} /></Metadata
                   >
                   <!-- </div> -->
                 {/each}{/if}

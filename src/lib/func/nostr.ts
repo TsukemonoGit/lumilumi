@@ -469,16 +469,16 @@ export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
   rxNostr3ReccoctRelay(url);
 }
-let tieKey: string;
-export function setTieKey(key: string) {
-  tieKey = key;
-  // console.log(tieKey);
-}
-export function getRelaysById(id: string): string[] {
+// let tieKey: string;
+// export function setTieKey(key: string) {
+//   tieKey = key;
+//   // console.log(tieKey);
+// }
+export function getRelaysById(id: string, key: string): string[] {
   //console.log(tieMapStore);
   const tieMap: Map<string, Set<string>> | undefined =
-    get(tieMapStore)?.[tieKey]?.[1];
-  //console.log(tieMap);
+    get(tieMapStore)?.[key]?.[1];
+
   return Array.from(tieMap?.get(id) || []);
 }
 export function usePromiseReq(
@@ -517,8 +517,8 @@ export function usePromiseReq(
     ? [...initData]
     : [initData];
   //console.log(accumulatedData);
-  const tie =
-    tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
+  // const tie =
+  //   tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req, { relays: relays })

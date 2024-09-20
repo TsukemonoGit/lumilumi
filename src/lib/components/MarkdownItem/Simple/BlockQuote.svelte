@@ -11,6 +11,8 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
+
   // console.log("[blockQuote]", part);
 
   let children: Token[];
@@ -32,6 +34,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />{/each}
     {:else}
       <NostrContent
@@ -40,6 +43,7 @@
         {depth}
         {displayMenu}
         {tags}
+        {tieKey}
       />
     {/if}
   </blockquote>

@@ -32,7 +32,7 @@
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean = true;
   export let depth: number;
-
+  export let tieKey: string | undefined;
   let dialogOpen: any;
 
   const baseMenuTexts = [
@@ -147,7 +147,7 @@
       />
     {/if}
     <div slot="popoverContent" class="w-[24rem] max-w-full">
-      <UserProfile {pubkey} bannerHeight={80} iconSize={60} {depth} />
+      <UserProfile {pubkey} bannerHeight={80} iconSize={60} {depth} {tieKey} />
 
       <div
         class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md mt-2"
@@ -197,7 +197,9 @@
       </div>
       <h2 class="mt-1 text-lg font-medium">Seen on</h2>
       <div class="break-words whitespace-pre-wrap">
-        {metadata ? getRelaysById(metadata.id).join(", ") : ""}
+        {metadata && tieKey
+          ? getRelaysById(metadata.id, tieKey).join(", ")
+          : ""}
       </div>
     </div>
   </Dialog>

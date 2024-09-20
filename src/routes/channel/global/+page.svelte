@@ -4,7 +4,7 @@
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
 
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { setTieKey } from "$lib/func/nostr";
+
   import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { Search, SquareArrowOutUpRight } from "lucide-svelte";
@@ -18,7 +18,7 @@
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "undefined";
+  const tieKey = "globalchannel";
   let isOnMount = false;
   let since: number | undefined = undefined;
   onMount(() => {
@@ -40,7 +40,7 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
@@ -54,7 +54,7 @@
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
-  setTieKey("undefined");
+
   afterNavigate(() => {
     if (!$loginUser) {
       $toastSettings = {
@@ -115,15 +115,15 @@
               let:metadata
             >
               <div slot="loading" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} {tieKey} />
               </div>
               <div slot="nodata" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} {tieKey} />
               </div>
               <div slot="error" class="w-full">
-                <EventCard note={event} />
+                <EventCard note={event} {tieKey} />
               </div>
-              <EventCard {metadata} note={event} /></Metadata
+              <EventCard {metadata} note={event} {tieKey} /></Metadata
             >
 
             <!-- <div

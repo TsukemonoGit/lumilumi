@@ -24,6 +24,7 @@
   export let bannerHeight: number = 180;
   export let iconSize: number = 80;
   export let depth: number;
+  export let tieKey: string | undefined;
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
@@ -119,7 +120,7 @@
             <ReplyToUserButton {metadata} />
             {#if prof.lud16 || prof.lud06}
               <div class=" w-fit"><UserZap {metadata} /></div>
-            {/if}<UserPofileEllipsis {metadata} {prof} />
+            {/if}<UserPofileEllipsis {metadata} {prof} {tieKey} />
           </div>
         </div>
         {#if prof.nip05}
@@ -131,7 +132,7 @@
             href={prof.website}>{prof.website}</Link
           >{/if}
 
-        {#if $showUserStatus}<ShowStatus {pubkey} />{/if}
+        {#if $showUserStatus}<ShowStatus {pubkey} {tieKey} />{/if}
       </div>
 
       {#if prof.about}
@@ -145,6 +146,7 @@
             displayMenu={true}
             {depth}
             repostable={false}
+            {tieKey}
           />
         </div>
       {/if}

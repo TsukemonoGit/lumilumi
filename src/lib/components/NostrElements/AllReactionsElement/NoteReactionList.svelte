@@ -6,7 +6,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   export let events: Nostr.Event[];
-
+  export let tieKey: string | undefined;
   const filterEventsByContent = (events: Nostr.Event[], content: string) => {
     return events.filter((event) => (event.content || "+") === content);
   };
@@ -44,6 +44,7 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
               <UserMenu
@@ -52,6 +53,7 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
               <UserMenu
@@ -60,9 +62,16 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
-              <UserMenu pubkey={event.pubkey} {metadata} size={24} depth={0} />
+              <UserMenu
+                pubkey={event.pubkey}
+                {metadata}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
             </Metadata>
           {/if}
         {/each}

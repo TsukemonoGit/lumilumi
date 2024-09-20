@@ -16,6 +16,7 @@
   export let note: Nostr.Event;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
@@ -61,7 +62,7 @@
     }
     const neventPointer: nip19.EventPointer = {
       id: heyaId,
-      relays: getRelaysById(heyaId),
+      relays: tieKey ? getRelaysById(heyaId, tieKey) : [],
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
@@ -84,6 +85,7 @@
       {displayMenu}
       depth={depth + 1}
       {repostable}
+      {tieKey}
     />
     <!--<hr />-->
   {/if}
@@ -97,6 +99,7 @@
         {displayMenu}
         {depth}
         {repostable}
+        {tieKey}
       />
     </div>
     {#if tag}
@@ -149,4 +152,4 @@
   </Text>
 {/if}
 {#if displayMenu}
-  <NoteActionButtons {note} {repostable} />{/if}
+  <NoteActionButtons {note} {repostable} {tieKey} />{/if}

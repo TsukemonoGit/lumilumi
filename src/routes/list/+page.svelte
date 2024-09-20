@@ -9,9 +9,8 @@
   import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { loginUser, toastSettings } from "$lib/stores/stores";
-  import { setTieKey } from "$lib/func/nostr";
 
-  setTieKey("undefined");
+  const tieKey = undefined;
 
   const handleClickToList = (event: Nostr.Event) => {
     const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
@@ -64,7 +63,7 @@
               on:click={() => handleClickToList(event)}
               class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
             >
-              <ListLinkCard {event} depth={0} /></button
+              <ListLinkCard {event} depth={0} {tieKey} /></button
             >
           {/each}
         {/if}

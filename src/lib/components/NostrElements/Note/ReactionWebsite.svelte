@@ -16,6 +16,7 @@
   export let displayMenu: boolean;
   export let depth: number;
   export let proxy: string[] | undefined;
+  export let tieKey: string | undefined;
 
   $: website = reactionWebsite(note);
   function reactionWebsite(note: Nostr.Event): string | undefined {
@@ -57,7 +58,7 @@
   {/if}
   <div class="ml-auto">
     {#if displayMenu}
-      <NoteActionButtons {note} repostable={false} />{/if}
+      <NoteActionButtons {note} repostable={false} {tieKey} />{/if}
   </div>
 </div>
 <!--リアクションしたノートの情報（リポストのを使いまわし）-->

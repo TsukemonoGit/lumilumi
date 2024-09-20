@@ -11,6 +11,7 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
 
   let children: Token[] = [];
 
@@ -36,6 +37,7 @@
                 {tags}
                 {openModal}
                 {nolist}
+                {tieKey}
               />
             {/each}
           {:else if child.content}
@@ -45,6 +47,7 @@
               {depth}
               {displayMenu}
               {tags}
+              {tieKey}
             />
           {/if}
         </li>
@@ -58,6 +61,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/if}
     {/each}

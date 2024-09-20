@@ -14,6 +14,7 @@
   export let displayMenu: boolean;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseText(text, tags);
 
@@ -86,6 +87,7 @@
         {displayMenu}
         depth={depth + 1}
         {repostable}
+        {tieKey}
       />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
     <ContentImage {part} {openModal} />

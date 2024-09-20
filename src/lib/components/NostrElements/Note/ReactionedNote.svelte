@@ -12,7 +12,6 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import Markdown from "$lib/components/MarkdownItem/Markdown.svelte";
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
 
   export let repostable: boolean;
@@ -21,6 +20,8 @@
   export let tag: string[];
   //export let kind: number | undefined;
   export let depth: number;
+  export let tieKey: string | undefined;
+
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);
@@ -89,6 +90,7 @@
           {displayMenu}
           {depth}
           {repostable}
+          {tieKey}
         />
       {:else}
         <Content
@@ -97,10 +99,11 @@
           {displayMenu}
           {depth}
           {repostable}
+          {tieKey}
         />
       {/if}
       {#if displayMenu}
-        <NoteActionButtons note={text} {repostable} />{/if}
+        <NoteActionButtons note={text} {repostable} {tieKey} />{/if}
     </div>
   </Text>
 {:else if tag[0] === "a"}
@@ -123,15 +126,15 @@
         let:metadata
       >
         <div slot="loading" class="w-full">
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {tieKey} />
         </div>
         <div slot="nodata" class="w-full">
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {tieKey} />
         </div>
         <div slot="error" class="w-full" let:error>
-          <EventCard note={event} {depth} {repostable} />
+          <EventCard note={event} {depth} {repostable} {tieKey} />
         </div>
-        <EventCard note={event} {metadata} {depth} {repostable} />
+        <EventCard note={event} {metadata} {depth} {repostable} {tieKey} />
       </Metadata>
     </LatestEvent>
   {/if}

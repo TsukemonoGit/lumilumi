@@ -12,6 +12,7 @@
   export let thread: boolean = false;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
 </script>
 
 <Text queryKey={["timeline", id]} {id} let:text let:status>
@@ -46,13 +47,37 @@
     let:metadata
   >
     <div slot="loading">
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
+      <EventCard
+        note={text}
+        {mini}
+        {maxHeight}
+        {thread}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
     </div>
     <div slot="nodata">
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
+      <EventCard
+        note={text}
+        {mini}
+        {maxHeight}
+        {thread}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
     </div>
     <div slot="error" let:error>
-      <EventCard note={text} {mini} {maxHeight} {thread} {depth} {repostable} />
+      <EventCard
+        note={text}
+        {mini}
+        {maxHeight}
+        {thread}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
     </div>
     <EventCard
       note={text}
@@ -63,6 +88,7 @@
       {displayMenu}
       {depth}
       {repostable}
+      {tieKey}
     />
   </Metadata>
 </Text>

@@ -19,6 +19,7 @@
   import { page } from "$app/stores";
   export let metadata: Nostr.Event;
   export let prof: Profile;
+  export let tieKey: string | undefined;
   let dialogOpen: any;
   let menuTexts = [
     { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 3 },
@@ -139,7 +140,7 @@
 
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
-      {getRelaysById(metadata.id).join(", ")}
+      {tieKey ? getRelaysById(metadata.id, tieKey).join(", ") : ""}
     </div>
   </div></Dialog
 >

@@ -23,6 +23,7 @@
     title: string | undefined;
     description: string | undefined;
   };
+  export let tieKey: string | undefined;
 
   let dialogOpen: any;
 
@@ -49,7 +50,7 @@
       kind: note.kind,
       identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
       pubkey: note.pubkey,
-      relays: getRelaysById(note.id),
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     };
     const naddr = nip19.naddrEncode(naddrpointer);
     switch (menuTexts[index].num) {
@@ -149,7 +150,7 @@
 
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
-      {getRelaysById(note.id).join(", ")}
+      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
     </div>
   </div></Dialog
 >

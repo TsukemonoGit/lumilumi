@@ -29,6 +29,7 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
 </script>
 
 {#if part.type === "heading"}
@@ -40,6 +41,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "hr"}
   <hr class="my-4" />
@@ -52,6 +54,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
   <!---->
 {:else if part.type === "code_block"}
@@ -69,6 +72,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "blockquote"}
   <BlockQuote
@@ -79,6 +83,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "ordered_list"}
   <OrderedList
@@ -89,6 +94,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "bullet_list"}
   <BulletList
@@ -99,6 +105,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "list_item"}
   <ListItem
@@ -109,6 +116,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "inline"}
   <Inline
@@ -119,9 +127,19 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "link"}
-  <Link {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
+  <Link
+    {part}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {openModal}
+    {nolist}
+    {tieKey}
+  />
 {:else if part.type === "image"}
   <Image {part} />
 {:else if part.type === "strong"}
@@ -133,6 +151,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "s"}
   <Strikethrough
@@ -143,11 +162,28 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "text"}
-  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
+  <NostrContent
+    text={part.content}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {tieKey}
+  />
 {:else if part.type === "em"}
-  <Em {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
+  <Em
+    {part}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {openModal}
+    {nolist}
+    {tieKey}
+  />
 {:else if part.type === "softbreak"}
   <!---->
 {:else if part.type === "footnote_ref"}
@@ -161,6 +197,7 @@
     {tags}
     {openModal}
     {nolist}
+    {tieKey}
   />
 {:else if part.type === "footnote"}
   {part.content}
@@ -175,9 +212,25 @@
 {:else if part.type === "sup"}
   <sup>{part.content}</sup>
 {:else if part.type === "mark"}
-  <Mark {part} {repostable} {depth} {displayMenu} {tags} {openModal} {nolist} />
+  <Mark
+    {part}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {openModal}
+    {nolist}
+    {tieKey}
+  />
 {:else}<b>{part.type}</b>
-  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
+  <NostrContent
+    text={part.content}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {tieKey}
+  />
 {/if}
 
 <style lang="postcss">

@@ -14,6 +14,7 @@
   export let content: string | undefined;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
   export let decoded:
     | {
         type: "naddr";
@@ -50,6 +51,7 @@
           />{:else}<PopupUserName
             pubkey={decoded.data}
             metadata={undefined}
+            {tieKey}
           />{/if}</span
       >{:else if decoded.type === "nevent"}<span
         class="grid grid-cols-[auto_1fr_auto]"
@@ -61,6 +63,7 @@
             {displayMenu}
             {depth}
             {repostable}
+            {tieKey}
           />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
@@ -74,6 +77,7 @@
             {displayMenu}
             {depth}
             {repostable}
+            {tieKey}
           />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
@@ -130,19 +134,20 @@
               let:metadata
             >
               <div slot="loading">
-                <EventCard note={event} {displayMenu} {repostable} />
+                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
               </div>
               <div slot="nodata">
-                <EventCard note={event} {displayMenu} {repostable} />
+                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
               </div>
               <div slot="error">
-                <EventCard note={event} {displayMenu} {repostable} />
+                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
               </div>
               <EventCard
                 {metadata}
                 {displayMenu}
                 note={event}
                 {repostable}
+                {tieKey}
               /></Metadata
             >
           </LatestEvent>
@@ -155,6 +160,7 @@
           />{:else}<PopupUserName
             pubkey={decoded.data.pubkey}
             metadata={undefined}
+            {tieKey}
           />{/if}</span
       >
     {:else if decoded.type === "nrelay"}<span

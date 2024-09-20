@@ -1,12 +1,11 @@
 <script lang="ts">
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { generateRandomId, setTieKey } from "$lib/func/nostr";
+  import { generateRandomId } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
@@ -37,7 +36,6 @@
   };
   afterNavigate(() => {
     view = false;
-    setTieKey(tieKey);
     req = createRxForwardReq(generateRandomId());
 
     setTimeout(() => {
@@ -74,7 +72,6 @@
   });
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
@@ -180,6 +177,7 @@
                       displayMenu={true}
                       depth={1}
                       repostable={true}
+                      {tieKey}
                     />
                   </div>
                 {/each}
@@ -228,18 +226,31 @@
                         let:metadata
                       >
                         <div slot="loading">
-                          <EventCard note={event} excludefunc={excludeKind1} />
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
                         </div>
                         <div slot="nodata">
-                          <EventCard note={event} excludefunc={excludeKind1} />
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
                         </div>
                         <div slot="error">
-                          <EventCard note={event} excludefunc={excludeKind1} />
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
                         </div>
                         <EventCard
                           {metadata}
                           note={event}
                           excludefunc={excludeKind1}
+                          {tieKey}
                         />
                       </Metadata>
                       <!-- </div> -->
@@ -293,18 +304,31 @@
                       let:metadata
                     >
                       <div slot="loading">
-                        <EventCard note={event} excludefunc={excludeKind7} />
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
                       </div>
                       <div slot="nodata">
-                        <EventCard note={event} excludefunc={excludeKind7} />
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
                       </div>
                       <div slot="error">
-                        <EventCard note={event} excludefunc={excludeKind7} />
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
                       </div>
                       <EventCard
                         {metadata}
                         note={event}
                         excludefunc={excludeKind7}
+                        {tieKey}
                       />
                     </Metadata>
                     <!-- </div> -->

@@ -11,6 +11,8 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
+
   let children: Token[];
 
   $: if (part.children) {
@@ -36,6 +38,7 @@
                 {tags}
                 {openModal}
                 {nolist}
+                {tieKey}
               />{:else}
               <a
                 href="#footnote-ref-{child2.meta.id}"
@@ -49,6 +52,7 @@
             {depth}
             {displayMenu}
             {tags}
+            {tieKey}
           />
         {/if}
       </li>{/each}
@@ -59,6 +63,7 @@
     {depth}
     {displayMenu}
     {tags}
+    {tieKey}
   />{/if}
 
 <style lang="postcss">

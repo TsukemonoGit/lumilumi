@@ -30,7 +30,6 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
@@ -63,9 +62,9 @@
   //   }
   // >;
   export let reaCheck = false;
-  export let tieKey: string | undefined = undefined;
+  export let tieKey: string;
 
-  const query = createQuery({
+  createQuery({
     queryKey: [...queryKey, "olderData"],
     queryFn: undefined,
     staleTime: Infinity, // 4 hour
@@ -75,12 +74,9 @@
   });
 
   const [tie, tieMap] = createTie();
-
-  $: if (!tieKey || tieKey) {
-    setTieKey(tieKey ?? "undefined");
-    if (!tieKey) {
-      //$tieMapStore = { undefined: undefined };
-    } else if (!$tieMapStore) {
+  $: if (tieKey) {
+    //$tieMapStore = { undefined: undefined };
+    if (!$tieMapStore) {
       $tieMapStore = { [tieKey]: [tie, tieMap] };
     } else if (!$tieMapStore?.[tieKey]) {
       $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
@@ -101,8 +97,8 @@
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
   $: operator = reaCheck
-    ? pipe(uniq, userStatus(), reactionCheck(), scanArray())
-    : pipe(uniq, userStatus(), scanArray());
+    ? pipe(tie, uniq, userStatus(), reactionCheck(), scanArray())
+    : pipe(tie, uniq, userStatus(), scanArray());
   $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   $: data = result.data;
   $: status = result.status;
@@ -199,6 +195,7 @@
         50,
         [newFilters],
         queryKey,
+        tie,
         relays
       );
       console.log("first older", older);
@@ -289,6 +286,7 @@
         queryKey,
         //lastfavcheck,
         untilTime,
+        tie,
         relays
       );
       console.log(older);

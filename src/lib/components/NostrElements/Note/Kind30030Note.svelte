@@ -5,6 +5,8 @@
   export let note: Nostr.Event;
   export let repostable: boolean;
   export let maxHeight: string;
+  export let tieKey: string | undefined;
+
   $: dtag = note?.tags?.find((tag) => tag[0] === "d")?.[1];
   $: title = note?.tags?.find((tag) => tag[0] === "title")?.[1];
   $: description = note.tags.find(
@@ -44,5 +46,5 @@
       {/if}
     {/each}
   </div>
-  <NoteActionButtons {note} {repostable} />
+  <NoteActionButtons {note} {repostable} {tieKey} />
 </div>

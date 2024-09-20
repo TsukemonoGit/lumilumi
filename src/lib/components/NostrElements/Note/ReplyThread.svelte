@@ -5,6 +5,7 @@
   export let displayMenu: boolean;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
 </script>
 
 {#if replyID}
@@ -15,5 +16,6 @@
     thread={true}
     depth={depth + 1}
     {repostable}
+    {tieKey}
   />
 {/if}

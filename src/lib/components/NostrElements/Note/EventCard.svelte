@@ -10,7 +10,7 @@
   import Content from "./Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { eventKinds, profile } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
   import Reply from "./Reply.svelte";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
@@ -54,6 +54,9 @@
   export let excludefunc = (event: Nostr.Event) => false;
 
   export let repostable: boolean = true;
+
+  export let tieKey: string | undefined;
+
   let atag: string | undefined;
   $: {
     if (
@@ -240,7 +243,7 @@
     }
     const neventPointer: nip19.EventPointer = {
       id: id,
-      relays: getRelaysById(id),
+      relays: tieKey ? getRelaysById(id, tieKey) : [],
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
@@ -276,17 +279,24 @@
 {#if muteType === "null" || viewMuteEvent}
   {#if thread && replyID}
     <!-- <div class="border-b border-magnum-600/30"> -->
-    <ReplyThread {replyID} {displayMenu} {depth} {repostable} />
+    <ReplyThread {replyID} {displayMenu} {depth} {repostable} {tieKey} />
     <!-- </div> -->
   {/if}
 
   <article class="{noteClass()} w-full">
     {#if note.kind === 1}
-      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} />{/if}
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
         <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
         {#if !thread && (replyID || replyUsers.length > 0)}
-          <Reply {replyID} {replyUsers} {displayMenu} {depth} {repostable} />
+          <Reply
+            {replyID}
+            {replyUsers}
+            {displayMenu}
+            {depth}
+            {repostable}
+            {tieKey}
+          />
           <!--<hr />-->
         {/if}
 
@@ -301,6 +311,7 @@
               {displayMenu}
               {depth}
               {repostable}
+              {tieKey}
             />
           </div>
           {#if warning}
@@ -315,13 +326,14 @@
           </div>
         {/if}
         {#if displayMenu}
-          <NoteActionButtons {note} {repostable} />{/if}
+          <NoteActionButtons {note} {repostable} {tieKey} />{/if}
       </NoteTemplate>
     {:else if note.kind === 42}
       <!--kind42 パブ茶コメント-->
 
-      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
         <Kind42Note
+          {tieKey}
           {note}
           {displayMenu}
           {depth}
@@ -343,6 +355,7 @@
             size={20}
             {displayMenu}
             {depth}
+            {tieKey}
           />
         </div>
         <div class=" inline-block break-all break-words whitespace-pre-line">
@@ -363,7 +376,7 @@
         {/if}
         <div class="ml-auto mr-2">
           {#if displayMenu}
-            <NoteActionButtons {note} {repostable} />{/if}
+            <NoteActionButtons {note} {repostable} {tieKey} />{/if}
         </div>
       </div>
       <!--リアクションしたノートの情報-->
@@ -375,6 +388,7 @@
           {repostable}
           {maxHeight}
           {displayMenu}
+          {tieKey}
         />
       {/if}
     {:else if note.kind === 7}
@@ -388,6 +402,7 @@
             size={20}
             {displayMenu}
             {depth}
+            {tieKey}
           />
         </div>
         <div class="break-all break-words whitespace-pre-line">
@@ -409,13 +424,19 @@
         {/if}
         <div class="ml-auto">
           {#if displayMenu}
-            <NoteActionButtons {note} {repostable} />{/if}
+            <NoteActionButtons {note} {repostable} {tieKey} />{/if}
         </div>
       </div>
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}{#if $page.route.id === "/" || $page.route.id === "/notifications"}<!--タイムラインと通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
-          <ReactionedNote {tag} depth={depth + 1} {repostable} {displayMenu} />
+          <ReactionedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {tieKey}
+          />
         {:else}
           <RepostedNote
             {tag}
@@ -423,15 +444,23 @@
             {repostable}
             {displayMenu}
             {maxHeight}
+            {tieKey}
           />
         {/if}
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-      <ReactionWebsite {note} {metadata} {displayMenu} {depth} {proxy} />
+      <ReactionWebsite
+        {note}
+        {metadata}
+        {displayMenu}
+        {depth}
+        {proxy}
+        {tieKey}
+      />
     {:else if note.kind === 0}
       <!--kind0-->
-      <Kind0Note {note} {proxy} {displayMenu} {depth} {repostable} />
+      <Kind0Note {note} {proxy} {displayMenu} {depth} {repostable} {tieKey} />
     {:else if note.kind === 40}
       <!--kind40 パブ茶部屋-->
       <LatestEvent
@@ -447,6 +476,7 @@
             handleClickToChannel={() => handleClickToChannel(note.id)}
             id={note.id}
             event={note}
+            {tieKey}
           />
         </div>
         <div slot="nodata">
@@ -455,6 +485,7 @@
             handleClickToChannel={() => handleClickToChannel(note.id)}
             id={note.id}
             event={note}
+            {tieKey}
           />
         </div>
         <div slot="error">
@@ -463,6 +494,7 @@
             handleClickToChannel={() => handleClickToChannel(note.id)}
             id={note.id}
             event={note}
+            {tieKey}
           />
         </div>
         <ChannelMetadataLayout
@@ -470,14 +502,15 @@
           handleClickToChannel={() => handleClickToChannel(note.id)}
           id={note.id}
           {event}
+          {tieKey}
         />
       </LatestEvent>
     {:else if note.kind === 30000}
-      <ListLinkCard event={note} {depth} />
+      <ListLinkCard event={note} {depth} {tieKey} />
     {:else if note.kind === 30030}
       <!--kind30030-->
-      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth}>
-        <Kind30030Note {note} {repostable} {maxHeight} /></NoteTemplate
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        <Kind30030Note {note} {repostable} {maxHeight} {tieKey} /></NoteTemplate
       >
     {:else if note.kind === 9735}
       <!--kind9735 zap receipt-->
@@ -489,11 +522,13 @@
         {repostable}
         {maxHeight}
         {displayMenu}
+        {tieKey}
       />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
       {#if !data}
         <OtherKindNote
+          {tieKey}
           {note}
           {metadata}
           {displayMenu}
@@ -509,6 +544,7 @@
           {displayMenu}
           {depth}
           {repostable}
+          {tieKey}
         />
       {/if}
     {:else}
@@ -686,6 +722,7 @@
         {depth}
         {repostable}
         {maxHeight}
+        {tieKey}
       />{/if}
   </article>
 {/if}

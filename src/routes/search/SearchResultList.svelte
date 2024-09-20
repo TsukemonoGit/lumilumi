@@ -6,6 +6,7 @@
     nowProgress,
     queryClient,
     slicedEvent,
+    tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus } from "$lib/types";
@@ -20,8 +21,8 @@
     type RxReqEmittable,
     type RxReqOverable,
     type RxReqPipeable,
+    createTie,
   } from "rx-nostr";
-  import { setTieKey } from "$lib/func/nostr";
   import { onDestroy, onMount } from "svelte";
   import {
     firstLoadOlderEvents,
@@ -37,7 +38,6 @@
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  let lastfavcheck: boolean = false;
   export let req:
     | (RxReq<"backward"> &
         RxReqEmittable<{
@@ -51,6 +51,7 @@
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
+  export let tieKey: string;
   // export let tie: OperatorFunction<
   //   EventPacket,
   //   EventPacket & {
@@ -108,6 +109,17 @@
   });
 
   let isOnMount = false;
+
+  const [tie, tieMap] = createTie();
+  $: if (tieKey) {
+    //$tieMapStore = { undefined: undefined };
+    if (!$tieMapStore) {
+      $tieMapStore = { [tieKey]: [tie, tieMap] };
+    } else if (!$tieMapStore?.[tieKey]) {
+      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+    }
+  }
+
   onMount(async () => {
     if (!isOnMount) {
       console.log("onMount");
@@ -131,7 +143,6 @@
   });
 
   async function init() {
-    setTieKey("undefined");
     const ev: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
@@ -169,6 +180,7 @@
         50,
         newFilters,
         queryKey,
+        tie,
         relays
       );
 
@@ -211,6 +223,7 @@
         filters,
         queryKey,
         untilTime,
+        tie,
         relays
       );
       console.log(older);

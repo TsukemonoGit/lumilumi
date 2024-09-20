@@ -11,6 +11,8 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
+
   let children: Token[];
   $: if (part.children) {
     children = transformTokens(part.children);
@@ -39,6 +41,7 @@
             {tags}
             {openModal}
             {nolist}
+            {tieKey}
           />{/if}
       {/each}
     {:else}
@@ -48,10 +51,18 @@
         {depth}
         {displayMenu}
         {tags}
+        {tieKey}
       />
     {/if}{/each}
 {:else}
-  <NostrContent text={part.content} {repostable} {depth} {displayMenu} {tags} />
+  <NostrContent
+    text={part.content}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {tieKey}
+  />
 {/if}
 
 <style lang="postcss">

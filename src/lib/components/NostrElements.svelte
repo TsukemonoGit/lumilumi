@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
 
-  import { getFollowingList, pubkeysIn, setTieKey } from "$lib/func/nostr";
+  import { getFollowingList, pubkeysIn } from "$lib/func/nostr";
 
   import TimelineList from "./NostrMainData/TimelineList.svelte";
 
@@ -53,7 +53,7 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
@@ -154,7 +154,7 @@
       <div
         class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
       >
-        <FolloweeFilteredEventList {events} />
+        <FolloweeFilteredEventList {events} {tieKey} />
       </div>
     </TimelineList>
   {/if}

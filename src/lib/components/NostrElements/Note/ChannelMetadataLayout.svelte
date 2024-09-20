@@ -11,8 +11,11 @@
   export let id: string; //40
   export let handleClickToChannel: (() => void) | undefined = undefined;
   export let linkButtonTitle: string;
+
   let size = 96;
   export let event: Nostr.Event; //40か41
+  export let tieKey: string | undefined;
+
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
       return JSON.parse(text.content) as ChannelData;
@@ -97,7 +100,7 @@
       <div class="flex flex-col justify-between items-center">
         <UserMenu pubkey={event.pubkey} {metadata} size={40} depth={0} />
         <button class="text-magnum-400"
-          ><ChannelEllipsisMenu note={event} {channelData} /></button
+          ><ChannelEllipsisMenu note={event} {channelData} {tieKey} /></button
         >
       </div>
     </Metadata>

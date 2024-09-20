@@ -10,8 +10,7 @@
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
-  import { setRelays, setTieKey } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import { afterNavigate, goto } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -28,6 +27,7 @@
     author?: string | undefined;
   };
 
+  $: tieKey = data.id;
   let isMount = false;
   onMount(() => {
     init();
@@ -100,20 +100,41 @@
             slot="loading"
             class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
           >
-            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+            <EventCard
+              note={text}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
           </div>
           <div
             slot="nodata"
             class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
           >
-            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+            <EventCard
+              note={text}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
           </div>
           <div
             slot="error"
             class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
             let:error
           >
-            <EventCard note={text} {maxHeight} {thread} {depth} {repostable} />
+            <EventCard
+              note={text}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
           </div>
           <div
             class="divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
@@ -126,6 +147,7 @@
               {displayMenu}
               {depth}
               {repostable}
+              {tieKey}
             />
           </div>
         </Metadata>
@@ -168,15 +190,21 @@
                     let:metadata
                   >
                     <div slot="loading">
-                      <EventCard note={event} depth={0} {repostable} />
+                      <EventCard note={event} depth={0} {repostable} {tieKey} />
                     </div>
                     <div slot="nodata">
-                      <EventCard note={event} depth={0} {repostable} />
+                      <EventCard note={event} depth={0} {repostable} {tieKey} />
                     </div>
                     <div slot="error">
-                      <EventCard note={event} depth={0} {repostable} />
+                      <EventCard note={event} depth={0} {repostable} {tieKey} />
                     </div>
-                    <EventCard {metadata} note={event} depth={0} {repostable} />
+                    <EventCard
+                      {metadata}
+                      note={event}
+                      depth={0}
+                      {repostable}
+                      {tieKey}
+                    />
                   </Metadata>
                   <!-- </div> -->
                 {/each}

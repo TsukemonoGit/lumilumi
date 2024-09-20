@@ -15,6 +15,7 @@
   export let displayMenu: boolean;
   export let depth: number;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
 </script>
 
 <div class=" break-all overflow-x-hidden gap-4 p-1">
@@ -43,5 +44,5 @@
   <OgpCard
     contents={data.ogp}
     url={data.url}
-  />{#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
+  />{#if displayMenu}<NoteActionButtons {note} {repostable} {tieKey} />{/if}
 </div>

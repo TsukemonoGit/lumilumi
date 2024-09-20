@@ -3,7 +3,7 @@
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { getFollowingList, setTieKey } from "$lib/func/nostr";
+  import { getFollowingList } from "$lib/func/nostr";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -45,7 +45,6 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
 
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
@@ -246,15 +245,15 @@
                 let:metadata
               >
                 <div slot="loading" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="nodata" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="error" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
-                <EventCard {metadata} note={event} /></Metadata
+                <EventCard {metadata} note={event} {tieKey} /></Metadata
               >
             {/each}
           {/if}
