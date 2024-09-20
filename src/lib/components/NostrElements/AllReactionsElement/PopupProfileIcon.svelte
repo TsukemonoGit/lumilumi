@@ -11,6 +11,7 @@
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   const size = 20;
   export let pubkey: string;
+  export let tieKey: string | undefined;
 
   const picture = (content: string): string | undefined => {
     try {
@@ -78,6 +79,6 @@
     </Metadata>
   </div>
   <div slot="popoverContent">
-    <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} />
+    <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} {tieKey} />
   </div>
 </Popover>

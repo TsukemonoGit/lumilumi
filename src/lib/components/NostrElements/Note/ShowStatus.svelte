@@ -6,6 +6,7 @@
   import { beforeNavigate } from "$app/navigation";
 
   export let pubkey: string;
+  export let tieKey: string | undefined;
   beforeNavigate(() => {
     pubkey = "";
   });
@@ -23,6 +24,7 @@
               note={event}
               iconSize={16}
               iconClass="text-zinc-500"
+              {tieKey}
             />
           </div>
           <a
@@ -41,6 +43,7 @@
         {:else if event.content.trim() !== ""}
           <div class=" min-w-[16px] flex items-center justify-center">
             <EllipsisMenu
+              {tieKey}
               TriggerIcon={TrendingUp}
               note={event}
               iconSize={16}
@@ -63,6 +66,7 @@
             class=" min-w-[16px] flex items-center justify-center"
           >
             <EllipsisMenu
+              {tieKey}
               TriggerIcon={Music}
               note={event}
               iconSize={16}
@@ -86,6 +90,7 @@
             class=" min-w-[16px] flex items-center justify-center"
           >
             <EllipsisMenu
+              {tieKey}
               TriggerIcon={Music}
               note={event}
               iconSize={16}

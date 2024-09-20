@@ -15,17 +15,18 @@
 
   export let id: string;
   export let width: number;
+  export let tieKey: string | undefined;
 
   let size = 16;
   let viewAll = false;
   let relays: string[] = [];
   slicedEvent.subscribe(() => {
-    relays = getRelaysById(id);
+    relays = tieKey ? getRelaysById(id, tieKey) : [];
   });
   onMount(() => {
     //でてすぐはちょっとしかリレーないから１秒後にもっかい取得し直してみる
     setTimeout(() => {
-      relays = getRelaysById(id);
+      relays = tieKey ? getRelaysById(id, tieKey) : [];
     }, 1000);
   });
 

@@ -10,6 +10,8 @@
   export let tags;
   export let openModal;
   export let nolist: boolean;
+  export let tieKey: string | undefined;
+
   let children: Token[];
   $: if (part.children) {
     children = transformTokens(part.children);
@@ -29,6 +31,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h1>
@@ -43,6 +46,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h2>
@@ -57,6 +61,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h3>
@@ -71,6 +76,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h4>
@@ -85,6 +91,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h5>
@@ -99,6 +106,7 @@
           {tags}
           {openModal}
           {nolist}
+          {tieKey}
         />
       {/each}
     </h6>

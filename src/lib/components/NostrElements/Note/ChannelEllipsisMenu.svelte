@@ -21,6 +21,7 @@
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   export let channelData: ChannelData;
+  export let tieKey: string | undefined;
 
   let dialogOpen: any;
 
@@ -46,7 +47,7 @@
     //  console.log(menuTexts[index]);
     const eventpointer: nip19.EventPointer = {
       id: note.id,
-      relays: getRelaysById(note.id),
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
       author: note.pubkey,
       kind: note.kind,
     };
@@ -54,7 +55,7 @@
       kind: note.kind,
       identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
       pubkey: note.pubkey,
-      relays: getRelaysById(note.id),
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     };
     const naddr = nip19.naddrEncode(naddrpointer);
     const nevent = nip19.neventEncode(eventpointer);
@@ -162,7 +163,7 @@
 
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
-      {getRelaysById(note.id).join(", ")}
+      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
     </div>
   </div></Dialog
 >

@@ -67,6 +67,7 @@
         displayMenu={false}
         depth={0}
         repostable={false}
+        tieKey={undefined}
       />
     </div>
   {/if}

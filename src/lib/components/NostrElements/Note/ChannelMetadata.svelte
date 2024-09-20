@@ -6,6 +6,7 @@
   export let id: string; //kind40 channel id
   export let handleClickToChannel: (() => void) | undefined = undefined;
   export let linkButtonTitle: string;
+  export let tieKey: string | undefined;
 </script>
 
 <!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->
@@ -30,6 +31,7 @@
         {id}
         {linkButtonTitle}
         event={text}
+        {tieKey}
       />
     </div>
     <div slot="nodata" class="w-full">
@@ -38,6 +40,7 @@
         {id}
         {linkButtonTitle}
         event={text}
+        {tieKey}
       />
     </div>
     <div slot="error" class="w-full">
@@ -46,6 +49,7 @@
         {id}
         {linkButtonTitle}
         event={text}
+        {tieKey}
       />
     </div>
     <ChannelMetadataLayout
@@ -53,6 +57,7 @@
       {id}
       {linkButtonTitle}
       {event}
+      {tieKey}
     />
   </LatestEvent>
 </Text>

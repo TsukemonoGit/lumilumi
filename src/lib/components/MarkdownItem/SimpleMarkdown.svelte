@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { parseMarkdownText } from "$lib/func/content";
-  import { viewMediaModal } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
-  import ContentBlock from "./ContentBlock.svelte";
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
   import markdownit from "markdown-it";
   import { transformTokens } from "$lib/func/markdown";
@@ -16,6 +13,7 @@
   export let depth: number;
   export let repostable: boolean;
   export let nolist: boolean = false;
+  export let tieKey: string | undefined;
 
   const md = markdownit();
 
@@ -52,6 +50,7 @@
         {tags}
         {openModal}
         {nolist}
+        {tieKey}
       />
     {/each}
   {/if}

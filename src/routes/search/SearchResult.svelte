@@ -2,11 +2,10 @@
   import { createRxForwardReq, createTie } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
-  import SetRepoReactions from "../../lib/components/NostrMainData/SetRepoReactions.svelte";
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
-  import { generateRandomId, setTieKey } from "$lib/func/nostr";
+  import { generateRandomId } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -19,15 +18,13 @@
   export let relays: string[];
 
   $: console.log(filters);
-  // const tieKey = "search";
+  const tieKey = "search";
 
   onMount(() => {
     console.log("relays", relays);
-    setTieKey("undefined");
   });
   afterNavigate(() => {
     console.log("relays", relays);
-    setTieKey("undefined");
   });
   onDestroy(() => {
     // $queryClient.cancelQueries({
@@ -48,6 +45,7 @@
       let:events
       {viewIndex}
       {amount}
+      {tieKey}
       let:len
       relays={relays.length > 0 ? relays : nip50relays}
     >
@@ -73,15 +71,15 @@
                 let:metadata
               >
                 <div slot="loading" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="nodata" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="error" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
-                <EventCard {metadata} note={event} />
+                <EventCard {metadata} note={event} {tieKey} />
               </Metadata>
             </div>
           {/each}

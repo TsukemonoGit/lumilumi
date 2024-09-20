@@ -2,12 +2,7 @@
   import { Repeat2, Heart, MessageSquare, Quote, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    getDefaultWriteRelays,
-    getRelaysById,
-    publishEvent,
-    usePromiseReq,
-  } from "$lib/func/nostr";
+  import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import type { AdditionalPostOptions } from "$lib/types";
@@ -39,6 +34,8 @@
 
   export let note: Nostr.Event;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
+
   let dtag: string[] | undefined;
   let atag: string | undefined;
 
@@ -111,7 +108,7 @@
     console.log(menuTexts[index].num);
     const eventpointer: nip19.EventPointer = {
       id: note.id,
-      relays: getRelaysById(note.id),
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
       author: note.pubkey,
       kind: note.kind,
     };
@@ -262,22 +259,22 @@
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
     tags.push(["p", note.pubkey]);
-
+    const relaylist = tieKey ? getRelaysById(note.id, tieKey) : [];
     const root = note.tags.find(
       (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
     );
 
     if (atag) {
-      tags.push(["a", atag, getRelaysById(note.id)?.[0] ?? ""]);
+      tags.push(["a", atag, relaylist?.[0] ?? ""]);
     } else {
       if (root) {
         // if (note.kind !== 42) {
         //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
         tags.push(root);
         // }
-        tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "reply"]);
+        tags.push(["e", note.id, relaylist?.[0] ?? "", "reply"]);
       } else {
-        tags.push(["e", note.id, getRelaysById(note.id)?.[0] ?? "", "root"]);
+        tags.push(["e", note.id, relaylist?.[0] ?? "", "root"]);
       }
     }
 
@@ -448,6 +445,7 @@
                 {metadata}
                 displayMenu={false}
                 repostable={false}
+                {tieKey}
               />
             </div>
             <div class="mt-4 rounded-md">
@@ -474,7 +472,7 @@
     >
   {/if}
   <!--メニュー-->
-  <EllipsisMenu {note} />
+  <EllipsisMenu {note} {tieKey} />
 </div>
 
 <ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice />

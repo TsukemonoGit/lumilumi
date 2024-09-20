@@ -515,6 +515,7 @@
               displayMenu={false}
               repostable={false}
               maxHeight={"10rem"}
+              tieKey={undefined}
             />
           </div>
           <!-- <div

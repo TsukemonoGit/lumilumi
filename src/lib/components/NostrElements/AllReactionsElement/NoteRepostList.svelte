@@ -4,6 +4,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   export let events: Nostr.Event[];
+  export let tieKey: string | undefined;
 </script>
 
 <CollapsibleList title="Repost" bind:amount={events.length}>
@@ -20,6 +21,7 @@
           metadata={undefined}
           size={24}
           depth={0}
+          {tieKey}
         />
 
         <UserMenu
@@ -28,6 +30,7 @@
           metadata={undefined}
           size={24}
           depth={0}
+          {tieKey}
         />
 
         <UserMenu
@@ -36,9 +39,16 @@
           metadata={undefined}
           size={24}
           depth={0}
+          {tieKey}
         />
 
-        <UserMenu pubkey={event.pubkey} {metadata} size={24} depth={0} />
+        <UserMenu
+          pubkey={event.pubkey}
+          {metadata}
+          size={24}
+          depth={0}
+          {tieKey}
+        />
       </Metadata>
     {/each}
   </div>

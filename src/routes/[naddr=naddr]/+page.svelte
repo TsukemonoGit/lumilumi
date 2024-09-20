@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { setRelays, setTieKey } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
@@ -55,7 +55,7 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     if ($defaultRelays) {
       setRelays($defaultRelays);
     } else if (!$defaultRelays && data.relays) {
@@ -89,19 +89,37 @@
           slot="loading"
           class=" w-full ivide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
         >
-          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+          <EventCard
+            note={event}
+            depth={0}
+            repostable={true}
+            {maxHeight}
+            {tieKey}
+          />
         </div>
         <div
           slot="nodata"
           class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
         >
-          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+          <EventCard
+            note={event}
+            depth={0}
+            repostable={true}
+            {maxHeight}
+            {tieKey}
+          />
         </div>
         <div
           slot="error"
           class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
         >
-          <EventCard note={event} depth={0} repostable={true} {maxHeight} />
+          <EventCard
+            note={event}
+            depth={0}
+            repostable={true}
+            {maxHeight}
+            {tieKey}
+          />
         </div>
         <div
           class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
@@ -112,6 +130,7 @@
             depth={0}
             repostable={true}
             {maxHeight}
+            {tieKey}
           />
         </div>
       </Metadata>
@@ -169,10 +188,20 @@
                 let:metadata
               >
                 <div slot="loading">
-                  <EventCard note={event} depth={0} repostable={true} />
+                  <EventCard
+                    note={event}
+                    depth={0}
+                    repostable={true}
+                    {tieKey}
+                  />
                 </div>
                 <div slot="nodata">
-                  <EventCard note={event} depth={0} repostable={true} />
+                  <EventCard
+                    note={event}
+                    depth={0}
+                    repostable={true}
+                    {tieKey}
+                  />
                 </div>
                 <div slot="error">
                   <EventCard
@@ -180,6 +209,7 @@
                     depth={0}
                     repostable={true}
                     {maxHeight}
+                    {tieKey}
                   />
                 </div>
                 <EventCard
@@ -187,6 +217,7 @@
                   note={event}
                   depth={0}
                   repostable={true}
+                  {tieKey}
                 />
               </Metadata>
               <!-- </div> -->

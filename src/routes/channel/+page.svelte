@@ -3,7 +3,7 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
-  import { setTieKey } from "$lib/func/nostr";
+
   import { loginUser, toastSettings } from "$lib/stores/stores";
   import { Search, SquareArrowOutUpRight } from "lucide-svelte";
 
@@ -11,10 +11,11 @@
   //import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
 
+  const tieKey = undefined;
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
-  setTieKey("undefined");
+
   afterNavigate(() => {
     if (!$loginUser) {
       $toastSettings = {
@@ -50,6 +51,7 @@
             handleClickToChannel={() => handleClickToChannel(id)}
             {id}
             linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+            {tieKey}
           />
         </div>
       {/each}

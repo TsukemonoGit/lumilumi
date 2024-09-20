@@ -7,6 +7,7 @@
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
 
   export let events: Nostr.Event[];
+  export let tieKey: string | undefined;
   //とりあえずデコード失敗したら0になるようになってるけどちゃんと取り除いて
 
   const getAmount = (event: Nostr.Event): number | undefined => {
@@ -74,6 +75,7 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
               <UserMenu
@@ -82,6 +84,7 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
               <UserMenu
@@ -90,6 +93,7 @@
                 metadata={undefined}
                 size={24}
                 depth={0}
+                {tieKey}
               />
 
               <UserMenu
@@ -97,6 +101,7 @@
                 {metadata}
                 size={24}
                 depth={0}
+                {tieKey}
               />
             </Metadata>
             {#if zapper.content !== ""}<div

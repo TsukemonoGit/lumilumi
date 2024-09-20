@@ -10,6 +10,8 @@
   import { goto } from "$app/navigation";
   export let event: Nostr.Event;
   export let depth: number;
+  export let tieKey: string | undefined;
+
   const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
   const title = event.tags.find((tag) => tag[0] === "title")?.[1];
   const description = event.tags.find((tag) => tag[0] === "description")?.[1];
@@ -99,6 +101,7 @@
       ><ListEllipsisMenu
         note={event}
         listData={{ dtag: dtag, title: title, description: description }}
+        {tieKey}
       />
     </button>
   </div>

@@ -21,6 +21,8 @@
   export let depth: number;
   export let maxHeight: string;
   export let repostable: boolean;
+  export let tieKey: string | undefined;
+
   $: title =
     note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
     note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
@@ -37,7 +39,7 @@
     note.kind === 3;
   const eventpointer: nip19.EventPointer = {
     id: note.id,
-    relays: getRelaysById(note.id),
+    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     author: note.pubkey,
     kind: note.kind,
   };
@@ -45,7 +47,7 @@
     kind: note.kind,
     identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
     pubkey: note.pubkey,
-    relays: getRelaysById(note.id),
+    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
   };
   const naddr = nip19.naddrEncode(naddrpointer);
   const nevent = nip19.neventEncode(eventpointer);
@@ -128,5 +130,5 @@
         {repostable}
       />{/if}
   </div>
-  {#if displayMenu}<NoteActionButtons {note} {repostable} />{/if}
+  {#if displayMenu}<NoteActionButtons {note} {repostable} {tieKey} />{/if}
 </div>

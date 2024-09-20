@@ -19,6 +19,8 @@
   export let repostable: boolean;
   export let maxHeight: string;
   export let displayMenu: boolean;
+  export let tieKey: string | undefined;
+
   let viewMuteEvent: boolean;
   //kind9734の取得と検証
   const zapRequestEvent = extractKind9734(note);
@@ -81,6 +83,7 @@
                 {metadata}
                 size={20}
                 {depth}
+                {tieKey}
               />
             </div>
             <div class="inline-block break-all break-words whitespace-pre-line">
@@ -99,7 +102,7 @@
             </div>
 
             <div class="ml-auto mr-2">
-              <NoteActionButtons {note} {repostable} />
+              <NoteActionButtons {note} {repostable} {tieKey} />
             </div>
           </div>
           <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
@@ -111,6 +114,7 @@
               {repostable}
               {maxHeight}
               {displayMenu}
+              {tieKey}
             />
           {/if}
         </Metadata>
@@ -118,7 +122,7 @@
     {:else}
       <div class="text-magnum-200">Invalid kind:9735 Event</div>
       <div class="ml-auto mr-2">
-        <NoteActionButtons {note} {repostable} />
+        <NoteActionButtons {note} {repostable} {tieKey} />
       </div>
     {/if}
   {/await}

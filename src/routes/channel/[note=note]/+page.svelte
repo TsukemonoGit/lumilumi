@@ -4,7 +4,7 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { setRelays, setTieKey } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
@@ -26,7 +26,7 @@
   //repostable={false}チャンネル部屋ではリポストできないようにしてみる（kindで判断じゃなくてチャンネル部屋にいるときだけだけどダイジョブ？？？）
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "undefined";
+  const tieKey = `channel+${data.id}`;
 
   let isOnMount = false;
   let since: number | undefined = undefined;
@@ -49,7 +49,7 @@
   });
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     if (!$defaultRelays && data.relays) {
       setRelays(data.relays);
     }
@@ -77,6 +77,7 @@
     <ChannelMetadata
       id={data.id}
       linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+      {tieKey}
     />{#if since}
       <TimelineList
         queryKey={timelineQuery}
@@ -141,15 +142,20 @@
                 let:metadata
               >
                 <div slot="loading" class="w-full">
-                  <EventCard note={event} repostable={false} />
+                  <EventCard note={event} repostable={false} {tieKey} />
                 </div>
                 <div slot="nodata" class="w-full">
-                  <EventCard note={event} repostable={false} />
+                  <EventCard note={event} repostable={false} {tieKey} />
                 </div>
                 <div slot="error" class="w-full">
-                  <EventCard note={event} repostable={false} />
+                  <EventCard note={event} repostable={false} {tieKey} />
                 </div>
-                <EventCard {metadata} note={event} repostable={false} />
+                <EventCard
+                  {metadata}
+                  note={event}
+                  repostable={false}
+                  {tieKey}
+                />
               </Metadata>
               <!-- </div> -->
             {/each}

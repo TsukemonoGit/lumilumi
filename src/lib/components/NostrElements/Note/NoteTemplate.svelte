@@ -21,6 +21,7 @@
   //const bech32Pattern = /<bech32>/;
 
   export let displayMenu: boolean = true;
+  export let tieKey: string | undefined;
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -32,7 +33,7 @@
     note.kind === 3;
   const eventpointer: nip19.EventPointer = {
     id: note.id,
-    relays: getRelaysById(note.id),
+    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     author: note.pubkey,
     kind: note.kind,
   };
@@ -40,7 +41,7 @@
     kind: note.kind,
     identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
     pubkey: note.pubkey,
-    relays: getRelaysById(note.id),
+    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
   };
   const naddr = nip19.naddrEncode(naddrpointer);
   const nevent = nip19.neventEncode(eventpointer);
@@ -60,10 +61,11 @@
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
+        {tieKey}
       />
     </div>
     {#if $showRelayIcon && displayMenu}
-      <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
   </div>
 
   <div class="pt-1 max-w-full overflow-x-hidden">

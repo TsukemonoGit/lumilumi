@@ -11,7 +11,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { promisePublishEvent, setTieKey } from "$lib/func/nostr";
+  import { promisePublishEvent } from "$lib/func/nostr";
   import { onMount } from "svelte";
 
   import { _ } from "svelte-i18n";
@@ -46,7 +46,7 @@
 
   async function init() {
     since = undefined;
-    setTieKey(tieKey);
+
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
@@ -193,15 +193,15 @@
                 let:metadata
               >
                 <div slot="loading" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="nodata" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
                 <div slot="error" class="w-full">
-                  <EventCard note={event} />
+                  <EventCard note={event} {tieKey} />
                 </div>
-                <EventCard {metadata} note={event} /></Metadata
+                <EventCard {metadata} note={event} {tieKey} /></Metadata
               >
               <!-- </div> -->
             {/each}{/if}

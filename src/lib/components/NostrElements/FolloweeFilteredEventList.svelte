@@ -1,13 +1,12 @@
 <script lang="ts">
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { extractKind9734 } from "$lib/func/makeZap";
-  import { getFollowingList } from "$lib/func/nostr";
-  import { onlyFollowee, showReactioninTL } from "$lib/stores/stores";
+
   import * as Nostr from "nostr-typedef";
-  import { writable } from "svelte/store";
 
   export let events: Nostr.Event<number>[];
+  export let tieKey: string;
+
   // const followFilteredEvents = writable<Nostr.Event[]>();
 
   // export const getFollowFilteredEvents = (
@@ -46,15 +45,15 @@
       let:metadata
     >
       <div slot="loading" class="w-full">
-        <EventCard note={event} repostable={true} />
+        <EventCard note={event} repostable={true} {tieKey} />
       </div>
       <div slot="nodata" class="w-full">
-        <EventCard note={event} repostable={true} />
+        <EventCard note={event} repostable={true} {tieKey} />
       </div>
       <div slot="error" class="w-full">
-        <EventCard note={event} repostable={true} />
+        <EventCard note={event} repostable={true} {tieKey} />
       </div>
-      <EventCard {metadata} note={event} repostable={true} />
+      <EventCard {metadata} note={event} repostable={true} {tieKey} />
     </Metadata>
     <!-- </div> -->
   {/each}

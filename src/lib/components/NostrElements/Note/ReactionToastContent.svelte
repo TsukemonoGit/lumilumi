@@ -14,7 +14,6 @@
   const contentLen = 40;
   //tagはaかe
   export let tag: string[];
-
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);
@@ -85,6 +84,7 @@
         displayMenu={false}
         depth={0}
         repostable={false}
+        tieKey={undefined}
       />
     </div>
   </Text>
@@ -111,6 +111,7 @@
         displayMenu={false}
         depth={0}
         repostable={false}
+        tieKey={undefined}
       />
     </LatestEvent>
   {/if}
