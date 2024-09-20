@@ -254,8 +254,8 @@ export function useReq(
   }: UseReqOpts<EventPacket | EventPacket[]>,
   relays: string[] | undefined = undefined,
   { staleTime, gcTime, initialDataUpdatedAt, refetchInterval }: UseQueryOpt = {
-    staleTime: 2 * 60 * 60 * 1000,
-    gcTime: 2 * 60 * 60 * 1000,
+    staleTime: 3 * 60 * 60 * 1000,
+    gcTime: 3 * 60 * 60 * 1000,
     initialDataUpdatedAt: undefined,
     refetchInterval: Infinity,
   }
