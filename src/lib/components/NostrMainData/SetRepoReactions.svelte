@@ -17,7 +17,7 @@
   const updateInterval = 1000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
-
+  // $: console.log($viewEventIds);
   $: etagList = $viewEventIds
     .filter((tag) => tag[0] === "e")
     .map((tag) => tag[1]);

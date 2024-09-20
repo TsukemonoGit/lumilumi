@@ -98,30 +98,34 @@
     atag &&
     (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
   ) {
-    currentNoteTag = ["a", atag];
     $viewEventIds = $viewEventIds.filter(
-      (item) => item[1] !== currentNoteTag?.[1]
+      (item) =>
+        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
     );
     if (!$viewEventIds.includes(["a", atag])) {
       $viewEventIds.push(["a", atag]);
     }
+    currentNoteTag = ["a", atag];
   } else if (
     atag === undefined &&
     note &&
     note.id !== "" && //プレビュー画面もEventCardを使っていてnote.idが""になってるからそれを除くため！！
     (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
   ) {
-    currentNoteTag = ["e", note.id];
     $viewEventIds = $viewEventIds.filter(
-      (item) => item[1] !== currentNoteTag?.[1]
+      (item) =>
+        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
     );
+
     if (!$viewEventIds.includes(["e", note.id])) {
       $viewEventIds.push(["e", note.id]);
     }
+    currentNoteTag = ["e", note.id];
   }
   onDestroy(() => {
     $viewEventIds = $viewEventIds.filter(
-      (item: string[]) => item !== currentNoteTag
+      (item: string[]) =>
+        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
     );
   });
   // $: console.log($viewEventIds);
