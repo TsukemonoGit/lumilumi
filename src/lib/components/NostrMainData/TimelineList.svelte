@@ -324,6 +324,9 @@
 
   const handlePrev = () => {
     if (viewIndex > 0) {
+      scroll({
+        top: 90,
+      });
       viewIndex = Math.max(viewIndex - sift, 0);
     }
     updateViewEvent($data);
