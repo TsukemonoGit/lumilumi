@@ -15,10 +15,11 @@
   import ProfileEditButton from "./ProfileEditButton.svelte";
 
   import UserPofileEllipsis from "./UserPofileEllipsis.svelte";
-  import { ExternalLink, Pin } from "lucide-svelte";
+  import { ExternalLink, Pin, RadioTower, Pencil } from "lucide-svelte";
   import ShowStatus from "../NostrElements/Note/ShowStatus.svelte";
   import EllipsisMenuNote from "../NostrElements/Note/NoteActionButtuns/EllipsisMenuNote.svelte";
   import ReplyToUserButton from "./ReplyToUserButton.svelte";
+  import UserEditEllipsis from "./UserEditEllipsis.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -79,7 +80,7 @@
             {/if}
           </div>
         </div>
-        <div class="absolute bottom-1 right-2 flex flex-col gap-1">
+        <!-- <div class="absolute bottom-1 right-2 flex flex-col gap-1">
           {#if $loginUser === pubkey}<a
               class="rounded-full p-1 bg-white border border-magnum-700 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 flex items-center active:opacity-50 justify-center gap-1"
               target="_blank"
@@ -91,10 +92,17 @@
               ><Pin class="w-5 rotate-45 " />{$_(
                 "settings.nostviewstr.kind10001"
               )}<ExternalLink class="w-4 " />
-            </a><ProfileEditButton {metadata} />{:else}<FollowButton
-              {pubkey}
-            />{/if}
-        </div>
+            </a><ProfileEditButton {metadata} /><a
+              class="rounded-full p-1 bg-white border border-magnum-700 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-75 flex items-center active:opacity-50 justify-center gap-1"
+              target="_blank"
+              title={`Nostviewstr ${$_("settings.kind10002")}`}
+              rel="noopener noreferrer"
+              href="./relays"
+              ><RadioTower class="w-5" />{$_("settings.kind10002")}<Pencil
+                class="w-4 "
+              /></a
+            >{:else}<FollowButton {pubkey} />{/if}
+        </div> -->
         <div
           class="bg-magnum-800 w-full border-b border-magnum-400"
           style="height:{bannerHeight}px"
@@ -115,9 +123,11 @@
         <div class="flex flex-row items-center gap-2 mt-1">
           <div class="sm:text-xl text-md font-bold break-all">
             {prof.display_name ?? ""}@{prof.name}
+            {#if prof.bot}<span class="text-sm font-normal">bot</span>{/if}
           </div>
           <div class="flex ml-auto gap-2">
-            <ReplyToUserButton {metadata} />
+            {#if $loginUser === pubkey}<UserEditEllipsis {metadata} />{:else}
+              <ReplyToUserButton {metadata} />{/if}
             {#if prof.lud16 || prof.lud06}
               <div class=" w-fit"><UserZap {metadata} /></div>
             {/if}<UserPofileEllipsis {metadata} {prof} {tieKey} />
@@ -150,35 +160,6 @@
           />
         </div>
       {/if}
-      <div class="flex flex-row-reverse gap-1">
-        <!-- <button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><FileJson2 /></button
-        > -->
-        <!-- <button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><RadioTower /></button
-        > -->
-        <!-- <button
-          on:click={handleClickReactions}
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><BookHeart /></button
-        > -->
-        <!-- <button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><Pin /></button
-        > -->
-        <!-- <button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><RefreshCcw /></button
-        ><button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><Copy /></button
-        ><button
-          class="w-fit rounded-full bg-neutral-200 text-magnum-800 p-1 hover:opacity-75 active:opacity-50"
-          ><ExternalLink /></button
-        > -->
-      </div>
     </div>
   {/if}
 </Metadata>

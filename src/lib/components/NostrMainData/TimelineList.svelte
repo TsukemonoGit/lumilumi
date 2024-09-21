@@ -325,7 +325,7 @@
   const handlePrev = () => {
     if (viewIndex > 0) {
       scroll({
-        top: 90,
+        top: 100,
       });
       viewIndex = Math.max(viewIndex - sift, 0);
     }

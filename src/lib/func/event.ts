@@ -94,3 +94,18 @@ export function extractZappedId(tags: string[][]): {
     tag: eTag ? (eTag as string[]) : [],
   };
 }
+
+// 一致するIDを1つだけ削除するヘルパー関数
+export function removeFirstMatchingId(
+  viewEventIds: string[][],
+  tag: string[] | undefined
+) {
+  if (!tag) return; // tagがundefinedの場合は何もしない
+
+  const index = viewEventIds.findIndex(
+    (item: string[]) => item[0] === tag[0] && item[1] === tag[1]
+  );
+  if (index !== -1) {
+    viewEventIds.splice(index, 1); // 一致する1つだけ削除
+  }
+}

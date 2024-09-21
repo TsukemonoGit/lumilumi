@@ -13,34 +13,35 @@
   let filters: Nostr.Filter[] = [];
   let result: { data: any; status: any; error: any };
 
-  let lastUpdateTimestamp = Date.now() + 3000; // 初回は余裕を持たせる
-  const updateInterval = 1000; // 1秒（ミリ秒）
+  // let lastUpdateTimestamp = Date.now() + 3000; // 初回は余裕を持たせる
+  const updateInterval = 3000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
   // $: console.log($viewEventIds);
-  $: etagList = $viewEventIds
-    .filter((tag) => tag[0] === "e")
-    .map((tag) => tag[1]);
-  $: atagList = $viewEventIds
-    .filter((tag) => tag[0] === "a")
-    .map((tag) => tag[1]);
+  $: etagList = Array.from(
+    new Set($viewEventIds.filter((tag) => tag[0] === "e").map((tag) => tag[1]))
+  );
+  $: atagList = Array.from(
+    new Set($viewEventIds.filter((tag) => tag[0] === "a").map((tag) => tag[1]))
+  );
+  $: if (etagList || atagList) {
+    console.log(etagList.length, atagList.length);
+    debounceUpdate();
+  }
   function debounceUpdate() {
     if (updating) {
       return;
-    } else {
-      updating = true;
-      const currentTimestamp = Date.now();
-      const timeSinceLastUpdate = currentTimestamp - lastUpdateTimestamp;
-
-      if (timeSinceLastUpdate >= updateInterval) {
-        performUpdate();
-      } else if (!timeoutId) {
-        timeoutId = setTimeout(() => {
-          performUpdate();
-        }, updateInterval - timeSinceLastUpdate);
-      }
-      updating = false;
     }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      updating = true;
+
+      performUpdate();
+
+      updating = false;
+    }, updateInterval); // 連続で実行されるのを防ぐ
   }
 
   function performUpdate() {
@@ -73,13 +74,9 @@
       );
     }
     changeEmit(filters);
-    lastUpdateTimestamp = Date.now();
+
     //実行されたらID削除
     timeoutId = undefined;
-  }
-
-  $: if ($viewEventIds) {
-    debounceUpdate();
   }
 
   result = useRepReactionList();

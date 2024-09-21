@@ -77,17 +77,19 @@
     const queryData: EventPacket | undefined = $queryClient.getQueryData(key);
     if (queryData) {
       metadata = queryData.event;
-    }
-    const ev = await usePromiseReq(
-      { queryKey: key, filters, operator },
-      undefined
-    );
-    console.log(ev);
-    if (ev && ev.length > 0) {
-      if (queryData && queryData.event.created_at > ev[0].event.created_at) {
-        metadata = queryData.event;
-      } else {
+    } else {
+      //プロフィールを更新ボタンはあるんだし改めて最新を取得する必要なし
+      const ev = await usePromiseReq(
+        { queryKey: key, filters, operator },
+        undefined
+      );
+      console.log(ev);
+      if (ev && ev.length > 0) {
+        // if (queryData && queryData.event.created_at > ev[0].event.created_at) {
+        //   metadata = queryData.event;
+        // } else {
         metadata = ev[0].event;
+        //}
       }
     }
     //metadata = sample2;
@@ -291,6 +293,7 @@
             displayMenu={true}
             depth={0}
             repostable={true}
+            tieKey={undefined}
           />
         </div>
       {/if}

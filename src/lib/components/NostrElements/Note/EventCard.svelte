@@ -38,7 +38,11 @@
   import OtherKindNote from "./OtherKindNote.svelte";
   import Kind31990Note from "./Kind31990Note.svelte";
   import ReactionedNote from "./ReactionedNote.svelte";
-  import { replyedEvent, repostedId } from "$lib/func/event";
+  import {
+    removeFirstMatchingId,
+    replyedEvent,
+    repostedId,
+  } from "$lib/func/event";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -94,39 +98,56 @@
 
   $: muteType =
     paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
-  $: if (
-    atag &&
-    (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
-  ) {
-    $viewEventIds = $viewEventIds.filter(
-      (item) =>
-        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
-    );
-    if (!$viewEventIds.includes(["a", atag])) {
-      $viewEventIds.push(["a", atag]);
-    }
-    currentNoteTag = ["a", atag];
-  } else if (
-    atag === undefined &&
-    note &&
-    note.id !== "" && //プレビュー画面もEventCardを使っていてnote.idが""になってるからそれを除くため！！
-    (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
-  ) {
-    $viewEventIds = $viewEventIds.filter(
-      (item) =>
-        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
-    );
 
-    if (!$viewEventIds.includes(["e", note.id])) {
+  // // 指定したタグが既に存在するか確認するヘルパー関数
+  // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {
+  //   return viewEventIds.some(
+  //     (item: string[]) => item[0] === tagType && item[1] === tagId
+  //   );
+  // }
+
+  //フィルター作る方で重複削除してるから自分の分だけ追加・削除する
+
+  //atag
+  $: if (note.id) {
+    if (
+      atag &&
+      (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
+    ) {
+      // 現在のタグを削除
+      if (currentNoteTag) {
+        removeFirstMatchingId($viewEventIds, currentNoteTag);
+      }
+      // 新しいタグがまだ存在しなければ追加
+      //if (!tagExists($viewEventIds, "a", atag)) {
+      $viewEventIds.push(["a", atag]);
+      //}
+      currentNoteTag = ["a", atag];
+      $viewEventIds = $viewEventIds;
+    } else if (
+      atag === undefined &&
+      note &&
+      note.id !== "" && // プレビュー画面の無効なIDを除外
+      (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
+    ) {
+      //etag
+      // 現在のタグを削除
+      if (currentNoteTag) {
+        removeFirstMatchingId($viewEventIds, currentNoteTag);
+      }
+      // 新しいタグがまだ存在しなければ追加
+      // if (!tagExists($viewEventIds, "e", note.id)) {
       $viewEventIds.push(["e", note.id]);
+      //}
+      currentNoteTag = ["e", note.id];
+      $viewEventIds = $viewEventIds;
     }
-    currentNoteTag = ["e", note.id];
   }
+
   onDestroy(() => {
-    $viewEventIds = $viewEventIds.filter(
-      (item: string[]) =>
-        !(item[0] === currentNoteTag?.[0] && item[1] === currentNoteTag?.[1])
-    );
+    // コンポーネント破棄時に現在のタグを削除
+    removeFirstMatchingId($viewEventIds, currentNoteTag);
+    $viewEventIds = $viewEventIds;
   });
   // $: console.log($viewEventIds);
   //eかa
