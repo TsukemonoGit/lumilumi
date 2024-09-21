@@ -329,7 +329,10 @@
       });
       viewIndex = Math.max(viewIndex - sift, 0);
     }
-    updateViewEvent($data);
+    setTimeout(() => {
+      updateViewEvent($data);
+    }, 1);
+
     // //スマホではスクロールちゃんとなってたからでかいときだけやる
     // if (window.innerWidth > 640) {
     //   //px
