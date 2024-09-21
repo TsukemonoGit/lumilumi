@@ -28,7 +28,8 @@
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
     unsubscribe();
-    $queryClient.removeQueries({ queryKey: ["reactions", "zapped", id] });
+    // $queryClient.removeQueries({ queryKey: ["reactions", "zapped", id] });//まだこのIDがTLにいるかもしれないからけさない
+    //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
 
   $: data = _result?.data;

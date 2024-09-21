@@ -4,16 +4,22 @@
   import type Nostr from "nostr-typedef";
 
   import { queryClient } from "$lib/stores/stores";
-  import { QueryObserver } from "@tanstack/svelte-query";
+  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   export let id: string;
   let _result: { data: EventPacket; status: any; error: any };
-
+  const queryKey: QueryKey = ["reactions", "reaction", id];
   const observer1 = new QueryObserver($queryClient, {
-    queryKey: ["reactions", "reaction", id],
+    queryKey: queryKey,
   });
+
+  // let unsubscribe: () => void;
+  // onMount(() => {
+  //   const data = $queryClient?.getQueryData(queryKey);
+  //   console.log(data);
+  //   console.log($queryClient?.getQueriesData({ queryKey: queryKey }));
   const unsubscribe = observer1.subscribe((result: any) => {
     if (
       !_result?.data ||
@@ -22,12 +28,16 @@
         result.data.event.created_at > _result.data.event.created_at)
     ) {
       _result = result;
+      //  const data = $queryClient?.getQueryData(queryKey);
+      //  console.log(data);
+      status = "success";
     }
   });
+  //});
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
     unsubscribe();
-    $queryClient.removeQueries({ queryKey: ["reactions", "reaction", id] });
+    // $queryClient.removeQueries({ queryKey: queryKey });
   });
   $: data = _result?.data;
   $: status = _result?.status;

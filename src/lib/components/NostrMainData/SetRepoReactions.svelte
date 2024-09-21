@@ -14,7 +14,7 @@
   let result: { data: any; status: any; error: any };
 
   // let lastUpdateTimestamp = Date.now() + 3000; // 初回は余裕を持たせる
-  const updateInterval = 3000; // 1秒（ミリ秒）
+  const updateInterval = 2000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
   // $: console.log($viewEventIds);
