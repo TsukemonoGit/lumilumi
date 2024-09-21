@@ -114,7 +114,7 @@
       class="w-full break-words overflow-hidden"
       id={componentKey.toString()}
     >
-      <UserProfile pubkey={userPubkey} depth={0} />
+      <UserProfile pubkey={userPubkey} depth={0} tieKey={undefined} />
       <div
         use:melt={$root}
         class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500"}

@@ -13,7 +13,7 @@
     { text: `${$_("user.profileEdit")}`, icon: User, num: 0 },
     { text: `${$_("settings.nostviewstr.kind10001")}🔗`, icon: Pin, num: 1 },
 
-    { text: `${$_("settings.kind10002")}`, icon: RadioTower, num: 2 },
+    { text: `${$_("settings.kind10002")}🔗`, icon: RadioTower, num: 2 },
   ];
 
   const handleSelectItem = async (index: number) => {
@@ -34,8 +34,11 @@
         break;
 
       case 2:
-        //edit relays
-        goto(`${encodedPub}/relays`);
+        const url2 = `https://nostviewstr.vercel.app/${encodedPub}/10002`;
+
+        window.open(url2, "_blank", "noreferrer");
+        //edit relays まだ
+        // goto(`${encodedPub}/relays`);
         break;
     }
   };

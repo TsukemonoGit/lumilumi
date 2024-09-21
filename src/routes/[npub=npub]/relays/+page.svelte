@@ -19,6 +19,7 @@
   import { _ } from "svelte-i18n";
 
   import { nip19 } from "nostr-tools";
+  import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
 
   export let data: {
     pubkey: string;
@@ -127,8 +128,14 @@
 <section class=" w-full">
   まだ
   {#if newKind10002 && newKind10002.tags}
-    {#each newKind10002.tags ?? [] as relays}
-      {relays[1]}
+    {#each newKind10002.tags as [r, url, rw], index}
+      <div class=" overflow-hidden p-1">
+        <RelayCard
+          {url}
+          read={!rw || rw === "read" ? true : false}
+          write={!rw || rw === "write" ? true : false}
+        />
+      </div>
     {/each}
   {/if}
 </section>
