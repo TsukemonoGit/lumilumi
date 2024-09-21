@@ -325,13 +325,13 @@
   const handlePrev = () => {
     if (viewIndex > 0) {
       scroll({
-        top: 100,
+        top: 120,
       });
       viewIndex = Math.max(viewIndex - sift, 0);
+      setTimeout(() => {
+        updateViewEvent($data);
+      }, 100);
     }
-    setTimeout(() => {
-      updateViewEvent($data);
-    }, 1);
 
     // //スマホではスクロールちゃんとなってたからでかいときだけやる
     // if (window.innerWidth > 640) {

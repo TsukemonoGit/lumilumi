@@ -294,3 +294,7 @@ input:-webkit-autofill:focus {
 .contentBlock ul ol {
   padding-left: 0.5em;
 }
+
+/* main  {
+  overflow-anchor: auto;
+} */
