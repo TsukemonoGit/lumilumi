@@ -94,30 +94,30 @@
       {/if}
     {/if}
   </div>
-
-  <div class="rounded-md bg-neutral-800 p-2">
-    {#if (title && title !== "") || dtag}
-      <div class="text-lg font-bold">
-        {title && title !== "" ? title : dtag}
-      </div>{/if}
-    <div
-      class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
-    >
-      {#if description && description !== ""}<div
-          class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
-        >
-          {description}
+  {#if title || dtag || description}
+    <div class="rounded-md bg-neutral-800 p-2">
+      {#if (title && title !== "") || dtag}
+        <div class="text-lg font-bold">
+          {title && title !== "" ? title : dtag}
         </div>{/if}
+      <div
+        class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
+      >
+        {#if description && description !== ""}<div
+            class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
+          >
+            {description}
+          </div>{/if}
 
-      {#if image && $showImg}
-        <img
-          loading="lazy"
-          src={image}
-          alt=""
-          class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
-        />{/if}
-    </div>
-  </div>
+        {#if image && $showImg}
+          <img
+            loading="lazy"
+            src={image}
+            alt=""
+            class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
+          />{/if}
+      </div>
+    </div>{/if}
   <div
     class="mt-0.5 overflow-y-auto overflow-x-hidden"
     style="max-height:{maxHeight ?? 'none'}"
