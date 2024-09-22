@@ -23,7 +23,11 @@ export default {
         "2xl": "1440px",
       },
     },
+
     extend: {
+      screens: {
+        xs: "420px",
+      },
       colors: {
         magnum: getColorsFromName("magnum"),
         neutral: getColorsFromName("neutral"),

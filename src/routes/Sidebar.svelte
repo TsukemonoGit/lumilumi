@@ -137,7 +137,7 @@
 <EditUserStatus bind:trigger />
 
 <style>
-  @media screen and (max-width: 640px) {
+  @media screen and (max-width: 768px) {
     .sidebar {
       display: none;
     }

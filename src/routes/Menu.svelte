@@ -227,7 +227,7 @@
   .menuGroup {
     display: none;
   }
-  @media screen and (max-width: 640px) {
+  @media screen and (max-width: 768px) {
     .menuGroup {
       display: block;
     }

@@ -23,9 +23,8 @@
   export let repostable: boolean;
   export let tieKey: string | undefined;
 
-  $: title =
-    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1] ??
-    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
+  $: title = note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1];
+  $: dtag = note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
   $: description = note.tags.find(
     (tag) =>
       (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
@@ -59,7 +58,10 @@
   };
 </script>
 
-<div class=" break-all overflow-x-hidden gap-4 p-1">
+<div
+  class="break-words overflow-x-hidden gap-4 p-1"
+  style="word-break: break-word;"
+>
   <div class="w-full flex gap-1">
     {#if metadata}
       <div>
@@ -92,29 +94,29 @@
       {/if}
     {/if}
   </div>
-  <div class="grid grid-cols-[1fr_auto] w-full gap-1 items-center">
-    <div>
-      {#if title}
-        <div class="text-lg font-bold text-magnum-400">
-          {title}
-        </div>{/if}
-      {#if description}
-        <div class=" text-neutral-300/80 max-h-40 overflow-y-auto">
+
+  <div class="rounded-md bg-neutral-800 p-2">
+    {#if (title && title !== "") || dtag}
+      <div class="text-lg font-bold">
+        {title && title !== "" ? title : dtag}
+      </div>{/if}
+    <div
+      class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
+    >
+      {#if description && description !== ""}<div
+          class="px-1 text-neutral-300/80 max-h-32 overflow-y-auto"
+        >
           {description}
         </div>{/if}
+
+      {#if image && $showImg}
+        <img
+          loading="lazy"
+          src={image}
+          alt=""
+          class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
+        />{/if}
     </div>
-    {#if image && $showImg}
-      <img
-        loading="lazy"
-        src={image}
-        alt=""
-        class="object-contain"
-        style="max-height:{!maxHeight || maxHeight === 'none'
-          ? '12rem'
-          : '6rem'};max-width:{!maxHeight || maxHeight === 'none'
-          ? '12rem'
-          : '6rem'}"
-      />{/if}
   </div>
   <div
     class="mt-0.5 overflow-y-auto overflow-x-hidden"

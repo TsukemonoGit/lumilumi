@@ -217,7 +217,7 @@
       />
       <div class="container">
         <!-- grid grid-cols-[auto_1fr]-->
-        <main class="sm:ml-52 ml-0 mt-8 sm:mb-2 mb-20">
+        <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
           <slot />
           {#if $nowProgress}
             <div class="fixed right-10 bottom-20 z-[99]">
@@ -225,7 +225,7 @@
             </div>
           {/if}
         </main>
-        <div class="fixed lift-0 top-0 sm:w-52 w-0">
+        <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
           <Sidebar />
         </div>
       </div>
