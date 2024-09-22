@@ -125,27 +125,27 @@
   }
 
   .h1 {
-    @apply text-4xl md:text-5xl mt-8 mb-4 font-semibold;
+    @apply text-4xl  mt-8 mb-4 font-semibold;
   }
 
   .h2 {
-    @apply text-3xl md:text-4xl mt-8 mb-4 font-semibold;
+    @apply text-3xl  mt-8 mb-4 font-semibold;
   }
 
   .h3 {
-    @apply text-2xl md:text-3xl mt-6 mb-4 font-semibold;
+    @apply text-2xl  mt-6 mb-4 font-semibold;
   }
 
   .h4 {
-    @apply text-xl md:text-2xl mt-6 mb-4 font-bold;
+    @apply text-xl  mt-6 mb-4 font-bold;
   }
 
   .h5 {
-    @apply text-lg md:text-xl mt-4 mb-2 font-bold;
+    @apply text-lg  mt-4 mb-2 font-bold;
   }
 
   .h6 {
-    @apply text-base md:text-lg mt-4 mb-2 font-bold;
+    @apply text-base  mt-4 mb-2 font-bold;
   }
   /* .h1,
   .h2,

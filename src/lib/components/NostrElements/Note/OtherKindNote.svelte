@@ -92,7 +92,7 @@
       {/if}
     {/if}
   </div>
-  <div class="grid grid-cols-[1fr_auto] w-full gap-1">
+  <div class="grid grid-cols-[1fr_auto] w-full gap-1 items-center">
     <div>
       {#if title}
         <div class="text-lg font-bold text-magnum-400">
@@ -108,7 +108,12 @@
         loading="lazy"
         src={image}
         alt=""
-        class="max-w-16 object-contain max-h-16"
+        class="object-contain"
+        style="max-height:{!maxHeight || maxHeight === 'none'
+          ? '12rem'
+          : '6rem'};max-width:{!maxHeight || maxHeight === 'none'
+          ? '12rem'
+          : '6rem'}"
       />{/if}
   </div>
   <div
