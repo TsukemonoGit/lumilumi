@@ -104,7 +104,7 @@
       class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
     >
       {#if description && description !== ""}<div
-          class="px-1 text-neutral-300/80 max-h-32 overflow-y-auto"
+          class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
         >
           {description}
         </div>{/if}
