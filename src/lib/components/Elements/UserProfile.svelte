@@ -127,7 +127,7 @@
           </div>
           <div class="flex ml-auto gap-2">
             {#if $loginUser === pubkey}<UserEditEllipsis {metadata} />{:else}
-              <ReplyToUserButton {metadata} />{/if}
+              <FollowButton {pubkey} /><ReplyToUserButton {metadata} />{/if}
             {#if prof.lud16 || prof.lud06}
               <div class=" w-fit"><UserZap {metadata} /></div>
             {/if}<UserPofileEllipsis {metadata} {prof} {tieKey} />
