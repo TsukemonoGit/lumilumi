@@ -191,7 +191,7 @@
     }
   };
   let isPosting: boolean = false;
-  $: nsecCheck = nsecRegex.test(text);
+  $: nsecCheck = nsecRegex.test(text) || nsecRegex.test(warningText);
   const postNote = async () => {
     isPosting = true;
     $nowProgress = true;
@@ -628,11 +628,7 @@
             placeholder="いま どうしてる？"
           />
         </fieldset>
-        {#if nsecCheck}
-          <div class="text-sm text-red-500　">
-            {$_("post.nsecAlart")}
-          </div>
-        {/if}
+
         {#if onWarning}
           <div class="flex">
             <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
@@ -643,8 +639,12 @@
               bind:value={warningText}
             />
           </div>
-        {:else}<div class="h-4" />{/if}
-
+          <!--{:else}<div class="h-4" />-->{/if}
+        {#if nsecCheck}
+          <div class="text-sm text-red-500　">
+            {$_("post.nsecAlart")}
+          </div>
+        {/if}
         <div class="mt-2 flex justify-between">
           <button
             on:click={() => {
