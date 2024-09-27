@@ -10,6 +10,7 @@ export function extractAmount(
   const bolt11Tag = note.tags.find((tag) => tag[0] === "bolt11");
   //console.log(bolt11Tag);
   if (!bolt11Tag || bolt11Tag.length <= 1) {
+    console.log("zap bolt11Tag error");
     return;
   }
   try {
@@ -31,9 +32,11 @@ export function extractAmount(
       //ある場合にのみイコールなのが必須
       if (requestAmount) {
         if (amountSection !== requestAmount) {
+          console.log("zap amount error");
           return undefined;
         }
       }
+      //amountSectionの値がザップの値
       if (amountSection) {
         return Math.floor(Number(amountSection) / 1000);
       }

@@ -13,6 +13,9 @@
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
   import { extractAmount, extractZappedId } from "$lib/func/event";
   import NoteTemplate from "./NoteTemplate.svelte";
+  import UserName from "./UserName.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
+  import Kind9735Invalid from "./Kind9735Invalid.svelte";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -41,10 +44,13 @@
 
   async function check9735(note: Nostr.Event): Promise<boolean | undefined> {
     //受け取る側のウォレットのpubkeyを取得する
+    //
+    const receivepub = zapRequestEvent?.tags.find((tag) => tag[0] === "p")?.[1];
     const metadata = (
-      $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
-    ).event;
+      $queryClient?.getQueryData(["metadata", receivepub]) as EventPacket
+    )?.event;
     if (!metadata) {
+      console.log("failed to get reseiver metadata");
       return;
     }
     const zapPubkey = await getZapLNURLPubkey(metadata);
@@ -53,137 +59,119 @@
   }
 </script>
 
-{#if zapRequestEvent !== undefined && amount !== undefined}
-  {#await check9735(note) then isValidEvent9735}
-    {#if isValidEvent9735 === true || isValidEvent9735 === undefined}
-      {#if muteType !== "null" && depth >= 1}
-        <button
-          class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-          on:click={() => (viewMuteEvent = !viewMuteEvent)}
-        >
-          {viewMuteEvent ? "hide" : "view"} Mute: {muteType}
-        </button>
-      {/if}
-
-      {#if muteType === "null" || viewMuteEvent}
-        <Metadata
-          queryKey={["metadata", zapRequestEvent.pubkey]}
-          pubkey={zapRequestEvent.pubkey}
-          let:metadata
-        >
-          <div class="flex gap-1 items-center align-middle">
-            <Zap
-              class="min-w-[20px] mt-auto mb-auto stroke-orange-400 fill-orange-400"
-              size={20}
-            />
-            {amount}
-
-            <div class="self-center">
-              <UserMenu
-                pubkey={zapRequestEvent.pubkey}
-                {metadata}
-                size={20}
-                {depth}
-                {tieKey}
-              />
-            </div>
-            <div class="inline-block break-all break-words whitespace-pre-line">
-              {#if metadata}
-                {profile(metadata)?.display_name ?? profile(metadata)?.name}
-                <span class="text-magnum-100 text-sm"
-                  >@{profile(metadata)?.name && profile(metadata)?.name !== ""
-                    ? profile(metadata)?.name
-                    : profile(metadata)?.display_name}</span
-                >
-              {:else}
-                <span class="text-magnum-100 text-sm"
-                  >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span
-                >
-              {/if}
-            </div>
-
-            <div class="ml-auto mr-2">
-              <NoteActionButtons {note} {repostable} {tieKey} />
-            </div>
-          </div>
-          <div class="break-all text-sm px-2">{zapRequestEvent.content}</div>
-
-          {#if zappedId.tag.length > 0}
-            <RepostedNote
-              tag={zappedId.tag}
-              {depth}
-              {repostable}
-              {maxHeight}
-              {displayMenu}
-              {tieKey}
-            />
+{#if !zapRequestEvent || !amount}<Kind9735Invalid
+    {note}
+    {repostable}
+    {displayMenu}
+    {depth}
+    {maxHeight}
+    {tieKey}
+    {mini}
+  />{:else}
+  {@const receivepub = zapRequestEvent?.tags.find((tag) => tag[0] === "p")?.[1]}
+  {#if !receivepub}<Kind9735Invalid
+      {note}
+      {repostable}
+      {displayMenu}
+      {depth}
+      {maxHeight}
+      {tieKey}
+      {mini}
+    />
+  {:else}
+    <Metadata
+      queryKey={["metadata", receivepub]}
+      pubkey={receivepub}
+      let:metadata={receiverMetadata}
+    >
+      <div slot="loading">loading zap receiver</div>
+      <div slot="nodata">nodata zap receiver</div>
+      <div slot="error">error zap receiver</div>
+      {#await getZapLNURLPubkey(receiverMetadata) then isValidEvent9735}
+        {#if !isValidEvent9735}<Kind9735Invalid
+            {note}
+            {repostable}
+            {displayMenu}
+            {depth}
+            {maxHeight}
+            {tieKey}
+            {mini}
+          />
+        {:else}
+          {#if muteType !== "null" && depth >= 1}
+            <button
+              class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+              on:click={() => (viewMuteEvent = !viewMuteEvent)}
+            >
+              {viewMuteEvent ? "hide" : "view"} Mute: {muteType}
+            </button>
           {/if}
-        </Metadata>
-      {/if}
-    {:else}
-      <Metadata
-        queryKey={["metadata", note.pubkey]}
-        pubkey={note.pubkey}
-        let:metadata
-      >
-        <div slot="loading">
-          <NoteTemplate
-            {note}
-            metadata={undefined}
-            {mini}
-            {displayMenu}
-            {depth}
-            {tieKey}
-            ><span class="text-magnum-200 italic"
-              >Invalid kind:{note.kind} Event</span
-            >
-            <div class="w-fit ml-auto mr-2">
-              <NoteActionButtons {note} {repostable} {tieKey} />
-            </div></NoteTemplate
-          >
-        </div>
-        <div slot="nodata">
-          <NoteTemplate
-            {note}
-            metadata={undefined}
-            {mini}
-            {displayMenu}
-            {depth}
-            {tieKey}
-            ><span class="text-magnum-200 italic"
-              >Invalid kind:{note.kind} Event</span
-            >
-            <div class="w-fit ml-auto mr-2">
-              <NoteActionButtons {note} {repostable} {tieKey} />
-            </div></NoteTemplate
-          >
-        </div>
-        <div slot="error">
-          <NoteTemplate
-            {note}
-            metadata={undefined}
-            {mini}
-            {displayMenu}
-            {depth}
-            {tieKey}
-            ><span class="text-magnum-200 italic"
-              >Invalid kind:{note.kind} Event</span
-            >
-            <div class="w-fit ml-auto mr-2">
-              <NoteActionButtons {note} {repostable} {tieKey} />
-            </div></NoteTemplate
-          >
-        </div>
 
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
-          ><span class="text-magnum-200 italic"
-            >Invalid kind:{note.kind} Event</span
-          >
-          <div class="w-fit ml-auto mr-2">
-            <NoteActionButtons {note} {repostable} {tieKey} />
-          </div></NoteTemplate
-        >
-      </Metadata>
-    {/if}
-  {/await}
-{/if}
+          {#if muteType === "null" || viewMuteEvent}
+            <Metadata
+              queryKey={["metadata", zapRequestEvent.pubkey]}
+              pubkey={zapRequestEvent.pubkey}
+              let:metadata
+            >
+              <div class="flex gap-1 items-center align-middle">
+                <Zap
+                  class="min-w-[20px] mt-auto mb-auto stroke-orange-400 fill-orange-400"
+                  size={20}
+                />
+                {amount}
+
+                <div class="self-center">
+                  <UserMenu
+                    pubkey={zapRequestEvent.pubkey}
+                    {metadata}
+                    size={20}
+                    {depth}
+                    {tieKey}
+                  />
+                </div>
+                <div
+                  class="inline-block break-all break-words whitespace-pre-line"
+                >
+                  {#if metadata}
+                    {profile(metadata)?.display_name ?? profile(metadata)?.name}
+                    <span class="text-magnum-100 text-sm"
+                      >@{profile(metadata)?.name &&
+                      profile(metadata)?.name !== ""
+                        ? profile(metadata)?.name
+                        : profile(metadata)?.display_name}</span
+                    >
+                  {:else}
+                    <span class="text-magnum-100 text-sm"
+                      >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span
+                    >
+                  {/if}
+                </div>
+                <UserMenu
+                  pubkey={note.pubkey}
+                  metadata={undefined}
+                  size={20}
+                  {depth}
+                  {tieKey}
+                />
+                <div class="ml-auto mr-2">
+                  <NoteActionButtons {note} {repostable} {tieKey} />
+                </div>
+              </div>
+              <div class="break-all text-sm px-2">
+                {zapRequestEvent.content}
+              </div>
+
+              {#if zappedId.tag.length > 0}
+                <RepostedNote
+                  tag={zappedId.tag}
+                  {depth}
+                  {repostable}
+                  {maxHeight}
+                  {displayMenu}
+                  {tieKey}
+                />
+              {/if}
+            </Metadata>
+          {/if}{/if}
+      {/await}
+    </Metadata>{/if}{/if}

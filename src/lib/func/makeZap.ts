@@ -114,6 +114,7 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
   //description tag を持たなければならない
   const descriptionTag = event.tags.find((tag) => tag[0] === "description");
   if (!descriptionTag || descriptionTag.length <= 1) {
+    console.log("zap descriptionTag error");
     return;
   }
   try {
@@ -121,6 +122,9 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
     //kind9734の検証
     if (verifyEvent(kind9734)) {
       return kind9734;
+    } else {
+      console.log("zap kind9734 error");
+      return;
     }
   } catch (error) {
     console.error("Error parsing description tag:", error);
