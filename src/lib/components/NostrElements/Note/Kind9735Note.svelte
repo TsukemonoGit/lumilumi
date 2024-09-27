@@ -12,6 +12,7 @@
   import type { EventPacket } from "rx-nostr";
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
   import { extractAmount, extractZappedId } from "$lib/func/event";
+  import NoteTemplate from "./NoteTemplate.svelte";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -20,7 +21,7 @@
   export let maxHeight: string;
   export let displayMenu: boolean;
   export let tieKey: string | undefined;
-
+  export let mini;
   let viewMuteEvent: boolean;
   //kind9734の取得と検証
   const zapRequestEvent = extractKind9734(note);
@@ -120,10 +121,69 @@
         </Metadata>
       {/if}
     {:else}
-      <div class="text-magnum-200">Invalid kind:9735 Event</div>
-      <div class="ml-auto mr-2">
-        <NoteActionButtons {note} {repostable} {tieKey} />
-      </div>
+      <Metadata
+        queryKey={["metadata", note.pubkey]}
+        pubkey={note.pubkey}
+        let:metadata
+      >
+        <div slot="loading">
+          <NoteTemplate
+            {note}
+            metadata={undefined}
+            {mini}
+            {displayMenu}
+            {depth}
+            {tieKey}
+            ><span class="text-magnum-200 italic"
+              >Invalid kind:{note.kind} Event</span
+            >
+            <div class="w-fit ml-auto mr-2">
+              <NoteActionButtons {note} {repostable} {tieKey} />
+            </div></NoteTemplate
+          >
+        </div>
+        <div slot="nodata">
+          <NoteTemplate
+            {note}
+            metadata={undefined}
+            {mini}
+            {displayMenu}
+            {depth}
+            {tieKey}
+            ><span class="text-magnum-200 italic"
+              >Invalid kind:{note.kind} Event</span
+            >
+            <div class="w-fit ml-auto mr-2">
+              <NoteActionButtons {note} {repostable} {tieKey} />
+            </div></NoteTemplate
+          >
+        </div>
+        <div slot="error">
+          <NoteTemplate
+            {note}
+            metadata={undefined}
+            {mini}
+            {displayMenu}
+            {depth}
+            {tieKey}
+            ><span class="text-magnum-200 italic"
+              >Invalid kind:{note.kind} Event</span
+            >
+            <div class="w-fit ml-auto mr-2">
+              <NoteActionButtons {note} {repostable} {tieKey} />
+            </div></NoteTemplate
+          >
+        </div>
+
+        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
+          ><span class="text-magnum-200 italic"
+            >Invalid kind:{note.kind} Event</span
+          >
+          <div class="w-fit ml-auto mr-2">
+            <NoteActionButtons {note} {repostable} {tieKey} />
+          </div></NoteTemplate
+        >
+      </Metadata>
     {/if}
   {/await}
 {/if}

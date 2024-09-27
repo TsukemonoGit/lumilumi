@@ -548,6 +548,7 @@
         {maxHeight}
         {displayMenu}
         {tieKey}
+        {mini}
       />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
