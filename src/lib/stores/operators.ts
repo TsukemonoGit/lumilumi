@@ -315,66 +315,69 @@ const pubkey = (event: Nostr.Event): string | undefined => {
 };
 
 export function reactionCheck() {
-  return filter((packet: EventPacket) => {
-    const followList = getFollowingList();
-    if (
-      packet.event.kind === 1 ||
-      packet.event.kind === 6 ||
-      packet.event.kind === 16
-    ) {
-      //自分のpubがtagsに入っていてもリアクションとして取得したものじゃない可能性があるkind
-
+  return pipe(
+    muteCheck(),
+    filter((packet: EventPacket) => {
+      const followList = getFollowingList();
       if (
-        packet.event.pubkey !== get(loginUser) &&
-        packet.event.tags.find(
-          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
-        )
+        packet.event.kind === 1 ||
+        packet.event.kind === 6 ||
+        packet.event.kind === 16
       ) {
-        //自分の投稿への反応
+        //自分のpubがtagsに入っていてもリアクションとして取得したものじゃない可能性があるkind
 
-        if (followList && followList.includes(packet.event.pubkey)) {
-          console.log("includes", packet.event);
-          //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
-          setReactionEvent(packet);
+        if (
+          packet.event.pubkey !== get(loginUser) &&
+          packet.event.tags.find(
+            (tag) => tag[0] === "p" && tag[1] === get(loginUser)
+          )
+        ) {
+          //自分の投稿への反応
 
-          console.log(get(reactionToast));
-          return true;
-        } else {
-          //自分の投稿への反応のうちフォロー外からのものはリアクションとして通知するだけでTLには流さない
-          if (!get(onlyFollowee)) {
-            //フォロー外の通知ONのときだけ追加
+          if (followList && followList.includes(packet.event.pubkey)) {
+            console.log("includes", packet.event);
+            //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
             setReactionEvent(packet);
+
+            console.log(get(reactionToast));
+            return true;
+          } else {
+            //自分の投稿への反応のうちフォロー外からのものはリアクションとして通知するだけでTLには流さない
+            if (!get(onlyFollowee)) {
+              //フォロー外の通知ONのときだけ追加
+              setReactionEvent(packet);
+            }
+            return false;
           }
-          return false;
+        } else {
+          //自分のPが含まれない普通の投稿だからそのまま流す
+          return true;
         }
       } else {
-        //自分のPが含まれない普通の投稿だからそのまま流す
-        return true;
-      }
-    } else {
-      if (
-        packet.event.pubkey !== get(loginUser) &&
-        packet.event.tags.find(
-          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
-        )
-      ) {
-        //TLには流れないものたちのうち自分へのリアクション
+        if (
+          packet.event.pubkey !== get(loginUser) &&
+          packet.event.tags.find(
+            (tag) => tag[0] === "p" && tag[1] === get(loginUser)
+          )
+        ) {
+          //TLには流れないものたちのうち自分へのリアクション
 
-        if (followList && followList.includes(packet.event.pubkey)) {
-          //自分の投稿への反応のうちフォロイーからのもの
-          setReactionEvent(packet);
-        } else {
-          //自分の投稿への反応のうちフォロー外からのもの
-          if (!get(onlyFollowee)) {
-            //フォロー外の通知ONのときだけ追加
+          if (followList && followList.includes(packet.event.pubkey)) {
+            //自分の投稿への反応のうちフォロイーからのもの
             setReactionEvent(packet);
+          } else {
+            //自分の投稿への反応のうちフォロー外からのもの
+            if (!get(onlyFollowee)) {
+              //フォロー外の通知ONのときだけ追加
+              setReactionEvent(packet);
+            }
           }
         }
-      }
 
-      return false;
-    }
-  });
+        return false;
+      }
+    })
+  );
 }
 
 const observedEvents = new Set<string>();

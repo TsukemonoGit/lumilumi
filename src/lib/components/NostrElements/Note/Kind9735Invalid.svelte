@@ -30,7 +30,7 @@
       ><span class="text-magnum-200 italic"
         >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
-      <div class="w-fit ml-auto mr-2">
+      <div class="w-fit ml-auto">
         <NoteActionButtons {note} {repostable} {tieKey} />
       </div></NoteTemplate
     >
@@ -46,7 +46,7 @@
       ><span class="text-magnum-200 italic"
         >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
-      <div class="w-fit ml-auto mr-2">
+      <div class="w-fit ml-auto">
         <NoteActionButtons {note} {repostable} {tieKey} />
       </div></NoteTemplate
     >
@@ -62,7 +62,7 @@
       ><span class="text-magnum-200 italic"
         >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
-      <div class="w-fit ml-auto mr-2">
+      <div class="w-fit ml-auto">
         <NoteActionButtons {note} {repostable} {tieKey} />
       </div></NoteTemplate
     >
@@ -72,7 +72,7 @@
     ><span class="text-magnum-200 italic"
       >{message ?? `Invalid kind:${note.kind} Event`}</span
     >
-    <div class="w-fit ml-auto mr-2">
+    <div class="w-fit ml-auto">
       <NoteActionButtons {note} {repostable} {tieKey} />
     </div></NoteTemplate
   >
