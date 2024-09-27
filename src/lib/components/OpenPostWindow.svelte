@@ -33,11 +33,7 @@
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import {
-    convertMetaTags,
-    filesUpload,
-    generateResultMessage,
-  } from "$lib/func/util";
+  import { convertMetaTags, filesUpload, nsecRegex } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
     DefaultPostOptions,
@@ -195,78 +191,80 @@
     }
   };
   let isPosting: boolean = false;
+  $: nsecCheck = nsecRegex.test(text);
   const postNote = async () => {
     isPosting = true;
     $nowProgress = true;
-    if (text.trim().length > 0) {
-      const { text: checkedText, tags: checkedTags } = contentCheck(
-        text.trim(),
-        tags
-      );
-      if (onWarning) checkedTags.push(["content-warning", warningText]);
-      if ($additionalReplyUsers.length > 0) {
-        const replyUsersArray: string[][] = $additionalReplyUsers.map(
-          (user) => ["p", user]
-        );
-        checkedTags.push(...replyUsersArray);
-      }
-      const newev: Nostr.EventParameters = {
-        kind: initOptions.kind,
-        content: checkedText,
-        tags: checkedTags,
-      };
-      const signer = nip07Signer();
-      const event = await signer.signEvent(newev);
-      //publishEvent(newev);
+    if (text.trim().length <= 0) return;
 
-      const { event: ev, res } = await promisePublishSignedEvent(event);
-      console.log(res);
+    const { text: checkedText, tags: checkedTags } = contentCheck(
+      text.trim(),
+      tags
+    );
+    if (onWarning) checkedTags.push(["content-warning", warningText]);
+    if ($additionalReplyUsers.length > 0) {
+      const replyUsersArray: string[][] = $additionalReplyUsers.map((user) => [
+        "p",
+        user,
+      ]);
+      checkedTags.push(...replyUsersArray);
+    }
+    const newev: Nostr.EventParameters = {
+      kind: initOptions.kind,
+      content: checkedText,
+      tags: checkedTags,
+    };
+    const signer = nip07Signer();
+    const event = await signer.signEvent(newev);
+    //publishEvent(newev);
 
-      const isSuccessRelays: string[] = res
+    const { event: ev, res } = await promisePublishSignedEvent(event);
+    console.log(res);
+
+    const isSuccessRelays: string[] = res
+      .filter((item) => item.ok)
+      .map((item) => normalizeRelayURL(item.from));
+    const isFailedRelays = res
+      .filter((item) => !item.ok)
+      .map((item) => normalizeRelayURL(item.from));
+
+    // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
+
+    const writeRelays = getDefaultWriteRelays();
+
+    const pendingRelays = writeRelays.filter(
+      (relay) =>
+        !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
+    );
+    console.log(pendingRelays);
+    // if (pendingRelays.length > 0) {
+    //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
+    // }
+    // $toastSettings = {
+    //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
+    //   description: str,
+    //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
+    // };
+    if (isSuccessRelays.length <= 0) {
+      //再送チャレンジ
+      const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
+
+      const isSuccessRelays2: string[] = res2
         .filter((item) => item.ok)
         .map((item) => normalizeRelayURL(item.from));
-      const isFailedRelays = res
-        .filter((item) => !item.ok)
-        .map((item) => normalizeRelayURL(item.from));
-
-      // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
-
-      const writeRelays = getDefaultWriteRelays();
-
-      const pendingRelays = writeRelays.filter(
-        (relay) =>
-          !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
-      );
-      console.log(pendingRelays);
-      // if (pendingRelays.length > 0) {
-      //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
-      // }
-      // $toastSettings = {
-      //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
-      //   description: str,
-      //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
-      // };
-      if (isSuccessRelays.length <= 0) {
-        //再送チャレンジ
-        const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
-
-        const isSuccessRelays2: string[] = res2
-          .filter((item) => item.ok)
-          .map((item) => normalizeRelayURL(item.from));
-        if (isSuccessRelays2.length <= 0) {
-          $toastSettings = {
-            title: "Failed",
-            description: "failed to publish",
-            color: "bg-red-500",
-          };
-        }
-      } else {
-        //成功したときだけ閉じる
-        $open = false;
+      if (isSuccessRelays2.length <= 0) {
+        $toastSettings = {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        };
       }
-      $nowProgress = false;
-      isPosting = false;
+    } else {
+      //成功したときだけ閉じる
+      $open = false;
     }
+    $nowProgress = false;
+    isPosting = false;
   };
 
   //末尾に"/"をつける
@@ -599,8 +597,7 @@
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
             disabled={isPosting}
-            class="inline-flex h-24 w-full flex-1 items-center justify-center
-                    rounded-sm border border-solid p-2 leading-none bg-neutral-800 disabled:opacity-20"
+            class={`inline-flex h-24 w-full flex-1 items-center justify-center rounded-sm border  p-2 leading-none disabled:opacity-20 ${nsecCheck ? "bg-red-500/20" : "bg-neutral-800 "}`}
             id="note"
             bind:this={textarea}
             bind:value={text}
@@ -631,6 +628,11 @@
             placeholder="いま どうしてる？"
           />
         </fieldset>
+        {#if nsecCheck}
+          <div class="text-sm text-red-500　">
+            {$_("post.nsecAlart")}
+          </div>
+        {/if}
         {#if onWarning}
           <div class="flex">
             <div class="mt-auto mb-auto text-sm break-keep">理由：</div>

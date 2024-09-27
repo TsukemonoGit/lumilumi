@@ -54,7 +54,8 @@
     "kind3": "NostViewstr で Follow List ( kind:3 ) を編集する"
   },
   "post": {
-    "confirm": "投稿されていないテキストがあります。閉じますか？"
+    "confirm": "投稿されていないテキストがあります。閉じますか？",
+    "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています"
   },
   "profile": {
     "display_name": "表示名",

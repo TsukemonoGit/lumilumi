@@ -46,7 +46,8 @@
     "kind3": "Edit Follow List (kind:3) in NostViewstr"
   },
   "post": {
-    "confirm": "There is unposted text. Are you sure you want to close?"
+    "confirm": "There is unposted text. Are you sure you want to close?",
+    "nsecAlart": "Warning: Input contains private key (nsec)"
   },
   "user": {
     "profileEdit": "Edit profile",
