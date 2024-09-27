@@ -10,6 +10,8 @@
   export let displayMenu: boolean;
   export let tieKey: string | undefined;
   export let mini;
+  export let message: string | undefined = undefined;
+  console.log(message);
 </script>
 
 <Metadata
@@ -25,7 +27,8 @@
       {displayMenu}
       {depth}
       {tieKey}
-      ><span class="text-magnum-200 italic">Invalid kind:{note.kind} Event</span
+      ><span class="text-magnum-200 italic"
+        >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
       <div class="w-fit ml-auto mr-2">
         <NoteActionButtons {note} {repostable} {tieKey} />
@@ -40,7 +43,8 @@
       {displayMenu}
       {depth}
       {tieKey}
-      ><span class="text-magnum-200 italic">Invalid kind:{note.kind} Event</span
+      ><span class="text-magnum-200 italic"
+        >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
       <div class="w-fit ml-auto mr-2">
         <NoteActionButtons {note} {repostable} {tieKey} />
@@ -55,7 +59,8 @@
       {displayMenu}
       {depth}
       {tieKey}
-      ><span class="text-magnum-200 italic">Invalid kind:{note.kind} Event</span
+      ><span class="text-magnum-200 italic"
+        >{message ?? `Invalid kind:${note.kind} Event`}</span
       >
       <div class="w-fit ml-auto mr-2">
         <NoteActionButtons {note} {repostable} {tieKey} />
@@ -64,7 +69,9 @@
   </div>
 
   <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
-    ><span class="text-magnum-200 italic">Invalid kind:{note.kind} Event</span>
+    ><span class="text-magnum-200 italic"
+      >{message ?? `Invalid kind:${note.kind} Event`}</span
+    >
     <div class="w-fit ml-auto mr-2">
       <NoteActionButtons {note} {repostable} {tieKey} />
     </div></NoteTemplate

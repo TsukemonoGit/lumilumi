@@ -84,9 +84,42 @@
       pubkey={receivepub}
       let:metadata={receiverMetadata}
     >
-      <div slot="loading">loading zap receiver</div>
-      <div slot="nodata">nodata zap receiver</div>
-      <div slot="error">error zap receiver</div>
+      <div slot="loading">
+        <Kind9735Invalid
+          {note}
+          {repostable}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {tieKey}
+          {mini}
+          message={"loading zap recipient's data..."}
+        />
+      </div>
+      <div slot="nodata">
+        <Kind9735Invalid
+          {note}
+          {repostable}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {tieKey}
+          {mini}
+          message={"failed to get zap recipient's data."}
+        />
+      </div>
+      <div slot="error">
+        <Kind9735Invalid
+          {note}
+          {repostable}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {tieKey}
+          {mini}
+          message={"error to get zap recipient's data."}
+        />
+      </div>
       {#await getZapLNURLPubkey(receiverMetadata) then isValidEvent9735}
         {#if !isValidEvent9735}<Kind9735Invalid
             {note}
