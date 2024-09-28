@@ -15,9 +15,11 @@
     defaultRelays,
     queryClient,
     showUserStatus,
-    noBanner,
+    showBanner,
     showKind16,
     onlyFollowee,
+    addClientTag,
+    showClientTag,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -91,8 +93,10 @@
       showReactioninTL: savedReactionTL,
       nostrWalletConnect: savedNostrWalletConnect,
       showUserStatus: savedShowUserStatus,
-      noBanner: savedNobanner,
+      showBanner: savedshowBanner,
       showKind16: savedShowKind16,
+      addClientTag: savedAddClientTag,
+      showClientTag: savedShowClientTag,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -116,7 +120,7 @@
     $showReactioninTL = savedReactionTL ?? true;
     $nostrWalletConnect = savedNostrWalletConnect ?? "";
     $showUserStatus = savedShowUserStatus ?? false;
-    $noBanner = savedNobanner ?? false;
+    $showBanner = savedshowBanner ?? true;
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
     //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定
@@ -134,6 +138,8 @@
         console.log(error);
       }
     }
+    $addClientTag = savedAddClientTag;
+    $showClientTag = savedShowClientTag ? savedShowClientTag : true;
   }
 </script>
 

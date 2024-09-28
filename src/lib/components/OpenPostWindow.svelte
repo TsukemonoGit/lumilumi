@@ -31,13 +31,19 @@
     additionalPostOptions,
     queryClient,
     toastSettings,
+    addClientTag,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { convertMetaTags, filesUpload, nsecRegex } from "$lib/func/util";
+  import {
+    clientTag,
+    convertMetaTags,
+    filesUpload,
+    nsecRegex,
+  } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
     DefaultPostOptions,
@@ -215,6 +221,9 @@
       ]);
       checkedTags.push(...replyUsersArray);
     }
+    if ($addClientTag) {
+      checkedTags.push(clientTag);
+    }
     const newev: Nostr.EventParameters = {
       kind: initOptions.kind,
       content: checkedText,
@@ -286,6 +295,8 @@
     customReaction = "";
     $additionalReplyUsers = [];
     initOptions = { ...options, kind: options.kind ?? 1 };
+    viewMetadataList = false;
+    inputMetadata = "";
   };
 
   const handleTextareaInput = (event: Event) => {

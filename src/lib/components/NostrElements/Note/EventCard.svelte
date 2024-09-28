@@ -247,6 +247,7 @@
   // };
   $: proxy = checkProxy(note.tags);
   $: warning = checkContentWarning(note.tags);
+
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
   let replyUsers: string[];
@@ -350,6 +351,7 @@
             <ProxyTag proxyTag={proxy} />
           </div>
         {/if}
+
         {#if displayMenu}
           <NoteActionButtons {note} {repostable} {tieKey} />{/if}
       </NoteTemplate>
@@ -399,6 +401,7 @@
             <ProxyTag proxyTag={proxy} />
           </div>
         {/if}
+
         <div class="ml-auto mr-2">
           {#if displayMenu}
             <NoteActionButtons {note} {repostable} {tieKey} />{/if}

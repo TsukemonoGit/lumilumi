@@ -85,6 +85,7 @@
         depth={0}
         repostable={false}
         tieKey={undefined}
+        isShowClientTag={false}
       />
     </div>
   </Text>

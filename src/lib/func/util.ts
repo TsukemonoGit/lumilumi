@@ -7,6 +7,12 @@ import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch } from "nostr-tools/utils";
 import { nip19 } from "nostr-tools";
+
+export const clientTag = [
+  "client",
+  "lumilumi",
+  "31990:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:1727506446612",
+];
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
@@ -227,7 +233,7 @@ export const initSettings: LumiSetting = {
   relays: [],
   useRelaySet: "0",
   pubkey: "",
-  showPreview: false,
+  showPreview: true,
   defaultReaction: {
     content: "+",
     tag: [],
@@ -250,8 +256,10 @@ export const initSettings: LumiSetting = {
   showReactioninTL: true,
   nostrWalletConnect: "",
   showUserStatus: false,
-  noBanner: false,
+  showBanner: true,
   showKind16: false,
+  addClientTag: false,
+  showClientTag: true,
 };
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");

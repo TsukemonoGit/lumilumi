@@ -17,6 +17,7 @@
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
+
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
