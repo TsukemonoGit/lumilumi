@@ -175,9 +175,8 @@
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
       on:click={() => onClickClientTag(clientTag[2])}
-      class={`inline ml-2 text-sm text-magnum-200/70 hover:underline`}
-    >
-      via {clientTag[1]}
-    </button>{:else}<span class={`inline ml-2 text-sm  text-neutral-200/50`}>
-      via {clientTag[1]}
+      class={`inline text-sm text-magnum-200/70 hover:underline`}
+      >via {clientTag[1]}
+    </button>{:else}<span class={`inline text-sm  text-neutral-200/50`}
+      >via {clientTag[1]}
     </span>{/if}{/if}
