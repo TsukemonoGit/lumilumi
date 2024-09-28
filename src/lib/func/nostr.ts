@@ -7,7 +7,13 @@ import {
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
-import type { UseReqOpts, ReqResult, ReqStatus, UseQueryOpt } from "$lib/types";
+import type {
+  UseReqOpts,
+  ReqResult,
+  ReqStatus,
+  UseQueryOpt,
+  Profile,
+} from "$lib/types";
 import {
   useQueryClient,
   createQuery,
@@ -35,6 +41,7 @@ import * as Nostr from "nostr-typedef";
 import { metadata } from "$lib/stores/operators";
 import { rxNostr3ReccoctRelay, set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+import { nip19 } from "nostr-tools";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -61,20 +68,32 @@ export function getDefaultWriteRelays(): string[] {
     .filter((config) => config.write)
     .map((config) => config.url);
 }
-// metadataの保存
-let savedMetadata: [QueryKey, EventPacket][] = [];
+
 let followingList: string[] = [];
 
-let metadataChanged = false;
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
   if (followingList.length > 0) {
+    // まず、現在のローカルストレージのデータを取得
+    const metadataStr = localStorage.getItem("metadata");
+    let currentMetadata: [QueryKey, EventPacket][] = metadataStr
+      ? JSON.parse(metadataStr)
+      : [];
+    let metadataChanged = false;
     while (queue.length > 0) {
       const [key, data] = queue.shift()!;
-      saveMetadataToLocalStorage(key, data);
+      const [changed, savedMetadata] = saveMetadataToLocalStorage(
+        currentMetadata,
+        key,
+        data
+      );
+      if (changed) {
+        metadataChanged = true;
+      }
+      currentMetadata = savedMetadata;
     }
     if (metadataChanged) {
-      localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
+      localStorage?.setItem("metadata", JSON.stringify(currentMetadata));
       metadataChanged = false;
     }
   }
@@ -114,13 +133,12 @@ export function getFollowingList() {
     console.log("followingList naiyo~");
   }
 }
-const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
-  // まず、現在のローカルストレージのデータを取得
-  const metadataStr = localStorage.getItem("metadata");
-  let currentMetadata: [QueryKey, EventPacket][] = metadataStr
-    ? JSON.parse(metadataStr)
-    : [];
-
+const saveMetadataToLocalStorage = (
+  currentMetadata: [QueryKey, EventPacket][],
+  key: QueryKey,
+  data: EventPacket
+): [boolean, [QueryKey, EventPacket][]] => {
+  let metadataChanged = false;
   const existingIndex = currentMetadata.findIndex(
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
@@ -135,6 +153,7 @@ const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
         //新しいデータだったら上書き
         currentMetadata[existingIndex] = [key, data];
         get(queryClient).setQueryData(key, (oldData: any) => data);
+        metadataChanged = true;
       } else {
         //古いデータだったら保存されてる方を返す
         // 保存されているメタデータの方をクエリにセット（？）
@@ -147,11 +166,13 @@ const saveMetadataToLocalStorage = (key: QueryKey, data: EventPacket) => {
       // 保存されていない場合、新しいデータを追加する
       currentMetadata.push([key, data]);
       get(queryClient).setQueryData(key, (oldData: any) => data);
+      metadataChanged = true;
     }
-    // 更新されたデータをローカルストレージに保存
-    localStorage.setItem("metadata", JSON.stringify(currentMetadata));
-    savedMetadata = currentMetadata;
-    metadataChanged = true;
+    // // 更新されたデータをローカルストレージに保存
+    // localStorage.setItem("metadata", JSON.stringify(currentMetadata));
+    return [metadataChanged, currentMetadata];
+  } else {
+    return [false, currentMetadata];
   }
 };
 
@@ -208,16 +229,6 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
 //   }
 //   // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
 //};
-const processMetadataQueue = () => {
-  while (get(metadataQueue).length > 0) {
-    const [key, data] = get(metadataQueue).shift()!;
-    saveMetadataToLocalStorage(key, data);
-  }
-  if (metadataChanged) {
-    localStorage?.setItem("metadata", JSON.stringify(savedMetadata));
-    metadataChanged = false;
-  }
-};
 
 // Set an interval to process the queue periodically
 //setInterval(processMetadataQueue, 1000);
@@ -562,4 +573,33 @@ export function usePromiseReq(
 
     _req.emit(filters);
   });
+}
+
+export interface MetadataList {
+  [key: string]: UserData;
+}
+export interface UserData {
+  name: string | undefined;
+  display_name: string | undefined;
+  nip05: string | undefined;
+}
+export function getMetadataList(
+  querydata: [QueryKey, EventPacket][]
+): MetadataList {
+  return querydata.reduce((acc: MetadataList, [key, packet]) => {
+    try {
+      const profile: Profile = JSON.parse(packet.event.content);
+      const pubkey = nip19.npubEncode(packet.event.pubkey);
+
+      // 新しいプロファイルデータを結果に追加
+      acc[pubkey] = {
+        name: profile.name,
+        display_name: profile.display_name,
+        nip05: profile.nip05,
+      };
+    } catch (error) {
+      console.error("Error parsing profile:", error);
+    }
+    return acc; // 蓄積された結果を返す
+  }, {} as MetadataList);
 }

@@ -9,13 +9,17 @@
     Send,
     TriangleAlert,
     Plus,
+    UserPlus,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
     getDefaultWriteRelays,
+    getMetadataList,
     promisePublishEvent,
     promisePublishSignedEvent,
     publishEvent,
+    type MetadataList,
+    type UserData,
   } from "$lib/func/nostr";
   import {
     emojis,
@@ -44,6 +48,8 @@
   import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
   import Metadata from "./NostrMainData/Metadata.svelte";
+  import type { QueryKey } from "@tanstack/svelte-query";
+  import { nip19 } from "nostr-tools";
   //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 
   export let options: DefaultPostOptions = {
@@ -296,6 +302,8 @@
     text =
       text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
     cursorPosition += emojiText.length;
+    //viewCustomEmojis = false;
+    textarea.focus();
   };
 
   const delay = (ms: number) =>
@@ -467,6 +475,54 @@
       return;
     }
   };
+
+  //--------------userlist
+  let metadataList: MetadataList = {};
+
+  function setMetadataList() {
+    try {
+      const metadataStr = localStorage.getItem("metadata");
+      let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
+        ? JSON.parse(metadataStr)
+        : [];
+      metadataList = getMetadataList(metadataQueryData);
+    } catch (error) {}
+  }
+
+  let viewMetadataList: boolean;
+  let inputMetadata: string = "";
+  $: if (viewMetadataList) {
+    setMetadataList();
+  }
+  function checkUserInput(inputMetadata: string, arg1: UserData) {
+    if (inputMetadata === "") {
+      return true;
+    }
+    if (
+      (arg1.name &&
+        arg1.name.toLowerCase().includes(inputMetadata.toLowerCase())) ||
+      (arg1.display_name &&
+        arg1.display_name
+          .toLowerCase()
+          .includes(inputMetadata.toLowerCase())) ||
+      (arg1.nip05 &&
+        arg1.nip05.toLowerCase().includes(inputMetadata.toLowerCase()))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  function handleClickUser(pub: string): any {
+    //tags.push(["p", nip19.decode(pub).data as string]);
+
+    const emojiText = ` nostr:${pub} `;
+    text =
+      text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
+    cursorPosition += emojiText.length;
+    viewMetadataList = false;
+    textarea.focus();
+  }
 </script>
 
 <svelte:window on:keyup={keyboardShortcut} on:keydown={handleKeyDown} />
@@ -645,13 +701,13 @@
             {$_("post.nsecAlart")}
           </div>
         {/if}
-        <div class="mt-2 flex justify-between">
+        <div class="mt-2 flex justify-between gap-2">
           <button
             on:click={() => {
               onWarning = !onWarning;
             }}
-            class=" h-8 rounded-sm
-                bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75"
+            class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
+                    bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
           >
             <TriangleAlert
               size="20"
@@ -659,7 +715,8 @@
             />
           </button>
 
-          <div class=" flex gap-4">
+          <div class=" flex gap-2">
+            <!--emojis-->
             {#if $emojis && $emojis.length > 0}
               {#if viewCustomEmojis}
                 <input
@@ -673,9 +730,12 @@
                 aria-label="open custom emoji list"
                 on:click={() => {
                   viewCustomEmojis = !viewCustomEmojis;
+                  if (viewMetadataList && viewCustomEmojis) {
+                    viewMetadataList = false;
+                  }
                 }}
-                class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
+                class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
+                    bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
               >
                 <SmilePlus
                   size="20"
@@ -685,7 +745,36 @@
                 />
               </button>
             {/if}
+            <!--userdata-->
 
+            {#if viewMetadataList}
+              <input
+                type="text"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+         border-magnum-400"
+                bind:value={inputMetadata}
+              />
+            {/if}
+            <button
+              aria-label="open custom emoji list"
+              on:click={() => {
+                viewMetadataList = !viewMetadataList;
+                if (viewMetadataList && viewCustomEmojis) {
+                  viewCustomEmojis = false;
+                }
+              }}
+              class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
+                 bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
+            >
+              <UserPlus
+                size="20"
+                class={viewMetadataList
+                  ? "fill-magnum-700 stroke-magnum-500"
+                  : ""}
+              />
+            </button>
+
+            <!---->
             <button
               disabled={isPosting}
               aria-label="post note"
@@ -697,7 +786,7 @@
             </button>
           </div>
         </div>
-
+        <!--emojis-->
         {#if viewCustomEmojis}
           <div
             class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
@@ -719,6 +808,24 @@
                       alt={e[0]}
                       title={e[0]}
                     />{:else}{e[0]}{/if}
+                </button>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+        <!--metadataList-->
+        {#if viewMetadataList}
+          <div
+            class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+          >
+            {#each Object.entries(metadataList) as [pubkey, profile], index}
+              {#if checkUserInput(inputMetadata, profile)}
+                <button
+                  aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
+                  on:click={() => handleClickUser(pubkey)}
+                  class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                >
+                  {profile.display_name ?? ""}@{profile.name ?? ""}
                 </button>
               {/if}
             {/each}
