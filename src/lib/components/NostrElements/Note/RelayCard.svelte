@@ -47,9 +47,9 @@
 
         case 1:
           //nostrWatch
-
+          //https://legacy.nostr.watch/
           window.open(
-            `https://nostr.watch/relay/${hostname}`,
+            `https://legacy.nostr.watch/relay/${hostname}`,
             "_blank",
             "noreferrer"
           );

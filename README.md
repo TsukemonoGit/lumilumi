@@ -129,3 +129,13 @@ https://github.com/akiomik/nosvelte
 - ZAP
 
 など
+
+
+
+
+----
+- clienttag link : [nostrapp.link](https://nostrapp.link/)
+- pin link: [nostviewstr](https://nostviewstr.vercel.app/)
+- note link: [njump.me](https://njump.me/)
+- translate: [google translate](https://translate.google.com/)
+- relay link: [Nostrrr](https://nostrrr.com/), [nostr watch](https://legacy.nostr.watch/)
