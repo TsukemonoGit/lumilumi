@@ -19,8 +19,10 @@
     nostrWalletConnect,
     nowProgress,
     showUserStatus,
-    noBanner,
+    showBanner,
     showKind16,
+    addClientTag,
+    showClientTag,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
@@ -96,8 +98,10 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
-    $noBanner = settings.noBanner;
+    $showBanner = settings.showBanner;
     $showKind16 = settings.showKind16;
+    $addClientTag = settings.addClientTag;
+    $showClientTag = settings.showClientTag;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -186,8 +190,10 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
-    $noBanner = settings.noBanner;
+    $showBanner = settings.showBanner;
     $showKind16 = settings.showKind16;
+    $addClientTag = settings.addClientTag;
+    $showClientTag = settings.showClientTag;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -503,7 +509,7 @@
       <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
   </fieldset>
   <!--投稿の設定-->
-  <fieldset class="border border-magnum-500 rounded-md p-2">
+  <!-- <fieldset class="border border-magnum-500 rounded-md p-2">
     <legend class="text-magnum-200 font-bold text-lg">Default Reaction</legend>
     <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
       <CustomReaction
@@ -526,6 +532,47 @@
         {settings.defaultReaction.content}
       {/if}
     </div>
+  </fieldset> -->
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">Post</legend>
+    <ul>
+      <li>
+        <div class="flex gap-2">
+          <div>{$_("settings.post.defaultReaction")} :</div>
+          <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
+            <CustomReaction
+              note={undefined}
+              root={undefined}
+              atag={undefined}
+              {handleClickOk}
+              bind:emoji={emojiTag}
+              bind:customReaction={customString}
+            />{#if settings.defaultReaction?.tag?.length > 0}
+              {#if $showImg}
+                <img
+                  loading="lazy"
+                  class="h-4 object-contain justify-self-center"
+                  src={settings.defaultReaction.tag[2]}
+                  alt={settings.defaultReaction.tag[1]}
+                  title={settings.defaultReaction.tag[1]}
+                />{:else}{settings.defaultReaction.tag[1]}{/if}
+            {:else if settings.defaultReaction?.content}
+              {settings.defaultReaction.content}
+            {/if}
+          </div>
+        </div>
+      </li>
+      <li>
+        <label>
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={settings.addClientTag}
+          />
+          {$_("settings.post.addClientTag")}
+        </label>
+      </li>
+    </ul>
   </fieldset>
   <!--- 表示設定 --->
   <fieldset class="border border-magnum-500 rounded-md p-2">
@@ -591,9 +638,16 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
-          bind:checked={settings.noBanner}
+          bind:checked={settings.showBanner}
         />
         {$_("settings.display.banner")}
+      </label><label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showClientTag}
+        />
+        {$_("settings.display.showClientTag")}
       </label>
     </div>
   </fieldset>
@@ -717,3 +771,15 @@
     <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />
   </div></Dialog
 >
+
+<style>
+  ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+
+    line-height: 1.8em;
+  }
+  ul li::marker {
+    color: rgb(var(--color-magnum-400));
+  }
+</style>

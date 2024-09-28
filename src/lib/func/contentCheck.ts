@@ -95,7 +95,7 @@ export function contentCheck(
           break;
       }
     } catch (error) {
-      console.error("Failed to decode NIP-19 identifier:", match[1]);
+      console.log("Failed to decode NIP-19 identifier:", match[1]);
     }
   });
 

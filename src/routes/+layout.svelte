@@ -9,7 +9,7 @@
     slicedEvent,
     uploader,
     verifier,
-    noBanner,
+    showBanner,
     viewMediaModal,
   } from "$lib/stores/stores";
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
@@ -98,7 +98,7 @@
       )?.[0] as HTMLElement | null;
       if (nlBanner) console.log(nlBanner);
     }
-    if ($noBanner && nlBanner) {
+    if (!$showBanner && nlBanner) {
       nlBanner.style.display = "none";
     }
   });
@@ -123,7 +123,7 @@
     | undefined;
   $: console.log($page);
 
-  $: if ($noBanner && nlBanner) {
+  $: if (!$showBanner && nlBanner) {
     nlBanner.style.display = "none";
   } else if (nlBanner) {
     nlBanner.style.display = "";
