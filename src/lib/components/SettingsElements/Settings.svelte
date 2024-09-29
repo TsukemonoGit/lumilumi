@@ -322,20 +322,21 @@
   }
 
   onDestroy(() => {
-    console.log(shouldReload);
+    console.log("onDestroy", shouldReload);
     if (browser && !shouldReload) {
       window?.removeEventListener("beforeunload", handleBeforeUnload);
     }
   });
 
-  beforeNavigate(({ cancel }) => {
-    if (settingsChanged() && !shouldReload) {
+  beforeNavigate((navigation) => {
+    console.log("beforeNavigate", navigation.type);
+    if (navigation.type !== "form" && settingsChanged() && !shouldReload) {
       if (
         !confirm(
           "You have unsaved changes. Are you sure you want to leave this page?"
         )
       ) {
-        cancel();
+        navigation.cancel();
       }
     }
     shouldReload = false;
