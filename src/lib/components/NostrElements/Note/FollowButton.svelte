@@ -188,15 +188,23 @@
 </script>
 
 {#if isfollowee !== undefined}
-  <button
-    disabled={$nowProgress}
-    class="rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 opacity-100 {isfollowee
-      ? 'opacity-75'
-      : ''}"
-    on:click={handleClickFollow}
-  >
-    {isfollowee ? `${$_("user.following")}` : `${$_("user.follow")}`}
-  </button>
+  {#if isfollowee}
+    <button
+      disabled={$nowProgress}
+      class={`rounded-full  border border-magnum-300 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
+      on:click={handleClickFollow}
+    >
+      {$_("user.following")}
+    </button>
+  {:else}
+    <button
+      disabled={$nowProgress}
+      class={`rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60  `}
+      on:click={handleClickFollow}
+    >
+      {$_("user.follow")}
+    </button>
+  {/if}
 {/if}
 
 <AlertDialog

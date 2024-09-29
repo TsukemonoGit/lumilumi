@@ -14,10 +14,7 @@
   export let tieKey: string | undefined;
 </script>
 
-<div
-  class="grid grid-cols-[auto_1fr] whitespace-pre-wrap break-words"
-  style="word-break: break-word;"
->
+<div class="grid grid-cols-[auto_1fr] py-1">
   <div class="p-1">
     <UserMenu
       pubkey={note.pubkey}
@@ -28,10 +25,14 @@
     />
   </div>
   <div class="p-1">
-    <div class="flex align-middle">
+    <div
+      class="flex align-middle whitespace-pre-wrap break-words"
+      style="word-break: break-word;"
+    >
       <div>
         {profile(note)?.display_name ?? profile(note)?.name}<span
-          class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
+          class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
+          style="word-break: break-word;"
           >@{profile(note)?.name && profile(note)?.name !== ""
             ? profile(note)?.name
             : profile(note)?.display_name}</span
@@ -41,10 +42,9 @@
         <FollowButton pubkey={note.pubkey} />
       </div>
     </div>
-    <!--<hr />-->
-    <div class=" max-h-48 overflow-y-auto">
+    <div class="mt-2 max-h-48 overflow-y-auto">
       <Content
-        text={profile(note)?.about ?? ""}
+        text={profile(note)?.about?.trim() ?? ""}
         tags={note.tags}
         {displayMenu}
         {depth}
