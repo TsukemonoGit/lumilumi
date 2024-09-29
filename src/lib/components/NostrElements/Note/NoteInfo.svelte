@@ -31,6 +31,6 @@
       </button>{:else}<span
         class={`  text-neutral-200/50 w-fit whitespace-pre-wrap break-words`}
         style="word-break: break-word;"
-        >via {clientTag[1]}
+        >{clientTag[1]}
       </span>{/if}{/if}
 </div>
