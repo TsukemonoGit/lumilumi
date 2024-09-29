@@ -139,3 +139,4 @@ https://github.com/akiomik/nosvelte
 - note link: [njump.me](https://njump.me/)
 - translate: [google translate](https://translate.google.com/)
 - relay link: [Nostrrr](https://nostrrr.com/), [nostr watch](https://legacy.nostr.watch/)
+- emoji link: [emojito](https://emojito.meme/)
