@@ -18,6 +18,9 @@
 
   import { queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
+
+  import Kind0List from "./Kind0List.svelte";
+  import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
   export let data: {
     pubkey: string;
   };
@@ -48,21 +51,21 @@
   let isOnMount = false;
   let since: number | undefined = undefined;
   $: timelineQuery = ["user", "post", userPubkey];
-  onMount(() => {
+  onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
     view = true;
   });
-  afterNavigate((navigate) => {
+  afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
     view = false;
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
@@ -96,6 +99,7 @@
     { id: "reactions", title: "Reactions" },
     // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relays" },
+    { id: "followee", title: "Follow" },
   ];
 
   const [send, receive] = crossfade({
@@ -379,6 +383,35 @@
                 {/each}
               </div>
             </LatestEvent>
+          {/if}
+        </div>
+
+        <div use:melt={$content("followee")} class="content">
+          {#if $value === "followee"}
+            <Contacts
+              queryKey={["timeline", "contacts", data.pubkey]}
+              pubkey={data.pubkey}
+              let:contacts
+              let:status
+            >
+              <div slot="loading" class="p-1">
+                <p>Loading...</p>
+              </div>
+
+              <div slot="error" class="p-1" let:error>
+                <p>{error}</p>
+              </div>
+              <div slot="nodata" class="p-1">
+                <p>Loading...</p>
+              </div>
+              {#if contacts}
+                <Kind0List
+                  pubList={contacts.tags
+                    .filter((tag) => tag[0] === "p" && tag.length > 1)
+                    .map((tag) => tag[1])}
+                  {tieKey}
+                />{/if}
+            </Contacts>
           {/if}
         </div>
       </div>
