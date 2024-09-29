@@ -15,7 +15,7 @@
   };
 </script>
 
-{#if clientTag && ((isShowClientTag && $showClientTag) || $page.route.id === "/[note=note]" || $page.route.id === "/[naddr=naddr]")}
+{#if clientTag && isShowClientTag && $showClientTag && $page.route.id !== "/[note=note]" && $page.route.id !== "/[naddr=naddr]"}
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
       on:click={() => onClickClientTag(clientTag.slice(2))}

@@ -16,6 +16,7 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import { sortEvents } from "$lib/func/util";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
 
   export let data: {
     identifier: string;
@@ -96,7 +97,7 @@
             repostable={true}
             {maxHeight}
             {tieKey}
-          />
+          /><NoteInfo note={event} />
         </div>
         <div
           slot="nodata"
@@ -108,7 +109,7 @@
             repostable={true}
             {maxHeight}
             {tieKey}
-          />
+          /><NoteInfo note={event} />
         </div>
         <div
           slot="error"
@@ -120,7 +121,7 @@
             repostable={true}
             {maxHeight}
             {tieKey}
-          />
+          /><NoteInfo note={event} />
         </div>
         <div
           class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
@@ -132,7 +133,7 @@
             repostable={true}
             {maxHeight}
             {tieKey}
-          />
+          /><NoteInfo note={event} />
         </div>
       </Metadata>
 

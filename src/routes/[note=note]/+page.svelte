@@ -19,6 +19,7 @@
   import Text from "$lib/components/NostrMainData/Text.svelte";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
+  import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
 
   export let data: {
     id: string;
@@ -108,7 +109,7 @@
               {depth}
               {repostable}
               {tieKey}
-            />
+            /><NoteInfo note={text} />
           </div>
           <div
             slot="nodata"
@@ -121,7 +122,7 @@
               {depth}
               {repostable}
               {tieKey}
-            />
+            /><NoteInfo note={text} />
           </div>
           <div
             slot="error"
@@ -135,7 +136,7 @@
               {depth}
               {repostable}
               {tieKey}
-            />
+            /><NoteInfo note={text} />
           </div>
           <div
             class="divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
@@ -149,7 +150,7 @@
               {depth}
               {repostable}
               {tieKey}
-            />
+            /><NoteInfo note={text} />
           </div>
         </Metadata>
 
