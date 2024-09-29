@@ -7,7 +7,8 @@
 
   export let pubkey: string;
   export let tieKey: string | undefined;
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     pubkey = "";
   });
 </script>

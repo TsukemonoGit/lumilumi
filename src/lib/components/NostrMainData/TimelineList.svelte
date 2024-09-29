@@ -117,7 +117,8 @@
     updateViewEvent($data);
   }
   //$: console.log($data);
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     $slicedEvent = [];
   });
 
@@ -133,7 +134,8 @@
     }
   });
 
-  afterNavigate(async () => {
+  afterNavigate(async (navigate) => {
+    console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       console.log("afterNavigate");
       $nowProgress = true;

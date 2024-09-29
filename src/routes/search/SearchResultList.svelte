@@ -104,7 +104,8 @@
     updateViewEvent($data);
   }
   $: console.log($data);
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     $slicedEvent = [];
   });
 

@@ -37,14 +37,16 @@
       init();
     }
   });
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       isOnMount = true;
       init();
     }
   });
   let view = false;
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     view = false;
   });
   async function init() {

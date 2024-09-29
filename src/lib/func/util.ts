@@ -12,6 +12,7 @@ export const clientTag = [
   "client",
   "lumilumi",
   "31990:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:1727506446612",
+  "wss://relay.nostr.band",
 ];
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる

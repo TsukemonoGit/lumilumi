@@ -40,7 +40,8 @@
       isOnMount = false;
     }
   });
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       isOnMount = true;
       init();

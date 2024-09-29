@@ -108,7 +108,8 @@
       relaysReconnectChallenge();
     }
   }
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     //ページが変わったらリセット
     $slicedEvent = [];
   });

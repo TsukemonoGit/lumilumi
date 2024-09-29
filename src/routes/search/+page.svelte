@@ -126,7 +126,8 @@
     isMount = false;
   }
 
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     openSearchResult = false;
   });
 

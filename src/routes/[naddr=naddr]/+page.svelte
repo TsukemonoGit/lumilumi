@@ -44,7 +44,8 @@
       isOnMount = false;
     }
   });
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       isOnMount = true;
       init();
@@ -165,13 +166,13 @@
         <div slot="error">error</div>
 
         <!--kind6-->
-        <NoteRepostList events={kind6} />
+        <NoteRepostList events={kind6} {tieKey} />
 
         <!--kind7-->
-        <NoteReactionList events={kind7} />
+        <NoteReactionList events={kind7} {tieKey} />
 
         <!--zap レシート-->
-        <ZapReactionList events={kind9735} />
+        <ZapReactionList events={kind9735} {tieKey} />
 
         <!--kind1,42-->
         <CollapsibleList title="Kind1,42" amount={kind1.length}>

@@ -123,8 +123,8 @@
     $nowProgress = false;
   });
 
-  afterNavigate(() => {
-    console.log("afternavigate");
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
   });
 
   const handleClickSave = async () => {

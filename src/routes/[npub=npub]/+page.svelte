@@ -57,7 +57,8 @@
     }
     view = true;
   });
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     view = false;
     if (!isOnMount) {
       isOnMount = true;
@@ -67,7 +68,8 @@
     }
     view = true;
   });
-  beforeNavigate(() => {
+  beforeNavigate((navigate) => {
+    console.log("beforeNavigate", navigate.type);
     $value = "post";
   });
   async function init() {

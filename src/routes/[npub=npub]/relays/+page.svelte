@@ -42,8 +42,9 @@
     }
   });
 
-  afterNavigate(async () => {
-    console.log("afternavigate");
+  afterNavigate(async (navigate) => {
+    console.log("afterNavigate", navigate.type);
+
     if (!isMount) {
       isMount = true;
 

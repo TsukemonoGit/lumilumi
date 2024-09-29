@@ -16,7 +16,8 @@
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
 
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
+    console.log("afterNavigate", navigate.type);
     if (!$loginUser) {
       $toastSettings = {
         title: "Warning",
