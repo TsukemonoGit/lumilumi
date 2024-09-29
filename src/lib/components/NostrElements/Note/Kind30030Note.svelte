@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { showImg } from "$lib/stores/stores";
+  import { showClientTag, showImg } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import { parseNaddr } from "$lib/func/util";
+  import { nip19 } from "nostr-tools";
+  import { page } from "$app/stores";
+  import ClientTag from "./ClientTag.svelte";
   export let note: Nostr.Event;
   export let repostable: boolean;
   export let maxHeight: string;
   export let tieKey: string | undefined;
-
   $: dtag = note?.tags?.find((tag) => tag[0] === "d")?.[1];
   $: title = note?.tags?.find((tag) => tag[0] === "title")?.[1];
   $: description = note.tags.find(
@@ -44,7 +47,8 @@
       {:else}
         <div>{shortcode}</div>
       {/if}
-    {/each}
+    {/each}<ClientTag tags={note.tags} />
   </div>
+
   <NoteActionButtons {note} {repostable} {tieKey} />
 </div>

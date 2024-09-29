@@ -2,13 +2,14 @@
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
-  import { showImg, viewMediaModal, showClientTag } from "$lib/stores/stores";
+  import { showImg, viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { _ } from "svelte-i18n";
   import ContentImage from "./content/ContentImage.svelte";
-  import { parseNaddr } from "$lib/func/util";
+
+  import ClientTag from "./ClientTag.svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -71,14 +72,6 @@
 
   let imgError: boolean = false;
   let imgLoad: boolean = false;
-
-  $: clientTag = tags.find((tag) => tag[0] === "client");
-
-  const onClickClientTag = (atag: string[]) => {
-    const naddrAddress = parseNaddr(["a", ...atag]);
-    const encoded = nip19.naddrEncode(naddrAddress);
-    window.open(`https://nostrapp.link/a/${encoded}`, "_blank", "noreferrer");
-  };
 </script>
 
 <!-- <MediaDisplay
@@ -171,12 +164,4 @@
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
     >{/if}{/each}
-{#if isShowClientTag && $showClientTag && clientTag}
-  {#if clientTag.length > 2}<button
-      title={"open in nostrapp.link"}
-      on:click={() => onClickClientTag(clientTag.slice(2))}
-      class={`inline text-sm text-magnum-200/70 hover:underline`}
-      >via {clientTag[1]}
-    </button>{:else}<span class={`inline text-sm  text-neutral-200/50`}
-      >via {clientTag[1]}
-    </span>{/if}{/if}
+<ClientTag {tags} {isShowClientTag} />

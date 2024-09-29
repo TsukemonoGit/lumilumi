@@ -14,6 +14,7 @@
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
+  import ClientTag from "./ClientTag.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
@@ -130,7 +131,7 @@
         {depth}
         {repostable}
         {tieKey}
-      />{:else}
+      /><ClientTag tags={note.tags} />{:else}
       <Content
         text={note.content}
         tags={note.tags}
