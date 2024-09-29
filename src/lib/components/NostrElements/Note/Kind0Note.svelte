@@ -29,7 +29,7 @@
       class="flex align-middle whitespace-pre-wrap break-words"
       style="word-break: break-word;"
     >
-      <div>
+      <div class="mb-2">
         {profile(note)?.display_name ?? profile(note)?.name}<span
           class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
           style="word-break: break-word;"
@@ -42,7 +42,10 @@
         <FollowButton pubkey={note.pubkey} />
       </div>
     </div>
-    <div class="mt-2 max-h-48 overflow-y-auto">
+    <div
+      class="max-h-48 overflow-y-auto whitespace-pre-wrap break-words"
+      style="word-break: break-word;"
+    >
       <Content
         text={profile(note)?.about?.trim() ?? ""}
         tags={note.tags}

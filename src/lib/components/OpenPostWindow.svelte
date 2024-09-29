@@ -692,7 +692,7 @@
               handleDragOver(e);
               clickEscape = 0;
             }}
-            placeholder="いま どうしてる？"
+            placeholder={$_("post.placeholder")}
           />
         </fieldset>
 

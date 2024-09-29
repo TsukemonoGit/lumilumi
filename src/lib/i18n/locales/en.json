@@ -52,7 +52,8 @@
   },
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?",
-    "nsecAlart": "Warning: Input contains private key (nsec)"
+    "nsecAlart": "Warning: Input contains private key (nsec)",
+    "placeholder": "What's happenning?"
   },
   "user": {
     "profileEdit": "Edit profile",

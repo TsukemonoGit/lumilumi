@@ -60,7 +60,8 @@
   },
   "post": {
     "confirm": "投稿されていないテキストがあります。閉じますか？",
-    "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています"
+    "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています",
+    "placeholder": "いま どうしてる？"
   },
   "profile": {
     "display_name": "表示名",

@@ -747,7 +747,7 @@
   </fieldset>
 </form>
 
-<div class=" fixed sm:bottom-5 bottom-16 right-5 z-1">
+<div class=" fixed md:bottom-5 bottom-16 right-5 z-1">
   <div
     class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
