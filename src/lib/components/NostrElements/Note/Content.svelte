@@ -74,8 +74,8 @@
 
   $: clientTag = tags.find((tag) => tag[0] === "client");
 
-  const onClickClientTag = (atag: string) => {
-    const naddrAddress = parseNaddr(["a", atag]);
+  const onClickClientTag = (atag: string[]) => {
+    const naddrAddress = parseNaddr(["a", ...atag]);
     const encoded = nip19.naddrEncode(naddrAddress);
     window.open(`https://nostrapp.link/a/${encoded}`, "_blank", "noreferrer");
   };
@@ -174,7 +174,7 @@
 {#if isShowClientTag && $showClientTag && clientTag}
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
-      on:click={() => onClickClientTag(clientTag[2])}
+      on:click={() => onClickClientTag(clientTag.slice(2))}
       class={`inline text-sm text-magnum-200/70 hover:underline`}
       >via {clientTag[1]}
     </button>{:else}<span class={`inline text-sm  text-neutral-200/50`}
