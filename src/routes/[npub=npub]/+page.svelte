@@ -19,8 +19,16 @@
   import { queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
-  import Kind0List from "./Kind0List.svelte";
+  import Kind0List from "./PaginationList.svelte";
   import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
+  import PaginationList from "./PaginationList.svelte";
+  import Metadatanoyatu from "./Metadatanoyatu.svelte";
+  import EllipsisMenuNaddr from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenuNaddr.svelte";
+  import { parseNaddr } from "$lib/func/util";
+  import { nip19 } from "nostr-tools";
+
+  import type { CreateTabsProps } from "@melt-ui/svelte";
+
   export let data: {
     pubkey: string;
   };
@@ -51,6 +59,7 @@
   let isOnMount = false;
   let since: number | undefined = undefined;
   $: timelineQuery = ["user", "post", userPubkey];
+
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
@@ -87,19 +96,41 @@
       since = ev[0].event.created_at;
     }
   }
+
+  // const handleChange: CreateTabsProps["onValueChange"] = ({ curr, next }) => {
+  //   console.log(curr, next);
+
+  $: if ($value) {
+    const tabsElement = document?.querySelector("#userTabs");
+    console.log($value);
+    setTimeout(() => {
+      tabsElement?.scrollIntoView({
+        block: "start",
+        inline: "nearest",
+        behavior: "instant",
+      });
+      window.scrollBy(0, -50);
+    }, 0);
+  }
+  // return next;
+  // };
+
   const {
     elements: { root, list, content, trigger },
     states: { value },
   } = createTabs({
     defaultValue: "post",
+    //  onValueChange: handleChange,
   });
 
   const triggers = [
     { id: "post", title: "Post" },
-    { id: "reactions", title: "Reactions" },
-    // { id: "pin", title: "Pin" },
-    { id: "relays", title: "Relays" },
+    { id: "reactions", title: "Reaction" },
+    { id: "bookmark", title: "Bookmark" },
     { id: "followee", title: "Follow" },
+
+    // { id: "pin", title: "Pin" },
+    { id: "relays", title: "Relay" },
   ];
 
   const [send, receive] = crossfade({
@@ -122,6 +153,7 @@
     >
       <UserProfile pubkey={userPubkey} depth={0} tieKey={undefined} />
       <div
+        id="userTabs"
         use:melt={$root}
         class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500"}
       >
@@ -405,13 +437,150 @@
                 <p>Loading...</p>
               </div>
               {#if contacts}
-                <Kind0List
-                  pubList={contacts.tags
+                <PaginationList
+                  list={contacts.tags
                     .filter((tag) => tag[0] === "p" && tag.length > 1)
                     .map((tag) => tag[1])}
                   {tieKey}
-                />{/if}
+                  let:id><Metadatanoyatu pubkey={id} {tieKey} /></PaginationList
+                >{/if}
             </Contacts>
+          {/if}
+        </div>
+        <div use:melt={$content("bookmark")} class="content">
+          {#if $value === "bookmark"}
+            <!---->
+            <LatestEvent
+              queryKey={["bookmark", data.pubkey]}
+              filters={[{ authors: [data.pubkey], kinds: [10003], limit: 1 }]}
+              let:event
+              let:status
+            >
+              <div slot="loading" class="p-1">
+                <p>Loading...</p>
+              </div>
+
+              <div slot="error" class="p-1" let:error>
+                <p>{error}</p>
+              </div>
+              <div slot="nodata" class="p-1">
+                <p>Loading...</p>
+              </div>
+              {#if event}
+                {@const filteredList = event.tags.filter(
+                  (tag) =>
+                    (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") &&
+                    tag.length > 1
+                )}
+                <PaginationList
+                  list={filteredList.map((tag) => tag[1])}
+                  {tieKey}
+                  let:id
+                  let:index
+                >
+                  {#if filteredList[index][0] === "e"}
+                    <Note
+                      {id}
+                      mini={false}
+                      displayMenu={true}
+                      depth={0}
+                      repostable={true}
+                      {tieKey}
+                    />
+                    <!---->
+                  {:else if filteredList[index][0] === "a"}
+                    {@const naddr = parseNaddr(filteredList[index])}
+                    <LatestEvent
+                      queryKey={[
+                        "naddr",
+                        `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`,
+                      ]}
+                      filters={[
+                        naddr.identifier !== ""
+                          ? {
+                              kinds: [naddr.kind],
+                              authors: [naddr.pubkey],
+                              "#d": [naddr.identifier],
+                            }
+                          : {
+                              kinds: [naddr.kind],
+                              authors: [naddr.pubkey],
+                            },
+                      ]}
+                      let:event
+                    >
+                      <div
+                        slot="loading"
+                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                      >
+                        {filteredList[index]}<EllipsisMenuNaddr
+                          naddr={nip19.naddrEncode(naddr)}
+                        />
+                      </div>
+                      <div
+                        slot="nodata"
+                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                      >
+                        {filteredList[index]}<EllipsisMenuNaddr
+                          naddr={nip19.naddrEncode(naddr)}
+                        />
+                      </div>
+                      <div
+                        slot="error"
+                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                      >
+                        {filteredList[index]}<EllipsisMenuNaddr
+                          naddr={nip19.naddrEncode(naddr)}
+                        />
+                      </div>
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                        let:metadata
+                      >
+                        <div slot="loading">
+                          <EventCard
+                            note={event}
+                            displayMenu={true}
+                            repostable={true}
+                            {tieKey}
+                          />
+                        </div>
+                        <div slot="nodata">
+                          <EventCard
+                            note={event}
+                            displayMenu={true}
+                            repostable={true}
+                            {tieKey}
+                          />
+                        </div>
+                        <div slot="error">
+                          <EventCard
+                            note={event}
+                            displayMenu={true}
+                            repostable={true}
+                            {tieKey}
+                          />
+                        </div>
+                        <EventCard
+                          {metadata}
+                          displayMenu={true}
+                          repostable={true}
+                          note={event}
+                          {tieKey}
+                        /></Metadata
+                      >
+                    </LatestEvent>
+                    <!---->
+                  {:else if filteredList[index][0] === "t"}
+                    [t,{id}]
+                    <!---->
+                  {:else}
+                    <!---->
+                    [r,{id}]
+                  {/if}
+                </PaginationList>{/if}
+            </LatestEvent>
           {/if}
         </div>
       </div>

@@ -35,9 +35,8 @@
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
+    updating = true;
     timeoutId = setTimeout(() => {
-      updating = true;
-
       performUpdate();
 
       updating = false;

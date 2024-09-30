@@ -239,4 +239,16 @@
     font-size: 0.9em;
     color: theme(colors.magnum.400);
   }
+  hr {
+    overflow: visible;
+    text-align: center;
+  }
+  hr::after {
+    background: theme(colors.neutral.900);
+    color: rgb(var(--color-magnum-100) / 0.5);
+    content: " ･ᴗ･ " !important;
+    position: relative;
+    padding: 0 4px;
+    top: -13px;
+  }
 </style>

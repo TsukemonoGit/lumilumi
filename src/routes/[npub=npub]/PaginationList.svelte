@@ -2,23 +2,22 @@
   import { createPagination, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
 
-  import Metadatanoyatu from "./Metadatanoyatu.svelte";
   import type { CreatePaginationProps } from "@melt-ui/svelte";
-  import { beforeNavigate } from "$app/navigation";
+
   import { onMount } from "svelte";
 
-  export let pubList: string[];
+  export let list: string[];
   export let tieKey: string;
   let paginationElement: Element | null;
   onMount(() => {
     paginationElement = document?.querySelector("#pagination");
   });
-  const handleChange: CreatePaginationProps["onPageChange"] = ({
-    curr,
-    next,
-  }) => {
-    console.log(curr, next);
-
+  // const handleChange: CreatePaginationProps["onPageChange"] = ({
+  //   curr,
+  //   next,
+  // }) => {
+  //   console.log(curr, next);
+  $: if ($range) {
     setTimeout(() => {
       paginationElement?.scrollIntoView({
         block: "start",
@@ -27,24 +26,22 @@
       });
       window.scrollBy(0, -90);
     }, 1);
-
-    return next;
-  };
+  }
+  //   return next;
+  // };
 
   const {
     elements: { root, pageTrigger, prevButton, nextButton },
     states: { pages, range },
   } = createPagination({
-    count: pubList.length,
+    count: list.length,
     perPage: 20,
     defaultPage: 1,
     siblingCount: 1,
-    onPageChange: handleChange,
+    //onPageChange: handleChange,
   });
 
-  $: viewList = pubList.slice($range.start, $range.end);
-
-  beforeNavigate((navigate) => console.log(navigate));
+  $: viewList = list.slice($range.start, $range.end);
 </script>
 
 <div
@@ -86,9 +83,9 @@
       {$range.start} - {$range.end}
     </p>
   </nav>
-  {#each viewList as pubhex, index}<Metadatanoyatu
-      pubkey={pubhex}
-      {tieKey}
+  {#each viewList as pubhex, index}<slot
+      id={pubhex}
+      index={index + $range.start}
     />{/each}
   <nav
     class="flex flex-col items-center"
