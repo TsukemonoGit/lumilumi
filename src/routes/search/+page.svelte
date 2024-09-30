@@ -40,6 +40,7 @@
   let compRef: SvelteComponent;
   let openSearchResult = false;
 
+  let searchRelays = nip50relays;
   function updateQueryParams() {
     const params = new URLSearchParams(window.location.search);
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
@@ -259,6 +260,11 @@
     // }
     $nowProgress = false;
   };
+
+  const setRelay = (event: { detail: { relays: string[] } }) => {
+    console.log(event);
+    searchRelays = event.detail.relays;
+  };
 </script>
 
 <svelte:head>
@@ -269,72 +275,37 @@
 
 <section>
   {#if $loginUser}
-    <SetSearchRelays pubkey={$loginUser} let:relays>
-      <div slot="loading" class="w-full">
-        <Settei
-          title={"Search"}
-          relays={nip50relays}
-          {onClickSave}
-          Description={SearchDescription}
-        />
-      </div>
-      <div slot="error" class="w-full">
-        <Settei
-          title={"Search"}
-          relays={nip50relays}
-          {onClickSave}
-          Description={SearchDescription}
-        />
-      </div>
-      <div slot="nodata" class="w-full">
-        <Settei
-          title={"Search"}
-          relays={nip50relays}
-          {onClickSave}
-          Description={SearchDescription}
-        />
-      </div>
-      {#if relays.length > 0}
-        <Settei
-          title={"Search"}
-          {relays}
-          {onClickSave}
-          Description={SearchDescription}
-        />{/if}<SearchOption
-        bind:followingList
-        bind:searchKind
-        bind:searchHashtag
-        bind:searchWord
-        bind:searchPubkey
-        bind:searchPubkeyTo
-        bind:searchSince
-        bind:searchUntil
-        bind:followee
-        {handleClickSearch}
-        {createFilter}
-        {resetValue}
-        {filters}
-      />
-      {#if openSearchResult}
-        <SearchResult bind:this={compRef} bind:filters={showFilters} {relays} />
-      {/if}
-      <!-- <div class="flex gap-2">
-        <div class="font-medium text-magnum-400">SearchRelays</div>
-        <div class="text-sm">
-          {nip50relays.join(", ")}
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-2 mb-2">
-        <div class="flex flex-col items-start justify-center">
-          <div class="font-medium text-magnum-400">keyword</div>
-          <input
-            type="text"
-            id="word"
-            class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-            placeholder=""
-            bind:value={searchWord}
-          />
-        </div> -->
+    <SetSearchRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}>
+      <div slot="loading" class="w-full"></div>
+      <div slot="error" class="w-full"></div>
+      <div slot="nodata" class="w-full"></div>
     </SetSearchRelays>
+
+    <Settei
+      title={"Search"}
+      relays={searchRelays}
+      {onClickSave}
+      Description={SearchDescription}
+    />{/if}<SearchOption
+    bind:followingList
+    bind:searchKind
+    bind:searchHashtag
+    bind:searchWord
+    bind:searchPubkey
+    bind:searchPubkeyTo
+    bind:searchSince
+    bind:searchUntil
+    bind:followee
+    {handleClickSearch}
+    {createFilter}
+    {resetValue}
+    {filters}
+  />
+  {#if openSearchResult}
+    <SearchResult
+      bind:this={compRef}
+      bind:filters={showFilters}
+      relays={searchRelays}
+    />
   {/if}
 </section>
