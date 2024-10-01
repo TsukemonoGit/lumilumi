@@ -10,7 +10,7 @@
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
-  import { defaultRelays } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "$lib/stores/stores";
   export let filters: Nostr.Filter[];
 
   let amount = 50;
@@ -27,10 +27,13 @@
     console.log("relays", relays);
   });
   onDestroy(() => {
-    // $queryClient.cancelQueries({
-    //   queryKey: ["search"],
-    // });
-    // $queryClient.removeQueries({ queryKey: ["search"] });
+    console.log("onDestroy");
+    $queryClient.cancelQueries({
+      queryKey: ["search"],
+    });
+    $queryClient.cancelQueries({ queryKey: ["search", "olderData"] });
+    $queryClient.removeQueries({ queryKey: ["search"] });
+    $queryClient.removeQueries({ queryKey: ["search", "olderData"] });
     //console.log("cancelQueries");
   });
 </script>
@@ -39,7 +42,7 @@
   <div class="w-full break-words overflow-x-hidden max-w-full">
     <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
     <SearchResultList
-      queryKey={["search", generateRandomId(4)]}
+      queryKey={["search"]}
       {filters}
       req={createRxForwardReq()}
       let:events

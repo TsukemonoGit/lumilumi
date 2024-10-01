@@ -9,6 +9,7 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
+  import { createEventDispatcher } from "svelte";
 
   export let req:
     | (RxReq<"backward"> &
@@ -21,6 +22,9 @@
     | undefined = undefined;
 
   export let pubkey: string;
+
+  // Create event dispatcher
+  const dispatch = createEventDispatcher();
 
   $: result = deriveResult(pubkey, req);
   $: console.log(result);
@@ -48,6 +52,11 @@
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
+
+  $: if ($data && $data.length > 0) {
+    console.log($data);
+    dispatch("relayChange", { relays: $data });
+  }
 
   interface $$Slots {
     default: {

@@ -156,6 +156,8 @@
   }
 
   function createFilter() {
+    searchPubkey = searchPubkey.trim();
+    searchPubkeyTo = searchPubkeyTo.trim();
     $filters = [
       {
         search: searchWord || undefined,
@@ -220,9 +222,9 @@
     searchUntil = undefined;
   }
 
-  const handleReload = () => {
-    console.log("reload");
-  };
+  // const handleReload = () => {
+  //   console.log("reload");
+  // };
 
   const onClickSave = async (relays: string[]) => {
     console.log("save");
@@ -250,9 +252,10 @@
     $queryClient.refetchQueries({
       queryKey: ["searchRelay", $loginUser],
     });
-    if (isSuccess.length > 0) {
-      handleReload();
-    }
+
+    // if (isSuccess.length > 0) {
+    //   handleReload();
+    // }
     // if (isSuccess.length > 0) {
     //   $queryClient.refetchQueries({
     //     queryKey: key,

@@ -1,81 +1,32 @@
 <script lang="ts">
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+
   import {
     loginUser,
     nowProgress,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
-  import { promisePublishEvent } from "$lib/func/nostr";
-  import { onMount } from "svelte";
+
+  import { generateRandomId, promisePublishEvent } from "$lib/func/nostr";
+  import { SvelteComponent } from "svelte";
 
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
+
   import Settei from "./Settei.svelte";
   import { generateResultMessage } from "$lib/func/util";
   import GlobalDescription from "./GlobalDescription.svelte";
+  import GlobalTimeline from "./GlobalTimeline.svelte";
+  import { afterNavigate } from "$app/navigation";
+  import type { QueryKey } from "@tanstack/svelte-query";
+  import { setReadRelaysByKind30002 } from "$lib/stores/useGlobalRelaySet";
+  import type { EventPacket } from "rx-nostr";
 
-  let amount = 50;
-  let viewIndex = 0;
-  const tieKey = "global";
-  let isOnMount = false;
-  let since: number | undefined = undefined;
-  const timelineQuery: QueryKey = ["global", "feed"];
-  onMount(() => {
-    if (!isOnMount) {
-      isOnMount = true;
-      init();
-
-      isOnMount = false;
-    }
-  });
-  afterNavigate(() => {
-    if (!isOnMount) {
-      isOnMount = true;
-      init();
-
-      isOnMount = false;
-    }
-  });
-
-  async function init() {
-    since = undefined;
-
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
-      ...timelineQuery,
-      "olderData",
-    ]);
-    if (!ev || ev.length <= 0) {
-      since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
-    } else {
-      since = ev[0].event.created_at;
-    }
-  }
-  //let isView = true;
-  //let compRef: TimelineList;
-  const handleReload = () => {
-    // compRef.$destroy();
-    // isView = false;
-    // $queryClient.refetchQueries({
-    //   queryKey: ["globalRelay", $loginUser],
-    // });
-
-    $toastSettings = {
-      title: "info",
-      description: "reload to set new relay list",
-      color: "bg-green-500",
-    };
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
-  };
-
+  let compRef: SvelteComponent;
+  let openGlobalTimeline: boolean;
+  let globalRelays: string[] = [];
+  let timelineQuery: QueryKey = ["global", "feed", generateRandomId(2)];
   const onClickSave = async (relays: string[]) => {
     $nowProgress = true;
     console.log(relays);
@@ -98,16 +49,52 @@
       description: str,
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
+
     if (isSuccess.length > 0) {
-      handleReload();
+      console.log("removeQueries");
+      $queryClient.refetchQueries({
+        queryKey: ["globalRelay", $loginUser],
+      });
+      timelineQuery = ["global", "feed", generateRandomId(2)];
+      $queryClient.removeQueries({
+        queryKey: timelineQuery,
+      });
+      $queryClient.removeQueries({
+        queryKey: [...timelineQuery, "olderData"],
+      });
+      globalRelays = relays;
     }
-    // if (isSuccess.length > 0) {
-    //   $queryClient.refetchQueries({
-    //     queryKey: key,
-    //   });
-    // }
     $nowProgress = false;
   };
+
+  const setRelay = (event: { detail: { relays: string[] } }) => {
+    console.log("setRelay", event);
+    if (event.detail.relays.length > 0) {
+      globalRelays = event.detail.relays;
+    }
+    // openGlobalTimeline = true;
+  };
+  $: console.log(openGlobalTimeline);
+  $: if (globalRelays.length > 0) {
+    console.log("global");
+    openGlobalTimeline = false;
+
+    setTimeout(() => {
+      openGlobalTimeline = true;
+    }, 1);
+  }
+  afterNavigate(() => {
+    const data: EventPacket | undefined = $queryClient.getQueryData([
+      "globalRelay",
+      $loginUser,
+    ]);
+    console.log("afterNavigate", data);
+    if (data) {
+      globalRelays = (data.event.tags as string[][])
+        .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
+        .map((tag: string[]) => tag[1]);
+    }
+  });
 </script>
 
 <svelte:head>
@@ -117,97 +104,22 @@
 </svelte:head>
 
 <section class="w-full break-words overflow-hidden">
-  <SetGlobalRelays pubkey={$loginUser} let:relays>
-    <div slot="loading" class="w-full">
-      <Settei
-        title={"Global"}
-        relays={[]}
-        {onClickSave}
-        Description={GlobalDescription}
-      />
-    </div>
-    <div slot="error" class="w-full">
-      <Settei
-        title={"Global"}
-        relays={[]}
-        {onClickSave}
-        Description={GlobalDescription}
-      />
-    </div>
-    <div slot="nodata" class="w-full">
-      <Settei
-        title={"Global"}
-        relays={[]}
-        {onClickSave}
-        Description={GlobalDescription}
-      />
-    </div>
-    <Settei
-      title={"Global"}
-      {relays}
-      {onClickSave}
-      Description={GlobalDescription}
-    />
-
-    {#if since}
-      <TimelineList
-        queryKey={timelineQuery}
-        filters={[
-          {
-            kinds: [1, 6, 16],
-            limit: 50,
-            since: since,
-          },
-        ]}
-        req={createRxForwardReq()}
-        let:events
-        {viewIndex}
-        {amount}
-        let:len
-        {tieKey}
-        {relays}
-      >
-        <!-- <SetRepoReactions /> -->
-        <div slot="loading">
-          <p>Loading...</p>
-        </div>
-
-        <div slot="error" let:error>
-          <p>{error}</p>
-        </div>
-
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <!-- <div
-                  class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                  events.length - 1
-                    ? 'last-visible'
-                    : ''} {index === 0 ? 'first-visible' : ''}"
-                > -->
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="nodata" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="error" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <EventCard {metadata} note={event} {tieKey} /></Metadata
-              >
-              <!-- </div> -->
-            {/each}{/if}
-        </div>
-      </TimelineList>{/if}
+  <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
+    ><div slot="loading" class="w-full"></div>
+    <div slot="error" class="w-full"></div>
+    <div slot="nodata" class="w-full"></div>
   </SetGlobalRelays>
+
+  <Settei
+    title={"Global"}
+    relays={globalRelays}
+    {onClickSave}
+    Description={GlobalDescription}
+  />
+
+  {#if openGlobalTimeline && globalRelays.length > 0}
+    <GlobalTimeline bind:this={compRef} {globalRelays} {timelineQuery} />
+  {/if}
 </section>
 
 <div class="postWindow">
