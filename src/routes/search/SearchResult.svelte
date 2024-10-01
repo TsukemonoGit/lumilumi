@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { createRxForwardReq, createTie } from "rx-nostr";
+  import { createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
-  import { generateRandomId } from "$lib/func/nostr";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -28,10 +27,10 @@
   });
   onDestroy(() => {
     console.log("onDestroy");
-    $queryClient.cancelQueries({
-      queryKey: ["search"],
-    });
-    $queryClient.cancelQueries({ queryKey: ["search", "olderData"] });
+    // $queryClient.cancelQueries({
+    //   queryKey: ["search"],
+    // });
+    // $queryClient.cancelQueries({ queryKey: ["search", "olderData"] });
     $queryClient.removeQueries({ queryKey: ["search"] });
     $queryClient.removeQueries({ queryKey: ["search", "olderData"] });
     //console.log("cancelQueries");
