@@ -25,6 +25,7 @@
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
+  import type { EventPacket } from "rx-nostr";
 
   let searchWord = "";
   let searchKind: number | undefined = undefined;
@@ -93,6 +94,17 @@
   }
 
   async function init() {
+    const data: EventPacket | undefined = $queryClient.getQueryData([
+      "searchRelay",
+      $loginUser,
+    ]);
+    console.log("afterNavigate", data);
+    if (data) {
+      searchRelays = (data.event.tags as string[][])
+        .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
+        .map((tag: string[]) => tag[1]);
+    }
+
     // const params = get(page).url.searchParams;
     const params = new URLSearchParams(window.location.search);
     console.log(params);
@@ -156,6 +168,8 @@
   }
 
   function createFilter() {
+    searchPubkey = searchPubkey.trim();
+    searchPubkeyTo = searchPubkeyTo.trim();
     $filters = [
       {
         search: searchWord || undefined,
@@ -220,9 +234,9 @@
     searchUntil = undefined;
   }
 
-  const handleReload = () => {
-    console.log("reload");
-  };
+  // const handleReload = () => {
+  //   console.log("reload");
+  // };
 
   const onClickSave = async (relays: string[]) => {
     console.log("save");
@@ -247,11 +261,11 @@
       description: str,
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
-    $queryClient.refetchQueries({
-      queryKey: ["searchRelay", $loginUser],
-    });
+
     if (isSuccess.length > 0) {
-      handleReload();
+      $queryClient.refetchQueries({
+        queryKey: ["searchRelay", $loginUser],
+      });
     }
     // if (isSuccess.length > 0) {
     //   $queryClient.refetchQueries({
