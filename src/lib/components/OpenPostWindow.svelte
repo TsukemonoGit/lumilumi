@@ -315,6 +315,9 @@
     cursorPosition += emojiText.length;
     //viewCustomEmojis = false;
     textarea.focus();
+    setTimeout(() => {
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    });
   };
 
   const delay = (ms: number) =>
@@ -366,8 +369,10 @@
             // さらに10ms待機するPromise //確実にテキスト挿入完了してから次の処理をするため
             await delay(10);
 
-            textarea.selectionEnd = cursorPosition;
             textarea.focus();
+            setTimeout(() => {
+              textarea.selectionEnd = cursorPosition;
+            }, 0);
           }
         }
       });
@@ -524,15 +529,19 @@
     return false;
   }
 
-  function handleClickUser(pub: string): any {
+  async function handleClickUser(pub: string): Promise<any> {
     //tags.push(["p", nip19.decode(pub).data as string]);
 
-    const emojiText = ` nostr:${pub} `;
+    const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
     text =
       text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
     cursorPosition += emojiText.length;
     viewMetadataList = false;
+
     textarea.focus();
+    setTimeout(() => {
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    });
   }
 </script>
 
