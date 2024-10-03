@@ -575,9 +575,12 @@
       </li>
     </ul>
   </fieldset>
-  <!--- 表示設定 --->
+
+  <!--- データ使用に関する設定 --->
   <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">Display</legend>
+    <legend class="text-magnum-200 font-bold text-lg"
+      >{$_("settings.usage.title")}</legend
+    >
     <div class="flex flex-col gap-2">
       <label>
         <input
@@ -587,6 +590,37 @@
         />
         {$_("settings.display.loadImage")}
       </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showUserStatus}
+        />
+        {$_("settings.display.showUserStatus")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showReactioninTL}
+        />
+        {$_("settings.display.showReactioninTL")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showKind16}
+        />
+        {$_("settings.display.showKind16")}
+      </label>
+    </div>
+  </fieldset>
+
+  <!--- 表示設定 --->
+  <fieldset class="border border-magnum-500 rounded-md p-2">
+    <legend class="text-magnum-200 font-bold text-lg">Display</legend>
+    <div class="flex flex-col gap-2">
       <label>
         <input
           type="checkbox"
@@ -611,30 +645,7 @@
         />
         {$_("settings.display.showRelayIcon")}
       </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showReactioninTL}
-        />
-        {$_("settings.display.showReactioninTL")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showUserStatus}
-        />
-        {$_("settings.display.showUserStatus")}
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showKind16}
-        />
-        {$_("settings.display.showKind16")}
-      </label>
+
       <label>
         <input
           type="checkbox"

@@ -24,7 +24,7 @@
       "preview": "ノート作成時にプレビューを表示する（画像読み込みが有効のときのみ）",
       "menu": "menuボタンを左側に表示する",
       "showRelayIcon": "アイコンの下にリレー情報を表示する",
-      "showReactioninTL": "自分へのリアクションをTLに流す",
+      "showReactioninTL": "通知Toastを表示する",
       "showUserStatus": "ユーザーステータスを表示する",
       "banner": "右側のアカウントバナーを表示する",
       "showKind16": "kind16(kind1以外のリポスト)を表示する",
@@ -43,7 +43,10 @@
       "notes": "NIP違反のショートコードを含む絵文字は除外されます。"
     },
     "relay": "リロード後に変更が反映されます。",
-    "kind10002": "リレー編集"
+    "kind10002": "リレー編集",
+    "usage": {
+      "title": "通信量に影響を与える設定"
+    }
   },
   "user": {
     "following": "フォロー中",

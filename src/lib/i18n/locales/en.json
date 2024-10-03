@@ -24,7 +24,7 @@
       "preview": "Show preview when creating notes (only when image loading is enabled)",
       "menu": "Display the menu button on the left side.",
       "showRelayIcon": "Relay information is displayed under the icon",
-      "showReactioninTL": "Stream your reactions to Timeline",
+      "showReactioninTL": "show reaction toast",
       "showUserStatus": "show user status",
       "banner": "Show the account banner on the right",
       "showKind16": "Show kind16 (reposts other than kind1)　",
@@ -43,7 +43,10 @@
       "notes": "Emojis that contain NIP violation shortcodes are excluded."
     },
     "relay": "The changes will take effect after reloading.",
-    "kind10002": "Edit Relays"
+    "kind10002": "Edit Relays",
+    "usage": {
+      "title": "Settings that affect data consumption"
+    }
   },
   "nostviewstr": {
     "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr",
