@@ -1,10 +1,11 @@
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { publishEvent } from "$lib/func/nostr";
-  import { emojis, showImg } from "$lib/stores/stores";
+  import { addClientTag, emojis, showImg } from "$lib/stores/stores";
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import split from "graphemesplit";
+  import { clientTag } from "$lib/func/util";
   export let note: Nostr.Event | undefined;
 
   export let root: string[] | undefined;
@@ -45,7 +46,9 @@
         ["k", note.kind.toString()]
       );
     }
-
+    if ($addClientTag) {
+      tags.push(clientTag);
+    }
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: tags,

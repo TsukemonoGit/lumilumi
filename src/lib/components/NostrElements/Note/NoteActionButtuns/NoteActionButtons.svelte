@@ -21,8 +21,9 @@
     postWindowOpen,
     additionalPostOptions,
     queryClient,
+    addClientTag,
   } from "$lib/stores/stores";
-  import { nip33Regex, profile } from "$lib/func/util";
+  import { clientTag, nip33Regex, profile } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -73,6 +74,9 @@
         ["k", note.kind.toString()]
       );
     }
+    if ($addClientTag) {
+      tags.push(clientTag);
+    }
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: tags,
@@ -106,9 +110,10 @@
 
   const handleSelectItem = async (index: number) => {
     console.log(menuTexts[index].num);
+    const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
     const eventpointer: nip19.EventPointer = {
       id: note.id,
-      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      relays: relayhints,
       author: note.pubkey,
       kind: note.kind,
     };
@@ -117,14 +122,18 @@
       case 0:
         //repost
         let tags: string[][] = [["p", note.pubkey]];
+
         //replaceable
         if (atag) {
-          tags.push(["a", atag]);
+          tags.push(["a", atag, relayhints[0] ?? ""]);
         } else {
-          tags.push(["e", note.id]);
+          tags.push(["e", note.id, relayhints[0] ?? ""]);
         }
         if (note.kind !== 1) {
           tags.push(["k", note.kind.toString()]);
+        }
+        if ($addClientTag) {
+          tags.push(clientTag);
         }
         const ev: Nostr.EventParameters =
           note.kind === 1
