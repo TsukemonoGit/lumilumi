@@ -543,6 +543,35 @@
       textarea.setSelectionRange(cursorPosition, cursorPosition);
     });
   }
+
+  let emojiInput: HTMLInputElement;
+  let metadataInput: HTMLInputElement;
+
+  const handleClickCustomReaction = () => {
+    viewCustomEmojis = !viewCustomEmojis;
+    if (viewCustomEmojis) {
+      setTimeout(() => {
+        emojiInput.focus();
+        emojiInput.setSelectionRange(0, 0);
+      });
+    }
+    if (viewMetadataList && viewCustomEmojis) {
+      viewMetadataList = false;
+    }
+  };
+
+  const handleClickMetadata = () => {
+    viewMetadataList = !viewMetadataList;
+    if (viewMetadataList) {
+      setTimeout(() => {
+        metadataInput.focus();
+        metadataInput.setSelectionRange(0, 0);
+      });
+    }
+    if (viewMetadataList && viewCustomEmojis) {
+      viewCustomEmojis = false;
+    }
+  };
 </script>
 
 <svelte:window on:keyup={keyboardShortcut} on:keydown={handleKeyDown} />
@@ -740,6 +769,7 @@
             {#if $emojis && $emojis.length > 0}
               {#if viewCustomEmojis}
                 <input
+                  bind:this={emojiInput}
                   type="text"
                   class="h-8 w-full rounded-md text-magnum-100 border-2
             border-magnum-400"
@@ -748,12 +778,7 @@
               {/if}
               <button
                 aria-label="open custom emoji list"
-                on:click={() => {
-                  viewCustomEmojis = !viewCustomEmojis;
-                  if (viewMetadataList && viewCustomEmojis) {
-                    viewMetadataList = false;
-                  }
-                }}
+                on:click={handleClickCustomReaction}
                 class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
                     bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
               >
@@ -769,6 +794,7 @@
 
             {#if viewMetadataList}
               <input
+                bind:this={metadataInput}
                 type="text"
                 class="h-8 w-full rounded-md text-magnum-100 border-2
          border-magnum-400"
@@ -776,13 +802,8 @@
               />
             {/if}
             <button
-              aria-label="open custom emoji list"
-              on:click={() => {
-                viewMetadataList = !viewMetadataList;
-                if (viewMetadataList && viewCustomEmojis) {
-                  viewCustomEmojis = false;
-                }
-              }}
+              aria-label="open name list"
+              on:click={handleClickMetadata}
               class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
                  bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
             >
