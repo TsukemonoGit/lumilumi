@@ -106,6 +106,7 @@
   };
 </script>
 
+<!--reconnect relayは readable default relayだけ-->
 <Popover bind:open ariaLabel={"relays status"}>
   <RadioTower size="20" class={overallStateColor} />
 
@@ -143,13 +144,7 @@
               <div slot="popoverContent" class="mr-8">
                 {$relayStateMap.get(relayUrl)}
               </div></Popover
-            ><span class="inline w-60">{relayUrl}</span
-            >{#if $relayStateMap.get(relayUrl) === "error"}<button
-                on:click={() => handleClickReconnect(relayUrl)}
-                class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
-                disabled={relayUrl === disabledButton}
-                ><RefreshCcw class="text-magnum-700 " size={16} /></button
-              >{/if}
+            ><span class="inline w-60">{relayUrl}</span>
           </li>
         {/each}
       </ul>
