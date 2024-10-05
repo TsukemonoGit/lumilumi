@@ -40,7 +40,7 @@
     if (initData) {
       initialDataUpdatedAt = now() * 1000 - 2 * 57 * 60 * 1000; //2hよりちょっと前//最初詠み込まれたときにドバっとなって重くなるのを防ぐ
       staleTime = 2 * 60 * 60 * 1000; //2h
-      refetchInterval = staleTime;
+      refetchInterval = 2 * 60 * 60 * 1000;
     }
   }
 
@@ -51,7 +51,8 @@
     req,
     initData,
     staleTime,
-    initialDataUpdatedAt
+    initialDataUpdatedAt,
+    refetchInterval
   );
   $: data = result.data;
   $: status = result.status;
