@@ -484,7 +484,7 @@
   <EllipsisMenu {note} {tieKey} />
 </div>
 
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice />
+<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={atag ?? note.id} />
 
 <style>
   input[type="text"] {

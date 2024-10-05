@@ -11,7 +11,6 @@
     Share,
     NotepadText,
     Tv,
-    MessagesSquare,
     Squirrel,
     Layers,
     Notebook,

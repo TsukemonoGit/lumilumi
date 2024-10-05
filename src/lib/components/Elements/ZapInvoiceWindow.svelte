@@ -1,12 +1,19 @@
 <script lang="ts">
+  import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
+  import { QueryObserver } from "@tanstack/svelte-query";
   import { X } from "lucide-svelte";
 
   import QRCode from "qrcode";
+  import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
+  import { type EventPacket } from "rx-nostr";
+
   export let invoice: string | undefined;
+  export let id: string;
+
   $: url = invoice ? `lightning:${invoice}` : undefined;
-  // $: console.log(invoice);
+
   const {
     elements: {
       trigger,
@@ -23,6 +30,37 @@
   });
 
   export { open };
+
+  let zapped: { data: EventPacket; status: any; error: any };
+  let unsubscribe: (() => void) | undefined; // Start as undefined
+
+  const observer = new QueryObserver($queryClient, {
+    queryKey: ["reactions", "zapped", id],
+  });
+
+  $: if (!$open && unsubscribe) {
+    unsubscribe(); // Call the unsubscribe function if it exists
+    unsubscribe = undefined; // Reset unsubscribe after calling
+  } else if ($open && !zapped) {
+    unsubscribe = observer.subscribe((result: any) => {
+      if (result?.data?.event) {
+        zapped = result;
+        console.log(zapped);
+        unsubscribe?.(); // Unsubscribe after receiving data
+      }
+    });
+  } else if ($open && zapped) {
+    $toastSettings = {
+      title: "Zapped",
+      description: "Success to zap",
+      color: "bg-green-500",
+    };
+    $open = false;
+  }
+
+  onDestroy(() => {
+    unsubscribe?.(); // Ensure unsubscribe is only called if it exists
+  });
 </script>
 
 {#if $open}
