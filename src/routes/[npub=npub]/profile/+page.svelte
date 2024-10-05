@@ -28,6 +28,9 @@
   import { nip19 } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
+  import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
+  import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
+  import InputImageFromFile from "./InputImageFromFile.svelte";
 
   export let data: {
     pubkey: string;
@@ -318,8 +321,11 @@
         bind:value={newProfile.display_name}
         placeholder="display_name"
       />
-
-      {$_("profile.picture")}
+      <div class="flex gap-2 mb-2 items-end justify-between">
+        {$_("profile.picture")}<InputImageFromFile
+          bind:inputText={newProfile.picture}
+        />
+      </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
@@ -339,7 +345,10 @@
           />
         </div>
       </div> -->
-      {$_("profile.banner")}
+      <div class="flex gap-2 mb-2 items-end justify-between">
+        {$_("profile.banner")}
+        <InputImageFromFile bind:inputText={newProfile.banner} />
+      </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
