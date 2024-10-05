@@ -52,9 +52,6 @@
       since = ev[0].event.created_at;
     }
   }
-  const handleClickToChannel = (id: string) => {
-    goto(`/channel/${nip19.noteEncode(id)}`);
-  };
 
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);

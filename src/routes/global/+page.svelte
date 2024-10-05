@@ -20,7 +20,7 @@
   import GlobalTimeline from "./GlobalTimeline.svelte";
   import { afterNavigate } from "$app/navigation";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { setReadRelaysByKind30002 } from "$lib/stores/useGlobalRelaySet";
+
   import type { EventPacket } from "rx-nostr";
 
   let compRef: SvelteComponent;

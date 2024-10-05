@@ -50,60 +50,62 @@
   }
 </script>
 
-<TimelineList
-  queryKey={timelineQuery}
-  filters={[
-    {
-      kinds: [1, 6, 16],
-      limit: 50,
-      since: since,
-    },
-  ]}
-  req={createRxForwardReq()}
-  let:events
-  {viewIndex}
-  {amount}
-  let:len
-  {tieKey}
-  relays={globalRelays}
->
-  <!-- <SetRepoReactions /> -->
-  <div slot="loading">
-    <p>Loading...</p>
-  </div>
-
-  <div slot="error" let:error>
-    <p>{error}</p>
-  </div>
-
-  <div
-    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+{#if since}
+  <TimelineList
+    queryKey={timelineQuery}
+    filters={[
+      {
+        kinds: [1, 6, 16],
+        limit: 50,
+        since: since,
+      },
+    ]}
+    req={createRxForwardReq()}
+    let:events
+    {viewIndex}
+    {amount}
+    let:len
+    {tieKey}
+    relays={globalRelays}
   >
-    {#if events && events.length > 0}
-      {#each events as event, index (event.id)}
-        <!-- <div
+    <!-- <SetRepoReactions /> -->
+    <div slot="loading">
+      <p>Loading...</p>
+    </div>
+
+    <div slot="error" let:error>
+      <p>{error}</p>
+    </div>
+
+    <div
+      class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+    >
+      {#if events && events.length > 0}
+        {#each events as event, index (event.id)}
+          <!-- <div
         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
         events.length - 1
           ? 'last-visible'
           : ''} {index === 0 ? 'first-visible' : ''}"
       > -->
-        <Metadata
-          queryKey={["metadata", event.pubkey]}
-          pubkey={event.pubkey}
-          let:metadata
-        >
-          <div slot="loading" class="w-full">
-            <EventCard note={event} {tieKey} />
-          </div>
-          <div slot="nodata" class="w-full">
-            <EventCard note={event} {tieKey} />
-          </div>
-          <div slot="error" class="w-full">
-            <EventCard note={event} {tieKey} />
-          </div>
-          <EventCard {metadata} note={event} {tieKey} /></Metadata
-        >
-        <!-- </div> -->
-      {/each}{/if}
-  </div>
-</TimelineList>
+          <Metadata
+            queryKey={["metadata", event.pubkey]}
+            pubkey={event.pubkey}
+            let:metadata
+          >
+            <div slot="loading" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <div slot="nodata" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <div slot="error" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <EventCard {metadata} note={event} {tieKey} /></Metadata
+          >
+          <!-- </div> -->
+        {/each}{/if}
+    </div>
+  </TimelineList>
+{/if}
