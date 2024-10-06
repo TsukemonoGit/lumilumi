@@ -54,6 +54,10 @@
     "profileEdit": "プロフィールの編集",
     "followList": {
       "update": "followList の 更新"
+    },
+    "petname": {
+      "petname": "ニックネーム",
+      "write": "フォローユーザーの表示名を設定できます。"
     }
   },
   "nostviewstr": {

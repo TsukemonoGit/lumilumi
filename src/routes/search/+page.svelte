@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getFollowingList, promisePublishEvent } from "$lib/func/nostr";
+  import { promisePublishEvent } from "$lib/func/nostr";
   import {
     awaitInterval,
     generateResultMessage,
@@ -15,6 +15,7 @@
   import * as Nostr from "nostr-typedef";
   import {
     defaultRelays,
+    followList,
     loginUser,
     nowProgress,
     queryClient,
@@ -144,7 +145,6 @@
     openSearchResult = false;
   });
 
-  $: followingList = getFollowingList();
   $: if (
     searchKind === searchKind ||
     searchHashtag ||
@@ -176,8 +176,8 @@
 
         authors: npubRegex.test(searchPubkey)
           ? [getHex(searchPubkey)]
-          : followee
-            ? followingList
+          : followee && $followList
+            ? Array.from($followList.keys())
             : undefined,
         since: !Number.isNaN(searchSince) ? searchSince : undefined,
         until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
@@ -301,7 +301,6 @@
       {onClickSave}
       Description={SearchDescription}
     />{/if}<SearchOption
-    bind:followingList
     bind:searchKind
     bind:searchHashtag
     bind:searchWord

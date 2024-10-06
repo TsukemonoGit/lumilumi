@@ -5,6 +5,7 @@
   export let onClickOK: () => void;
   export let title = "";
   export let description = "";
+  export let okButtonName: string | undefined = undefined;
   const {
     elements: {
       trigger,
@@ -56,7 +57,7 @@
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
           on:click={onClickOK}
         >
-          Continue
+          {okButtonName ? okButtonName : "Continue"}
         </button>
       </div>
 

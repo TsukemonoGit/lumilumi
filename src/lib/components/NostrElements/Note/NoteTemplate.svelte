@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { showRelayIcon } from "$lib/stores/stores";
+  import { followList, showRelayIcon } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
 
@@ -22,6 +22,7 @@
 
   export let displayMenu: boolean = true;
   export let tieKey: string | undefined;
+  $: petname = $followList.get(note.pubkey);
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -72,12 +73,14 @@
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
         <div>
-          {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-            class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-            >@{profile(metadata)?.name && profile(metadata)?.name !== ""
-              ? profile(metadata)?.name
-              : profile(metadata)?.display_name}</span
-          >
+          {#if petname}<span class="font-bold">📛{petname}</span
+            >{:else}{profile(metadata)?.display_name ??
+              profile(metadata)?.name}<span
+              class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
+              >@{profile(metadata)?.name && profile(metadata)?.name !== ""
+                ? profile(metadata)?.name
+                : profile(metadata)?.display_name}</span
+            >{/if}
         </div>
       {:else}
         <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">

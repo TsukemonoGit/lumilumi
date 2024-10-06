@@ -1,9 +1,13 @@
 <script lang="ts">
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
+  import {
+    followList,
+    loginUser,
+    onlyFollowee,
+    queryClient,
+  } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { getFollowingList } from "$lib/func/nostr";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -99,14 +103,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    const followee = getFollowingList();
-    if (onlyFollowee && followee) {
+    if (onlyFollowee && $followList) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return followee.includes(event.pubkey);
+          return $followList.has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && followee.includes(kind9734.pubkey);
+          return kind9734 && $followList.has(kind9734.pubkey);
         }
       });
     } else {
@@ -118,14 +121,13 @@
     if (event.pubkey === $loginUser) {
       return false;
     }
-    const followee = getFollowingList();
-    if ($onlyFollowee && followee) {
+    if ($onlyFollowee && $followList) {
       //フォロイーのみ
       if (event.kind !== 9735) {
-        if (!followee.includes(event.pubkey)) return false;
+        if (!$followList.has(event.pubkey)) return false;
       } else {
         const kind9734 = extractKind9734(event);
-        if (kind9734 !== undefined && !followee.includes(kind9734.pubkey)) {
+        if (kind9734 !== undefined && !$followList.has(kind9734.pubkey)) {
           return false;
         }
       }

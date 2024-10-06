@@ -3,7 +3,7 @@ import {
   type QueryClientConfig,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 import {
   type RxNostr,
   type EventPacket,
@@ -119,3 +119,6 @@ export const reactionToast = writable<{
 
 export const addClientTag = writable<boolean>(false);
 export const showClientTag = writable<boolean>(true);
+export const followList: Writable<Map<string, string | undefined>> = writable<
+  Map<string, string | undefined>
+>(new Map());

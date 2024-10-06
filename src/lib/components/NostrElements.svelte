@@ -3,11 +3,12 @@
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
 
-  import { getFollowingList, pubkeysIn } from "$lib/func/nostr";
+  import { pubkeysIn } from "$lib/func/nostr";
 
   import TimelineList from "./NostrMainData/TimelineList.svelte";
 
   import {
+    followList,
     loginUser,
     queryClient,
     showKind16,
@@ -73,7 +74,7 @@
     }
     const filters: Nostr.Filter[] = [
       {
-        authors: pubkeyList,
+        authors: Array.from(pubkeyList.keys()),
         kinds: kinds,
         since: since,
       },
@@ -94,7 +95,7 @@
     if ($showUserStatus) {
       filters.push({
         kinds: [30315],
-        authors: pubkeyList,
+        authors: Array.from(pubkeyList.keys()),
       });
     }
     console.log(filters);
@@ -105,14 +106,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    const followee = getFollowingList();
-    if (onlyFollowee && followee) {
+    if (onlyFollowee && $followList) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return followee.includes(event.pubkey);
+          return $followList.has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && followee.includes(kind9734.pubkey);
+          return kind9734 && $followList.has(kind9734.pubkey);
         }
       });
     } else {
