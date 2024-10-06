@@ -62,7 +62,7 @@
 
   <div
     slot="popoverContent"
-    class="max-w-full w-[600px] rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+    class="max-w-full w-[600px] rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2"
   >
     <input
       bind:this={metadataInput}
@@ -71,18 +71,19 @@
          border-magnum-400"
       bind:value={inputMetadata}
     />
-
-    {#each Object.entries(metadataList) as [pubkey, profile], index}
-      {#if checkUserInput(inputMetadata, profile)}
-        <button
-          aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
-          on:click={() => handleClickUser(pubkey)}
-          class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-          >{#if profile.petname}
-            📛{profile.petname}
-          {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
-        </button>
-      {/if}
-    {/each}
+    <div class="max-h-40 overflow-y-auto">
+      {#each Object.entries(metadataList) as [pubkey, profile], index}
+        {#if checkUserInput(inputMetadata, profile)}
+          <button
+            aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
+            on:click={() => handleClickUser(pubkey)}
+            class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+            >{#if profile.petname}
+              📛{profile.petname}
+            {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
+          </button>
+        {/if}
+      {/each}
+    </div>
   </div>
 </Popover>
