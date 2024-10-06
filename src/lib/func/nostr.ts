@@ -107,7 +107,7 @@ export function pubkeysIn(
   pubkey: string | undefined = undefined
 ): Map<string, string | undefined> {
   const followingMap: Map<string, string | undefined> = contacts.tags.reduce(
-    (acc, [tag, value, petname]) => {
+    (acc, [tag, value, relay, petname]) => {
       // "p" タグのチェック
       if (tag === "p" && !acc.has(value)) {
         // Map に pubkey をキー、petname を値として追加

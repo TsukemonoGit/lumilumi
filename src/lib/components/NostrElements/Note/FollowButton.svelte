@@ -245,9 +245,12 @@
       // "p" タグを見つけた場合
       if (tag[0] === "p" && tag[1] === pubkey) {
         // petnameが空であれば["p", pubkey]、そうでなければ["p", pubkey, petnameInput]
+
         return petnameInput === ""
-          ? ["p", pubkey]
-          : ["p", pubkey, petnameInput];
+          ? tag.slice(0, 3)
+          : tag.length > 2
+            ? [...tag.slice(0, 3), petnameInput]
+            : ["p", pubkey, "", petnameInput];
       }
       return tag; // それ以外のタグはそのまま
     });
