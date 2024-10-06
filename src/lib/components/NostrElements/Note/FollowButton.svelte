@@ -20,6 +20,7 @@
   } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
 
   export let pubkey: string;
 
@@ -385,13 +386,15 @@
 <AlertDialog
   bind:open={openPetnameDialog}
   onClickOK={onClickOKPetname}
-  title={$_("user.petname.write")}
+  title={$_("user.petname.petname")}
   okButtonName="OK"
 >
   <div slot="main">
     {#if $beforeKind3}
       <div class="flex flex-col items-start justify-center">
-        <div class="font-medium text-magnum-400">Petname</div>
+        <div class="font-medium text-magnum-400">
+          {$_("user.petname.write")} (NIP-02)
+        </div>
         <input
           type="text"
           class="h-10 w-full rounded-md px-3 py-2 mt-2 border border-magnum-600 bg-neutral-900"

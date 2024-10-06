@@ -64,6 +64,10 @@
     "follow": "Follow",
     "followList": {
       "update": "Update Follow List"
+    },
+    "petname": {
+      "petname": "Petname",
+      "write": "Can set the display name (petname) of the follow users."
     }
   },
   "profile": {
