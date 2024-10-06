@@ -28,6 +28,7 @@ https://github.com/akiomik/nosvelte
 
 - NIP-19入りの記事（kind:30023）も割とちゃんと見れる
 
+- petname📛がつけれる
 
 ## 各種設定
 
@@ -103,6 +104,8 @@ https://github.com/akiomik/nosvelte
 
   - ポスト
   - リアクション
+  - フォローリスト
+  - ブックマーク（ kind:10003 のみ）
   - リレーリスト ( kind:10002 )
 
     - Nip11 の情報が閲覧可能

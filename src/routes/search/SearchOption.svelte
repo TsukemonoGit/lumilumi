@@ -10,6 +10,7 @@
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import type { Writable } from "svelte/store";
+  import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
 
   export let searchWord: string | undefined;
   export let followee: boolean;
@@ -33,24 +34,19 @@
     return kindData ? (locale === "ja" ? kindData.ja : kindData.en) : "";
   };
 
-  async function handleClickPub(str: string) {
-    try {
-      const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      if (pub) {
-        if (str === "author") {
-          searchPubkey = nip19.npubEncode(pub);
-        } else {
-          searchPubkeyTo = nip19.npubEncode(pub);
-        }
-      }
-    } catch (error) {
-      console.log("failed to get pubkey");
-    }
-  }
   const {
     elements: { root, content, trigger },
     states: { open },
   } = createCollapsible({ forceVisible: true });
+
+  const handleClickUser = (pubkey: string) => {
+    console.log(pubkey);
+    searchPubkey = pubkey;
+  };
+  const handleClickSearchPubkeyTo = (pubkey: string) => {
+    console.log(pubkey);
+    searchPubkeyTo = pubkey;
+  };
 </script>
 
 <div class="flex flex-wrap gap-2 mb-2">
@@ -123,37 +119,39 @@
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">from</div>
           <div
-            class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
           >
+            <UserDataList {handleClickUser} />
+
             <input
               type="text"
               id="npub"
-              class="h-10 px-3 py-2 rounded-md"
+              class="h-10 px-3 py-2 rounded-r-md"
               placeholder="npub"
               bind:value={searchPubkey}
-            /><button
+            />
+
+            <!-- <button
               on:click={() => handleClickPub("author")}
               class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
               >Set My Pubkey</button
-            >
+            > -->
           </div>
         </div>
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">to</div>
           <div
-            class="grid grid-cols-[1fr_auto] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
           >
+            <UserDataList handleClickUser={handleClickSearchPubkeyTo} />
+
             <input
               type="text"
               id="npub"
-              class="h-10 px-3 py-2 rounded-md"
+              class="h-10 px-3 py-2 rounded-r-md"
               placeholder="npub"
               bind:value={searchPubkeyTo}
-            /><button
-              on:click={() => handleClickPub("p")}
-              class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
-              >Set My Pubkey</button
-            >
+            />
           </div>
         </div>
         <div class="flex flex-col items-start justify-center w-full">

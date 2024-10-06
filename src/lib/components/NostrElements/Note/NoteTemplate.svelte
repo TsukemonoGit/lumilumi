@@ -73,7 +73,7 @@
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
         <div>
-          {#if petname}<span class="font-bold">📛{petname}</span
+          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else}{profile(metadata)?.display_name ??
               profile(metadata)?.name}<span
               class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
