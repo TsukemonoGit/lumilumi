@@ -1,6 +1,6 @@
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
-  import { nowProgress } from "$lib/stores/stores";
+  import { followList, nowProgress } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, ChevronsUpDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
@@ -12,7 +12,6 @@
   import type { Writable } from "svelte/store";
 
   export let searchWord: string | undefined;
-  export let followingList: string[] | undefined;
   export let followee: boolean;
   export let createFilter;
   export let searchKind: number | undefined = undefined;
@@ -65,7 +64,7 @@
       bind:value={searchWord}
     />
   </div>
-  {#if followingList !== undefined && followingList.length > 0}
+  {#if $followList !== undefined && $followList.size > 0}
     <div class="flex flex-col items-start justify-center mt-auto py-2">
       <label>
         <input

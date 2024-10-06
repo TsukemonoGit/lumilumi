@@ -15,9 +15,7 @@
   import {
     getDefaultWriteRelays,
     getMetadataList,
-    promisePublishEvent,
     promisePublishSignedEvent,
-    publishEvent,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -522,7 +520,9 @@
           .toLowerCase()
           .includes(inputMetadata.toLowerCase())) ||
       (arg1.nip05 &&
-        arg1.nip05.toLowerCase().includes(inputMetadata.toLowerCase()))
+        arg1.nip05.toLowerCase().includes(inputMetadata.toLowerCase())) ||
+      (arg1.petname &&
+        arg1.petname.toLowerCase().includes(inputMetadata.toLowerCase()))
     ) {
       return true;
     }
@@ -865,8 +865,9 @@
                   aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
                   on:click={() => handleClickUser(pubkey)}
                   class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                >
-                  {profile.display_name ?? ""}@{profile.name ?? ""}
+                  >{#if profile.petname}
+                    📛{profile.petname}
+                  {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
                 </button>
               {/if}
             {/each}

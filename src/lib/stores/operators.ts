@@ -3,6 +3,7 @@ import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
+  followList,
   loginUser,
   metadataQueue,
   mutebykinds,
@@ -14,8 +15,7 @@ import {
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
-import { getFollowingList } from "$lib/func/nostr";
-import { createQuery, type QueryKey } from "@tanstack/svelte-query";
+import { type QueryKey } from "@tanstack/svelte-query";
 
 export function filterId(
   id: string
@@ -318,7 +318,7 @@ export function reactionCheck() {
   return pipe(
     muteCheck(),
     filter((packet: EventPacket) => {
-      const followList = getFollowingList();
+      const follow = get(followList);
       if (
         packet.event.kind === 1 ||
         packet.event.kind === 6 ||
@@ -334,7 +334,7 @@ export function reactionCheck() {
         ) {
           //自分の投稿への反応
 
-          if (followList && followList.includes(packet.event.pubkey)) {
+          if (follow && follow.has(packet.event.pubkey)) {
             console.log("includes", packet.event);
             //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
             setReactionEvent(packet);
@@ -362,7 +362,7 @@ export function reactionCheck() {
         ) {
           //TLには流れないものたちのうち自分へのリアクション
 
-          if (followList && followList.includes(packet.event.pubkey)) {
+          if (follow && follow.has(packet.event.pubkey)) {
             //自分の投稿への反応のうちフォロイーからのもの
             setReactionEvent(packet);
           } else {

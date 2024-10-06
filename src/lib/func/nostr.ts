@@ -1,6 +1,7 @@
 import {
   app,
   defaultRelays,
+  followList,
   metadataQueue,
   queryClient,
   relayStateMap,
@@ -69,11 +70,9 @@ export function getDefaultWriteRelays(): string[] {
     .map((config) => config.url);
 }
 
-let followingList: string[] = [];
-
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
-  if (followingList.length > 0) {
+  if (get(followList).size > 0) {
     // まず、現在のローカルストレージのデータを取得
     const metadataStr = localStorage.getItem("metadata");
     let currentMetadata: [QueryKey, EventPacket][] = metadataStr
@@ -106,33 +105,32 @@ metadataQueue.subscribe((queue) => {
 export function pubkeysIn(
   contacts: Nostr.Event,
   pubkey: string | undefined = undefined
-): string[] {
-  const followingList = contacts.tags.reduce((acc, [tag, value]) => {
-    if (tag === "p" && !acc.includes(value)) {
-      return [...acc, value];
-    } else {
+): Map<string, string | undefined> {
+  const followingMap: Map<string, string | undefined> = contacts.tags.reduce(
+    (acc, [tag, value, petname]) => {
+      // "p" タグのチェック
+      if (tag === "p" && !acc.has(value)) {
+        // Map に pubkey をキー、petname を値として追加
+        acc.set(value, petname || undefined);
+      }
       return acc;
-    }
-  }, []);
+    },
+    new Map<string, string | undefined>()
+  );
 
-  if (pubkey && !followingList.includes(pubkey)) {
-    followingList.push(pubkey);
+  // 指定された pubkey が Map に存在しない場合、追加
+  if (pubkey && !followingMap.has(pubkey)) {
+    followingMap.set(pubkey, undefined);
   }
 
-  setFollowingList(followingList);
-  return followingList;
+  setFollowingList(followingMap);
+  return followingMap;
 }
-export function setFollowingList(data: string[]) {
-  followingList = data;
+export function setFollowingList(data: Map<string, string | undefined>) {
+  followList.set(data);
   // console.log(followingList);
 }
-export function getFollowingList() {
-  if (followingList.length > 0) {
-    return followingList;
-  } else {
-    console.log("followingList naiyo~");
-  }
-}
+
 const saveMetadataToLocalStorage = (
   currentMetadata: [QueryKey, EventPacket][],
   key: QueryKey,
@@ -143,7 +141,7 @@ const saveMetadataToLocalStorage = (
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
-  if (followingList.includes(data.event.pubkey)) {
+  if (get(followList).has(data.event.pubkey)) {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
@@ -582,6 +580,7 @@ export interface UserData {
   name: string | undefined;
   display_name: string | undefined;
   nip05: string | undefined;
+  petname: string | undefined;
 }
 export function getMetadataList(
   querydata: [QueryKey, EventPacket][]
@@ -590,12 +589,13 @@ export function getMetadataList(
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
-
+      const petname = get(followList).get(packet.event.pubkey);
       // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,
         display_name: profile.display_name,
         nip05: profile.nip05,
+        petname: petname,
       };
     } catch (error) {
       console.error("Error parsing profile:", error);
