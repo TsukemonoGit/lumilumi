@@ -203,10 +203,9 @@
   let isPosting: boolean = false;
   $: nsecCheck = nsecRegex.test(text) || nsecRegex.test(warningText);
   const postNote = async () => {
+    if (text.trim().length <= 0) return;
     isPosting = true;
     $nowProgress = true;
-    if (text.trim().length <= 0) return;
-
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
       tags
@@ -817,7 +816,7 @@
 
             <!---->
             <button
-              disabled={isPosting}
+              disabled={isPosting || text.trim() === ""}
               aria-label="post note"
               class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-20"
