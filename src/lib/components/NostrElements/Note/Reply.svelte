@@ -1,11 +1,8 @@
 <script lang="ts">
   import { Reply, Minimize2 } from "lucide-svelte";
   import Note from "./Note.svelte";
-  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
-  import UserName from "./UserName.svelte";
 
   export let replyID: string | undefined;
-  export let replyUsers: string[];
   export let displayMenu: boolean;
   export let depth: number;
   export let repostable: boolean;
@@ -13,16 +10,6 @@
   let loadNote = false;
 </script>
 
-{#if replyUsers.length > 0}
-  <div
-    class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
-  >
-    {#each replyUsers as user}
-      {#if !displayMenu}<UserName pubhex={user} />{:else}
-        <PopupUserName pubkey={user} metadata={undefined} {tieKey} />{/if}
-    {/each}
-  </div>
-{/if}
 {#if replyID}
   {#if !loadNote}
     <button

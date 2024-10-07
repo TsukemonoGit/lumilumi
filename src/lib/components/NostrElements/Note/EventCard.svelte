@@ -43,6 +43,8 @@
     replyedEvent,
     repostedId,
   } from "$lib/func/event";
+  import UserName from "./UserName.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -314,15 +316,22 @@
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
         <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+        {#if replyUsers.length > 0}
+          <div
+            class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
+          >
+            {#each replyUsers as user}
+              {#if !displayMenu}<UserName pubhex={user} />{:else}
+                <PopupUserName
+                  pubkey={user}
+                  metadata={undefined}
+                  {tieKey}
+                />{/if}
+            {/each}
+          </div>
+        {/if}
         {#if !thread && (replyID || replyUsers.length > 0)}
-          <Reply
-            {replyID}
-            {replyUsers}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {tieKey}
-          />
+          <Reply {replyID} {displayMenu} {depth} {repostable} {tieKey} />
           <!--<hr />-->
         {/if}
 

@@ -10,6 +10,8 @@
   import type { ChannelData } from "$lib/types";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
+  import UserName from "./UserName.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   export let thread: boolean;
   export let displayMenu: boolean;
@@ -79,15 +81,18 @@
 </script>
 
 {#await replyedEvent(note.tags) then { replyID, replyUsers }}
+  {#if replyUsers.length > 0}
+    <div
+      class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
+    >
+      {#each replyUsers as user}
+        {#if !displayMenu}<UserName pubhex={user} />{:else}
+          <PopupUserName pubkey={user} metadata={undefined} {tieKey} />{/if}
+      {/each}
+    </div>
+  {/if}
   {#if !thread && (replyID || replyUsers.length > 0)}
-    <Reply
-      {replyID}
-      {replyUsers}
-      {displayMenu}
-      depth={depth + 1}
-      {repostable}
-      {tieKey}
-    />
+    <Reply {replyID} {displayMenu} depth={depth + 1} {repostable} {tieKey} />
     <!--<hr />-->
   {/if}
 {/await}
