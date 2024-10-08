@@ -8,7 +8,7 @@ import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
 import { pipe, type OperatorFunction } from "rxjs";
 //import * as Nostr from "nostr-typedef";
 import { get } from "svelte/store";
-import { loginUser, slicedEvent } from "$lib/stores/stores";
+import { slicedEvent } from "$lib/stores/stores";
 
 export async function loadOlderEvents(
   sift: number,
@@ -69,7 +69,7 @@ export async function loadOlderEvents(
   const olderEvents = await usePromiseReq(
     {
       operator: operator,
-      queryKey: queryKey,
+
       filters: [newFilters],
       req: newReq,
     },
@@ -102,7 +102,6 @@ export async function firstLoadOlderEvents(
   const olderEvents = await usePromiseReq(
     {
       operator: operator,
-      queryKey: queryKey,
       filters: filters,
       req: newReq,
     },

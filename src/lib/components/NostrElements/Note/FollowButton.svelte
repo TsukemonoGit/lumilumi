@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { pubkeysIn, promisePublishEvent } from "$lib/func/nostr";
+  import {
+    pubkeysIn,
+    promisePublishEvent,
+    usePromiseReq,
+  } from "$lib/func/nostr";
   import {
     followList,
     loginUser,
@@ -20,6 +24,8 @@
   } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import { pipe } from "rxjs";
+  import { latest } from "rx-nostr/src";
 
   export let pubkey: string;
 
@@ -75,15 +81,33 @@
 
   const refreshContactsData = async (kind3Event: EventPacket) => {
     $nowProgress = true;
-    await $queryClient.refetchQueries({ queryKey: contactsQueryKey });
-    await delay(1000);
-    const newKind3: EventPacket | undefined =
-      $queryClient.getQueryData(contactsQueryKey);
-    if (newKind3 && newKind3.event.created_at > kind3Event.event.created_at) {
-      kind3Event = newKind3;
+    // await $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+    // await delay(1000);
+    // const newKind3: EventPacket | undefined =
+    //   $queryClient.getQueryData(contactsQueryKey);
+    const newKind3: EventPacket[] = await usePromiseReq(
+      {
+        filters: [{ kinds: [3], authors: [$loginUser], limit: 1 }],
+        operator: pipe(latest()),
+      },
+      undefined,
+      2000
+    );
+    // console.log("newKind3", newKind3);
+    // console.log("kind3Event", kind3Event);
+    if (
+      newKind3.length > 0 &&
+      newKind3[0].event.created_at > kind3Event.event.created_at
+    ) {
+      $queryClient.setQueryData(
+        contactsQueryKey,
+        (oldData: any) => newKind3[0]
+      );
+      kind3Event = newKind3[0];
       pubkeysIn(kind3Event.event);
     }
     $beforeKind3 = kind3Event.event;
+    // console.log("$beforeKind3", $beforeKind3);
   };
 
   const handleFollowStateChange = () => {

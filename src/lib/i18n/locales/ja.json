@@ -125,7 +125,8 @@
   },
   "about": {
     "houkoku": "バグ報告",
-    "share": "共有"
+    "share": "共有",
+    "luminostr": "フォローリストなどが飛んだとき"
   },
   "notifications": {
     "onlyFollowee": "フォロイーのみ"

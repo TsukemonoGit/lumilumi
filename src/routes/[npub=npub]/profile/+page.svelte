@@ -82,10 +82,7 @@
       metadata = queryData.event;
     } else {
       //プロフィールを更新ボタンはあるんだし改めて最新を取得する必要なし
-      const ev = await usePromiseReq(
-        { queryKey: key, filters, operator },
-        undefined
-      );
+      const ev = await usePromiseReq({ filters, operator }, undefined);
       console.log(ev);
       if (ev && ev.length > 0) {
         // if (queryData && queryData.event.created_at > ev[0].event.created_at) {
