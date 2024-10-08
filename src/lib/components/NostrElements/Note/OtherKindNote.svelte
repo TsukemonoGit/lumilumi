@@ -2,12 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import Content from "./Content.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
-  import {
-    datetime,
-    eventKinds,
-    formatAbsoluteDate,
-    profile,
-  } from "$lib/func/util";
+  import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
@@ -15,6 +10,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
   import ClientTag from "./ClientTag.svelte";
+  import { eventKinds } from "$lib/func/kinds";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;

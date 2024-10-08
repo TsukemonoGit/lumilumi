@@ -2,9 +2,10 @@
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import UserMenu from "$lib/components/Elements/UserMenu.svelte";
   import type { Ogp } from "$lib/func/ogp";
-  import { eventKinds, profile } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import { eventKinds } from "$lib/func/kinds";
 
   export let note: Nostr.Event;
   export let data: {

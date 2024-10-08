@@ -6,11 +6,10 @@
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
-  import { eventKinds } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import type { Writable } from "svelte/store";
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
+  import { eventKinds } from "$lib/func/kinds";
 
   export let searchWord: string | undefined;
   export let followee: boolean;

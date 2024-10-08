@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { eventKinds } from "$lib/func/util";
+  import { eventKinds } from "$lib/func/kinds";
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
