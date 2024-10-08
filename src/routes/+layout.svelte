@@ -40,6 +40,18 @@
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
   //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+
+  //import SvelteQueryDevtools
+  let SvelteQueryDevtools: any;
+
+  // Conditionally load SvelteQueryDevtools during development
+  if (import.meta.env.MODE === "development") {
+    // Dynamically import SvelteQueryDevtools only in development mode
+    import("@tanstack/svelte-query-devtools").then((module) => {
+      SvelteQueryDevtools = module.SvelteQueryDevtools;
+    });
+  }
+
   $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
 
   //https://github.com/penpenpng/rx-nostr/pull/138
@@ -232,5 +244,8 @@
       </div>
     </SetDefaultRelays>
   </NostrMain>
+  {#if SvelteQueryDevtools}
+    <SvelteQueryDevtools initialIsOpen={false} />
+  {/if}
   <!-- <SvelteQueryDevtools initialIsOpen={false} /> -->
 </QueryClientProvider>

@@ -9,18 +9,17 @@
   } from "$lib/stores/stores";
   import { type EventPacket } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
-
   import * as Nostr from "nostr-typedef";
   import { writable } from "svelte/store";
   import {
     datetime,
+    delay,
     formatAbsoluteDate,
     formatRelativeDate,
     generateResultMessage,
   } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import Link from "$lib/components/Elements/Link.svelte";
 
   export let pubkey: string;
 
@@ -28,59 +27,43 @@
   const afterEventParameters = writable<Nostr.EventParameters | undefined>();
   let dialogOpen: any;
 
+  $: contactsQueryKey = ["timeline", "contacts", $loginUser];
   $: isfollowee = $followList.has(pubkey);
 
-  const handleClickFollow = async () => {
-    console.log("mada");
-    if ($loginUser === "") return;
+  // Public key validation
+  const validateLoginPubkey = async (): Promise<boolean> => {
+    if ($loginUser === "") return false;
     try {
       const signPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
       )?.getPublicKey();
       if ($loginUser !== signPubkey) {
-        $toastSettings = {
-          title: "Error",
-          description: "login pubkey ≠ sign pubkey",
-          color: "bg-red-500",
-        };
-        return;
+        showToast("Error", "login pubkey ≠ sign pubkey", "bg-red-500");
+        return false;
       }
+      return true;
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "failed to get sign pubkey",
-        color: "bg-red-500",
-      };
-      return;
+      showToast("Error", "failed to get sign pubkey", "bg-red-500");
+      return false;
     }
-    const followState = $followList.has(pubkey);
-    let kind3Event: EventPacket | undefined = $queryClient.getQueryData([
-      "timeline",
-      "contacts",
-      $loginUser,
-    ]);
-    console.log(kind3Event);
+  };
 
+  // Show toast notification
+  const showToast = (title: string, description: string, color: string) => {
+    $toastSettings = { title, description, color };
+  };
+
+  // Handle follow/unfollow logic
+  const handleFollow = async () => {
+    if (!(await validateLoginPubkey())) return;
+
+    const followState = $followList.has(pubkey);
+    let kind3Event: EventPacket | undefined =
+      $queryClient.getQueryData(contactsQueryKey);
     if (!kind3Event) return;
 
-    $nowProgress = true;
-    const newkind3: EventPacket | undefined = await $queryClient.fetchQuery({
-      queryKey: ["timeline", "contacts", $loginUser],
-    });
-
-    if (newkind3) {
-      if (newkind3.event.created_at > kind3Event.event.created_at) {
-        kind3Event = newkind3;
-        pubkeysIn(kind3Event.event); // pubkeyリストを更新する
-      }
-      //Contactsの方で新しいデータ受信したらlocalStorageに入るようになってるはず
-      //だからlocalstrageにあるデータが最新データ
-    }
-
-    $beforeKind3 = kind3Event.event;
-
+    await refreshContactsData(kind3Event);
     isfollowee = $followList.has(pubkey);
-    console.log(kind3Event);
 
     if (followState !== isfollowee) {
       $nowProgress = false;
@@ -90,63 +73,64 @@
     handleFollowStateChange();
   };
 
+  const refreshContactsData = async (kind3Event: EventPacket) => {
+    $nowProgress = true;
+    await $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+    await delay(1000);
+    const newKind3: EventPacket | undefined =
+      $queryClient.getQueryData(contactsQueryKey);
+    if (newKind3 && newKind3.event.created_at > kind3Event.event.created_at) {
+      kind3Event = newKind3;
+      pubkeysIn(kind3Event.event);
+    }
+    $beforeKind3 = kind3Event.event;
+  };
+
   const handleFollowStateChange = () => {
-    if (!$beforeKind3) {
-      return;
-    }
-    if (isfollowee) {
-      // 最新イベントでもフォローされた状態だからフォロー外す
-      const tags = $beforeKind3.tags.filter(
-        ([tagName, pub]) => !(tagName === "p" && pub === pubkey)
-      );
-      $afterEventParameters = {
-        content: $beforeKind3.content,
-        tags: tags,
-        kind: 3,
-        pubkey: $beforeKind3.pubkey,
-      };
-    } else {
-      // 最新イベントでもフォローされてない状態だからフォローする
-      const tags = [...$beforeKind3.tags, ["p", pubkey]];
-      $afterEventParameters = {
-        content: $beforeKind3.content,
-        tags: tags,
-        kind: 3,
-      };
-    }
-    console.log(isfollowee);
+    if (!$beforeKind3) return;
+
+    const tags = isfollowee
+      ? $beforeKind3.tags.filter(
+          ([tagName, pub]) => !(tagName === "p" && pub === pubkey)
+        )
+      : [...$beforeKind3.tags, ["p", pubkey]];
+
+    $afterEventParameters = {
+      content: $beforeKind3.content,
+      tags,
+      kind: 3,
+      pubkey: $beforeKind3.pubkey,
+    };
+
     $nowProgress = false;
     $dialogOpen = true;
   };
 
-  const onClickOK = async () => {
-    console.log("close");
+  // Handle event publishing
+  const publishEvent = async () => {
     $dialogOpen = false;
     $nowProgress = true;
 
     const { event: ev, res } = await promisePublishEvent(
       $afterEventParameters as Nostr.Event
     );
-    console.log(res);
+    handlePublishResult(res, ev);
+  };
 
+  const handlePublishResult = (res: any[], ev: Nostr.Event) => {
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+    const message = generateResultMessage(isSuccess, isFailed);
 
-    let str = generateResultMessage(isSuccess, isFailed);
-    console.log(str);
-
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
+    showToast(
+      isSuccess.length > 0 ? "Success" : "Failed",
+      message,
+      isSuccess.length > 0 ? "bg-green-500" : "bg-red-500"
+    );
 
     if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({
-        queryKey: ["timeline", "contacts", $loginUser],
-      });
-
-      pubkeysIn(ev); // pubkeyリストを更新する
+      $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+      pubkeysIn(ev);
     }
 
     isfollowee = $followList.has(pubkey);
@@ -159,24 +143,7 @@
     $nowProgress = false;
   };
 
-  // async function updateKind3(): Promise<EventPacket[]> {
-  //   const newReq = createRxBackwardReq();
-  //   const operator = pipe(latest());
-  //   const filters = [{ kinds: [3], authors: [$loginUser], limit: 1 }];
-
-  //   const newkind3: EventPacket[] = await usePromiseReq(
-  //     {
-  //       operator,
-  //       queryKey: ["timeline", "contacts", $loginUser],
-  //       filters,
-  //       req: newReq,
-  //     },
-  //     undefined
-  //   );
-  //   console.log("length", newkind3.length);
-  //   console.log("list", newkind3);
-  //   return newkind3;
-  // }
+  // Handle petname dialog
   let openPetnameDialog:
     | {
         update: (
@@ -194,102 +161,45 @@
       }
     | undefined;
   let petnameInput: string = "";
-  const handleClickPetname = async () => {
-    let kind3Event: EventPacket | undefined = $queryClient.getQueryData([
-      "timeline",
-      "contacts",
-      $loginUser,
-    ]);
-    console.log(kind3Event);
 
-    $nowProgress = true;
-    const newkind3: EventPacket | undefined = await $queryClient.fetchQuery({
-      queryKey: ["timeline", "contacts", $loginUser],
-    });
-
-    if (newkind3) {
-      if (
-        !kind3Event ||
-        newkind3.event.created_at > kind3Event.event.created_at
-      ) {
-        kind3Event = newkind3;
-        pubkeysIn(kind3Event.event); // pubkeyリストを更新する
-      }
-      //Contactsの方で新しいデータ受信したらlocalStorageに入るようになってるはず
-      //だからlocalstrageにあるデータが最新データ
-    }
-
-    $beforeKind3 = kind3Event?.event;
+  const handlePetnameClick = async () => {
+    let kind3Event: EventPacket | undefined =
+      $queryClient.getQueryData(contactsQueryKey);
+    await refreshContactsData(kind3Event!);
     petnameInput = $followList.get(pubkey) ?? "";
-    isfollowee = $followList.has(pubkey);
-
     $openPetnameDialog = true;
     $nowProgress = false;
   };
 
-  const onClickOKPetname = async () => {
-    if (!$beforeKind3) {
-      $openPetnameDialog = false;
-      return;
-    }
-    //if(petnameInput==="")もともとペットネームがついている場合削除する。ついてない場合何もしない
-    //まず現状のpetnameを調べる
-    const beforepetname = $followList?.get(pubkey);
-    if (
-      (!beforepetname && petnameInput === "") ||
-      beforepetname === petnameInput
-    ) {
-      return;
-    } //変更がない場合
-    // tagsの更新処理
-    const updatedTags = $beforeKind3.tags.map((tag) => {
-      // "p" タグを見つけた場合
-      if (tag[0] === "p" && tag[1] === pubkey) {
-        // petnameが空であれば["p", pubkey]、そうでなければ["p", pubkey, petnameInput]
+  const updatePetname = async () => {
+    if (!$beforeKind3) return;
 
+    const beforePetname = $followList.get(pubkey);
+    if (
+      (!beforePetname && petnameInput === "") ||
+      beforePetname === petnameInput
+    )
+      return;
+
+    const updatedTags = $beforeKind3.tags.map((tag) => {
+      if (tag[0] === "p" && tag[1] === pubkey) {
         return petnameInput === ""
           ? tag.slice(0, 3)
           : tag.length > 2
             ? [...tag.slice(0, 3), petnameInput]
             : ["p", pubkey, "", petnameInput];
       }
-      return tag; // それ以外のタグはそのまま
+      return tag;
     });
+
     $afterEventParameters = {
       content: $beforeKind3.content,
       tags: updatedTags,
       kind: 3,
       pubkey: $beforeKind3.pubkey,
     };
-
-    const { event: ev, res } = await promisePublishEvent(
-      $afterEventParameters as Nostr.Event
-    );
-    console.log(res);
-
-    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
-
-    let str = generateResultMessage(isSuccess, isFailed);
-    console.log(str);
-
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
-
-    if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({
-        queryKey: ["timeline", "contacts", $loginUser],
-      });
-
-      pubkeysIn(ev); // pubkeyリストを更新する
-    }
-
-    resetState();
+    publishEvent();
     $openPetnameDialog = false;
-    console.log(petnameInput);
   };
 </script>
 
@@ -298,14 +208,14 @@
     <button
       disabled={$nowProgress}
       class={`rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-      on:click={handleClickPetname}
+      on:click={handlePetnameClick}
     >
       📛
     </button>
     <button
       disabled={$nowProgress}
       class={`rounded-full h-[32px] border border-magnum-300 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-      on:click={handleClickFollow}
+      on:click={handleFollow}
     >
       {$_("user.following")}
     </button>
@@ -313,7 +223,7 @@
     <button
       disabled={$nowProgress}
       class={`rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 h-[32px] `}
-      on:click={handleClickFollow}
+      on:click={handleFollow}
     >
       {$_("user.follow")}
     </button>
@@ -322,7 +232,7 @@
 
 <AlertDialog
   bind:open={dialogOpen}
-  {onClickOK}
+  onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
   <div slot="main">
@@ -385,7 +295,7 @@
 
 <AlertDialog
   bind:open={openPetnameDialog}
-  onClickOK={onClickOKPetname}
+  onClickOK={updatePetname}
   title={$_("user.petname.petname")}
   okButtonName="OK"
 >
