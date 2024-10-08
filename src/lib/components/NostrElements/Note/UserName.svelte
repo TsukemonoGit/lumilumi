@@ -7,7 +7,7 @@
   export let pubhex: string;
 
   $: petname = $followList?.get(pubhex);
-  $: console.log(petname);
+  //$: console.log(petname);
 </script>
 
 <span class="inline-flex"

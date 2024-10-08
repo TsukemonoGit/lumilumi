@@ -133,13 +133,12 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
 }
 export async function getZapRelay(pubkey: string): Promise<string[]> {
   let queryRelay: EventPacket | undefined = get(queryClient).getQueryData([
-    "relays",
+    "defaultRelay",
     pubkey,
   ]);
   if (!queryRelay) {
     const relayData = await usePromiseReq(
       {
-        queryKey: ["relays", pubkey] as QueryKey,
         filters: [
           {
             kinds: [10002],

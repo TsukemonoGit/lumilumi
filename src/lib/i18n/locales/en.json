@@ -126,7 +126,8 @@
   },
   "about": {
     "houkoku": "Bug Reports",
-    "share": "Share"
+    "share": "Share",
+    "luminostr": "When your follow list, bookmarks, etc. are lost"
   },
   "notifications": {
     "onlyFollowee": "only followee"

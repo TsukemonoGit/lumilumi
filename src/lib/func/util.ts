@@ -845,3 +845,5 @@ export function getColor(state: string | undefined): string {
       return "text-gray-500";
   }
 }
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

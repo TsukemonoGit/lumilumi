@@ -14,6 +14,7 @@ import type {
   ReqStatus,
   UseQueryOpt,
   Profile,
+  UsePromiseReqOpts,
 } from "$lib/types";
 import {
   useQueryClient,
@@ -492,12 +493,11 @@ export function getRelaysById(id: string, key: string): string[] {
 }
 export function usePromiseReq(
   {
-    queryKey,
     filters,
     operator,
     req,
     initData = [],
-  }: UseReqOpts<EventPacket[] | EventPacket>,
+  }: UsePromiseReqOpts<EventPacket[] | EventPacket>,
   relays: string[] | undefined,
   timeout: number | undefined = 3000
 ): Promise<EventPacket[]> {

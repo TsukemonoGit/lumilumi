@@ -110,7 +110,6 @@
     try {
       const relaydata = await usePromiseReq(
         {
-          queryKey: ["defaultRelay", pubkey] as QueryKey,
           filters: [{ kinds: [10002], authors: [pubkey], limit: 1 }],
           operator: pipe(latest()),
         },
@@ -118,6 +117,10 @@
       );
       //console.log(relaydata);
       if (relaydata && relaydata.length > 0) {
+        $queryClient.setQueryData(
+          ["defaultRelay", pubkey],
+          (oldData: any) => relaydata[0]
+        );
         return relaydata[0];
       }
     } catch (error) {

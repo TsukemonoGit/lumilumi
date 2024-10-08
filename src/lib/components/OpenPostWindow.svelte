@@ -41,6 +41,7 @@
     convertMetaTags,
     filesUpload,
     nsecRegex,
+    delay,
   } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
@@ -316,9 +317,6 @@
       textarea.setSelectionRange(cursorPosition, cursorPosition);
     });
   };
-
-  const delay = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleFileUpload = async (fileList: FileList) => {
     if (!fileList || fileList.length <= 0 || !$uploader) return;
