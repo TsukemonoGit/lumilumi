@@ -112,7 +112,7 @@
           <li>{index}, {t}</li>
         {/each}
       </ul>
-      <h2 class="m-0 text-lg font-medium">Ward</h2>
+      <h2 class="m-0 text-lg font-medium">Word</h2>
       <ul
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"
       >
