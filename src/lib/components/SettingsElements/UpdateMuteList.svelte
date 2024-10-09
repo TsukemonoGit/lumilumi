@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
-  import type { MuteList } from "$lib/types";
+  import type { LumiMute, MuteList } from "$lib/types";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
@@ -9,7 +9,7 @@
   import { _ } from "svelte-i18n";
 
   export let pubkey: string;
-  export let muteList: { list: MuteList; updated: number } | undefined;
+  export let muteList: LumiMute | undefined;
   let dialogOpen: any;
   async function handleClickMute() {
     try {
@@ -49,10 +49,16 @@
 
     console.log(pk);
     if (pk) {
-      muteList = {
-        list: await toMuteList(pk.event),
-        updated: Math.floor(Date.now() / 1000),
-      };
+      if (
+        !muteList?.event ||
+        pk.event.created_at >= muteList.event.created_at
+      ) {
+        muteList = {
+          list: await toMuteList(pk.event),
+          updated: Math.floor(Date.now() / 1000),
+          event: pk.event,
+        };
+      }
     } else {
       $toastSettings = {
         title: "Warning",
