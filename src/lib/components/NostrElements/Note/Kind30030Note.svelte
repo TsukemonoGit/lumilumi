@@ -274,14 +274,14 @@
     <button
       disabled={$nowProgress || disabled}
       on:click={handleClickRemove}
-      class="rounded-3xl w-fit p-2 bg-magnum-600/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
+      class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
       >{$_("customEmoji.remove")}</button
     >
   {:else}
     <button
       on:click={handleClickAdd}
       disabled={$nowProgress || disabled}
-      class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-800 ml-auto text-magnum-800 hover:opacity-75 active:opacity-50 disabled:opacity-15"
+      class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
       >{$_("customEmoji.add")}</button
     >
   {/if}
