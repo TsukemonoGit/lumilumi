@@ -51,6 +51,7 @@
     if (pk) {
       if (
         !muteList?.event ||
+        muteList?.event.pubkey !== pk.event.pubkey ||
         pk.event.created_at >= muteList.event.created_at
       ) {
         muteList = {

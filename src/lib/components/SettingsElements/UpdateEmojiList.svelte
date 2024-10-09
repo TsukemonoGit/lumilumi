@@ -73,7 +73,9 @@
       return;
     }
     const event =
-      !beforeEvent || pk.event.created_at >= beforeEvent.created_at
+      !beforeEvent ||
+      beforeEvent.pubkey !== pk.event.pubkey ||
+      pk.event.created_at >= beforeEvent.created_at
         ? pk.event
         : beforeEvent;
     list = event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {

@@ -16,6 +16,13 @@
   import { pipe } from "rxjs";
   import { createEmojiListFrom10030 } from "$lib/func/settings";
   import { _ } from "svelte-i18n";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import type {
+    Invalidator,
+    Subscriber,
+    Unsubscriber,
+    Updater,
+  } from "svelte/store";
 
   export let note: Nostr.Event;
   export let repostable: boolean;
@@ -34,21 +41,70 @@
     (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
   );
 
-  async function handleClickAdd(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
+  let dialogOpen: {
+    update: (
+      updater: Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: Subscriber<boolean>,
+      invalidate?: Invalidator<boolean> | undefined
+    ): Unsubscriber;
+    get: () => boolean;
+    destroy?: (() => void) | undefined;
+  };
+
+  async function handleClickMakeKind10030() {
+    console.log("make new 10030");
+    $dialogOpen = false;
+    $nowProgress = true;
+    disabled = true;
+
+    const newEvPara: Nostr.EventParameters = {
+      kind: 10030,
+      pubkey: $loginUser,
+      tags: [["a", atag]],
+      content: "",
+    };
+
+    const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+
+    if (!isSuccess) {
+      //失敗
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to add emoji",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
+      disabled = false;
+
+      return;
+    }
+    $nowProgress = false;
+    const list = await createEmojiListFrom10030(ev);
+    $emojis = {
+      list: list,
+      updated: Math.floor(Date.now() / 1000),
+      event: ev,
+    };
+    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+    disabled = false;
+  }
+
+  async function handleClickAdd() {
     console.log("myEmojiListに", atag, "を追加");
     $nowProgress = true;
     disabled = true;
     //最新の10030を取得
     let newestKind10030 = await refetchKind10030();
     if (!newestKind10030) {
+      //------しっぱいじゃなくて　データないけど新しく作っていいですかを書く------
       $nowProgress = false;
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to add emoji",
-        color: "bg-red-500",
-      };
+      $dialogOpen = true;
       return;
     }
     //新しいリストにほんとに含まれてないか確認
@@ -96,14 +152,13 @@
     disabled = false;
   }
   let disabled = false;
-  async function handleClickRemove(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {
+  async function handleClickRemove() {
     console.log("myEmojiListから", inMyCustomEmoji, "を削除");
     $nowProgress = true;
     disabled = true;
     let newestKind10030 = await refetchKind10030();
     if (!newestKind10030) {
+      //削除ってことは追加されてるってことで初めてのデータじゃないからないってことはない
       $nowProgress = false;
       $toastSettings = {
         title: "Error",
@@ -154,7 +209,7 @@
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
-
+  //今の同期されたデータと別ユーザーの可能性
   async function refetchKind10030(): Promise<Nostr.Event | undefined> {
     const kind10030 = await usePromiseReq(
       {
@@ -169,6 +224,7 @@
     if (
       kind10030.length > 0 &&
       (!$emojis.event ||
+        $emojis.event.pubkey !== kind10030[0].event.pubkey ||
         kind10030[0].event.created_at > $emojis.event.created_at)
     ) {
       return kind10030[0].event;
@@ -231,3 +287,11 @@
   {/if}
   <NoteActionButtons {note} {repostable} {tieKey} />
 </div>
+
+<AlertDialog
+  bind:open={dialogOpen}
+  onClickOK={handleClickMakeKind10030}
+  title={$_("create.10030.title")}
+  okButtonName="OK"
+  ><div slot="main">{$_("create.10030.text")}</div></AlertDialog
+>

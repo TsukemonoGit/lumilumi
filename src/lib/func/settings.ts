@@ -269,6 +269,7 @@ export async function getMuteByList(
     if (
       beforeData &&
       beforeData.event &&
+      beforeData.event.pubkey === packet.event.pubkey &&
       beforeData.event.created_at >= packet.event.created_at
     ) {
       muteByList.push(beforeData);
@@ -296,11 +297,6 @@ export async function getMuteByList(
         if (pTags.length > 0) {
           const existingKind = muteByList.find((item) => item.kind === kind);
           if (existingKind) {
-            if (
-              !existingKind.event ||
-              packet.event.created_at > existingKind.event.created_at
-            ) {
-            }
             muteByList = muteByList.reduce(
               (pre, cur) => {
                 if (cur.kind === packet.event.kind) {
