@@ -148,5 +148,11 @@
   "customEmoji": {
     "remove": "Remove from My Custom Emoji List.",
     "add": "Add to My Custom Emoji List."
+  },
+  "create": {
+    "10030": {
+      "title": "Confirm creation of custom emoji list",
+      "text": "Missing existing custom emoji list (kind:10030), create a new one?"
+    }
   }
 }
