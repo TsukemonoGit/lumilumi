@@ -2,7 +2,12 @@ import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { loginUser, queryClient, verifier } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-import type { MuteList, Theme } from "$lib/types";
+import type {
+  LumiMuteByKindList,
+  LumiSetting,
+  MuteList,
+  Theme,
+} from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
 import * as Nostr from "nostr-typedef";
@@ -248,37 +253,74 @@ export async function getMutebykindList(
 
 //pachet[]をmutebykindのほぞんのかたちにする
 export async function getMuteByList(
-  packets: EventPacket[]
-): Promise<{ kind: number; list: string[] }[]> {
-  const muteByList: { kind: number; list: string[] }[] = [];
+  packets: EventPacket[],
+  beforeMuteByList: LumiMuteByKindList[] | undefined
+): Promise<LumiMuteByKindList[]> {
+  let muteByList: LumiMuteByKindList[] = [];
 
   for (const packet of packets) {
-    const kind = Number(
-      packet.event.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
+    const beforeData = beforeMuteByList?.find(
+      (list) => list.event?.kind === packet.event.kind
     );
-    if (kind) {
-      let pTags = packet.event.tags
-        .filter((tag) => tag[0] === "p")
-        .map((tag) => tag[1]);
+    if (
+      beforeData &&
+      beforeData.event &&
+      beforeData.event.created_at >= packet.event.created_at
+    ) {
+      muteByList.push(beforeData);
+    } else {
+      const kind = Number(
+        packet.event.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
+      );
+      if (kind) {
+        let pTags = packet.event.tags
+          .filter((tag) => tag[0] === "p")
+          .map((tag) => tag[1]);
 
-      if (packet.event.content.length > 0) {
-        const privateTags = await decryptContent(packet.event);
-        if (privateTags && privateTags.length > 0) {
-          const ppTags = privateTags
-            .filter((tag: string[]) => tag[0] === "p")
-            .map((tag: string[]) => tag[1]);
-          if (ppTags.length > 0) {
-            pTags = [...pTags, ...ppTags];
+        if (packet.event.content.length > 0) {
+          const privateTags = await decryptContent(packet.event);
+          if (privateTags && privateTags.length > 0) {
+            const ppTags = privateTags
+              .filter((tag: string[]) => tag[0] === "p")
+              .map((tag: string[]) => tag[1]);
+            if (ppTags.length > 0) {
+              pTags = [...pTags, ...ppTags];
+            }
           }
         }
-      }
 
-      if (pTags.length > 0) {
-        const existingKind = muteByList.findIndex((item) => item.kind === kind);
-        if (existingKind !== -1) {
-          muteByList[existingKind].list.push(...pTags);
-        } else {
-          muteByList.push({ kind, list: pTags });
+        if (pTags.length > 0) {
+          const existingKind = muteByList.find((item) => item.kind === kind);
+          if (existingKind) {
+            if (
+              !existingKind.event ||
+              packet.event.created_at > existingKind.event.created_at
+            ) {
+            }
+            muteByList = muteByList.reduce(
+              (pre, cur) => {
+                if (cur.kind === packet.event.kind) {
+                  return [
+                    ...pre,
+                    {
+                      kind: packet.event.kind,
+                      list: pTags,
+                      event: packet.event,
+                    },
+                  ];
+                } else {
+                  return [...pre, cur];
+                }
+              },
+              [] as {
+                kind: number;
+                list: string[];
+                event: Nostr.Event | undefined;
+              }[]
+            );
+          } else {
+            muteByList.push({ kind, list: pTags, event: packet.event });
+          }
         }
       }
     }
@@ -296,4 +338,42 @@ async function decryptContent(event: Nostr.Event): Promise<string[][] | null> {
     console.error("Failed to decrypt content:", error);
     return null;
   }
+}
+
+export async function migrateSettings() {
+  const STORAGE_KEY = "lumiSetting";
+  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+  const lumiMute_STORAGE_KEY = "lumiMute";
+  const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
+  let savedSettings = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedSettings) return;
+
+  const settings: LumiSetting = JSON.parse(savedSettings);
+
+  // LumiEmojiを別のキーに移動
+  if (settings.emoji) {
+    localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(settings.emoji));
+    delete settings.emoji; // lumisettingから削除
+  }
+
+  // LumiMuteを別のキーに移動
+  if (settings.mute) {
+    localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(settings.mute));
+    delete settings.mute; // lumisettingから削除
+  }
+
+  // LumiMuteByKindを別のキーに移動
+  if (settings.mutebykinds) {
+    localStorage.setItem(
+      lumiMuteByKind_STORAGE_KEY,
+      JSON.stringify(settings.mutebykinds)
+    );
+    delete settings.mutebykinds; // lumisettingから削除
+  }
+
+  // 変更後の設定を再保存
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+
+  console.log("Settings migration completed.");
 }

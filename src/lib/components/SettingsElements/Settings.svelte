@@ -25,8 +25,20 @@
     showClientTag,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
-  import { initSettings, npubRegex, relayRegex } from "$lib/func/util";
-  import type { LumiSetting } from "$lib/types";
+  import {
+    initLumiEmoji,
+    initLumiMute,
+    initLumiMuteByKind,
+    initSettings,
+    npubRegex,
+    relayRegex,
+  } from "$lib/func/util";
+  import type {
+    LumiEmoji,
+    LumiMute,
+    LumiMuteByKind,
+    LumiSetting,
+  } from "$lib/types";
   import { _ } from "svelte-i18n";
   import { beforeNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
@@ -38,10 +50,16 @@
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
   import Dialog from "../Elements/Dialog.svelte";
+  import { migrateSettings } from "$lib/func/settings";
 
   const STORAGE_KEY = "lumiSetting";
-
+  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+  const lumiMute_STORAGE_KEY = "lumiMute";
+  const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = { ...initSettings };
+  let lumiEmoji: LumiEmoji;
+  let lumiMute: LumiMute;
+  let lumiMuteByKind: LumiMuteByKind;
 
   const originalSettings = writable<LumiSetting | null>(null);
 
@@ -73,6 +91,7 @@
   } = createLabel();
 
   onMount(async () => {
+    await migrateSettings();
     const savedSettings = loadSettings();
     console.log(savedSettings);
     if (savedSettings) {
@@ -90,9 +109,7 @@
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
     $showRelayIcon = settings.showRelayIcon;
-    $mutes = settings.mute.list;
-    $emojis = settings.emoji.list;
-    $mutebykinds = settings.mutebykinds?.list;
+
     $defaultReaction = settings.defaultReaction;
     $selectedRelayset = settings.useRelaySet;
     $showReactioninTL = settings.showReactioninTL;
@@ -102,6 +119,23 @@
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
+
+    const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
+    const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
+    const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
+    console.log(mute);
+    $mutes = mute ? (JSON.parse(mute) as LumiMute).list : undefined;
+    console.log($mutes);
+    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji).list : [];
+    $mutebykinds = mutebykind
+      ? (JSON.parse(mutebykind) as LumiMuteByKind).list
+      : [];
+    lumiMute = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
+    console.log($mutes);
+    lumiEmoji = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
+    lumiMuteByKind = mutebykind
+      ? (JSON.parse(mutebykind) as LumiMuteByKind)
+      : initLumiMuteByKind;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -156,6 +190,12 @@
     if (!isPubkeyValid()) return;
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
+    localStorage.setItem(
+      lumiMuteByKind_STORAGE_KEY,
+      JSON.stringify(lumiMuteByKind)
+    );
+    localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(lumiEmoji));
     $nowProgress = true;
     toastSettings.set({
       title: "Success",
@@ -183,9 +223,7 @@
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
     $showRelayIcon = settings.showRelayIcon;
-    $mutes = settings.mute.list;
-    $emojis = settings.emoji.list;
-    $mutebykinds = settings.mutebykinds.list;
+
     $defaultReaction = settings.defaultReaction;
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
@@ -194,6 +232,10 @@
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
+
+    $mutes = lumiMute.list;
+    $emojis = lumiEmoji.list;
+    $mutebykinds = lumiMuteByKind.list;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -670,10 +712,7 @@
     </legend>
     <!--mute-->
     <div class="mt-2">
-      <UpdateMuteList
-        bind:pubkey={settings.pubkey}
-        bind:muteList={settings.mute}
-      />
+      <UpdateMuteList bind:pubkey={settings.pubkey} bind:muteList={lumiMute} />
     </div>
     {#if $loginUser}
       <a
@@ -691,7 +730,7 @@
     <div class="mt-2">
       <UpdateMutebykindList
         bind:pubkey={settings.pubkey}
-        bind:mutebykindList={settings.mutebykinds}
+        bind:mutebykindList={lumiMuteByKind}
       />
     </div>
     {#if $loginUser}
@@ -715,7 +754,7 @@
     <div class="mt-4">
       <UpdateEmojiList
         bind:pubkey={settings.pubkey}
-        bind:emojiList={settings.emoji}
+        bind:emojiList={lumiEmoji}
       />
     </div>
     <div

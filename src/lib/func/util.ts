@@ -1,4 +1,10 @@
-import type { LumiSetting, Profile } from "$lib/types";
+import type {
+  LumiEmoji,
+  LumiMute,
+  LumiMuteByKind,
+  LumiSetting,
+  Profile,
+} from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
 import { getToken } from "nostr-tools/nip98";
@@ -292,18 +298,20 @@ export const initSettings: LumiSetting = {
   showImg: false,
   menuleft: false,
   showRelayIcon: false,
-  emoji: {
-    list: [],
-    updated: 0,
-  },
-  mute: {
-    list: { p: [], word: [], t: [], e: [] },
-    updated: 0,
-  },
-  mutebykinds: {
-    list: [],
-    updated: 0,
-  },
+  // emoji: {
+  //   list: [],
+  //   updated: 0,
+  //   event: undefined,
+  // },
+  // mute: {
+  //   list: { p: [], word: [], t: [], e: [] },
+  //   updated: 0,
+  //   event: undefined,
+  // },
+  // mutebykinds: {
+  //   list: [],
+  //   updated: 0,
+  // },
   showReactioninTL: true,
   nostrWalletConnect: "",
   showUserStatus: false,
@@ -311,6 +319,24 @@ export const initSettings: LumiSetting = {
   showKind16: false,
   addClientTag: false,
   showClientTag: true,
+};
+export const initLumiEmoji: LumiEmoji = {
+  list: [],
+  updated: 0,
+  event: undefined,
+};
+export const initLumiMute: LumiMute = {
+  list: { p: [], word: [], t: [], e: [] },
+  updated: 0,
+  event: undefined,
+};
+export const initLumiMuteByKind: LumiMuteByKind = {
+  list: [] as {
+    kind: number;
+    list: string[];
+    event: Nostr.Event | undefined;
+  }[],
+  updated: 0,
 };
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");
