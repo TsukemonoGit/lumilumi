@@ -106,11 +106,11 @@
         OK
       </button>
     </div>
-    {#if $emojis && $emojis.length > 0}
+    {#if $emojis && $emojis.list.length > 0}
       <div
         class="border border-magnum-600 flex flex-wrap max-w-80 max-h-80 overflow-y-auto"
       >
-        {#each $emojis as e, index}
+        {#each $emojis.list as e, index}
           {#if customReaction === "" || e[0]
               .toLowerCase()
               .includes(customReaction.toLowerCase())}

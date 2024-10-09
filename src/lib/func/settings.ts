@@ -1,6 +1,6 @@
 import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
-import { loginUser, queryClient, verifier } from "$lib/stores/stores";
+import { app, loginUser, queryClient, verifier } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
 import type {
   LumiMuteByKindList,
@@ -19,9 +19,11 @@ import {
   uniq,
   type DefaultRelayConfig,
   type EventPacket,
+  type RxNostr,
 } from "rx-nostr";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
+import { emojiShortcodeRegex, nip33Regex } from "./util";
 
 export function setTheme(theme: Theme) {
   if (
@@ -179,13 +181,15 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
 }
 
 export async function getNaddrEmojiList(
+  rxNostr: RxNostr,
   filters: Filter[],
-  relays: DefaultRelayConfig[]
+  relays: DefaultRelayConfig[] | undefined
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  // const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
-  rxNostr.setDefaultRelays(relays);
-
+  if (relays) {
+    rxNostr.setDefaultRelays(relays);
+  }
   const event = await new Promise<EventPacket[]>((resolve) => {
     let res: EventPacket[];
 
@@ -193,7 +197,7 @@ export async function getNaddrEmojiList(
       .use(rxReq)
       .pipe(uniq(), latestEachNaddr(), scanArray(), completeOnTimeout(5000))
       .subscribe({
-        next: (packet) => {
+        next: (packet: EventPacket[]) => {
           console.log("Received:", packet);
           res = packet;
         },
@@ -376,4 +380,103 @@ export async function migrateSettings() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
   console.log("Settings migration completed.");
+}
+
+export async function createEmojiListFrom10030(
+  event: Nostr.Event
+): Promise<string[][]> {
+  //10030に直emojiになってるやつをまずlistに追加
+  let list: string[][] = event.tags.reduce(
+    (acc: string[][], [tag, shortcode, url]) => {
+      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+        return [...acc, [shortcode, url]];
+      } else {
+        return acc;
+      }
+    },
+    []
+  );
+
+  //10030のatagたちをフィルターにする
+  const naddrFilters = event.tags.reduce(
+    (acc: Nostr.Filter[], [tag, value]) => {
+      console.log(tag, value);
+      if (tag === "a") {
+        const matches = value.match(nip33Regex);
+        console.log(matches);
+        if (matches) {
+          const filter: Nostr.Filter = {
+            kinds: [Number(matches[1])],
+            authors: [matches[2]],
+            "#d": [matches[3]],
+            //limit: 1,
+          };
+
+          return [...acc, filter];
+        } else {
+          return acc;
+        }
+      } else {
+        return acc;
+      }
+    },
+    []
+  );
+
+  //チャンクに分ける
+  const chunkedFilters: Filter[][] = chunkArray(naddrFilters, 10);
+
+  // 全てのチャンクを並列で処理する
+  const pkListArray = await Promise.all(
+    chunkedFilters.map((chunk) =>
+      getNaddrEmojiList(get(app).rxNostr, chunk, undefined)
+    )
+  );
+
+  if (pkListArray.length > 0) {
+    //重複しないように整える
+
+    // フラット化して一つの配列にする
+    const flattenedList = pkListArray.flat();
+
+    // dtag をキーとして最新のイベントをマップに格納
+    const latestEventsMap = new Map<string, EventPacket>();
+
+    flattenedList.forEach((packet) => {
+      const dTag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
+      if (dTag) {
+        const existingEvent = latestEventsMap.get(dTag);
+        if (
+          !existingEvent ||
+          packet.event.created_at > existingEvent.event.created_at
+        ) {
+          latestEventsMap.set(dTag, packet);
+        }
+      }
+    });
+
+    // 各チャンクの結果を結合する
+    latestEventsMap.forEach((pk) => {
+      if (pk && pk.event) {
+        list = [
+          ...list,
+          ...pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+            if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+              return [...acc, [shortcode, url]];
+            } else {
+              return acc;
+            }
+          }, []),
+        ];
+      }
+    });
+  }
+  return list;
+}
+
+// フィルターを5個ずつのチャンクに分割する関数
+function chunkArray(array: Filter[], chunkSize: number) {
+  return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
+    array.slice(i * chunkSize, i * chunkSize + chunkSize)
+  );
 }

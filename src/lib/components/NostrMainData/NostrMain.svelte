@@ -35,6 +35,11 @@
   } from "$lib/types";
   import { page } from "$app/stores";
   import { migrateSettings } from "$lib/func/settings";
+  import {
+    initLumiEmoji,
+    initLumiMute,
+    initLumiMuteByKind,
+  } from "$lib/func/util";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -155,12 +160,12 @@
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
     console.log(mute);
-    $mutes = mute ? (JSON.parse(mute) as LumiMute).list : undefined;
+    $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
     console.log($mutes);
-    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji).list : [];
+    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
     $mutebykinds = mutebykind
-      ? (JSON.parse(mutebykind) as LumiMuteByKind).list
-      : [];
+      ? (JSON.parse(mutebykind) as LumiMuteByKind)
+      : initLumiMuteByKind;
   }
 </script>
 

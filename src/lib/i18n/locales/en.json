@@ -144,5 +144,9 @@
       "search2": "If kind:10007 is not found, use default relay settings.",
       "search3": "Please set up relays that has search function."
     }
+  },
+  "customEmoji": {
+    "remove": "Remove from My Custom Emoji List.",
+    "add": "Add to My Custom Emoji List."
   }
 }

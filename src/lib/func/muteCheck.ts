@@ -41,13 +41,13 @@ export function muteCheck(event: Nostr.Event): MuteCheck {
 }
 
 function shouldMuteByP(event: Nostr.Event): boolean {
-  const pMutes = get(mutes)?.p || [];
+  const pMutes = get(mutes)?.list.p || [];
 
   return pMutes.includes(event.pubkey); // Replace with actual property check
 }
 
 function shouldMuteByWord(event: Nostr.Event): boolean {
-  const wordMutes = get(mutes)?.word || [];
+  const wordMutes = get(mutes)?.list.word || [];
   //----------------------------------------------------------------------ワードミュートはとりあえずkind:1,7,42に限ってみる
   //表示もできるようになったからやっぱKind何でも隠すにしてみる
   // Check if any word mute from wordMutes array is included in event.content
@@ -55,7 +55,7 @@ function shouldMuteByWord(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByT(event: Nostr.Event): boolean {
-  const tMutes = get(mutes)?.t || [];
+  const tMutes = get(mutes)?.list.t || [];
 
   // Find all tags in event.tags where tag[0] is "t"
   const tagsWithT = event.tags.filter((tag) => tag[0] === "t");
@@ -65,7 +65,7 @@ function shouldMuteByT(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByE(event: Nostr.Event): boolean {
-  const eMutes = get(mutes)?.e || [];
+  const eMutes = get(mutes)?.list.e || [];
   const tagsWithE = event.tags.filter(
     (tag) => tag[0] === "e" || tag[0] === "q"
   );
@@ -76,7 +76,7 @@ function shouldMuteByE(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByKinds(event: Nostr.Event): boolean {
-  const kindsMutes = get(mutebykinds) || [];
+  const kindsMutes = get(mutebykinds).list || [];
 
   // Implement logic to check if event.kind and other properties match mutebykinds criteria
   // Example logic:

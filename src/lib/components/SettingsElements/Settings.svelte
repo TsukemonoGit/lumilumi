@@ -124,12 +124,13 @@
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
     console.log(mute);
-    $mutes = mute ? (JSON.parse(mute) as LumiMute).list : undefined;
+    $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
     console.log($mutes);
-    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji).list : [];
+    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
     $mutebykinds = mutebykind
-      ? (JSON.parse(mutebykind) as LumiMuteByKind).list
-      : [];
+      ? (JSON.parse(mutebykind) as LumiMuteByKind)
+      : initLumiMuteByKind;
+    ///なｎ
     lumiMute = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
     console.log($mutes);
     lumiEmoji = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
@@ -233,9 +234,9 @@
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
 
-    $mutes = lumiMute.list;
-    $emojis = lumiEmoji.list;
-    $mutebykinds = lumiMuteByKind.list;
+    $mutes = lumiMute;
+    $emojis = lumiEmoji;
+    $mutebykinds = lumiMuteByKind;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
