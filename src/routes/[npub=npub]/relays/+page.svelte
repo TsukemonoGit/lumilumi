@@ -1,24 +1,16 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
-  import {
-    emojis,
-    loginUser,
-    nowProgress,
-    queryClient,
-    showImg,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { afterNavigate } from "$app/navigation";
+  import { usePromiseReq } from "$lib/func/nostr";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import { pipe } from "rxjs";
-  import { latest, uniq, type EventPacket } from "rx-nostr";
+  import { latest, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   //import { samplemetadata, sample2 } from "./data";
   import { _ } from "svelte-i18n";
 
-  import { nip19 } from "nostr-tools";
   import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
 
   export let data: {

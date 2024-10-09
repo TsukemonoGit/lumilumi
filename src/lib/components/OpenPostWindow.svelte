@@ -763,7 +763,7 @@
 
           <div class=" flex gap-2">
             <!--emojis-->
-            {#if $emojis && $emojis.length > 0}
+            {#if $emojis && $emojis.list.length > 0}
               {#if viewCustomEmojis}
                 <input
                   bind:this={emojiInput}
@@ -829,7 +829,7 @@
           <div
             class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
           >
-            {#each $emojis as e, index}
+            {#each $emojis.list as e, index}
               {#if customReaction === "" || e[0]
                   .toLowerCase()
                   .includes(customReaction.toLowerCase())}

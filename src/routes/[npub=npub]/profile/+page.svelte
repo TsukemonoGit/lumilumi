@@ -372,7 +372,7 @@
         on:input={handleTextareaInput}
         on:click={handleTextareaInput}
       />
-      {#if $emojis && $emojis.length > 0}
+      {#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
           <Popover bind:open ariaLabel="custom emoji">
             <SmilePlus size="20" />
@@ -380,7 +380,7 @@
               <div
                 class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
               >
-                {#each $emojis as e, index}
+                {#each $emojis.list as e, index}
                   {#if customReaction === "" || e[0]
                       .toLowerCase()
                       .includes(customReaction.toLowerCase())}

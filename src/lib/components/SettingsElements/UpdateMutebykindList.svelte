@@ -10,13 +10,13 @@
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
+  import type { LumiMuteByKind } from "$lib/types";
 
   export let pubkey: string;
-  export let mutebykindList:
-    | { list: { kind: number; list: string[] }[]; updated: number }
-    | undefined = undefined;
+  export let mutebykindList: LumiMuteByKind | undefined = undefined;
   let dialogOpen: any;
   async function handleClickMuteByKind() {
+    const beforeList = mutebykindList?.list;
     try {
       const gotPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
@@ -53,7 +53,7 @@
     console.log(pk);
     if (pk && pk.length > 0) {
       mutebykindList = {
-        list: await getMuteByList(pk),
+        list: await getMuteByList(pk, beforeList),
         updated: Math.floor(Date.now() / 1000),
       };
       console.log(mutebykindList.list);

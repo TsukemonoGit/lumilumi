@@ -10,15 +10,24 @@
     formatAbsoluteDate,
     nip33Regex,
   } from "$lib/func/util";
-  import { nowProgress, showImg, toastSettings } from "$lib/stores/stores";
+  import {
+    nowProgress,
+    showImg,
+    toastSettings,
+    verifier,
+  } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import type { EventPacket } from "rx-nostr";
-
+  import type { LumiEmoji } from "$lib/types";
+  import { createRxNostr } from "rx-nostr/src";
+  import { get } from "svelte/store";
+  import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   export let pubkey: string;
-  export let emojiList: { list: string[][]; updated: number } | undefined;
+  export let emojiList: LumiEmoji | undefined;
   let dialogOpen: any;
   async function handleClickEmoji() {
+    const beforeEvent = emojiList?.event;
     let list: string[][] = [];
     try {
       const gotPubkey = await (
@@ -54,7 +63,7 @@
     ];
     const pk = await getDoukiList(filters, relays);
     // console.log(event);
-    if (!pk) {
+    if (!pk && !beforeEvent) {
       $toastSettings = {
         title: "Warning",
         description: "emoji list not found",
@@ -63,7 +72,13 @@
       $nowProgress = false;
       return;
     }
-    list = pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+    const event =
+      !beforeEvent ||
+      beforeEvent.pubkey !== pk.event.pubkey ||
+      pk.event.created_at >= beforeEvent.created_at
+        ? pk.event
+        : beforeEvent;
+    list = event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
       if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
         return [...acc, [shortcode, url]];
       } else {
@@ -71,7 +86,7 @@
       }
     }, []);
 
-    const naddrFilters = pk.event.tags.reduce(
+    const naddrFilters = event.tags.reduce(
       (acc: Nostr.Filter[], [tag, value]) => {
         console.log(tag, value);
         if (tag === "a") {
@@ -96,11 +111,13 @@
       []
     );
 
-    const chunkedFilters = chunkArray(naddrFilters, 4);
-
+    const chunkedFilters = chunkArray(naddrFilters, 10);
+    const rxNostr = createRxNostr({
+      verifier: get(verifier) ?? cryptoVerifier,
+    });
     // 全てのチャンクを並列で処理する
     const pkListArray = await Promise.all(
-      chunkedFilters.map((chunk) => getNaddrEmojiList(chunk, relays))
+      chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
     );
     if (pkListArray.length > 0) {
       //重複しないように整える
@@ -144,7 +161,11 @@
       });
 
       // console.log(list.length);
-      emojiList = { list: list, updated: Math.floor(Date.now() / 1000) };
+      emojiList = {
+        list: list,
+        updated: Math.floor(Date.now() / 1000),
+        event: event,
+      };
     }
     $nowProgress = false;
   }

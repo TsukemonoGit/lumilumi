@@ -27,16 +27,29 @@
   import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
-  import type { LumiSetting } from "$lib/types";
+  import type {
+    LumiEmoji,
+    LumiMute,
+    LumiMuteByKind,
+    LumiSetting,
+  } from "$lib/types";
   import { page } from "$app/stores";
+  import { migrateSettings } from "$lib/func/settings";
+  import {
+    initLumiEmoji,
+    initLumiMute,
+    initLumiMuteByKind,
+  } from "$lib/func/util";
 
   const STORAGE_KEY = "lumiSetting";
-
+  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+  const lumiMute_STORAGE_KEY = "lumiMute";
+  const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let localRelays: DefaultRelayConfig[] = [];
   let pubkey: string = "";
   let loading = true; // ローディング状態を追跡する変数を追加
 
-  onMount(() => {
+  onMount(async () => {
     console.log($defaultRelays);
     console.log($queryClient?.getQueryData(["defaultRelay", $loginUser]));
     initializeRxNostr();
@@ -45,9 +58,9 @@
     if (followee === "true") {
       $onlyFollowee = true;
     }
-
+    await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
-
+    loadMutetokanoSettei();
     if (savedSettings) {
       applySavedSettings(savedSettings);
     } else {
@@ -86,9 +99,9 @@
 
       menuleft: savedMenuLeft,
       showRelayIcon: savedShowRelayIcon,
-      mute: savedMute,
-      emoji: savedEmoji,
-      mutebykinds: savedMutebykinds,
+      // mute: savedMute,
+      // emoji: savedEmoji,
+      // mutebykinds: savedMutebykinds,
       defaultReaction: savedDefaultReaction,
       showReactioninTL: savedReactionTL,
       nostrWalletConnect: savedNostrWalletConnect,
@@ -127,19 +140,32 @@
     // getMetadataFromLocalStorage();
     //}
     $showKind16 = savedShowKind16;
-    $mutes = savedMute ? savedMute.list : undefined;
+    // $mutes = savedMute ? savedMute.list : undefined;
 
-    $emojis = savedEmoji && savedEmoji.list ? savedEmoji.list : [];
+    // $emojis = savedEmoji && savedEmoji.list ? savedEmoji.list : [];
 
-    if (savedMutebykinds && savedMutebykinds.list) {
-      try {
-        $mutebykinds = savedMutebykinds.list;
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    // if (savedMutebykinds && savedMutebykinds.list) {
+    //   try {
+    //     $mutebykinds = savedMutebykinds.list;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
     $addClientTag = savedAddClientTag;
     $showClientTag = savedShowClientTag ? savedShowClientTag : true;
+  }
+
+  function loadMutetokanoSettei() {
+    const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
+    const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
+    const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
+    console.log(mute);
+    $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
+    console.log($mutes);
+    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
+    $mutebykinds = mutebykind
+      ? (JSON.parse(mutebykind) as LumiMuteByKind)
+      : initLumiMuteByKind;
   }
 </script>
 

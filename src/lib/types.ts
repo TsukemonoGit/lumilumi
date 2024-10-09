@@ -106,20 +106,34 @@ export interface LumiSetting {
   showReactioninTL: boolean;
   showUserStatus: boolean;
   nostrWalletConnect: string;
-  emoji: {
-    list: string[][];
-    updated: number; //最後に同期した日付
-  };
-  mute: {
-    list: MuteList;
-    updated: number; //最終同期日時};
-  };
-  mutebykinds: { list: { kind: number; list: string[] }[]; updated: number }; //{ list: { kind: number; list: string[] }[]; updated: number };
+  emoji?: LumiEmoji;
+  mute?: LumiMute;
+  mutebykinds?: LumiMuteByKind;
   defaultReaction: { content: string; tag: string[] };
   showBanner: boolean;
   showKind16: boolean;
   addClientTag: boolean;
   showClientTag: boolean;
+}
+export interface LumiEmoji {
+  list: string[][];
+  updated: number; //最後に同期した日付
+  event: Nostr.Event | undefined;
+}
+export interface LumiMute {
+  list: MuteList;
+  updated: number; //最終同期日時};
+  event: Nostr.Event | undefined;
+}
+export interface LumiMuteByKind {
+  list: LumiMuteByKindList[];
+  updated: number;
+}
+
+export interface LumiMuteByKindList {
+  kind: number;
+  list: string[];
+  event: Nostr.Event | undefined;
 }
 export interface MuteList {
   p: string[];

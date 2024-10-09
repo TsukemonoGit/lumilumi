@@ -11,7 +11,13 @@ import {
   type ConnectionState,
   type EventVerifier,
 } from "rx-nostr";
-import type { AdditionalPostOptions, MuteList } from "$lib/types";
+import type {
+  AdditionalPostOptions,
+  LumiEmoji,
+  LumiMute,
+  LumiMuteByKind,
+  MuteList,
+} from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
 import type { Part } from "$lib/func/content";
@@ -44,9 +50,9 @@ export const showImg = writable<boolean>(false);
 export const showPreview = writable<boolean>(false);
 export const menuLeft = writable<boolean>(false);
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
-export const emojis = writable<string[][]>();
-export const mutes = writable<MuteList | undefined>();
-export const mutebykinds = writable<{ kind: number; list: string[] }[]>([]);
+export const emojis = writable<LumiEmoji>();
+export const mutes = writable<LumiMute>();
+export const mutebykinds = writable<LumiMuteByKind>();
 export const nowProgress = writable<boolean>(false);
 
 export const viewEventIds = writable<string[][]>([]);
