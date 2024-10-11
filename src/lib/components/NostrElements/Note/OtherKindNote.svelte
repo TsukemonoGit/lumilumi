@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import Content from "./Content.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";

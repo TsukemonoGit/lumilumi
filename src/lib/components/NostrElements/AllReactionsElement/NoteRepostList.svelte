@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   export let events: Nostr.Event[];
   export let tieKey: string | undefined;
 </script>

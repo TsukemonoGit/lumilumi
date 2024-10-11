@@ -10,7 +10,7 @@
   import { type EventPacket } from "rx-nostr";
 
   export let invoice: string | undefined;
-  export let id: string;
+  export let id: string | undefined;
 
   $: url = invoice ? `lightning:${invoice}` : undefined;
 
@@ -34,14 +34,18 @@
   let zapped: { data: EventPacket; status: any; error: any };
   let unsubscribe: (() => void) | undefined; // Start as undefined
 
-  const observer = new QueryObserver($queryClient, {
-    queryKey: ["reactions", "zapped", id],
-  });
+  const observer:
+    | QueryObserver<unknown, Error, unknown, unknown, string[]>
+    | undefined = id
+    ? new QueryObserver($queryClient, {
+        queryKey: ["reactions", "zapped", id],
+      })
+    : undefined;
 
-  $: if (!$open && unsubscribe) {
+  $: if (observer && !$open && unsubscribe) {
     unsubscribe(); // Call the unsubscribe function if it exists
     unsubscribe = undefined; // Reset unsubscribe after calling
-  } else if ($open && !zapped) {
+  } else if (observer && $open && !zapped) {
     unsubscribe = observer.subscribe((result: any) => {
       if (result?.data?.event) {
         zapped = result;

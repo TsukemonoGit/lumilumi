@@ -25,7 +25,7 @@
   import Kind0Note from "./Kind0Note.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";

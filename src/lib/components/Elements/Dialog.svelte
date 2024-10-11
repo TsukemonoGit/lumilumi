@@ -53,6 +53,7 @@
           Close
         </button>
       </div>
+
       <button
         use:melt={$close}
         aria-label="close"

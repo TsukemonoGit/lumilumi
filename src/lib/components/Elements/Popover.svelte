@@ -11,7 +11,7 @@
   } = createPopover({
     forceVisible: true,
   });
-
+  export let showCloseButton = true;
   const sync = createSync(states);
   $: sync.open(open, (v) => (open = v));
 </script>
@@ -27,7 +27,9 @@
   >
     <div use:melt={$arrow}></div>
     <div class="flex flex-col gap-2.5"><slot name="popoverContent"></slot></div>
-    <button class="close" use:melt={$close}> <X class="size-4" /></button>
+    {#if showCloseButton}<button class="close" use:melt={$close}>
+        <X class="size-4" /></button
+      >{/if}
   </div>{/if}
 
 <style lang="postcss">

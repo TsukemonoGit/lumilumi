@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import Reaction from "./Reaction.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { profile } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";

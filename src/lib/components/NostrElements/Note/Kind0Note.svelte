@@ -4,7 +4,7 @@
   import { _ } from "svelte-i18n";
   import Content from "./Content.svelte";
   import FollowButton from "./FollowButton.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   export let displayMenu: boolean;
   export let note: Nostr.Event;

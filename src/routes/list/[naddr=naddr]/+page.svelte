@@ -6,7 +6,6 @@
   import ListUsersCard from "$lib/components/NostrMainData/ListUsersCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
@@ -128,7 +127,7 @@
       {#await pubkeyList(event)}
         waiting decrypt list
       {:then pubkeys}
-        <ListUsersCard {pubkeys} />
+        <ListUsersCard {pubkeys} {tieKey} />
 
         {#if since}
           <TimelineList

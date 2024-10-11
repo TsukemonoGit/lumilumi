@@ -7,7 +7,7 @@
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";

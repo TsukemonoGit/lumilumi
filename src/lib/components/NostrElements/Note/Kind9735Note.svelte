@@ -1,5 +1,5 @@
 <script lang="ts">
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { profile } from "$lib/func/util";
   import { Zap } from "lucide-svelte";
   import { nip19 } from "nostr-tools";

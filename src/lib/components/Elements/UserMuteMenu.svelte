@@ -54,7 +54,7 @@
       strategy: "absolute", // `absolute` もしくは `fixed`
 
       flip: {
-        fallbackPlacements: ["bottom", "top", "left"], // はみ出した時の代替位置
+        fallbackPlacements: ["left", "bottom", "top"], // はみ出した時の代替位置
         padding: 8, // 画面の端からの余白
       },
 
@@ -792,7 +792,7 @@
   <div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
-    class="ml-2 z-20 rounded-lg bg-white shadow"
+    class=" z-20 rounded-lg bg-white shadow"
   >
     <!-- <div use:melt={$arrow} /> -->
     <div

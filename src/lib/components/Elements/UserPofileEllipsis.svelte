@@ -1,146 +1,34 @@
 <script lang="ts">
+  import { Ellipsis } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import {
-    Copy,
-    Ellipsis,
-    FileJson2,
-    Radio,
-    RefreshCcw,
-    Share,
-    SquareArrowOutUpRight,
-  } from "lucide-svelte";
-  import { _ } from "svelte-i18n";
-  import DropdownMenu from "./DropdownMenu.svelte";
-  import Dialog from "./Dialog.svelte";
-  import { nip19 } from "nostr-tools";
-  import { toastSettings } from "$lib/stores/stores";
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+
+  import UserMenu from "./UserMenu.svelte";
   import type { Profile } from "$lib/types";
-  import { page } from "$app/stores";
+  import Popover from "./Popover.svelte";
   export let metadata: Nostr.Event;
   export let prof: Profile;
   export let tieKey: string | undefined;
-  let dialogOpen: any;
-  let menuTexts = [
-    { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 3 },
-
-    { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
-
-    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-
-    { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
-  ];
-
-  const handleSelectItem = async (index: number) => {
-    const encodedPub = nip19.npubEncode(metadata.pubkey);
-
-    switch (menuTexts[index].num) {
-      case 0:
-        //view json
-        $dialogOpen = true;
-        break;
-
-      case 1:
-        //open in njump
-
-        const url = `https://njump.me/${encodedPub}`;
-
-        window.open(url, "_blank", "noreferrer");
-        break;
-
-      case 3:
-        //Copy EventID
-        try {
-          await navigator.clipboard.writeText(encodedPub);
-          $toastSettings = {
-            title: "Success",
-            description: `Copied to clipboard`,
-            color: "bg-green-500",
-          };
-        } catch (error: any) {
-          console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
-            color: "bg-orange-500",
-          };
-        }
-        break;
-
-      case 6:
-        //broadcast
-        publishEvent(metadata);
-
-        break;
-      case 7:
-        //Share link
-        const shareData = {
-          //title: "",
-          //text: "lumilumi",
-          url: `${$page.url.origin}/${encodedPub}`,
-        };
-
-        try {
-          // await navigator.clipboard.writeText(
-          //   `${$page.url.origin}/${encodedPub}`
-          // );
-          await navigator.share(shareData);
-          $toastSettings = {
-            title: "Success",
-            description: `shared successfully`,
-            color: "bg-green-500",
-          };
-        } catch (error: any) {
-          console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to share",
-            color: "bg-orange-500",
-          };
-        }
-        break;
-    }
-  };
 </script>
 
-<DropdownMenu {menuTexts} {handleSelectItem}>
-  <div
+<Popover ariaLabel="user menu" showCloseButton={false}>
+  <button
+    type="button"
     class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
+    ><Ellipsis /></button
   >
-    <Ellipsis />
-  </div></DropdownMenu
->
 
-<!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(metadata, null, 2)}
-    </div>
-    <h2 class="mt-1 text-lg font-medium">User Data</h2>
-    <div
-      class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
-    >
-      {#each Object.entries(prof) as [data, index]}
-        <div class="flex flex-col py-1">
-          <div class="font-bold whitespace-pre-wrap break-wards">
-            {data}
-          </div>
-          <div class="ml-2 whitespace-pre-wrap break-all">
-            {prof[data]}
-          </div>
-        </div>
-      {/each}
-    </div>
+  <div
+    slot="popoverContent"
+    class="menu flex flex-col flex-wrap divide-y divide-zinc-500 bg-neutral-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
+  >
+    <UserMenu pubkey={metadata.pubkey} {metadata} profile={prof} {tieKey} />
+  </div>
+</Popover>
 
-    <h2 class="m-0 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {tieKey ? getRelaysById(metadata.id, tieKey).join(", ") : ""}
-    </div>
-  </div></Dialog
->
+<style lang="postcss">
+  .menu {
+    @apply z-40 flex max-h-[300px] min-w-[220px] flex-col shadow-lg;
+
+    @apply ring-0 !important;
+  }
+</style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import type { Ogp } from "$lib/func/ogp";
   import { profile } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";

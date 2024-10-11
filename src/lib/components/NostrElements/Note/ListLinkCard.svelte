@@ -1,6 +1,6 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { showImg } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";

@@ -88,4 +88,4 @@
   </div></AlertDialog
 >
 
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice />
+<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={undefined} />

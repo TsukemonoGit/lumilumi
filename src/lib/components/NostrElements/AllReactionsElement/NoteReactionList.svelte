@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import Reaction from "../Note/Reaction.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   export let events: Nostr.Event[];

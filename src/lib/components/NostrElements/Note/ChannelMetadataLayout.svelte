@@ -6,7 +6,7 @@
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { splitHexColorString } from "$lib/func/util";
-  import UserMenu from "$lib/components/Elements/UserMenu.svelte";
+  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import ChannelEllipsisMenu from "./ChannelEllipsisMenu.svelte";
   export let id: string; //40
   export let handleClickToChannel: (() => void) | undefined = undefined;

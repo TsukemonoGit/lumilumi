@@ -1,8 +1,9 @@
 <script lang="ts">
   //import * as Nostr from "nostr-typedef";
-  import UserMenu from "../Elements/UserMenu.svelte";
+  import UserMenu from "../Elements/UserPopupMenu.svelte";
   import Metadata from "./Metadata.svelte";
   export let pubkeys: string[];
+  export let tieKey;
   const depth: number = 0;
 </script>
 
@@ -15,13 +16,28 @@
         metadata={undefined}
         size={24}
         {depth}
+        {tieKey}
       />
 
-      <UserMenu slot="error" {pubkey} metadata={undefined} size={24} {depth} />
+      <UserMenu
+        slot="error"
+        {pubkey}
+        metadata={undefined}
+        size={24}
+        {depth}
+        {tieKey}
+      />
 
-      <UserMenu slot="nodata" {pubkey} metadata={undefined} size={24} {depth} />
+      <UserMenu
+        slot="nodata"
+        {pubkey}
+        metadata={undefined}
+        size={24}
+        {depth}
+        {tieKey}
+      />
 
-      <div><UserMenu {pubkey} {metadata} size={24} {depth} /></div>
+      <div><UserMenu {pubkey} {metadata} size={24} {depth} {tieKey} /></div>
     </Metadata>
   {/each}
 </div>
