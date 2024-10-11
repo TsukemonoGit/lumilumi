@@ -497,9 +497,13 @@ export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export function userMuteStatus(pub: string): UserMuteStatus {
-  const repoList = get(mutebykinds)?.list?.find((li) => li.kind === 6);
-  const reaList = get(mutebykinds)?.list?.find((li) => li.kind === 7);
-  const zapList = get(mutebykinds)?.list?.find((li) => li.kind === 9734);
+  const list = get(mutebykinds)?.list;
+  if (!list || !Array.isArray(list)) {
+    return initUserMuteStatus;
+  }
+  const repoList = list.find((li) => li.kind === 6);
+  const reaList = list.find((li) => li.kind === 7);
+  const zapList = list.find((li) => li.kind === 9734);
   return {
     user: get(mutes)?.list?.p?.includes(pub),
     repost: repoList?.list?.includes(pub) ? true : false,
