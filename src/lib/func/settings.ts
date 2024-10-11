@@ -506,7 +506,7 @@ export function updateMuteByList(
 
   // 対象の 'd' タグから kind を取得（'kind' が数値であることを想定）
   const kind = tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
-  console.log(kind);
+
   // 'kind' が存在しない場合、元のリストをそのまま返す
   if (!kind) {
     return list;

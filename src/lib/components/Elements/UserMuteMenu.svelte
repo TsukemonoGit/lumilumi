@@ -119,6 +119,7 @@
   let kind: number | undefined;
   let dtag: string | undefined;
   let title: string;
+  let text: string;
   function reset() {
     kind = undefined;
     dtag = undefined;
@@ -141,6 +142,7 @@
         kind = 10000;
         dtag = undefined;
         title = $_("create.kind10000.title");
+        text = $_("create.kind10000.text");
         $nowProgress = false;
 
         $dialogOpen = true;
@@ -201,6 +203,7 @@
         //データないけど新しく作っていいですか
 
         title = $_("create.kind30007.6.title");
+        text = $_("create.kind30007.6.text");
         $nowProgress = false;
 
         $dialogOpen = true;
@@ -265,6 +268,8 @@
         //データないけど新しく作っていいですか
 
         title = $_("create.kind30007.7.title");
+        text = $_("create.kind30007.7.text");
+
         $nowProgress = false;
 
         $dialogOpen = true;
@@ -329,8 +334,9 @@
       console.log(kind30007);
       if (!kind30007) {
         //データないけど新しく作っていいですか
-
         title = $_("create.kind30007.3974.title");
+        text = $_("create.kind30007.3974.text");
+
         $nowProgress = false;
 
         $dialogOpen = true;
@@ -826,6 +832,6 @@
 <AlertDialog
   bind:open={dialogOpen}
   onClickOK={handleClickOk}
-  title={title + kind + dtag}
-  okButtonName="OK"><div slot="main"></div></AlertDialog
+  {title}
+  okButtonName="OK"><div slot="main">{text}</div></AlertDialog
 >
