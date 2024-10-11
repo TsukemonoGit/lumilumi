@@ -22,6 +22,7 @@
   import EllipsisMenuNote from "../NostrElements/Note/NoteActionButtuns/EllipsisMenuNote.svelte";
   import ReplyToUserButton from "./ReplyToUserButton.svelte";
   import UserEditEllipsis from "./UserEditEllipsis.svelte";
+  import MuteStatusIcons from "./MuteStatusIcons.svelte";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -117,7 +118,9 @@
           </div>
           <div class="flex flex-col gap-2">
             <div class="flex flex-row ml-auto gap-2">
-              {#if $loginUser !== pubkey}<ReplyToUserButton {metadata} />{/if}
+              {#if $loginUser !== pubkey}<MuteStatusIcons
+                  {pubkey}
+                /><ReplyToUserButton {metadata} />{/if}
               {#if prof.lud16 || prof.lud06}
                 <div class=" w-fit"><UserZap {metadata} /></div>
               {/if}<UserPofileEllipsis {metadata} {prof} {tieKey} />

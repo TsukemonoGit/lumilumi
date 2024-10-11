@@ -4,6 +4,7 @@ import type {
   LumiMuteByKind,
   LumiSetting,
   Profile,
+  UserMuteStatus,
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
@@ -13,6 +14,8 @@ import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch } from "nostr-tools/utils";
 import { nip19 } from "nostr-tools";
+import { get } from "svelte/store";
+import { mutebykinds, mutes } from "$lib/stores/stores";
 
 export const clientTag = [
   "client",
@@ -492,3 +495,22 @@ export function getColor(state: string | undefined): string {
 }
 export const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export function userMuteStatus(pub: string): UserMuteStatus {
+  const repoList = get(mutebykinds).list.find((li) => li.kind === 6);
+  const reaList = get(mutebykinds).list.find((li) => li.kind === 7);
+  const zapList = get(mutebykinds).list.find((li) => li.kind === 9734);
+  return {
+    user: get(mutes).list.p.includes(pub),
+    repost: repoList?.list.includes(pub) ? true : false,
+    reaction: reaList?.list.includes(pub) ? true : false,
+    zap: zapList?.list.includes(pub) ? true : false,
+  };
+}
+
+export const initUserMuteStatus: UserMuteStatus = {
+  user: false,
+  repost: false,
+  reaction: false,
+  zap: false,
+};

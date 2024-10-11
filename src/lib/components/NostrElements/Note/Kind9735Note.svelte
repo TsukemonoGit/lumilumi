@@ -8,13 +8,16 @@
   import RepostedNote from "./RepostedNote.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import {
+    loginUser,
+    mutebykinds,
+    mutes,
+    queryClient,
+  } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
   import { extractAmount, extractZappedId } from "$lib/func/event";
-  import NoteTemplate from "./NoteTemplate.svelte";
-  import UserName from "./UserName.svelte";
-  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
+
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
 
   export let note: Nostr.Event;
@@ -36,27 +39,14 @@
 
   const amount: number | undefined = extractAmount(note, zapRequestEvent);
 
+  //muteの値が変わったら更新する
   const muteType = !zapRequestEvent
     ? "null"
     : excludefunc(zapRequestEvent)
       ? "null"
-      : muteCheck(zapRequestEvent);
-
-  async function check9735(note: Nostr.Event): Promise<boolean | undefined> {
-    //受け取る側のウォレットのpubkeyを取得する
-    //
-    const receivepub = zapRequestEvent?.tags.find((tag) => tag[0] === "p")?.[1];
-    const metadata = (
-      $queryClient?.getQueryData(["metadata", receivepub]) as EventPacket
-    )?.event;
-    if (!metadata) {
-      console.log("failed to get reseiver metadata");
-      return;
-    }
-    const zapPubkey = await getZapLNURLPubkey(metadata);
-
-    return zapPubkey === note.pubkey;
-  }
+      : $mutes || $mutebykinds
+        ? muteCheck(zapRequestEvent)
+        : "null";
 </script>
 
 {#if !zapRequestEvent || !amount}<Kind9735Invalid

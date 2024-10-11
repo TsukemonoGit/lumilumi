@@ -257,33 +257,33 @@ export async function getMutebykindList(
 
 //pachet[]をmutebykindのほぞんのかたちにする
 export async function getMuteByList(
-  packets: EventPacket[],
+  events: Nostr.Event[],
   beforeMuteByList: LumiMuteByKindList[] | undefined
 ): Promise<LumiMuteByKindList[]> {
   let muteByList: LumiMuteByKindList[] = [];
 
-  for (const packet of packets) {
+  for (const packet of events) {
     const beforeData = beforeMuteByList?.find(
-      (list) => list.event?.kind === packet.event.kind
+      (list) => list.event?.kind === packet.kind
     );
     if (
       beforeData &&
       beforeData.event &&
-      beforeData.event.pubkey === packet.event.pubkey &&
-      beforeData.event.created_at >= packet.event.created_at
+      beforeData.event.pubkey === packet.pubkey &&
+      beforeData.event.created_at >= packet.created_at
     ) {
       muteByList.push(beforeData);
     } else {
       const kind = Number(
-        packet.event.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
+        packet.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
       );
       if (kind) {
-        let pTags = packet.event.tags
+        let pTags = packet.tags
           .filter((tag) => tag[0] === "p")
           .map((tag) => tag[1]);
 
-        if (packet.event.content.length > 0) {
-          const privateTags = await decryptContent(packet.event);
+        if (packet.content.length > 0) {
+          const privateTags = await decryptContent(packet);
           if (privateTags && privateTags.length > 0) {
             const ppTags = privateTags
               .filter((tag: string[]) => tag[0] === "p")
@@ -299,13 +299,13 @@ export async function getMuteByList(
           if (existingKind) {
             muteByList = muteByList.reduce(
               (pre, cur) => {
-                if (cur.kind === packet.event.kind) {
+                if (cur.kind === packet.kind) {
                   return [
                     ...pre,
                     {
-                      kind: packet.event.kind,
+                      kind: packet.kind,
                       list: pTags,
-                      event: packet.event,
+                      event: packet,
                     },
                   ];
                 } else {
@@ -319,7 +319,7 @@ export async function getMuteByList(
               }[]
             );
           } else {
-            muteByList.push({ kind, list: pTags, event: packet.event });
+            muteByList.push({ kind, list: pTags, event: packet });
           }
         }
       }
@@ -328,7 +328,9 @@ export async function getMuteByList(
   return muteByList;
 }
 
-async function decryptContent(event: Nostr.Event): Promise<string[][] | null> {
+export async function decryptContent(
+  event: Nostr.Event
+): Promise<string[][] | null> {
   try {
     const privateTagsJson = await (
       window?.nostr as Nostr.Nip07.Nostr
@@ -337,6 +339,21 @@ async function decryptContent(event: Nostr.Event): Promise<string[][] | null> {
   } catch (error) {
     console.error("Failed to decrypt content:", error);
     return null;
+  }
+}
+
+export async function encryptPrvTags(
+  pubkey: string,
+  prvTags: string[][]
+): Promise<string | undefined> {
+  try {
+    const privateString = await (
+      window?.nostr as Nostr.Nip07.Nostr
+    )?.nip04?.encrypt(pubkey, JSON.stringify(prvTags));
+    return privateString;
+  } catch (error) {
+    console.error("Failed to decrypt content:", error);
+    return undefined;
   }
 }
 
@@ -475,4 +492,36 @@ function chunkArray(array: Filter[], chunkSize: number) {
   return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
     array.slice(i * chunkSize, i * chunkSize + chunkSize)
   );
+}
+
+export function updateMuteByList(
+  tags: string[][],
+  ev: Nostr.Event,
+  list: LumiMuteByKindList[]
+): LumiMuteByKindList[] {
+  // 対象の 'p' タグから新しいリストを生成
+  const newList = tags
+    .filter((tag) => tag[0] === "p" && tag.length > 1)
+    .map((tag) => tag[1]);
+
+  // 対象の 'd' タグから kind を取得（'kind' が数値であることを想定）
+  const kind = tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
+  console.log(kind);
+  // 'kind' が存在しない場合、元のリストをそのまま返す
+  if (!kind) {
+    return list;
+  }
+  if (!list.find((li) => li.kind === Number(kind))) {
+    list.push({ kind: Number(kind), event: ev, list: newList });
+    return list;
+  }
+  return list.reduce((before, cur) => {
+    // cur.kind と 'kind' を比較し、異なる場合はそのまま before に追加
+    if (cur.kind !== Number(kind)) {
+      return [...before, cur];
+    } else {
+      // 'kind' が一致する場合、新しいイベントとリストに置き換え
+      return [...before, { kind: Number(kind), event: ev, list: newList }];
+    }
+  }, [] as LumiMuteByKindList[]);
 }
