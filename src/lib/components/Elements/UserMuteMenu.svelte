@@ -99,7 +99,7 @@
     },
   ];
 
-  $: muteStatus = userMuteStatus(pubkey);
+  $: muteStatus = $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined;
 
   let dialogOpen: {
     update: (
@@ -799,7 +799,7 @@
       <!-- <div class="text-zinc-300 font-bold pl-2 text-md py-2">Mute Type</div> -->
 
       {#each muteMenu as { id, addText, removeText, Icon }}
-        {#if !muteStatus[id]}
+        {#if !muteStatus?.[id]}
           <button
             on:click={() => handleAddMute(id)}
             class="
