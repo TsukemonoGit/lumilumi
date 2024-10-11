@@ -53,7 +53,10 @@
     console.log(pk);
     if (pk && pk.length > 0) {
       mutebykindList = {
-        list: await getMuteByList(pk, beforeList),
+        list: await getMuteByList(
+          pk.map((p) => p.event),
+          beforeList
+        ),
         updated: Math.floor(Date.now() / 1000),
       };
       console.log(mutebykindList.list);

@@ -180,3 +180,10 @@ export interface UseQueryOpt {
   initialDataUpdatedAt: number | undefined;
   refetchInterval: number;
 }
+
+export interface UserMuteStatus {
+  user: boolean;
+  repost: boolean;
+  reaction: boolean;
+  zap: boolean;
+}

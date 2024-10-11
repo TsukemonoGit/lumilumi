@@ -4,7 +4,13 @@
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "./Reaction.svelte";
 
-  import { loginUser, showUserStatus, viewEventIds } from "$lib/stores/stores";
+  import {
+    loginUser,
+    mutebykinds,
+    mutes,
+    showUserStatus,
+    viewEventIds,
+  } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "./Content.svelte";
@@ -97,9 +103,13 @@
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
-
+  //muteの値が変わったら更新する
   $: muteType =
-    paramNoteId === note.id || excludefunc(note) ? "null" : muteCheck(note);
+    paramNoteId === note.id || excludefunc(note)
+      ? "null"
+      : $mutes || $mutebykinds
+        ? muteCheck(note)
+        : "null";
 
   // // 指定したタグが既に存在するか確認するヘルパー関数
   // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {

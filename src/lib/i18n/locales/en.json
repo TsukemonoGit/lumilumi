@@ -56,7 +56,7 @@
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?",
     "nsecAlart": "Warning: Input contains private key (nsec)",
-    "placeholder": "What's happenning?"
+    "placeholder": "What's happening?"
   },
   "user": {
     "profileEdit": "Edit profile",
@@ -153,6 +153,24 @@
     "10030": {
       "title": "Confirm creation of custom emoji list",
       "text": "Missing existing custom emoji list (kind:10030), create a new one?"
+    },
+    "kind10000": {
+      "text": "An existing mute list (KIND:10000) could not be found. Is it OK to create a new one?",
+      "title": "Confirm mute list creation"
+    },
+    "kind30007": {
+      "6": {
+        "title": "Confirmation of mute list creation for repost",
+        "text": "An existing repost mute list (kind:30007 dtag: 6) could not be found. Is it OK to create a new one?"
+      },
+      "7": {
+        "title": "Confirmation of mute list creation for reaction",
+        "text": "An existing reaction mute list (kind:30007 dtag: 7) could not be found. Is it OK to create a new one?"
+      },
+      "3974": {
+        "title": "Confirmation of mute list creation for zap",
+        "text": "An existing zap mute list (kind:30007 dtag: 9734) could not be found. Is it OK to create a new one?"
+      }
     }
   }
 }

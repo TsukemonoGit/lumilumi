@@ -91,6 +91,7 @@
       updated: Math.floor(Date.now() / 1000),
       event: ev,
     };
+    $emojis = $emojis;
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
@@ -102,7 +103,7 @@
     //最新の10030を取得
     let newestKind10030 = await refetchKind10030();
     if (!newestKind10030) {
-      //------しっぱいじゃなくて　データないけど新しく作っていいですかを書く------
+      //データないけど新しく作っていいですかnoyatu
       $nowProgress = false;
       $dialogOpen = true;
       return;
@@ -148,6 +149,7 @@
       updated: Math.floor(Date.now() / 1000),
       event: newestKind10030,
     };
+    $emojis = $emojis;
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
@@ -206,6 +208,7 @@
       updated: Math.floor(Date.now() / 1000),
       event: newestKind10030,
     };
+    $emojis = $emojis;
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }

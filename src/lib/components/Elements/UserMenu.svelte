@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import {
+    loginUser,
     nowProgress,
     queryClient,
     showImg,
@@ -14,11 +15,17 @@
     SquareArrowOutUpRight,
     User,
     RefreshCcw,
+    ChevronRight,
+    EyeOff,
+    Zap,
+    Repeat2,
+    SmilePlus,
+    Slash,
   } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
-  import { splitHexColorString } from "$lib/func/util";
-  import type { Profile } from "$lib/types";
+  import { splitHexColorString, userMuteStatus } from "$lib/func/util";
+  import type { Profile, UserMuteStatus } from "$lib/types";
   import Dialog from "./Dialog.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { getRelaysById } from "$lib/func/nostr";
@@ -26,6 +33,8 @@
   import UserProfile from "./UserProfile.svelte";
   import { _ } from "svelte-i18n";
   import { writable } from "svelte/store";
+
+  import UserMuteMenu from "./UserMuteMenu.svelte";
 
   export let pubkey: string;
   export let size: number;
@@ -166,6 +175,20 @@
             </div></button
           >
         {/each}
+        {#if pubkey !== $loginUser}
+          <UserMuteMenu {pubkey}>
+            <div
+              class="flex text-magnum-400
+            font-medium leading-none hover:bg-magnum-500/25 focus:bg-magnum-700/25 align-middle justify-between items-center"
+            >
+              <div
+                class="inline-flex rounded-full text-sm my-auto items-center py-1"
+              >
+                <EyeOff class="mx-2 my-auto" />MUTE
+              </div>
+              <ChevronRight />
+            </div></UserMuteMenu
+          >{/if}
       </div>
     </div></Popover
   >
