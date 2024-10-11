@@ -167,6 +167,7 @@
       ? (JSON.parse(mutebykind) as LumiMuteByKind)
       : initLumiMuteByKind;
     if ($mutebykinds && !Array.isArray($mutebykinds.list)) {
+      //storageのデータわけたときにパースするの忘れててstringのままはいってるやつをしゅうせいするためだけのやつ
       try {
         const list = JSON.parse($mutebykinds.list);
         console.log(list);
