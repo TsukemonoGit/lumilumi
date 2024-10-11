@@ -87,7 +87,7 @@
     >
       {#each replyUsers as user}
         {#if !displayMenu}<UserName pubhex={user} />{:else}
-          <PopupUserName pubkey={user} metadata={undefined} {tieKey} />{/if}
+          <PopupUserName pubkey={user} {tieKey} />{/if}
       {/each}
     </div>
   {/if}

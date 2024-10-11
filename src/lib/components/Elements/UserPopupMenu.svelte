@@ -13,6 +13,7 @@
   import { writable } from "svelte/store";
 
   import UserMenu from "./UserMenu.svelte";
+  import { getProfile } from "$lib/func/event";
 
   export let pubkey: string;
   export let size: number;
@@ -21,14 +22,6 @@
   export let depth: number;
   export let tieKey: string | undefined;
 
-  const getProfile = (ev: Nostr.Event | undefined): Profile | undefined => {
-    if (!ev) return undefined;
-    try {
-      return JSON.parse(ev.content);
-    } catch {
-      return undefined;
-    }
-  };
   $: profile = getProfile(metadata);
   $: url = profile?.picture;
   const title = writable<string>("");

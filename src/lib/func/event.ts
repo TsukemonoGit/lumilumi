@@ -1,3 +1,4 @@
+import type { Profile } from "$lib/types";
 import { decode } from "light-bolt11-decoder";
 import * as Nostr from "nostr-typedef";
 
@@ -112,3 +113,14 @@ export function removeFirstMatchingId(
     viewEventIds.splice(index, 1); // 一致する1つだけ削除
   }
 }
+
+export const getProfile = (
+  ev: Nostr.Event | undefined
+): Profile | undefined => {
+  if (!ev) return undefined;
+  try {
+    return JSON.parse(ev.content);
+  } catch {
+    return undefined;
+  }
+};

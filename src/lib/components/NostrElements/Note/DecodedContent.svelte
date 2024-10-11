@@ -48,11 +48,7 @@
         class="text-magnum-100 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data}
-          />{:else}<PopupUserName
-            pubkey={decoded.data}
-            metadata={undefined}
-            {tieKey}
-          />{/if}</span
+          />{:else}<PopupUserName pubkey={decoded.data} {tieKey} />{/if}</span
       >{:else if decoded.type === "nevent"}<span
         class="grid grid-cols-[auto_1fr_auto]"
         ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
@@ -159,7 +155,6 @@
             pubhex={decoded.data.pubkey}
           />{:else}<PopupUserName
             pubkey={decoded.data.pubkey}
-            metadata={undefined}
             {tieKey}
           />{/if}</span
       >

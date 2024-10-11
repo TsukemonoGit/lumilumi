@@ -26,12 +26,14 @@
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
+  import { getProfile } from "$lib/func/event";
 
   export let tieKey: string | undefined;
 
   export let metadata: Nostr.Event | undefined;
   export let pubkey: string;
   export let profile: Profile | undefined;
+
   let dialogOpen: any;
   let encodedPubkey: string | undefined = undefined;
   $: if (pubkey) {
