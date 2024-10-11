@@ -501,10 +501,10 @@ export function userMuteStatus(pub: string): UserMuteStatus {
   const reaList = get(mutebykinds)?.list?.find((li) => li.kind === 7);
   const zapList = get(mutebykinds)?.list?.find((li) => li.kind === 9734);
   return {
-    user: get(mutes).list.p.includes(pub),
-    repost: repoList?.list.includes(pub) ? true : false,
-    reaction: reaList?.list.includes(pub) ? true : false,
-    zap: zapList?.list.includes(pub) ? true : false,
+    user: get(mutes)?.list?.p?.includes(pub),
+    repost: repoList?.list?.includes(pub) ? true : false,
+    reaction: reaList?.list?.includes(pub) ? true : false,
+    zap: zapList?.list?.includes(pub) ? true : false,
   };
 }
 
