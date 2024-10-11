@@ -166,6 +166,19 @@
     $mutebykinds = mutebykind
       ? (JSON.parse(mutebykind) as LumiMuteByKind)
       : initLumiMuteByKind;
+    if ($mutebykinds && !Array.isArray($mutebykinds.list)) {
+      try {
+        const list = JSON.parse($mutebykinds.list);
+        console.log(list);
+        $mutebykinds = { ...$mutebykinds, list: list ?? [] };
+        localStorage.setItem(
+          lumiMuteByKind_STORAGE_KEY,
+          JSON.stringify($mutebykinds)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 </script>
 
