@@ -707,7 +707,9 @@
       undefined,
       2000
     );
-    const localData = $mutebykinds?.list.find((li) => li.kind === Number(dtag));
+    const localData = $mutebykinds?.list?.find(
+      (li) => li.kind === Number(dtag)
+    );
 
     if (
       kind30007.length > 0 &&
