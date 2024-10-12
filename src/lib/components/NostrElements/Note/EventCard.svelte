@@ -51,6 +51,7 @@
   } from "$lib/func/event";
   import UserName from "./UserName.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
+  import Kind4Note from "./Kind4Note.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -265,7 +266,7 @@
   let replyUsers: string[];
   $: if (
     note &&
-    (note.kind === 1 || note.kind === 42) &&
+    (note.kind === 1 || note.kind === 42 || note.kind === 4) &&
     note.tags.length > 0
   ) {
     const res = replyedEvent(note.tags);
@@ -567,6 +568,22 @@
         {displayMenu}
         {tieKey}
         {mini}
+      />
+    {:else if note.kind === 4}
+      <!--旧仕様のDMだよ-->
+      <Kind4Note
+        {tieKey}
+        {mini}
+        {note}
+        {metadata}
+        {displayMenu}
+        {depth}
+        {maxHeight}
+        {warning}
+        {replyUsers}
+        {thread}
+        {proxy}
+        {replyID}
       />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
