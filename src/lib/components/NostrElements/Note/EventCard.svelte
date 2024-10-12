@@ -51,6 +51,7 @@
   } from "$lib/func/event";
   import UserName from "./UserName.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
+  import { _ } from "svelte-i18n";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -568,6 +569,12 @@
         {tieKey}
         {mini}
       />
+    {:else if note.kind === 4}
+      <!--旧仕様のDMだよ-->
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        <span class="text-sm text-neutral-400">{$_("event.kind4.text")}</span
+        ></NoteTemplate
+      >
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}
       {#if !data}

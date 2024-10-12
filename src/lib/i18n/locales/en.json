@@ -172,5 +172,10 @@
         "text": "An existing zap mute list (kind:30007 dtag: 9734) could not be found. Is it OK to create a new one?"
       }
     }
+  },
+  "event": {
+    "kind4": {
+      "text": "( Old specification DM )"
+    }
   }
 }
