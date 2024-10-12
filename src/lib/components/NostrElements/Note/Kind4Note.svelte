@@ -44,12 +44,11 @@
         user ?? note.pubkey,
         note.content
       );
-      console.log(decrypt);
+
       if (!decrypt) {
         decrypt = "decrypt error";
       }
     } catch (error) {
-      console.log(error);
       decrypt = "decrypt error";
     }
   }
