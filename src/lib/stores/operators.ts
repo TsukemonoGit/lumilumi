@@ -152,11 +152,12 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
           dtag,
           packet.event.pubkey,
         ]);
+        const updatedAt = Date.now() + 23 * 60 * 60 * 1000;
         if (!pre || packet.event.created_at > pre.event.created_at) {
           get(queryClient).setQueryData(
             ["userStatus", dtag, packet.event.pubkey],
             packet,
-            { updatedAt: Date.now() + 12 * 24 * 60 * 60 * 1000 }
+            { updatedAt: updatedAt }
           );
         }
         // console.log(
