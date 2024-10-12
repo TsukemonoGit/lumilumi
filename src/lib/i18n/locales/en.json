@@ -175,7 +175,8 @@
   },
   "event": {
     "kind4": {
-      "text": "( Old specification DM )"
+      "text": "( Old specification DM )",
+      "decrypt": "Decrypt and view contents"
     }
   }
 }
