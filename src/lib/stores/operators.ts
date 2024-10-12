@@ -15,7 +15,7 @@ import {
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
-import { type QueryKey } from "@tanstack/svelte-query";
+import { type QueryKey, type SetDataOptions } from "@tanstack/svelte-query";
 
 export function filterId(
   id: string
@@ -141,6 +141,7 @@ export function metadata(): OperatorFunction<EventPacket, EventPacket> {
     }
   });
 }
+
 export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
   return tap((packet: EventPacket) => {
     if (packet.event.kind === 30315) {
@@ -155,7 +156,7 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
           get(queryClient).setQueryData(
             ["userStatus", dtag, packet.event.pubkey],
             packet,
-            { updatedAt: Infinity }
+            { updatedAt: Date.now() + 12 * 24 * 60 * 60 * 1000 }
           );
         }
         // console.log(
