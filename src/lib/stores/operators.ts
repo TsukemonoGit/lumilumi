@@ -154,7 +154,8 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
         if (!pre || packet.event.created_at > pre.event.created_at) {
           get(queryClient).setQueryData(
             ["userStatus", dtag, packet.event.pubkey],
-            packet
+            packet,
+            { updatedAt: Infinity }
           );
         }
         // console.log(
