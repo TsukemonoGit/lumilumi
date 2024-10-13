@@ -18,7 +18,7 @@
       data = res;
       // console.log(data);
       createQuery({
-        queryKey: ["userStatus", "general", pubkey],
+        queryKey: ["userStatus", "music", pubkey],
         queryFn: () => res,
         //initialData: res,
         staleTime: Infinity,

@@ -25,7 +25,8 @@
       //これだと一回TLに出てこないと設定変わらない
       createQuery({
         queryKey: ["userStatus", "general", pubkey],
-        initialData: res,
+        queryFn: () => res,
+        //initialData: res,
         staleTime: Infinity,
         gcTime: Infinity,
       });
