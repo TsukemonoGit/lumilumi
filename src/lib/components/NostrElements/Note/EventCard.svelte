@@ -5,6 +5,7 @@
   import Reaction from "./Reaction.svelte";
 
   import {
+    followList,
     loginUser,
     mutebykinds,
     mutes,
@@ -37,7 +38,7 @@
   import ShowStatus from "./ShowStatus.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
   import ReplyThread from "./ReplyThread.svelte";
-  import { muteCheck } from "$lib/func/muteCheck";
+  import { muteCheck, type MuteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "./ReactionWebsite.svelte";
   import type { Ogp } from "$lib/func/ogp";
@@ -105,13 +106,15 @@
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
   //muteの値が変わったら更新する
-  $: muteType =
-    paramNoteId === note.id || excludefunc(note)
-      ? "null"
-      : $mutes || $mutebykinds
-        ? muteCheck(note)
-        : "null";
-
+  let muteType: MuteCheck;
+  $: if ($mutes || $mutebykinds) {
+    muteType =
+      paramNoteId === note.id || excludefunc(note)
+        ? "null"
+        : $mutes || $mutebykinds
+          ? muteCheck(note)
+          : "null";
+  }
   // // 指定したタグが既に存在するか確認するヘルパー関数
   // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {
   //   return viewEventIds.some(
@@ -305,6 +308,7 @@
       return undefined;
     }
   };
+  $: petname = $followList.get(note.pubkey);
 </script>
 
 {#if muteType !== "null" && depth >= 1}
@@ -402,7 +406,8 @@
           />
         </div>
         <div class=" inline-block break-all break-words whitespace-pre-line">
-          {#if metadata}
+          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+            >{:else if metadata}
             {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
               class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
             >
@@ -450,7 +455,8 @@
           />
         </div>
         <div class="break-all break-words whitespace-pre-line">
-          {#if metadata}
+          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+            >{:else if metadata}
             {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
               class="text-magnum-100 text-sm mt-auto"
               >@{profile(metadata)?.name}</span

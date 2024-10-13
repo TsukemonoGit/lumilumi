@@ -19,7 +19,8 @@
       // console.log(data);
       createQuery({
         queryKey: ["userStatus", "general", pubkey],
-        initialData: res,
+        queryFn: () => res,
+        //initialData: res,
         staleTime: Infinity,
         gcTime: Infinity,
       });
