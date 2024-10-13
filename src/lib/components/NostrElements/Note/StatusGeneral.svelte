@@ -4,6 +4,12 @@
   import { queryClient, slicedEvent } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
 
+  import {
+    type QueryKey,
+    type SetDataOptions,
+    createQuery,
+  } from "@tanstack/svelte-query";
+
   export let pubkey: string;
   let data: EventPacket;
 
@@ -16,6 +22,13 @@
     if (res) {
       data = res;
       //console.log(data);
+      //これだと一回TLに出てこないと設定変わらない
+      createQuery({
+        queryKey: ["userStatus", "general", pubkey],
+        initialData: res,
+        staleTime: Infinity,
+        gcTime: Infinity,
+      });
     }
   }
 

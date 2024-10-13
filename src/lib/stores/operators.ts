@@ -15,7 +15,11 @@ import {
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
-import { type QueryKey, type SetDataOptions } from "@tanstack/svelte-query";
+import {
+  createQuery,
+  type QueryKey,
+  type SetDataOptions,
+} from "@tanstack/svelte-query";
 
 export function filterId(
   id: string
@@ -152,12 +156,11 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
           dtag,
           packet.event.pubkey,
         ]);
-        const updatedAt = Date.now() + 23 * 60 * 60 * 1000;
+        //const updatedAt = Date.now() + 12 * 60 * 60 * 1000;
         if (!pre || packet.event.created_at > pre.event.created_at) {
           get(queryClient).setQueryData(
             ["userStatus", dtag, packet.event.pubkey],
-            packet,
-            { updatedAt: updatedAt }
+            packet
           );
         }
         // console.log(

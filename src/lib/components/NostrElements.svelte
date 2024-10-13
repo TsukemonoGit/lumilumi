@@ -18,7 +18,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
+  import { type QueryKey, createQueries } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/makeZap";
   import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
 
