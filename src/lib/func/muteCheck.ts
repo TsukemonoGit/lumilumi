@@ -66,13 +66,11 @@ function shouldMuteByT(event: Nostr.Event): boolean {
 
 function shouldMuteByE(event: Nostr.Event): boolean {
   const eMutes = get(mutes)?.list.e || [];
-  const tagsWithE = event.tags.filter(
-    (tag) => tag[0] === "e" || tag[0] === "q"
-  );
-  return (
-    eMutes.includes(event.id) ||
-    tagsWithE.some((tag) => eMutes.includes(tag[1]))
-  ); // Replace with actual property check
+  // const tagsWithE = event.tags.filter(
+  //   (tag) => tag[0] === "e" || tag[0] === "q"
+  // );
+  return eMutes.includes(event.id); // ||
+  //tagsWithE.some((tag) => eMutes.includes(tag[1])) // Replace with actual property check
 }
 
 function shouldMuteByKinds(event: Nostr.Event): boolean {

@@ -67,7 +67,7 @@
   //     isNew: boolean;
   //   }
   // >;
-  export let reaCheck = false;
+
   export let tieKey: string;
 
   createQuery({

@@ -11,6 +11,7 @@
     nip33Regex,
   } from "$lib/func/util";
   import {
+    loginUser,
     nowProgress,
     showImg,
     toastSettings,
@@ -23,6 +24,7 @@
   import { createRxNostr } from "rx-nostr/src";
   import { get } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+  import { nip19 } from "nostr-tools";
   export let pubkey: string;
   export let emojiList: LumiEmoji | undefined;
   let dialogOpen: any;
@@ -212,6 +214,12 @@
           </div>
         {/each}
       </div>
-    {/if}
+    {/if}<a
+      class="underline text-magnum-300 break-all ml-4 text-sm"
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/10030"
+      >{$_("settings.nostviewstr.kind10030")}
+    </a>
   </div>
 </Dialog>

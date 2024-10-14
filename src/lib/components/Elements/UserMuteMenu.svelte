@@ -42,6 +42,7 @@
     decryptContent,
     encryptPrvTags,
   } from "$lib/func/settings";
+  import { refetchKind10000 } from "$lib/func/mute";
   export let pubkey: string;
 
   //-------------------------------------mute menu
@@ -669,28 +670,6 @@
       // $mutebykinds = $mutebykinds;
       localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
       $nowProgress = false;
-    }
-  }
-
-  async function refetchKind10000(): Promise<Nostr.Event | undefined> {
-    const kind10000 = await usePromiseReq(
-      {
-        filters: [{ kinds: [10000], authors: [$loginUser], limit: 1 }],
-        operator: pipe(latest()),
-      },
-      undefined,
-      2000
-    );
-
-    if (
-      kind10000.length > 0 &&
-      (!$mutes.event ||
-        $mutes.event.pubkey !== kind10000[0].event.pubkey ||
-        kind10000[0].event.created_at >= $mutes.event.created_at)
-    ) {
-      return kind10000[0].event;
-    } else {
-      return $mutes.event;
     }
   }
 

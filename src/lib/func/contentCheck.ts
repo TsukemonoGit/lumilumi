@@ -57,9 +57,9 @@ export function contentCheck(
             newTags.push(["p", decoded.data.pubkey]);
           }
           break;
-        case "nrelay":
-          newTags.push(["r", decoded.data]);
-          break;
+        // case "nrelay":
+        //   newTags.push(["r", decoded.data]);
+        //   break;
         case "nevent":
           if (decoded.data.relays) {
             newTags.push([
