@@ -231,7 +231,7 @@
   }
 </script>
 
-<div class="flex flex-wrap gap-1 my-4">
+<div class="flex flex-wrap gap-1 mb-2">
   <button
     class="w-40 flex h-10 items-center justify-between rounded-lg bg-neutral-800 px-3 py-2
   text-magnum-200 shadow transition-opacity hover:opacity-90"

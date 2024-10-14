@@ -123,7 +123,7 @@
 
 <div
   use:melt={$root}
-  class="flex w-full flex-col overflow-hidden max-h-[23rem] rounded-xl shadow-lg data-[orientation=vertical]:flex-row"
+  class="flex w-full flex-col overflow-hidden xs:max-h-[23rem] max-h-[20rem] rounded-xl shadow-md data-[orientation=vertical]:flex-row mb-2"
 >
   <div
     use:melt={$list}

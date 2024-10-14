@@ -109,7 +109,7 @@
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main" class="min-h-[29rem] -mt-4">
+  <div slot="main" class="min-h-[29rem]">
     {#if muteList}
       <AddMute bind:muteList />
       <MuteTabList bind:muteList />
