@@ -4,7 +4,7 @@
   import type { LumiMute } from "$lib/types";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { loginUser, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import AddMute from "./AddMute.svelte";
@@ -113,7 +113,14 @@
     {#if muteList}
       <AddMute bind:muteList />
       <MuteTabList bind:muteList />
-    {/if}
+    {/if}<a
+      class="underline text-magnum-300 break-all ml-4 text-sm"
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/10000"
+    >
+      {$_("settings.nostviewstr.kind10000")}
+    </a>
   </div>
 </Dialog>
 
