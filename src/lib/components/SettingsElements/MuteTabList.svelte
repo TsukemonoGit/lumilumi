@@ -147,7 +147,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
     <ul
       class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
     >
-      {#each muteList.list.word as word, index}
+      {#each $mutes.list.word as word, index}
         <li>
           {word}
           <button
@@ -163,7 +163,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
     <ul
       class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 w-full"
     >
-      {#each muteList.list.t as t, index}
+      {#each $mutes.list.t as t, index}
         <li>
           {t}
           <button class="remove" on:click={() => handleClickRemove(["t", t])}
@@ -177,7 +177,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
     <ul
       class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
     >
-      {#each muteList.list.p as p, index}
+      {#each $mutes.list.p as p, index}
         <li>
           {nip19.npubEncode(p)}
           <button class="remove" on:click={() => handleClickRemove(["p", p])}
@@ -192,7 +192,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
     <ul
       class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
     >
-      {#each muteList.list.e as e, index}
+      {#each $mutes.list.e as e, index}
         <li>
           {nip19.noteEncode(e)}<button
             class="remove"
