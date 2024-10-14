@@ -178,5 +178,10 @@
       "text": "( Old specification DM )",
       "decrypt": "Decrypt and view contents"
     }
+  },
+  "mute": {
+    "type": {
+      "select": "Select the type of mute"
+    }
   }
 }

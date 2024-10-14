@@ -11,6 +11,8 @@
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import type { LumiMuteByKind } from "$lib/types";
+  import { eventKinds } from "$lib/func/kinds";
+  import { locale } from "svelte-i18n";
 
   export let pubkey: string;
   export let mutebykindList: LumiMuteByKind | undefined = undefined;
@@ -90,8 +92,10 @@
       <h2 class="m-0 text-lg font-medium">Mute By Kind</h2>
       {#each mutebykindList.list as list, index}
         {#if list.list && list.list.length > 0}
+          {@const kindstr = eventKinds.get(list.kind)}
           <h2 class="m-0 text-lg font-medium">
-            kind:{list.kind}
+            kind: {list.kind}
+            {kindstr ? `(${kindstr[$locale === "ja" ? "ja" : "en"]})` : ""}
           </h2>
           <ul
             class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[15vh]"

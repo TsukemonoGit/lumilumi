@@ -61,6 +61,9 @@
   let lumiMute: LumiMute;
   let lumiMuteByKind: LumiMuteByKind;
 
+  $: if ($mutes) {
+    lumiMute = $mutes;
+  } //lumiMuteが変わっても$mutesはかわらないmかも知れないけど$mutesがかわったらlumiMuteもかわる
   const originalSettings = writable<LumiSetting | null>(null);
 
   const selectedRelayset = writable<string>();

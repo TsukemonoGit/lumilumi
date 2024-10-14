@@ -188,6 +188,9 @@
     "zap": {
       "add": "ZAPをミュートする",
       "remove": "ZAPミュートを解除する"
+    },
+    "type": {
+      "select": "ミュートの種類"
     }
   },
   "event": {

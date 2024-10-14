@@ -170,7 +170,7 @@
       //storageのデータわけたときにパースするの忘れててstringのままはいってるやつをしゅうせいするためだけのやつ
       try {
         const list = JSON.parse($mutebykinds.list);
-        console.log(list);
+        //console.log(list);
         $mutebykinds = { ...$mutebykinds, list: list ?? [] };
         localStorage.setItem(
           lumiMuteByKind_STORAGE_KEY,

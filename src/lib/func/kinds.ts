@@ -185,18 +185,24 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     },
   ],
   //
-  //んあ～～～～～～
+  //～～～～～～
   //
-
+  [
+    9734,
+    {
+      ja: "Zap リクエスト",
+      en: "Zap Request",
+    },
+  ],
   [
     9735,
     {
-      ja: "Zap",
-      en: "Zap",
+      ja: "Zap レシート",
+      en: "Zap Receipt",
     },
   ],
   //
-  //んあ～～～～～～
+  //～～～～～～
   //
 
   [
