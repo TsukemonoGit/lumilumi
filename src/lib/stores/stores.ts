@@ -128,3 +128,6 @@ export const showClientTag = writable<boolean>(true);
 export const followList: Writable<Map<string, string | undefined>> = writable<
   Map<string, string | undefined>
 >(new Map());
+
+export const userStatusStore: Writable<Map<string, Map<string, Nostr.Event>>> =
+  writable<Map<string, Map<string, Nostr.Event>>>(new Map());

@@ -6,7 +6,7 @@
   import { pubkeysIn } from "$lib/func/nostr";
 
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-
+  import { pipe } from "rxjs";
   import {
     followList,
     loginUser,
@@ -25,6 +25,7 @@
   import { _ } from "svelte-i18n";
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
+  import { reactionCheck, userStatus } from "$lib/stores/operators";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -142,7 +143,6 @@
       let:events
       {viewIndex}
       {amount}
-      reaCheck={$showReactioninTL}
       let:len
     >
       <!-- <SetRepoReactions /> -->

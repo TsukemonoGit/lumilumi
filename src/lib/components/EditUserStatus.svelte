@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import {
+    nowProgress,
+    toastSettings,
+    userStatusStore,
+  } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
 
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
-  import type { EventPacket } from "rx-nostr";
+
   import { publishEvent } from "$lib/func/nostr";
   const {
     elements: {
@@ -40,14 +44,17 @@
         if (!pubkey) {
           throw Error("failed to get pubkey");
         }
-        const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
-          ["userStatus", "general", pubkey]
-        );
+        // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
+        //   ["userStatus", "general", pubkey]
+        // );
+        const statusEvent: Nostr.Event | undefined = $userStatusStore
+          .get(pubkey)
+          ?.get("general");
         console.log(statusEvent);
+
         if (statusEvent) {
-          userStatus = statusEvent.event.content;
-          userURL =
-            statusEvent.event.tags.find((tag) => tag[0] === "r")?.[1] ?? "";
+          userStatus = statusEvent.content;
+          userURL = statusEvent.tags.find((tag) => tag[0] === "r")?.[1] ?? "";
         }
         $nowProgress = false;
       } catch (error: any) {

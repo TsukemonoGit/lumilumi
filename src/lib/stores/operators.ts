@@ -11,6 +11,7 @@ import {
   onlyFollowee,
   queryClient,
   reactionToast,
+  userStatusStore,
 } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
@@ -77,7 +78,7 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
     if (
       a.event &&
       a.event.id &&
-      a.event.kind !== 30315 &&
+      //   a.event.kind !== 30315 &&
       !get(queryClient).getQueryData(queryKey)
     ) {
       // if (get(queryClient)) {
@@ -95,8 +96,7 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
     // 新しい順にソート
 
     //insertEventPacketIntoDescendingList(acc, a)にしてみてたけどなんかめっちゃ遅くなったからソートに戻す
-    const sorted =
-      a.event.kind !== 30315 ? sortEventPackets([...acc, a]) : [...acc]; //.sort((a, b) => b.event.created_at - a.event.created_at);
+    const sorted = sortEventPackets([...acc, a]); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
     return sorted;
   }, []);
@@ -147,34 +147,64 @@ export function metadata(): OperatorFunction<EventPacket, EventPacket> {
 }
 
 export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
-  return tap((packet: EventPacket) => {
-    if (packet.event.kind === 30315) {
-      const dtag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
-      if (dtag) {
-        const pre: EventPacket | undefined = get(queryClient).getQueryData([
-          "userStatus",
-          dtag,
-          packet.event.pubkey,
-        ]);
-        //const updatedAt = Date.now() + 12 * 60 * 60 * 1000;
-        if (!pre || packet.event.created_at > pre.event.created_at) {
-          get(queryClient).setQueryData(
-            ["userStatus", dtag, packet.event.pubkey],
-            packet
-          );
-        }
-        // console.log(
-        //   "key:",
-        //   ["userStatus", dtag, packet.event.pubkey],
-        //   "data:",
-        //   get(queryClient).getQueryData([
-        //     "userStatus",
-        //     dtag,
-        //     packet.event.pubkey,
-        //   ])
-        // );
-      }
+  return filter((packet: EventPacket) => {
+    if (packet.event.kind !== 30315) {
+      return true;
+    } //30315以外は何もせず通過
+
+    const dtag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
+    if (!dtag) {
+      return false;
     }
+    console.log(packet);
+
+    // 現在の store から pubkey と dtag に対応するイベントを取得
+    const pre: Nostr.Event | undefined = get(userStatusStore)
+      .get(packet.event.pubkey)
+      ?.get(dtag);
+
+    // 以前のイベントが存在しないか、作成日時が新しい場合に更新
+    if (!pre || packet.event.created_at > pre.created_at) {
+      // store を更新
+      userStatusStore.update((store) => {
+        // pubkey に対応する Map を取得または初期化
+        let pubkeyMap = store.get(packet.event.pubkey);
+        if (!pubkeyMap) {
+          pubkeyMap = new Map<string, Nostr.Event>();
+          store.set(packet.event.pubkey, pubkeyMap);
+        }
+
+        // dtag に対応するイベントをセット
+        pubkeyMap.set(dtag, packet.event);
+
+        return store;
+      });
+
+      //  const pre: EventPacket | undefined = get(queryClient).getQueryData([
+      //     "userStatus",
+      //     dtag,
+      //     packet.event.pubkey,
+      //   ]);
+      //   //const updatedAt = Date.now() + 12 * 60 * 60 * 1000;
+      //   if (!pre || packet.event.created_at > pre.event.created_at) {
+      //     get(queryClient).setQueryData(
+      //       ["userStatus", dtag, packet.event.pubkey],
+      //       packet
+      //     );
+      //   }
+      // console.log(
+      //   "key:",
+      //   ["userStatus", dtag, packet.event.pubkey],
+      //   "data:",
+      //   get(queryClient).getQueryData([
+      //     "userStatus",
+      //     dtag,
+      //     packet.event.pubkey,
+      //   ])
+      // );
+    }
+
+    return false; //30315は通過させずストアにいれるだけ
   });
 }
 export function latestbyId<A extends EventPacket>(): OperatorFunction<A, A[]> {
