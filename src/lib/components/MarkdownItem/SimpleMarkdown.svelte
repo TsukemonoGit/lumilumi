@@ -7,6 +7,7 @@
   import markdownItSub from "markdown-it-sub";
   import markdownItSup from "markdown-it-sup";
   import markdownItMark from "markdown-it-mark";
+  import markdownBrPlugin from "$lib/func/markdown-it-br";
   export let text: string;
   export let tags: string[][];
   export let displayMenu: boolean;
@@ -19,10 +20,12 @@
 
   //プレビューにも使ってるからconstだとだめ
   $: tokens = md
+
     .use(markdownItFootnote)
     .use(markdownItSub)
     .use(markdownItSup)
     .use(markdownItMark)
+    .use(markdownBrPlugin)
     .parse(text, {});
   $: parts = transformTokens(tokens);
 

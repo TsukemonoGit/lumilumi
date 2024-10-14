@@ -222,6 +222,8 @@
     {nolist}
     {tieKey}
   />
+{:else if part.type === "hardbreak"}
+  <br />
 {:else}<b>{part.type}</b>
   <NostrContent
     text={part.content}
