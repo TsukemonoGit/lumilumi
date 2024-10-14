@@ -6,6 +6,8 @@
     nowProgress,
     queryClient,
     relayStateMap,
+    showReactioninTL,
+    showUserStatus,
     slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
@@ -100,9 +102,20 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  $: operator = reaCheck
-    ? pipe(tie, uniq, userStatus(), reactionCheck(), scanArray())
-    : pipe(tie, uniq, userStatus(), scanArray());
+  $: operator = setOperator();
+
+  function setOperator() {
+    let operator = pipe(tie, uniq);
+    if (tieKey === "timeline" && $showUserStatus) {
+      //めいんTLのとき
+      operator = pipe(operator, userStatus());
+    }
+    if ($showReactioninTL) {
+      operator = pipe(operator, reactionCheck());
+    }
+    //最後に配列にする
+    return pipe(operator, scanArray());
+  }
   $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   $: data = result.data;
   $: status = result.status;
