@@ -7,15 +7,17 @@
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { loginUser, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import type { LumiMuteByKind } from "$lib/types";
   import { eventKinds } from "$lib/func/kinds";
   import { locale } from "svelte-i18n";
+  import { Image } from "lucide-svelte";
 
   export let pubkey: string;
   export let mutebykindList: LumiMuteByKind | undefined = undefined;
+
   let dialogOpen: any;
   async function handleClickMuteByKind() {
     const beforeList = mutebykindList?.list;
@@ -107,5 +109,13 @@
         {/if}
       {/each}
     {/if}
+
+    <a
+      class="underline text-magnum-300 break-all ml-4 text-sm"
+      target="_blank"
+      rel="noopener noreferrer"
+      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/30007"
+      >{$_("settings.nostviewstr.kind30007")}
+    </a>
   </div>
 </Dialog>
