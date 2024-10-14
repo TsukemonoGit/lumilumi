@@ -6,7 +6,7 @@
   export let pubkey: string;
   let data: Nostr.Event | undefined;
 
-  $: if ($slicedEvent || $userStatusStore) {
+  $: if ($userStatusStore) {
     data = $userStatusStore.get(pubkey)?.get("music");
   }
 
