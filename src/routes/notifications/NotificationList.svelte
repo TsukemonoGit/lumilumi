@@ -13,49 +13,36 @@
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus } from "$lib/types";
-  import { type QueryKey, createQuery } from "@tanstack/svelte-query";
+  import {
+    type QueryKey,
+    createQuery,
+    QueryObserver,
+    type QueryObserverResult,
+  } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
-  import {
-    firstLoadOlderEvents,
-    loadOlderEvents,
-    waitForConnections,
-  } from "./timelineList";
-  import {
-    createTie,
-    now,
-    type EventPacket,
-    type RxReq,
-    type RxReqEmittable,
-    type RxReqOverable,
-    type RxReqPipeable,
-  } from "rx-nostr";
-  import Metadata from "./Metadata.svelte";
+
+  import { createTie, now, type EventPacket } from "rx-nostr";
+
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
-  import {
-    userStatus,
-    reactionCheck,
-    scanArray,
-    muteCheck,
-  } from "$lib/stores/operators";
+  import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
+  import {
+    waitForConnections,
+    loadOlderEvents,
+  } from "$lib/components/NostrMainData/timelineList";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import { usePromiseReq } from "$lib/func/nostr";
+  import { writable, type Writable } from "svelte/store";
 
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
   // export let lastfavcheck: boolean = true;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
+
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
@@ -71,7 +58,7 @@
   export let tieKey: string;
 
   createQuery({
-    queryKey: [...queryKey, "olderData"],
+    queryKey: queryKey,
     queryFn: undefined,
     staleTime: Infinity, // 4 hour
     gcTime: Infinity, // 4 hour
@@ -102,34 +89,32 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  $: operator = setOperator();
+  $: operator = pipe(tie, uniq, scanArray());
 
-  function setOperator() {
-    let operator = pipe(tie, uniq);
-    if (tieKey === "timeline" && $showUserStatus) {
-      //めいんTLのとき
-      operator = pipe(operator, userStatus());
+  // $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
+  const observer = new QueryObserver($queryClient, {
+    queryKey: queryKey,
+  });
+  const data: Writable<EventPacket[]> = writable<EventPacket[]>();
+  observer.subscribe((result: QueryObserverResult<unknown, Error>) => {
+    console.log(result);
+    if (result.data) {
+      $data = result.data as EventPacket[];
     }
-    if (tieKey === "timeline" && $showReactioninTL) {
-      operator = pipe(operator, reactionCheck());
-    }
-    //最後に配列にする
-    return pipe(operator, scanArray());
-  }
-  $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
+  });
+
+  // $: status = result.status;
+  // $: error = result.error;
   let readUrls: string[] = [];
   $: if ($defaultRelays) {
     readUrls = Object.values($defaultRelays)
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: if (($data && viewIndex >= 0) || !$nowProgress) {
-    updateViewEvent($data);
+  $: if ($data?.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
+    updateViewEvent();
   }
-  //$: console.log($data);
+  //$: console.log(data);
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
     $slicedEvent = [];
@@ -160,132 +145,38 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
+    // const ev: EventPacket[] | undefined = $queryClient.getQueryData(queryKey);
 
-    if (ev) {
-      console.log(ev);
+    console.log(readUrls);
 
-      //  updateViewEvent($data);
+    //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
+    // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
+    await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
+    console.log($relayStateMap);
 
-      //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
-      //   const newFilters = filters.map((filter: Nostr.Filter) => ({
-      //     ...filter,
-      //     since: ev[0].event.created_at,
-      //     until: now(),
-      //   }));
-      //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-      //   if (older.length > 0) {
-      //     $queryClient.setQueryData(
-      //       [...queryKey, "olderData"],
-      //       [...ev, ...older]
-      //     );
-      //   }
-      //   updateViewEvent($data);
-    }
+    const older = await usePromiseReq(
+      { filters: filters, operator, req: undefined },
+      undefined
+    );
 
-    if (!ev || ev?.length <= 0) {
-      // const newFilters = filters.map((filter: Nostr.Filter) => ({
-      //   ...filter,
-      //   since: undefined,
-      //   until:
-      //     filter.until === undefined ? (filter.since ?? now()) : filter.until,
-      //   limit: 50,
-      // }));
-      const newFilters = {
-        ...filters[0],
-        since: undefined,
-        until:
-          filters[0].until === undefined
-            ? (filters[0].since ?? now())
-            : filters[0].until,
-        limit: 50,
-      };
-      console.log(readUrls);
+    console.log("first older", older);
+    if (older.length > 0) {
+      const olderdata = filters[0].limit
+        ? older.slice(0, filters[0].limit)
+        : older; //sinceとuntilがめっちゃ離れてるときのこと考えてない
 
-      //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
-      // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
-      console.log($relayStateMap);
-
-      const older = await firstLoadOlderEvents(
-        50,
-        [newFilters],
+      $queryClient.setQueryData(
+        //古いやつより新しいやつ
         queryKey,
-        tie,
-        relays
+        (before: EventPacket[] | undefined) => [...olderdata, ...(before ?? [])]
       );
-      console.log("first older", older);
-      if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
-          ...queryKey,
-          "olderData",
-        ]);
-
-        $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...(olddata ?? []), ...older]
-        );
-      }
+      // console.log($queryClient.getQueryData(queryKey));
+      // updateViewEvent();
     }
   }
 
-  // async function waitForConnections(
-  //   readUrls: string[],
-  //   relayStateMap: Map<string, string>,
-  //   maxWaitTime: number
-  // ) {
-  //   const normalizeUrl = (url: string) => url.replace(/\/$/, ""); // Function to remove trailing slash
-  //   const normalizedReadUrls = readUrls.map(normalizeUrl); // Normalize all URLs in readUrls
-
-  //   const targetPercentage = 0.8; // 80%
-  //   const startTime = Date.now();
-
-  //   // Function to count the number of connected relays, excluding those with error status
-  //   const countConnected = () => {
-  //     const filteredUrls = normalizedReadUrls.filter(
-  //       (url) => relayStateMap.get(normalizeUrl(url)) !== "error"
-  //     );
-  //     const targetCount = Math.ceil(filteredUrls.length * targetPercentage);
-  //     const connectedCount = filteredUrls.filter(
-  //       (url) => relayStateMap.get(normalizeUrl(url)) === "connected"
-  //     ).length;
-  //     return { connectedCount, targetCount };
-  //   };
-
-  //   // Wait until the number of connected relays reaches the target count or maxWaitTime is exceeded
-  //   while (true) {
-  //     const { connectedCount, targetCount } = countConnected();
-
-  //     if (connectedCount >= targetCount) {
-  //       console.log(
-  //         `Reached ${connectedCount} connected relays out of ${targetCount}. Proceeding...`
-  //       );
-  //       break;
-  //     }
-
-  //     const elapsedTime = Date.now() - startTime;
-  //     if (elapsedTime >= maxWaitTime) {
-  //       console.log(
-  //         `Maximum wait time exceeded. Proceeding with ${connectedCount} connected relays.`
-  //       );
-  //       break;
-  //     }
-
-  //     console.log(
-  //       `Waiting for connections... (${connectedCount}/${targetCount})`
-  //     );
-  //     await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 1 second before checking again
-  //   }
-  // }
-
   interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus; len: number };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
+    default: { events: Nostr.Event[]; len: number };
   }
 
   const handleNext = async () => {
@@ -310,12 +201,9 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
-          [...queryKey, "olderData"]
-        );
         $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...(olderdatas ?? []), ...older]
+          queryKey,
+          (before: EventPacket[] | undefined) => [...(before ?? []), ...older]
         );
       }
     }
@@ -326,20 +214,8 @@
       viewIndex += sift; //スライドする量
     }
 
-    updateViewEvent($data);
+    updateViewEvent();
     $nowProgress = false;
-    // console.log(viewIndex);
-    // //スマホではスクロールちゃんとなってたからでかいときだけやる
-    // if (window.innerWidth > 640) {
-    //   //px
-    //   const lastVisibleElement = document?.querySelector(".last-visible");
-    //   setTimeout(() => {
-    //     //データが更新終わるのを待ってからスライドしてみる
-    //     if (lastVisibleElement) {
-    //       lastVisibleElement.scrollIntoView({ block: "end" });
-    //     }
-    //   }, 10);
-    // }
   };
 
   const handlePrev = () => {
@@ -349,27 +225,14 @@
       });
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
-        updateViewEvent($data);
+        updateViewEvent();
       }, 100);
     }
-
-    // //スマホではスクロールちゃんとなってたからでかいときだけやる
-    // if (window.innerWidth > 640) {
-    //   //px
-
-    //   const firstVisibleElement = document?.querySelector(".first-visible");
-    //   setTimeout(() => {
-    //     //データが更新終わるのを待ってからスライドしてみる
-    //     if (firstVisibleElement) {
-    //       firstVisibleElement.scrollIntoView(true);
-    //     }
-    //   }, 10);
-    // }
   };
   let untilTime: number;
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
-  export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
+  export let updateViewEvent = () => {
     if (updating) {
       return;
     }
@@ -380,15 +243,15 @@
     timeoutId = setTimeout(() => {
       updating = true;
 
-      const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
-        ...queryKey,
-        "olderData",
-      ]);
+      const allEvents: EventPacket[] | undefined =
+        $queryClient.getQueryData(queryKey);
       console.log("updateViewEvent");
-      const allEvents = data ?? [];
-      if (olderdatas) {
-        allEvents.push(...olderdatas);
+
+      if (!allEvents) {
+        updating = false;
+        return;
       }
+
       untilTime =
         allEvents.length > 0
           ? allEvents[allEvents.length - 1].event.created_at
@@ -408,6 +271,7 @@
       slicedEvent.update((value) =>
         allUniqueEvents.slice(viewIndex, viewIndex + amount)
       );
+      $slicedEvent = $slicedEvent;
       updating = false;
     }, 50); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
@@ -415,7 +279,7 @@
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent($data);
+    updateViewEvent();
   }
 
   onDestroy(() => {
@@ -448,14 +312,9 @@
 {#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
-{#if $error}
-  <slot name="error" error={$error} />
-{:else if $slicedEvent && $slicedEvent?.length > 0}
-  <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} />
-{:else if $status === "loading"}
-  <slot name="loading" />
-{:else}
-  <slot name="nodata" />
+
+{#if $slicedEvent && $slicedEvent?.length > 0}
+  <slot events={$slicedEvent} len={$data?.length ?? 0} />
 {/if}
 {#if $slicedEvent && $slicedEvent?.length > 0}
   <button

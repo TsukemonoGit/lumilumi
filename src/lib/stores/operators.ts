@@ -156,7 +156,7 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
     if (!dtag) {
       return false;
     }
-    console.log(packet);
+    //console.log(packet);
 
     // 現在の store から pubkey と dtag に対応するイベントを取得
     const pre: Nostr.Event | undefined = get(userStatusStore)

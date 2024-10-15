@@ -252,22 +252,6 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
     }
   }
 
-  input {
-    height: theme(spacing.8);
-    flex-shrink: 0;
-    flex-grow: 1;
-    border-top-left-radius: theme(borderRadius.md);
-    border-top-right-radius: theme(borderRadius.md);
-    border: 1px solid theme(colors.neutral.200);
-    padding-inline: theme(spacing[2.5]);
-    line-height: 1;
-    color: theme(colors.neutral.900);
-
-    &:focus {
-      border-color: theme(colors.magnum.400);
-    }
-  }
-
   .save {
     display: inline-flex;
     height: theme(spacing.8);
