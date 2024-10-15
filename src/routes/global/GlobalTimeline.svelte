@@ -56,7 +56,7 @@
     filters={[
       {
         kinds: [1, 6, 16],
-        limit: 50,
+
         since: since,
       },
     ]}

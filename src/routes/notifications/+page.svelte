@@ -2,18 +2,18 @@
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import {
+    defaultRelays,
     followList,
     loginUser,
     onlyFollowee,
     queryClient,
   } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
-  import { crossfade } from "svelte/transition";
-  import { cubicInOut } from "svelte/easing";
+
   import * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
@@ -21,6 +21,7 @@
   import { extractKind9734 } from "$lib/func/makeZap";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import NotificationList from "./NotificationList.svelte";
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -28,36 +29,58 @@
   const tieKey = "notifications";
 
   let isOnMount = false;
-  let since: number | undefined = undefined;
-  const timelineQuery: QueryKey = ["notifications", "feed"];
-  onMount(() => {
+
+  const timelineQuery: QueryKey = ["notifications"];
+  let filters: Nostr.Filter[] = [
+    {
+      kinds: [
+        1, 6, 7, 16, 42, 9735, 4 /**初代DM*/,
+      ] /** 2代目DM 14? ,  三代目DM 1059 pに自分のpubが入ってくるわけじゃないからこれではこうどくできないよ*/,
+
+      "#p": [$loginUser],
+      since: undefined,
+      until: undefined,
+      limit: undefined,
+    },
+  ];
+  $: readRelays = $defaultRelays
+    ? Object.values($defaultRelays)
+        .filter((config) => config.read)
+        .map((value) => value.url)
+    : [];
+  $: console.log(readRelays);
+  let view = false;
+  onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
+      view = true;
     }
   });
-  afterNavigate(() => {
+  afterNavigate(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
+      view = true;
     }
   });
-
+  beforeNavigate(() => {
+    view = false;
+  });
   async function init() {
-    since = undefined;
-
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
-      ...timelineQuery,
-      "olderData",
-    ]);
+    const ev: EventPacket[] | undefined =
+      $queryClient?.getQueryData(timelineQuery);
     if (!ev || ev.length <= 0) {
-      since = now() - 15 * 60;
+      filters[0].since = undefined;
+      filters[0].limit = 100;
+      filters[0].until = now();
     } else {
-      since = ev[0].event.created_at;
+      filters[0].since = ev[0].event.created_at;
+      filters[0].until = now();
     }
   }
 
@@ -85,10 +108,10 @@
     type: "multiple",
     defaultValue: triggers.map((trigger) => trigger.id), //初期は全部選択
   });
-  const [send, receive] = crossfade({
-    duration: 250,
-    easing: cubicInOut,
-  });
+  // const [send, receive] = crossfade({
+  //   duration: 250,
+  //   easing: cubicInOut,
+  // });
 
   $: console.log($value); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
@@ -207,20 +230,10 @@
         None
       </button>
     </div>
-    {#if since}
-      <TimelineList
+    {#if view}
+      <NotificationList
         queryKey={timelineQuery}
-        filters={[
-          {
-            kinds: [
-              1, 6, 7, 16, 42, 9735, 4 /**初代DM*/,
-            ] /** 2代目DM 14? ,  三代目DM 1059 pに自分のpubが入ってくるわけじゃないからこれではこうどくできないよ*/,
-
-            "#p": [$loginUser],
-            since: since,
-          },
-        ]}
-        req={createRxForwardReq()}
+        {filters}
         let:events
         {viewIndex}
         {amount}
@@ -232,9 +245,6 @@
           <p>Loading...</p>
         </div> -->
 
-        <div slot="error" let:error>
-          <p>{error}</p>
-        </div>
         <!-- <SetRepoReactions /> -->
         <div
           class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
@@ -260,7 +270,7 @@
             {/each}
           {/if}
         </div>
-      </TimelineList>{/if}
+      </NotificationList>{/if}
   </div>
 </section>
 <div class="postWindow">

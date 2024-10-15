@@ -96,14 +96,14 @@
 
           //   since: since,
           // },
-          {
-            kinds: [7], //   "#k": ["42"],
-            "#p": [$loginUser],
-            "#e": [data.id],
-            limit: 20,
+          // {
+          //   kinds: [7], //   "#k": ["42"],
+          //   "#p": [$loginUser],
+          //   "#e": [data.id],
+          //   limit: 20,
 
-            since: since,
-          },
+          //   since: since,
+          // },
         ]}
         req={createRxForwardReq()}
         let:events
