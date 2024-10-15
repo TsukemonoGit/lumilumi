@@ -11,6 +11,7 @@
     nip33Regex,
   } from "$lib/func/util";
   import {
+    emojis,
     loginUser,
     nowProgress,
     showImg,
@@ -168,6 +169,8 @@
         updated: Math.floor(Date.now() / 1000),
         event: event,
       };
+      $emojis = emojiList;
+      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     }
     $nowProgress = false;
   }

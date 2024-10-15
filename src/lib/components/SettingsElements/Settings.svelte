@@ -57,6 +57,8 @@
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = { ...initSettings };
+
+  //以下3つは同期した時点で保存
   let lumiEmoji: LumiEmoji;
   let lumiMute: LumiMute;
   let lumiMuteByKind: LumiMuteByKind;

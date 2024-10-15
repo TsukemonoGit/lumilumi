@@ -81,7 +81,7 @@ export async function getDoukiList(
     let res: EventPacket;
     setTimeout(() => {
       subscription.unsubscribe();
-      rxNostr.dispose();
+      //rxNostr.dispose();
       resolve(res);
     }, 7000); //completeOnTimeoutでおわらないことないとおもうけどいちおう
 
@@ -158,18 +158,20 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
     t: [],
     e: [],
   };
-  try {
-    const privateContent = await (
-      window?.nostr as Nostr.Nip07.Nostr
-    )?.nip04?.decrypt(get(loginUser), event.content);
-    if (privateContent) {
-      const parsedContent: string[][] = JSON.parse(privateContent);
-      if (parsedContent.length > 0) {
-        tags = parsedContent;
+  if (event.content !== "") {
+    try {
+      const privateContent = await (
+        window?.nostr as Nostr.Nip07.Nostr
+      )?.nip04?.decrypt(get(loginUser), event.content);
+      if (privateContent) {
+        const parsedContent: string[][] = JSON.parse(privateContent);
+        if (parsedContent.length > 0) {
+          tags = parsedContent;
+        }
       }
+    } catch (error) {
+      console.log("failed to decrypt");
     }
-  } catch (error) {
-    console.log("failed to decrypt");
   }
   tags = [...tags, ...event.tags];
   tags.forEach(([tag, content]) => {

@@ -7,7 +7,12 @@
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { loginUser, nowProgress, toastSettings } from "$lib/stores/stores";
+  import {
+    loginUser,
+    mutebykinds,
+    nowProgress,
+    toastSettings,
+  } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import type { LumiMuteByKind } from "$lib/types";
@@ -63,6 +68,8 @@
         ),
         updated: Math.floor(Date.now() / 1000),
       };
+      $mutebykinds = mutebykindList;
+      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
       console.log(mutebykindList.list);
     } else {
       $toastSettings = {
