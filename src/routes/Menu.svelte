@@ -111,13 +111,19 @@
     />
     <div
       use:melt={$content}
-      class="fixed left-0 top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
-            shadow-lg focus:outline-none"
-      transition:fly={{
-        x: -350,
-        duration: 300,
-        opacity: 1,
-      }}
+      class={`fixed ${$menuLeft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
+            shadow-lg focus:outline-none`}
+      transition:fly={$menuLeft
+        ? {
+            x: -350,
+            duration: 300,
+            opacity: 1,
+          }
+        : {
+            x: 350,
+            duration: 300,
+            opacity: 1,
+          }}
     >
       <nav class="h-full justify-between flex flex-col my-2 overflow-hidden">
         <ul

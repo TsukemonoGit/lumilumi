@@ -614,6 +614,9 @@
           {tieKey}
         />
       {/if}
+    {:else if note.kind === 1059}
+      <!---->
+      Gift Wrap
     {:else}
       <!-- その他
       {@const clientData = findClientTag(note)}

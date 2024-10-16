@@ -33,9 +33,7 @@
   const timelineQuery: QueryKey = ["notifications"];
   let filters: Nostr.Filter[] = [
     {
-      kinds: [
-        1, 6, 7, 16, 42, 9735, 4 /**初代DM*/,
-      ] /** 2代目DM 14? ,  三代目DM 1059 pに自分のpubが入ってくるわけじゃないからこれではこうどくできないよ*/,
+      kinds: [1, 6, 7, 16, 42, 9735, 4 /**初代DM*/, 1059 /** 三代目DM */],
 
       "#p": [$loginUser],
       since: undefined,
