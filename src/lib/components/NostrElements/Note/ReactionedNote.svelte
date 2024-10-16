@@ -21,6 +21,7 @@
   //export let kind: number | undefined;
   export let depth: number;
   export let tieKey: string | undefined;
+  export let maxHeight: string;
 
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
@@ -83,7 +84,10 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <div class="mx-2 my-1 text-sm opacity-70">
+    <div
+      class="mx-2 my-1 text-sm opacity-80 overflow-y-auto overflow-x-hidden"
+      style="max-height:{maxHeight ?? 'none'}"
+    >
       {#if text.kind === 30023 || text.kind === 30024}<SimpleMarkdown
           text={text.content ?? ""}
           tags={text.tags}

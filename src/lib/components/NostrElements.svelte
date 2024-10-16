@@ -18,14 +18,13 @@
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
-  import { type QueryKey, createQueries } from "@tanstack/svelte-query";
+  import { type QueryKey } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/makeZap";
   import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
 
   import { _ } from "svelte-i18n";
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
-  import { reactionCheck, userStatus } from "$lib/stores/operators";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -85,7 +84,7 @@
       filters.push({
         kinds: [
           42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
-          /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/,
+          /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/, 1059,
           9735 /*zap receipt**/,
         ],
         "#p": [$loginUser],

@@ -173,9 +173,10 @@
           return event.kind === 9735;
         case "other":
           return (
-            event.kind === 42 || event.kind === 4 //||
+            event.kind === 42 ||
+            event.kind === 4 ||
             //  event.kind === 14 ||
-            //  event.kind === 1059
+            event.kind === 1059
           );
         default:
           return false;

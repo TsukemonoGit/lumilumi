@@ -443,7 +443,9 @@
     {:else if note.kind === 7}
       <!--リアクション-->
       <div class="flex gap-1 items-center bg-magnum-800/25">
-        <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
+        <div class="w-fit max-w-[40%]">
+          <Reaction event={note} />
+        </div>
         <div class="self-center">
           <UserMenu
             pubkey={note.pubkey}
@@ -486,6 +488,7 @@
             {repostable}
             {displayMenu}
             {tieKey}
+            {maxHeight}
           />
         {:else}
           <RepostedNote
