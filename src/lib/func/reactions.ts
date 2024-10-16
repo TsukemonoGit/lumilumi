@@ -1,4 +1,4 @@
-import { queryClient, verifier } from "$lib/stores/stores";
+import { app, queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import {
   createQuery,
@@ -23,21 +23,25 @@ let rxNostr3: RxNostr;
 //   verifier: get(verifier) ?? cryptoVerifier,
 //   connectionStrategy: "aggressive",
 // }); //reaction repost用
+const req3 = createRxForwardReq();
 
 export function set3Relays(relays: any) {
   if (!rxNostr3) {
     rxNostr3 = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
-      connectionStrategy: "aggressive",
     }); //reaction repost用
   }
   rxNostr3.setDefaultRelays(relays);
 }
 
 export function rxNostr3ReccoctRelay(url: string) {
-  rxNostr3?.reconnect(url);
+  console.log(req3);
+  //if(!req3){req3 = createRxForwardReq();}
+  if (!rxNostr3) {
+    set3Relays(get(app).rxNostr.getDefaultRelays());
+  }
+  rxNostr3.reconnect(url);
 }
-const req3 = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {
   //  console.log(filters);

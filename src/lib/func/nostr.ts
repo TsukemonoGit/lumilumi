@@ -468,10 +468,10 @@ export function relaysReconnectChallenge() {
   //これわざわざエラーのときってしなくてもエラーとリジェクトの時いがいりコネクトされないらしい
   //------------------------------------------------------------------------　default relays🦌リコネクトできないから要修正
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
-    if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
-      get(app).rxNostr.reconnect(key);
-      rxNostr3ReccoctRelay(key);
-    }
+    // if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
+    get(app).rxNostr.reconnect(key);
+    rxNostr3ReccoctRelay(key);
+    // }
   });
   //rxNostr3RelaysReconnectChallenge();
 }
