@@ -83,37 +83,9 @@
       openGlobalTimeline = true;
     }, 1);
   }
-  let isMount = false;
-  onMount(async () => {
-    if (isMount) {
-      return;
-    }
-    isMount = true;
-    await init();
-    isMount = false;
-  });
-
-  afterNavigate(async () => {
-    if (isMount) {
-      return;
-    }
-    isMount = true;
-    await init();
-
-    const data: EventPacket | undefined = $queryClient.getQueryData([
-      "globalRelay",
-      $loginUser,
-    ]);
-    console.log("afterNavigate", data);
-    if (data) {
-      globalRelays = (data.event.tags as string[][])
-        .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
-        .map((tag: string[]) => tag[1]);
-    }
-    isMount = false;
-  });
   let relaySettei = false;
-  async function init() {
+  onMount(async () => {
+    //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);
     const relay = params.getAll("relay");
     console.log(relay);
@@ -122,7 +94,31 @@
     } else {
       relaySettei = true;
     }
-  }
+  });
+
+  afterNavigate(async () => {
+    //paramにリレーがあったらそれをセットする
+    const params = new URLSearchParams(window.location.search);
+    const relay = params.getAll("relay");
+    console.log(relay);
+    if (relay.length > 0) {
+      globalRelays = relay;
+    } else {
+      relaySettei = true;
+
+      //すでにあるならデータをセットする
+      const data: EventPacket | undefined = $queryClient.getQueryData([
+        "globalRelay",
+        $loginUser,
+      ]);
+      console.log("afterNavigate", data);
+      if (data) {
+        globalRelays = (data.event.tags as string[][])
+          .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
+          .map((tag: string[]) => tag[1]);
+      }
+    }
+  });
 </script>
 
 <svelte:head>
