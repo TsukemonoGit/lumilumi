@@ -44,7 +44,7 @@
   images={mediaList}
   bind:currentIndex={modalIndex}
 /> -->
-<article class="contentBlock">
+<article class="contentBlock overflow-hidden">
   {#if parts}
     {#each parts as token}
       <SimpleContentBlock

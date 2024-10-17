@@ -28,7 +28,7 @@
   } from "$lib/func/settings";
   import { promisePublishEvent } from "$lib/func/nostr";
 
-  export let muteList: LumiMute;
+  //export let muteList: LumiMute;
 
   let muteInput: string = "";
 
@@ -226,7 +226,7 @@
     };
     // $mutes = $mutes;
     localStorage.setItem("lumiMute", JSON.stringify($mutes));
-    muteList = $mutes;
+
     $nowProgress = false;
   }
 </script>

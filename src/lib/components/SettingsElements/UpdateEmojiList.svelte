@@ -27,10 +27,10 @@
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
   export let pubkey: string;
-  export let emojiList: LumiEmoji | undefined;
+  // export let emojiList: LumiEmoji | undefined;
   let dialogOpen: any;
   async function handleClickEmoji() {
-    const beforeEvent = emojiList?.event;
+    const beforeEvent = $emojis?.event;
     let list: string[][] = [];
     try {
       const gotPubkey = await (
@@ -164,12 +164,12 @@
       });
 
       // console.log(list.length);
-      emojiList = {
+      $emojis = {
         list: list,
         updated: Math.floor(Date.now() / 1000),
         event: event,
       };
-      $emojis = emojiList;
+
       localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     }
     $nowProgress = false;
@@ -188,22 +188,22 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickEmoji}>Emoji</button
 ><time class="ml-2"
-  >{$_("settings.lastUpdated")}: {emojiList
-    ? formatAbsoluteDate(emojiList?.updated)
+  >{$_("settings.lastUpdated")}: {$emojis
+    ? formatAbsoluteDate($emojis?.updated)
     : ""}</time
->{#if emojiList}<button
+>{#if $emojis}<button
     class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   <div slot="main">
-    {#if emojiList}
+    {#if $emojis}
       <h2 class="m-0 text-lg font-medium">EmojiList</h2>
       <div
         class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
       >
-        {#each emojiList.list as e, index}
+        {#each $emojis.list as e, index}
           <div
             class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
           >

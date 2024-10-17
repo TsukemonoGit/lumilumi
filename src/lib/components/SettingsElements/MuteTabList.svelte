@@ -23,7 +23,7 @@
   import * as Nostr from "nostr-typedef";
   import { promisePublishEvent } from "$lib/func/nostr";
 
-  export let muteList: LumiMute;
+  // export let muteList: LumiMute;
   const {
     elements: { root, list, content, trigger },
     states: { value },
@@ -31,10 +31,10 @@
     defaultValue: "tab-1",
   });
   const triggers = [
-    { id: "tab-1", title: `Word (${muteList?.list.word.length})` },
-    { id: "tab-2", title: `Hashtag (${muteList?.list.t.length})` },
-    { id: "tab-3", title: `User (${muteList?.list.p.length})` },
-    { id: "tab-4", title: `Event (${muteList?.list.e.length})` },
+    { id: "tab-1", title: `Word (${$mutes?.list.word.length})` },
+    { id: "tab-2", title: `Hashtag (${$mutes?.list.t.length})` },
+    { id: "tab-3", title: `User (${$mutes?.list.p.length})` },
+    { id: "tab-4", title: `Event (${$mutes?.list.e.length})` },
   ];
   const [send, receive] = crossfade({
     duration: 250,
@@ -117,7 +117,6 @@
     // $mutes = $mutes;
     localStorage.setItem("lumiMute", JSON.stringify($mutes));
     $nowProgress = false;
-    muteList = $mutes;
   }
 </script>
 

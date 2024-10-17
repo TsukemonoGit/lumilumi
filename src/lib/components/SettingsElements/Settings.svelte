@@ -59,13 +59,10 @@
   let settings: LumiSetting = { ...initSettings };
 
   //以下3つは同期した時点で保存
-  let lumiEmoji: LumiEmoji;
-  let lumiMute: LumiMute;
-  let lumiMuteByKind: LumiMuteByKind;
+  // let lumiEmoji: LumiEmoji;
+  // let lumiMute: LumiMute;
+  // let lumiMuteByKind: LumiMuteByKind;
 
-  $: if ($mutes) {
-    lumiMute = $mutes;
-  } //lumiMuteが変わっても$mutesはかわらないmかも知れないけど$mutesがかわったらlumiMuteもかわる
   const originalSettings = writable<LumiSetting | null>(null);
 
   const selectedRelayset = writable<string>();
@@ -135,13 +132,13 @@
     $mutebykinds = mutebykind
       ? (JSON.parse(mutebykind) as LumiMuteByKind)
       : initLumiMuteByKind;
-    ///なｎ
-    lumiMute = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-    console.log($mutes);
-    lumiEmoji = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
-    lumiMuteByKind = mutebykind
-      ? (JSON.parse(mutebykind) as LumiMuteByKind)
-      : initLumiMuteByKind;
+    // ///なｎ
+    // lumiMute = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
+    // console.log($mutes);
+    // lumiEmoji = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
+    // lumiMuteByKind = mutebykind
+    //   ? (JSON.parse(mutebykind) as LumiMuteByKind)
+    //   : initLumiMuteByKind;
     originalSettings.set({ ...settings });
     window?.addEventListener("beforeunload", handleBeforeUnload);
   });
@@ -196,12 +193,12 @@
     if (!isPubkeyValid()) return;
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
-    localStorage.setItem(
-      lumiMuteByKind_STORAGE_KEY,
-      JSON.stringify(lumiMuteByKind)
-    );
-    localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(lumiEmoji));
+    // localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
+    // localStorage.setItem(
+    //   lumiMuteByKind_STORAGE_KEY,
+    //   JSON.stringify(lumiMuteByKind)
+    // );
+    // localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(lumiEmoji));
     $nowProgress = true;
     toastSettings.set({
       title: "Success",
@@ -239,9 +236,9 @@
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
 
-    $mutes = lumiMute;
-    $emojis = lumiEmoji;
-    $mutebykinds = lumiMuteByKind;
+    // $mutes = lumiMute;
+    // $emojis = lumiEmoji;
+    // $mutebykinds = lumiMuteByKind;
     //リレーの設定やり直すためにリロードするリロードしてくださいを出す
 
     originalSettings.set({ ...settings });
@@ -718,7 +715,7 @@
     </legend>
     <!--mute-->
     <div class="mt-2">
-      <UpdateMuteList bind:pubkey={settings.pubkey} bind:muteList={lumiMute} />
+      <UpdateMuteList bind:pubkey={settings.pubkey} />
     </div>
     {#if $loginUser}
       <a
@@ -734,10 +731,7 @@
     {/if}
     <!--mute by kind-->
     <div class="mt-2">
-      <UpdateMutebykindList
-        bind:pubkey={settings.pubkey}
-        bind:mutebykindList={lumiMuteByKind}
-      />
+      <UpdateMutebykindList bind:pubkey={settings.pubkey} />
     </div>
     {#if $loginUser}
       <div class="flex gap-2 items-center">
@@ -758,10 +752,7 @@
 
     <!--emoji-->
     <div class="mt-4">
-      <UpdateEmojiList
-        bind:pubkey={settings.pubkey}
-        bind:emojiList={lumiEmoji}
-      />
+      <UpdateEmojiList bind:pubkey={settings.pubkey} />
     </div>
     <div
       class="border rounded-md border-magnum-400 p-1 m-2 before:content-['*']"

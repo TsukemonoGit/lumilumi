@@ -21,11 +21,11 @@
   import { Image } from "lucide-svelte";
 
   export let pubkey: string;
-  export let mutebykindList: LumiMuteByKind | undefined = undefined;
+  // export let mutebykindList: LumiMuteByKind | undefined = undefined;
 
   let dialogOpen: any;
   async function handleClickMuteByKind() {
-    const beforeList = mutebykindList?.list;
+    const beforeList = $mutebykinds?.list;
     try {
       const gotPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
@@ -61,16 +61,15 @@
     const pk = await getMutebykindList(filters, relays);
     console.log(pk);
     if (pk && pk.length > 0) {
-      mutebykindList = {
+      $mutebykinds = {
         list: await getMuteByList(
           pk.map((p) => p.event),
           beforeList
         ),
         updated: Math.floor(Date.now() / 1000),
       };
-      $mutebykinds = mutebykindList;
+
       localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
-      console.log(mutebykindList.list);
     } else {
       $toastSettings = {
         title: "Warning",
@@ -87,19 +86,19 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickMuteByKind}>MuteByKind</button
 ><time class="ml-2"
-  >{$_("settings.lastUpdated")}: {mutebykindList
-    ? formatAbsoluteDate(mutebykindList?.updated)
+  >{$_("settings.lastUpdated")}: {$mutebykinds
+    ? formatAbsoluteDate($mutebykinds?.updated)
     : ""}</time
->{#if mutebykindList}<button
+>{#if $mutebykinds}<button
     class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   <div slot="main">
-    {#if mutebykindList}
+    {#if $mutebykinds}
       <h2 class="m-0 text-lg font-medium">Mute By Kind</h2>
-      {#each mutebykindList.list as list, index}
+      {#each $mutebykinds.list as list, index}
         {#if list.list && list.list.length > 0}
           {@const kindstr = eventKinds.get(list.kind)}
           <h2 class="m-0 text-lg font-medium">

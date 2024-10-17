@@ -17,9 +17,10 @@
   import MuteTabList from "./MuteTabList.svelte";
 
   export let pubkey: string;
-  export let muteList: LumiMute | undefined;
+  //export let muteList: LumiMute | undefined;
   let dialogOpen: any;
   async function handleClickMute() {
+    const beforeList = $mutes?.event;
     try {
       const gotPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
@@ -58,16 +59,16 @@
     console.log(pk);
     if (pk) {
       if (
-        !muteList?.event ||
-        muteList?.event.pubkey !== pk.event.pubkey ||
-        pk.event.created_at >= muteList.event.created_at
+        !beforeList ||
+        beforeList.pubkey !== pk.event.pubkey ||
+        pk.event.created_at >= beforeList.created_at
       ) {
-        muteList = {
+        $mutes = {
           list: await toMuteList(pk.event),
           updated: Math.floor(Date.now() / 1000),
           event: pk.event,
         };
-        $mutes = muteList;
+
         localStorage.setItem("lumiMute", JSON.stringify($mutes));
       }
     } else {
@@ -87,19 +88,19 @@
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickMute}>Mute</button
 ><time class="ml-2"
-  >{$_("settings.lastUpdated")}: {muteList
-    ? formatAbsoluteDate(muteList?.updated)
+  >{$_("settings.lastUpdated")}: {$mutes
+    ? formatAbsoluteDate($mutes?.updated)
     : ""}</time
->{#if muteList}<button
+>{#if $mutes}<button
     class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   <div slot="main" class="min-h-[29rem]">
-    {#if muteList}
-      <AddMute bind:muteList />
-      <MuteTabList bind:muteList />
+    {#if $mutes}
+      <AddMute />
+      <MuteTabList />
     {/if}<a
       class="underline text-magnum-300 break-all ml-4 text-sm"
       target="_blank"
