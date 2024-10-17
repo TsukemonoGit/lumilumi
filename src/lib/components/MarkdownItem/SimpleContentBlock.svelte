@@ -30,6 +30,9 @@
   export let openModal;
   export let nolist: boolean;
   export let tieKey: string | undefined;
+  if (part.type === "hr") {
+    console.log(part);
+  }
 </script>
 
 {#if part.type === "heading"}
@@ -44,7 +47,7 @@
     {tieKey}
   />
 {:else if part.type === "hr"}
-  <hr class="my-4" />
+  <hr class="my-6" />
 {:else if part.type === "paragraph"}
   <Paragraph
     {part}

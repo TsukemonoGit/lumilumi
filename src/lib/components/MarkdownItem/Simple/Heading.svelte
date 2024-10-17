@@ -121,32 +121,42 @@
   .h4,
   .h5,
   .h6 {
-    @apply font-title tracking-wide;
-    /* border-bottom: dashed 1px theme(colors.magnum.400/0.5); */
+    @apply font-title tracking-wide  mt-8 mb-6  py-1.5;
+    line-height: 1em;
   }
-
+  .h1,
+  .h2 {
+    @apply border-b border-neutral-200;
+  }
   .h1 {
-    @apply text-4xl  mt-8 mb-4 font-semibold;
+    font-size: 2em;
+    font-weight: 600;
   }
 
   .h2 {
-    @apply text-3xl  mt-8 mb-4 font-semibold;
+    font-size: 1.8em;
+    font-weight: 600;
   }
 
   .h3 {
-    @apply text-2xl  mt-6 mb-4 font-semibold;
+    font-size: 1.6em;
+    font-weight: 600;
   }
 
   .h4 {
-    @apply text-xl  mt-6 mb-4 font-bold;
+    font-size: 1.4em;
+    font-weight: 600;
   }
 
   .h5 {
-    @apply text-lg  mt-4 mb-2 font-bold;
+    font-size: 1.2em;
+    font-weight: 600;
   }
 
   .h6 {
-    @apply text-base  mt-4 mb-2 font-bold;
+    /* @apply text-base  mt-4 mb-2 font-bold; */
+    font-size: 1em;
+    font-weight: 600;
   }
   /* .h1,
   .h2,
