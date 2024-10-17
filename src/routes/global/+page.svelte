@@ -55,13 +55,14 @@
       $queryClient.refetchQueries({
         queryKey: ["globalRelay", $loginUser],
       });
-      timelineQuery = ["global", "feed", generateRandomId(2)];
+
       $queryClient.removeQueries({
         queryKey: timelineQuery,
       });
       $queryClient.removeQueries({
         queryKey: [...timelineQuery, "olderData"],
       });
+      timelineQuery = ["global", "feed", generateRandomId(2)];
       globalRelays = relays;
     }
     $nowProgress = false;
