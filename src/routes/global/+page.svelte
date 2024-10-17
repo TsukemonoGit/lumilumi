@@ -9,7 +9,7 @@
   } from "$lib/stores/stores";
 
   import { generateRandomId, promisePublishEvent } from "$lib/func/nostr";
-  import { SvelteComponent } from "svelte";
+  import { onMount, SvelteComponent } from "svelte";
 
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -83,7 +83,23 @@
       openGlobalTimeline = true;
     }, 1);
   }
-  afterNavigate(() => {
+  let isMount = false;
+  onMount(async () => {
+    if (isMount) {
+      return;
+    }
+    isMount = true;
+    await init();
+    isMount = false;
+  });
+
+  afterNavigate(async () => {
+    if (isMount) {
+      return;
+    }
+    isMount = true;
+    await init();
+
     const data: EventPacket | undefined = $queryClient.getQueryData([
       "globalRelay",
       $loginUser,
@@ -94,7 +110,19 @@
         .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
         .map((tag: string[]) => tag[1]);
     }
+    isMount = false;
   });
+  let relaySettei = false;
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const relay = params.getAll("relay");
+    console.log(relay);
+    if (relay.length > 0) {
+      globalRelays = relay;
+    } else {
+      relaySettei = true;
+    }
+  }
 </script>
 
 <svelte:head>
@@ -104,18 +132,20 @@
 </svelte:head>
 
 <section class="w-full break-words overflow-hidden">
-  <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
-    ><div slot="loading" class="w-full"></div>
-    <div slot="error" class="w-full"></div>
-    <div slot="nodata" class="w-full"></div>
-  </SetGlobalRelays>
+  {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
+    <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
+      ><div slot="loading" class="w-full"></div>
+      <div slot="error" class="w-full"></div>
+      <div slot="nodata" class="w-full"></div>
+    </SetGlobalRelays>
 
-  <Settei
-    title={"Global"}
-    relays={globalRelays}
-    {onClickSave}
-    Description={GlobalDescription}
-  />
+    <Settei
+      title={"Global"}
+      relays={globalRelays}
+      {onClickSave}
+      Description={GlobalDescription}
+    />
+  {/if}
 
   {#if openGlobalTimeline && globalRelays.length > 0}
     <GlobalTimeline bind:this={compRef} {globalRelays} {timelineQuery} />

@@ -21,19 +21,19 @@
   const tieKey = "globalchannel";
   let isOnMount = false;
   let since: number | undefined = undefined;
-  onMount(() => {
+  onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
   });
-  afterNavigate((navigate) => {
+  afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
