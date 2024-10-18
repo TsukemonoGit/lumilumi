@@ -8,7 +8,7 @@
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import { _ } from "svelte-i18n";
   import ContentImage from "./content/ContentImage.svelte";
-
+  import CustomEmoji from "./content/CustomEmoji.svelte";
   import ClientTag from "./ClientTag.svelte";
 
   export let text: string;
@@ -20,6 +20,7 @@
   export let isShowClientTag: boolean = true;
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseText(text, tags);
+  //$: console.log(parts);
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   $: mediaList = parts.filter(
@@ -69,9 +70,6 @@
       return undefined;
     }
   };
-
-  let imgError: boolean = false;
-  let imgLoad: boolean = false;
 </script>
 
 <!-- <MediaDisplay
@@ -140,16 +138,9 @@
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all "
         href={part.content ?? ""}>{part.content}</Link
-      >{/if}{:else if part.type === "emoji"}{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
-        height="24"
-        loading="lazy"
-        alt={`:${part.content}:`}
-        src={part.url}
-        title={`:${part.content}:`}
-        class="inline h-[24px] object-contain m-0 overflow-hidden"
-        on:load={() => (imgLoad = true)}
-        on:error={() => (imgError = true)}
-      />{:else}:{part.content}:{/if}{:else if part.type === "hashtag"}
+      >{/if}{:else if part.type === "emoji"}
+    <CustomEmoji {part} />
+  {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
       href={`/search?t=${part.url}`}
