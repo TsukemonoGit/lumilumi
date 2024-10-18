@@ -39,6 +39,7 @@
   import type { Part } from "$lib/func/content";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
+  import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
   //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
 
   //import SvelteQueryDevtools
@@ -118,6 +119,7 @@
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
       relaysReconnectChallenge();
+      rxNostr3RelaysReconnectChallenge();
     }
   }
   afterNavigate((navigate) => {

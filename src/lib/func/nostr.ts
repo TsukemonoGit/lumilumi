@@ -450,30 +450,16 @@ export async function promisePublishEvent(
   return promisePublishSignedEvent(event);
 }
 
-//ConnectionState
-// | "initialized"
-// | "connecting"
-// | "connected"
-// | "waiting-for-retrying"
-// | "retrying"
-// | "dormant"
-// | "error"
-// | "rejected"
-// | "terminated";
-// const reconectableStatus:ConnectionState[]=[];
 export function relaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-  //これわざわざエラーのときってしなくてもエラーとリジェクトの時いがいりコネクトされないらしい
-  //------------------------------------------------------------------------　default relays🦌リコネクトできないから要修正
+
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
-    // if (get(app).rxNostr.getRelayStatus(key)?.connection === "error") {
-    get(app).rxNostr.reconnect(key);
-    rxNostr3ReccoctRelay(key);
-    // }
+    if (value.read) {
+      get(app).rxNostr.reconnect(key);
+    }
   });
-  //rxNostr3RelaysReconnectChallenge();
 }
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
