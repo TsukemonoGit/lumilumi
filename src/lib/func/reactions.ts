@@ -49,6 +49,10 @@ export function rxNostr3RelaysReconnectChallenge() {
     });
   }
 }
+
+export function rxNostr3Status() {
+  console.log(rxNostr3.getAllRelayStatus());
+}
 export function rxNostr3ReccoctRelay(url: string) {
   rxNostr3.reconnect(url);
 }
