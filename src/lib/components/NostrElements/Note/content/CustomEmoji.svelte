@@ -8,8 +8,8 @@
   export let part: Part;
   let imgError: boolean = false;
   let imgLoad: boolean = false;
-  console.log(imgError);
-  console.log(imgLoad);
+  ///console.log(imgError);
+  //console.log(imgLoad);
 </script>
 
 {#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img

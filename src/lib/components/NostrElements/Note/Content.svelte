@@ -10,7 +10,7 @@
   import ContentImage from "./content/ContentImage.svelte";
   import CustomEmoji from "./content/CustomEmoji.svelte";
   import ClientTag from "./ClientTag.svelte";
-  import Geohash from "./Geohash.svelte";
+  import Geohash from "./geohash/Geohash.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
   export let text: string;

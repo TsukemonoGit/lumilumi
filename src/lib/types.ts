@@ -187,3 +187,8 @@ export interface UserMuteStatus {
   reaction: boolean;
   zap: boolean;
 }
+
+export interface DecodedGeohash {
+  latitude: number;
+  longitude: number;
+}

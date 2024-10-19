@@ -56,6 +56,7 @@
   }
 
   const handleClickSave = async () => {
+    console.log($newRelays);
     if (arraysEqual($newRelays, relays)) {
       return;
     }
