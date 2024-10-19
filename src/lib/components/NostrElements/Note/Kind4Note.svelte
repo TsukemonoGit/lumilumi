@@ -4,7 +4,7 @@
 
   import { _ } from "svelte-i18n";
   import { loginUser } from "$lib/stores/stores";
-  import { nip04 } from "nostr-tools";
+
   import Content from "./Content.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
@@ -23,7 +23,7 @@
   export let warning: string[] | undefined;
   export let replyUsers: string[];
   export let thread: boolean;
-  export let proxy: string[] | undefined;
+
   export let replyID: string | undefined;
   let decrypt: string | undefined = undefined;
 
@@ -99,10 +99,4 @@
       <WarningHide2 text={warning[1]} />
     {/if}
   </div>
-
-  {#if proxy}
-    <div class="text-end">
-      <ProxyTag proxyTag={proxy} />
-    </div>
-  {/if}
 </NoteTemplate>

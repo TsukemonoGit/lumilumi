@@ -8,7 +8,6 @@
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
   export let displayMenu: boolean;
   export let note: Nostr.Event;
-  export let proxy: string[] | undefined = undefined;
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
@@ -55,10 +54,5 @@
         {tieKey}
       />
     </div>
-    {#if proxy}
-      <div class="text-end">
-        <ProxyTag proxyTag={proxy} />
-      </div>
-    {/if}
   </div>
 </div>

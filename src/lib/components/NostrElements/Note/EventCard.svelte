@@ -179,10 +179,6 @@
     return tags.find((item) => item[0] === "content-warning");
   };
 
-  const checkProxy = (tags: string[][]): string[] | undefined => {
-    return tags.find((item) => item[0] === "proxy");
-  };
-
   // const findClientTag = (
   //   note: Nostr.Event
   // ):
@@ -257,7 +253,7 @@
   //     return item.replace(bech32Pattern, clientData.naddr ?? "");
   //   });
   // };
-  $: proxy = checkProxy(note.tags); // string[] | undefined
+
   $: warning = checkContentWarning(note.tags); // string[] | undefined
 
   // const { kind, tag } = repostedId(note.tags);
@@ -355,12 +351,6 @@
               {repostable}
               {tieKey}
             />
-
-            {#if proxy}
-              <div class="inline float-end">
-                <ProxyTag proxyTag={proxy} />
-              </div>
-            {/if}
           </div>
           {#if warning}
             <!-- <WarningHide1 text={tag[1]} /> -->
@@ -413,11 +403,6 @@
             >
           {/if}
         </div>
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
 
         <div class="ml-auto mr-2">
           {#if displayMenu}
@@ -465,11 +450,7 @@
             >
           {/if}
         </div>
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
+
         <div class="ml-auto">
           {#if displayMenu}
             <NoteActionButtons {note} {repostable} {tieKey} />{/if}
@@ -499,17 +480,10 @@
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-      <ReactionWebsite
-        {note}
-        {metadata}
-        {displayMenu}
-        {depth}
-        {proxy}
-        {tieKey}
-      />
+      <ReactionWebsite {note} {metadata} {displayMenu} {depth} {tieKey} />
     {:else if note.kind === 0}
       <!--kind0-->
-      <Kind0Note {note} {proxy} {displayMenu} {depth} {repostable} {tieKey} />
+      <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
     {:else if note.kind === 40}
       <!--kind40 パブ茶部屋-->
       <LatestEvent
@@ -587,7 +561,6 @@
         {warning}
         {replyUsers}
         {thread}
-        {proxy}
         {replyID}
       />
     {:else if note.kind === 31990}
