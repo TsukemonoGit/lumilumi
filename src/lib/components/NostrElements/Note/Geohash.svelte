@@ -11,6 +11,7 @@
   $: mapLink = `https://www.google.com/maps?q=${decoded.latitude},${decoded.longitude}`;
 </script>
 
-<Link className=" text-magnum-400 flex mx-1 hover:opacity-75" href={mapLink}
-  ><MapPinned size={20} /><ExternalLink size={12} /></Link
+<Link
+  className="inline-flex float-end text-magnum-500/75  mx-1 hover:opacity-75"
+  href={mapLink}><MapPinned size={20} /><!--<ExternalLink size={12} />--></Link
 >

@@ -261,8 +261,6 @@
   $: proxy = checkProxy(note.tags); // string[] | undefined
   $: warning = checkContentWarning(note.tags); // string[] | undefined
 
-  $: geohash = note.tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]; // string | undefined
-
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
   let replyUsers: string[];
@@ -358,11 +356,7 @@
               {repostable}
               {tieKey}
             />
-            {#if geohash}
-              <div class="inline float-end">
-                <Geohash {geohash} />
-              </div>
-            {/if}
+
             {#if proxy}
               <div class="inline float-end">
                 <ProxyTag proxyTag={proxy} />
