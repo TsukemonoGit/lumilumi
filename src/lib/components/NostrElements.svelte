@@ -129,7 +129,7 @@
   let:status
 >
   <div slot="loading">
-    {#await awaitInterval(5000) then}
+    {#await awaitInterval(3000) then}
       <MakeNewKind3 />{/await}
   </div>
   <div slot="error"><MakeNewKind3 /></div>
@@ -146,7 +146,10 @@
       let:len
     >
       <!-- <SetRepoReactions /> -->
-      <div slot="loading">event loading <SampleGlobalLink /></div>
+      <div slot="loading">
+        {#await awaitInterval(3000) then}event loading <SampleGlobalLink
+          />{/await}
+      </div>
 
       <div slot="error" let:error>error</div>
 
