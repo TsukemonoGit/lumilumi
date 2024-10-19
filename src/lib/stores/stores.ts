@@ -36,7 +36,7 @@ const config: QueryClientConfig = {
 export const metadataQueue = writable<[QueryKey, EventPacket][]>([]);
 export const queryClient = writable(new QueryClient(config));
 
-export const app = writable<{ rxNostr: RxNostr }>();
+export const app = writable<{ rxNostr: RxNostr; rxNostr3: RxNostr }>();
 
 export const toastSettings = writable<{
   title: string;
@@ -109,6 +109,10 @@ export const showUserStatus = writable<boolean>();
 export const relayStateMap = writable<Map<string, ConnectionState>>(
   new Map<string, ConnectionState>()
 );
+export const relayStateMap3 = writable<Map<string, ConnectionState>>(
+  new Map<string, ConnectionState>()
+);
+
 export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);

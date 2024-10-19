@@ -1,4 +1,10 @@
-import { app, defaultRelays, queryClient, verifier } from "$lib/stores/stores";
+import {
+  app,
+  defaultRelays,
+  queryClient,
+  relayStateMap3,
+  verifier,
+} from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import {
   createQuery,
@@ -23,12 +29,17 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 // }); //reaction repost用
 const req3 = createRxForwardReq();
 export function setRxNostr3() {
-  if (get(app)?.rxNostr) {
+  if (get(app)?.rxNostr3) {
     return;
   }
   const rxNostr3 = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   app.update((be) => {
     return { ...be, rxNostr3: rxNostr3 };
+  });
+
+  rxNostr3.createConnectionStateObservable().subscribe((packet) => {
+    //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
+    relayStateMap3.update((value) => value.set(packet.from, packet.state));
   });
 }
 export function set3Relays(relays: any) {
@@ -62,6 +73,7 @@ export function rxNostr3Status() {
 export function rxNostr3ReccoctRelay(url: string) {
   get(app).rxNostr3.reconnect(url);
 }
+
 export function changeEmit(filters: Nostr.Filter[]) {
   //  console.log(filters);
   req3.emit(filters);
@@ -98,7 +110,7 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
         obs.subscribe({
           next: (v: EventPacket) => {
             if (fulfilled) {
-              handleEvent(v, _queryClient);
+              handleEvent(v);
             } else {
               resolve(v);
               fulfilled = true;
@@ -141,16 +153,16 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
   };
 }
 
-function handleEvent(v: EventPacket, _queryClient: QueryClient) {
+function handleEvent(v: EventPacket) {
   const etag = v.event.tags.findLast(
     (item) => item[0] === "e" || item[0] === "a"
   );
 
   if (v.event.kind === 7 && etag) {
-    _queryClient.setQueryData(["reactions", "reaction", etag[1]], v);
+    get(queryClient).setQueryData(["reactions", "reaction", etag[1]], v);
   } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-    _queryClient.setQueryData(["reactions", "repost", etag[1]], v);
+    get(queryClient).setQueryData(["reactions", "repost", etag[1]], v);
   } else if (v.event.kind === 9735 && etag) {
-    _queryClient.setQueryData(["reactions", "zapped", etag[1]], v);
+    get(queryClient).setQueryData(["reactions", "zapped", etag[1]], v);
   }
 }

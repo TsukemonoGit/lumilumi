@@ -10,9 +10,9 @@
 
   export let id: string;
   let _result: { data: EventPacket; status: any; error: any };
-  const queryKey: QueryKey = ["reactions", "reaction", id];
+
   const observer1 = new QueryObserver($queryClient, {
-    queryKey: queryKey,
+    queryKey: ["reactions", "reaction", id],
   });
 
   // let unsubscribe: () => void;
@@ -52,10 +52,14 @@
   }
 </script>
 
-{#if error}
-  <slot name="error" {error} />
-{:else if data}
+<div class="break-all">status:{status}</div>
+<div class="break-all">data:{JSON.stringify(data?.event?.content ?? "")}</div>
+<div class="break-all">error:{error}</div>
+
+{#if data?.event}
   <slot event={data?.event} {status} />
+{:else if error}
+  <slot name="error" {error} />
 {:else if status === "loading"}
   <slot name="loading" />
 {:else}

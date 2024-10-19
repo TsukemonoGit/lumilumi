@@ -46,10 +46,10 @@
   }
 </script>
 
-{#if error}
+{#if data?.event}
+  <slot event={data?.event} {status} />
+{:else if error}
   <slot name="error" {error} />
-{:else if data}
-  <slot event={data.event} {status} />
 {:else if status === "loading"}
   <slot name="loading" />
 {:else}
