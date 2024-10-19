@@ -52,6 +52,7 @@
   }
 </script>
 
+{observer1?.hasListeners()}
 <div class="break-all">status:{status}</div>
 <div class="break-all">data:{JSON.stringify(data?.event?.content ?? "")}</div>
 <div class="break-all">error:{error}</div>
