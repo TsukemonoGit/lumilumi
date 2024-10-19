@@ -23,7 +23,7 @@
     class="inline-flex float-end text-magnum-500/75 mx-1 hover:opacity-75"
     on:click={handleClickAddress}
   >
-    <MapPin />
+    <MapPin size={20} />
   </button>
 {:else}
   <Link
