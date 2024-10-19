@@ -4,9 +4,9 @@
   import type Nostr from "nostr-typedef";
 
   import { queryClient } from "$lib/stores/stores";
-  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
+  import { QueryObserver } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
 
   export let id: string;
   let _result: { data: EventPacket; status: any; error: any };
@@ -52,10 +52,10 @@
   }
 </script>
 
-{observer1?.hasListeners()}
+<!-- {observer1?.hasListeners()}
 <div class="break-all">status:{status}</div>
 <div class="break-all">data:{JSON.stringify(data?.event?.content ?? "")}</div>
-<div class="break-all">error:{error}</div>
+<div class="break-all">error:{error}</div> -->
 
 {#if data?.event}
   <slot event={data?.event} {status} />

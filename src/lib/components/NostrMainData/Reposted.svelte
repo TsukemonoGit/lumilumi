@@ -28,6 +28,7 @@
 
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
+    //console.log("destroy");
     unsubscribe();
     // $queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });//まだこのIDがTLにいるかもしれないからけさない
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
