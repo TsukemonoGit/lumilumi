@@ -10,6 +10,8 @@
   import ContentImage from "./content/ContentImage.svelte";
   import CustomEmoji from "./content/CustomEmoji.svelte";
   import ClientTag from "./ClientTag.svelte";
+  import Geohash from "./Geohash.svelte";
+  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
   export let text: string;
   export let tags: string[][];
@@ -70,6 +72,8 @@
       return undefined;
     }
   };
+  $: geohash = tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]; // string | undefined
+  $: proxy = tags.find((item) => item[0] === "proxy"); // string[] | undefined
 </script>
 
 <!-- <MediaDisplay
@@ -156,3 +160,8 @@
       style="word-break: break-word;">{part.content}</span
     >{/if}{/each}
 <ClientTag {tags} {isShowClientTag} />
+{#if geohash}
+  <Geohash {geohash} />{/if}
+{#if proxy}
+  <ProxyTag proxyTag={proxy} />
+{/if}

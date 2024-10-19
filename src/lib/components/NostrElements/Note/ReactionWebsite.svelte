@@ -4,7 +4,7 @@
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { profile } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
+
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
   import { showImg } from "$lib/stores/stores";
@@ -15,7 +15,7 @@
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean;
   export let depth: number;
-  export let proxy: string[] | undefined;
+
   export let tieKey: string | undefined;
 
   $: website = reactionWebsite(note);
@@ -52,11 +52,7 @@
       >
     {/if}
   </div>
-  {#if proxy}
-    <div class="text-end">
-      <ProxyTag proxyTag={proxy} />
-    </div>
-  {/if}
+
   <div class="ml-auto">
     {#if displayMenu}
       <NoteActionButtons {note} repostable={false} {tieKey} />{/if}

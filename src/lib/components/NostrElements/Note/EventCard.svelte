@@ -102,10 +102,6 @@
     }
   }
 
-  // $: replaceable =
-  //   (note.kind >= 30000 && note.kind < 40000) ||
-  //   (note.kind >= 10000 && note.kind < 20000);
-  //muteの値が変わったら更新する
   let muteType: MuteCheck;
   $: if ($mutes || $mutebykinds) {
     muteType =
@@ -183,10 +179,6 @@
     return tags.find((item) => item[0] === "content-warning");
   };
 
-  const checkProxy = (tags: string[][]): string[] | undefined => {
-    return tags.find((item) => item[0] === "proxy");
-  };
-
   // const findClientTag = (
   //   note: Nostr.Event
   // ):
@@ -261,8 +253,8 @@
   //     return item.replace(bech32Pattern, clientData.naddr ?? "");
   //   });
   // };
-  $: proxy = checkProxy(note.tags);
-  $: warning = checkContentWarning(note.tags);
+
+  $: warning = checkContentWarning(note.tags); // string[] | undefined
 
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
@@ -366,12 +358,6 @@
           {/if}
         </div>
 
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
-
         {#if displayMenu}
           <NoteActionButtons {note} {repostable} {tieKey} />{/if}
       </NoteTemplate>
@@ -417,11 +403,6 @@
             >
           {/if}
         </div>
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
 
         <div class="ml-auto mr-2">
           {#if displayMenu}
@@ -469,11 +450,7 @@
             >
           {/if}
         </div>
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
+
         <div class="ml-auto">
           {#if displayMenu}
             <NoteActionButtons {note} {repostable} {tieKey} />{/if}
@@ -503,17 +480,10 @@
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-      <ReactionWebsite
-        {note}
-        {metadata}
-        {displayMenu}
-        {depth}
-        {proxy}
-        {tieKey}
-      />
+      <ReactionWebsite {note} {metadata} {displayMenu} {depth} {tieKey} />
     {:else if note.kind === 0}
       <!--kind0-->
-      <Kind0Note {note} {proxy} {displayMenu} {depth} {repostable} {tieKey} />
+      <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
     {:else if note.kind === 40}
       <!--kind40 パブ茶部屋-->
       <LatestEvent
@@ -591,7 +561,6 @@
         {warning}
         {replyUsers}
         {thread}
-        {proxy}
         {replyID}
       />
     {:else if note.kind === 31990}
