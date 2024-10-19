@@ -53,7 +53,6 @@
   import UserName from "./UserName.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import Kind4Note from "./Kind4Note.svelte";
-  import Geohash from "./Geohash.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
