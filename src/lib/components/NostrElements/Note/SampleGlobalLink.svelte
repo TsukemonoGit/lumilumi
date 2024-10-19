@@ -3,7 +3,7 @@
 </script>
 
 <div>
-  sample global timeline link:
+  <div class="font-bold mt-2">sample global timeline link:</div>
   <ul>
     <li>
       <a

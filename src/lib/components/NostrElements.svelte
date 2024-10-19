@@ -129,7 +129,7 @@
   let:status
 >
   <div slot="loading">
-    {#await awaitInterval(2000) then}
+    {#await awaitInterval(5000) then}
       <MakeNewKind3 />{/await}
   </div>
   <div slot="error"><MakeNewKind3 /></div>
