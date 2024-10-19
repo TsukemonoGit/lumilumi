@@ -134,8 +134,9 @@
   },
   "create_kind3": {
     "create": "Create new Follow List",
-    "newMessage": "If a follow list already exists, it will be reset. Is it okay to create a new one?\nThe page will reload after creation.",
-    "message": "The follow list could not be found. Please click the button below to create a new follow list."
+    "newMessage": "If a follow list already exists, it will be reset. Is it okay to create a new one?",
+    "message": "The follow list could not be found. Please click the button below to create a new follow list.",
+    "reload": "The page will reload after creation."
   },
   "relay": {
     "description": {

@@ -6,6 +6,7 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { promisePublishSignedEvent } from "$lib/func/nostr";
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
+  import SampleGlobalLink from "./SampleGlobalLink.svelte";
 
   const handleClickCreateKind3 = () => {
     //つくっていいかがめんだしておｋでかきこむ
@@ -54,6 +55,8 @@
 {#if $loginUser}
   <div class="break-all whitespace-pre-wrap">
     {$_("create_kind3.message")}
+
+    <SampleGlobalLink />
   </div>
   <button
     on:click={handleClickCreateKind3}
@@ -66,5 +69,6 @@
   title={$_("create_kind3.create")}
   ><div slot="main" class=" text-neutral-200 whitespace-pre-wrap">
     {$_("create_kind3.newMessage")}
+    {$_("create_kind3.reload")}
   </div></AlertDialog
 >

@@ -3,6 +3,7 @@
     pubkeysIn,
     promisePublishEvent,
     usePromiseReq,
+    promisePublishSignedEvent,
   } from "$lib/func/nostr";
   import {
     followList,
@@ -11,7 +12,11 @@
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { type EventPacket } from "rx-nostr";
+  import {
+    nip07Signer,
+    type EventPacket,
+    type OkPacketAgainstEvent,
+  } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
   import { writable } from "svelte/store";
@@ -59,6 +64,8 @@
     $toastSettings = { title, description, color };
   };
 
+  let dialogCreateKind3Open: any;
+
   // Handle follow/unfollow logic
   const handleFollow = async () => {
     if (!(await validateLoginPubkey())) return;
@@ -66,7 +73,11 @@
     const followState = $followList.has(pubkey);
     let kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey);
-    if (!kind3Event) return;
+    if (!kind3Event) {
+      //新しいKind3作っていいですかを出す
+      $dialogCreateKind3Open = true;
+      return;
+    }
 
     await refreshContactsData(kind3Event);
     isfollowee = $followList.has(pubkey);
@@ -225,6 +236,45 @@
     publishEvent();
     $openPetnameDialog = false;
   };
+
+  const onClickOK = async () => {
+    console.log("onClickOK");
+    $dialogCreateKind3Open = false;
+    $nowProgress = true;
+    const ev: Nostr.EventParameters = {
+      kind: 3,
+      content: "",
+      tags: [
+        ["p", $loginUser],
+        ["p", pubkey],
+      ],
+    };
+    const signer = nip07Signer();
+    const event = await signer.signEvent(ev);
+    if (event.pubkey !== $loginUser) {
+      $toastSettings = {
+        title: "Error",
+        description: "login pubkey ≠ sign pubkey",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
+      return;
+    } else {
+      const { event: ev, res } = await promisePublishSignedEvent(event);
+      const isSuccessRelays: OkPacketAgainstEvent[] = res.filter(
+        (item) => item.ok
+      );
+
+      if (isSuccessRelays.length <= 0) {
+        $toastSettings = {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        };
+      }
+    }
+    $nowProgress = false;
+  };
 </script>
 
 {#if isfollowee !== undefined}
@@ -346,3 +396,12 @@
     {/if}
   </div>
 </AlertDialog>
+
+<AlertDialog
+  bind:open={dialogCreateKind3Open}
+  {onClickOK}
+  title={$_("create_kind3.create")}
+  ><div slot="main" class=" text-neutral-200 whitespace-pre-wrap">
+    {$_("create_kind3.newMessage")}
+  </div></AlertDialog
+>

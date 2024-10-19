@@ -6,7 +6,7 @@
   import { pubkeysIn } from "$lib/func/nostr";
 
   import TimelineList from "./NostrMainData/TimelineList.svelte";
-  import { pipe } from "rxjs";
+
   import {
     followList,
     loginUser,
@@ -25,6 +25,7 @@
   import { _ } from "svelte-i18n";
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
+  import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -128,7 +129,7 @@
   let:status
 >
   <div slot="loading">
-    {#await awaitInterval(5000) then}
+    {#await awaitInterval(2000) then}
       <MakeNewKind3 />{/await}
   </div>
   <div slot="error"><MakeNewKind3 /></div>
@@ -145,7 +146,7 @@
       let:len
     >
       <!-- <SetRepoReactions /> -->
-      <div slot="loading">loading</div>
+      <div slot="loading">event loading <SampleGlobalLink /></div>
 
       <div slot="error" let:error>error</div>
 
