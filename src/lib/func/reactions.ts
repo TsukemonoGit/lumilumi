@@ -1,10 +1,4 @@
-import {
-  app,
-  defaultRelays,
-  queryClient,
-  relayStateMap3,
-  verifier,
-} from "$lib/stores/stores";
+import { app, defaultRelays, queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import {
   createQuery,
@@ -37,10 +31,10 @@ export function setRxNostr3() {
     return { ...be, rxNostr3: rxNostr3 };
   });
 
-  rxNostr3.createConnectionStateObservable().subscribe((packet) => {
-    //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-    relayStateMap3.update((value) => value.set(packet.from, packet.state));
-  });
+  // rxNostr3.createConnectionStateObservable().subscribe((packet) => {
+  //   //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
+  //   relayStateMap3.update((value) => value.set(packet.from, packet.state));
+  // });
 }
 export function set3Relays(relays: any) {
   if (!get(app).rxNostr3) {

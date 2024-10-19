@@ -109,9 +109,9 @@ export const showUserStatus = writable<boolean>();
 export const relayStateMap = writable<Map<string, ConnectionState>>(
   new Map<string, ConnectionState>()
 );
-export const relayStateMap3 = writable<Map<string, ConnectionState>>(
-  new Map<string, ConnectionState>()
-);
+// export const relayStateMap3 = writable<Map<string, ConnectionState>>(
+//   new Map<string, ConnectionState>()
+// );
 
 export const verifier = writable<EventVerifier>();
 

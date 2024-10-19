@@ -1,20 +1,11 @@
 <script lang="ts">
-  import {
-    defaultRelays,
-    relayStateMap,
-    relayStateMap3,
-  } from "$lib/stores/stores";
+  import { defaultRelays, relayStateMap } from "$lib/stores/stores";
   import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import RelayStatusColor from "./RelayStatusColor.svelte";
-  import {
-    rxNostr3ReccoctRelay,
-    rxNostr3RelaysReconnectChallenge,
-    rxNostr3Status,
-  } from "$lib/func/reactions";
-  import RelayStatusColor3 from "./RelayStatusColor3.svelte";
+  import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
 
   //ConnectionState
   // | "initialized"
@@ -141,7 +132,7 @@
                 ><RefreshCcw class="text-magnum-700 " size={16} /></button
               >{/if}
           </li>
-          <li class="flex align-middle items-center break-all">
+          <!-- <li class="flex align-middle items-center break-all">
             <RelayStatusColor3 relay={relay.url} /><span class="inline w-60"
               >{relayUrl}</span
             >
@@ -151,7 +142,7 @@
                 disabled={relayUrl === disabledButton}
                 ><RefreshCcw class="text-magnum-700 " size={16} /></button
               >{/if}
-          </li>
+          </li> -->
         {/each}
       </ul>
       <div class="text-magnum-200 font-bold text-lg">write</div>
