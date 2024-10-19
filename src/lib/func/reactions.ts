@@ -75,7 +75,7 @@ export function rxNostr3ReccoctRelay(url: string) {
 }
 
 export function changeEmit(filters: Nostr.Filter[]) {
-  //  console.log(filters);
+  console.log(filters);
   req3.emit(filters);
 }
 
