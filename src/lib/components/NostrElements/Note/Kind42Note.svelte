@@ -47,10 +47,6 @@
     return tags.find((item) => item[0] === "content-warning");
   };
 
-  const checkProxy = (tags: string[][]): string[] | undefined => {
-    return tags.find((item) => item[0] === "proxy");
-  };
-
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
       return JSON.parse(text.content) as ChannelData;

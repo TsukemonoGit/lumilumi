@@ -344,11 +344,10 @@
 
   const handlePrev = () => {
     if (viewIndex > 0) {
-      if (window.scrollY < 120) {
-        scroll({
-          top: 120,
-        });
-      }
+      scroll({
+        top: window.scrollY + 120,
+      });
+
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
         updateViewEvent($data);

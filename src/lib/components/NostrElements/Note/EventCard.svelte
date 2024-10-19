@@ -528,6 +528,29 @@
           {tieKey}
         />
       </LatestEvent>
+    {:else if note.kind === 41}
+      <!--kind:40チャンネルroot-->
+      {@const root = note.tags.find((tag) => tag[0] === "e")?.[1]}
+      <!--kind40 パブ茶部屋-->
+      {#if root}
+        <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(root)}`}
+          handleClickToChannel={() => handleClickToChannel(root)}
+          id={root}
+          event={note}
+          {tieKey}
+        />
+      {:else}
+        <OtherKindNote
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+        />
+      {/if}
     {:else if note.kind === 30000}
       <ListLinkCard event={note} {depth} {tieKey} />
     {:else if note.kind === 30030}
