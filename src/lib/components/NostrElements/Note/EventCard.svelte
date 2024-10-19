@@ -53,6 +53,7 @@
   import UserName from "./UserName.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import Kind4Note from "./Kind4Note.svelte";
+  import Geohash from "./Geohash.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -102,10 +103,6 @@
     }
   }
 
-  // $: replaceable =
-  //   (note.kind >= 30000 && note.kind < 40000) ||
-  //   (note.kind >= 10000 && note.kind < 20000);
-  //muteの値が変わったら更新する
   let muteType: MuteCheck;
   $: if ($mutes || $mutebykinds) {
     muteType =
@@ -261,8 +258,10 @@
   //     return item.replace(bech32Pattern, clientData.naddr ?? "");
   //   });
   // };
-  $: proxy = checkProxy(note.tags);
-  $: warning = checkContentWarning(note.tags);
+  $: proxy = checkProxy(note.tags); // string[] | undefined
+  $: warning = checkContentWarning(note.tags); // string[] | undefined
+
+  $: geohash = note.tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]; // string | undefined
 
   // const { kind, tag } = repostedId(note.tags);
   let replyID: string | undefined;
@@ -359,18 +358,22 @@
               {repostable}
               {tieKey}
             />
+            {#if geohash}
+              <div class="inline float-end">
+                <Geohash {geohash} />
+              </div>
+            {/if}
+            {#if proxy}
+              <div class="inline float-end">
+                <ProxyTag proxyTag={proxy} />
+              </div>
+            {/if}
           </div>
           {#if warning}
             <!-- <WarningHide1 text={tag[1]} /> -->
             <WarningHide2 text={warning[1]} />
           {/if}
         </div>
-
-        {#if proxy}
-          <div class="text-end">
-            <ProxyTag proxyTag={proxy} />
-          </div>
-        {/if}
 
         {#if displayMenu}
           <NoteActionButtons {note} {repostable} {tieKey} />{/if}

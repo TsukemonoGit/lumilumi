@@ -124,3 +124,32 @@ export const getProfile = (
     return undefined;
   }
 };
+
+export function decodeGeohash(geohash: string) {
+  const base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+  let even = true;
+  let lat = [-90.0, 90.0];
+  let lon = [-180.0, 180.0];
+
+  // 範囲の更新処理を共通化
+  const updateRange = (range: number[], bit: number) => {
+    const mid = (range[0] + range[1]) / 2;
+    bit ? (range[0] = mid) : (range[1] = mid);
+  };
+
+  for (const char of geohash) {
+    const bits = base32.indexOf(char);
+
+    for (let i = 4; i >= 0; i--) {
+      const bit = (bits >> i) & 1;
+      even ? updateRange(lon, bit) : updateRange(lat, bit);
+      even = !even;
+    }
+  }
+
+  // 緯度と経度の中央値を計算して返す
+  return {
+    latitude: (lat[0] + lat[1]) / 2,
+    longitude: (lon[0] + lon[1]) / 2,
+  };
+}
