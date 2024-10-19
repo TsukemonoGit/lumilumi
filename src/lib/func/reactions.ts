@@ -17,44 +17,50 @@ import * as Nostr from "nostr-typedef";
 import { zapCheck } from "$lib/stores/operators";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
-let rxNostr3: RxNostr;
-
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
 //   connectionStrategy: "aggressive",
 // }); //reaction repost用
 const req3 = createRxForwardReq();
-
+export function setRxNostr3() {
+  if (get(app)?.rxNostr) {
+    return;
+  }
+  const rxNostr3 = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  app.update((be) => {
+    return { ...be, rxNostr3: rxNostr3 };
+  });
+}
 export function set3Relays(relays: any) {
-  if (!rxNostr3) {
-    rxNostr3 = createRxNostr({
+  if (!get(app).rxNostr3) {
+    get(app).rxNostr3 = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
       connectionStrategy: "aggressive",
     }); //reaction repost用
   }
-  rxNostr3.setDefaultRelays(relays);
+  get(app).rxNostr3.setDefaultRelays(relays);
 }
 
 export function rxNostr3RelaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-  if (Object.entries(rxNostr3.getDefaultRelays()).length <= 0) {
-    rxNostr3.setDefaultRelays(get(defaultRelays));
+  if (Object.entries(get(app).rxNostr3.getDefaultRelays()).length <= 0) {
+    get(app).rxNostr3.setDefaultRelays(get(defaultRelays));
   } else {
     Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
       if (value.read) {
-        rxNostr3.reconnect(key);
+        get(app).rxNostr3.reconnect(key);
       }
     });
   }
 }
 
 export function rxNostr3Status() {
-  console.log(rxNostr3.getAllRelayStatus());
+  console.log(get(app).rxNostr3.getAllRelayStatus());
 }
 export function rxNostr3ReccoctRelay(url: string) {
-  rxNostr3.reconnect(url);
+  get(app).rxNostr3.reconnect(url);
 }
 export function changeEmit(filters: Nostr.Filter[]) {
   //  console.log(filters);
@@ -77,8 +83,8 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = rxNostr3
-    .use(req3)
+  const obs: Observable<EventPacket> = get(app)
+    .rxNostr3.use(req3)
     .pipe(operator, zapCheck());
 
   const query = createQuery({

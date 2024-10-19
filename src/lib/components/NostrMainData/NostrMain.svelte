@@ -40,6 +40,7 @@
     initLumiMute,
     initLumiMuteByKind,
   } from "$lib/func/util";
+  import { setRxNostr3 } from "$lib/func/reactions";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -80,6 +81,9 @@
   function initializeRxNostr() {
     if (!$app?.rxNostr) {
       setRxNostr();
+    }
+    if (!$app?.rxNostr3) {
+      setRxNostr3();
     }
   }
 

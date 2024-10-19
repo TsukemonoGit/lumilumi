@@ -39,7 +39,10 @@
   import type { Part } from "$lib/func/content";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
-  import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
+  import {
+    rxNostr3RelaysReconnectChallenge,
+    setRxNostr3,
+  } from "$lib/func/reactions";
   //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
 
   //import SvelteQueryDevtools
@@ -105,6 +108,9 @@
       $uploader = tmp ?? mediaUploader[0];
       if (!$app?.rxNostr) {
         setRxNostr();
+      }
+      if (!$app?.rxNostr3) {
+        setRxNostr3();
       }
       nlBanner = document.getElementsByTagName(
         "nl-banner"
