@@ -4,6 +4,8 @@
     promisePublishEvent,
     usePromiseReq,
     promisePublishSignedEvent,
+    makeMainFilters,
+    changeMainEmit,
   } from "$lib/func/nostr";
   import {
     followList,
@@ -16,6 +18,7 @@
     nip07Signer,
     type EventPacket,
     type OkPacketAgainstEvent,
+    now,
   } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
@@ -166,6 +169,8 @@
     if (isSuccess.length > 0) {
       $queryClient.refetchQueries({ queryKey: contactsQueryKey });
       pubkeysIn(ev);
+      const filters = makeMainFilters(ev, now());
+      changeMainEmit(filters);
     }
 
     isfollowee = $followList.has(pubkey);

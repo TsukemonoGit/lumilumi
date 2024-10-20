@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
 
-  import { pubkeysIn } from "$lib/func/nostr";
+  import { changeMainEmit, makeMainFilters, pubkeysIn } from "$lib/func/nostr";
 
   import TimelineList from "./NostrMainData/TimelineList.svelte";
 
@@ -27,6 +27,7 @@
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
   import MainTimeline from "./NostrMainData/MainTimeline.svelte";
+  import { changeEmit } from "$lib/func/reactions";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -73,43 +74,6 @@
     }
   }
 
-  const makeFilters = (contacts: Nostr.Event<number>): Nostr.Filter[] => {
-    //console.log(contacts);
-    const pubkeyList = pubkeysIn(contacts, $loginUser);
-    const kinds = [1, 6];
-    if ($showKind16) {
-      kinds.push(16);
-    }
-    const filters: Nostr.Filter[] = [
-      {
-        authors: Array.from(pubkeyList.keys()),
-        kinds: kinds,
-        since: since,
-      },
-    ];
-
-    if ($showReactioninTL) {
-      filters.push({
-        kinds: [
-          42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
-          /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/, 1059,
-          9735 /*zap receipt**/,
-        ],
-        "#p": [$loginUser],
-        since: since,
-      });
-    } //とりあえず通知をTLに流したくないときは フィルターから外してみる
-
-    if ($showUserStatus) {
-      filters.push({
-        kinds: [30315],
-        authors: Array.from(pubkeyList.keys()),
-      });
-    }
-    console.log(filters);
-    return filters;
-  };
-
   export const getFollowFilteredEvents = (
     events: Nostr.Event[],
     onlyFollowee: boolean
@@ -144,7 +108,7 @@
   {#if since}
     <MainTimeline
       queryKey={timelineQuery}
-      filters={makeFilters(contacts)}
+      filters={makeMainFilters(contacts, since)}
       {tieKey}
       let:events
       {viewIndex}

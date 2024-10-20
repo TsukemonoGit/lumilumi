@@ -67,15 +67,7 @@
   //     isNew: boolean;
   //   }
   // >;
-  $: if (filters) {
-    console.log(req);
-    if (relays) {
-      req?.emit(filters, { relays: relays });
-      console.log(filters);
-    } else {
-      req?.emit(filters);
-    }
-  }
+
   export let tieKey: string;
 
   createQuery({

@@ -11,7 +11,7 @@
     slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
-  import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
+
   import type { ReqStatus } from "$lib/types";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
@@ -21,24 +21,11 @@
     loadOlderEvents,
     waitForConnections,
   } from "./timelineList";
-  import {
-    createTie,
-    now,
-    type EventPacket,
-    type RxReq,
-    type RxReqEmittable,
-    type RxReqOverable,
-    type RxReqPipeable,
-  } from "rx-nostr";
+  import { createTie, now, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
-  import {
-    userStatus,
-    reactionCheck,
-    scanArray,
-    muteCheck,
-  } from "$lib/stores/operators";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
   import { changeMainEmit } from "$lib/func/nostr";
@@ -53,10 +40,6 @@
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-
-  $: if (filters) {
-    changeMainEmit(filters);
-  }
 
   export let tieKey: string;
 

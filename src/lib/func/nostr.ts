@@ -2,9 +2,13 @@ import {
   app,
   defaultRelays,
   followList,
+  loginUser,
   metadataQueue,
   queryClient,
   relayStateMap,
+  showKind16,
+  showReactioninTL,
+  showUserStatus,
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
@@ -209,10 +213,50 @@ export function generateRandomId(length: number = 6): string {
 const req = createRxForwardReq();
 
 export function changeMainEmit(filters: Nostr.Filter[]) {
-  console.log(filters);
+  console.log("changeMainEmit", filters);
+
   req.emit(filters);
 }
+export const makeMainFilters = (
+  contacts: Nostr.Event<number>,
+  since: number
+): Nostr.Filter[] => {
+  //console.log(contacts);
+  const pubkeyList = pubkeysIn(contacts, get(loginUser));
+  const kinds = [1, 6];
+  if (get(showKind16)) {
+    kinds.push(16);
+  }
+  const filters: Nostr.Filter[] = [
+    {
+      authors: Array.from(pubkeyList.keys()),
+      kinds: kinds,
+      since: since,
+    },
+  ];
 
+  if (get(showReactioninTL)) {
+    filters.push({
+      kinds: [
+        42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
+        /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/, 1059,
+        9735 /*zap receipt**/,
+      ],
+      "#p": [get(loginUser)],
+      since: since,
+    });
+  } //とりあえず通知をTLに流したくないときは フィルターから外してみる
+
+  if (get(showUserStatus)) {
+    filters.push({
+      kinds: [30315],
+      authors: Array.from(pubkeyList.keys()),
+    });
+  }
+  // console.log(filters);
+
+  return filters;
+};
 //これメインTL用のreqで一つだけのforwardreqのやつ
 //rxNostr3ようのやつは別であるけど
 //changeMainEmitでフィルターを更新する
