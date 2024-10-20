@@ -9,8 +9,8 @@ import type {
 import { uniq } from "rx-nostr";
 import { pipe } from "rxjs";
 
-import { useReq } from "$lib/func/nostr.js";
 import type { ReqResult } from "$lib/types.js";
+import { useReq } from "$lib/func/useReq";
 
 export function useEventSave(
   queryKey: QueryKey,

@@ -13,9 +13,10 @@ import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
 import { derived, get } from "svelte/store";
-import { setRelays, useReq } from "$lib/func/nostr";
+import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
 import { app } from "./stores";
+import { useReq } from "$lib/func/useReq";
 
 //今設定されてるdefaultRelayConfigのreadだけ30002で上書きする
 export function useGlobalRelaySet(

@@ -41,41 +41,23 @@
   } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
+  import { changeMainEmit } from "$lib/func/nostr";
+  import { useMainTimeline } from "$lib/stores/useMainTimeline";
 
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
-  // export let lastfavcheck: boolean = true;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
+
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  // export let tie: OperatorFunction<
-  //   EventPacket,
-  //   EventPacket & {
-  //     seenOn: Set<string>;
-  //     isNew: boolean;
-  //   }
-  // >;
+
   $: if (filters) {
-    console.log(req);
-    if (relays) {
-      req?.emit(filters, { relays: relays });
-      console.log(filters);
-    } else {
-      req?.emit(filters);
-    }
+    changeMainEmit(filters);
   }
+
   export let tieKey: string;
 
   createQuery({
@@ -124,7 +106,7 @@
     //最後に配列にする
     return pipe(operator, scanArray());
   }
-  $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
+  $: result = useMainTimeline(queryKey, operator, filters);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

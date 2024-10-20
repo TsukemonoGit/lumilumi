@@ -26,6 +26,7 @@
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
+  import MainTimeline from "./NostrMainData/MainTimeline.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -62,7 +63,13 @@
     if (!ev || ev.length <= 0) {
       since = now() - 15 * 60; //15分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する
     } else {
-      since = ev[0].event.created_at;
+      const data: EventPacket[] | undefined =
+        $queryClient?.getQueryData(timelineQuery);
+      if (data && data.length <= 0) {
+        since = data[0].event.created_at;
+      } else {
+        since = ev[0].event.created_at;
+      }
     }
   }
 
@@ -135,10 +142,9 @@
   <div slot="error"><MakeNewKind3 /></div>
   <div slot="nodata"><MakeNewKind3 /></div>
   {#if since}
-    <TimelineList
+    <MainTimeline
       queryKey={timelineQuery}
       filters={makeFilters(contacts)}
-      req={createRxForwardReq()}
       {tieKey}
       let:events
       {viewIndex}
@@ -158,7 +164,7 @@
       >
         <FolloweeFilteredEventList {events} {tieKey} />
       </div>
-    </TimelineList>
+    </MainTimeline>
   {/if}
 </Contacts>
 

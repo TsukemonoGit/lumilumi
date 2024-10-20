@@ -36,9 +36,10 @@ import {
   completeOnTimeout,
   type RxReqEmittable,
   type RxReqStrategy,
+  createRxForwardReq,
 } from "rx-nostr";
-import { writable, derived, get } from "svelte/store";
-import { Observable } from "rxjs";
+import { writable, derived, get, type Readable } from "svelte/store";
+import { Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import { metadata } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
@@ -201,132 +202,54 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
 
   return result ? result[1] : undefined;
 };
-// export const getMetadataFromLocalStorage = (): void => {
-//   const metadataStr = localStorage.getItem("metadata");
-//   if (!metadataStr) {
-//     return;
-//   }
-
-//   const metadata = JSON.parse(metadataStr);
-//   setSavedMetadata(metadata);
-//   // console.log(metadata);
-//   if (get(showImg) === false) {
-//     //画像表示おんのときは新しいの取るから、古いのをセットしない。画像表示しないときは古いの使い回す
-//     Object.keys(metadata).forEach((pubkey) => {
-//       //console.log(metadata[pubkey][0]);
-//       //  console.log(metadata[pubkey]);
-//       // console.log(metadata[pubkey][0]);
-//       // console.log(metadata[pubkey][1]);
-//       get(queryClient).setQueryData(
-//         metadata[pubkey][0],
-//         (oldData: any) => metadata[pubkey][1],
-//         { updatedAt: Infinity }
-//       );
-//       // get(queryClient).setQueriesData(
-//       //   { queryKey: metadata[pubkey][0] },
-//       //   metadata[pubkey][1]
-//       // );
-//     });
-//   }
-//   // console.log(get(queryClient).getQueriesData({ queryKey: ["metadata"] }));
-//};
-
-// Set an interval to process the queue periodically
-//setInterval(processMetadataQueue, 1000);
-
-//すでにそのキーの値があったらスルー
-//また、フォロイーセットに含まれないpubkeyの場合もスルーする
-// // unknownがnullでないもののみをフィルタリング
-// const savemetadata = metadata.filter(
-//   (item: [QueryKey, unknown]) => item[1] !== undefined
-// );
-
-// // 文字列に変換してローカルストレージに保存
-// localStorage.setItem("metadata", JSON.stringify(savemetadata));
-// savedMetadata = savemetadata;
-
-//console.log(savemetadata);
-
-// RxReqのフォワードリクエストかどうかを判別する型ガード関数
-function isForwardReq(req: any) {
-  return req?.over === undefined;
-}
 
 export function generateRandomId(length: number = 6): string {
   return Array.from({ length }, () => Math.random().toString(36)[2]).join("");
 }
+const req = createRxForwardReq();
 
-export function useReq(
-  {
-    queryKey,
-    filters,
-    operator,
-    req,
-    initData,
-  }: UseReqOpts<EventPacket | EventPacket[]>,
-  relays: string[] | undefined = undefined,
-  { staleTime, gcTime, initialDataUpdatedAt, refetchInterval }: UseQueryOpt = {
-    staleTime: 3 * 60 * 60 * 1000,
-    gcTime: 3 * 60 * 60 * 1000,
-    initialDataUpdatedAt: undefined,
-    refetchInterval: Infinity,
-  }
-): ReqResult<EventPacket | EventPacket[]> {
-  const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
+export function changeMainEmit(filters: Nostr.Filter[]) {
+  console.log(filters);
+  req.emit(filters);
+}
+
+//これメインTL用のreqで一つだけのforwardreqのやつ
+//rxNostr3ようのやつは別であるけど
+//changeMainEmitでフィルターを更新する
+export function useForwardReq(
+  operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
+  queryKey: QueryKey,
+  filters: Nostr.Filter[]
+): {
+  data: Readable<EventPacket | EventPacket[] | undefined>;
+  status: Readable<ReqStatus>;
+  error: Readable<Error>;
+} {
+  //console.log(filters);
+
+  const _queryClient = get(queryClient);
 
   if (!_queryClient) {
-    throw Error();
-  }
-  const _rxNostr = get(app).rxNostr;
-  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    console.log("error");
-    throw Error();
-  }
-  // console.log(_rxNostr.getDefaultRelays());
-
-  //  console.log(filters);
-  let _req:
-    | RxReqStrategy
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
-
-  if (req) {
-    _req = req;
-  } else {
-    _req = createRxBackwardReq(generateRandomId());
+    throw new Error("Query client is not available");
   }
 
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
-  //const tie = get(tieMapStore)?.[tieKey]?.[0];
-  // const obs: Observable<EventPacket | EventPacket[]> = tie
-  //   ? _rxNostr.use(_req, { relays: relays }).pipe(tie, metadata(), operator) //muteCheck(),
-  //   : _rxNostr.use(_req, { relays: relays }).pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる//muteCheck(),
 
-  //一定時間立って削除したデータの再取得できるように
-  const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
-    .use(_req, { relays: relays })
+  const obs: Observable<EventPacket | EventPacket[]> = get(app)
+    .rxNostr.use(req)
     .pipe(metadata(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
-    staleTime: staleTime,
-    initialData: initData,
-    initialDataUpdatedAt: initialDataUpdatedAt,
-    refetchInterval: refetchInterval,
-    gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
+    gcTime: Infinity,
+    staleTime: Infinity,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
 
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //console.log(v);
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
             } else {
@@ -334,29 +257,21 @@ export function useReq(
               fulfilled = true;
             }
           },
-
           complete: () => status.set("success"),
           error: (e) => {
             console.error("[rx-nostr]", e);
             status.set("error");
             error.set(e);
-
-            if (!fulfilled && !isForwardReq(_req)) {
-              console.log("fulfilled");
-              reject(e);
-              fulfilled = true;
-            }
           },
         });
-        _req.emit(filters);
+        changeMainEmit(filters);
       });
     },
   });
 
   return {
-    data: derived(query, ($query) => $query.data, initData),
+    data: derived(query, ($query) => $query.data, undefined),
     status: derived([query, status], ([$query, $status]) => {
-      //console.log($query.data);
       if ($query.isSuccess) {
         return "success";
       } else if ($query.isError) {
