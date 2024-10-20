@@ -31,6 +31,7 @@
     queryClient,
     addClientTag,
     viewEventIds,
+    showAllReactions,
   } from "$lib/stores/stores";
   import { clientTag, nip33Regex, profile } from "$lib/func/util";
 
@@ -356,7 +357,7 @@
     }, updateInterval); // 連続で実行されるのを防ぐ
   }
 
-  $: if ($viewEventIds) {
+  $: if ($showAllReactions && $viewEventIds) {
     debounceUpdate();
   }
 
