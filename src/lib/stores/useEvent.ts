@@ -7,12 +7,10 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { uniq } from "rx-nostr";
 import { pipe } from "rxjs";
 
-import { filterId } from "./operators.js";
-import { useReq } from "$lib/func/nostr.js";
 import type { ReqResult } from "$lib/types.js";
+import { useReq } from "$lib/func/useReq";
 
 export function useEvent(
   queryKey: QueryKey,

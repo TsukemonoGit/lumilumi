@@ -1,4 +1,4 @@
-import { useReq } from "$lib/func/nostr";
+import { useReq } from "$lib/func/useReq";
 import type { ReqResult } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";

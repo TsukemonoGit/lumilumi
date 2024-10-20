@@ -10,8 +10,8 @@ import type {
 import { latest } from "rx-nostr";
 import { pipe } from "rxjs";
 
-import { useReq } from "$lib/func/nostr.js";
 import type { ReqResult } from "$lib/types.js";
+import { useReq } from "$lib/func/useReq";
 
 export function useReplaceableEvent(
   rxNostr: RxNostr,

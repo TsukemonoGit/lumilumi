@@ -10,8 +10,8 @@ import { latestEach } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";
-import { useReq } from "$lib/func/nostr.js";
 import type { ReqResult } from "$lib/types.js";
+import { useReq } from "$lib/func/useReq.js";
 
 export function useReplaceableEventList(
   queryKey: QueryKey,
