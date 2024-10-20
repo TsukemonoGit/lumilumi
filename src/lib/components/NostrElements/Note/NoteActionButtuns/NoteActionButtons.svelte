@@ -596,7 +596,7 @@
     >
   {/if}
 
-  <div class="flex gap-1">
+  <div class="flex gap-1 overflow-hidden">
     {#if $showAllReactions}{#if hasReactions}
         <button
           on:click={() => {
