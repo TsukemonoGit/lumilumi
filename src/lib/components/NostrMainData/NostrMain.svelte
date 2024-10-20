@@ -20,6 +20,7 @@
     onlyFollowee,
     addClientTag,
     showClientTag,
+    showAllReactions,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -114,6 +115,7 @@
       showKind16: savedShowKind16,
       addClientTag: savedAddClientTag,
       showClientTag: savedShowClientTag,
+      showAllReactions: savedShowAllReactions,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -157,6 +159,7 @@
     // }
     $addClientTag = savedAddClientTag;
     $showClientTag = savedShowClientTag ? savedShowClientTag : true;
+    $showAllReactions = savedShowAllReactions;
   }
 
   function loadMutetokanoSettei() {
@@ -165,7 +168,7 @@
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
     // console.log(mute);
     $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-    console.log($mutes);
+    //   console.log($mutes);
     $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
     $mutebykinds = mutebykind
       ? (JSON.parse(mutebykind) as LumiMuteByKind)

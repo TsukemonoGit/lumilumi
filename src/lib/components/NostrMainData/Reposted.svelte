@@ -3,8 +3,8 @@
 
   import type Nostr from "nostr-typedef";
 
-  import { queryClient } from "$lib/stores/stores";
-  import { QueryObserver } from "@tanstack/svelte-query";
+  import { loginUser, queryClient, slicedEvent } from "$lib/stores/stores";
+  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
   import { onDestroy } from "svelte";
 
@@ -13,7 +13,7 @@
   let _result: { data: EventPacket; status: any; error: any };
 
   const observer2 = new QueryObserver($queryClient, {
-    queryKey: ["reactions", "repost", id],
+    queryKey: ["reactions", "repost", id, $loginUser],
   });
   const unsubscribe = observer2.subscribe((result: any) => {
     if (

@@ -14,8 +14,9 @@ import {
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { zapCheck } from "$lib/stores/operators";
+//import { zapCheck } from "$lib/stores/operators";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
+import { zappedPubkey } from "$lib/stores/operators";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -91,7 +92,7 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
 
   const obs: Observable<EventPacket> = get(app)
     .rxNostr3.use(req3)
-    .pipe(operator, zapCheck());
+    .pipe(operator);
 
   const query = createQuery({
     queryKey: ["reactions"], //TLに表示されているノートたちへのリアクションの監視だからinfinity?
@@ -153,10 +154,20 @@ function handleEvent(v: EventPacket) {
   );
 
   if (v.event.kind === 7 && etag) {
-    get(queryClient).setQueryData(["reactions", "reaction", etag[1]], v);
+    get(queryClient).setQueryData(
+      ["reactions", "reaction", etag[1], v.event.pubkey],
+      v
+    );
   } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-    get(queryClient).setQueryData(["reactions", "repost", etag[1]], v);
+    get(queryClient).setQueryData(
+      ["reactions", "repost", etag[1], v.event.pubkey],
+      v
+    );
   } else if (v.event.kind === 9735 && etag) {
-    get(queryClient).setQueryData(["reactions", "zapped", etag[1]], v);
+    const zappedUser = zappedPubkey(v.event);
+    get(queryClient).setQueryData(
+      ["reactions", "zapped", etag[1], zappedUser],
+      v
+    );
   }
 }

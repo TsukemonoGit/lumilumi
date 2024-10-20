@@ -5,7 +5,7 @@
   import { defaultRelays } from "$lib/stores/stores";
 
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import Note from "$lib/components/NostrElements/Note/Note.svelte";
+
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";

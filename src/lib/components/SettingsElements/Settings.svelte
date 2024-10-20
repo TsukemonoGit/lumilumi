@@ -23,6 +23,7 @@
     showKind16,
     addClientTag,
     showClientTag,
+    showAllReactions,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import {
@@ -121,13 +122,13 @@
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
-
+    $showAllReactions = settings.showAllReactions;
     const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
-    console.log(mute);
+    //console.log(mute);
     $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-    console.log($mutes);
+    //console.log($mutes);
     $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
     $mutebykinds = mutebykind
       ? (JSON.parse(mutebykind) as LumiMuteByKind)
@@ -235,7 +236,7 @@
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
-
+    $showAllReactions = settings.showAllReactions;
     // $mutes = lumiMute;
     // $emojis = lumiEmoji;
     // $mutebykinds = lumiMuteByKind;
@@ -634,6 +635,14 @@
           bind:checked={settings.showImg}
         />
         {$_("settings.display.loadImage")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.showAllReactions}
+        />
+        {$_("settings.display.showAllReaction")}
       </label>
       <label>
         <input
