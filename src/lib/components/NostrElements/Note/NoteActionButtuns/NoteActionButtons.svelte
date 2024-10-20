@@ -596,28 +596,29 @@
       {:else}<div class="w-[20px] overflow-hidden" />{/if}</Metadata
     >
   {/if}
+
   <div class="flex gap-1">
-    {#if hasReactions}
-      <button
-        on:click={() => {
-          viewAllReactions = !viewAllReactions;
-        }}
-      >
-        {#if !viewAllReactions}
-          <SquareChevronDown
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-          />
-        {:else}
-          <SquareChevronUp
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-          />
-        {/if}
-      </button>
-    {:else}
-      <div class="w-[20px] overflow-hidden" />
-    {/if}
+    {#if $showAllReactions}{#if hasReactions}
+        <button
+          on:click={() => {
+            viewAllReactions = !viewAllReactions;
+          }}
+        >
+          {#if !viewAllReactions}
+            <SquareChevronDown
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+            />
+          {:else}
+            <SquareChevronUp
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+            />
+          {/if}
+        </button>
+      {:else}
+        <div class="w-[20px] overflow-hidden" />
+      {/if}{/if}
     <!--メニュー-->
     <EllipsisMenu {note} {tieKey} />
   </div>
