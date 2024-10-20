@@ -271,7 +271,7 @@
       {:else}
         <div>:{shortcode}:</div>
       {/if}
-    {/each}<ClientTag tags={note.tags} />
+    {/each}<ClientTag depth={0} tags={note.tags} />
   </div>
   {#if inMyCustomEmoji}
     <button

@@ -6,6 +6,7 @@
 
   export let tags: string[][];
   export let isShowClientTag: boolean = true;
+  export let depth: number;
   $: clientTag = tags.find((tag) => tag[0] === "client");
 
   const onClickClientTag = (atag: string[]) => {
@@ -15,7 +16,7 @@
   };
 </script>
 
-{#if clientTag && isShowClientTag && $showClientTag && $page.route.id !== "/[note=note]" && $page.route.id !== "/[naddr=naddr]"}
+{#if clientTag && isShowClientTag && $showClientTag && !($page.route.id === "/[note=note]" || $page.route.id === "/[naddr=naddr]") && depth !== 0}
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
       on:click={() => onClickClientTag(clientTag.slice(2))}

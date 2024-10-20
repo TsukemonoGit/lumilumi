@@ -127,7 +127,7 @@
         {depth}
         {repostable}
         {tieKey}
-      /><ClientTag tags={note.tags} />{:else}
+      /><ClientTag tags={note.tags} {depth} />{:else}
       <Content
         text={note.content}
         tags={note.tags}
