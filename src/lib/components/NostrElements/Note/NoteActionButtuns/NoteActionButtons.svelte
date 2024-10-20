@@ -48,7 +48,6 @@
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
-  import { writable } from "svelte/store";
 
   export let note: Nostr.Event;
   export let repostable: boolean;
@@ -365,7 +364,7 @@
     allReactions.repost = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "repost", note.id],
+          queryKey: ["reactions", "repost", atag ?? note.id],
         })
         .filter(([key, value]) => value !== undefined) as [
         QueryKey,
@@ -376,7 +375,7 @@
     allReactions.reaction = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "reaction", note.id],
+          queryKey: ["reactions", "reaction", atag ?? note.id],
         })
         .filter(([key, value]) => value !== undefined) as [
         QueryKey,
@@ -387,7 +386,7 @@
     allReactions.zap = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "zapped", note.id],
+          queryKey: ["reactions", "zapped", atag ?? note.id],
         })
         .filter(([key, value]) => value !== undefined) as [
         QueryKey,
