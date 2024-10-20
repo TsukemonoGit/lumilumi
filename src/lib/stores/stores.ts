@@ -16,7 +16,6 @@ import type {
   LumiEmoji,
   LumiMute,
   LumiMuteByKind,
-  MuteList,
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
@@ -135,3 +134,5 @@ export const followList: Writable<Map<string, string | undefined>> = writable<
 
 export const userStatusStore: Writable<Map<string, Map<string, Nostr.Event>>> =
   writable<Map<string, Map<string, Nostr.Event>>>(new Map());
+
+export const showAllReactions = writable<boolean>(false);

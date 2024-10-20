@@ -329,7 +329,7 @@ export function zapCheck() {
       return true; // kindが9735でない場合はtrueを返す（イベントを通過させる）
     }
 
-    const pub = pubkey(event.event);
+    const pub = zappedPubkey(event.event);
     if (pub === get(loginUser)) {
       return true; // kindが9735で、かつpubがget(loginUser)と一致する場合はtrueを返す（イベントを通過させる）
     } else {
@@ -338,7 +338,7 @@ export function zapCheck() {
   });
 }
 
-const pubkey = (event: Nostr.Event): string | undefined => {
+export const zappedPubkey = (event: Nostr.Event): string | undefined => {
   try {
     return JSON.parse(
       event.tags.find((tag) => tag[0] === "description")?.[1] ?? ""

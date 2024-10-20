@@ -1,6 +1,10 @@
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import { viewEventIds, loginUser } from "$lib/stores/stores";
+  import {
+    viewEventIds,
+    loginUser,
+    showAllReactions,
+  } from "$lib/stores/stores";
   import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
@@ -45,12 +49,13 @@
 
   function performUpdate() {
     if ((etagList.length <= 0 && atagList.length <= 0) || !$loginUser) return;
+
     filters =
       etagList.length > 0
         ? [
             {
               "#e": etagList,
-              authors: [$loginUser],
+              authors: $showAllReactions ? undefined : [$loginUser],
               kinds: [7, 6, 16],
             },
             {
@@ -63,7 +68,7 @@
       filters.push(
         {
           "#a": atagList,
-          authors: [$loginUser],
+          authors: $showAllReactions ? undefined : [$loginUser],
           kinds: [7, 6, 16],
         },
         {

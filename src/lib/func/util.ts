@@ -322,6 +322,7 @@ export const initSettings: LumiSetting = {
   showKind16: false,
   addClientTag: false,
   showClientTag: true,
+  showAllReactions: false,
 };
 export const initLumiEmoji: LumiEmoji = {
   list: [],

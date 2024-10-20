@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { Repeat2, Heart, MessageSquare, Quote, Zap } from "lucide-svelte";
+  import {
+    Repeat2,
+    Heart,
+    MessageSquare,
+    Quote,
+    Zap,
+    SquareChevronDown,
+    SquareChevronUp,
+  } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
@@ -22,6 +30,7 @@
     additionalPostOptions,
     queryClient,
     addClientTag,
+    viewEventIds,
   } from "$lib/stores/stores";
   import { clientTag, nip33Regex, profile } from "$lib/func/util";
 
@@ -32,6 +41,13 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
+  import type { QueryKey } from "@tanstack/svelte-query";
+  import type { EventPacket } from "rx-nostr";
+
+  import RepostList from "../../AllReactionsElement/RepostList.svelte";
+  import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
+  import ZapList from "../../AllReactionsElement/ZapList.svelte";
+  import { writable } from "svelte/store";
 
   export let note: Nostr.Event;
   export let repostable: boolean;
@@ -307,6 +323,88 @@
     //   }, 20);
     // }
   };
+
+  // let allReactions = writable<{
+  //   repost: Nostr.Event[];
+  //   reaction: Nostr.Event[];
+  //   zap: Nostr.Event[];
+  // }>({ repost: [], reaction: [], zap: [] });
+  let allReactions: {
+    repost: Nostr.Event[];
+    reaction: Nostr.Event[];
+    zap: Nostr.Event[];
+  } = { repost: [], reaction: [], zap: [] };
+
+  let hasReactions: boolean;
+
+  const updateInterval = 3000; // 1秒（ミリ秒）
+  let timeoutId: NodeJS.Timeout | undefined = undefined;
+  let updating = false;
+
+  function debounceUpdate() {
+    if (updating) {
+      return;
+    }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    updating = true;
+    timeoutId = setTimeout(() => {
+      updateReactionsData();
+
+      updating = false;
+    }, updateInterval); // 連続で実行されるのを防ぐ
+  }
+
+  $: if ($viewEventIds) {
+    debounceUpdate();
+  }
+
+  function updateReactionsData() {
+    allReactions.repost = (
+      $queryClient
+        .getQueriesData({
+          queryKey: ["reactions", "repost", note.id],
+        })
+        .filter(([key, value]) => value !== undefined) as [
+        QueryKey,
+        EventPacket,
+      ][]
+    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+
+    allReactions.reaction = (
+      $queryClient
+        .getQueriesData({
+          queryKey: ["reactions", "reaction", note.id],
+        })
+        .filter(([key, value]) => value !== undefined) as [
+        QueryKey,
+        EventPacket,
+      ][]
+    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+
+    allReactions.zap = (
+      $queryClient
+        .getQueriesData({
+          queryKey: ["reactions", "zapped", note.id],
+        })
+        .filter(([key, value]) => value !== undefined) as [
+        QueryKey,
+        EventPacket,
+      ][]
+    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+
+    hasReactions = hasAnyReaction();
+  }
+  function hasAnyReaction(): boolean {
+    return (
+      allReactions.repost.length > 0 ||
+      allReactions.reaction.length > 0 ||
+      allReactions.zap.length > 0
+    );
+  }
+  //$: console.log(allReactions);
+  let viewAllReactions: boolean;
 </script>
 
 <div
@@ -327,21 +425,26 @@
     </button>
     <!--リポスト-->
     {#if repostable}
-      <Reposted id={atag ?? note.id} let:event>
-        <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="21" />
-        </DropdownMenu>
+      <div class="flex items-end">
+        <Reposted id={atag ?? note.id} let:event>
+          <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
 
-        <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="21" />
-        </DropdownMenu>
-        <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-          <Repeat2 size="21" />
-        </DropdownMenu>
-        <DropdownMenu {menuTexts} {handleSelectItem}>
-          <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
-        </DropdownMenu>
-      </Reposted>
+          <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
+          <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
+          <DropdownMenu {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
+          </DropdownMenu>
+        </Reposted><span class="text-sm"
+          >{#if allReactions.repost.length > 0}{allReactions.repost
+              .length}{/if}</span
+        >
+      </div>
     {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
         <Quote size="20" class={"stroke-magnum-500/75"} />
       </button>
@@ -350,47 +453,55 @@
 
   {#if note.kind !== 9734 && note.kind !== 9735}
     <!--リアクション-->
-    <Reactioned id={atag ?? note.id} let:event>
-      <button
-        aria-label="reaction"
-        slot="loading"
-        on:click={handleClickReaction}
-      >
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-        />
-      </button>
+    <div class="flex max-w-[40%] items-end">
+      <Reactioned id={atag ?? note.id} let:event>
+        <button
+          aria-label="reaction"
+          slot="loading"
+          on:click={handleClickReaction}
+        >
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
+          />
+        </button>
 
-      <button
-        aria-label="reaction"
-        slot="nodata"
-        on:click={handleClickReaction}
-      >
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-        />
-      </button>
-
-      <button aria-label="reaction" slot="error" on:click={handleClickReaction}>
-        <Heart
-          size="20"
-          class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-        />
-      </button>
-
-      {#if event === undefined}
-        <button aria-label="reaction" on:click={handleClickReaction}>
+        <button
+          aria-label="reaction"
+          slot="nodata"
+          on:click={handleClickReaction}
+        >
           <Heart
             size="20"
             class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
           />
         </button>
-      {:else}
-        <div class="overflow-hidden max-w-[40%]"><Reaction {event} /></div>
-      {/if}
-    </Reactioned>
+
+        <button
+          aria-label="reaction"
+          slot="error"
+          on:click={handleClickReaction}
+        >
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+          />
+        </button>
+
+        {#if event === undefined}
+          <button aria-label="reaction" on:click={handleClickReaction}
+            ><Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+            /></button
+          >{:else}<div class="overflow-hidden">
+            <Reaction {event} />
+          </div>{/if}</Reactioned
+      ><span class=" text-sm"
+        >{#if allReactions.reaction.length > 0}{allReactions.reaction
+            .length}{/if}</span
+      >
+    </div>
     <!--カスタムリアクション-->
     <CustomReaction {note} {root} {atag} />
   {/if}
@@ -405,43 +516,47 @@
       <div slot="error" class="w-[20px]"></div>
       {@const prof = profile(metadata)}
       {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
+        <div class="flex items-end">
+          <Zapped id={atag ?? note.id} let:event>
+            <button slot="loading" on:click={handleClickZap} aria-label="zap">
+              <Zap
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
+              />
+            </button>
 
-        <Zapped id={atag ?? note.id} let:event>
-          <button slot="loading" on:click={handleClickZap} aria-label="zap">
-            <Zap
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-            />
-          </button>
-
-          <button aria-label="zap" slot="nodata" on:click={handleClickZap}>
-            <Zap
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            />
-          </button>
-
-          <button aria-label="zap" slot="error" on:click={handleClickZap}>
-            <Zap
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            />
-          </button>
-
-          {#if event === undefined}
-            <button aria-label="zap" on:click={handleClickZap}>
+            <button aria-label="zap" slot="nodata" on:click={handleClickZap}>
               <Zap
                 size="20"
                 class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
               />
             </button>
-          {:else}
-            <Zap
-              size="20"
-              class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
-            />
-          {/if}
-        </Zapped>
+
+            <button aria-label="zap" slot="error" on:click={handleClickZap}>
+              <Zap
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+              />
+            </button>
+
+            {#if event === undefined}
+              <button aria-label="zap" on:click={handleClickZap}>
+                <Zap
+                  size="20"
+                  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+                />
+              </button>
+            {:else}
+              <Zap
+                size="20"
+                class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
+              />
+            {/if}
+          </Zapped><span class="text-sm"
+            >{#if allReactions.zap.length > 0}{allReactions.zap
+                .length}{/if}</span
+          >
+        </div>
         <AlertDialog
           bind:open={dialogOpen}
           onClickOK={() => onClickOK(metadata)}
@@ -480,9 +595,52 @@
       {:else}<div class="w-[20px] overflow-hidden" />{/if}</Metadata
     >
   {/if}
-  <!--メニュー-->
-  <EllipsisMenu {note} {tieKey} />
+  <div class="flex gap-1">
+    {#if hasReactions}
+      <button
+        on:click={() => {
+          viewAllReactions = !viewAllReactions;
+        }}
+      >
+        {#if !viewAllReactions}
+          <SquareChevronDown
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+          />
+        {:else}
+          <SquareChevronUp
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+          />
+        {/if}
+      </button>
+    {:else}
+      <div class="w-[20px] overflow-hidden" />
+    {/if}
+    <!--メニュー-->
+    <EllipsisMenu {note} {tieKey} />
+  </div>
 </div>
+
+{#if viewAllReactions}
+  <!--kind6-->
+  {#if allReactions.repost.length > 0}
+    <div class="flex gap-1 p-1">
+      <Repeat2 size="20" class="text-magnum-500/75 mr-2" />
+      <RepostList events={allReactions.repost} {tieKey} />
+    </div>
+  {/if}
+
+  {#if allReactions.reaction.length > 0}
+    <!--kind7-->
+    <ReactionList events={allReactions.reaction} {tieKey} />
+  {/if}
+
+  {#if allReactions.zap.length > 0}
+    <!--zap レシート-->
+    <ZapList events={allReactions.zap} {tieKey} />
+  {/if}
+{/if}
 
 <ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={atag ?? note.id} />
 

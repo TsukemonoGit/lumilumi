@@ -28,7 +28,8 @@
       "showUserStatus": "ユーザーステータスを表示する",
       "banner": "右側のアカウントバナーを表示する",
       "showKind16": "kind16(kind1以外のリポスト)を表示する",
-      "showClientTag": "TLにもクライアントタグ(via)を表示"
+      "showClientTag": "TLにもクライアントタグ(via)を表示",
+      "showAllReaction": "みんなのリアクションを表示する"
     },
     "post": {
       "addClientTag": "投稿にClientタグ(via)をつける",
