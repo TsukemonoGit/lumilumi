@@ -19,15 +19,12 @@
   import { queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
-  import Kind0List from "./PaginationList.svelte";
   import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
   import PaginationList from "./PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
   import EllipsisMenuNaddr from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import { parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-
-  import type { CreateTabsProps } from "@melt-ui/svelte";
 
   export let data: {
     pubkey: string;
@@ -140,9 +137,19 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-User</title>
-  <meta property="og:description" content="User" />
-  <meta name="description" content="User" />
+  <meta
+    name="description"
+    content="User:{data.pubkey
+      ? `pubkey:${nip19.npubEncode(data.pubkey)}`
+      : ''}"
+  />
+
+  <meta
+    property="og:description"
+    content="User:{data.pubkey
+      ? `pubkey:${nip19.npubEncode(data.pubkey)}`
+      : ''}"
+  />
 </svelte:head>
 
 <section>

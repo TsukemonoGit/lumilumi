@@ -27,6 +27,18 @@
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
   import type { EventPacket } from "rx-nostr";
+  import { npubEncode } from "nostr-tools/nip19";
+
+  export let data: {
+    searchWord: string;
+    searchKind: number | undefined;
+    searchPubkey: string;
+    searchHashtag: string;
+    searchSince: number | undefined;
+    searchUntil: number | undefined;
+    searchPubkeyTo: string;
+    followee: boolean;
+  };
 
   let searchWord = "";
   let searchKind: number | undefined = undefined;
@@ -95,29 +107,29 @@
   }
 
   async function init() {
-    const data: EventPacket | undefined = $queryClient.getQueryData([
+    const queryData: EventPacket | undefined = $queryClient.getQueryData([
       "searchRelay",
       $loginUser,
     ]);
-    console.log("afterNavigate", data);
-    if (data) {
-      searchRelays = (data.event.tags as string[][])
+    console.log("afterNavigate", queryData);
+    if (queryData) {
+      searchRelays = (queryData.event.tags as string[][])
         .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
         .map((tag: string[]) => tag[1]);
     }
 
-    // const params = get(page).url.searchParams;
-    const params = new URLSearchParams(window.location.search);
-    console.log(params);
+    // // const params = get(page).url.searchParams;
+    // const params = new URLSearchParams(window.location.search);
+    // console.log(params);
 
-    searchHashtag = params.get("t") ?? undefined;
-    searchWord = params.get("word") ?? "";
-    searchKind = params.get("k") !== null ? Number(params.get("k")) : undefined;
-    searchPubkey = params.get("author") ?? "";
-    searchPubkeyTo = params.get("p") ?? "";
-    searchSince = params.get("s") ? Number(params.get("s")) : undefined;
-    searchUntil = params.get("u") ? Number(params.get("u")) : undefined;
-    followee = params.get("f") === "true";
+    searchHashtag = data.searchHashtag;
+    searchWord = data.searchWord;
+    searchKind = data.searchKind;
+    searchPubkey = data.searchPubkey;
+    searchPubkeyTo = data.searchPubkeyTo;
+    searchSince = data.searchSince;
+    searchUntil = data.searchUntil;
+    followee = data.followee;
     //kindはデフォ値があるから含めない
     if (
       searchHashtag ||
@@ -282,9 +294,27 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Search</title>
-  <meta property="og:description" content="Search" />
-  <meta name="description" content="Search" />
+  <meta
+    name="description"
+    content="Search
+{data.searchWord ? `ward:${data.searchWord}` : ''}
+{data.searchHashtag ? `hashtag:${data.searchHashtag}` : ''}
+{data.searchKind ? `kind:${data.searchKind}` : ''}
+{data.searchPubkey ? `from:${nip19.npubEncode(data.searchPubkey)}` : ''}
+{data.searchPubkeyTo ? `to:${nip19.npubEncode(data.searchPubkeyTo)}` : ''}
+"
+  />
+
+  <meta
+    property="og:description"
+    content="Search
+{data.searchWord ? `ward:${data.searchWord}` : ''}
+{data.searchHashtag ? `hashtag:${data.searchHashtag}` : ''}
+{data.searchKind ? `kind:${data.searchKind}` : ''}
+{data.searchPubkey ? `from:${nip19.npubEncode(data.searchPubkey)}` : ''}
+{data.searchPubkeyTo ? `to:${nip19.npubEncode(data.searchPubkeyTo)}` : ''}
+  "
+  />
 </svelte:head>
 
 <section>

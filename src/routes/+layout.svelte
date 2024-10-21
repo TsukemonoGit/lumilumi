@@ -181,9 +181,9 @@
 <svelte:head>
   <title>Lumilumi</title>
 
-  <meta property="og:title" content="Lumilumi" />
+  <meta property="og:title" content="Lumilumi the Nostr Client" />
   <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
-  <meta
+  <!-- <meta
     property="og:description"
     content={$page.route.id === "/"
       ? "the nostr client"
@@ -194,7 +194,7 @@
           : $page.route.id === "/[npub=npub]"
             ? "User"
             : "the nostr client"}
-  />
+  /> -->
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />

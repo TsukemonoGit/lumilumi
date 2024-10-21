@@ -2,7 +2,7 @@
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   //import * as Nostr from "nostr-typedef";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
+
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { setRelays } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
@@ -11,7 +11,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { type QueryKey } from "@tanstack/svelte-query";
+
   import { nip19 } from "nostr-tools";
 
   export let data: {
@@ -70,10 +70,25 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Channel</title>
-  <meta property="og:description" content="Channel" />
-  <meta name="description" content="Channel" />
+  <meta
+    name="description"
+    content="Public chat 
+RoomId:{nip19.neventEncode({
+      id: data.id,
+      relays: data.relays ?? [],
+    })}"
+  />
+
+  <meta
+    property="og:description"
+    content="Public chat 
+RoomId:{nip19.neventEncode({
+      id: data.id,
+      relays: data.relays ?? [],
+    })}"
+  />
 </svelte:head>
+
 {#if view}
   <section class="w-full break-words overflow-hidden">
     <ChannelMetadata

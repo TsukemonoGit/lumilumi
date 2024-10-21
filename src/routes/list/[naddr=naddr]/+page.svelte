@@ -11,6 +11,7 @@
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
 
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
@@ -108,10 +109,21 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-List</title>
-  <meta property="og:description" content="List" />
-  <meta name="description" content="List" />
+  <meta
+    name="description"
+    content="User List
+ID:{data.identifier}
+pubkey:{nip19.npubEncode(data.pubkey)}"
+  />
+
+  <meta
+    property="og:description"
+    content="User List
+ID:{data.identifier}
+pubkey:{nip19.npubEncode(data.pubkey)}"
+  />
 </svelte:head>
+
 {#if loading}
   loading
 {:else}

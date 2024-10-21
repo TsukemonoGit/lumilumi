@@ -123,9 +123,9 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Global</title>
-  <meta property="og:description" content="Global" />
-  <meta name="description" content="Global" />
+  <meta name="description" content="Global timeline" />
+
+  <meta property="og:description" content="Global timeline" />
 </svelte:head>
 
 <section class="w-full break-words overflow-hidden">

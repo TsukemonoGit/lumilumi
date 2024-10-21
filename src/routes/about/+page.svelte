@@ -35,8 +35,9 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-About</title>
-  <meta name="description" content="The Nostr webclient" />
+  <meta name="description" content="about lumilumi" />
+
+  <meta property="og:description" content="about lumilumi" />
 </svelte:head>
 <!-- <h1 class="title my-4">ABOUT</h1> -->
 <section class="border border-magnum-500 rounded-md h-full my-4 mx-2 p-2">

@@ -20,6 +20,7 @@
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
+  import { eventKinds } from "$lib/func/kinds";
 
   export let data: {
     id: string;
@@ -67,9 +68,21 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Note</title>
-  <meta property="og:description" content="Note" />
-  <meta name="description" content="Note" />
+  <meta
+    name="description"
+    content="{data.kind
+      ? (eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`)
+      : ''}  noteID:{nip19.noteEncode(data.id)}
+{data.author ? `pubkey:${nip19.npubEncode(data.author)}` : ''}"
+  />
+
+  <meta
+    property="og:description"
+    content="{data.kind
+      ? (eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`)
+      : ''}  noteID:{data.id}
+{data.author ? `pubkey:${nip19.npubEncode(data.author)}` : ''}"
+  />
 </svelte:head>
 
 <section class="mb-20">

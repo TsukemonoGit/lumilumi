@@ -17,6 +17,8 @@
   import { sortEvents } from "$lib/func/util";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
+  import { nip19 } from "nostr-tools";
+  import { eventKinds } from "$lib/func/kinds";
 
   export let data: {
     identifier: string;
@@ -69,9 +71,19 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Naddr</title>
-  <meta property="og:description" content="Naddr" />
-  <meta name="description" content="Naddr" />
+  <meta
+    name="description"
+    content="{eventKinds.get(data.kind)?.en ??
+      `kind:${data.kind}`}  ID:{data.identifier}
+pubkey:{nip19.npubEncode(data.pubkey)}"
+  />
+
+  <meta
+    property="og:description"
+    content="{eventKinds.get(data.kind)?.en ??
+      `kind:${data.kind}`}  ID:{data.identifier}
+pubkey:{nip19.npubEncode(data.pubkey)}"
+  />
 </svelte:head>
 {#if loading}
   loading
