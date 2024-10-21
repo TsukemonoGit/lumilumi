@@ -10,11 +10,7 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    getRelaysById,
-    promisePublishEvent,
-    publishEvent,
-  } from "$lib/func/nostr";
+  import { getRelaysById, promisePublishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import type { AdditionalPostOptions } from "$lib/types";
@@ -301,7 +297,7 @@
     $dialogOpen = false;
     $invoiceOpen = true;
     //サップの量保存
-    const storage = localStorage.setItem("zap", zapAmount.toString());
+    localStorage.setItem("zap", zapAmount.toString());
   };
   $: if (!$invoiceOpen) {
     invoice = undefined;
