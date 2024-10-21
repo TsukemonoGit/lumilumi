@@ -108,22 +108,6 @@
   };
 </script>
 
-<svelte:head>
-  <meta
-    name="description"
-    content="User List
-ID:{data.identifier}
-pubkey:{nip19.npubEncode(data.pubkey)}"
-  />
-
-  <meta
-    property="og:description"
-    content="User List
-ID:{data.identifier}
-pubkey:{nip19.npubEncode(data.pubkey)}"
-  />
-</svelte:head>
-
 {#if loading}
   loading
 {:else}

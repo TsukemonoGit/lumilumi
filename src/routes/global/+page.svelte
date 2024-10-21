@@ -122,12 +122,6 @@
   });
 </script>
 
-<svelte:head>
-  <meta name="description" content="Global timeline" />
-
-  <meta property="og:description" content="Global timeline" />
-</svelte:head>
-
 <section class="w-full break-words overflow-hidden">
   {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
     <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}

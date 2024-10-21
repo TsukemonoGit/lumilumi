@@ -4,6 +4,8 @@ import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
 import { ogDescription } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
+import { locale } from "svelte-i18n";
+import { get } from "svelte/store";
 
 interface CustomParams {
   naddr: string;
@@ -22,12 +24,20 @@ export const load: PageLoad<{
     const { type, data } = nip19.decode(naddr);
 
     // console.log("[decode]", type, data);
+
     if (type === "naddr") {
       const naddr = data as nip19.AddressPointer;
-      ogDescription.set(`${
-        eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`
-      }  ID:${data.identifier}
+
+      const kindString = eventKinds.get(data.kind)?.[
+        get(locale) === "ja" ? "ja" : "en"
+      ];
+
+      ogDescription.set(`kind:${data.kind} ${
+        kindString ? `(${kindString})` : ""
+      }
+ID:${data.identifier}
 pubkey:${nip19.npubEncode(data.pubkey)}`);
+
       return naddr;
     } else {
       throw Error;

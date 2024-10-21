@@ -291,30 +291,6 @@
   };
 </script>
 
-<svelte:head>
-  <meta
-    name="description"
-    content="Search
-{data.searchWord ? `ward:${data.searchWord}` : ''}
-{data.searchHashtag ? `hashtag:${data.searchHashtag}` : ''}
-{data.searchKind ? `kind:${data.searchKind}` : ''}
-{data.searchPubkey ? `from:${nip19.npubEncode(data.searchPubkey)}` : ''}
-{data.searchPubkeyTo ? `to:${nip19.npubEncode(data.searchPubkeyTo)}` : ''}
-"
-  />
-
-  <meta
-    property="og:description"
-    content="Search
-{data.searchWord ? `ward:${data.searchWord}` : ''}
-{data.searchHashtag ? `hashtag:${data.searchHashtag}` : ''}
-{data.searchKind ? `kind:${data.searchKind}` : ''}
-{data.searchPubkey ? `from:${nip19.npubEncode(data.searchPubkey)}` : ''}
-{data.searchPubkeyTo ? `to:${nip19.npubEncode(data.searchPubkeyTo)}` : ''}
-  "
-  />
-</svelte:head>
-
 <section>
   {#if $loginUser}
     <SetSearchRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}>

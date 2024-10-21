@@ -1,13 +1,12 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
-  import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
 
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
 
   import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { Search, SquareArrowOutUpRight } from "lucide-svelte";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import { nip19 } from "nostr-tools";
   import { onMount } from "svelte";
@@ -15,12 +14,14 @@
   import { _ } from "svelte-i18n";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "globalchannel";
   let isOnMount = false;
   let since: number | undefined = undefined;
+
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
@@ -29,6 +30,7 @@
       isOnMount = false;
     }
   });
+
   afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
@@ -67,11 +69,6 @@
   });
 </script>
 
-<svelte:head>
-  <title>Lumilumi-Channel-global</title>
-  <meta property="og:description" content="Channel-global" />
-  <meta name="description" content="Channel-global" />
-</svelte:head>
 {#if $loginUser}
   <section
     class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"

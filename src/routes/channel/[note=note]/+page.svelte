@@ -69,26 +69,6 @@
   }
 </script>
 
-<svelte:head>
-  <meta
-    name="description"
-    content="Public chat 
-RoomId:{nip19.neventEncode({
-      id: data.id,
-      relays: data.relays ?? [],
-    })}"
-  />
-
-  <meta
-    property="og:description"
-    content="Public chat 
-RoomId:{nip19.neventEncode({
-      id: data.id,
-      relays: data.relays ?? [],
-    })}"
-  />
-</svelte:head>
-
 {#if view}
   <section class="w-full break-words overflow-hidden">
     <ChannelMetadata

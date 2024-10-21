@@ -1,3 +1,5 @@
+import { ogDescription } from "$lib/stores/stores";
+import { nip19 } from "nostr-tools";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = ({ url }) => {
@@ -17,6 +19,13 @@ export const load: PageLoad = ({ url }) => {
     : undefined;
   const searchPubkeyTo = searchParams.get("p") || "";
   const followee = searchParams.get("f") === "true";
+
+  ogDescription.set(`Search
+${searchWord ? `ward:${searchWord}` : ""}
+${searchHashtag ? `hashtag:${searchHashtag}` : ""}
+${searchKind ? `kind:${searchKind}` : ""}
+${searchPubkey ? `from:${nip19.npubEncode(searchPubkey)}` : ""}
+${searchPubkeyTo ? `to:${nip19.npubEncode(searchPubkeyTo)}` : ""}`);
 
   return {
     searchWord,

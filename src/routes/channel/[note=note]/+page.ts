@@ -2,6 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
+import { ogDescription } from "$lib/stores/stores";
 
 interface CustomParams {
   note: string;
@@ -24,8 +25,20 @@ export const load: PageLoad<{
     //console.log("[decode]", type, data);
     if (type === "nevent") {
       const nevent = data as nip19.EventPointer;
+
+      ogDescription.set(`Public chat 
+RoomId:${nip19.neventEncode({
+        id: data.id,
+        relays: data.relays ?? [],
+      })}`);
+
       return nevent;
     } else if (type === "note") {
+      ogDescription.set(`Public chat 
+RoomId:${nip19.neventEncode({
+        id: data,
+      })}`);
+
       return { id: data as string };
     } else {
       throw Error;

@@ -334,7 +334,7 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     30023,
     {
       ja: "記事",
-      en: "	Long-form Content",
+      en: "Long-form Content",
     },
   ],
   [

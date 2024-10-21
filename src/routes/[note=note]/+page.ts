@@ -4,6 +4,8 @@ import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
 import { ogDescription } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
+import { locale } from "svelte-i18n";
+import { get } from "svelte/store";
 
 interface CustomParams {
   note: string;
@@ -26,10 +28,17 @@ export const load: PageLoad<{
     // console.log("[decode]", type, data);
     if (type === "nevent") {
       const nevent = data as nip19.EventPointer;
-      ogDescription.set(`${
-        data.kind ? eventKinds.get(data.kind)?.en ?? `kind:${data.kind}` : ""
-      }  noteID:${nip19.noteEncode(data.id)}
+
+      const kindString = data.kind
+        ? eventKinds.get(data.kind)?.[get(locale) === "ja" ? "ja" : "en"]
+        : undefined;
+
+      ogDescription.set(`kind:${data.kind} ${
+        kindString ? `(${kindString})` : ""
+      }
+noteID:${nip19.noteEncode(data.id)}
 ${data.author ? `pubkey:${nip19.npubEncode(data.author)}` : ""}`);
+
       return nevent;
     } else if (type === "note") {
       ogDescription.set(`noteID:${nip19.noteEncode(data)}`);
