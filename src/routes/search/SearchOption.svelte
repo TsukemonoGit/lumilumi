@@ -51,7 +51,7 @@
 
   async function handleClickShare() {
     const shareData = { url: $page.url.href };
-    console.log($page);
+    //console.log($page);
     try {
       await navigator.share(shareData);
       // await navigator.clipboard.writeText(
