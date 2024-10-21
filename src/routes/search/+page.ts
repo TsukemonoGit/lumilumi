@@ -31,11 +31,12 @@ export const load: PageLoad = ({ url }) => {
     desc = desc + `\nkind:${searchKind}`;
   }
   if (searchPubkey) {
-    desc = desc + `\nfrom:${nip19.npubEncode(searchPubkey)}`;
+    desc = desc + `\nfrom:${searchPubkey}`;
   }
   if (searchPubkeyTo) {
-    desc = desc + `\nto:${nip19.npubEncode(searchPubkeyTo)}`;
+    desc = desc + `\nto:${searchPubkeyTo}`;
   }
+  console.log(desc);
   ogDescription.set(desc);
 
   return {
