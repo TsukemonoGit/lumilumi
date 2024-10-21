@@ -8,7 +8,6 @@
   import Content from "./Content.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
   import UserName from "./UserName.svelte";
   import Reply from "./Reply.svelte";
@@ -24,7 +23,7 @@
   export let replyUsers: string[];
   export let thread: boolean;
 
-  export let replyID: string | undefined;
+  export let replyTag: string[] | undefined;
   let decrypt: string | undefined = undefined;
 
   //自分宛て？もしくは自分が書いた？
@@ -65,8 +64,8 @@
       {/each}
     </div>
   {/if}
-  {#if !thread && (replyID || replyUsers.length > 0)}
-    <Reply {replyID} {displayMenu} {depth} repostable={false} {tieKey} />
+  {#if !thread && (replyTag || replyUsers.length > 0)}
+    <Reply {replyTag} {displayMenu} {depth} repostable={false} {tieKey} />
     <!--<hr />-->
   {/if}
 

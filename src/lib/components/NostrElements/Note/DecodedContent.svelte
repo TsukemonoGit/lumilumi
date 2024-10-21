@@ -10,6 +10,7 @@
 
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import viewport from "$lib/func/useViewportAction";
+  import NaddrEvent from "./NaddrEvent.svelte";
   export let displayMenu: boolean;
   export let content: string | undefined;
   export let depth: number;
@@ -81,72 +82,14 @@
         class="grid grid-cols-[auto_1fr_auto]"
         ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
         <div class="border rounded-md border-magnum-600/30">
-          <LatestEvent
-            queryKey={[
-              "naddr",
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-            ]}
-            filters={[
-              decoded.data.identifier !== ""
-                ? {
-                    kinds: [decoded.data.kind],
-                    authors: [decoded.data.pubkey],
-                    "#d": [decoded.data.identifier],
-                  }
-                : {
-                    kinds: [decoded.data.kind],
-                    authors: [decoded.data.pubkey],
-                  },
-            ]}
-            let:event
-          >
-            <div
-              slot="loading"
-              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-            >
-              {content}{#if displayMenu}<EllipsisMenuNaddr
-                  naddr={content?.slice(6)}
-                />{/if}
-            </div>
-            <div
-              slot="nodata"
-              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-            >
-              {content}{#if displayMenu}<EllipsisMenuNaddr
-                  naddr={content?.slice(6)}
-                />{/if}
-            </div>
-            <div
-              slot="error"
-              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-            >
-              {content}{#if displayMenu}<EllipsisMenuNaddr
-                  naddr={content?.slice(6)}
-                />{/if}
-            </div>
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-              let:metadata
-            >
-              <div slot="loading">
-                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
-              </div>
-              <div slot="nodata">
-                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
-              </div>
-              <div slot="error">
-                <EventCard note={event} {displayMenu} {repostable} {tieKey} />
-              </div>
-              <EventCard
-                {metadata}
-                {displayMenu}
-                note={event}
-                {repostable}
-                {tieKey}
-              /></Metadata
-            >
-          </LatestEvent>
+          <NaddrEvent
+            data={decoded.data}
+            {displayMenu}
+            {depth}
+            {tieKey}
+            {repostable}
+            {content}
+          />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
       </span>{:else if decoded.type === "nprofile"}<span

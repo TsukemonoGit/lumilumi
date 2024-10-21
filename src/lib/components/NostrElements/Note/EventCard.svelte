@@ -24,7 +24,7 @@
   import { onDestroy } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
+
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
@@ -257,7 +257,7 @@
   $: warning = checkContentWarning(note.tags); // string[] | undefined
 
   // const { kind, tag } = repostedId(note.tags);
-  let replyID: string | undefined;
+  let replyTag: string[] | undefined;
   let replyUsers: string[];
   $: if (
     note &&
@@ -265,10 +265,10 @@
     note.tags.length > 0
   ) {
     const res = replyedEvent(note.tags);
-    replyID = res.replyID;
+    replyTag = res.replyTag;
     replyUsers = res.replyUsers;
   } else {
-    replyID = undefined;
+    replyTag = undefined;
     replyUsers = [];
   }
   const handleClickToChannel = (id: string) => {
@@ -312,9 +312,9 @@
   </button>
 {/if}
 {#if muteType === "null" || viewMuteEvent}
-  {#if thread && replyID}
+  {#if thread && replyTag}
     <!-- <div class="border-b border-magnum-600/30"> -->
-    <ReplyThread {replyID} {displayMenu} {depth} {repostable} {tieKey} />
+    <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
     <!-- </div> -->
   {/if}
 
@@ -333,8 +333,8 @@
             {/each}
           </div>
         {/if}
-        {#if !thread && (replyID || replyUsers.length > 0)}
-          <Reply {replyID} {displayMenu} {depth} {repostable} {tieKey} />
+        {#if !thread && (replyTag || replyUsers.length > 0)}
+          <Reply {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
           <!--<hr />-->
         {/if}
 
@@ -584,7 +584,7 @@
         {warning}
         {replyUsers}
         {thread}
-        {replyID}
+        {replyTag}
       />
     {:else if note.kind === 31990}
       {@const data = get31990Ogp(note)}

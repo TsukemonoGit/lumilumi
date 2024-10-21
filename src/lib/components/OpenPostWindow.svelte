@@ -55,7 +55,7 @@
   import { writable, type Writable } from "svelte/store";
   import Metadata from "./NostrMainData/Metadata.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nip19 } from "nostr-tools";
+
   //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 
   export let options: DefaultPostOptions = {

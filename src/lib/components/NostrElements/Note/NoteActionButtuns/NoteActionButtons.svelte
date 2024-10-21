@@ -308,21 +308,24 @@
     tags.push(["p", note.pubkey]);
     const relaylist = tieKey ? getRelaysById(note.id, tieKey) : [];
     const root = note.tags.find(
-      (item) => item[0] === "e" && item.length > 2 && item[3] === "root"
+      (item) =>
+        (item[0] === "e" || item[0] === "a") &&
+        item.length > 2 &&
+        item[3] === "root"
     );
 
-    if (atag) {
-      tags.push(["a", atag, relaylist?.[0] ?? ""]);
+    const addTag = atag
+      ? ["a", atag, relaylist?.[0] ?? ""]
+      : ["e", note.id, relaylist?.[0] ?? ""];
+
+    if (root) {
+      // if (note.kind !== 42) {
+      //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
+      tags.push(root);
+      // }
+      tags.push([...addTag, "reply"]);
     } else {
-      if (root) {
-        // if (note.kind !== 42) {
-        //パブ茶（42）の場合はそっちの方でrootが付いてるからリプライにもつけたら重複するから外す
-        tags.push(root);
-        // }
-        tags.push(["e", note.id, relaylist?.[0] ?? "", "reply"]);
-      } else {
-        tags.push(["e", note.id, relaylist?.[0] ?? "", "root"]);
-      }
+      tags.push([...addTag, "root"]);
     }
 
     const options: AdditionalPostOptions = {
