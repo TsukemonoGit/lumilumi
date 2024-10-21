@@ -118,12 +118,12 @@
             <button
               aria-label={`Select emoji ${e[0]}`}
               on:click={() => handleClickEmoji(e)}
-              class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >
               {#if $showImg}
                 <img
                   loading="lazy"
-                  class="h-4 object-contain justify-self-center"
+                  class="h-6 object-contain justify-self-center"
                   src={e[1]}
                   alt={e[0]}
                   title={e[0]}

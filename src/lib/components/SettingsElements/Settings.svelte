@@ -599,7 +599,7 @@
               {#if $showImg}
                 <img
                   loading="lazy"
-                  class="h-4 object-contain justify-self-center"
+                  class="h-6 object-contain justify-self-center"
                   src={settings.defaultReaction.tag[2]}
                   alt={settings.defaultReaction.tag[1]}
                   title={settings.defaultReaction.tag[1]}
