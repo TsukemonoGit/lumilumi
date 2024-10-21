@@ -20,12 +20,23 @@ export const load: PageLoad = ({ url }) => {
   const searchPubkeyTo = searchParams.get("p") || "";
   const followee = searchParams.get("f") === "true";
 
-  ogDescription.set(`Search
-${searchWord ? `ward:${searchWord}` : ""}
-${searchHashtag ? `hashtag:${searchHashtag}` : ""}
-${searchKind ? `kind:${searchKind}` : ""}
-${searchPubkey ? `from:${nip19.npubEncode(searchPubkey)}` : ""}
-${searchPubkeyTo ? `to:${nip19.npubEncode(searchPubkeyTo)}` : ""}`);
+  let desc = "Search";
+  if (searchWord) {
+    desc = desc + `\nward:${searchWord}`;
+  }
+  if (searchHashtag) {
+    desc = desc + `\nhashtag:${searchHashtag}`;
+  }
+  if (searchKind) {
+    desc = desc + `\nkind:${searchKind}`;
+  }
+  if (searchPubkey) {
+    desc = desc + `\nfrom:${nip19.npubEncode(searchPubkey)}`;
+  }
+  if (searchPubkeyTo) {
+    desc = desc + `\nto:${nip19.npubEncode(searchPubkeyTo)}`;
+  }
+  ogDescription.set(desc);
 
   return {
     searchWord,
