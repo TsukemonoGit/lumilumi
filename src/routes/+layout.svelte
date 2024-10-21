@@ -181,7 +181,7 @@
 <svelte:head>
   <title>Lumilumi</title>
 
-  <meta property="og:title" content="Lumilumi the Nostr Client" />
+  <meta property="og:title" content="Lumilumi" />
   <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
   <!-- <meta
     property="og:description"

@@ -3,10 +3,8 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Home</title>
-
-  <meta property="og:description" content="The Nostr webclient" />
-  <meta name="description" content="The Nostr webclient" />
+  <meta property="og:description" content="The Nostr Client" />
+  <meta name="description" content="The Nostr Client" />
 </svelte:head>
 
 <section class="w-full break-words overflow-hidden">
