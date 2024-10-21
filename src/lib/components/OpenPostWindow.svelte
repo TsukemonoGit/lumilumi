@@ -42,6 +42,7 @@
     filesUpload,
     nsecRegex,
     delay,
+    normalizeRelayURL,
   } from "$lib/func/util";
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
@@ -280,10 +281,6 @@
     isPosting = false;
   };
 
-  //末尾に"/"をつける
-  const normalizeRelayURL = (str: string) => {
-    return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
-  };
   const resetState = () => {
     text = options.content ?? "";
     tags = [...options.tags];

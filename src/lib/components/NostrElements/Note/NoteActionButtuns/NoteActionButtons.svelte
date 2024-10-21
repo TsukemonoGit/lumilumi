@@ -10,7 +10,11 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+  import {
+    getRelaysById,
+    promisePublishEvent,
+    publishEvent,
+  } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import type { AdditionalPostOptions } from "$lib/types";
@@ -33,7 +37,12 @@
     viewEventIds,
     showAllReactions,
   } from "$lib/stores/stores";
-  import { clientTag, nip33Regex, profile } from "$lib/func/util";
+  import {
+    clientTag,
+    nip33Regex,
+    normalizeRelayURL,
+    profile,
+  } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -79,7 +88,7 @@
   }
   // let reaction = writable<string | null>(null);
 
-  const handleClickReaction = () => {
+  const handleClickReaction = async () => {
     const tags: string[][] = root ? [root] : [];
     if (atag) {
       tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
@@ -101,9 +110,26 @@
     if ($defaultReaction?.tag?.length > 0) {
       ev.tags?.push($defaultReaction?.tag);
     }
-    publishEvent(ev);
+
+    //観測失敗することあるから押したやつは押したときに観測しておくことにする
+
+    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
   };
 
+  async function publishAndSetQuery(
+    eventParam: Nostr.EventParameters,
+    queryKey: QueryKey
+  ) {
+    const { event: ev, res } = await promisePublishEvent(eventParam);
+
+    const isSuccessRelays: string[] = res
+      .filter((item) => item.ok)
+      .map((item) => normalizeRelayURL(item.from));
+
+    if (isSuccessRelays.length > 0) {
+      $queryClient.setQueriesData({ queryKey: queryKey }, (before) => ev);
+    }
+  }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
 
@@ -163,7 +189,7 @@
                 tags: tags,
                 content: "",
               };
-        publishEvent(ev);
+        await publishAndSetQuery(ev, ["reactions", "repost", atag ?? note.id]);
 
         break;
       case 1:
@@ -503,7 +529,7 @@
       >
     </div>
     <!--カスタムリアクション-->
-    <CustomReaction {note} {root} {atag} />
+    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
   {/if}
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735}

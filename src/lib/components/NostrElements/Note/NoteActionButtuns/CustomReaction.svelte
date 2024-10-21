@@ -14,12 +14,13 @@
   export let customReaction: string = "";
   export let emoji: string[] = [];
   export let handleClickOk: any | undefined = undefined;
+  export let publishAndSetQuery;
 
   let customReactionError: boolean = false;
   let customReactionErrorMessage: string = "";
   let open: boolean;
 
-  const handleClickCustomReaction = () => {
+  const handleClickCustomReaction = async () => {
     const textLen = split(customReaction).length; //countSymbolsIgnoringCombiningMarks(customReaction);
 
     if (textLen !== 1) {
@@ -54,12 +55,12 @@
       tags: tags,
       content: customReaction,
     };
-    publishEvent(ev);
+    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
     open = false;
     customReaction = "";
   };
 
-  const handleClickEmoji = (e: string[]) => {
+  const handleClickEmoji = async (e: string[]) => {
     emoji = e;
     if (!note) {
       return;
@@ -75,7 +76,7 @@
       ],
       content: `:${e[0]}:`,
     };
-    publishEvent(ev);
+    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
     open = false;
     customReaction = "";
   };

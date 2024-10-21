@@ -519,3 +519,8 @@ export const initUserMuteStatus: UserMuteStatus = {
   reaction: false,
   zap: false,
 };
+
+//末尾に"/"をつける
+export const normalizeRelayURL = (str: string) => {
+  return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
+};
