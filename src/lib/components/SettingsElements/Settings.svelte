@@ -588,6 +588,7 @@
           <div>{$_("settings.post.defaultReaction")} :</div>
           <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
             <CustomReaction
+              publishAndSetQuery={() => {}}
               note={undefined}
               root={undefined}
               atag={undefined}

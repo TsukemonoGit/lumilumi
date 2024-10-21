@@ -5,7 +5,6 @@
     generateResultMessage,
     nip50relays,
     npubRegex,
-    splitArray,
   } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
@@ -27,7 +26,6 @@
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
   import type { EventPacket } from "rx-nostr";
-  import { npubEncode } from "nostr-tools/nip19";
 
   export let data: {
     searchWord: string;

@@ -115,7 +115,11 @@
         >
       </div>
       <hr />
-      <div class=" font-medium text-magnum-400 p-2"><Description /></div>
+      <div class=" font-medium text-magnum-400 p-2">
+        {#if Description}
+          <svelte:component this={Description} />
+        {/if}
+      </div>
     </div>
   {/if}
 </div>

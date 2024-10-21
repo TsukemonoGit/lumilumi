@@ -11,6 +11,7 @@
     verifier,
     showBanner,
     viewMediaModal,
+    ogDescription,
   } from "$lib/stores/stores";
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
@@ -101,7 +102,7 @@
 
       //await nostrLogin.launch();
       const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
-      console.log(theme);
+      // console.log(theme);
       setTheme(theme);
 
       const tmp = localStorage.getItem("uploader");
@@ -142,7 +143,7 @@
         author?: string | undefined;
       }
     | undefined;
-  $: console.log($page);
+  //$: console.log($page);
 
   $: if (!$showBanner && nlBanner) {
     nlBanner.style.display = "none";
@@ -166,7 +167,7 @@
   let modalIndex: number;
   let mediaList: Part[];
   viewMediaModal.subscribe((e) => {
-    console.log(e);
+    //console.log(e);
     if ($viewMediaModal) {
       modalIndex = $viewMediaModal.index;
       mediaList = $viewMediaModal.mediaList;
@@ -183,18 +184,11 @@
 
   <meta property="og:title" content="Lumilumi" />
   <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
-  <!-- <meta
-    property="og:description"
-    content={$page.route.id === "/"
-      ? "the nostr client"
-      : $page.route.id?.includes("/channel")
-        ? "channel"
-        : $page.route.id?.includes("/list")
-          ? "list"
-          : $page.route.id === "/[npub=npub]"
-            ? "User"
-            : "the nostr client"}
-  /> -->
+
+  <meta name="description" content={$ogDescription} />
+
+  <meta property="og:description" content={$ogDescription} />
+
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
@@ -202,10 +196,7 @@
   {#each pwaAssetsHead.links as link}
     <link {...link} />
   {/each}
-  <!-- <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/default-theme.css"
-  /> -->
+
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/reset.css"
@@ -253,7 +244,7 @@
     </SetDefaultRelays>
   </NostrMain>
   {#if SvelteQueryDevtools}
-    <SvelteQueryDevtools initialIsOpen={false} />
+    <svelte:component this={SvelteQueryDevtools} initialIsOpen={false} />
   {/if}
   <!-- <SvelteQueryDevtools initialIsOpen={false} /> -->
 </QueryClientProvider>

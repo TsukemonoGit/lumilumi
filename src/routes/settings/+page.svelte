@@ -5,10 +5,10 @@
 </script>
 
 <svelte:head>
-  <title>Lumilumi-Setting</title>
   <meta property="og:description" content="Setting" />
   <meta name="description" content="Setting" />
 </svelte:head>
+
 <Settings />
 <div class="flex justify-center mt-2 mb-32">
   <Link href="https://github.com/TsukemonoGit/lumilumi">

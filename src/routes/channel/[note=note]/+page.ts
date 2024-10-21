@@ -16,12 +16,12 @@ export const load: PageLoad<{
 }> = ({ params }: { params: RouteParams }) => {
   const { note } = params as CustomParams; // キャストして kind を取得
 
-  console.log(note);
+  //console.log(note);
 
   try {
     const { type, data } = nip19.decode(note);
 
-    console.log("[decode]", type, data);
+    //console.log("[decode]", type, data);
     if (type === "nevent") {
       const nevent = data as nip19.EventPointer;
       return nevent;
@@ -31,7 +31,7 @@ export const load: PageLoad<{
       throw Error;
     }
   } catch (e) {
-    console.error("[note decode error]", e);
+    //console.error("[note decode error]", e);
     throw error(404, "Not Found");
   }
 };

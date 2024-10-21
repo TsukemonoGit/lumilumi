@@ -21,16 +21,16 @@ export const load: PageLoad<{
     //  throw error(406, "Not Acceptable");//npubとおってこなかったとき
   }
 
-  console.log(npub);
+  //console.log(npub);
 
   try {
     const { type, data } = nip19.decode(npub);
 
-    console.log("[decode]", type, data);
+    //console.log("[decode]", type, data);
 
     return { pubkey: data as string };
   } catch (e) {
-    console.error("[npub decode error]", e);
+    //   console.error("[npub decode error]", e);
     throw error(404, "Not Found");
   }
 };

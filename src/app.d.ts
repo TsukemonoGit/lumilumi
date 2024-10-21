@@ -10,12 +10,6 @@ declare global {
     // interface Platform {}
   }
   /// <reference types="svelte" />
-
-  declare namespace svelte.JSX {
-    interface HTMLAttributes<T> {
-      onenterViewport?: (event: CustomEvent) => void;
-    }
-  }
 }
 
 export {};

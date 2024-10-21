@@ -2,6 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
+import { ogDescription } from "$lib/stores/stores";
 
 interface CustomParams {
   npub: string;
@@ -13,16 +14,18 @@ export const load: PageLoad<{
 }> = ({ params }: { params: RouteParams }) => {
   const { npub } = params as CustomParams; // キャストして kind を取得
 
-  console.log(npub);
+  //console.log(npub);
 
   try {
     const { type, data } = nip19.decode(npub);
 
-    console.log("[decode]", type, data);
-
+    //console.log("[decode]", type, data);
+    ogDescription.set(
+      `User:${data ? `pubkey:${nip19.npubEncode(data as string)}` : ""}`
+    );
     return { pubkey: data as string };
   } catch (e) {
-    console.error("[npub decode error]", e);
+    //  console.error("[npub decode error]", e);
     throw error(404, "Not Found");
   }
 };

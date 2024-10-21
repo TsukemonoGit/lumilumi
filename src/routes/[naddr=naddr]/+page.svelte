@@ -5,7 +5,7 @@
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { defaultRelays } from "$lib/stores/stores";
+  import { defaultRelays, ogDescription } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import { onMount } from "svelte";
@@ -70,23 +70,6 @@
   }
 </script>
 
-<svelte:head>
-  <meta
-    name="description"
-    content={`${
-      eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`
-    }  ID:${data.identifier}
-pubkey:${nip19.npubEncode(data.pubkey)}`}
-  />
-
-  <meta
-    property="og:description"
-    content={`${
-      eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`
-    }  ID:${data.identifier}
-pubkey:${nip19.npubEncode(data.pubkey)}`}
-  />
-</svelte:head>
 {#if loading}
   loading
 {:else}

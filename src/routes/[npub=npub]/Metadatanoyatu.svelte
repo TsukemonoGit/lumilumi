@@ -37,7 +37,6 @@
       <Kind0Note
         note={metadata}
         displayMenu={true}
-        proxy={metadata.tags.find((tag) => tag[0] === "proxy")}
         depth={0}
         repostable={true}
         {tieKey}

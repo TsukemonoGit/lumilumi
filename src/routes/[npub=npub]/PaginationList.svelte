@@ -2,8 +2,6 @@
   import { createPagination, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
 
-  import type { CreatePaginationProps } from "@melt-ui/svelte";
-
   import { onMount } from "svelte";
 
   export let list: string[];

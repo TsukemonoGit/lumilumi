@@ -26,7 +26,7 @@ export const load: LayoutLoad = async (
     try {
       const { type, data } = nip19.decode(noteParam);
 
-      console.log("[decode]", type, data);
+      // console.log("[decode]", type, data);
       if (type === "nevent") {
         const nevent = data as nip19.EventPointer;
         return nevent;
@@ -36,7 +36,7 @@ export const load: LayoutLoad = async (
         throw Error;
       }
     } catch (e) {
-      console.error("[note decode error]", e);
+      //  console.error("[note decode error]", e);
     }
   }
 };

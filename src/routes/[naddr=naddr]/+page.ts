@@ -2,6 +2,8 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
+import { ogDescription } from "$lib/stores/stores";
+import { eventKinds } from "$lib/func/kinds";
 
 interface CustomParams {
   naddr: string;
@@ -19,15 +21,19 @@ export const load: PageLoad<{
   try {
     const { type, data } = nip19.decode(naddr);
 
-    console.log("[decode]", type, data);
+    // console.log("[decode]", type, data);
     if (type === "naddr") {
       const naddr = data as nip19.AddressPointer;
+      ogDescription.set(`${
+        eventKinds.get(data.kind)?.en ?? `kind:${data.kind}`
+      }  ID:${data.identifier}
+pubkey:${nip19.npubEncode(data.pubkey)}`);
       return naddr;
     } else {
       throw Error;
     }
   } catch (e) {
-    console.error("[note decode error]", e);
+    // console.error("[note decode error]", e);
     throw error(404, "Not Found");
   }
 };

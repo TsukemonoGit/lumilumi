@@ -7,7 +7,6 @@
   import type { Profile } from "$lib/types";
   import { splitHexColorString } from "$lib/func/util";
 
-  import { writable } from "svelte/store";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   //let metadata: Nostr.Event;
