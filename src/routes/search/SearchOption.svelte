@@ -1,8 +1,8 @@
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
-  import { followList, nowProgress } from "$lib/stores/stores";
+  import { followList, nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
-  import { X, ChevronsUpDown } from "lucide-svelte";
+  import { X, ChevronsUpDown, Share } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
@@ -10,6 +10,8 @@
   import type { Writable } from "svelte/store";
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
   import { eventKinds } from "$lib/func/kinds";
+  import { _ } from "svelte-i18n";
+  import { page } from "$app/stores";
 
   export let searchWord: string | undefined;
   export let followee: boolean;
@@ -46,6 +48,29 @@
     console.log(pubkey);
     searchPubkeyTo = pubkey;
   };
+
+  async function handleClickShare() {
+    const shareData = { url: $page.url.href };
+    console.log($page);
+    try {
+      await navigator.share(shareData);
+      // await navigator.clipboard.writeText(
+      //   `${$page.url.origin}/channel/${nevent}`
+      // );
+      $toastSettings = {
+        title: "Success",
+        description: `shared successfully`,
+        color: "bg-green-500",
+      };
+    } catch (error: any) {
+      console.error(error.message);
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to share",
+        color: "bg-orange-500",
+      };
+    }
+  }
 </script>
 
 <div class="flex flex-wrap gap-2 mb-2">
@@ -191,8 +216,18 @@
     {/each}
   </div>
 </div>
-<button
-  class="rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  disabled={$nowProgress}
-  on:click={handleClickSearch}>Search</button
->
+
+<div class="relative w-full h-12">
+  <button
+    class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+    disabled={$nowProgress}
+    on:click={handleClickSearch}>Search</button
+  >
+
+  <button
+    class="absolute right-0 top-[2px] w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+    on:click={handleClickShare}
+    disabled={$nowProgress}
+    ><Share size={16} />{$_("about.share")}
+  </button>
+</div>

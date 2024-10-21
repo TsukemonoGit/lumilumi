@@ -1,5 +1,5 @@
 import { ogDescription } from "$lib/stores/stores";
-import { nip19 } from "nostr-tools";
+
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = ({ url }) => {
@@ -25,7 +25,7 @@ export const load: PageLoad = ({ url }) => {
     desc = desc + `\nward:${searchWord}`;
   }
   if (searchHashtag) {
-    desc = desc + `\nhashtag:${searchHashtag}`;
+    desc = desc + `\n#${searchHashtag}`;
   }
   if (searchKind) {
     desc = desc + `\nkind:${searchKind}`;
