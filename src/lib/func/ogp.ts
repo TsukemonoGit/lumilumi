@@ -46,7 +46,7 @@ export const fetchOgpContent = async (
     const result = (await response
       ?.json()
       .catch((err) => console.log(err))) as Metadata;
-    console.log(result);
+    // console.log(result);
     // APIエンドポイントから取得したOGP情報を返す
     return {
       title: result.title || "",
