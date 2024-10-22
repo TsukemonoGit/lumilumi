@@ -266,67 +266,62 @@ export async function getMuteByList(
 
   for (const packet of events) {
     const beforeData = beforeMuteByList?.find(
-      (list) => list.event?.kind === packet.kind
+      (list) =>
+        list.event?.tags.find((tag) => tag[0] === "d")?.[1] ===
+        packet.tags.find((tag) => tag[0] === "d")?.[1]
     );
+
+    // 前回データがあり、同じpubkeyで、より新しい場合は既存データを使用
     if (
       beforeData &&
-      beforeData.event &&
-      beforeData.event.pubkey === packet.pubkey &&
+      beforeData.event?.pubkey === packet.pubkey &&
       beforeData.event.created_at >= packet.created_at
     ) {
       muteByList.push(beforeData);
     } else {
-      const kind = Number(
-        packet.tags.filter((tag) => tag[0] === "d").map((tag) => tag[1])
-      );
+      // "d" タグからkindを取得
+      const kindTag = packet.tags.find((tag) => tag[0] === "d");
+      const kind = kindTag ? parseInt(kindTag[1], 10) : undefined;
+
       if (kind) {
+        // "p" タグを取得
         let pTags = packet.tags
           .filter((tag) => tag[0] === "p")
           .map((tag) => tag[1]);
 
+        // コンテンツにデータが含まれている場合、非同期で暗号化されたタグを取得
         if (packet.content.length > 0) {
           const privateTags = await decryptContent(packet);
           if (privateTags && privateTags.length > 0) {
             const ppTags = privateTags
               .filter((tag: string[]) => tag[0] === "p")
               .map((tag: string[]) => tag[1]);
-            if (ppTags.length > 0) {
-              pTags = [...pTags, ...ppTags];
-            }
+            pTags = [...pTags, ...ppTags];
           }
         }
 
         if (pTags.length > 0) {
-          const existingKind = muteByList.find((item) => item.kind === kind);
-          if (existingKind) {
-            muteByList = muteByList.reduce(
-              (pre, cur) => {
-                if (cur.kind === packet.kind) {
-                  return [
-                    ...pre,
-                    {
-                      kind: packet.kind,
-                      list: pTags,
-                      event: packet,
-                    },
-                  ];
-                } else {
-                  return [...pre, cur];
-                }
-              },
-              [] as {
-                kind: number;
-                list: string[];
-                event: Nostr.Event | undefined;
-              }[]
-            );
+          // muteByListに同じkindが存在するか確認
+          const existingKindIndex = muteByList.findIndex(
+            (item) => item.kind === kind
+          );
+
+          if (existingKindIndex !== -1) {
+            // 既存のkindが見つかった場合は新しいイベントで上書き
+            muteByList[existingKindIndex] = {
+              kind,
+              list: pTags,
+              event: packet,
+            };
           } else {
+            // 新しいkindの場合は追加
             muteByList.push({ kind, list: pTags, event: packet });
           }
         }
       }
     }
   }
+
   return muteByList;
 }
 
