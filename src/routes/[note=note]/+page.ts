@@ -2,7 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
-import { ogDescription } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
 import { locale } from "svelte-i18n";
 import { get } from "svelte/store";
@@ -32,7 +32,9 @@ export const load: PageLoad<{
       const kindString = data.kind
         ? eventKinds.get(data.kind)?.[get(locale) === "ja" ? "ja" : "en"]
         : undefined;
-
+      ogTitle.set(
+        `Lumilumi - kind:${data.kind} ${kindString ? `(${kindString})` : ""}`
+      );
       ogDescription.set(`kind:${data.kind} ${
         kindString ? `(${kindString})` : ""
       }
@@ -41,6 +43,7 @@ ${data.author ? `pubkey:${nip19.npubEncode(data.author)}` : ""}`);
 
       return nevent;
     } else if (type === "note") {
+      ogTitle.set(`Lumilumi - note:${nip19.noteEncode(data)}`);
       ogDescription.set(`noteID:${nip19.noteEncode(data)}`);
       return { id: data as string };
     } else {

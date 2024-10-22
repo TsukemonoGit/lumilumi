@@ -1,4 +1,4 @@
-import { ogDescription } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 import type { PageLoad } from "./$types";
 
@@ -37,6 +37,7 @@ export const load: PageLoad = ({ url }) => {
     desc = desc + `\nto:${searchPubkeyTo}`;
   }
   console.log(desc);
+  ogTitle.set("Lumilulmi - Search");
   ogDescription.set(desc);
 
   return {

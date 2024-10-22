@@ -2,7 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
-import { ogDescription } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 interface CustomParams {
   naddr: string;
@@ -23,7 +23,7 @@ export const load: PageLoad<{
     console.log("[decode]", type, data);
     if (type === "naddr") {
       const naddr = data as nip19.AddressPointer;
-
+      ogTitle.set("Lumilumi - User List");
       ogDescription.set(`User List
 ID:${data.identifier}
 pubkey:${nip19.npubEncode(data.pubkey)}"`);

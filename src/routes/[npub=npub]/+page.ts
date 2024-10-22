@@ -2,7 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
-import { ogDescription } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 interface CustomParams {
   npub: string;
@@ -21,14 +21,15 @@ export const load: PageLoad<{
     const { type, data } = nip19.decode(npub);
     if (type === "npub") {
       //console.log("[decode]", type, data);
-      ogDescription.set(
-        `User:${data ? `pubkey:${nip19.npubEncode(data as string)}` : ""}`
-      );
+
+      ogTitle.set(`Lumilumi - User:${nip19.npubEncode(data as string)}`);
+
+      ogDescription.set(`User:${nip19.npubEncode(data as string)}`);
       return { pubkey: data as string };
     } else if (type === "nprofile") {
-      ogDescription.set(
-        `User:${data ? `pubkey:${nip19.npubEncode(data.pubkey)}` : ""}`
-      );
+      ogTitle.set(`Lumilumi - User:${nip19.npubEncode(data.pubkey)}`);
+
+      ogDescription.set(`User:${nip19.npubEncode(data.pubkey)}`);
 
       return { pubkey: data.pubkey, relays: data.relays ?? undefined };
     } else {

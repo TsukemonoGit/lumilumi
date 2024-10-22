@@ -5,7 +5,7 @@
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { defaultRelays, ogDescription } from "$lib/stores/stores";
+  import { defaultRelays } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import { onMount } from "svelte";
@@ -17,8 +17,6 @@
   import { sortEvents } from "$lib/func/util";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
-  import { nip19 } from "nostr-tools";
-  import { eventKinds } from "$lib/func/kinds";
 
   export let data: {
     identifier: string;

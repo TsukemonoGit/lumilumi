@@ -137,4 +137,6 @@ export const userStatusStore: Writable<Map<string, Map<string, Nostr.Event>>> =
 
 export const showAllReactions = writable<boolean>(false);
 
+export const ogTitle = writable<string>("Lumilumi");
+
 export const ogDescription = writable<string>("the nostr client");

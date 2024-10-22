@@ -2,7 +2,7 @@ import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
-import { ogDescription } from "$lib/stores/stores";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 interface CustomParams {
   note: string;
@@ -21,7 +21,7 @@ export const load: PageLoad<{
 
   try {
     const { type, data } = nip19.decode(note);
-
+    ogTitle.set("Lumilumi - Public chat");
     //console.log("[decode]", type, data);
     if (type === "nevent") {
       const nevent = data as nip19.EventPointer;

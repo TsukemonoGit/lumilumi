@@ -12,6 +12,7 @@
     showBanner,
     viewMediaModal,
     ogDescription,
+    ogTitle,
   } from "$lib/stores/stores";
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
@@ -182,7 +183,7 @@
 <svelte:head>
   <title>Lumilumi</title>
 
-  <meta property="og:title" content="Lumilumi" />
+  <meta property="og:title" content={$ogTitle} />
   <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
 
   <meta name="description" content={$ogDescription} />
