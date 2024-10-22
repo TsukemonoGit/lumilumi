@@ -12,19 +12,8 @@ import {
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
-import type {
-  UseReqOpts,
-  ReqResult,
-  ReqStatus,
-  UseQueryOpt,
-  Profile,
-  UsePromiseReqOpts,
-} from "$lib/types";
-import {
-  useQueryClient,
-  createQuery,
-  type QueryKey,
-} from "@tanstack/svelte-query";
+import type { ReqStatus, Profile, UsePromiseReqOpts } from "$lib/types";
+import { createQuery, type QueryKey } from "@tanstack/svelte-query";
 
 import {
   type EventPacket,
@@ -39,7 +28,6 @@ import {
   nip07Signer,
   completeOnTimeout,
   type RxReqEmittable,
-  type RxReqStrategy,
   createRxForwardReq,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";

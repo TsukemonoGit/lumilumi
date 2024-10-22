@@ -1,20 +1,11 @@
 <script lang="ts">
-  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
+  import { now, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import Contacts from "./NostrMainData/Contacts.svelte";
 
-  import { changeMainEmit, makeMainFilters, pubkeysIn } from "$lib/func/nostr";
+  import { makeMainFilters } from "$lib/func/nostr";
 
-  import TimelineList from "./NostrMainData/TimelineList.svelte";
-
-  import {
-    followList,
-    loginUser,
-    queryClient,
-    showKind16,
-    showReactioninTL,
-    showUserStatus,
-  } from "$lib/stores/stores";
+  import { followList, loginUser, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -27,7 +18,6 @@
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
   import MainTimeline from "./NostrMainData/MainTimeline.svelte";
-  import { changeEmit } from "$lib/func/reactions";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
