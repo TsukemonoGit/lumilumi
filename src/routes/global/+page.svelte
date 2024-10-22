@@ -26,7 +26,7 @@
   let compRef: SvelteComponent;
   let openGlobalTimeline: boolean;
   let globalRelays: string[] = [];
-  let tieKey=generateRandomId(2);
+  let tieKey = generateRandomId(2);
   $: timelineQuery = ["global", "feed", tieKey];
   const onClickSave = async (relays: string[]) => {
     $nowProgress = true;
@@ -63,7 +63,7 @@
       $queryClient.removeQueries({
         queryKey: [...timelineQuery, "olderData"],
       });
-      tieKey = generateRandomId(2)];
+      tieKey = generateRandomId(2);
       globalRelays = relays;
     }
     $nowProgress = false;
