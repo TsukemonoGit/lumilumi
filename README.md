@@ -127,6 +127,11 @@ https://github.com/akiomik/nosvelte
 
 ### 他
 
+- /relay/[relayURL] でそのリレーのTLがみれる
+
+  e.g. https://lumilumi.vercel.app/relay/catstrr.swarmstr.com
+
+
 - 翻訳機能
 - ブロードキャスト機能
 - ZAP
@@ -141,5 +146,5 @@ https://github.com/akiomik/nosvelte
 - pin link: [nostviewstr](https://nostviewstr.vercel.app/)
 - note link: [njump.me](https://njump.me/)
 - translate: [google translate](https://translate.google.com/)
-- relay link: [Nostrrr](https://nostrrr.com/), [nostr watch](https://legacy.nostr.watch/)
+- relay link: [nostr watch](https://legacy.nostr.watch/)<!--[Nostrrr](https://nostrrr.com/), -->
 - emoji link: [emojito](https://emojito.meme/)
