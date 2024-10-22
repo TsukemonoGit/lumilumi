@@ -201,6 +201,7 @@
           [...queryKey, "olderData"],
           [...(olddata ?? []), ...older]
         );
+        updateViewEvent($data);
       }
     }
   }

@@ -196,6 +196,7 @@
           [...(olddata ?? []), ...older]
         );
       }
+      updateViewEvent($data);
       result.status = readable("success");
     }
   }
