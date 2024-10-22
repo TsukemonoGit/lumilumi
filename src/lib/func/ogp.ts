@@ -49,12 +49,16 @@ export const fetchOgpContent = async (
     //console.log(result);
     // APIエンドポイントから取得したOGP情報を返す
     return {
-      title: result.title || "",
+      title:
+        (result.open_graph && result.open_graph.title) || result.title || "",
       image:
         result.open_graph && result.open_graph.images
           ? result.open_graph.images[result.open_graph.images.length - 1].url
           : "",
-      description: (result.open_graph && result.open_graph.description) || "",
+      description:
+        (result.open_graph && result.open_graph.description) ||
+        result.description ||
+        "",
       favicon: result.favicon || "",
     };
   } catch (error) {
