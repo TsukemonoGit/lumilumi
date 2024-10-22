@@ -5,7 +5,7 @@
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { generateRandomId } from "$lib/func/nostr";
+  import { generateRandomId, setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
@@ -16,7 +16,7 @@
   import { Pin } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
@@ -28,6 +28,7 @@
 
   export let data: {
     pubkey: string;
+    relays?: string[] | undefined;
   };
 
   let amount = 50;
@@ -82,6 +83,10 @@
     $value = "post";
   });
   async function init() {
+    //ログインしてない＝10002リレーないから
+    if (!$loginUser && data.relays && data.relays.length > 0) {
+      setRelays(data.relays);
+    }
     since = undefined;
     const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
       ...timelineQuery,
