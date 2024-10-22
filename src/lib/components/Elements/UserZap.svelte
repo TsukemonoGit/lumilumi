@@ -53,7 +53,7 @@
 <button
   on:click={() => ($dialogOpen = true)}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-  ><Zap /></button
+  title="zap"><Zap /></button
 >
 <AlertDialog bind:open={dialogOpen} onClickOK={() => onClickOK()} title="Zap">
   <div slot="main" class=" text-neutral-200">

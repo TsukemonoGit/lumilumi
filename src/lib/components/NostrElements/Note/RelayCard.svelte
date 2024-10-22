@@ -207,20 +207,20 @@
               <div
                 class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
               >
-                <Ellipsis />
+                <Ellipsis size={20} />
               </div>
             </DropdownMenu>
           </div>
         </div>
         {#if relayInfo.description}
           <div
-            class=" whitespace-pre-wrap break-words"
+            class="mb-2 whitespace-pre-wrap break-words"
             style="word-break: break-word;"
           >
             {relayInfo.description ?? ""}
           </div>{/if}
         <div
-          class="my-2 whitespace-pre-wrap break-words"
+          class=" whitespace-pre-wrap break-words text-sm"
           style="word-break: break-word;"
         >
           <span class="font-bold">URL:</span>
@@ -229,13 +229,13 @@
 
         {#if relayInfo.software}
           <div
-            class="my-2 whitespace-pre-wrap break-words"
+            class=" whitespace-pre-wrap break-words text-sm"
             style="word-break: break-word;"
           >
             <span class="font-bold">Software: </span>{relayInfo.software}
           </div>{/if}
         {#if relayInfo.supported_nips}
-          <div class="w-full flex-wrap flex">
+          <div class="w-full flex-wrap flex text-sm">
             <span class="font-bold">NIPs:</span>
             {#each relayInfo.supported_nips as nip}
               <a

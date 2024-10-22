@@ -14,7 +14,7 @@
   <button
     type="button"
     class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-    ><Ellipsis /></button
+    title="menu"><Ellipsis /></button
   >
 
   <div
