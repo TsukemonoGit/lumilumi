@@ -12,6 +12,7 @@
     FileJson2,
     SquareArrowOutUpRight,
     RadioTower,
+    Share,
   } from "lucide-svelte";
 
   import Avatar from "svelte-boring-avatars";
@@ -42,6 +43,7 @@
 
     { text: `${$_("menu.nostr-watch")}`, icon: SquareArrowOutUpRight, num: 1 },
     // { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
+    { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
   ];
 
   const handleSelectItem = async (index: number) => {
@@ -110,6 +112,33 @@
         case 5:
           //goto relay page
           goto(`/relay/${url.slice(6)}`);
+          break;
+        case 6:
+          //share relay page
+          const shareData = {
+            //title: "",
+            //text: "lumilumi",
+            url: `${$page.url.origin}/relay/${url.slice(6)}`,
+          };
+
+          try {
+            await navigator.share(shareData);
+            // await navigator.clipboard.writeText(
+            //   `${$page.url.origin}/${replaceable ? naddr : nevent}`
+            // );
+            $toastSettings = {
+              title: "Success",
+              description: `shared successfully`,
+              color: "bg-green-500",
+            };
+          } catch (error: any) {
+            console.error(error.message);
+            $toastSettings = {
+              title: "Error",
+              description: "Failed to share",
+              color: "bg-orange-500",
+            };
+          }
           break;
       }
     } catch (error) {
