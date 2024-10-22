@@ -68,7 +68,8 @@
     },
     "petname": {
       "petname": "Petname",
-      "write": "Can set the display name (petname) of the follow users."
+      "write": "Can set the display name (petname) of the follow users.",
+      "edit": "Edit Petname"
     }
   },
   "profile": {

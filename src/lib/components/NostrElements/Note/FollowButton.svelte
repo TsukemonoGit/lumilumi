@@ -287,7 +287,7 @@
     <button
       disabled={$nowProgress}
       class={`rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-      title={$_("user.petname.petname")}
+      title={$_("user.petname.edit")}
       on:click={handlePetnameClick}
     >
       📛
