@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
@@ -9,7 +11,9 @@
     Ellipsis,
     FileJson2,
     SquareArrowOutUpRight,
+    RadioTower,
   } from "lucide-svelte";
+
   import Avatar from "svelte-boring-avatars";
   import { _ } from "svelte-i18n";
 
@@ -21,7 +25,13 @@
   let dialogOpen: any;
   let size = 48;
 
-  let menuTexts = [
+  let menuTexts =
+    `wss://${$page.params.relay}` !== url
+      ? [{ text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 }]
+      : [];
+
+  menuTexts = [
+    ...menuTexts,
     { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
     { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
     {
@@ -31,7 +41,7 @@
     },
 
     { text: `${$_("menu.nostr-watch")}`, icon: SquareArrowOutUpRight, num: 1 },
-    { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
+    // { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
   ];
 
   const handleSelectItem = async (index: number) => {
@@ -96,6 +106,10 @@
 
           window.open(formatUrl(url), "_blank", "noreferrer");
 
+          break;
+        case 5:
+          //goto relay page
+          goto(`/relay/${url.slice(6)}`);
           break;
       }
     } catch (error) {
@@ -169,18 +183,31 @@
             </DropdownMenu>
           </div>
         </div>
-
-        {url}
-
+        {#if relayInfo.description}
+          <div
+            class=" whitespace-pre-wrap break-words"
+            style="word-break: break-word;"
+          >
+            {relayInfo.description ?? ""}
+          </div>{/if}
         <div
           class="my-2 whitespace-pre-wrap break-words"
           style="word-break: break-word;"
         >
-          {relayInfo.description ?? ""}
+          <span class="font-bold">URL:</span>
+          {url}
         </div>
+
+        {#if relayInfo.software}
+          <div
+            class="my-2 whitespace-pre-wrap break-words"
+            style="word-break: break-word;"
+          >
+            <span class="font-bold">Software: </span>{relayInfo.software}
+          </div>{/if}
         {#if relayInfo.supported_nips}
           <div class="w-full flex-wrap flex">
-            NIPs:
+            <span class="font-bold">NIPs:</span>
             {#each relayInfo.supported_nips as nip}
               <a
                 class="px-1 whitespace-nowrap text-magnum-400 font-semibold"

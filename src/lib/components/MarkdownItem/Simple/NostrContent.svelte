@@ -134,6 +134,10 @@
       href={`/search?t=${part.url}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
     >
+  {:else if part.type === "relay"}
+    <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
+      >{part.content}</a
+    >
   {:else if part.type === "nip"}
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}

@@ -3,18 +3,18 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { generateRandomId } from "$lib/func/nostr";
+
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { now, type EventPacket } from "rx-nostr/src";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
 
   let isOnMount = false;
   export let timelineQuery: QueryKey;
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "global";
+  export let tieKey = "global";
   export let globalRelays;
 
   onMount(async () => {

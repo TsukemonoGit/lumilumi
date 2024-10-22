@@ -101,7 +101,8 @@
     },
     "broadcast": "ブロードキャスト",
     "open": {
-      "relayHtml": "リレーのサイトを開く"
+      "relayHtml": "リレーのサイトを開く",
+      "relayTimeline": "リレータイムラインを見る"
     },
     "nostr-watch": "nostr.watch で開く",
     "nostrrr": "Nostrrr で開く",

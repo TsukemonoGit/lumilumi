@@ -1,0 +1,59 @@
+<script lang="ts">
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { onMount } from "svelte";
+  import GlobalTimeline from "../../global/GlobalTimeline.svelte";
+
+  export let data: {
+    relay: string;
+  };
+  let relayUrl: string | undefined;
+  let isMount = false;
+  onMount(() => {
+    if (isMount) {
+      return;
+    }
+    init();
+  });
+  afterNavigate(() => {
+    if (isMount) {
+      return;
+    }
+    init();
+  });
+
+  beforeNavigate(() => {
+    relayUrl = undefined;
+  });
+
+  async function init() {
+    isMount = true;
+    setTimeout(() => {
+      relayUrl = data.relay;
+
+      isMount = false;
+    }, 0);
+  }
+</script>
+
+{#if relayUrl}
+  <div class="rounded-md border border-magnum-500">
+    <RelayCard url={relayUrl} write={false} read={false} />
+  </div>
+
+  <GlobalTimeline
+    tieKey={relayUrl}
+    globalRelays={[relayUrl]}
+    timelineQuery={[relayUrl]}
+  />
+
+  <div class="postWindow">
+    <OpenPostWindow
+      options={{
+        tags: [],
+        kind: 1,
+      }}
+    />
+  </div>
+{/if}

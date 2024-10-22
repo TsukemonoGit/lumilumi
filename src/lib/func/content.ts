@@ -1,5 +1,5 @@
 import { nip19 } from "nostr-tools";
-import { nip19Regex, urlRegex, nipRegex, parseNaddr } from "./util";
+import { nip19Regex, urlRegex, nipRegex, parseNaddr, relayRegex } from "./util";
 
 export interface Part {
   type:
@@ -8,6 +8,7 @@ export interface Part {
     | "emoji"
     | "hashtag"
     | "nip"
+    | "relay"
     | "text"
     | "image"
     | "audio"
@@ -33,6 +34,7 @@ export interface Part {
   list?: Part[];
   imageUrl?: string;
 }
+
 /** ImageFile_Check_正規表現_パターン */
 const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
 //movie
@@ -325,6 +327,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
     const emojiResult = findEmojiIndex(remainingText);
     const hashtagResult = findHashtagIndex(remainingText);
     const nipMatch = remainingText.match(nipRegex);
+    const relayMatch = remainingText.match(relayRegex);
 
     const numberIndex = numberMatch
       ? remainingText.indexOf(numberMatch[0])
@@ -334,6 +337,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
     const emojiIndex = emojiResult ? emojiResult.index : -1;
     const hashtagIndex = hashtagResult ? hashtagResult.index : -1;
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
+    const relayIndex = relayMatch ? remainingText.indexOf(relayMatch[0]) : -1;
 
     if (
       numberIndex === -1 &&
@@ -341,7 +345,8 @@ export function parseText(input: string, tags: string[][]): Part[] {
       urlIndex === -1 &&
       emojiIndex === -1 &&
       hashtagIndex === -1 &&
-      nipIndex === -1
+      nipIndex === -1 &&
+      relayIndex === -1
     ) {
       // No more matches, add the remaining text as a normal text part
       parts.push({ type: "text", content: remainingText });
@@ -363,6 +368,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
         match: hashtagResult ? [hashtagResult.hashtag] : null,
       },
       { type: "nip", index: nipIndex, match: nipMatch },
+      { type: "relay", index: relayIndex, match: relayMatch },
     ]
       .filter(({ index }) => index !== -1)
       .sort((a, b) => a.index - b.index)[0];
@@ -459,6 +465,13 @@ export function parseText(input: string, tags: string[][]): Part[] {
             url: `https://github.com/nostr-protocol/nips/blob/master/${match?.[0].slice(
               4
             )}.md`, // Remove "nip-" prefix
+          });
+          break;
+        case "relay":
+          parts.push({
+            type: "relay",
+            content: match[0],
+            url: `/relay/${match?.[0].slice(6)}`,
           });
           break;
       }

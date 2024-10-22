@@ -40,7 +40,7 @@ export const mediaUploader = [
   "https://yabu.me",
 ];
 //https://api.nostr.watch/v1/nip/50
-export const relayRegex = /^wss?:\/\/\S+$/g;
+export const relayRegex = /wss?:\/\/\S+/g; ///^wss?:\/\/\S+$/g;
 //export const nip33RegexG = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/g;
 export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;
 export const nip19Regex =

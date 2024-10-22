@@ -27,7 +27,7 @@
       "showReactioninTL": "show reaction toast",
       "showUserStatus": "show user status",
       "banner": "Show the account banner on the right",
-      "showKind16": "Show kind16 (reposts other than kind1)　",
+      "showKind16": "Show kind16 (reposts other than kind1)",
       "showClientTag": "Show Display client tag (via) in TL",
       "showAllReaction": "Show everyone's reactions"
     },
@@ -101,7 +101,8 @@
     },
     "broadcast": "broadcast",
     "open": {
-      "relayHtml": "Open relay site"
+      "relayHtml": "Open relay site",
+      "relayTimeline": "Goto RelayTimeline"
     },
     "nostr-watch": "Open in nostr.watch",
     "nostrrr": "Open in Nostrrr",
