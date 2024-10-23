@@ -6,16 +6,24 @@
   export let events: Nostr.Event[];
   export let tieKey: string | undefined;
 
+  // undefined や null を除外した配列を作成
+  $: validEvents = events.filter(
+    (event) => event !== undefined && event !== null
+  );
+
+  // content の一致でフィルタリングする関数
   const filterEventsByContent = (events: Nostr.Event[], content: string) => {
     return events.filter((event) => (event.content || "+") === content);
   };
 
+  // ユニークな内容を取得する部分
   $: uniqueContents = [
-    ...new Set(events.map((event) => event.content || "+")),
+    ...new Set(validEvents.map((event) => event.content || "+")),
   ].sort(); // Get unique contents and sort them
 
+  // content に一致するイベントを見つける関数
   const findEvent = (content: string): Nostr.Event => {
-    return events.find(
+    return validEvents.find(
       (event) => (event.content || "+") === content
     ) as Nostr.Event;
   };
@@ -29,7 +37,8 @@
       <Reaction event={findEvent(content)} />
     </div>
     <div class="flex-wrap px-2 gap-1">
-      {#each filterEventsByContent(events, content) as event (event.id)}
+      {#each filterEventsByContent(validEvents, content) as event (event.id)}
+        <!-- 修正: validEvents を使用 -->
         {#if event.pubkey}
           <Metadata
             queryKey={["metadata", event.pubkey]}
