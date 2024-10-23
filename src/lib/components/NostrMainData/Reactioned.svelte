@@ -22,7 +22,7 @@
   //   console.log($queryClient?.getQueriesData({ queryKey: queryKey }));
   const unsubscribe = observer1.subscribe((result: any) => {
     if (
-      !_result?.data ||
+      !_result?.data?.event ||
       (result?.data &&
         result.data.event &&
         result.data.event.created_at > _result.data.event.created_at)
