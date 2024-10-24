@@ -1,7 +1,12 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
+    promisePublishEvent,
+    setRelays,
+    usePromiseReq,
+  } from "$lib/func/nostr";
+  import {
+    defaultRelays,
     loginUser,
     nowProgress,
     queryClient,
@@ -24,6 +29,7 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
 
   export let data: {
     pubkey: string;
@@ -283,11 +289,14 @@
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
 
-    if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({
-        queryKey: ["defaultRelay", data.pubkey],
-      });
-    }
+    // if (isSuccess.length > 0) {
+    //   $queryClient.refetchQueries({
+    //     queryKey: ["defaultRelay", data.pubkey],
+    //   });
+    // }
+    // const relays = setRelaysByKind10002(event);
+    // setRelays(relays);
+
     //reset押したときに戻るデータを更新
     kind10002 = event;
     $nowProgress = false;

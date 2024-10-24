@@ -52,7 +52,9 @@ export function useRelaySet(
     error: reqResult.error,
   };
 }
-
+let kind10002: Nostr.Event;
+let kind3: Nostr.Event;
+let relay: DefaultRelayConfig[] = [];
 export function toRelaySet(
   value: EventPacket | EventPacket[] | undefined
 ): DefaultRelayConfig[] {
@@ -60,9 +62,6 @@ export function toRelaySet(
   if (!value) {
     return [];
   } else if (Array.isArray(value)) {
-    let relay: DefaultRelayConfig[] = [];
-    let kind3: Nostr.Event;
-    let kind10002: Nostr.Event;
     value.forEach((packet) => {
       if (packet.event.kind === 3) {
         if (

@@ -17,7 +17,7 @@
   // | "error"
   // | "rejected"
   // | "terminated";
-
+  $: console.log($defaultRelays);
   $: readRelays = $defaultRelays
     ? Object.values($defaultRelays).filter((config) => config.read)
     : [];
