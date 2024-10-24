@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   //import * as Nostr from "nostr-typedef";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
 
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { setRelays } from "$lib/func/nostr";

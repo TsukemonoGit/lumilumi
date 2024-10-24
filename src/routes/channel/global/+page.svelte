@@ -12,7 +12,7 @@
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   const timelineQuery: QueryKey = ["globalchannel"];

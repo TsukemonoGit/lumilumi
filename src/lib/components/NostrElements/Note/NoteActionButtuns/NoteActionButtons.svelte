@@ -42,7 +42,7 @@
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import EventCard from "../EventCard.svelte";
+  import EventCard from "../EventCard/EventCard.svelte";
   import { afterUpdate, onMount } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/makeZap";

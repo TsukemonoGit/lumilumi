@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
+  import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { onMount } from "svelte";
   import GlobalTimeline from "../../global/GlobalTimeline.svelte";

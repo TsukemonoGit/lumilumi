@@ -4,7 +4,7 @@
   import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
 
   import { nip50relays } from "$lib/func/util";
-  import EventCard from "../../lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "../../lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";

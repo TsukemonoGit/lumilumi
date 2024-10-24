@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { afterNavigate, goto } from "$app/navigation";
+  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
     loginUser,
     nowProgress,
@@ -16,8 +16,14 @@
   //import { samplemetadata, sample2 } from "./data";
   import { _ } from "svelte-i18n";
 
-  import { X } from "lucide-svelte";
+  import { X, Save } from "lucide-svelte";
   import { writable } from "svelte/store";
+  import { page } from "$app/stores";
+  import { generateResultMessage } from "$lib/func/util";
+  import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+  import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   export let data: {
     pubkey: string;
@@ -29,7 +35,7 @@
   let newTags = writable<string[][]>([]);
 
   // Read/Write状態を保存するためのMap
-  const relayStates: Map<string, { read: boolean; write: boolean }> = new Map();
+  let relayStates: Map<string, { read: boolean; write: boolean }> = new Map();
 
   let isError = false;
   let isMount = false;
@@ -70,6 +76,10 @@
           color: "bg-red-500",
         };
         isError = true;
+        // 現在のURLの親階層に戻る
+        const currentUrl = $page.url.pathname; // 現在のURLパスを取得
+        const parentUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/")); // 一つ前の階層を取得
+        goto(parentUrl); // 一つ前の階層に移動
         return;
       }
     } catch (error) {
@@ -90,18 +100,22 @@
       $newTags = getTags(kind10002);
       // newKind10002.tagsの値に基づいてread/writeの初期値を設定
 
-      $newTags.forEach(([r, url, rw], index) => {
-        // "rw" の値を解析して初期値を設定
-        relayStates.set(url, {
-          read: !rw || rw === "read" ? true : false,
-          write: !rw || rw === "write" ? true : false,
-        });
-      });
+      setAllStates();
+
       $nowProgress = false;
     }
     $nowProgress = false;
   }
-
+  function setAllStates() {
+    relayStates = new Map();
+    $newTags.forEach(([r, url, rw], index) => {
+      // "rw" の値を解析して初期値を設定
+      relayStates.set(url, {
+        read: !rw || rw === "read" ? true : false,
+        write: !rw || rw === "write" ? true : false,
+      });
+    });
+  }
   function getTags(ev: Nostr.Event): string[][] {
     //タグの末尾を揃える
     return ev.tags.reduce((before, tag) => {
@@ -120,7 +134,7 @@
     const defaultRelayData: EventPacket[] | undefined =
       $queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
     if (defaultRelayData) {
-      // console.log(defaultRelayData);
+      console.log(defaultRelayData);
       return defaultRelayData[0];
     }
     try {
@@ -223,11 +237,12 @@
   function reset() {
     //
     $newTags = getTags(kind10002);
+    setAllStates();
     updateRelayCounts();
   }
 
-  function save() {
-    console.log($newTags);
+  async function save() {
+    // console.log($newTags);
 
     // 新しいタグを生成
     $newTags = relayStates.entries().reduce((before, [url, state]) => {
@@ -255,19 +270,31 @@
       kind: 10002,
       pubkey: $loginUser,
     };
+    const { event, res } = await promisePublishEvent(eventParam);
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+
+    let str = generateResultMessage(isSuccess, isFailed);
+    console.log(str);
+
+    $toastSettings = {
+      title: isSuccess.length > 0 ? "Success" : "Failed",
+      description: str,
+      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+    };
+
+    if (isSuccess.length > 0) {
+      $queryClient.refetchQueries({
+        queryKey: ["defaultRelay", data.pubkey],
+      });
+    }
+    //reset押したときに戻るデータを更新
+    kind10002 = event;
+    $nowProgress = false;
   }
   let writeLen: number = 0;
   let readLen: number = 0;
-  // $: if (relayStates) {
-  //   writeLen = Array.from(relayStates.values()).filter(
-  //     (state) => state.write
-  //   ).length;
-  // }
 
-  // $: console.log(writeLen);
-  // $: readLen = Array.from(relayStates.values()).filter(
-  //   (state) => state.read
-  // ).length;
   $: if ($newTags) {
     updateRelayCounts();
   }
@@ -283,83 +310,139 @@
   }
 </script>
 
-<section class="w-full">
-  <table>
-    <tr>
-      <th class="text-center"
-        >relay
-        <div class=" text-xs font-normal">{$newTags.length}</div></th
-      ><th class="text-center"
-        >read
-        <div class=" text-xs font-normal">
-          {readLen}
-        </div></th
-      ><th class="text-center"
-        >write
-        <div class=" text-xs font-normal">
-          {writeLen}
-        </div></th
-      ><th class="text-center"></th>
-    </tr>
-    {#each $newTags as [r, url, rw], index}
+<section class="w-full mb-20">
+  <div class="w-full border border-magnum-400 rounded-md p-1">
+    <!-- {#if kind10002}<EventCard
+      note={kind10002}
+      metadata={undefined}
+      tieKey={undefined}
+      displayMenu={false}
+    />{/if} -->
+    {#if kind10002}
+      <Metadata
+        pubkey={data.pubkey}
+        queryKey={["metadata", data.pubkey]}
+        let:metadata
+      >
+        <div slot="loading">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+        <div slot="nodata">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+        <div slot="error">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+
+        <NoteTemplate note={kind10002} depth={0} tieKey={undefined} {metadata}>
+          kind: 10002 Relays
+          <div class="inline-flex float-end pr-1">
+            <EllipsisMenu note={kind10002} tieKey={undefined} />
+          </div>
+        </NoteTemplate>
+      </Metadata>
+    {/if}
+    <!-- <div class="flex font-bold justify-between w-full h-8 items-center">
+    kind: 10002 Relays {#if kind10002}<EllipsisMenu
+        note={kind10002}
+        tieKey={undefined}
+      />{/if}
+  </div> -->
+    <table>
       <tr>
-        <td class="text-left break-all"
-          >{url}
-          <!-- <RelayCard
+        <th class="text-center"
+          >relay
+          <div class=" text-xs font-normal">{$newTags.length}</div></th
+        ><th class="text-center"
+          >read
+          <div class=" text-xs font-normal">
+            {readLen}
+          </div></th
+        ><th class="text-center"
+          >write
+          <div class=" text-xs font-normal">
+            {writeLen}
+          </div></th
+        ><th class="text-center"></th>
+      </tr>
+      {#each $newTags as [r, url, rw], index}
+        <tr>
+          <td class="text-left break-all"
+            >{url}
+            <!-- <RelayCard
               {url}
               read={readStates[index]}
               write={writeStates[index]}
             /> -->
-        </td>
-        <td class="text-center"
-          ><input
-            type="checkbox"
-            checked={relayStates.get(url)?.read}
-            on:change={(e) => handleClickRead(e, url)}
-          /></td
-        >
-        <td class="text-center"
-          ><input
-            type="checkbox"
-            checked={relayStates.get(url)?.write}
-            on:change={(e) => handleClickWrite(e, url)}
-          /></td
-        ><td
-          ><button
-            class="m-auto h-6 w-6 flex justify-center items-center
+          </td>
+          <td class="text-center"
+            ><input
+              type="checkbox"
+              checked={relayStates.get(url)?.read}
+              on:change={(e) => handleClickRead(e, url)}
+            /></td
+          >
+          <td class="text-center"
+            ><input
+              type="checkbox"
+              checked={relayStates.get(url)?.write}
+              on:change={(e) => handleClickWrite(e, url)}
+            /></td
+          ><td
+            ><button
+              class="m-auto h-6 w-6 flex justify-center items-center
             rounded-full text-magnum-800 bg-magnum-100
             hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300"
-            on:click={() => removeRelay(url)}><X size={20} /></button
-          ></td
-        >
-      </tr>
-    {/each}
-  </table>
-  <div class="mt-2 flex items-center w-full">
-    <input
-      type="text"
-      class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
-      placeholder="wss://"
-      bind:value={newRelay}
-    />
-    <button
-      class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit"
-      on:click={addNewRelay}
-    >
-      Add
-    </button>
+              on:click={() => removeRelay(url)}><X size={20} /></button
+            ></td
+          >
+        </tr>
+      {/each}
+    </table>
+    <div class="mt-2 flex items-center w-full">
+      <input
+        type="text"
+        class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
+        placeholder="wss://"
+        bind:value={newRelay}
+      />
+      <button
+        class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit disabled:opacity-25"
+        on:click={addNewRelay}
+        disabled={$nowProgress}
+      >
+        Add
+      </button>
+    </div>
   </div>
-  <div class="flex">
+  <div class="w-full flex gap-2 mt-8">
     <button
-      class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit"
+      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50 disabled:opacity-25"
+      disabled={$nowProgress}
+      on:click={save}
+    >
+      <Save />Save
+    </button><button
+      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50 disabled:opacity-25"
+      disabled={$nowProgress}
       on:click={reset}
     >
       Reset
-    </button><button
-      class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit"
-      on:click={save}
-    >
-      Save
     </button>
   </div>
 </section>
@@ -371,13 +454,13 @@
     margin: 6px 0;
     font-size: 16px;
     text-align: left;
-    border: 1px solid theme("colors.magnum.300");
+    border: 1px solid rgb(var(--color-magnum-600) / 0.5);
   }
 
   th,
   td {
     padding: 6px;
-    border: 1px solid theme("colors.magnum.300");
+    border: 1px solid rgb(var(--color-magnum-600) / 0.5);
   }
   tr:hover {
     background-color: theme("colors.neutral.800");

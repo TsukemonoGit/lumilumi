@@ -1,6 +1,6 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
-  import EventCard from "./EventCard.svelte";
+  import EventCard from "./EventCard/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   import Text from "$lib/components/NostrMainData/Text.svelte";

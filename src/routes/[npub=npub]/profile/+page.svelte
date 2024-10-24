@@ -28,8 +28,7 @@
   import { nip19 } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
-  import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
+
   import InputImageFromFile from "./InputImageFromFile.svelte";
 
   export let data: {

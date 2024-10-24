@@ -9,7 +9,7 @@
   import { Triangle } from "lucide-svelte";
   import Avatar from "svelte-boring-avatars";
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
+  import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { onMount } from "svelte";
 

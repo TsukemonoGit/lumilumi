@@ -2,13 +2,10 @@
   import { nip19 } from "nostr-tools";
   import Note from "./Note.svelte";
   import { Quote } from "lucide-svelte";
-  import EventCard from "./EventCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import UserName from "./UserName.svelte";
 
-  import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import viewport from "$lib/func/useViewportAction";
   import NaddrEvent from "./NaddrEvent.svelte";
   export let displayMenu: boolean;

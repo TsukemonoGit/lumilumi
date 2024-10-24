@@ -50,7 +50,7 @@
     MargePostOptions,
     Profile,
   } from "$lib/types";
-  import EventCard from "./NostrElements/Note/EventCard.svelte";
+  import EventCard from "./NostrElements/Note/EventCard/EventCard.svelte";
   import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
   import Metadata from "./NostrMainData/Metadata.svelte";

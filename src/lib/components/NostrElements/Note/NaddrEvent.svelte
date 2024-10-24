@@ -3,7 +3,7 @@
   import type { nip19 } from "nostr-tools";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import EventCard from "./EventCard.svelte";
+  import EventCard from "./EventCard/EventCard.svelte";
 
   export let data: nip19.AddressPointer;
   export let content: string | undefined;

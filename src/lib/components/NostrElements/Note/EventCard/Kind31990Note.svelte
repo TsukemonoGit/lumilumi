@@ -4,8 +4,9 @@
   import type { Ogp } from "$lib/func/ogp";
   import { profile } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+
   import { eventKinds } from "$lib/func/kinds";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   export let note: Nostr.Event;
   export let data: {
