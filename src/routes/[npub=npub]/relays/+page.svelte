@@ -20,6 +20,10 @@
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
   import { generateResultMessage } from "$lib/func/util";
+  import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+  import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   export let data: {
     pubkey: string;
@@ -130,7 +134,7 @@
     const defaultRelayData: EventPacket[] | undefined =
       $queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
     if (defaultRelayData) {
-      // console.log(defaultRelayData);
+      console.log(defaultRelayData);
       return defaultRelayData[0];
     }
     try {
@@ -307,71 +311,124 @@
 </script>
 
 <section class="w-full mb-20">
-  <table>
-    <tr>
-      <th class="text-center"
-        >relay
-        <div class=" text-xs font-normal">{$newTags.length}</div></th
-      ><th class="text-center"
-        >read
-        <div class=" text-xs font-normal">
-          {readLen}
-        </div></th
-      ><th class="text-center"
-        >write
-        <div class=" text-xs font-normal">
-          {writeLen}
-        </div></th
-      ><th class="text-center"></th>
-    </tr>
-    {#each $newTags as [r, url, rw], index}
+  <div class="w-full border border-magnum-400 rounded-md p-1">
+    <!-- {#if kind10002}<EventCard
+      note={kind10002}
+      metadata={undefined}
+      tieKey={undefined}
+      displayMenu={false}
+    />{/if} -->
+    {#if kind10002}
+      <Metadata
+        pubkey={data.pubkey}
+        queryKey={["metadata", data.pubkey]}
+        let:metadata
+      >
+        <div slot="loading">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+        <div slot="nodata">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+        <div slot="error">
+          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
+            kind: 10002 Relays
+            <div class="inline-flex float-end">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>
+        </div>
+
+        <NoteTemplate note={kind10002} depth={0} tieKey={undefined} {metadata}>
+          kind: 10002 Relays
+          <div class="inline-flex float-end pr-1">
+            <EllipsisMenu note={kind10002} tieKey={undefined} />
+          </div>
+        </NoteTemplate>
+      </Metadata>
+    {/if}
+    <!-- <div class="flex font-bold justify-between w-full h-8 items-center">
+    kind: 10002 Relays {#if kind10002}<EllipsisMenu
+        note={kind10002}
+        tieKey={undefined}
+      />{/if}
+  </div> -->
+    <table>
       <tr>
-        <td class="text-left break-all"
-          >{url}
-          <!-- <RelayCard
+        <th class="text-center"
+          >relay
+          <div class=" text-xs font-normal">{$newTags.length}</div></th
+        ><th class="text-center"
+          >read
+          <div class=" text-xs font-normal">
+            {readLen}
+          </div></th
+        ><th class="text-center"
+          >write
+          <div class=" text-xs font-normal">
+            {writeLen}
+          </div></th
+        ><th class="text-center"></th>
+      </tr>
+      {#each $newTags as [r, url, rw], index}
+        <tr>
+          <td class="text-left break-all"
+            >{url}
+            <!-- <RelayCard
               {url}
               read={readStates[index]}
               write={writeStates[index]}
             /> -->
-        </td>
-        <td class="text-center"
-          ><input
-            type="checkbox"
-            checked={relayStates.get(url)?.read}
-            on:change={(e) => handleClickRead(e, url)}
-          /></td
-        >
-        <td class="text-center"
-          ><input
-            type="checkbox"
-            checked={relayStates.get(url)?.write}
-            on:change={(e) => handleClickWrite(e, url)}
-          /></td
-        ><td
-          ><button
-            class="m-auto h-6 w-6 flex justify-center items-center
+          </td>
+          <td class="text-center"
+            ><input
+              type="checkbox"
+              checked={relayStates.get(url)?.read}
+              on:change={(e) => handleClickRead(e, url)}
+            /></td
+          >
+          <td class="text-center"
+            ><input
+              type="checkbox"
+              checked={relayStates.get(url)?.write}
+              on:change={(e) => handleClickWrite(e, url)}
+            /></td
+          ><td
+            ><button
+              class="m-auto h-6 w-6 flex justify-center items-center
             rounded-full text-magnum-800 bg-magnum-100
             hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300"
-            on:click={() => removeRelay(url)}><X size={20} /></button
-          ></td
-        >
-      </tr>
-    {/each}
-  </table>
-  <div class="mt-2 flex items-center w-full">
-    <input
-      type="text"
-      class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
-      placeholder="wss://"
-      bind:value={newRelay}
-    />
-    <button
-      class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit disabled:opacity-25"
-      on:click={addNewRelay}
-      disabled={$nowProgress}
-    >
-      Add
-    </button>
+              on:click={() => removeRelay(url)}><X size={20} /></button
+            ></td
+          >
+        </tr>
+      {/each}
+    </table>
+    <div class="mt-2 flex items-center w-full">
+      <input
+        type="text"
+        class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
+        placeholder="wss://"
+        bind:value={newRelay}
+      />
+      <button
+        class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit disabled:opacity-25"
+        on:click={addNewRelay}
+        disabled={$nowProgress}
+      >
+        Add
+      </button>
+    </div>
   </div>
   <div class="w-full flex gap-2 mt-8">
     <button
@@ -397,13 +454,13 @@
     margin: 6px 0;
     font-size: 16px;
     text-align: left;
-    border: 1px solid theme("colors.magnum.300");
+    border: 1px solid rgb(var(--color-magnum-600) / 0.5);
   }
 
   th,
   td {
     padding: 6px;
-    border: 1px solid theme("colors.magnum.300");
+    border: 1px solid rgb(var(--color-magnum-600) / 0.5);
   }
   tr:hover {
     background-color: theme("colors.neutral.800");
