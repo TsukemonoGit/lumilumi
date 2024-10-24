@@ -304,6 +304,8 @@
     }
   };
   $: petname = $followList.get(note.pubkey);
+
+  let loadThread = false;
 </script>
 
 {#if muteType !== "null" && depth >= 1}
@@ -316,8 +318,17 @@
 {/if}
 {#if muteType === "null" || viewMuteEvent}
   {#if thread && replyTag}
-    <!-- <div class="border-b border-magnum-600/30"> -->
-    <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
+    {#if depth !== 0 && depth % 6 === 0 && !loadThread}
+      <button
+        class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
+        on:click={() => (loadThread = true)}
+      >
+        Show more
+      </button>
+    {:else}
+      <!-- <div class="border-b border-magnum-600/30"> -->
+      <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
+    {/if}
     <!-- </div> -->
   {/if}
 
