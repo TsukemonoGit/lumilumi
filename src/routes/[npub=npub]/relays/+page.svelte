@@ -243,7 +243,7 @@
 
   async function save() {
     // console.log($newTags);
-
+    $nowProgress = true;
     // 新しいタグを生成
     $newTags = relayStates.entries().reduce((before, [url, state]) => {
       if (state.read && state.write) {
