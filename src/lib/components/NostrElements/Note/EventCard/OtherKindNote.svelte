@@ -1,16 +1,19 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import Content from "./Content.svelte";
+
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
   import { showImg } from "$lib/stores/stores";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
-  import ClientTag from "./ClientTag.svelte";
+
   import { eventKinds } from "$lib/func/kinds";
+  import Content from "../Content.svelte";
+  import ClientTag from "../ClientTag.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;

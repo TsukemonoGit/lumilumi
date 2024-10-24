@@ -5,7 +5,7 @@
   import { showImg } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
   import Avatar from "svelte-boring-avatars";
-  import ListEllipsisMenu from "./ListEllipsisMenu.svelte";
+  import ListEllipsisMenu from "../ListEllipsisMenu.svelte";
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
   export let event: Nostr.Event;

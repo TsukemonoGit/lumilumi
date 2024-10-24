@@ -2,10 +2,11 @@
   import * as Nostr from "nostr-typedef";
   import { profile } from "$lib/func/util";
   import { _ } from "svelte-i18n";
-  import Content from "./Content.svelte";
-  import FollowButton from "./FollowButton.svelte";
+
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
-  import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
+  import FollowButton from "../FollowButton.svelte";
+  import Content from "../Content.svelte";
+
   export let displayMenu: boolean;
   export let note: Nostr.Event;
   export let depth: number;

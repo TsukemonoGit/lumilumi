@@ -3,16 +3,15 @@
 
   import { nip33Regex, parseNaddr } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
-  import EventCard from "./EventCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-
-  import Text from "$lib/components/NostrMainData/Text.svelte";
-  import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
-  import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import Content from "./Content.svelte";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import EllipsisMenuNote from "../NoteActionButtuns/EllipsisMenuNote.svelte";
+  import Content from "../Content.svelte";
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
+  import EllipsisMenuNaddr from "../NoteActionButtuns/EllipsisMenuNaddr.svelte";
+  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import EventCard from "./EventCard.svelte";
+  import Text from "$lib/components/NostrMainData/Text.svelte";
 
   export let repostable: boolean;
   export let displayMenu: boolean;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type Nostr from "nostr-typedef";
 
-  import { slicedEvent, userStatusStore } from "$lib/stores/stores";
+  import { userStatusStore } from "$lib/stores/stores";
 
   export let pubkey: string;
   let data: Nostr.Event | undefined;

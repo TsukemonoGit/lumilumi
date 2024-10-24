@@ -1,8 +1,9 @@
 <script lang="ts">
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
-  import NoteTemplate from "./NoteTemplate.svelte";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import NoteTemplate from "../NoteTemplate.svelte";
+
   export let note: Nostr.Event;
   export let depth: number;
   export let repostable: boolean;

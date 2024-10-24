@@ -4,21 +4,17 @@
   import { Zap } from "lucide-svelte";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
-  import RepostedNote from "./RepostedNote.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
-  import {
-    loginUser,
-    mutebykinds,
-    mutes,
-    queryClient,
-  } from "$lib/stores/stores";
-  import type { EventPacket } from "rx-nostr";
+  import { mutebykinds, mutes } from "$lib/stores/stores";
+
   import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
   import { extractAmount, extractZappedId } from "$lib/func/event";
 
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
+  import RepostedNote from "./RepostedNote.svelte";
 
   export let note: Nostr.Event;
   export let depth: number;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
 

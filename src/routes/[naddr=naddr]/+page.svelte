@@ -15,7 +15,7 @@
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import { sortEvents } from "$lib/func/util";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
 
   export let data: {

@@ -1,16 +1,16 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import NoteTemplate from "./NoteTemplate.svelte";
 
   import { _ } from "svelte-i18n";
   import { loginUser } from "$lib/stores/stores";
 
-  import Content from "./Content.svelte";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
-  import UserName from "./UserName.svelte";
-  import Reply from "./Reply.svelte";
+  import Content from "../Content.svelte";
+  import NoteTemplate from "../NoteTemplate.svelte";
+  import UserName from "../UserName.svelte";
+  import Reply from "../Reply.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;

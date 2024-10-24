@@ -1,9 +1,10 @@
 <script lang="ts">
   import { Music, TrendingUp } from "lucide-svelte";
-  import StatusGeneral from "./StatusGeneral.svelte";
-  import StatusMusic from "./StatusMusic.svelte";
+  import StatusGeneral from "../../NostrMainData/StatusGeneral.svelte";
+
   import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
   import { beforeNavigate } from "$app/navigation";
+  import StatusMusic from "$lib/components/NostrMainData/StatusMusic.svelte";
 
   export let pubkey: string;
   export let tieKey: string | undefined;

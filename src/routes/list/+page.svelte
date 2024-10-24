@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/Note/ListLinkCard.svelte";
+  import ListLinkCard from "$lib/components/NostrElements/Note/EventCard/ListLinkCard.svelte";
   import ListMain from "$lib/components/NostrMainData/ListMain.svelte";
   import { _ } from "svelte-i18n";
 

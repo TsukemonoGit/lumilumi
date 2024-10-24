@@ -6,13 +6,13 @@
   import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId, setRelays } from "$lib/func/nostr";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
-  import RelayCard from "$lib/components/NostrElements/Note/RelayCard.svelte";
+  import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import { Pin } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 

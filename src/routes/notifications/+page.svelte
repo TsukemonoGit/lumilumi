@@ -20,7 +20,7 @@
 
   import { extractKind9734 } from "$lib/func/makeZap";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   let amount = 50;
   let viewIndex = 0;

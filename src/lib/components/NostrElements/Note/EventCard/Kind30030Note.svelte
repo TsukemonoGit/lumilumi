@@ -7,9 +7,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
 
-  import ClientTag from "./ClientTag.svelte";
   import Avatar from "svelte-boring-avatars";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
@@ -23,6 +21,8 @@
     Unsubscriber,
     Updater,
   } from "svelte/store";
+  import ClientTag from "../ClientTag.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   export let note: Nostr.Event;
   export let repostable: boolean;

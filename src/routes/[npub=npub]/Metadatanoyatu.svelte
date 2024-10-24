@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Kind0Note from "$lib/components/NostrElements/Note/Kind0Note.svelte";
+  import Kind0Note from "$lib/components/NostrElements/Note/EventCard/Kind0Note.svelte";
+
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { nip19 } from "nostr-tools";
 

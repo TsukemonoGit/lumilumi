@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
 
   import { Repeat2 } from "lucide-svelte";
-  import Reaction from "./Reaction.svelte";
+  import Reaction from "../Reaction.svelte";
 
   import {
     followList,
@@ -14,12 +14,12 @@
   } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
-  import Content from "./Content.svelte";
+  import Content from "../Content.svelte";
 
   //import WarningHide1 from "../Elements/WarningHide1.svelte";
   import { profile } from "$lib/func/util";
-  import Reply from "./Reply.svelte";
-  import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
+  import Reply from "../Reply.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy } from "svelte";
 
@@ -30,29 +30,32 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";
-  import NoteTemplate from "./NoteTemplate.svelte";
+  import NoteTemplate from "../NoteTemplate.svelte";
   import Kind9735Note from "./Kind9735Note.svelte";
   import { getRelaysById } from "$lib/func/nostr";
-  import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
+  import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
   import { goto } from "$app/navigation";
-  import ShowStatus from "./ShowStatus.svelte";
-  import ListLinkCard from "./ListLinkCard.svelte";
-  import ReplyThread from "./ReplyThread.svelte";
+  import ShowStatus from "../ShowStatus.svelte";
+
+  import ReplyThread from "../ReplyThread.svelte";
   import { muteCheck, type MuteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
-  import ReactionWebsite from "./ReactionWebsite.svelte";
+  import ReactionWebsite from "../ReactionWebsite.svelte";
   import type { Ogp } from "$lib/func/ogp";
-  import OtherKindNote from "./OtherKindNote.svelte";
+
   import Kind31990Note from "./Kind31990Note.svelte";
-  import ReactionedNote from "./ReactionedNote.svelte";
+
   import {
     removeFirstMatchingId,
     replyedEvent,
     repostedId,
   } from "$lib/func/event";
-  import UserName from "./UserName.svelte";
+  import UserName from "../UserName.svelte";
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import Kind4Note from "./Kind4Note.svelte";
+  import ListLinkCard from "./ListLinkCard.svelte";
+  import OtherKindNote from "./OtherKindNote.svelte";
+  import ReactionedNote from "./ReactionedNote.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
