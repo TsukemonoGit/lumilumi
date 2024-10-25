@@ -157,7 +157,7 @@
                     {#if prof}
                       <DisplayName
                         height={21}
-                        name={prof.display_name ?? prof.name ?? ""}
+                        name={prof.display_name ?? ""}
                         tags={metadata.tags}
                       />
                     {/if}
@@ -165,7 +165,7 @@
                       >@{#if prof}
                         <DisplayName
                           height={21}
-                          name={prof.name ?? prof.display_name ?? ""}
+                          name={prof.name ?? ""}
                           tags={metadata.tags}
                         />
                       {/if}</span

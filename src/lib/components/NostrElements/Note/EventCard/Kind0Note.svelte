@@ -36,18 +36,14 @@
         {#if prof}
           <DisplayName
             height={21}
-            name={prof.display_name ?? prof.name ?? ""}
+            name={prof.display_name ?? ""}
             tags={note.tags}
           />
         {/if}<span
           class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
           style="word-break: break-word;"
           >@{#if prof}
-            <DisplayName
-              height={21}
-              name={prof.name ?? prof.display_name ?? ""}
-              tags={note.tags}
-            />
+            <DisplayName height={21} name={prof.name ?? ""} tags={note.tags} />
           {/if}</span
         >
       </div>

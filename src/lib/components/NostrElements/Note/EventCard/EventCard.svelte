@@ -413,7 +413,7 @@
             {#if prof}
               <DisplayName
                 height={21}
-                name={prof.display_name ?? prof.name ?? ""}
+                name={prof.display_name ?? ""}
                 tags={metadata.tags}
               />
             {/if}<span class="text-magnum-100 text-sm"
@@ -470,7 +470,7 @@
             {#if prof}
               <DisplayName
                 height={21}
-                name={prof.display_name ?? prof.name ?? ""}
+                name={prof.display_name ?? ""}
                 tags={note.tags}
               />
             {/if}<span class="text-magnum-100 text-sm mt-auto"
