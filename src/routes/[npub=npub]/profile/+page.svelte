@@ -230,6 +230,7 @@
   };
 
   let open: any;
+  let displayNameEmojiOpen: any;
 </script>
 
 <section class=" w-full">
@@ -334,7 +335,7 @@
         placeholder="display_name"
       />{#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
-          <Popover bind:open ariaLabel="custom emoji">
+          <Popover bind:open={displayNameEmojiOpen} ariaLabel="custom emoji">
             <SmilePlus size="20" />
             <div slot="popoverContent">
               <div
