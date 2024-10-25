@@ -114,7 +114,11 @@
                   name={prof.display_name}
                   tags={metadata.tags}
                 />
-              {/if}@{prof.name}
+              {/if}@<DisplayName
+                height={21}
+                name={prof.name ?? ""}
+                tags={metadata.tags}
+              />
               {#if prof.bot}<span class="text-sm font-normal">bot</span>{/if}
               {#if petname}
                 📛{petname}{/if}

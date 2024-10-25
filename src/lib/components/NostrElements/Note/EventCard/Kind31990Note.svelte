@@ -37,12 +37,10 @@
         />
       </div>
       <div class="text-magnum-100 text-sm">
-        @{#if prof && prof.name && prof.name !== ""}
-          {prof.name}
-        {:else}
+        @{#if prof}
           <DisplayName
             height={21}
-            name={prof?.display_name ?? ""}
+            name={prof?.name ?? prof?.display_name ?? ""}
             tags={metadata.tags}
           />
         {/if}

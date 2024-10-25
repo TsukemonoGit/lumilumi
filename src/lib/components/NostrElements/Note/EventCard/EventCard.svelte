@@ -410,16 +410,18 @@
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
-            {#if prof && prof.display_name}
+            {#if prof}
               <DisplayName
                 height={21}
-                name={prof.display_name}
+                name={prof.display_name ?? prof.name ?? ""}
                 tags={metadata.tags}
               />
-            {:else}
-              {prof?.name ?? ""}
             {/if}<span class="text-magnum-100 text-sm"
-              >@{profile(metadata)?.name}</span
+              >@<DisplayName
+                height={21}
+                name={prof?.name ?? ""}
+                tags={metadata.tags}
+              /></span
             >
           {:else}
             <span class="text-magnum-100 text-sm"
@@ -465,16 +467,18 @@
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
-            {#if prof && prof.display_name}
+            {#if prof}
               <DisplayName
                 height={21}
-                name={prof.display_name}
+                name={prof.display_name ?? prof.name ?? ""}
                 tags={note.tags}
               />
-            {:else}
-              {prof?.name ?? ""}
             {/if}<span class="text-magnum-100 text-sm mt-auto"
-              >@{prof?.name}</span
+              >@<DisplayName
+                height={21}
+                name={prof?.name ?? ""}
+                tags={metadata.tags}
+              /></span
             >
           {:else}
             <span class="text-magnum-100 text-sm"

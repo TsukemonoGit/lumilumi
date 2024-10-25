@@ -154,22 +154,18 @@
                 >
                   {#if metadata}
                     {@const prof = profile(metadata)}
-                    {#if prof && prof.display_name}
+                    {#if prof}
                       <DisplayName
                         height={21}
-                        name={prof.display_name}
+                        name={prof.display_name ?? prof.name ?? ""}
                         tags={metadata.tags}
                       />
-                    {:else}
-                      {prof?.name ?? ""}
                     {/if}
                     <span class="text-magnum-100 text-sm"
-                      >@{#if prof && prof.name && prof.name !== ""}
-                        {prof.name}
-                      {:else}
+                      >@{#if prof}
                         <DisplayName
                           height={21}
-                          name={prof?.display_name ?? ""}
+                          name={prof.name ?? prof.display_name ?? ""}
                           tags={metadata.tags}
                         />
                       {/if}</span

@@ -63,13 +63,16 @@
         to.
         <div class="flex flex-row items-center gap-2 mt-1">
           <div class="sm:text-xl text-md font-bold break-all">
-            {#if prof.display_name}
-              <DisplayName
-                height={21}
-                name={prof.display_name}
-                tags={metadata.tags}
-              />
-            {/if}@{prof.name}
+            <DisplayName
+              height={21}
+              name={prof.display_name ?? ""}
+              tags={metadata.tags}
+            />
+            @<DisplayName
+              height={21}
+              name={prof.name ?? ""}
+              tags={metadata.tags}
+            />
           </div>
         </div>
       {/if}

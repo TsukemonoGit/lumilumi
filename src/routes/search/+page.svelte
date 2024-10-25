@@ -144,7 +144,7 @@
         return { ...filter, limit: 50 };
       });
       console.log("showFilters", showFilters);
-
+      console.log("searchRelays", searchRelays);
       handleClickSearch();
     }
     isMount = false;

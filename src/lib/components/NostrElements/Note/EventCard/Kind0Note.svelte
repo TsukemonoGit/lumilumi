@@ -33,19 +33,19 @@
       style="word-break: break-word;"
     >
       <div class="mb-2">
-        {#if prof && prof.display_name}
-          <DisplayName height={21} name={prof.display_name} tags={note.tags} />
-        {:else}
-          {prof?.name ?? ""}
+        {#if prof}
+          <DisplayName
+            height={21}
+            name={prof.display_name ?? prof.name ?? ""}
+            tags={note.tags}
+          />
         {/if}<span
           class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
           style="word-break: break-word;"
-          >@{#if prof && prof.name && prof.name !== ""}
-            {prof.name}
-          {:else}
+          >@{#if prof}
             <DisplayName
               height={21}
-              name={prof?.display_name ?? ""}
+              name={prof.name ?? prof.display_name ?? ""}
               tags={note.tags}
             />
           {/if}</span
@@ -60,7 +60,7 @@
       style="word-break: break-word;"
     >
       <Content
-        text={profile(note)?.about?.trim() ?? ""}
+        text={prof?.about?.trim() ?? ""}
         tags={note.tags}
         {displayMenu}
         {depth}

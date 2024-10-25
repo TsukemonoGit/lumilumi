@@ -45,15 +45,17 @@
   </div>
   <div class="break-all break-words whitespace-pre-line">
     {#if metadata}
-      {#if prof && prof.display_name}
-        <DisplayName
+      <DisplayName
+        height={21}
+        name={prof?.display_name ?? prof?.name ?? ""}
+        tags={metadata.tags}
+      />
+      <span class="text-magnum-100 text-sm mt-auto"
+        >@<DisplayName
           height={21}
-          name={prof.display_name}
+          name={prof?.name ?? ""}
           tags={metadata.tags}
-        />
-      {:else}
-        {prof?.name}{/if}<span class="text-magnum-100 text-sm mt-auto"
-        >@{profile(metadata)?.name}</span
+        /></span
       >
     {:else}
       <span class="text-magnum-100 text-sm"

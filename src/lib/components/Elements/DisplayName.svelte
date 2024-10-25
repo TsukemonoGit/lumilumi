@@ -7,12 +7,12 @@
   export let height: number;
 
   $: emojiTags = tags.filter((tag) => tag[0] === "emoji" && tag.length > 2);
+
+  $: parts =
+    emojiTags.length >= 0 ? parseEmojiText(name, emojiTags) : undefined;
 </script>
 
-{#if emojiTags.length <= 0}{name}{:else}{@const parts = parseEmojiText(
-    name,
-    emojiTags
-  )}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
+{#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
         {part}
         {height}
       />{:else}<span class="inline align-middle">{part.content}</span>{/if}
