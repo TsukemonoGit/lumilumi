@@ -15,6 +15,7 @@
 
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
   import RepostedNote from "./RepostedNote.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -149,15 +150,27 @@
                   />
                 </div>
                 <div
-                  class="inline-block break-all break-words whitespace-pre-line"
+                  class="inline-block break-all break-words whitespace-pre-line items-center flex-wrap"
                 >
                   {#if metadata}
-                    {profile(metadata)?.display_name ?? profile(metadata)?.name}
+                    {@const prof = profile(metadata)}
+                    {#if prof && prof.display_name}
+                      <DisplayName
+                        name={prof.display_name}
+                        tags={metadata.tags}
+                      />
+                    {:else}
+                      {prof?.name ?? ""}
+                    {/if}
                     <span class="text-magnum-100 text-sm"
-                      >@{profile(metadata)?.name &&
-                      profile(metadata)?.name !== ""
-                        ? profile(metadata)?.name
-                        : profile(metadata)?.display_name}</span
+                      >@{#if prof && prof.name && prof.name !== ""}
+                        {prof.name}
+                      {:else}
+                        <DisplayName
+                          name={prof?.display_name ?? ""}
+                          tags={metadata.tags}
+                        />
+                      {/if}</span
                     >
                   {:else}
                     <span class="text-magnum-100 text-sm"

@@ -6,12 +6,15 @@
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import FollowButton from "../FollowButton.svelte";
   import Content from "../Content.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let displayMenu: boolean;
   export let note: Nostr.Event;
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
+
+  $: prof = profile(note);
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">
@@ -29,13 +32,19 @@
       class="flex align-middle whitespace-pre-wrap break-words"
       style="word-break: break-word;"
     >
-      <div class="mb-2">
-        {profile(note)?.display_name ?? profile(note)?.name}<span
+      <div class="mb-2 flex items-center flex-wrap">
+        {#if prof && prof.display_name}
+          <DisplayName name={prof.display_name} tags={note.tags} />
+        {:else}
+          {prof?.name ?? ""}
+        {/if}<span
           class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
           style="word-break: break-word;"
-          >@{profile(note)?.name && profile(note)?.name !== ""
-            ? profile(note)?.name
-            : profile(note)?.display_name}</span
+          >@{#if prof && prof.name && prof.name !== ""}
+            {prof.name}
+          {:else}
+            <DisplayName name={prof?.display_name ?? ""} tags={note.tags} />
+          {/if}</span
         >
       </div>
       <div class="ml-auto">

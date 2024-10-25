@@ -11,6 +11,7 @@
   import { isvalidURL } from "$lib/func/ogp";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
   export let displayMenu: boolean;
@@ -27,6 +28,7 @@
       return undefined;
     }
   }
+  $: prof = profile(metadata);
 </script>
 
 <div class="flex gap-1 items-center bg-magnum-800/25">
@@ -41,10 +43,15 @@
       {tieKey}
     />
   </div>
-  <div class="break-all break-words whitespace-pre-line">
+  <div
+    class="break-all break-words whitespace-pre-line flex items-center flex-wrap"
+  >
     {#if metadata}
-      {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-        class="text-magnum-100 text-sm mt-auto">@{profile(metadata)?.name}</span
+      {#if prof && prof.display_name}
+        <DisplayName name={prof.display_name} tags={metadata.tags} />
+      {:else}
+        {prof?.name}{/if}<span class="text-magnum-100 text-sm mt-auto"
+        >@{profile(metadata)?.name}</span
       >
     {:else}
       <span class="text-magnum-100 text-sm"

@@ -56,6 +56,7 @@
   import ListLinkCard from "./ListLinkCard.svelte";
   import OtherKindNote from "./OtherKindNote.svelte";
   import ReactionedNote from "./ReactionedNote.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -405,11 +406,18 @@
             {tieKey}
           />
         </div>
-        <div class=" inline-block break-all break-words whitespace-pre-line">
+        <div
+          class=" inline-block break-all break-words whitespace-pre-line items-center flex-wrap"
+        >
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
-            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-magnum-100 text-sm">@{profile(metadata)?.name}</span
+            {@const prof = profile(metadata)}
+            {#if prof && prof.display_name}
+              <DisplayName name={prof.display_name} tags={metadata.tags} />
+            {:else}
+              {prof?.name ?? ""}
+            {/if}<span class="text-magnum-100 text-sm"
+              >@{profile(metadata)?.name}</span
             >
           {:else}
             <span class="text-magnum-100 text-sm"
@@ -451,12 +459,18 @@
             {tieKey}
           />
         </div>
-        <div class="break-all break-words whitespace-pre-line">
+        <div
+          class="break-all break-words whitespace-pre-line flex items-center flex-wrap"
+        >
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
-            {profile(metadata)?.display_name ?? profile(metadata)?.name}<span
-              class="text-magnum-100 text-sm mt-auto"
-              >@{profile(metadata)?.name}</span
+            {@const prof = profile(metadata)}
+            {#if prof && prof.display_name}
+              <DisplayName name={prof.display_name} tags={note.tags} />
+            {:else}
+              {prof?.name ?? ""}
+            {/if}<span class="text-magnum-100 text-sm mt-auto"
+              >@{prof?.name}</span
             >
           {:else}
             <span class="text-magnum-100 text-sm"

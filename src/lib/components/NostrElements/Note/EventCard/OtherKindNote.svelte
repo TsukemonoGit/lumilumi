@@ -14,6 +14,7 @@
   import Content from "../Content.svelte";
   import ClientTag from "../ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined;
@@ -56,6 +57,8 @@
 
     goto(`/${replaceable ? naddr : nevent}`);
   };
+
+  $: prof = profile(metadata);
 </script>
 
 <div
@@ -74,10 +77,12 @@
           {tieKey}
         />
       </div>
-      <div class="text-magnum-100 text-sm">
-        @{profile(metadata)?.name && profile(metadata)?.name !== ""
-          ? profile(metadata)?.name
-          : profile(metadata)?.display_name}
+      <div class="text-magnum-100 text-sm flex items-center flex-wrap">
+        @{#if prof && prof.name && prof.name !== ""}
+          {prof.name}
+        {:else}
+          <DisplayName name={prof?.display_name ?? ""} tags={note.tags} />
+        {/if}
       </div>
       <div class="text-neutral-300/50 text-sm">
         {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}

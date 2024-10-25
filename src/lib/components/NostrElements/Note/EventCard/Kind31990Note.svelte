@@ -7,6 +7,7 @@
 
   import { eventKinds } from "$lib/func/kinds";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
   export let data: {
@@ -18,6 +19,8 @@
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
+
+  $: prof = profile(metadata);
 </script>
 
 <div class=" break-all overflow-x-hidden gap-4 p-1">
@@ -33,10 +36,12 @@
           {tieKey}
         />
       </div>
-      <div class="text-magnum-100 text-sm">
-        @{profile(metadata)?.name && profile(metadata)?.name !== ""
-          ? profile(metadata)?.name
-          : profile(metadata)?.display_name}
+      <div class="text-magnum-100 text-sm flex items-center flex-wrap">
+        @{#if prof && prof.name && prof.name !== ""}
+          {prof.name}
+        {:else}
+          <DisplayName name={prof?.display_name ?? ""} tags={metadata.tags} />
+        {/if}
       </div>
       <div class="text-neutral-300/50 text-sm">
         {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
