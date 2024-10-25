@@ -77,11 +77,15 @@
           {tieKey}
         />
       </div>
-      <div class="text-magnum-100 text-sm flex items-center flex-wrap">
+      <div class="text-magnum-100 text-sm">
         @{#if prof && prof.name && prof.name !== ""}
           {prof.name}
         {:else}
-          <DisplayName name={prof?.display_name ?? ""} tags={note.tags} />
+          <DisplayName
+            height={21}
+            name={prof?.display_name ?? ""}
+            tags={note.tags}
+          />
         {/if}
       </div>
       <div class="text-neutral-300/50 text-sm">

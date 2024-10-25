@@ -32,9 +32,9 @@
       class="flex align-middle whitespace-pre-wrap break-words"
       style="word-break: break-word;"
     >
-      <div class="mb-2 flex items-center flex-wrap">
+      <div class="mb-2">
         {#if prof && prof.display_name}
-          <DisplayName name={prof.display_name} tags={note.tags} />
+          <DisplayName height={21} name={prof.display_name} tags={note.tags} />
         {:else}
           {prof?.name ?? ""}
         {/if}<span
@@ -43,7 +43,11 @@
           >@{#if prof && prof.name && prof.name !== ""}
             {prof.name}
           {:else}
-            <DisplayName name={prof?.display_name ?? ""} tags={note.tags} />
+            <DisplayName
+              height={21}
+              name={prof?.display_name ?? ""}
+              tags={note.tags}
+            />
           {/if}</span
         >
       </div>

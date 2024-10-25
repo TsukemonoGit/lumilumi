@@ -43,12 +43,14 @@
       {tieKey}
     />
   </div>
-  <div
-    class="break-all break-words whitespace-pre-line flex items-center flex-wrap"
-  >
+  <div class="break-all break-words whitespace-pre-line">
     {#if metadata}
       {#if prof && prof.display_name}
-        <DisplayName name={prof.display_name} tags={metadata.tags} />
+        <DisplayName
+          height={21}
+          name={prof.display_name}
+          tags={metadata.tags}
+        />
       {:else}
         {prof?.name}{/if}<span class="text-magnum-100 text-sm mt-auto"
         >@{profile(metadata)?.name}</span

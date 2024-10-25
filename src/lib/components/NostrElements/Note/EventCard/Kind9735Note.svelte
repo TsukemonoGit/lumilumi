@@ -150,12 +150,13 @@
                   />
                 </div>
                 <div
-                  class="inline-block break-all break-words whitespace-pre-line items-center flex-wrap"
+                  class="inline-block break-all break-words whitespace-pre-line"
                 >
                   {#if metadata}
                     {@const prof = profile(metadata)}
                     {#if prof && prof.display_name}
                       <DisplayName
+                        height={21}
                         name={prof.display_name}
                         tags={metadata.tags}
                       />
@@ -167,6 +168,7 @@
                         {prof.name}
                       {:else}
                         <DisplayName
+                          height={21}
                           name={prof?.display_name ?? ""}
                           tags={metadata.tags}
                         />

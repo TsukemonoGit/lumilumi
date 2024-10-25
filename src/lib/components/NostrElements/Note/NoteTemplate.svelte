@@ -74,19 +74,20 @@
   <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
-        <div class="flex items-center flex-wrap">
+        <div>
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
-            >{:else}{#if prof && prof.display_name}
-              <DisplayName name={prof.display_name} tags={metadata.tags} />
-            {:else}
-              {prof?.name ?? ""}
-            {/if}
+            >{:else}{#if prof && prof.display_name}<DisplayName
+                height={21}
+                name={prof.display_name}
+                tags={metadata.tags}
+              />{:else}{prof?.name ?? ""}{/if}
             <span
               class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
               >@{#if prof && prof.name && prof.name !== ""}
                 {prof.name}
               {:else}
                 <DisplayName
+                  height={21}
                   name={prof?.display_name ?? ""}
                   tags={metadata.tags}
                 />

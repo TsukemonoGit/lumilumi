@@ -6,6 +6,7 @@
   import { _ } from "svelte-i18n";
 
   export let part: Part;
+  export let height: number = 24;
   let imgError: boolean = false;
   let imgLoad: boolean = false;
   ///console.log(imgError);
@@ -13,12 +14,12 @@
 </script>
 
 {#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
-    height="24"
+    height={`${height}px`}
     loading="lazy"
     alt={`:${part.content}:`}
     src={part.url}
     title={`:${part.content}:`}
-    class="inline h-[24px] object-contain m-0 overflow-hidden"
+    class={`inline h-[${height}px] object-contain m-0 overflow-hidden`}
     on:load={() => {
       //console.log("load");
 

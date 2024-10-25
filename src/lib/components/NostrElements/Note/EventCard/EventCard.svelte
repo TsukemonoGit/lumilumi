@@ -406,14 +406,16 @@
             {tieKey}
           />
         </div>
-        <div
-          class=" inline-block break-all break-words whitespace-pre-line items-center flex-wrap"
-        >
+        <div class=" inline-block break-all break-words whitespace-pre-line">
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
             {#if prof && prof.display_name}
-              <DisplayName name={prof.display_name} tags={metadata.tags} />
+              <DisplayName
+                height={21}
+                name={prof.display_name}
+                tags={metadata.tags}
+              />
             {:else}
               {prof?.name ?? ""}
             {/if}<span class="text-magnum-100 text-sm"
@@ -459,14 +461,16 @@
             {tieKey}
           />
         </div>
-        <div
-          class="break-all break-words whitespace-pre-line flex items-center flex-wrap"
-        >
+        <div class="break-all break-words whitespace-pre-line">
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
             {#if prof && prof.display_name}
-              <DisplayName name={prof.display_name} tags={note.tags} />
+              <DisplayName
+                height={21}
+                name={prof.display_name}
+                tags={note.tags}
+              />
             {:else}
               {prof?.name ?? ""}
             {/if}<span class="text-magnum-100 text-sm mt-auto"

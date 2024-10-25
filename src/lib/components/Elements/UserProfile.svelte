@@ -24,7 +24,7 @@
   import UserEditEllipsis from "./UserEditEllipsis.svelte";
   import MuteStatusIcons from "./MuteStatusIcons.svelte";
   import DisplayName from "./DisplayName.svelte";
-  import * as Nostr from "nostr-typedef";
+  // import * as Nostr from "nostr-typedef";
 
   export let pubkey: string;
   export let bannerHeight: number = 180;
@@ -107,11 +107,13 @@
         <!--nameとか | アイコン-->
         <div class="flex flex-row items-center gap-2 mt-1 justify-between">
           <div class="flex flex-col gap-2 mt-1">
-            <div
-              class=" sm:text-xl text-md font-bold break-all text-left items-center flex flex-wrap"
-            >
+            <div class=" sm:text-xl text-md font-bold break-all text-left">
               {#if prof.display_name}
-                <DisplayName name={prof.display_name} tags={metadata.tags} />
+                <DisplayName
+                  height={21}
+                  name={prof.display_name}
+                  tags={metadata.tags}
+                />
               {/if}@{prof.name}
               {#if prof.bot}<span class="text-sm font-normal">bot</span>{/if}
               {#if petname}
