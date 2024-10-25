@@ -37,6 +37,7 @@ import { metadata } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
+import { hexRegex } from "./util";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -105,7 +106,8 @@ export function pubkeysIn(
   const followingMap: Map<string, string | undefined> = contacts.tags.reduce(
     (acc, [tag, value, relay, petname]) => {
       // "p" タグのチェック
-      if (tag === "p" && !acc.has(value)) {
+      //ちゃんとvalueがpubhexかかくにんしないといけない
+      if (tag === "p" && !acc.has(value) && hexRegex.test(value)) {
         // Map に pubkey をキー、petname を値として追加
         acc.set(value, petname || undefined);
       }

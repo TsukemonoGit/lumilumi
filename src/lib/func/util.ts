@@ -39,6 +39,8 @@ export const mediaUploader = [
   "https://nostpic.com",
   "https://yabu.me",
 ];
+
+export const hexRegex = /^[0-9a-fA-F]{64}$/;
 //https://api.nostr.watch/v1/nip/50
 export const relayRegex = /wss?:\/\/[a-zA-Z0-9.-]+(:[0-9]{1,5})?\/?/g;
 //export const relayRegex = /wss?:\/\/\S+/g; ///^wss?:\/\/\S+$/g;
