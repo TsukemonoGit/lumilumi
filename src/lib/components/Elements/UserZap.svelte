@@ -6,6 +6,7 @@
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import ZapInvoiceWindow from "./ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
+  import DisplayName from "./DisplayName.svelte";
   export let metadata: Nostr.Event;
   let invoice: string | undefined = undefined;
   let dialogOpen: any;
@@ -61,8 +62,12 @@
       {#if prof}
         to.
         <div class="flex flex-row items-center gap-2 mt-1">
-          <div class="sm:text-xl text-md font-bold break-all">
-            {prof.display_name ?? ""}@{prof.name}
+          <div
+            class="sm:text-xl text-md font-bold break-all flex items-center flex-wrap"
+          >
+            {#if prof.display_name}
+              <DisplayName name={prof.display_name} tags={metadata.tags} />
+            {/if}@{prof.name}
           </div>
         </div>
       {/if}

@@ -147,7 +147,10 @@
     newTags = newTags.filter((tag) => {
       if (tag[0] === "emoji") {
         const emojiText = `:${tag[1]}:`;
-        return newProfile.about?.includes(emojiText);
+        return (
+          newProfile.about?.includes(emojiText) ||
+          newProfile.display_name?.includes(emojiText)
+        );
       }
       return true;
     });
@@ -213,6 +216,19 @@
       newProfile.about?.slice(cursorPosition);
     cursorPosition += emojiText.length;
   };
+  const handleClickEmojiDisplayName = (e: string[]) => {
+    const emojiTag = ["emoji", ...e];
+    if (!newTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
+      newTags.push(emojiTag);
+    }
+    const emojiText = `:${e[0]}:`;
+    newProfile.display_name = newProfile.display_name + emojiText;
+    // newProfile.display_name?.slice(0, cursorPosition) +
+    // emojiText +
+    // newProfile.display_name?.slice(cursorPosition);
+    // cursorPosition += emojiText.length;
+  };
+
   let open: any;
 </script>
 
@@ -316,7 +332,38 @@
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
         bind:value={newProfile.display_name}
         placeholder="display_name"
-      />
+      />{#if $emojis && $emojis.list.length > 0}
+        <div class="w-fit flex self-end">
+          <Popover bind:open ariaLabel="custom emoji">
+            <SmilePlus size="20" />
+            <div slot="popoverContent">
+              <div
+                class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+              >
+                {#each $emojis.list as e, index}
+                  {#if customReaction === "" || e[0]
+                      .toLowerCase()
+                      .includes(customReaction.toLowerCase())}
+                    <button
+                      on:click={() => handleClickEmojiDisplayName(e)}
+                      class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                    >
+                      {#if $showImg}
+                        <img
+                          loading="lazy"
+                          class="h-6 object-contain justify-self-center"
+                          src={e[1]}
+                          alt={e[0]}
+                          title={e[0]}
+                        />{:else}{e[0]}{/if}
+                    </button>
+                  {/if}
+                {/each}
+              </div>
+            </div>
+          </Popover>
+        </div>
+      {/if}
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.picture")}<InputImageFromFile
           bind:inputText={newProfile.picture}

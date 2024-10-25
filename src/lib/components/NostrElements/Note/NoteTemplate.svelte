@@ -11,6 +11,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
   export let metadata: Nostr.Event | undefined = undefined;
@@ -51,6 +52,7 @@
 
     goto(`/${replaceable ? naddr : nevent}`);
   };
+  $: prof = profile(metadata);
 </script>
 
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden my-1"}>
@@ -72,15 +74,24 @@
   <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       {#if metadata}
-        <div>
+        <div class="flex items-center flex-wrap">
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
-            >{:else}{profile(metadata)?.display_name ??
-              profile(metadata)?.name}<span
+            >{:else}{#if prof && prof.display_name}
+              <DisplayName name={prof.display_name} tags={metadata.tags} />
+            {:else}
+              {prof?.name ?? ""}
+            {/if}
+            <span
               class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-              >@{profile(metadata)?.name && profile(metadata)?.name !== ""
-                ? profile(metadata)?.name
-                : profile(metadata)?.display_name}</span
-            >{/if}
+              >@{#if prof && prof.name && prof.name !== ""}
+                {prof.name}
+              {:else}
+                <DisplayName
+                  name={prof?.display_name ?? ""}
+                  tags={metadata.tags}
+                />
+              {/if}
+            </span>{/if}
         </div>
       {:else}
         <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">
