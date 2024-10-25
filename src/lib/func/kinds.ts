@@ -133,7 +133,7 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     42,
     {
       ja: "チャンネルメッセージ",
-      en: "	Channel Message",
+      en: "Channel Message",
     },
   ],
   [

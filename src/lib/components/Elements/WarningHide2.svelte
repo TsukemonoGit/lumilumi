@@ -25,9 +25,12 @@
     : ''}"
   style=" opacity:{1 - $value[0] / 100}"
 >
-  <div class=" flex flex-auto justify-center items-center w-hull">
-    <TriangleAlert size="20" class="text-magnum-300" />{text ??
-      "warning"}<TriangleAlert size="20" class="text-magnum-300" />
+  <div
+    class=" grid grid-cols-[auto_1fr_auto] justify-between w-full overflow-hidden overflow-y-auto py-1"
+  >
+    <TriangleAlert size="20" class="text-magnum-300 min-w-4 " />
+    <div class="w-full text-center">{text ?? "warning"}</div>
+    <TriangleAlert size="20" class="text-magnum-300 min-w-4" />
   </div>
 </div>
 <span
