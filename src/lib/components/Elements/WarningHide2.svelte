@@ -13,14 +13,10 @@
     max: 100,
     step: 1,
   });
-
-  // $: bgColor = `bg-magnum-600/${$value}`;
-  // $: bgColor = `rgba(249, 201, 120, ${1 - $value[0] / 100})`;
 </script>
 
 <div
-  class="bgColor absolute top-0 left-0 w-full h-full flex bg-magnum-600 {$value[0] >=
-  50
+  class="absolute top-0 left-0 w-full h-full flex bg-magnum-600 {$value[0] >= 50
     ? 'pointer-events-none'
     : ''}"
   style=" opacity:{1 - $value[0] / 100}"
