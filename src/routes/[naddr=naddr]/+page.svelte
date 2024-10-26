@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
@@ -17,6 +17,7 @@
   import { sortEvents } from "$lib/func/util";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
+  import { page } from "$app/stores";
 
   export let data: {
     identifier: string;
@@ -56,6 +57,9 @@
   });
 
   async function init() {
+    if (data.kind === 30000) {
+      goto(`list/${$page.params.naddr}`);
+    }
     since = undefined;
 
     if ($defaultRelays) {
