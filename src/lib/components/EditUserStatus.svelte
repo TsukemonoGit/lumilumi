@@ -244,7 +244,7 @@
       </fieldset>
 
       <fieldset class="mb-4 flex flex-col items-start gap-2">
-        <label class=" text-zinc-100" for="URL">URL or EventID</label>
+        <label class=" text-zinc-100" for="URL">URL or EventID (option)</label>
         <input
           class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
