@@ -39,13 +39,15 @@
             name={prof.display_name ?? ""}
             tags={note.tags}
           />
-        {/if}<span
-          class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
-          style="word-break: break-word;"
-          >@{#if prof}
-            <DisplayName height={21} name={prof.name ?? ""} tags={note.tags} />
-          {/if}</span
-        >
+          {#if prof.name && prof.name !== ""}<span
+              class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
+              style="word-break: break-word;"
+              ><DisplayName
+                height={21}
+                name={`@${prof.name}`}
+                tags={note.tags}
+              />
+            </span>{/if}{/if}
       </div>
       <div class="ml-auto">
         <FollowButton pubkey={note.pubkey} />

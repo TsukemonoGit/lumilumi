@@ -30,6 +30,7 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
 
   import InputImageFromFile from "./InputImageFromFile.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let data: {
     pubkey: string;
@@ -284,9 +285,20 @@
 
       <div class=" flex flex-col justify-center mt-auto">
         <div class="flex flex-row items-center gap-2 mt-1">
-          <div class="sm:text-xl text-md font-bold break-all">
-            {newProfile.display_name ?? ""}@{newProfile.name}
+          <div class=" sm:text-xl text-md font-bold break-all text-left">
+            {#if newProfile.display_name}
+              <DisplayName
+                height={21}
+                name={newProfile.display_name}
+                tags={newTags}
+              />
+            {/if}{#if newProfile.name && newProfile.name !== ""}<DisplayName
+                height={21}
+                name={`@${newProfile.name}`}
+                tags={newTags}
+              />{/if}
           </div>
+          {#if newProfile.bot}<span class="text-sm font-normal">bot</span>{/if}
         </div>
         {#if newProfile.nip05}
           <div class="text-sm flex break-all">

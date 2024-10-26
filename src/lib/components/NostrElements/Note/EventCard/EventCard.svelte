@@ -416,13 +416,14 @@
                 name={prof.display_name ?? ""}
                 tags={metadata.tags}
               />
-            {/if}<span class="text-magnum-100 text-sm"
-              >@<DisplayName
-                height={21}
-                name={prof?.name ?? ""}
-                tags={metadata.tags}
-              /></span
-            >
+              {#if prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  /></span
+                >{/if}{/if}
           {:else}
             <span class="text-magnum-100 text-sm"
               >@{nip19.npubEncode(note.pubkey)}</span
@@ -473,13 +474,14 @@
                 name={prof.display_name ?? ""}
                 tags={note.tags}
               />
-            {/if}<span class="text-magnum-100 text-sm mt-auto"
-              >@<DisplayName
-                height={21}
-                name={prof?.name ?? ""}
-                tags={metadata.tags}
-              /></span
-            >
+              {#if prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm mt-auto"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  /></span
+                >{/if}{/if}
           {:else}
             <span class="text-magnum-100 text-sm"
               >@{nip19.npubEncode(note.pubkey)}</span

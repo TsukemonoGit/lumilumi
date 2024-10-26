@@ -83,8 +83,7 @@
             height={21}
             name={prof?.name ?? prof?.display_name ?? ""}
             tags={metadata.tags}
-          />
-        {/if}
+          />{:else}noname{/if}
       </div>
       <div class="text-neutral-300/50 text-sm">
         {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}

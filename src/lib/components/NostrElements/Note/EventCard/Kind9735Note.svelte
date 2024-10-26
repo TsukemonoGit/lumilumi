@@ -159,17 +159,14 @@
                         height={21}
                         name={prof.display_name ?? ""}
                         tags={metadata.tags}
-                      />
-                    {/if}
-                    <span class="text-magnum-100 text-sm"
-                      >@{#if prof}
-                        <DisplayName
-                          height={21}
-                          name={prof.name ?? ""}
-                          tags={metadata.tags}
-                        />
-                      {/if}</span
-                    >
+                      />{#if prof && prof.name && prof.name !== ""}<span
+                          class="text-magnum-100 text-sm"
+                          ><DisplayName
+                            height={21}
+                            name={`@${prof.name}`}
+                            tags={metadata.tags}
+                          />
+                        </span>{/if}{/if}
                   {:else}
                     <span class="text-magnum-100 text-sm"
                       >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span

@@ -50,13 +50,14 @@
         name={prof?.display_name ?? ""}
         tags={metadata.tags}
       />
-      <span class="text-magnum-100 text-sm mt-auto"
-        >@<DisplayName
-          height={21}
-          name={prof?.name ?? ""}
-          tags={metadata.tags}
-        /></span
-      >
+      {#if prof && prof.name && prof.name !== ""}
+        <span class="text-magnum-100 text-sm mt-auto"
+          ><DisplayName
+            height={21}
+            name={`@${prof.name}`}
+            tags={metadata.tags}
+          /></span
+        >{/if}
     {:else}
       <span class="text-magnum-100 text-sm"
         >@{nip19.npubEncode(note.pubkey)}</span

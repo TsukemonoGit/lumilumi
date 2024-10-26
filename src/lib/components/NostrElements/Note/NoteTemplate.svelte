@@ -76,24 +76,22 @@
       {#if metadata}
         <div>
           {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
-            >{:else}{#if prof}<DisplayName
-                height={21}
-                name={prof.display_name ?? ""}
-                tags={metadata.tags}
-              />{/if}
-            <span
-              class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex"
-              >{#if prof}
-                @<DisplayName
+            >{:else if prof}<DisplayName
+              height={21}
+              name={prof.display_name ?? ""}
+              tags={metadata.tags}
+            />
+            {#if prof.name && prof.name !== ""}<span
+                class="inline text-magnum-100 text-sm"
+                ><DisplayName
                   height={21}
-                  name={prof.name ?? ""}
+                  name={`@${prof.name}`}
                   tags={metadata.tags}
-                />
-              {/if}
-            </span>{/if}
+                /></span
+              >{/if}{/if}
         </div>
       {:else}
-        <span class="text-magnum-100 text-sm mt-auto mb-auto break-all">
+        <span class="text-magnum-100 text-sm break-all">
           @{nip19.npubEncode(note.pubkey)}</span
         >
       {/if}

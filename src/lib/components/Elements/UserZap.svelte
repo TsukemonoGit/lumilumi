@@ -68,11 +68,11 @@
               name={prof.display_name ?? ""}
               tags={metadata.tags}
             />
-            @<DisplayName
-              height={21}
-              name={prof.name ?? ""}
-              tags={metadata.tags}
-            />
+            {#if prof.name && prof.name !== ""}<DisplayName
+                height={21}
+                name={`@${prof.name}`}
+                tags={metadata.tags}
+              />{/if}
           </div>
         </div>
       {/if}
