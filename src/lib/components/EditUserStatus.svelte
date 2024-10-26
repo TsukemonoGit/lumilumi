@@ -244,16 +244,14 @@
       </fieldset>
 
       <fieldset class="mb-4 flex flex-col items-start gap-2">
-        <label class=" text-zinc-100" for="URL">
-          URL or EventID (note~,npub~.naddr~)
-        </label>
+        <label class=" text-zinc-100" for="URL">URL or EventID</label>
         <input
           class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
           id="URL"
           type="url"
           bind:value={userURL}
-          placeholder="https://"
+          placeholder="https,note,npub,naddr,etc"
         />
       </fieldset>
       <div class="mt-6 flex justify-end gap-4">
