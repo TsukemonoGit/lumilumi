@@ -29,7 +29,10 @@
   const size = 18;
 
   $: res = replyedEvent(note.tags);
-  $: replyTag = res.replyTag;
+  $: replyTag =
+    res.replyTag && res.replyTag.length > 3 && res.replyTag[3] === "root"
+      ? undefined
+      : res.replyTag; //rootは部屋ID
   $: replyUsers = res.replyUsers;
   // const replyedEvent = (
   //   tags: string[][]
