@@ -5,6 +5,11 @@
   import EllipsisMenu from "./NoteActionButtuns/EllipsisMenu.svelte";
   import { beforeNavigate } from "$app/navigation";
   import StatusMusic from "$lib/components/NostrMainData/StatusMusic.svelte";
+  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import * as Nostr from "nostr-typedef";
+  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
+  import { nip19 } from "nostr-tools";
+  import { page } from "$app/stores";
 
   export let pubkey: string;
   export let tieKey: string | undefined;
@@ -12,14 +17,30 @@
     console.log("beforeNavigate", navigate.type);
     pubkey = "";
   });
+
+  function getLink(event: Nostr.Event): string | undefined {
+    //userURL
+    const raeTags = event.tags.find(
+      (tag) => tag[0] === "r" || tag[0] === "e" || tag[0] === "a"
+    );
+    if (raeTags && raeTags.length >= 2) {
+      if (raeTags[0] === "r") {
+        return raeTags[1];
+      } else if (raeTags[0] === "e" && hexRegex.test(raeTags[1])) {
+        return `${$page.url.origin}/${nip19.noteEncode(raeTags[1])}`;
+      } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
+        return `${$page.url.origin}/${nip19.naddrEncode(parseNaddr(raeTags))}`;
+      }
+    }
+  }
 </script>
 
 {#if pubkey}
   <div class="text-sm text-zinc-500">
     <StatusGeneral {pubkey} let:event>
-      {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
+      {@const link = getLink(event)}
       <div class="flex gap-1 items-center">
-        {#if link !== ""}
+        {#if link && link !== ""}
           <div class=" min-w-[16px] flex items-center justify-center">
             <EllipsisMenu
               TriggerIcon={TrendingUp}
@@ -39,7 +60,11 @@
               class="truncate line-clamp-2 max-w-full"
               style="	white-space: pre-wrap; word-break: break-word;"
             >
-              {event.content.trim() !== "" ? event.content.trim() : "link"}
+              <DisplayName
+                height={20}
+                name={event.content || link}
+                tags={event.tags}
+              />
             </div></a
           >
         {:else if event.content.trim() !== ""}
@@ -56,7 +81,7 @@
             class="truncate line-clamp-2 max-w-full"
             style="	white-space: pre-wrap; word-break: break-word;"
           >
-            {event.content}
+            <DisplayName height={20} name={event.content} tags={event.tags} />
           </div>
         {/if}
       </div>

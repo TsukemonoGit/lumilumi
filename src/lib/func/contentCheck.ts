@@ -113,3 +113,24 @@ export function contentCheck(
 
   return { text, tags: newTags };
 }
+
+export function contentEmojiCheck(
+  text: string,
+  tags: string[][]
+): { text: string; tags: string[][] } {
+  let newTags = [...tags];
+
+  // 絵文字タグを抽出
+  const emojiTag = tags
+    .filter((tag) => tag[0] === "emoji")
+    .map((tag) => tag[1]);
+
+  // 絵文字タグをテキスト内でチェックし、含まれていない場合に削除
+  emojiTag.forEach((emoji) => {
+    if (!text.includes(`:${emoji}:`)) {
+      newTags = newTags.filter((tag) => tag[0] !== "emoji" || tag[1] !== emoji);
+    }
+  });
+
+  return { text, tags: newTags };
+}

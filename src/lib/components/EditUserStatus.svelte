@@ -1,16 +1,22 @@
 <script lang="ts">
   import {
+    emojis,
     nowProgress,
+    showImg,
     toastSettings,
     userStatusStore,
   } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { X } from "lucide-svelte";
+  import { SmilePlus, X } from "lucide-svelte";
 
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
 
   import { publishEvent } from "$lib/func/nostr";
+  import Popover from "./Elements/Popover.svelte";
+  import { contentEmojiCheck } from "$lib/func/contentCheck";
+  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
+  import { nip19 } from "nostr-tools";
   const {
     elements: {
       trigger,
@@ -54,7 +60,22 @@
 
         if (statusEvent) {
           userStatus = statusEvent.content;
-          userURL = statusEvent.tags.find((tag) => tag[0] === "r")?.[1] ?? "";
+          //userURL
+          const raeTags = statusEvent.tags.find(
+            (tag) => tag[0] === "r" || tag[0] === "e" || tag[0] === "a"
+          );
+          if (raeTags && raeTags.length >= 2) {
+            if (raeTags[0] === "r") {
+              userURL = raeTags[1];
+            } else if (raeTags[0] === "e" && hexRegex.test(raeTags[1])) {
+              userURL = nip19.noteEncode(raeTags[1]);
+            } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
+              userURL = nip19.naddrEncode(parseNaddr(raeTags));
+            }
+            emojiTags = statusEvent.tags.filter(
+              (tag) => tag[0] === "emoji" && tag.length >= 3
+            );
+          }
         }
         $nowProgress = false;
       } catch (error: any) {
@@ -78,13 +99,20 @@
   const handleClickSave = () => {
     $nowProgress = true;
 
-    const tags = [["d", "general"]];
+    let tags = [["d", "general"]];
     if (userURL.trim() !== "") {
-      tags.push(["r", userURL]);
+      const addTag = createNewAddTag(userURL.trim());
+      if (addTag) {
+        tags.push(addTag);
+      }
     }
+    if (emojiTags.length > 0) {
+      tags = [...tags, ...emojiTags];
+    }
+    const newtags = contentEmojiCheck(userStatus, tags);
     const newStatus: Nostr.EventParameters = {
       kind: 30315,
-      tags: tags,
+      tags: newtags.tags,
       content: userStatus,
     };
     publishEvent(newStatus);
@@ -93,9 +121,64 @@
       description: "",
       color: "bg-green-500",
     };
+    emojiTags = [];
     $nowProgress = false;
     $open = false;
   };
+  let displayNameEmojiOpen: any;
+  let emojiTags: string[][] = [];
+  const handleClickEmojiDisplayName = (e: string[]) => {
+    const emojiTag = ["emoji", ...e];
+    if (!emojiTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
+      emojiTags.push(emojiTag);
+    }
+    const emojiText = `:${e[0]}:`;
+    userStatus = userStatus + emojiText;
+    // newProfile.display_name?.slice(0, cursorPosition) +
+    // emojiText +
+    // newProfile.display_name?.slice(cursorPosition);
+    // cursorPosition += emojiText.length;
+  };
+  let customReaction: string = "";
+
+  function createNewAddTag(str: string): string[] {
+    const nip19Regex =
+      /^(((npub|nsec|nprofile|naddr|nevent|note)1[023456789acdefghjklmnpqrstuvwxyz]{58,}))$/;
+    if (nip19Regex.test(str)) {
+      try {
+        const { type, data } = nip19.decode(str);
+        if (type === "naddr") {
+          let tag = ["a", `${data.kind}:${data.pubkey}:${data.identifier}`];
+          if (data.relays && data.relays[0] && data.relays[0] !== "") {
+            tag = [...tag, data.relays[0]];
+          }
+          return tag;
+        } else if (type === "note") {
+          return ["e", data];
+        } else if (type === "nevent") {
+          let tag = ["e", data.id];
+          if (data.relays && data.relays[0] && data.relays[0] !== "") {
+            tag = [...tag, data.relays[0]];
+          }
+          return tag;
+        } else if (type === "nprofile") {
+          let tag = ["p", data.pubkey];
+          if (data.relays && data.relays[0] && data.relays[0] !== "") {
+            tag = [...tag, data.relays[0]];
+          }
+          return tag;
+        } else if (type === "npub") {
+          return ["p", data];
+        } else {
+          return ["r", str];
+        }
+      } catch (error) {
+        return ["r", str];
+      }
+    } else {
+      return ["r", str];
+    }
+  }
 </script>
 
 {#if $open}
@@ -126,17 +209,49 @@
           id="status"
           type="text"
           bind:value={userStatus}
-        />
+        />{#if $emojis && $emojis.list.length > 0}
+          <div class=" w-fit flex self-end">
+            <Popover bind:open={displayNameEmojiOpen} ariaLabel="custom emoji">
+              <SmilePlus size="20" />
+              <div slot="popoverContent">
+                <div
+                  class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+                >
+                  {#each $emojis.list as e, index}
+                    {#if customReaction === "" || e[0]
+                        .toLowerCase()
+                        .includes(customReaction.toLowerCase())}
+                      <button
+                        on:click={() => handleClickEmojiDisplayName(e)}
+                        class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                      >
+                        {#if $showImg}
+                          <img
+                            loading="lazy"
+                            class="h-6 object-contain justify-self-center"
+                            src={e[1]}
+                            alt={e[0]}
+                            title={e[0]}
+                          />{:else}{e[0]}{/if}
+                      </button>
+                    {/if}
+                  {/each}
+                </div>
+              </div>
+            </Popover>
+          </div>
+        {/if}
       </fieldset>
+
       <fieldset class="mb-4 flex flex-col items-start gap-2">
-        <label class=" text-zinc-100" for="URL"> URL </label>
+        <label class=" text-zinc-100" for="URL">URL or EventID</label>
         <input
           class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
           id="URL"
           type="url"
           bind:value={userURL}
-          placeholder="https://"
+          placeholder="https,note,npub,naddr,etc"
         />
       </fieldset>
       <div class="mt-6 flex justify-end gap-4">
