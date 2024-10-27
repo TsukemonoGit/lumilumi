@@ -5,7 +5,12 @@
 
   import { makeMainFilters } from "$lib/func/nostr";
 
-  import { followList, loginUser, queryClient } from "$lib/stores/stores";
+  import {
+    followList,
+    loginUser,
+    queryClient,
+    timelineFilter,
+  } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -18,6 +23,7 @@
   import MakeNewKind3 from "./NostrElements/Note/MakeNewKind3.svelte";
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
   import MainTimeline from "./NostrMainData/MainTimeline.svelte";
+  import { page } from "$app/stores";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -81,6 +87,57 @@
       return events;
     }
   };
+
+  function checkCanvasation(
+    note: Nostr.Event,
+
+    select: number
+  ): boolean {
+    if ($page.url.pathname !== "/") {
+      return true;
+    }
+
+    if (note.kind !== 1) {
+      return true;
+    }
+    if (select === 0) {
+      return true;
+    }
+    const pTags: string[] = note.tags
+      .filter(
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
+      )
+      .map((tag) => tag[1]);
+
+    //ログインユーザーの会話はどれでも表示
+    if (note.pubkey === $loginUser || pTags.includes($loginUser)) {
+      return true;
+    }
+    //自分以外のopTags
+    if (select === 2) {
+      if (pTags.length > 0) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    if (select === 1) {
+      if (pTags.length <= 0) {
+        return true;
+      }
+      // フォローリストに一つも含まれない場合は false を返す
+      const hasFollowed = pTags.some((pub) => $followList.has(pub));
+      return hasFollowed;
+    } else {
+      return true;
+    }
+  }
+  let updateViewEvent: any;
+  $: if ($timelineFilter && updateViewEvent) {
+    //設定が変わったら更新
+
+    updateViewEvent();
+  }
 </script>
 
 <Contacts
@@ -104,6 +161,10 @@
       {viewIndex}
       {amount}
       let:len
+      eventFilter={(note) => {
+        return checkCanvasation(note, $timelineFilter.selectCanversation);
+      }}
+      bind:updateViewEvent
     >
       <!-- <SetRepoReactions /> -->
       <div slot="loading">

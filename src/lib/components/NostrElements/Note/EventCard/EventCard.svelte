@@ -311,399 +311,356 @@
   let loadThread = false;
 
   //canvasationcheck
-  $: showCanvasationCheck =
-    $page.url.pathname !== "/"
-      ? true
-      : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
-  function checkCanvasation(tags: string[][], select: number): boolean {
-    if (note.kind !== 1) {
-      return true;
-    }
-    if (select === 0) {
-      return true;
-    }
-    const pTags: string[] = tags
-      .filter(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
-      )
-      .map((tag) => tag[1]);
-
-    //ログインユーザーの会話はどれでも表示
-    if (note.pubkey === $loginUser || pTags.includes($loginUser)) {
-      return true;
-    }
-    //自分以外のopTags
-    if (select === 2) {
-      if (pTags.length > 0) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-    if (select === 1) {
-      if (pTags.length <= 0) {
-        return true;
-      }
-      // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((pub) => $followList.has(pub));
-      return hasFollowed;
-    } else {
-      return true;
-    }
-  }
+  // $: showCanvasationCheck =
+  //   $page.url.pathname !== "/"
+  //     ? true
+  //     : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
 </script>
 
-{#if showCanvasationCheck}
-  {#if muteType !== "null" && depth >= 1}
-    <button
-      class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-      on:click={() => (viewMuteEvent = !viewMuteEvent)}
-    >
-      {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
-    </button>
-  {/if}
-  {#if muteType === "null" || viewMuteEvent}
-    {#if thread && replyTag}
-      {#if depth >= 1 && depth % 6 === 0 && !loadThread}
-        <button
-          class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
-          on:click={() => (loadThread = true)}
-        >
-          Show more
-        </button>
-      {:else}
-        <!-- <div class="border-b border-magnum-600/30"> -->
-        <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
-      {/if}
-      <!-- </div> -->
+<!-- {#if showCanvasationCheck} -->
+{#if muteType !== "null" && depth >= 1}
+  <button
+    class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+    on:click={() => (viewMuteEvent = !viewMuteEvent)}
+  >
+    {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
+  </button>
+{/if}
+{#if muteType === "null" || viewMuteEvent}
+  {#if thread && replyTag}
+    {#if depth >= 1 && depth % 6 === 0 && !loadThread}
+      <button
+        class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
+        on:click={() => (loadThread = true)}
+      >
+        Show more
+      </button>
+    {:else}
+      <!-- <div class="border-b border-magnum-600/30"> -->
+      <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
     {/if}
+    <!-- </div> -->
+  {/if}
 
-    <article class="{noteClass()} w-full">
-      {#if note.kind === 1}
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
-          <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
-          {#if replyUsers.length > 0}
-            <div
-              class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
-            >
-              {#each replyUsers as user}
-                {#if !displayMenu}<UserName pubhex={user} />{:else}
-                  <PopupUserName pubkey={user} {tieKey} />{/if}
-              {/each}
-            </div>
-          {/if}
-          {#if !thread && (replyTag || replyUsers.length > 0)}
-            <Reply {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
-            <!--<hr />-->
-          {/if}
-
-          <div class="relative overflow-hidden mb-1.5">
-            <div
-              class="mt-0.5 overflow-y-auto overflow-x-hidden"
-              style="max-height:{maxHeight ?? 'none'}"
-            >
-              <Content
-                text={note.content}
-                tags={note.tags}
-                {displayMenu}
-                {depth}
-                {repostable}
-                {tieKey}
-              />
-            </div>
-            {#if warning}
-              <!-- <WarningHide1 text={tag[1]} /> -->
-              <WarningHide2 text={warning[1]} />
-            {/if}
+  <article class="{noteClass()} w-full">
+    {#if note.kind === 1}
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
+        <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+        {#if replyUsers.length > 0}
+          <div
+            class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
+          >
+            {#each replyUsers as user}
+              {#if !displayMenu}<UserName pubhex={user} />{:else}
+                <PopupUserName pubkey={user} {tieKey} />{/if}
+            {/each}
           </div>
+        {/if}
+        {#if !thread && (replyTag || replyUsers.length > 0)}
+          <Reply {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
+          <!--<hr />-->
+        {/if}
 
+        <div class="relative overflow-hidden mb-1.5">
+          <div
+            class="mt-0.5 overflow-y-auto overflow-x-hidden"
+            style="max-height:{maxHeight ?? 'none'}"
+          >
+            <Content
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
+          </div>
+          {#if warning}
+            <!-- <WarningHide1 text={tag[1]} /> -->
+            <WarningHide2 text={warning[1]} />
+          {/if}
+        </div>
+
+        {#if displayMenu}
+          <NoteActionButtons {note} {repostable} {tieKey} />{/if}
+      </NoteTemplate>
+    {:else if note.kind === 42}
+      <!--kind42 パブ茶コメント-->
+
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        <Kind42Note
+          {tieKey}
+          {note}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {thread}
+        /></NoteTemplate
+      >
+    {:else if note.kind === 6 || note.kind === 16}
+      <!--リポスト-->
+      <div class="flex gap-1 items-center bg-magnum-800/25">
+        <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
+          size="20"
+          class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
+        />
+        <div class="self-center">
+          <UserMenu
+            pubkey={note.pubkey}
+            bind:metadata
+            size={20}
+            {displayMenu}
+            {depth}
+            {tieKey}
+          />
+        </div>
+        <div class=" inline-block break-all break-words whitespace-pre-line">
+          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+            >{:else if metadata}
+            {@const prof = profile(metadata)}
+            {#if prof}
+              <DisplayName
+                height={21}
+                name={prof.display_name ?? ""}
+                tags={metadata.tags}
+              />
+              {#if prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  /></span
+                >{/if}{/if}
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+        </div>
+
+        <div class="ml-auto mr-2">
           {#if displayMenu}
             <NoteActionButtons {note} {repostable} {tieKey} />{/if}
-        </NoteTemplate>
-      {:else if note.kind === 42}
-        <!--kind42 パブ茶コメント-->
-
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          <Kind42Note
-            {tieKey}
-            {note}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {thread}
-          /></NoteTemplate
-        >
-      {:else if note.kind === 6 || note.kind === 16}
-        <!--リポスト-->
-        <div class="flex gap-1 items-center bg-magnum-800/25">
-          <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
-            size="20"
-            class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
-          />
-          <div class="self-center">
-            <UserMenu
-              pubkey={note.pubkey}
-              bind:metadata
-              size={20}
-              {displayMenu}
-              {depth}
-              {tieKey}
-            />
-          </div>
-          <div class=" inline-block break-all break-words whitespace-pre-line">
-            {#if petname}<span class="font-bold text-magnum-100"
-                >📛{petname}</span
-              >{:else if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />
-                {#if prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    /></span
-                  >{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{nip19.npubEncode(note.pubkey)}</span
-              >
-            {/if}
-          </div>
-
-          <div class="ml-auto mr-2">
-            {#if displayMenu}
-              <NoteActionButtons {note} {repostable} {tieKey} />{/if}
-          </div>
         </div>
-        <!--リアクションしたノートの情報-->
-        {@const { kind, tag } = repostedId(note.tags)}
-        {#if tag}
-          <RepostedNote
-            {tag}
-            depth={depth + 1}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        {/if}
-      {:else if note.kind === 7}
-        <!--リアクション-->
-        <div class="flex gap-1 items-center bg-magnum-800/25">
-          <div class="w-fit max-w-[40%]">
-            <Reaction event={note} />
-          </div>
-          <div class="self-center">
-            <UserMenu
-              pubkey={note.pubkey}
-              bind:metadata
-              size={20}
-              {displayMenu}
-              {depth}
-              {tieKey}
-            />
-          </div>
-          <div class="break-all break-words whitespace-pre-line">
-            {#if petname}<span class="font-bold text-magnum-100"
-                >📛{petname}</span
-              >{:else if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />
-                {#if prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm mt-auto"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    /></span
-                  >{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{nip19.npubEncode(note.pubkey)}</span
-              >
-            {/if}
-          </div>
-
-          <div class="ml-auto">
-            {#if displayMenu}
-              <NoteActionButtons {note} {repostable} {tieKey} />{/if}
-          </div>
-        </div>
-        <!--リアクションしたノートの情報（リポストのを使いまわし）-->
-        {@const { kind, tag } = repostedId(note.tags)}
-        {#if tag}{#if $page.route.id === "/" || $page.route.id === "/notifications"}<!--タイムラインと通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
-            <ReactionedNote
-              {tag}
-              depth={depth + 1}
-              {repostable}
-              {displayMenu}
-              {tieKey}
-              {maxHeight}
-            />
-          {:else}
-            <RepostedNote
-              {tag}
-              depth={depth + 1}
-              {repostable}
-              {displayMenu}
-              {maxHeight}
-              {tieKey}
-            />
-          {/if}
-        {/if}
-      {:else if note.kind === 17}
-        <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-        <ReactionWebsite {note} {metadata} {displayMenu} {depth} {tieKey} />
-      {:else if note.kind === 0}
-        <!--kind0-->
-        <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
-      {:else if note.kind === 40}
-        <!--kind40 パブ茶部屋-->
-        <LatestEvent
-          queryKey={["channel", "kind41", note.id]}
-          filters={[
-            { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
-          ]}
-          let:event
-        >
-          <div slot="loading">
-            <ChannelMetadataLayout
-              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-              handleClickToChannel={() => handleClickToChannel(note.id)}
-              id={note.id}
-              event={note}
-              {tieKey}
-            />
-          </div>
-          <div slot="nodata">
-            <ChannelMetadataLayout
-              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-              handleClickToChannel={() => handleClickToChannel(note.id)}
-              id={note.id}
-              event={note}
-              {tieKey}
-            />
-          </div>
-          <div slot="error">
-            <ChannelMetadataLayout
-              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-              handleClickToChannel={() => handleClickToChannel(note.id)}
-              id={note.id}
-              event={note}
-              {tieKey}
-            />
-          </div>
-          <ChannelMetadataLayout
-            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-            handleClickToChannel={() => handleClickToChannel(note.id)}
-            id={note.id}
-            {event}
-            {tieKey}
-          />
-        </LatestEvent>
-      {:else if note.kind === 41}
-        <!--kind:40チャンネルroot-->
-        {@const root = note.tags.find((tag) => tag[0] === "e")?.[1]}
-        <!--kind40 パブ茶部屋-->
-        {#if root}
-          <ChannelMetadataLayout
-            linkButtonTitle={`/channel/${nip19.noteEncode(root)}`}
-            handleClickToChannel={() => handleClickToChannel(root)}
-            id={root}
-            event={note}
-            {tieKey}
-          />
-        {:else}
-          <OtherKindNote
-            {tieKey}
-            {note}
-            {metadata}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {maxHeight}
-          />
-        {/if}
-      {:else if note.kind === 30000}
-        <ListLinkCard event={note} {depth} {tieKey} />
-      {:else if note.kind === 30030}
-        <!--kind30030-->
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          <Kind30030Note
-            {note}
-            {repostable}
-            {maxHeight}
-            {tieKey}
-          /></NoteTemplate
-        >
-      {:else if note.kind === 9735}
-        <!--kind9735 zap receipt-->
-
-        <Kind9735Note
-          {note}
-          {depth}
-          {excludefunc}
+      </div>
+      <!--リアクションしたノートの情報-->
+      {@const { kind, tag } = repostedId(note.tags)}
+      {#if tag}
+        <RepostedNote
+          {tag}
+          depth={depth + 1}
           {repostable}
           {maxHeight}
           {displayMenu}
           {tieKey}
-          {mini}
         />
-      {:else if note.kind === 4}
-        <!--旧仕様のDMだよ-->
-        <Kind4Note
+      {/if}
+    {:else if note.kind === 7}
+      <!--リアクション-->
+      <div class="flex gap-1 items-center bg-magnum-800/25">
+        <div class="w-fit max-w-[40%]">
+          <Reaction event={note} />
+        </div>
+        <div class="self-center">
+          <UserMenu
+            pubkey={note.pubkey}
+            bind:metadata
+            size={20}
+            {displayMenu}
+            {depth}
+            {tieKey}
+          />
+        </div>
+        <div class="break-all break-words whitespace-pre-line">
+          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+            >{:else if metadata}
+            {@const prof = profile(metadata)}
+            {#if prof}
+              <DisplayName
+                height={21}
+                name={prof.display_name ?? ""}
+                tags={metadata.tags}
+              />
+              {#if prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm mt-auto"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  /></span
+                >{/if}{/if}
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+        </div>
+
+        <div class="ml-auto">
+          {#if displayMenu}
+            <NoteActionButtons {note} {repostable} {tieKey} />{/if}
+        </div>
+      </div>
+      <!--リアクションしたノートの情報（リポストのを使いまわし）-->
+      {@const { kind, tag } = repostedId(note.tags)}
+      {#if tag}{#if $page.route.id === "/" || $page.route.id === "/notifications"}<!--タイムラインと通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
+          <ReactionedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {tieKey}
+            {maxHeight}
+          />
+        {:else}
+          <RepostedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {maxHeight}
+            {tieKey}
+          />
+        {/if}
+      {/if}
+    {:else if note.kind === 17}
+      <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
+      <ReactionWebsite {note} {metadata} {displayMenu} {depth} {tieKey} />
+    {:else if note.kind === 0}
+      <!--kind0-->
+      <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
+    {:else if note.kind === 40}
+      <!--kind40 パブ茶部屋-->
+      <LatestEvent
+        queryKey={["channel", "kind41", note.id]}
+        filters={[
+          { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
+        ]}
+        let:event
+      >
+        <div slot="loading">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+            {tieKey}
+          />
+        </div>
+        <div slot="nodata">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+            {tieKey}
+          />
+        </div>
+        <div slot="error">
+          <ChannelMetadataLayout
+            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+            handleClickToChannel={() => handleClickToChannel(note.id)}
+            id={note.id}
+            event={note}
+            {tieKey}
+          />
+        </div>
+        <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+          handleClickToChannel={() => handleClickToChannel(note.id)}
+          id={note.id}
+          {event}
           {tieKey}
-          {mini}
+        />
+      </LatestEvent>
+    {:else if note.kind === 41}
+      <!--kind:40チャンネルroot-->
+      {@const root = note.tags.find((tag) => tag[0] === "e")?.[1]}
+      <!--kind40 パブ茶部屋-->
+      {#if root}
+        <ChannelMetadataLayout
+          linkButtonTitle={`/channel/${nip19.noteEncode(root)}`}
+          handleClickToChannel={() => handleClickToChannel(root)}
+          id={root}
+          event={note}
+          {tieKey}
+        />
+      {:else}
+        <OtherKindNote
+          {tieKey}
           {note}
           {metadata}
           {displayMenu}
           {depth}
+          {repostable}
           {maxHeight}
-          {warning}
-          {replyUsers}
-          {thread}
-          {replyTag}
         />
-      {:else if note.kind === 31990}
-        {@const data = get31990Ogp(note)}
-        {#if !data}
-          <OtherKindNote
-            {tieKey}
-            {note}
-            {metadata}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {maxHeight}
-          />
-        {:else}
-          <Kind31990Note
-            {note}
-            {data}
-            {metadata}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {tieKey}
-          />
-        {/if}
-      {:else if note.kind === 1059}
-        <!---->
-        Gift Wrap
+      {/if}
+    {:else if note.kind === 30000}
+      <ListLinkCard event={note} {depth} {tieKey} />
+    {:else if note.kind === 30030}
+      <!--kind30030-->
+      <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+        <Kind30030Note {note} {repostable} {maxHeight} {tieKey} /></NoteTemplate
+      >
+    {:else if note.kind === 9735}
+      <!--kind9735 zap receipt-->
+
+      <Kind9735Note
+        {note}
+        {depth}
+        {excludefunc}
+        {repostable}
+        {maxHeight}
+        {displayMenu}
+        {tieKey}
+        {mini}
+      />
+    {:else if note.kind === 4}
+      <!--旧仕様のDMだよ-->
+      <Kind4Note
+        {tieKey}
+        {mini}
+        {note}
+        {metadata}
+        {displayMenu}
+        {depth}
+        {maxHeight}
+        {warning}
+        {replyUsers}
+        {thread}
+        {replyTag}
+      />
+    {:else if note.kind === 31990}
+      {@const data = get31990Ogp(note)}
+      {#if !data}
+        <OtherKindNote
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+        />
       {:else}
-        <!-- その他
+        <Kind31990Note
+          {note}
+          {data}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+        />
+      {/if}
+    {:else if note.kind === 1059}
+      <!---->
+      Gift Wrap
+    {:else}
+      <!-- その他
       {@const clientData = findClientTag(note)}
       {#if !clientData}
      client tagがないやつここ
@@ -870,15 +827,15 @@
             {/if}
           {/await}
         </LatestEvent>-->
-        <OtherKindNote
-          {note}
-          {metadata}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {maxHeight}
-          {tieKey}
-        />{/if}
-    </article>
-  {/if}
+      <OtherKindNote
+        {note}
+        {metadata}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {maxHeight}
+        {tieKey}
+      />{/if}
+  </article>
 {/if}
+<!-- {/if} -->
