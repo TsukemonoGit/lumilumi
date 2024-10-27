@@ -5,6 +5,7 @@
   import { fade } from "svelte/transition";
   export let open = false;
   export let ariaLabel: string;
+  export let zIndex = 20;
   const {
     elements: { trigger, content, arrow, close },
     states,
@@ -24,6 +25,7 @@
     use:melt={$content}
     transition:fade={{ duration: 100 }}
     class="content"
+    style={`z-index:${zIndex}`}
   >
     <div use:melt={$arrow}></div>
     <div class="flex flex-col gap-2.5"><slot name="popoverContent"></slot></div>
@@ -55,6 +57,6 @@
   }
 
   .content {
-    @apply z-[100] rounded-[4px] bg-neutral-800 p-2 shadow-md max-w-[90%];
+    @apply rounded-[4px] bg-neutral-800 p-2 shadow-md max-w-[90%];
   }
 </style>

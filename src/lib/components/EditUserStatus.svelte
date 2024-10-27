@@ -211,7 +211,11 @@
           bind:value={userStatus}
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
-            <Popover bind:open={displayNameEmojiOpen} ariaLabel="custom emoji">
+            <Popover
+              bind:open={displayNameEmojiOpen}
+              ariaLabel="custom emoji"
+              zIndex={100}
+            >
               <SmilePlus size="20" />
               <div slot="popoverContent">
                 <div
