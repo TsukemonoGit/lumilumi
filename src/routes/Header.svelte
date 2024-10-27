@@ -25,7 +25,7 @@
     defaultValue: optionsArr[$timelineFilter.selectCanversation][0],
     value: selected,
   });
-  $: console.log($timelineFilter.showAllMute);
+  // $: console.log($timelineFilter.adaptMute);
   $: $timelineFilter.selectCanversation = Number($selected);
   $: if ($timelineFilter) {
     localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
@@ -61,15 +61,15 @@
             <ul>
               <li>
                 <div class="flex gap-1">
-                  <span class="label">トップレベルミュートも表示</span>
+                  <span class="label">{$_("filter.menu.muteOn")}</span>
                   <input
                     type="checkbox"
-                    bind:checked={$timelineFilter.showAllMute}
+                    bind:checked={$timelineFilter.adaptMute}
                   />
                 </div>
               </li>
               <li>
-                <div class="label">会話の表示</div>
+                <div class="label">{$_("filter.menu.canversation")}</div>
                 <div
                   use:melt={$root}
                   class="px-2 py-1 flex flex-col data-[orientation=horizontal]:flex-row"

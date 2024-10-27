@@ -18,14 +18,14 @@ export type RxReqBase = RxReq;
 export type ReqStatus = "loading" | "success" | "error";
 
 export interface TimelineFilter {
-  showAllMute: boolean; //top level mute is hidden default
+  adaptMute: boolean; //top level mute is hidden default
   selectCanversation: number; //Radio Group
   //0 all
   //1 follow only
   //2 all
 }
 export const timelineFilterInit: TimelineFilter = {
-  showAllMute: false,
+  adaptMute: true,
   selectCanversation: 0,
 };
 export interface ReqResult<A> {

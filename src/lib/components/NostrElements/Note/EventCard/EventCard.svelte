@@ -108,9 +108,10 @@
   }
 
   let muteType: MuteCheck;
-  $: if ($mutes || $mutebykinds) {
-    muteType =
-      paramNoteId === note.id || excludefunc(note)
+  $: if ($mutes || $mutebykinds || $timelineFilter) {
+    muteType = !$timelineFilter.adaptMute
+      ? "null"
+      : paramNoteId === note.id || excludefunc(note)
         ? "null"
         : $mutes || $mutebykinds
           ? muteCheck(note)
@@ -335,14 +336,9 @@
       if (pTags.length <= 0) {
         return true;
       }
-      pTags
-        .map((tag) => tag[1])
-        .map((pub) => {
-          if ($followList.has(pub)) {
-            return true;
-          }
-        });
-      return false;
+      // フォローリストに一つも含まれない場合は false を返す
+      const hasFollowed = pTags.some((tag) => $followList.has(tag[1]));
+      return hasFollowed;
     } else {
       return true;
     }
@@ -350,7 +346,7 @@
 </script>
 
 {#if showCanvasationCheck}
-  {#if muteType !== "null" && ($timelineFilter.showAllMute || depth >= 1)}
+  {#if muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
       on:click={() => (viewMuteEvent = !viewMuteEvent)}
@@ -360,7 +356,7 @@
   {/if}
   {#if muteType === "null" || viewMuteEvent}
     {#if thread && replyTag}
-      {#if ($timelineFilter.showAllMute || depth >= 1) && depth % 6 === 0 && !loadThread}
+      {#if depth >= 1 && depth % 6 === 0 && !loadThread}
         <button
           class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
           on:click={() => (loadThread = true)}

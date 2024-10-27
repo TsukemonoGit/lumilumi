@@ -187,5 +187,16 @@
     "type": {
       "select": "Select the type of mute"
     }
+  },
+  "filter": {
+    "menu": {
+      "muteOn": "Adapt Mute",
+      "canversation": "Conversation Display Levels"
+    },
+    "canversation": {
+      "all": "Show all conversations",
+      "onlyFollowee": "Show Conversations with Followed Users Only",
+      "none": "Hide Conversations"
+    }
   }
 }
