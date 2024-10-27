@@ -18,8 +18,8 @@
   $: if (
     $reactionToast &&
     !(
-      ($reactionToast.title || $reactionToast.title === "") &&
-      ($reactionToast.description || $reactionToast.description === "")
+      (!$reactionToast.title || $reactionToast.title === "") &&
+      (!$reactionToast.description || $reactionToast.description === "")
     )
   ) {
     addToast({
