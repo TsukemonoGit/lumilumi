@@ -322,9 +322,17 @@
     if (select === 0) {
       return true;
     }
-    const pTags = tags.filter(
-      (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
-    ); //自分以外のopTags
+    const pTags: string[] = tags
+      .filter(
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
+      )
+      .map((tag) => tag[1]);
+
+    //ログインユーザーの会話はどれでも表示
+    if (note.pubkey === $loginUser || pTags.includes($loginUser)) {
+      return true;
+    }
+    //自分以外のopTags
     if (select === 2) {
       if (pTags.length > 0) {
         return false;
@@ -337,7 +345,7 @@
         return true;
       }
       // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((tag) => $followList.has(tag[1]));
+      const hasFollowed = pTags.some((pub) => $followList.has(pub));
       return hasFollowed;
     } else {
       return true;
