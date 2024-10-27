@@ -11,11 +11,13 @@ import {
   type ConnectionState,
   type EventVerifier,
 } from "rx-nostr";
-import type {
-  AdditionalPostOptions,
-  LumiEmoji,
-  LumiMute,
-  LumiMuteByKind,
+import {
+  timelineFilterInit,
+  type AdditionalPostOptions,
+  type LumiEmoji,
+  type LumiMute,
+  type LumiMuteByKind,
+  type TimelineFilter,
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
@@ -140,3 +142,6 @@ export const showAllReactions = writable<boolean>(false);
 export const ogTitle = writable<string>("Lumilumi");
 
 export const ogDescription = writable<string>("the nostr client");
+
+//localstorage "timelineFilter"
+export const timelineFilter = writable<TimelineFilter>(timelineFilterInit);

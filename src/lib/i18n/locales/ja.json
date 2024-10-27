@@ -202,5 +202,16 @@
       "text": "(旧仕様のDM)",
       "decrypt": "復号して内容を見る"
     }
+  },
+  "filter": {
+    "canversation": {
+      "all": "すべての会話を表示",
+      "onlyFollowee": "フォローユーザーとの会話のみ表示",
+      "none": "会話を表示しない"
+    },
+    "menu": {
+      "canversation": "会話の表示",
+      "muteOn": "ミュートを適応する"
+    }
   }
 }

@@ -1,17 +1,11 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
-import type {
-  EventPacket,
-  RxReq,
-  RxReqEmittable,
-  RxReqOverable,
-  RxReqPipeable,
-} from "rx-nostr";
+import type { EventPacket } from "rx-nostr";
 
 import type { OperatorFunction } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
-import { useReq } from "$lib/func/useReq";
+
 import { useForwardReq } from "$lib/func/nostr";
 
 //import { useReq } from "$lib/func/useReq.js";

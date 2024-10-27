@@ -21,6 +21,7 @@
     addClientTag,
     showClientTag,
     showAllReactions,
+    timelineFilter,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -59,6 +60,14 @@
     const followee = localStorage.getItem("onlyFollowee");
     if (followee === "true") {
       $onlyFollowee = true;
+    }
+    const timeline = localStorage.getItem("timelineFilter");
+    if (timeline) {
+      try {
+        $timelineFilter = JSON.parse(timeline);
+      } catch (error) {
+        console.log("timelineFilter parse error");
+      }
     }
     await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
