@@ -33,12 +33,7 @@
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
-  import {
-    userStatus,
-    reactionCheck,
-    scanArray,
-    muteCheck,
-  } from "$lib/stores/operators";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
 

@@ -1,10 +1,39 @@
 <script lang="ts">
   import RelayStatus from "$lib/components/RelayStatus.svelte";
+  import { SlidersHorizontal } from "lucide-svelte";
   import { currentPage } from "./menu";
+  import Popover from "$lib/components/Elements/Popover.svelte";
+  import { createRadioGroup, melt } from "@melt-ui/svelte";
+  import { _ } from "svelte-i18n";
+  import { timelineFilter } from "$lib/stores/stores";
+  import { writable } from "svelte/store";
+
+  let openPopover: any;
+  const optionsArr = [
+    ["0", $_("filter.canversation.all")],
+    ["1", $_("filter.canversation.onlyFollowee")],
+    ["2", $_("filter.canversation.none")],
+  ];
+  const selected = writable<string>(
+    optionsArr[$timelineFilter.selectCanversation][0]
+  );
+
+  const {
+    elements: { root, item, hiddenInput },
+    helpers: { isChecked },
+  } = createRadioGroup({
+    defaultValue: optionsArr[$timelineFilter.selectCanversation][0],
+    value: selected,
+  });
+  $: console.log($timelineFilter.showAllMute);
+  $: $timelineFilter.selectCanversation = Number($selected);
+  $: if ($timelineFilter) {
+    localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
+  }
 </script>
 
 <header>
-  <div class=" fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
+  <div class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
     <div class="flex w-full h-8 justify-center items-center gap-4">
       {#if $currentPage?.Icon}
         <div>
@@ -14,6 +43,63 @@
       <div class="uppercase font-bold">{$currentPage?.alt ?? "lumilumi"}</div>
       <RelayStatus />
     </div>
+    {#if $currentPage?.alt === "home"}<div
+        class="absolute right-0 top-0 h-8 flex"
+      >
+        <Popover
+          bind:open={openPopover}
+          ariaLabel="timeline filter setting"
+          showCloseButton={true}
+        >
+          <div
+            class=" flex items-center font-bold gap-1 rounded-full border text-magnum-200 border-magnum-200
+                hover:bg-magnum-800/75 active:bg-magnum-700/75 px-2 my-1"
+          >
+            <SlidersHorizontal size={20} />filter
+          </div>
+          <div slot="popoverContent" class="w-[320px] max-w-full flex flex-col">
+            <ul>
+              <li>
+                <div class="flex gap-1">
+                  <span class="label">トップレベルミュートも表示</span>
+                  <input
+                    type="checkbox"
+                    bind:checked={$timelineFilter.showAllMute}
+                  />
+                </div>
+              </li>
+              <li>
+                <div class="label">会話の表示</div>
+                <div
+                  use:melt={$root}
+                  class="px-2 py-1 flex flex-col data-[orientation=horizontal]:flex-row"
+                  aria-label="View density"
+                >
+                  {#each optionsArr as [index, option]}
+                    <div class="flex items-center gap-3">
+                      <button
+                        use:melt={$item(index)}
+                        class="grid h-6 w-6 cursor-default place-items-center rounded-full bg-magnum-700 shadow-sm
+      hover:bg-magnum-600"
+                        id={option}
+                        aria-labelledby="{option}-label"
+                      >
+                        {#if $isChecked(index)}
+                          <div class="h-3 w-3 rounded-full bg-magnum-500" />
+                        {/if}
+                      </button>
+                      <label for={option} id="{option}-label">
+                        {option}
+                      </label>
+                    </div>
+                  {/each}
+                  <input name="line-height" use:melt={$hiddenInput} />
+                </div>
+              </li>
+            </ul>
+          </div></Popover
+        >
+      </div>{/if}
   </div>
 </header>
 
@@ -24,5 +110,17 @@
     justify-content: center;
     align-items: center;
     flex: 0.6;
+  }
+  ul {
+    list-style-type: disc; /* デフォルトのリストアイコン */
+
+    padding-left: 1.5em; /* パディングを追加してアイコンとテキストの距離を調整 */
+  }
+  li {
+    padding-top: 4px;
+  }
+  .label {
+    font-weight: bold;
+    list-style-type: disc;
   }
 </style>
