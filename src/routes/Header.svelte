@@ -64,6 +64,7 @@
                   <span class="label">{$_("filter.menu.muteOn")}</span>
                   <input
                     type="checkbox"
+                    class="rounded-checkbox"
                     bind:checked={$timelineFilter.adaptMute}
                   />
                 </div>
@@ -79,13 +80,13 @@
                     <div class="flex items-center gap-3">
                       <button
                         use:melt={$item(index)}
-                        class="grid h-6 w-6 cursor-default place-items-center rounded-full bg-magnum-700 shadow-sm
-      hover:bg-magnum-600"
+                        class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
+      hover:bg-magnum-800"
                         id={option}
                         aria-labelledby="{option}-label"
                       >
                         {#if $isChecked(index)}
-                          <div class="h-3 w-3 rounded-full bg-magnum-500" />
+                          <div class="h-3 w-3 rounded-full bg-magnum-400" />
                         {/if}
                       </button>
                       <label for={option} id="{option}-label">
