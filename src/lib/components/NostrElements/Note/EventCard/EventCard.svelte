@@ -519,7 +519,7 @@
                 <DisplayName
                   height={21}
                   name={prof.display_name ?? ""}
-                  tags={note.tags}
+                  tags={metadata.tags}
                 />
                 {#if prof.name && prof.name !== ""}<span
                     class="text-magnum-100 text-sm mt-auto"
