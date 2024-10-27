@@ -7,6 +7,7 @@
   import FollowButton from "../FollowButton.svelte";
   import Content from "../Content.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { followList } from "$lib/stores/stores";
 
   export let displayMenu: boolean;
   export let note: Nostr.Event;
@@ -15,6 +16,7 @@
   export let tieKey: string | undefined;
 
   $: prof = profile(note);
+  $: petname = $followList.get(note.pubkey);
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">
@@ -47,7 +49,9 @@
                 name={`@${prof.name}`}
                 tags={note.tags}
               />
-            </span>{/if}{/if}
+            </span>{/if}{/if}{#if petname}<span
+            class="font-bold text-magnum-100">📛{petname}</span
+          >{/if}
       </div>
       <div class="ml-auto">
         <FollowButton pubkey={note.pubkey} />

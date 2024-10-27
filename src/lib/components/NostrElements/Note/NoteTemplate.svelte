@@ -73,28 +73,28 @@
 
   <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
-      {#if metadata}
-        <div>
-          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
-            >{:else if prof}<DisplayName
-              height={21}
-              name={prof.display_name ?? ""}
-              tags={metadata.tags}
-            />
-            {#if prof.name && prof.name !== ""}<span
-                class="inline text-magnum-100 text-sm"
-                ><DisplayName
-                  height={21}
-                  name={`@${prof.name}`}
-                  tags={metadata.tags}
-                /></span
-              >{/if}{/if}
-        </div>
-      {:else}
-        <span class="text-magnum-100 text-sm break-all">
-          @{nip19.npubEncode(note.pubkey)}</span
-        >
-      {/if}
+      <div>
+        {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span>
+        {:else if metadata && prof}
+          <DisplayName
+            height={21}
+            name={prof.display_name ?? ""}
+            tags={metadata.tags}
+          />
+          {#if prof.name && prof.name !== ""}<span
+              class="inline text-magnum-100 text-sm"
+              ><DisplayName
+                height={21}
+                name={`@${prof.name}`}
+                tags={metadata.tags}
+              /></span
+            >{/if}
+        {:else}
+          <span class="text-magnum-100 text-sm break-all">
+            @{nip19.npubEncode(note.pubkey)}</span
+          >
+        {/if}
+      </div>
       {#if displayMenu}
         <button
           on:click={handleClickToNotepage}
