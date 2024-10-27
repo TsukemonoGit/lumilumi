@@ -60,7 +60,7 @@
           <div slot="popoverContent" class="w-[320px] max-w-full flex flex-col">
             <ul>
               <li>
-                <div class="flex gap-1">
+                <div class="flex gap-2 items-center">
                   <span class="label">{$_("filter.menu.muteOn")}</span>
                   <input
                     type="checkbox"
@@ -73,7 +73,7 @@
                 <div class="label">{$_("filter.menu.canversation")}</div>
                 <div
                   use:melt={$root}
-                  class="px-2 py-1 flex flex-col data-[orientation=horizontal]:flex-row"
+                  class="my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
                   aria-label="View density"
                 >
                   {#each optionsArr as [index, option]}

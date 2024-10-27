@@ -15,7 +15,15 @@
     actions: { portal },
   } = createToaster<ToastData>();
 
-  $: if ($reactionToast) {
+  $: if (
+    $reactionToast &&
+    !(
+      $reactionToast.title &&
+      $reactionToast.title === "" &&
+      $reactionToast.description &&
+      $reactionToast.description === ""
+    )
+  ) {
     addToast({
       data: $reactionToast,
     });
