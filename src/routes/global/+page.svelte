@@ -19,7 +19,6 @@
   import GlobalDescription from "./GlobalDescription.svelte";
   import GlobalTimeline from "./GlobalTimeline.svelte";
   import { afterNavigate } from "$app/navigation";
-  import type { QueryKey } from "@tanstack/svelte-query";
 
   import type { EventPacket } from "rx-nostr";
 

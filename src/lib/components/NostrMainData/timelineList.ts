@@ -59,7 +59,7 @@ export async function loadOlderEvents(
   //けどなんか大変そうだから最初のフィルターだけにしよう
   const newFilters = {
     ...filters[0],
-    limit: sift,
+    limit: sift + 1,
     until: until,
     since: undefined,
   };
