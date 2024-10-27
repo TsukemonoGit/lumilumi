@@ -311,10 +311,10 @@
   let loadThread = false;
 
   //canvasationcheck
-  $: showCanvasationCheck = checkCanvasation(
-    note.tags,
-    $timelineFilter.selectCanversation
-  );
+  $: showCanvasationCheck =
+    $page.url.pathname !== "/"
+      ? true
+      : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
   function checkCanvasation(tags: string[][], select: number): boolean {
     if (!(note.kind === 1 || note.kind === 42)) {
       return true;

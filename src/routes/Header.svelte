@@ -44,7 +44,7 @@
       <RelayStatus />
     </div>
     {#if $currentPage?.alt === "home"}<div
-        class="absolute right-0 top-0 h-8 flex"
+        class="absolute right-1 top-0 h-8 flex"
       >
         <Popover
           bind:open={openPopover}
@@ -53,9 +53,9 @@
         >
           <div
             class=" flex items-center font-bold gap-1 rounded-full border text-magnum-200 border-magnum-200
-                hover:bg-magnum-800/75 active:bg-magnum-700/75 px-2 my-1"
+                hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
           >
-            <SlidersHorizontal size={20} />filter
+            <SlidersHorizontal size={20} />Filter
           </div>
           <div slot="popoverContent" class="w-[320px] max-w-full flex flex-col">
             <ul>
