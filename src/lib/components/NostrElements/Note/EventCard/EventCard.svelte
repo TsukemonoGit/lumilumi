@@ -316,7 +316,7 @@
       ? true
       : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
   function checkCanvasation(tags: string[][], select: number): boolean {
-    if (!(note.kind === 1 || note.kind === 42)) {
+    if (note.kind !== 1) {
       return true;
     }
     if (select === 0) {
