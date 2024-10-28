@@ -84,7 +84,7 @@
       />
     </div>
     <div
-      class="mx-2 my-1 text-sm opacity-80 overflow-y-auto overflow-x-hidden"
+      class=" ml-6 my-1 text-sm opacity-80 overflow-y-auto overflow-x-hidden"
       style="max-height:{maxHeight ?? 'none'}"
     >
       {#if text.kind === 30023 || text.kind === 30024}<SimpleMarkdown
