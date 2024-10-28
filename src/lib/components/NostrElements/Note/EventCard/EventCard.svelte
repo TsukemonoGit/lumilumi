@@ -403,7 +403,7 @@
       <div class="flex gap-1 items-center bg-magnum-800/25">
         <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
           size="20"
-          class="min-w-[20px] mt-auto mb-auto stroke-magnum-500"
+          class="min-w-[20px] mt-auto mb-auto stroke-magnum-300"
         />
         <div class="self-center">
           <UserMenu
@@ -448,14 +448,25 @@
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        <RepostedNote
-          {tag}
-          depth={depth + 1}
-          {repostable}
-          {maxHeight}
-          {displayMenu}
-          {tieKey}
-        />
+        {#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
+          <ReactionedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {tieKey}
+            {maxHeight}
+          />
+        {:else}
+          <RepostedNote
+            {tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {maxHeight}
+            {tieKey}
+          />
+        {/if}
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -505,7 +516,8 @@
       </div>
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
-      {#if tag}{#if $page.route.id === "/" || $page.route.id === "/notifications"}<!--タイムラインと通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
+      <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある　nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
+      {#if tag}{#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
           <ReactionedNote
             {tag}
             depth={depth + 1}
