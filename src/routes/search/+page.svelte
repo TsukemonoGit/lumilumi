@@ -39,7 +39,7 @@
   };
 
   let searchWord = "";
-  let searchKind: number | undefined = undefined;
+  let searchKind: number | undefined;
   let searchPubkey = "";
   let searchSince: number | undefined;
   let searchUntil: number | undefined;
@@ -57,7 +57,7 @@
     const params = new URLSearchParams(window.location.search);
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
     searchWord ? params.set("word", searchWord) : params.delete("word");
-    searchKind !== undefined
+    searchKind !== undefined && searchKind !== null
       ? params.set("k", String(searchKind))
       : params.delete("k");
     searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
@@ -135,14 +135,16 @@
       searchPubkey ||
       searchPubkeyTo ||
       searchSince ||
-      searchUntil
+      searchUntil ||
+      searchKind ||
+      searchKind === 0
     ) {
-      await waitForDefaultRelays(2000);
+      await waitForDefaultRelays(5000);
 
       createFilter();
-      showFilters = $filters.map((filter) => {
-        return { ...filter, limit: 50 };
-      });
+      // showFilters = $filters.map((filter) => {
+      //   return { ...filter, limit: 50 };
+      // });
       console.log("showFilters", showFilters);
       console.log("searchRelays", searchRelays);
       handleClickSearch();
@@ -201,9 +203,12 @@
     if (npubRegex.test(searchPubkeyTo)) {
       $filters[0] = { ...$filters[0], "#p": [getHex(searchPubkeyTo)] };
     }
-    if (searchKind !== undefined && searchKind !== null) {
-      $filters[0].kinds = [searchKind];
-    }
+
+    $filters[0].kinds =
+      searchKind === undefined || searchKind === null
+        ? undefined
+        : [searchKind];
+
     // const chunk = 100;
     // if (
     //   followee &&
