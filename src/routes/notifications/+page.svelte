@@ -153,6 +153,14 @@
         }
       }
     }
+    if (event.kind === 7) {
+      if (
+        event.tags.findLast((tag) => tag[0] === "p" && tag.length > 1)?.[1] !==
+        $loginUser
+      ) {
+        return false;
+      }
+    }
     //  return true;
     return filterSelectedStates(event);
   };

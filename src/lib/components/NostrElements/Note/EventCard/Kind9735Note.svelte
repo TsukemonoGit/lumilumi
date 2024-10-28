@@ -16,6 +16,8 @@
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import ReactionedNote from "./ReactionedNote.svelte";
+  import { page } from "$app/stores";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -135,7 +137,7 @@
             >
               <div class="flex gap-1 items-center align-middle">
                 <Zap
-                  class="min-w-[20px] mt-auto mb-auto stroke-orange-400 fill-orange-400"
+                  class="min-w-[20px] mt-auto mb-auto stroke-magnum-300 fill-magnum-300"
                   size={20}
                 />
                 {amount}
@@ -189,14 +191,25 @@
               </div>
 
               {#if zappedId.tag.length > 0}
-                <RepostedNote
-                  tag={zappedId.tag}
-                  {depth}
-                  {repostable}
-                  {maxHeight}
-                  {displayMenu}
-                  {tieKey}
-                />
+                {#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
+                  <ReactionedNote
+                    tag={zappedId.tag}
+                    depth={depth + 1}
+                    {repostable}
+                    {displayMenu}
+                    {tieKey}
+                    {maxHeight}
+                  />
+                {:else}
+                  <RepostedNote
+                    tag={zappedId.tag}
+                    depth={depth + 1}
+                    {repostable}
+                    {displayMenu}
+                    {maxHeight}
+                    {tieKey}
+                  />
+                {/if}
               {/if}
             </Metadata>
           {/if}{/if}
