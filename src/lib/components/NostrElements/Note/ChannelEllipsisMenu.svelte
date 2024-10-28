@@ -45,12 +45,7 @@
 
   const handleSelectItem = async (index: number) => {
     //  console.log(menuTexts[index]);
-    const eventpointer: nip19.EventPointer = {
-      id: note.id,
-      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-      author: note.pubkey,
-      kind: note.kind,
-    };
+
     const naddrpointer: nip19.AddressPointer = {
       kind: note.kind,
       identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
@@ -58,7 +53,7 @@
       relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     };
     const naddr = nip19.naddrEncode(naddrpointer);
-    const nevent = nip19.neventEncode(eventpointer);
+
     switch (menuTexts[index].num) {
       case 0:
         //view json
@@ -83,7 +78,7 @@
       case 3:
         //Copy EventID
         try {
-          await navigator.clipboard.writeText(nevent);
+          await navigator.clipboard.writeText(nevent ?? "");
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
@@ -145,6 +140,27 @@
         break;
     }
   };
+
+  let nevent: string | undefined = undefined;
+  let encodedPubkey: string | undefined = undefined;
+  $: if (note) {
+    try {
+      encodedPubkey = nip19.npubEncode(note.pubkey);
+    } catch {
+      encodedPubkey = undefined;
+    }
+    try {
+      const eventpointer: nip19.EventPointer = {
+        id: note.id,
+        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        author: note.pubkey,
+        kind: note.kind,
+      };
+      nevent = nip19.neventEncode(eventpointer);
+    } catch {
+      nevent = undefined;
+    }
+  }
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
@@ -160,7 +176,11 @@
     >
       {JSON.stringify(note, null, 2)}
     </div>
-
+    <div class="my-1 break-all overflow-auto">
+      <!-- <div class="text-lg font-medium">Encoded</div> -->
+      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+      <div class=" font-mono font-bold text-xs">{nevent}</div>
+    </div>
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
       {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}

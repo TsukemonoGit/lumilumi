@@ -43,7 +43,17 @@
       encodedPubkey = undefined;
     }
   }
-
+  let nevent: string | undefined = undefined;
+  $: if (metadata) {
+    try {
+      nevent = nip19.neventEncode({
+        id: metadata.id,
+        relays: tieKey ? getRelaysById(metadata.id, tieKey) : [],
+      });
+    } catch {
+      nevent = undefined;
+    }
+  }
   const baseMenuTexts = [
     { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
     { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
@@ -183,6 +193,11 @@
       class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
     >
       {JSON.stringify(metadata, null, 2)}
+    </div>
+    <div class="my-1 break-all overflow-auto">
+      <!-- <div class="text-lg font-medium">Encoded</div> -->
+      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+      <div class=" font-mono font-bold text-xs">{nevent}</div>
     </div>
     <h2 class="mt-1 text-lg font-medium">User Data</h2>
     <div

@@ -16,6 +16,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
+
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   export let listData: {
@@ -46,13 +47,6 @@
   }
 
   const handleSelectItem = async (index: number) => {
-    const naddrpointer: nip19.AddressPointer = {
-      kind: note.kind,
-      identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-      pubkey: note.pubkey,
-      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-    };
-    const naddr = nip19.naddrEncode(naddrpointer);
     switch (menuTexts[index].num) {
       case 0:
         //view json
@@ -70,7 +64,7 @@
       case 3:
         //Copy EventID
         try {
-          await navigator.clipboard.writeText(naddr);
+          await navigator.clipboard.writeText(naddr ?? "");
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
@@ -132,6 +126,27 @@
         break;
     }
   };
+
+  let naddr: string | undefined = undefined;
+  let encodedPubkey: string | undefined = undefined;
+  $: if (note) {
+    try {
+      encodedPubkey = nip19.npubEncode(note.pubkey);
+    } catch {
+      encodedPubkey = undefined;
+    }
+    try {
+      const naddrpointer: nip19.AddressPointer = {
+        kind: note.kind,
+        identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+        pubkey: note.pubkey,
+        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      };
+      naddr = nip19.naddrEncode(naddrpointer);
+    } catch (error) {
+      naddr = undefined;
+    }
+  }
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
@@ -147,7 +162,11 @@
     >
       {JSON.stringify(note, null, 2)}
     </div>
-
+    <div class="my-1 break-all overflow-auto">
+      <!-- <div class="text-lg font-medium">Encoded</div> -->
+      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+      <div class=" font-mono font-bold text-xs">{naddr}</div>
+    </div>
     <h2 class="m-0 text-lg font-medium">Seen on</h2>
     <div class="break-words whitespace-pre-wrap">
       {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
