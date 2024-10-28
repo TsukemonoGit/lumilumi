@@ -143,6 +143,7 @@
             >
               Zap⚡️@mono
             </button>
+            <script src="https://cdn.jsdelivr.net/npm/nostr-zap@1.1.0"></script>
           </div>
         </li>
         <li>
