@@ -52,7 +52,7 @@
           showCloseButton={true}
         >
           <div
-            class=" flex items-center font-bold gap-1 rounded-full border text-magnum-300 border-magnum-300
+            class=" flex items-center font-bold gap-1 rounded-full border text-magnum-200 border-magnum-300
                 hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
           >
             <SlidersHorizontal size={20} />Filter

@@ -20,11 +20,11 @@
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
       on:click={() => onClickClientTag(clientTag.slice(2))}
-      class={`inline float-end text-sm text-magnum-200/70 hover:underline w-fit whitespace-pre-wrap break-words`}
+      class={`inline float-end text-sm font-semibold text-magnum-500/75 hover:underline hover:text-magnum-400/80 w-fit whitespace-pre-wrap break-words `}
       style="word-break: break-word;"
       >via {clientTag[1]}
     </button>{:else}<span
-      class={`inline float-end text-sm  text-neutral-200/50 w-fit whitespace-pre-wrap break-words`}
+      class={`inline float-end text-sm font-semibold text-neutral-200/50 w-fit whitespace-pre-wrap break-words`}
       style="word-break: break-word;"
       >via {clientTag[1]}
     </span>{/if}{/if}

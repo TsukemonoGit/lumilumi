@@ -138,7 +138,7 @@
             >
               <div class="flex gap-1 items-center align-middle">
                 <Zap
-                  class="min-w-[20px] mt-auto mb-auto stroke-magnum-300 fill-magnum-300"
+                  class="min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400"
                   size={20}
                 />
                 {amount}
