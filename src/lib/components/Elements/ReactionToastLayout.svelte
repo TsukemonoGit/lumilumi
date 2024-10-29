@@ -27,8 +27,8 @@
         return extractZappedId(event.tags)?.tag;
         break;
       default:
-        const { replyID, replyUsers } = replyedEvent(event.tags);
-        return replyID ? ["e", replyID] : undefined;
+        const { replyTag, replyUsers } = replyedEvent(event.tags);
+        return replyTag;
     }
   };
 </script>

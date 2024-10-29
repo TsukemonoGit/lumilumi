@@ -401,6 +401,16 @@ export function reactionCheck() {
           (tag) => tag[0] === "p" && tag[1] === get(loginUser)
         )
       ) {
+        //リアクションにリアクション元のP全部入れてくるやつがいるから最後のｐが自分じゃなかったら除外
+        if (
+          packet.event.kind === 7 &&
+          packet.event.tags.findLast(
+            (tag) => tag[0] === "p" && tag.length > 1
+          )?.[1] !== get(loginUser)
+        ) {
+          return false;
+        }
+
         //TLには流れないものたちのうち自分へのリアクション
 
         if (follow && follow.has(packet.event.pubkey)) {
@@ -421,10 +431,11 @@ export function reactionCheck() {
 }
 
 const observedEvents = new Set<string>();
+
 function setReactionEvent(packet: EventPacket) {
   //重複チェク
   //未観測の場合のみ追加
-
+  //最後かチェック
   if (observedEvents.has(packet.event.id)) {
     return; // 既に観測されている場合は何もしない
   }
