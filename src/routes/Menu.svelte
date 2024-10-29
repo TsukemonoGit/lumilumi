@@ -21,6 +21,7 @@
   import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
   import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
   import logo from "$lib/images/favicon.svg";
+  import { goto } from "$app/navigation";
   const {
     elements: {
       trigger,
@@ -49,8 +50,8 @@
       }
     } catch (error) {}
   };
-  $: menuPosition = $menuLeft ? "left-5" : "right-5";
-  $: menuPosition2 = $menuLeft ? "right-5" : "left-5";
+  $: menuPosition = $menuLeft ? "left-2 flex flex-row-reverse" : "right-2 ";
+  $: menuPosition2 = $menuLeft ? "right-5 " : "left-5";
   let editStatustrigger: MeltElement<
     [
       {
@@ -77,6 +78,15 @@
     string
   >;
   // beforeNavigate(() => ($open = false));
+
+  function handleClickHome() {
+    // 現在のパスが `/` ならトップにスクロール
+    if ($page.url?.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      goto("/");
+    }
+  }
 </script>
 
 <EditUserStatus bind:trigger={editStatustrigger} />
@@ -94,9 +104,9 @@
       use:melt={$trigger}
       aria-label="Update dimensions"
       ><AlignJustify class="size-6" />
-      <!-- {#if $currentPageIcon}
-        <svelte:component this={$currentPageIcon} class="size-4 align-bottom" />
-      {/if} -->
+    </button>
+    <button on:click={handleClickHome} class="trigger"
+      ><House class="size-6" />
     </button>
   </div>
 </div>
