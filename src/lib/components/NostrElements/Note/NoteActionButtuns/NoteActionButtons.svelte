@@ -290,6 +290,7 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
+      $dialogOpen = false;
       return;
     }
     $nowProgress = false;

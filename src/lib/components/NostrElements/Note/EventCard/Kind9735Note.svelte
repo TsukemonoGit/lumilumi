@@ -37,7 +37,7 @@
   } = extractZappedId(note.tags);
 
   const amount: number | undefined = extractAmount(note, zapRequestEvent);
-
+  console.log(amount);
   //muteの値が変わったら更新する
   const muteType = !zapRequestEvent
     ? "null"

@@ -33,7 +33,7 @@ export function extractAmount(
       //ある場合にのみイコールなのが必須
       if (requestAmount) {
         if (amountSection !== requestAmount) {
-          console.log("zap amount error");
+          console.log("zap amount error", amountSection, requestAmount);
           return undefined;
         }
       }
