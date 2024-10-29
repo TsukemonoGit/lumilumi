@@ -4,7 +4,7 @@
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
-  import { splitHexColorString } from "$lib/func/util";
+  import { hexRegex, splitHexColorString } from "$lib/func/util";
   import type { Profile } from "$lib/types";
 
   import Popover from "./Popover.svelte";
@@ -28,9 +28,10 @@
   $: if (profile && profile.name) {
     $title = `@${profile.name}`;
   }
+  $: pubcheck = hexRegex.test(pubkey);
 </script>
 
-{#if !displayMenu}
+{#if !displayMenu || !pubcheck}
   <!-- <div title={$title}> -->
   {#if $showImg && url && url !== ""}
     <UserAvatar {url} name={pubkey} {pubkey} {size} title={$title} />

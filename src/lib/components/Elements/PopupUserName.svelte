@@ -1,14 +1,11 @@
 <script lang="ts">
-  import * as Nostr from "nostr-typedef";
-  import { queryClient } from "$lib/stores/stores";
-
   import Popover from "./Popover.svelte";
   import UserProfile from "./UserProfile.svelte";
   import UserName from "../NostrElements/Note/UserName.svelte";
   import { _ } from "svelte-i18n";
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";
-  import type { EventPacket } from "rx-nostr";
+
   import Metadata from "../NostrMainData/Metadata.svelte";
   export let pubkey: string;
 

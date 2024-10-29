@@ -1,6 +1,7 @@
 import type { Profile } from "$lib/types";
 import { decode } from "light-bolt11-decoder";
 import * as Nostr from "nostr-typedef";
+import { hexRegex } from "./util";
 
 //https://scrapbox.io/nostr/NIP-57
 export function extractAmount(
@@ -66,7 +67,7 @@ export const replyedEvent = (
   tags: string[][]
 ): { replyTag: string[] | undefined; replyUsers: string[] } => {
   const users = tags.reduce((acc, [tag, value]) => {
-    if (tag === "p") {
+    if (tag === "p" && hexRegex.test(value)) {
       return [...acc, value];
     } else {
       return acc;
