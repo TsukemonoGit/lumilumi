@@ -18,6 +18,7 @@
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
   import ReactionedNote from "./ReactionedNote.svelte";
   import { page } from "$app/stores";
+  import { encodetoNpub } from "$lib/func/encode";
 
   export let note: Nostr.Event;
   export let depth: number;
@@ -171,7 +172,7 @@
                         </span>{/if}{/if}
                   {:else}
                     <span class="text-magnum-100 text-sm"
-                      >@{nip19.npubEncode(zapRequestEvent.pubkey)}</span
+                      >@{encodetoNpub(zapRequestEvent.pubkey)}</span
                     >
                   {/if}
                 </div>

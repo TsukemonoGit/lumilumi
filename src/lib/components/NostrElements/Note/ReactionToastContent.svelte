@@ -42,9 +42,18 @@
       return undefined;
     }
   };
+
+  function encodeNotehex(str: string): string {
+    try {
+      return nip19.noteEncode(str);
+    } catch (error) {
+      return str;
+    }
+  }
 </script>
 
 {#if tag[0] === "e"}
+  {@const loadingText = encodeNotehex(tag[1])}
   <!-- {#if kind}
       {kind}
     {/if} -->
@@ -54,26 +63,20 @@
       slot="loading"
       class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
     >
-      Loading {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
+      Loading {loadingText}<EllipsisMenuNote notestr={loadingText} />
     </div>
     <div
       slot="nodata"
       class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
     >
-      nodata {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
+      nodata {loadingText}<EllipsisMenuNote notestr={loadingText} />
     </div>
     <div
       slot="error"
       class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       let:error
     >
-      {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
+      {loadingText}<EllipsisMenuNote notestr={loadingText} />
     </div>
     <div class="mx-2 text-sm">
       <Content

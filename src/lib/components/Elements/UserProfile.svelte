@@ -24,6 +24,7 @@
   import UserEditEllipsis from "./UserEditEllipsis.svelte";
   import MuteStatusIcons from "./MuteStatusIcons.svelte";
   import DisplayName from "./DisplayName.svelte";
+  import { encodetoNpub } from "$lib/func/encode";
   // import * as Nostr from "nostr-typedef";
 
   export let pubkey: string;
@@ -32,6 +33,8 @@
   export let depth: number;
   export let tieKey: string | undefined;
   $: petname = $followList?.get(pubkey);
+
+  $: loadingText = encodetoNpub(pubkey);
 </script>
 
 <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
@@ -39,26 +42,20 @@
     slot="loading"
     class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
   >
-    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
-      notestr={nip19.npubEncode(pubkey)}
-    />
+    {loadingText}<EllipsisMenuNote notestr={loadingText} />
   </div>
   <div
     slot="nodata"
     class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
   >
-    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
-      notestr={nip19.npubEncode(pubkey)}
-    />
+    {loadingText}<EllipsisMenuNote notestr={loadingText} />
   </div>
   <div
     slot="error"
     class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
     let:error
   >
-    {nip19.npubEncode(pubkey)}<EllipsisMenuNote
-      notestr={nip19.npubEncode(pubkey)}
-    />
+    {loadingText}<EllipsisMenuNote notestr={loadingText} />
   </div>
   {@const prof = profile(metadata)}
 

@@ -133,6 +133,9 @@
       //toast
     }
   }
+  $: if (!$invoiceOpen) {
+    unsubscribe?.();
+  }
 </script>
 
 <!-- <h1 class="title my-4">ABOUT</h1> -->

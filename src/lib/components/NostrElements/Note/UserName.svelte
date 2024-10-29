@@ -4,9 +4,12 @@
   import { profile } from "$lib/func/util";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { followList } from "$lib/stores/stores";
+  import { encodetoNpub } from "$lib/func/encode";
   export let pubhex: string;
 
   $: petname = $followList?.get(pubhex);
+  $: loadingText = encodetoNpub(pubhex);
+
   //$: console.log(petname);
 </script>
 
@@ -18,15 +21,15 @@
       ><span
         slot="loading"
         class="text-sm text-neutral-500 inline-flex break-all"
-        >{nip19.npubEncode(pubhex)}</span
+        >{loadingText}</span
       ><span
         slot="nodata"
         class="text-sm text-neutral-500 inline-flex break-all"
-        >{nip19.npubEncode(pubhex)}</span
+        >{loadingText}</span
       ><span
         slot="error"
         class="text-sm text-neutral-500 inline-flex break-all"
-        let:error>{nip19.npubEncode(pubhex)}</span
+        let:error>{loadingText}</span
       >{profile(metadata)?.name && profile(metadata)?.name !== ""
         ? profile(metadata)?.name
         : profile(metadata)?.display_name}</Metadata
