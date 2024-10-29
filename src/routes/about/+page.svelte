@@ -1,10 +1,26 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { showImg, toastSettings } from "$lib/stores/stores";
+  import {
+    loginUser,
+    nowProgress,
+    queryClient,
+    showImg,
+    toastSettings,
+    viewEventIds,
+  } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
   import { _ } from "svelte-i18n";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import { makeZapRequest } from "nostr-tools/nip57";
+  import type { EventTemplate } from "nostr-tools";
+  import { monoZap } from "$lib/func/util";
+  import * as Nostr from "nostr-typedef";
+  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
+  import { QueryObserver } from "@tanstack/svelte-query";
+  import { now } from "rx-nostr";
+
   const handleClickShare = async () => {
     //share link
     const shareData = {
@@ -32,6 +48,91 @@
     }
   };
   let loadImage: boolean = false;
+
+  let dialogOpen: any;
+  let zapAmount: number;
+  let zapComment: string;
+  let invoice: string | undefined = undefined;
+  let invoiceOpen: any;
+  const observer2 = new QueryObserver($queryClient, {
+    queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
+  });
+  let unsubscribe: () => void;
+  async function onClickZap() {
+    invoice = undefined;
+    if (zapAmount <= 0) {
+      //toast dasite
+      $dialogOpen = false;
+      return;
+    }
+    $nowProgress = true;
+    const amount = zapAmount * 1000;
+
+    try {
+      const zapRequest: EventTemplate = makeZapRequest({
+        profile: monoZap.pubkey,
+        event: monoZap.noteId,
+        amount: amount,
+        relays: monoZap.relays,
+        comment: zapComment,
+      });
+      const signedRequest = await (
+        window.nostr as Nostr.Nip07.Nostr
+      )?.signEvent(zapRequest);
+      const encoded = encodeURI(JSON.stringify(signedRequest));
+      const url = `${monoZap.endoiunt}?amount=${amount}&nostr=${encoded}`;
+      console.log("[zap url]", url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.error("[zap failed]", await response.text());
+
+        throw Error;
+      }
+      const payment = await response.json();
+      const { pr: zapInvoice } = payment;
+      if (zapInvoice === undefined) {
+        console.error("[zap failed]", payment);
+        throw Error;
+      }
+      $dialogOpen = false;
+      $invoiceOpen = true;
+      invoice = zapInvoice;
+      $nowProgress = false;
+
+      //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
+      const date = now();
+      unsubscribe = observer2.subscribe((result: any) => {
+        console.log(result);
+        if (result?.data?.event && result.data.event.created_at >= date) {
+          $invoiceOpen = false;
+          unsubscribe?.();
+          //購読対象から削除
+          const index = $viewEventIds.findIndex(
+            (item) => item[0] === "e" && item[1] === monoZap.noteId
+          );
+          if (index !== -1) {
+            $viewEventIds.splice(index, 1);
+          }
+          $toastSettings = {
+            title: "Success",
+            description: "Thank you for the zap!",
+            color: "bg-green-500",
+          };
+        }
+      });
+      //購読対象に追加
+      $viewEventIds.push(["e", monoZap.noteId]);
+      $viewEventIds = $viewEventIds;
+    } catch (error) {
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to zap",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
+      //toast
+    }
+  }
 </script>
 
 <!-- <h1 class="title my-4">ABOUT</h1> -->
@@ -140,10 +241,10 @@
               data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
               data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
               data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
+              on:click={() => ($dialogOpen = true)}
             >
               Zap⚡️@mono
             </button>
-            <script src="https://cdn.jsdelivr.net/npm/nostr-zap@1.1.0"></script>
           </div>
         </li>
         <li>
@@ -167,6 +268,34 @@
     </li>
   </ul>
 </section>
+
+<AlertDialog
+  bind:open={dialogOpen}
+  onClickOK={() => onClickZap()}
+  title="Zap to mono"
+>
+  <div slot="main" class=" text-neutral-200">
+    <div class="mt-4 rounded-md">
+      <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+      <input
+        type="number"
+        id="amount"
+        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+        placeholder="amount"
+        bind:value={zapAmount}
+      />
+      <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
+      <input
+        type="text"
+        id="comment"
+        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+        placeholder="comment"
+        bind:value={zapComment}
+      />
+    </div>
+  </div></AlertDialog
+>
+<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={monoZap.noteId} />
 
 <style lang="postcss">
   li {

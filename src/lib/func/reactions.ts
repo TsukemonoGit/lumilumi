@@ -1,16 +1,7 @@
 import { app, defaultRelays, queryClient, verifier } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
-import {
-  createQuery,
-  QueryClient,
-  type QueryKey,
-} from "@tanstack/svelte-query";
-import {
-  createRxNostr,
-  createRxForwardReq,
-  type EventPacket,
-  type RxNostr,
-} from "rx-nostr";
+import { createQuery } from "@tanstack/svelte-query";
+import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";

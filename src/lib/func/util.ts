@@ -23,6 +23,18 @@ export const clientTag = [
   "31990:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:1727506446612",
   "wss://relay.nostr.band",
 ];
+export const monoZap = {
+  endoiunt: "https://coinos.io/api/lnurl/cea7d54f-ac93-4c5b-91c8-8d29c7f51510",
+
+  relays: [
+    "wss://nostr.mutinywallet.com",
+    "wss://bostr.nokotaro.com",
+    "wss://relay.nostr.band/",
+    "wss://relay.nostr.wirednet.jp",
+  ],
+  pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
+  noteId: "df6034a5676deca7bc687abc7dc2ea703a8de01954f0d87879cbc790a5ead234",
+};
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
