@@ -26,10 +26,13 @@
   let dialogOpen: any;
   let size = 48;
 
+  $: encodedUrl = encodeURIComponent(url);
+
   let menuTexts =
-    `wss://${$page.params.relay}` !== url
-      ? [{ text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 }]
-      : [];
+    //$page.params.relay !== encodedUrl
+    //?
+    [{ text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 }];
+  // : [];
 
   menuTexts = [
     ...menuTexts,
@@ -60,6 +63,7 @@
         case 1:
           //nostrWatch
           //https://legacy.nostr.watch/
+
           window.open(
             `https://legacy.nostr.watch/relay/${hostname}`,
             "_blank",
@@ -111,14 +115,15 @@
           break;
         case 5:
           //goto relay page
-          goto(`/relay/${url.slice(6)}`);
+
+          goto(`/relay/${encodedUrl}`);
           break;
         case 6:
           //share relay page
           const shareData = {
             //title: "",
             //text: "lumilumi",
-            url: `${$page.url.origin}/relay/${url.slice(6)}`,
+            url: `${$page.url.origin}/relay/${encodedUrl}`,
           };
 
           try {
