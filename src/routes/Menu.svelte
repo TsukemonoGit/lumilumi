@@ -90,7 +90,10 @@
 </script>
 
 <EditUserStatus bind:trigger={editStatustrigger} />
-<div class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-white">
+<div
+  class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-neutral-900 border-t border-magnum-300/50"
+>
+  <!--/90 backdrop-blur-->
   <div class="absolute {menuPosition2} h-full mt-2">
     <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
       <UserAvatar2 size={40} /></a
@@ -251,17 +254,17 @@
 
   .item {
     @apply relative w-[40px] h-[40px] select-none rounded-sm;
-    @apply z-20 text-magnum-900 outline-none;
-    @apply data-[highlighted]:bg-magnum-200 data-[highlighted]:text-magnum-900;
+    @apply z-20 text-magnum-300 outline-none;
+    @apply data-[highlighted]:bg-magnum-300 data-[highlighted]:text-magnum-300;
     @apply data-[disabled]:text-neutral-300;
     @apply flex items-center text-sm leading-none;
     @apply cursor-default ring-0 !important;
   }
 
   .trigger {
-    @apply inline-flex items-end gap-1 justify-center rounded-md bg-white px-3 py-3;
-    @apply text-magnum-900 transition-colors hover:bg-white/90 data-[highlighted]:outline-none;
-    @apply overflow-visible data-[highlighted]:bg-magnum-200 data-[highlighted]:ring-magnum-400 !important;
+    @apply inline-flex items-end gap-1 justify-center rounded-md px-3 py-3;
+    @apply text-magnum-300 transition-colors  data-[highlighted]:outline-none;
+    @apply overflow-visible data-[highlighted]:bg-magnum-300 data-[highlighted]:ring-magnum-400 !important;
     @apply text-sm font-medium leading-none focus:z-30 focus:ring;
   }
 

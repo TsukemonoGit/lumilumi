@@ -401,9 +401,11 @@
     {:else if note.kind === 6 || note.kind === 16}
       <!--リポスト-->
       <div class="flex gap-1 items-center bg-magnum-800/25">
-        <span class="text-xs text-magnum-500">{note.kind}</span><Repeat2
+        {#if note.kind === 16}<span class="text-xs text-magnum-500"
+            >{note.kind}</span
+          >{/if}<Repeat2
           size="20"
-          class="min-w-[20px] mt-auto mb-auto stroke-magnum-300"
+          class="min-w-[20px] mt-auto mb-auto stroke-magnum-400"
         />
         <div class="self-center">
           <UserMenu

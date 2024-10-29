@@ -572,8 +572,8 @@
 <button
   title="open post window"
   use:melt={$trigger}
-  class="inline-flex items-center justify-center rounded-full bg-white border border-magnum-700 p-3.5
-  font-medium leading-none text-magnum-700 shadow hover:opacity-75 z-30"
+  class="inline-flex items-center justify-center rounded-full bg-neutral-900 border border-magnum-300 p-3.5
+  font-medium leading-none text-magnum-300 shadow hover:opacity-75 z-30"
 >
   <SquarePen size={28} />
 </button>
