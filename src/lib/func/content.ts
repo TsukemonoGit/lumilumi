@@ -471,7 +471,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
           parts.push({
             type: "relay",
             content: match[0],
-            url: `/relay/${match?.[0].slice(6)}`,
+            url: `/relay/${encodeURIComponent(match[0])}`,
           });
           break;
       }
