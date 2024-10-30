@@ -45,6 +45,7 @@
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
   } from "$lib/func/reactions";
+
   //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
 
   //import SvelteQueryDevtools
@@ -144,13 +145,24 @@
         author?: string | undefined;
       }
     | undefined;
-  //$: console.log($page);
-
-  $: if (!$showBanner && nlBanner) {
-    nlBanner.style.display = "none";
-  } else if (nlBanner) {
-    nlBanner.style.display = "";
+  $: baddrCheck($page, nlBanner, $showBanner);
+  function baddrCheck(page: any, ba: any, ner: any) {
+    if ($page.route.id === "/settings" && nlBanner) {
+      nlBanner.style.display = "";
+    } else if (nlBanner) {
+      if ($showBanner) {
+        nlBanner.style.display = "";
+      } else {
+        nlBanner.style.display = "none";
+      }
+    }
   }
+
+  // $: if (!$showBanner && $page.route.id !== "/settings" && nlBanner) {
+  //   nlBanner.style.display = "none";
+  // } else if (nlBanner) {
+  //   nlBanner.style.display = "";
+  // }
 
   let showModal: {
     update: (

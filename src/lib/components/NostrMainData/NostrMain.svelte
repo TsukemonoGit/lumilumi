@@ -69,6 +69,9 @@
         console.log("timelineFilter parse error");
       }
     }
+
+    $showBanner = localStorage.getItem("showBanner") === "true";
+
     await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
     loadMutetokanoSettei();
@@ -120,7 +123,7 @@
       showReactioninTL: savedReactionTL,
       nostrWalletConnect: savedNostrWalletConnect,
       showUserStatus: savedShowUserStatus,
-      showBanner: savedshowBanner,
+
       showKind16: savedShowKind16,
       addClientTag: savedAddClientTag,
       showClientTag: savedShowClientTag,
@@ -148,7 +151,7 @@
     $showReactioninTL = savedReactionTL ?? true;
     $nostrWalletConnect = savedNostrWalletConnect ?? "";
     $showUserStatus = savedShowUserStatus ?? false;
-    $showBanner = savedshowBanner ?? true;
+
     // if (!$showImg) {
     //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
     //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定

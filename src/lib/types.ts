@@ -121,7 +121,7 @@ export interface LumiSetting {
   mute?: LumiMute;
   mutebykinds?: LumiMuteByKind;
   defaultReaction: { content: string; tag: string[] };
-  showBanner: boolean;
+  //showBanner: boolean;
   showKind16: boolean;
   addClientTag: boolean;
   showClientTag: boolean;

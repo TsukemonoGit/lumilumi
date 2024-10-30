@@ -19,7 +19,6 @@
     nostrWalletConnect,
     nowProgress,
     showUserStatus,
-    showBanner,
     showKind16,
     addClientTag,
     showClientTag,
@@ -41,7 +40,7 @@
     LumiSetting,
   } from "$lib/types";
   import { _ } from "svelte-i18n";
-  import { beforeNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
@@ -118,7 +117,7 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
-    $showBanner = settings.showBanner;
+
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
@@ -232,7 +231,7 @@
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
-    $showBanner = settings.showBanner;
+
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
@@ -702,13 +701,6 @@
       </label>
 
       <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.showBanner}
-        />
-        {$_("settings.display.banner")}
-      </label><label>
         <input
           type="checkbox"
           class="rounded-checkbox"

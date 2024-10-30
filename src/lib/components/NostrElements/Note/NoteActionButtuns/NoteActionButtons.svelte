@@ -392,7 +392,7 @@
         .getQueriesData({
           queryKey: ["reactions", "repost", atag ?? note.id],
         })
-        .filter(([key, value]) => value !== undefined) as [
+        .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
         EventPacket,
       ][]
@@ -403,7 +403,7 @@
         .getQueriesData({
           queryKey: ["reactions", "reaction", atag ?? note.id],
         })
-        .filter(([key, value]) => value !== undefined) as [
+        .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
         EventPacket,
       ][]
@@ -414,7 +414,7 @@
         .getQueriesData({
           queryKey: ["reactions", "zapped", atag ?? note.id],
         })
-        .filter(([key, value]) => value !== undefined) as [
+        .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
         EventPacket,
       ][]

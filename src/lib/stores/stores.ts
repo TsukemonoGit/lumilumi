@@ -117,7 +117,7 @@ export const relayStateMap = writable<Map<string, ConnectionState>>(
 export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);
-export const showBanner = writable<boolean>(false);
+export const showBanner = writable<boolean>(true);
 export const viewMediaModal = writable<{ index: number; mediaList: Part[] }>();
 export const showKind16 = writable<boolean>(false);
 export const onlyFollowee = writable<boolean>(false);

@@ -23,6 +23,7 @@ export const items: {
   { Icon: Users, link: "/list", alt: "list" },
 
   { Icon: Settings, link: "/settings", alt: "settings" },
+  { Icon: undefined, link: "/about", alt: "about" },
   // {
   //   Icon: UserAvatar2,
   //   link: undefined,

@@ -336,7 +336,7 @@ export const initSettings: LumiSetting = {
   showReactioninTL: true,
   nostrWalletConnect: "",
   showUserStatus: false,
-  showBanner: true,
+  // showBanner: true,
   showKind16: false,
   addClientTag: false,
   showClientTag: true,
