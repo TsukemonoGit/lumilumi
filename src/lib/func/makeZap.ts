@@ -161,7 +161,7 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
     }
   }
 
-  const readRelay: string[] | undefined = queryRelay?.event.tags.reduce(
+  const readRelay: string[] | undefined = queryRelay?.event?.tags?.reduce(
     (acc: string[], tag: string[]) => {
       if (tag[0] === "r" && tag.length === 2) {
         return [...acc, tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`];
