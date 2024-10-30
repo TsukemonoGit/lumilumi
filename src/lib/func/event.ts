@@ -1,7 +1,7 @@
 import type { Profile } from "$lib/types";
 import { decode } from "light-bolt11-decoder";
 import * as Nostr from "nostr-typedef";
-import { hexRegex } from "./util";
+import { hexRegex, nip33Regex } from "./util";
 
 //https://scrapbox.io/nostr/NIP-57
 export function extractAmount(
@@ -58,7 +58,11 @@ export const repostedId = (
     tag: tags
       .slice()
       .reverse()
-      .find((tag) => tag[0] === "e" || tag[0] === "a"),
+      .find(
+        (tag) =>
+          (tag[0] === "e" && hexRegex.test(tag[1])) ||
+          (tag[0] === "a" && nip33Regex.test(tag[1]))
+      ),
     kind: kind,
   };
 };
@@ -73,7 +77,11 @@ export const replyedEvent = (
       return acc;
     }
   }, []);
-  const IDs = tags?.filter((tag) => tag[0] === "e" || tag[0] === "a");
+  const IDs = tags?.filter(
+    (tag) =>
+      (tag[0] === "e" && hexRegex.test(tag[1])) ||
+      (tag[0] === "a" && nip33Regex.test(tag[1]))
+  );
   const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
   const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
   //  console.log(root?.[1]);
@@ -87,7 +95,11 @@ export function extractZappedId(tags: string[][]): {
   kind: number | undefined;
   tag: string[];
 } {
-  const eTag = tags?.find((tag) => tag[0] === "e" || tag[0] === "a");
+  const eTag = tags?.find(
+    (tag) =>
+      (tag[0] === "e" && hexRegex.test(tag[1])) ||
+      (tag[0] === "a" && nip33Regex.test(tag[1]))
+  );
   return {
     kind: undefined,
     tag: eTag ? (eTag as string[]) : [],

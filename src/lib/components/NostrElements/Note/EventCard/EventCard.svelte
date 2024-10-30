@@ -468,7 +468,7 @@
             {maxHeight}
             {tieKey}
           />
-        {/if}
+        {/if}{:else}<span class="italic">error</span>
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -538,6 +538,7 @@
             {tieKey}
           />
         {/if}
+      {:else}<span class="italic">error</span>
       {/if}
     {:else if note.kind === 17}
       <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
