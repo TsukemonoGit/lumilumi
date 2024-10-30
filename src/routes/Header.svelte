@@ -52,10 +52,10 @@
           showCloseButton={true}
         >
           <div
-            class=" flex items-center font-bold gap-1 rounded-full border text-magnum-200 border-magnum-300
+            class=" flex items-center font-bold text-sm gap-1 rounded-full border text-magnum-200 border-magnum-300
                 hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
           >
-            <SlidersHorizontal size={20} />Options
+            <SlidersHorizontal size={16} />Options
           </div>
           <div slot="popoverContent" class="w-[320px] max-w-full flex flex-col">
             <ul>
