@@ -49,6 +49,12 @@
   $: if (!$invoiceOpen) {
     invoice = undefined;
   }
+  let amountEle: HTMLInputElement;
+  $: if ($dialogOpen) {
+    setTimeout(() => {
+      amountEle?.focus();
+    }, 1);
+  }
 </script>
 
 <button
@@ -81,6 +87,7 @@
       <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
       <input
         type="number"
+        bind:this={amountEle}
         id="amount"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
         placeholder="amount"

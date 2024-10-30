@@ -32,6 +32,7 @@
     addClientTag,
     viewEventIds,
     showAllReactions,
+    loginUser,
   } from "$lib/stores/stores";
   import {
     clientTag,
@@ -47,8 +48,8 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
   import { _ } from "svelte-i18n";
-  import type { QueryKey } from "@tanstack/svelte-query";
-  import type { EventPacket } from "rx-nostr";
+  import { type QueryKey, QueryObserver } from "@tanstack/svelte-query";
+  import { type EventPacket, now } from "rx-nostr";
 
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
@@ -251,10 +252,18 @@
   let zapAmount: number = 50;
   let zapComment: string;
   let invoiceOpen: any;
+  let amountEle: HTMLInputElement;
+  const observer = new QueryObserver($queryClient, {
+    queryKey: ["reactions", "zapped", atag ?? note.id, $loginUser],
+  });
+  let unsubscribe: () => void;
 
   const handleClickZap = () => {
     $dialogOpen = true;
     //zapの量決めるダイアログ出す
+    setTimeout(() => {
+      amountEle?.focus();
+    }, 1);
   };
   onMount(() => {
     const storagezap = localStorage.getItem("zap");
@@ -297,11 +306,22 @@
     invoice = zapInvoice;
     $dialogOpen = false;
     $invoiceOpen = true;
+    //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
+    const date = now();
+    unsubscribe = observer.subscribe((result: any) => {
+      console.log(result);
+      if (result?.data?.event && result.data.event.created_at >= date) {
+        $invoiceOpen = false;
+        unsubscribe?.();
+      }
+    });
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
+
   $: if (!$invoiceOpen) {
     invoice = undefined;
+    unsubscribe?.();
   }
 
   const onClickReplyIcon = () => {
@@ -591,6 +611,7 @@
           <div slot="main" class=" text-neutral-200">
             <div class="rounded-md">
               <EventCard
+                maxHeight={"12rem"}
                 {note}
                 {metadata}
                 displayMenu={false}
@@ -601,6 +622,7 @@
             <div class="mt-4 rounded-md">
               <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
               <input
+                bind:this={amountEle}
                 type="number"
                 id="amount"
                 class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
