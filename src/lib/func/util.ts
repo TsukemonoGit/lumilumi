@@ -56,6 +56,8 @@ export const hexRegex = /^[0-9a-fA-F]{64}$/;
 //https://api.nostr.watch/v1/nip/50
 export const relayRegex =
   /wss?:\/\/[a-zA-Z0-9.-]+(:[0-9]{1,5})?(\/[a-zA-Z0-9._~%+-]*)*/g;
+export const relayRegex2 =
+  /^wss:\/\/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d{2,5})?(\/.*)?$/;
 //export const relayRegex = /wss?:\/\/\S+/g; ///^wss?:\/\/\S+$/g;
 //export const nip33RegexG = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/g;
 export const nip33Regex = /^([0-9]{1,9}):([0-9a-fA-F]{64}):(.*)$/;

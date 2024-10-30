@@ -32,6 +32,7 @@
     initSettings,
     npubRegex,
     relayRegex,
+    relayRegex2,
   } from "$lib/func/util";
   import type {
     LumiEmoji,
@@ -174,7 +175,7 @@
     if (!input.endsWith("/")) {
       input += "/";
     }
-    if (relayRegex.test(input)) {
+    if (relayRegex2.test(input)) {
       settings.relays = [
         ...settings.relays,
         { url: input, read: true, write: true },

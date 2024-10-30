@@ -24,7 +24,7 @@
   import { X, Save } from "lucide-svelte";
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
-  import { generateResultMessage } from "$lib/func/util";
+  import { generateResultMessage, relayRegex2 } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
@@ -203,7 +203,7 @@
     // ここでスラッシュを追加
     newRelay = !newRelay.endsWith("/") ? `${newRelay}/` : newRelay;
 
-    if (!/^wss?:\/\/\S+\/?$/.test(newRelay)) {
+    if (!relayRegex2.test(newRelay)) {
       $toastSettings = {
         title: "Error",
         description: "Please check the relay URL format",
@@ -230,6 +230,7 @@
     });
     relayStates.set(newRelay, { read: true, write: true });
     updateRelayCounts();
+    newRelay = "";
   }
 
   function removeRelay(url: string) {

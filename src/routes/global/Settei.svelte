@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { relayRegex } from "$lib/func/util";
+  import { relayRegex, relayRegex2 } from "$lib/func/util";
   import { createAccordion, melt } from "@melt-ui/svelte";
   import { ChevronDown, X } from "lucide-svelte";
   import { writable } from "svelte/store";
@@ -36,7 +36,7 @@
       : newRelayURL.trim();
 
     console.log(url);
-    if (!relayRegex.test(url) || $newRelays.includes(url)) {
+    if (!relayRegex2.test(url) || $newRelays.includes(url)) {
       $toastSettings = {
         title: "Error",
         description: "failed to add relay",
