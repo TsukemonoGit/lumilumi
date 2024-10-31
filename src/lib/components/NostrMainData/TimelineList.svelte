@@ -51,7 +51,7 @@
         RxReqPipeable)
     | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
-  export let viewIndex: number;
+  export let viewIndex: number = 0;
   export let amount: number; //1ページに表示する量
   export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
   export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
