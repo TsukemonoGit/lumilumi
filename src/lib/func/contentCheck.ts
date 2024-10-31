@@ -75,13 +75,13 @@ export function contentCheck(
         case "naddr":
           if (decoded.data.relays) {
             newTags.push([
-              "q",
+              "a",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
               decoded.data.relays?.[0] ?? "",
             ]);
           } else {
             newTags.push([
-              "q",
+              "a",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
             ]);
           }
