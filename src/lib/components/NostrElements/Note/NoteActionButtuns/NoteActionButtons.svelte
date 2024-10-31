@@ -164,9 +164,21 @@
 
         //replaceable
         if (atag) {
-          tags.push(["a", atag, relayhints[0] ?? ""]);
+          tags.push([
+            "a",
+            atag,
+            relayhints[0] ?? "",
+            "" /*marker*/,
+            note.pubkey,
+          ]);
         } else {
-          tags.push(["e", note.id, relayhints[0] ?? ""]);
+          tags.push([
+            "e",
+            note.id,
+            relayhints[0] ?? "",
+            "" /*marker*/,
+            note.pubkey,
+          ]);
         }
         if (note.kind !== 1) {
           tags.push(["k", note.kind.toString()]);

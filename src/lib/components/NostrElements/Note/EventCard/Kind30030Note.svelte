@@ -263,6 +263,7 @@
     {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
       {#if $showImg}
         <img
+          title={`:${shortcode}:`}
           loading="lazy"
           alt={shortcode}
           src={url}

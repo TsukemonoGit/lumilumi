@@ -61,26 +61,27 @@ export function contentCheck(
         //   newTags.push(["r", decoded.data]);
         //   break;
         case "nevent":
-          if (decoded.data.relays) {
-            newTags.push([
-              "q",
-              decoded.data.id,
-              decoded.data.relays?.[0] ?? "",
-            ]);
-          } else {
-            newTags.push(["q", decoded.data.id]);
+          const neventTag = [
+            "q",
+            decoded.data.id,
+            decoded.data.relays?.[0] ?? "",
+          ];
+
+          if (decoded.data.author) {
+            neventTag.push(decoded.data.author);
           }
+          newTags.push(neventTag);
           break;
         case "naddr":
           if (decoded.data.relays) {
             newTags.push([
-              "a",
+              "q",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
               decoded.data.relays?.[0] ?? "",
             ]);
           } else {
             newTags.push([
-              "a",
+              "q",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
             ]);
           }
