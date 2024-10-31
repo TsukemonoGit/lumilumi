@@ -32,8 +32,7 @@
   };
 
   let amount = 50;
-  let viewIndex = 0;
-  let viewIndex1 = 0;
+
   let componentKey = 0; // Key to force re-render
   let view: boolean = false;
   let req = createRxForwardReq();
@@ -128,9 +127,10 @@
   const triggers = [
     { id: "post", title: "Post" },
     { id: "reactions", title: "Reaction" },
-    { id: "bookmark", title: "Bookmark" },
-    { id: "followee", title: "Follow" },
 
+    { id: "followee", title: "Follow" },
+    { id: "bookmark", title: "Bookmark" },
+    { id: "zap", title: "Zapped" },
     // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relay" },
   ];
@@ -171,7 +171,7 @@
       >
         <div
           use:melt={$list}
-          class="flex shrink-0 overflow-x-auto
+          class="flex shrink-0 flex-wrap overflow-x-auto
                   data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r"
         >
           {#each triggers as triggerItem}
@@ -246,7 +246,6 @@
                 ]}
                 {req}
                 let:events
-                {viewIndex}
                 {amount}
                 {tieKey}
               >
@@ -324,7 +323,86 @@
               ]}
               {req}
               let:events
-              viewIndex={viewIndex1}
+              {amount}
+              {tieKey}
+            >
+              <!-- <SetRepoReactions /> -->
+              <div slot="loading">
+                <p>timeline Loading...</p>
+              </div>
+
+              <div slot="error" let:error>
+                <p>{error}</p>
+              </div>
+
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              >
+                {#if events && events.length > 0}
+                  {#each events as event, index (event.id)}
+                    <!-- <div
+                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
+                      events.length - 1
+                        ? 'last-visible'
+                        : ''} {index === 0 ? 'first-visible' : ''}"
+                    > -->
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                      let:metadata
+                    >
+                      <div slot="loading">
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
+                      </div>
+                      <div slot="nodata">
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
+                      </div>
+                      <div slot="error">
+                        <EventCard
+                          note={event}
+                          excludefunc={excludeKind7}
+                          {tieKey}
+                        />
+                      </div>
+                      <EventCard
+                        {metadata}
+                        note={event}
+                        excludefunc={excludeKind7}
+                        {tieKey}
+                      />
+                    </Metadata>
+                    <!-- </div> -->
+                  {/each}
+                {/if}
+              </div>
+            </TimelineList>
+          {/if}
+        </div>
+
+        <!--zap-->
+        <div use:melt={$content("zap")} class="content">
+          {#if $value === "zap"}
+            <TimelineList
+              queryKey={["user", "zap", userPubkey]}
+              filters={[
+                {
+                  kinds: [9735],
+                  limit: 50,
+                  "#p": [userPubkey],
+                  since: now(),
+                },
+              ]}
+              {req}
+              let:events
+              viewIndex={0}
               {amount}
               {tieKey}
             >
