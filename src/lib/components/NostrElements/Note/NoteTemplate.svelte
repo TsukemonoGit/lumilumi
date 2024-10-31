@@ -74,7 +74,7 @@
   <div class="pt-1 max-w-full overflow-x-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       <div>
-        {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span>
+        {#if petname}<span class="text-magnum-100">📛{petname}</span>
         {:else if metadata && prof}
           <DisplayName
             height={21}

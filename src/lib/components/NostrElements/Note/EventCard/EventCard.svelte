@@ -418,7 +418,7 @@
           />
         </div>
         <div class=" inline-block break-all break-words whitespace-pre-line">
-          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+          {#if petname}<span class="text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
             {#if prof}
@@ -487,7 +487,7 @@
           />
         </div>
         <div class="break-all break-words whitespace-pre-line">
-          {#if petname}<span class="font-bold text-magnum-100">📛{petname}</span
+          {#if petname}<span class="text-magnum-100">📛{petname}</span
             >{:else if metadata}
             {@const prof = profile(metadata)}
             {#if prof}

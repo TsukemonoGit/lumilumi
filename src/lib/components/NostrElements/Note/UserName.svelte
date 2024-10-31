@@ -14,7 +14,7 @@
 </script>
 
 <span class="inline-flex"
-  >{#if petname}<span class="font-bold">📛{petname}</span>{:else}@<Metadata
+  >{#if petname}📛{petname}{:else}@<Metadata
       queryKey={["metadata", pubhex]}
       pubkey={pubhex}
       let:metadata

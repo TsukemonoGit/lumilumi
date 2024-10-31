@@ -49,8 +49,8 @@
                 name={`@${prof.name}`}
                 tags={note.tags}
               />
-            </span>{/if}{/if}{#if petname}<span
-            class="font-bold text-magnum-100">📛{petname}</span
+            </span>{/if}{/if}{#if petname}<span class="text-magnum-100"
+            >📛{petname}</span
           >{/if}
       </div>
       <div class="ml-auto">
