@@ -1,15 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import {
-    User,
-    ChevronRight,
-    EyeOff,
-    Zap,
-    Repeat2,
-    SmilePlus,
-    Slash,
-  } from "lucide-svelte";
+  import { User, Zap, Repeat2, SmilePlus, Slash } from "lucide-svelte";
 
   import { userMuteStatus } from "$lib/func/util";
   import type { UserMuteStatus } from "$lib/types";
