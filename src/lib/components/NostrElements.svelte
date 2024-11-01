@@ -32,19 +32,19 @@
   let since: number | undefined = undefined;
   const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];
 
-  onMount(() => {
+  onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
   });
-  afterNavigate((navigate) => {
+  afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }

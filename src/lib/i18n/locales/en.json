@@ -186,6 +186,22 @@
   "mute": {
     "type": {
       "select": "Select the type of mute"
+    },
+    "user": {
+      "add": "Mute the user",
+      "remove": "Unmute the user"
+    },
+    "repost": {
+      "add": "Mute reposts",
+      "remove": "Unmute reposts"
+    },
+    "reaction": {
+      "add": "Mute Reactions",
+      "remove": "Unmute Reactions"
+    },
+    "zap": {
+      "add": "Mute ZAP",
+      "remove": "Unmute ZAP"
     }
   },
   "filter": {

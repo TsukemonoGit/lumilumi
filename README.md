@@ -6,6 +6,7 @@ Version 2.0, January 2004
 
 https://github.com/akiomik/nosvelte
 
+
 ## 特徴
 
 - kind:10000 の Mute、kind:30007 の Mute by kind に対応
@@ -148,3 +149,17 @@ https://github.com/akiomik/nosvelte
 - translate: [google translate](https://translate.google.com/)
 - relay link: [nostr watch](https://legacy.nostr.watch/)<!--[Nostrrr](https://nostrrr.com/), -->
 - emoji link: [emojito](https://emojito.meme/)
+
+
+------
+<img src="./image/10.png" width=300>
+<img src="./image/11.png" width=300>
+<img src="./image/1.png" width=300>
+<img src="./image/2.png" width=300>
+<img src="./image/3.png" width=300>
+<img src="./image/4.png" width=300>
+<img src="./image/5.png" width=300>
+<img src="./image/6.png" width=300>
+<img src="./image/7.png" width=300>
+<img src="./image/8.png" width=300>
+<img src="./image/9.png" width=300>
