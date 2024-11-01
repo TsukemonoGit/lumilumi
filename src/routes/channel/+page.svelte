@@ -30,11 +30,11 @@
   });
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
   <title>Lumilumi-Channel</title>
   <meta property="og:description" content="Channel" />
   <meta name="description" content="Channel" />
-</svelte:head>
+</svelte:head> -->
 {#if $loginUser}
   <section
     class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
