@@ -1,4 +1,8 @@
 <script lang="ts">
+  //@ts-ignore
+  import { pwaInfo } from "virtual:pwa-info";
+  import { pwaAssetsHead } from "virtual:pwa-assets/head";
+
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
 
@@ -17,12 +21,11 @@
   import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
   import { browser } from "$app/environment";
   import "../app.css";
-  import { pwaAssetsHead } from "virtual:pwa-assets/head";
+
   import { setTheme } from "$lib/func/settings";
   import type { Theme } from "$lib/types";
   import Toast from "$lib/components/Elements/Toast.svelte";
-  //@ts-ignore
-  import { pwaInfo } from "virtual:pwa-info";
+
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";
   import Menu from "./Menu.svelte";
@@ -157,12 +160,6 @@
       }
     }
   }
-
-  // $: if (!$showBanner && $page.route.id !== "/settings" && nlBanner) {
-  //   nlBanner.style.display = "none";
-  // } else if (nlBanner) {
-  //   nlBanner.style.display = "";
-  // }
 
   let showModal: {
     update: (

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import Settings from "$lib/components/SettingsElements/Settings.svelte";
   import Github from "./Github.svelte";

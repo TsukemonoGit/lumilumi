@@ -37,7 +37,7 @@ export const load: PageLoad = ({ url }) => {
     desc = desc + `\nto:${searchPubkeyTo}`;
   }
   console.log(desc);
-  ogTitle.set("Lumilulmi - Search");
+  ogTitle.set("Lumilumi - Search");
   ogDescription.set(desc);
 
   return {

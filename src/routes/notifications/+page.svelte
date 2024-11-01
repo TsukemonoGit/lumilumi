@@ -199,11 +199,11 @@
   }
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
   <title>Lumilumi-Notifications</title>
   <meta property="og:description" content="Notifications" />
   <meta name="description" content="Notifications" />
-</svelte:head>
+</svelte:head> -->
 <section>
   <NotificationFilter />
   <div class="w-full break-words overflow-x-hidden">

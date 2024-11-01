@@ -141,7 +141,7 @@
   });
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
   <meta
     name="description"
     content="User:{data.pubkey
@@ -154,8 +154,8 @@
     content="User:{data.pubkey
       ? `pubkey:${nip19.npubEncode(data.pubkey)}`
       : ''}"
-  />
-</svelte:head>
+  /> 
+</svelte:head>-->
 
 <section>
   {#if userPubkey && view}

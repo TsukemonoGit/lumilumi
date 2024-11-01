@@ -18,8 +18,6 @@
   import UserAvatar2 from "./UserAvatar2.svelte";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
   import { melt } from "@melt-ui/svelte";
-  import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
-  import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
 
   let encodedPub: string;
   $: if ($loginUser) {
@@ -34,31 +32,7 @@
       }
     } catch (error) {}
   };
-  let trigger: MeltElement<
-    [
-      {
-        update: (
-          updater: import("svelte/store").Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: import("svelte/store").Subscriber<boolean>,
-          invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-        ): import("svelte/store").Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      },
-    ],
-    (node: HTMLElement) => MeltActionReturn<any>,
-    ([$open]: [boolean]) => {
-      readonly "aria-haspopup": "dialog";
-      readonly "aria-expanded": boolean;
-      readonly type: "button";
-    },
-    string
-  >;
+  let trigger: any;
 </script>
 
 <div class="sidebar fixed top-28 bottom-12">
