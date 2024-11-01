@@ -240,7 +240,7 @@
 <div class="flex flex-col w-full">
   <div class="grid grid-cols-[1fr_auto] w-full gap-1">
     <div>
-      Emoji set: <span class="text-lg font-bold text-magnum-400"
+      Emoji set: <span class="text-lg font-bold text-magnum-300"
         >{title ?? dtag}</span
       >{#if description}
         <div class=" text-neutral-300/80">{description}</div>{/if}

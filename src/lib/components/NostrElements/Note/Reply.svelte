@@ -22,7 +22,7 @@
     >
   {:else}
     <button
-      class="my-1 flex items-center w-fit px-2 rounded-md bg-magnum-200 text-sm font-bold text-magnum-700 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
+      class="my-1 flex items-center w-fit px-1 py-0.5 rounded-md bg-magnum-200 text-sm font-bold text-magnum-700 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
       on:click={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" />{$_(
         "timeline.hideParentPost"
