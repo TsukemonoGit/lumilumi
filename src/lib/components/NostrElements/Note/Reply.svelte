@@ -16,15 +16,17 @@
 {#if replyTag}
   {#if !loadNote}
     <button
-      class="my-1 flex items-center w-fit px-1 py-0.5 max-w-full font-bold rounded-md text-sm bg-magnum-700 text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
+      class="my-1 flex items-center w-fit px-1 py-0.5 max-w-full rounded-md text-sm border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
       on:click={() => (loadNote = true)}
-      ><Reply size="20" />{$_("timeline.viewParentPost")}</button
+      ><Reply size="20" class="text-magnum-500" />{$_(
+        "timeline.viewParentPost"
+      )}</button
     >
   {:else}
     <button
-      class="my-1 flex items-center w-fit px-1 py-0.5 rounded-md bg-magnum-200 text-sm font-bold text-magnum-700 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
+      class="my-1 flex items-center w-fit px-1 py-0.5 rounded-md text-sm border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
       on:click={() => (loadNote = false)}
-      ><Minimize2 size="20" class="mr-1" />{$_(
+      ><Minimize2 size="20" class="mr-1 text-magnum-600" />{$_(
         "timeline.hideParentPost"
       )}</button
     >
