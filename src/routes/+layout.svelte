@@ -190,7 +190,8 @@
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
-  <title>Lumilumi</title>
+  <title>Lumilumi</title
+  ><!--ここを{$ogTitle}にするとMenubarの項目をホバーするだけでタイトル変わる謎になる-->
 
   <meta property="og:title" content={$ogTitle} />
   <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
