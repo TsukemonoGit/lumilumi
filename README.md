@@ -128,9 +128,9 @@ https://github.com/akiomik/nosvelte
 
 ### 他
 
-- /relay/[relayURL] でそのリレーのTLがみれる
+- /relay/[relayURLをエンコードしたやつ] でそのリレーのTLがみれる
 
-  e.g. [https://lumilumi.vercel.app/relay/](https://lumilumi.vercel.app/relay/wss%3A%2F%2Fcatstrr.swarmstr.com%2F)
+  e.g. [https://lumilumi.vercel.app/relay/wss%3A%2F%2Fcatstrr.swarmstr.com%2F](https://lumilumi.vercel.app/relay/wss%3A%2F%2Fcatstrr.swarmstr.com%2F)
 
 
 - 翻訳機能
