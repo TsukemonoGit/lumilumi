@@ -16,7 +16,8 @@
 </script>
 
 <div
-  class="absolute top-0 left-0 w-full h-full flex bg-magnum-600 {$value[0] >= 50
+  class="absolute top-0 left-0 w-full h-full flex bg-neutral-700 {$value[0] >=
+  50
     ? 'pointer-events-none'
     : ''}"
   style=" opacity:{1 - $value[0] / 100}"
@@ -24,9 +25,9 @@
   <div
     class=" grid grid-cols-[auto_1fr_auto] justify-between w-full overflow-hidden overflow-y-auto py-1"
   >
-    <TriangleAlert size="20" class="text-magnum-300 min-w-4 " />
+    <TriangleAlert size="20" class="text-magnum-500 min-w-4 mx-1" />
     <div class="w-full text-center">{text ?? "warning"}</div>
-    <TriangleAlert size="20" class="text-magnum-300 min-w-4" />
+    <TriangleAlert size="20" class="text-magnum-500 min-w-4 mx-1" />
   </div>
 </div>
 <span
@@ -39,6 +40,6 @@
 
   <span
     use:melt={$thumbs[0]}
-    class="h-5 w-5 rounded-full bg-magnum-950 focus:ring-4 focus:!ring-magnum-300/40"
+    class="h-5 w-5 rounded-full bg-magnum-500 focus:ring-4 focus:!ring-magnum-300/40"
   />
 </span>
