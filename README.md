@@ -130,7 +130,7 @@ https://github.com/akiomik/nosvelte
 
 - /relay/[relayURL] でそのリレーのTLがみれる
 
-  e.g. https://lumilumi.vercel.app/relay/catstrr.swarmstr.com
+  e.g. [https://lumilumi.vercel.app/relay/](https://lumilumi.vercel.app/relay/wss%3A%2F%2Fcatstrr.swarmstr.com%2F)
 
 
 - 翻訳機能
