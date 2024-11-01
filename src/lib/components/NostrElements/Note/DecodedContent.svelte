@@ -43,7 +43,7 @@
 
 <div use:viewport on:enterViewport={handleEnterViewport} class="inline">
   {#if hasLoaded}{#if decoded.type === "npub"}<span
-        class="text-magnum-100 align-middle"
+        class="text-magnum-300 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data}
           />{:else}<PopupUserName pubkey={decoded.data} {tieKey} />{/if}</span
@@ -90,7 +90,7 @@
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
       </span>{:else if decoded.type === "nprofile"}<span
-        class="text-magnum-100 align-middle"
+        class="text-magnum-300 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data.pubkey}
           />{:else}<PopupUserName

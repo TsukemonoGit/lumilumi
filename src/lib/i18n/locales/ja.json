@@ -213,5 +213,9 @@
       "canversation": "会話の表示",
       "muteOn": "ミュートを適応する"
     }
+  },
+  "timeline": {
+    "viewParentPost": "返信元を表示",
+    "hideParentPost": "隠す"
   }
 }

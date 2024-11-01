@@ -198,5 +198,9 @@
       "onlyFollowee": "Show Conversations with Followed Users Only",
       "none": "Hide Conversations"
     }
+  },
+  "timeline": {
+    "viewParentPost": "View Parent",
+    "hideParentPost": "Hide"
   }
 }

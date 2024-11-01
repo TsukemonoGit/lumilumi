@@ -56,9 +56,9 @@
 <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
   {#if replyUsers.length > 0}
     <div
-      class="my-1 text-sm text-magnum-100 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
+      class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
     >
-      {#each replyUsers as user}
+      <span class="text-sm text-neutral-50">To:</span>{#each replyUsers as user}
         {#if !displayMenu}<UserName pubhex={user} />{:else}
           <PopupUserName pubkey={user} {tieKey} />{/if}
       {/each}
