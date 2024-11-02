@@ -56,7 +56,7 @@
   import Kind4Note from "./Kind4Note.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
   import OtherKindNote from "./OtherKindNote.svelte";
-  import ReactionedNote from "./ReactionedNote.svelte";
+
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
   export let note: Nostr.Event;
@@ -451,25 +451,15 @@
       <!--リアクションしたノートの情報-->
       {@const { kind, tag } = repostedId(note.tags)}
       {#if tag}
-        {#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
-          <ReactionedNote
-            {tag}
-            depth={depth + 1}
-            {repostable}
-            {displayMenu}
-            {tieKey}
-            {maxHeight}
-          />
-        {:else}
-          <RepostedNote
-            {tag}
-            depth={depth + 1}
-            {repostable}
-            {displayMenu}
-            {maxHeight}
-            {tieKey}
-          />
-        {/if}{:else}<span class="italic">error</span>
+        <RepostedNote
+          {tag}
+          depth={depth + 1}
+          {repostable}
+          {displayMenu}
+          {maxHeight}
+          {tieKey}
+        />
+      {:else}<span class="italic">error</span>
       {/if}
     {:else if note.kind === 7}
       <!--リアクション-->
@@ -520,25 +510,15 @@
       <!--リアクションしたノートの情報（リポストのを使いまわし）-->
       {@const { kind, tag } = repostedId(note.tags)}
       <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある　nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
-      {#if tag}{#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
-          <ReactionedNote
-            {tag}
-            depth={depth + 1}
-            {repostable}
-            {displayMenu}
-            {tieKey}
-            {maxHeight}
-          />
-        {:else}
-          <RepostedNote
-            {tag}
-            depth={depth + 1}
-            {repostable}
-            {displayMenu}
-            {maxHeight}
-            {tieKey}
-          />
-        {/if}
+      {#if tag}
+        <RepostedNote
+          {tag}
+          depth={depth + 1}
+          {repostable}
+          {displayMenu}
+          {maxHeight}
+          {tieKey}
+        />
       {:else}<span class="italic">error</span>
       {/if}
     {:else if note.kind === 17}

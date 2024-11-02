@@ -2,7 +2,6 @@
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { profile } from "$lib/func/util";
   import { Zap } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
@@ -16,8 +15,7 @@
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import ReactionedNote from "./ReactionedNote.svelte";
-  import { page } from "$app/stores";
+
   import { encodetoNpub } from "$lib/func/encode";
 
   export let note: Nostr.Event;
@@ -192,25 +190,14 @@
               </div>
 
               {#if zappedId.tag.length > 0}
-                {#if $page.route.id === "/notifications" && depth === 0}<!--通知欄のリアクションだけ簡易表示（ポストは絶対自分のだし）-->
-                  <ReactionedNote
-                    tag={zappedId.tag}
-                    depth={depth + 1}
-                    {repostable}
-                    {displayMenu}
-                    {tieKey}
-                    {maxHeight}
-                  />
-                {:else}
-                  <RepostedNote
-                    tag={zappedId.tag}
-                    depth={depth + 1}
-                    {repostable}
-                    {displayMenu}
-                    {maxHeight}
-                    {tieKey}
-                  />
-                {/if}
+                <RepostedNote
+                  tag={zappedId.tag}
+                  depth={depth + 1}
+                  {repostable}
+                  {displayMenu}
+                  {maxHeight}
+                  {tieKey}
+                />
               {/if}
             </Metadata>
           {/if}{/if}

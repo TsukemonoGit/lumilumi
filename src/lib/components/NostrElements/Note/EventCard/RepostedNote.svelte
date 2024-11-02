@@ -11,6 +11,9 @@
   import EllipsisMenuNaddr from "../NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import EllipsisMenuNote from "../NoteActionButtuns/EllipsisMenuNote.svelte";
   import EventCard from "./EventCard.svelte";
+  import OmittedCard from "./OmittedCard.svelte";
+  import { page } from "$app/stores";
+  import { loginUser } from "$lib/stores/stores";
 
   export let displayMenu: boolean;
   export let repostable: boolean;
@@ -82,51 +85,61 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <Metadata
-      queryKey={["metadata", text.pubkey]}
-      pubkey={text.pubkey}
-      let:metadata
-    >
-      <div slot="loading">
-        <EventCard
-          note={text}
-          {depth}
-          {repostable}
-          {maxHeight}
-          {displayMenu}
-          {tieKey}
-        />
-      </div>
-      <div slot="nodata">
-        <EventCard
-          note={text}
-          {depth}
-          {repostable}
-          {maxHeight}
-          {displayMenu}
-          {tieKey}
-        />
-      </div>
-      <div slot="error" let:error>
-        <EventCard
-          note={text}
-          {depth}
-          {repostable}
-          {maxHeight}
-          {displayMenu}
-          {tieKey}
-        />
-      </div>
-      <EventCard
-        note={text}
-        {metadata}
+    {#if $page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
+      <OmittedCard
+        {text}
         {depth}
         {repostable}
         {maxHeight}
         {displayMenu}
         {tieKey}
       />
-    </Metadata>
+    {:else}
+      <Metadata
+        queryKey={["metadata", text.pubkey]}
+        pubkey={text.pubkey}
+        let:metadata
+      >
+        <div slot="loading">
+          <EventCard
+            note={text}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+            {tieKey}
+          />
+        </div>
+        <div slot="nodata">
+          <EventCard
+            note={text}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+            {tieKey}
+          />
+        </div>
+        <div slot="error" let:error>
+          <EventCard
+            note={text}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+            {tieKey}
+          />
+        </div>
+        <EventCard
+          note={text}
+          {metadata}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+        />
+      </Metadata>{/if}
   </Text>
 {:else if tag[0] === "a"}
   {@const filter = naddrFilter()}
@@ -142,51 +155,61 @@
       <div slot="error" let:error>
         {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
-      <Metadata
-        queryKey={["metadata", event.pubkey]}
-        pubkey={event.pubkey}
-        let:metadata
-      >
-        <div slot="loading" class="w-full">
-          <EventCard
-            note={event}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <div slot="nodata" class="w-full">
-          <EventCard
-            note={event}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <div slot="error" class="w-full" let:error>
-          <EventCard
-            note={event}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <EventCard
-          note={event}
-          {metadata}
+      {#if $page.route.id === "/notifications" && depth === 1 && event.pubkey === $loginUser}
+        <OmittedCard
+          text={event}
           {depth}
           {repostable}
           {maxHeight}
           {displayMenu}
           {tieKey}
         />
-      </Metadata>
+      {:else}
+        <Metadata
+          queryKey={["metadata", event.pubkey]}
+          pubkey={event.pubkey}
+          let:metadata
+        >
+          <div slot="loading" class="w-full">
+            <EventCard
+              note={event}
+              {depth}
+              {repostable}
+              {maxHeight}
+              {displayMenu}
+              {tieKey}
+            />
+          </div>
+          <div slot="nodata" class="w-full">
+            <EventCard
+              note={event}
+              {depth}
+              {repostable}
+              {maxHeight}
+              {displayMenu}
+              {tieKey}
+            />
+          </div>
+          <div slot="error" class="w-full" let:error>
+            <EventCard
+              note={event}
+              {depth}
+              {repostable}
+              {maxHeight}
+              {displayMenu}
+              {tieKey}
+            />
+          </div>
+          <EventCard
+            note={event}
+            {metadata}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+            {tieKey}
+          />
+        </Metadata>{/if}
     </LatestEvent>
   {/if}
 {/if}

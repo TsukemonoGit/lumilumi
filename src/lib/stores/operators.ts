@@ -16,16 +16,9 @@ import {
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
-import {
-  createQuery,
-  type QueryKey,
-  type SetDataOptions,
-} from "@tanstack/svelte-query";
+import { type QueryKey } from "@tanstack/svelte-query";
 
-import {
-  muteCheck as muteCheckEvent,
-  type MuteCheck,
-} from "$lib/func/muteCheck";
+import { muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
 
 export function filterId(
   id: string
@@ -397,20 +390,10 @@ export function reactionCheck() {
     } else {
       if (
         packet.event.pubkey !== get(loginUser) &&
-        packet.event.tags.find(
+        packet.event.tags.findLast(
           (tag) => tag[0] === "p" && tag[1] === get(loginUser)
         )
       ) {
-        //リアクションにリアクション元のP全部入れてくるやつがいるから最後のｐが自分じゃなかったら除外
-        if (
-          packet.event.kind === 7 &&
-          packet.event.tags.findLast(
-            (tag) => tag[0] === "p" && tag.length > 1
-          )?.[1] !== get(loginUser)
-        ) {
-          return false;
-        }
-
         //TLには流れないものたちのうち自分へのリアクション
 
         if (follow && follow.has(packet.event.pubkey)) {

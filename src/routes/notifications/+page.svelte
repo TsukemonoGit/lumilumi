@@ -1,6 +1,5 @@
 <script lang="ts">
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
-  import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
+  import { now, type EventPacket } from "rx-nostr";
   import {
     defaultRelays,
     followList,
@@ -153,7 +152,7 @@
         }
       }
     }
-    if (event.kind === 7) {
+    if (event.kind === 7 || event.kind === 6 || event.kind === 16) {
       if (
         event.tags.findLast((tag) => tag[0] === "p" && tag.length > 1)?.[1] !==
         $loginUser
