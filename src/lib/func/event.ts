@@ -131,3 +131,24 @@ export const getProfile = (
     return undefined;
   }
 };
+
+export function latestList(list: Nostr.Event[]): Nostr.Event[] {
+  //key値 `${list[i].kind}:${list[i].pubkey}:${list[i].tags.find((tag)=>tag[0]==="d"&&tag.length>1)?.[1]}`
+
+  //キー値が同じものはlist[i].created_atが最新のものを採用する
+
+  const map = list.reduce((acc, event) => {
+    const key = `${event.kind}:${event.pubkey}:${
+      event.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+    }`;
+
+    // 既存のイベントが無い、もしくは現在のイベントがより新しい場合に更新
+    if (!acc.has(key) || event.created_at > acc.get(key)!.created_at) {
+      acc.set(key, event);
+    }
+
+    return acc;
+  }, new Map<string, Nostr.Event>());
+
+  return Array.from(map.values());
+}
