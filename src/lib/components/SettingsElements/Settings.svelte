@@ -79,6 +79,7 @@
       item: radioGroupitem,
       hiddenInput: radioGrouphiddenInput,
     },
+    states: { value: relaySetValue },
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
     defaultValue: settings.useRelaySet,
@@ -128,6 +129,7 @@
     $defaultReaction = settings.defaultReaction;
 
     $selectedRelayset = settings.useRelaySet;
+    $relaySetValue = settings.useRelaySet;
     beforeRelays = settings.relays;
 
     $showReactioninTL = settings.showReactioninTL;
