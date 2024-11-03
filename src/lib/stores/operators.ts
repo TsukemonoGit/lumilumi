@@ -297,11 +297,13 @@ function shouldMuteByT(eventPacket: EventPacket): boolean {
 
 function shouldMuteByE(eventPacket: EventPacket): boolean {
   const eMutes = get(mutes)?.list.e || [];
-  // const tagsWithE = eventPacket.event.tags.filter(
-  //   (tag) => tag[0] === "e" || tag[0] === "q"
-  // );
-  return eMutes.includes(eventPacket.event.id); //||
-  //  tagsWithE.some((tag) => eMutes.includes(tag[1])) // Replace with actual property check
+  const tagsWithE = eventPacket.event.tags.filter(
+    (tag) => tag[0] === "e" || tag[0] === "q"
+  );
+  return (
+    eMutes.includes(eventPacket.event.id) ||
+    tagsWithE.some((tag) => eMutes.includes(tag[1]))
+  ); // Replace with actual property check
 }
 
 function shouldMuteByKinds(eventPacket: EventPacket): boolean {
@@ -353,7 +355,8 @@ export function reactionCheck() {
     if (
       packet.event.kind === 1 ||
       packet.event.kind === 6 ||
-      packet.event.kind === 16
+      packet.event.kind === 16 ||
+      packet.event.kind === 42
     ) {
       //自分のpubがtagsに入っていてもリアクションとして取得したものじゃない可能性があるkind
 

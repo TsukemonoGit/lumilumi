@@ -29,7 +29,8 @@
       "banner": "右側のアカウントバナーを表示する",
       "showKind16": "kind16(kind1以外のリポスト)を表示する",
       "showClientTag": "TLにもクライアントタグ(via)を表示",
-      "showAllReaction": "みんなのリアクションを表示する"
+      "showAllReaction": "みんなのリアクションを表示する",
+      "kind42inTL": "パブリックチャットをHomeTLに表示する"
     },
     "post": {
       "addClientTag": "投稿にClientタグ(via)をつける",
@@ -195,7 +196,8 @@
     },
     "type": {
       "select": "ミュートの種類"
-    }
+    },
+    "channel": "ミュート中のチャンネルです"
   },
   "event": {
     "kind4": {

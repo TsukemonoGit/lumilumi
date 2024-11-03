@@ -13,7 +13,18 @@
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
   import Note from "$lib/components/NostrElements/Note/Note.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
-  import { Pin } from "lucide-svelte";
+
+  import {
+    Pin,
+    ReceiptText,
+    MessageSquareText,
+    Smile,
+    Zap,
+    Sticker,
+    BookMarked,
+    Users,
+    RadioTower,
+  } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   import { loginUser, queryClient } from "$lib/stores/stores";
@@ -110,7 +121,7 @@
         inline: "nearest",
         behavior: "instant",
       });
-      window.scrollBy(0, -50);
+      window.scrollBy(0, -100);
     }, 0);
   }
   // return next;
@@ -125,14 +136,15 @@
   });
 
   const triggers = [
-    { id: "post", title: "Post" },
-    { id: "reactions", title: "Reaction" },
+    { id: "post", title: "Post", Icon: ReceiptText },
+    { id: "chat", title: "Chat", Icon: MessageSquareText },
+    { id: "reactions", title: "Reaction", Icon: Sticker },
 
-    { id: "followee", title: "Follow" },
-    { id: "bookmark", title: "Bookmark" },
-    { id: "zap", title: "Zapped" },
+    { id: "followee", title: "Follow", Icon: Users },
+    { id: "bookmark", title: "Bookmark", Icon: BookMarked },
+    { id: "zap", title: "Zapped", Icon: Zap },
     // { id: "pin", title: "Pin" },
-    { id: "relays", title: "Relay" },
+    { id: "relays", title: "Relay", Icon: RadioTower },
   ];
 
   const [send, receive] = crossfade({
@@ -167,7 +179,7 @@
       <div
         id="userTabs"
         use:melt={$root}
-        class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500"}
+        class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500 "}
       >
         <div
           use:melt={$list}
@@ -177,9 +189,13 @@
           {#each triggers as triggerItem}
             <button
               use:melt={$trigger(triggerItem.id)}
-              class="trigger relative"
+              class="trigger relative flex-col gap-1 min-w-20"
             >
-              {triggerItem.title}
+              {#if triggerItem.Icon}<svelte:component
+                  this={triggerItem.Icon}
+                  size={20}
+                  class="min-h-[20px]"
+                />{/if}{triggerItem.title}
               {#if $value === triggerItem.id}
                 <div
                   in:send={{ key: "trigger" }}
@@ -251,7 +267,7 @@
               >
                 <!-- <SetRepoReactions /> -->
                 <div slot="loading">
-                  <p>timeline Loading...</p>
+                  <p class="px-2">timeline Loading...</p>
                 </div>
 
                 <div slot="error" let:error>
@@ -262,7 +278,85 @@
                   class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
                 >
                   {#if events && events.length > 0}
-                    {#each events.filter( (event) => [1, 6, 16].includes(event.kind) ) as event, index (event.id)}
+                    {#each events as event, index (event.id)}
+                      <!-- <div
+                        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
+                        events.length - 1
+                          ? 'last-visible'
+                          : ''} {index === 0 ? 'first-visible' : ''}"
+                      > -->
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                        let:metadata
+                      >
+                        <div slot="loading">
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
+                        </div>
+                        <div slot="nodata">
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
+                        </div>
+                        <div slot="error">
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind1}
+                            {tieKey}
+                          />
+                        </div>
+                        <EventCard
+                          {metadata}
+                          note={event}
+                          excludefunc={excludeKind1}
+                          {tieKey}
+                        />
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}
+                  {/if}
+                </div>
+              </TimelineList>{/if}
+          {/if}
+        </div>
+        <div use:melt={$content("chat")} class="content">
+          {#if $value === "chat"}
+            {#if since}
+              <TimelineList
+                queryKey={["publck chat", userPubkey]}
+                filters={[
+                  {
+                    kinds: [42],
+
+                    authors: [userPubkey],
+                    since: since,
+                  },
+                ]}
+                {req}
+                let:events
+                {amount}
+                {tieKey}
+              >
+                <!-- <SetRepoReactions /> -->
+                <div slot="loading">
+                  <p class="px-2">public chat Loading...</p>
+                </div>
+
+                <div slot="error" let:error>
+                  <p>{error}</p>
+                </div>
+
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
                       <!-- <div
                         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                         events.length - 1
@@ -328,7 +422,7 @@
             >
               <!-- <SetRepoReactions /> -->
               <div slot="loading">
-                <p>timeline Loading...</p>
+                <p class="px-2">timeline Loading...</p>
               </div>
 
               <div slot="error" let:error>
@@ -408,7 +502,7 @@
             >
               <!-- <SetRepoReactions /> -->
               <div slot="loading">
-                <p>timeline Loading...</p>
+                <p class="px-2">timeline Loading...</p>
               </div>
 
               <div slot="error" let:error>
@@ -703,8 +797,8 @@
     line-height: 1;
 
     flex: 1;
-    height: theme(spacing.12);
-    padding-inline: theme(spacing.2);
+    height: theme(spacing.14);
+    /* padding-inline: theme(spacing.2); */
 
     &:focus {
       position: relative;

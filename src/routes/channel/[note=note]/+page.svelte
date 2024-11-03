@@ -7,12 +7,20 @@
   import { setRelays } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
-  import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
+  import {
+    defaultRelays,
+    loginUser,
+    queryClient,
+    timelineFilter,
+  } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   import { nip19 } from "nostr-tools";
+
+  import { mutes } from "$lib/stores/stores";
+  import { _ } from "svelte-i18n";
 
   export let data: {
     id: string;
@@ -67,6 +75,15 @@
     isOnMount = false;
     view = true;
   }
+
+  $: isMute = channelMuteCheck(data.id, $timelineFilter.adaptMute);
+  function channelMuteCheck(id: string, adaptMute: boolean): boolean {
+    if (!adaptMute) {
+      return false;
+    }
+    const eMutes = $mutes.list.e || [];
+    return eMutes.includes(id);
+  }
 </script>
 
 {#if view}
@@ -75,7 +92,11 @@
       id={data.id}
       linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
       {tieKey}
-    />{#if since}
+    />
+    {#if isMute}
+      <!---->
+      {$_("mute.channel")}
+    {:else if since}
       <TimelineList
         queryKey={timelineQuery}
         filters={[

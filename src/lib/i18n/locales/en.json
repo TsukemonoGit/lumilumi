@@ -29,7 +29,8 @@
       "banner": "Show the account banner on the right",
       "showKind16": "Show kind16 (reposts other than kind1)",
       "showClientTag": "Show Display client tag (via) in TL",
-      "showAllReaction": "Show everyone's reactions"
+      "showAllReaction": "Show everyone's reactions",
+      "kind42inTL": "Display public chats on HomeTL"
     },
     "post": {
       "addClientTag": "Add client tag (via) to post",
@@ -202,7 +203,8 @@
     "zap": {
       "add": "Mute ZAP",
       "remove": "Unmute ZAP"
-    }
+    },
+    "channel": "Channel on mute."
   },
   "filter": {
     "menu": {

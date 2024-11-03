@@ -126,6 +126,7 @@ export interface LumiSetting {
   addClientTag: boolean;
   showClientTag: boolean;
   showAllReactions: boolean;
+  kind42inTL: boolean;
 }
 export interface LumiEmoji {
   list: string[][];

@@ -2,6 +2,7 @@ import {
   app,
   defaultRelays,
   followList,
+  kind42inTL,
   loginUser,
   metadataQueue,
   queryClient,
@@ -216,6 +217,10 @@ export const makeMainFilters = (
   const kinds = [1, 6];
   if (get(showKind16)) {
     kinds.push(16);
+  }
+  console.log("kind42inTL", get(kind42inTL));
+  if (get(kind42inTL)) {
+    kinds.push(42);
   }
   const filters: Nostr.Filter[] = [
     {

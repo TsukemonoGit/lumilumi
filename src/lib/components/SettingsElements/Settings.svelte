@@ -24,6 +24,7 @@
     showClientTag,
     showAllReactions,
     queryClient,
+    kind42inTL,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import {
@@ -134,6 +135,7 @@
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
     $showAllReactions = settings.showAllReactions;
+    $kind42inTL = settings.kind42inTL;
     const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
@@ -260,6 +262,7 @@
     $addClientTag = settings.addClientTag;
     $showClientTag = settings.showClientTag;
     $showAllReactions = settings.showAllReactions;
+    $kind42inTL = settings.kind42inTL;
     // $mutes = lumiMute;
     // $emojis = lumiEmoji;
     // $mutebykinds = lumiMuteByKind;
@@ -710,6 +713,14 @@
           bind:checked={settings.showReactioninTL}
         />
         {$_("settings.display.showReactioninTL")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.kind42inTL}
+        />
+        {$_("settings.display.kind42inTL")}
       </label>
       <label>
         <input
