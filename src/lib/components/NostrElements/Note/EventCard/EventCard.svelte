@@ -174,7 +174,8 @@
   const baseClass = " overflow-hidden ";
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
-    const user = ptag.find((tag) => tag[1] === $loginUser);
+    const user =
+      note.pubkey !== $loginUser && ptag.find((tag) => tag[1] === $loginUser);
     // let ret = `${baseClass} ${user ? " bg-magnum-700/20" : "border-magnum-600/30"}`;
     // return depth === 0
     //   ? `border-magnum-600 ${ret}`
