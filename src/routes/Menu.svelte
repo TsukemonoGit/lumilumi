@@ -1,17 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import {
-    AlignJustify,
-    Bell,
-    Globe,
-    House,
-    MessagesSquare,
-    Search,
-    Settings,
-    TrendingUp,
-    Users,
-  } from "lucide-svelte";
+  import { AlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
   import { loginUser, menuLeft, showImg } from "$lib/stores/stores";
 
@@ -22,6 +12,7 @@
   import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
   import logo from "$lib/images/favicon.svg";
   import { goto } from "$app/navigation";
+  import { mainMenuItems } from "./menu";
   const {
     elements: {
       trigger,
@@ -142,78 +133,43 @@
         <ul
           class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
         >
-          <li aria-current={$page.url?.pathname === "/" ? "page" : undefined}>
-            <a href="/" use:melt={$close}
-              ><House /><span class="ml-2">Home</span></a
-            >
-          </li>
+          {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
+            {#if alt === "edit status"}
+              <li>
+                {#if $trigger}<button
+                    use:melt={$editStatustrigger}
+                    use:melt={$close}
+                    ><TrendingUp /><span class="ml-2">Edit status</span></button
+                  >{/if}
+              </li>
+            {:else}
+              <li
+                aria-current={$page.url?.pathname ===
+                (link === undefined && $loginUser ? `/${encodedPub}` : link)
+                  ? "page"
+                  : undefined}
+              >
+                {#if noPubkey || $loginUser}
+                  <a
+                    href={link ?? `/${encodedPub}`}
+                    use:melt={$close}
+                    title={alt}
+                  >
+                    <svelte:component this={Icon} /><span class="ml-2"
+                      >{alt}</span
+                    >
+                  </a>
+                {:else}
+                  <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
+                  <div class="disabledLink" use:melt={$close} title={alt}>
+                    <svelte:component this={Icon} /><span class="ml-2"
+                      >{alt}</span
+                    >
+                  </div>
+                {/if}
+              </li>{/if}
+          {/each}
 
-          <li
-            aria-current={$page.url.pathname === "/notifications"
-              ? "page"
-              : undefined}
-          >
-            <a href="/notifications" use:melt={$close}
-              ><Bell /><span class="ml-2">Notifications</span></a
-            >
-          </li>
-          <li
-            aria-current={$page.url.pathname === "/search" ? "page" : undefined}
-          >
-            <a href="/search" use:melt={$close}
-              ><Search /><span class="ml-2">search</span></a
-            >
-          </li>
-
-          <li
-            aria-current={$page.url.pathname === "/global" ? "page" : undefined}
-          >
-            <a href="/global" use:melt={$close}
-              ><Globe /><span class="ml-2">global</span></a
-            >
-          </li>
-          <li
-            aria-current={$page.url.pathname === "/channel"
-              ? "page"
-              : undefined}
-          >
-            <a href="/channel" use:melt={$close}
-              ><MessagesSquare /><span class="ml-2">Channel</span></a
-            >
-          </li>
-          <li
-            aria-current={$page.url.pathname === "/list" ? "page" : undefined}
-          >
-            <a href="/list" use:melt={$close}
-              ><Users /><span class="ml-2">list</span></a
-            >
-          </li>
-
-          <li
-            aria-current={$page.url.pathname === "/settings"
-              ? "page"
-              : undefined}
-          >
-            <a href="/settings" use:melt={$close}
-              ><Settings /><span class="ml-2">settings</span></a
-            >
-          </li>
-          <li>
-            {#if $trigger}<button
-                use:melt={$editStatustrigger}
-                use:melt={$close}
-                ><TrendingUp /><span class="ml-2">Edit status</span></button
-              >{/if}
-          </li>
-          <!-- <li
-            aria-current={$page.url.pathname === `/${encodedPub}`
-              ? "page"
-              : undefined}
-          >
-            <a href={`/${encodedPub}`}
-              ><UserAvatar2 size={32} /><span class="ml-2">profile</span>
-            </a>
-          </li> -->
           <li
             aria-current={$page.url?.pathname === "/about" ? "page" : undefined}
           >
@@ -280,7 +236,18 @@
     text-decoration: none;
     transition: color 0.2s linear;
   }
-
+  .disabledLink {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    color: theme("colors.neutral.500");
+    font-weight: 700;
+    font-size: var(--text-xl);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: color 0.2s linear;
+  }
   nav button {
     display: flex;
     align-items: center;
