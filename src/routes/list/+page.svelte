@@ -30,24 +30,30 @@
     //同じaタグのイベントは最新のだけにする
     return latestList(list);
   };
-  afterNavigate(() => {
-    if (!$loginUser) {
-      $toastSettings = {
-        title: "Warning",
-        description: $_("list.settingswarning"),
-        color: "bg-orange-500",
-      };
+  // afterNavigate(() => {
+  //   if (!$loginUser) {
+  //     $toastSettings = {
+  //       title: "Warning",
+  //       description: $_("list.settingswarning"),
+  //       color: "bg-orange-500",
+  //     };
 
-      goto("/settings");
-    }
-  });
+  //     goto("/settings");
+  //   }
+  // });
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
   <title>Lumilumi-List</title><meta property="og:description" content="List" />
   <meta name="description" content="List" />
-</svelte:head>
-{#if $loginUser}
+</svelte:head> -->
+{#if !$loginUser}
+  <a
+    href="/settings"
+    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+  >
+{:else}
   <section class="container">
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
       <ListMain

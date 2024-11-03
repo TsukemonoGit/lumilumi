@@ -12,6 +12,7 @@
     Users,
     MessagesSquare,
     TrendingUp,
+    User,
   } from "lucide-svelte";
 
   import { nip19 } from "nostr-tools";
@@ -47,9 +48,13 @@
           ? "page"
           : undefined}
       >
-        <a href="/notifications"
-          ><Bell /><span class="ml-2">Notifications</span></a
-        >
+        {#if $loginUser}
+          <a href="/notifications"
+            ><Bell /><span class="ml-2">Notifications</span></a
+          >{:else}<div class="disabledLink">
+            <Bell /><span class="ml-2">Notifications</span>
+          </div>
+        {/if}
       </li>
       <li aria-current={$page.url.pathname === "/search" ? "page" : undefined}>
         <a href="/search"><Search /><span class="ml-2">search</span></a>
@@ -64,7 +69,11 @@
         >
       </li>
       <li aria-current={$page.url.pathname === "/list" ? "page" : undefined}>
-        <a href="/list"><Users /><span class="ml-2">list</span></a>
+        {#if $loginUser}<a href="/list"
+            ><Users /><span class="ml-2">list</span></a
+          >{:else}<div class="disabledLink">
+            <Users /><span class="ml-2">list</span>
+          </div>{/if}
       </li>
 
       <li
@@ -72,9 +81,11 @@
           ? "page"
           : undefined}
       >
-        <a href={`/${encodedPub}`}
-          ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
-        </a>
+        {#if $loginUser}<a href={`/${encodedPub}`}
+            ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
+          </a>{:else}<div class="disabledLink">
+            <User /><span class="ml-2">profile</span>
+          </div>{/if}
       </li>
       <li>
         {#if $trigger}<button use:melt={$trigger}
@@ -129,7 +140,18 @@
     text-decoration: none;
     transition: color 0.2s linear;
   }
-
+  .disabledLink {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    color: theme("colors.neutral.500");
+    font-weight: 700;
+    font-size: var(--text-xl);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: color 0.2s linear;
+  }
   nav button {
     display: flex;
     align-items: center;

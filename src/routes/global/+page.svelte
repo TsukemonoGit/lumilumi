@@ -122,27 +122,34 @@
   });
 </script>
 
-<section class="w-full break-words overflow-hidden">
-  {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
-    <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
-      ><div slot="loading" class="w-full"></div>
-      <div slot="error" class="w-full"></div>
-      <div slot="nodata" class="w-full"></div>
-    </SetGlobalRelays>
+{#if !$loginUser && globalRelays.length <= 0}
+  <a
+    href="/settings"
+    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+  >
+{:else}
+  <section class="w-full break-words overflow-hidden">
+    {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
+      <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
+        ><div slot="loading" class="w-full"></div>
+        <div slot="error" class="w-full"></div>
+        <div slot="nodata" class="w-full"></div>
+      </SetGlobalRelays>
 
-    <Settei
-      title={"Global"}
-      relays={globalRelays}
-      {onClickSave}
-      Description={GlobalDescription}
-    />
-  {/if}
+      <Settei
+        title={"Global"}
+        relays={globalRelays}
+        {onClickSave}
+        Description={GlobalDescription}
+      />
+    {/if}
 
-  {#if openGlobalTimeline && globalRelays.length > 0}
-    <GlobalTimeline bind:this={compRef} {globalRelays} {timelineQuery} />
-  {/if}
-</section>
-
+    {#if openGlobalTimeline && globalRelays.length > 0}
+      <GlobalTimeline bind:this={compRef} {globalRelays} {timelineQuery} />
+    {/if}
+  </section>
+{/if}
 <div class="postWindow">
   <OpenPostWindow
     options={{

@@ -55,73 +55,72 @@
     }
   }
 
-  afterNavigate((navigate) => {
-    console.log("afterNavigate", navigate.type);
-    if (!$loginUser) {
-      $toastSettings = {
-        title: "Warning",
-        description: $_("channel.settingswarning"),
-        color: "bg-orange-500",
-      };
+  // afterNavigate((navigate) => {
+  //   console.log("afterNavigate", navigate.type);
+  //   if (!$loginUser) {
+  //     $toastSettings = {
+  //       title: "Warning",
+  //       description: $_("channel.settingswarning"),
+  //       color: "bg-orange-500",
+  //     };
 
-      goto("/settings");
-    }
-  });
+  //     goto("/settings");
+  //   }
+  // });
 </script>
 
-{#if $loginUser}
-  <section
-    class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
-  >
-    {#if since}
-      <TimelineList
-        queryKey={timelineQuery}
-        filters={[
-          {
-            kinds: [42],
-            since: since,
-          },
-          {
-            kinds: [16],
-            "#k": ["42"],
+<section
+  class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
+>
+  {#if since}
+    <TimelineList
+      queryKey={timelineQuery}
+      filters={[
+        {
+          kinds: [42],
+          since: since,
+        },
+        {
+          kinds: [16],
+          "#k": ["42"],
 
-            since: since,
-          },
-          // {
-          //   kinds: [7],
-          //   "#k": ["42"],
-          //   "#p": [$loginUser],
-          //   limit: 20,
+          since: since,
+        },
+        // {
+        //   kinds: [7],
+        //   "#k": ["42"],
+        //   "#p": [$loginUser],
+        //   limit: 20,
 
-          //   since: since,
-          // },
-        ]}
-        req={createRxForwardReq()}
-        let:events
-        {viewIndex}
-        {amount}
-        let:len
-        {tieKey}
-        >{#if events && events.length > 0}
-          {#each events as event (event.id)}
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-              let:metadata
-            >
-              <div slot="loading" class="w-full">
-                <EventCard note={event} {tieKey} />
-              </div>
-              <div slot="nodata" class="w-full">
-                <EventCard note={event} {tieKey} />
-              </div>
-              <div slot="error" class="w-full">
-                <EventCard note={event} {tieKey} />
-              </div>
-              <EventCard {metadata} note={event} {tieKey} /></Metadata
-            >
+        //   since: since,
+        // },
+      ]}
+      req={createRxForwardReq()}
+      let:events
+      {viewIndex}
+      {amount}
+      let:len
+      {tieKey}
+      >{#if events && events.length > 0}
+        {#each events as event (event.id)}
+          <Metadata
+            queryKey={["metadata", event.pubkey]}
+            pubkey={event.pubkey}
+            let:metadata
+          >
+            <div slot="loading" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <div slot="nodata" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <div slot="error" class="w-full">
+              <EventCard note={event} {tieKey} />
+            </div>
+            <EventCard {metadata} note={event} {tieKey} /></Metadata
+          >
 
-            <!-- <div
+          <!-- <div
               class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
             >
               <ChannelMetadata
@@ -130,13 +129,12 @@
                 linkButtonTitle={`/channel/${nip19.noteEncode(event.id)}`}
               />
             </div> -->
-          {/each}{/if}
-      </TimelineList>
-    {/if}
+        {/each}{/if}
+    </TimelineList>
+  {/if}{#if $loginUser}
     <Link
       className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
       href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${10005}`}
       >{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight size={16} /></Link
-    >
-  </section>
-{/if}
+    >{/if}
+</section>

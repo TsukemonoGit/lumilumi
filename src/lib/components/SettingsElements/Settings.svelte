@@ -447,7 +447,7 @@
         class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500"
         placeholder="npub"
         bind:value={inputPubkey}
-      />
+      /> ( User to retrieve what to display )
     </div>
   </fieldset>
   <!-- ラジオボタン -->

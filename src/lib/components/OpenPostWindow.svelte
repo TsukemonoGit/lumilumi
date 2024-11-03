@@ -229,56 +229,68 @@
       tags: checkedTags,
     };
     const signer = nip07Signer();
-    const event = await signer.signEvent(newev);
-    //publishEvent(newev);
+    try {
+      const event = await signer.signEvent(newev);
 
-    const { event: ev, res } = await promisePublishSignedEvent(event);
-    console.log(res);
+      //publishEvent(newev);
 
-    const isSuccessRelays: string[] = res
-      .filter((item) => item.ok)
-      .map((item) => normalizeRelayURL(item.from));
-    const isFailedRelays = res
-      .filter((item) => !item.ok)
-      .map((item) => normalizeRelayURL(item.from));
+      const { event: ev, res } = await promisePublishSignedEvent(event);
+      console.log(res);
 
-    // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
-
-    const writeRelays = getDefaultWriteRelays();
-
-    const pendingRelays = writeRelays.filter(
-      (relay) =>
-        !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
-    );
-    console.log(pendingRelays);
-    // if (pendingRelays.length > 0) {
-    //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
-    // }
-    // $toastSettings = {
-    //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
-    //   description: str,
-    //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
-    // };
-    if (isSuccessRelays.length <= 0) {
-      //再送チャレンジ
-      const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
-
-      const isSuccessRelays2: string[] = res2
+      const isSuccessRelays: string[] = res
         .filter((item) => item.ok)
         .map((item) => normalizeRelayURL(item.from));
-      if (isSuccessRelays2.length <= 0) {
-        $toastSettings = {
-          title: "Failed",
-          description: "failed to publish",
-          color: "bg-red-500",
-        };
+      const isFailedRelays = res
+        .filter((item) => !item.ok)
+        .map((item) => normalizeRelayURL(item.from));
+
+      // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
+
+      const writeRelays = getDefaultWriteRelays();
+
+      const pendingRelays = writeRelays.filter(
+        (relay) =>
+          !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
+      );
+      console.log(pendingRelays);
+      // if (pendingRelays.length > 0) {
+      //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
+      // }
+      // $toastSettings = {
+      //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
+      //   description: str,
+      //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
+      // };
+      if (isSuccessRelays.length <= 0) {
+        //再送チャレンジ
+        const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
+
+        const isSuccessRelays2: string[] = res2
+          .filter((item) => item.ok)
+          .map((item) => normalizeRelayURL(item.from));
+        if (isSuccessRelays2.length <= 0) {
+          $toastSettings = {
+            title: "Failed",
+            description: "failed to publish",
+            color: "bg-red-500",
+          };
+        }
+      } else {
+        //成功したときだけ閉じる
+        $open = false;
       }
-    } else {
-      //成功したときだけ閉じる
-      $open = false;
+
+      $nowProgress = false;
+      isPosting = false;
+    } catch (error) {
+      $toastSettings = {
+        title: "Failed",
+        description: "failed to publish",
+        color: "bg-red-500",
+      };
+      $nowProgress = false;
+      isPosting = false;
     }
-    $nowProgress = false;
-    isPosting = false;
   };
 
   const resetState = () => {

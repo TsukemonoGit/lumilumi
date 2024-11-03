@@ -140,54 +140,63 @@
   }
 </script>
 
-<Contacts
-  queryKey={["timeline", "contacts", $loginUser]}
-  pubkey={$loginUser}
-  let:contacts
-  let:status
->
-  <div slot="loading">
-    {#await awaitInterval(3000) then}
-      <MakeNewKind3 />{/await}
-  </div>
-  <div slot="error"><MakeNewKind3 /></div>
-  <div slot="nodata"><MakeNewKind3 /></div>
-  {#if since}
-    <MainTimeline
-      queryKey={timelineQuery}
-      filters={makeMainFilters(contacts, since)}
-      {tieKey}
-      let:events
-      {viewIndex}
-      {amount}
-      let:len
-      eventFilter={(note) => {
-        return checkCanvasation(note, $timelineFilter.selectCanversation);
-      }}
-      bind:updateViewEvent
-    >
-      <!-- <SetRepoReactions /> -->
-      <div slot="loading">
-        {#await awaitInterval(3000) then}event loading <SampleGlobalLink
-          />{/await}
-      </div>
-
-      <div slot="error" let:error>error</div>
-
-      <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+{#if !$loginUser}
+  <a
+    href="/settings"
+    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+  >
+  <SampleGlobalLink />
+{:else}
+  <Contacts
+    queryKey={["timeline", "contacts", $loginUser]}
+    pubkey={$loginUser}
+    let:contacts
+    let:status
+  >
+    <div slot="loading">
+      {#await awaitInterval(3000) then}
+        <MakeNewKind3 />{/await}
+    </div>
+    <div slot="error"><MakeNewKind3 /></div>
+    <div slot="nodata"><MakeNewKind3 /></div>
+    {#if since}
+      <MainTimeline
+        queryKey={timelineQuery}
+        filters={makeMainFilters(contacts, since)}
+        {tieKey}
+        let:events
+        {viewIndex}
+        {amount}
+        let:len
+        eventFilter={(note) => {
+          return checkCanvasation(note, $timelineFilter.selectCanversation);
+        }}
+        bind:updateViewEvent
       >
-        <FolloweeFilteredEventList {events} {tieKey} />
-      </div>
-    </MainTimeline>
-  {/if}
-</Contacts>
+        <!-- <SetRepoReactions /> -->
+        <div slot="loading">
+          {#await awaitInterval(3000) then}event loading <SampleGlobalLink
+            />{/await}
+        </div>
 
-<div class="postWindow">
-  <OpenPostWindow
-    options={{
-      tags: [],
-      kind: 1,
-    }}
-  />
-</div>
+        <div slot="error" let:error>error</div>
+
+        <div
+          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        >
+          <FolloweeFilteredEventList {events} {tieKey} />
+        </div>
+      </MainTimeline>
+    {/if}
+  </Contacts>
+
+  <div class="postWindow">
+    <OpenPostWindow
+      options={{
+        tags: [],
+        kind: 1,
+      }}
+    />
+  </div>
+{/if}

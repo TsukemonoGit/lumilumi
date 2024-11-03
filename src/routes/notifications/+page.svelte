@@ -203,90 +203,99 @@
   <meta property="og:description" content="Notifications" />
   <meta name="description" content="Notifications" />
 </svelte:head> -->
-<section>
-  <NotificationFilter />
-  <div class="w-full break-words overflow-x-hidden">
-    <div use:melt={$root} class=" flex items-center">
-      <button
-        class="toggle-item relative w-full"
-        disabled={$value?.length === triggers.length}
-        on:click={handleClickAll}
-      >
-        All
-      </button>
 
-      {#each triggers as triggerItem}
+{#if !$loginUser}
+  <a
+    href="/settings"
+    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+  >
+{:else}
+  <section>
+    <NotificationFilter />
+    <div class="w-full break-words overflow-x-hidden">
+      <div use:melt={$root} class=" flex items-center">
         <button
-          use:melt={$item(triggerItem.id)}
           class="toggle-item relative w-full"
+          disabled={$value?.length === triggers.length}
+          on:click={handleClickAll}
         >
-          <!-- Svelteコンポーネントとしてアイコンを扱う -->
-          {#if typeof triggerItem.title === "string"}
-            {triggerItem.title}
-          {:else}
-            <svelte:component this={triggerItem.title} />
-          {/if}
+          All
         </button>
-      {/each}
-      <button
-        class="toggle-item relative w-full"
-        disabled={$value?.length === 0}
-        on:click={handleClickNone}
-      >
-        None
-      </button>
-    </div>
-    {#if view}
-      <NotificationList
-        queryKey={timelineQuery}
-        {filters}
-        let:events
-        {viewIndex}
-        {amount}
-        bind:eventFilter={notifilter}
-        {tieKey}
-        bind:updateViewEvent
-      >
-        <!-- <div slot="loading">
+
+        {#each triggers as triggerItem}
+          <button
+            use:melt={$item(triggerItem.id)}
+            class="toggle-item relative w-full"
+          >
+            <!-- Svelteコンポーネントとしてアイコンを扱う -->
+            {#if typeof triggerItem.title === "string"}
+              {triggerItem.title}
+            {:else}
+              <svelte:component this={triggerItem.title} />
+            {/if}
+          </button>
+        {/each}
+        <button
+          class="toggle-item relative w-full"
+          disabled={$value?.length === 0}
+          on:click={handleClickNone}
+        >
+          None
+        </button>
+      </div>
+      {#if view}
+        <NotificationList
+          queryKey={timelineQuery}
+          {filters}
+          let:events
+          {viewIndex}
+          {amount}
+          bind:eventFilter={notifilter}
+          {tieKey}
+          bind:updateViewEvent
+        >
+          <!-- <div slot="loading">
           <p>Loading...</p>
         </div> -->
 
-        <!-- <SetRepoReactions /> -->
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="nodata" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="error" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <EventCard {metadata} note={event} {tieKey} /></Metadata
-              >
-            {/each}
-          {/if}
-        </div>
-      </NotificationList>{/if}
+          <!-- <SetRepoReactions /> -->
+          <div
+            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+          >
+            {#if events && events.length > 0}
+              {#each events as event, index (event.id)}
+                <Metadata
+                  queryKey={["metadata", event.pubkey]}
+                  pubkey={event.pubkey}
+                  let:metadata
+                >
+                  <div slot="loading" class="w-full">
+                    <EventCard note={event} {tieKey} />
+                  </div>
+                  <div slot="nodata" class="w-full">
+                    <EventCard note={event} {tieKey} />
+                  </div>
+                  <div slot="error" class="w-full">
+                    <EventCard note={event} {tieKey} />
+                  </div>
+                  <EventCard {metadata} note={event} {tieKey} /></Metadata
+                >
+              {/each}
+            {/if}
+          </div>
+        </NotificationList>{/if}
+    </div>
+  </section>
+  <div class="postWindow">
+    <OpenPostWindow
+      options={{
+        tags: [],
+        kind: 1,
+      }}
+    />
   </div>
-</section>
-<div class="postWindow">
-  <OpenPostWindow
-    options={{
-      tags: [],
-      kind: 1,
-    }}
-  />
-</div>
+{/if}
 
 <style lang="postcss">
   .toggle-item {

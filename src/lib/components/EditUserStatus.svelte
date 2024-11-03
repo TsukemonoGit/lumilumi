@@ -17,6 +17,7 @@
   import { contentEmojiCheck } from "$lib/func/contentCheck";
   import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
+  import { nip07Signer } from "rx-nostr";
   const {
     elements: {
       trigger,
@@ -96,7 +97,7 @@
     }
   });
 
-  const handleClickSave = () => {
+  const handleClickSave = async () => {
     $nowProgress = true;
 
     let tags = [["d", "general"]];
@@ -115,15 +116,29 @@
       tags: newtags.tags,
       content: userStatus,
     };
-    publishEvent(newStatus);
-    $toastSettings = {
-      title: "Published",
-      description: "",
-      color: "bg-green-500",
-    };
-    emojiTags = [];
-    $nowProgress = false;
-    $open = false;
+    const signer = nip07Signer();
+    try {
+      const event = await signer.signEvent(newStatus);
+
+      publishEvent(event);
+      $toastSettings = {
+        title: "Published",
+        description: "",
+        color: "bg-green-500",
+      };
+      emojiTags = [];
+      $nowProgress = false;
+      $open = false;
+    } catch (error) {
+      $toastSettings = {
+        title: "Failed",
+        description: "failed to publish",
+        color: "bg-red-500",
+      };
+      emojiTags = [];
+      $nowProgress = false;
+      $open = false;
+    }
   };
   let displayNameEmojiOpen: any;
   let emojiTags: string[][] = [];

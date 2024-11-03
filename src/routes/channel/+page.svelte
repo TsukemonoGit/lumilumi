@@ -16,18 +16,18 @@
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
 
-  afterNavigate((navigate) => {
-    console.log("afterNavigate", navigate.type);
-    if (!$loginUser) {
-      $toastSettings = {
-        title: "Warning",
-        description: $_("channel.settingswarning"),
-        color: "bg-orange-500",
-      };
+  // afterNavigate((navigate) => {
+  //   console.log("afterNavigate", navigate.type);
+  //   if (!$loginUser) {
+  //     $toastSettings = {
+  //       title: "Warning",
+  //       description: $_("channel.settingswarning"),
+  //       color: "bg-orange-500",
+  //     };
 
-      goto("/settings");
-    }
-  });
+  //     goto("/settings");
+  //   }
+  // });
 </script>
 
 <!-- <svelte:head>
@@ -35,10 +35,18 @@
   <meta property="og:description" content="Channel" />
   <meta name="description" content="Channel" />
 </svelte:head> -->
-{#if $loginUser}
-  <section
-    class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
-  >
+
+<section
+  class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
+>
+  {#if !$loginUser}
+    <a
+      href="/settings"
+      class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+      style="word-break: break-word;"
+      >Please set up pubkey on the Settings page</a
+    >
+  {:else}
     <ChannelMain
       queryKey={["kind10005", $loginUser]}
       pubkey={$loginUser}
@@ -63,11 +71,11 @@
       href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${10005}`}
       >{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight size={16} /></Link
     >
-    <a
-      href={"/channel/global"}
-      class="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all items-center"
-    >
-      {$_("channel.global")}
-    </a>
-  </section>
-{/if}
+  {/if}
+  <a
+    href={"/channel/global"}
+    class="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all items-center"
+  >
+    {$_("channel.global")}
+  </a>
+</section>
