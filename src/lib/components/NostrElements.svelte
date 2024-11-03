@@ -97,7 +97,7 @@
       return true;
     }
 
-    if (note.kind !== 1) {
+    if (note.kind !== 1 && note.kind !== 42) {
       return true;
     }
     if (select === 0) {
