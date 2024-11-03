@@ -134,7 +134,7 @@
           class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
         >
           {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
-            {#if !link && alt === "edit status"}
+            {#if alt === "edit status"}
               <li>
                 {#if $trigger}<button
                     use:melt={$editStatustrigger}
