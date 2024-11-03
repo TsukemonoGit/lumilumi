@@ -58,6 +58,7 @@
   import type { DefaultRelayConfig } from "rx-nostr";
   import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
+  import SampleCard from "./SampleCard.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -772,6 +773,7 @@
       </label>
     </div>
   </fieldset>
+
   <!--- Douki --->
   <fieldset class="border border-magnum-500 rounded-md p-2">
     <legend class=" text-magnum-200 font-bold text-lg">
@@ -860,21 +862,30 @@
 
 <div class=" fixed md:bottom-5 bottom-16 right-5 z-1">
   <div
-    class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
+    class="opacity-75 hover:opacity-100 bg-neutral-800 border border-magnum-500 rounded-md text-neutral-50"
   >
-    <!-- <button
+    <SampleCard
+      showImg={settings.showImg}
+      showUserStatus={settings.showUserStatus}
+      showClientTag={settings.showClientTag}
+      showRelayIcon={settings.showRelayIcon}
+      showReactioninTL={settings.showAllReactions}
+    />
+    <div class=" flex flex-row items-center gap-4 mt-1 justify-center p-2">
+      <!-- <button
       class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
       on:click={reloadWithoutWarning}><RotateCw /></button
     > -->
 
-    <button
-      class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
-      on:click={saveSettings}><Save />SAVE</button
-    >
-    <button
-      class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
-      on:click={cancelSettings}>CANCEL</button
-    >
+      <button
+        class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
+        on:click={saveSettings}><Save />SAVE</button
+      >
+      <button
+        class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
+        on:click={cancelSettings}>CANCEL</button
+      >
+    </div>
   </div>
 </div>
 

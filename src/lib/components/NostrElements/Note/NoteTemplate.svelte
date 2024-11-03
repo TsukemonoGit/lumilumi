@@ -7,7 +7,7 @@
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
-  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
+  import UserPopupMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";
@@ -58,7 +58,7 @@
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden my-1"}>
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
-      <UserMenu
+      <UserPopupMenu
         pubkey={note.pubkey}
         bind:metadata
         size={mini ? 20 : 40}

@@ -20,6 +20,7 @@
   export let repostable: boolean;
   export let tieKey: string | undefined;
   export let isShowClientTag: boolean = true;
+  export let showClientTag: boolean = true;
   //プレビューにも使ってるからconstだとだめ
   $: parts = parseText(text, tags);
   //$: console.log(parts);
@@ -163,7 +164,8 @@
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
     >{/if}{/each}
-<ClientTag {tags} {isShowClientTag} {depth} />
+{#if showClientTag}
+  <ClientTag {tags} {isShowClientTag} {depth} />{/if}
 {#if geohash}
   <Geohash {geohash} />{/if}
 {#if proxy}

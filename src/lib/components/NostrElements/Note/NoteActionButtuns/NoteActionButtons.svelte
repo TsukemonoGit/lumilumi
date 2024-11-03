@@ -498,10 +498,9 @@
           <DropdownMenu {menuTexts} {handleSelectItem}>
             <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
           </DropdownMenu>
-        </Reposted><span class="text-sm"
-          >{#if allReactions.repost.length > 0}{allReactions.repost
-              .length}{/if}</span
-        >
+        </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
+            >{allReactions.repost.length}</span
+          >{/if}
       </div>
     {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
         <Quote size="20" class={"stroke-magnum-500/75"} />
@@ -555,10 +554,9 @@
           >{:else}<div class="overflow-hidden">
             <Reaction {event} />
           </div>{/if}</Reactioned
-      ><span class=" text-sm"
-        >{#if allReactions.reaction.length > 0}{allReactions.reaction
-            .length}{/if}</span
-      >
+      >{#if allReactions.reaction.length > 0}<span class=" text-sm"
+          >{allReactions.reaction.length}</span
+        >{/if}
     </div>
     <!--カスタムリアクション-->
     <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
@@ -610,10 +608,9 @@
                 class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
               />
             {/if}
-          </Zapped><span class="text-sm"
-            >{#if allReactions.zap.length > 0}{allReactions.zap
-                .length}{/if}</span
-          >
+          </Zapped>{#if allReactions.zap.length > 0}<span class="text-sm"
+              >{allReactions.zap.length}</span
+            >{/if}
         </div>
         <AlertDialog
           bind:open={dialogOpen}
