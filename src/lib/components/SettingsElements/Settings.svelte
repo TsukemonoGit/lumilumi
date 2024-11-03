@@ -702,6 +702,14 @@
         <input
           type="checkbox"
           class="rounded-checkbox"
+          bind:checked={settings.kind42inTL}
+        />
+        {$_("settings.display.kind42inTL")}
+      </label>
+      <label>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
           bind:checked={settings.showUserStatus}
         />
         {$_("settings.display.showUserStatus")}
@@ -714,14 +722,7 @@
         />
         {$_("settings.display.showReactioninTL")}
       </label>
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.kind42inTL}
-        />
-        {$_("settings.display.kind42inTL")}
-      </label>
+
       <label>
         <input
           type="checkbox"
