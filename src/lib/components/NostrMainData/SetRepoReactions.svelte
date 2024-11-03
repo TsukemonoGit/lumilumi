@@ -29,7 +29,6 @@
     new Set($viewEventIds.filter((tag) => tag[0] === "a").map((tag) => tag[1]))
   );
   $: if (etagList || atagList) {
-    console.log(etagList.length, atagList.length);
     debounceUpdate();
   }
   function debounceUpdate() {
@@ -42,7 +41,7 @@
     updating = true;
     timeoutId = setTimeout(() => {
       performUpdate();
-
+      console.log(etagList.length, atagList.length);
       updating = false;
     }, updateInterval); // 連続で実行されるのを防ぐ
   }

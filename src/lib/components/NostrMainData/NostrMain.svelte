@@ -22,6 +22,7 @@
     showClientTag,
     showAllReactions,
     timelineFilter,
+    kind42inTL,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -128,6 +129,7 @@
       addClientTag: savedAddClientTag,
       showClientTag: savedShowClientTag,
       showAllReactions: savedShowAllReactions,
+      kind42inTL: savedKind42inTL,
     } = settings;
     //  console.log(savedRelays);
     if (savedRelaySet === "1" && savedRelays.length > 0) {
@@ -172,6 +174,7 @@
     $addClientTag = savedAddClientTag;
     $showClientTag = savedShowClientTag ? savedShowClientTag : true;
     $showAllReactions = savedShowAllReactions;
+    $kind42inTL = savedKind42inTL;
   }
 
   function loadMutetokanoSettei() {
