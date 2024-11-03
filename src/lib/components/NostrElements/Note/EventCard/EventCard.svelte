@@ -47,6 +47,7 @@
   import Kind31990Note from "./Kind31990Note.svelte";
 
   import {
+    get31990Ogp,
     removeFirstMatchingId,
     replyedEvent,
     repostedId,
@@ -288,24 +289,6 @@
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
 
-  const get31990Ogp = (
-    ev: Nostr.Event
-  ): { ogp: Ogp; url: string } | undefined => {
-    try {
-      const data = JSON.parse(ev.content);
-      return {
-        ogp: {
-          title: data.name,
-          image: data.banner,
-          description: data.about,
-          favicon: data.picture,
-        } as Ogp,
-        url: data.website,
-      };
-    } catch (error) {
-      return undefined;
-    }
-  };
   $: petname = $followList.get(note.pubkey);
 
   let loadThread = false;

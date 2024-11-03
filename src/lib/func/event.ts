@@ -2,6 +2,7 @@ import type { Profile } from "$lib/types";
 import { decode } from "light-bolt11-decoder";
 import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./util";
+import type { Ogp } from "./ogp";
 
 //https://scrapbox.io/nostr/NIP-57
 export function extractAmount(
@@ -152,3 +153,22 @@ export function latestList(list: Nostr.Event[]): Nostr.Event[] {
 
   return Array.from(map.values());
 }
+
+export const get31990Ogp = (
+  ev: Nostr.Event
+): { ogp: Ogp; url: string } | undefined => {
+  try {
+    const data = JSON.parse(ev.content);
+    return {
+      ogp: {
+        title: data.name,
+        image: data.banner,
+        description: data.about,
+        favicon: data.picture,
+      } as Ogp,
+      url: data.website,
+    };
+  } catch (error) {
+    return undefined;
+  }
+};

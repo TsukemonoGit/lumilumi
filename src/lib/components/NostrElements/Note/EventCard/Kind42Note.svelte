@@ -15,6 +15,7 @@
   import UserName from "../UserName.svelte";
   import Reply from "../Reply.svelte";
   import { replyedEvent } from "$lib/func/event";
+  import ChannelTag from "./ChannelTag.svelte";
 
   export let thread: boolean;
   export let displayMenu: boolean;
@@ -26,7 +27,6 @@
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
-  const size = 18;
 
   $: res = replyedEvent(note.tags);
   $: replyTag =
@@ -56,34 +56,7 @@
   const checkContentWarning = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "content-warning");
   };
-
-  const getContent = (text: Nostr.Event): ChannelData | undefined => {
-    try {
-      return JSON.parse(text.content) as ChannelData;
-    } catch (error) {
-      return undefined;
-    }
-  };
-
-  const handleClickToChannel = () => {
-    if (!heyaId) {
-      return;
-    }
-    const neventPointer: nip19.EventPointer = {
-      id: heyaId,
-      relays: tieKey ? getRelaysById(heyaId, tieKey) : [],
-    };
-    goto(`/channel/${nip19.neventEncode(neventPointer)}`);
-  };
-  $: channelLink = getChannelLink(heyaId);
-  function getChannelLink(heyaId: string | undefined): string {
-    if (!heyaId) return "";
-    try {
-      return `/channel/${nip19.noteEncode(heyaId)}`;
-    } catch (error) {
-      return "";
-    }
-  }
+  $: warningTag = checkContentWarning(note.tags);
 </script>
 
 {#if replyUsers.length > 0}
@@ -101,66 +74,22 @@
   <!--<hr />-->
 {/if}
 
-{#await checkContentWarning(note.tags) then tag}
-  <div class="relative">
-    <div class=" max-h-64 overflow-y-auto overflow-x-auto">
-      <Content
-        text={note.content}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
-    </div>
-    {#if tag}
-      <WarningHide2 text={tag[1]} />
-    {/if}
+<div class="relative">
+  <div class=" max-h-64 overflow-y-auto overflow-x-auto">
+    <Content
+      text={note.content}
+      tags={note.tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {tieKey}
+    />
   </div>
-{/await}
-{#if heyaId}
-  <Text queryKey={["timeline", heyaId]} id={heyaId} let:text>
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="loading"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="nodata"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="error"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    {#await getContent(text) then channelData}
-      {#if channelData}
-        <button
-          title={channelLink}
-          on:click={handleClickToChannel}
-          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        >
-          <MessagesSquare {size} class="mr-1" />{channelData.name}
-        </button>
-      {:else}
-        <button
-          title={channelLink}
-          on:click={handleClickToChannel}
-          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        >
-          <MessagesSquare {size} class="mr-1" />kind:42
-        </button>
-      {/if}
-    {/await}
-  </Text>
-{/if}
+  {#if warningTag}
+    <WarningHide2 text={warningTag[1]} />
+  {/if}
+</div>
+
+<ChannelTag {heyaId} {tieKey} />
 {#if displayMenu}
   <NoteActionButtons {note} {repostable} {tieKey} />{/if}
