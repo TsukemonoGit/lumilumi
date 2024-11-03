@@ -143,7 +143,7 @@
 {#if !$loginUser}
   <a
     href="/settings"
-    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
+    class=" whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
     style="word-break: break-word;">{$_("setting.pubkey")}</a
   >
   <SampleGlobalLink />

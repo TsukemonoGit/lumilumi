@@ -21,38 +21,21 @@
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
   import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
   import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
+  import { mainMenuItems } from "./menu";
 
-  const items: {
-    Icon: any;
-    link: string | undefined;
-    alt: string;
-  }[] = [
-    { Icon: House, link: "/", alt: "home" },
-    { Icon: Bell, link: "/notifications", alt: "notifications" },
-    { Icon: Search, link: "/search", alt: "search" },
-    { Icon: Globe, link: "/global", alt: "global" },
-    { Icon: MessagesSquare, link: "/channel", alt: "channel" },
-    { Icon: Users, link: "/list", alt: "list" },
-
-    { Icon: Settings, link: "/settings", alt: "settings" },
-    // {
-    //   Icon: UserAvatar2,
-    //   link: undefined,
-    //   alt: "user page",
-    // },
-  ];
   const {
     elements: { menubar },
     builders: { createMenu },
   } = createMenubar();
   const {
     elements: { trigger, menu, item, separator },
-    builders: { createSubmenu, createMenuRadioGroup },
   } = createMenu();
 
   // 現在のページに基づいてアイコンを設定
   export const currentPageIcon = derived(page, ($page) => {
-    const currentItem = items.find((item) => item.link === $page.url?.pathname);
+    const currentItem = mainMenuItems.find(
+      (item) => item.link === $page.url?.pathname
+    );
     return currentItem ? currentItem.Icon : undefined;
   });
 
@@ -128,21 +111,32 @@
       >
         <nav class="p-2">
           <ul class="flex flex-wrap w-32 h-32 justify-around items-center">
-            {#each items as { Icon, link, alt }}
+            {#each mainMenuItems as { Icon, link, alt, noPubkey }}
               <li
                 aria-current={$page.url?.pathname ===
                 (link === undefined && $loginUser ? `/${encodedPub}` : link)
                   ? "page"
                   : undefined}
               >
-                <a
-                  href={link ?? `/${encodedPub}`}
-                  class="item flex justify-center items-center"
-                  use:melt={$item}
-                  title={alt}
-                >
-                  <svelte:component this={Icon} />
-                </a>
+                {#if noPubkey}
+                  <a
+                    href={link ?? `/${encodedPub}`}
+                    class="item flex justify-center items-center"
+                    use:melt={$item}
+                    title={alt}
+                  >
+                    <svelte:component this={Icon} />
+                  </a>
+                {:else}
+                  <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
+                  <div
+                    class="text-neutral-500 item flex justify-center items-center"
+                    use:melt={$item}
+                    title={alt}
+                  >
+                    <svelte:component this={Icon} />
+                  </div>
+                {/if}
               </li>
             {/each}
             <li>
