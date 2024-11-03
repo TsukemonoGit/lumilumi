@@ -83,17 +83,11 @@
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
     defaultValue: settings.useRelaySet,
-    onValueChange: ({ curr, next }) => {
-      settings.useRelaySet = next;
-      console.log(settings.useRelaySet);
-      return next;
-    },
-    //value: selectedRelayset,
   });
-  // $: if ($selectedRelayset && $selectedRelayset.trim() !== "") {
-  //   console.log($selectedRelayset);
-  //   settings.useRelaySet = $selectedRelayset;
-  // }
+  $: if ($relaySetValue) {
+    settings.useRelaySet = $relaySetValue;
+  }
+
   const optionsArr = ["0", "1"];
   const optionsArrStr = [
     $_("settings.relayMenuText0"),
