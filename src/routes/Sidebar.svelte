@@ -58,7 +58,7 @@
               ? "page"
               : undefined}
           >
-            {#if noPubkey}
+            {#if noPubkey || $loginUser}
               <a href={link ?? `/${encodedPub}`} title={alt}>
                 <svelte:component this={Icon} /><span class="ml-2">{alt}</span>
               </a>

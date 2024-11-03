@@ -149,7 +149,7 @@
                   ? "page"
                   : undefined}
               >
-                {#if noPubkey}
+                {#if noPubkey || $loginUser}
                   <a
                     href={link ?? `/${encodedPub}`}
                     use:melt={$close}
