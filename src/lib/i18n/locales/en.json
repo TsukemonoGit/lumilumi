@@ -218,5 +218,12 @@
   "timeline": {
     "viewParentPost": "View Parent",
     "hideParentPost": "Hide"
+  },
+  "global": {
+    "explain": "Set up your public key (and configure kind:30002 id:global) on the settings page, or access the global timeline by using the following URL:",
+    "gotoSetting": "Go to Settings Page"
+  },
+  "setting": {
+    "pubkey": "Please set up pubkey on the Settings page"
   }
 }

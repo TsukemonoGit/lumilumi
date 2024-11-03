@@ -21,6 +21,8 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
+  import { _ } from "svelte-i18n";
+
   let amount = 50;
   let viewIndex = 0;
   // const [tie, tieMap] = createTie();
@@ -208,7 +210,7 @@
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
-    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+    style="word-break: break-word;">{$_("setting.pubkey")}</a
   >
 {:else}
   <section>

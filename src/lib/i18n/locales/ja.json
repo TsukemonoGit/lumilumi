@@ -217,5 +217,12 @@
   "timeline": {
     "viewParentPost": "返信元を表示",
     "hideParentPost": "隠す"
+  },
+  "global": {
+    "gotoSetting": "設定ページへ",
+    "explain": "設定ページで公開鍵を設定（してkind:30002 id:globalを設定）するか、次のようなURLにアクセスすると、グローバルタイムラインを閲覧できます"
+  },
+  "setting": {
+    "pubkey": "設定ページで公開鍵を設定してください"
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
   import ListLinkCard from "$lib/components/NostrElements/Note/EventCard/ListLinkCard.svelte";
   import ListMain from "$lib/components/NostrMainData/ListMain.svelte";
@@ -51,7 +51,7 @@
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
-    style="word-break: break-word;">Please set up pubkey on the Settings page</a
+    style="word-break: break-word;">{$_("setting.pubkey")}</a
   >
 {:else}
   <section class="container">

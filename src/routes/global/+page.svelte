@@ -21,6 +21,7 @@
   import { afterNavigate } from "$app/navigation";
 
   import type { EventPacket } from "rx-nostr";
+  import { page } from "$app/stores";
 
   let compRef: SvelteComponent;
   let openGlobalTimeline: boolean;
@@ -98,6 +99,7 @@
   });
 
   afterNavigate(async () => {
+    globalRelays = [];
     //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);
     const relay = params.getAll("relay");
@@ -120,14 +122,25 @@
       }
     }
   });
+  console.log($page);
 </script>
 
 {#if !$loginUser && globalRelays.length <= 0}
-  <a
-    href="/settings"
-    class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
-    style="word-break: break-word;">Please set up pubkey on the Settings page</a
-  >
+  <p class="whitespace-pre-wrap break-words p-2">
+    {$_("global.explain")}
+
+    <code class="block p-2 rounded">
+      {`${$page.url.origin}${$page.url.pathname}?relay=[relayUrl]&relay=[relayUrl]`}
+    </code>
+    <br />
+    <a
+      href="/settings"
+      class="underline text-magnum-400 hover:opacity-75"
+      style="word-break: break-word;"
+    >
+      {$_("global.gotoSetting")}
+    </a>
+  </p>
 {:else}
   <section class="w-full break-words overflow-hidden">
     {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
