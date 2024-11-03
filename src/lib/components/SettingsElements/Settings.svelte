@@ -23,6 +23,7 @@
     addClientTag,
     showClientTag,
     showAllReactions,
+    queryClient,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import {
@@ -52,6 +53,10 @@
   import Link from "../Elements/Link.svelte";
   import Dialog from "../Elements/Dialog.svelte";
   import { migrateSettings } from "$lib/func/settings";
+  import { setRelays } from "$lib/func/nostr";
+  import type { DefaultRelayConfig } from "rx-nostr";
+  import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
+  import type { EventPacket } from "rx-nostr/src";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -74,15 +79,15 @@
       item: radioGroupitem,
       hiddenInput: radioGrouphiddenInput,
     },
+    states: { value: relaySetValue },
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
     defaultValue: settings.useRelaySet,
-    value: selectedRelayset,
   });
-  $: if ($selectedRelayset && $selectedRelayset.trim() !== "") {
-    console.log($selectedRelayset);
-    settings.useRelaySet = $selectedRelayset;
+  $: if ($relaySetValue) {
+    settings.useRelaySet = $relaySetValue;
   }
+
   const optionsArr = ["0", "1"];
   const optionsArrStr = [
     $_("settings.relayMenuText0"),
@@ -92,6 +97,8 @@
   const {
     elements: { root: relayInputroot },
   } = createLabel();
+
+  let beforeRelays: DefaultRelayConfig[];
 
   onMount(async () => {
     await migrateSettings();
@@ -114,7 +121,11 @@
     $showRelayIcon = settings.showRelayIcon;
 
     $defaultReaction = settings.defaultReaction;
+
     $selectedRelayset = settings.useRelaySet;
+    $relaySetValue = settings.useRelaySet;
+    beforeRelays = settings.relays;
+
     $showReactioninTL = settings.showReactioninTL;
     $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
@@ -141,7 +152,7 @@
     //   ? (JSON.parse(mutebykind) as LumiMuteByKind)
     //   : initLumiMuteByKind;
     originalSettings.set({ ...settings });
-    window?.addEventListener("beforeunload", handleBeforeUnload);
+    // window?.addEventListener("beforeunload", handleBeforeUnload);
   });
 
   function loadSettings() {
@@ -222,7 +233,19 @@
     // }
 
     $loginUser = settings.pubkey;
+
+    //relayset情報を更新する前に確認
+    console.log($selectedRelayset, settings.useRelaySet);
+    if (
+      $selectedRelayset !== settings.useRelaySet ||
+      (settings.useRelaySet === "1" &&
+        JSON.stringify(beforeRelays) !== JSON.stringify(settings.relays))
+    ) {
+      resetDefaultRelay(settings);
+    }
+    beforeRelays = settings.relays;
     $selectedRelayset = settings.useRelaySet;
+
     $showImg = settings.showImg;
     $showPreview = settings.showPreview;
     $menuLeft = settings.menuleft;
@@ -247,6 +270,32 @@
     $nowProgress = false;
   }
 
+  function resetDefaultRelay(settings: LumiSetting) {
+    if (settings.useRelaySet === "1" && settings.relays.length > 0) {
+      setRelays(settings.relays as DefaultRelayConfig[]);
+    } else {
+      // queryKey: ["defaultRelay", $loginUser] のデータがあるか確認
+      const data: EventPacket[] | undefined = $queryClient.getQueryData([
+        "defaultRelay",
+        $loginUser,
+      ]);
+      console.log(data);
+      if (data) {
+        // データがある場合はイベントの形を整えてセット
+        const relays = setRelaysByKind10002(data[0].event);
+        setRelays(relays);
+      } else {
+        // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定
+        useRelaySet(
+          ["defaultRelay", $loginUser],
+          [
+            { authors: [$loginUser], kinds: [10002], limit: 1 },
+          ] as Nostr.Filter[],
+          undefined
+        );
+      }
+    }
+  }
   function isRelaySelectionInvalid() {
     if (settings.useRelaySet === "1") {
       const currentRelays = settings.relays;
@@ -353,30 +402,31 @@
     return false;
   }
 
-  let shouldReload = false;
-  // リロード前にフラグを設定してイベントリスナーを無効にする関数
-  function reloadWithoutWarning() {
-    shouldReload = true;
-    location.reload();
-  }
+  // let shouldReload = false;
+  // // リロード前にフラグを設定してイベントリスナーを無効にする関数
+  // function reloadWithoutWarning() {
+  //   shouldReload = true;
+  //   location.reload();
+  // }
 
-  function handleBeforeUnload(e: BeforeUnloadEvent) {
-    if (!shouldReload && settingsChanged()) {
-      e.preventDefault();
-      e.returnValue = "";
-    }
-  }
+  // function handleBeforeUnload(e: BeforeUnloadEvent) {
+  //   if (!shouldReload && settingsChanged()) {
+  //     e.preventDefault();
+  //     e.returnValue = "";
+  //   }
+  // }
 
-  onDestroy(() => {
-    console.log("onDestroy", shouldReload);
-    if (browser && !shouldReload) {
-      window?.removeEventListener("beforeunload", handleBeforeUnload);
-    }
-  });
+  // onDestroy(() => {
+  //   console.log("onDestroy", shouldReload);
+  //   if (browser && !shouldReload) {
+  //     window?.removeEventListener("beforeunload", handleBeforeUnload);
+  //   }
+  // });
 
   beforeNavigate((navigation) => {
     console.log("beforeNavigate", navigation.type);
-    if (navigation.type !== "form" && settingsChanged() && !shouldReload) {
+    if (navigation.type !== "form" && settingsChanged()) {
+      // && !shouldReload) {
       if (
         !confirm(
           "You have unsaved changes. Are you sure you want to leave this page?"
@@ -385,7 +435,7 @@
         navigation.cancel();
       }
     }
-    shouldReload = false;
+    //  shouldReload = false;
   });
 
   let emojiTag: string[] | undefined;
@@ -801,10 +851,10 @@
   <div
     class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
-    <button
+    <!-- <button
       class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
       on:click={reloadWithoutWarning}><RotateCw /></button
-    >
+    > -->
 
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
