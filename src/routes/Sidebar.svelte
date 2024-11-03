@@ -3,17 +3,7 @@
   import logo from "$lib/images/favicon.svg";
   import { loginUser, showImg } from "$lib/stores/stores";
 
-  import {
-    Globe,
-    Search,
-    Bell,
-    Settings,
-    House,
-    Users,
-    MessagesSquare,
-    TrendingUp,
-    User,
-  } from "lucide-svelte";
+  import { TrendingUp, User } from "lucide-svelte";
 
   import { nip19 } from "nostr-tools";
   import UserAvatar2 from "./UserAvatar2.svelte";
