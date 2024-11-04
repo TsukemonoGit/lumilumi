@@ -15,7 +15,9 @@
   export let tieKey: string | undefined;
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
-    pubkey = "";
+    if (navigate.type !== "form") {
+      pubkey = "";
+    }
   });
 
   function getLink(event: Nostr.Event): string | undefined {

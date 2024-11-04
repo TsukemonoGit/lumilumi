@@ -16,6 +16,7 @@
   // }) => {
   //   console.log(curr, next);
   $: if ($range) {
+    console.log($range);
     setTimeout(() => {
       paginationElement?.scrollIntoView({
         block: "start",

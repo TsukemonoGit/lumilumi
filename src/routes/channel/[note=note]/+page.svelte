@@ -47,7 +47,7 @@
   });
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);
-    if (!isOnMount) {
+    if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
     }
@@ -55,7 +55,9 @@
   let view = false;
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
-    view = false;
+    if (navigate.type !== "form") {
+      view = false;
+    }
   });
   async function init() {
     since = undefined;

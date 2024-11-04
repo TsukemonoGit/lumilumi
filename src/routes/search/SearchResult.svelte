@@ -5,7 +5,7 @@
 
   import { nip50relays } from "$lib/func/util";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import { afterNavigate } from "$app/navigation";
+
   import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
@@ -16,15 +16,15 @@
   let viewIndex = 0;
   export let relays: string[];
 
-  $: console.log(filters);
+  //$: console.log(filters);
   const tieKey = "search";
 
-  onMount(() => {
-    console.log("relays", relays);
-  });
-  afterNavigate(() => {
-    console.log("relays", relays);
-  });
+  // onMount(() => {
+  //   console.log("relays", relays);
+  // });
+  // afterNavigate(() => {
+  //   console.log("relays", relays);
+  // });
   onDestroy(() => {
     console.log("onDestroy");
     // $queryClient.cancelQueries({

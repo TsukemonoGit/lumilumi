@@ -103,10 +103,12 @@
     updateViewEvent($data);
   }
   //$: console.log($data);
-  beforeNavigate((navigate) => {
-    console.log("beforeNavigate", navigate.type);
-    $slicedEvent = [];
-  });
+  // beforeNavigate((navigate) => {
+  //   console.log("beforeNavigate", navigate.type);
+  //   if (navigate.type !== "form") {
+  //     $slicedEvent = [];
+  //   }
+  // });
 
   let isOnMount = false;
   onMount(async () => {
@@ -122,7 +124,7 @@
 
   afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
-    if (!isOnMount) {
+    if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
       $nowProgress = true;
       isOnMount = true;
@@ -138,26 +140,24 @@
       "olderData",
     ]);
 
-    if (ev) {
-      console.log(ev);
-
-      //  updateViewEvent($data);
-
-      //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
-      //   const newFilters = filters.map((filter: Nostr.Filter) => ({
-      //     ...filter,
-      //     since: ev[0].event.created_at,
-      //     until: now(),
-      //   }));
-      //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-      //   if (older.length > 0) {
-      //     $queryClient.setQueryData(
-      //       [...queryKey, "olderData"],
-      //       [...ev, ...older]
-      //     );
-      //   }
-      //   updateViewEvent($data);
-    }
+    //if (ev) {
+    //console.log(ev);
+    //  updateViewEvent($data);
+    //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
+    //   const newFilters = filters.map((filter: Nostr.Filter) => ({
+    //     ...filter,
+    //     since: ev[0].event.created_at,
+    //     until: now(),
+    //   }));
+    //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
+    //   if (older.length > 0) {
+    //     $queryClient.setQueryData(
+    //       [...queryKey, "olderData"],
+    //       [...ev, ...older]
+    //     );
+    //   }
+    //   updateViewEvent($data);
+    // }
 
     if (!ev || ev?.length <= 0) {
       // const newFilters = filters.map((filter: Nostr.Filter) => ({

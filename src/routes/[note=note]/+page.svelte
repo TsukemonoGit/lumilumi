@@ -36,7 +36,9 @@
   });
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);
-    init();
+    if (navigate.type !== "form") {
+      init();
+    }
   });
 
   function init() {

@@ -53,13 +53,15 @@
   const excludeKind7 = (event: Nostr.Event) => {
     return event.kind === 7 && event.pubkey === data.pubkey;
   };
-  afterNavigate(() => {
-    view = false;
-    req = createRxForwardReq(generateRandomId());
+  afterNavigate((navigate) => {
+    if (navigate.type !== "form") {
+      view = false;
+      req = createRxForwardReq(generateRandomId());
 
-    setTimeout(() => {
-      view = true;
-    }, 100);
+      setTimeout(() => {
+        view = true;
+      }, 100);
+    }
   });
   $: userPubkey = data.pubkey; // Make pubkey reactive
   const tieKey = "npub";
@@ -79,18 +81,22 @@
   });
   afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
-    view = false;
-    if (!isOnMount) {
-      isOnMount = true;
-      await init();
+    if (navigate.type !== "form") {
+      view = false;
+      if (!isOnMount) {
+        isOnMount = true;
+        await init();
 
-      isOnMount = false;
+        isOnMount = false;
+      }
+      view = true;
     }
-    view = true;
   });
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
-    $value = "post";
+    if (navigate.type !== "form") {
+      $value = "post";
+    }
   });
   async function init() {
     //ログインしてない＝10002リレーないから
