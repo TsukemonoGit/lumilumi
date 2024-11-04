@@ -27,13 +27,12 @@
   </button>
 {:else}
   <Link
-    className="inline-flex float-end text-magnum-500/75  mx-1 hover:opacity-75"
+    className="inline-flex float-end text-magnum-500/75  mx-1 hover:opacity-75 items-center"
     href={mapLink}
-    ><MapPinned size={20} /><!--<ExternalLink size={12} />--></Link
+    ><UseGeohash {decoded} {geohash} let:contents>
+      <div class="text-xs inline-flex float-end mx-1 text-magnum-500 underline">
+        {contents.display_name ?? "Location not found"}
+      </div>
+    </UseGeohash><MapPinned size={20} /><!--<ExternalLink size={12} />--></Link
   >
-  <UseGeohash {decoded} {geohash} let:contents>
-    <div class="text-xs inline-flex float-end mx-1 text-neutral-400">
-      {contents.display_name}
-    </div>
-  </UseGeohash>
 {/if}
