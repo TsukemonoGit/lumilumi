@@ -261,6 +261,28 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Search relays list",
     },
   ],
+  [
+    10009,
+    {
+      ja: "ユーザーグループ",
+      en: "User groups",
+    },
+  ],
+  //
+  [
+    10015,
+    {
+      ja: "興味・関心リスト",
+      en: "Interests list",
+    },
+  ],
+  [
+    10019,
+    {
+      ja: "ナッツザップ情報イベント",
+      en: "Nutzap informational event",
+    },
+  ],
   //
   //んあ～～～～～～
   //
@@ -353,7 +375,23 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Emoji sets",
     },
   ],
-
+  ////
+  [
+    30078,
+    {
+      ja: "アプリケーション固有データ",
+      en: "Application-specific Data",
+    },
+  ],
+  ////
+  [
+    30311,
+    {
+      ja: "ライブイベント",
+      en: "Live Event",
+    },
+  ],
+  ////
   [
     30315,
     {
