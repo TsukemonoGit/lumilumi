@@ -44,8 +44,8 @@
       isOnMount = false;
     }
   });
-  afterNavigate(() => {
-    if (!isOnMount) {
+  afterNavigate((navigate) => {
+    if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
 

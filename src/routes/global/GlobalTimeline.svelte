@@ -25,8 +25,8 @@
       isOnMount = false;
     }
   });
-  afterNavigate(async () => {
-    if (!isOnMount) {
+  afterNavigate(async (navigate) => {
+    if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await init();
 

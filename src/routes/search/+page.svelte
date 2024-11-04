@@ -70,9 +70,9 @@
     pushState(newUrl, {});
   }
   let isMount = false;
-  afterNavigate(() => {
+  afterNavigate((navigate) => {
     openSearchResult = false;
-    if (!isMount) {
+    if (navigate.type !== "form" && !isMount) {
       isMount = true;
       init();
     }
@@ -154,7 +154,9 @@
 
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
-    openSearchResult = false;
+    if (navigate.type !== "form") {
+      openSearchResult = false;
+    }
   });
 
   $: if (

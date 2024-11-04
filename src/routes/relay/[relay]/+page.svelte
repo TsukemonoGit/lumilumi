@@ -16,15 +16,17 @@
     }
     init();
   });
-  afterNavigate(() => {
-    if (isMount) {
+  afterNavigate((navigate) => {
+    if (navigate.type === "form" || isMount) {
       return;
     }
     init();
   });
 
-  beforeNavigate(() => {
-    relayUrl = undefined;
+  beforeNavigate((navigate) => {
+    if (navigate.type !== "form") {
+      relayUrl = undefined;
+    }
   });
 
   async function init() {

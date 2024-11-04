@@ -33,7 +33,6 @@
     initLumiMuteByKind,
     initSettings,
     npubRegex,
-    relayRegex,
     relayRegex2,
   } from "$lib/func/util";
   import type {
@@ -43,7 +42,7 @@
     LumiSetting,
   } from "$lib/types";
   import { _ } from "svelte-i18n";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { beforeNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
@@ -58,6 +57,7 @@
   import type { DefaultRelayConfig } from "rx-nostr";
   import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
+  import Kind30078 from "./Kind30078.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -773,6 +773,7 @@
       </label>
     </div>
   </fieldset>
+
   <!--- Douki --->
   <fieldset class="border border-magnum-500 rounded-md p-2">
     <legend class=" text-magnum-200 font-bold text-lg">
@@ -857,6 +858,8 @@
     <legend class="text-magnum-200 font-bold text-lg">theme</legend>
     <ThemeSwitch />
   </fieldset>
+
+  <Kind30078 />
 </form>
 
 <div class=" fixed md:bottom-5 bottom-16 right-5 z-1">

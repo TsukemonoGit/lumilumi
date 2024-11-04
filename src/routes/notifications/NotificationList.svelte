@@ -115,10 +115,12 @@
     updateViewEvent();
   }
   //$: console.log(data);
-  beforeNavigate((navigate) => {
-    console.log("beforeNavigate", navigate.type);
-    $slicedEvent = [];
-  });
+  // beforeNavigate((navigate) => {
+  //   console.log("beforeNavigate", navigate.type);
+  //   if (navigate.type !== "form") {
+  //     $slicedEvent = [];
+  //   }
+  // });
 
   let isOnMount = false;
   onMount(async () => {
@@ -134,7 +136,7 @@
 
   afterNavigate(async (navigate) => {
     console.log("afterNavigate", navigate.type);
-    if (!isOnMount) {
+    if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
       $nowProgress = true;
       isOnMount = true;

@@ -58,8 +58,8 @@
       view = true;
     }
   });
-  afterNavigate(async () => {
-    if (!isOnMount) {
+  afterNavigate(async (navigate) => {
+    if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await init();
 
@@ -67,8 +67,10 @@
       view = true;
     }
   });
-  beforeNavigate(() => {
-    view = false;
+  beforeNavigate((navigate) => {
+    if (navigate.type !== "form") {
+      view = false;
+    }
   });
   async function init() {
     const ev: EventPacket[] | undefined =

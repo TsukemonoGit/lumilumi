@@ -98,7 +98,10 @@
     }
   });
 
-  afterNavigate(async () => {
+  afterNavigate(async (navigate) => {
+    if (navigate.type === "form") {
+      return;
+    }
     globalRelays = [];
     //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);

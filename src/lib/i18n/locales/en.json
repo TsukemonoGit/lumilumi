@@ -20,7 +20,7 @@
     },
     "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
-      "loadImage": "load and show image",
+      "loadImage": "Load and display image (Real-time profile update ON/OFF)",
       "preview": "Show preview when creating notes (only when image loading is enabled)",
       "menu": "Display the menu button on the left side.",
       "showRelayIcon": "Relay information is displayed under the icon",

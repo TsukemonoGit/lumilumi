@@ -7,6 +7,7 @@ import {
   metadataQueue,
   queryClient,
   relayStateMap,
+  showImg,
   showKind16,
   showReactioninTL,
   showUserStatus,
@@ -217,6 +218,10 @@ export const makeMainFilters = (
   const kinds = [1, 6];
   if (get(showKind16)) {
     kinds.push(16);
+  }
+  if (get(showImg)) {
+    //画像読み込みのときはkind:0リアルタイム更新
+    kinds.push(0);
   }
   console.log("kind42inTL", get(kind42inTL));
   if (get(kind42inTL)) {

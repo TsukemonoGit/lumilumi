@@ -123,9 +123,9 @@
     $nowProgress = false;
   });
 
-  afterNavigate((navigate) => {
-    console.log("afterNavigate", navigate.type);
-  });
+  // afterNavigate((navigate) => {
+  //   console.log("afterNavigate", navigate.type);
+  // });
 
   const handleClickSave = async () => {
     if (lud !== "") {

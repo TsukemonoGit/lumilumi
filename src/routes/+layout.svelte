@@ -137,7 +137,9 @@
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);
     //ページが変わったらリセット
-    $slicedEvent = [];
+    if (navigate.type !== "form") {
+      $slicedEvent = [];
+    }
   });
 
   export let data:

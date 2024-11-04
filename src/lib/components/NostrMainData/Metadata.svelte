@@ -7,7 +7,6 @@
   import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import {
-    now,
     type EventPacket,
     type RxReq,
     type RxReqEmittable,
@@ -29,20 +28,24 @@
     | undefined = undefined;
 
   let initialDataUpdatedAt: number;
-  let staleTime: number = Infinity;
+  const staleTime: number = Infinity;
   let refetchInterval: number = Infinity;
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
   let initData: EventPacket | undefined = getMetadata(queryKey);
   //console.log(initData);
-  if (!$showImg) {
-    staleTime = Infinity;
-  } else {
-    if (initData) {
-      initialDataUpdatedAt = now() * 1000 - 2 * 57 * 60 * 1000; //2hよりちょっと前//最初詠み込まれたときにドバっとなって重くなるのを防ぐ
-      staleTime = 2 * 60 * 60 * 1000; //2h
-      refetchInterval = 2 * 60 * 60 * 1000;
-    }
-  }
+  //if (!$showImg) {
+  // staleTime = Infinity;
+  // }
+  //else {
+  //画像表示オンのときはローカルデータ使わないで新しく取得する
+  //if (initData) {
+  //staleTime = Infinity;
+  //refetchInterval = Infinity;
+  //initialDataUpdatedAt = now() * 1000 - 2 * 57 * 60 * 1000; //2hよりちょっと前//最初詠み込まれたときにドバっとなって重くなるのを防ぐ
+  // staleTime = 2 * 60 * 60 * 1000; //2h
+  // refetchInterval = 2 * 60 * 60 * 1000;
+  //}
+  // }
 
   $: result = useMetadata(
     $app.rxNostr,
