@@ -859,7 +859,7 @@
     <ThemeSwitch />
   </fieldset>
 
-  <Kind30078 />
+  <!-- <Kind30078 /> -->
 </form>
 
 <div class=" fixed md:bottom-5 bottom-16 right-5 z-1">
