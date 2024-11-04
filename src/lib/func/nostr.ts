@@ -220,6 +220,7 @@ export const makeMainFilters = (
     kinds.push(16);
   }
   if (get(showImg)) {
+    //画像読み込みのときはkind:0リアルタイム更新
     kinds.push(0);
   }
   console.log("kind42inTL", get(kind42inTL));
