@@ -55,6 +55,11 @@
     {maxHeight}
     {tieKey}
     {mini}
+    message={!zapRequestEvent
+      ? "failed to get zap request event"
+      : !amount
+        ? "failed to get zap amount"
+        : undefined}
   />{:else}
   {@const receivepub = zapRequestEvent?.tags.find((tag) => tag[0] === "p")?.[1]}
   {#if !receivepub}<Kind9735Invalid
@@ -65,6 +70,7 @@
       {maxHeight}
       {tieKey}
       {mini}
+      message={"failed to get zapped user"}
     />
   {:else}
     <Metadata
