@@ -350,71 +350,50 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
 
 export function reactionCheck() {
   return filter((packet: EventPacket) => {
-    //ここでミュートチェックしたらリアクション以外にも関わるから下でやる
-    const follow = get(followList);
-    if (
-      packet.event.kind === 1 ||
-      packet.event.kind === 6 ||
-      packet.event.kind === 16 ||
-      packet.event.kind === 42
-    ) {
-      //自分のpubがtagsに入っていてもリアクションとして取得したものじゃない可能性があるkind
+    const followListSet = get(followList);
+    const loginUserPubkey = get(loginUser);
+    const isFollowingUser = (pubkey: string) =>
+      followListSet && followListSet.has(pubkey);
 
-      if (
-        packet.event.pubkey !== get(loginUser) &&
-        packet.event.tags.find(
-          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
-        )
-      ) {
-        //自分の投稿への反応
+    const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind);
+    const isSelfPost = packet.event.pubkey === loginUserPubkey;
+    const containsUserTag = packet.event.tags.some(
+      (tag) => tag[0] === "p" && tag[1] === loginUserPubkey
+    );
+    const isReactionEvent =
+      !isTargetEventKind && containsUserTag && !isSelfPost;
 
-        if (follow && follow.has(packet.event.pubkey)) {
-          console.log("includes", packet.event);
-          //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
+    if (isTargetEventKind) {
+      // 通常の投稿や特定のイベント種別の場合
+      if (!isSelfPost && containsUserTag) {
+        // 自分の投稿への反応
+        if (isFollowingUser(packet.event.pubkey)) {
+          // フォロイーからの反応 → タイムラインに表示
           if (muteCheckEvent(packet.event) === "null") {
             setReactionEvent(packet);
           }
-
-          console.log(get(reactionToast));
           return true;
         } else {
-          if (muteCheckEvent(packet.event) !== "null") {
-            return false;
-          }
-          //自分の投稿への反応のうちフォロー外からのものはリアクションとして通知するだけでTLには流さない
-          if (!get(onlyFollowee)) {
-            //フォロー外の通知ONのときだけ追加
+          // フォロー外からの反応 → 通知のみ、タイムラインには表示しない
+          if (muteCheckEvent(packet.event) === "null" && !get(onlyFollowee)) {
             setReactionEvent(packet);
           }
           return false;
         }
       } else {
-        //自分のPが含まれない普通の投稿だからそのまま流す
+        // 通常の投稿として流す
         return true;
       }
-    } else {
-      if (
-        packet.event.pubkey !== get(loginUser) &&
-        packet.event.tags.findLast(
-          (tag) => tag[0] === "p" && tag[1] === get(loginUser)
-        )
-      ) {
-        //TLには流れないものたちのうち自分へのリアクション
-
-        if (follow && follow.has(packet.event.pubkey)) {
-          //自分の投稿への反応のうちフォロイーからのもの
-          setReactionEvent(packet);
-        } else {
-          //自分の投稿への反応のうちフォロー外からのもの
-          if (!get(onlyFollowee)) {
-            //フォロー外の通知ONのときだけ追加
-            setReactionEvent(packet);
-          }
-        }
+    } else if (isReactionEvent) {
+      // タイムラインには流さないイベント種別で、自分への反応
+      if (isFollowingUser(packet.event.pubkey)) {
+        setReactionEvent(packet);
+      } else if (!get(onlyFollowee)) {
+        setReactionEvent(packet);
       }
-
-      return false;
     }
+
+    return false;
   });
 }
 
