@@ -35,7 +35,7 @@
           alt={`:${emoji.alt}:`}
           src={emoji.url}
           height="20"
-          class="h-[20px] object-contain"
+          class="h-[20px] object-contain overflow-hidden"
         />
       {:else}
         {emoji.alt}

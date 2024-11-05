@@ -41,7 +41,11 @@
   };
 </script>
 
-<div use:viewport on:enterViewport={handleEnterViewport} class="inline">
+<div
+  use:viewport
+  on:enterViewport={handleEnterViewport}
+  class="inline overflow-hidden"
+>
   {#if hasLoaded}{#if decoded.type === "npub"}<span
         class="text-magnum-300 align-middle"
         >{#if !displayMenu}<UserName

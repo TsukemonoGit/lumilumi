@@ -19,7 +19,7 @@
     alt={`:${part.content}:`}
     src={part.url}
     title={`:${part.content}:`}
-    class={`inline object-contain m-0 overflow-hidden`}
+    class={`inline object-contain m-0 overflow-hidden align-bottom`}
     style={`height:${height}px`}
     on:load={() => {
       //console.log("load");

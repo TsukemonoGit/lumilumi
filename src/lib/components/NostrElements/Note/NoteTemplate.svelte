@@ -55,7 +55,7 @@
   $: prof = profile(metadata);
 </script>
 
-<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-x-hidden my-1"}>
+<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-hidden my-1"}>
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
       <UserMenu
@@ -71,7 +71,7 @@
       <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
   </div>
 
-  <div class="pt-1 max-w-full overflow-x-hidden">
+  <div class="pt-1 max-w-full overflow-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
       <div>
         {#if petname}<span class="text-magnum-100">📛{petname}</span>
