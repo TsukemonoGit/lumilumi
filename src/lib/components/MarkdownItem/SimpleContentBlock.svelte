@@ -30,9 +30,9 @@
   export let openModal;
   export let nolist: boolean;
   export let tieKey: string | undefined;
-  if (part.type === "hr") {
-    console.log(part);
-  }
+  // if (part.type === "hr") {
+  //   console.log(part);
+  // }
 </script>
 
 {#if part.type === "heading"}

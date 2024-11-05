@@ -32,7 +32,7 @@
 
   let muteInput: string = "";
 
-  const options = ["Word", "Hashtag", "User", "Event"];
+  const options = ["Word", "Hashtag", "User", "Thread"];
 
   const {
     elements: { trigger, menu, option, group, groupLabel, label },
@@ -69,7 +69,7 @@
     }
     $nowProgress = true;
     switch ($selectedLabel) {
-      case "Event":
+      case "Thread":
         //idチェック
         if (muteInput.startsWith("nostr:")) {
           muteInput = muteInput.slice(6);
@@ -270,7 +270,7 @@
   <input
     type="text"
     class=" rounded-md px-3 py-2 border border-magnum-300 disabled:opacity-25"
-    placeholder={`mute ${$selectedLabel}`}
+    placeholder={`mute ${$selectedLabel !== "Thread" ? $selectedLabel : "NoteID"}`}
     disabled={!$selectedLabel}
     bind:value={muteInput}
   />
