@@ -136,7 +136,8 @@
 
     $alertdialogOpen = true;
   };
-  const handleClickPublish = () => {
+
+  const handleClickPublish = async () => {
     $alertdialogOpen = false;
     const sameIndex = kind30078LumiSettings.findIndex(
       (data) => data.name === saveName
@@ -157,7 +158,15 @@
             }
           });
 
-    publishSettings(newLumiSettings);
+    const result = await publishSettings(newLumiSettings);
+    if (result) {
+      saveName = "";
+      $toastSettings = {
+        title: "Success",
+        description: "Success to Save",
+        color: "bg-green-500",
+      };
+    }
   };
 
   const set30078 = (ev: Nostr.Event) => {
@@ -175,10 +184,19 @@
     }
   };
 
-  const handleClickDelete = (name: string) => {
+  const handleClickDelete = async (name: string) => {
     const newData = kind30078LumiSettings.filter((data) => data.name !== name);
 
-    publishSettings(newData);
+    const result = await publishSettings(newData);
+
+    if (result) {
+      saveName = "";
+      $toastSettings = {
+        title: "Success",
+        description: "Success to Delete",
+        color: "bg-green-500",
+      };
+    }
   };
 
   const handleClickLoad = (name: string) => {
@@ -226,7 +244,9 @@
     $nowProgress = false;
   };
 
-  async function publishSettings(lumiData: Kind30078LumiSetting[]) {
+  async function publishSettings(
+    lumiData: Kind30078LumiSetting[]
+  ): Promise<boolean> {
     try {
       $nowProgress = true;
 
@@ -249,18 +269,20 @@
         //しっぱい
         $toastSettings = {
           title: "Error",
-          description: "Failed to add mute",
+          description: "Failed to publish",
           color: "bg-red-500",
         };
         $nowProgress = false;
 
-        return;
+        return false;
       }
       set30078(ev);
 
       $nowProgress = false;
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   }
 

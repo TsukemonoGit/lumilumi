@@ -137,6 +137,9 @@ https://github.com/akiomik/nosvelte
 - ブロードキャスト機能
 - ZAP
 
+- 設定のアップロード/ダウンロード ( kind: 30078,  d: "lumi-settings" ) 
+
+
 など
 
 
