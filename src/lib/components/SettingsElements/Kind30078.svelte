@@ -303,8 +303,7 @@
 <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickUpDownload}
-  >現在の設定をリレーにアップロード/ダウンロード</button
+  on:click={handleClickUpDownload}>{$_("settings.load")}</button
 >
 <!-- <button
   disabled={$nowProgress}
