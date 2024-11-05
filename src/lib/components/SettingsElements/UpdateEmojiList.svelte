@@ -21,7 +21,7 @@
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
   import type { EventPacket } from "rx-nostr";
-  import type { LumiEmoji } from "$lib/types";
+
   import { createRxNostr } from "rx-nostr/src";
   import { get } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
@@ -55,7 +55,7 @@
     if (!relays) {
       $toastSettings = {
         title: "Error",
-        description: "relay list not found ",
+        description: "relay list not found",
         color: "bg-red-500",
       };
       return;
@@ -192,7 +192,7 @@
     ? formatAbsoluteDate($emojis?.updated)
     : ""}</time
 >{#if $emojis}<button
-    class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->

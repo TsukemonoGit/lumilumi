@@ -108,7 +108,9 @@ export async function getDoukiList(
   return event;
 }
 
-export async function getQueryRelays(pubkey: string) {
+export async function getQueryRelays(
+  pubkey: string
+): Promise<DefaultRelayConfig[] | undefined> {
   let defaultRelayData = get(queryClient)?.getQueryData([
     "defaultRelay",
     pubkey,

@@ -23,7 +23,7 @@ https://github.com/akiomik/nosvelte
 
     short code で表示
 
-  - metadata を更新しない
+  - metadata を更新しない (画像ONのときはリアルタイム更新)
 
     メタデータはフォロー分だけキャッシュしてます
 
@@ -45,7 +45,7 @@ https://github.com/akiomik/nosvelte
 
 - 画像を表示 ON/OFF
 
-  - ON では、アイコンを表示する、カスタム絵文字、画像、OGP を表示する、nip05 の認証確認するメタデータの更新をチェックする。
+  - ON では、アイコンを表示する、カスタム絵文字、画像、OGP を表示する、nip05 の認証確認する、メタデータの更新をチェックする。
 
 - ノート作成時のプレビューの ON/OFF
 

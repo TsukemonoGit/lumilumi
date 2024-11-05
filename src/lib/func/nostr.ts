@@ -349,10 +349,11 @@ export function publishEvent(ev: Nostr.EventParameters) {
   });
 }
 export async function promisePublishSignedEvent(
-  event: Nostr.Event
+  event: Nostr.Event,
+  relays?: string[] | undefined
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const _rxNostr = get(app).rxNostr;
-  if (Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
+  if (!relays && Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
     console.log("error");
     throw new Error("No default relays found.");
   }
@@ -389,7 +390,7 @@ export async function promisePublishSignedEvent(
     // 1秒ごとにチェック、最大3秒待つ
     setTimeout(checkRelays, interval);
 
-    _rxNostr.send(event).subscribe({
+    _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
         console.log(
           `リレー ${packet.from} への送信が ${
@@ -403,12 +404,13 @@ export async function promisePublishSignedEvent(
   }).then((res) => ({ event, res }));
 }
 export async function promisePublishEvent(
-  ev: Nostr.EventParameters
+  ev: Nostr.EventParameters,
+  relays?: string[] | undefined
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const signer = nip07Signer();
   const event = await signer.signEvent(ev);
 
-  return promisePublishSignedEvent(event);
+  return promisePublishSignedEvent(event, relays);
 }
 
 export function relaysReconnectChallenge() {

@@ -90,7 +90,7 @@
     ? formatAbsoluteDate($mutebykinds?.updated)
     : ""}</time
 >{#if $mutebykinds}<button
-    class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->

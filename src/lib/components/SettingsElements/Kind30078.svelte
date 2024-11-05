@@ -1,44 +1,401 @@
 <script lang="ts">
-  import { nowProgress } from "$lib/stores/stores";
+  import {
+    loginUser,
+    nowProgress,
+    showBanner,
+    timelineFilter,
+    toastSettings,
+    uploader,
+  } from "$lib/stores/stores";
+  import Dialog from "../Elements/Dialog.svelte";
+  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { latest } from "rx-nostr";
+  import { pipe } from "rxjs";
+
+  import { getQueryRelays, setTheme } from "$lib/func/settings";
+  import type { EventPacket, DefaultRelayConfig } from "rx-nostr";
+  import type {
+    Kind30078LumiSetting,
+    Kind30078LumiSettingObj,
+    LumiSetting,
+    Theme,
+  } from "$lib/types";
+  import { now } from "rx-nostr/src";
+  import type { EventParameters } from "nostr-typedef";
+  import * as Nostr from "nostr-typedef";
+  import { datetime } from "$lib/func/util";
+  import AlertDialog from "../Elements/AlertDialog.svelte";
+  import { _ } from "svelte-i18n";
 
   // 設定をアップロード
-
   // 設定をダウンロード
   // //設定ごとにd作ったら消したりしにくくなるから一個にまとめよ
   // tags:["d","lumi-settings"]
-  // [
-  //   {
-  //   name:"lumi1",
-  // lumiSetting:string,
-  // showBanner:string,
-  // theme:string,
-  // timelineFilter:string
-  // },
-  // {name:"lumi2",
-  // lumiSetting:string,
-  // showBanner:string,
-  // theme:string,
-  // timelineFilter:string
-  // }
-  // ]
 
-  function handleClickUpload(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {}
+  /* 
+  const event = {
+    content:
+      '[{"name":"normal","lumiSetting":{"relays":[],"useRelaySet":"0","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":true,"menuleft":true,"showRelayIcon":true,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":true,"showKind16":true,"addClientTag":true,"showClientTag":true,"showAllReactions":true,"kind42inTL":true},"showBanner":false,"theme":"light","timelineFilter":{"adaptMute":false,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730722071},{"name":"test","lumiSetting":{"relays":[{"url":"wss://nos.lol/","read":true,"write":true}],"useRelaySet":"1","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":false,"menuleft":false,"showRelayIcon":false,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":false,"showKind16":false,"addClientTag":false,"showClientTag":true,"showAllReactions":false,"kind42inTL":false},"showBanner":false,"theme":"system","timelineFilter":{"adaptMute":true,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730773127}]',
+    tags: [["d", "lumi-settings"]],
+    kind: 30078,
+    pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
+    created_at: 1730773127,
+    id: "9a13e329f30d4223568e686794c864dab485fdab9ff1d7be20792076bafd3953",
+    sig: "e537869f83f0dddb85c1add7e307116be1428d66cbc101a21cf355ba4b4722db6c511337258899916968da76406594ee0db5ab3ad6dd8d36972732af3fe4c276",
+  }; */
 
-  function handleClickDownload(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  ) {}
+  export let settingsChanged: () => boolean;
+  export let saveLumiSettings: () => void;
+  export let settings: LumiSetting;
+
+  let kind30078LumiSettings: Kind30078LumiSetting[] = [];
+  let localLumisetting: Kind30078LumiSettingObj;
+
+  let dialogOpen: any;
+  let alertdialogOpen: any;
+
+  async function handleClickUpDownload() {
+    if (settingsChanged()) {
+      //編集中の項目があります。さきにsave（またはリセット）してください
+      $toastSettings = {
+        title: "Error",
+        description:
+          "編集中の項目があります。さきにsave（またはリセット）してください",
+        color: "bg-red-500",
+      };
+      return;
+    }
+
+    //localのデータを整形 nameは未定？
+
+    localLumisetting = {
+      lumiSetting: settings,
+      showBanner: $showBanner,
+      theme: localStorage.getItem("theme") ?? "system",
+      timelineFilter: $timelineFilter,
+      uploader: $uploader,
+    };
+
+    //オープンするときに最新の30078確認する
+    $nowProgress = true;
+    await get30078();
+    //set30078(event);
+
+    $nowProgress = false;
+    $dialogOpen = true;
+  }
+  // onMount(() => {});
+  // function handleClickDownload(
+  //   event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+  // ) {}
+
+  let saveName: string = "";
+
+  async function get30078() {
+    const relays = await getQueryRelays($loginUser);
+    console.log(relays);
+    if (!relays) {
+      $toastSettings = {
+        title: "Error",
+        description: "relay list not found",
+        color: "bg-red-500",
+      };
+      return;
+    }
+    const kind30078: EventPacket[] = await usePromiseReq(
+      {
+        filters: [
+          {
+            kinds: [30078],
+            authors: [$loginUser],
+            limit: 1,
+            "#d": ["lumi-settings"],
+          },
+        ],
+        operator: pipe(latest()),
+        req: undefined,
+        initData: undefined,
+      },
+      relays.map(({ url, read, write }) => url)
+    );
+    if (kind30078.length > 0) {
+      set30078(kind30078[0].event);
+    }
+  }
+
+  const handleClickSave = async () => {
+    saveName = saveName.trim();
+    if (saveName === "") {
+      $toastSettings = {
+        title: "Error",
+        description: "Name is required.",
+        color: "bg-red-500",
+      };
+      return;
+    }
+
+    $alertdialogOpen = true;
+  };
+  const handleClickPublish = () => {
+    $alertdialogOpen = false;
+    const sameIndex = kind30078LumiSettings.findIndex(
+      (data) => data.name === saveName
+    );
+    const addData: Kind30078LumiSetting = {
+      name: saveName,
+      ...localLumisetting,
+      created_at: now(),
+    };
+    const newLumiSettings =
+      sameIndex === -1
+        ? [...kind30078LumiSettings, addData]
+        : kind30078LumiSettings.map((data) => {
+            if (data.name !== saveName) {
+              return data;
+            } else {
+              return addData;
+            }
+          });
+
+    publishSettings(newLumiSettings);
+  };
+
+  const set30078 = (ev: Nostr.Event) => {
+    console.log(ev);
+    try {
+      kind30078LumiSettings = JSON.parse(ev.content);
+      console.log(kind30078LumiSettings);
+      // kind30078LumiSettings が配列かどうかを確認し、配列でない場合は空の配列に設定
+      if (!Array.isArray(kind30078LumiSettings)) {
+        kind30078LumiSettings = [];
+      }
+    } catch (error) {
+      console.log("Error parsing event content:", error);
+      kind30078LumiSettings = []; // エラー時には空の配列にフォールバック
+    }
+  };
+
+  const handleClickDelete = (name: string) => {
+    const newData = kind30078LumiSettings.filter((data) => data.name !== name);
+
+    publishSettings(newData);
+  };
+
+  const handleClickLoad = (name: string) => {
+    const loadData: Kind30078LumiSetting | undefined =
+      kind30078LumiSettings.find((data) => data.name === name);
+    if (!loadData) {
+      $toastSettings = {
+        title: "Error",
+        description: "failed to load", //編集中の項目があります。さきにsave（またはリセット）してください
+        color: "bg-red-500",
+      };
+      return;
+    }
+    $nowProgress = true;
+
+    if (loadData.showBanner) {
+      $showBanner = loadData.showBanner;
+      localStorage?.setItem("showBanner", loadData.showBanner.toString());
+    }
+
+    if (loadData.theme) {
+      setTheme(loadData.theme as Theme);
+
+      localStorage?.setItem("theme", loadData.theme);
+    }
+
+    if (loadData.timelineFilter) {
+      $timelineFilter = loadData.timelineFilter;
+      localStorage?.setItem(
+        "timelineFilter",
+        JSON.stringify(loadData.timelineFilter)
+      );
+    }
+
+    if (loadData.uploader) {
+      $uploader = loadData.uploader;
+      if (loadData.uploader) {
+        localStorage?.setItem("uploader", loadData.uploader);
+      }
+    }
+    if (loadData.lumiSetting) {
+      settings = loadData.lumiSetting;
+      saveLumiSettings();
+    }
+    $nowProgress = false;
+  };
+
+  async function publishSettings(lumiData: Kind30078LumiSetting[]) {
+    try {
+      $nowProgress = true;
+
+      const str = JSON.stringify(lumiData);
+      const evePara: EventParameters = {
+        content: str,
+        tags: [["d", "lumi-settings"]],
+        kind: 30078,
+        pubkey: $loginUser,
+      };
+      const relays = await getQueryRelays($loginUser);
+      const writeRelays = configToWrite(relays);
+      const { event: ev, res: res } = await promisePublishEvent(
+        evePara,
+        writeRelays
+      );
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+      console.log(isSuccess);
+      if (isSuccess.length <= 0) {
+        //しっぱい
+        $toastSettings = {
+          title: "Error",
+          description: "Failed to add mute",
+          color: "bg-red-500",
+        };
+        $nowProgress = false;
+
+        return;
+      }
+      set30078(ev);
+
+      $nowProgress = false;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const configToWrite = (
+    relays: DefaultRelayConfig[] | undefined
+  ): string[] | undefined => {
+    return !relays
+      ? undefined
+      : relays.reduce((cur, { url, write }) => {
+          if (write) {
+            return [...cur, url];
+          }
+          return cur;
+        }, [] as string[]); // 戻り値の配列はstring型のみに変更
+  };
 </script>
 
 <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickUpload}
+  on:click={handleClickUpDownload}
   >現在の設定をリレーにアップロード/ダウンロード</button
 >
-<button
+<!-- <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   on:click={handleClickDownload}>リレーから設定を読み込む</button
+> -->
+
+<Dialog bind:open={dialogOpen}>
+  <div slot="main">
+    <div class="flex gap-1 items-center">
+      <input
+        type="text"
+        class=" rounded-md h-8 px-2 border border-magnum-300 disabled:opacity-25"
+        maxlength="32"
+        placeholder="name"
+        bind:value={saveName}
+      /><button
+        class="h-8 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+        on:click={handleClickSave}>SAVE</button
+      >
+    </div>
+
+    <div class="rounded-md border border-magnum-600 mt-2">
+      <table>
+        <tr>
+          <th>name</th><th>created_at</th><th>load</th><th>delete</th>
+        </tr>
+
+        {#each kind30078LumiSettings as { name, ...value }}
+          <tr
+            ><td>{name}</td>
+            <td
+              ><time datetime={datetime(value.created_at)}
+                >{new Date(value.created_at * 1000).toLocaleString()}</time
+              ></td
+            >
+            <td
+              ><button
+                class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                on:click={() => handleClickLoad(name)}>LOAD</button
+              ></td
+            >
+            <td
+              ><button
+                class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
+                on:click={() => handleClickDelete(name)}>DELETE</button
+              ></td
+            >
+          </tr>{/each}
+      </table>
+      {#if kind30078LumiSettings.length <= 0}
+        <!---->
+        <p class="text-center">no data</p>
+      {/if}
+    </div>
+  </div>
+</Dialog>
+
+<AlertDialog
+  bind:open={alertdialogOpen}
+  onClickOK={handleClickPublish}
+  title={`SAVE`}
+  okButtonName="OK"
+  ><div slot="main">
+    {#if kind30078LumiSettings.find((data) => data.name === saveName)}
+      <p class="font-bold py-2">name: {saveName}</p>
+      <p>
+        {$_("settings.save.rewrite")}
+      </p>
+    {:else}
+      <p class="font-bold py-2">name: {saveName}</p>
+      <p>{$_("settings.save.new")}</p>
+    {/if}
+  </div></AlertDialog
 >
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0;
+    font-size: 16px;
+    text-align: left;
+    table-layout: auto;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid rgb(var(--color-magnum-600));
+    height: 2rem;
+  }
+  td {
+    padding: 0px 4px;
+    border-bottom: 1px solid rgb(var(--color-magnum-600));
+  }
+
+  th {
+    text-align: center;
+    border-bottom: 2px solid rgb(var(--color-magnum-600));
+  }
+  /* 最後から2番目の列の幅を指定 */
+  th:nth-last-child(2),
+  td:nth-last-child(2) {
+    text-align: center;
+  }
+  /* 最後から2番目の列の幅を指定 */
+  th:nth-last-child(3),
+  td:nth-last-child(3) {
+    text-align: center;
+  }
+  /* delete 列の幅を指定 */
+  th:last-child,
+  td:last-child {
+    text-align: center;
+  }
+</style>
