@@ -47,7 +47,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image, RotateCw } from "lucide-svelte";
+  import { Save, X, Image } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -115,27 +115,7 @@
       content: "+",
       tag: [],
     };
-    $loginUser = settings.pubkey;
-    $showImg = settings.showImg;
-    $showPreview = settings.showPreview;
-    $menuLeft = settings.menuleft;
-    $showRelayIcon = settings.showRelayIcon;
 
-    $defaultReaction = settings.defaultReaction;
-
-    $selectedRelayset = settings.useRelaySet;
-    $relaySetValue = settings.useRelaySet;
-    beforeRelays = settings.relays;
-
-    $showReactioninTL = settings.showReactioninTL;
-    $nostrWalletConnect = settings.nostrWalletConnect;
-    $showUserStatus = settings.showUserStatus;
-
-    $showKind16 = settings.showKind16;
-    $addClientTag = settings.addClientTag;
-    $showClientTag = settings.showClientTag;
-    $showAllReactions = settings.showAllReactions;
-    $kind42inTL = settings.kind42inTL;
     const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
     const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
@@ -153,14 +133,26 @@
     // lumiMuteByKind = mutebykind
     //   ? (JSON.parse(mutebykind) as LumiMuteByKind)
     //   : initLumiMuteByKind;
-    originalSettings.set({ ...settings });
+
     // window?.addEventListener("beforeunload", handleBeforeUnload);
   });
 
   function loadSettings() {
     let savedSettings = localStorage.getItem(STORAGE_KEY);
+    if (savedSettings) {
+      try {
+        const loadSet = JSON.parse(savedSettings);
 
-    return savedSettings ? JSON.parse(savedSettings) : null;
+        $relaySetValue = loadSet.useRelaySet; //ラジオボタンの状態更新
+
+        originalSettings.set({ ...loadSet });
+        return loadSet;
+      } catch (error) {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   async function initializeSettings() {
@@ -205,7 +197,7 @@
     console.log("save");
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return;
-
+    $relaySetValue = settings.useRelaySet; //ラジオボタンの状態更新
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     // localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
     // localStorage.setItem(
@@ -345,13 +337,14 @@
     console.log("cancel");
     const savedSettings = loadSettings();
     settings = { ...initSettings };
+    $relaySetValue = settings.useRelaySet; //ラジオボタンの状態更新
     if (savedSettings) {
       settings = savedSettings;
       inputPubkey = nip19.npubEncode(settings.pubkey);
       toastSettings.set({
-        title: "Warning",
+        title: "Success",
         description: `${$_("settings.toast.resetData")}`,
-        color: "bg-orange-500",
+        color: "bg-green-500",
       });
     }
   }
@@ -859,7 +852,7 @@
     <ThemeSwitch />
   </fieldset>
 
-  <!-- <Kind30078 /> -->
+  <Kind30078 {settingsChanged} bind:settings saveLumiSettings={saveSettings} />
 </form>
 
 <div class=" fixed md:bottom-5 bottom-16 right-5 z-1">

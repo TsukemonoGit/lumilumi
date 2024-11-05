@@ -92,12 +92,12 @@
     ? formatAbsoluteDate($mutes?.updated)
     : ""}</time
 >{#if $mutes}<button
-    class="rounded-md border ml-2 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+    class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     on:click={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main" class="min-h-[29rem]">
+  <div slot="main">
     {#if $mutes}
       <AddMute />
       <MuteTabList />

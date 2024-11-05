@@ -163,7 +163,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -224,7 +224,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -291,7 +291,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -358,7 +358,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -434,7 +434,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -499,7 +499,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -566,7 +566,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -635,7 +635,7 @@
           .filter((item) => item.ok)
           .map((item) => item.from);
         console.log(isSuccess);
-        if (!isSuccess) {
+        if (isSuccess.length <= 0) {
           //しっぱい
           $toastSettings = {
             title: "Error",
@@ -721,7 +721,7 @@
     const { event: ev, res: res } = await promisePublishEvent(newEvPara);
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     console.log(isSuccess);
-    if (!isSuccess) {
+    if (isSuccess.length <= 0) {
       //しっぱい
       $toastSettings = {
         title: "Error",

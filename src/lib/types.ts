@@ -205,3 +205,28 @@ export interface DecodedGeohash {
   latitude: number;
   longitude: number;
 }
+
+export interface Kind30078LumiSetting {
+  name: string;
+  lumiSetting: LumiSetting;
+  showBanner: boolean;
+  theme: string;
+  timelineFilter: TimelineFilter;
+  uploader: string;
+  created_at: number;
+  // lumiSetting: string;
+  // showBanner: string;
+  // theme: string;
+  // timelineFilter: string;
+  // uploader: string;
+
+  //created_at: string;
+}
+
+export interface Kind30078LumiSettingObj {
+  lumiSetting: LumiSetting;
+  showBanner: boolean;
+  theme: string;
+  timelineFilter: TimelineFilter;
+  uploader: string;
+}

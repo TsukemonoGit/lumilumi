@@ -47,7 +47,11 @@
     "relay": "The changes will take effect after reloading.",
     "kind10002": "Edit Relays",
     "usage": {
-      "title": "Settings that affect data consumption"
+      "title": "Settings that affect data consumption: ↑Highest to ↓Lowest"
+    },
+    "save": {
+      "rewrite": "A data entry with the same name already exists. Do you want to overwrite it?",
+      "new": "Do you want to create a new entry with the specified name?"
     }
   },
   "nostviewstr": {

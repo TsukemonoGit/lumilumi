@@ -72,7 +72,7 @@
     const { event: ev, res: res } = await promisePublishEvent(newEvPara);
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
 
-    if (!isSuccess) {
+    if (isSuccess.length <= 0) {
       //失敗
       $toastSettings = {
         title: "Error",
@@ -127,7 +127,7 @@
       const { event: ev, res: res } = await promisePublishEvent(newEvPara);
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
 
-      if (!isSuccess) {
+      if (isSuccess.length <= 0) {
         $toastSettings = {
           title: "Error",
           description: "Failed to add emoji",
@@ -188,7 +188,7 @@
       const { event: ev, res: res } = await promisePublishEvent(newEvPara);
 
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-      if (!isSuccess) {
+      if (isSuccess.length <= 0) {
         $toastSettings = {
           title: "Error",
           description: "Failed to add emoji",

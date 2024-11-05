@@ -1,11 +1,5 @@
 <script lang="ts">
-  import {
-    createCombobox,
-    melt,
-    type ComboboxOptionProps,
-    createSelect,
-    type SelectOption,
-  } from "@melt-ui/svelte";
+  import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
 
   import type { Theme } from "$lib/types";
   import ThemeIcon from "./ThemeIcon.svelte";
