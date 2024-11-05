@@ -371,7 +371,9 @@ export function reactionCheck() {
         if (follow && follow.has(packet.event.pubkey)) {
           console.log("includes", packet.event);
           //自分の投稿への反応のうちフォロイーからのものは普通にTLに流れるポスト
-          setReactionEvent(packet);
+          if (muteCheckEvent(packet.event) === "null") {
+            setReactionEvent(packet);
+          }
 
           console.log(get(reactionToast));
           return true;
