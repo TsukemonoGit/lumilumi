@@ -65,7 +65,13 @@ export async function makeInvoice({
 
 export const getZapLNURLPubkey = async (
   metadata: Nostr.Event
-): Promise<string | null> => {
+): Promise<{ pub: string | undefined; error?: string }> => {
+  const data: { pub: string | undefined; error?: string } | undefined = get(
+    queryClient
+  )?.getQueryData(["zapLNURLPubkey", metadata.pubkey]);
+  if (data) {
+    return data;
+  }
   const result = await get(queryClient)?.fetchQuery({
     queryKey: ["zapLNURLPubkey", metadata.pubkey] as QueryKey,
     queryFn: () => fetchZapLNURLPubkey(metadata),
@@ -78,7 +84,7 @@ export const getZapLNURLPubkey = async (
 
 export async function fetchZapLNURLPubkey(
   metadata: Nostr.Event
-): Promise<null | string> {
+): Promise<{ pub: string | undefined; error?: string }> {
   try {
     let lnurl: string = "";
     let { lud06, lud16 } = JSON.parse(metadata.content);
@@ -93,21 +99,31 @@ export async function fetchZapLNURLPubkey(
         `https://${domain}`
       ).toString();
     } else {
-      return null;
+      return { pub: undefined, error: "Failed to get zapped user's lnurl" };
     }
 
     let res = await fetch(lnurl);
-    if (!res.ok) throw new Error("Network response was not ok");
+    if (!res.ok) {
+      return { pub: undefined, error: "Network response was not ok" };
+    }
+
     let body = await res.json();
 
     if (body.allowsNostr && body.nostrPubkey) {
-      return body.nostrPubkey;
+      return { pub: body.nostrPubkey };
+    } else {
+      return {
+        pub: undefined,
+        error: !body.allowsNostr
+          ? "Error in the allowsNostr field of the LNURL Server."
+          : body.nostrPubkey
+          ? "The nostrPubkey field of the LNURL Server is not set."
+          : undefined,
+      };
     }
   } catch (err) {
-    console.error(err);
+    return { pub: undefined, error: undefined };
   }
-
-  return null;
 }
 
 export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {

@@ -114,8 +114,19 @@
           message={"error to get zap recipient's data."}
         />
       </div>
-      {#await getZapLNURLPubkey(receiverMetadata) then isValidEvent9735}
-        {#if !isValidEvent9735}<Kind9735Invalid
+      {#await getZapLNURLPubkey(receiverMetadata)}
+        <Kind9735Invalid
+          {note}
+          {repostable}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {tieKey}
+          {mini}
+          message={"Checking the LNURL Server's pubkey..."}
+        />
+      {:then isValidEvent9735}
+        {#if !isValidEvent9735.pub}<Kind9735Invalid
             {note}
             {repostable}
             {displayMenu}
@@ -123,6 +134,7 @@
             {maxHeight}
             {tieKey}
             {mini}
+            message={isValidEvent9735.error}
           />
         {:else}
           {#if muteType !== "null" && depth >= 1}
