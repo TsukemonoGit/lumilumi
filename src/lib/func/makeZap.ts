@@ -88,27 +88,30 @@ export async function fetchZapLNURLPubkey(
   try {
     let lnurl: string = "";
     let { lud06, lud16 } = JSON.parse(metadata.content);
+
     if (lud06) {
-      let { words } = bech32.decode(lud06, 1000);
-      let data = bech32.fromWords(words);
+      const { words } = bech32.decode(lud06, 1000);
+      const data = bech32.fromWords(words);
       lnurl = new TextDecoder().decode(data);
     } else if (lud16) {
-      let [name, domain] = lud16.split("@");
+      const [name, domain] = lud16.split("@");
       lnurl = new URL(
         `/.well-known/lnurlp/${name}`,
         `https://${domain}`
       ).toString();
     } else {
-      return { pub: undefined, error: "Failed to get zapped user's lnurl" };
+      return {
+        pub: undefined,
+        error: "Failed to retrieve the zapped user's LNURL.",
+      };
     }
 
-    let res = await fetch(lnurl);
-    if (!res.ok) {
-      return { pub: undefined, error: "Network response was not ok" };
+    const res = await getNurlFetch(lnurl);
+    if (!res) {
+      return { pub: undefined, error: `Failed to fetch from ${lnurl}` };
     }
 
-    let body = await res.json();
-
+    const body = await res.json();
     if (body.allowsNostr && body.nostrPubkey) {
       return { pub: body.nostrPubkey };
     } else {
@@ -116,13 +119,39 @@ export async function fetchZapLNURLPubkey(
         pub: undefined,
         error: !body.allowsNostr
           ? "Error in the allowsNostr field of the LNURL Server."
-          : body.nostrPubkey
-          ? "The nostrPubkey field of the LNURL Server is not set."
-          : undefined,
+          : "The nostrPubkey field of the LNURL Server is not set.",
       };
     }
   } catch (err) {
-    return { pub: undefined, error: undefined };
+    return {
+      pub: undefined,
+      error: "An error occurred while fetching LNURL data.",
+    };
+  }
+}
+
+async function getNurlFetch(lnurl: string): Promise<Response | undefined> {
+  const data: Response | undefined = get(queryClient)?.getQueryData([
+    "fetchNnurl",
+    lnurl,
+  ]);
+  if (data) return data;
+
+  try {
+    const response = await get(queryClient)?.fetchQuery({
+      queryKey: ["fetchNnurl", lnurl] as QueryKey,
+      queryFn: async () => {
+        const res = await fetch(lnurl);
+        if (!res.ok) throw new Error(`Failed to fetch from ${lnurl}`);
+        return res;
+      },
+      staleTime: Infinity,
+      gcTime: Infinity,
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Fetch error:", error);
+    return undefined;
   }
 }
 

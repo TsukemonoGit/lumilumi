@@ -12,7 +12,7 @@
   export let tieKey: string | undefined;
   export let mini;
   export let message: string | undefined = undefined;
-  console.log(message);
+  // console.log(message);
 </script>
 
 <Metadata
