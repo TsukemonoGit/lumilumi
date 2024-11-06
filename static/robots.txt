@@ -9,3 +9,4 @@ Disallow: /search/
 Disallow: /list/
 Disallow: /channel/
 Disallow: /global/
+Disallow: /api/
