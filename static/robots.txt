@@ -1,3 +1,11 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Crawl-delay: 86400  # 1日（秒単位）
+Disallow: /npub
+Disallow: /nprofile
+Disallow: /note
+Disallow: /nevent
+Disallow: /naddr
+Disallow: /search/
+Disallow: /list/
+Disallow: /channel/
+Disallow: /global/

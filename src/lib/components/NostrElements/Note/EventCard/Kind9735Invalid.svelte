@@ -70,7 +70,7 @@
   </div>
 
   <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
-    ><span class="text-magnum-200 italic"
+    ><span class="text-magnum-200 italic whitespace-pre-wrap break-words"
       >{message ?? `Invalid kind:${note.kind} Event`}</span
     >
     <div class="w-fit ml-auto">
