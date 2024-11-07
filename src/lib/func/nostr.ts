@@ -46,7 +46,10 @@ export function setRxNostr() {
   if (get(app)?.rxNostr) {
     return;
   }
-  rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  rxNostr = createRxNostr({
+    verifier: get(verifier) ?? cryptoVerifier,
+    connectionStrategy: "lazy-keep",
+  });
   app.update((be) => {
     return { ...be, rxNostr: rxNostr };
   });

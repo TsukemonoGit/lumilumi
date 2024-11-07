@@ -18,7 +18,10 @@ export function setRxNostr3() {
   if (get(app)?.rxNostr3) {
     return;
   }
-  const rxNostr3 = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  const rxNostr3 = createRxNostr({
+    verifier: get(verifier) ?? cryptoVerifier,
+    connectionStrategy: "lazy-keep",
+  });
   app.update((be) => {
     return { ...be, rxNostr3: rxNostr3 };
   });
@@ -32,7 +35,7 @@ export function set3Relays(relays: any) {
   if (!get(app).rxNostr3) {
     get(app).rxNostr3 = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
-      connectionStrategy: "aggressive",
+      connectionStrategy: "lazy-keep",
     }); //reaction repost用
   }
   get(app).rxNostr3.setDefaultRelays(relays);
