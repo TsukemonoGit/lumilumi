@@ -53,7 +53,7 @@
       "rewrite": "A data entry with the same name already exists. Do you want to overwrite it?",
       "new": "Do you want to create a new entry with the specified name?"
     },
-    "load": "Upload/download current configuration to relay"
+    "load": "Upload/Download current configuration to relay"
   },
   "nostviewstr": {
     "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr",

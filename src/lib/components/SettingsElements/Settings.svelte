@@ -197,7 +197,7 @@
     console.log("save");
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return;
-    $relaySetValue = settings.useRelaySet; //ラジオボタンの状態更新
+    $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     // localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
     // localStorage.setItem(
@@ -279,16 +279,18 @@
         // データがある場合はイベントの形を整えてセット
         const relays = setRelaysByKind10002(data[0].event);
         setRelays(relays);
-      } else {
-        // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定
-        useRelaySet(
-          ["defaultRelay", $loginUser],
-          [
-            { authors: [$loginUser], kinds: [10002], limit: 1 },
-          ] as Nostr.Filter[],
-          undefined
-        );
       }
+      //else {
+      // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
+      //コンポーネント外やでerrorがでる
+      // useRelaySet(
+      //   ["defaultRelay", $loginUser],
+      //   [
+      //     { authors: [$loginUser], kinds: [10002], limit: 1 },
+      //   ] as Nostr.Filter[],
+      //   undefined
+      // );
+      //}
     }
   }
   function isRelaySelectionInvalid() {
@@ -525,7 +527,7 @@
           </label>
         </div>
       {/each}
-      <input name="line-height" use:melt={$radioGrouphiddenInput} />
+      <input use:melt={$radioGrouphiddenInput} />
     </div>
 
     <!-- リレー設定 -->
