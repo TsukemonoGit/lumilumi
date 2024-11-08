@@ -527,7 +527,7 @@
           </label>
         </div>
       {/each}
-      <input name="line-height" use:melt={$radioGrouphiddenInput} />
+      <input use:melt={$radioGrouphiddenInput} />
     </div>
 
     <!-- リレー設定 -->
