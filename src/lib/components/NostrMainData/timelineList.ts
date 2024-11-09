@@ -13,7 +13,7 @@ import { slicedEvent } from "$lib/stores/stores";
 export async function loadOlderEvents(
   sift: number,
   filters: Filter[],
-  queryKey: QueryKey,
+
   // lastfavcheck: boolean,
   until: number,
   tie: OperatorFunction<
@@ -57,12 +57,14 @@ export async function loadOlderEvents(
   //最後がkind1だったらほかのkind6とかは間に入ってるってことだからkind6とかも合わせて取得
   //filterごとにlimitついてるから、filtersじゃなくてfilterごとに数取ってsliceシテってしないといけない。
   //けどなんか大変そうだから最初のフィルターだけにしよう
-  const newFilters = {
-    ...filters[0],
-    limit: sift + 1,
-    until: until,
-    since: undefined,
-  };
+  const newFilters = filters.map((filter) => {
+    return {
+      ...filter,
+      limit: sift + 1,
+      until: until,
+      since: undefined,
+    };
+  });
   console.log(newFilters);
   const newReq = createRxBackwardReq();
   const operator = pipe(tie, uniq(), scanArray());
@@ -70,7 +72,7 @@ export async function loadOlderEvents(
     {
       operator: operator,
 
-      filters: [newFilters],
+      filters: newFilters,
       req: newReq,
     },
     relays
@@ -86,7 +88,6 @@ export async function loadOlderEvents(
 export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
-  queryKey: QueryKey,
   tie: OperatorFunction<
     EventPacket,
     EventPacket & {
