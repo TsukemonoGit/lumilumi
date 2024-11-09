@@ -7,7 +7,7 @@ export const useNip05Check = (
   nip05Address: string,
   pubkey: string
 ): {
-  data: Readable<boolean | null | undefined>;
+  data: Readable<{ result: boolean; error?: string } | undefined | null>;
   status: Writable<ReqStatus>;
   error: Readable<Error>;
 } => {
@@ -17,14 +17,7 @@ export const useNip05Check = (
 
   const query = createQuery({
     queryKey: genQueryKey(),
-    queryFn: async () => {
-      try {
-        const res = await nip05.isValid(pubkey, nip05Address);
-        return res;
-      } catch (e) {
-        throw e;
-      }
-    },
+    queryFn: () => fetchNip05(pubkey, nip05Address),
     staleTime: Infinity,
     gcTime: Infinity,
     refetchOnWindowFocus: false,
@@ -54,3 +47,37 @@ export const useNip05Check = (
     error,
   };
 };
+
+const NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/;
+
+async function fetchNip05(pubkey: string, fullname: string) {
+  const match = fullname.match(NIP05_REGEX);
+  if (!match) {
+    return { result: false, error: "formatError" }; //"NIP-05 format error" };
+  }
+
+  const [, name = "_", domain] = match;
+  const url = `https://${domain}/.well-known/nostr.json?name=${name}`;
+
+  try {
+    const res = await fetch(url, { redirect: "manual" });
+
+    if (res.status !== 200) {
+      return { result: false, error: "fetchResponseError" }; //"Wrong response code" };
+    }
+
+    const json = await res.json();
+    const registeredPubkey = json.names[name];
+
+    if (!registeredPubkey) {
+      return { result: false, error: "noPubkey" }; //"Pubkey not set in nostr.json" };
+    }
+
+    return {
+      result: registeredPubkey === pubkey,
+      error: registeredPubkey === pubkey ? undefined : "impersonation", //"Possibility of impersonation",
+    };
+  } catch (error) {
+    return { result: false, error: "fetchError" }; //"An error occurred during fetch" };
+  }
+}
