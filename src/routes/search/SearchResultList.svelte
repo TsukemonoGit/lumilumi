@@ -181,7 +181,7 @@
       const older = await firstLoadOlderEvents(
         50,
         newFilters,
-        queryKey,
+
         tie,
         relays
       );
@@ -224,7 +224,7 @@
       const older = await loadOlderEvents(
         syutokusururyou,
         filters,
-        queryKey,
+
         untilTime,
         tie,
         relays
