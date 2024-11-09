@@ -231,5 +231,15 @@
   },
   "setting": {
     "pubkey": "設定ページで公開鍵を設定してください"
+  },
+  "nip05": {
+    "verify": "検証",
+    "error": {
+      "formatError": "NIP-05フォーマットエラー",
+      "fetchResponseError": "レスポンスコードエラー",
+      "noPubkey": "nostr.jsonに公開鍵情報がありません",
+      "impersonation": "なりすましの可能性があります",
+      "fetchError": "データの取得中にエラーが発生しました"
+    }
   }
 }

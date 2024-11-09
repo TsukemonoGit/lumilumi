@@ -232,5 +232,15 @@
   },
   "setting": {
     "pubkey": "Please set up pubkey on the Settings page"
+  },
+  "nip05": {
+    "verify": "Verify",
+    "error": {
+      "formatError": "NIP-05 format error",
+      "fetchResponseError": "Wrong response code",
+      "noPubkey": "Pubkey not set in nostr.json",
+      "impersonation": "Possibility of impersonation",
+      "fetchError": "An error occurred during fetch"
+    }
   }
 }

@@ -53,7 +53,7 @@ const NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/;
 async function fetchNip05(pubkey: string, fullname: string) {
   const match = fullname.match(NIP05_REGEX);
   if (!match) {
-    return { result: false, error: "NIP-05 format error" };
+    return { result: false, error: "formatError" }; //"NIP-05 format error" };
   }
 
   const [, name = "_", domain] = match;
@@ -63,24 +63,21 @@ async function fetchNip05(pubkey: string, fullname: string) {
     const res = await fetch(url, { redirect: "manual" });
 
     if (res.status !== 200) {
-      return { result: false, error: "Wrong response code" };
+      return { result: false, error: "fetchResponseError" }; //"Wrong response code" };
     }
 
     const json = await res.json();
     const registeredPubkey = json.names[name];
 
     if (!registeredPubkey) {
-      return { result: false, error: "Pubkey not set in nostr.json" };
+      return { result: false, error: "noPubkey" }; //"Pubkey not set in nostr.json" };
     }
 
     return {
       result: registeredPubkey === pubkey,
-      error:
-        registeredPubkey === pubkey
-          ? undefined
-          : "Possibility of impersonation",
+      error: registeredPubkey === pubkey ? undefined : "impersonation", //"Possibility of impersonation",
     };
   } catch (error) {
-    return { result: false, error: "An error occurred during fetch" };
+    return { result: false, error: "fetchError" }; //"An error occurred during fetch" };
   }
 }
