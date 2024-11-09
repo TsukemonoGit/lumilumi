@@ -37,7 +37,7 @@
   <div
     class="absolute w-full max-h-[calc(100%-24px)] overflow-y-auto text-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-magnum-100 text-sm p-1"
   >
-    {text}
+    {text ?? ""}
   </div>
 </div>
 
