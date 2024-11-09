@@ -123,6 +123,13 @@
           //   since: since,
           // },
         ]}
+        olderFilters={[
+          {
+            "#e": [data.id],
+            kinds: [42],
+            since: since,
+          },
+        ]}
         req={createRxForwardReq()}
         let:events
         {viewIndex}

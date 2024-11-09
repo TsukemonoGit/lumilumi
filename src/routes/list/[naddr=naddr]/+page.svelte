@@ -135,6 +135,13 @@
                 since: since,
               },
             ]}
+            olderFilters={[
+              {
+                kinds: [1, 6, 16],
+                authors: pubkeys,
+                since: since,
+              },
+            ]}
             req={createRxForwardReq()}
             let:events
             {viewIndex}

@@ -28,13 +28,14 @@
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
-  import { changeMainEmit } from "$lib/func/nostr";
+
   import { useMainTimeline } from "$lib/stores/useMainTimeline";
 
   const sift = 40; //スライドする量
 
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
+  export let olderFilters: Nostr.Filter[];
 
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量
@@ -167,15 +168,17 @@
       //     filter.until === undefined ? (filter.since ?? now()) : filter.until,
       //   limit: 50,
       // }));
-      const newFilters = {
-        ...filters[0],
-        since: undefined,
-        until:
-          filters[0].until === undefined
-            ? (filters[0].since ?? now())
-            : filters[0].until,
-        limit: 50,
-      };
+      const newFilters: Nostr.Filter[] = olderFilters.map((filter) => {
+        return {
+          ...filter,
+          since: undefined,
+          until:
+            filters[0].until === undefined
+              ? (filter.since ?? now())
+              : filter.until,
+          limit: 50,
+        };
+      });
       console.log(readUrls);
 
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
@@ -185,8 +188,8 @@
 
       const older = await firstLoadOlderEvents(
         50,
-        [newFilters],
-        queryKey,
+        newFilters,
+
         tie,
         relays
       );
@@ -226,8 +229,8 @@
       $nowProgress = true;
       const older = await loadOlderEvents(
         syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
-        filters,
-        queryKey,
+        olderFilters,
+
         //lastfavcheck,
         untilTime,
         tie,

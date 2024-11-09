@@ -215,20 +215,28 @@ export function changeMainEmit(filters: Nostr.Filter[]) {
 export const makeMainFilters = (
   contacts: Nostr.Event<number>,
   since: number
-): Nostr.Filter[] => {
+): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
   const pubkeyList = pubkeysIn(contacts, get(loginUser));
   const kinds = [1, 6];
   if (get(showKind16)) {
     kinds.push(16);
   }
-  if (get(showImg)) {
-    //画像読み込みのときはkind:0リアルタイム更新
-    kinds.push(0);
-  }
+
   console.log("kind42inTL", get(kind42inTL));
   if (get(kind42inTL)) {
     kinds.push(42);
+  }
+  const olderFilters: Nostr.Filter[] = [
+    {
+      authors: Array.from(pubkeyList.keys()),
+      kinds: kinds,
+      since: since,
+    },
+  ];
+  if (get(showImg)) {
+    //画像読み込みのときはkind:0リアルタイム更新
+    kinds.push(0);
   }
   const filters: Nostr.Filter[] = [
     {
@@ -258,7 +266,7 @@ export const makeMainFilters = (
   }
   // console.log(filters);
 
-  return filters;
+  return { mainFilters: filters, olderFilters: olderFilters };
 };
 //これメインTL用のreqで一つだけのforwardreqのやつ
 //rxNostr3ようのやつは別であるけど

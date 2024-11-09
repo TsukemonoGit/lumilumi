@@ -161,9 +161,11 @@
     <div slot="error"><MakeNewKind3 /></div>
     <div slot="nodata"><MakeNewKind3 /></div>
     {#if since}
+      {@const filters = makeMainFilters(contacts, since)}
       <MainTimeline
         queryKey={timelineQuery}
-        filters={makeMainFilters(contacts, since)}
+        filters={filters.mainFilters}
+        olderFilters={filters.olderFilters}
         {tieKey}
         let:events
         {viewIndex}

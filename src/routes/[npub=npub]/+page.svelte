@@ -266,6 +266,14 @@
                     since: since,
                   },
                 ]}
+                olderFilters={[
+                  {
+                    kinds: [1, 6, 16],
+
+                    authors: [userPubkey],
+                    since: since,
+                  },
+                ]}
                 {req}
                 let:events
                 {amount}
@@ -337,6 +345,14 @@
               <TimelineList
                 queryKey={["publck chat", userPubkey]}
                 filters={[
+                  {
+                    kinds: [42],
+
+                    authors: [userPubkey],
+                    since: since,
+                  },
+                ]}
+                olderFilters={[
                   {
                     kinds: [42],
 
@@ -421,6 +437,14 @@
                   since: now(),
                 },
               ]}
+              olderFilters={[
+                {
+                  kinds: [7, 17],
+                  limit: 50,
+                  authors: [userPubkey],
+                  since: now(),
+                },
+              ]}
               {req}
               let:events
               {amount}
@@ -493,6 +517,14 @@
             <TimelineList
               queryKey={["user", "zap", userPubkey]}
               filters={[
+                {
+                  kinds: [9735],
+                  limit: 50,
+                  "#p": [userPubkey],
+                  since: now(),
+                },
+              ]}
+              olderFilters={[
                 {
                   kinds: [9735],
                   limit: 50,
