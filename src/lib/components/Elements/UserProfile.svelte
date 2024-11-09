@@ -126,7 +126,7 @@
                   📛{petname}{/if}
               </div>
               {#if prof.nip05}
-                <div class="text-sm flex break-all">
+                <div class="text-sm flex break-all flex-wrap items-center">
                   {prof.nip05}<Nip05Check {pubkey} nip05Address={prof.nip05} />
                 </div>{/if}
             </div>

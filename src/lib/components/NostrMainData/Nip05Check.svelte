@@ -21,12 +21,14 @@
       {size}
       class="ml-1 inline-flex text-red-600  my-auto"
     />
-    {#if nip05 === true}<ShieldCheck
+    {#if nip05.result === true}<ShieldCheck
         {size}
         class="ml-1 inline-flex text-green-600  my-auto"
       />
-    {:else if nip05 === false}
-      <BadgeAlert {size} class="ml-1 inline-flex text-red-600  my-auto" />
+    {:else if nip05.result === false}
+      <span class="ml-1 inline-flex items-center text-red-600 my-auto"
+        ><BadgeAlert {size} />{nip05.error ?? ""}</span
+      >
     {/if}
   </UseNip05Check>
 {/if}

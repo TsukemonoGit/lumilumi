@@ -10,7 +10,7 @@
   $: error = nip05.error;
   $: console.log($data);
   interface $$Slots {
-    default: { nip05: boolean; status: ReqStatus };
+    default: { nip05: { result: boolean; error?: string }; status: ReqStatus };
     loading: Record<never, never>;
     error: { error: Error };
     nodata: Record<never, never>;
