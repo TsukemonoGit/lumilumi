@@ -45,11 +45,14 @@ export const load: PageLoad<{
     }
   } else {
     //nip05
-    const prof = await queryProfile(npub);
+    const prof: nip19.ProfilePointer | null = await queryProfile(npub);
     if (!prof) {
       throw error(400, "Bad Request");
     }
     console.log(npub);
+    ogTitle.set(`Lumilumi - User:${npub}`);
+    ogDescription.set(`User:${npub}`);
+
     return { ...prof, nip05Address: npub };
   }
 };
