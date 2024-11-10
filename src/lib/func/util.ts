@@ -77,7 +77,7 @@ export const nipRegex = /NIP-([0-9]{2,})/g;
 
 export const LUD06Regex = /^(LNURL1|lnurl1)[AC-HJ-NP-Z02-9]+$/;
 export const LUD16Regex = /^[-_a-zA-Z0-9.]+@[-a-zA-Z0-9.]+$/;
-
+export const NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/;
 export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   if (!ev) {
     return undefined;

@@ -40,6 +40,7 @@
   export let data: {
     pubkey: string;
     relays?: string[] | undefined;
+    nip05Address?: string;
   };
 
   let amount = 50;
@@ -112,6 +113,12 @@
       since = now();
     } else {
       since = ev[0].event.created_at;
+    }
+    console.log(data.nip05Address);
+    if (data.nip05Address) {
+      $queryClient?.setQueryData(["nip05", data.nip05Address.toLowerCase()], {
+        result: true,
+      });
     }
   }
 

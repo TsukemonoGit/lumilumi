@@ -312,15 +312,27 @@
   };
 
   const handleClickEmoji = (e: string[]) => {
-    const emojiTag: string[] = ["emoji", ...e];
-    if (!tags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
-      tags.push(emojiTag);
+    const emoji = [...e];
+    const sameEmoji = tags.find(
+      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+    );
+
+    if (!sameEmoji) {
+      // 同じ名前の絵文字がない場合、新しい絵文字として追加
+      tags.push(["emoji", ...emoji]);
+    } else if (sameEmoji[2] !== e[1]) {
+      // 同じ名前の絵文字があり、URLが異なる場合、新しい名前を付けて追加
+      emoji[0] = `${emoji[0]}_`;
+      tags.push(["emoji", ...emoji]);
     }
-    const emojiText = `:${e[0]}:`;
+
+    // 絵文字をテキストに追加
+    const emojiText = `:${emoji[0]}:`;
     text =
       text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
     cursorPosition += emojiText.length;
-    //viewCustomEmojis = false;
+
+    // カーソル位置を更新
     textarea.focus();
     setTimeout(() => {
       textarea.setSelectionRange(cursorPosition, cursorPosition);

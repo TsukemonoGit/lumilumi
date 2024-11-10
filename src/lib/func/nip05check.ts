@@ -2,6 +2,7 @@ import { createQuery } from "@tanstack/svelte-query";
 import { nip05 } from "nostr-tools";
 import { derived, writable, type Readable, type Writable } from "svelte/store";
 import type { ReqStatus } from "$lib/types";
+import { NIP05_REGEX } from "nostr-tools/nip05";
 
 export const useNip05Check = (
   nip05Address: string,
@@ -11,7 +12,7 @@ export const useNip05Check = (
   status: Writable<ReqStatus>;
   error: Readable<Error>;
 } => {
-  const genQueryKey = () => ["nip05", nip05Address] as const;
+  const genQueryKey = () => ["nip05", nip05Address.toLowerCase()] as const;
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
@@ -47,8 +48,6 @@ export const useNip05Check = (
     error,
   };
 };
-
-const NIP05_REGEX = /^(?:([\w.+-]+)@)?([\w_-]+(\.[\w_-]+)+)$/;
 
 async function fetchNip05(pubkey: string, fullname: string) {
   const match = fullname.match(NIP05_REGEX);
