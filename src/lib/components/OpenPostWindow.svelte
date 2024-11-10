@@ -313,16 +313,31 @@
 
   const handleClickEmoji = (e: string[]) => {
     const emoji = [...e];
+    // 1. URLが同じ絵文字を探す
     const sameEmoji = tags.find(
+      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
+    );
+
+    if (sameEmoji) {
+      // 同じURLの絵文字があれば、その名前を使う
+      emoji[0] = sameEmoji[1];
+    }
+
+    // 2. 同じ名前の絵文字があるか確認
+    const sameNameEmoji = tags.find(
       (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
     );
 
-    if (!sameEmoji) {
-      // 同じ名前の絵文字がない場合、新しい絵文字として追加
-      tags.push(["emoji", ...emoji]);
-    } else if (sameEmoji[2] !== e[1]) {
-      // 同じ名前の絵文字があり、URLが異なる場合、新しい名前を付けて追加
-      emoji[0] = `${emoji[0]}_`;
+    // 3. 絵文字の条件に従って追加処理
+    if (sameNameEmoji) {
+      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
+      if (sameNameEmoji[2] !== emoji[1]) {
+        emoji[0] = `${emoji[0]}_`;
+        tags.push(["emoji", ...emoji]);
+      }
+      // 完全に同じ名前・URLの絵文字がある場合は何もしない
+    } else {
+      // 同じ名前もURLもない場合、新しい絵文字として追加
       tags.push(["emoji", ...emoji]);
     }
 
