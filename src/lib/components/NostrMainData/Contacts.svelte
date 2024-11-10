@@ -58,10 +58,11 @@
   $: result = $app?.rxNostr
     ? useContacts($app?.rxNostr, queryKey, pubkey, req)
     : undefined;
+
   $: data = result?.data;
   $: status = result?.status;
   $: error = result?.error;
-  $: if ($data) {
+  $: if (data && $data) {
     if (storageKind3 && storageKind3.created_at > $data.event.created_at) {
       kind3Data = storageKind3;
     } else if ($data.event) {

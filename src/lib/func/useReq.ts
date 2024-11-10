@@ -39,11 +39,12 @@ export function useReq(
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
 
   if (!_queryClient) {
+    console.log("!_queryClient error");
     throw Error();
   }
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    console.log("error");
+    console.log("DefaultRelays error");
     throw Error();
   }
   // console.log(_rxNostr.getDefaultRelays());

@@ -32,7 +32,6 @@ export function useReplaceableEvent(
   initialDataUpdatedAt: number | undefined = undefined,
   refetchInterval: number = Infinity
 ): ReqResult<EventPacket> {
-  // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
   const operator = pipe(latest());
   return useReq(
