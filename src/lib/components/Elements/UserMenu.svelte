@@ -27,6 +27,7 @@
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
   import { getProfile } from "$lib/func/event";
+  import { useNip05Check, useNip05PromiseCheck } from "$lib/func/nip05check";
 
   export let tieKey: string | undefined;
 
@@ -136,21 +137,25 @@
         if (!encodedPubkey) {
           return;
         }
-        let urlData: string = "";
-        const nip05 = getProfile(metadata)?.nip05;
-        if (!nip05) {
-          urlData = encodedPubkey;
-        } else {
-          const data = $queryClient.getQueryData([
-            "nip05",
-            nip05.toLowerCase(),
-          ]);
-          if (data) {
+        $nowProgress = true;
+        let urlData: string = encodedPubkey;
+        const nip05 = profile?.nip05;
+        if (nip05) {
+          const data: { result: boolean; error?: string } | undefined =
+            $queryClient.getQueryData(["nip05", nip05.toLowerCase()]);
+          if (data && data.result) {
             urlData = nip05;
           } else {
+            const data = await useNip05PromiseCheck(nip05, pubkey);
+            if (data) {
+              $queryClient.setQueryData(["nip05", nip05.toLowerCase()], data);
+              if (data.result) {
+                urlData = nip05;
+              }
+            }
           }
         }
-
+        $nowProgress = false;
         const shareData = {
           //title: "",
           //text: "lumilumi",
