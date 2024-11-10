@@ -142,13 +142,16 @@
         const nip05 = profile?.nip05;
         if (nip05) {
           const data: { result: boolean; error?: string } | undefined =
-            $queryClient.getQueryData(["nip05", nip05.toLowerCase()]);
+            $queryClient.getQueryData(["nip05", pubkey, nip05.toLowerCase()]);
           if (data && data.result) {
             urlData = nip05;
           } else {
             const data = await useNip05PromiseCheck(nip05, pubkey);
             if (data) {
-              $queryClient.setQueryData(["nip05", nip05.toLowerCase()], data);
+              $queryClient.setQueryData(
+                ["nip05", pubkey, nip05.toLowerCase()],
+                data
+              );
               if (data.result) {
                 urlData = nip05;
               }

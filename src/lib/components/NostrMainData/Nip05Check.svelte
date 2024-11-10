@@ -15,7 +15,7 @@
   const size = 16;
   let doCheck = false;
 
-  $: data = $queryClient?.getQueryData(["nip05", nip05Address]);
+  $: data = $queryClient?.getQueryData(["nip05", pubkey, nip05Address]);
   $: if (data) {
     doCheck = true;
   }

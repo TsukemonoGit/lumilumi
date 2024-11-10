@@ -12,7 +12,8 @@ export const useNip05Check = (
   status: Writable<ReqStatus>;
   error: Readable<Error>;
 } => {
-  const genQueryKey = () => ["nip05", nip05Address.toLowerCase()] as const;
+  const genQueryKey = () =>
+    ["nip05", pubkey, nip05Address.toLowerCase()] as const;
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 

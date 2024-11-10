@@ -116,9 +116,12 @@
     }
     console.log(data.nip05Address);
     if (data.nip05Address) {
-      $queryClient?.setQueryData(["nip05", data.nip05Address.toLowerCase()], {
-        result: true,
-      });
+      $queryClient?.setQueryData(
+        ["nip05", data.pubkey, data.nip05Address.toLowerCase()],
+        {
+          result: true,
+        }
+      );
     }
   }
 
