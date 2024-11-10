@@ -123,8 +123,11 @@
       );
 
       pubkeysIn(newKind3[0].event);
+      $beforeKind3 = newKind3[0].event;
+    } else if (kind3Event) {
+      $beforeKind3 = kind3Event.event;
     }
-    $beforeKind3 = newKind3[0].event;
+
     // console.log("$beforeKind3", $beforeKind3);
   };
 
