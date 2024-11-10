@@ -230,7 +230,7 @@ export const makeMainFilters = (
   const olderFilters: Nostr.Filter[] = [
     {
       authors: Array.from(pubkeyList.keys()),
-      kinds: kinds,
+      kinds: [...kinds],
       since: since,
     },
   ];

@@ -138,6 +138,15 @@
 
     updateViewEvent();
   }
+
+  // //なぜかkind0がTLに流れるのを次観測したらいれるのをけんとうするやつ
+  // const excludeKind0 = (note: Nostr.Event): boolean => {
+  //   if (note.kind === 0) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // };
 </script>
 
 {#if !$loginUser}
@@ -172,7 +181,7 @@
         {amount}
         let:len
         eventFilter={(note) => {
-          return checkCanvasation(note, $timelineFilter.selectCanversation);
+          return checkCanvasation(note, $timelineFilter.selectCanversation); // && excludeKind0(note)
         }}
         bind:updateViewEvent
       >
