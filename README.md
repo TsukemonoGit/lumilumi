@@ -12,8 +12,7 @@ https://github.com/akiomik/nosvelte
 - kind:10000 の Mute、kind:30007 の Mute by kind に対応
 - kind:10030 custom emoji に対応
 - 通信量が気になる方のための、画像を表示しない、のモード
-
-  - nip05 のチェックをしない
+  
   - アイコンを表示しない
 
     npub をもとに生成した boring avatar ( https://github.com/boringdesigners/boring-avatars )を表示
@@ -31,6 +30,7 @@ https://github.com/akiomik/nosvelte
 
 - petname📛がつけれる
 
+- nip05 チェックは手動
 ## 各種設定
 
 ### リレー設定
@@ -45,7 +45,7 @@ https://github.com/akiomik/nosvelte
 
 - 画像を表示 ON/OFF
 
-  - ON では、アイコンを表示する、カスタム絵文字、画像、OGP を表示する、nip05 の認証確認する、メタデータの更新をチェックする。
+  - ON では、アイコンを表示する、カスタム絵文字、画像、OGP を表示する、メタデータの更新をチェックする。
 
 - ノート作成時のプレビューの ON/OFF
 
@@ -136,6 +136,7 @@ https://github.com/akiomik/nosvelte
 - 翻訳機能
 - ブロードキャスト機能
 - ZAP
+- g tag 付き投稿の住所、Mapリンク
 
 - 設定のアップロード/ダウンロード ( kind: 30078,  d: "lumi-settings" ) 
 
@@ -166,3 +167,4 @@ https://github.com/akiomik/nosvelte
 <img src="./image/7.png" width=500>
 <img src="./image/8.png" width=500>
 <img src="./image/9.png" width=500>
+<img src="./image/12.png" width=500>
