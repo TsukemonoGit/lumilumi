@@ -195,7 +195,7 @@
       const older = await loadOlderEvents(
         syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
         filters,
-        queryKey,
+
         //lastfavcheck,
         untilTime,
         tie,
