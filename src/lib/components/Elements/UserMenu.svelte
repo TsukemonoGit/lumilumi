@@ -133,18 +133,28 @@
       case 7:
         //リンクの共有
         //Share link
-        // const nip05=getProfile(metadata)?.nip05;
-        // if(nip05){
+        if (!encodedPubkey) {
+          return;
+        }
+        let urlData: string = "";
+        const nip05 = getProfile(metadata)?.nip05;
+        if (!nip05) {
+          urlData = encodedPubkey;
+        } else {
+          const data = $queryClient.getQueryData([
+            "nip05",
+            nip05.toLowerCase(),
+          ]);
+          if (data) {
+            urlData = nip05;
+          } else {
+          }
+        }
 
-        // const data=$queryClient.getQueryData(["nip05",nip05]);
-        // if(!data){
-
-        // }
-        // }
         const shareData = {
           //title: "",
           //text: "lumilumi",
-          url: `${$page.url.origin}/${encodedPubkey}`,
+          url: `${$page.url.origin}/${urlData}`,
         };
 
         try {

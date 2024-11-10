@@ -74,15 +74,17 @@
     if (!(await validateLoginPubkey())) return;
 
     const followState = $followList.has(pubkey);
-    let kind3Event: EventPacket | undefined =
-      $queryClient.getQueryData(contactsQueryKey);
-    if (!kind3Event) {
+    const kind3Event: EventPacket | undefined =
+      $queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
+
+    await refreshContactsData(kind3Event);
+
+    if (!$beforeKind3) {
       //新しいKind3作っていいですかを出す
       $dialogCreateKind3Open = true;
       return;
     }
 
-    await refreshContactsData(kind3Event);
     isfollowee = $followList.has(pubkey);
 
     if (followState !== isfollowee) {
@@ -93,8 +95,9 @@
     handleFollowStateChange();
   };
 
-  const refreshContactsData = async (kind3Event: EventPacket) => {
+  const refreshContactsData = async (kind3Event: EventPacket | undefined) => {
     $nowProgress = true;
+    console.log($loginUser);
     // await $queryClient.refetchQueries({ queryKey: contactsQueryKey });
     // await delay(1000);
     // const newKind3: EventPacket | undefined =
@@ -110,17 +113,18 @@
     // console.log("newKind3", newKind3);
     // console.log("kind3Event", kind3Event);
     if (
-      newKind3.length > 0 &&
-      newKind3[0].event.created_at > kind3Event.event.created_at
+      !kind3Event ||
+      (newKind3.length > 0 &&
+        newKind3[0].event.created_at > kind3Event.event.created_at)
     ) {
       $queryClient.setQueryData(
         contactsQueryKey,
         (oldData: any) => newKind3[0]
       );
-      kind3Event = newKind3[0];
-      pubkeysIn(kind3Event.event);
+
+      pubkeysIn(newKind3[0].event);
     }
-    $beforeKind3 = kind3Event.event;
+    $beforeKind3 = newKind3[0].event;
     // console.log("$beforeKind3", $beforeKind3);
   };
 
@@ -170,7 +174,7 @@
       $queryClient.refetchQueries({ queryKey: contactsQueryKey });
       pubkeysIn(ev);
       const filters = makeMainFilters(ev, now());
-      changeMainEmit(filters);
+      changeMainEmit(filters.mainFilters);
     }
 
     isfollowee = $followList.has(pubkey);
