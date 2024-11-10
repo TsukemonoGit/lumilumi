@@ -25,7 +25,6 @@ export const useNip05Check = (
     refetchOnMount: false,
   });
 
-  // query のデータが変更されたときに実行される derived ストア
   const data = derived(
     query,
     ($query) => {
@@ -35,7 +34,14 @@ export const useNip05Check = (
         status.set("success");
       } else if ($query.status === "error") {
         status.set("error");
-        error.set($query.error);
+        // CORSエラーの場合、明示的なメッセージを設定
+        const errorMessage =
+          $query.error?.message === "corsError"
+            ? new Error(
+                "CORSエラーが発生しました。APIのドメインがCORSをサポートしているか確認してください。"
+              )
+            : $query.error;
+        error.set(errorMessage);
       }
       return $query.data;
     },
@@ -52,7 +58,7 @@ export const useNip05Check = (
 async function fetchNip05(pubkey: string, fullname: string) {
   const match = fullname.match(NIP05_REGEX);
   if (!match) {
-    return { result: false, error: "formatError" }; //"NIP-05 format error" };
+    return { result: false, error: "formatError" }; // "NIP-05 format error"
   }
 
   const [, name = "_", domain] = match;
@@ -62,21 +68,25 @@ async function fetchNip05(pubkey: string, fullname: string) {
     const res = await fetch(url, { redirect: "manual" });
 
     if (res.status !== 200) {
-      return { result: false, error: "fetchResponseError" }; //"Wrong response code" };
+      return { result: false, error: "fetchResponseError" }; // "Wrong response code"
     }
 
     const json = await res.json();
     const registeredPubkey = json.names[name];
 
     if (!registeredPubkey) {
-      return { result: false, error: "noPubkey" }; //"Pubkey not set in nostr.json" };
+      return { result: false, error: "noPubkey" }; // "Pubkey not set in nostr.json"
     }
 
     return {
       result: registeredPubkey === pubkey,
-      error: registeredPubkey === pubkey ? undefined : "impersonation", //"Possibility of impersonation",
+      error: registeredPubkey === pubkey ? undefined : "impersonation", // "Possibility of impersonation"
     };
   } catch (error) {
-    return { result: false, error: "fetchError" }; //"An error occurred during fetch" };
+    // CORSエラーであるかどうかを判定し、エラーコードを設定
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      return { result: false, error: "corsError" }; // CORSエラー
+    }
+    return { result: false, error: "fetchError" }; // "An error occurred during fetch"
   }
 }

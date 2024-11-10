@@ -240,7 +240,8 @@
       "fetchResponseError": "Wrong response code",
       "noPubkey": "Pubkey not set in nostr.json",
       "impersonation": "Possibility of impersonation",
-      "fetchError": "An error occurred during fetch"
+      "fetchError": "An error occurred during fetch",
+      "corsError": "CORS error."
     }
   }
 }

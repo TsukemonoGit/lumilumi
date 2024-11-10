@@ -237,9 +237,10 @@
     "error": {
       "formatError": "NIP-05フォーマットエラー",
       "fetchResponseError": "レスポンスコードエラー",
-      "noPubkey": "nostr.jsonに公開鍵情報がありません",
+      "noPubkey": "nostr.jsonにこの公開鍵の情報がありません",
       "impersonation": "なりすましの可能性があります",
-      "fetchError": "データの取得中にエラーが発生しました"
+      "fetchError": "データの取得中にエラーが発生しました",
+      "corsError": "CORSエラー"
     }
   }
 }
