@@ -34,8 +34,9 @@
   import PaginationList from "./PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
   import EllipsisMenuNaddr from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import { parseNaddr } from "$lib/func/util";
+  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
+  import NaddrEvent from "$lib/components/NostrElements/Note/NaddrEvent.svelte";
 
   export let data: {
     pubkey: string;
@@ -250,17 +251,28 @@
               <div
                 class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
               >
-                {#each event.tags.filter((tag) => tag[0] === "e") as [e, id], index}
+                {#each event.tags.filter((tag) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
                   <div
                     class="max-w-full break-words whitespace-pre-line box-border overflow-hidden"
                   >
-                    <Pin class="-rotate-45 text-magnum-400" /><Note
-                      {id}
-                      displayMenu={true}
-                      depth={1}
-                      repostable={true}
-                      {tieKey}
-                    />
+                    <Pin
+                      class="-rotate-45 text-magnum-400"
+                    />{#if e === "e"}<Note
+                        {id}
+                        displayMenu={true}
+                        depth={1}
+                        repostable={true}
+                        {tieKey}
+                      />{:else}
+                      <NaddrEvent
+                        data={parseNaddr([e, id])}
+                        displayMenu={true}
+                        depth={1}
+                        repostable={true}
+                        {tieKey}
+                        content={id}
+                      />
+                    {/if}
                   </div>
                 {/each}
               </div>
