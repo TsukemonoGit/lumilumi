@@ -190,7 +190,7 @@
     <Icon class="mx-2 my-auto" />{text}
   </button>
 {/each}
-{#if pubkey !== $loginUser}
+{#if $loginUser && pubkey !== $loginUser}
   <UserMuteMenu {pubkey}>
     <div
       class="

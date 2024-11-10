@@ -46,7 +46,7 @@
 
   // Public key validation
   const validateLoginPubkey = async (): Promise<boolean> => {
-    if ($loginUser === "") return false;
+    if (!$loginUser || $loginUser === "") return false;
     try {
       const signPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
@@ -289,34 +289,35 @@
   };
 </script>
 
-{#if isfollowee !== undefined}
-  {#if isfollowee}
-    <button
-      disabled={$nowProgress}
-      class={`rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-      title={$_("user.petname.edit")}
-      on:click={handlePetnameClick}
-    >
-      📛
-    </button>
-    <button
-      disabled={$nowProgress}
-      class={`rounded-full h-[32px] border border-magnum-300 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-      on:click={handleFollow}
-    >
-      {$_("user.following")}
-    </button>
-  {:else}
-    <button
-      disabled={$nowProgress}
-      class={`rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 h-[32px] `}
-      on:click={handleFollow}
-    >
-      {$_("user.follow")}
-    </button>
+{#if $loginUser}
+  {#if isfollowee !== undefined}
+    {#if isfollowee}
+      <button
+        disabled={$nowProgress}
+        class={`rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
+        title={$_("user.petname.edit")}
+        on:click={handlePetnameClick}
+      >
+        📛
+      </button>
+      <button
+        disabled={$nowProgress}
+        class={`rounded-full h-[32px] border border-magnum-300 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
+        on:click={handleFollow}
+      >
+        {$_("user.following")}
+      </button>
+    {:else}
+      <button
+        disabled={$nowProgress}
+        class={`rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 h-[32px] `}
+        on:click={handleFollow}
+      >
+        {$_("user.follow")}
+      </button>
+    {/if}
   {/if}
 {/if}
-
 <AlertDialog
   bind:open={dialogOpen}
   onClickOK={publishEvent}
