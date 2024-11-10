@@ -90,3 +90,45 @@ async function fetchNip05(pubkey: string, fullname: string) {
     return { result: false, error: "fetchError" }; // "An error occurred during fetch"
   }
 }
+
+export const useNip05PromiseCheck = async (
+  nip05Address: string,
+  pubkey: string
+): Promise<{ result: boolean; error?: string }> => {
+  // NIP-05のアドレスが正しいフォーマットか確認
+  const match = nip05Address.match(NIP05_REGEX);
+  if (!match) {
+    return { result: false, error: "formatError" }; // フォーマットエラー
+  }
+
+  // NIP-05のアドレスから名前とドメインを取得
+  const [, name = "_", domain] = match;
+  const url = `https://${domain}/.well-known/nostr.json?name=${name}`;
+
+  try {
+    // フェッチ処理を行い、ステータスコードが200か確認
+    const res = await fetch(url, { redirect: "manual" });
+    if (res.status !== 200) {
+      return { result: false, error: "fetchResponseError" }; // 適切なレスポンスコードでない場合
+    }
+
+    const json = await res.json();
+    const registeredPubkey = json.names[name];
+
+    // 公開鍵が設定されているか確認
+    if (!registeredPubkey) {
+      return { result: false, error: "noPubkey" }; // 公開鍵がnostr.jsonに設定されていない
+    }
+
+    return {
+      result: registeredPubkey === pubkey,
+      error: registeredPubkey === pubkey ? undefined : "impersonation", // なりすましの可能性
+    };
+  } catch (error) {
+    // CORSエラーであるかどうかを判定し、エラーメッセージを設定
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      return { result: false, error: "corsError" }; // CORSエラー
+    }
+    return { result: false, error: "fetchError" }; // フェッチ中のエラー
+  }
+};
