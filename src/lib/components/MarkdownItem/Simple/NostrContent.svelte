@@ -99,7 +99,7 @@
       >
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
@@ -112,12 +112,12 @@
       >
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "url"}<Link
       props={{ "aria-label": `External Links: ${part.url}` }}
-      className="underline text-magnum-300 break-all "
+      className="underline text-magnum-300 break-all hover:opacity-80 "
       href={part.content ?? ""}>{part.content}</Link
     >{:else if part.type === "emoji"}{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
@@ -132,16 +132,18 @@
     <a
       aria-label={"Search for events containing the hashtag"}
       href={`/search?t=${part.url}`}
-      class="underline text-magnum-300 break-all">#{part.content}</a
+      class="underline text-magnum-300 break-all hover:opacity-80"
+      >#{part.content}</a
     >
   {:else if part.type === "relay"}
-    <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
-      >{part.content}</a
+    <a
+      class="underline text-magnum-300 break-all hover:opacity-80"
+      href={part.url ?? ""}>{part.content}</a
     >
   {:else if part.type === "nip"}
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
-      className="underline text-magnum-300 break-all"
+      className="underline text-magnum-300 break-all hover:opacity-80"
       href={part.url ?? ""}>{part.content}</Link
     >{:else}<span
       class="whitespace-pre-wrap break-words"

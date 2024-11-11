@@ -12,18 +12,19 @@
   $: alt = part?.attrs?.find((attr) => attr[0] === "alt")?.[1];
   $: title = part?.attrs?.find((attr) => attr[0] === "title")?.[1];
   $: button = `View Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`;
-  // $: console.log(part);
+  //$: console.log(part);
 
   $: width = part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288";
   $: height = part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288";
 </script>
 
+<br />
 {#if $showImg || view}
   <img
     loading="lazy"
     {width}
     {height}
-    class="overflow-hidden object-contain"
+    class="overflow-hidden object-contain inline"
     style={`max-width:min(${width}px,100%);max-height:min(${height}px,100%)`}
     src={src ?? ""}
     alt={alt ?? ""}

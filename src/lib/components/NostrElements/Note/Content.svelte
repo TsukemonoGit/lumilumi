@@ -107,7 +107,7 @@
       >
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
@@ -120,7 +120,7 @@
       >
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
   {:else if part.type === "url"}{#if $showImg}<OGP
@@ -129,7 +129,7 @@
         ><Link
           props={{ "aria-label": `External Links: ${part.url}` }}
           slot="nodata"
-          className="underline text-magnum-300 break-all "
+          className="underline text-magnum-300 break-all hover:opacity-80"
           href={part.content ?? ""}>{part.content}</Link
         >{#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
           <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
@@ -140,7 +140,7 @@
           >{/if}</OGP
       >{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all "
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}{:else if part.type === "emoji"}
     <CustomEmoji {part} />
@@ -157,7 +157,7 @@
   {:else if part.type === "nip"}
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
-      className="underline text-magnum-300 break-all"
+      className="underline text-magnum-300 break-all hover:opacity-80"
       href={part.url ?? ""}>{part.content}</Link
     >{:else}<span
       class="whitespace-pre-wrap break-words"

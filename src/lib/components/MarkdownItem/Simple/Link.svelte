@@ -12,18 +12,17 @@
   export let openModal;
   export let nolist: boolean;
   export let tieKey: string | undefined;
-
+  //console.log(part);
   let children: Token[];
   $: if (part.children) {
     children = transformTokens(part.children);
-    // console.log(children);
   }
   $: url = part.attrs?.find((attr) => attr[0] === "href")?.[1];
   $: href = url?.startsWith("nostr:") ? `./${url.slice(6)}` : url;
 </script>
 
 <a
-  class="underline text-magnum-300 break-all"
+  class="underline text-magnum-300 break-all hover:opacity-80"
   {href}
   target="_blank"
   rel="noopener noreferrer"

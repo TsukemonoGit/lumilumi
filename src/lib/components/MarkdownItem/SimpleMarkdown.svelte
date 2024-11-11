@@ -9,6 +9,7 @@
   import markdownItMark from "markdown-it-mark";
   import markdownBrPlugin from "$lib/func/markdown-it-br";
   import markdownImgPlugin from "$lib/func/markdown-it-img";
+  import markdownLinkPlugin from "$lib/func/markdown-it-link";
 
   export let text: string;
   export let tags: string[][];
@@ -22,13 +23,15 @@
 
   //プレビューにも使ってるからconstだとだめ
   $: tokens = md
+
     .use(markdownImgPlugin)
+
     .use(markdownItFootnote)
     .use(markdownItSub)
     .use(markdownItSup)
     .use(markdownItMark)
     .use(markdownBrPlugin)
-
+    .use(markdownLinkPlugin)
     .parse(text, {});
   $: parts = transformTokens(tokens);
 
