@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { convertMetaTags, filesUpload, mediaUploader } from "$lib/func/util";
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
@@ -8,54 +7,63 @@
   // Web Share Target API
   //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
   //マニフェストからのやつ
-
-  const title = $page.url.searchParams.get("title");
-  const text = $page.url.searchParams.get("text");
-  const url = $page.url.searchParams.get("url");
-  let sharedContent = [title, text, url]
-
-    .filter((param) => param !== null)
-    .join("\n");
+  let fileList: FileList;
+  let sharedContent: string;
   let tags: string[][] = [];
 
   onMount(async () => {
     try {
-      let uploader = localStorage.getItem("uploader");
-      if (!uploader) {
-        uploader = mediaUploader[0];
-      }
+      // Service Workerからのメッセージを受け取る
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.addEventListener("message", (event) => {
+          const { title, text, url, files } = event.data;
 
-      // サーバーから共有データを取得する
-      const formData = await getSharedData();
-      const sharedImage = formData.get("image") as File | null;
-      if (sharedImage) {
-        const fileList = createFileList(sharedImage);
-        const url = await filesUpload(fileList, uploader);
-
-        url.map(async (data) => {
-          if (data.status === "success") {
-            const url = data.nip94_event?.tags.find(
-              (tag) => tag[0] === "url"
-            )?.[1];
-
-            if (url) {
-              // imetaをタグに入れる
-              if (data.nip94_event) {
-                tags.push(convertMetaTags(data.nip94_event));
-              }
-              sharedContent = sharedContent + url;
-            }
-          }
+          // 受け取ったデータを処理
+          console.log("Received data from service worker:", {
+            title,
+            text,
+            url,
+            files,
+          });
+          fileList = files;
+          sharedContent = [title, text, url]
+            .filter((param) => param !== null)
+            .join("\n");
         });
+
+        let uploader = localStorage.getItem("uploader");
+        if (!uploader) {
+          uploader = mediaUploader[0];
+        }
+
+        if (fileList) {
+          const url = await filesUpload(fileList, uploader);
+
+          url.map(async (data) => {
+            if (data.status === "success") {
+              const url = data.nip94_event?.tags.find(
+                (tag) => tag[0] === "url"
+              )?.[1];
+
+              if (url) {
+                // imetaをタグに入れる
+                if (data.nip94_event) {
+                  tags.push(convertMetaTags(data.nip94_event));
+                }
+                sharedContent = sharedContent + url;
+              }
+            }
+          });
+        }
+        $additionalPostOptions = {
+          tags: tags,
+          addableUserList: [],
+          defaultUsers: [],
+          warningText: undefined,
+          content: sharedContent,
+        };
+        $postWindowOpen = true;
       }
-      $additionalPostOptions = {
-        tags: tags,
-        addableUserList: [],
-        defaultUsers: [],
-        warningText: undefined,
-        content: sharedContent,
-      };
-      $postWindowOpen = true;
     } catch (error) {
       console.log(error);
     }
