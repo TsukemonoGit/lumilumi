@@ -14,7 +14,7 @@
   onMount(async () => {
     try {
       // Service Workerからのメッセージを受け取る
-      if (navigator.serviceWorker) {
+      if ("serviceWorker" in navigator) {
         navigator.serviceWorker.addEventListener("message", (event) => {
           const { title, text, url, files } = event.data;
 

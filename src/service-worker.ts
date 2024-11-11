@@ -1,34 +1,25 @@
 self.addEventListener("fetch", (event: any) => {
-  const url = new URL(event.request.url);
-
-  if (event.request.method === "POST" && url.pathname === "/post") {
+  if (
+    event.request.method === "POST" &&
+    new URL(event.request.url).pathname === "/post"
+  ) {
     event.respondWith(
-      (async () => {
+      (async function () {
         const formData = await event.request.formData();
         const title = formData.get("title");
         const text = formData.get("text");
         const url = formData.get("url");
-        const files = formData.getAll("media"); // 送信されたメディアファイル
+        const files = formData.getAll("media");
 
-        // 必要な処理（例えば、データを保存する、UIに通知を送るなど）
-        console.log({ title, text, url, files });
-
-        // フォアグラウンドページにデータを送信する方法
-        (self as any).clients.matchAll().then((clients) => {
-          clients.forEach((client) => {
-            client.postMessage({
-              title,
-              text,
-              url,
-              files,
-            });
-          });
+        // クライアントに共有データを送信
+        const allClients = await (self as any).clients.matchAll({
+          includeUncontrolled: true,
+        });
+        allClients.forEach((client) => {
+          client.postMessage({ title, text, url, files });
         });
 
-        // レスポンスを返す
-        return new Response("Data received successfully!", {
-          status: 200,
-        });
+        return new Response("", { status: 200 });
       })()
     );
   }
