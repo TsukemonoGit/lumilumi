@@ -3,8 +3,10 @@ import type MarkdownIt from "markdown-it";
 const markdownImgPlugin = function (md: MarkdownIt) {
   md.inline.ruler.before("image", "html_img", function (state, silent) {
     const pos = state.pos;
+    // widthとheightにパーセントも含める
     const imgRegex =
-      /^<img\s+src="([^"]+)"(?:\s+width="(\d+)")?(?:\s+height="(\d+)")?\s*\/?>/i;
+      /^<img\s+src="([^"]+)"(?:\s+width="(\d+%?)")?(?:\s+height="(\d+%?)")?\s*\/?>/i;
+
     const match = imgRegex.exec(state.src.slice(pos));
 
     if (match) {
