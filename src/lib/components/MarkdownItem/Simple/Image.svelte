@@ -23,7 +23,7 @@
     loading="lazy"
     {width}
     {height}
-    class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
+    class="overflow-hidden object-contain"
     style={`max-width:min(${width}px,100%);max-height:min(${height}px,100%)`}
     src={src ?? ""}
     alt={alt ?? ""}
