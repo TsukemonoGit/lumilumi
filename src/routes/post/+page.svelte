@@ -4,97 +4,104 @@
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
   import { onMount } from "svelte";
 
-  // Web Share Target API
-  //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
-  //マニフェストからのやつ
-  // export let data: {
-  //   title: string;
-  //   text: string;
-  //   url: string;
-  //   media: string;
-  // };
-
   let fileList: FileList;
-  let sharedContent: string = "";
+
   let tags: string[][] = [];
-  // $: fileList = data.media ? createFileList(new File([], data.media)) : null;
+  export let data;
+  console.log(data);
+  // // サービスワーカーのメッセージ受信処理
+  // onMount(() => {
+  //   if (navigator?.serviceWorker) {
+  //     navigator.serviceWorker
+  //       .register("/service-worker.js")
+  //       .then((registration) => {
+  //         console.log(
+  //           "Service Worker registered with scope:",
+  //           registration.scope
+  //         );
+  //       })
+  //       .catch((error) => {
+  //         console.error("サービスワーカーの登録に失敗しました:", error);
+  //       });
 
-  // sharedContent = [data.title, data.text, data.url]
-  //   .filter((param) => param !== null)
-  //   .join("\n");
+  //     navigator.serviceWorker.ready
+  //       .then((registration) => {
+  //         console.log("サービスワーカーが準備完了:", registration);
 
-  onMount(async () => {
-    try {
-      // Service Workerからのメッセージを受け取る
-      if (navigator?.serviceWorker) {
-        navigator.serviceWorker.addEventListener("message", (event) => {
-          const { title, text, url, files } = event.data;
+  //         // メッセージリスナーを設定
+  //         navigator.serviceWorker.addEventListener("message", (event) => {
+  //           console.log("サービスワーカーからのメッセージ:", event.data);
 
-          // 受け取ったデータを処理
-          console.log("Received data from service worker:", {
-            title,
-            text,
-            url,
-            files,
-          });
-          fileList = files;
-          sharedContent = [title, text, url]
-            .filter((param) => param !== null)
-            .join("\n");
-        });
+  //           const { title, text, url, media } = event.data;
+  //           // メッセージの内容を処理
+  //           console.log("Received data:", { title, text, url, media });
+  //           fileList = media;
+  //           sharedContent = [title, text, url].filter(Boolean).join("\n");
 
-        let uploader = localStorage.getItem("uploader");
-        if (!uploader) {
-          uploader = mediaUploader[0];
-        }
-
-        if (fileList) {
-          const url = await filesUpload(fileList, uploader);
-
-          url.map(async (data) => {
-            if (data.status === "success") {
-              const url = data.nip94_event?.tags.find(
-                (tag) => tag[0] === "url"
-              )?.[1];
-
-              if (url) {
-                // imetaをタグに入れる
-                if (data.nip94_event) {
-                  tags.push(convertMetaTags(data.nip94_event));
-                }
-                sharedContent = sharedContent + url;
-              }
-            }
-          });
-        }
-        $additionalPostOptions = {
-          tags: tags,
-          addableUserList: [],
-          defaultUsers: [],
-          warningText: undefined,
-          content: sharedContent,
-        };
-        $postWindowOpen = true;
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  //           // ファイルアップロードの処理を開始
+  //           handleFileUpload(fileList, sharedContent);
+  //         });
+  //       })
+  //       .catch((error) => {
+  //         console.error("サービスワーカーの準備に失敗しました:", error);
+  //       });
+  //   } else {
+  //     console.log("サービスワーカーはサポートされていません。");
+  //   }
+  // });
+  onMount(() => {
+    handleFileUpload(
+      data.data.media,
+      [data.data.title, data.data.text, data.data.url]
+        .filter(Boolean)
+        .join("\n")
+    );
   });
+  async function handleFileUpload(
+    files: FileList | null,
+    initialContent: string
+  ) {
+    let sharedContent: string = initialContent;
+    try {
+      let uploader = localStorage.getItem("uploader");
+      if (!uploader) {
+        uploader = mediaUploader[0];
+      }
+      if (files) {
+        // ファイルアップロード
+        const urlResults = await filesUpload(files, uploader);
 
-  // // FileをFileListに変換する関数
-  // function createFileList(file: File): FileList {
-  //   const dataTransfer = new DataTransfer();
-  //   dataTransfer.items.add(file);
-  //   return dataTransfer.files;
-  // }
-  // // サーバーから共有データを取得する関数
-  // async function getSharedData(): Promise<FormData> {
-  //   const response = await fetch("/post", {
-  //     method: "POST",
-  //   });
-  //   const formData = await response.formData();
-  //   return formData;
-  // }
+        // URLが正常にアップロードされているかチェック
+        urlResults.map(async (data) => {
+          if (data.status === "success") {
+            const url = data.nip94_event?.tags.find(
+              (tag) => tag[0] === "url"
+            )?.[1];
+            if (url) {
+              // imetaをタグに追加
+              if (data.nip94_event) {
+                tags.push(convertMetaTags(data.nip94_event));
+              }
+              sharedContent = `${initialContent}\n${url}`;
+            }
+          }
+        });
+      }
+      // Svelteのストアに新しいオプションをセット
+      $additionalPostOptions = {
+        tags: tags,
+        addableUserList: [],
+        defaultUsers: [],
+        warningText: undefined,
+        content: sharedContent,
+      };
+
+      // ポストウィンドウを開く
+      $postWindowOpen = true;
+    } catch (error) {
+      console.error("ファイルアップロードの処理でエラーが発生しました:", error);
+    }
+  }
 </script>
 
 <div class="postWindow">

@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+// サービスワーカー内でのメッセージ送信の確認
 self.addEventListener("fetch", (event) => {
   if (
     // @ts-ignore
@@ -14,16 +15,14 @@ self.addEventListener("fetch", (event) => {
         const title = formData.get("title");
         const text = formData.get("text");
         const url = formData.get("url");
-        const files = formData.getAll("media");
+        const media = formData.getAll("media");
 
         // クライアントに共有データを送信
-        // @ts-ignore
-        const allClients = await (self).clients.matchAll({
+        const allClients = await self.clients.matchAll({
           includeUncontrolled: true,
         });
-        // @ts-ignore
         allClients.forEach((client) => {
-          client.postMessage({ title, text, url, files });
+          client.postMessage({ title, text, url, media });
         });
 
         return new Response("", { status: 200 });
