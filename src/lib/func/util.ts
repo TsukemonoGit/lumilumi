@@ -211,7 +211,7 @@ export function datetime(unixtime: number) {
 export async function filesUpload(
   files: FileList,
   uploader: string,
-  signal: AbortSignal // 新たに signal を受け取る
+  signal?: AbortSignal // 新たに signal を受け取る
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
   let res: FileUploadResponse[] = [];
