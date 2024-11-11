@@ -7,9 +7,21 @@
   // Web Share Target API
   //https://developer.mozilla.org/ja/docs/Web/Manifest/share_target
   //マニフェストからのやつ
+  // export let data: {
+  //   title: string;
+  //   text: string;
+  //   url: string;
+  //   media: string;
+  // };
+
   let fileList: FileList;
-  let sharedContent: string;
+  let sharedContent: string = "";
   let tags: string[][] = [];
+  // $: fileList = data.media ? createFileList(new File([], data.media)) : null;
+
+  // sharedContent = [data.title, data.text, data.url]
+  //   .filter((param) => param !== null)
+  //   .join("\n");
 
   onMount(async () => {
     try {
@@ -69,20 +81,20 @@
     }
   });
 
-  // FileをFileListに変換する関数
-  function createFileList(file: File): FileList {
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    return dataTransfer.files;
-  }
-  // サーバーから共有データを取得する関数
-  async function getSharedData(): Promise<FormData> {
-    const response = await fetch("/post", {
-      method: "POST",
-    });
-    const formData = await response.formData();
-    return formData;
-  }
+  // // FileをFileListに変換する関数
+  // function createFileList(file: File): FileList {
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(file);
+  //   return dataTransfer.files;
+  // }
+  // // サーバーから共有データを取得する関数
+  // async function getSharedData(): Promise<FormData> {
+  //   const response = await fetch("/post", {
+  //     method: "POST",
+  //   });
+  //   const formData = await response.formData();
+  //   return formData;
+  // }
 </script>
 
 <div class="postWindow">

@@ -34,7 +34,7 @@ export default defineConfig({
             files: [
               {
                 name: "media",
-                accept: ["image/*,video/*,audio/*"],
+                accept: ["image/*", "video/*", "audio/*"],
               },
             ],
           },
