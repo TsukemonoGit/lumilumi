@@ -17,7 +17,7 @@ const markdownImgPlugin = function (md: MarkdownIt) {
     const pos = state.pos;
 
     // <img> タグ全体にマッチする正規表現
-    const imgRegex = /<img\s+[^>]+\/?>/i;
+    const imgRegex = /^<img\s+[^>]+\/?>/i;
     const match = imgRegex.exec(state.src.slice(pos));
 
     if (match) {
