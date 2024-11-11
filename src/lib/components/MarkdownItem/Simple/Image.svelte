@@ -18,13 +18,12 @@
   $: height = part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288";
 </script>
 
-<br />
 {#if $showImg || view}
   <img
     loading="lazy"
     {width}
     {height}
-    class="overflow-hidden object-contain inline"
+    class="overflow-hidden object-contain"
     style={`max-width:min(${width}px,100%);max-height:min(${height}px,100%)`}
     src={src ?? ""}
     alt={alt ?? ""}
