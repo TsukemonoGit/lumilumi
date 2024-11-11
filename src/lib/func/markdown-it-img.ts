@@ -4,7 +4,7 @@ const markdownImgPlugin = function (md: MarkdownIt) {
   md.inline.ruler.before("image", "html_img", function (state, silent) {
     const pos = state.pos;
 
-    // 属性の順序に依存せず、任意の属性にマッチする正規表現
+    // imgタグ全体にマッチする正規表現
     const imgRegex = /<img\s+([^>]+?)\s*\/?>/i;
     const match = imgRegex.exec(state.src.slice(pos));
 
@@ -13,12 +13,12 @@ const markdownImgPlugin = function (md: MarkdownIt) {
         const token = state.push("image", "img", 0);
         token.attrs = [];
 
-        // 個々の属性の解析
+        // 属性名（alt, src, width, height, style）とその値をマッチさせる正規表現
         const attrRegex =
           /\b(alt|src|width|height|style)=["']?([^"'\s>]+)["']?/gi;
         let attrMatch;
 
-        // 各属性をトークンに追加
+        // 各属性を順番に取得してtoken.attrsに追加
         while ((attrMatch = attrRegex.exec(match[1])) !== null) {
           const attrName = attrMatch[1];
           const attrValue = attrMatch[2];
