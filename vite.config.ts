@@ -33,8 +33,8 @@ export default defineConfig({
             url: "url",
             files: [
               {
-                name: "image",
-                accept: ["image/*"],
+                name: "media",
+                accept: ["image/*,video/*,audio/*"],
               },
             ],
           },
