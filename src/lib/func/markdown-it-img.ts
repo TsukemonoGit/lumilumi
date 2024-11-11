@@ -1,34 +1,32 @@
 import type MarkdownIt from "markdown-it";
 
+const parseImgAttributes = (imgTag: string) => {
+  const attributes: [string, string][] = [];
+  const attrRegex = /\b(alt|src|width|height|style)=["']?([^"'>]+)["']?/gi;
+  let attrMatch;
+
+  while ((attrMatch = attrRegex.exec(imgTag)) !== null) {
+    attributes.push([attrMatch[1], attrMatch[2]]);
+  }
+
+  return attributes;
+};
+
 const markdownImgPlugin = function (md: MarkdownIt) {
   md.inline.ruler.before("image", "html_img", function (state, silent) {
     const pos = state.pos;
-    // widthとheightにパーセントも含める
-    const imgRegex =
-      /^<img\s+src="([^"]+)"(?:\s+width="(\d+%?)")?(?:\s+height="(\d+%?)")?\s*\/?>/i;
 
+    // <img> タグ全体にマッチする正規表現
+    const imgRegex = /<img\s+[^>]+\/?>/i;
     const match = imgRegex.exec(state.src.slice(pos));
 
     if (match) {
       if (!silent) {
         const token = state.push("image", "img", 0);
-
-        // 属性をトークンの属性として設定
-        token.attrs = [
-          ["src", match[1]], // src 属性
-        ];
-
-        // width属性があれば追加
-        if (match[2]) {
-          token.attrs.push(["width", match[2]]);
-        }
-
-        // height属性があれば追加
-        if (match[3]) {
-          token.attrs.push(["height", match[3]]);
-        }
+        token.attrs = parseImgAttributes(match[0]);
       }
 
+      // 正しい位置に進める
       state.pos += match[0].length;
       return true;
     }

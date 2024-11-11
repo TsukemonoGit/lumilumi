@@ -22,13 +22,12 @@
 
   //プレビューにも使ってるからconstだとだめ
   $: tokens = md
-
+    .use(markdownImgPlugin)
     .use(markdownItFootnote)
     .use(markdownItSub)
     .use(markdownItSup)
     .use(markdownItMark)
     .use(markdownBrPlugin)
-    .use(markdownImgPlugin)
 
     .parse(text, {});
   $: parts = transformTokens(tokens);
