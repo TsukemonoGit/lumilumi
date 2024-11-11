@@ -1,7 +1,7 @@
 self.addEventListener("fetch", (event: any) => {
   const url = new URL(event.request.url);
 
-  if (event.request.method === "POST" && url.pathname === "/share") {
+  if (event.request.method === "POST" && url.pathname === "/post") {
     event.respondWith(
       (async () => {
         const formData = await event.request.formData();
