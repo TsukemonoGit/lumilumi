@@ -19,11 +19,11 @@
   // $: console.log(data);
   onMount(async () => {
     console.log("onMount");
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    if (navigator.serviceWorker) {
       console.log("serviceWorker");
       // メッセージを受け取るリスナーを設定
       navigator.serviceWorker.addEventListener("message", async (event) => {
-        console.log(event);
+        console.log("message", event);
         const data = event.data;
         if (!data) return;
         sharedContent = [data.title, data.text, data.url]
@@ -65,10 +65,10 @@
         }
       });
 
-      // サービスワーカーに最新データをリクエスト
-      navigator.serviceWorker.controller.postMessage({
-        type: "requestLatestData",
-      });
+      // // サービスワーカーに最新データをリクエスト
+      // navigator.serviceWorker.controller.postMessage({
+      //   type: "requestLatestData",
+      // });
     }
     console.log("onMount");
   });

@@ -9,10 +9,10 @@ export default defineConfig({
     SvelteKitPWA({
       strategies: "injectManifest", //これ入れないと作った方のサービスワーカー登録されない
       // srcDir: "./src",
-      filename: "my-sw.js", //自分の作ったサービスワーカーの名前
+      filename: "my-sw.ts", //自分の作ったサービスワーカーの名前
       injectManifest: { injectionPoint: undefined },
-      // scope: "/",
-      // base: "/",
+      scope: "/",
+      base: "/",
       devOptions: {
         //devで確認したい場合は、プラグイン設定にdevOptionsオプションを追加してください（Web App Manifestと生成されたサービスワーカーが得られます）：
         enabled: true,
@@ -47,8 +47,8 @@ export default defineConfig({
         },
       },
       injectRegister: "auto", //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
-
-      registerType: "autoUpdate",
+      registerType: "prompt",
+      //registerType: "autoUpdate",
       workbox: {
         globPatterns: [
           "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
