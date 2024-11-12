@@ -140,6 +140,8 @@ https://github.com/akiomik/nosvelte
 
 - 設定のアップロード/ダウンロード ( kind: 30078,  d: "lumi-settings" ) 
 
+- 対応しているブラウザでPWAにしておくと画像共有、リンク共有のメニューに出てきて直接投稿できる
+<img src="./image/13.png" width=200>
 
 など
 
