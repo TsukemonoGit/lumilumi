@@ -110,7 +110,7 @@ export async function firstLoadOlderEvents(
     4000
   );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-
+  //↑これoperator通したときに通さないやつとかいたら飛び飛びの古いのまで取得することになるから省かないようにしたデータからシフト分だけ取らないと
   console.log("sift", sift);
   console.log("olderEvents.length", olderEvents.length);
   return olderEvents.slice(0, sift === 0 ? undefined : sift);

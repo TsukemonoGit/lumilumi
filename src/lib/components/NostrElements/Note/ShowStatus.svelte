@@ -11,12 +11,12 @@
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
 
-  export let pubkey: string;
+  export let pubkey: string | undefined;
   export let tieKey: string | undefined;
   beforeNavigate((navigate) => {
-    console.log("beforeNavigate", navigate.type);
+    //console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
-      pubkey = "";
+      pubkey = undefined;
     }
   });
 
