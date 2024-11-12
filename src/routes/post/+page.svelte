@@ -64,11 +64,12 @@
           handleFilesUpload(fileList, sharedContent);
         }
       });
-
-      // // サービスワーカーに最新データをリクエスト
-      // navigator.serviceWorker.controller.postMessage({
-      //   type: "requestLatestData",
-      // });
+      if (navigator.serviceWorker.controller) {
+        // サービスワーカーに最新データをリクエスト
+        navigator.serviceWorker.controller.postMessage({
+          type: "requestLatestData",
+        });
+      }
     }
     console.log("onMount");
   });
@@ -124,7 +125,7 @@
     files: FileList | null,
     initialContent: string
   ) {
-    let sharedContent: string = initialContent;
+    let sharedContent: string = initialContent ?? "";
     try {
       let uploader = localStorage.getItem("uploader");
       if (!uploader) {
@@ -145,7 +146,8 @@
               if (data.nip94_event) {
                 tags.push(convertMetaTags(data.nip94_event));
               }
-              sharedContent = `${initialContent}\n${url}`;
+              sharedContent = url;
+              console.log(sharedContent);
             }
           }
         });
