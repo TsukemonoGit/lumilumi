@@ -5,10 +5,74 @@
   import { onMount } from "svelte";
 
   let fileList: FileList;
-
+  let cachedMediaFiles: { name: string; blob: Blob }[] = [];
   let tags: string[][] = [];
-  export let data;
-  console.log(data);
+  // export let data: {
+  //   title: string;
+  //   text: string;
+  //   url?: string;
+  //   media?: string[];
+  // };
+  let sharedContent: string; // = [data.title, data.text, data.url]
+  //   .filter(Boolean)
+  //   .join("\n");
+  // $: console.log(data);
+  onMount(async () => {
+    console.log("onMount");
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      console.log("serviceWorker");
+      // メッセージを受け取るリスナーを設定
+      navigator.serviceWorker.addEventListener("message", async (event) => {
+        console.log(event);
+        const data = event.data;
+        if (!data) return;
+        sharedContent = [data.title, data.text, data.url]
+          .filter(Boolean)
+          .join("\n");
+        if (!data.media || data.media.length <= 0) {
+          // Svelteのストアに新しいオプションをセット
+          $additionalPostOptions = {
+            tags: tags,
+            addableUserList: [],
+            defaultUsers: [],
+            warningText: undefined,
+            content: sharedContent,
+          };
+
+          // ポストウィンドウを開く
+          $postWindowOpen = true;
+          return;
+        }
+        if (data.media) {
+          console.log(data.media);
+          // キャッシュからファイルを取得し FileList を作成
+          const cache = await caches.open("media-cache");
+          const files = await Promise.all(
+            data.media.map(async (fileUrl: string) => {
+              const cachedResponse = await cache.match(fileUrl);
+              if (cachedResponse) {
+                const blob = await cachedResponse.blob();
+                return new File([blob], fileUrl.split("/").pop() || "unknown", {
+                  type: blob.type,
+                });
+              }
+            })
+          ).then((files) => files.filter(Boolean));
+          console.log(files);
+          // FileListを生成してハンドル関数に渡す
+          const fileList = createFileList(files as File[]);
+          handleFilesUpload(fileList, sharedContent);
+        }
+      });
+
+      // サービスワーカーに最新データをリクエスト
+      navigator.serviceWorker.controller.postMessage({
+        type: "requestLatestData",
+      });
+    }
+    console.log("onMount");
+  });
+
   // // サービスワーカーのメッセージ受信処理
   // onMount(() => {
   //   if (navigator?.serviceWorker) {
@@ -49,15 +113,14 @@
   //     console.log("サービスワーカーはサポートされていません。");
   //   }
   // });
-  onMount(() => {
-    handleFileUpload(
-      data.data.media,
-      [data.data.title, data.data.text, data.data.url]
-        .filter(Boolean)
-        .join("\n")
-    );
-  });
-  async function handleFileUpload(
+  // FileListを作成するためのユーティリティ関数
+  function createFileList(files: File[]): FileList {
+    const dataTransfer = new DataTransfer();
+    files.forEach((file) => dataTransfer.items.add(file));
+    return dataTransfer.files;
+  }
+
+  async function handleFilesUpload(
     files: FileList | null,
     initialContent: string
   ) {

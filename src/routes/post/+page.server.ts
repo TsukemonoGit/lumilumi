@@ -1,23 +1,26 @@
 // +page.server.ts
+import {
+  convertMetaTags,
+  filesUpload,
+  fileUpload,
+  mediaUploader,
+} from "$lib/func/util.js";
 import { fail } from "@sveltejs/kit";
 
 let data: { title: any; text: any; url?: any; media?: any } = {
-  title: "Sample Title",
-  text: "This is a message from the server",
+  title: "",
+  text: "",
 };
 
-export async function load() {
-  // 直接オブジェクトを返す
-  return { data }; // クライアントにデータを返す
-}
+// export async function load() {
+//   return data;
+// }
 
 export const actions = {
   default: async ({ request }) => {
     try {
-      // FormDataを使用してリクエストボディを取得
       const formData = await request.formData();
 
-      // フォームデータから値を取得
       data = {
         title: formData.get("title"),
         text: formData.get("text"),

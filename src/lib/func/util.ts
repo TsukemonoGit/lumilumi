@@ -256,7 +256,54 @@ export async function filesUpload(
   }
   return res;
 }
+export async function fileUpload(
+  file: File,
+  uploader: string,
+  signal?: AbortSignal // 新たに signal を受け取る
+): Promise<FileUploadResponse[]> {
+  console.log(file, uploader);
+  let res: FileUploadResponse[] = [];
 
+  try {
+    const serverConfig = await readServerConfig(uploader);
+    console.log(serverConfig);
+    const header = await getToken(
+      serverConfig.api_url,
+      "POST",
+      async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+      true
+    );
+    console.log(file);
+    console.log(header);
+    console.log(serverConfig.api_url);
+    console.log(file.type);
+    const response: FileUploadResponse = await uploadFile(
+      file,
+      serverConfig.api_url,
+      header,
+      { content_type: file.type },
+      signal // signal を渡す
+    );
+    console.log(response);
+    res.push(response);
+  } catch (error: any) {
+    if (error.name === "AbortError") {
+      console.log("Upload aborted:", file.name);
+      res.push({
+        status: "error",
+        message: "Upload aborted: " + file.name,
+      } as FileUploadResponse);
+    } else {
+      console.error("Error uploading file:", error);
+      res.push({
+        status: "error",
+        message: "Failed to upload file: " + file.name,
+      } as FileUploadResponse);
+    }
+  }
+
+  return res;
+}
 export const generateResultMessage = (
   isSuccess: string[],
   isFailed: string[]
