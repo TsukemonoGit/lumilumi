@@ -7,7 +7,7 @@ export default defineConfig({
     svelteTesting(),
     sveltekit(),
     SvelteKitPWA({
-      strategies: "generateSW",
+      strategies: "injectManifest",
       srcDir: "src",
       filename: "service-worker.js",
       devOptions: {
