@@ -7,9 +7,12 @@ export default defineConfig({
     svelteTesting(),
     sveltekit(),
     SvelteKitPWA({
-      strategies: "injectManifest",
-      srcDir: "src",
-      filename: "service-worker.js",
+      strategies: "injectManifest", //これ入れないと作った方のサービスワーカー登録されない
+      // srcDir: "./src",
+      filename: "my-sw.js", //自分の作ったサービスワーカーの名前
+      injectManifest: { injectionPoint: undefined },
+      // scope: "/",
+      // base: "/",
       devOptions: {
         //devで確認したい場合は、プラグイン設定にdevOptionsオプションを追加してください（Web App Manifestと生成されたサービスワーカーが得られます）：
         enabled: true,

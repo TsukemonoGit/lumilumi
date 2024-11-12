@@ -1,7 +1,9 @@
 /// <reference lib="webworker" />
-let title;
-let text;
-let url;
+// src/service-worker.js (例)
+self.__WB_MANIFEST;  // Workbox がマニフェストを自動的に挿入します
+
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.1.5/workbox-sw.js');
+
 
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installed');

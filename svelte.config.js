@@ -16,7 +16,7 @@ const config = {
     },
     csrf: false,
     files: {
-      serviceWorker: 'src/service-worker.js', // or `src/my-sw.ts`
+      serviceWorker: 'src/my-sw.js', // or `src/my-sw.ts`
     }
   }
 };
