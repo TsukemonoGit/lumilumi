@@ -1,10 +1,5 @@
 // +page.server.ts
-import {
-  convertMetaTags,
-  filesUpload,
-  fileUpload,
-  mediaUploader,
-} from "$lib/func/util.js";
+
 import { fail } from "@sveltejs/kit";
 
 let data: { title: any; text: any; url?: any; media?: any } = {

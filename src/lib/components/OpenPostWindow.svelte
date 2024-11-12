@@ -630,7 +630,7 @@
             max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      {#if signPubkey && (initOptions.tags.length > 0 || (initOptions.content && initOptions.content.length > 0) || ($showImg && $showPreview))}
+      {#if signPubkey && $showImg && $showPreview}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
@@ -643,7 +643,7 @@
                 sig: "",
                 id: "",
                 pubkey: signPubkey,
-                content: text,
+                content: text ?? "",
                 tags: tags,
                 kind: initOptions.kind,
                 created_at: now(),
