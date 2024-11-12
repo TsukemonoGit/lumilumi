@@ -151,7 +151,7 @@
               if (data.nip94_event) {
                 tags.push(convertMetaTags(data.nip94_event));
               }
-              sharedContent = url;
+              sharedContent = `\n${url}`;
               // 500ms待機するPromise //image not foundになるのを避けるため
               await delay(1000);
               console.log(sharedContent);
