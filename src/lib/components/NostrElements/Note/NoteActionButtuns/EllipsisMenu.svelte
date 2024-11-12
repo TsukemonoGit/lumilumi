@@ -153,7 +153,7 @@
           //text: "lumilumi",
           url: `${$page.url.origin}/${replaceable ? naddr : nevent}`,
         };
-
+        //console.log(shareData);
         try {
           await navigator.share(shareData);
           // await navigator.clipboard.writeText(

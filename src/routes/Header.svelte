@@ -7,6 +7,7 @@
   import { _ } from "svelte-i18n";
   import { showBanner, timelineFilter } from "$lib/stores/stores";
   import { writable } from "svelte/store";
+  import { page } from "$app/stores";
 
   let openPopover: any;
   const optionsArr = [
@@ -41,7 +42,10 @@
           <svelte:component this={$currentPage.Icon} />
         </div>
       {/if}
-      <div class="uppercase font-bold">{$currentPage?.alt ?? "lumilumi"}</div>
+      <div class="uppercase font-bold">
+        {$currentPage?.alt ??
+          ($page.route.id === "/post" ? "share" : "lumilumi")}
+      </div>
       <RelayStatus />
     </div>
     {#if $currentPage?.alt !== "settings"}<!--&& $currentPage?.alt !== "about"-->

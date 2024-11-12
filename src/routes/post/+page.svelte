@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import {
     convertMetaTags,
@@ -13,8 +14,6 @@
   } from "$lib/stores/stores";
   import { onMount } from "svelte";
 
-  let fileList: FileList;
-  let cachedMediaFiles: { name: string; blob: Blob }[] = [];
   let tags: string[][] = [];
   // export let data: {
   //   title: string;
@@ -26,6 +25,7 @@
   //   .filter(Boolean)
   //   .join("\n");
   // $: console.log(data);
+
   onMount(async () => {
     console.log("onMount");
     if (navigator.serviceWorker) {
@@ -54,7 +54,6 @@
           return;
         }
         if (data.media) {
-          console.log(data.media);
           // キャッシュからファイルを取得し FileList を作成
           const cache = await caches.open("media-cache");
           const files = await Promise.all(
@@ -68,7 +67,7 @@
               }
             })
           ).then((files) => files.filter(Boolean));
-          console.log(files);
+
           // FileListを生成してハンドル関数に渡す
           const fileList = createFileList(files as File[]);
           handleFilesUpload(fileList, sharedContent);
@@ -81,7 +80,6 @@
         });
       }
     }
-    console.log("onMount");
   });
 
   // // サービスワーカーのメッセージ受信処理
