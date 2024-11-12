@@ -36,6 +36,7 @@
         const data = event.data;
         if (!data) return;
         sharedContent = [data.title, data.text, data.url]
+          .filter((data) => data !== undefined)
           .filter(Boolean)
           .join("\n");
         if (!data.media || data.media.length <= 0) {
