@@ -1,13 +1,16 @@
-参考
-
-nosvelte
-Apache License
-Version 2.0, January 2004
-
-https://github.com/akiomik/nosvelte
+# Lumilumi the nostr web client
+<img src="./image/1.png" width=500>
 
 
 ## 特徴
+- 画像共有、URL共有対応
+
+  <img src="./image/13.png" width=300>
+
+  windowsならedgeで、Androidならchromeでpwaしないとメニューにでないかも？
+  
+  chromeだと拡張機能が使えないけど[Amber](https://github.com/greenart7c3/Amber)をいれると簡単にNIP-46が使えます
+
 
 - kind:10000 の Mute、kind:30007 の Mute by kind に対応
 - kind:10030 custom emoji に対応
@@ -31,6 +34,8 @@ https://github.com/akiomik/nosvelte
 - petname📛がつけれる
 
 - nip05 チェックは手動
+
+
 ## 各種設定
 
 ### リレー設定
@@ -140,8 +145,7 @@ https://github.com/akiomik/nosvelte
 
 - 設定のアップロード/ダウンロード ( kind: 30078,  d: "lumi-settings" ) 
 
-- 対応しているブラウザでPWAにしておくと画像共有、リンク共有のメニューに出てきて直接投稿できる
-<img src="./image/13.png" width=200>
+
 
 など
 
@@ -160,7 +164,7 @@ https://github.com/akiomik/nosvelte
 ------
 <img src="./image/10.png" width=500>
 <img src="./image/11.png" width=500>
-<img src="./image/1.png" width=500>
+
 <img src="./image/2.png" width=500>
 <img src="./image/3.png" width=500>
 <img src="./image/4.png" width=500>
@@ -170,3 +174,14 @@ https://github.com/akiomik/nosvelte
 <img src="./image/8.png" width=500>
 <img src="./image/9.png" width=500>
 <img src="./image/12.png" width=500>
+
+
+
+-------------------
+参考
+
+nosvelte
+Apache License
+Version 2.0, January 2004
+
+https://github.com/akiomik/nosvelte
