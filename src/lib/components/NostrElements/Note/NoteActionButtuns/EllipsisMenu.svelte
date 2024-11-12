@@ -149,7 +149,7 @@
       case 7:
         //Share link
         const shareData = {
-          //title: "",
+          title: "",
           //text: "lumilumi",
           url: `${$page.url.origin}/${replaceable ? naddr : nevent}`,
         };

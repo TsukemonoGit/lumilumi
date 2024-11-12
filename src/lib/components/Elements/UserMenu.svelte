@@ -161,7 +161,7 @@
         $nowProgress = false;
         const shareData = {
           //title: "",
-          //text: "lumilumi",
+          text: "",
           url: `${$page.url.origin}/${urlData}`,
         };
 

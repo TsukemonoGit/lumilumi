@@ -121,7 +121,7 @@
         case 6:
           //share relay page
           const shareData = {
-            //title: "",
+            title: "",
             //text: "lumilumi",
             url: `${$page.url.origin}/relay/${encodedUrl}`,
           };

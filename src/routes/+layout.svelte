@@ -96,7 +96,23 @@
         },
       });
     }
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/my-sw.js", { updateViaCache: "none" })
+        .then((registration) => {
+          // 登録完了
+          console.log(
+            "Service Worker registered with scope:",
+            registration.scope
+          );
 
+          // アップデートがあれば通知
+          registration.update();
+        })
+        .catch((error) => {
+          console.error("Service Worker registration failed:", error);
+        });
+    }
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {

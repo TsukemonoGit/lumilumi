@@ -1,6 +1,11 @@
 <script lang="ts">
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { convertMetaTags, filesUpload, mediaUploader } from "$lib/func/util";
+  import {
+    convertMetaTags,
+    delay,
+    filesUpload,
+    mediaUploader,
+  } from "$lib/func/util";
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
   import { onMount } from "svelte";
 
@@ -147,6 +152,8 @@
                 tags.push(convertMetaTags(data.nip94_event));
               }
               sharedContent = url;
+              // 500ms待機するPromise //image not foundになるのを避けるため
+              await delay(1000);
               console.log(sharedContent);
             }
           }
