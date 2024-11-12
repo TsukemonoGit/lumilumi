@@ -6,7 +6,11 @@
     filesUpload,
     mediaUploader,
   } from "$lib/func/util";
-  import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
+  import {
+    additionalPostOptions,
+    nowProgress,
+    postWindowOpen,
+  } from "$lib/stores/stores";
   import { onMount } from "svelte";
 
   let fileList: FileList;
@@ -137,6 +141,7 @@
         uploader = mediaUploader[0];
       }
       if (files) {
+        $nowProgress = true;
         // ファイルアップロード
         const urlResults = await filesUpload(files, uploader);
 
@@ -153,8 +158,9 @@
               }
               sharedContent = `\n${url}`;
               // 500ms待機するPromise //image not foundになるのを避けるため
-              await delay(1000);
+              await delay(2000);
               console.log(sharedContent);
+              $nowProgress = false;
             }
           }
         });
