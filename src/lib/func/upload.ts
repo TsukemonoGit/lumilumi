@@ -3,6 +3,24 @@ import {
   type OptionalFormDataFields,
 } from "nostr-tools/nip96";
 
+// エラーハンドリングを共通化
+function handleErrorResponse(response: Response): never {
+  switch (response.status) {
+    case 413:
+      throw new Error("File too large!");
+    case 400:
+      throw new Error("Bad request! Some fields are missing or invalid!");
+    case 403:
+      throw new Error(
+        "Forbidden! Payload tag does not match the requested file!"
+      );
+    case 402:
+      throw new Error("Payment required!");
+    default:
+      throw new Error("Unknown error in uploading file!");
+  }
+}
+
 export async function uploadFile(
   file: File,
   serverApiUrl: string,
@@ -12,15 +30,19 @@ export async function uploadFile(
 ): Promise<FileUploadResponse> {
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
-  optionalFormDataFields &&
+
+  // optionalFormDataFields を処理
+  if (optionalFormDataFields) {
     Object.entries(optionalFormDataFields).forEach(([key, value]) => {
       if (value) {
         formData.append(key, value);
       }
     });
+  }
   formData.append("file", file);
 
-  const response = await fetch(serverApiUrl, {
+  // 初回リクエストの送信
+  let response = await fetch(serverApiUrl, {
     method: "POST",
     headers: {
       Authorization: nip98AuthorizationHeader,
@@ -29,32 +51,53 @@ export async function uploadFile(
     signal, // signal を追加して fetch リクエストに渡す
   });
 
-  if (response.ok === false) {
-    if (response.status === 413) {
-      throw new Error("File too large!");
-    }
-    if (response.status === 400) {
-      throw new Error("Bad request! Some fields are missing or invalid!");
-    }
-    if (response.status === 403) {
-      throw new Error(
-        "Forbidden! Payload tag does not match the requested file!"
-      );
-    }
-    if (response.status === 402) {
-      throw new Error("Payment required!");
-    }
-    throw new Error("Unknown error in uploading file!");
+  // レスポンスエラーチェック
+  if (!response.ok) {
+    handleErrorResponse(response); // エラー処理を呼び出し
   }
 
+  // 初期レスポンス処理
+  let statusResponse: FileUploadResponse;
   try {
-    console.log(response);
-    const parsedResponse = await response.json();
-    // if (!validateFileUploadResponse(parsedResponse)) { //Invalidなりがち
-    //   throw new Error("Invalid response from the server!");
-    // }
-    return parsedResponse;
-  } catch (error) {
-    throw new Error("Error parsing JSON response!");
+    statusResponse = await response.json();
+    if (response.status === 201) {
+      return statusResponse; // 最初のステータスが201の場合、即座に返す
+    }
+  } catch (error: any) {
+    throw new Error("Failed to parse the initial response");
   }
+
+  // 進行状況確認ループ
+  while (response.status === 200 || response.status === 202) {
+    // 再確認までの待機（例：3秒）
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    response = await fetch(serverApiUrl, {
+      method: "POST",
+      headers: {
+        Authorization: nip98AuthorizationHeader,
+      },
+      body: formData,
+      signal, // signal を追加して fetch リクエストに渡す
+    });
+
+    // レスポンスエラーチェック
+    if (!response.ok) {
+      handleErrorResponse(response); // エラー処理を呼び出し
+    }
+
+    try {
+      statusResponse = await response.json();
+    } catch (error: any) {
+      throw new Error("Failed to parse status response");
+    }
+
+    if (response.status === 201) {
+      // ステータスが201の場合に最終レスポンスを返す
+      console.log(response);
+      return statusResponse;
+    }
+  }
+
+  throw new Error("Unexpected status code during file upload process!");
 }
