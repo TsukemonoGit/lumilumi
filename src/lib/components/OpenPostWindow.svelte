@@ -169,6 +169,16 @@
         metadata = (
           $queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
         )?.event;
+      } else {
+        const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+        if (pub) {
+          console.log(pub);
+          signPubkey = pub;
+
+          metadata = (
+            $queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
+          )?.event;
+        }
       }
     } catch (error) {
       $toastSettings = {
