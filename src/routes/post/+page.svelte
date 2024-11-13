@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
+  import * as Nostr from "nostr-typedef";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import {
     convertMetaTags,
@@ -29,7 +29,8 @@
   //   .filter(Boolean)
   //   .join("\n");
   // $: console.log(data);
-  const setSettings = () => {
+  const setSettings = async () => {
+    $nowProgress = true;
     const lumi = localStorage.getItem("lumiSetting");
     try {
       if (lumi) {
@@ -47,7 +48,15 @@
     } else {
       $uploader = savedUploader;
     }
+
+    const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+    if (pub) {
+      console.log(pub);
+      signPubkey = pub;
+    }
+    $nowProgress = false;
   };
+  let signPubkey: string;
   onMount(async () => {
     console.log("onMount");
     setSettings();
@@ -206,5 +215,6 @@
       tags: [],
       kind: 1,
     }}
+    {signPubkey}
   />
 </div>
