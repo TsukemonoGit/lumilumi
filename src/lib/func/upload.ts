@@ -41,43 +41,13 @@ export async function uploadFile(
   }
   formData.append("file", file);
 
-  // 初回リクエストの送信
-  let response = await fetch(serverApiUrl, {
-    method: "POST",
-    headers: {
-      Authorization: nip98AuthorizationHeader,
-    },
-    body: formData,
-    signal, // signal を追加して fetch リクエストに渡す
-  });
-
-  // レスポンスエラーチェック
-  if (!response.ok) {
-    handleErrorResponse(response); // エラー処理を呼び出し
-  }
-
-  // 初期レスポンス処理
-  let statusResponse: FileUploadResponse;
-  try {
-    statusResponse = await response.json();
-    if (response.status === 201) {
-      return statusResponse; // 最初のステータスが201の場合、即座に返す
-    }
-  } catch (error: any) {
-    throw new Error("Failed to parse the initial response");
-  }
-
   // 進行状況確認ループ（1秒おきにチェック、最大5秒まで）
   const startTime = Date.now(); // ループ開始時間を記録
-  while (response.status === 200 || response.status === 202) {
-    // 1秒待機
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  let response: Response;
+  let statusResponse: FileUploadResponse;
 
-    // 経過時間が5秒を超えたら強制終了
-    if (Date.now() - startTime > 5000) {
-      return statusResponse;
-    }
-
+  // 初回リクエストもこのループ内で処理
+  while (true) {
     response = await fetch(serverApiUrl, {
       method: "POST",
       headers: {
@@ -98,12 +68,23 @@ export async function uploadFile(
       throw new Error("Failed to parse status response");
     }
 
+    // 初期レスポンスが201ならすぐに返す
     if (response.status === 201) {
-      // ステータスが201の場合に最終レスポンスを返す
-      console.log(response);
       return statusResponse;
     }
-  }
 
-  throw new Error("Unexpected status code during file upload process!");
+    // 経過時間が5秒を超えたら強制終了
+    if (Date.now() - startTime > 5000) {
+      return statusResponse;
+    }
+
+    // 進行状況が200または202の場合、1秒待機して再チェック
+    if (response.status === 200 || response.status === 202) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      continue;
+    }
+
+    // それ以外の場合は、ループを終了
+    throw new Error("Unexpected status code during file upload process!");
+  }
 }
