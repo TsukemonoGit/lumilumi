@@ -30,22 +30,22 @@
   //   .join("\n");
   // $: console.log(data);
   const setSettings = () => {
+    const lumi = localStorage.getItem("lumiSetting");
     try {
-      const lumi = localStorage.getItem("lumiSetting");
       if (lumi) {
         const savedSettings: LumiSetting = JSON.parse(lumi);
 
         $showImg = savedSettings.showImg;
         $showPreview = savedSettings.showPreview;
       }
-      let savedUploader = localStorage.getItem("uploader");
-      if (!savedUploader) {
-        $uploader = mediaUploader[0];
-      } else {
-        $uploader = savedUploader;
-      }
     } catch (error) {
       console.log(error);
+    }
+    let savedUploader = localStorage.getItem("uploader");
+    if (!savedUploader) {
+      $uploader = mediaUploader[0];
+    } else {
+      $uploader = savedUploader;
     }
   };
   onMount(async () => {
