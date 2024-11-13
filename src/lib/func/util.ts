@@ -304,6 +304,7 @@ export async function fileUpload(
 
   return res;
 }
+
 export const generateResultMessage = (
   isSuccess: string[],
   isFailed: string[]

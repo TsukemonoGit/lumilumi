@@ -391,8 +391,6 @@
               tags.push(convertMetaTags(data.nip94_event));
             }
 
-            // 500ms待機するPromise //image not foundになるのを避けるため
-            await delay(1000);
             text =
               text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
             cursorPosition = len;
