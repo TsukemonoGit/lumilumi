@@ -11,7 +11,11 @@
     additionalPostOptions,
     nowProgress,
     postWindowOpen,
+    uploader,
+    showPreview,
+    showImg,
   } from "$lib/stores/stores";
+  import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
 
   let tags: string[][] = [];
@@ -25,9 +29,28 @@
   //   .filter(Boolean)
   //   .join("\n");
   // $: console.log(data);
+  const setSettings = () => {
+    try {
+      const lumi = localStorage.getItem("lumiSetting");
+      if (lumi) {
+        const savedSettings: LumiSetting = JSON.parse(lumi);
 
+        $showImg = savedSettings.showImg;
+        $showPreview = savedSettings.showPreview;
+      }
+      let savedUploader = localStorage.getItem("uploader");
+      if (!savedUploader) {
+        $uploader = mediaUploader[0];
+      } else {
+        $uploader = savedUploader;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   onMount(async () => {
     console.log("onMount");
+    setSettings();
     if (navigator.serviceWorker) {
       console.log("serviceWorker");
       // メッセージを受け取るリスナーを設定
@@ -135,14 +158,10 @@
   ) {
     let sharedContent: string = initialContent ?? "";
     try {
-      let uploader = localStorage.getItem("uploader");
-      if (!uploader) {
-        uploader = mediaUploader[0];
-      }
       if (files) {
         $nowProgress = true;
         // ファイルアップロード
-        const urlResults = await filesUpload(files, uploader);
+        const urlResults = await filesUpload(files, $uploader);
 
         // URLが正常にアップロードされているかチェック
         urlResults.map(async (data) => {

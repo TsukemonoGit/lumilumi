@@ -96,11 +96,13 @@ self.addEventListener("message", (event) => {
 async function sendLatestDataToClient(client) {
   // キャッシュから最新データを取得して送信
 
-  const response = {
-    title: data.title,
-    text: data.text,
-    url: data.url,
-    media: media,
-  };
+  const response = data
+    ? {
+        title: data.title,
+        text: data.text,
+        url: data.url,
+        media: media,
+      }
+    : null;
   client.postMessage(response);
 }
