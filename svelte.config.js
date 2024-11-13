@@ -14,7 +14,8 @@ const config = {
     serviceWorker: {//pwa仮想モジュール（virtual:pwa-registerまたはvirtual:pwa-register/svelte）を使用している場合は、SvelteKitの設定からサービスワーカーの登録を除外する必要があります：
       register: false
     },
-    csrf: false,
+    csrf: { checkOrigin: false },//これつけないと共有のときにCross-site POST form submissions are forbiddenがでる
+    //https://svelte.dev/docs/kit/configuration#csrf   Content-Type の application/x-www-form-urlencoded, multipart/form-data, 、 または text/plain 他のオリジンからアプリにアクセスするには、このオプションを無効にする必要があります。気をつけて！って書いてある
     files: {
       serviceWorker: 'src/my-sw.ts', // or `src/my-sw.ts`
     }
