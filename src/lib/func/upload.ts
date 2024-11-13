@@ -67,10 +67,16 @@ export async function uploadFile(
     throw new Error("Failed to parse the initial response");
   }
 
-  // 進行状況確認ループ
+  // 進行状況確認ループ（1秒おきにチェック、最大5秒まで）
+  const startTime = Date.now(); // ループ開始時間を記録
   while (response.status === 200 || response.status === 202) {
-    // 再確認までの待機（例：3秒）
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // 1秒待機
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // 経過時間が5秒を超えたら強制終了
+    if (Date.now() - startTime > 5000) {
+      return statusResponse;
+    }
 
     response = await fetch(serverApiUrl, {
       method: "POST",
