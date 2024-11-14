@@ -17,7 +17,7 @@
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
 
-  import { extractKind9734 } from "$lib/func/makeZap";
+  import { extractKind9734 } from "$lib/func/zap";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";

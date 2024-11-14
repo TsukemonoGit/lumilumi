@@ -15,7 +15,8 @@
   import { publishEvent } from "$lib/func/nostr";
   import Popover from "./Elements/Popover.svelte";
   import { contentEmojiCheck } from "$lib/func/contentCheck";
-  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
+  import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
   const {

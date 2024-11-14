@@ -24,12 +24,13 @@
   import { X, Save } from "lucide-svelte";
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
-  import { generateResultMessage, relayRegex2 } from "$lib/func/util";
+  import { generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  import { relayRegex2 } from "$lib/func/regex";
 
   export let data: {
     pubkey: string;

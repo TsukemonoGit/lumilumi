@@ -3,7 +3,7 @@ import { nip19 } from "nostr-tools";
 import { error } from "@sveltejs/kit";
 import type { PageLoad, RouteParams } from "./$types";
 import { ogDescription, ogTitle } from "$lib/stores/stores";
-import { NIP05_REGEX } from "$lib/func/util";
+import { NIP05_REGEX } from "$lib/func/regex";
 import { queryProfile } from "nostr-tools/nip05";
 
 interface CustomParams {

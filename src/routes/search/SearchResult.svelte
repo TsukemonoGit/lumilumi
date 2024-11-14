@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
   import Metadata from "../../lib/components/NostrMainData/Metadata.svelte";
 
-  import { nip50relays } from "$lib/func/util";
+  import { nip50relays } from "$lib/func/constants";
   import EventCard from "../../lib/components/NostrElements/Note/EventCard/EventCard.svelte";
 
   import { onDestroy, onMount } from "svelte";

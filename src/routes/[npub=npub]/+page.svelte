@@ -34,7 +34,8 @@
   import PaginationList from "./PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
   import EllipsisMenuNaddr from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
+  import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import NaddrEvent from "$lib/components/NostrElements/Note/NaddrEvent.svelte";
 

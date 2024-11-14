@@ -42,7 +42,7 @@
     initLumiEmoji,
     initLumiMute,
     initLumiMuteByKind,
-  } from "$lib/func/util";
+  } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
 
   const STORAGE_KEY = "lumiSetting";

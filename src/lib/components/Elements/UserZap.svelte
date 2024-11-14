@@ -5,7 +5,7 @@
   import { profile } from "$lib/func/util";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import ZapInvoiceWindow from "./ZapInvoiceWindow.svelte";
-  import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
+  import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import DisplayName from "./DisplayName.svelte";
   export let metadata: Nostr.Event;
   let invoice: string | undefined = undefined;

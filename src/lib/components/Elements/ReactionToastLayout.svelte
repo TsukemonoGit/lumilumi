@@ -2,15 +2,10 @@
   import { Repeat, Reply, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import Reaction from "../NostrElements/Note/Reaction.svelte";
-  import {
-    extractAmount,
-    extractZappedId,
-    replyedEvent,
-    repostedId,
-  } from "$lib/func/event";
+  import { extractZappedId, replyedEvent, repostedId } from "$lib/func/event";
   import ReactionToastContent from "../NostrElements/Note/ReactionToastContent.svelte";
   import UserName from "../NostrElements/Note/UserName.svelte";
-  import { extractKind9734 } from "$lib/func/makeZap";
+  import { extractKind9734, extractAmount } from "$lib/func/zap";
   import Content from "../NostrElements/Note/Content.svelte";
   export let event: Nostr.Event;
 

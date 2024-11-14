@@ -7,9 +7,10 @@
   import StatusMusic from "$lib/components/NostrMainData/StatusMusic.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
   import * as Nostr from "nostr-typedef";
-  import { hexRegex, nip33Regex, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
+  import { hexRegex, nip33Regex } from "$lib/func/regex";
 
   export let pubkey: string | undefined;
   export let tieKey: string | undefined;

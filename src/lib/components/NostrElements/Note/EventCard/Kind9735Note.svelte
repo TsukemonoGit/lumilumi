@@ -9,8 +9,12 @@
   import { muteCheck } from "$lib/func/muteCheck";
   import { mutebykinds, mutes } from "$lib/stores/stores";
 
-  import { extractKind9734, getZapLNURLPubkey } from "$lib/func/makeZap";
-  import { extractAmount, extractZappedId } from "$lib/func/event";
+  import {
+    extractKind9734,
+    getZapLNURLPubkey,
+    extractAmount,
+  } from "$lib/func/zap";
+  import { extractZappedId } from "$lib/func/event";
 
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
   import RepostedNote from "./RepostedNote.svelte";

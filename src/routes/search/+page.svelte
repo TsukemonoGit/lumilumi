@@ -1,11 +1,6 @@
 <script lang="ts">
   import { promisePublishEvent } from "$lib/func/nostr";
-  import {
-    awaitInterval,
-    generateResultMessage,
-    nip50relays,
-    npubRegex,
-  } from "$lib/func/util";
+  import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
@@ -26,6 +21,8 @@
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
   import type { EventPacket } from "rx-nostr";
+  import { nip50relays } from "$lib/func/constants";
+  import { npubRegex } from "$lib/func/regex";
 
   export let data: {
     searchWord: string;

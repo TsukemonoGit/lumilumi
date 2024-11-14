@@ -1,5 +1,5 @@
 import { test } from "vitest";
-import { decodeGeohash } from "./event";
+import { decodeGeohash } from "./geohash";
 test("decodeGeohash", () => {
   const geohash = "xps4mhn85m55";
   const result = decodeGeohash(geohash);

@@ -1,4 +1,4 @@
-import { NIP05_REGEX } from "$lib/func/util";
+import { NIP05_REGEX } from "$lib/func/regex";
 import type { ParamMatcher } from "@sveltejs/kit";
 
 export const match = ((param) => {

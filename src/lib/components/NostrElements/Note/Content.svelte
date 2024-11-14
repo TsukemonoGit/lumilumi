@@ -13,6 +13,8 @@
   import Geohash from "../geohash/Geohash.svelte";
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
+  import InvoiceCard from "./EventCard/InvoiceCard.svelte";
+
   export let text: string;
   export let tags: string[][];
   export let displayMenu: boolean;
@@ -159,7 +161,9 @@
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
       href={part.url ?? ""}>{part.content}</Link
-    >{:else}<span
+    >{:else if part.type === "invoice" && part.content}
+    <InvoiceCard invoice={part.content} />
+  {:else}<span
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
     >{/if}{/each}

@@ -5,11 +5,7 @@
     getNaddrEmojiList,
     getQueryRelays,
   } from "$lib/func/settings";
-  import {
-    emojiShortcodeRegex,
-    formatAbsoluteDate,
-    nip33Regex,
-  } from "$lib/func/util";
+  import { formatAbsoluteDate } from "$lib/func/util";
   import {
     emojis,
     loginUser,
@@ -26,6 +22,7 @@
   import { get } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
+  import { emojiShortcodeRegex, nip33Regex } from "$lib/func/regex";
   export let pubkey: string;
   // export let emojiList: LumiEmoji | undefined;
   let dialogOpen: any;

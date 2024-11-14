@@ -39,7 +39,7 @@ import { metadata } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
-import { hexRegex } from "./util";
+import { hexRegex } from "./regex";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {

@@ -15,7 +15,7 @@
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
-  import { extractKind9734 } from "$lib/func/makeZap";
+  import { extractKind9734 } from "$lib/func/zap";
   import FolloweeFilteredEventList from "./NostrElements/FolloweeFilteredEventList.svelte";
 
   import { _ } from "svelte-i18n";

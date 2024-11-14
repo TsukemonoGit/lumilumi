@@ -19,11 +19,7 @@
 
   import Link from "$lib/components/Elements/Link.svelte";
   import Content from "$lib/components/NostrElements/Note/Content.svelte";
-  import {
-    generateResultMessage,
-    LUD06Regex,
-    LUD16Regex,
-  } from "$lib/func/util";
+  import { generateResultMessage } from "$lib/func/util";
 
   import { nip19 } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
@@ -31,6 +27,7 @@
 
   import InputImageFromFile from "./InputImageFromFile.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
 
   export let data: {
     pubkey: string;

@@ -1,5 +1,12 @@
 import { nip19 } from "nostr-tools";
-import { nip19Regex, urlRegex, nipRegex, parseNaddr, relayRegex } from "./util";
+import { parseNaddr } from "./util";
+import {
+  nip19Regex,
+  urlRegex,
+  nipRegex,
+  relayRegex,
+  invoiceRegex,
+} from "./regex";
 
 export interface Part {
   type:
@@ -25,7 +32,8 @@ export interface Part {
     | "imageLink"
     | "footnoteRef"
     | "footnoteDef"
-    | "explicitLineBreak";
+    | "explicitLineBreak"
+    | "invoice";
   content: string | undefined;
   url?: string;
   number?: number;
@@ -257,7 +265,7 @@ function splitLists(text: string): string[] {
   //console.log(parts);
   return trimmedParts;
 }
-
+//---------------------------------------------------------------------------parseText
 export function parseText(input: string, tags: string[][]): Part[] {
   const parts: Part[] = [];
   let remainingText = input;
@@ -328,6 +336,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
     const hashtagResult = findHashtagIndex(remainingText);
     const nipMatch = remainingText.match(nipRegex);
     const relayMatch = remainingText.match(relayRegex);
+    const invoiceMatch = remainingText.match(invoiceRegex);
 
     const numberIndex = numberMatch
       ? remainingText.indexOf(numberMatch[0])
@@ -338,7 +347,9 @@ export function parseText(input: string, tags: string[][]): Part[] {
     const hashtagIndex = hashtagResult ? hashtagResult.index : -1;
     const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
     const relayIndex = relayMatch ? remainingText.indexOf(relayMatch[0]) : -1;
-
+    const invoiceIndex = invoiceMatch
+      ? remainingText.indexOf(invoiceMatch[0])
+      : -1;
     if (
       numberIndex === -1 &&
       nip19Index === -1 &&
@@ -346,7 +357,8 @@ export function parseText(input: string, tags: string[][]): Part[] {
       emojiIndex === -1 &&
       hashtagIndex === -1 &&
       nipIndex === -1 &&
-      relayIndex === -1
+      relayIndex === -1 &&
+      invoiceIndex === -1
     ) {
       // No more matches, add the remaining text as a normal text part
       parts.push({ type: "text", content: remainingText });
@@ -369,6 +381,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
       },
       { type: "nip", index: nipIndex, match: nipMatch },
       { type: "relay", index: relayIndex, match: relayMatch },
+      { type: "invoice", index: invoiceIndex, match: invoiceMatch },
     ]
       .filter(({ index }) => index !== -1)
       .sort((a, b) => a.index - b.index)[0];
@@ -472,6 +485,12 @@ export function parseText(input: string, tags: string[][]): Part[] {
             type: "relay",
             content: match[0],
             url: `/relay/${encodeURIComponent(match[0])}`,
+          });
+          break;
+        case "invoice":
+          parts.push({
+            type: "invoice",
+            content: match[0],
           });
           break;
       }

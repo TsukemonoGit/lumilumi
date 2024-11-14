@@ -39,7 +39,7 @@
     createNoopClient,
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
-  import { mediaUploader } from "$lib/func/util";
+  import { mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
   import type { Part } from "$lib/func/content";
   import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
