@@ -43,7 +43,7 @@
   >{:else}
   <div class="w-full rounded-full border-magnum-600/30 border overflow-hidden">
     <div
-      class=" flex gap-1 text-magnum-400 w-full justify-center bg-neutral-700"
+      class=" flex gap-1 text-magnum-400 justify-center bg-magnum-900/50 font-semibold items-center"
     >
       <Zap />Lightning Invoice
     </div>
@@ -59,7 +59,7 @@
       <button
         on:click={handleClickPay}
         disabled={$nowProgress}
-        class="rounded-md p-2 m-1 w-16 bg-magnum-200 border border-magnum-900 text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
+        class="rounded-md p-2 m-1 w-16 bg-magnum-600 border border-magnum-600 text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-15 font-bold"
         >Pay</button
       >
     </div>
