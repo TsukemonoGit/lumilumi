@@ -326,7 +326,7 @@
     <!-- </div> -->
   {/if}
 
-  <article class="{noteClass()} w-full card">
+  <article class="{noteClass()} w-full">
     {#if note.kind === 1}
       <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
         {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
