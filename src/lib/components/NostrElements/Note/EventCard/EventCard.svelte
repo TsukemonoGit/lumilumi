@@ -818,4 +818,10 @@
       />{/if}
   </article>
 {/if}
+
 <!-- {/if} -->
+<style>
+  article {
+    content-visibility: auto;
+  }
+</style>
