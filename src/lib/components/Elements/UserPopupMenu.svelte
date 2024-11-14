@@ -4,8 +4,8 @@
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
-  import { hexRegex, splitHexColorString } from "$lib/func/util";
-  import type { Profile } from "$lib/types";
+  import { splitHexColorString } from "$lib/func/util";
+  import { hexRegex } from "$lib/func/regex";
 
   import Popover from "./Popover.svelte";
   import UserProfile from "./UserProfile.svelte";

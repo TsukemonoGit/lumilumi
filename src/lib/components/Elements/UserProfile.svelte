@@ -1,7 +1,7 @@
 <script lang="ts">
   import Metadata from "../NostrMainData/Metadata.svelte";
-  import { hexRegex, profile, splitHexColorString } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
+  import { profile, splitHexColorString } from "$lib/func/util";
+
   import {
     followList,
     loginUser,
@@ -25,6 +25,7 @@
   import MuteStatusIcons from "./MuteStatusIcons.svelte";
   import DisplayName from "./DisplayName.svelte";
   import { encodetoNpub } from "$lib/func/encode";
+  import { hexRegex } from "$lib/func/regex";
   // import * as Nostr from "nostr-typedef";
 
   export let pubkey: string;

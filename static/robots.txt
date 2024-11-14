@@ -1,4 +1,4 @@
-User-agent: *
+User-agent: Googlebot
 Crawl-delay: 86400  # 1日（秒単位）
 Disallow: /npub
 Disallow: /nprofile
@@ -10,3 +10,19 @@ Disallow: /list/
 Disallow: /channel/
 Disallow: /global/
 Disallow: /api/
+
+User-agent: Bingbot
+Crawl-delay: 86400  # 1日（秒単位）
+Disallow: /npub
+Disallow: /nprofile
+Disallow: /note
+Disallow: /nevent
+Disallow: /naddr
+Disallow: /search/
+Disallow: /list/
+Disallow: /channel/
+Disallow: /global/
+Disallow: /api/
+
+User-agent: *
+Disallow: /

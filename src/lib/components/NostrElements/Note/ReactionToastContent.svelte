@@ -1,7 +1,7 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
 
-  import { nip33Regex, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
   import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
@@ -10,6 +10,7 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Content from "./Content.svelte";
+  import { nip33Regex } from "$lib/func/regex";
 
   const contentLen = 40;
   //tagはaかe

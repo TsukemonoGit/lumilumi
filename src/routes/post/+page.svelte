@@ -1,12 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import {
-    convertMetaTags,
-    delay,
-    filesUpload,
-    mediaUploader,
-  } from "$lib/func/util";
+  import { convertMetaTags, delay, filesUpload } from "$lib/func/util";
   import {
     additionalPostOptions,
     nowProgress,
@@ -17,6 +12,7 @@
   } from "$lib/stores/stores";
   import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
+  import { mediaUploader } from "$lib/func/constants";
 
   let tags: string[][] = [];
   // export let data: {

@@ -23,7 +23,7 @@ import {
 } from "rx-nostr";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
-import { emojiShortcodeRegex, nip33Regex } from "./util";
+import { emojiShortcodeRegex, nip33Regex } from "./regex";
 
 export function setTheme(theme: Theme) {
   if (

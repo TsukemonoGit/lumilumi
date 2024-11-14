@@ -15,7 +15,7 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { makeZapRequest } from "nostr-tools/nip57";
   import type { EventTemplate } from "nostr-tools";
-  import { monoZap } from "$lib/func/util";
+  import { monoZap } from "$lib/func/constants";
   import * as Nostr from "nostr-typedef";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";

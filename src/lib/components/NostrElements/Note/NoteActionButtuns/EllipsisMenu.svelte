@@ -25,7 +25,7 @@
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
-  import { nostviewstrable } from "$lib/func/util";
+  import { nostviewstrable } from "$lib/func/constants";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   export let TriggerIcon = Ellipsis;

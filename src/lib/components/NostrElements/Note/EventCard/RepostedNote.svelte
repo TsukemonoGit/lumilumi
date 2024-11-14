@@ -1,7 +1,7 @@
 <script lang="ts">
   import { nip19 } from "nostr-tools";
 
-  import { nip33Regex, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
@@ -14,6 +14,7 @@
   import OmittedCard from "./OmittedCard.svelte";
   import { page } from "$app/stores";
   import { loginUser } from "$lib/stores/stores";
+  import { nip33Regex } from "$lib/func/regex";
 
   export let displayMenu: boolean;
   export let repostable: boolean;

@@ -37,13 +37,12 @@
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import {
-    clientTag,
     convertMetaTags,
     filesUpload,
-    nsecRegex,
     delay,
     normalizeRelayURL,
   } from "$lib/func/util";
+
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
     DefaultPostOptions,
@@ -55,6 +54,8 @@
   import { writable, type Writable } from "svelte/store";
   import Metadata from "./NostrMainData/Metadata.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { nsecRegex } from "$lib/func/regex";
+  import { clientTag } from "$lib/func/constants";
 
   //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
 

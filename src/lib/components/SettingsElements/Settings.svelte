@@ -27,14 +27,7 @@
     kind42inTL,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
-  import {
-    initLumiEmoji,
-    initLumiMute,
-    initLumiMuteByKind,
-    initSettings,
-    npubRegex,
-    relayRegex2,
-  } from "$lib/func/util";
+
   import type {
     LumiEmoji,
     LumiMute,
@@ -58,6 +51,13 @@
   import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
   import Kind30078 from "./Kind30078.svelte";
+  import {
+    initSettings,
+    initLumiMute,
+    initLumiEmoji,
+    initLumiMuteByKind,
+  } from "$lib/func/constants";
+  import { relayRegex2, npubRegex } from "$lib/func/regex";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";

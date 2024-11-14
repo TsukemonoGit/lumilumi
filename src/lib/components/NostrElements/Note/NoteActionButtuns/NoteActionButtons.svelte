@@ -34,19 +34,14 @@
     showAllReactions,
     loginUser,
   } from "$lib/stores/stores";
-  import {
-    clientTag,
-    nip33Regex,
-    normalizeRelayURL,
-    profile,
-  } from "$lib/func/util";
+  import { normalizeRelayURL, profile } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard/EventCard.svelte";
   import { afterUpdate, onMount } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { getZapRelay, makeInvoice } from "$lib/func/makeZap";
+  import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import { _ } from "svelte-i18n";
   import { type QueryKey, QueryObserver } from "@tanstack/svelte-query";
   import { type EventPacket, now } from "rx-nostr";
@@ -54,6 +49,8 @@
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
+  import { clientTag } from "$lib/func/constants";
+  import { nip33Regex } from "$lib/func/regex";
 
   export let note: Nostr.Event;
   export let repostable: boolean;
@@ -498,10 +495,9 @@
           <DropdownMenu {menuTexts} {handleSelectItem}>
             <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
           </DropdownMenu>
-        </Reposted><span class="text-sm"
-          >{#if allReactions.repost.length > 0}{allReactions.repost
-              .length}{/if}</span
-        >
+        </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
+            >{allReactions.repost.length}</span
+          >{/if}
       </div>
     {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
         <Quote size="20" class={"stroke-magnum-500/75"} />

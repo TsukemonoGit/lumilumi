@@ -1,11 +1,10 @@
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import { publishEvent } from "$lib/func/nostr";
   import { addClientTag, emojis, showImg } from "$lib/stores/stores";
   import { SmilePlus } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import split from "graphemesplit";
-  import { clientTag } from "$lib/func/util";
+  import { clientTag } from "$lib/func/constants";
   export let note: Nostr.Event | undefined;
 
   export let root: string[] | undefined;

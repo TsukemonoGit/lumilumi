@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mediaUploader } from "$lib/func/util";
+  import { mediaUploader } from "$lib/func/constants";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";

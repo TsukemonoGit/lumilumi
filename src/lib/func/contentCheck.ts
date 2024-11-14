@@ -1,5 +1,5 @@
 import { nip19 } from "nostr-tools";
-import { hashtagRegex, nip19Regex, urlRegex } from "./util";
+import { hashtagRegex, nip19Regex, urlRegex } from "./regex";
 
 export function contentCheck(
   text: string,
