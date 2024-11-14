@@ -67,7 +67,7 @@
     }
   });
   $: userPubkey = data.pubkey; // Make pubkey reactive
-  $: console.log(userPubkey);
+
   const tieKey = "npub";
 
   let isOnMount = false;
