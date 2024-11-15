@@ -99,7 +99,7 @@
       aria-label="Update dimensions"
       ><AlignJustify class="size-6" />
     </button>
-    <button on:click={handleClickHome} class="trigger"
+    <button on:click={handleClickHome} class="trigger" title="Home"
       ><House class="size-6" />
     </button>
   </div>

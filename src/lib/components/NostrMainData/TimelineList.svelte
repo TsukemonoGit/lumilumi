@@ -98,21 +98,28 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  $: operator = setOperator();
+  //$: operator = setOperator();
 
-  function setOperator() {
-    let operator = pipe(tie, uniq);
-    if (tieKey === "timeline" && $showUserStatus) {
-      //めいんTLのとき
-      operator = pipe(operator, userStatus());
-    }
-    if (tieKey === "timeline" && $showReactioninTL) {
-      operator = pipe(operator, reactionCheck());
-    }
-    //最後に配列にする
-    return pipe(operator, scanArray());
-  }
-  $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
+  //maintlのやつはわけたからいらん
+  // function setOperator() {
+  //   let operator = pipe(tie, uniq);
+  //   if (tieKey === "timeline" && $showUserStatus) {
+  //     //めいんTLのとき
+  //     operator = pipe(operator, userStatus());
+  //   }
+  //   if (tieKey === "timeline" && $showReactioninTL) {
+  //     operator = pipe(operator, reactionCheck());
+  //   }
+  //   //最後に配列にする
+  //   return pipe(operator, scanArray());
+  // }
+  $: result = useTimelineEventList(
+    queryKey,
+    filters,
+    pipe(tie, uniq),
+    req,
+    relays
+  );
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

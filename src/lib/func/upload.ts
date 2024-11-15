@@ -73,8 +73,8 @@ export async function uploadFile(
       return statusResponse;
     }
 
-    // 経過時間が5秒を超えたら強制終了
-    if (Date.now() - startTime > 5000) {
+    // 経過時間が5秒を超えたら強制終了//動画だと5病で足りなかったからもうちょい伸ばしてみる
+    if (Date.now() - startTime > 8000) {
       return statusResponse;
     }
 

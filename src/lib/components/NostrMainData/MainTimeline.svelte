@@ -76,7 +76,6 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  $: operator = setOperator();
 
   function setOperator() {
     let operator = pipe(tie, uniq);
@@ -90,7 +89,7 @@
     //最後に配列にする
     return pipe(operator, scanArray());
   }
-  $: result = useMainTimeline(queryKey, operator, filters);
+  $: result = useMainTimeline(queryKey, setOperator(), filters);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;

@@ -97,6 +97,7 @@
       </div>
       {#if displayMenu}
         <button
+          title="goto note page"
           on:click={handleClickToNotepage}
           class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
