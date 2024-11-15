@@ -155,7 +155,7 @@
   const publishEvent = async () => {
     $dialogOpen = false;
     $nowProgress = true;
-
+    //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
     const { event: ev, res } = await promisePublishEvent(
       $afterEventParameters as Nostr.Event
     );

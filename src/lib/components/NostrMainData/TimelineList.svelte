@@ -116,11 +116,11 @@
   $: result = useTimelineEventList(
     queryKey,
     filters,
-    pipe(tie, uniq),
+    pipe(tie, uniq, scanArray()),
     req,
     relays
   );
-  $: data = result.data;
+  $: globalData = result.data;
   $: status = result.status;
   $: error = result.error;
   let readUrls: string[] = [];
@@ -129,10 +129,11 @@
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: if (($data && viewIndex >= 0) || !$nowProgress) {
-    updateViewEvent($data);
+  $: if (($globalData && viewIndex >= 0) || !$nowProgress) {
+    updateViewEvent($globalData);
   }
-  //$: console.log($data);
+  $: olderQueryKey = [...queryKey, "olderData"];
+  //$: console.log($globalData);
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);
   //   if (navigate.type !== "form") {
@@ -165,15 +166,14 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
+    updating = false;
+    const ev: EventPacket[] | undefined =
+      $queryClient.getQueryData(olderQueryKey);
 
     //if (ev) {
     //   console.log(ev);
 
-    //  updateViewEvent($data);
+    //  updateViewEvent($globalData);
 
     //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
     //   const newFilters = filters.map((filter: Nostr.Filter) => ({
@@ -188,7 +188,7 @@
     //       [...ev, ...older]
     //     );
     //   }
-    //   updateViewEvent($data);
+    //   updateViewEvent($globalData);
     //   }
 
     if (!ev || ev?.length <= 0) {
@@ -225,17 +225,17 @@
         relays
       );
       console.log("first older", older);
+
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
-          ...queryKey,
-          "olderData",
+        const olddata: EventPacket[] | undefined =
+          $queryClient.getQueryData(olderQueryKey);
+
+        $queryClient.setQueryData(olderQueryKey, [
+          ...(olddata ?? []),
+          ...older,
         ]);
 
-        $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...(olddata ?? []), ...older]
-        );
-        updateViewEvent($data);
+        updateViewEvent($globalData);
       }
     }
   }
@@ -269,13 +269,12 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
-          [...queryKey, "olderData"]
-        );
-        $queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          [...(olderdatas ?? []), ...older]
-        );
+        const olderdatas: EventPacket[] | undefined =
+          $queryClient.getQueryData(olderQueryKey);
+        $queryClient.setQueryData(olderQueryKey, [
+          ...(olderdatas ?? []),
+          ...older,
+        ]);
       }
     }
     //console.log(allUniqueEvents?.length);
@@ -285,7 +284,7 @@
       viewIndex += sift; //スライドする量
     }
 
-    updateViewEvent($data);
+    updateViewEvent($globalData);
     $nowProgress = false;
   };
 
@@ -297,14 +296,16 @@
 
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
-        updateViewEvent($data);
+        updateViewEvent($globalData);
       }, 100);
     }
   };
   let untilTime: number;
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
-  export let updateViewEvent = (data: EventPacket[] | undefined = $data) => {
+  export let updateViewEvent = (
+    data: EventPacket[] | undefined = $globalData
+  ) => {
     if (updating) {
       return;
     }
@@ -315,12 +316,11 @@
     timeoutId = setTimeout(() => {
       updating = true;
 
-      const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
-        ...queryKey,
-        "olderData",
-      ]);
+      const olderdatas: EventPacket[] | undefined =
+        $queryClient.getQueryData(olderQueryKey);
       console.log("updateViewEvent");
-      const allEvents = data ?? [];
+      const allEvents: EventPacket[] = data ?? [];
+
       if (olderdatas) {
         allEvents.push(...olderdatas);
       }
@@ -340,9 +340,10 @@
         .filter(eventFilter)
         .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
-      slicedEvent.update((value) =>
-        allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      );
+      // slicedEvent.update((value) =>
+      //   allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      // );
+      $slicedEvent = allUniqueEvents.slice(viewIndex, viewIndex + amount);
       updating = false;
     }, 50); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
@@ -350,7 +351,7 @@
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent($data);
+    updateViewEvent($globalData);
   }
 
   onDestroy(() => {
@@ -386,7 +387,7 @@
 {#if $error}
   <slot name="error" error={$error} />
 {:else if $slicedEvent && $slicedEvent?.length > 0}
-  <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} />
+  <slot events={$slicedEvent} status={$status} len={$globalData?.length ?? 0} />
 {:else if $status === "loading"}
   <slot name="loading" />
 {:else}
