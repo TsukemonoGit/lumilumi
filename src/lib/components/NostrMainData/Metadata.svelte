@@ -72,10 +72,10 @@
   $: metadata = $data?.event ?? localData?.event;
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
-{:else if metadata}
+{#if metadata}
   <slot {metadata} status={$status} />
+{:else if $error}
+  <slot name="error" error={$error} />
 {:else if $status === "loading"}
   <slot name="loading" />
 {:else}
