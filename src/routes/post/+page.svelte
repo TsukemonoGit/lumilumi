@@ -13,14 +13,17 @@
   import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
+  import { page } from "$app/stores";
+
+  const paramTitle = $page.url.searchParams.get("title");
+  const paramText = $page.url.searchParams.get("text");
+  const paramUrl = $page.url.searchParams.get("url");
+  const paramSharedContent = [paramTitle, paramText, paramUrl]
+    .filter((param) => param !== null)
+    .join("\n");
 
   let tags: string[][] = [];
-  // export let data: {
-  //   title: string;
-  //   text: string;
-  //   url?: string;
-  //   media?: string[];
-  // };
+
   let sharedContent: string; // = [data.title, data.text, data.url]
   //   .filter(Boolean)
   //   .join("\n");
@@ -53,10 +56,23 @@
     $nowProgress = false;
   };
   let signPubkey: string;
+
   onMount(async () => {
     console.log("onMount");
+
     setSettings();
-    if (navigator.serviceWorker) {
+    if (paramSharedContent) {
+      $additionalPostOptions = {
+        tags: tags,
+        addableUserList: [],
+        defaultUsers: [],
+        warningText: undefined,
+        content: paramSharedContent,
+      };
+
+      // ポストウィンドウを開く
+      $postWindowOpen = true;
+    } else if (navigator.serviceWorker) {
       console.log("serviceWorker");
       // メッセージを受け取るリスナーを設定
       navigator.serviceWorker.addEventListener("message", async (event) => {
