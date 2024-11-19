@@ -182,7 +182,7 @@ body {
   line-height: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .container {
     @apply px-0.5;
   }
@@ -243,7 +243,7 @@ input:-webkit-autofill:focus {
     @apply fixed left-[50%] bottom-4 z-10 h-fit -translate-x-1/2;
   }
 }
-@media screen and (min-width: 769px) {
+@media screen and (min-width: 768px) {
   .postWindow {
     /* display: none !important; */
     @apply fixed right-auto left-24 top-8 z-10 h-fit;
