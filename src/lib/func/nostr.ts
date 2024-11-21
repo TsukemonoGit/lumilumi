@@ -49,6 +49,7 @@ export function setRxNostr() {
   rxNostr = createRxNostr({
     verifier: get(verifier) ?? cryptoVerifier,
     connectionStrategy: "lazy-keep",
+    eoseTimeout: 10000, //フォワードはEOSEで終わらないから影響しない
   });
   app.update((be) => {
     return { ...be, rxNostr: rxNostr };
@@ -450,6 +451,7 @@ export function getRelaysById(id: string, key: string): string[] {
 
   return Array.from(tieMap?.get(id) || []);
 }
+
 export function usePromiseReq(
   {
     filters,
@@ -541,6 +543,7 @@ export interface UserData {
   nip05: string | undefined;
   petname: string | undefined;
 }
+
 export function getMetadataList(
   querydata: [QueryKey, EventPacket][]
 ): MetadataList {
