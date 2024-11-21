@@ -20,7 +20,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
   $: result = useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req);

@@ -31,7 +31,6 @@ export function useRelaySet(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<DefaultRelayConfig[]> | undefined {
   setRelays(relaySearchRelays);

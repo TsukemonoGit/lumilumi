@@ -21,7 +21,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
   $: result = useAllReactions(queryKey, id, atag, req);

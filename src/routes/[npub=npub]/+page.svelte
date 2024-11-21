@@ -298,7 +298,6 @@
                     since: since,
                   },
                 ]}
-                {req}
                 let:events
                 {amount}
                 {tieKey}
@@ -384,7 +383,6 @@
                     since: since,
                   },
                 ]}
-                {req}
                 let:events
                 {amount}
                 {tieKey}
@@ -469,7 +467,6 @@
                   since: now(),
                 },
               ]}
-              {req}
               let:events
               {amount}
               {tieKey}
@@ -556,7 +553,6 @@
                   since: now(),
                 },
               ]}
-              {req}
               let:events
               viewIndex={0}
               {amount}

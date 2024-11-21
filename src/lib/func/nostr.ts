@@ -49,6 +49,7 @@ export function setRxNostr() {
   rxNostr = createRxNostr({
     verifier: get(verifier) ?? cryptoVerifier,
     connectionStrategy: "lazy-keep",
+    eoseTimeout: 10000, //eoseで終わらないforwardReqには影響しないミリ秒
   });
   app.update((be) => {
     return { ...be, rxNostr: rxNostr };

@@ -15,11 +15,6 @@ import { get, writable, derived, type Writable } from "svelte/store";
 import { generateRandomId } from "./nostr";
 import { type Observable } from "rxjs";
 
-// RxReqのフォワードリクエストかどうかを判別する型ガード関数
-function isForwardReq(req: any) {
-  return req?.over === undefined;
-}
-
 export function useReq(
   {
     queryKey,
@@ -57,8 +52,7 @@ export function useReq(
           relays: string[];
         }> &
         RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
+        RxReqPipeable);
 
   if (req) {
     _req = req;
@@ -85,13 +79,14 @@ export function useReq(
     initialDataUpdatedAt: initialDataUpdatedAt,
     refetchInterval: refetchInterval,
     gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
+
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
 
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //console.log(v);
+            //       console.log(v);
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
             } else {
@@ -100,13 +95,16 @@ export function useReq(
             }
           },
 
-          complete: () => status.set("success"),
+          complete: () => {
+            console.log("complete");
+            status.set("success");
+          },
           error: (e) => {
             console.error("[rx-nostr]", e);
             status.set("error");
             error.set(e);
 
-            if (!fulfilled && !isForwardReq(_req)) {
+            if (!fulfilled) {
               console.log("fulfilled");
               reject(e);
               fulfilled = true;
@@ -114,6 +112,7 @@ export function useReq(
           },
         });
         _req.emit(filters);
+        _req.over();
       });
     },
   });

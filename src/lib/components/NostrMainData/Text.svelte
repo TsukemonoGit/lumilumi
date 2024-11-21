@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { queryClient } from "$lib/stores/stores";
   import { useEvent } from "$lib/stores/useEvent";
   import type { ReqStatus } from "$lib/types";
 
@@ -10,7 +11,7 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
-
+  export let relays: string[] = [];
   export let queryKey: QueryKey;
   export let id: string;
   export let req:
@@ -20,10 +21,13 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
-  $: result = useEvent(queryKey, id, req);
+  if (relays.length > 0) {
+    //リレーに情報あるときは取り直しのときだからデータリセット
+    $queryClient.removeQueries({ queryKey: queryKey });
+  }
+  $: result = useEvent(queryKey, id, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -34,14 +38,15 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
+  $: console.log($status);
 </script>
 
 {#if $error}
   <slot name="error" error={$error} />
+{:else if $status === "success" && !$data}
+  <slot name="nodata" />
 {:else if $data}
-  <slot text={$data?.event} status={$status} />
+  <slot text={$data.event} status={$status} />
 {:else if $status === "loading"}
   <slot name="loading" />
-{:else}
-  <slot name="nodata" />
 {/if}

@@ -27,7 +27,6 @@ export function useTimelineEventList(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined,
 
   relays?: string[] | undefined

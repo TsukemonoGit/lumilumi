@@ -24,7 +24,6 @@ export function useReplaceableEventList(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<EventPacket[]> {
   // TODO: Add npub support

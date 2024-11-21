@@ -22,7 +22,6 @@ export function useMetadata(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined,
   initData?: EventPacket | EventPacket[] | undefined,
   staleTime: number = Infinity,

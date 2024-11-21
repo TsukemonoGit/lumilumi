@@ -29,7 +29,6 @@ export function useGlobalRelaySet(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): any {
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {

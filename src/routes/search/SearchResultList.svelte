@@ -45,7 +45,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   export let viewIndex: number;
   export let amount: number; //1ページに表示する量

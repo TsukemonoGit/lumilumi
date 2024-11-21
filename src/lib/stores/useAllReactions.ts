@@ -20,13 +20,12 @@ export function useAllReactions(
   id: string | undefined,
   atag: string | undefined,
   req?:
-    | (RxReq<"backward"> &
+    | RxReq<"backward"> &
         RxReqEmittable<{
           relays: string[];
         }> &
         RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+        RxReqPipeable
 ): ReqResult<EventPacket[]> {
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;

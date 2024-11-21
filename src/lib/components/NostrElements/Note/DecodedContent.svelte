@@ -56,6 +56,7 @@
         ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
         <div class="border rounded-md border-magnum-600/30">
           <Note
+            nodataRelays={decoded.data.relays ?? []}
             id={decoded.data.id}
             mini={true}
             {displayMenu}
@@ -102,7 +103,5 @@
             {tieKey}
           />{/if}</span
       >
-    {:else if decoded.type === "nrelay"}<span
-        class="text-sm text-neutral-500 flex-inline">{decoded.data}</span
-      >{:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
+    {:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
 </div>

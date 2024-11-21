@@ -19,7 +19,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   $: result = useReplaceableEventList(queryKey, pubkey, 30000, req);
   $: data = result.data;

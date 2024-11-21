@@ -24,7 +24,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   export let relays: DefaultRelayConfig[] | undefined = undefined;
 

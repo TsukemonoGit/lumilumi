@@ -22,10 +22,13 @@ export function useEvent(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined
+    | undefined,
+  relays?: string[]
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
   const operator = pipe();
-  return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
+  return useReq(
+    { queryKey, filters, operator, req },
+    relays
+  ) as ReqResult<EventPacket>;
 }

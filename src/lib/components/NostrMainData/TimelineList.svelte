@@ -50,7 +50,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   export let viewIndex: number = 0;
   export let amount: number; //1ページに表示する量

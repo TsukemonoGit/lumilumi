@@ -17,7 +17,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
   export let pubkey: string;
@@ -36,7 +35,6 @@
           }> &
           RxReqOverable &
           RxReqPipeable)
-      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
       | undefined
   ) {
     return useGlobalRelaySet(

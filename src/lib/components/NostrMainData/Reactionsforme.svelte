@@ -20,7 +20,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
   $: result = useUniqueEventList(queryKey, filters, req);

@@ -21,7 +21,6 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
   let relays: DefaultRelayConfig[] | undefined = undefined;
   export let paramRelays: string[] | undefined;
@@ -66,7 +65,6 @@
           }> &
           RxReqOverable &
           RxReqPipeable)
-      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
       | undefined
   ) {
     if (!localRelays || localRelays.length <= 0) {

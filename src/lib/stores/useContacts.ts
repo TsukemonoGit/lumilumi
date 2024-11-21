@@ -22,7 +22,6 @@ export function useContacts(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<EventPacket> {
   return useReplaceableEvent(rxNostr, queryKey, pubkey, 3, req);

@@ -14,7 +14,7 @@
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
-
+  export let nodataRelays: string[] = [];
   $: loadingText = encodetoNote(id);
 </script>
 
@@ -23,17 +23,94 @@
     slot="loading"
     class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
   >
-    Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
-        notestr={loadingText}
-      />{/if}
+    <div>Loading {loadingText}</div>
+    {#if displayMenu}<EllipsisMenuNote notestr={loadingText} />{/if}
   </div>
-  <div
-    slot="nodata"
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-  >
-    nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
-        notestr={loadingText}
-      />{/if}
+  <div slot="nodata">
+    <!--no dataでも、relay hintが入ってたらそっちで探してみる-->
+
+    {#if nodataRelays}<Text
+        queryKey={["timeline", id]}
+        {id}
+        relays={nodataRelays}
+        let:text
+      >
+        <div
+          slot="loading"
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+        >
+          <div>Loading {loadingText}</div>
+          <EllipsisMenuNote notestr={loadingText} />
+        </div>
+        <div
+          slot="nodata"
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+        >
+          <div>Nodata {loadingText}</div>
+          <EllipsisMenuNote notestr={loadingText} />
+        </div>
+        <div class="mx-2">
+          <Metadata
+            queryKey={["metadata", text.pubkey]}
+            pubkey={text.pubkey}
+            let:metadata
+          >
+            <div slot="loading">
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+              />
+            </div>
+            <div slot="nodata">
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+              />
+            </div>
+            <div slot="error" let:error>
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+              />
+            </div>
+            <EventCard
+              note={text}
+              {metadata}
+              {mini}
+              {maxHeight}
+              {thread}
+              {displayMenu}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
+          </Metadata>
+        </div>
+      </Text>{:else}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        Nodata {loadingText}
+
+        {#if displayMenu}<EllipsisMenuNote notestr={loadingText} />
+        {/if}
+      </div>
+    {/if}
   </div>
   <div
     slot="error"
