@@ -38,7 +38,6 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
-  $: console.log($status);
 </script>
 
 {#if $error}
