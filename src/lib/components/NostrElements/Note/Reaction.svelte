@@ -1,6 +1,7 @@
 <script lang="ts">
   import { showImg } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
+
   export let event: Nostr.Event;
 
   export const getEmoji = (

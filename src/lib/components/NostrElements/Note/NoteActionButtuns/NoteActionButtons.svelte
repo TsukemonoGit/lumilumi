@@ -83,13 +83,18 @@
   // let reaction = writable<string | null>(null);
 
   const handleClickReaction = async () => {
+    const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
     const tags: string[][] = root ? [root] : [];
     if (atag) {
-      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
+      tags.push(
+        ["p", note.pubkey],
+        ["a", atag, relayhints[0] ?? ""],
+        ["k", note.kind.toString()]
+      );
     } else {
       tags.push(
         ["p", note.pubkey],
-        ["e", note.id],
+        ["e", note.id, relayhints[0] ?? ""],
         ["k", note.kind.toString()]
       );
     }
@@ -557,7 +562,7 @@
       >
     </div>
     <!--カスタムリアクション-->
-    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
+    <CustomReaction {note} {root} {atag} {tieKey} {publishAndSetQuery} />
   {/if}
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735}

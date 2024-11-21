@@ -5,6 +5,7 @@
   import * as Nostr from "nostr-typedef";
   import split from "graphemesplit";
   import { clientTag } from "$lib/func/constants";
+  import { getRelaysById } from "$lib/func/nostr";
   export let note: Nostr.Event | undefined;
 
   export let root: string[] | undefined;
@@ -14,6 +15,7 @@
   export let emoji: string[] = [];
   export let handleClickOk: any | undefined = undefined;
   export let publishAndSetQuery;
+  export let tieKey: string | undefined;
 
   let customReactionError: boolean = false;
   let customReactionErrorMessage: string = "";
@@ -35,14 +37,18 @@
       handleClickOk();
       return;
     }
-
+    const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
     const tags: string[][] = root ? [root] : [];
     if (atag) {
-      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
+      tags.push(
+        ["p", note.pubkey],
+        ["a", atag, relayhints[0] ?? ""],
+        ["k", note.kind.toString()]
+      );
     } else {
       tags.push(
         ["p", note.pubkey],
-        ["e", note.id],
+        ["e", note.id, relayhints[0] ?? ""],
         ["k", note.kind.toString()]
       );
     }
@@ -64,12 +70,12 @@
     if (!note) {
       return;
     }
-
+    const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: [
         ["p", note.pubkey],
-        ["e", note.id],
+        ["e", note.id, relayhints[0] ?? ""],
         ["k", note.kind.toString()],
         ["emoji", ...e],
       ],
