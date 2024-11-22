@@ -23,8 +23,8 @@
         RxReqOverable &
         RxReqPipeable)
     | undefined = undefined;
-
-  $: result = useLatestEvent(queryKey, filters, req, relays);
+  $: max3relays = relays ? relays.slice(0, 3) : undefined;
+  $: result = useLatestEvent(queryKey, filters, req, max3relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
