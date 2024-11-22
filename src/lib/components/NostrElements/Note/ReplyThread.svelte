@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { relayRegex } from "$lib/func/regex";
   import { parseNaddr } from "$lib/func/util";
   import NaddrEvent from "./NaddrEvent.svelte";
   import Note from "./Note.svelte";
@@ -12,7 +13,12 @@
 
 {#if replyTag}
   {#if replyTag[0] === "e"}
+    {@const relayhint =
+      replyTag && replyTag.length > 2 && relayRegex.test(replyTag[2])
+        ? [replyTag[2]]
+        : undefined}
     <Note
+      {relayhint}
       id={replyTag[1]}
       mini={true}
       {displayMenu}
@@ -30,7 +36,7 @@
       {depth}
       {tieKey}
       {repostable}
-      content={undefined}
+      content={replyTag[1]}
       mini={true}
       thread={true}
     />

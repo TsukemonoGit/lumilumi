@@ -44,13 +44,12 @@ export interface UseReqOpts<A> {
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
   req?:
-    | (RxReq<"backward"> &
+    | RxReq<"backward"> &
         RxReqEmittable<{
           relays: string[];
         }> &
         RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
+        RxReqPipeable;
 
   initData?: A;
 }

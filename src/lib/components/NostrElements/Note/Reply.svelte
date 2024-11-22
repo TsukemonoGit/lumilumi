@@ -4,6 +4,7 @@
   import NaddrEvent from "./NaddrEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
   import { _ } from "svelte-i18n";
+  import { relayRegex } from "$lib/func/regex";
 
   export let replyTag: string[] | undefined;
   export let displayMenu: boolean;
@@ -30,7 +31,12 @@
     >
     <div class="border rounded-md border-magnum-600/30">
       {#if replyTag[0] === "e"}
+        {@const relayhint =
+          replyTag && replyTag.length > 2 && relayRegex.test(replyTag[2])
+            ? [replyTag[2]]
+            : undefined}
         <Note
+          {relayhint}
           id={replyTag[1]}
           mini={true}
           {displayMenu}
