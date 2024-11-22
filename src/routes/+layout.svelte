@@ -107,7 +107,7 @@
           );
 
           // アップデートがあれば通知
-          registration.update();
+          // registration.update();
         })
         .catch((error) => {
           console.error("Service Worker registration failed:", error);

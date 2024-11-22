@@ -20,7 +20,7 @@
   $: loadingText = encodetoNote(id);
   const queryCheck = (id: string) => {
     //if (!$queryClient.getQueryData(["timeline", id])) {//見つかんないときにリレーヒントから探すからない
-    $queryClient.resetQueries({ queryKey: ["timeline", id] });
+    $queryClient.removeQueries({ queryKey: ["timeline", id] });
     //  }
   };
 </script>
