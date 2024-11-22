@@ -53,7 +53,14 @@ export interface UseReqOpts<A> {
 
   initData?: A;
 }
+export interface UseForwardReqOpts<A> {
+  queryKey: QueryKey;
+  filters: Nostr.Filter[];
+  operator: OperatorFunction<EventPacket, A>;
+  req: RxReq<"forward"> & RxReqEmittable & RxReqPipeable;
 
+  initData?: A;
+}
 export interface UsePromiseReqOpts<A> {
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;

@@ -24,7 +24,6 @@ export function useUniqueEventList(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<EventPacket[]> {
   const operator = pipe(uniq(), scanArray());

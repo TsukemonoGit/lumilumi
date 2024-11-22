@@ -11,7 +11,7 @@ import type {
 import type { OperatorFunction } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
-import { useReq } from "$lib/func/useReq";
+import { useForwardReq, useReq } from "$lib/func/useReq";
 
 //import { useReq } from "$lib/func/useReq.js";
 
@@ -20,15 +20,7 @@ export function useTimelineEventList(
 
   filters: Nostr.Filter[],
   operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
-  req?:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined,
+  req: RxReq<"forward"> & RxReqEmittable & RxReqPipeable,
 
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
@@ -37,7 +29,7 @@ export function useTimelineEventList(
   //   : pipe(pipe(), userStatus(), scanArray());
   //フィルターに自分へのリプライを取得するフィルターが含まれているか
 
-  return useReq({ queryKey, filters, operator, req }, relays, {
+  return useForwardReq({ queryKey, filters, operator, req }, relays, {
     staleTime: Infinity,
     gcTime: Infinity,
     initialDataUpdatedAt: undefined,

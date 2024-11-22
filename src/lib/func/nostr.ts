@@ -272,7 +272,7 @@ export const makeMainFilters = (
 //これメインTL用のreqで一つだけのforwardreqのやつ
 //rxNostr3ようのやつは別であるけど
 //changeMainEmitでフィルターを更新する
-export function useForwardReq(
+export function useMainTimelineReq(
   operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
   queryKey: QueryKey,
   filters: Nostr.Filter[]

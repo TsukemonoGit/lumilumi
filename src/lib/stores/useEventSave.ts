@@ -23,7 +23,6 @@ export function useEventSave(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];

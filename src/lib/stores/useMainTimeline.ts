@@ -6,7 +6,7 @@ import type { OperatorFunction } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
 
-import { useForwardReq } from "$lib/func/nostr";
+import { useMainTimelineReq } from "$lib/func/nostr";
 
 //import { useReq } from "$lib/func/useReq.js";
 
@@ -20,5 +20,7 @@ export function useMainTimeline(
   //   : pipe(pipe(), userStatus(), scanArray());
   //フィルターに自分へのリプライを取得するフィルターが含まれているか
 
-  return useForwardReq(operator, queryKey, filters) as ReqResult<EventPacket[]>;
+  return useMainTimelineReq(operator, queryKey, filters) as ReqResult<
+    EventPacket[]
+  >;
 }
