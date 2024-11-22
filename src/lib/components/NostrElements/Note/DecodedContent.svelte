@@ -31,7 +31,7 @@
         data: Uint8Array;
       }
     | {
-        type: "nrelay" | "npub" | "note";
+        type: "npub" | "note";
         data: string;
       };
 
@@ -102,7 +102,5 @@
             {tieKey}
           />{/if}</span
       >
-    {:else if decoded.type === "nrelay"}<span
-        class="text-sm text-neutral-500 flex-inline">{decoded.data}</span
-      >{:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
+    {:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
 </div>

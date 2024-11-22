@@ -11,6 +11,7 @@
     RxReqPipeable,
   } from "rx-nostr";
 
+  export let relays: string[] | undefined = undefined;
   export let queryKey: QueryKey;
   export let id: string;
   export let req:
@@ -20,10 +21,9 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
-  $: result = useEvent(queryKey, id, req);
+  $: result = useEvent(queryKey, id, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -40,8 +40,8 @@
   <slot name="error" error={$error} />
 {:else if $data}
   <slot text={$data?.event} status={$status} />
+{:else if $status === "success"}
+  <slot name="nodata" />
 {:else if $status === "loading"}
   <slot name="loading" />
-{:else}
-  <slot name="nodata" />
 {/if}

@@ -6,6 +6,7 @@
   import Text from "$lib/components/NostrMainData/Text.svelte";
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
+  import NoteByRelayhint from "./NoteByRelayhint.svelte";
   export let id: string;
   export let mini: boolean = false;
   export let maxHeight: string = "24rem";
@@ -14,7 +15,7 @@
   export let depth: number;
   export let repostable: boolean;
   export let tieKey: string | undefined;
-
+  export let relayhint: string[] | undefined = undefined;
   $: loadingText = encodetoNote(id);
 </script>
 
@@ -27,13 +28,26 @@
         notestr={loadingText}
       />{/if}
   </div>
-  <div
-    slot="nodata"
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-  >
-    nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
-        notestr={loadingText}
-      />{/if}
+  <div slot="nodata">
+    {#if relayhint && relayhint.length > 0}
+      <NoteByRelayhint
+        {id}
+        {mini}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {relayhint}
+      />
+    {:else}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
+            notestr={loadingText}
+          />{/if}
+      </div>
+    {/if}
   </div>
   <div
     slot="error"

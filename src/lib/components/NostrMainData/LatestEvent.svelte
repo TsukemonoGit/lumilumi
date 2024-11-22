@@ -12,6 +12,7 @@
     RxReqPipeable,
   } from "rx-nostr";
 
+  export let relays: string[] | undefined = undefined;
   export let queryKey: QueryKey;
   export let filters: Nostr.Filter[];
   export let req:
@@ -21,10 +22,9 @@
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
     | undefined = undefined;
 
-  $: result = useLatestEvent(queryKey, filters, req);
+  $: result = useLatestEvent(queryKey, filters, req, relays);
   $: data = result.data;
   $: status = result.status;
   $: error = result.error;
@@ -34,14 +34,15 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
+  //$: console.log(queryKey, $data, $status, relays);
 </script>
 
 {#if $error}
   <slot name="error" error={$error} />
+{:else if $status === "success" && !$data}
+  <slot name="nodata" />
 {:else if $data !== undefined}
   <slot event={$data.event} status={$status} />
-{:else if $status === "loading"}
-  <slot name="loading" />
 {:else}
-  <slot name="nodata" />
+  <slot name="loading" />
 {/if}

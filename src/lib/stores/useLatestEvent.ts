@@ -22,9 +22,12 @@ export function useLatestEvent(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined
+    | undefined,
+  relays?: string[] | undefined
 ): ReqResult<EventPacket> {
   const operator = pipe(latest());
-  return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
+  return useReq(
+    { queryKey, filters, operator, req },
+    relays
+  ) as ReqResult<EventPacket>;
 }
