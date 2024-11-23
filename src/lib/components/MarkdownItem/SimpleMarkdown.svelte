@@ -7,9 +7,12 @@
   import markdownItSub from "markdown-it-sub";
   import markdownItSup from "markdown-it-sup";
   import markdownItMark from "markdown-it-mark";
-  import markdownBrPlugin from "$lib/func/markdown-it-br";
-  import markdownImgPlugin from "$lib/func/markdown-it-img";
-  import markdownLinkPlugin from "$lib/func/markdown-it-link";
+  import markdownBrPlugin from "$lib/func/markdown-it/markdown-it-br";
+  import markdownDlPlugin from "$lib/func/markdown-it/markdown-it-dl";
+  import markdownImgPlugin from "$lib/func/markdown-it/markdown-it-img";
+  import markdownLinkPlugin from "$lib/func/markdown-it/markdown-it-link";
+  import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
+  import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
 
   export let text: string;
   export let tags: string[][];
@@ -32,6 +35,9 @@
     .use(markdownItMark)
     .use(markdownBrPlugin)
     .use(markdownLinkPlugin)
+    .use(markdownDlPlugin)
+    .use(markdownDdPlugin)
+    .use(markdownDtPlugin)
     .parse(text, {});
   $: parts = transformTokens(tokens);
 

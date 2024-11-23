@@ -45,7 +45,7 @@
     | { type: "nevent"; data: nip19.EventPointer }
     | { type: "nprofile"; data: nip19.ProfilePointer }
     | { type: "nsec"; data: Uint8Array }
-    | { type: "nrelay" | "npub" | "note"; data: string }
+    | { type: "npub" | "note"; data: string }
     | undefined => {
     if (content === undefined) {
       return undefined;
