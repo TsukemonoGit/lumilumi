@@ -10,6 +10,8 @@ import { nip19 } from "nostr-tools";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
 
+export let noReactionKind = [3, 10000, 30000];
+
 export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   if (!ev) {
     return undefined;

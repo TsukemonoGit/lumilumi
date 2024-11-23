@@ -106,8 +106,11 @@
             registration.scope
           );
 
-          // アップデートがあれば通知
-          registration.update();
+          // homeにいるときだけにしないと無限ループする
+          //アップデートがあれば通知
+          if ($page.url.pathname === "/") {
+            registration.update();
+          }
         })
         .catch((error) => {
           console.error("Service Worker registration failed:", error);

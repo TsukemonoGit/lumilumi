@@ -78,10 +78,10 @@
         />
       </div>
       <div class="text-magnum-100 text-sm">
-        @{#if prof}
+        {#if prof}
           <DisplayName
             height={21}
-            name={prof?.name ?? prof?.display_name ?? ""}
+            name={`@${prof?.name ?? prof?.display_name ?? ""}`}
             tags={metadata.tags}
           />{:else}noname{/if}
       </div>
@@ -146,5 +146,7 @@
         {tieKey}
       />{/if}
   </div>
-  {#if displayMenu}<NoteActionButtons {note} {repostable} {tieKey} />{/if}
+  {#if displayMenu}
+    <NoteActionButtons {note} {repostable} {tieKey} />
+  {/if}
 </div>

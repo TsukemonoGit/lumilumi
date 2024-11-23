@@ -675,7 +675,7 @@
 
           <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
         </div>
-        <div class="flex gap-1 mb-0.5">
+        <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
               @<Metadata

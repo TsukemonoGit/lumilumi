@@ -34,7 +34,7 @@
     showAllReactions,
     loginUser,
   } from "$lib/stores/stores";
-  import { normalizeRelayURL, profile } from "$lib/func/util";
+  import { noReactionKind, normalizeRelayURL, profile } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -463,9 +463,9 @@
 </script>
 
 <div
-  class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
+  class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1 place-self-end"
 >
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735}
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
     <!--リプライ-->
     <button
       aria-label="reply"
@@ -479,7 +479,7 @@
       />
     </button>
     <!--リポスト-->
-    {#if repostable}
+    {#if repostable && !noReactionKind.includes(note.kind)}
       <div class="flex items-end">
         <Reposted id={atag ?? note.id} let:event>
           <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
@@ -505,7 +505,7 @@
     {/if}
   {/if}
 
-  {#if note.kind !== 9734 && note.kind !== 9735}
+  {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
       <Reactioned id={atag ?? note.id} let:event>
@@ -560,7 +560,7 @@
     <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
   {/if}
 
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735}
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
     <Metadata
       queryKey={["metadata", note.pubkey]}
       pubkey={note.pubkey}
