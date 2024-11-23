@@ -20,27 +20,25 @@
   }
 </script>
 
-<strong>
-  {#if part.children && children}
-    {#each children as child}
-      <SimpleContentBlock
-        part={child}
-        {repostable}
-        {depth}
-        {displayMenu}
-        {tags}
-        {openModal}
-        {nolist}
-        {tieKey}
-      />{/each}
-  {:else}
-    <NostrContent
-      text={part.content}
+{#if part.children && children}
+  {#each children as child}
+    <SimpleContentBlock
+      part={child}
       {repostable}
       {depth}
       {displayMenu}
       {tags}
+      {openModal}
+      {nolist}
       {tieKey}
-    />
-  {/if}
-</strong>
+    />{/each}
+{:else}
+  <NostrContent
+    text={part.content}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {tieKey}
+  />
+{/if}

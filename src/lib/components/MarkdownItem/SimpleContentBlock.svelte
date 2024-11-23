@@ -11,17 +11,14 @@
   import OrderedList from "./Simple/OrderedList.svelte";
   import type { Token } from "markdown-it/index.js";
   import Fence from "./Simple/Fence.svelte";
-  import Inline from "./Simple/Inline.svelte";
   import Link from "./Simple/Link.svelte";
   import Image from "./Simple/Image.svelte";
-  import Strong from "./Simple/Strong.svelte";
-  import Strikethrough from "./Simple/Strikethrough.svelte";
-  import Em from "./Simple/Em.svelte";
   import CodeInline from "./Simple/CodeInline.svelte";
   import FootnoteRef from "./Simple/FootnoteRef.svelte";
   import FootnoteBlock from "./Simple/FootnoteBlock.svelte";
   import NostrContent from "./Simple/NostrContent.svelte";
-  import Mark from "./Simple/Mark.svelte";
+  import Dl from "./Simple/Dl.svelte";
+  import NotabPart from "./Simple/NotabPart.svelte";
   export let part: Token;
   export let displayMenu;
   export let depth;
@@ -122,16 +119,18 @@
     {tieKey}
   />
 {:else if part.type === "inline"}
-  <Inline
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {tieKey}
-  />
+  <span>
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    /></span
+  >
 {:else if part.type === "link"}
   <Link
     {part}
@@ -146,27 +145,31 @@
 {:else if part.type === "image"}
   <Image {part} />
 {:else if part.type === "strong"}
-  <Strong
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {tieKey}
-  />
+  <strong>
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    /></strong
+  >
 {:else if part.type === "s"}
-  <Strikethrough
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {tieKey}
-  />
+  <s>
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    /></s
+  >
 {:else if part.type === "text"}
   <NostrContent
     text={part.content}
@@ -177,16 +180,18 @@
     {tieKey}
   />
 {:else if part.type === "em"}
-  <Em
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {tieKey}
-  />
+  <em class="italic">
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    /></em
+  >
 {:else if part.type === "softbreak"}
   <!---->
 {:else if part.type === "footnote_ref"}
@@ -215,7 +220,22 @@
 {:else if part.type === "sup"}
   <sup>{part.content}</sup>
 {:else if part.type === "mark"}
-  <Mark
+  <mark>
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    /></mark
+  >
+{:else if part.type === "hardbreak"}
+  <br />
+{:else if part.type === "dl"}
+  <Dl
     {part}
     {repostable}
     {depth}
@@ -225,8 +245,6 @@
     {nolist}
     {tieKey}
   />
-{:else if part.type === "hardbreak"}
-  <br />
 {:else}<b>{part.type}</b>
   <NostrContent
     text={part.content}
