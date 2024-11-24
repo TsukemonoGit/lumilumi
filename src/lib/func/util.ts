@@ -9,6 +9,7 @@ import { binarySearch } from "nostr-tools/utils";
 import { nip19 } from "nostr-tools";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
+import { nip19Regex, urlRegex } from "./regex";
 
 export let noReactionKind = [3, 10000, 30000];
 
@@ -464,4 +465,38 @@ export const initUserMuteStatus: UserMuteStatus = {
 //末尾に"/"をつける
 export const normalizeRelayURL = (str: string) => {
   return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
+};
+
+export const nip19UserRegex =
+  /nostr:(((npub|nsec|nprofile)1[023456789acdefghjklmnpqrstuvwxyz]{58,}))/g;
+
+export const nip19NoteRegex =
+  /nostr:(((naddr|nevent|note)1[023456789acdefghjklmnpqrstuvwxyz]{58,}))/g;
+
+// export const translateText = async (text: string, fetchUserInfo: (key: string) => Promise<string>) => {
+//   // nip19UserRegexにマッチする部分を探し、情報を置き換える処理
+//   const replacedText = await text.replace(nip19UserRegex, async (match, p1) => {
+//     try {
+//       // `p1` が `(((npub|nsec|nprofile)1[023456789acdefghjklmnpqrstuvwxyz]{58,}))` に該当する部分
+//       const userInfo = await fetchUserInfo(p1);
+//       return `[👤${userInfo}]`; // 取得したユーザー情報を表示
+//     } catch {
+//       return "[👤Unknown]"; // エラー時のフォールバック
+//     }
+//   });
+
+//   // 他の置換
+//   const finalText = replacedText
+//     .replace(nip19NoteRegex, "[🗒️]")
+//     .replace(urlRegex, "[🔗]");
+
+//   return encodeURIComponent(finalText);
+// };
+
+export const translateText = (text: string) => {
+  const replacedText = text
+    .replace(nip19UserRegex, "[👤]")
+    .replace(nip19NoteRegex, "[🗒️]")
+    .replace(urlRegex, "[🔗]");
+  return encodeURIComponent(replacedText);
 };

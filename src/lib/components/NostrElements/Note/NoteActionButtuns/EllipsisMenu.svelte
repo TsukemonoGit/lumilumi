@@ -26,6 +26,8 @@
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
   import { nostviewstrable } from "$lib/func/constants";
+  import { nip19Regex, urlRegex } from "$lib/func/regex";
+  import { translateText } from "$lib/func/util";
   export let note: Nostr.Event;
   export let indexes: number[] | undefined = undefined;
   export let TriggerIcon = Ellipsis;
@@ -102,7 +104,8 @@
 
       case 2:
         //Translate
-        const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${encodeURIComponent(note.content)}`;
+
+        const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${translateText(note.content)}`;
 
         window.open(translateUrl, "_blank", "noreferrer");
         break;
