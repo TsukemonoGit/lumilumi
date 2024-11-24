@@ -360,6 +360,7 @@ export function publishEvent(ev: Nostr.EventParameters) {
     );
   });
 }
+
 export async function promisePublishSignedEvent(
   event: Nostr.Event,
   relays?: string[] | undefined
@@ -415,6 +416,7 @@ export async function promisePublishSignedEvent(
     });
   }).then((res) => ({ event, res }));
 }
+
 export async function promisePublishEvent(
   ev: Nostr.EventParameters,
   relays?: string[] | undefined
@@ -444,6 +446,7 @@ export function reconnectRelay(url: string) {
 //   tieKey = key;
 //   // console.log(tieKey);
 // }
+
 export function getRelaysById(id: string, key: string): string[] {
   //console.log(tieMapStore);
   const tieMap: Map<string, Set<string>> | undefined =

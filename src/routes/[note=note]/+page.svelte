@@ -20,7 +20,6 @@
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
-  import { eventKinds } from "$lib/func/kinds";
 
   export let data: {
     id: string;

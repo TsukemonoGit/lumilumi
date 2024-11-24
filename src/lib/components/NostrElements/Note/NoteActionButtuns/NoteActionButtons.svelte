@@ -685,7 +685,7 @@
   <!--kind6-->
   {#if allReactions.repost.length > 0}
     <div class="flex gap-1 p-1">
-      <Repeat2 size="20" class="text-magnum-500/75 mr-2" />
+      <Repeat2 size="20" class="text-magnum-500/75 mr-2 min-w-4" />
       <RepostList events={allReactions.repost} {tieKey} />
     </div>
   {/if}

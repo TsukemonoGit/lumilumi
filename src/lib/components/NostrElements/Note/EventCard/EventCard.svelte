@@ -820,8 +820,8 @@
 {/if}
 
 <!-- {/if} -->
-<!-- <style>
+<style>
   article {
     content-visibility: auto;
   }
-</style> -->
+</style>
