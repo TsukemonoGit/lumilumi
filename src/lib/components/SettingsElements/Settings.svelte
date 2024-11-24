@@ -135,6 +135,7 @@
     //   : initLumiMuteByKind;
 
     // window?.addEventListener("beforeunload", handleBeforeUnload);
+    originalSettings.set({ ...settings });
   });
 
   function loadSettings() {
@@ -145,7 +146,7 @@
 
         $relaySetValue = loadSet.useRelaySet; //ラジオボタンの状態更新
 
-        originalSettings.set({ ...loadSet });
+        // originalSettings.set({ ...loadSet });
         return loadSet;
       } catch (error) {
         return null;
@@ -173,7 +174,9 @@
       console.log(error);
     }
   }
+
   let relayInput: string = "";
+
   function addRelay() {
     if (!relayInput) return;
     let input = relayInput.trim();
@@ -368,6 +371,7 @@
   function settingsChanged(): boolean {
     const changedFields: string[] = [];
     if (!$originalSettings) {
+      //公開鍵が設定されてないとロードするデータが探せないからね
       return true;
     }
     const currentSettings = { ...settings };

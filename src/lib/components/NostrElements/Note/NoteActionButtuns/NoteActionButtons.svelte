@@ -675,6 +675,7 @@
         <div class="w-[20px] overflow-hidden" />
       {/if}{/if}
     <!--メニュー-->
+
     <EllipsisMenu {note} {tieKey} />
   </div>
 </div>

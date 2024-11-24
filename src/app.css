@@ -188,7 +188,7 @@ body {
   }
 }
 .container {
-  @apply max-w-[1280px];
+  @apply max-w-[960px];
 }
 input[type="text"] {
   background-color: rgb(var(--color-neutral-900) / 1);
@@ -249,7 +249,7 @@ input:-webkit-autofill:focus {
   .postWindow {
     /* display: none !important; */
     @apply fixed right-auto left-24 top-8 z-10 h-fit;
-    left: max(6.5rem, calc(50% - 530px));
+    left: max(6.5rem, calc(50% - 380px));
   }
 }
 

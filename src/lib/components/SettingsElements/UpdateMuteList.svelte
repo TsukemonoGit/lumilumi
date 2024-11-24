@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
-  import type { LumiMute } from "$lib/types";
+
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import {
