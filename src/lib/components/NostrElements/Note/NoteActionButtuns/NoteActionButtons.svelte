@@ -586,6 +586,8 @@
   {/if}
   <!---->
   {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+    <!--カスタムリアクション-->
+    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
       <Reactioned id={atag ?? note.id} let:event>
@@ -636,8 +638,6 @@
             .length}{/if}</span
       >
     </div>
-    <!--カスタムリアクション-->
-    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
   {/if}
   <!---->
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
