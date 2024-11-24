@@ -26,8 +26,7 @@
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
-  import { getProfile } from "$lib/func/event";
-  import { useNip05Check, useNip05PromiseCheck } from "$lib/func/nip05check";
+  import { useNip05PromiseCheck } from "$lib/func/nip05check";
 
   export let tieKey: string | undefined;
 

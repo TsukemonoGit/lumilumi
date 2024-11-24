@@ -56,7 +56,7 @@
   <div
     class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card flex items-center align-middle"
   >
-    <Zap class="stroke-orange-400 fill-orange-400" size={20} />
+    <Zap class="stroke-orange-400 fill-orange-400 min-w-4" size={20} />
     <div class="min-w-8 flex justify-center">
       {amount === -1 ? "invalid event" : amount}
     </div>

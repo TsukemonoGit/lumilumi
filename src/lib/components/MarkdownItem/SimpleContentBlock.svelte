@@ -1,7 +1,6 @@
 <script lang="ts">
   import { _ } from "svelte-i18n";
 
-  import BlockQuote from "./Simple/BlockQuote.svelte";
   import BulletList from "./Simple/BulletList.svelte";
   import CodeBlock from "./Simple/CodeBlock.svelte";
   import ListItem from "./Simple/ListItem.svelte";
@@ -75,16 +74,18 @@
     {tieKey}
   />
 {:else if part.type === "blockquote"}
-  <BlockQuote
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {tieKey}
-  />
+  <blockquote>
+    <NotabPart
+      {part}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {tags}
+      {openModal}
+      {nolist}
+      {tieKey}
+    />
+  </blockquote>
 {:else if part.type === "ordered_list"}
   <OrderedList
     {part}
@@ -273,5 +274,21 @@
     position: relative;
     padding: 0 4px;
     top: -13px;
+  }
+
+  blockquote {
+    padding: 0.1em 1.5em;
+    margin: 1em 0;
+    border-left: 5px solid rgb(var(--color-magnum-500) / 1); /* 引用の左側にカラーテーマに基づくライン */
+    background-color: rgb(
+      var(--color-neutral-800) / 1
+    ); /* 背景色をカラーテーマに基づく */
+    color: rgb(
+      var(--color-neutral-50) / 1
+    ); /* テキスト色をカラーテーマに基づく */
+    font-style: italic;
+    quotes: "“" "”" "‘" "’";
+    line-height: 1.5;
+    /* position: relative; 擬似要素の位置を調整するために必要 */
   }
 </style>
