@@ -463,102 +463,35 @@
 </script>
 
 <div
-  class="flex justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
+  class="flex flex-row-reverse justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
 >
-  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
-    <!--リプライ-->
-    <button
-      aria-label="reply"
-      on:click={() => {
-        onClickReplyIcon();
-      }}
-    >
-      <MessageSquare
-        size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-      />
-    </button>
-    <!--リポスト-->
-    {#if repostable && !noReactionKind.includes(note.kind)}
-      <div class="flex items-end">
-        <Reposted id={atag ?? note.id} let:event>
-          <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-
-          <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
-          </DropdownMenu>
-        </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
-            >{allReactions.repost.length}</span
-          >{/if}
-      </div>
-    {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
-        <Quote size="20" class={"stroke-magnum-500/75"} />
-      </button>
-    {/if}
-  {/if}
-
-  {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
-    <!--リアクション-->
-    <div class="flex max-w-[40%] items-end">
-      <Reactioned id={atag ?? note.id} let:event>
+  <div class="flex gap-1 overflow-hidden">
+    {#if $showAllReactions}{#if hasReactions}
         <button
-          aria-label="reaction"
-          slot="loading"
-          on:click={handleClickReaction}
+          on:click={() => {
+            viewAllReactions = !viewAllReactions;
+          }}
         >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-          />
-        </button>
-
-        <button
-          aria-label="reaction"
-          slot="nodata"
-          on:click={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        <button
-          aria-label="reaction"
-          slot="error"
-          on:click={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        {#if event === undefined}
-          <button aria-label="reaction" on:click={handleClickReaction}
-            ><Heart
+          {#if !viewAllReactions}
+            <SquareChevronDown
               size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            /></button
-          >{:else}<div class="overflow-hidden">
-            <Reaction {event} />
-          </div>{/if}</Reactioned
-      ><span class=" text-sm"
-        >{#if allReactions.reaction.length > 0}{allReactions.reaction
-            .length}{/if}</span
-      >
-    </div>
-    <!--カスタムリアクション-->
-    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
-  {/if}
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+            />
+          {:else}
+            <SquareChevronUp
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+            />
+          {/if}
+        </button>
+      {:else}
+        <div class="w-[20px] overflow-hidden" />
+      {/if}{/if}
+    <!--メニュー-->
+
+    <EllipsisMenu {note} {tieKey} />
+  </div>
+  <!---->
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
     <Metadata
@@ -651,33 +584,101 @@
       {:else}<div class="w-[20px] overflow-hidden" />{/if}</Metadata
     >
   {/if}
-
-  <div class="flex gap-1 overflow-hidden">
-    {#if $showAllReactions}{#if hasReactions}
+  <!---->
+  {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+    <!--リアクション-->
+    <div class="flex max-w-[40%] items-end">
+      <Reactioned id={atag ?? note.id} let:event>
         <button
-          on:click={() => {
-            viewAllReactions = !viewAllReactions;
-          }}
+          aria-label="reaction"
+          slot="loading"
+          on:click={handleClickReaction}
         >
-          {#if !viewAllReactions}
-            <SquareChevronDown
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
-          {:else}
-            <SquareChevronUp
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
-          {/if}
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
+          />
         </button>
-      {:else}
-        <div class="w-[20px] overflow-hidden" />
-      {/if}{/if}
-    <!--メニュー-->
 
-    <EllipsisMenu {note} {tieKey} />
-  </div>
+        <button
+          aria-label="reaction"
+          slot="nodata"
+          on:click={handleClickReaction}
+        >
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+          />
+        </button>
+
+        <button
+          aria-label="reaction"
+          slot="error"
+          on:click={handleClickReaction}
+        >
+          <Heart
+            size="20"
+            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+          />
+        </button>
+
+        {#if event === undefined}
+          <button aria-label="reaction" on:click={handleClickReaction}
+            ><Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+            /></button
+          >{:else}<div class="overflow-hidden">
+            <Reaction {event} />
+          </div>{/if}</Reactioned
+      ><span class=" text-sm"
+        >{#if allReactions.reaction.length > 0}{allReactions.reaction
+            .length}{/if}</span
+      >
+    </div>
+    <!--カスタムリアクション-->
+    <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
+  {/if}
+  <!---->
+  {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
+    <!--リポスト-->
+    {#if repostable && !noReactionKind.includes(note.kind)}
+      <div class="flex items-end">
+        <Reposted id={atag ?? note.id} let:event>
+          <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
+
+          <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
+          <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" />
+          </DropdownMenu>
+          <DropdownMenu {menuTexts} {handleSelectItem}>
+            <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
+          </DropdownMenu>
+        </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
+            >{allReactions.repost.length}</span
+          >{/if}
+      </div>
+    {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
+        <Quote size="20" class={"stroke-magnum-500/75"} />
+      </button>
+    {/if}
+    <!--リプライ-->
+    <button
+      aria-label="reply"
+      on:click={() => {
+        onClickReplyIcon();
+      }}
+    >
+      <MessageSquare
+        size="20"
+        class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
+      />
+    </button>
+  {/if}
 </div>
 
 {#if viewAllReactions}
