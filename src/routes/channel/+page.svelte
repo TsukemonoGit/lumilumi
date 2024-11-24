@@ -36,9 +36,7 @@
   <meta name="description" content="Channel" />
 </svelte:head> -->
 
-<section
-  class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
->
+<section class=" flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
   {#if !$loginUser}
     <a
       href="/settings"

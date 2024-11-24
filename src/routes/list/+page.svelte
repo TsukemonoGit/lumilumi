@@ -54,7 +54,7 @@
     style="word-break: break-word;">{$_("setting.pubkey")}</a
   >
 {:else}
-  <section class="container">
+  <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
       <ListMain
         queryKey={["kind30000", $loginUser]}

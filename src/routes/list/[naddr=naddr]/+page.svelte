@@ -111,7 +111,7 @@
 {#if loading}
   loading
 {:else}
-  <section class="container w-full break-words overflow-hidden">
+  <section class=" w-full break-words overflow-hidden">
     <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
       <div slot="loading">loading</div>
       <div slot="error">error</div>

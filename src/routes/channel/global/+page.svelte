@@ -69,9 +69,7 @@
   // });
 </script>
 
-<section
-  class="container flex flex-col gap-2 max-w-full overflow-x-hidden w-full"
->
+<section class=" flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
   {#if since}
     <TimelineList
       queryKey={timelineQuery}
