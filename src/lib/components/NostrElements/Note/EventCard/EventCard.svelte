@@ -823,5 +823,6 @@
 <style>
   article {
     content-visibility: auto;
+    contain-intrinsic-size: auto 300px;
   }
 </style>
