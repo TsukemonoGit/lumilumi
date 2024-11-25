@@ -14,7 +14,9 @@
   import OmittedCard from "./OmittedCard.svelte";
   import { page } from "$app/stores";
   import { loginUser } from "$lib/stores/stores";
-  import { nip33Regex } from "$lib/func/regex";
+  import { nip33Regex, relayRegex } from "$lib/func/regex";
+  import NoteByRelayhint from "../NoteByRelayhint.svelte";
+  import NaddrByRelayhint from "../NaddrByRelayhint.svelte";
 
   export let displayMenu: boolean;
   export let repostable: boolean;
@@ -69,13 +71,27 @@
         notestr={nip19.noteEncode(tag[1])}
       />
     </div>
-    <div
-      slot="nodata"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-    >
-      nodata {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
+    <div slot="nodata">
+      {@const relayhint =
+        tag.length > 2 && relayRegex.test(tag[2]) ? [tag[2]] : undefined}
+      {#if relayhint && relayhint.length > 0}
+        <NoteByRelayhint
+          id={tag[1]}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+          {relayhint}
+        />
+      {:else}
+        <div
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+        >
+          nodata {nip19.noteEncode(tag[1])}{#if displayMenu}<EllipsisMenuNote
+              notestr={nip19.noteEncode(tag[1])}
+            />{/if}
+        </div>
+      {/if}
     </div>
     <div
       slot="error"
@@ -151,7 +167,26 @@
         Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
       <div slot="nodata">
-        nodata {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        {@const relayhint =
+          tag.length > 2 && relayRegex.test(tag[2]) ? [tag[2]] : undefined}
+        {#if relayhint && relayhint.length > 0}
+          <NaddrByRelayhint
+            data={parseNaddr(tag)}
+            content={tag[1]}
+            {displayMenu}
+            {depth}
+            {repostable}
+            {tieKey}
+            {relayhint}
+          />
+        {:else}
+          <div
+            class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+          >
+            Nodata {tag[1]}{#if displayMenu}<EllipsisMenuNaddr
+                naddr={encodedNaddr}
+              />{/if}
+          </div>{/if}
       </div>
       <div slot="error" let:error>
         {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />

@@ -22,7 +22,7 @@
         RxReqOverable &
         RxReqPipeable)
     | undefined = undefined;
-  $: max3relays = relays ? relays.slice(0, 3) : undefined;
+  $: max3relays = relays && relays.length > 0 ? relays.slice(0, 3) : undefined;
   $: result = useEvent(queryKey, id, req, max3relays);
   $: data = result.data;
   $: status = result.status;
@@ -38,10 +38,9 @@
 
 {#if $error}
   <slot name="error" error={$error} />
-{:else if $data}
+{:else if $data?.event}
   <slot text={$data?.event} status={$status} />
-{:else if $status === "success"}
-  <slot name="nodata" />
 {:else if $status === "loading"}
-  <slot name="loading" />
+  <slot name="loading" />{:else if $status === "success"}
+  <slot name="nodata" />
 {/if}
