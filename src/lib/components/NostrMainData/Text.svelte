@@ -37,10 +37,13 @@
 </script>
 
 {#if $error}
-  <slot name="error" error={$error} />
-{:else if $data?.event}
-  <slot text={$data?.event} status={$status} />
-{:else if $status === "loading"}
-  <slot name="loading" />{:else if $status === "success"}
+  <slot
+    name="error"
+    error={$error}
+  />{:else if $status === "success" && !$data?.event}
   <slot name="nodata" />
+{:else if $data && $data.event}
+  <slot text={$data.event} status={$status} />
+{:else if $status === "loading"}
+  <slot name="loading" />
 {/if}

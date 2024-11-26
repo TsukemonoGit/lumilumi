@@ -162,7 +162,7 @@
           >
             <div slot="loading">loading</div>
             <div slot="nodata">nodata</div>
-            <div slot="error">error</div>
+            <div slot="error" let:error>{error}</div>
 
             <!--kind6-->
             <NoteRepostList events={kind6} {tieKey} />

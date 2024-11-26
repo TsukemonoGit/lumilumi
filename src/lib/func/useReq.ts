@@ -65,7 +65,6 @@ export function useReq(
   } else {
     _req = createRxBackwardReq(generateRandomId());
   }
-
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
   //const tie = get(tieMapStore)?.[tieKey]?.[0];
@@ -85,13 +84,35 @@ export function useReq(
     initialDataUpdatedAt: initialDataUpdatedAt,
     refetchInterval: refetchInterval,
     gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
-    queryFn: (): Promise<EventPacket | EventPacket[]> => {
+    queryFn: (): Promise<EventPacket | EventPacket[] | null> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
 
+        // let timeout: NodeJS.Timeout | null = null;
+
+        // const clearTimeoutIfExists = () => {
+        //   if (timeout !== null) {
+        //     clearTimeout(timeout);
+        //     timeout = null;
+        //   }
+        // };
+
+        // // データが来なかった場合にタイムアウト処理を行う
+        // timeout = setTimeout(() => {
+        //   if (!fulfilled) {
+        //     console.log(
+        //       "No data received for 15 seconds. Marking as success.",
+        //       queryKey
+        //     );
+        //     status.set("success");
+        //     resolve(null); // タイムアウト時に undefined を返す
+        //   }
+        // }, 15000);
+
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //console.log(v);
+            //  console.log(v);
+            //  clearTimeoutIfExists();
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
             } else {
@@ -100,15 +121,23 @@ export function useReq(
             }
           },
 
-          complete: () => status.set("success"),
+          complete: () => {
+            //   clearTimeoutIfExists();
+            //console.log("complete");
+            status.set("success");
+
+            if (!fulfilled) {
+              resolve(null); // データが一度も来ていない場合は undefined を返す
+            }
+          },
           error: (e) => {
-            console.error("[rx-nostr]", e);
+            //   clearTimeoutIfExists();
+            console.log("error", e);
             status.set("error");
             error.set(e);
 
             if (!fulfilled) {
-              console.log("fulfilled");
-              reject(e);
+              reject(e); // エラーの場合は Promise を reject
               fulfilled = true;
             }
           },
@@ -125,18 +154,18 @@ export function useReq(
       //console.log($query.data);
       if ($query.isSuccess) {
         return "success";
-      } else if ($query.isError) {
-        return "error";
+        // } else if ($query.isError) {
+        //   return "error";
       } else {
         return $status;
       }
     }),
     error: derived([query, error], ([$query, $error]) => {
-      if ($query.isError) {
-        return $query.error;
-      } else {
-        return $error;
-      }
+      //  if ($query.isError) {
+      //       return $query.error;
+      //   } else {
+      return $error;
+      //  }
     }),
   };
 }

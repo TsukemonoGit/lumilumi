@@ -40,10 +40,12 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
+  //  $: console.log($status);
 </script>
 
 {#if $error}
-  <slot name="error" error={$error} />
+  <slot name="error" error={$error} />{:else if $status === "success" && !$data}
+  <slot name="nodata" />
 {:else if $data && $data?.length > 0}
   <slot
     kind1={$data
@@ -58,6 +60,4 @@
   />
 {:else if $status === "loading"}
   <slot name="loading" />
-{:else}
-  <slot name="nodata" />
 {/if}

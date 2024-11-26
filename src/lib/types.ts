@@ -29,7 +29,7 @@ export const timelineFilterInit: TimelineFilter = {
   selectCanversation: 0,
 };
 export interface ReqResult<A> {
-  data: Readable<A | undefined>;
+  data: Readable<A | undefined | null>;
   status: Readable<ReqStatus>;
   error: Readable<Error>;
 }

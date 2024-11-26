@@ -27,7 +27,7 @@ export function useEvent(
   relays?: string[] | undefined
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
-  const operator = pipe(latest());
+  const operator = pipe();
   return useReq(
     { queryKey, filters, operator, req },
     relays
