@@ -5,10 +5,14 @@
 
   import { _ } from "svelte-i18n";
 
-  export let part: Part;
-  export let height: number = 24;
-  let imgError: boolean = false;
-  let imgLoad: boolean = false;
+  interface Props {
+    part: Part;
+    height?: number;
+  }
+
+  let { part, height = 24 }: Props = $props();
+  let imgError: boolean = $state(false);
+  let imgLoad: boolean = $state(false);
   ///console.log(imgError);
   //console.log(imgLoad);
 </script>
@@ -21,12 +25,12 @@
     title={`:${part.content}:`}
     class={`inline object-contain m-0 overflow-hidden align-bottom`}
     style={`height:${height}px`}
-    on:load={() => {
+    onload={() => {
       //console.log("load");
 
       imgLoad = true;
     }}
-    on:error={() => {
+    onerror={() => {
       //console.log("error");
       imgError = true;
     }}

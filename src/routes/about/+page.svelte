@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { page } from "$app/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import {
@@ -20,6 +22,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
+  import { writable } from "svelte/store";
 
   const handleClickShare = async () => {
     //share link
@@ -47,17 +50,17 @@
       };
     }
   };
-  let loadImage: boolean = false;
+  let loadImage: boolean = $state(false);
 
-  let dialogOpen: any;
-  let zapAmount: number;
-  let zapComment: string;
-  let invoice: string | undefined = undefined;
-  let invoiceOpen: any;
+  let dialogOpen: any = writable(false);
+  let zapAmount: number = $state(0);
+  let zapComment: string = $state("");
+  let invoice: string | undefined = $state(undefined);
+  let invoiceOpen: any = $state();
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
   });
-  let unsubscribe: () => void;
+  let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {
     invoice = undefined;
     if (zapAmount <= 0) {
@@ -133,9 +136,11 @@
       //toast
     }
   }
-  $: if (!$invoiceOpen) {
-    unsubscribe?.();
-  }
+  run(() => {
+    if (!$invoiceOpen) {
+      unsubscribe?.();
+    }
+  });
 </script>
 
 <!-- <h1 class="title my-4">ABOUT</h1> -->
@@ -207,7 +212,7 @@
           {:else}
             <button
               class="my-2 flex items-center w-fit px-2 py-1 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
-              on:click={() => (loadImage = true)}>load images</button
+              onclick={() => (loadImage = true)}>load images</button
             >
           {/if}
         </div>
@@ -244,7 +249,7 @@
               data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
               data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
               data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
-              on:click={() => ($dialogOpen = true)}
+              onclick={() => ($dialogOpen = true)}
             >
               Zap⚡️@mono
             </button>
@@ -253,7 +258,7 @@
         <li>
           <div class="item">
             <button
-              on:click={handleClickShare}
+              onclick={handleClickShare}
               class="flex gap-1 items-center underline"
               >{$_("about.share")}<Share size="20" class="text-magnum-500 " /> Lumilumi</button
             >
@@ -273,32 +278,34 @@
 </section>
 
 <AlertDialog
-  bind:open={dialogOpen}
+  open={dialogOpen}
   onClickOK={() => onClickZap()}
   title="Zap to mono"
 >
-  <div slot="main" class=" text-neutral-200">
-    <div class="mt-4 rounded-md">
-      <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
-      <input
-        type="number"
-        id="amount"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-        placeholder="amount"
-        bind:value={zapAmount}
-      />
-      <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
-      <input
-        type="text"
-        id="comment"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-        placeholder="comment"
-        bind:value={zapComment}
-      />
+  {#snippet main()}
+    <div class=" text-neutral-200">
+      <div class="mt-4 rounded-md">
+        <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+        <input
+          type="number"
+          id="amount"
+          class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+          placeholder="amount"
+          bind:value={zapAmount}
+        />
+        <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
+        <input
+          type="text"
+          id="comment"
+          class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+          placeholder="comment"
+          bind:value={zapComment}
+        />
+      </div>
     </div>
-  </div></AlertDialog
+  {/snippet}</AlertDialog
 >
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={monoZap.noteId} />
+<ZapInvoiceWindow open={invoiceOpen} {invoice} id={monoZap.noteId} />
 
 <style lang="postcss">
   li {

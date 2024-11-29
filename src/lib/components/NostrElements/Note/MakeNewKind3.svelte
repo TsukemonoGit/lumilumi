@@ -7,12 +7,13 @@
   import { promisePublishSignedEvent } from "$lib/func/nostr";
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import SampleGlobalLink from "./SampleGlobalLink.svelte";
+  import { writable } from "svelte/store";
 
   const handleClickCreateKind3 = () => {
     //つくっていいかがめんだしておｋでかきこむ
     $dialogOpen = true;
   };
-  let dialogOpen: any;
+  let dialogOpen: any = writable(false);
   const onClickOK = async () => {
     console.log("onClickOK");
     $dialogOpen = false;
@@ -59,16 +60,15 @@
     <SampleGlobalLink />
   </div>
   <button
-    on:click={handleClickCreateKind3}
+    onclick={handleClickCreateKind3}
     class=" rounded-md bg-magnum-200 px-3 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 mx-auto flex"
     >{$_("create_kind3.create")}</button
   >{/if}
-<AlertDialog
-  bind:open={dialogOpen}
-  {onClickOK}
-  title={$_("create_kind3.create")}
-  ><div slot="main" class=" text-neutral-200 whitespace-pre-wrap">
-    {$_("create_kind3.newMessage")}
-    {$_("create_kind3.reload")}
-  </div></AlertDialog
+<AlertDialog open={dialogOpen} {onClickOK} title={$_("create_kind3.create")}
+  >{#snippet main()}
+    <div class=" text-neutral-200 whitespace-pre-wrap">
+      {$_("create_kind3.newMessage")}
+      {$_("create_kind3.reload")}
+    </div>
+  {/snippet}</AlertDialog
 >

@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
   import type { ReqStatus } from "$lib/types";
@@ -14,26 +15,48 @@
   import { defaultRelays } from "$lib/stores/relays";
   import { loginUser } from "$lib/stores/stores";
 
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  let relays: DefaultRelayConfig[] | undefined = undefined;
-  export let paramRelays: string[] | undefined;
-  export let localRelays: DefaultRelayConfig[];
-  export let pubkey: string;
-  console.log(pubkey);
-  $: result = pubkey
-    ? deriveResult(localRelays, pubkey, req)
-    : $loginUser !== ""
-      ? deriveResult(localRelays, $loginUser, req)
-      : setLoadRelays();
+  interface Props {
+    pubkey: string;
+    localRelays: DefaultRelayConfig[];
+    paramRelays: string[];
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
+    contents?: import("svelte").Snippet<
+      [{ relays: DefaultRelayConfig[] | string[]; status: ReqStatus }]
+    >;
+  }
+  let {
+    paramRelays,
+    pubkey,
+    localRelays,
+    req = undefined,
+    error,
+    loading,
+    nodata,
+    contents,
+  }: Props = $props();
+
+  let relays: DefaultRelayConfig[] | undefined = undefined;
+
+  console.log(pubkey);
+  let result: any;
+  loginUser.subscribe(() => {
+    result = pubkey
+      ? deriveResult(localRelays, pubkey, req)
+      : $loginUser !== ""
+        ? deriveResult(localRelays, $loginUser, req)
+        : setLoadRelays();
+  });
   //個々に来た段階でpubkeyがないってことは設定がないで、homeに来てたら設定に飛ぶから、それ以外のnoteのページとかに直できたときだから、
   //paramにリレーが設定されてたらそれを使ってなかったらなんか適当にデフォルトリレーセットしよう
   function setLoadRelays() {
@@ -66,7 +89,6 @@
           }> &
           RxReqOverable &
           RxReqPipeable)
-      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
       | undefined
   ) {
     if (!localRelays || localRelays.length <= 0) {
@@ -87,42 +109,39 @@
     }
   }
 
-  $: data = result?.data;
-  $: status = result?.status;
-  $: error = result?.error;
-  $: console.log($status);
-  $: if (
-    ($status === "success" && !$data) ||
-    ($data !== undefined && $data.length <= 0)
-  ) {
-    //ノーデータだったときにデフォルトリレーをセット
-    setRelays(defaultRelays);
-    //適当にデータ返しておこう
-    result = {
-      data: readable(defaultRelays),
-      status: readable("success" as ReqStatus),
-      error: readable(undefined),
-    };
-  }
-  interface $$Slots {
-    default: {
-      relays: DefaultRelayConfig[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let data = $derived(result?.data);
+  let status = $derived(result?.status);
+  let errorData = $derived(result?.error);
+  // $: console.log($status);
+  // data?.subscribe(()=>{ if (
+  //   ($status === "success" && !$data) ||
+  //   ($data !== undefined && ($data?.length??0 <= 0))
+  // ) {
+  //   //ノーデータだったときにデフォルトリレーをセット
+  //   setRelays(defaultRelays);
+  //   //適当にデータ返しておこう
+  //   result = {
+  //     data: readable(defaultRelays),
+  //     status: readable("success" as ReqStatus),
+  //     error: readable(undefined),
+  //   };
+  // }})
 </script>
 
 {#if relays}
-  <slot {relays} status="success" />
-{:else if $error}
-  <slot name="error" error={$error} />
+  {@render contents?.({ relays: relays, status: "success" })}
+{:else if $status === "success" && !$data}
+  {@render contents?.({ relays: defaultRelays, status: $status ?? "error" })}
+{:else if $errorData}
+  {@render error?.($errorData)}
 {:else if $data && $data.length > 0}
-  <slot relays={localRelays ?? $data} status={$status ?? "error"} />
+  {@render contents?.({
+    relays: localRelays ?? $data,
+    status: $status ?? "error",
+  })}
+  <!-- <slot relays={localRelays ?? $data} status={$status ?? "error"} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

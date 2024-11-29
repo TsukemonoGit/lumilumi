@@ -2,7 +2,11 @@
   import { MessageCircle } from "lucide-svelte";
   import Link from "./Link.svelte";
 
-  export let proxyTag: string[];
+  interface Props {
+    proxyTag: string[];
+  }
+
+  let { proxyTag }: Props = $props();
 </script>
 
 <Link

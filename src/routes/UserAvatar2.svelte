@@ -10,8 +10,13 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   //let metadata: Nostr.Event;
-  //let url = writable<string>();
-  export let size = 24;
+
+  interface Props {
+    //let url = writable<string>();
+    size?: number;
+  }
+
+  let { size = 24 }: Props = $props();
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {
       return null;
@@ -43,56 +48,60 @@
 
 {#if $loginUser}
   <div class="my-auto">
-    <Metadata
-      queryKey={["metadata", $loginUser]}
-      pubkey={$loginUser}
-      let:metadata
-    >
-      <div slot="loading">
-        <Avatar
-          size={size - 4}
-          name={$loginUser}
-          variant="beam"
-          colors={splitHexColorString($loginUser)}
-        />
-      </div>
-      <div slot="nodata">
-        <Avatar
-          size={size - 4}
-          name={$loginUser}
-          variant="beam"
-          colors={splitHexColorString($loginUser)}
-        />
-      </div>
-      <div slot="error">
-        <Avatar
-          size={size - 4}
-          name={$loginUser}
-          variant="beam"
-          colors={splitHexColorString($loginUser)}
-        />
-      </div>
-      {@const url = picture(metadata)}
-      <div
-        style={`width:${size}px;height:${size}px`}
-        class="flex justify-center items-center"
-      >
-        {#if $showImg && metadata && url && url !== ""}
-          <UserAvatar
-            {url}
-            name={metadata.pubkey}
-            pubkey={metadata.pubkey}
-            size={size - 4}
-          />
-        {:else}
+    <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser}>
+      {#snippet loading()}
+        <div>
           <Avatar
             size={size - 4}
             name={$loginUser}
             variant="beam"
             colors={splitHexColorString($loginUser)}
           />
-        {/if}
-      </div></Metadata
-    >
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>
+          <Avatar
+            size={size - 4}
+            name={$loginUser}
+            variant="beam"
+            colors={splitHexColorString($loginUser)}
+          />
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div>
+          <Avatar
+            size={size - 4}
+            name={$loginUser}
+            variant="beam"
+            colors={splitHexColorString($loginUser)}
+          />
+        </div>
+      {/snippet}
+      {#snippet content({ metadata })}
+        {@const url = picture(metadata)}
+        <div
+          style={`width:${size}px;height:${size}px`}
+          class="flex justify-center items-center"
+        >
+          {#if $showImg && metadata && url && url !== ""}
+            <UserAvatar
+              {url}
+              name={metadata.pubkey}
+              pubkey={metadata.pubkey}
+              size={size - 4}
+            />
+          {:else}
+            <Avatar
+              size={size - 4}
+              name={$loginUser}
+              variant="beam"
+              colors={splitHexColorString($loginUser)}
+            />
+          {/if}
+        </div>
+      {/snippet}
+    </Metadata>
   </div>
 {/if}

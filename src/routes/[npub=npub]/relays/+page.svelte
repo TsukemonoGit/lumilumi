@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import {
@@ -330,42 +331,43 @@
       displayMenu={false}
     />{/if} -->
     {#if kind10002}
-      <Metadata
-        pubkey={data.pubkey}
-        queryKey={["metadata", data.pubkey]}
-        let:metadata
-      >
-        <div slot="loading">
+      <Metadata pubkey={data.pubkey} queryKey={["metadata", data.pubkey]}>
+        {#snippet loading()}
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
               <EllipsisMenu note={kind10002} tieKey={undefined} />
             </div>
           </NoteTemplate>
-        </div>
-        <div slot="nodata">
+        {/snippet}
+        {#snippet nodata()}
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
               <EllipsisMenu note={kind10002} tieKey={undefined} />
             </div>
           </NoteTemplate>
-        </div>
-        <div slot="error">
+        {/snippet}
+        {#snippet error()}
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
               <EllipsisMenu note={kind10002} tieKey={undefined} />
             </div>
           </NoteTemplate>
-        </div>
-
-        <NoteTemplate note={kind10002} depth={0} tieKey={undefined} {metadata}>
-          kind: 10002 Relays
-          <div class="inline-flex float-end pr-1">
-            <EllipsisMenu note={kind10002} tieKey={undefined} />
-          </div>
-        </NoteTemplate>
+        {/snippet}
+        {#snippet content({ metadata })}
+          <NoteTemplate
+            note={kind10002}
+            depth={0}
+            tieKey={undefined}
+            {metadata}
+          >
+            kind: 10002 Relays
+            <div class="inline-flex float-end pr-1">
+              <EllipsisMenu note={kind10002} tieKey={undefined} />
+            </div>
+          </NoteTemplate>{/snippet}
       </Metadata>
     {/if}
     <!-- <div class="flex font-bold justify-between w-full h-8 items-center">
@@ -375,55 +377,58 @@
       />{/if}
   </div> -->
     <table>
-      <tr>
-        <th class="text-center"
-          >relay
-          <div class=" text-xs font-normal">{$newTags.length}</div></th
-        ><th class="text-center"
-          >read
-          <div class=" text-xs font-normal">
-            {readLen}
-          </div></th
-        ><th class="text-center"
-          >write
-          <div class=" text-xs font-normal">
-            {writeLen}
-          </div></th
-        ><th class="text-center"></th>
-      </tr>
-      {#each $newTags as [r, url, rw], index}
+      <thead>
         <tr>
-          <td class="text-left break-all"
-            >{url}
-            <!-- <RelayCard
+          <th class="text-center"
+            >relay
+            <div class=" text-xs font-normal">{$newTags.length}</div></th
+          ><th class="text-center"
+            >read
+            <div class=" text-xs font-normal">
+              {readLen}
+            </div></th
+          ><th class="text-center"
+            >write
+            <div class=" text-xs font-normal">
+              {writeLen}
+            </div></th
+          ><th class="text-center"></th>
+        </tr></thead
+      ><tbody>
+        {#each $newTags as [r, url, rw], index}
+          <tr>
+            <td class="text-left break-all"
+              >{url}
+              <!-- <RelayCard
               {url}
               read={readStates[index]}
               write={writeStates[index]}
             /> -->
-          </td>
-          <td class="text-center"
-            ><input
-              type="checkbox"
-              checked={relayStates.get(url)?.read}
-              on:change={(e) => handleClickRead(e, url)}
-            /></td
-          >
-          <td class="text-center"
-            ><input
-              type="checkbox"
-              checked={relayStates.get(url)?.write}
-              on:change={(e) => handleClickWrite(e, url)}
-            /></td
-          ><td
-            ><button
-              class="m-auto h-6 w-6 flex justify-center items-center
+            </td>
+            <td class="text-center"
+              ><input
+                type="checkbox"
+                checked={relayStates.get(url)?.read}
+                on:change={(e) => handleClickRead(e, url)}
+              /></td
+            >
+            <td class="text-center"
+              ><input
+                type="checkbox"
+                checked={relayStates.get(url)?.write}
+                on:change={(e) => handleClickWrite(e, url)}
+              /></td
+            ><td
+              ><button
+                class="m-auto h-6 w-6 flex justify-center items-center
             rounded-full text-magnum-800 bg-magnum-100
             hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300"
-              on:click={() => removeRelay(url)}><X size={20} /></button
-            ></td
-          >
-        </tr>
-      {/each}
+                on:click={() => removeRelay(url)}><X size={20} /></button
+              ></td
+            >
+          </tr>
+        {/each}</tbody
+      >
     </table>
     <div class="mt-2 flex items-center w-full">
       <input

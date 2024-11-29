@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
@@ -39,17 +41,21 @@
   import { nip19 } from "nostr-tools";
   import NaddrEvent from "$lib/components/NostrElements/Note/NaddrEvent.svelte";
 
-  export let data: {
-    pubkey: string;
-    relays?: string[] | undefined;
-    nip05Address?: string;
-  };
+  interface Props {
+    data: {
+      pubkey: string;
+      relays?: string[] | undefined;
+      nip05Address?: string;
+    };
+  }
+
+  let { data }: Props = $props();
 
   let amount = 50;
 
   let componentKey = 0; // Key to force re-render
-  let view: boolean = false;
-  let req = createRxForwardReq();
+  let view: boolean = $state(false);
+  let req = $state(createRxForwardReq());
   const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
   };
@@ -66,13 +72,13 @@
       }, 100);
     }
   });
-  $: userPubkey = data.pubkey; // Make pubkey reactive
+  let userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
   const tieKey = "npub";
 
   let isOnMount = false;
-  let since: number | undefined = undefined;
-  $: timelineQuery = ["user", "post", userPubkey];
+  let since: number | undefined = $state(undefined);
+  let timelineQuery = $derived(["user", "post", userPubkey]);
 
   onMount(async () => {
     if (!isOnMount) {
@@ -131,18 +137,6 @@
   // const handleChange: CreateTabsProps["onValueChange"] = ({ curr, next }) => {
   //   console.log(curr, next);
 
-  $: if ($value) {
-    const tabsElement = document?.querySelector("#userTabs");
-    console.log($value);
-    setTimeout(() => {
-      tabsElement?.scrollIntoView({
-        block: "start",
-        inline: "nearest",
-        behavior: "instant",
-      });
-      window.scrollBy(0, -100);
-    }, 0);
-  }
   // return next;
   // };
 
@@ -169,6 +163,21 @@
   const [send, receive] = crossfade({
     duration: 250,
     easing: cubicInOut,
+  });
+
+  value.subscribe((v) => {
+    if (v) {
+      const tabsElement = document?.querySelector("#userTabs");
+      console.log(v);
+      setTimeout(() => {
+        tabsElement?.scrollIntoView({
+          block: "start",
+          inline: "nearest",
+          behavior: "instant",
+        });
+        window.scrollBy(0, -100);
+      }, 0);
+    }
   });
 </script>
 
@@ -210,8 +219,7 @@
               use:melt={$trigger(triggerItem.id)}
               class="trigger relative flex-col gap-1 min-w-20"
             >
-              {#if triggerItem.Icon}<svelte:component
-                  this={triggerItem.Icon}
+              {#if triggerItem.Icon}<triggerItem.Icon
                   size={20}
                   class="min-h-[20px]"
                 />{/if}{triggerItem.title}
@@ -220,7 +228,7 @@
                   in:send={{ key: "trigger" }}
                   out:receive={{ key: "trigger" }}
                   class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400"
-                />
+                ></div>
               {/if}
             </button>
           {/each}
@@ -236,48 +244,49 @@
                   authors: [userPubkey],
                 },
               ]}
-              let:event
             >
-              <!-- <SetRepoReactions />
-                  <div slot="loading" class="p-1">
-                    <p>pin Loading...</p>
-                  </div>
+              {#snippet children({ event })}
+                <!-- <SetRepoReactions />
+                    <div slot="loading" class="p-1">
+                      <p>pin Loading...</p>
+                    </div>
 
-                  <div slot="error" class="p-1" let:error>
-                    <p>{error}</p>
-                  </div>
-                  <div slot="nodata" class="p-1">
-                    <p>nodata</p>
-                  </div> -->
+                    <div slot="error" class="p-1" let:error>
+                      <p>{error}</p>
+                    </div>
+                    <div slot="nodata" class="p-1">
+                      <p>nodata</p>
+                    </div> -->
 
-              <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
-              >
-                {#each event.tags.filter((tag) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
-                  <div
-                    class="max-w-full break-words whitespace-pre-line box-border overflow-hidden"
-                  >
-                    <Pin
-                      class="-rotate-45 text-magnum-400"
-                    />{#if e === "e"}<Note
-                        {id}
-                        displayMenu={true}
-                        depth={1}
-                        repostable={true}
-                        {tieKey}
-                      />{:else}
-                      <NaddrEvent
-                        data={parseNaddr([e, id])}
-                        displayMenu={true}
-                        depth={1}
-                        repostable={true}
-                        {tieKey}
-                        content={id}
-                      />
-                    {/if}
-                  </div>
-                {/each}
-              </div>
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
+                >
+                  {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
+                    <div
+                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden"
+                    >
+                      <Pin
+                        class="-rotate-45 text-magnum-400"
+                      />{#if e === "e"}<Note
+                          {id}
+                          displayMenu={true}
+                          depth={1}
+                          repostable={true}
+                          {tieKey}
+                        />{:else}
+                        <NaddrEvent
+                          data={parseNaddr([e, id])}
+                          displayMenu={true}
+                          depth={1}
+                          repostable={true}
+                          {tieKey}
+                          content={id}
+                        />
+                      {/if}
+                    </div>
+                  {/each}
+                </div>
+              {/snippet}
             </LatestEvent>
             {#if since}
               <TimelineList
@@ -299,67 +308,77 @@
                   },
                 ]}
                 {req}
-                let:events
                 {amount}
                 {tieKey}
               >
-                <!-- <SetRepoReactions /> -->
-                <div slot="loading">
-                  <p class="px-2">timeline Loading...</p>
-                </div>
-
-                <div slot="error" let:error>
-                  <p>{error}</p>
-                </div>
-
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                >
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <!-- <div
+                {#snippet content({ events, len })}
+                  <!-- <SetRepoReactions /> -->
+                  <div
+                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                  >
+                    {#if events && events.length > 0}
+                      {#each events as event, index (event.id)}
+                        <!-- <div
                         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                         events.length - 1
                           ? 'last-visible'
                           : ''} {index === 0 ? 'first-visible' : ''}"
                       > -->
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="error">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <EventCard
-                          {metadata}
-                          note={event}
-                          excludefunc={excludeKind1}
-                          {tieKey}
-                        />
-                      </Metadata>
-                      <!-- </div> -->
-                    {/each}
-                  {/if}
-                </div>
+                        <Metadata
+                          queryKey={["metadata", event.pubkey]}
+                          pubkey={event.pubkey}
+                        >
+                          {#snippet loading()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet nodata()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet error()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet content({ metadata })}
+                            <EventCard
+                              {metadata}
+                              note={event}
+                              excludefunc={excludeKind1}
+                              {tieKey}
+                            />
+                          {/snippet}
+                        </Metadata>
+                        <!-- </div> -->
+                      {/each}
+                    {/if}
+                  </div>{/snippet}
+                {#snippet loading()}
+                  <div>
+                    <p class="px-2">timeline Loading...</p>
+                  </div>
+                {/snippet}
+
+                {#snippet error()}
+                  <div>
+                    <p>{error}</p>
+                  </div>
+                {/snippet}
               </TimelineList>{/if}
           {/if}
         </div>
@@ -385,67 +404,77 @@
                   },
                 ]}
                 {req}
-                let:events
                 {amount}
                 {tieKey}
               >
-                <!-- <SetRepoReactions /> -->
-                <div slot="loading">
-                  <p class="px-2">public chat Loading...</p>
-                </div>
-
-                <div slot="error" let:error>
-                  <p>{error}</p>
-                </div>
-
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                >
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <!-- <div
+                {#snippet content({ events })}
+                  <!-- <SetRepoReactions /> -->
+                  <div
+                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                  >
+                    {#if events && events.length > 0}
+                      {#each events as event, index (event.id)}
+                        <!-- <div
                         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                         events.length - 1
                           ? 'last-visible'
                           : ''} {index === 0 ? 'first-visible' : ''}"
                       > -->
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="error">
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind1}
-                            {tieKey}
-                          />
-                        </div>
-                        <EventCard
-                          {metadata}
-                          note={event}
-                          excludefunc={excludeKind1}
-                          {tieKey}
-                        />
-                      </Metadata>
-                      <!-- </div> -->
-                    {/each}
-                  {/if}
-                </div>
+                        <Metadata
+                          queryKey={["metadata", event.pubkey]}
+                          pubkey={event.pubkey}
+                        >
+                          {#snippet loading()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet nodata()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet error()}
+                            <div>
+                              <EventCard
+                                note={event}
+                                excludefunc={excludeKind1}
+                                {tieKey}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet content({ metadata })}
+                            <EventCard
+                              {metadata}
+                              note={event}
+                              excludefunc={excludeKind1}
+                              {tieKey}
+                            />
+                          {/snippet}
+                        </Metadata>
+                        <!-- </div> -->
+                      {/each}
+                    {/if}
+                  </div>{/snippet}
+                {#snippet loading()}
+                  <div>
+                    <p class="px-2">public chat Loading...</p>
+                  </div>
+                {/snippet}
+
+                {#snippet error()}
+                  <div>
+                    <p>{error}</p>
+                  </div>
+                {/snippet}
               </TimelineList>{/if}
           {/if}
         </div>
@@ -470,67 +499,77 @@
                 },
               ]}
               {req}
-              let:events
               {amount}
               {tieKey}
             >
-              <!-- <SetRepoReactions /> -->
-              <div slot="loading">
-                <p class="px-2">timeline Loading...</p>
-              </div>
-
-              <div slot="error" let:error>
-                <p>{error}</p>
-              </div>
-
-              <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-              >
-                {#if events && events.length > 0}
-                  {#each events as event, index (event.id)}
-                    <!-- <div
+              {#snippet content({ events })}
+                <!-- <SetRepoReactions /> -->
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
+                      <!-- <div
                       class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                       events.length - 1
                         ? 'last-visible'
                         : ''} {index === 0 ? 'first-visible' : ''}"
                     > -->
-                    <Metadata
-                      queryKey={["metadata", event.pubkey]}
-                      pubkey={event.pubkey}
-                      let:metadata
-                    >
-                      <div slot="loading">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <div slot="nodata">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <div slot="error">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <EventCard
-                        {metadata}
-                        note={event}
-                        excludefunc={excludeKind7}
-                        {tieKey}
-                      />
-                    </Metadata>
-                    <!-- </div> -->
-                  {/each}
-                {/if}
-              </div>
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                      >
+                        {#snippet loading()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet nodata()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet error()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet content({ metadata })}
+                          <EventCard
+                            {metadata}
+                            note={event}
+                            excludefunc={excludeKind7}
+                            {tieKey}
+                          />
+                        {/snippet}
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}
+                  {/if}
+                </div>{/snippet}
+              {#snippet loading()}
+                <div>
+                  <p class="px-2">timeline Loading...</p>
+                </div>
+              {/snippet}
+
+              {#snippet error()}
+                <div>
+                  <p>{error}</p>
+                </div>
+              {/snippet}
             </TimelineList>
           {/if}
         </div>
@@ -557,68 +596,78 @@
                 },
               ]}
               {req}
-              let:events
               viewIndex={0}
               {amount}
               {tieKey}
             >
-              <!-- <SetRepoReactions /> -->
-              <div slot="loading">
-                <p class="px-2">timeline Loading...</p>
-              </div>
-
-              <div slot="error" let:error>
-                <p>{error}</p>
-              </div>
-
-              <div
-                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-              >
-                {#if events && events.length > 0}
-                  {#each events as event, index (event.id)}
-                    <!-- <div
+              {#snippet content({ events })}
+                <!-- <SetRepoReactions /> -->
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
+                      <!-- <div
                       class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
                       events.length - 1
                         ? 'last-visible'
                         : ''} {index === 0 ? 'first-visible' : ''}"
                     > -->
-                    <Metadata
-                      queryKey={["metadata", event.pubkey]}
-                      pubkey={event.pubkey}
-                      let:metadata
-                    >
-                      <div slot="loading">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <div slot="nodata">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <div slot="error">
-                        <EventCard
-                          note={event}
-                          excludefunc={excludeKind7}
-                          {tieKey}
-                        />
-                      </div>
-                      <EventCard
-                        {metadata}
-                        note={event}
-                        excludefunc={excludeKind7}
-                        {tieKey}
-                      />
-                    </Metadata>
-                    <!-- </div> -->
-                  {/each}
-                {/if}
-              </div>
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                      >
+                        {#snippet loading()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet nodata()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet error()}
+                          <div>
+                            <EventCard
+                              note={event}
+                              excludefunc={excludeKind7}
+                              {tieKey}
+                            />
+                          </div>
+                        {/snippet}
+                        {#snippet content({ metadata })}
+                          <EventCard
+                            {metadata}
+                            note={event}
+                            excludefunc={excludeKind7}
+                            {tieKey}
+                          />
+                        {/snippet}
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}
+                  {/if}
+                </div>{/snippet}
+              {#snippet loading()}
+                <div>
+                  <p class="px-2">timeline Loading...</p>
+                </div>
+              {/snippet}
+
+              {#snippet error()}
+                <div>
+                  <p>{error}</p>
+                </div>
+              {/snippet}
             </TimelineList>
           {/if}
         </div>
@@ -634,32 +683,39 @@
                   authors: [userPubkey],
                 },
               ]}
-              let:event
             >
-              <div slot="loading" class="p-1">
-                <p>relays Loading...</p>
-              </div>
+              {#snippet loading()}
+                <div class="p-1">
+                  <p>relays Loading...</p>
+                </div>
+              {/snippet}
 
-              <div slot="error" class="p-1" let:error>
-                <p>{error}</p>
-              </div>
-              <div slot="nodata" class="p-1">
-                <p>relays Loading...</p>
-              </div>
+              {#snippet error()}
+                <div class="p-1">
+                  <p>{error}</p>
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="p-1">
+                  <p>relays Loading...</p>
+                </div>
+              {/snippet}
 
-              <div
-                class="max-w-[100vw] break-words divide-y divide-magnum-600/30"
-              >
-                {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
-                  <div class=" overflow-hidden p-1">
-                    <RelayCard
-                      {url}
-                      read={!rw || rw === "read" ? true : false}
-                      write={!rw || rw === "write" ? true : false}
-                    />
-                  </div>
-                {/each}
-              </div>
+              {#snippet children({ event })}
+                <div
+                  class="max-w-[100vw] break-words divide-y divide-magnum-600/30"
+                >
+                  {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
+                    <div class=" overflow-hidden p-1">
+                      <RelayCard
+                        {url}
+                        read={!rw || rw === "read" ? true : false}
+                        write={!rw || rw === "write" ? true : false}
+                      />
+                    </div>
+                  {/each}
+                </div>
+              {/snippet}
             </LatestEvent>
           {/if}
         </div>
@@ -669,27 +725,35 @@
             <Contacts
               queryKey={["timeline", "contacts", data.pubkey]}
               pubkey={data.pubkey}
-              let:contacts
-              let:status
             >
-              <div slot="loading" class="p-1">
-                <p>Loading...</p>
-              </div>
+              {#snippet loading()}
+                <div class="p-1">
+                  <p>Loading...</p>
+                </div>
+              {/snippet}
 
-              <div slot="error" class="p-1" let:error>
-                <p>{error}</p>
-              </div>
-              <div slot="nodata" class="p-1">
-                <p>Loading...</p>
-              </div>
-              {#if contacts}
-                <PaginationList
-                  list={contacts.tags
-                    .filter((tag) => tag[0] === "p" && tag.length > 1)
-                    .map((tag) => tag[1])}
-                  {tieKey}
-                  let:id><Metadatanoyatu pubkey={id} {tieKey} /></PaginationList
-                >{/if}
+              {#snippet error()}
+                <div class="p-1">
+                  <p>{error}</p>
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="p-1">
+                  <p>Loading...</p>
+                </div>
+              {/snippet}
+              {#snippet content({ contacts, status })}
+                {#if contacts}
+                  <PaginationList
+                    list={contacts.tags
+                      .filter((tag) => tag[0] === "p" && tag.length > 1)
+                      .map((tag) => tag[1])}
+                    {tieKey}
+                    >{#snippet children({ id })}
+                      <Metadatanoyatu pubkey={id} {tieKey} />
+                    {/snippet}
+                  </PaginationList>{/if}
+              {/snippet}
             </Contacts>
           {/if}
         </div>
@@ -699,133 +763,150 @@
             <LatestEvent
               queryKey={["bookmark", data.pubkey]}
               filters={[{ authors: [data.pubkey], kinds: [10003], limit: 1 }]}
-              let:event
-              let:status
             >
-              <div slot="loading" class="p-1">
-                <p>Loading...</p>
-              </div>
+              {#snippet loading()}
+                <div class="p-1">
+                  <p>Loading...</p>
+                </div>
+              {/snippet}
 
-              <div slot="error" class="p-1" let:error>
-                <p>{error}</p>
-              </div>
-              <div slot="nodata" class="p-1">
-                <p>Loading...</p>
-              </div>
-              {#if event}
-                {@const filteredList = event.tags.filter(
-                  (tag) =>
-                    (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") &&
-                    tag.length > 1
-                )}
-                <PaginationList
-                  list={filteredList.map((tag) => tag[1])}
-                  {tieKey}
-                  let:id
-                  let:index
-                >
-                  {#if filteredList[index][0] === "e"}
-                    <Note
-                      {id}
-                      mini={false}
-                      displayMenu={true}
-                      depth={0}
-                      repostable={true}
-                      {tieKey}
-                    />
-                    <!---->
-                  {:else if filteredList[index][0] === "a"}
-                    {@const naddr = parseNaddr(filteredList[index])}
-                    <LatestEvent
-                      queryKey={[
-                        "naddr",
-                        `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`,
-                      ]}
-                      filters={[
-                        naddr.identifier !== ""
-                          ? {
-                              kinds: [naddr.kind],
-                              authors: [naddr.pubkey],
-                              "#d": [naddr.identifier],
-                            }
-                          : {
-                              kinds: [naddr.kind],
-                              authors: [naddr.pubkey],
-                            },
-                      ]}
-                      let:event
-                    >
-                      <div
-                        slot="loading"
-                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                      >
-                        {filteredList[index]}<EllipsisMenuNaddr
-                          naddr={nip19.naddrEncode(naddr)}
-                        />
-                      </div>
-                      <div
-                        slot="nodata"
-                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                      >
-                        {filteredList[index]}<EllipsisMenuNaddr
-                          naddr={nip19.naddrEncode(naddr)}
-                        />
-                      </div>
-                      <div
-                        slot="error"
-                        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                      >
-                        {filteredList[index]}<EllipsisMenuNaddr
-                          naddr={nip19.naddrEncode(naddr)}
-                        />
-                      </div>
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                        let:metadata
-                      >
-                        <div slot="loading">
-                          <EventCard
-                            note={event}
-                            displayMenu={true}
-                            repostable={true}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="nodata">
-                          <EventCard
-                            note={event}
-                            displayMenu={true}
-                            repostable={true}
-                            {tieKey}
-                          />
-                        </div>
-                        <div slot="error">
-                          <EventCard
-                            note={event}
-                            displayMenu={true}
-                            repostable={true}
-                            {tieKey}
-                          />
-                        </div>
-                        <EventCard
-                          {metadata}
+              {#snippet error()}
+                <div class="p-1">
+                  <p>{error}</p>
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="p-1">
+                  <p>Loading...</p>
+                </div>
+              {/snippet}
+              {#snippet children({ event, status })}
+                {#if event}
+                  {@const filteredList = event.tags.filter(
+                    (tag) =>
+                      (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") &&
+                      tag.length > 1
+                  )}
+                  <PaginationList
+                    list={filteredList.map((tag) => tag[1])}
+                    {tieKey}
+                  >
+                    {#snippet children({ id, index })}
+                      {#if filteredList[index][0] === "e"}
+                        <Note
+                          {id}
+                          mini={false}
                           displayMenu={true}
+                          depth={0}
                           repostable={true}
-                          note={event}
                           {tieKey}
-                        /></Metadata
-                      >
-                    </LatestEvent>
-                    <!---->
-                  {:else if filteredList[index][0] === "t"}
-                    [t,{id}]
-                    <!---->
-                  {:else}
-                    <!---->
-                    [r,{id}]
-                  {/if}
-                </PaginationList>{/if}
+                        />
+                        <!---->
+                      {:else if filteredList[index][0] === "a"}
+                        {@const naddr = parseNaddr(filteredList[index])}
+                        <LatestEvent
+                          queryKey={[
+                            "naddr",
+                            `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`,
+                          ]}
+                          filters={[
+                            naddr.identifier !== ""
+                              ? {
+                                  kinds: [naddr.kind],
+                                  authors: [naddr.pubkey],
+                                  "#d": [naddr.identifier],
+                                }
+                              : {
+                                  kinds: [naddr.kind],
+                                  authors: [naddr.pubkey],
+                                },
+                          ]}
+                        >
+                          {#snippet loading()}
+                            <div
+                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                            >
+                              {filteredList[index]}<EllipsisMenuNaddr
+                                naddr={nip19.naddrEncode(naddr)}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet nodata()}
+                            <div
+                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                            >
+                              {filteredList[index]}<EllipsisMenuNaddr
+                                naddr={nip19.naddrEncode(naddr)}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet error()}
+                            <div
+                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+                            >
+                              {filteredList[index]}<EllipsisMenuNaddr
+                                naddr={nip19.naddrEncode(naddr)}
+                              />
+                            </div>
+                          {/snippet}
+                          {#snippet children({ event })}
+                            <Metadata
+                              queryKey={["metadata", event.pubkey]}
+                              pubkey={event.pubkey}
+                            >
+                              {#snippet loading()}
+                                <div>
+                                  <EventCard
+                                    note={event}
+                                    displayMenu={true}
+                                    repostable={true}
+                                    {tieKey}
+                                  />
+                                </div>
+                              {/snippet}
+                              {#snippet nodata()}
+                                <div>
+                                  <EventCard
+                                    note={event}
+                                    displayMenu={true}
+                                    repostable={true}
+                                    {tieKey}
+                                  />
+                                </div>
+                              {/snippet}
+                              {#snippet error()}
+                                <div>
+                                  <EventCard
+                                    note={event}
+                                    displayMenu={true}
+                                    repostable={true}
+                                    {tieKey}
+                                  />
+                                </div>
+                              {/snippet}
+                              {#snippet content({ metadata })}
+                                <EventCard
+                                  {metadata}
+                                  displayMenu={true}
+                                  repostable={true}
+                                  note={event}
+                                  {tieKey}
+                                />
+                              {/snippet}
+                            </Metadata>
+                          {/snippet}
+                        </LatestEvent>
+                        <!---->
+                      {:else if filteredList[index][0] === "t"}
+                        [t,{id}]
+                        <!---->
+                      {:else}
+                        <!---->
+                        [r,{id}]
+                      {/if}
+                    {/snippet}
+                  </PaginationList>{/if}
+              {/snippet}
             </LatestEvent>
           {/if}
         </div>

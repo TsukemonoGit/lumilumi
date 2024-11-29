@@ -4,11 +4,21 @@
   import NaddrEvent from "./NaddrEvent.svelte";
   import Note from "./Note.svelte";
 
-  export let replyTag: string[] | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    replyTag: string[] | undefined;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
+
+  let {
+    replyTag,
+    displayMenu,
+    depth,
+    repostable,
+    tieKey
+  }: Props = $props();
 </script>
 
 {#if replyTag}

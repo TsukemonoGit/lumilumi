@@ -5,25 +5,38 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
-  export let notestr: string;
-  export let indexes: number[] | undefined = undefined;
-  export let TriggerIcon = Ellipsis;
-  export let iconSize = 20;
-  export let iconClass = "";
-
-  let menuTexts = [
-    {
-      text: $_("menu.copy.nevent"),
-      icon: Copy,
-      num: 3,
-    },
-
-    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-  ];
-
-  if (indexes !== undefined) {
-    menuTexts = menuTexts.filter((item) => indexes.includes(item.num));
+  interface Props {
+    notestr: string;
+    indexes?: number[] | undefined;
+    TriggerIcon?: any;
+    iconSize?: number;
+    iconClass?: string;
   }
+
+  let {
+    notestr,
+    indexes = undefined,
+    TriggerIcon = Ellipsis,
+    iconSize = 20,
+    iconClass = "",
+  }: Props = $props();
+
+  let menuTexts = $derived.by(() => {
+    let menu = [
+      {
+        text: $_("menu.copy.nevent"),
+        icon: Copy,
+        num: 3,
+      },
+
+      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
+    ];
+
+    if (indexes !== undefined) {
+      menu = menu.filter((item) => indexes.includes(item.num));
+    }
+    return menu;
+  });
 
   const handleSelectItem = async (index: number) => {
     switch (menuTexts[index].num) {

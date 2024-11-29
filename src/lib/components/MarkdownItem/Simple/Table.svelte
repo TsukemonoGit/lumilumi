@@ -1,24 +1,35 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import type { Token } from "markdown-it/index.js";
   import { transformTokens } from "$lib/func/markdown";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
 
-  export let part: Token;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    part: Token;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    tieKey: string | undefined;
+  }
 
-  let children: Token[] = [];
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey,
+  }: Props = $props();
+
+  let children: Token[] = $derived(transformTokens(part.children ?? []));
 
   // トークンが存在する場合に変換を行い、子トークンを取得
-  $: if (part?.children && Array.isArray(part.children)) {
-    children = transformTokens(part.children);
-    //  console.log("[table_transform]", children);
-  }
 
   // console.log("[table]", part);
 </script>

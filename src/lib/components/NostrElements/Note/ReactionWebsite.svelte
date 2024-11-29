@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Element with a slot='...' attribute must be a child of a component or a descendant of a custom element -->
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import Reaction from "./Reaction.svelte";
@@ -36,7 +37,7 @@
   <div class="self-center">
     <UserMenu
       pubkey={note.pubkey}
-      bind:metadata
+      {metadata}
       size={20}
       {displayMenu}
       {depth}
@@ -75,21 +76,22 @@
 {#if website}
   <div class="p-2">
     {#if $showImg && isvalidURL(website)}
-      <OGP url={website} let:contents>
-        <Link
-          slot="nodata"
-          className="underline text-magnum-300 break-all "
-          href={website}>{website}</Link
-        >
-        {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-          <OgpCard {contents} url={website} />
-        {:else}
-          <Link
-            slot="nodata"
-            className="underline text-magnum-300 break-all "
-            href={website}>{website}</Link
+      <OGP url={website}>
+        {#snippet nodata()}
+          <Link className="underline text-magnum-300 break-all " href={website}
+            >{website}</Link
           >
-        {/if}
+        {/snippet}
+        {#snippet renderContent(contents)}
+          {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+            <OgpCard {contents} url={website} />
+          {:else}
+            <Link
+              className="underline text-magnum-300 break-all "
+              href={website}>{website}</Link
+            >
+          {/if}
+        {/snippet}
       </OGP>
     {:else}
       <Link className="underline text-magnum-300 break-all " href={website}

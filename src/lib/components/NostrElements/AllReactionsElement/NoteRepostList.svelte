@@ -3,8 +3,12 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
 
   import RepostList from "./RepostList.svelte";
-  export let events: Nostr.Event[];
-  export let tieKey: string | undefined;
+  interface Props {
+    events: Nostr.Event[];
+    tieKey: string | undefined;
+  }
+
+  let { events = $bindable(), tieKey }: Props = $props();
 </script>
 
 <CollapsibleList title="Repost" bind:amount={events.length}>

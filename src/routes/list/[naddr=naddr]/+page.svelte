@@ -11,18 +11,15 @@
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nip19 } from "nostr-tools";
+
   import * as Nostr from "nostr-typedef";
 
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import { onMount } from "svelte";
 
-  export let data: {
-    identifier: string;
-    pubkey: string;
-    kind: number;
-    relays?: string[] | undefined;
-  };
+  import type { PageData } from "./$types";
+  let { data }: { data: PageData } = $props();
+
   const atag = `${data.kind}:${data.pubkey}${data.identifier}`;
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
@@ -31,10 +28,10 @@
   let amount = 50;
   let viewIndex = 0;
   const tieKey = "naddr";
-  let loading = true;
+  let loading = $state(true);
 
   let isOnMount = false;
-  let since: number | undefined = undefined;
+  let since: number | undefined = $state(undefined);
   const timelineQuery: QueryKey = ["list", "feed", atag];
   onMount(() => {
     if (!isOnMount) {
@@ -112,85 +109,102 @@
   loading
 {:else}
   <section class=" w-full break-words overflow-hidden">
-    <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
-      <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
-      <div class="w-full flex justify-between">
-        <ListLinkCard {event} depth={0} {tieKey} />
-      </div>
+    <LatestEvent queryKey={["naddr", atag]} {filters}>
+      {#snippet loading()}
+        <div>loading</div>
+      {/snippet}
+      {#snippet error()}
+        <div>error</div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>nodata</div>
+      {/snippet}
+      {#snippet children({ event })}
+        <div class="w-full flex justify-between">
+          <ListLinkCard {event} depth={0} {tieKey} />
+        </div>
 
-      {#await pubkeyList(event)}
-        waiting decrypt list
-      {:then pubkeys}
-        <ListUsersCard {pubkeys} {tieKey} />
+        {#await pubkeyList(event)}
+          waiting decrypt list
+        {:then pubkeys}
+          <ListUsersCard {pubkeys} {tieKey} />
 
-        {#if since}
-          <TimelineList
-            queryKey={timelineQuery}
-            filters={[
-              {
-                kinds: [1, 6, 16],
-                authors: pubkeys,
-                since: since,
-              },
-            ]}
-            olderFilters={[
-              {
-                kinds: [1, 6, 16],
-                authors: pubkeys,
-                since: since,
-              },
-            ]}
-            req={createRxForwardReq()}
-            let:events
-            {viewIndex}
-            {amount}
-            let:len
-            {tieKey}
-          >
-            <!-- <SetRepoReactions /> -->
-            <div slot="loading">
-              <p>Loading...</p>
-            </div>
-
-            <div slot="error" let:error>
-              <p>{error}</p>
-            </div>
-
-            <div
-              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+          {#if since}
+            <TimelineList
+              queryKey={timelineQuery}
+              filters={[
+                {
+                  kinds: [1, 6, 16],
+                  authors: pubkeys,
+                  since: since,
+                },
+              ]}
+              olderFilters={[
+                {
+                  kinds: [1, 6, 16],
+                  authors: pubkeys,
+                  since: since,
+                },
+              ]}
+              req={createRxForwardReq()}
+              {viewIndex}
+              {amount}
+              {tieKey}
             >
-              {#if events && events.length > 0}
-                {#each events as event, index (event.id)}
-                  <!-- <div
-                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                      events.length - 1
-                        ? 'last-visible'
-                        : ''} {index === 0 ? 'first-visible' : ''}"
-                    > -->
-                  <Metadata
-                    queryKey={["metadata", event.pubkey]}
-                    pubkey={event.pubkey}
-                    let:metadata
-                  >
-                    <div slot="loading" class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                    <div slot="nodata" class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                    <div slot="error" class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                    <EventCard {metadata} note={event} {tieKey} /></Metadata
-                  >
-                  <!-- </div> -->
-                {/each}{/if}
-            </div>
-          </TimelineList>{/if}
-      {/await}</LatestEvent
-    >
+              {#snippet content({ events, len })}
+                <!-- <SetRepoReactions /> -->
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
+                      <!-- <div
+                        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
+                        events.length - 1
+                          ? 'last-visible'
+                          : ''} {index === 0 ? 'first-visible' : ''}"
+                      > -->
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                      >
+                        {#snippet loading()}
+                          <div class="w-full">
+                            <EventCard note={event} {tieKey} />
+                          </div>
+                        {/snippet}
+                        {#snippet nodata()}
+                          <div class="w-full">
+                            <EventCard note={event} {tieKey} />
+                          </div>
+                        {/snippet}
+                        {#snippet error()}
+                          <div class="w-full">
+                            <EventCard note={event} {tieKey} />
+                          </div>
+                        {/snippet}
+                        {#snippet content({ metadata })}
+                          <EventCard {metadata} note={event} {tieKey} />
+                        {/snippet}
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}{/if}
+                </div>{/snippet}
+              {#snippet loading()}
+                <div>
+                  <p>Loading...</p>
+                </div>
+              {/snippet}
+
+              {#snippet error()}
+                <div>
+                  <p>{error}</p>
+                </div>
+              {/snippet}
+            </TimelineList>{/if}
+        {/await}
+      {/snippet}
+    </LatestEvent>
   </section>
   <div class="postWindow">
     <OpenPostWindow

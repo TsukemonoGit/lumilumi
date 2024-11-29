@@ -17,37 +17,47 @@
 
   import Avatar from "svelte-boring-avatars";
   import { _ } from "svelte-i18n";
+  import { writable, type Writable } from "svelte/store";
 
-  export let url: string;
-  export let write: boolean;
-  export let read: boolean;
+  interface Props {
+    url: string;
+    write: boolean;
+    read: boolean;
+  }
+
+  let { url, write, read }: Props = $props();
 
   let imageLoaded = true;
-  let dialogOpen: any;
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
   let size = 48;
 
-  $: encodedUrl = encodeURIComponent(url);
+  let encodedUrl = $derived(encodeURIComponent(url));
 
-  let menuTexts =
+  // svelte-ignore non_reactive_update
+  const menuTexts =
     //$page.params.relay !== encodedUrl
     //?
-    [{ text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 }];
-  // : [];
+    [
+      { text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 },
 
-  menuTexts = [
-    ...menuTexts,
-    { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
-    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-    {
-      text: `${$_("menu.open.relayHtml")}`,
-      icon: SquareArrowOutUpRight,
-      num: 4,
-    },
+      { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
+      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+      {
+        text: `${$_("menu.open.relayHtml")}`,
+        icon: SquareArrowOutUpRight,
+        num: 4,
+      },
 
-    { text: `${$_("menu.nostr-watch")}`, icon: SquareArrowOutUpRight, num: 1 },
-    // { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
-  ];
+      {
+        text: `${$_("menu.nostr-watch")}`,
+        icon: SquareArrowOutUpRight,
+        num: 1,
+      },
+      // { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
+      { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
+    ];
 
   const handleSelectItem = async (index: number) => {
     try {
@@ -258,14 +268,16 @@
     </div>
 
     <Dialog bind:open={dialogOpen}>
-      <div slot="main">
-        <h2 class="m-0 text-lg font-medium">Relay Information</h2>
-        <div
-          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-        >
-          {JSON.stringify(relayInfo, null, 2)}
+      {#snippet main()}
+        <div>
+          <h2 class="m-0 text-lg font-medium">Relay Information</h2>
+          <div
+            class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+          >
+            {JSON.stringify(relayInfo, null, 2)}
+          </div>
         </div>
-      </div></Dialog
+      {/snippet}</Dialog
     >
   {/if}
 {/await}

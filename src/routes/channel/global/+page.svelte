@@ -20,7 +20,7 @@
   let viewIndex = 0;
   const tieKey = "globalchannel";
   let isOnMount = false;
-  let since: number | undefined = undefined;
+  let since: number | undefined = $state(undefined);
 
   onMount(async () => {
     if (!isOnMount) {
@@ -106,40 +106,47 @@
         },
       ]}
       req={createRxForwardReq()}
-      let:events
       {viewIndex}
       {amount}
-      let:len
       {tieKey}
-      >{#if events && events.length > 0}
-        {#each events as event (event.id)}
-          <Metadata
-            queryKey={["metadata", event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <div slot="loading" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <div slot="nodata" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <div slot="error" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <EventCard {metadata} note={event} {tieKey} /></Metadata
-          >
-
-          <!-- <div
-              class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
+      >{#snippet content({ events, len })}
+        {#if events && events.length > 0}
+          {#each events as event (event.id)}
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
             >
-              <ChannelMetadata
-                handleClickToChannel={() => handleClickToChannel(event.id)}
-                id={event.id}
-                linkButtonTitle={`/channel/${nip19.noteEncode(event.id)}`}
-              />
-            </div> -->
-        {/each}{/if}
+              {#snippet loading()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet error()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard {metadata} note={event} {tieKey} />
+              {/snippet}
+            </Metadata>
+
+            <!-- <div
+                class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
+              >
+                <ChannelMetadata
+                  handleClickToChannel={() => handleClickToChannel(event.id)}
+                  id={event.id}
+                  linkButtonTitle={`/channel/${nip19.noteEncode(event.id)}`}
+                />
+              </div> -->
+          {/each}{/if}
+      {/snippet}
     </TimelineList>
   {/if}{#if $loginUser}
     <Link

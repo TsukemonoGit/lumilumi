@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import {
     loginUser,
     nowProgress,
@@ -11,7 +13,6 @@
     EyeOff,
     FileJson2,
     RefreshCcw,
-    SquareArrowOutUpRight,
     User,
     Radio,
     Share,
@@ -27,33 +28,41 @@
   import { nip19 } from "nostr-tools";
   import { page } from "$app/stores";
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
+  import { writable, type Writable } from "svelte/store";
 
-  export let tieKey: string | undefined;
-
-  export let metadata: Nostr.Event | undefined;
-  export let pubkey: string;
-  export let profile: Profile | undefined;
-
-  let dialogOpen: any;
-  let encodedPubkey: string | undefined = undefined;
-  $: if (pubkey) {
-    try {
-      encodedPubkey = nip19.npubEncode(pubkey);
-    } catch {
-      encodedPubkey = undefined;
-    }
+  interface Props {
+    tieKey: string | undefined;
+    metadata: Nostr.Event | undefined;
+    pubkey: string;
+    profile: Profile | undefined;
   }
-  let nevent: string | undefined = undefined;
-  $: if (metadata) {
-    try {
-      nevent = nip19.neventEncode({
-        id: metadata.id,
-        relays: tieKey ? getRelaysById(metadata.id, tieKey) : [],
-      });
-    } catch {
-      nevent = undefined;
+
+  let { tieKey, metadata, pubkey, profile }: Props = $props();
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+  let encodedPubkey = $derived.by(() => {
+    if (pubkey) {
+      try {
+        return nip19.npubEncode(pubkey);
+      } catch {
+        return undefined;
+      }
     }
-  }
+  });
+  let nevent = $derived.by(() => {
+    if (metadata) {
+      try {
+        return nip19.neventEncode({
+          id: metadata.id,
+          relays: tieKey ? getRelaysById(metadata.id, tieKey) : [],
+        });
+      } catch {
+        return undefined;
+      }
+    }
+  });
+
   const baseMenuTexts = [
     { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
     { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
@@ -61,7 +70,7 @@
     { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
   ];
 
-  $: menuTexts = [
+  let menuTexts = $derived([
     ...($page.url.pathname === `/${encodedPubkey}`
       ? baseMenuTexts.filter((item) => item.num !== 0) // "userPage" を削除
       : baseMenuTexts),
@@ -72,7 +81,7 @@
         ]
       : []),
     { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
-  ];
+  ]);
 
   const handleSelectItem = async (index: number) => {
     switch (index) {
@@ -184,7 +193,7 @@
 
 {#each menuTexts as { icon: Icon, text, num }}
   <button
-    on:click={() => handleSelectItem(num)}
+    onclick={() => handleSelectItem(num)}
     class="
      flex
      font-medium leading-none bg-neutral-800 text-magnum-300 hover:bg-magnum-500/25 active:opacity-50 disabled:opacity-15 py-1 items-center"
@@ -207,38 +216,42 @@
   >{/if}
 
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(metadata, null, 2)}
-    </div>
-    <div class="my-1 break-all overflow-auto">
-      <!-- <div class="text-lg font-medium">Encoded</div> -->
-      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-      <div class=" font-mono font-bold text-xs">{nevent}</div>
-    </div>
-    <h2 class="mt-1 text-lg font-medium">User Data</h2>
-    <div
-      class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
-    >
-      {#if profile}
-        {#each Object.entries(profile) as [data, index]}
-          <div class="flex flex-col py-1">
-            <div class="font-bold whitespace-pre-wrap break-wards">
-              {data}
+  {#snippet main()}
+    <div>
+      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      >
+        {JSON.stringify(metadata, null, 2)}
+      </div>
+      <div class="my-1 break-all overflow-auto">
+        <!-- <div class="text-lg font-medium">Encoded</div> -->
+        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+        <div class=" font-mono font-bold text-xs">{nevent}</div>
+      </div>
+      <h2 class="mt-1 text-lg font-medium">User Data</h2>
+      <div
+        class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
+      >
+        {#if profile}
+          {#each Object.entries(profile) as [data, index]}
+            <div class="flex flex-col py-1">
+              <div class="font-bold whitespace-pre-wrap break-wards">
+                {data}
+              </div>
+              <div class="ml-2 whitespace-pre-wrap break-all">
+                {profile[data]}
+              </div>
             </div>
-            <div class="ml-2 whitespace-pre-wrap break-all">
-              {profile[data]}
-            </div>
-          </div>
-        {/each}
-      {/if}
+          {/each}
+        {/if}
+      </div>
+      <h2 class="mt-1 text-lg font-medium">Seen on</h2>
+      <div class="break-words whitespace-pre-wrap">
+        {metadata && tieKey
+          ? getRelaysById(metadata.id, tieKey).join(", ")
+          : ""}
+      </div>
     </div>
-    <h2 class="mt-1 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {metadata && tieKey ? getRelaysById(metadata.id, tieKey).join(", ") : ""}
-    </div>
-  </div>
+  {/snippet}
 </Dialog>

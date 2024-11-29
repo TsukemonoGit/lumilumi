@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import {
     loginUser,
@@ -26,6 +27,7 @@
   import { datetime } from "$lib/func/util";
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { _ } from "svelte-i18n";
+  import { writable } from "svelte/store";
 
   // 設定をアップロード
   // 設定をダウンロード
@@ -51,7 +53,7 @@
   let kind30078LumiSettings: Kind30078LumiSetting[] = [];
   let localLumisetting: Kind30078LumiSettingObj;
 
-  let dialogOpen: any;
+  let dialogOpen: any = writable(false);
   let alertdialogOpen: any;
 
   async function handleClickUpDownload() {
@@ -312,7 +314,7 @@
 > -->
 
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
+  {#snippet main()}
     <div class="flex gap-1 items-center">
       <input
         type="text"
@@ -328,46 +330,49 @@
 
     <div class="rounded-md border border-magnum-600 mt-2">
       <table>
-        <tr>
-          <th>name</th><th>created_at</th><th>load</th><th>delete</th>
-        </tr>
-
-        {#each kind30078LumiSettings as { name, ...value }}
-          <tr
-            ><td>{name}</td>
-            <td
-              ><time datetime={datetime(value.created_at)}
-                >{new Date(value.created_at * 1000).toLocaleString()}</time
-              ></td
-            >
-            <td
-              ><button
-                class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-                on:click={() => handleClickLoad(name)}>LOAD</button
-              ></td
-            >
-            <td
-              ><button
-                class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
-                on:click={() => handleClickDelete(name)}>DELETE</button
-              ></td
-            >
-          </tr>{/each}
+        <thead>
+          <tr>
+            <th>name</th><th>created_at</th><th>load</th><th>delete</th>
+          </tr></thead
+        >
+        <tbody>
+          {#each kind30078LumiSettings as { name, ...value }}
+            <tr
+              ><td>{name}</td>
+              <td
+                ><time datetime={datetime(value.created_at)}
+                  >{new Date(value.created_at * 1000).toLocaleString()}</time
+                ></td
+              >
+              <td
+                ><button
+                  class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                  on:click={() => handleClickLoad(name)}>LOAD</button
+                ></td
+              >
+              <td
+                ><button
+                  class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
+                  on:click={() => handleClickDelete(name)}>DELETE</button
+                ></td
+              >
+            </tr>{/each}
+        </tbody>
       </table>
       {#if kind30078LumiSettings.length <= 0}
         <!---->
         <p class="text-center">no data</p>
       {/if}
     </div>
-  </div>
+  {/snippet}
 </Dialog>
 
 <AlertDialog
-  bind:open={alertdialogOpen}
+  open={alertdialogOpen}
   onClickOK={handleClickPublish}
   title={`SAVE`}
   okButtonName="OK"
-  ><div slot="main">
+  >{#snippet main()}
     {#if kind30078LumiSettings.find((data) => data.name === saveName)}
       <p class="font-bold py-2">name: {saveName}</p>
       <p>
@@ -377,7 +382,7 @@
       <p class="font-bold py-2">name: {saveName}</p>
       <p>{$_("settings.save.new")}</p>
     {/if}
-  </div></AlertDialog
+  {/snippet}</AlertDialog
 >
 
 <style>

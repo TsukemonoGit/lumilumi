@@ -29,7 +29,7 @@
   let viewIndex = 0;
   const tieKey = "timeline";
   let isOnMount = false;
-  let since: number | undefined = undefined;
+  let since: number | undefined = $state(undefined);
   const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];
 
   onMount(async () => {
@@ -132,12 +132,13 @@
       return true;
     }
   }
-  let updateViewEvent: any;
-  $: if ($timelineFilter && updateViewEvent) {
+  let updateViewEvent: any = $state();
+  timelineFilter.subscribe((value) => {
     //設定が変わったら更新
-
-    updateViewEvent();
-  }
+    if (value) {
+      updateViewEvent?.();
+    }
+  });
 
   //kind0がTLに流れるのをあれするやつ
   const excludeKind0 = (note: Nostr.Event): boolean => {
@@ -157,52 +158,57 @@
   >
   <SampleGlobalLink />
 {:else}
-  <Contacts
-    queryKey={["timeline", "contacts", $loginUser]}
-    pubkey={$loginUser}
-    let:contacts
-    let:status
-  >
-    <div slot="loading">
-      {#await awaitInterval(3000) then}
-        <MakeNewKind3 />{/await}
-    </div>
-    <div slot="error"><MakeNewKind3 /></div>
-    <div slot="nodata"><MakeNewKind3 /></div>
-    {#if since}
-      {@const filters = makeMainFilters(contacts, since)}
-      <MainTimeline
-        queryKey={timelineQuery}
-        filters={filters.mainFilters}
-        olderFilters={filters.olderFilters}
-        {tieKey}
-        let:events
-        {viewIndex}
-        {amount}
-        let:len
-        eventFilter={(note) => {
-          return (
-            checkCanvasation(note, $timelineFilter.selectCanversation) &&
-            excludeKind0(note)
-          );
-        }}
-        bind:updateViewEvent
-      >
-        <!-- <SetRepoReactions /> -->
-        <div slot="loading">
-          {#await awaitInterval(3000) then}event loading <SampleGlobalLink
-            />{/await}
-        </div>
-
-        <div slot="error" let:error>error</div>
-
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+  <Contacts queryKey={["timeline", "contacts", $loginUser]} pubkey={$loginUser}>
+    {#snippet loading()}
+      <div>
+        {#await awaitInterval(3000) then}
+          <MakeNewKind3 />{/await}
+      </div>
+    {/snippet}
+    {#snippet error()}
+      <div><MakeNewKind3 /></div>
+    {/snippet}
+    {#snippet nodata()}
+      <div><MakeNewKind3 /></div>
+    {/snippet}
+    {#snippet content({ contacts, status })}
+      {#if since}
+        <MainTimeline
+          queryKey={timelineQuery}
+          filters={makeMainFilters(contacts, since).mainFilters}
+          olderFilters={makeMainFilters(contacts, since).olderFilters}
+          {tieKey}
+          {viewIndex}
+          {amount}
+          eventFilter={(note) => {
+            return (
+              checkCanvasation(note, $timelineFilter.selectCanversation) &&
+              excludeKind0(note)
+            );
+          }}
+          bind:updateViewEvent
         >
-          <FolloweeFilteredEventList {events} {tieKey} />
-        </div>
-      </MainTimeline>
-    {/if}
+          {#snippet content({ events, len })}
+            <!-- <SetRepoReactions /> -->
+
+            <div
+              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            >
+              <FolloweeFilteredEventList {events} {tieKey} />
+            </div>{/snippet}
+          {#snippet loading()}
+            <div>
+              {#await awaitInterval(3000) then}event loading <SampleGlobalLink
+                />{/await}
+            </div>
+          {/snippet}
+
+          {#snippet error()}
+            <div>error</div>
+          {/snippet}
+        </MainTimeline>
+      {/if}
+    {/snippet}
   </Contacts>
 
   <div class="postWindow">

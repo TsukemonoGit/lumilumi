@@ -6,8 +6,12 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import UserPopupMenu from "$lib/components/Elements/UserPopupMenu.svelte";
 
-  export let events: Nostr.Event[];
-  export let tieKey: string | undefined;
+  interface Props {
+    events: Nostr.Event[];
+    tieKey: string | undefined;
+  }
+
+  let { events, tieKey }: Props = $props();
 
   //とりあえずデコード失敗したら0になるようになってるけどちゃんと取り除いて
 
@@ -35,8 +39,10 @@
     return events.filter((event) => getAmount(event) === amount);
   };
 
-  $: amounts = [...new Set(events.map((event) => getAmount(event) ?? -1))].sort(
-    (a, b) => b - a
+  let amounts = $derived(
+    [...new Set(events.map((event) => getAmount(event) ?? -1))].sort(
+      (a, b) => b - a
+    )
   ); // Sort amounts in descending order
 
   const zapperEvent = (event: Nostr.Event): Nostr.Event | undefined => {
@@ -67,42 +73,46 @@
           <Metadata
             queryKey={["metadata", zapper?.pubkey]}
             pubkey={zapper.pubkey ?? ""}
-            let:metadata
           >
-            <UserPopupMenu
-              slot="loading"
-              pubkey={zapper.pubkey ?? ""}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet loading()}
+              <UserPopupMenu
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              slot="error"
-              pubkey={zapper.pubkey ?? ""}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet error()}
+              <UserPopupMenu
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              slot="nodata"
-              pubkey={zapper.pubkey ?? ""}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet nodata()}
+              <UserPopupMenu
+                pubkey={zapper.pubkey ?? ""}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              pubkey={zapper.pubkey ?? ""}
-              {metadata}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet content({ metadata })}
+              <UserPopupMenu
+                pubkey={zapper.pubkey ?? ""}
+                {metadata}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
           </Metadata>
           {#if zapper.content !== ""}<div
               class="inline-flex break-all align-middle"

@@ -13,8 +13,13 @@
   import { nip33Regex } from "$lib/func/regex";
 
   const contentLen = 40;
-  //tagはaかe
-  export let tag: string[];
+
+  interface Props {
+    //tagはaかe
+    tag: string[];
+  }
+
+  let { tag }: Props = $props();
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);
@@ -59,65 +64,77 @@
       {kind}
     {/if} -->
 
-  <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
-    <div
-      slot="loading"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-    >
-      Loading {loadingText}<EllipsisMenuNote notestr={loadingText} />
-    </div>
-    <div
-      slot="nodata"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-    >
-      nodata {loadingText}<EllipsisMenuNote notestr={loadingText} />
-    </div>
-    <div
-      slot="error"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-      let:error
-    >
-      {loadingText}<EllipsisMenuNote notestr={loadingText} />
-    </div>
-    <div class="mx-2 text-sm">
-      <Content
-        text={text.content.length < contentLen
-          ? (text.content ?? "")
-          : `${text.content.slice(0, contentLen)}...`}
-        tags={text.tags}
-        displayMenu={false}
-        depth={0}
-        repostable={false}
-        tieKey={undefined}
-        isShowClientTag={false}
-      />
-    </div>
+  <Text queryKey={["timeline", tag[1]]} id={tag[1]}>
+    {#snippet loading()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        Loading {loadingText}<EllipsisMenuNote notestr={loadingText} />
+      </div>
+    {/snippet}
+    {#snippet nodata()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        nodata {loadingText}<EllipsisMenuNote notestr={loadingText} />
+      </div>
+    {/snippet}
+    {#snippet error()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        {loadingText}<EllipsisMenuNote notestr={loadingText} />
+      </div>
+    {/snippet}
+    {#snippet content({ data: text })}
+      <div class="mx-2 text-sm">
+        <Content
+          text={text.content.length < contentLen
+            ? (text.content ?? "")
+            : `${text.content.slice(0, contentLen)}...`}
+          tags={text.tags}
+          displayMenu={false}
+          depth={0}
+          repostable={false}
+          tieKey={undefined}
+          isShowClientTag={false}
+        />
+      </div>
+    {/snippet}
   </Text>
 {:else if tag[0] === "a"}
   {@const filter = naddrFilter()}
   {@const encodedNaddr = encodeNaddr(tag)}
   {#if filter}
-    <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
-      <div slot="loading">
-        Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
-      </div>
-      <div slot="nodata">
-        nodata {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
-      </div>
-      <div slot="error" let:error>
-        {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
-      </div>
+    <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]}>
+      {#snippet loading()}
+        <div>
+          Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>
+          nodata {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div>
+          {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        </div>
+      {/snippet}
 
-      <Content
-        text={event.content.length < contentLen
-          ? (event.content ?? "")
-          : `${event.content.slice(0, contentLen)}...`}
-        tags={event.tags}
-        displayMenu={false}
-        depth={0}
-        repostable={false}
-        tieKey={undefined}
-      />
+      {#snippet children({ event })}
+        <Content
+          text={event.content.length < contentLen
+            ? (event.content ?? "")
+            : `${event.content.slice(0, contentLen)}...`}
+          tags={event.tags}
+          displayMenu={false}
+          depth={0}
+          repostable={false}
+          tieKey={undefined}
+        />
+      {/snippet}
     </LatestEvent>
   {/if}
 {/if}

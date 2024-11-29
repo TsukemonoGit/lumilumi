@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { page } from "$app/stores";
   import logo from "$lib/images/favicon.svg";
   import { loginUser, showImg } from "$lib/stores/stores";
@@ -8,13 +10,11 @@
   import { nip19 } from "nostr-tools";
   import UserAvatar2 from "./UserAvatar2.svelte";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
-  import { melt } from "@melt-ui/svelte";
+  //  import { melt } from "@melt-ui/svelte";
   import { mainMenuItems } from "./menu";
+  import { writable, type Writable } from "svelte/store";
 
-  let encodedPub: string;
-  $: if ($loginUser) {
-    pubCheck();
-  }
+  let encodedPub: string = $state("");
 
   const pubCheck = () => {
     try {
@@ -24,7 +24,15 @@
       }
     } catch (error) {}
   };
-  let trigger: any;
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+
+  loginUser.subscribe((value) => {
+    if (value) {
+      pubCheck();
+    }
+  });
 </script>
 
 <div class="sidebar fixed top-28 bottom-12">
@@ -46,9 +54,11 @@
             </li>
           {:else}
             <li>
-              {#if $trigger}<button use:melt={$trigger}
-                  ><TrendingUp /><span class="ml-2">Edit status</span></button
-                >{/if}
+              <button
+                onclick={() => {
+                  $dialogOpen = true;
+                }}><TrendingUp /><span class="ml-2">Edit status</span></button
+              >
             </li>
           {/if}
         {:else}
@@ -60,12 +70,12 @@
           >
             {#if noPubkey || $loginUser}
               <a href={link ?? `/${encodedPub}`} title={alt}>
-                <svelte:component this={Icon} /><span class="ml-2">{alt}</span>
+                <Icon /><span class="ml-2">{alt}</span>
               </a>
             {:else}
               <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
               <div class="disabledLink" title={alt}>
-                <svelte:component this={Icon} /><span class="ml-2">{alt}</span>
+                <Icon /><span class="ml-2">{alt}</span>
               </div>
             {/if}
           </li>{/if}
@@ -93,7 +103,7 @@
     </ul>
   </nav>
 </div>
-<EditUserStatus bind:trigger />
+<EditUserStatus bind:dialogOpen />
 
 <style>
   @media screen and (max-width: 767px) {
@@ -141,7 +151,7 @@
   nav li[aria-current="page"] a {
     color: theme("colors.magnum.400");
   }
-  .title {
+  /* .title {
     display: flex;
 
     align-items: center;
@@ -153,7 +163,7 @@
     letter-spacing: 0.1em;
     text-decoration: none;
     transition: color 0.2s linear;
-  }
+  } */
   a:hover {
     color: theme("colors.magnum.400");
   }

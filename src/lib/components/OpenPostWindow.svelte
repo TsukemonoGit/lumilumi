@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { _ } from "svelte-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
@@ -55,27 +57,31 @@
   import Metadata from "./NostrMainData/Metadata.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
-  import { clientTag } from "$lib/func/constants";
+  import { clientTag, mediaUploader } from "$lib/func/constants";
 
-  //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
+  let {
+    options = {
+      tags: [],
+      kind: 1,
+      content: "",
+    },
+    signPubkey = $bindable(undefined),
+  }: Props = $props();
 
-  export let options: DefaultPostOptions = {
-    tags: [],
-    kind: 1,
-    content: "",
-  };
-
-  let text: string = options.content ?? "";
-  let tags: string[][] = [...options.tags];
+  let text: string = $state(options.content ?? "");
+  let tags: string[][] = $state([...options.tags]);
   let cursorPosition: number = 0;
-  let onWarning: boolean;
-  let warningText = "";
-  let customReaction: string = "";
-  let viewCustomEmojis: boolean;
-  let selectedUploader: string;
-  let files: FileList | undefined;
-  let fileInput: HTMLInputElement | undefined;
-  let initOptions: MargePostOptions = { ...options, kind: options.kind ?? 1 };
+  let onWarning: boolean = $state<boolean>(false);
+  let warningText = $state("");
+  let customReaction: string = $state("");
+  let viewCustomEmojis: boolean = $state<boolean>(false);
+  const selectedUploader: Writable<string> = writable();
+  let files: FileList | undefined = $state();
+  let fileInput: HTMLInputElement | undefined = $state();
+  let initOptions: MargePostOptions = $state({
+    ...options,
+    kind: options.kind ?? 1,
+  });
   const { elements, states } = createDialog({
     forceVisible: true,
     closeOnOutsideClick: false, //overlay押したときに閉じない
@@ -86,76 +92,17 @@
   const { open } = states;
 
   //$: console.log(initOptions.tags);
-  let metadata: Nostr.Event | undefined = undefined;
+  let metadata: Nostr.Event | undefined = $state(undefined);
 
-  let additionalReplyUsers: Writable<string[]> = writable([]);
-  let clickEscape: number = 0;
+  const additionalReplyUsers: Writable<string[]> = writable([]);
+  let clickEscape: number = $state(0);
 
-  $: if ($postWindowOpen) {
-    console.log($additionalPostOptions);
-
-    if ($additionalPostOptions) {
-      // タグをコピー
-
-      initOptions = {
-        ...options,
-        kind: $additionalPostOptions.kind ?? options.kind ?? 1,
-        //チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
-        tags: (() => {
-          const combinedTags = options.tags.concat($additionalPostOptions.tags);
-          let hasRoot = false;
-
-          return combinedTags.filter((tag) => {
-            // "root"タグを含む場合の処理
-            if (tag.includes("root")) {
-              if (!hasRoot) {
-                hasRoot = true; // 最初の"root"タグは保持
-                return true;
-              }
-              return false; // 2つ目以降の"root"タグは除外
-            }
-            return true; // root以外のタグはそのまま
-          });
-        })(),
-        content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
-        addableUserList: $additionalPostOptions.addableUserList,
-        defaultUsers: $additionalPostOptions.defaultUsers,
-        warningText: $additionalPostOptions.warningText,
-      };
-      tags = initOptions.tags;
-      text = initOptions.content ?? "";
-
-      if (initOptions.addableUserList) {
-        $additionalReplyUsers = [...initOptions.addableUserList];
-      }
-      if (initOptions.warningText !== undefined) {
-        warningText = initOptions.warningText;
-        onWarning = true;
-      }
-      $additionalPostOptions = undefined;
-    }
-
-    $open = true;
-    $postWindowOpen = false;
+  interface Props {
+    //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
+    options?: DefaultPostOptions;
+    signPubkey?: string | undefined;
   }
-  export let signPubkey: string | undefined = undefined;
-  $: if ($open === true) {
-    //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
-    signPubkeyCheck();
-    clickEscape = 0;
-    // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-    // metadata = $queryClient.getQueryData(["metadata", pubkey]);
-    // console.log(metadata);
 
-    if (textarea) {
-      textarea.focus();
-
-      textarea.selectionEnd = 0;
-      textarea.scroll({
-        top: 0,
-      });
-    }
-  }
   async function signPubkeyCheck() {
     if ($nowProgress) {
       return;
@@ -182,14 +129,7 @@
   }
 
   // アップロードキャンセル用のコントローラーを作成
-  let uploadAbortController: AbortController | null = null;
-
-  $: if (!$open) {
-    if (uploadAbortController) {
-      uploadAbortController.abort(); // アップロードを中断
-    }
-    resetState();
-  }
+  let uploadAbortController: AbortController | null = $state(null);
 
   const metadataName = (ev: Nostr.Event): string => {
     try {
@@ -203,8 +143,7 @@
       return "";
     }
   };
-  let isPosting: boolean = false;
-  $: nsecCheck = nsecRegex.test(text) || nsecRegex.test(warningText);
+  let isPosting: boolean = $state(false);
   const postNote = async () => {
     if (text.trim().length <= 0) return;
     isPosting = true;
@@ -231,8 +170,8 @@
     };
     const signer = nip07Signer();
     try {
-      const event = await signer.signEvent(newev);
-
+      const event = await signer.signEvent($state.snapshot(newev));
+      console.log(event);
       //publishEvent(newev);
 
       const { event: ev, res } = await promisePublishSignedEvent(event);
@@ -284,6 +223,7 @@
       $nowProgress = false;
       isPosting = false;
     } catch (error) {
+      console.log(error);
       $toastSettings = {
         title: "Failed",
         description: "failed to publish",
@@ -349,9 +289,9 @@
     cursorPosition += emojiText.length;
 
     // カーソル位置を更新
-    textarea.focus();
+    textarea?.focus();
     setTimeout(() => {
-      textarea.setSelectionRange(cursorPosition, cursorPosition);
+      textarea?.setSelectionRange(cursorPosition, cursorPosition);
     });
   };
 
@@ -399,9 +339,9 @@
             // さらに10ms待機するPromise //確実にテキスト挿入完了してから次の処理をするため
             await delay(10);
 
-            textarea.focus();
+            textarea?.focus();
             setTimeout(() => {
-              textarea.selectionEnd = cursorPosition;
+              if (textarea) textarea.selectionEnd = cursorPosition;
             }, 0);
           }
         }
@@ -448,11 +388,7 @@
     await handleFileUpload(fileList.files);
   };
 
-  $: if (selectedUploader) {
-    $uploader = selectedUploader;
-  }
-
-  let textarea: HTMLTextAreaElement;
+  let textarea: HTMLTextAreaElement | undefined = $state();
 
   //Close確認用
   const {
@@ -495,7 +431,9 @@
         // setTimeoutしないと古いカーソル位置を取得する可能性があるらしい
         //setTimeout を使って次のイベントループサイクルにカーソル位置の更新を延期
         //確実に最新のカーソル位置が cursorPosition に反映されるようになります。
-        cursorPosition = textarea.selectionStart;
+        if (textarea) {
+          cursorPosition = textarea.selectionStart;
+        }
       }, 0);
     }
   };
@@ -523,7 +461,7 @@
   };
 
   //--------------userlist
-  let metadataList: MetadataList = {};
+  let metadataList: MetadataList = $state({});
 
   function setMetadataList() {
     try {
@@ -535,11 +473,8 @@
     } catch (error) {}
   }
 
-  let viewMetadataList: boolean;
-  let inputMetadata: string = "";
-  $: if (viewMetadataList) {
-    setMetadataList();
-  }
+  let viewMetadataList: boolean = $state(false);
+  let inputMetadata: string = $state("");
   function checkUserInput(inputMetadata: string, arg1: UserData) {
     if (inputMetadata === "") {
       return true;
@@ -570,21 +505,21 @@
     cursorPosition += emojiText.length;
     viewMetadataList = false;
 
-    textarea.focus();
+    textarea?.focus();
     setTimeout(() => {
-      textarea.setSelectionRange(cursorPosition, cursorPosition);
+      textarea?.setSelectionRange(cursorPosition, cursorPosition);
     });
   }
 
-  let emojiInput: HTMLInputElement;
-  let metadataInput: HTMLInputElement;
+  let emojiInput: HTMLInputElement | undefined = $state();
+  let metadataInput: HTMLInputElement | undefined = $state();
 
   const handleClickCustomReaction = () => {
     viewCustomEmojis = !viewCustomEmojis;
     if (viewCustomEmojis) {
       setTimeout(() => {
-        emojiInput.focus();
-        emojiInput.setSelectionRange(0, 0);
+        emojiInput?.focus();
+        emojiInput?.setSelectionRange(0, 0);
       });
     }
     if (viewMetadataList && viewCustomEmojis) {
@@ -596,17 +531,104 @@
     viewMetadataList = !viewMetadataList;
     if (viewMetadataList) {
       setTimeout(() => {
-        metadataInput.focus();
-        metadataInput.setSelectionRange(0, 0);
+        metadataInput?.focus();
+        metadataInput?.setSelectionRange(0, 0);
       });
     }
     if (viewMetadataList && viewCustomEmojis) {
       viewCustomEmojis = false;
     }
   };
+  postWindowOpen.subscribe((value) => {
+    if (value) {
+      console.log($additionalPostOptions);
+
+      if ($additionalPostOptions) {
+        // タグをコピー
+
+        initOptions = {
+          ...options,
+          kind: $additionalPostOptions.kind ?? options.kind ?? 1,
+          //チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
+          tags: (() => {
+            const combinedTags = options.tags.concat(
+              $additionalPostOptions.tags
+            );
+            let hasRoot = false;
+
+            return combinedTags.filter((tag) => {
+              // "root"タグを含む場合の処理
+              if (tag.includes("root")) {
+                if (!hasRoot) {
+                  hasRoot = true; // 最初の"root"タグは保持
+                  return true;
+                }
+                return false; // 2つ目以降の"root"タグは除外
+              }
+              return true; // root以外のタグはそのまま
+            });
+          })(),
+          content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
+          addableUserList: $additionalPostOptions.addableUserList,
+          defaultUsers: $additionalPostOptions.defaultUsers,
+          warningText: $additionalPostOptions.warningText,
+        };
+        tags = initOptions.tags;
+        text = initOptions.content ?? "";
+
+        if (initOptions.addableUserList) {
+          $additionalReplyUsers = [...initOptions.addableUserList];
+        }
+        if (initOptions.warningText !== undefined) {
+          warningText = initOptions.warningText;
+          onWarning = true;
+        }
+        $additionalPostOptions = undefined;
+      }
+
+      $open = true;
+      $postWindowOpen = false;
+    }
+  });
+  open.subscribe((value) => {
+    if (value) {
+      //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
+      signPubkeyCheck();
+      clickEscape = 0;
+      // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      // metadata = $queryClient.getQueryData(["metadata", pubkey]);
+      // console.log(metadata);
+
+      if (textarea) {
+        textarea.focus();
+
+        textarea.selectionEnd = 0;
+        textarea?.scroll({
+          top: 0,
+        });
+      }
+    } else {
+      if (uploadAbortController) {
+        uploadAbortController.abort(); // アップロードを中断
+      }
+      resetState();
+    }
+  });
+
+  let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
+
+  selectedUploader.subscribe((value) => {
+    $uploader = value;
+  });
+
+  $effect(() => {
+    if (viewMetadataList) {
+      setMetadataList();
+    }
+  });
 </script>
 
-<svelte:window on:keyup={keyboardShortcut} on:keydown={handleKeyDown} />
+<svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
 <button
   title="open post window"
   use:melt={$trigger}
@@ -619,13 +641,14 @@
 {#if $open}
   <div use:melt={$portalled}>
     <button
+      aria-label="overlay"
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-      on:click={handleOverlayClick}
-    />
+      onclick={handleOverlayClick}
+    ></button>
     <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[720px]
+      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[640px]
             max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
@@ -673,7 +696,7 @@
         <div class="flex flex-row gap-2 mb-2">
           <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
 
-          <UploaderSelect bind:defaultValue={$uploader} bind:selectedUploader />
+          <UploaderSelect bind:selectedUploader={$selectedUploader} />
         </div>
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
@@ -681,9 +704,10 @@
               @<Metadata
                 queryKey={["metadata", initOptions.defaultUsers[0]]}
                 pubkey={initOptions.defaultUsers[0]}
-                let:metadata
               >
-                {metadataName(metadata)}
+                {#snippet content({ metadata })}
+                  {metadataName(metadata)}
+                {/snippet}
               </Metadata>
             </div>
           {/if}
@@ -697,16 +721,17 @@
                 @<Metadata
                   queryKey={["metadata", replyuser]}
                   pubkey={replyuser}
-                  let:metadata
                 >
-                  {metadataName(metadata)}
+                  {#snippet content({ metadata })}
+                    {metadataName(metadata)}
+                  {/snippet}
                 </Metadata>
                 {#if $additionalReplyUsers.includes(replyuser)}
                   <button
                     class=" inline-flex h-6 w-6 appearance-none align-middle
                      rounded-full p-1 text-magnum-800 bg-magnum-100
                     hover:bg-magnum-300 focus:shadow-magnum-400"
-                    on:click={() => {
+                    onclick={() => {
                       $additionalReplyUsers = $additionalReplyUsers.filter(
                         (user) => user !== replyuser
                       );
@@ -718,7 +743,7 @@
                     class=" inline-flex h-6 w-6 appearance-none align-middle
                  rounded-full p-1 text-magnum-800
                 hover:bg-magnum-100 focus:shadow-magnum-400"
-                    on:click={() => {
+                    onclick={() => {
                       additionalReplyUsers.update((users) => {
                         users.push(replyuser);
                         return users;
@@ -738,32 +763,32 @@
             id="note"
             bind:this={textarea}
             bind:value={text}
-            on:input={(e) => {
+            oninput={(e) => {
               handleTextareaInput(e);
               clickEscape = 0;
             }}
-            on:click={(e) => {
+            onclick={(e) => {
               handleTextareaInput(e);
               clickEscape = 0;
             }}
-            on:touchend={(e) => {
+            ontouchend={(e) => {
               handleTextareaInput(e);
               clickEscape = 0;
             }}
-            on:paste={(e) => {
+            onpaste={(e) => {
               paste(e);
               clickEscape = 0;
             }}
-            on:drop={(e) => {
+            ondrop={(e) => {
               handleDrop(e);
               clickEscape = 0;
             }}
-            on:dragover={(e) => {
+            ondragover={(e) => {
               handleDragOver(e);
               clickEscape = 0;
             }}
             placeholder={$_("post.placeholder")}
-          />
+          ></textarea>
         </fieldset>
 
         {#if onWarning}
@@ -784,7 +809,7 @@
         {/if}
         <div class="mt-2 flex justify-between gap-2">
           <button
-            on:click={() => {
+            onclick={() => {
               onWarning = !onWarning;
             }}
             class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
@@ -810,7 +835,7 @@
               {/if}
               <button
                 aria-label="open custom emoji list"
-                on:click={handleClickCustomReaction}
+                onclick={handleClickCustomReaction}
                 class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
                     bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
               >
@@ -835,7 +860,7 @@
             {/if}
             <button
               aria-label="open name list"
-              on:click={handleClickMetadata}
+              onclick={handleClickMetadata}
               class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
                  bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
             >
@@ -853,7 +878,7 @@
               aria-label="post note"
               class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-20"
-              on:click={postNote}
+              onclick={postNote}
             >
               <Send size="20" />
             </button>
@@ -870,7 +895,7 @@
                   .includes(customReaction.toLowerCase())}
                 <button
                   aria-label={`Select emoji ${e[0]}`}
-                  on:click={() => handleClickEmoji(e)}
+                  onclick={() => handleClickEmoji(e)}
                   class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                 >
                   {#if $showImg}
@@ -895,7 +920,7 @@
               {#if checkUserInput(inputMetadata, profile)}
                 <button
                   aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
-                  on:click={() => handleClickUser(pubkey)}
+                  onclick={() => handleClickUser(pubkey)}
                   class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                   >{#if profile.petname}
                     📛{profile.petname}
@@ -912,7 +937,10 @@
 
 {#if $openConfirm}
   <div use:melt={$portalledConfirm}>
-    <div use:melt={$overlayConfirm} class="fixed inset-0 z-50 bg-black/50" />
+    <div
+      use:melt={$overlayConfirm}
+      class="fixed inset-0 z-50 bg-black/50"
+    ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
             max-w-[450px] -translate-x-1/2 -translate-y-1/2 bg-neutral-900 p-2"
@@ -938,7 +966,7 @@
         <button
           class="inline-flex h-8 items-center justify-center rounded-[4px]
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75"
-          on:click={() => {
+          onclick={() => {
             open.set(false);
             openConfirm.set(false);
           }}

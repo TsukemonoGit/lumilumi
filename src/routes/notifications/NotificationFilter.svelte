@@ -15,7 +15,7 @@
       type="checkbox"
       class="rounded-checkbox"
       bind:checked={$onlyFollowee}
-      on:change={handleChangeChecked}
+      onchange={handleChangeChecked}
     />
     {$_("notifications.onlyFollowee")}
   </label>

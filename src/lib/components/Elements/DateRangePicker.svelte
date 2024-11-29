@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { createDateRangePicker, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-svelte";
@@ -7,7 +9,6 @@
 
   import { locale } from "svelte-i18n";
 
-  export let title: string;
   const {
     elements: {
       calendar,
@@ -31,10 +32,15 @@
     defaultPlaceholder: now(getLocalTimeZone()),
     maxValue: now(getLocalTimeZone()),
   });
-  export let startTimeUnix: number | undefined;
-  export let endTimeUnix: number | undefined;
+  interface Props {
+    title: string;
+    startTimeUnix: number | undefined;
+    endTimeUnix: number | undefined;
+  }
+
+  let { title, startTimeUnix = $bindable(), endTimeUnix = $bindable() }: Props = $props();
   export { startSegment, endSegment };
-  $: {
+  run(() => {
     if (value && $value.start && $value.end) {
       startTimeUnix = Math.floor(
         ($value.start as ZonedDateTime).toDate().getTime() / 1000
@@ -44,7 +50,7 @@
         ($value.end as ZonedDateTime).toDate().getTime() / 1000
       );
     }
-  }
+  });
 </script>
 
 <div class="picker-container">

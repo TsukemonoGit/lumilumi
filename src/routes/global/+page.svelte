@@ -9,7 +9,7 @@
   } from "$lib/stores/stores";
 
   import { generateRandomId, promisePublishEvent } from "$lib/func/nostr";
-  import { onMount, SvelteComponent } from "svelte";
+  import { onMount, type SvelteComponent } from "svelte";
 
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -22,12 +22,14 @@
 
   import type { EventPacket } from "rx-nostr";
   import { page } from "$app/stores";
+  import { writable, type Writable } from "svelte/store";
 
-  let compRef: SvelteComponent;
-  let openGlobalTimeline: boolean;
-  let globalRelays: string[] = [];
-  let tieKey = generateRandomId(2);
-  $: timelineQuery = ["global", "feed", tieKey];
+  let compRef: SvelteComponent | undefined = $state();
+  let openGlobalTimeline: boolean = $state(false);
+  let globalRelays: Writable<string[]> = writable([]);
+  let tieKey = $state(generateRandomId(2));
+  let timelineQuery = $derived(["global", "feed", tieKey]);
+
   const onClickSave = async (relays: string[]) => {
     $nowProgress = true;
     console.log(relays);
@@ -64,35 +66,38 @@
         queryKey: [...timelineQuery, "olderData"],
       });
       tieKey = generateRandomId(2);
-      globalRelays = relays;
+      $globalRelays = relays;
     }
     $nowProgress = false;
   };
 
-  const setRelay = (event: { detail: { relays: string[] } }) => {
-    console.log("setRelay", event);
-    if (event.detail.relays.length > 0) {
-      globalRelays = event.detail.relays;
+  const setRelay = (relays: string[]) => {
+    if (relays.length > 0) {
+      $globalRelays = relays;
     }
     // openGlobalTimeline = true;
   };
-  $: console.log(openGlobalTimeline);
-  $: if (globalRelays.length > 0) {
-    console.log("global");
-    openGlobalTimeline = false;
+  // run(() => {
+  //   console.log(openGlobalTimeline);
+  // });
+  globalRelays.subscribe((value) => {
+    if (value.length > 0) {
+      console.log("global");
+      openGlobalTimeline = false;
 
-    setTimeout(() => {
-      openGlobalTimeline = true;
-    }, 1);
-  }
-  let relaySettei = false;
+      setTimeout(() => {
+        openGlobalTimeline = true;
+      }, 1);
+    }
+  });
+  let relaySettei = $state(false);
   onMount(async () => {
     //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);
     const relay = params.getAll("relay");
     console.log(relay);
     if (relay.length > 0) {
-      globalRelays = relay;
+      $globalRelays = relay;
     } else {
       relaySettei = true;
     }
@@ -102,13 +107,13 @@
     if (navigate.type === "form") {
       return;
     }
-    globalRelays = [];
+    $globalRelays = [];
     //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);
     const relay = params.getAll("relay");
     console.log(relay);
     if (relay.length > 0) {
-      globalRelays = relay;
+      $globalRelays = relay;
     } else {
       relaySettei = true;
 
@@ -119,7 +124,7 @@
       ]);
       console.log("afterNavigate", data);
       if (data) {
-        globalRelays = (data.event.tags as string[][])
+        $globalRelays = (data.event.tags as string[][])
           .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
           .map((tag: string[]) => tag[1]);
       }
@@ -128,7 +133,7 @@
   console.log($page);
 </script>
 
-{#if !$loginUser && globalRelays.length <= 0}
+{#if !$loginUser && $globalRelays.length <= 0}
   <p class="whitespace-pre-wrap break-words p-2">
     {$_("global.explain")}
 
@@ -147,23 +152,38 @@
 {:else}
   <section class="w-full break-words overflow-hidden">
     {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
-      <SetGlobalRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}
-        ><div slot="loading" class="w-full"></div>
-        <div slot="error" class="w-full"></div>
-        <div slot="nodata" class="w-full"></div>
+      <SetGlobalRelays pubkey={$loginUser} relayChange={setRelay}
+        >{#snippet loading()}
+          <div class="w-full"></div>
+        {/snippet}
+        {#snippet error()}
+          <div class="w-full"></div>
+        {/snippet}
+        {#snippet nodata()}
+          <div class="w-full"></div>
+        {/snippet}
+        {#snippet children({ relays })}
+          <!---->
+        {/snippet}
       </SetGlobalRelays>
 
       <Settei
         title={"Global"}
-        relays={globalRelays}
+        relays={$globalRelays}
         {onClickSave}
         Description={GlobalDescription}
       />
     {/if}
 
-    {#if openGlobalTimeline && globalRelays.length > 0}
-      <GlobalTimeline bind:this={compRef} {globalRelays} {timelineQuery} />
+    <!-- {#snippet children()} -->
+    {#if openGlobalTimeline && $globalRelays.length > 0}
+      <GlobalTimeline
+        bind:this={compRef}
+        globalRelays={$globalRelays}
+        {timelineQuery}
+      />
     {/if}
+    <!-- {/snippet} -->
   </section>
 {/if}
 <div class="postWindow">

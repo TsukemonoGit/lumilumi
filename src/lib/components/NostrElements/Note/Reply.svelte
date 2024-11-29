@@ -6,25 +6,29 @@
   import { _ } from "svelte-i18n";
   import { relayRegex } from "$lib/func/regex";
 
-  export let replyTag: string[] | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
-  let loadNote = false;
+  interface Props {
+    replyTag: string[] | undefined;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
+
+  let { replyTag, displayMenu, depth, repostable, tieKey }: Props = $props();
+  let loadNote = $state(false);
 </script>
 
 {#if replyTag}
   {#if !loadNote}
     <button
       class="my-1 flex items-center w-fit px-1 py-0.5 max-w-full font-bold rounded-md text-sm bg-magnum-600 text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
-      on:click={() => (loadNote = true)}
+      onclick={() => (loadNote = true)}
       ><Reply size="20" />{$_("timeline.viewParentPost")}</button
     >
   {:else}
     <button
       class="my-1 flex items-center w-fit px-1 py-0.5 rounded-md bg-magnum-200 text-sm font-bold text-magnum-600 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
-      on:click={() => (loadNote = false)}
+      onclick={() => (loadNote = false)}
       ><Minimize2 size="20" class="mr-1" />{$_(
         "timeline.hideParentPost"
       )}</button

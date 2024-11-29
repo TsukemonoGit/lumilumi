@@ -2,10 +2,21 @@
   import { useGeohash, type Geohash } from "$lib/func/geohash";
   import type { DecodedGeohash } from "$lib/types";
 
-  export let geohash: string;
-  export let decoded: DecodedGeohash;
-  $: ogp = useGeohash(geohash, decoded);
-  $: data = ogp.data;
+  interface Props {
+    geohash: string;
+    decoded: DecodedGeohash;
+    children?: import('svelte').Snippet<[any]>;
+    nodata?: import('svelte').Snippet;
+  }
+
+  let {
+    geohash,
+    decoded,
+    children,
+    nodata
+  }: Props = $props();
+  let ogp = $derived(useGeohash(geohash, decoded));
+  let data = $derived(ogp.data);
 
   interface $$Slots {
     default: { contents: Geohash };
@@ -16,7 +27,7 @@
 </script>
 
 {#if $data}
-  <slot contents={$data} />
+  {@render children?.({ contents: $data, })}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

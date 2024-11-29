@@ -62,8 +62,10 @@ export function setRxNostr() {
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  rxNostr.setDefaultRelays(relays);
-  defaultRelays.set(rxNostr.getDefaultRelays());
+  if (rxNostr && defaultRelays) {
+    rxNostr.setDefaultRelays(relays);
+    defaultRelays.set(rxNostr.getDefaultRelays());
+  }
   set3Relays(relays);
 }
 export function getDefaultWriteRelays(): string[] {
@@ -131,7 +133,10 @@ export function pubkeysIn(
   return followingMap;
 }
 export function setFollowingList(data: Map<string, string | undefined>) {
-  followList.set(data);
+  // console.log(get(followList), data);
+  if (get(followList)) {
+    followList.set(data);
+  }
   // console.log(followingList);
 }
 
@@ -218,6 +223,7 @@ export const makeMainFilters = (
   since: number
 ): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
+
   const pubkeyList = pubkeysIn(contacts, get(loginUser));
   const kinds = [1, 6];
   if (get(showKind16)) {
@@ -265,7 +271,7 @@ export const makeMainFilters = (
       authors: Array.from(pubkeyList.keys()),
     });
   }
-  // console.log(filters);
+  console.log(filters);
 
   return { mainFilters: filters, olderFilters: olderFilters };
 };

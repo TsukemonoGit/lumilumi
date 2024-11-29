@@ -7,8 +7,12 @@
   import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/NostrMainData/Text.svelte";
 
-  export let heyaId: string | undefined;
-  export let tieKey: string | undefined;
+  interface Props {
+    heyaId: string | undefined;
+    tieKey: string | undefined;
+  }
+
+  let { heyaId, tieKey }: Props = $props();
 
   const size = 18;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
@@ -29,7 +33,6 @@
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
-  $: channelLink = getChannelLink(heyaId);
 
   function getChannelLink(heyaId: string | undefined): string {
     if (!heyaId) return "";
@@ -39,48 +42,54 @@
       return "";
     }
   }
+  let channelLink = $derived(getChannelLink(heyaId));
 </script>
 
 {#if heyaId}
-  <Text queryKey={["timeline", heyaId]} id={heyaId} let:text>
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="loading"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="nodata"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    <button
-      title={channelLink}
-      on:click={handleClickToChannel}
-      slot="error"
-      class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-      ><MessagesSquare {size} class="mr-1" />kind:42</button
-    >
-    {@const channelData = getContent(text)}
-    {#if channelData}
+  <Text queryKey={["timeline", heyaId]} id={heyaId}>
+    {#snippet loading()}
       <button
         title={channelLink}
-        on:click={handleClickToChannel}
+        onclick={handleClickToChannel}
         class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        ><MessagesSquare {size} class="mr-1" />kind:42</button
       >
-        <MessagesSquare {size} class="mr-1" />{channelData.name}
-      </button>
-    {:else}
+    {/snippet}
+    {#snippet nodata()}
       <button
         title={channelLink}
-        on:click={handleClickToChannel}
+        onclick={handleClickToChannel}
         class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        ><MessagesSquare {size} class="mr-1" />kind:42</button
       >
-        <MessagesSquare {size} class="mr-1" />kind:42
-      </button>
-    {/if}
+    {/snippet}
+    {#snippet error()}
+      <button
+        title={channelLink}
+        onclick={handleClickToChannel}
+        class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        ><MessagesSquare {size} class="mr-1" />kind:42</button
+      >
+    {/snippet}
+    {#snippet content({ data: text })}
+      {@const channelData = getContent(text)}
+      {#if channelData}
+        <button
+          title={channelLink}
+          onclick={handleClickToChannel}
+          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        >
+          <MessagesSquare {size} class="mr-1" />{channelData.name}
+        </button>
+      {:else}
+        <button
+          title={channelLink}
+          onclick={handleClickToChannel}
+          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+        >
+          <MessagesSquare {size} class="mr-1" />kind:42
+        </button>
+      {/if}
+    {/snippet}
   </Text>
 {/if}

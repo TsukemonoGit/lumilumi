@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
@@ -15,18 +16,37 @@
   } from "rx-nostr";
   import { getMetadata } from "$lib/func/nostr";
 
-  export let queryKey: QueryKey;
-  export let pubkey: string;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | undefined = undefined;
+  interface Props {
+    queryKey: QueryKey;
+    pubkey: string;
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  let initialDataUpdatedAt: number;
+    content?: import("svelte").Snippet<
+      [{ metadata: Nostr.Event; status: ReqStatus }]
+    >;
+  }
+  let {
+    req = undefined,
+    pubkey,
+    queryKey,
+
+    error,
+    loading,
+    nodata,
+    content,
+  }: Props = $props();
+
+  //let initialDataUpdatedAt: number;
   const staleTime: number = Infinity;
   let refetchInterval: number = Infinity;
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
@@ -47,19 +67,21 @@
   //}
   // }
 
-  $: result = useMetadata(
-    $app.rxNostr,
-    queryKey,
-    pubkey,
-    req,
-    initData,
-    staleTime,
-    initialDataUpdatedAt,
-    refetchInterval
+  let result = $derived(
+    useMetadata(
+      $app.rxNostr,
+      queryKey,
+      pubkey,
+      req,
+      initData,
+      staleTime,
+      undefined,
+      refetchInterval
+    )
   );
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
+  let data = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface $$Slots {
@@ -68,15 +90,17 @@
     error: { error: Error };
     nodata: Record<never, never>;
   }
-  $: metadata = $data?.event ?? localData?.event;
+  let metadata = $derived($data?.event ?? localData?.event);
+  //$inspect(metadata);
 </script>
 
 {#if metadata}
-  <slot {metadata} status={$status} />
-{:else if $error}
-  <slot name="error" error={$error} />
+  {@render content?.({ metadata: metadata, status: $status })}
+  <!-- <slot {metadata} status={$status} /> -->
+{:else if $errorData}
+  {@render error?.($errorData)}
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

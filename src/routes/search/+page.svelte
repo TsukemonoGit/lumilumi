@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { promisePublishEvent } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
@@ -24,32 +26,25 @@
   import { nip50relays } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";
 
-  export let data: {
-    searchWord: string;
-    searchKind: number | undefined;
-    searchPubkey: string;
-    searchHashtag: string;
-    searchSince: number | undefined;
-    searchUntil: number | undefined;
-    searchPubkeyTo: string;
-    followee: boolean;
-  };
+  import type { PageData } from "./$types";
 
-  let searchWord = "";
-  let searchKind: number | undefined;
-  let searchPubkey = "";
-  let searchSince: number | undefined;
-  let searchUntil: number | undefined;
-  let searchHashtag: string | undefined;
-  let searchPubkeyTo: string = "";
-  let followee = false;
+  let { data }: { data: PageData } = $props();
+
+  let searchWord: string | undefined = $state();
+  let searchKind: number | undefined = $state();
+  let searchPubkey = $state("");
+  let searchSince: number | undefined = $state();
+  let searchUntil: number | undefined = $state();
+  let searchHashtag: string | undefined = $state();
+  let searchPubkeyTo: string = $state("");
+  let followee = $state(false);
   const filters: Writable<Nostr.Filter[]> = writable([]);
-  let showFilters: Nostr.Filter[];
+  let showFilters: Nostr.Filter[] = $state([]);
 
-  let compRef: SvelteComponent;
-  let openSearchResult = false;
+  let compRef: SvelteComponent | undefined = $state();
+  let openSearchResult = $state(false);
 
-  let searchRelays = nip50relays;
+  let searchRelays = $state(nip50relays);
   function updateQueryParams() {
     const params = new URLSearchParams(window.location.search);
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
@@ -80,12 +75,7 @@
       init();
     }
   });
-  let readUrls: string[];
-  $: if ($defaultRelays) {
-    readUrls = Object.values($defaultRelays)
-      .filter((config) => config.read)
-      .map((config) => config.url);
-  }
+  let readUrls: string[] = $state([]);
 
   async function waitForDefaultRelays(maxWaitTime: number) {
     const interval = 100; // 100ms ごとにチェック
@@ -156,19 +146,6 @@
     }
   });
 
-  $: if (
-    searchKind === searchKind ||
-    searchHashtag ||
-    searchWord ||
-    searchPubkey ||
-    searchPubkeyTo ||
-    searchSince ||
-    searchUntil ||
-    followee
-  ) {
-    createFilter();
-  }
-
   function getHex(str: string): string {
     try {
       return nip19.decode(str).data as string;
@@ -179,8 +156,8 @@
   }
 
   function createFilter() {
-    searchPubkey = searchPubkey.trim();
-    searchPubkeyTo = searchPubkeyTo.trim();
+    searchPubkey = searchPubkey?.trim() ?? "";
+    searchPubkeyTo = searchPubkeyTo?.trim() ?? "";
     $filters = [
       {
         search: searchWord || undefined,
@@ -289,18 +266,45 @@
     $nowProgress = false;
   };
 
-  const setRelay = (event: { detail: { relays: string[] } }) => {
-    console.log(event);
-    searchRelays = event.detail.relays;
+  const setRelay = (relays: string[]) => {
+    console.log(relays);
+    searchRelays = relays;
   };
+  run(() => {
+    if ($defaultRelays) {
+      readUrls = Object.values($defaultRelays)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
+  });
+  run(() => {
+    if (
+      searchKind === searchKind ||
+      searchHashtag ||
+      searchWord ||
+      searchPubkey ||
+      searchPubkeyTo ||
+      searchSince ||
+      searchUntil ||
+      followee
+    ) {
+      createFilter();
+    }
+  });
 </script>
 
 <section>
   {#if $loginUser}
-    <SetSearchRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}>
-      <div slot="loading" class="w-full"></div>
-      <div slot="error" class="w-full"></div>
-      <div slot="nodata" class="w-full"></div>
+    <SetSearchRelays pubkey={$loginUser} relayChange={setRelay}>
+      {#snippet loading()}
+        <div class="w-full"></div>
+      {/snippet}
+      {#snippet error()}
+        <div class="w-full"></div>
+      {/snippet}
+      {#snippet nodata()}
+        <div class="w-full"></div>
+      {/snippet}
     </SetSearchRelays>
 
     <Settei
@@ -322,10 +326,11 @@
     {resetValue}
     {filters}
   />
+
   {#if openSearchResult}
     <SearchResult
       bind:this={compRef}
-      bind:filters={showFilters}
+      filters={showFilters}
       relays={searchRelays}
     />
   {/if}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import {
     defaultRelays,
@@ -22,7 +24,12 @@
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
 
-  import { createTie, now, type EventPacket } from "rx-nostr";
+  import {
+    createTie,
+    now,
+    type DefaultRelayConfig,
+    type EventPacket,
+  } from "rx-nostr";
 
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
@@ -39,42 +46,96 @@
 
   const sift = 40; //スライドする量
 
-  export let queryKey: QueryKey;
-  export let filters: Nostr.Filter[];
-  // export let lastfavcheck: boolean = true;
+  let untilTime: number;
+  let updating: boolean = false;
+  let timeoutId: NodeJS.Timeout | null = null;
+  interface Props {
+    queryKey: QueryKey;
+    filters: Nostr.Filter[];
+    // export let lastfavcheck: boolean = true;
+    viewIndex: number;
+    amount: number; //1ページに表示する量
+    eventFilter?: (event: Nostr.Event) => boolean; // デフォルトフィルタ
+    relays?: string[] | undefined; //emitにしていするいちじりれー
+    // >;
+    tieKey: string;
+    updateViewEvent?: any;
+    children?: import("svelte").Snippet<[any]>;
+  }
 
-  export let viewIndex: number;
-  export let amount: number; //1ページに表示する量
-  export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
-  export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  // export let tie: OperatorFunction<
-  //   EventPacket,
-  //   EventPacket & {
-  //     seenOn: Set<string>;
-  //     isNew: boolean;
-  //   }
-  // >;
+  let {
+    queryKey,
+    filters,
+    viewIndex = $bindable(),
+    amount,
+    eventFilter = () => true,
+    relays = undefined,
+    tieKey,
+    updateViewEvent = $bindable<() => void>(),
+    children,
+  }: Props = $props();
 
-  export let tieKey: string;
+  (updateViewEvent = () => {
+    if (updating) {
+      return;
+    }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
 
-  createQuery({
-    queryKey: queryKey,
-    queryFn: undefined,
-    staleTime: Infinity, // 4 hour
-    gcTime: Infinity, // 4 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
+    timeoutId = setTimeout(() => {
+      updating = true;
+
+      const allEvents: EventPacket[] | undefined =
+        $queryClient.getQueryData(queryKey);
+      console.log("updateViewEvent");
+
+      if (!allEvents) {
+        updating = false;
+        return;
+      }
+
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+      const uniqueEvents = sortEvents(
+        Array.from(
+          new Map(
+            allEvents.map((event) => [event.event.id, event.event])
+          ).values()
+        )
+      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+
+      allUniqueEvents = uniqueEvents
+        .filter(eventFilter)
+        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+
+      slicedEvent.update((value) =>
+        allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      );
+      $slicedEvent = $slicedEvent;
+      updating = false;
+    }, 50); // 連続で実行されるのを防ぐ
+    //console.log($slicedEvent);
+  }),
+    // export let tie: OperatorFunction<
+    //   EventPacket,
+    //   EventPacket & {
+    //     seenOn: Set<string>;
+    //     isNew: boolean;
+    //   }
+
+    createQuery({
+      queryKey: queryKey,
+      queryFn: undefined,
+      staleTime: Infinity, // 4 hour
+      gcTime: Infinity, // 4 hour
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
 
   const [tie, tieMap] = createTie();
-  $: if (tieKey) {
-    //$tieMapStore = { undefined: undefined };
-    if (!$tieMapStore) {
-      $tieMapStore = { [tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
-    }
-  }
 
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -89,7 +150,6 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  $: operator = pipe(tie, uniq, scanArray());
 
   // $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   const observer = new QueryObserver($queryClient, {
@@ -105,15 +165,7 @@
 
   // $: status = result.status;
   // $: error = result.error;
-  let readUrls: string[] = [];
-  $: if ($defaultRelays) {
-    readUrls = Object.values($defaultRelays)
-      .filter((config) => config.read)
-      .map((config) => config.url);
-  }
-  $: if ($data?.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
-    updateViewEvent();
-  }
+  let readUrls: string[] = $state([]);
   //$: console.log(data);
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);
@@ -231,53 +283,6 @@
       }, 100);
     }
   };
-  let untilTime: number;
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
-  export let updateViewEvent = () => {
-    if (updating) {
-      return;
-    }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(() => {
-      updating = true;
-
-      const allEvents: EventPacket[] | undefined =
-        $queryClient.getQueryData(queryKey);
-      console.log("updateViewEvent");
-
-      if (!allEvents) {
-        updating = false;
-        return;
-      }
-
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
-      const uniqueEvents = sortEvents(
-        Array.from(
-          new Map(
-            allEvents.map((event) => [event.event.id, event.event])
-          ).values()
-        )
-      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
-
-      allUniqueEvents = uniqueEvents
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
-
-      slicedEvent.update((value) =>
-        allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      );
-      $slicedEvent = $slicedEvent;
-      updating = false;
-    }, 50); // 連続で実行されるのを防ぐ
-    //console.log($slicedEvent);
-  };
 
   function handleClickTop() {
     viewIndex = 0;
@@ -287,13 +292,36 @@
   onDestroy(() => {
     console.log("test");
   });
+  // run(() => {
+  if (tieKey) {
+    //$tieMapStore = { undefined: undefined };
+    if (!$tieMapStore) {
+      $tieMapStore = { [tieKey]: [tie, tieMap] };
+    } else if (!$tieMapStore?.[tieKey]) {
+      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+    }
+  }
+  // });
+  let operator = $derived(pipe(tie, uniq, scanArray()));
+  defaultRelays.subscribe((value: Record<string, DefaultRelayConfig>) => {
+    if (value) {
+      readUrls = Object.values(value)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
+  });
+  data.subscribe((value) => {
+    if (value && value.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
+      updateViewEvent();
+    }
+  });
 </script>
 
 {#if viewIndex !== 0}
   <div class=" w-full">
     <button
       class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      on:click={() => handleClickTop()}
+      onclick={() => handleClickTop()}
       disabled={$nowProgress}
       ><SkipForward
         size={20}
@@ -303,7 +331,7 @@
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      on:click={() => handlePrev()}
+      onclick={() => handlePrev()}
       ><Triangle
         size={20}
         class="mx-auto stroke-magnum-100 fill-magnum-100"
@@ -316,13 +344,13 @@
 {/if}
 
 {#if $slicedEvent && $slicedEvent?.length > 0}
-  <slot events={$slicedEvent} len={$data?.length ?? 0} />
+  {@render children?.({ events: $slicedEvent, len: $data?.length ?? 0 })}
 {/if}
 {#if $slicedEvent && $slicedEvent?.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    on:click={() => handleNext()}
+    onclick={() => handleNext()}
     ><Triangle
       size={20}
       class="rotate-180 stroke-magnum-100 fill-magnum-100"

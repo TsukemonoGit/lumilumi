@@ -15,10 +15,15 @@
   import AddMute from "./AddMute.svelte";
 
   import MuteTabList from "./MuteTabList.svelte";
+  import { writable } from "svelte/store";
 
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+  }
+
+  let { pubkey = $bindable() }: Props = $props();
   //export let muteList: LumiMute | undefined;
-  let dialogOpen: any;
+  let dialogOpen: any = writable(false);
   async function handleClickMute() {
     const beforeList = $mutes?.event;
     try {
@@ -86,28 +91,32 @@
 <button
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickMute}>Mute</button
+  onclick={handleClickMute}>Mute</button
 ><time class="ml-2"
   >{$_("settings.lastUpdated")}: {$mutes
     ? formatAbsoluteDate($mutes?.updated)
     : ""}</time
 >{#if $mutes}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    on:click={() => ($dialogOpen = true)}>view data</button
+    onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    {#if $mutes}
-      <AddMute />
-      <MuteTabList />
-    {/if}<a
-      class="underline text-magnum-300 break-all ml-4 text-sm"
-      target="_blank"
-      rel="noopener noreferrer"
-      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/10000"
-    >
-      {$_("settings.nostviewstr.kind10000")}
-    </a>
-  </div>
+<Dialog open={dialogOpen}>
+  {#snippet main()}
+    <div>
+      {#if $mutes}
+        <AddMute />
+        <MuteTabList />
+      {/if}<a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10000"
+      >
+        {$_("settings.nostviewstr.kind10000")}
+      </a>
+    </div>
+  {/snippet}
 </Dialog>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import RelayStatus from "$lib/components/RelayStatus.svelte";
   import { SlidersHorizontal } from "lucide-svelte";
   import { currentPage } from "./menu";
@@ -9,7 +11,7 @@
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
 
-  let openPopover: any;
+  let openPopover: any = $state();
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],
@@ -27,19 +29,26 @@
     value: selected,
   });
   // $: console.log($timelineFilter.adaptMute);
-  $: $timelineFilter.selectCanversation = Number($selected);
-  $: if ($timelineFilter) {
-    localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
-  }
-  $: localStorage.setItem("showBanner", $showBanner.toString());
+  run(() => {
+    $timelineFilter.selectCanversation = Number($selected);
+  });
+  run(() => {
+    if ($timelineFilter) {
+      localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
+    }
+  });
+  run(() => {
+    localStorage.setItem("showBanner", $showBanner.toString());
+  });
 </script>
 
 <header>
   <div class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
     <div class="flex w-full h-8 justify-center items-center gap-4">
       {#if $currentPage?.Icon}
+        {@const SvelteComponent = $currentPage.Icon}
         <div>
-          <svelte:component this={$currentPage.Icon} />
+          <SvelteComponent />
         </div>
       {/if}
       <div class="uppercase font-bold">
@@ -53,7 +62,7 @@
         <div class="container relative">
           <div class="option">
             <Popover
-              bind:open={openPopover}
+              open={openPopover}
               ariaLabel="timeline filter setting"
               showCloseButton={true}
             >
@@ -63,65 +72,66 @@
               >
                 <SlidersHorizontal size={16} />Options
               </div>
-              <div
-                slot="popoverContent"
-                class="w-[320px] max-w-full flex flex-col"
-              >
-                <ul>
-                  {#if $currentPage?.alt === "home"}
-                    <li class="mb-2">
-                      <div class="label">{$_("filter.menu.canversation")}</div>
-                      <div
-                        use:melt={$root}
-                        class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
-                        aria-label="View density"
-                      >
-                        {#each optionsArr as [index, option]}
-                          <div class="flex items-center gap-3">
-                            <button
-                              use:melt={$item(index)}
-                              class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
-      hover:bg-magnum-800"
-                              id={option}
-                              aria-labelledby="{option}-label"
-                            >
-                              {#if $isChecked(index)}
-                                <div
-                                  class="h-3 w-3 rounded-full bg-magnum-400"
-                                />
-                              {/if}
-                            </button>
-                            <label for={option} id="{option}-label">
-                              {option}
-                            </label>
-                          </div>
-                        {/each}
-                        <input name="line-height" use:melt={$hiddenInput} />
-                      </div>
+              {#snippet popoverContent()}
+                <div class="w-[320px] max-w-full flex flex-col">
+                  <ul>
+                    {#if $currentPage?.alt === "home"}
+                      <li class="mb-2">
+                        <div class="label">
+                          {$_("filter.menu.canversation")}
+                        </div>
+                        <div
+                          use:melt={$root}
+                          class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
+                          aria-label="View density"
+                        >
+                          {#each optionsArr as [index, option]}
+                            <div class="flex items-center gap-3">
+                              <button
+                                use:melt={$item(index)}
+                                class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
+        hover:bg-magnum-800"
+                                id={option}
+                                aria-labelledby="{option}-label"
+                              >
+                                {#if $isChecked(index)}
+                                  <div
+                                    class="h-3 w-3 rounded-full bg-magnum-400"
+                                  ></div>
+                                {/if}
+                              </button>
+                              <label for={option} id="{option}-label">
+                                {option}
+                              </label>
+                            </div>
+                          {/each}
+                          <input name="line-height" use:melt={$hiddenInput} />
+                        </div>
+                      </li>
+                    {/if}
+                    <li>
+                      <label class="label">
+                        <input
+                          type="checkbox"
+                          class="rounded-checkbox"
+                          bind:checked={$timelineFilter.adaptMute}
+                        />
+                        {$_("filter.menu.muteOn")}
+                      </label>
                     </li>
-                  {/if}
-                  <li>
-                    <label class="label">
-                      <input
-                        type="checkbox"
-                        class="rounded-checkbox"
-                        bind:checked={$timelineFilter.adaptMute}
-                      />
-                      {$_("filter.menu.muteOn")}
-                    </label>
-                  </li>
-                  <li>
-                    <label class="label">
-                      <input
-                        type="checkbox"
-                        class="rounded-checkbox"
-                        bind:checked={$showBanner}
-                      />
-                      {$_("settings.display.banner")}
-                    </label>
-                  </li>
-                </ul>
-              </div></Popover
+                    <li>
+                      <label class="label">
+                        <input
+                          type="checkbox"
+                          class="rounded-checkbox"
+                          bind:checked={$showBanner}
+                        />
+                        {$_("settings.display.banner")}
+                      </label>
+                    </li>
+                  </ul>
+                </div>
+              {/snippet}</Popover
             >
           </div>
         </div>

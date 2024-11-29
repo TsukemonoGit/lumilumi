@@ -136,7 +136,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
             in:send={{ key: "trigger" }}
             out:receive={{ key: "trigger" }}
             class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400"
-          />
+></div>
         {/if}
       </button>
     {/each}
@@ -150,7 +150,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
           {word}
           <button
             class="remove"
-            on:click={() => handleClickRemove(["word", word])}
+            onclick={() => handleClickRemove(["word", word])}
             ><X size={20} /></button
           >
         </li>
@@ -164,7 +164,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
       {#each $mutes.list.t as t, index}
         <li>
           {t}
-          <button class="remove" on:click={() => handleClickRemove(["t", t])}
+          <button class="remove" onclick={() => handleClickRemove(["t", t])}
             ><X size={20} /></button
           >
         </li>
@@ -178,7 +178,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
       {#each $mutes.list.p as p, index}
         <li>
           {nip19.npubEncode(p)}
-          <button class="remove" on:click={() => handleClickRemove(["p", p])}
+          <button class="remove" onclick={() => handleClickRemove(["p", p])}
             ><X size={20} /></button
           >
         </li>
@@ -194,7 +194,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
         <li>
           {nip19.noteEncode(e)}<button
             class="remove"
-            on:click={() => handleClickRemove(["e", e])}><X size={20} /></button
+            onclick={() => handleClickRemove(["e", e])}><X size={20} /></button
           >
         </li>
       {/each}

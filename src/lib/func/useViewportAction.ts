@@ -1,24 +1,37 @@
-let intersectionObserver: IntersectionObserver;
+import type { Action } from "svelte/action";
 
-function ensureIntersectionObserver() {
-  if (intersectionObserver) return;
-
-  intersectionObserver = new IntersectionObserver((entries) => {
+// Svelte アクションとしての `viewport`
+export const viewport: Action<
+  HTMLElement,
+  null,
+  {
+    onenterViewport?: (e: CustomEvent) => void; // ビューポートに入った際のコールバック
+    onexitViewport?: (e: CustomEvent) => void; // ビューポートから出た際のコールバック
+  }
+> = (node) => {
+  // IntersectionObserver のコールバック
+  const callback: IntersectionObserverCallback = (entries) => {
     entries.forEach((entry) => {
-      const eventName = entry.isIntersecting ? "enterViewport" : "exitViewport";
-      entry.target.dispatchEvent(new CustomEvent(eventName)); // カスタムイベントを発火
+      if (entry.isIntersecting) {
+        //   console.log("enter");
+        node.dispatchEvent(new CustomEvent("enterViewport"));
+      } else {
+        //    console.log("exit");
+        node.dispatchEvent(new CustomEvent("exitViewport"));
+      }
     });
-  });
-}
+  };
 
-export default function viewport(element: HTMLElement) {
-  ensureIntersectionObserver();
+  // 各ノードごとに個別の IntersectionObserver を作成
+  const intersectionObserver = new IntersectionObserver(callback);
 
-  intersectionObserver.observe(element);
+  // このノードを監視対象に追加
+  intersectionObserver.observe(node);
 
   return {
     destroy() {
-      intersectionObserver.unobserve(element); // クリーンアップ
+      // ノードの監視を解除
+      intersectionObserver.unobserve(node);
     },
   };
-}
+};

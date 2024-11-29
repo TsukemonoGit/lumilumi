@@ -6,44 +6,53 @@
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import UserName from "./UserName.svelte";
 
-  import viewport from "$lib/func/useViewportAction";
   import NaddrEvent from "./NaddrEvent.svelte";
-  export let displayMenu: boolean;
-  export let content: string | undefined;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
-  export let decoded:
-    | {
-        type: "naddr";
-        data: nip19.AddressPointer;
-      }
-    | {
-        type: "nevent";
-        data: nip19.EventPointer;
-      }
-    | {
-        type: "nprofile";
-        data: nip19.ProfilePointer;
-      }
-    | {
-        type: "nsec";
-        data: Uint8Array;
-      }
-    | {
-        type: "npub" | "note";
-        data: string;
-      };
+  import { viewport } from "$lib/func/useViewportAction";
+  import { writable } from "svelte/store";
+  interface Props {
+    displayMenu: boolean;
+    content: string | undefined;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+    decoded:
+      | {
+          type: "naddr";
+          data: nip19.AddressPointer;
+        }
+      | {
+          type: "nevent";
+          data: nip19.EventPointer;
+        }
+      | {
+          type: "nprofile";
+          data: nip19.ProfilePointer;
+        }
+      | {
+          type: "nsec";
+          data: Uint8Array;
+        }
+      | {
+          type: "npub" | "note";
+          data: string;
+        };
+  }
 
-  let hasLoaded = false;
+  let { displayMenu, content, depth, repostable, tieKey, decoded }: Props =
+    $props();
+
+  let hasLoaded = $state(false);
   const handleEnterViewport = () => {
-    hasLoaded = true;
+    if (!hasLoaded) {
+      //console.log("decoded content enter viewport", hasLoaded);
+      hasLoaded = true;
+    }
   };
 </script>
 
 <div
   use:viewport
-  on:enterViewport={handleEnterViewport}
+  onenterViewport={handleEnterViewport}
   class="inline overflow-hidden"
 >
   {#if hasLoaded}{#if decoded.type === "npub"}<span

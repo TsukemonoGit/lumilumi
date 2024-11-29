@@ -47,21 +47,23 @@
     <ChannelMain
       queryKey={["kind10005", $loginUser]}
       pubkey={$loginUser}
-      let:event
+      
     >
-      {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
-        <div
-          class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
-        >
-          <ChannelMetadata
-            handleClickToChannel={() => handleClickToChannel(id)}
-            {id}
-            linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-            {tieKey}
-          />
-        </div>
-      {/each}
-    </ChannelMain>
+      {#snippet children({ event })}
+            {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
+          <div
+            class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
+          >
+            <ChannelMetadata
+              handleClickToChannel={() => handleClickToChannel(id)}
+              {id}
+              linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+              {tieKey}
+            />
+          </div>
+        {/each}
+                {/snippet}
+        </ChannelMain>
 
     <Link
       className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "

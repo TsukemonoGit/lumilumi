@@ -9,18 +9,23 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
-  export let note: Nostr.Event;
-  export let data: {
-    ogp: Ogp;
-    url: string;
-  };
-  export let metadata: Nostr.Event | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    note: Nostr.Event;
+    data: {
+      ogp: Ogp;
+      url: string;
+    };
+    metadata: Nostr.Event | undefined;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
 
-  $: prof = profile(metadata);
+  let { note, data, metadata, displayMenu, depth, repostable, tieKey }: Props =
+    $props();
+
+  let prof = $derived(profile(metadata));
 </script>
 
 <div class=" break-all overflow-x-hidden gap-4 p-1">
@@ -29,7 +34,7 @@
       <div>
         <UserMenu
           pubkey={note.pubkey}
-          bind:metadata
+          {metadata}
           size={20}
           {displayMenu}
           {depth}

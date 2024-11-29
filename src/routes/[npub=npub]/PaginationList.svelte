@@ -1,12 +1,19 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { createPagination, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
 
   import { onMount } from "svelte";
 
-  export let list: string[];
-  export let tieKey: string;
-  let paginationElement: Element | null;
+  interface Props {
+    list: string[];
+    tieKey: string;
+    children?: import("svelte").Snippet<[any]>;
+  }
+
+  let { list, tieKey, children }: Props = $props();
+  let paginationElement: Element | null | undefined = $state();
   onMount(() => {
     paginationElement = document?.querySelector("#pagination");
   });
@@ -15,17 +22,7 @@
   //   next,
   // }) => {
   //   console.log(curr, next);
-  $: if ($range) {
-    console.log($range);
-    setTimeout(() => {
-      paginationElement?.scrollIntoView({
-        block: "start",
-        inline: "nearest",
-        behavior: "instant",
-      });
-      window.scrollBy(0, -150);
-    }, 1);
-  }
+
   //   return next;
   // };
 
@@ -40,7 +37,21 @@
     //onPageChange: handleChange,
   });
 
-  $: viewList = list.slice($range.start, $range.end);
+  let viewList = $derived(list.slice($range.start, $range.end));
+
+  range.subscribe((value) => {
+    if (value) {
+      console.log(value);
+      setTimeout(() => {
+        paginationElement?.scrollIntoView({
+          block: "start",
+          inline: "nearest",
+          behavior: "instant",
+        });
+        window.scrollBy(0, -150);
+      }, 1);
+    }
+  });
 </script>
 
 <div
@@ -82,10 +93,10 @@
       {$range.start} - {$range.end}
     </p>
   </nav>
-  {#each viewList as pubhex, index}<slot
-      id={pubhex}
-      index={index + $range.start}
-    />{/each}
+  {#each viewList as pubhex, index}{@render children?.({
+      id: pubhex,
+      index: index + $range.start,
+    })}{/each}
   <nav
     class="flex flex-col items-center"
     aria-label="pagination"

@@ -59,26 +59,28 @@
       <ListMain
         queryKey={["kind30000", $loginUser]}
         pubkey={$loginUser}
-        let:events
+        
       >
-        {@const peopleList = filtered(events)}
-        {#if peopleList.length === 0}
-          <Link
-            className="underline text-magnum-300 break-all "
-            href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
-            >{$_("nostviewstr.kind30000")}</Link
-          >
-        {:else}
-          {#each peopleList as event}
-            <button
-              on:click={() => handleClickToList(event)}
-              class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
+        {#snippet children({ events })}
+                {@const peopleList = filtered(events)}
+          {#if peopleList.length === 0}
+            <Link
+              className="underline text-magnum-300 break-all "
+              href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
+              >{$_("nostviewstr.kind30000")}</Link
             >
-              <ListLinkCard {event} depth={0} {tieKey} /></button
-            >
-          {/each}
-        {/if}
-      </ListMain>
+          {:else}
+            {#each peopleList as event}
+              <button
+                onclick={() => handleClickToList(event)}
+                class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
+              >
+                <ListLinkCard {event} depth={0} {tieKey} /></button
+              >
+            {/each}
+          {/if}
+                      {/snippet}
+            </ListMain>
       <div
         class=" border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
       >

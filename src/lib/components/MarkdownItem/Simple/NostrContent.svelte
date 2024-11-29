@@ -7,19 +7,30 @@
   import DecodedContent from "$lib/components/NostrElements/Note/DecodedContent.svelte";
   import ContentImage from "$lib/components/NostrElements/Note/content/ContentImage.svelte";
 
-  export let text: string;
-  export let tags: string[][];
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    text: string;
+    tags: string[][];
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
+
+  let {
+    text,
+    tags,
+    displayMenu,
+    depth,
+    repostable,
+    tieKey
+  }: Props = $props();
   //プレビューにも使ってるからconstだとだめ
-  $: parts = parseText(text, tags);
+  let parts = $derived(parseText(text, tags));
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  $: mediaList = parts.filter(
+  let mediaList = $derived(parts.filter(
     (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-  );
+  ));
 
   //let modalIndex = 0;
   const openModal = (index: number) => {
@@ -64,8 +75,8 @@
       return undefined;
     }
   };
-  let imgError: boolean = false;
-  let imgLoad: boolean = false;
+  let imgError: boolean = $state(false);
+  let imgLoad: boolean = $state(false);
 </script>
 
 <!-- <MediaDisplay
@@ -126,8 +137,8 @@
         src={part.url}
         title={`:${part.content}:`}
         class="inline h-[24px] object-contain m-0 overflow-hidden"
-        on:load={() => (imgLoad = true)}
-        on:error={() => (imgError = true)}
+        onload={() => (imgLoad = true)}
+        onerror={() => (imgError = true)}
       />{:else}:{part.content}:{/if}{:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}

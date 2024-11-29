@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { eventKinds } from "$lib/func/kinds";
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { fly } from "svelte/transition";
 
-  export let selectedKind: number | undefined = undefined;
+  interface Props {
+    selectedKind?: number | undefined;
+  }
+
+  let { selectedKind = $bindable(undefined) }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow },
 
@@ -14,8 +20,12 @@
     forceVisible: true,
     loop: true,
   });
-  $: console.log($item);
-  $: console.log($locale);
+  run(() => {
+    console.log($item);
+  });
+  run(() => {
+    console.log($locale);
+  });
   locale;
 </script>
 
@@ -33,7 +43,7 @@
       <div
         class="item"
         use:melt={$item}
-        on:m-click={(e) => {
+        onm-click={(e) => {
           selectedKind = kind;
         }}
       >

@@ -19,13 +19,18 @@
   import type { EventPacket } from "rx-nostr";
 
   import { createRxNostr } from "rx-nostr/src";
-  import { get } from "svelte/store";
+  import { get, writable, type Writable } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
   import { emojiShortcodeRegex, nip33Regex } from "$lib/func/regex";
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+  }
+
+  let { pubkey = $bindable() }: Props = $props();
   // export let emojiList: LumiEmoji | undefined;
-  let dialogOpen: any;
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
   async function handleClickEmoji() {
     const beforeEvent = $emojis?.event;
     let list: string[][] = [];
@@ -183,43 +188,47 @@
 <button
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickEmoji}>Emoji</button
+  onclick={handleClickEmoji}>Emoji</button
 ><time class="ml-2"
   >{$_("settings.lastUpdated")}: {$emojis
     ? formatAbsoluteDate($emojis?.updated)
     : ""}</time
 >{#if $emojis}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    on:click={() => ($dialogOpen = true)}>view data</button
+    onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    {#if $emojis}
-      <h2 class="m-0 text-lg font-medium">EmojiList</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
-      >
-        {#each $emojis.list as e, index}
-          <div
-            class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
-          >
-            {#if $showImg}<img
-                loading="lazy"
-                class="h-12 object-contain justify-self-center"
-                src={e[1]}
-                alt={e[0]}
-              />{:else}{e[1]}{/if}
-            <div class="break-keep">{e[0]}</div>
-          </div>
-        {/each}
-      </div>
-    {/if}<a
-      class="underline text-magnum-300 break-all ml-4 text-sm"
-      target="_blank"
-      rel="noopener noreferrer"
-      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/10030"
-      >{$_("settings.nostviewstr.kind10030")}
-    </a>
-  </div>
+  {#snippet main()}
+    <div>
+      {#if $emojis}
+        <h2 class="m-0 text-lg font-medium">EmojiList</h2>
+        <div
+          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
+        >
+          {#each $emojis.list as e, index}
+            <div
+              class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
+            >
+              {#if $showImg}<img
+                  loading="lazy"
+                  class="h-12 object-contain justify-self-center"
+                  src={e[1]}
+                  alt={e[0]}
+                />{:else}{e[1]}{/if}
+              <div class="break-keep">{e[0]}</div>
+            </div>
+          {/each}
+        </div>
+      {/if}<a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10030"
+        >{$_("settings.nostviewstr.kind10030")}
+      </a>
+    </div>
+  {/snippet}
 </Dialog>

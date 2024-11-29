@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
@@ -26,64 +28,95 @@
   import { locale } from "svelte-i18n";
   import { page } from "$app/stores";
   import { nostviewstrable } from "$lib/func/constants";
-  import { nip19Regex, urlRegex } from "$lib/func/regex";
-  import { translateText } from "$lib/func/util";
-  export let note: Nostr.Event;
-  export let indexes: number[] | undefined = undefined;
-  export let TriggerIcon = Ellipsis;
-  export let iconSize = 20;
-  export let iconClass = "";
-  export let tieKey: string | undefined;
 
-  let dialogOpen: any;
+  import { translateText } from "$lib/func/util";
+  import { writable, type Writable } from "svelte/store";
+  interface Props {
+    note: Nostr.Event;
+    indexes?: number[] | undefined;
+    TriggerIcon?: any;
+    iconSize?: number;
+    iconClass?: string;
+    tieKey: string | undefined;
+  }
+
+  let {
+    note,
+    indexes = undefined,
+    TriggerIcon = Ellipsis,
+    iconSize = 20,
+    iconClass = "",
+    tieKey,
+  }: Props = $props();
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: {
+    update: (
+      updater: import("svelte/store").Updater<boolean>,
+      sideEffect?: ((newValue: boolean) => void) | undefined
+    ) => void;
+    set: (this: void, value: boolean) => void;
+    subscribe(
+      this: void,
+      run: import("svelte/store").Subscriber<boolean>,
+      invalidate?: any
+    ): import("svelte/store").Unsubscriber;
+    get: () => boolean;
+    destroy?: (() => void) | undefined;
+  };
+
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
     (note.kind >= 10000 && note.kind < 20000) ||
     note.kind === 0 ||
     note.kind === 3;
-  let menuTexts = [
-    {
-      text: $_("menu.copy.text"),
-      icon: NotepadText,
-      num: 8,
-    },
-    {
-      text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
-      icon: Copy,
-      num: 3,
-    },
-    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-    { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-    { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
-    { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
-  ];
 
-  //30030 emojitoリンク
-  if (note.kind === 30030) {
-    menuTexts?.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
-  }
+  let menuTexts = $derived.by(() => {
+    let menu = [
+      {
+        text: $_("menu.copy.text"),
+        icon: NotepadText,
+        num: 8,
+      },
+      {
+        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
+        icon: Copy,
+        num: 3,
+      },
+      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
+      { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
+      { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+      { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
+      { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
+    ];
 
-  //30311 zap.streamリンク
-  if (note.kind === 30311) {
-    menuTexts?.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
-  }
-  //31990 App Managerリンク
-  if (note.kind === 31990) {
-    menuTexts?.push({ text: `${$_("menu.nostrapp")}`, icon: Layers, num: 11 });
-  }
-  //replaceable のすとびうあのリンク
-  if (nostviewstrable.includes(note.kind)) {
-    menuTexts?.push({
-      text: `${$_("menu.nostviewstr")}`,
-      icon: Squirrel,
-      num: 10,
-    });
-  }
-  if (indexes !== undefined) {
-    menuTexts = menuTexts.filter((item) => indexes.includes(item.num));
-  }
+    //30030 emojitoリンク
+    if (note.kind === 30030) {
+      menu.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
+    }
+
+    //30311 zap.streamリンク
+    if (note.kind === 30311) {
+      menu.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
+    }
+    //31990 App Managerリンク
+    if (note.kind === 31990) {
+      menu.push({ text: `${$_("menu.nostrapp")}`, icon: Layers, num: 11 });
+    }
+    //replaceable のすとびうあのリンク
+    if (nostviewstrable.includes(note.kind)) {
+      menu?.push({
+        text: `${$_("menu.nostviewstr")}`,
+        icon: Squirrel,
+        num: 10,
+      });
+    }
+    if (indexes !== undefined) {
+      menu = menu.filter((item) => indexes.includes(item.num));
+    }
+    return menu;
+  });
 
   const handleSelectItem = async (index: number) => {
     //  console.log(menuTexts[index]);
@@ -216,41 +249,48 @@
     }
   };
 
-  let nevent: string | undefined;
-  let naddr: string | undefined;
-  let encodedPubkey: string | undefined = undefined;
-  $: if (note) {
-    try {
-      if (replaceable) {
-        const naddrpointer: nip19.AddressPointer = {
-          kind: note.kind,
-          identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-          pubkey: note.pubkey,
-          relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-        };
-        naddr = nip19.naddrEncode(naddrpointer);
-        nevent = undefined;
-      } else {
-        const eventpointer: nip19.EventPointer = {
-          id: note.id,
-          relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-          author: note.pubkey,
-          kind: note.kind,
-        };
+  // let nevent: string | undefined = $state();
+  // let naddr: string | undefined = $state();
+  // let encodedPubkey: string | undefined = $state(undefined);
 
-        nevent = nip19.neventEncode(eventpointer);
+  let { naddr, nevent, encodedPubkey } = $derived.by(() => {
+    let nevent: string | undefined = undefined;
+    let naddr: string | undefined = undefined;
+    let encodedPubkey: string | undefined = undefined;
+    if (note) {
+      try {
+        if (replaceable) {
+          const naddrpointer: nip19.AddressPointer = {
+            kind: note.kind,
+            identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+            pubkey: note.pubkey,
+            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+          };
+          naddr = nip19.naddrEncode(naddrpointer);
+          nevent = undefined;
+        } else {
+          const eventpointer: nip19.EventPointer = {
+            id: note.id,
+            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            author: note.pubkey,
+            kind: note.kind,
+          };
+
+          nevent = nip19.neventEncode(eventpointer);
+          naddr = undefined;
+        }
+      } catch (error) {
+        nevent = undefined;
         naddr = undefined;
       }
-    } catch (error) {
-      nevent = undefined;
-      naddr = undefined;
+      try {
+        encodedPubkey = nip19.npubEncode(note.pubkey);
+      } catch {
+        encodedPubkey = undefined;
+      }
     }
-    try {
-      encodedPubkey = nip19.npubEncode(note.pubkey);
-    } catch {
-      encodedPubkey = undefined;
-    }
-  }
+    return { naddr, nevent, encodedPubkey };
+  });
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
@@ -259,23 +299,25 @@
 
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(note, null, 2)}
-    </div>
-    <div class="my-1 break-all overflow-auto">
-      <!-- <div class="text-lg font-medium">Encoded</div> -->
-      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-      <div class=" font-mono font-bold text-xs">
-        {replaceable ? naddr : nevent}
+  {#snippet main()}
+    <div>
+      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      >
+        {JSON.stringify(note, null, 2)}
+      </div>
+      <div class="my-1 break-all overflow-auto">
+        <!-- <div class="text-lg font-medium">Encoded</div> -->
+        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+        <div class=" font-mono font-bold text-xs">
+          {replaceable ? naddr : nevent}
+        </div>
+      </div>
+      <h2 class="m-0 text-lg font-medium">Seen on</h2>
+      <div class="break-words whitespace-pre-wrap">
+        {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
       </div>
     </div>
-    <h2 class="m-0 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-    </div>
-  </div></Dialog
+  {/snippet}</Dialog
 >

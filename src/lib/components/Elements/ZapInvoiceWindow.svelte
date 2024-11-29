@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
@@ -8,11 +10,13 @@
   import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
+  import type { Writable } from "svelte/store";
 
-  export let invoice: string | undefined;
-  export let id: string | undefined;
-
-  $: url = invoice ? `lightning:${invoice}` : undefined;
+  interface Props {
+    invoice: string | undefined;
+    id: string | undefined;
+    open: Writable<boolean>;
+  }
 
   const {
     elements: {
@@ -24,15 +28,23 @@
       close,
       portalled,
     },
-    states: { open },
+    states: { open: dialogOpen },
   } = createDialog({
     forceVisible: true,
   });
+  let { invoice, id, open = $bindable() }: Props = $props();
+  open?.subscribe((value: boolean) => {
+    if (value) {
+      $dialogOpen = true;
+      $open = false;
+    }
+  });
 
-  export { open };
+  let url = $derived(invoice ? `lightning:${invoice}` : undefined);
 
-  let zapped: { data: EventPacket; status: any; error: any };
-  let unsubscribe: (() => void) | undefined; // Start as undefined
+  let zapped: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
+  let unsubscribe: (() => void) | undefined = $state(); // Start as undefined
 
   const observer:
     | QueryObserver<unknown, Error, unknown, unknown, string[]>
@@ -42,38 +54,40 @@
       })
     : undefined;
 
-  $: if (observer && !$open && unsubscribe) {
-    unsubscribe(); // Call the unsubscribe function if it exists
-    unsubscribe = undefined; // Reset unsubscribe after calling
-  } else if (observer && $open && !zapped) {
-    unsubscribe = observer.subscribe((result: any) => {
-      if (result?.data?.event) {
-        zapped = result;
-        console.log(zapped);
-        unsubscribe?.(); // Unsubscribe after receiving data
-      }
-    });
-  } else if ($open && zapped) {
-    $toastSettings = {
-      title: "Zapped",
-      description: "Success to zap",
-      color: "bg-green-500",
-    };
-    $open = false;
-  }
+  run(() => {
+    if (observer && !$dialogOpen && unsubscribe) {
+      unsubscribe(); // Call the unsubscribe function if it exists
+      unsubscribe = undefined; // Reset unsubscribe after calling
+    } else if (observer && $dialogOpen && !zapped) {
+      unsubscribe = observer.subscribe((result: any) => {
+        if (result?.data?.event) {
+          zapped = result;
+          console.log(zapped);
+          unsubscribe?.(); // Unsubscribe after receiving data
+        }
+      });
+    } else if ($dialogOpen && zapped) {
+      $toastSettings = {
+        title: "Zapped",
+        description: "Success to zap",
+        color: "bg-green-500",
+      };
+      $dialogOpen = false;
+    }
+  });
 
   onDestroy(() => {
     unsubscribe?.(); // Ensure unsubscribe is only called if it exists
   });
 </script>
 
-{#if $open}
+{#if $dialogOpen}
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-    />
+    ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
             max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-800
@@ -101,7 +115,7 @@
             {/await}
           </div>
           <div class="break-all">{invoice}</div>
-          <iframe src={url} title="Lightning" width="0" height="0" />
+          <iframe src={url} title="Lightning" width="0" height="0"></iframe>
         </fieldset>
       {/if}
       <div class="mt-6 flex justify-end gap-4">

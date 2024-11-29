@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useAllReactions } from "$lib/stores/useAllReactions";
   import type { ReqStatus } from "$lib/types";
@@ -11,22 +12,51 @@
     RxReqPipeable,
   } from "rx-nostr";
 
-  export let queryKey: QueryKey;
-  export let id: string | undefined = undefined;
-  export let atag: string | undefined = undefined;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | undefined = undefined;
+  interface Props {
+    queryKey: QueryKey;
+    id?: string | undefined;
+    atag?: string | undefined;
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  $: result = useAllReactions(queryKey, id, atag, req);
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
+    children?: import("svelte").Snippet<
+      [
+        {
+          kind1: Nostr.Event[];
+          kind6: Nostr.Event[];
+          kind7: Nostr.Event[];
+          kind9735: Nostr.Event[];
+          status: ReqStatus;
+        },
+      ]
+    >;
+  }
+
+  let {
+    req = undefined,
+    id = undefined,
+    atag = undefined,
+    queryKey,
+
+    error,
+    loading,
+    nodata,
+    children,
+  }: Props = $props();
+
+  let result = $derived(useAllReactions(queryKey, id, atag, req));
+  let data = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
 
   interface $$Slots {
     default: {
@@ -43,11 +73,24 @@
   //  $: console.log($status);
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />{:else if $status === "success" && !$data}
-  <slot name="nodata" />
+{#if $errorData}
+  {@render error?.($errorData)}
+{:else if $status === "success" && !$data}
+  {@render nodata?.()}
 {:else if $data && $data?.length > 0}
-  <slot
+  {@render children?.({
+    kind1: $data
+      ?.map(({ event }) => event)
+      .filter((event) => event.kind === 1 || event.kind === 42),
+    kind7: $data?.map(({ event }) => event).filter((event) => event.kind === 7),
+    kind6: $data?.map(({ event }) => event).filter((event) => event.kind === 6),
+    kind9735: $data
+      ?.map(({ event }) => event)
+      .filter((event) => event.kind === 9735),
+    status: $status,
+  })}
+
+  <!-- <slot
     kind1={$data
       ?.map(({ event }) => event)
       .filter((event) => event.kind === 1 || event.kind === 42)}
@@ -57,7 +100,7 @@
       ?.map(({ event }) => event)
       .filter((event) => event.kind === 9735)}
     status={$status}
-  />
+  /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {/if}

@@ -4,11 +4,11 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { onMount } from "svelte";
   import GlobalTimeline from "../../global/GlobalTimeline.svelte";
+  import type { PageData } from "./$types";
 
-  export let data: {
-    relay: string;
-  };
-  let relayUrl: string | undefined;
+  let { data }: { data: PageData } = $props();
+
+  let relayUrl: string | undefined = $state();
   let isMount = false;
   onMount(() => {
     if (isMount) {

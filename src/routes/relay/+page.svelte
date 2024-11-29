@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let relayURL;
+  let { relayURL } = $props();
 </script>
 
 <input value={relayURL} />

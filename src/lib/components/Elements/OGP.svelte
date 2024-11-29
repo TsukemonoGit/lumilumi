@@ -1,10 +1,16 @@
 <script lang="ts">
   import { useOgp, type Ogp } from "$lib/func/ogp";
 
-  export let url: string;
+  interface Props {
+    url: string;
+    renderContent?: import("svelte").Snippet<[Ogp]>;
+    nodata?: import("svelte").Snippet;
+  }
 
-  $: ogp = useOgp(url);
-  $: data = ogp.data;
+  let { url, renderContent, nodata }: Props = $props();
+
+  let ogp = $derived(useOgp(url));
+  let data = $derived(ogp.data);
 
   interface $$Slots {
     default: { contents: Ogp };
@@ -14,8 +20,8 @@
   }
 </script>
 
-{#if $data}
-  <slot contents={$data} />
+{#if $data && renderContent}
+  {@render renderContent($data)}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

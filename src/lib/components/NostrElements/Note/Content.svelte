@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Element with a slot='...' attribute must be a child of a component or a descendant of a custom element -->
 <script lang="ts">
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
@@ -15,26 +16,48 @@
 
   import InvoiceCard from "./EventCard/InvoiceCard.svelte";
 
-  export let text: string;
-  export let tags: string[][];
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
-  export let isShowClientTag: boolean = true;
+  interface Props {
+    text: string;
+    tags: string[][];
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+    isShowClientTag?: boolean;
+  }
+
+  let {
+    text,
+    tags,
+    displayMenu,
+    depth,
+    repostable,
+    tieKey,
+    isShowClientTag = true,
+  }: Props = $props();
+  // export let text: string;
+  // export let tags: string[][];
+  // export let displayMenu: boolean;
+  // export let depth: number;
+  // export let repostable: boolean;
+  // export let tieKey: string | undefined;
+  // export let isShowClientTag: boolean = true;
   //プレビューにも使ってるからconstだとだめ
-  $: parts = parseText(text, tags);
+  let parts = $derived(parseText(text, tags));
   //$: console.log(parts);
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  $: mediaList = parts.filter(
-    (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+  let mediaList = $derived(
+    parts.filter(
+      (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+    )
   );
 
   //let modalIndex = 0;
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
+    console.log("viewmedia");
     $viewMediaModal = { index: index, mediaList: mediaList };
   };
 
@@ -74,8 +97,10 @@
       return undefined;
     }
   };
-  $: geohash = tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]; // string | undefined
-  $: proxy = tags.find((item) => item[0] === "proxy"); // string[] | undefined
+  let geohash = $derived(
+    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
+  ); // string | undefined
+  let proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
 </script>
 
 <!-- <MediaDisplay
@@ -125,22 +150,21 @@
         className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >{/if}
-  {:else if part.type === "url"}{#if $showImg}<OGP
-        url={part.content ?? ""}
-        let:contents
-        ><Link
-          props={{ "aria-label": `External Links: ${part.url}` }}
-          slot="nodata"
-          className="underline text-magnum-300 break-all hover:opacity-80"
-          href={part.content ?? ""}>{part.content}</Link
-        >{#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-          <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
+  {:else if part.type === "url"}{#if $showImg}<OGP url={part.content ?? ""}
+        >{#snippet renderContent(contents)}
+          {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+            <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
+              props={{ "aria-label": `External Links: ${part.url}` }}
+              className="underline text-magnum-300 break-all "
+              href={part.content ?? ""}>{part.content ?? ""}</Link
+            >{/if}{/snippet}
+        {#snippet nodata()}
+          <Link
             props={{ "aria-label": `External Links: ${part.url}` }}
-            slot="nodata"
-            className="underline text-magnum-300 break-all "
-            href={part.content ?? ""}>{part.content ?? ""}</Link
-          >{/if}</OGP
-      >{:else}<Link
+            className="underline text-magnum-300 break-all hover:opacity-80"
+            href={part.content ?? ""}>{part.content}</Link
+          >{/snippet}
+      </OGP>{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link

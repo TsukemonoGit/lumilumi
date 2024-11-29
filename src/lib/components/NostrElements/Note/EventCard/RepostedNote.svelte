@@ -18,14 +18,19 @@
   import NoteByRelayhint from "../NoteByRelayhint.svelte";
   import NaddrByRelayhint from "../NaddrByRelayhint.svelte";
 
-  export let displayMenu: boolean;
-  export let repostable: boolean;
-  export let maxHeight: string;
-  //tagはaかe
-  export let tag: string[];
-  //export let kind: number | undefined;
-  export let depth: number;
-  export let tieKey: string | undefined;
+  interface Props {
+    displayMenu: boolean;
+    repostable: boolean;
+    maxHeight: string;
+    //tagはaかe
+    tag: string[];
+    //export let kind: number | undefined;
+    depth: number;
+    tieKey: string | undefined;
+  }
+
+  let { displayMenu, repostable, maxHeight, tag, depth, tieKey }: Props =
+    $props();
 
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
@@ -55,6 +60,9 @@
       return undefined;
     }
   };
+  let relayhint = $derived(
+    tag.length > 2 && relayRegex.test(tag[2]) ? [tag[2]] : undefined
+  );
 </script>
 
 {#if tag[0] === "e"}
@@ -62,117 +70,21 @@
       {kind}
     {/if} -->
 
-  <Text queryKey={["timeline", tag[1]]} id={tag[1]} let:text>
-    <div
-      slot="loading"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-    >
-      Loading {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
-    </div>
-    <div slot="nodata">
-      {@const relayhint =
-        tag.length > 2 && relayRegex.test(tag[2]) ? [tag[2]] : undefined}
-      {#if relayhint && relayhint.length > 0}
-        <NoteByRelayhint
-          id={tag[1]}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-          {relayhint}
-        />
-      {:else}
-        <div
-          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-        >
-          nodata {nip19.noteEncode(tag[1])}{#if displayMenu}<EllipsisMenuNote
-              notestr={nip19.noteEncode(tag[1])}
-            />{/if}
-        </div>
-      {/if}
-    </div>
-    <div
-      slot="error"
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-      let:error
-    >
-      {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-        notestr={nip19.noteEncode(tag[1])}
-      />
-    </div>
-    {#if $page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
-      <OmittedCard
-        {text}
-        {depth}
-        {repostable}
-        {maxHeight}
-        {displayMenu}
-        {tieKey}
-      />
-    {:else}
-      <Metadata
-        queryKey={["metadata", text.pubkey]}
-        pubkey={text.pubkey}
-        let:metadata
+  <Text queryKey={["timeline", tag[1]]} id={tag[1]}>
+    {#snippet loading()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        <div slot="loading">
-          <EventCard
-            note={text}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <div slot="nodata">
-          <EventCard
-            note={text}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <div slot="error" let:error>
-          <EventCard
-            note={text}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-          />
-        </div>
-        <EventCard
-          note={text}
-          {metadata}
-          {depth}
-          {repostable}
-          {maxHeight}
-          {displayMenu}
-          {tieKey}
+        Loading {nip19.noteEncode(tag[1])}<EllipsisMenuNote
+          notestr={nip19.noteEncode(tag[1])}
         />
-      </Metadata>{/if}
-  </Text>
-{:else if tag[0] === "a"}
-  {@const filter = naddrFilter()}
-  {@const encodedNaddr = encodeNaddr(tag)}
-  {#if filter}
-    <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]} let:event>
-      <div slot="loading">
-        Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
       </div>
-      <div slot="nodata">
-        {@const relayhint =
-          tag.length > 2 && relayRegex.test(tag[2]) ? [tag[2]] : undefined}
+    {/snippet}
+    {#snippet nodata()}
+      <div>
         {#if relayhint && relayhint.length > 0}
-          <NaddrByRelayhint
-            data={parseNaddr(tag)}
-            content={tag[1]}
+          <NoteByRelayhint
+            id={tag[1]}
             {displayMenu}
             {depth}
             {repostable}
@@ -183,17 +95,26 @@
           <div
             class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
           >
-            Nodata {tag[1]}{#if displayMenu}<EllipsisMenuNaddr
-                naddr={encodedNaddr}
+            nodata {nip19.noteEncode(tag[1])}{#if displayMenu}<EllipsisMenuNote
+                notestr={nip19.noteEncode(tag[1])}
               />{/if}
-          </div>{/if}
+          </div>
+        {/if}
       </div>
-      <div slot="error" let:error>
-        {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+    {/snippet}
+    {#snippet error()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      >
+        {nip19.noteEncode(tag[1])}<EllipsisMenuNote
+          notestr={nip19.noteEncode(tag[1])}
+        />
       </div>
-      {#if $page.route.id === "/notifications" && depth === 1 && event.pubkey === $loginUser}
+    {/snippet}
+    {#snippet content({ data: text })}
+      {#if $page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
         <OmittedCard
-          text={event}
+          {text}
           {depth}
           {repostable}
           {maxHeight}
@@ -201,51 +122,155 @@
           {tieKey}
         />
       {:else}
-        <Metadata
-          queryKey={["metadata", event.pubkey]}
-          pubkey={event.pubkey}
-          let:metadata
-        >
-          <div slot="loading" class="w-full">
+        <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
+          {#snippet loading()}
+            <div>
+              <EventCard
+                note={text}
+                {depth}
+                {repostable}
+                {maxHeight}
+                {displayMenu}
+                {tieKey}
+              />
+            </div>
+          {/snippet}
+          {#snippet nodata()}
+            <div>
+              <EventCard
+                note={text}
+                {depth}
+                {repostable}
+                {maxHeight}
+                {displayMenu}
+                {tieKey}
+              />
+            </div>
+          {/snippet}
+          {#snippet error()}
+            <div>
+              <EventCard
+                note={text}
+                {depth}
+                {repostable}
+                {maxHeight}
+                {displayMenu}
+                {tieKey}
+              />
+            </div>
+          {/snippet}
+          {#snippet content({ metadata })}
             <EventCard
-              note={event}
+              note={text}
+              {metadata}
               {depth}
               {repostable}
               {maxHeight}
               {displayMenu}
               {tieKey}
             />
-          </div>
-          <div slot="nodata" class="w-full">
-            <EventCard
-              note={event}
+          {/snippet}
+        </Metadata>{/if}
+    {/snippet}
+  </Text>
+{:else if tag[0] === "a"}
+  {@const filter = naddrFilter()}
+  {@const encodedNaddr = encodeNaddr(tag)}
+  {#if filter}
+    <LatestEvent filters={[filter]} queryKey={["naddr", tag[1]]}>
+      {#snippet loading()}
+        <div>
+          Loading {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>
+          {#if relayhint && relayhint.length > 0}
+            <NaddrByRelayhint
+              data={parseNaddr(tag)}
+              content={tag[1]}
+              {displayMenu}
               {depth}
               {repostable}
-              {maxHeight}
-              {displayMenu}
               {tieKey}
+              {relayhint}
             />
-          </div>
-          <div slot="error" class="w-full" let:error>
-            <EventCard
-              note={event}
-              {depth}
-              {repostable}
-              {maxHeight}
-              {displayMenu}
-              {tieKey}
-            />
-          </div>
-          <EventCard
-            note={event}
-            {metadata}
+          {:else}
+            <div
+              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+            >
+              Nodata {tag[1]}{#if displayMenu}<EllipsisMenuNaddr
+                  naddr={encodedNaddr}
+                />{/if}
+            </div>{/if}
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div>
+          {tag[1]}<EllipsisMenuNaddr naddr={encodedNaddr} />
+        </div>
+      {/snippet}
+      {#snippet children({ event })}
+        {#if $page.route.id === "/notifications" && depth === 1 && event.pubkey === $loginUser}
+          <OmittedCard
+            text={event}
             {depth}
             {repostable}
             {maxHeight}
             {displayMenu}
             {tieKey}
           />
-        </Metadata>{/if}
+        {:else}
+          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+            {#snippet loading()}
+              <div class="w-full">
+                <EventCard
+                  note={event}
+                  {depth}
+                  {repostable}
+                  {maxHeight}
+                  {displayMenu}
+                  {tieKey}
+                />
+              </div>
+            {/snippet}
+            {#snippet nodata()}
+              <div class="w-full">
+                <EventCard
+                  note={event}
+                  {depth}
+                  {repostable}
+                  {maxHeight}
+                  {displayMenu}
+                  {tieKey}
+                />
+              </div>
+            {/snippet}
+            {#snippet error()}
+              <div class="w-full">
+                <EventCard
+                  note={event}
+                  {depth}
+                  {repostable}
+                  {maxHeight}
+                  {displayMenu}
+                  {tieKey}
+                />
+              </div>
+            {/snippet}
+            {#snippet content({ metadata })}
+              <EventCard
+                note={event}
+                {metadata}
+                {depth}
+                {repostable}
+                {maxHeight}
+                {displayMenu}
+                {tieKey}
+              />
+            {/snippet}
+          </Metadata>{/if}
+      {/snippet}
     </LatestEvent>
   {/if}
 {/if}

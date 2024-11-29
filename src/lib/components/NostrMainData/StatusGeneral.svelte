@@ -1,14 +1,24 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type Nostr from "nostr-typedef";
 
   import { userStatusStore } from "$lib/stores/stores";
 
-  export let pubkey: string;
-  let data: Nostr.Event | undefined;
-
-  $: if ($userStatusStore) {
-    data = $userStatusStore.get(pubkey)?.get("general");
+  interface Props {
+    pubkey: string;
+    loading?: import('svelte').Snippet;
+    children?: import('svelte').Snippet<[any]>;
   }
+
+  let { pubkey, loading, children }: Props = $props();
+  let data: Nostr.Event | undefined = $state();
+
+  run(() => {
+    if ($userStatusStore) {
+      data = $userStatusStore.get(pubkey)?.get("general");
+    }
+  });
   //$: if ($slicedEvent) {
   // const res: EventPacket | undefined = $queryClient.getQueryData([
   //   "userStatus",
@@ -38,7 +48,7 @@
 </script>
 
 {#if !data}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else if data}
-  <slot event={data} />
+  {@render children?.({ event: data, })}
 {/if}

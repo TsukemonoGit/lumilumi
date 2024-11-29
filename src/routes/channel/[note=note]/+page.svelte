@@ -21,24 +21,29 @@
 
   import { mutes } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
+  import type { PageData } from "./$types";
 
-  export let data: {
-    id: string;
-    relays?: string[] | undefined;
-    kind?: number | undefined;
-    author?: string | undefined;
-  };
+  // interface Props {
+  //   data: {
+  //     id: string;
+  //     relays?: string[] | undefined;
+  //     kind?: number | undefined;
+  //     author?: string | undefined;
+  //   };
+  // }
+
+  let { data }: { data: PageData } = $props();
+
   //チャンネルでのリポストって誰に向けて見せたくてリポストしてるのかわからんくて扱いにくいから
   //引用だけにしてみる
   //Globalのチャンネルフィードにはkind16リポストk=16を表示することにしてみる。
   //repostable={false}チャンネル部屋ではリポストできないようにしてみる（kindで判断じゃなくてチャンネル部屋にいるときだけだけどダイジョブ？？？）
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = `channel+${data.id}`;
+  let tieKey = $derived(`channel+${data.id}`);
 
   let isOnMount = false;
-  let since: number | undefined = undefined;
-  $: timelineQuery = ["channel", "feed", data.id]; //部屋から部屋に移動したときにconstだとだめだった
+  let since: number | undefined = $state(undefined);
   onMount(() => {
     if (!isOnMount) {
       isOnMount = true;
@@ -52,7 +57,7 @@
       init();
     }
   });
-  let view = false;
+  let view = $state(false);
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
@@ -78,7 +83,6 @@
     view = true;
   }
 
-  $: isMute = channelMuteCheck(data.id, $timelineFilter.adaptMute);
   function channelMuteCheck(id: string, adaptMute: boolean): boolean {
     if (!adaptMute) {
       return false;
@@ -86,6 +90,8 @@
     const eMutes = $mutes.list.e || [];
     return eMutes.includes(id);
   }
+  let timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
+  let isMute = $derived(channelMuteCheck(data.id, $timelineFilter.adaptMute));
 </script>
 
 {#if view}
@@ -131,11 +137,9 @@
           },
         ]}
         req={createRxForwardReq()}
-        let:events
         {viewIndex}
         {amount}
         {tieKey}
-        let:len
         eventFilter={(event) =>
           (event.kind === 42 &&
             event.tags.find(
@@ -143,51 +147,62 @@
             ) !== undefined) ||
           event.kind !== 42}
       >
-        <!-- <SetRepoReactions /> -->
-        <div slot="loading">
-          <p>Loading...</p>
-        </div>
-
-        <div slot="error" let:error>
-          <p>{error}</p>
-        </div>
-
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <!-- <div
+        {#snippet content({ events, len })}
+          <!-- <SetRepoReactions /> -->
+          <div
+            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+          >
+            {#if events && events.length > 0}
+              {#each events as event, index (event.id)}
+                <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card {index ===
                 events.length - 1
                   ? 'last-visible'
                   : ''} {index === 0 ? 'first-visible' : ''}"
               > -->
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading" class="w-full">
-                  <EventCard note={event} repostable={false} {tieKey} />
-                </div>
-                <div slot="nodata" class="w-full">
-                  <EventCard note={event} repostable={false} {tieKey} />
-                </div>
-                <div slot="error" class="w-full">
-                  <EventCard note={event} repostable={false} {tieKey} />
-                </div>
-                <EventCard
-                  {metadata}
-                  note={event}
-                  repostable={false}
-                  {tieKey}
-                />
-              </Metadata>
-              <!-- </div> -->
-            {/each}
-          {/if}
-        </div>
+                <Metadata
+                  queryKey={["metadata", event.pubkey]}
+                  pubkey={event.pubkey}
+                >
+                  {#snippet loading()}
+                    <div class="w-full">
+                      <EventCard note={event} repostable={false} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet nodata()}
+                    <div class="w-full">
+                      <EventCard note={event} repostable={false} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet error()}
+                    <div class="w-full">
+                      <EventCard note={event} repostable={false} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet content({ metadata })}
+                    <EventCard
+                      {metadata}
+                      note={event}
+                      repostable={false}
+                      {tieKey}
+                    />
+                  {/snippet}
+                </Metadata>
+                <!-- </div> -->
+              {/each}
+            {/if}
+          </div>{/snippet}
+        {#snippet loading()}
+          <div>
+            <p>Loading...</p>
+          </div>
+        {/snippet}
+
+        {#snippet error()}
+          <div>
+            <p>{error}</p>
+          </div>
+        {/snippet}
       </TimelineList>{/if}
   </section>
 {/if}

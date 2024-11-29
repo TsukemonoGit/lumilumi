@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { page } from "$app/stores";
   import { datetime, parseNaddr } from "$lib/func/util";
   import { showClientTag } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
-  export let note: Nostr.Event;
+  interface Props {
+    note: Nostr.Event;
+  }
 
-  $: clientTag = note.tags.find((tag) => tag[0] === "client");
+  let { note }: Props = $props();
+
+  let clientTag = $derived(note.tags.find((tag) => tag[0] === "client"));
 
   const onClickClientTag = (atag: string[]) => {
     const naddrAddress = parseNaddr(["a", ...atag]);
@@ -23,7 +26,7 @@
   {#if clientTag && $showClientTag}
     - {#if clientTag.length > 2}<button
         title={"open in nostrapp.link"}
-        on:click={() => onClickClientTag(clientTag.slice(2))}
+        onclick={() => onClickClientTag(clientTag.slice(2))}
         class={` text-magnum-200 hover:underline w-fit whitespace-pre-wrap break-words`}
         style="word-break: break-word;"
       >

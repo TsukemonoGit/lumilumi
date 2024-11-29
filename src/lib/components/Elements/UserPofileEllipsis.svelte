@@ -5,9 +5,13 @@
   import UserMenu from "./UserMenu.svelte";
   import type { Profile } from "$lib/types";
   import Popover from "./Popover.svelte";
-  export let metadata: Nostr.Event;
-  export let prof: Profile;
-  export let tieKey: string | undefined;
+  interface Props {
+    metadata: Nostr.Event;
+    prof: Profile;
+    tieKey: string | undefined;
+  }
+
+  let { metadata, prof, tieKey }: Props = $props();
 </script>
 
 <Popover ariaLabel="user menu" showCloseButton={false}>
@@ -17,12 +21,14 @@
     title="menu"><Ellipsis /></button
   >
 
-  <div
-    slot="popoverContent"
-    class="menu flex flex-col flex-wrap divide-y divide-zinc-500 bg-neutral-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
-  >
-    <UserMenu pubkey={metadata.pubkey} {metadata} profile={prof} {tieKey} />
-  </div>
+  {#snippet popoverContent()}
+    <div
+      
+      class="menu flex flex-col flex-wrap divide-y divide-zinc-500 bg-neutral-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
+    >
+      <UserMenu pubkey={metadata.pubkey} {metadata} profile={prof} {tieKey} />
+    </div>
+  {/snippet}
 </Popover>
 
 <style lang="postcss">

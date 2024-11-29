@@ -55,7 +55,7 @@
     }
     $nowProgress = false;
   };
-  let signPubkey: string;
+  let signPubkey: string = $state("");
 
   onMount(async () => {
     console.log("onMount");

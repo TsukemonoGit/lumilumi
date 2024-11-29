@@ -1,11 +1,17 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
+  import type { Writable } from "svelte/store";
 
-  export let onClickOK: () => void;
-  export let title = "";
-  export let description = "";
-  export let okButtonName: string | undefined = undefined;
+  interface Props {
+    onClickOK: () => void;
+    title?: string;
+    description?: string;
+    okButtonName?: string | undefined;
+    main?: import("svelte").Snippet;
+    open?: Writable<boolean>;
+  }
+
   const {
     elements: {
       trigger,
@@ -16,17 +22,31 @@
       close,
       portalled,
     },
-    states: { open },
+    states: { open: openEle },
   } = createDialog({
     role: "alertdialog",
     forceVisible: true,
   });
-  export { open };
+  let {
+    onClickOK,
+    title = "",
+    description = "",
+    okButtonName = undefined,
+    main,
+    open,
+  }: Props = $props();
+  open?.subscribe((value: boolean) => {
+    if (value) {
+      $openEle = true;
+    }
+  });
+
+  // export { open };
 </script>
 
-{#if $open}
+{#if $openEle}
   <div class="" use:melt={$portalled}>
-    <div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50" />
+    <div use:melt={$overlay} class="fixed inset-0 z-50 bg-black/50"></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
             max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-md bg-neutral-800
@@ -41,7 +61,7 @@
       </p>
 
       <div class="mb-4 text-zinc-200">
-        <slot name="main" />
+        {@render main?.()}
       </div>
 
       <div class="mt-6 flex justify-end gap-4">
@@ -55,7 +75,7 @@
         <button
           class="inline-flex h-8 items-center justify-center rounded-[4px]
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-          on:click={onClickOK}
+          onclick={onClickOK}
         >
           {okButtonName ? okButtonName : "Continue"}
         </button>

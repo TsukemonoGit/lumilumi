@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
@@ -16,18 +18,25 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
+  import { writable, type Writable } from "svelte/store";
 
-  export let note: Nostr.Event;
-  export let indexes: number[] | undefined = undefined;
-  export let listData: {
-    dtag: string | undefined;
-    title: string | undefined;
-    description: string | undefined;
-  };
-  export let tieKey: string | undefined;
+  interface Props {
+    note: Nostr.Event;
+    indexes?: number[] | undefined;
+    listData: {
+      dtag: string | undefined;
+      title: string | undefined;
+      description: string | undefined;
+    };
+    tieKey: string | undefined;
+  }
 
-  let dialogOpen: any;
+  let { note, indexes = undefined, listData, tieKey }: Props = $props();
 
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+
+  // svelte-ignore non_reactive_update
   let menuTexts = [
     {
       text: $_("menu.copy.naddr"),
@@ -127,26 +136,28 @@
     }
   };
 
-  let naddr: string | undefined = undefined;
-  let encodedPubkey: string | undefined = undefined;
-  $: if (note) {
-    try {
-      encodedPubkey = nip19.npubEncode(note.pubkey);
-    } catch {
-      encodedPubkey = undefined;
+  let naddr: string | undefined = $state(undefined);
+  let encodedPubkey: string | undefined = $state(undefined);
+  run(() => {
+    if (note) {
+      try {
+        encodedPubkey = nip19.npubEncode(note.pubkey);
+      } catch {
+        encodedPubkey = undefined;
+      }
+      try {
+        const naddrpointer: nip19.AddressPointer = {
+          kind: note.kind,
+          identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+          pubkey: note.pubkey,
+          relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        };
+        naddr = nip19.naddrEncode(naddrpointer);
+      } catch (error) {
+        naddr = undefined;
+      }
     }
-    try {
-      const naddrpointer: nip19.AddressPointer = {
-        kind: note.kind,
-        identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-        pubkey: note.pubkey,
-        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-      };
-      naddr = nip19.naddrEncode(naddrpointer);
-    } catch (error) {
-      naddr = undefined;
-    }
-  }
+  });
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
@@ -155,21 +166,23 @@
 
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(note, null, 2)}
+  {#snippet main()}
+    <div>
+      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
+      <div
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      >
+        {JSON.stringify(note, null, 2)}
+      </div>
+      <div class="my-1 break-all overflow-auto">
+        <!-- <div class="text-lg font-medium">Encoded</div> -->
+        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+        <div class=" font-mono font-bold text-xs">{naddr}</div>
+      </div>
+      <h2 class="m-0 text-lg font-medium">Seen on</h2>
+      <div class="break-words whitespace-pre-wrap">
+        {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
+      </div>
     </div>
-    <div class="my-1 break-all overflow-auto">
-      <!-- <div class="text-lg font-medium">Encoded</div> -->
-      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-      <div class=" font-mono font-bold text-xs">{naddr}</div>
-    </div>
-    <h2 class="m-0 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-    </div>
-  </div></Dialog
+  {/snippet}</Dialog
 >

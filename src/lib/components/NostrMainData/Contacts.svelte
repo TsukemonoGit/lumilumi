@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { browser } from "$app/environment";
   import { app } from "$lib/stores/stores";
@@ -15,18 +16,50 @@
   } from "rx-nostr";
   import { onMount } from "svelte";
 
-  export let queryKey: QueryKey;
-  export let pubkey: string;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  export let relays: DefaultRelayConfig[] | undefined = undefined;
+  interface Props {
+    relays?: string[] | undefined;
+    queryKey: QueryKey;
+    pubkey: string;
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    content?: import("svelte").Snippet<
+      [{ contacts: Nostr.Event; status: ReqStatus }]
+    >;
+  }
+
+  let {
+    req = undefined,
+    relays = undefined,
+    queryKey,
+    pubkey,
+    error,
+    loading,
+    nodata,
+    content,
+  }: Props = $props();
+
+  // export let queryKey: QueryKey;
+  // export let pubkey: string;
+  // export let req:
+  //   | (RxReq<"backward"> &
+  //       RxReqEmittable<{
+  //         relays: string[];
+  //       }> &
+  //       RxReqOverable &
+  //       RxReqPipeable)
+  //   | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+  //   | undefined = undefined;
+  // export let relays: DefaultRelayConfig[] | undefined = undefined;
 
   let storageKind3: Nostr.Event;
 
@@ -50,41 +83,41 @@
       }
     }
   });
-  let kind3Data: Nostr.Event;
+
   if (relays && relays.length > 0 && $app?.rxNostr) {
     $app?.rxNostr.setDefaultRelays(relays);
   }
 
-  $: result = $app?.rxNostr
+  let result = $app?.rxNostr
     ? useContacts($app?.rxNostr, queryKey, pubkey, req)
     : undefined;
 
-  $: data = result?.data;
-  $: status = result?.status;
-  $: error = result?.error;
-  $: if (data && $data) {
-    if (storageKind3 && storageKind3.created_at > $data.event.created_at) {
-      kind3Data = storageKind3;
-    } else if ($data.event) {
-      kind3Data = $data.event;
-      localStorage.setItem(kind3key, JSON.stringify(kind3Data));
-    }
-  }
+  let data = $derived(result?.data);
+  let status = $derived(result?.status);
+  let errorData = $derived(result?.error);
 
-  interface $$Slots {
-    default: { contacts: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let kind3Data: Nostr.Event | undefined = $derived.by(() => {
+    if (data && $data) {
+      if (storageKind3 && storageKind3.created_at > $data.event.created_at) {
+        return storageKind3;
+      } else if ($data.event) {
+        return $data.event;
+      }
+    }
+    return undefined;
+  });
+  $effect(() => {
+    localStorage.setItem(kind3key, JSON.stringify(kind3Data));
+  });
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
+{#if $errorData}
+  {@render error?.($errorData)}
 {:else if kind3Data}
-  <slot contacts={kind3Data} status={$status ?? "error"} />
+  {@render content?.({ contacts: kind3Data, status: $status ?? "error" })}
+  <!-- <slot contacts={kind3Data} status={$status ?? "error"} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

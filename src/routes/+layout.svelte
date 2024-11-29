@@ -1,10 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot subscribe to stores that are not declared at the top level of the component -->
 <script lang="ts">
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount } from "svelte";
+  import { onMount, type Component } from "svelte";
 
   import {
     app,
@@ -48,11 +49,21 @@
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
   } from "$lib/func/reactions";
+  import { writable, type Writable } from "svelte/store";
 
-  //import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+  let { data, children } = $props<{
+    data:
+      | {
+          id: string;
+          relays?: string[] | undefined;
+          kind?: number | undefined;
+          author?: string | undefined;
+        }
+      | undefined;
+    children: import("svelte").Snippet;
+  }>();
 
-  //import SvelteQueryDevtools
-  let SvelteQueryDevtools: any;
+  let SvelteQueryDevtools: any = $state();
 
   // Conditionally load SvelteQueryDevtools during development
   if (import.meta.env.MODE === "development") {
@@ -62,7 +73,7 @@
     });
   }
 
-  $: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : "";
+  let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 
   //https://github.com/penpenpng/rx-nostr/pull/138
   const verificationClient = browser
@@ -131,6 +142,7 @@
       setTheme(theme);
 
       const tmp = localStorage.getItem("uploader");
+      console.log(tmp);
       $uploader = tmp ?? mediaUploader[0];
       if (!$app?.rxNostr) {
         setRxNostr();
@@ -162,17 +174,10 @@
     }
   });
 
-  export let data:
-    | {
-        id: string;
-        relays?: string[] | undefined;
-        kind?: number | undefined;
-        author?: string | undefined;
-      }
-    | undefined;
-  $: baddrCheck($page, nlBanner, $showBanner);
-  function baddrCheck(page: any, ba: any, ner: any) {
-    if ($page.route.id === "/settings" && nlBanner) {
+  $effect(() => baddrCheck($page, nlBanner, $showBanner));
+
+  function baddrCheck(page: any, banner: any, showbnr: any) {
+    if (page.route.id === "/settings" && nlBanner) {
       nlBanner.style.display = "";
     } else if (nlBanner) {
       if ($showBanner) {
@@ -183,26 +188,15 @@
     }
   }
 
-  let showModal: {
-    update: (
-      updater: import("svelte/store").Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: import("svelte/store").Subscriber<boolean>,
-      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-    ): import("svelte/store").Unsubscriber;
-    get: () => boolean;
-  };
-  let modalIndex: number;
-  let mediaList: Part[];
+  // svelte-ignore non_reactive_update
+  let showModal: Writable<boolean> = writable(false);
+  let modalIndex: number = $state(0);
+  let mediaList: Part[] = $state([]);
   viewMediaModal.subscribe((e) => {
-    //console.log(e);
-    if ($viewMediaModal) {
-      modalIndex = $viewMediaModal.index;
-      mediaList = $viewMediaModal.mediaList;
+    if (e) {
+      console.log(e);
+      modalIndex = e.index;
+      mediaList = e.mediaList;
       setTimeout(() => {
         $showModal = true;
       }, 0);
@@ -246,39 +240,50 @@
 </svelte:head>
 
 <QueryClientProvider client={$queryClient}>
-  <NostrMain let:pubkey let:localRelays>
-    <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
-      <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
-      <Header />
-      <SetRepoReactions />
-      <Menu />
+  <NostrMain>
+    {#snippet loading()}
+      <!---->
+    {/snippet}
+    {#snippet contents({ pubkey, localRelays })}
+      <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
+        {#snippet loading()}
+          loading
+        {/snippet}
+        {#snippet nodata()}
+          nodata
+        {/snippet}
+        {#snippet error()}error
+        {/snippet}
+        {#snippet contents({ relays, status })}
+          <Header />
+          <SetRepoReactions />
+          <Menu />
 
-      <Toast /><ReactionToast />
-      <MediaDisplay
-        bind:open={showModal}
-        bind:images={mediaList}
-        bind:currentIndex={modalIndex}
-      />
-      <div class="container">
-        <!-- grid grid-cols-[auto_1fr]-->
-        <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
-          <slot />
-          {#if $nowProgress}
-            <div class="fixed right-10 bottom-20 z-[99]">
-              <LoadingElement />
+          <Toast /><ReactionToast />
+          <MediaDisplay
+            bind:open={showModal}
+            images={mediaList}
+            bind:currentIndex={modalIndex}
+          />
+          <div class="container">
+            <!-- grid grid-cols-[auto_1fr]-->
+            <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
+              {@render children?.()}
+              {#if $nowProgress}
+                <div class="fixed right-10 bottom-20 z-[99]">
+                  <LoadingElement />
+                </div>
+              {/if}
+            </main>
+            <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
+              <Sidebar />
             </div>
-          {/if}
-        </main>
-        <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
-          <Sidebar />
-        </div>
-      </div>
-    </SetDefaultRelays>
+          </div>{/snippet}
+      </SetDefaultRelays>
+    {/snippet}
   </NostrMain>
   {#if SvelteQueryDevtools}
-    <svelte:component this={SvelteQueryDevtools} initialIsOpen={false} />
+    <SvelteQueryDevtools initialIsOpen={false} />
   {/if}
   <!-- <SvelteQueryDevtools initialIsOpen={false} /> -->
 </QueryClientProvider>

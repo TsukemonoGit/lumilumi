@@ -1,17 +1,28 @@
 <script lang="ts">
+  import { createBubbler } from "svelte/legacy";
+
+  const bubble = createBubbler();
   import { Image } from "lucide-svelte";
 
-  export let files: FileList | undefined = undefined;
+  interface Props {
+    files?: FileList | undefined;
+    fileInput?: HTMLInputElement | undefined;
+    [key: string]: any;
+  }
 
-  export let fileInput: HTMLInputElement | undefined = undefined;
+  let {
+    files = $bindable(undefined),
+    fileInput = $bindable(undefined),
+    ...rest
+  }: Props = $props();
 
   function onButtonClick(): void {
     if (fileInput) fileInput.click();
   }
 
   function prunedRestProps() {
-    delete $$restProps.class;
-    return $$restProps;
+    delete rest.class;
+    return rest;
   }
 </script>
 
@@ -22,7 +33,7 @@
       bind:this={fileInput}
       bind:files
       {...prunedRestProps()}
-      on:change
+      onchange={bubble("change")}
       accept="image/*,video/*,audio/*"
       multiple
     />
@@ -31,11 +42,11 @@
     type="button"
     class="file-button-btn inline-flex h-8 items-center justify-center rounded-sm border border-magnum-500
       bg-zinc-900 px-4 font-medium leading-none text-zinc-100 align-middle my-auto hover:opacity-75 active:opacity-50"
-    disabled={$$restProps.disabled}
-    on:click={onButtonClick}
-    on:keydown
-    on:keyup
-    on:keypress
+    disabled={rest.disabled}
+    onclick={onButtonClick}
+    onkeydown={bubble("keydown")}
+    onkeyup={bubble("keyup")}
+    onkeypress={bubble("keypress")}
   >
     <Image size="20" class="stroke-magnum-300" />
   </button>

@@ -4,10 +4,14 @@
   import { showClientTag } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
 
-  export let tags: string[][];
-  export let isShowClientTag: boolean = true;
-  export let depth: number;
-  $: clientTag = tags.find((tag) => tag[0] === "client");
+  interface Props {
+    tags: string[][];
+    isShowClientTag?: boolean;
+    depth: number;
+  }
+
+  let { tags, isShowClientTag = true, depth }: Props = $props();
+  let clientTag = $derived(tags.find((tag) => tag[0] === "client"));
 
   const onClickClientTag = (atag: string[]) => {
     const naddrAddress = parseNaddr(["a", ...atag]);
@@ -19,7 +23,7 @@
 {#if clientTag && isShowClientTag && $showClientTag && !($page.route.id === "/[note=note]" || ($page.route.id === "/[naddr=naddr]" && depth === 0))}
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
-      on:click={() => onClickClientTag(clientTag.slice(2))}
+      onclick={() => onClickClientTag(clientTag.slice(2))}
       class={`inline float-end text-sm font-semibold text-magnum-500/75 hover:underline hover:text-magnum-400/80 w-fit whitespace-pre-wrap break-words `}
       style="word-break: break-word;"
       >via {clientTag[1]}

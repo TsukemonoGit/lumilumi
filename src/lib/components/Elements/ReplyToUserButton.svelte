@@ -3,7 +3,11 @@
   import type { AdditionalPostOptions } from "$lib/types";
   import { Reply } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  export let metadata: Nostr.Event;
+  interface Props {
+    metadata: Nostr.Event;
+  }
+
+  let { metadata }: Props = $props();
 
   function handleClickRelayToUser() {
     const options: AdditionalPostOptions = {
@@ -20,7 +24,7 @@
 </script>
 
 <button
-  on:click={handleClickRelayToUser}
+  onclick={handleClickRelayToUser}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
   title={"reply"}><Reply /></button
 >

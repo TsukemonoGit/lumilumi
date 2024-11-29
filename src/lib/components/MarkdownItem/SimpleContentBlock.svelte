@@ -18,15 +18,28 @@
   import NostrContent from "./Simple/NostrContent.svelte";
   import Dl from "./Simple/Dl.svelte";
   import NotabPart from "./Simple/NotabPart.svelte";
-  export let part: Token;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  export let tieKey: string | undefined;
-  // if (part.type === "hr") {
+  interface Props {
+    part: Token;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    tieKey: string | undefined; // if (part.type === "hr") {
+  }
+
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey
+  }: Props = $props();
+  
   //   console.log(part);
   // }
 </script>

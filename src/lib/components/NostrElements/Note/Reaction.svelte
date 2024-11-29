@@ -1,7 +1,11 @@
 <script lang="ts">
   import { showImg } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
-  export let event: Nostr.Event;
+  interface Props {
+    event: Nostr.Event;
+  }
+
+  let { event }: Props = $props();
 
   export const getEmoji = (
     ev: Nostr.Event

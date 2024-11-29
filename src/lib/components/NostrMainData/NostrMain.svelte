@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import {
     app,
@@ -49,9 +50,22 @@
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
-  let localRelays: DefaultRelayConfig[] = [];
-  let pubkey: string = "";
-  let loading = true; // ローディング状態を追跡する変数を追加
+
+  let {
+    contents,
+    loading,
+  }: {
+    loading: import("svelte").Snippet;
+    contents: import("svelte").Snippet<
+      [{ pubkey: string; localRelays: DefaultRelayConfig[] }]
+    >;
+  } = $props();
+
+  let localRelays: DefaultRelayConfig[] = $state([]);
+  // svelte-ignore non_reactive_update
+  let pubkey: string = $state("");
+
+  let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
   onMount(async () => {
     console.log($defaultRelays);
@@ -88,7 +102,7 @@
       }
     }
 
-    loading = false; // 初期化処理が完了したらローディングを終了
+    nowLoading = false; // 初期化処理が完了したらローディングを終了
     console.log($defaultRelays);
   });
 
@@ -205,8 +219,9 @@
   }
 </script>
 
-{#if loading}
-  <slot name="loading" />
+{#if nowLoading}
+  {@render loading()}
 {:else}
-  <slot {pubkey} {localRelays}></slot>
+  {@render contents({ pubkey, localRelays })}
+  <!-- <slot {pubkey} {localRelays}></slot> -->
 {/if}

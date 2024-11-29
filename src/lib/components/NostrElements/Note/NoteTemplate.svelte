@@ -13,17 +13,29 @@
   import SeenonIcons from "./SeenonIcons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined = undefined;
-  //export let status: string | undefined = undefined;
-  export let mini: boolean = false;
-  //export let tag: string[] | undefined;
-  export let depth: number;
-  //const bech32Pattern = /<bech32>/;
+  interface Props {
+    note: Nostr.Event;
+    metadata?: Nostr.Event | undefined;
+    //export let status: string | undefined = undefined;
+    mini?: boolean;
+    //export let tag: string[] | undefined;
+    depth: number;
+    //const bech32Pattern = /<bech32>/;
+    displayMenu?: boolean;
+    tieKey: string | undefined;
+    children?: import("svelte").Snippet;
+  }
 
-  export let displayMenu: boolean = true;
-  export let tieKey: string | undefined;
-  $: petname = $followList.get(note.pubkey);
+  let {
+    note,
+    metadata = $bindable(undefined),
+    mini = false,
+    depth,
+    displayMenu = true,
+    tieKey,
+    children,
+  }: Props = $props();
+  let petname = $derived($followList.get(note.pubkey));
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);
@@ -52,7 +64,7 @@
 
     goto(`/${replaceable ? naddr : nevent}`);
   };
-  $: prof = profile(metadata);
+  let prof = $derived(profile(metadata));
 </script>
 
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-hidden my-1"}>
@@ -60,7 +72,7 @@
     <div>
       <UserMenu
         pubkey={note.pubkey}
-        bind:metadata
+        {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
@@ -98,7 +110,7 @@
       {#if displayMenu}
         <button
           title="goto note page"
-          on:click={handleClickToNotepage}
+          onclick={handleClickToNotepage}
           class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
           <time datetime={datetime(note.created_at)}
@@ -108,6 +120,6 @@
       {/if}
     </div>
     <!--<hr />-->
-    <slot></slot>
+    {@render children?.()}
   </div>
 </div>

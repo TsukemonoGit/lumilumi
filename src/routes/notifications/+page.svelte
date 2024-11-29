@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { now, type EventPacket } from "rx-nostr";
   import {
     defaultRelays,
@@ -32,7 +34,7 @@
   let isOnMount = false;
 
   const timelineQuery: QueryKey = ["notifications"];
-  let filters: Nostr.Filter[] = [
+  let filters: Nostr.Filter[] = $state([
     {
       kinds: [1, 6, 7, 16, 42, 9735, 4 /**初代DM*/, 1059 /** 三代目DM */],
 
@@ -41,14 +43,18 @@
       until: undefined,
       limit: undefined,
     },
-  ];
-  $: readRelays = $defaultRelays
-    ? Object.values($defaultRelays)
-        .filter((config) => config.read)
-        .map((value) => value.url)
-    : [];
-  $: console.log(readRelays);
-  let view = false;
+  ]);
+  let readRelays = $derived(
+    $defaultRelays
+      ? Object.values($defaultRelays)
+          .filter((config) => config.read)
+          .map((value) => value.url)
+      : []
+  );
+  run(() => {
+    console.log(readRelays);
+  });
+  let view = $state(false);
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
@@ -114,7 +120,9 @@
   //   easing: cubicInOut,
   // });
 
-  $: console.log($value); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
+  run(() => {
+    console.log($value);
+  }); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
   const handleClickAll = () => {
     value.set(triggers.map((trigger) => trigger.id));
@@ -141,7 +149,7 @@
     }
   };
 
-  let notifilter = (event: Nostr.Event): boolean => {
+  let notifilter = $state((event: Nostr.Event): boolean => {
     if (event.pubkey === $loginUser) {
       return false;
     }
@@ -166,7 +174,7 @@
     }
     //  return true;
     return filterSelectedStates(event);
-  };
+  });
   //tabの選択状況によってのフィルターもTimelineListの中でやろうかと思ったけどnext🔻押したときの挙動がー（allではにページ目だけど他のとこではまだ一ページ目でなんとかかんとかとか）だからやめておく
   //filterしたあとの長さで考えたらへんになるねと思ったけどなんとかなったかも
   const filterSelectedStates = (event: Nostr.Event): boolean => {
@@ -194,12 +202,14 @@
       }
     });
   };
-  let updateViewEvent: any;
-  $: if ($value || $onlyFollowee) {
-    if (updateViewEvent) {
-      updateViewEvent();
+  let updateViewEvent: any = $state();
+  run(() => {
+    if ($value || $onlyFollowee) {
+      if (updateViewEvent) {
+        updateViewEvent();
+      }
     }
-  }
+  });
 </script>
 
 <!-- <svelte:head>
@@ -222,7 +232,7 @@
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === triggers.length}
-          on:click={handleClickAll}
+          onclick={handleClickAll}
         >
           All
         </button>
@@ -236,14 +246,14 @@
             {#if typeof triggerItem.title === "string"}
               {triggerItem.title}
             {:else}
-              <svelte:component this={triggerItem.title} />
+              <triggerItem.title />
             {/if}
           </button>
         {/each}
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === 0}
-          on:click={handleClickNone}
+          onclick={handleClickNone}
         >
           None
         </button>
@@ -252,42 +262,50 @@
         <NotificationList
           queryKey={timelineQuery}
           {filters}
-          let:events
           {viewIndex}
           {amount}
-          bind:eventFilter={notifilter}
+          eventFilter={notifilter}
           {tieKey}
           bind:updateViewEvent
         >
-          <!-- <div slot="loading">
-          <p>Loading...</p>
-        </div> -->
+          {#snippet children({ events })}
+            <!-- <div slot="loading">
+            <p>Loading...</p>
+          </div> -->
 
-          <!-- <SetRepoReactions /> -->
-          <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-          >
-            {#if events && events.length > 0}
-              {#each events as event, index (event.id)}
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <div slot="nodata" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <div slot="error" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <EventCard {metadata} note={event} {tieKey} /></Metadata
-                >
-              {/each}
-            {/if}
-          </div>
+            <!-- <SetRepoReactions /> -->
+            <div
+              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            >
+              {#if events && events.length > 0}
+                {#each events as event, index (event.id)}
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                  >
+                    {#snippet loading()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet nodata()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet error()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet content({ metadata })}
+                      <EventCard {metadata} note={event} {tieKey} />
+                    {/snippet}
+                  </Metadata>
+                {/each}
+              {/if}
+            </div>
+          {/snippet}
         </NotificationList>{/if}
     </div>
   </section>

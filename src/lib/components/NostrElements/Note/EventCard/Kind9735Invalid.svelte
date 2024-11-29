@@ -4,77 +4,93 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import NoteTemplate from "../NoteTemplate.svelte";
 
-  export let note: Nostr.Event;
-  export let depth: number;
-  export let repostable: boolean;
-  export let maxHeight: string;
-  export let displayMenu: boolean;
-  export let tieKey: string | undefined;
-  export let mini;
-  export let message: string | undefined = undefined;
-  // console.log(message);
+  interface Props {
+    note: Nostr.Event;
+    depth: number;
+    repostable: boolean;
+    maxHeight: string;
+    displayMenu: boolean;
+    tieKey: string | undefined;
+    mini: any;
+    message?: string | undefined; // console.log(message);
+  }
+
+  let {
+    note,
+    depth,
+    repostable,
+    maxHeight,
+    displayMenu,
+    tieKey,
+    mini,
+    message = undefined,
+  }: Props = $props();
 </script>
 
-<Metadata
-  queryKey={["metadata", note.pubkey]}
-  pubkey={note.pubkey}
-  let:metadata
->
-  <div slot="loading">
-    <NoteTemplate
-      {note}
-      metadata={undefined}
-      {mini}
-      {displayMenu}
-      {depth}
-      {tieKey}
-      ><span class="text-magnum-200 italic"
-        >{message ?? `Invalid kind:${note.kind} Event`}</span
+<Metadata queryKey={["metadata", note.pubkey]} pubkey={note.pubkey}>
+  {#snippet loading()}
+    <div>
+      <NoteTemplate
+        {note}
+        metadata={undefined}
+        {mini}
+        {displayMenu}
+        {depth}
+        {tieKey}
+        ><span class="text-magnum-200 italic"
+          >{message ?? `Invalid kind:${note.kind} Event`}</span
+        >
+        <div class="w-fit ml-auto">
+          <NoteActionButtons {note} {repostable} {tieKey} />
+        </div></NoteTemplate
       >
-      <div class="w-fit ml-auto">
-        <NoteActionButtons {note} {repostable} {tieKey} />
-      </div></NoteTemplate
-    >
-  </div>
-  <div slot="nodata">
-    <NoteTemplate
-      {note}
-      metadata={undefined}
-      {mini}
-      {displayMenu}
-      {depth}
-      {tieKey}
-      ><span class="text-magnum-200 italic"
-        >{message ?? `Invalid kind:${note.kind} Event`}</span
+    </div>
+  {/snippet}
+  {#snippet nodata()}
+    <div>
+      <NoteTemplate
+        {note}
+        metadata={undefined}
+        {mini}
+        {displayMenu}
+        {depth}
+        {tieKey}
+        ><span class="text-magnum-200 italic"
+          >{message ?? `Invalid kind:${note.kind} Event`}</span
+        >
+        <div class="w-fit ml-auto">
+          <NoteActionButtons {note} {repostable} {tieKey} />
+        </div></NoteTemplate
       >
-      <div class="w-fit ml-auto">
-        <NoteActionButtons {note} {repostable} {tieKey} />
-      </div></NoteTemplate
-    >
-  </div>
-  <div slot="error">
-    <NoteTemplate
-      {note}
-      metadata={undefined}
-      {mini}
-      {displayMenu}
-      {depth}
-      {tieKey}
-      ><span class="text-magnum-200 italic"
-        >{message ?? `Invalid kind:${note.kind} Event`}</span
+    </div>
+  {/snippet}
+  {#snippet error()}
+    <div>
+      <NoteTemplate
+        {note}
+        metadata={undefined}
+        {mini}
+        {displayMenu}
+        {depth}
+        {tieKey}
+        ><span class="text-magnum-200 italic"
+          >{message ?? `Invalid kind:${note.kind} Event`}</span
+        >
+        <div class="w-fit ml-auto">
+          <NoteActionButtons {note} {repostable} {tieKey} />
+        </div></NoteTemplate
       >
-      <div class="w-fit ml-auto">
-        <NoteActionButtons {note} {repostable} {tieKey} />
-      </div></NoteTemplate
-    >
-  </div>
+    </div>
+  {/snippet}
 
-  <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
-    ><span class="text-magnum-200 italic whitespace-pre-wrap break-words"
-      >{message ?? `Invalid kind:${note.kind} Event`}</span
+  {#snippet content({ metadata })}
+    <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}
+      ><span class="text-magnum-200 italic whitespace-pre-wrap break-words"
+        >{message ?? `Invalid kind:${note.kind} Event`}</span
+      >
+      <div class="w-fit ml-auto">
+        <NoteActionButtons {note} {repostable} {tieKey} />
+      </div></NoteTemplate
     >
-    <div class="w-fit ml-auto">
-      <NoteActionButtons {note} {repostable} {tieKey} />
-    </div></NoteTemplate
-  >
+  {/snippet}
 </Metadata>

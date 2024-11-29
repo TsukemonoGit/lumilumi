@@ -4,13 +4,17 @@
   import type { UserMuteStatus } from "$lib/types";
   import { Repeat2, SmilePlus, User, Slash, Zap } from "lucide-svelte";
 
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+  }
 
-  $: muteStatus =
-    $mutes || $mutebykinds ? userMuteStatus(pubkey) : initUserMuteStatus;
-  $: existMuteStatus = (
+  let { pubkey }: Props = $props();
+
+  let muteStatus =
+    $derived($mutes || $mutebykinds ? userMuteStatus(pubkey) : initUserMuteStatus);
+  let existMuteStatus = $derived((
     Object.keys(muteStatus) as Array<keyof UserMuteStatus>
-  ).find((key) => muteStatus[key] === true);
+  ).find((key) => muteStatus[key] === true));
 </script>
 
 {#if existMuteStatus}

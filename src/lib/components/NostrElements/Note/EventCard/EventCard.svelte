@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import * as Nostr from "nostr-typedef";
 
   import { Repeat2 } from "lucide-svelte";
@@ -42,7 +44,6 @@
   import { muteCheck, type MuteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "../ReactionWebsite.svelte";
-  import type { Ogp } from "$lib/func/ogp";
 
   import Kind31990Note from "./Kind31990Note.svelte";
 
@@ -60,42 +61,38 @@
 
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined = undefined;
-  //export let status: string | undefined = undefined;
-  export let mini: boolean = false;
+  let currentNoteTag: string[] | undefined = $state(undefined);
 
-  let currentNoteTag: string[] | undefined = undefined;
-  export let displayMenu: boolean = true;
-  export let maxHeight: string = "24rem";
-  export let thread: boolean = false;
-  export let depth: number = 0;
-  export let viewMuteEvent = false;
-  export let excludefunc = (event: Nostr.Event) => false;
-
-  export let repostable: boolean = true;
-
-  export let tieKey: string | undefined;
-
-  let atag: string | undefined;
-  $: {
-    if (
-      (note.kind >= 10000 && note.kind < 20000) ||
-      (note.kind >= 30000 && note.kind < 40000) ||
-      note.kind === 0 ||
-      note.kind === 3
-    ) {
-      //atag　で　りぽすと
-      const dtag = note.tags.find((tag) => tag[0] === "d");
-      atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
-    } else {
-      atag = undefined;
-    }
+  interface Props {
+    note: Nostr.Event;
+    metadata?: Nostr.Event | undefined;
+    //export let status: string | undefined = undefined;
+    mini?: boolean;
+    displayMenu?: boolean;
+    maxHeight?: string;
+    thread?: boolean;
+    depth?: number;
+    viewMuteEvent?: boolean;
+    excludefunc?: any;
+    repostable?: boolean;
+    tieKey: string | undefined;
   }
 
-  $: paramNoteId = $page.params.note
-    ? getIDbyParam($page.params.note)
-    : undefined;
+  let {
+    note,
+    metadata = $bindable(undefined),
+    mini = false,
+    displayMenu = true,
+    maxHeight = "24rem",
+    thread = false,
+    depth = 0,
+    viewMuteEvent = $bindable(false),
+    excludefunc = (event: Nostr.Event) => false,
+    repostable = true,
+    tieKey,
+  }: Props = $props();
+
+  let atag: string | undefined = $state();
 
   function getIDbyParam(str: string) {
     const { type, data } = nip19.decode(str);
@@ -105,61 +102,6 @@
       return data.id;
     } else {
       console.log(data);
-    }
-  }
-
-  let muteType: MuteCheck;
-  $: if ($mutes || $mutebykinds || $timelineFilter) {
-    muteType = !$timelineFilter.adaptMute
-      ? "null"
-      : paramNoteId === note.id || excludefunc(note)
-        ? "null"
-        : $mutes || $mutebykinds
-          ? muteCheck(note)
-          : "null";
-  }
-  // // 指定したタグが既に存在するか確認するヘルパー関数
-  // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {
-  //   return viewEventIds.some(
-  //     (item: string[]) => item[0] === tagType && item[1] === tagId
-  //   );
-  // }
-
-  //フィルター作る方で重複削除してるから自分の分だけ追加・削除する
-
-  //atag
-  $: if (note.id) {
-    if (
-      atag &&
-      (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
-    ) {
-      // 現在のタグを削除
-      if (currentNoteTag) {
-        removeFirstMatchingId($viewEventIds, currentNoteTag);
-      }
-      // 新しいタグがまだ存在しなければ追加
-      //if (!tagExists($viewEventIds, "a", atag)) {
-      $viewEventIds.push(["a", atag]);
-      //}
-      currentNoteTag = ["a", atag];
-      $viewEventIds = $viewEventIds;
-    } else if (
-      atag === undefined &&
-      note &&
-      note.id !== "" && // プレビュー画面の無効なIDを除外
-      (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
-    ) {
-      //etag
-      // 現在のタグを削除
-      if (currentNoteTag) {
-        removeFirstMatchingId($viewEventIds, currentNoteTag);
-      }
-      // 新しいタグがまだ存在しなければ追加
-      // if (!tagExists($viewEventIds, "e", note.id)) {
-      $viewEventIds.push(["e", note.id]);
-      //}
-      currentNoteTag = ["e", note.id];
-      $viewEventIds = $viewEventIds;
     }
   }
 
@@ -187,98 +129,9 @@
     return tags.find((item) => item[0] === "content-warning");
   };
 
-  // const findClientTag = (
-  //   note: Nostr.Event
-  // ):
-  //   | {
-  //       name: string;
-  //       aTag: string;
-  //       filter: Nostr.Filter;
-  //       naddr: string | undefined;
-  //     }
-  //   | undefined => {
-  //   const clientTag = note.tags.find((item) => item[0] === "client");
-  //   if (!clientTag) {
-  //     return undefined;
-  //   }
-  //   const matches = clientTag[2]?.match(nip33Regex);
-  //   if (!matches) {
-  //     return undefined;
-  //   }
-  //   const filter: Nostr.Filter = {
-  //     kinds: [Number(matches[1])],
-  //     authors: [matches[2]],
-  //     "#d": [matches[3]],
-  //     limit: 1,
-  //   };
-
-  //   const dtag = note.tags.find((tag) => tag[0] === "d");
-  //   const naddrAddress: nip19.AddressPointer = {
-  //     identifier: dtag?.[1] ?? "",
-  //     kind: note.kind,
-  //     pubkey: note.pubkey,
-  //     relays: getRelaysById(note.id),
-  //   };
-  //   try {
-  //     return {
-  //       name: clientTag[1],
-  //       aTag: clientTag[2],
-  //       filter: filter,
-  //       naddr: nip19.naddrEncode(naddrAddress),
-  //     };
-  //   } catch (error) {
-  //     return {
-  //       name: clientTag[1],
-  //       aTag: clientTag[2],
-  //       filter: filter,
-  //       naddr: undefined,
-  //     };
-  //   }
-  // };
-
-  // const findWebURL = (
-  //   tags: string[][],
-  //   clientData: {
-  //     name: string;
-  //     aTag: string;
-  //     filter: Nostr.Filter;
-  //     naddr: string | undefined;
-  //   }
-  // ): string[] => {
-  //   if (!clientData.naddr) return [];
-  //   const webTag = tags.reduce((acc, [tag, url, nip19]) => {
-  //     if (tag === "web" && nip19 === "naddr") {
-  //       return [...acc, url];
-  //     } else {
-  //       return acc;
-  //     }
-  //   }, []);
-
-  //   if (webTag.length == 0) {
-  //     return [];
-  //   }
-  //   return webTag.map((item) => {
-  //     return item.replace(bech32Pattern, clientData.naddr ?? "");
-  //   });
-  // };
-
-  $: warning = checkContentWarning(note.tags); // string[] | undefined
-
   // const { kind, tag } = repostedId(note.tags);
-  let replyTag: string[] | undefined;
-  let replyUsers: string[];
-  $: if (
-    note &&
-    (note.kind === 1 || note.kind === 42 || note.kind === 4) &&
-    note.tags.length > 0
-  ) {
-    const res = replyedEvent(note.tags);
-    replyTag = res.replyTag;
-    replyUsers = res.replyUsers;
-  } else {
-    replyTag = undefined;
-    replyUsers = [];
-  }
+  let replyTag: string[] | undefined = $state();
+  let replyUsers: string[] = $state([]);
   const handleClickToChannel = (id: string) => {
     if (!id) {
       return;
@@ -290,22 +143,116 @@
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
 
-  $: petname = $followList.get(note.pubkey);
-
-  let loadThread = false;
+  let loadThread = $state(false);
 
   //canvasationcheck
   // $: showCanvasationCheck =
   //   $page.url.pathname !== "/"
   //     ? true
   //     : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
+
+  if (
+    (note.kind >= 10000 && note.kind < 20000) ||
+    (note.kind >= 30000 && note.kind < 40000) ||
+    note.kind === 0 ||
+    note.kind === 3
+  ) {
+    //atag　で　りぽすと
+    const dtag = note.tags.find((tag) => tag[0] === "d");
+    atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+  } else {
+    atag = undefined;
+  }
+
+  let paramNoteId = $derived(
+    $page.params.note ? getIDbyParam($page.params.note) : undefined
+  );
+  let muteType = $derived.by(() => {
+    if ($mutes || $mutebykinds || $timelineFilter) {
+      return !$timelineFilter.adaptMute
+        ? "null"
+        : paramNoteId === note.id || excludefunc(note)
+          ? "null"
+          : $mutes || $mutebykinds
+            ? muteCheck(note)
+            : "null";
+    } else {
+      return "null";
+    }
+  });
+  // // 指定したタグが既に存在するか確認するヘルパー関数
+  // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {
+  //   return viewEventIds.some(
+  //     (item: string[]) => item[0] === tagType && item[1] === tagId
+  //   );
+  // }
+
+  //フィルター作る方で重複削除してるから自分の分だけ追加・削除する
+
+  //atag
+  $effect.pre(() => {
+    noteIDchange(note);
+  });
+
+  function noteIDchange(note: Nostr.Event) {
+    if (note.id) {
+      if (
+        atag &&
+        (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
+      ) {
+        // 現在のタグを削除
+        if (currentNoteTag) {
+          removeFirstMatchingId($viewEventIds, currentNoteTag);
+        }
+        // 新しいタグがまだ存在しなければ追加
+        //if (!tagExists($viewEventIds, "a", atag)) {
+        $viewEventIds.push(["a", atag]);
+        //}
+        currentNoteTag = ["a", atag];
+        $viewEventIds = $viewEventIds;
+      } else if (
+        atag === undefined &&
+        note &&
+        note.id !== "" && // プレビュー画面の無効なIDを除外
+        (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
+      ) {
+        //etag
+        // 現在のタグを削除
+        if (currentNoteTag) {
+          removeFirstMatchingId($viewEventIds, currentNoteTag);
+        }
+        // 新しいタグがまだ存在しなければ追加
+        // if (!tagExists($viewEventIds, "e", note.id)) {
+        $viewEventIds.push(["e", note.id]);
+        //}
+        currentNoteTag = ["e", note.id];
+        $viewEventIds = $viewEventIds;
+      }
+    }
+    if (
+      note &&
+      (note.kind === 1 || note.kind === 42 || note.kind === 4) &&
+      note.tags.length > 0
+    ) {
+      const res = replyedEvent(note.tags);
+      replyTag = res.replyTag;
+      replyUsers = res.replyUsers;
+    } else {
+      replyTag = undefined;
+      replyUsers = [];
+    }
+  }
+
+  let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
+
+  let petname = $derived($followList.get(note.pubkey));
 </script>
 
 <!-- {#if showCanvasationCheck} -->
 {#if muteType !== "null" && depth >= 1}
   <button
     class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-    on:click={() => (viewMuteEvent = !viewMuteEvent)}
+    onclick={() => (viewMuteEvent = !viewMuteEvent)}
   >
     {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
   </button>
@@ -315,7 +262,7 @@
     {#if depth >= 1 && depth % 6 === 0 && !loadThread}
       <button
         class="my-1 flex items-center w-fit px-2 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
-        on:click={() => (loadThread = true)}
+        onclick={() => (loadThread = true)}
       >
         Show more
       </button>
@@ -395,7 +342,7 @@
         <div class="self-center">
           <UserMenu
             pubkey={note.pubkey}
-            bind:metadata
+            {metadata}
             size={20}
             {displayMenu}
             {depth}
@@ -454,7 +401,7 @@
         <div class="self-center">
           <UserMenu
             pubkey={note.pubkey}
-            bind:metadata
+            {metadata}
             size={20}
             {displayMenu}
             {depth}
@@ -518,42 +465,49 @@
         filters={[
           { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
         ]}
-        let:event
       >
-        <div slot="loading">
+        {#snippet loading()}
+          <div>
+            <ChannelMetadataLayout
+              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+              handleClickToChannel={() => handleClickToChannel(note.id)}
+              id={note.id}
+              event={note}
+              {tieKey}
+            />
+          </div>
+        {/snippet}
+        {#snippet nodata()}
+          <div>
+            <ChannelMetadataLayout
+              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+              handleClickToChannel={() => handleClickToChannel(note.id)}
+              id={note.id}
+              event={note}
+              {tieKey}
+            />
+          </div>
+        {/snippet}
+        {#snippet error()}
+          <div>
+            <ChannelMetadataLayout
+              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
+              handleClickToChannel={() => handleClickToChannel(note.id)}
+              id={note.id}
+              event={note}
+              {tieKey}
+            />
+          </div>
+        {/snippet}
+        {#snippet children({ event })}
           <ChannelMetadataLayout
             linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
             handleClickToChannel={() => handleClickToChannel(note.id)}
             id={note.id}
-            event={note}
+            {event}
             {tieKey}
           />
-        </div>
-        <div slot="nodata">
-          <ChannelMetadataLayout
-            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-            handleClickToChannel={() => handleClickToChannel(note.id)}
-            id={note.id}
-            event={note}
-            {tieKey}
-          />
-        </div>
-        <div slot="error">
-          <ChannelMetadataLayout
-            linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-            handleClickToChannel={() => handleClickToChannel(note.id)}
-            id={note.id}
-            event={note}
-            {tieKey}
-          />
-        </div>
-        <ChannelMetadataLayout
-          linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-          handleClickToChannel={() => handleClickToChannel(note.id)}
-          id={note.id}
-          {event}
-          {tieKey}
-        />
+        {/snippet}
       </LatestEvent>
     {:else if note.kind === 41}
       <!--kind:40チャンネルroot-->
@@ -823,6 +777,6 @@
 <style>
   article {
     content-visibility: auto;
-    contain-intrinsic-size: auto 300px;
+    contain-intrinsic-size: auto 100px;
   }
 </style>

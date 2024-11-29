@@ -4,8 +4,12 @@
   import Popover from "./Elements/Popover.svelte";
   import { relayStateMap } from "$lib/stores/stores";
 
-  export let relay: string;
-  $: relayUrl = cleanRelayUrl(relay); // /がついてるほう
+  interface Props {
+    relay: string;
+  }
+
+  let { relay }: Props = $props();
+  let relayUrl = $derived(cleanRelayUrl(relay)); // /がついてるほう
 </script>
 
 <Popover ariaLabel={`${relay} status`}>
@@ -15,7 +19,9 @@
       $relayStateMap.get(relayUrl)
     )} fill-current  min-w-[20px] mr-1"
   />
-  <div slot="popoverContent" class="mr-8">
-    {$relayStateMap.get(relayUrl)}
-  </div></Popover
+  {#snippet popoverContent()}
+    <div  class="mr-8">
+      {$relayStateMap.get(relayUrl)}
+    </div>
+  {/snippet}</Popover
 >

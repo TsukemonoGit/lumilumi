@@ -3,24 +3,39 @@
   import { createPopover, createSync, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  export let open = false;
-  export let ariaLabel: string;
-  export let zIndex = 20;
   const {
     elements: { trigger, content, arrow, close },
     states,
   } = createPopover({
     forceVisible: true,
   });
-  export let showCloseButton = true;
+  interface Props {
+    open?: boolean;
+    ariaLabel: string;
+    zIndex?: number;
+    showCloseButton?: boolean;
+    children?: import("svelte").Snippet;
+    popoverContent?: import("svelte").Snippet;
+  }
+
+  let {
+    open = $bindable(false),
+    ariaLabel,
+    zIndex = 20,
+    showCloseButton = true,
+    children,
+    popoverContent,
+  }: Props = $props();
   const sync = createSync(states);
-  $: sync.open(open, (v) => (open = v));
+  $effect.pre(() => {
+    sync.open(open, (v) => (open = v));
+  });
 </script>
 
 <button
   class="hover:opacity-75 active:opacity-50 w-fit"
   aria-label={ariaLabel}
-  use:melt={$trigger}><slot /></button
+  use:melt={$trigger}>{@render children?.()}</button
 >{#if open}<div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
@@ -28,7 +43,7 @@
     style={`z-index:${zIndex}`}
   >
     <div use:melt={$arrow}></div>
-    <div class="flex flex-col gap-2.5"><slot name="popoverContent"></slot></div>
+    <div class="flex flex-col gap-2.5">{@render popoverContent?.()}</div>
     {#if showCloseButton}<button class="close" use:melt={$close}>
         <X class="size-4" /></button
       >{/if}

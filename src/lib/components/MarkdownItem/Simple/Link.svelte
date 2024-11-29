@@ -1,24 +1,37 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import NostrContent from "./NostrContent.svelte";
 
-  export let part: Token;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  export let tieKey: string | undefined;
-  //console.log(part);
-  let children: Token[];
-  $: if (part.children) {
-    children = transformTokens(part.children);
+  interface Props {
+    part: Token;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    tieKey: string | undefined;
   }
-  $: url = part.attrs?.find((attr) => attr[0] === "href")?.[1];
-  $: href = url?.startsWith("nostr:") ? `./${url.slice(6)}` : url;
+
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey,
+  }: Props = $props();
+  //console.log(part);
+  let children: Token[] = $derived(transformTokens(part.children ?? []));
+
+  let url = $derived(part.attrs?.find((attr) => attr[0] === "href")?.[1]);
+  let href = $derived(url?.startsWith("nostr:") ? `./${url.slice(6)}` : url);
 </script>
 
 <a

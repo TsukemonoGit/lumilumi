@@ -16,21 +16,41 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
 
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let maxHeight: string;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    note: Nostr.Event;
+    metadata: Nostr.Event | undefined;
+    displayMenu: boolean;
+    depth: number;
+    maxHeight: string;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
 
-  $: title = note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1];
-  $: dtag = note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1];
-  $: description = note.tags.find(
-    (tag) =>
-      (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-  )?.[1];
-  $: image = note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1];
+  let {
+    note,
+    metadata,
+    displayMenu,
+    depth,
+    maxHeight,
+    repostable,
+    tieKey,
+  }: Props = $props();
+
+  let title = $derived(
+    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
+  );
+  let dtag = $derived(
+    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+  );
+  let description = $derived(
+    note.tags.find(
+      (tag) =>
+        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
+    )?.[1]
+  );
+  let image = $derived(
+    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+  );
 
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||
@@ -58,7 +78,7 @@
     goto(`/${replaceable ? naddr : nevent}`);
   };
 
-  $: prof = profile(metadata);
+  let prof = $derived(profile(metadata));
 </script>
 
 <div
@@ -70,7 +90,7 @@
       <div>
         <UserMenu
           pubkey={note.pubkey}
-          bind:metadata
+          {metadata}
           size={20}
           {displayMenu}
           {depth}
@@ -90,7 +110,7 @@
       </div>
       {#if displayMenu}
         <button
-          on:click={handleClickToNotepage}
+          onclick={handleClickToNotepage}
           class="  ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
           <time datetime={datetime(note.created_at)}

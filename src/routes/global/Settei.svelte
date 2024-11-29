@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { relayRegex2 } from "$lib/func/regex";
   import { createAccordion, melt } from "@melt-ui/svelte";
   import { ChevronDown, X } from "lucide-svelte";
@@ -7,15 +9,21 @@
   import { toastSettings } from "$lib/stores/stores";
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
-  export let relays: string[] = [];
-  export let title: string;
-  export let Description;
-  export let onClickSave: (relays: string[]) => void;
+  interface Props {
+    relays?: string[];
+    title: string;
+    Description: any;
+    onClickSave: (relays: string[]) => void;
+  }
+
+  let { relays = [], title, Description, onClickSave }: Props = $props();
 
   const newRelays = writable<string[]>([...(relays ?? [])]);
-  $: if (relays) {
-    $newRelays = [...relays];
-  }
+  $effect.pre(() => {
+    if (relays) {
+      newRelays.set([...relays]);
+    }
+  });
   const {
     elements: { content, item, trigger, root },
     helpers: { isSelected },
@@ -25,7 +33,7 @@
   const removeRelay = (str: string) => {
     $newRelays = $newRelays.filter((relay) => relay !== str);
   };
-  let newRelayURL: string = "";
+  let newRelayURL: string = $state("");
 
   const handleClickAdd = () => {
     if (!newRelayURL.trim()) {
@@ -90,14 +98,14 @@
       >
         <button
           class="rounded-md bg-magnum-700 px-2 py-1 font-bold hover:opacity-75 active:opacity-50"
-          on:click={() => ($newRelays = relays)}>RESET</button
+          onclick={() => ($newRelays = relays)}>RESET</button
         >
         <div class="text-sm p-1">
           {#each $newRelays as relay}
             <div class="flex items-center gap-1">
               <RelayStatusColor {relay} />{relay}<button
                 class="ml-1 rounded-full bg-magnum-700 hover:opacity-75 active:opacity-50"
-                on:click={() => removeRelay(relay)}><X /></button
+                onclick={() => removeRelay(relay)}><X /></button
               >
             </div>
           {/each}
@@ -105,19 +113,19 @@
             <input type="text" placeholder="wss://" bind:value={newRelayURL} />
             <button
               class="rounded-full px-1 bg-magnum-700 hover:opacity-75 active:opacity-50"
-              on:click={handleClickAdd}>ADD</button
+              onclick={handleClickAdd}>ADD</button
             >
           </div>
         </div>
         <button
           class="rounded-md bg-magnum-700 px-2 py-1 font-bold hover:opacity-75 active:opacity-50"
-          on:click={handleClickSave}>SAVE</button
+          onclick={handleClickSave}>SAVE</button
         >
       </div>
       <hr />
       <div class=" font-medium text-magnum-400 p-2">
         {#if Description}
-          <svelte:component this={Description} />
+          <Description />
         {/if}
       </div>
     </div>
