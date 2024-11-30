@@ -24,7 +24,7 @@
   import Reply from "../Reply.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy } from "svelte";
+  import { onDestroy, untrack } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
 
@@ -190,8 +190,10 @@
   //フィルター作る方で重複削除してるから自分の分だけ追加・削除する
 
   //atag
-  $effect.pre(() => {
-    noteIDchange(note);
+  $effect(() => {
+    if (note) {
+      untrack(() => noteIDchange(note));
+    }
   });
 
   function noteIDchange(note: Nostr.Event) {

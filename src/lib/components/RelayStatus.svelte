@@ -8,6 +8,7 @@
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import RelayStatusColor from "./RelayStatusColor.svelte";
   import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
+  import { untrack } from "svelte";
 
   let readRelays = $derived(
     $defaultRelays
@@ -55,7 +56,9 @@
   let derivedStateMap = $derived($relayStateMap);
 
   $effect(() => {
-    stateMapChange(derivedStateMap);
+    if ($relayStateMap) {
+      untrack(() => stateMapChange(derivedStateMap));
+    }
   });
 
   function stateMapChange(map: Map<string, ConnectionState>) {

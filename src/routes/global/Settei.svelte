@@ -9,6 +9,7 @@
   import { toastSettings } from "$lib/stores/stores";
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
+  import { untrack } from "svelte";
   interface Props {
     relays?: string[];
     title: string;
@@ -19,9 +20,9 @@
   let { relays = [], title, Description, onClickSave }: Props = $props();
 
   const newRelays = writable<string[]>([...(relays ?? [])]);
-  $effect.pre(() => {
+  $effect(() => {
     if (relays) {
-      newRelays.set([...relays]);
+      untrack(() => newRelays.set([...relays]));
     }
   });
   const {

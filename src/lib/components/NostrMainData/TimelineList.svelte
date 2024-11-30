@@ -27,7 +27,7 @@
     type EventPacket,
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import { sortEvents } from "$lib/func/util";
   import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
@@ -132,7 +132,9 @@
   const [tie, tieMap] = createTie();
 
   $effect(() => {
-    setTie(tieKey);
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
   });
 
   function setTie(_tieKey: string) {
@@ -188,7 +190,9 @@
   let readUrls: string[] = [];
 
   $effect(() => {
-    defaultRelayChange($defaultRelays);
+    if ($defaultRelays) {
+      untrack(() => defaultRelayChange($defaultRelays));
+    }
   });
 
   function defaultRelayChange(relays: Record<string, DefaultRelayConfig>) {
@@ -200,7 +204,9 @@
   }
 
   $effect(() => {
-    dataChange($globalData, viewIndex, $nowProgress);
+    if (($globalData && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => dataChange($globalData, viewIndex, $nowProgress));
+    }
   });
 
   function dataChange(

@@ -59,7 +59,7 @@ let relay: DefaultRelayConfig[] = [];
 export function toRelaySet(
   value: EventPacket | EventPacket[] | undefined | null
 ): DefaultRelayConfig[] {
-  console.log(value);
+  // console.log(value);
   if (!value) {
     return [];
   } else if (Array.isArray(value)) {

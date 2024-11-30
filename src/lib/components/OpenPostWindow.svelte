@@ -58,6 +58,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
   import { clientTag, mediaUploader } from "$lib/func/constants";
+  import { untrack } from "svelte";
 
   let {
     options = {
@@ -623,7 +624,7 @@
 
   $effect(() => {
     if (viewMetadataList) {
-      setMetadataList();
+      untrack(() => setMetadataList());
     }
   });
 </script>

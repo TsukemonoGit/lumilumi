@@ -5,7 +5,7 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, type Component } from "svelte";
+  import { onMount, untrack, type Component } from "svelte";
 
   import {
     app,
@@ -174,7 +174,11 @@
     }
   });
 
-  $effect(() => baddrCheck($page, nlBanner, $showBanner));
+  $effect(() => {
+    if ($page && nlBanner && $showBanner) {
+      untrack(() => baddrCheck($page, nlBanner, $showBanner));
+    }
+  });
 
   function baddrCheck(page: any, banner: any, showbnr: any) {
     if (page.route.id === "/settings" && nlBanner) {

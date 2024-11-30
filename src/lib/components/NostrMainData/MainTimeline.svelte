@@ -24,7 +24,7 @@
   } from "./timelineList";
   import { createTie, now, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
@@ -178,8 +178,10 @@
   let deriveaData = $derived($data);
 
   $effect(() => {
-    dataChange(deriveaData, viewIndex, $nowProgress);
+    if ((deriveaData && viewIndex >= 0) || !$nowProgress)
+      untrack(() => dataChange(deriveaData, viewIndex, $nowProgress));
   });
+
   function dataChange(
     data: EventPacket[] | null | undefined,
     index: number,
@@ -191,7 +193,9 @@
   }
 
   $effect(() => {
-    setTie(tieKey);
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
   });
 
   function setTie(_tieKey: string) {

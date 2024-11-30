@@ -66,18 +66,18 @@
   let errorData: Error | undefined = $state();
 
   result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
-    console.log(value);
+    // console.log(value);
     if (value && value.length > 0) {
       data = value;
       //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
     }
   });
   result?.status.subscribe((value: ReqStatus | undefined) => {
-    console.log(value);
+    // console.log(value);
     if (value) {
       status = value;
       if (value === "success" && !result.data) {
-        console.log(defaultRelays);
+        // console.log(defaultRelays);
         setRelays(defaultRelays);
         data = defaultRelays;
       }
@@ -89,12 +89,12 @@
     }
   });
   app.subscribe((value) => {
-    console.log(value, localRelays, paramRelays);
+    // console.log(value, localRelays, paramRelays);
     if (
       value &&
       (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
     ) {
-      console.log(localRelays, paramRelays);
+      //console.log(localRelays, paramRelays);
       setRelays($state.snapshot(localRelays || paramRelays));
     }
   });

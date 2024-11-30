@@ -11,6 +11,7 @@
     type RxReqOverable,
     type RxReqPipeable,
   } from "rx-nostr";
+  import { untrack } from "svelte";
 
   // export let req:
   //   | (RxReq<"backward"> &
@@ -81,7 +82,9 @@
 
   // When relays data is available, dispatch 'relayChange' event
   $effect(() => {
-    dataChange($data);
+    if ($data) {
+      untrack(() => dataChange($data));
+    }
   });
   function dataChange(data: string[] | null | undefined) {
     if (data && data.length > 0) {

@@ -10,6 +10,7 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
+  import { untrack } from "svelte";
 
   interface Props {
     pubkey: string;
@@ -69,7 +70,9 @@
   let errorData = $derived(result?.error);
 
   $effect(() => {
-    dataChange($data);
+    if ($data) {
+      untrack(() => dataChange($data));
+    }
   });
   function dataChange(data: string[] | null | undefined) {
     if (data && data.length > 0) {

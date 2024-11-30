@@ -25,7 +25,7 @@
     createTie,
     type LazyFilter,
   } from "rx-nostr";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
@@ -138,7 +138,9 @@
       .map((config) => config.url);
   }
   $effect(() => {
-    dataChange($data, viewIndex, $nowProgress);
+    if (($data && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => dataChange($data, viewIndex, $nowProgress));
+    }
   });
 
   function dataChange(
@@ -174,7 +176,9 @@
   const [tie, tieMap] = createTie();
   // $effect.pre(() => {
   $effect(() => {
-    setTie(tieKey);
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
   });
 
   function setTie(_tieKey: string) {
