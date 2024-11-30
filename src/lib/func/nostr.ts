@@ -62,6 +62,7 @@ export function setRxNostr() {
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
+  console.log(relays);
   if (rxNostr && defaultRelays) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());

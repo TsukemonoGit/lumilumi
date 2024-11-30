@@ -169,8 +169,16 @@
     refetchOnMount: false,
   });
 
+  // data?.subscribe((value) => {
+  //   if (updateViewEvent && ((value && viewIndex >= 0) || !$nowProgress)) {
+  //     updateViewEvent(value);
+  //   }
+  // });
+
+  let deriveaData = $derived($data);
+
   $effect(() => {
-    dataChange($data, viewIndex, $nowProgress);
+    dataChange(deriveaData, viewIndex, $nowProgress);
   });
   function dataChange(
     data: EventPacket[] | null | undefined,

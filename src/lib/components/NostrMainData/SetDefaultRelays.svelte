@@ -55,14 +55,20 @@
         error: Readable<any>;
       }
     | undefined;
-  let relays: DefaultRelayConfig[] | undefined = undefined;
 
-  console.log(pubkey);
-  loginUser.subscribe((value) => {
-    userChange(value);
+  //console.log(pubkey);
+
+  // loginUser.subscribe((value) => {
+  //   console.log(value, pubkey);
+  //   userChange(value);
+  // });
+  let derivedUser = $derived($loginUser);
+  //$inspect(derivedUser);
+  $effect(() => {
+    console.log(derivedUser, pubkey);
+    userChange(derivedUser, pubkey);
   });
-  // $effect(() => {
-  //   userChange($loginUser);
+
   //   // let result = pubkey
   //   //   ? deriveResult(localRelays, pubkey, req)
   //   //   : $loginUser !== ""
@@ -70,13 +76,12 @@
   //   //     : setLoadRelays();
   // });
 
-  function userChange(user: string) {
+  function userChange(user: string, pubkey: string) {
     if (pubkey) {
       result = deriveResult(localRelays, pubkey, req);
     } else if (user && user !== "") {
       result = deriveResult(localRelays, user, req);
     } else {
-      console.log(user, pubkey);
       result = setLoadRelays();
     }
   }
@@ -118,6 +123,7 @@
           RxReqPipeable)
       | undefined
   ) {
+    console.log(localRelays, pubkey);
     if (!localRelays || localRelays.length <= 0) {
       return useRelaySet(
         ["defaultRelay", pubkey],
@@ -139,13 +145,17 @@
   let data:
     | Readable<DefaultRelayConfig[] | null | undefined | string[]>
     | string[]
-    | undefined = result?.data;
+    | undefined = $derived(result?.data);
   let status = $derived(result?.status);
   let errorData = $derived(result?.error);
   // console.log($status);
+
+  let deriveaData = $derived($data);
+  let deriveaStatus = $derived($status);
   $effect(() => {
-    if ($data && $status) {
-      dataChange($status, $data);
+    if (deriveaData && deriveaStatus) {
+      console.log("changedata");
+      dataChange(deriveaStatus, deriveaData);
     }
   });
   function dataChange(
@@ -178,13 +188,11 @@
   // }
 </script>
 
-{#if relays}{@render contents?.({ relays: relays, status: "success" })}
-  <!-- <slot {relays} status="success" /> -->
-{:else if $errorData}
+{#if $errorData}
   {@render error?.($errorData)}
-{:else if $data && $data.length > 0}
+{:else if localRelays || (deriveaData && deriveaData.length > 0)}
   {@render contents?.({
-    relays: localRelays ?? $data,
+    relays: localRelays ?? deriveaData,
     status: $status ?? "error",
   })}
   <!-- <slot relays={localRelays ?? $data} status={$status ?? "error"} /> -->

@@ -37,20 +37,23 @@ export function useReq(
     refetchInterval: Infinity,
   }
 ): ReqResult<EventPacket | EventPacket[]> {
+  // console.log(filters);
   const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
+  //console.log(_queryClient);
 
   if (!_queryClient) {
     console.log("!_queryClient error");
     throw Error();
   }
+
   const _rxNostr = get(app).rxNostr;
+
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("DefaultRelays error");
     throw Error();
   }
   // console.log(_rxNostr.getDefaultRelays());
 
-  //  console.log(filters);
   let _req:
     | RxReqStrategy
     | (RxReq<"backward"> &

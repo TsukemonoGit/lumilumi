@@ -42,7 +42,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image } from "lucide-svelte";
+  import { Save, X, Image, RotateCw } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -409,12 +409,12 @@
     return false;
   }
 
-  // let shouldReload = false;
-  // // リロード前にフラグを設定してイベントリスナーを無効にする関数
-  // function reloadWithoutWarning() {
-  //   shouldReload = true;
-  //   location.reload();
-  // }
+  let shouldReload = false;
+  // リロード前にフラグを設定してイベントリスナーを無効にする関数
+  function reloadWithoutWarning() {
+    shouldReload = true;
+    location.reload();
+  }
 
   // function handleBeforeUnload(e: BeforeUnloadEvent) {
   //   if (!shouldReload && settingsChanged()) {
@@ -860,10 +860,10 @@
   <div
     class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
-    <!-- <button
+    <button
       class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
-      on:click={reloadWithoutWarning}><RotateCw /></button
-    > -->
+      onclick={reloadWithoutWarning}><RotateCw /></button
+    >
 
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
+  //import { run } from "svelte/legacy";
+  import type { ConnectionState } from "rx-nostr";
   import { defaultRelays, relayStateMap } from "$lib/stores/stores";
   import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
@@ -9,9 +9,6 @@
   import RelayStatusColor from "./RelayStatusColor.svelte";
   import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
 
-  run(() => {
-    console.log($defaultRelays);
-  });
   let readRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.read)
@@ -55,13 +52,24 @@
     //console.log(overallStateColor);
   }
 
-  run(() => {
-    if ($relayStateMap) {
-      if (readRelays?.length > 0 || writeRelays?.length > 0) {
-        setAllStatusState();
-      }
-    }
+  let derivedStateMap = $derived($relayStateMap);
+
+  $effect(() => {
+    stateMapChange(derivedStateMap);
   });
+
+  function stateMapChange(map: Map<string, ConnectionState>) {
+    if (readRelays?.length > 0 || writeRelays?.length > 0) {
+      setAllStatusState();
+    }
+  }
+  // run(() => {
+  //     if ($relayStateMap) {
+  //       if (readRelays?.length > 0 || writeRelays?.length > 0) {
+  //         setAllStatusState();
+  //       }
+  //     }
+  //   });
   // function getOverallConnectionState(): string {
   //   const relayStates = [...readRelays, ...writeRelays].map(
   //     (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
