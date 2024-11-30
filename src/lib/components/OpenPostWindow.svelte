@@ -59,6 +59,7 @@
   import { nsecRegex } from "$lib/func/regex";
   import { clientTag, mediaUploader } from "$lib/func/constants";
   import { untrack } from "svelte";
+  import Content from "./NostrElements/Note/Content.svelte";
 
   let {
     options = {
@@ -655,29 +656,44 @@
             max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      {#if signPubkey && $showImg && $showPreview}
+      {#if $showImg && $showPreview}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
         >
           <div class="font-medium text-magnum-400">preview</div>
           <div class="border border-magnum-500 rounded-md">
-            <EventCard
-              {metadata}
-              note={{
-                sig: "",
-                id: "",
-                pubkey: signPubkey,
-                content: text ?? "",
-                tags: tags,
-                kind: initOptions.kind,
-                created_at: now(),
-              }}
-              displayMenu={false}
-              repostable={false}
-              maxHeight={"10rem"}
-              tieKey={undefined}
-            />
+            {#if signPubkey}<EventCard
+                {metadata}
+                note={{
+                  sig: "",
+                  id: "",
+                  pubkey: signPubkey,
+                  content: text ?? "",
+                  tags: tags,
+                  kind: initOptions.kind,
+                  created_at: now(),
+                }}
+                displayMenu={false}
+                repostable={false}
+                maxHeight={"10rem"}
+                tieKey={undefined}
+              />
+            {:else}
+              <div
+                class="mt-0.5 overflow-y-auto overflow-x-hidden"
+                style="max-height:10rem; min-height:1rem"
+              >
+                <Content
+                  {text}
+                  {tags}
+                  displayMenu={false}
+                  repostable={false}
+                  depth={0}
+                  tieKey={undefined}
+                />
+              </div>
+            {/if}
           </div>
           <!-- <div
             class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
