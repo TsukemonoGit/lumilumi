@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { queryClient, showImg } from "$lib/stores/stores";
   import {
@@ -11,6 +11,7 @@
   } from "lucide-svelte";
   import UseNip05Check from "./UseNip05Check.svelte";
   import { _ } from "svelte-i18n";
+  import { untrack } from "svelte";
 
   interface Props {
     pubkey: string;
@@ -21,10 +22,14 @@
   const size = 16;
   let doCheck = $state(false);
 
-  let data = $derived($queryClient?.getQueryData(["nip05", pubkey, nip05Address]));
-  run(() => {
+  let data = $derived(
+    $queryClient?.getQueryData(["nip05", pubkey, nip05Address])
+  );
+  $effect(() => {
     if (data) {
-      doCheck = true;
+      untrack(() => () => {
+        doCheck = true;
+      });
     }
   });
   // });
@@ -38,23 +43,15 @@
     ><AtSign {size} />{$_("nip05.verify")}</button
   >
 {:else}
-  <UseNip05Check {pubkey} {nip05Address} >
+  <UseNip05Check {pubkey} {nip05Address}>
     {#snippet loading()}
-        <Loader
-        
-        {size}
-        class="ml-1 inline-flex text-gray-400 my-auto"
-      />
-      {/snippet}
+      <Loader {size} class="ml-1 inline-flex text-gray-400 my-auto" />
+    {/snippet}
     {#snippet error()}
-        <BadgeAlert
-        
-        {size}
-        class="ml-1 inline-flex text-red-600  my-auto"
-      />
-      {/snippet}
-    {#snippet children({ nip05 })}
-        {#if nip05.result === true}<ShieldCheck
+      <BadgeAlert {size} class="ml-1 inline-flex text-red-600  my-auto" />
+    {/snippet}
+    {#snippet content({ nip05 })}
+      {#if nip05.result === true}<ShieldCheck
           {size}
           class="ml-1 inline-flex text-green-600  my-auto"
         />
@@ -63,6 +60,6 @@
           ><BadgeAlert {size} />{$_(`nip05.error.${nip05.error}`) ?? ""}</span
         >
       {/if}
-          {/snippet}
-    </UseNip05Check>
+    {/snippet}
+  </UseNip05Check>
 {/if}

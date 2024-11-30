@@ -10,7 +10,7 @@
     queryClient,
   } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
@@ -44,16 +44,19 @@
       limit: undefined,
     },
   ]);
-  let readRelays = $derived(
-    $defaultRelays
-      ? Object.values($defaultRelays)
-          .filter((config) => config.read)
-          .map((value) => value.url)
-      : []
-  );
-  run(() => {
-    console.log(readRelays);
-  });
+
+  // let readRelays = $derived(
+  //   $defaultRelays
+  //     ? Object.values($defaultRelays)
+  //         .filter((config) => config.read)
+  //         .map((value) => value.url)
+  //     : []
+  // );
+
+  // run(() => {
+  //   console.log(readRelays);
+  // });
+
   let view = $state(false);
   onMount(async () => {
     if (!isOnMount) {
@@ -120,9 +123,9 @@
   //   easing: cubicInOut,
   // });
 
-  run(() => {
-    console.log($value);
-  }); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
+  //  run(() => {
+  //    console.log($value);
+  //  }); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
   const handleClickAll = () => {
     value.set(triggers.map((trigger) => trigger.id));
@@ -203,11 +206,13 @@
     });
   };
   let updateViewEvent: any = $state();
-  run(() => {
+  $effect(() => {
     if ($value || $onlyFollowee) {
-      if (updateViewEvent) {
-        updateViewEvent();
-      }
+      untrack(() => () => {
+        if (updateViewEvent) {
+          updateViewEvent();
+        }
+      });
     }
   });
 </script>

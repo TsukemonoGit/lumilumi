@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import type Nostr from "nostr-typedef";
 
@@ -7,16 +7,16 @@
 
   interface Props {
     pubkey: string;
-    loading?: import('svelte').Snippet;
-    children?: import('svelte').Snippet<[any]>;
+    loading?: import("svelte").Snippet;
+    children?: import("svelte").Snippet<[any]>;
   }
 
   let { pubkey, loading, children }: Props = $props();
   let data: Nostr.Event | undefined = $state();
 
-  run(() => {
-    if ($userStatusStore) {
-      data = $userStatusStore.get(pubkey)?.get("general");
+  userStatusStore.subscribe((value) => {
+    if (value) {
+      data = value.get(pubkey)?.get("general");
     }
   });
   //$: if ($slicedEvent) {
@@ -50,5 +50,5 @@
 {#if !data}
   {@render loading?.()}
 {:else if data}
-  {@render children?.({ event: data, })}
+  {@render children?.({ event: data })}
 {/if}

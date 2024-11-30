@@ -48,10 +48,7 @@
   let dialogOpen: any = writable(false);
 
   let contactsQueryKey = $derived(["timeline", "contacts", $loginUser]);
-  let isfollowee: boolean = $state(false);
-  run(() => {
-    isfollowee = $followList.has(pubkey);
-  });
+  let isfollowee: boolean = $derived($followList.has(pubkey));
 
   // Public key validation
   const validateLoginPubkey = async (): Promise<boolean> => {
@@ -94,9 +91,9 @@
       return;
     }
 
-    isfollowee = $followList.has(pubkey);
+    //isfollowee = $followList.has(pubkey);
 
-    if (followState !== isfollowee) {
+    if (followState !== $followList.has(pubkey)) {
       $nowProgress = false;
       return;
     }
@@ -189,7 +186,7 @@
       changeMainEmit(filters.mainFilters);
     }
 
-    isfollowee = $followList.has(pubkey);
+    //  isfollowee = $followList.has(pubkey);
     resetState();
   };
 

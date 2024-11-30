@@ -94,15 +94,23 @@
       value &&
       (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
     ) {
+      const relays =
+        localRelays.length > 0
+          ? localRelays
+          : paramRelays && paramRelays.length > 0
+            ? paramRelays
+            : [];
       //console.log(localRelays, paramRelays);
-      setRelays($state.snapshot(localRelays || paramRelays));
+      setRelays($state.snapshot(relays));
     }
   });
+  $inspect(data, localRelays, paramRelays, errorData);
 </script>
 
 {#if errorData}
   {@render error?.(errorData)}
 {:else if data && data.length > 0}
+  <!-- {@const relays = setRelays(data)} -->
   {@render contents?.({
     relays: data,
     status: status ?? "success",
@@ -110,13 +118,21 @@
 {:else if status === "loading"}
   {@render loading?.()}
 {:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
+  {@const relays =
+    localRelays.length > 0
+      ? localRelays
+      : paramRelays && paramRelays.length > 0
+        ? paramRelays
+        : []}
+  <!-- {@const relaysset = setRelays($state.snapshot(relays))} -->
   <!-- {#await setRelays(localRelays || paramRelays) then} -->
   {@render contents?.({
-    relays: $state.snapshot(localRelays || paramRelays),
+    relays: $state.snapshot(relays),
     status: "success",
   })}
   <!-- {/await} -->
 {:else}
+  <!-- {@const relays = setRelays(defaultRelays)} -->
   {@render contents?.({
     relays: defaultRelays,
     status: status ?? "success",

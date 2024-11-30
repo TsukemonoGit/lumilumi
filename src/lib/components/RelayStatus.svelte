@@ -66,37 +66,7 @@
       setAllStatusState();
     }
   }
-  // run(() => {
-  //     if ($relayStateMap) {
-  //       if (readRelays?.length > 0 || writeRelays?.length > 0) {
-  //         setAllStatusState();
-  //       }
-  //     }
-  //   });
-  // function getOverallConnectionState(): string {
-  //   const relayStates = [...readRelays, ...writeRelays].map(
-  //     (relay) => $app.rxNostr.getRelayStatus(relay.url)?.connection
-  //   );
 
-  //   const stateCount: Record<string, number> = {};
-  //   relayStates.forEach((state) => {
-  //     if (state) {
-  //       stateCount[state] = (stateCount[state] || 0) + 1;
-  //     }
-  //   });
-
-  //   let maxCount = 0;
-  //   let overallState = "connected"; // デフォルトは接続中とする
-
-  //   for (const [state, count] of Object.entries(stateCount)) {
-  //     if (count > maxCount) {
-  //       maxCount = count;
-  //       overallState = state;
-  //     }
-  //   }
-
-  //   return overallState;
-  // }
   // let overallStateColor: string;
   // afterUpdate(updateOverallStateColor);
   // function updateOverallStateColor() {

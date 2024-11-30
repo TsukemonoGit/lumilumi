@@ -41,7 +41,7 @@
       sameWidth: true,
     },
   });
-
+  //console.log($uploader);
   const handleClickSelect = (value: string) => {
     if (value) {
       selectedUploader = value;

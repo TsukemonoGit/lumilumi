@@ -49,7 +49,7 @@ export function useReq(
   const _rxNostr = get(app).rxNostr;
 
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    console.log("DefaultRelays error");
+    console.log("DefaultRelays error", queryKey);
     throw Error();
   }
   // console.log(_rxNostr.getDefaultRelays());
@@ -197,7 +197,7 @@ export function useForwardReq(
   }
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
-    console.log("DefaultRelays error");
+    console.log("DefaultRelays error", queryKey);
     throw Error();
   }
 

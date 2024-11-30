@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { createDateRangePicker, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
@@ -8,6 +8,7 @@
   import { now, getLocalTimeZone } from "@internationalized/date";
 
   import { locale } from "svelte-i18n";
+  import { untrack } from "svelte";
 
   const {
     elements: {
@@ -38,17 +39,23 @@
     endTimeUnix: number | undefined;
   }
 
-  let { title, startTimeUnix = $bindable(), endTimeUnix = $bindable() }: Props = $props();
+  let {
+    title,
+    startTimeUnix = $bindable(),
+    endTimeUnix = $bindable(),
+  }: Props = $props();
   export { startSegment, endSegment };
-  run(() => {
+  $effect(() => {
     if (value && $value.start && $value.end) {
-      startTimeUnix = Math.floor(
-        ($value.start as ZonedDateTime).toDate().getTime() / 1000
-      );
+      untrack(() => {
+        startTimeUnix = Math.floor(
+          ($value.start as ZonedDateTime).toDate().getTime() / 1000
+        );
 
-      endTimeUnix = Math.floor(
-        ($value.end as ZonedDateTime).toDate().getTime() / 1000
-      );
+        endTimeUnix = Math.floor(
+          ($value.end as ZonedDateTime).toDate().getTime() / 1000
+        );
+      });
     }
   });
 </script>

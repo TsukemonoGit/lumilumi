@@ -17,7 +17,7 @@
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { onMount, type SvelteComponent } from "svelte";
+  import { onMount, untrack, type SvelteComponent } from "svelte";
   import SetSearchRelays from "$lib/components/NostrMainData/SetSearchRelays.svelte";
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
@@ -270,14 +270,14 @@
     console.log(relays);
     searchRelays = relays;
   };
-  run(() => {
-    if ($defaultRelays) {
-      readUrls = Object.values($defaultRelays)
+  defaultRelays.subscribe((value) => {
+    if (value) {
+      readUrls = Object.values(value)
         .filter((config) => config.read)
         .map((config) => config.url);
     }
   });
-  run(() => {
+  $effect(() => {
     if (
       searchKind === searchKind ||
       searchHashtag ||
@@ -288,7 +288,7 @@
       searchUntil ||
       followee
     ) {
-      createFilter();
+      untrack(() => createFilter());
     }
   });
 </script>

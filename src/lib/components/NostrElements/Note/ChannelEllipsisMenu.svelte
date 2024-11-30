@@ -22,6 +22,7 @@
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
+  import { untrack } from "svelte";
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -156,24 +157,26 @@
 
   let nevent: string | undefined = $state(undefined);
   let encodedPubkey: string | undefined = $state(undefined);
-  run(() => {
+  $effect(() => {
     if (note) {
-      try {
-        encodedPubkey = nip19.npubEncode(note.pubkey);
-      } catch {
-        encodedPubkey = undefined;
-      }
-      try {
-        const eventpointer: nip19.EventPointer = {
-          id: note.id,
-          relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-          author: note.pubkey,
-          kind: note.kind,
-        };
-        nevent = nip19.neventEncode(eventpointer);
-      } catch {
-        nevent = undefined;
-      }
+      untrack(() => () => {
+        try {
+          encodedPubkey = nip19.npubEncode(note.pubkey);
+        } catch {
+          encodedPubkey = undefined;
+        }
+        try {
+          const eventpointer: nip19.EventPointer = {
+            id: note.id,
+            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            author: note.pubkey,
+            kind: note.kind,
+          };
+          nevent = nip19.neventEncode(eventpointer);
+        } catch {
+          nevent = undefined;
+        }
+      });
     }
   });
 </script>

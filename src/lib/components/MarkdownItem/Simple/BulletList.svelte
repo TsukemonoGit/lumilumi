@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import NostrContent from "./NostrContent.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     part: Token;
@@ -25,15 +26,19 @@
     tags,
     openModal,
     nolist,
-    tieKey
+    tieKey,
   }: Props = $props();
 
   let children: Token[] = $state([]);
 
   // トークンが存在する場合、変換して子トークンを取得
-  run(() => {
+  $effect(() => {
     if (part?.children && Array.isArray(part.children)) {
-      children = transformTokens(part.children);
+      untrack(() => () => {
+        if (part?.children) {
+          children = transformTokens(part.children);
+        }
+      });
       //console.log("[Transformed List]", children);
     }
   });

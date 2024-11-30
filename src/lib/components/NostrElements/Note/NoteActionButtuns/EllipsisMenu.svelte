@@ -50,20 +50,7 @@
   }: Props = $props();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: {
-    update: (
-      updater: import("svelte/store").Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: import("svelte/store").Subscriber<boolean>,
-      invalidate?: any
-    ): import("svelte/store").Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  let dialogOpen: Writable<boolean> = writable(false);
 
   const replaceable =
     (note.kind >= 30000 && note.kind < 40000) ||

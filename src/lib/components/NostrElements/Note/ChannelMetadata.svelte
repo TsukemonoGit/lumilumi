@@ -20,7 +20,7 @@
   }: Props = $props();
 
   let loadingText = $derived(encodetoNpub(id));
-  console.log(id);
+  //console.log(id);
 </script>
 
 <!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->

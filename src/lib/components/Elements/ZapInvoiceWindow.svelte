@@ -7,7 +7,7 @@
   import { X } from "lucide-svelte";
 
   import QRCode from "qrcode";
-  import { onDestroy } from "svelte";
+  import { onDestroy, untrack } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
   import type { Writable } from "svelte/store";
@@ -54,25 +54,31 @@
       })
     : undefined;
 
-  run(() => {
+  $effect(() => {
     if (observer && !$dialogOpen && unsubscribe) {
-      unsubscribe(); // Call the unsubscribe function if it exists
-      unsubscribe = undefined; // Reset unsubscribe after calling
+      untrack(() => () => {
+        unsubscribe?.(); // Call the unsubscribe function if it exists
+        unsubscribe = undefined;
+      }); // Reset unsubscribe after calling
     } else if (observer && $dialogOpen && !zapped) {
-      unsubscribe = observer.subscribe((result: any) => {
-        if (result?.data?.event) {
-          zapped = result;
-          console.log(zapped);
-          unsubscribe?.(); // Unsubscribe after receiving data
-        }
+      untrack(() => () => {
+        unsubscribe = observer.subscribe((result: any) => {
+          if (result?.data?.event) {
+            zapped = result;
+            console.log(zapped);
+            unsubscribe?.(); // Unsubscribe after receiving data
+          }
+        });
       });
     } else if ($dialogOpen && zapped) {
-      $toastSettings = {
-        title: "Zapped",
-        description: "Success to zap",
-        color: "bg-green-500",
-      };
-      $dialogOpen = false;
+      untrack(() => () => {
+        $toastSettings = {
+          title: "Zapped",
+          description: "Success to zap",
+          color: "bg-green-500",
+        };
+        $dialogOpen = false;
+      });
     }
   });
 

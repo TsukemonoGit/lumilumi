@@ -619,7 +619,9 @@
   let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
 
   selectedUploader.subscribe((value) => {
-    $uploader = value;
+    if (value) {
+      $uploader = value;
+    }
   });
 
   $effect(() => {

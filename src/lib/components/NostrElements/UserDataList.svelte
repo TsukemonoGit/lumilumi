@@ -10,6 +10,7 @@
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";
+  import { untrack } from "svelte";
 
   let inputMetadata = $state("");
 
@@ -36,9 +37,11 @@
     } catch (error) {}
   }
 
-  run(() => {
+  $effect(() => {
     if (viewMetadataList) {
-      setMetadataList();
+      untrack(() => {
+        setMetadataList();
+      });
     }
   });
   function checkUserInput(inputMetadata: string, arg1: UserData) {

@@ -29,16 +29,20 @@
     value: selected,
   });
   // $: console.log($timelineFilter.adaptMute);
-  run(() => {
-    $timelineFilter.selectCanversation = Number($selected);
-  });
-  run(() => {
-    if ($timelineFilter) {
-      localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
+  selected.subscribe((value) => {
+    if (value !== undefined && value !== null) {
+      $timelineFilter.selectCanversation = Number(value);
     }
   });
-  run(() => {
-    localStorage.setItem("showBanner", $showBanner.toString());
+  timelineFilter.subscribe((value) => {
+    if (value) {
+      localStorage.setItem("timelineFilter", JSON.stringify(value));
+    }
+  });
+  showBanner.subscribe((value) => {
+    if (value !== undefined && value !== null) {
+      localStorage.setItem("showBanner", value.toString());
+    }
   });
 </script>
 

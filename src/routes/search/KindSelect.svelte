@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
+  import { run } from "svelte/legacy";
 
   import { eventKinds } from "$lib/func/kinds";
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
@@ -20,13 +20,13 @@
     forceVisible: true,
     loop: true,
   });
-  run(() => {
-    console.log($item);
-  });
-  run(() => {
-    console.log($locale);
-  });
-  locale;
+  // run(() => {
+  //   console.log($item);
+  // });
+  // run(() => {
+  //   console.log($locale);
+  // });
+  // locale;
 </script>
 
 <button type="button" class="trigger" use:melt={$trigger}>

@@ -19,6 +19,7 @@
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
   import { writable, type Writable } from "svelte/store";
+  import { untrack } from "svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -138,24 +139,26 @@
 
   let naddr: string | undefined = $state(undefined);
   let encodedPubkey: string | undefined = $state(undefined);
-  run(() => {
+  $effect(() => {
     if (note) {
-      try {
-        encodedPubkey = nip19.npubEncode(note.pubkey);
-      } catch {
-        encodedPubkey = undefined;
-      }
-      try {
-        const naddrpointer: nip19.AddressPointer = {
-          kind: note.kind,
-          identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-          pubkey: note.pubkey,
-          relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-        };
-        naddr = nip19.naddrEncode(naddrpointer);
-      } catch (error) {
-        naddr = undefined;
-      }
+      untrack(() => () => {
+        try {
+          encodedPubkey = nip19.npubEncode(note.pubkey);
+        } catch {
+          encodedPubkey = undefined;
+        }
+        try {
+          const naddrpointer: nip19.AddressPointer = {
+            kind: note.kind,
+            identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+            pubkey: note.pubkey,
+            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+          };
+          naddr = nip19.naddrEncode(naddrpointer);
+        } catch (error) {
+          naddr = undefined;
+        }
+      });
     }
   });
 </script>

@@ -136,8 +136,8 @@
       //toast
     }
   }
-  run(() => {
-    if (!$invoiceOpen) {
+  invoiceOpen.subscribe((value: any) => {
+    if (!value) {
       unsubscribe?.();
     }
   });

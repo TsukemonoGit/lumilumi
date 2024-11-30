@@ -51,8 +51,8 @@
       goto("/");
     }
   }
-  run(() => {
-    if ($loginUser) {
+  loginUser.subscribe((value) => {
+    if (value) {
       pubCheck();
     }
   });

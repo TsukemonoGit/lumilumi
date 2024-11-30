@@ -51,6 +51,7 @@
   let refetchInterval: number = Infinity;
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
   const localData = getMetadata(queryKey);
+  console.log(localData);
   const initData: EventPacket | undefined = $showImg ? undefined : localData; //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
   //console.log(initData);
   //if (!$showImg) {

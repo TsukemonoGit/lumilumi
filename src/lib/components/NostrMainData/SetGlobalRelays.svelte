@@ -76,7 +76,7 @@
   });
   function dataChange(data: string[] | null | undefined) {
     if (data && data.length > 0) {
-      console.log(data);
+      //console.log(data);
       relayChange(data);
     }
   }

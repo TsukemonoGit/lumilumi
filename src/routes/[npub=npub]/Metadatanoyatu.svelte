@@ -5,6 +5,7 @@
 
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { nip19 } from "nostr-tools";
+  import { untrack } from "svelte";
 
   interface Props {
     pubkey: string;
@@ -21,12 +22,14 @@
   };
   let view = $state(true);
 
-  run(() => {
+  $effect(() => {
     if (pubkey) {
-      view = false;
-      setTimeout(() => {
-        view = true;
-      }, 0);
+      untrack(() => () => {
+        view = false;
+        setTimeout(() => {
+          view = true;
+        }, 0);
+      });
     }
   });
 </script>
