@@ -83,13 +83,6 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface $$Slots {
-    default: { metadata: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
   let metadata = $derived($data?.event ?? localData?.event);
   //$inspect(metadata);
 </script>

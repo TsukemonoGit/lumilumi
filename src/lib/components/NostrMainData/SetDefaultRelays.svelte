@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
   import type { ReqResult, ReqStatus } from "$lib/types";
-  import { readable, type Readable } from "svelte/store";
+  import { derived, readable, type Readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
   import {
     type DefaultRelayConfig,
@@ -12,7 +12,7 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
-  import { loginUser } from "$lib/stores/stores";
+  import { app, loginUser } from "$lib/stores/stores";
 
   interface Props {
     pubkey: string;
@@ -47,159 +47,78 @@
     contents,
   }: Props = $props();
 
-  let result:
-    | ReqResult<DefaultRelayConfig[] | string[]>
-    | {
-        data: Readable<DefaultRelayConfig[] | string[]>;
-        status: Readable<ReqStatus>;
-        error: Readable<any>;
-      }
-    | undefined;
-
-  //console.log(pubkey);
-
-  // loginUser.subscribe((value) => {
-  //   console.log(value, pubkey);
-  //   userChange(value);
-  // });
-  let derivedUser = $derived($loginUser);
   //$inspect(derivedUser);
-  $effect(() => {
-    console.log(derivedUser, pubkey);
-    userChange(derivedUser, pubkey);
-  });
+  let queryKey = ["defaultRelay", pubkey];
+  let filters = [
+    // { authors: [pubkey], kinds: [3], limit: 1 },
+    { authors: [pubkey], kinds: [10002], limit: 1 },
+  ] as Nostr.Filter[];
 
-  //   // let result = pubkey
-  //   //   ? deriveResult(localRelays, pubkey, req)
-  //   //   : $loginUser !== ""
-  //   //     ? deriveResult(localRelays, $loginUser, req)
-  //   //     : setLoadRelays();
-  // });
+  //パラムリレーがあったりlocalリレーがあるときはそれを返す。なかったら10002リレーを探す。
+  //返すのとSetrelaysもしないといけないっぽい？
 
-  function userChange(user: string, pubkey: string) {
-    if (pubkey) {
-      result = deriveResult(localRelays, pubkey, req);
-    } else if (user && user !== "") {
-      result = deriveResult(localRelays, user, req);
-    } else {
-      result = setLoadRelays();
+  let result =
+    localRelays.length === 0 && (!paramRelays || paramRelays.length === 0)
+      ? useRelaySet(queryKey, filters, req)
+      : undefined;
+  let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
+  let status: ReqStatus | undefined = $state();
+  let errorData: Error | undefined = $state();
+
+  result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
+    console.log(value);
+    if (value && value.length > 0) {
+      data = value;
+      //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
     }
-  }
-  //個々に来た段階でpubkeyがないってことは設定がないで、homeに来てたら設定に飛ぶから、それ以外のnoteのページとかに直できたときだから、
-  //paramにリレーが設定されてたらそれを使ってなかったらなんか適当にデフォルトリレーセットしよう
-  function setLoadRelays():
-    | {
-        data: Readable<DefaultRelayConfig[] | string[]>;
-        status: Readable<ReqStatus>;
-        error: Readable<any>;
+  });
+  result?.status.subscribe((value: ReqStatus | undefined) => {
+    console.log(value);
+    if (value) {
+      status = value;
+      if (value === "success" && !result.data) {
+        console.log(defaultRelays);
+        setRelays(defaultRelays);
+        data = defaultRelays;
       }
-    | undefined {
-    if (paramRelays) {
-      setRelays(paramRelays);
-      return {
-        data: readable(paramRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    } else {
-      setRelays(defaultRelays);
-      return {
-        data: readable(defaultRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    }
-  }
-
-  function deriveResult(
-    localRelays: DefaultRelayConfig[],
-    pubkey: string,
-    req:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined
-  ) {
-    console.log(localRelays, pubkey);
-    if (!localRelays || localRelays.length <= 0) {
-      return useRelaySet(
-        ["defaultRelay", pubkey],
-        [
-          // { authors: [pubkey], kinds: [3], limit: 1 },
-          { authors: [pubkey], kinds: [10002], limit: 1 },
-        ] as Nostr.Filter[],
-        req
-      );
-    } else {
-      return {
-        data: readable(localRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    }
-  }
-
-  let data:
-    | Readable<DefaultRelayConfig[] | null | undefined | string[]>
-    | string[]
-    | undefined = $derived(result?.data);
-  let status = $derived(result?.status);
-  let errorData = $derived(result?.error);
-  // console.log($status);
-
-  let deriveaData = $derived($data);
-  let deriveaStatus = $derived($status);
-  $effect(() => {
-    if (deriveaData && deriveaStatus) {
-      console.log("changedata");
-      dataChange(deriveaStatus, deriveaData);
     }
   });
-  function dataChange(
-    status: string | undefined,
-    data: string | any[] | null | undefined
-  ) {
-    if ((status === "success" && !data) || (data && data.length <= 0)) {
-      //ノーデータだったときにデフォルトリレーをセット
-      setRelays(defaultRelays);
-      //適当にデータ返しておこう
-      result = {
-        data: readable(defaultRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
+  result?.error.subscribe((value: Error | undefined) => {
+    if (value) {
+      errorData = value;
     }
-  }
-  // $: if (
-  //   ($status === "success" && !$data) ||
-  //   ($data !== undefined && $data.length <= 0)
-  // ) {
-  //   //ノーデータだったときにデフォルトリレーをセット
-  //   setRelays(defaultRelays);
-  //   //適当にデータ返しておこう
-  //   result = {
-  //     data: readable(defaultRelays),
-  //     status: readable("success" as ReqStatus),
-  //     error: readable(undefined),
-  //   };
-  // }
+  });
+  app.subscribe((value) => {
+    console.log(value, localRelays, paramRelays);
+    if (
+      value &&
+      (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
+    ) {
+      console.log(localRelays, paramRelays);
+      setRelays($state.snapshot(localRelays || paramRelays));
+    }
+  });
 </script>
 
-{#if $errorData}
-  {@render error?.($errorData)}
-{:else if localRelays || (deriveaData && deriveaData.length > 0)}
+{#if errorData}
+  {@render error?.(errorData)}
+{:else if data && data.length > 0}
   {@render contents?.({
-    relays: localRelays ?? deriveaData,
-    status: $status ?? "error",
+    relays: data,
+    status: status ?? "success",
   })}
-  <!-- <slot relays={localRelays ?? $data} status={$status ?? "error"} /> -->
-{:else if $status === "loading"}
+{:else if status === "loading"}
   {@render loading?.()}
+{:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
+  <!-- {#await setRelays(localRelays || paramRelays) then} -->
+  {@render contents?.({
+    relays: $state.snapshot(localRelays || paramRelays),
+    status: "success",
+  })}
+  <!-- {/await} -->
 {:else}
-  {@render nodata?.()}
-  <!-- {@const relays = setRelays(defaultRelays)}
-  {@render children?.({ relays: defaultRelays, status: "success" })} -->
+  {@render contents?.({
+    relays: defaultRelays,
+    status: status ?? "success",
+  })}
 {/if}
