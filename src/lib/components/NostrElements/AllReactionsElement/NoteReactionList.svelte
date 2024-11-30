@@ -10,9 +10,9 @@
     tieKey: string | undefined;
   }
 
-  let { events = $bindable(), tieKey }: Props = $props();
+  let { events, tieKey }: Props = $props();
 </script>
 
-<CollapsibleList title="Reaction" bind:amount={events.length}>
+<CollapsibleList title="Reaction" amount={events.length}>
   <ReactionList {events} {tieKey} />
 </CollapsibleList>

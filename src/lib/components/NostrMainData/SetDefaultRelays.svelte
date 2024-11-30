@@ -104,7 +104,7 @@
       setRelays($state.snapshot(relays));
     }
   });
-  $inspect(data, localRelays, paramRelays, errorData);
+  // $inspect(data, localRelays, paramRelays, errorData);
 </script>
 
 {#if errorData}

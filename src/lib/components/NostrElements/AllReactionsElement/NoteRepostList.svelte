@@ -8,10 +8,10 @@
     tieKey: string | undefined;
   }
 
-  let { events = $bindable(), tieKey }: Props = $props();
+  let { events, tieKey }: Props = $props();
 </script>
 
-<CollapsibleList title="Repost" bind:amount={events.length}>
+<CollapsibleList title="Repost" amount={events.length}>
   <div class="mx-2">
     <RepostList {events} {tieKey} />
   </div>

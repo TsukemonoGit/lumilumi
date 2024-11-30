@@ -49,23 +49,16 @@
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
-
-  interface $$Slots {
-    default: { event: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 {#if $errorData}
   {@render error?.($errorData)}
   <!-- <slot name="error" error={$error} /> -->
-{:else if $status === "success" && !$data}
+{:else if $status === "success" && !$data?.event && !$data?.event.id}
   {@render nodata?.()}
   <!-- <slot name="nodata" /> -->
-{:else if $data && $data.event}
-  {@render content?.({ data: $data.event, status: $status })}
+{:else if $data && $data?.event}
+  {@render content?.({ data: $data?.event, status: $status })}
   <!-- <slot event={$data.event} status={$status} /> -->
 {:else}
   {@render loading?.()}

@@ -40,7 +40,7 @@
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard/EventCard.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import { _ } from "svelte-i18n";
@@ -74,31 +74,29 @@
   );
   let textareaReply: HTMLTextAreaElement;
   let textareaQuote: HTMLTextAreaElement;
-  // let dtag: string[] | undefined;
-  // let atag: string | undefined;
-  let { atag, dtag }: { atag: string | undefined; dtag: string[] | undefined } =
-    $derived.by(() => {
-      if (
-        (note.kind >= 10000 && note.kind < 20000) ||
-        (note.kind >= 30000 && note.kind < 40000) ||
-        note.kind === 0 ||
-        note.kind === 3
-      ) {
-        const foundDtag = note.tags.find((tag) => tag[0] === "d") as
-          | string[]
-          | undefined;
+  let dtag: string[] | undefined = $state();
+  let atag: string | undefined = $state();
 
-        return {
-          dtag: foundDtag,
-          atag: `${note.kind}:${note.pubkey}:${foundDtag ? foundDtag[1] : ""}`,
-        };
-      }
-
-      return {
-        dtag: undefined,
-        atag: undefined,
-      };
-    });
+  let queryId = $derived(atag ?? note?.id);
+  $effect(() => {
+    if (note.kind) {
+      untrack(() => () => {
+        if (
+          (note.kind >= 10000 && note.kind < 20000) ||
+          (note.kind >= 30000 && note.kind < 40000) ||
+          note.kind === 0 ||
+          note.kind === 3
+        ) {
+          //atag　で　りぽすと
+          dtag = note.tags.find((tag) => tag[0] === "d");
+          atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+        } else {
+          dtag = undefined;
+          atag = undefined;
+        }
+      });
+    }
+  });
 
   // $: {
   //   if (
@@ -142,7 +140,7 @@
 
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
 
-    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
+    await publishAndSetQuery(ev, ["reactions", "reaction", queryId]);
   };
 
   async function publishAndSetQuery(
@@ -230,7 +228,7 @@
                 tags: tags,
                 content: "",
               };
-        await publishAndSetQuery(ev, ["reactions", "repost", atag ?? note.id]);
+        await publishAndSetQuery(ev, ["reactions", "repost", queryId]);
 
         break;
       case 1:
@@ -299,7 +297,7 @@
   let amountEle: HTMLInputElement | undefined = $state(undefined);
   const observer = $derived(
     new QueryObserver($queryClient, {
-      queryKey: ["reactions", "zapped", atag ?? note.id, $loginUser],
+      queryKey: ["reactions", "zapped", queryId, $loginUser],
     })
   );
   let unsubscribe: () => void;
@@ -468,7 +466,7 @@
     allReactions.repost = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "repost", atag ?? note.id],
+          queryKey: ["reactions", "repost", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -479,7 +477,7 @@
     allReactions.reaction = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "reaction", atag ?? note.id],
+          queryKey: ["reactions", "reaction", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -490,7 +488,7 @@
     allReactions.zap = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "zapped", atag ?? note.id],
+          queryKey: ["reactions", "zapped", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,

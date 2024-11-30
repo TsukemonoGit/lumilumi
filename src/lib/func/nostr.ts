@@ -205,7 +205,7 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
   const result = metadata.find(
     ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
   );
-  console.log(result);
+  //console.log(result);
   return result ? result[1] : undefined;
 };
 
