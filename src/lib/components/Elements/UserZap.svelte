@@ -20,10 +20,11 @@
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
-  let invoiceOpen: Writable<boolean> = writable(false);
+  let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
   const prof = profile(metadata);
   const onClickOK = async () => {
+    invoice = undefined;
     console.log(zapAmount);
     console.log(zapComment);
     if (zapAmount <= 0) {
@@ -52,24 +53,10 @@
     $nowProgress = false;
     invoice = zapInvoice;
     dialogOpen?.(false);
-    $invoiceOpen = true;
+    invoiceOpen?.(true);
   };
-  invoiceOpen.subscribe((value: boolean) => {
-    if (!value) {
-      invoice = undefined;
-    }
-  });
 
   let amountEle: HTMLInputElement | undefined = $state();
-  $effect(() => {
-    if (!dialogOpen) {
-      untrack(() => () => {
-        setTimeout(() => {
-          amountEle?.focus();
-        }, 1);
-      });
-    }
-  });
 
   // run(() => {
   //   if ($dialogOpen) {
@@ -81,7 +68,12 @@
 </script>
 
 <button
-  onclick={() => dialogOpen?.(true)}
+  onclick={async () => {
+    dialogOpen?.(true);
+    setTimeout(() => {
+      amountEle?.focus();
+    }, 1);
+  }}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
   title="zap"><Zap /></button
 >
@@ -134,4 +126,4 @@
   {/snippet}</AlertDialog
 >
 
-<ZapInvoiceWindow open={invoiceOpen} {invoice} id={undefined} />
+<ZapInvoiceWindow bind:openZapwindow={invoiceOpen} {invoice} id={undefined} />

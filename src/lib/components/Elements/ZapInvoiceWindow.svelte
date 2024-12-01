@@ -10,12 +10,11 @@
   import { onDestroy, untrack } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
-  import type { Writable } from "svelte/store";
 
   interface Props {
     invoice: string | undefined;
     id: string | undefined;
-    open: Writable<boolean>;
+    openZapwindow: (bool: boolean) => void;
   }
 
   const {
@@ -28,17 +27,15 @@
       close,
       portalled,
     },
-    states: { open: dialogOpen },
+    states: { open },
   } = createDialog({
     forceVisible: true,
   });
-  let { invoice, id, open = $bindable() }: Props = $props();
-  open?.subscribe((value: boolean) => {
-    if (value) {
-      $dialogOpen = true;
-      $open = false;
-    }
-  });
+  let { invoice, id, openZapwindow = $bindable() }: Props = $props();
+
+  openZapwindow = (bool: boolean) => {
+    $open = bool;
+  };
 
   let url = $derived(invoice ? `lightning:${invoice}` : undefined);
 
@@ -55,13 +52,13 @@
     : undefined;
 
   $effect(() => {
-    if (observer && !$dialogOpen && unsubscribe) {
-      untrack(() => () => {
+    if (observer && !$open) {
+      untrack(() => {
         unsubscribe?.(); // Call the unsubscribe function if it exists
-        unsubscribe = undefined;
-      }); // Reset unsubscribe after calling
-    } else if (observer && $dialogOpen && !zapped) {
-      untrack(() => () => {
+        unsubscribe = undefined; // Reset unsubscribe after calling
+      });
+    } else if (observer && $open && !zapped) {
+      untrack(() => {
         unsubscribe = observer.subscribe((result: any) => {
           if (result?.data?.event) {
             zapped = result;
@@ -70,24 +67,23 @@
           }
         });
       });
-    } else if ($dialogOpen && zapped) {
-      untrack(() => () => {
+    } else if ($open && zapped) {
+      untrack(() => {
         $toastSettings = {
           title: "Zapped",
           description: "Success to zap",
           color: "bg-green-500",
         };
-        $dialogOpen = false;
+        $open = false;
       });
     }
   });
-
   onDestroy(() => {
     unsubscribe?.(); // Ensure unsubscribe is only called if it exists
   });
 </script>
 
-{#if $dialogOpen}
+{#if $open}
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}

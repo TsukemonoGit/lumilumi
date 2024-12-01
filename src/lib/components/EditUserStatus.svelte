@@ -20,7 +20,7 @@
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
-  import { writable } from "svelte/store";
+
   let { dialogOpen = $bindable() } = $props();
 
   let openPopover: (bool: boolean) => void = $state(() => {});

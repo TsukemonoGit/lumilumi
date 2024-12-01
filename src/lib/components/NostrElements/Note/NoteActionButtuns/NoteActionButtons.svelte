@@ -293,7 +293,7 @@
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
-  let invoiceOpen: Writable<boolean> = writable(false);
+  let invoiceOpen: (bool: boolean) => void = $state(() => {});
   let amountEle: HTMLInputElement | undefined = $state(undefined);
   const observer = $derived(
     new QueryObserver($queryClient, {
@@ -316,6 +316,7 @@
   });
 
   const onClickOK = async (metadata: Nostr.Event) => {
+    invoice = undefined;
     console.log(zapAmount);
     console.log(zapComment);
     if (zapAmount <= 0) {
@@ -349,13 +350,14 @@
     $nowProgress = false;
     invoice = zapInvoice;
     dialogOpen?.(false);
-    $invoiceOpen = true;
+    invoiceOpen?.(true);
+
     //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
     const date = now();
     unsubscribe = observer.subscribe((result: any) => {
       console.log(result);
       if (result?.data?.event && result.data.event.created_at >= date) {
-        $invoiceOpen = false;
+        invoiceOpen?.(false);
         unsubscribe?.();
       }
     });
@@ -368,12 +370,12 @@
   //   unsubscribe?.();
   // }
 
-  invoiceOpen.subscribe((value: boolean) => {
-    if (!value) {
-      invoice = undefined;
-      unsubscribe?.();
-    }
-  });
+  // invoiceOpen.subscribe((value: boolean) => {
+  //   if (!value) {
+  //     invoice = undefined;
+  //     unsubscribe?.();
+  //   }
+  // });
 
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
@@ -761,7 +763,11 @@
   {/if}
 {/if}
 
-<ZapInvoiceWindow open={invoiceOpen} {invoice} id={atag ?? note.id} />
+<ZapInvoiceWindow
+  bind:openZapwindow={invoiceOpen}
+  {invoice}
+  id={atag ?? note.id}
+/>
 
 <style>
   input[type="text"] {
