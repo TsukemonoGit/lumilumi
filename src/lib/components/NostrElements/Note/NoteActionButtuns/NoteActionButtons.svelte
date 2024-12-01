@@ -244,7 +244,9 @@
           warningText: warning ? warning[1] : undefined,
         };
         $additionalPostOptions = options;
-        $postWindowOpen = true;
+        setTimeout(() => {
+          $postWindowOpen = true;
+        }, 0);
         // replyText = atag
         //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
         //   : ` nostr:${nevent} \n`;

@@ -19,7 +19,9 @@
       addableUserList: [],
     };
     $additionalPostOptions = options;
-    $postWindowOpen = true;
+    setTimeout(() => {
+      $postWindowOpen = true;
+    }, 0);
   }
 </script>
 

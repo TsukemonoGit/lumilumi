@@ -70,7 +70,9 @@
       };
 
       // ポストウィンドウを開く
-      $postWindowOpen = true;
+      setTimeout(() => {
+        $postWindowOpen = true;
+      }, 0);
     } else if (navigator.serviceWorker) {
       console.log("serviceWorker");
       // メッセージを受け取るリスナーを設定
@@ -93,7 +95,9 @@
           };
 
           // ポストウィンドウを開く
-          $postWindowOpen = true;
+          setTimeout(() => {
+            $postWindowOpen = true;
+          }, 0);
           return;
         }
         if (data.media) {
@@ -213,7 +217,9 @@
       };
 
       // ポストウィンドウを開く
-      $postWindowOpen = true;
+      setTimeout(() => {
+        $postWindowOpen = true;
+      }, 0);
     } catch (error) {
       console.error("ファイルアップロードの処理でエラーが発生しました:", error);
     }
