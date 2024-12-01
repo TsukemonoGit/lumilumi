@@ -91,7 +91,7 @@
 
   relaySetValue.subscribe((value) => {
     if (value) {
-      settings.useRelaySet = $relaySetValue;
+      settings.useRelaySet = value;
     }
   });
 
