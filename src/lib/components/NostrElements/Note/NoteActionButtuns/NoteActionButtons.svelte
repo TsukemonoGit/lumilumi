@@ -411,7 +411,10 @@
       warningText: warning ? warning[1] : undefined,
     };
     $additionalPostOptions = options;
-    $postWindowOpen = true;
+    setTimeout(() => {
+      $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
+    }, 0);
+
     // openReplyWindow = !openReplyWindow;
 
     // replyText = "";

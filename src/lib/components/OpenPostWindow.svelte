@@ -542,19 +542,18 @@
   };
   postWindowOpen.subscribe((value) => {
     if (value) {
-      console.log($additionalPostOptions);
+      const addOption = $state.snapshot($additionalPostOptions);
+      console.log(addOption);
 
-      if ($additionalPostOptions) {
+      if (addOption) {
         // タグをコピー
 
         initOptions = {
           ...options,
-          kind: $additionalPostOptions.kind ?? options.kind ?? 1,
+          kind: addOption.kind ?? options.kind ?? 1,
           //チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
           tags: (() => {
-            const combinedTags = options.tags.concat(
-              $additionalPostOptions.tags
-            );
+            const combinedTags = options.tags.concat(addOption.tags);
             let hasRoot = false;
 
             return combinedTags.filter((tag) => {
@@ -569,10 +568,10 @@
               return true; // root以外のタグはそのまま
             });
           })(),
-          content: (options.content ?? "") + $additionalPostOptions.content, // contentをマージ
-          addableUserList: $additionalPostOptions.addableUserList,
-          defaultUsers: $additionalPostOptions.defaultUsers,
-          warningText: $additionalPostOptions.warningText,
+          content: (options.content ?? "") + addOption.content, // contentをマージ
+          addableUserList: addOption.addableUserList,
+          defaultUsers: addOption.defaultUsers,
+          warningText: addOption.warningText,
         };
         tags = initOptions.tags;
         text = initOptions.content ?? "";
