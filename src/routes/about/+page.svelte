@@ -56,7 +56,7 @@
   let zapAmount: number = $state(0);
   let zapComment: string = $state("");
   let invoice: string | undefined = $state(undefined);
-  let invoiceOpen: any = $state();
+  let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
   });
@@ -98,7 +98,7 @@
         throw Error;
       }
       dialogOpen?.(false);
-      $invoiceOpen = true;
+      invoiceOpen?.(true);
       invoice = zapInvoice;
       $nowProgress = false;
 
@@ -107,8 +107,9 @@
       unsubscribe = observer2.subscribe((result: any) => {
         console.log(result);
         if (result?.data?.event && result.data.event.created_at >= date) {
-          $invoiceOpen = false;
+          invoiceOpen?.(false);
           unsubscribe?.();
+
           //購読対象から削除
           const index = $viewEventIds.findIndex(
             (item) => item[0] === "e" && item[1] === monoZap.noteId
@@ -136,11 +137,6 @@
       //toast
     }
   }
-  invoiceOpen.subscribe((value: any) => {
-    if (!value) {
-      unsubscribe?.();
-    }
-  });
 </script>
 
 <!-- <h1 class="title my-4">ABOUT</h1> -->
@@ -305,7 +301,11 @@
     </div>
   {/snippet}</AlertDialog
 >
-<ZapInvoiceWindow open={invoiceOpen} {invoice} id={monoZap.noteId} />
+<ZapInvoiceWindow
+  bind:openZapwindow={invoiceOpen}
+  {invoice}
+  id={monoZap.noteId}
+/>
 
 <style lang="postcss">
   li {
