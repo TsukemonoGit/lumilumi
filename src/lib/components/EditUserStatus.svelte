@@ -150,7 +150,7 @@
       $open = false;
     }
   };
-  let displayNameEmojiOpen: any = writable(false);
+
   let emojiTags: string[][] = [];
   const handleClickEmojiDisplayName = (e: string[]) => {
     const emojiTag = ["emoji", ...e];
@@ -236,11 +236,7 @@
           bind:value={userStatus}
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
-            <Popover
-              open={displayNameEmojiOpen}
-              ariaLabel="custom emoji"
-              zIndex={100}
-            >
+            <Popover ariaLabel="custom emoji" zIndex={100}>
               <SmilePlus size="20" />
               {#snippet popoverContent()}
                 <div>

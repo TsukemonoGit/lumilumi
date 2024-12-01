@@ -5,12 +5,13 @@
   import { fade } from "svelte/transition";
   const {
     elements: { trigger, content, arrow, close },
-    states,
+    states: { open },
   } = createPopover({
     forceVisible: true,
   });
+
   interface Props {
-    open?: boolean;
+    openPopover?: (bool: boolean) => void;
     ariaLabel: string;
     zIndex?: number;
     showCloseButton?: boolean;
@@ -19,24 +20,24 @@
   }
 
   let {
-    open = $bindable(false),
+    openPopover = () => {},
     ariaLabel,
     zIndex = 20,
     showCloseButton = true,
     children,
     popoverContent,
   }: Props = $props();
-  const sync = createSync(states);
-  $effect.pre(() => {
-    sync.open(open, (v) => (open = v));
-  });
+
+  openPopover = (bool: boolean) => {
+    $open = bool;
+  };
 </script>
 
 <button
   class="hover:opacity-75 active:opacity-50 w-fit"
   aria-label={ariaLabel}
   use:melt={$trigger}>{@render children?.()}</button
->{#if open}<div
+>{#if $open}<div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
     class="content"

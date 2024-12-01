@@ -20,7 +20,6 @@
       ? Object.values($defaultRelays).filter((config) => config.write)
       : []
   );
-  let open: boolean = $state(false);
 
   let overallStateColor: string = $state("");
 
@@ -93,7 +92,7 @@
 </script>
 
 <!--reconnect relayは readable default relayだけ-->
-<Popover {open} ariaLabel={"relays status"}>
+<Popover ariaLabel={"relays status"}>
   <RadioTower size="20" class={overallStateColor} />
 
   {#snippet popoverContent()}
