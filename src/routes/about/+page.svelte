@@ -22,7 +22,6 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
-  import { writable } from "svelte/store";
 
   const handleClickShare = async () => {
     //share link

@@ -233,9 +233,6 @@
     // newProfile.display_name?.slice(cursorPosition);
     // cursorPosition += emojiText.length;
   };
-
-  let open: any = $state();
-  let displayNameEmojiOpen: any = $state();
 </script>
 
 <section class=" w-full">
@@ -351,7 +348,7 @@
         placeholder="display_name"
       />{#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
-          <Popover open={displayNameEmojiOpen} ariaLabel="custom emoji">
+          <Popover ariaLabel="custom emoji">
             <SmilePlus size="20" />
             {#snippet popoverContent()}
               <div>
@@ -439,7 +436,7 @@
       ></textarea>
       {#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
-          <Popover {open} ariaLabel="custom emoji">
+          <Popover ariaLabel="custom emoji">
             <SmilePlus size="20" />
             {#snippet popoverContent()}
               <div>

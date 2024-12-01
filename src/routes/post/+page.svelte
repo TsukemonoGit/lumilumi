@@ -23,7 +23,7 @@
     .join("\n");
 
   let tags: string[][] = [];
-
+  let signPubkey: string | undefined = $state();
   let sharedContent: string; // = [data.title, data.text, data.url]
   //   .filter(Boolean)
   //   .join("\n");
@@ -55,7 +55,6 @@
     }
     $nowProgress = false;
   };
-  let signPubkey: string = $state("");
 
   onMount(async () => {
     console.log("onMount");

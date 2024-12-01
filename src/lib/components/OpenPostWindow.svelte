@@ -61,6 +61,12 @@
   import { untrack } from "svelte";
   import Content from "./NostrElements/Note/Content.svelte";
 
+  interface Props {
+    //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
+    options?: DefaultPostOptions;
+    signPubkey?: string | undefined;
+  }
+
   let {
     options = {
       tags: [],
@@ -98,12 +104,6 @@
 
   const additionalReplyUsers: Writable<string[]> = writable([]);
   let clickEscape: number = $state(0);
-
-  interface Props {
-    //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
-    options?: DefaultPostOptions;
-    signPubkey?: string | undefined;
-  }
 
   async function signPubkeyCheck() {
     if ($nowProgress) {
