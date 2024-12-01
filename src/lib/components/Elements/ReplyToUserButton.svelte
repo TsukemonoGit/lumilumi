@@ -21,7 +21,7 @@
     $additionalPostOptions = options;
     setTimeout(() => {
       $postWindowOpen = true;
-    }, 0);
+    }, 1);
   }
 </script>
 

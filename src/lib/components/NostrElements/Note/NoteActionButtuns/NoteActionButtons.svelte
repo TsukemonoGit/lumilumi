@@ -246,7 +246,7 @@
         $additionalPostOptions = options;
         setTimeout(() => {
           $postWindowOpen = true;
-        }, 0);
+        }, 1);
         // replyText = atag
         //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
         //   : ` nostr:${nevent} \n`;
@@ -414,8 +414,9 @@
     };
     $additionalPostOptions = options;
     setTimeout(() => {
+      console.log($state.snapshot($additionalPostOptions));
       $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
-    }, 0);
+    }, 1);
 
     // openReplyWindow = !openReplyWindow;
 
