@@ -94,11 +94,11 @@
         try {
           if (encodedPubkey) {
             await navigator.clipboard.writeText(encodedPubkey);
-            $toastSettings = {
-              title: "Success",
-              description: "Copied to clipboard",
-              color: "bg-green-500",
-            };
+            // $toastSettings = {
+            //   title: "Success",
+            //   description: "Copied to clipboard",
+            //   color: "bg-green-500",
+            // };
           } else {
             throw new Error("No encoded pubkey");
           }
