@@ -29,23 +29,6 @@
   import { _ } from "svelte-i18n";
   import { writable, type Writable } from "svelte/store";
 
-  // 設定をアップロード
-  // 設定をダウンロード
-  // //設定ごとにd作ったら消したりしにくくなるから一個にまとめよ
-  // tags:["d","lumi-settings"]
-
-  /* 
-  const event = {
-    content:
-      '[{"name":"normal","lumiSetting":{"relays":[],"useRelaySet":"0","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":true,"menuleft":true,"showRelayIcon":true,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":true,"showKind16":true,"addClientTag":true,"showClientTag":true,"showAllReactions":true,"kind42inTL":true},"showBanner":false,"theme":"light","timelineFilter":{"adaptMute":false,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730722071},{"name":"test","lumiSetting":{"relays":[{"url":"wss://nos.lol/","read":true,"write":true}],"useRelaySet":"1","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":false,"menuleft":false,"showRelayIcon":false,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":false,"showKind16":false,"addClientTag":false,"showClientTag":true,"showAllReactions":false,"kind42inTL":false},"showBanner":false,"theme":"system","timelineFilter":{"adaptMute":true,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730773127}]',
-    tags: [["d", "lumi-settings"]],
-    kind: 30078,
-    pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
-    created_at: 1730773127,
-    id: "9a13e329f30d4223568e686794c864dab485fdab9ff1d7be20792076bafd3953",
-    sig: "e537869f83f0dddb85c1add7e307116be1428d66cbc101a21cf355ba4b4722db6c511337258899916968da76406594ee0db5ab3ad6dd8d36972732af3fe4c276",
-  }; */
-
   interface Props {
     settingsChanged: () => boolean;
     saveLumiSettings: () => void;
@@ -60,7 +43,7 @@
   // export let saveLumiSettings: () => void;
   // export let settings: LumiSetting;
 
-  let kind30078LumiSettings: Kind30078LumiSetting[] = $state([]);
+  let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;
 
   let dialogOpen: Writable<boolean> = writable(false);

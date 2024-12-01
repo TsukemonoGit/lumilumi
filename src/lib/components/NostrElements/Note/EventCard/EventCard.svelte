@@ -129,7 +129,7 @@
 
   // const { kind, tag } = repostedId(note.tags);
   let replyTag: string[] | undefined = $state();
-  let replyUsers: string[] = $state([]);
+  let replyUsers: string[] = $state.raw([]);
   const handleClickToChannel = (id: string) => {
     if (!id) {
       return;

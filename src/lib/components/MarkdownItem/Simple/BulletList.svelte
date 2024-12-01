@@ -29,18 +29,13 @@
     tieKey,
   }: Props = $props();
 
-  let children: Token[] = $state([]);
-
-  // トークンが存在する場合、変換して子トークンを取得
-  $effect(() => {
+  let children: Token[] = $derived.by(() => {
     if (part?.children && Array.isArray(part.children)) {
-      untrack(() => () => {
-        if (part?.children) {
-          children = transformTokens(part.children);
-        }
-      });
-      //console.log("[Transformed List]", children);
+      if (part?.children) {
+        return transformTokens(part.children);
+      }
     }
+    return [];
   });
 </script>
 

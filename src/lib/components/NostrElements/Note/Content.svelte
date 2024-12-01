@@ -57,7 +57,7 @@
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
-    console.log("viewmedia");
+    //   console.log("viewmedia");
     $viewMediaModal = { index: index, mediaList: mediaList };
   };
 

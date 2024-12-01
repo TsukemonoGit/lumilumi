@@ -38,7 +38,7 @@
   let followee = $state(false);
   // const filters: Writable<Nostr.Filter[]> = writable([]);
   let filters = $derived(createFilter());
-  let showFilters: Nostr.Filter[] = $state([]);
+  let showFilters: Nostr.Filter[] = $state.raw([]);
 
   let compRef: SvelteComponent | undefined = $state();
   let openSearchResult = $state(false);
@@ -74,7 +74,7 @@
       init();
     }
   });
-  let readUrls: string[] = $state([]);
+  let readUrls: string[] = $state.raw([]);
 
   async function waitForDefaultRelays(maxWaitTime: number) {
     const interval = 100; // 100ms ごとにチェック

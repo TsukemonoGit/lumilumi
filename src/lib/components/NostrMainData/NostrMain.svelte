@@ -61,7 +61,7 @@
     >;
   } = $props();
 
-  let localRelays: DefaultRelayConfig[] = $state([]);
+  let localRelays: DefaultRelayConfig[] = $state.raw([]);
   // svelte-ignore non_reactive_update
   let pubkey: string = $state("");
 

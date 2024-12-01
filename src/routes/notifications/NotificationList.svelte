@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import {
     defaultRelays,
@@ -8,13 +6,10 @@
     nowProgress,
     queryClient,
     relayStateMap,
-    showReactioninTL,
-    showUserStatus,
     slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
-  import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
-  import type { ReqStatus } from "$lib/types";
+
   import {
     type QueryKey,
     createQuery,
@@ -165,7 +160,7 @@
 
   // $: status = result.status;
   // $: error = result.error;
-  let readUrls: string[] = $state([]);
+  let readUrls: string[] = $state.raw([]);
   //$: console.log(data);
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);

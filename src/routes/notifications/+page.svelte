@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { now, type EventPacket } from "rx-nostr";
   import {
-    defaultRelays,
     followList,
     loginUser,
     onlyFollowee,
     queryClient,
   } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { onMount, untrack } from "svelte";
+  import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
@@ -34,7 +31,7 @@
   let isOnMount = false;
 
   const timelineQuery: QueryKey = ["notifications"];
-  let filters: Nostr.Filter[] = $state([
+  let filters: Nostr.Filter[] = [
     {
       kinds: [1, 6, 7, 16, 42, 9735, 4 /**初代DM*/, 1059 /** 三代目DM */],
 
@@ -43,7 +40,7 @@
       until: undefined,
       limit: undefined,
     },
-  ]);
+  ];
 
   // let readRelays = $derived(
   //   $defaultRelays
@@ -152,7 +149,7 @@
     }
   };
 
-  let notifilter = $state((event: Nostr.Event): boolean => {
+  const notifilter = (event: Nostr.Event): boolean => {
     if (event.pubkey === $loginUser) {
       return false;
     }
@@ -177,7 +174,7 @@
     }
     //  return true;
     return filterSelectedStates(event);
-  });
+  };
   //tabの選択状況によってのフィルターもTimelineListの中でやろうかと思ったけどnext🔻押したときの挙動がー（allではにページ目だけど他のとこではまだ一ページ目でなんとかかんとかとか）だからやめておく
   //filterしたあとの長さで考えたらへんになるねと思ったけどなんとかなったかも
   const filterSelectedStates = (event: Nostr.Event): boolean => {

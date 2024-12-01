@@ -1,6 +1,3 @@
-<svelte:options runes={true} />
-
-<!-- @migration-task Error while migrating Svelte code: Cannot subscribe to stores that are not declared at the top level of the component -->
 <script lang="ts">
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
@@ -197,7 +194,7 @@
   // svelte-ignore non_reactive_update
   let showModal: Writable<boolean> = writable(false);
   let modalIndex: number = $state(0);
-  let mediaList: Part[] = $state([]);
+  let mediaList: Part[] = $state.raw([]);
   viewMediaModal.subscribe((e) => {
     if (e) {
       console.log(e);

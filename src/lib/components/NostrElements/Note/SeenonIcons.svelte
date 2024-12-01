@@ -23,7 +23,7 @@
 
   let size = 16;
   let viewAll = $state(false);
-  let relays: string[] = $state([]);
+  let relays: string[] = $state.raw([]);
   slicedEvent.subscribe(() => {
     relays = tieKey ? getRelaysById(id, tieKey) : [];
   });
@@ -77,10 +77,10 @@
           {/await}
         </div>
         {#snippet popoverContent()}
-                <div  class="max-w-[90%]">
+          <div class="max-w-[90%]">
             <RelayCard {url} write={false} read={false} />
           </div>
-              {/snippet}
+        {/snippet}
       </Popover>
     {/each}
     {#if !viewAll && relays.length > 2}

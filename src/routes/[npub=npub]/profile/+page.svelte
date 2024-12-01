@@ -46,9 +46,9 @@
   const filters = [{ kinds: [0], authors: [data.pubkey], limit: 1 }];
   const operator = pipe(latest(), uniq());
 
-  let newProfile: Profile | undefined = $state();
+  let newProfile: Profile | undefined = $state.raw();
   let lud: string = $state("");
-  let newTags: string[][] = $state([]);
+  let newTags: string[][] = $state.raw([]);
   let isError = $state(false);
   onMount(async () => {
     if (!$queryClient) {
