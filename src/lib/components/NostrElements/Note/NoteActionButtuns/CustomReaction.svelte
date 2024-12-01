@@ -28,7 +28,7 @@
 
   let customReactionError: boolean = $state(false);
   let customReactionErrorMessage: string = $state("");
-  let open: boolean = $state();
+  let openPopover: (bool: boolean) => void = $state(() => {});
 
   const handleClickCustomReaction = async () => {
     const textLen = split(customReaction).length; //countSymbolsIgnoringCombiningMarks(customReaction);
@@ -66,7 +66,7 @@
       content: customReaction,
     };
     await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
-    open = false;
+    openPopover?.(false);
     customReaction = "";
   };
 
@@ -87,7 +87,7 @@
       content: `:${e[0]}:`,
     };
     await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
-    open = false;
+    openPopover?.(false);
     customReaction = "";
   };
   function handleKeyDown(event: KeyboardEvent) {
@@ -97,7 +97,7 @@
   }
 </script>
 
-<Popover {open} ariaLabel="Open emoji picker">
+<Popover bind:openPopover ariaLabel="Open emoji picker">
   <SmilePlus size="20" class="stroke-magnum-500/75" />
   {#snippet popoverContent()}
     <div>

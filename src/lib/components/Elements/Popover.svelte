@@ -20,7 +20,7 @@
   }
 
   let {
-    openPopover = () => {},
+    openPopover = $bindable(),
     ariaLabel,
     zIndex = 20,
     showCloseButton = true,

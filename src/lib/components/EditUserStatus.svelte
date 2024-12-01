@@ -23,6 +23,7 @@
   import { writable } from "svelte/store";
   let { dialogOpen = $bindable() } = $props();
 
+  let openPopover: (bool: boolean) => void = $state(() => {});
   const {
     elements: {
       trigger,
@@ -153,6 +154,8 @@
 
   let emojiTags: string[][] = [];
   const handleClickEmojiDisplayName = (e: string[]) => {
+    openPopover?.(false);
+
     const emojiTag = ["emoji", ...e];
     if (!emojiTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
       emojiTags.push(emojiTag);
@@ -236,7 +239,7 @@
           bind:value={userStatus}
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
-            <Popover ariaLabel="custom emoji" zIndex={100}>
+            <Popover bind:openPopover ariaLabel="custom emoji" zIndex={100}>
               <SmilePlus size="20" />
               {#snippet popoverContent()}
                 <div>
