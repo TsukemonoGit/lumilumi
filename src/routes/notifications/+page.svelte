@@ -206,13 +206,14 @@
     });
   };
   let updateViewEvent: any = $state();
-  $effect(() => {
-    if ($value || $onlyFollowee) {
-      untrack(() => () => {
-        if (updateViewEvent) {
-          updateViewEvent();
-        }
-      });
+  value?.subscribe((val) => {
+    if (val && updateViewEvent) {
+      updateViewEvent();
+    }
+  });
+  onlyFollowee?.subscribe(() => {
+    if (updateViewEvent) {
+      updateViewEvent();
     }
   });
 </script>
