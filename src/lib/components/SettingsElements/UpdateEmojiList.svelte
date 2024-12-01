@@ -77,22 +77,27 @@
       $nowProgress = false;
       return;
     }
-    const event =
+    const kind10030event =
       !beforeEvent ||
       beforeEvent.pubkey !== pk.event.pubkey ||
       pk.event.created_at >= beforeEvent.created_at
         ? pk.event
         : beforeEvent;
-    list = event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
-      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-        return [...acc, [shortcode, url]];
-      } else {
-        return acc;
-      }
-    }, []);
+    list = kind10030event.tags.reduce(
+      (acc: string[][], [tag, shortcode, url]) => {
+        if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+          return [...acc, [shortcode, url]];
+        } else {
+          return acc;
+        }
+      },
+      []
+    );
 
-    const naddrFilters = event.tags.reduce(
-      (acc: Nostr.Filter[], [tag, value]) => {
+    const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
+      kind10030event.tags as string[][]
+    ).reduce(
+      (acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
         console.log(tag, value);
         if (tag === "a") {
           const matches = value.match(nip33Regex);
@@ -102,24 +107,33 @@
               kinds: [Number(matches[1])],
               authors: [matches[2]],
               "#d": [matches[3]],
-              //limit: 1,
+              limit: 1,
             };
 
-            return [...acc, filter];
-          } else {
-            return acc;
+            // フィルタを結果に追加
+            acc.push({ id: value, filter: filter });
           }
-        } else {
-          return acc;
         }
+        return acc;
       },
-      []
+      [] as { id: string; filter: Nostr.Filter }[]
     );
 
-    const chunkedFilters = chunkArray(naddrFilters, 10);
+    console.log(naddrFilters);
+    const chunkedFilters = chunkArray(
+      naddrFilters.map((fil) => fil.filter),
+      20
+    );
     const rxNostr = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
     });
+    // const latestEventsMap = await getNaddrEmojiList(
+    //   rxNostr,
+    //   naddrFilters.map((filter) => filter.filter),
+    //   relays
+    // );//これするとでーたとれない
+    // console.log(latestEventsMap);
+
     // 全てのチャンクを並列で処理する
     const pkListArray = await Promise.all(
       chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
@@ -147,7 +161,19 @@
       });
 
       // 各チャンクの結果を結合する
-      latestEventsMap.forEach((pk) => {
+      const sortedLatestEvents = naddrFilters.map((filter) => {
+        const id = filter.id;
+        const event = latestEventsMap.values().find((pk) => {
+          const kind = pk.event.kind;
+          const pubkey = pk.event.pubkey;
+          const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
+          return `${kind}:${pubkey}:${dTag}` === id;
+        });
+        return event;
+      });
+
+      // 各チャンクの結果を結合する
+      sortedLatestEvents.forEach((pk) => {
         if (pk && pk.event) {
           list = [
             ...list,
@@ -165,11 +191,34 @@
         }
       });
 
-      // console.log(list.length);
+      //   // console.log(list.length);
+      //   $emojis = {
+      //     list: list,
+      //     updated: Math.floor(Date.now() / 1000),
+      //     event: event,
+      //   };
+
+      //   localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+      // }
+
+      // sortedLatestEvents.forEach((pk) => {
+      //   if (pk && pk.event) {
+      //     list = [
+      //       ...list,
+      //       ...pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+      //         if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+      //           return [...acc, [shortcode, url]];
+      //         } else {
+      //           return acc;
+      //         }
+      //       }, []),
+      //     ];
+      //   }
+      // });
       $emojis = {
         list: list,
         updated: Math.floor(Date.now() / 1000),
-        event: event,
+        event: kind10030event,
       };
 
       localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
