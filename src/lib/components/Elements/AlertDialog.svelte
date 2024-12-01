@@ -33,11 +33,12 @@
     description = "",
     okButtonName = undefined,
     main,
-    open,
+    open = $bindable(),
   }: Props = $props();
   open?.subscribe((value: boolean) => {
     if (value) {
       $openEle = true;
+      $open = false;
     }
   });
 

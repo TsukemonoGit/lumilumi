@@ -596,7 +596,7 @@
             >
           </div>
           <AlertDialog
-            open={dialogOpen}
+            bind:open={dialogOpen}
             onClickOK={() => onClickOK(metadata)}
             title="Zap"
             >{#snippet main()}

@@ -24,7 +24,7 @@
   } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import {
     datetime,
     delay,
@@ -36,6 +36,7 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr/src";
+  import { type QueryKey } from "@tanstack/svelte-query";
 
   interface Props {
     pubkey: string;
@@ -43,11 +44,17 @@
 
   let { pubkey }: Props = $props();
 
-  const beforeKind3 = writable<Nostr.Event | undefined>();
-  const afterEventParameters = writable<Nostr.EventParameters | undefined>();
-  let dialogOpen: any = writable(false);
+  let beforeKind3: Nostr.Event | undefined = $state();
+  let afterEventParameters: Nostr.EventParameters | undefined = $state();
 
-  let contactsQueryKey = $derived(["timeline", "contacts", $loginUser]);
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+
+  let contactsQueryKey: QueryKey = $derived([
+    "timeline",
+    "contacts",
+    $loginUser,
+  ]);
   let isfollowee: boolean = $derived($followList.has(pubkey));
 
   // Public key validation
@@ -73,7 +80,7 @@
     $toastSettings = { title, description, color };
   };
 
-  let dialogCreateKind3Open: any = $state();
+  let dialogCreateKind3Open: Writable<boolean> = writable(false);
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
@@ -85,7 +92,7 @@
 
     await refreshContactsData(kind3Event);
 
-    if (!$beforeKind3) {
+    if (!beforeKind3) {
       //新しいKind3作っていいですかを出す
       $dialogCreateKind3Open = true;
       return;
@@ -129,28 +136,29 @@
       );
 
       pubkeysIn(newKind3[0].event);
-      $beforeKind3 = newKind3[0].event;
+      beforeKind3 = newKind3[0].event;
     } else if (kind3Event) {
-      $beforeKind3 = kind3Event.event;
+      beforeKind3 = kind3Event.event;
     }
 
-    // console.log("$beforeKind3", $beforeKind3);
+    // console.log("beforeKind3", beforeKind3);
   };
 
   const handleFollowStateChange = () => {
-    if (!$beforeKind3) return;
+    const snapbefore = $state.snapshot(beforeKind3);
+    if (!snapbefore) return;
 
     const tags = isfollowee
-      ? $beforeKind3.tags.filter(
+      ? snapbefore.tags.filter(
           ([tagName, pub]) => !(tagName === "p" && pub === pubkey)
         )
-      : [...$beforeKind3.tags, ["p", pubkey]];
+      : [...snapbefore.tags, ["p", pubkey]];
 
-    $afterEventParameters = {
-      content: $beforeKind3.content,
+    afterEventParameters = {
+      content: snapbefore.content,
       tags,
       kind: 3,
-      pubkey: $beforeKind3.pubkey,
+      pubkey: snapbefore.pubkey,
     };
 
     $nowProgress = false;
@@ -163,12 +171,15 @@
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
     const { event: ev, res } = await promisePublishEvent(
-      $afterEventParameters as Nostr.Event
+      $state.snapshot(afterEventParameters) as Nostr.Event
     );
     handlePublishResult(res, ev);
   };
 
-  const handlePublishResult = (res: any[], ev: Nostr.Event) => {
+  const handlePublishResult = (
+    res: OkPacketAgainstEvent[],
+    ev: Nostr.Event
+  ) => {
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
     const message = generateResultMessage(isSuccess, isFailed);
@@ -180,7 +191,17 @@
     );
 
     if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+      // $queryClient.refetchQueries({ queryKey: contactsQueryKey });//これやったらnullになるなぜか
+
+      const packetEv: EventPacket = {
+        event: ev,
+        from: isSuccess[0],
+        type: "EVENT",
+        subId: "",
+        message: ["EVENT", "", ev],
+      };
+
+      $queryClient.setQueryData(contactsQueryKey, packetEv);
       pubkeysIn(ev);
       const filters = makeMainFilters(ev, now());
       changeMainEmit(filters.mainFilters);
@@ -191,41 +212,26 @@
   };
 
   const resetState = () => {
-    $beforeKind3 = undefined;
-    $afterEventParameters = undefined;
+    beforeKind3 = undefined;
+    afterEventParameters = undefined;
     $nowProgress = false;
   };
 
   // Handle petname dialog
-  let openPetnameDialog:
-    | {
-        update: (
-          updater: import("svelte/store").Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: import("svelte/store").Subscriber<boolean>,
-          invalidate?: any
-        ): import("svelte/store").Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      }
-    | undefined = $state();
+  let openPetnameDialog: Writable<boolean> = writable(false);
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
     let kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey);
-    await refreshContactsData(kind3Event!);
+    await refreshContactsData(kind3Event);
     petnameInput = $followList.get(pubkey) ?? "";
     $openPetnameDialog = true;
     $nowProgress = false;
   };
 
   const updatePetname = async () => {
-    if (!$beforeKind3) return;
+    if (!beforeKind3) return;
 
     const beforePetname = $followList.get(pubkey);
     if (
@@ -234,7 +240,7 @@
     )
       return;
 
-    const updatedTags = $beforeKind3.tags.map((tag) => {
+    const updatedTags = beforeKind3.tags.map((tag) => {
       if (tag[0] === "p" && tag[1] === pubkey) {
         return petnameInput === ""
           ? tag.slice(0, 3)
@@ -245,11 +251,11 @@
       return tag;
     });
 
-    $afterEventParameters = {
-      content: $beforeKind3.content,
+    afterEventParameters = {
+      content: beforeKind3.content,
       tags: updatedTags,
       kind: 3,
-      pubkey: $beforeKind3.pubkey,
+      pubkey: beforeKind3.pubkey,
     };
     publishEvent();
     $openPetnameDialog = false;
@@ -325,14 +331,14 @@
   {/if}
 {/if}
 <AlertDialog
-  open={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
   {#snippet main()}
     <div>
       <div class="text-magnum-500 font-bold text-lg mt-2">Before</div>
-      {#if $beforeKind3}
+      {#if beforeKind3}
         <div
           class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
         >
@@ -340,26 +346,32 @@
             <li>
               Updated at <time
                 class="font-semibold text-magnum-300"
-                datetime={datetime($beforeKind3?.created_at)}
-                >{formatAbsoluteDate($beforeKind3?.created_at, true)}</time
+                datetime={datetime(beforeKind3?.created_at)}
+                >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
               ><span class="ml-2"
-                >({formatRelativeDate($beforeKind3?.created_at, $locale)})</span
+                >({formatRelativeDate(beforeKind3?.created_at, $locale)})</span
               >
             </li>
             <li>
               List length <span class="font-semibold text-zinc-200"
-                >{$beforeKind3?.tags.length}</span
+                >{beforeKind3?.tags.length}</span
               >
             </li>
             <li>
               Followee <span class="font-semibold text-zinc-200"
-                >{pubkeysIn($beforeKind3).size}</span
+                >{beforeKind3?.tags?.reduce((acc, [tag, value]) => {
+                  if (tag === "p") {
+                    return [...acc, value];
+                  } else {
+                    return acc;
+                  }
+                }, []).length}</span
               >
             </li>
           </ul>
         </div>
       {/if}
-      {#if $afterEventParameters}
+      {#if afterEventParameters}
         <ArrowBigDown />
         <div class="text-magnum-500 font-bold text-lg mt-2">After</div>
         <div
@@ -368,12 +380,12 @@
           <ul class="leading-4">
             <li>
               List length <span class="font-semibold text-magnum-300"
-                >{$afterEventParameters?.tags?.length}</span
+                >{afterEventParameters?.tags?.length}</span
               >
             </li>
             <li>
               Followee <span class="font-semibold text-magnum-300"
-                >{$afterEventParameters?.tags?.reduce((acc, [tag, value]) => {
+                >{afterEventParameters?.tags?.reduce((acc, [tag, value]) => {
                   if (tag === "p") {
                     return [...acc, value];
                   } else {
@@ -397,7 +409,7 @@
 >
   {#snippet main()}
     <div>
-      {#if $beforeKind3}
+      {#if beforeKind3}
         <div class="flex flex-col items-start justify-center">
           <div class="font-medium text-magnum-400">
             {$_("user.petname.write")} (NIP-02)
@@ -411,10 +423,10 @@
         <div class="text-sm mt-6 bg-neutral-700 rounded-sm p-2">
           Follow List Updated at<time
             class="font-semibold text-magnum-300 ml-2"
-            datetime={datetime($beforeKind3?.created_at)}
-            >{formatAbsoluteDate($beforeKind3?.created_at, true)}</time
+            datetime={datetime(beforeKind3?.created_at)}
+            >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
           >
-          ({formatRelativeDate($beforeKind3?.created_at, $locale)})
+          ({formatRelativeDate(beforeKind3?.created_at, $locale)})
         </div>
       {/if}
     </div>

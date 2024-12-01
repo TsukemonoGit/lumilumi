@@ -48,19 +48,6 @@
     content,
   }: Props = $props();
 
-  // export let queryKey: QueryKey;
-  // export let pubkey: string;
-  // export let req:
-  //   | (RxReq<"backward"> &
-  //       RxReqEmittable<{
-  //         relays: string[];
-  //       }> &
-  //       RxReqOverable &
-  //       RxReqPipeable)
-  //   | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-  //   | undefined = undefined;
-  // export let relays: DefaultRelayConfig[] | undefined = undefined;
-
   let storageKind3: Nostr.Event;
 
   let kind3key = `kind3-${pubkey}`; // New format by pubkey
@@ -88,9 +75,11 @@
     $app?.rxNostr.setDefaultRelays(relays);
   }
 
-  let result = $app?.rxNostr
-    ? useContacts($app?.rxNostr, queryKey, pubkey, req)
-    : undefined;
+  let result = $derived(
+    $app?.rxNostr
+      ? useContacts($app?.rxNostr, queryKey, pubkey, req)
+      : undefined
+  );
 
   let data = $derived(result?.data);
   let status = $derived(result?.status);
