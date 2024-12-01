@@ -12,7 +12,6 @@
   import Popover from "./Popover.svelte";
   import UserProfile from "./UserProfile.svelte";
   import { _ } from "svelte-i18n";
-  import { writable } from "svelte/store";
 
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";
