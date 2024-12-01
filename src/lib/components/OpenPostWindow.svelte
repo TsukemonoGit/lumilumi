@@ -66,7 +66,6 @@
     options?: DefaultPostOptions;
     signPubkey?: string | undefined;
   }
-
   let {
     options = {
       tags: [],

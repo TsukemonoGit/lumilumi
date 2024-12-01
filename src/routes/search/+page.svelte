@@ -36,7 +36,8 @@
   let searchHashtag: string | undefined = $state();
   let searchPubkeyTo: string = $state("");
   let followee = $state(false);
-  const filters: Writable<Nostr.Filter[]> = writable([]);
+  // const filters: Writable<Nostr.Filter[]> = writable([]);
+  let filters = $derived(createFilter());
   let showFilters: Nostr.Filter[] = $state([]);
 
   let compRef: SvelteComponent | undefined = $state();
@@ -126,8 +127,8 @@
     ) {
       await waitForDefaultRelays(5000);
 
-      createFilter();
-      // showFilters = $filters.map((filter) => {
+      // filters = createFilter();
+      // showFilters = filters.map((filter) => {
       //   return { ...filter, limit: 50 };
       // });
       console.log("showFilters", showFilters);
@@ -153,32 +154,31 @@
     }
   }
 
-  function createFilter() {
-    searchPubkey = searchPubkey?.trim() ?? "";
-    searchPubkeyTo = searchPubkeyTo?.trim() ?? "";
-    $filters = [
-      {
-        search: searchWord || undefined,
+  function createFilter(): Nostr.Filter[] {
+    let filter: Nostr.Filter;
 
-        authors: npubRegex.test(searchPubkey)
-          ? [getHex(searchPubkey)]
-          : followee && $followList
-            ? Array.from($followList.keys())
-            : undefined,
-        since: !Number.isNaN(searchSince) ? searchSince : undefined,
-        until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-        // "#t": searchHashtag ? [searchHashtag] : [],
-        // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
-      },
-    ];
+    filter = {
+      search: searchWord || undefined,
+
+      authors: npubRegex.test(searchPubkey?.trim() ?? "")
+        ? [getHex(searchPubkey?.trim() ?? "")]
+        : followee && $followList
+          ? Array.from($followList.keys())
+          : undefined,
+      since: !Number.isNaN(searchSince) ? searchSince : undefined,
+      until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
+      // "#t": searchHashtag ? [searchHashtag] : [],
+      // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
+    };
+
     if (searchHashtag) {
-      $filters[0] = { ...$filters[0], "#t": [searchHashtag] };
+      filter = { ...filter, "#t": [searchHashtag] };
     }
-    if (npubRegex.test(searchPubkeyTo)) {
-      $filters[0] = { ...$filters[0], "#p": [getHex(searchPubkeyTo)] };
+    if (npubRegex.test(searchPubkeyTo?.trim() ?? "")) {
+      filter = { ...filter, "#p": [getHex(searchPubkeyTo?.trim() ?? "")] };
     }
 
-    $filters[0].kinds =
+    filter.kinds =
       searchKind === undefined || searchKind === null
         ? undefined
         : [searchKind];
@@ -191,17 +191,18 @@
     // ) {
     //   const splitList = splitArray(followingList, chunk);
     //   // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
-    //   $filters = splitList.map((list) => ({
-    //     ...$filters[0], // $filters[0] のその他のデータを維持
+    //   filters = splitList.map((list) => ({
+    //     ...filters[0], // filters[0] のその他のデータを維持
     //     authors: list, // authors を分割されたリストに置き換える
     //   }));
     // }
+    return [filter];
   }
 
   function handleClickSearch() {
     $nowProgress = true;
     updateQueryParams();
-    showFilters = $filters.map((filter) => {
+    showFilters = filters.map((filter) => {
       return { ...filter, limit: 50 };
     });
 
@@ -275,20 +276,22 @@
         .map((config) => config.url);
     }
   });
-  $effect(() => {
-    if (
-      searchKind === searchKind ||
-      searchHashtag ||
-      searchWord ||
-      searchPubkey ||
-      searchPubkeyTo ||
-      searchSince ||
-      searchUntil ||
-      followee
-    ) {
-      untrack(() => createFilter());
-    }
-  });
+
+  // $effect(() => {
+  //   console.log(searchWord);
+  //   if (
+  //     searchKind === searchKind ||
+  //     searchHashtag ||
+  //     searchWord ||
+  //     searchPubkey ||
+  //     searchPubkeyTo ||
+  //     searchSince ||
+  //     searchUntil ||
+  //     followee
+  //   ) {
+  //     untrack(() => createFilter());
+  //   }
+  // });
 </script>
 
 <section>

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { relayRegex2 } from "$lib/func/regex";
   import { createAccordion, melt } from "@melt-ui/svelte";
   import { ChevronDown, X } from "lucide-svelte";

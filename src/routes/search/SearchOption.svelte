@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<button>` is invalid inside `<button>` -->
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { followList, nowProgress, toastSettings } from "$lib/stores/stores";
@@ -24,7 +23,7 @@
     searchSince: number | undefined;
     searchUntil: number | undefined;
     resetValue: () => void;
-    filters: Writable<Nostr.Filter[]>;
+    filters: Nostr.Filter[];
     handleClickSearch: () => void;
   }
 
@@ -73,6 +72,7 @@
     console.log(pubkey);
     searchPubkey = pubkey;
   };
+
   const handleClickSearchPubkeyTo = (pubkey: string) => {
     console.log(pubkey);
     searchPubkeyTo = pubkey;
@@ -240,7 +240,7 @@
     class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
   >
     <div class="font-semibold text-magnum-400">Filters</div>
-    {#each $filters as filter}
+    {#each filters as filter}
       {JSON.stringify(filter, null, 2)}
     {/each}
   </div>

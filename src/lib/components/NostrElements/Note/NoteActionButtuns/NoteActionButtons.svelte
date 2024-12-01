@@ -557,41 +557,46 @@
         {@const prof = profile(metadata)}
         {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
           <div class="flex items-end">
-            <Zapped id={atag ?? note.id} let:event>
-              <button slot="loading" onclick={handleClickZap} aria-label="zap">
-                <Zap
-                  size="20"
-                  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-                />
-              </button>
-
-              <button aria-label="zap" slot="nodata" onclick={handleClickZap}>
-                <Zap
-                  size="20"
-                  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                />
-              </button>
-
-              <button aria-label="zap" slot="error" onclick={handleClickZap}>
-                <Zap
-                  size="20"
-                  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                />
-              </button>
-
-              {#if event === undefined}
+            <Zapped id={atag ?? note.id}>
+              {#snippet loading()}
+                <button onclick={handleClickZap} aria-label="zap">
+                  <Zap
+                    size="20"
+                    class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
+                  />
+                </button>
+              {/snippet}
+              {#snippet nodata()}
                 <button aria-label="zap" onclick={handleClickZap}>
                   <Zap
                     size="20"
                     class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
                   />
                 </button>
-              {:else}
-                <Zap
-                  size="20"
-                  class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
-                />
-              {/if}
+              {/snippet}
+              {#snippet error()}
+                <button aria-label="zap" onclick={handleClickZap}>
+                  <Zap
+                    size="20"
+                    class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+                  />
+                </button>
+              {/snippet}
+              {#snippet content({ event })}
+                {#if event === undefined}
+                  <button aria-label="zap" onclick={handleClickZap}>
+                    <Zap
+                      size="20"
+                      class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+                    />
+                  </button>
+                {:else}
+                  <Zap
+                    size="20"
+                    class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
+                  />
+                {/if}
+              {/snippet}
             </Zapped><span class="text-sm"
               >{#if allReactions.zap.length > 0}{allReactions.zap
                   .length}{/if}</span
@@ -659,22 +664,7 @@
             />
           </button>
         {/snippet}
-        {#snippet nodata()}
-          <button aria-label="reaction" onclick={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            />
-          </button>
-        {/snippet}
-        {#snippet error()}
-          <button aria-label="reaction" onclick={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            />
-          </button>
-        {/snippet}
+
         {#snippet content({ event })}
           {#if event === undefined}
             <button aria-label="reaction" onclick={handleClickReaction}
@@ -696,20 +686,16 @@
     <!--リポスト-->
     {#if repostable && !noReactionKind.includes(note.kind)}
       <div class="flex items-end">
-        <Reposted id={atag ?? note.id} let:event>
-          <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
+        <Reposted id={atag ?? note.id}>
+          {#snippet loading()}
+            <DropdownMenu {menuTexts} {handleSelectItem}>
+              <Repeat2 size="21" />
+            </DropdownMenu>{/snippet}
 
-          <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
-          </DropdownMenu>
+          {#snippet content({ event })}
+            <DropdownMenu {menuTexts} {handleSelectItem}>
+              <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
+            </DropdownMenu>{/snippet}
         </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
             >{allReactions.repost.length}</span
           >{/if}

@@ -10,17 +10,15 @@
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";
-  import { untrack } from "svelte";
 
   let inputMetadata = $state("");
 
   interface Props {
-    viewMetadataList?: boolean;
+    viewMetadataList?: (bool: boolean) => void;
     handleClickUser: any;
   }
 
-  let { viewMetadataList = $bindable(false), handleClickUser }: Props =
-    $props();
+  let { viewMetadataList = $bindable(), handleClickUser }: Props = $props();
 
   let metadataInput: HTMLInputElement | undefined = $state();
 
@@ -36,14 +34,19 @@
       metadataList = getMetadataList(metadataQueryData);
     } catch (error) {}
   }
-
-  $effect(() => {
-    if (viewMetadataList) {
-      untrack(() => {
-        setMetadataList();
-      });
+  let onOpenStateChange = (bool: boolean) => {
+    if (bool) {
+      setMetadataList();
     }
-  });
+  };
+  // $effect(() => {
+  //   if (viewMetadataList) {
+  //     untrack(() => {
+  //       setMetadataList();
+  //     });
+  //   }
+  // });
+
   function checkUserInput(inputMetadata: string, arg1: UserData) {
     if (inputMetadata === "") {
       return true;
@@ -66,7 +69,11 @@
   }
 </script>
 
-<Popover ariaLabel="user datalist" open={viewMetadataList}>
+<Popover
+  ariaLabel="user datalist"
+  bind:openPopover={viewMetadataList}
+  {onOpenStateChange}
+>
   <UserPlus size="20" class={"w-12 stroke-magnum-600 "} />
 
   <!--metadataList-->

@@ -17,6 +17,7 @@
     showCloseButton?: boolean;
     children?: import("svelte").Snippet;
     popoverContent?: import("svelte").Snippet;
+    onOpenStateChange?: (bool: boolean) => void;
   }
 
   let {
@@ -26,11 +27,17 @@
     showCloseButton = true,
     children,
     popoverContent,
+    onOpenStateChange,
   }: Props = $props();
 
   openPopover = (bool: boolean) => {
     $open = bool;
   };
+
+  open.subscribe((value) => {
+    //statechange
+    onOpenStateChange?.(value);
+  });
 </script>
 
 <button
