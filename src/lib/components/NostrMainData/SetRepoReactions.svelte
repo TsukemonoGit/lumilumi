@@ -123,7 +123,7 @@
 {#if $errorData}
   {@render error?.()}
 {:else if $data}
-  {@render content({ events: $data.event, status: status })}
+  {@render content?.({ events: $data.event, status: status })}
   <!-- <slot events={$data.event} {status} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}

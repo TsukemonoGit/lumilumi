@@ -12,24 +12,23 @@
   interface Props {
     id: string;
 
-    error?: import("svelte").Snippet;
-    nodata?: import("svelte").Snippet;
     loading?: import("svelte").Snippet;
 
     content?: import("svelte").Snippet<
       [
         {
           event: Nostr.Event;
-          status: ReqStatus;
         },
       ]
     >;
   }
 
-  let { id, error, loading, nodata, content }: Props = $props();
+  let { id, loading, content }: Props = $props();
   // export let id: string;
   let _result: { data: EventPacket; status: any; error: any } | undefined =
     $state();
+
+  let data = $derived(_result?.data);
 
   const observer1 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "reaction", id, $loginUser],
@@ -54,9 +53,6 @@
     unsubscribe();
     // $queryClient.removeQueries({ queryKey: queryKey });
   });
-  let data = $derived(_result?.data);
-  let status = $derived(_result?.status);
-  let errorData = $derived(_result?.error);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 </script>
@@ -67,12 +63,8 @@
 <div class="break-all">error:{error}</div> -->
 
 {#if data?.event}
-  {@render content?.({ event: data?.event, status: status })}
+  {@render content?.({ event: data?.event })}
   <!-- <slot event={data?.event} {status} /> -->
-{:else if errorData}
-  {@render error?.()}
-{:else if status === "loading"}
-  {@render loading?.()}
 {:else}
-  {@render nodata?.()}
+  {@render loading?.()}
 {/if}
