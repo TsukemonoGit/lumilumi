@@ -7,7 +7,7 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import { queryClient } from "$lib/stores/stores";
-  import { onMount } from "svelte";
+
   interface Props {
     id: string;
     mini?: boolean;
@@ -29,7 +29,7 @@
     depth,
     repostable,
     tieKey,
-    relayhint
+    relayhint,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
   const queryCheck = (id: string) => {
@@ -40,46 +40,38 @@
 </script>
 
 {#await queryCheck(id) then}
-  <Text queryKey={["timeline", id]} {id} relays={relayhint}  >
+  <Text queryKey={["timeline", id]} {id} relays={relayhint}>
     {#snippet loading()}
-        <div
-        
+      <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
         Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
             notestr={loadingText}
           />{/if}
       </div>
-      {/snippet}
+    {/snippet}
     {#snippet nodata()}
-        <div
-        
+      <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
         nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
             notestr={loadingText}
           />{/if}
       </div>
-      {/snippet}
-    {#snippet error({ error })}
-        <div
-        
-        
+    {/snippet}
+    {#snippet error()}
+      <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
         {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
             notestr={nip19.noteEncode(id)}
           />{/if}
       </div>
-      {/snippet}
-    {#snippet children({ text, status })}
-        <Metadata
-        queryKey={["metadata", text.pubkey]}
-        pubkey={text.pubkey}
-        
-      >
+    {/snippet}
+    {#snippet content({ data: text, status })}
+      <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
         {#snippet loading()}
-            <div >
+          <div>
             <EventCard
               note={text}
               {mini}
@@ -90,9 +82,9 @@
               {tieKey}
             />
           </div>
-          {/snippet}
+        {/snippet}
         {#snippet nodata()}
-            <div >
+          <div>
             <EventCard
               note={text}
               {mini}
@@ -103,9 +95,9 @@
               {tieKey}
             />
           </div>
-          {/snippet}
-        {#snippet error({ error })}
-            <div  >
+        {/snippet}
+        {#snippet error()}
+          <div>
             <EventCard
               note={text}
               {mini}
@@ -116,9 +108,9 @@
               {tieKey}
             />
           </div>
-          {/snippet}
-        {#snippet children({ metadata })}
-            <EventCard
+        {/snippet}
+        {#snippet content({ metadata })}
+          <EventCard
             note={text}
             {metadata}
             {mini}
@@ -129,8 +121,8 @@
             {repostable}
             {tieKey}
           />
-                  {/snippet}
-        </Metadata>
-          {/snippet}
-    </Text>
+        {/snippet}
+      </Metadata>
+    {/snippet}
+  </Text>
 {/await}

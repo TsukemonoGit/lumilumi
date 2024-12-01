@@ -650,49 +650,41 @@
     <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
-      <Reactioned id={atag ?? note.id} let:event>
-        <button
-          aria-label="reaction"
-          slot="loading"
-          onclick={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-          />
-        </button>
-
-        <button
-          aria-label="reaction"
-          slot="nodata"
-          onclick={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        <button
-          aria-label="reaction"
-          slot="error"
-          onclick={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        {#if event === undefined}
-          <button aria-label="reaction" onclick={handleClickReaction}
-            ><Heart
+      <Reactioned id={atag ?? note.id}>
+        {#snippet loading()}
+          <button aria-label="reaction" onclick={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
+            />
+          </button>
+        {/snippet}
+        {#snippet nodata()}
+          <button aria-label="reaction" onclick={handleClickReaction}>
+            <Heart
               size="20"
               class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            /></button
-          >{:else}<div class="overflow-hidden">
-            <Reaction {event} />
-          </div>{/if}</Reactioned
+            />
+          </button>
+        {/snippet}
+        {#snippet error()}
+          <button aria-label="reaction" onclick={handleClickReaction}>
+            <Heart
+              size="20"
+              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+            />
+          </button>
+        {/snippet}
+        {#snippet content({ event })}
+          {#if event === undefined}
+            <button aria-label="reaction" onclick={handleClickReaction}
+              ><Heart
+                size="20"
+                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+              /></button
+            >{:else}<div class="overflow-hidden">
+              <Reaction {event} />
+            </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
         >{#if allReactions.reaction.length > 0}{allReactions.reaction
             .length}{/if}</span

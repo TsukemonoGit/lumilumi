@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import RelayStatus from "$lib/components/RelayStatus.svelte";
   import { SlidersHorizontal } from "lucide-svelte";
   import { currentPage } from "./menu";
@@ -11,7 +9,6 @@
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
 
-  let openPopover: any = $state();
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],
@@ -65,11 +62,7 @@
       <div class="fixed w-full top-0">
         <div class="container relative">
           <div class="option">
-            <Popover
-              open={openPopover}
-              ariaLabel="timeline filter setting"
-              showCloseButton={true}
-            >
+            <Popover ariaLabel="timeline filter setting" showCloseButton={true}>
               <div
                 class=" flex items-center font-bold text-sm gap-1 rounded-full border text-magnum-200 border-magnum-300
                 hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"

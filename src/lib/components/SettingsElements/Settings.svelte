@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
@@ -822,7 +820,7 @@
       <Link
         className="underline text-magnum-300"
         href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
-        >(NIP-30)</Link
+        >{#snippet content()}(NIP-30){/snippet}</Link
       >
     </div>
     {#if $loginUser}

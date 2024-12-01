@@ -279,7 +279,7 @@
       if (readUrls) {
         await waitForConnections(readUrls, $relayStateMap, 10000);
       } // maxWaitTime set to 10 seconds
-      console.log($relayStateMap);
+      // console.log($relayStateMap);
 
       const older = await firstLoadOlderEvents(
         50,

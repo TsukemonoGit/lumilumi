@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { promisePublishEvent } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";

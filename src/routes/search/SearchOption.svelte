@@ -13,19 +13,47 @@
   import { eventKinds } from "$lib/func/kinds";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
+  interface Props {
+    searchWord: string | undefined;
+    followee: boolean;
+    createFilter: () => void;
+    searchKind: number | undefined;
+    searchPubkey: string | undefined;
+    searchPubkeyTo: string | undefined;
+    searchHashtag: string | undefined;
+    searchSince: number | undefined;
+    searchUntil: number | undefined;
+    resetValue: () => void;
+    filters: Writable<Nostr.Filter[]>;
+    handleClickSearch: () => void;
+  }
 
-  export let searchWord: string | undefined;
-  export let followee: boolean;
-  export let createFilter;
-  export let searchKind: number | undefined = undefined;
-  export let searchPubkey: string | undefined;
-  export let searchPubkeyTo: string | undefined;
-  export let searchHashtag: string | undefined;
-  export let searchSince: number | undefined;
-  export let searchUntil: number | undefined;
-  export let resetValue;
-  export let filters: Writable<Nostr.Filter[]>;
-  export let handleClickSearch;
+  let {
+    searchWord = $bindable(),
+    followee = $bindable(),
+    createFilter,
+    searchKind = $bindable(undefined),
+    searchPubkey = $bindable(),
+    searchPubkeyTo = $bindable(),
+    searchHashtag = $bindable(),
+    searchSince = $bindable(),
+    searchUntil = $bindable(),
+    resetValue,
+    filters,
+    handleClickSearch,
+  }: Props = $props();
+  // export let searchWord: string | undefined;
+  // export let followee: boolean;
+  // export let createFilter;
+  // export let searchKind: number | undefined = undefined;
+  // export let searchPubkey: string | undefined;
+  // export let searchPubkeyTo: string | undefined;
+  // export let searchHashtag: string | undefined;
+  // export let searchSince: number | undefined;
+  // export let searchUntil: number | undefined;
+  // export let resetValue;
+  // export let filters: Writable<Nostr.Filter[]>;
+  // export let handleClickSearch;
 
   const getKindLabel = (
     kind: number | undefined,
@@ -92,7 +120,7 @@
           type="checkbox"
           class="rounded-checkbox"
           bind:checked={followee}
-          on:change={createFilter}
+          onchange={createFilter}
         />
         only followee
       </label>
@@ -197,7 +225,7 @@
             title={"Date"}
           />
           <button
-            on:click={resetValue}
+            onclick={resetValue}
             class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
           >
             <X class="size-5" /></button
@@ -222,12 +250,12 @@
   <button
     class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
     disabled={$nowProgress}
-    on:click={handleClickSearch}>Search</button
+    onclick={handleClickSearch}>Search</button
   >
 
   <button
     class="absolute right-0 top-[2px] w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    on:click={handleClickShare}
+    onclick={handleClickShare}
     disabled={$nowProgress}
     ><Share size={16} />{$_("about.share")}
   </button>

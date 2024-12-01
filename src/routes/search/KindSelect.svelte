@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { eventKinds } from "$lib/func/kinds";
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
@@ -27,6 +25,10 @@
   //   console.log($locale);
   // });
   // locale;
+
+  const handleClickKind = (kind: number) => {
+    selectedKind = kind;
+  };
 </script>
 
 <button type="button" class="trigger" use:melt={$trigger}>
@@ -43,9 +45,7 @@
       <div
         class="item"
         use:melt={$item}
-        onm-click={(e) => {
-          selectedKind = kind;
-        }}
+        onm-click={() => handleClickKind(kind)}
       >
         {kind}
         {$locale === "ja" ? ja : en}

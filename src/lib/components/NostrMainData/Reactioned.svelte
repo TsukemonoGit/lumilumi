@@ -9,18 +9,32 @@
   import type { EventPacket } from "rx-nostr";
   import { onDestroy } from "svelte";
 
-  export let id: string;
-  let _result: { data: EventPacket; status: any; error: any };
+  interface Props {
+    id: string;
+
+    error?: import("svelte").Snippet;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    content?: import("svelte").Snippet<
+      [
+        {
+          event: Nostr.Event;
+          status: ReqStatus;
+        },
+      ]
+    >;
+  }
+
+  let { id, error, loading, nodata, content }: Props = $props();
+  // export let id: string;
+  let _result: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
 
   const observer1 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "reaction", id, $loginUser],
   });
 
-  // let unsubscribe: () => void;
-  // onMount(() => {
-  //   const data = $queryClient?.getQueryData(queryKey);
-  //   console.log(data);
-  //   console.log($queryClient?.getQueriesData({ queryKey: queryKey }));
   const unsubscribe = observer1.subscribe((result: any) => {
     if (
       !_result?.data?.event ||
@@ -40,17 +54,11 @@
     unsubscribe();
     // $queryClient.removeQueries({ queryKey: queryKey });
   });
-  $: data = _result?.data;
-  $: status = _result?.status;
-  $: error = _result?.error;
+  let data = $derived(_result?.data);
+  let status = $derived(_result?.status);
+  let errorData = $derived(_result?.error);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface $$Slots {
-    default: { event: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 <!-- {observer1?.hasListeners()}
@@ -59,11 +67,12 @@
 <div class="break-all">error:{error}</div> -->
 
 {#if data?.event}
-  <slot event={data?.event} {status} />
-{:else if error}
-  <slot name="error" {error} />
+  {@render content?.({ event: data?.event, status: status })}
+  <!-- <slot event={data?.event} {status} /> -->
+{:else if errorData}
+  {@render error?.()}
 {:else if status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

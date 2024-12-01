@@ -181,7 +181,7 @@
       $nowProgress = true;
       isOnMount = true;
       await init();
-      isOnMount = false;
+
       $nowProgress = false;
     }
   });
@@ -190,10 +190,11 @@
     console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
+
       $nowProgress = true;
       isOnMount = true;
       await init();
-      isOnMount = false;
+
       $nowProgress = false;
     }
   });
@@ -206,7 +207,7 @@
     //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
     // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
     await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
-    console.log($relayStateMap);
+    // console.log($relayStateMap);
 
     const older = await usePromiseReq(
       { filters: filters, operator, req: undefined },
@@ -227,6 +228,7 @@
       // console.log($queryClient.getQueryData(queryKey));
       // updateViewEvent();
     }
+    isOnMount = false;
   }
 
   interface $$Slots {

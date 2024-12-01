@@ -44,9 +44,9 @@
 
 {#if pubkey}
   <div class="text-sm text-zinc-500">
-    <StatusGeneral {pubkey} >
+    <StatusGeneral {pubkey}>
       {#snippet children({ event })}
-            {@const link = getLink(event)}
+        {@const link = getLink(event)}
         <div class="flex gap-1 items-center">
           {#if link && link !== ""}
             <div class=" min-w-[16px] flex items-center justify-center">
@@ -93,11 +93,12 @@
             </div>
           {/if}
         </div>
-                {/snippet}
-        </StatusGeneral>
-    <StatusMusic {pubkey} >
+      {/snippet}
+    </StatusGeneral>
+    <StatusMusic {pubkey}>
       {#snippet children({ event })}
-            {@const link = event.tags.find((tag) => tag[0] === "r")?.[1] ?? ""}
+        {@const link =
+          event.tags.find((tag: string[]) => tag[0] === "r")?.[1] ?? ""}
         <div class="flex gap-1 items-center">
           {#if link !== ""}<div
               class=" min-w-[16px] flex items-center justify-center"
@@ -144,7 +145,7 @@
             </div>
           {/if}
         </div>
-                {/snippet}
-        </StatusMusic>
+      {/snippet}
+    </StatusMusic>
   </div>
 {/if}

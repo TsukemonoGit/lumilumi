@@ -4,8 +4,8 @@
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
   import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
 
-  import { loginUser, toastSettings } from "$lib/stores/stores";
-  import { Search, SquareArrowOutUpRight } from "lucide-svelte";
+  import { loginUser } from "$lib/stores/stores";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
 
   import { nip19 } from "nostr-tools";
   //import * as Nostr from "nostr-typedef";
@@ -44,13 +44,9 @@
       style="word-break: break-word;">{$_("setting.pubkey")}</a
     >
   {:else}
-    <ChannelMain
-      queryKey={["kind10005", $loginUser]}
-      pubkey={$loginUser}
-      
-    >
+    <ChannelMain queryKey={["kind10005", $loginUser]} pubkey={$loginUser}>
       {#snippet children({ event })}
-            {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
+        {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
           <div
             class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
           >
@@ -62,13 +58,15 @@
             />
           </div>
         {/each}
-                {/snippet}
-        </ChannelMain>
+      {/snippet}
+    </ChannelMain>
 
     <Link
       className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
       href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${10005}`}
-      >{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight size={16} /></Link
+      >{#snippet content()}{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight
+          size={16}
+        />{/snippet}</Link
     >
   {/if}
   <a

@@ -35,13 +35,14 @@
   <Link
     className="inline-flex float-end text-magnum-500/75 text-right mx-1 hover:opacity-75 items-center text-xs underline gap-1"
     href={mapLink}
-    ><UseGeohash {decoded} {geohash}>
-      {#snippet children({ contents })}
-        {contents.display_name ?? "Location not found"}
-      {/snippet}
-    </UseGeohash><MapPinned
-      size={20}
-      class="min-w-4"
-    /><!--<ExternalLink size={12} />--></Link
+    >{#snippet content()}<UseGeohash {decoded} {geohash}>
+        {#snippet children({ contents })}
+          {contents.display_name ?? "Location not found"}
+        {/snippet}
+      </UseGeohash><MapPinned
+        size={20}
+        class="min-w-4"
+      /><!--<ExternalLink size={12} />-->
+    {/snippet}</Link
   >
 {/if}

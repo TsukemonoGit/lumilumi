@@ -12,37 +12,55 @@
     RxReqPipeable,
   } from "rx-nostr";
 
-  export let queryKey: QueryKey;
-  export let filters: Nostr.Filter[];
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
+  interface Props {
+    queryKey: QueryKey;
+    filters: Nostr.Filter[];
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  $: result = useUniqueEventList(queryKey, filters, req);
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
-
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
+    content?: import("svelte").Snippet<
+      [{ events: Nostr.Event[]; status: ReqStatus }]
+    >;
   }
+
+  let { queryKey, filters, req, error, loading, nodata, content }: Props =
+    $props();
+  // export let queryKey: QueryKey;
+  // export let filters: Nostr.Filter[];
+  // export let req:
+  //   | (RxReq<"backward"> &
+  //       RxReqEmittable<{
+  //         relays: string[];
+  //       }> &
+  //       RxReqOverable &
+  //       RxReqPipeable)
+  //   | undefined = undefined;
+
+  let result = $derived(useUniqueEventList(queryKey, filters, req));
+  let data = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
+{#if $errorData}
+  {@render error?.($errorData)}
 {:else if $data && $data?.length > 0}
-  <slot events={$data?.map(({ event }) => event)} status={$status} />
+  {@render content?.({
+    events: $data?.map(({ event }) => event),
+    status: $status,
+  })}
+  <!-- <slot events={$data?.map(({ event }) => event)} status={$status} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

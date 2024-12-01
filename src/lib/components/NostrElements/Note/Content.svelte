@@ -135,7 +135,8 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
       <audio
@@ -148,7 +149,8 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
   {:else if part.type === "url"}{#if $showImg}<OGP url={part.content ?? ""}
         >{#snippet renderContent(contents)}
@@ -156,18 +158,21 @@
             <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
               props={{ "aria-label": `External Links: ${part.url}` }}
               className="underline text-magnum-300 break-all "
-              href={part.content ?? ""}>{part.content ?? ""}</Link
+              href={part.content ?? ""}
+              >{#snippet content()}{part.content ?? ""}{/snippet}</Link
             >{/if}{/snippet}
         {#snippet nodata()}
           <Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}>{part.content}</Link
+            href={part.content ?? ""}
+            >{#snippet content()}{part.content ?? ""}{/snippet}</Link
           >{/snippet}
       </OGP>{:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "emoji"}
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
@@ -184,7 +189,7 @@
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</Link
+      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
     >{:else if part.type === "invoice" && part.content}
     <InvoiceCard invoice={part.content} />
   {:else}<span

@@ -19,7 +19,7 @@
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all "
-      href={part.url ?? ""}>{part.content}</Link
+      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
     >{/if}
   <div>
     <button
@@ -41,7 +41,7 @@
   <Link
     props={{ "aria-label": `External Links: ${part.url}` }}
     className="underline text-magnum-300 break-all "
-    href={part.url ?? ""}>{part.content}</Link
+    href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
   >{:else}
   <button
     class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50"

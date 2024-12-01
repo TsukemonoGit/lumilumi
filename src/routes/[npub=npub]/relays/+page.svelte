@@ -1,13 +1,8 @@
 <!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
+  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
-    promisePublishEvent,
-    setRelays,
-    usePromiseReq,
-  } from "$lib/func/nostr";
-  import {
-    defaultRelays,
     loginUser,
     nowProgress,
     queryClient,
@@ -27,15 +22,14 @@
   import { page } from "$app/stores";
   import { generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+
   import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-  import { relayRegex2 } from "$lib/func/regex";
 
-  export let data: {
-    pubkey: string;
-  };
+  import { relayRegex2 } from "$lib/func/regex";
+  import { type PageData } from "./$types";
+  let { data }: { data: PageData } = $props();
+
   // const data={pubkey:$page.params.npub};
   console.log(data.pubkey);
 
@@ -47,6 +41,7 @@
 
   let isError = false;
   let isMount = false;
+  let newRelay: string = $state("");
   onMount(async () => {
     if (!isMount) {
       isMount = true;
@@ -194,8 +189,6 @@
     updateRelayCounts();
   }
 
-  let newRelay: string = "";
-
   function addNewRelay() {
     newRelay = newRelay.trim();
     if (newRelay === "") {
@@ -307,9 +300,12 @@
   let writeLen: number = 0;
   let readLen: number = 0;
 
-  $: if ($newTags) {
-    updateRelayCounts();
-  }
+  newTags.subscribe((value) => {
+    if (value) {
+      updateRelayCounts();
+    }
+  });
+
   // 状態を更新する関数
   function updateRelayCounts() {
     writeLen = Array.from(relayStates.values()).filter(
@@ -409,21 +405,21 @@
               ><input
                 type="checkbox"
                 checked={relayStates.get(url)?.read}
-                on:change={(e) => handleClickRead(e, url)}
+                onchange={(e) => handleClickRead(e, url)}
               /></td
             >
             <td class="text-center"
               ><input
                 type="checkbox"
                 checked={relayStates.get(url)?.write}
-                on:change={(e) => handleClickWrite(e, url)}
+                onchange={(e) => handleClickWrite(e, url)}
               /></td
             ><td
               ><button
                 class="m-auto h-6 w-6 flex justify-center items-center
             rounded-full text-magnum-800 bg-magnum-100
             hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300"
-                on:click={() => removeRelay(url)}><X size={20} /></button
+                onclick={() => removeRelay(url)}><X size={20} /></button
               ></td
             >
           </tr>
@@ -439,7 +435,7 @@
       />
       <button
         class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit disabled:opacity-25"
-        on:click={addNewRelay}
+        onclick={addNewRelay}
         disabled={$nowProgress}
       >
         Add
@@ -450,13 +446,13 @@
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50 disabled:opacity-25"
       disabled={$nowProgress}
-      on:click={save}
+      onclick={save}
     >
       <Save />Save
     </button><button
       class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50 disabled:opacity-25"
       disabled={$nowProgress}
-      on:click={reset}
+      onclick={reset}
     >
       Reset
     </button>

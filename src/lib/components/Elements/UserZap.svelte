@@ -9,8 +9,7 @@
   import ZapInvoiceWindow from "./ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import DisplayName from "./DisplayName.svelte";
-  import { writable, type Writable } from "svelte/store";
-  import { untrack } from "svelte";
+
   interface Props {
     metadata: Nostr.Event;
   }
@@ -65,15 +64,17 @@
   //     }, 1);
   //   }
   // });
-</script>
-
-<button
-  onclick={async () => {
+  const handleClickZap = async () => {
+    //amount comment画面を開いてamountのinputにfocus
     dialogOpen?.(true);
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
-  }}
+  };
+</script>
+
+<button
+  onclick={handleClickZap}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
   title="zap"><Zap /></button
 >

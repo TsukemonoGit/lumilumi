@@ -307,7 +307,8 @@
           </div>{/if}
         {#if newProfile.website}<Link
             className="text-sm underline text-magnum-300 break-all  "
-            href={newProfile.website}>{newProfile.website}</Link
+            href={newProfile.website}
+            >{#snippet content()}{newProfile?.website}{/snippet}</Link
           >{/if}
       </div>
 

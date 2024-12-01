@@ -19,6 +19,7 @@ const config = {
     files: {
       serviceWorker: 'src/my-sw.ts', // or `src/my-sw.ts`
     }
-  }
+  },
+  // compilerOptions: { runes: true }
 };
 export default config;

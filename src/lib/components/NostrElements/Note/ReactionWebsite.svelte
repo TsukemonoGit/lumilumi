@@ -13,14 +13,24 @@
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
 
-  export let tieKey: string | undefined;
+  interface Props {
+    note: Nostr.Event;
+    metadata: Nostr.Event | undefined;
+    displayMenu: boolean;
+    depth: number;
+    tieKey: string | undefined;
+  }
+  let { note, metadata, displayMenu, tieKey, depth }: Props = $props();
 
-  $: website = reactionWebsite(note);
+  // export let note: Nostr.Event;
+  // export let metadata: Nostr.Event | undefined;
+  // export let displayMenu: boolean;
+  // export let depth: number;
+
+  // export let tieKey: string | undefined;
+
+  let website = $derived(reactionWebsite(note));
   function reactionWebsite(note: Nostr.Event): string | undefined {
     const webTag = note.tags.find((tag) => tag[0] === "r");
     if (webTag && webTag.length > 1) {
@@ -29,7 +39,7 @@
       return undefined;
     }
   }
-  $: prof = profile(metadata);
+  let prof = $derived(profile(metadata));
 </script>
 
 <div class="flex gap-1 items-center bg-magnum-800/25">
@@ -79,7 +89,7 @@
       <OGP url={website}>
         {#snippet nodata()}
           <Link className="underline text-magnum-300 break-all " href={website}
-            >{website}</Link
+            >{#snippet content()}{website}{/snippet}</Link
           >
         {/snippet}
         {#snippet renderContent(contents)}
@@ -88,14 +98,14 @@
           {:else}
             <Link
               className="underline text-magnum-300 break-all "
-              href={website}>{website}</Link
+              href={website}>{#snippet content()}{website}{/snippet}</Link
             >
           {/if}
         {/snippet}
       </OGP>
     {:else}
       <Link className="underline text-magnum-300 break-all " href={website}
-        >{website}</Link
+        >{#snippet content()}{website}{/snippet}</Link
       >{/if}
   </div>
 {/if}

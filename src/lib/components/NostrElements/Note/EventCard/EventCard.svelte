@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import * as Nostr from "nostr-typedef";
 
   import { Repeat2 } from "lucide-svelte";

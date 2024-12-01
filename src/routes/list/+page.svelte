@@ -56,18 +56,14 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
-      <ListMain
-        queryKey={["kind30000", $loginUser]}
-        pubkey={$loginUser}
-        
-      >
+      <ListMain queryKey={["kind30000", $loginUser]} pubkey={$loginUser}>
         {#snippet children({ events })}
-                {@const peopleList = filtered(events)}
+          {@const peopleList = filtered(events)}
           {#if peopleList.length === 0}
             <Link
               className="underline text-magnum-300 break-all "
               href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
-              >{$_("nostviewstr.kind30000")}</Link
+              >{#snippet content()}{$_("nostviewstr.kind30000")}{/snippet}</Link
             >
           {:else}
             {#each peopleList as event}
@@ -79,17 +75,17 @@
               >
             {/each}
           {/if}
-                      {/snippet}
-            </ListMain>
+        {/snippet}
+      </ListMain>
       <div
         class=" border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center"
       >
         <Link
           className=" font-semibold text-magnum-300 break-all inline-flex"
           href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
-          >{$_("nostviewstr.kind30000")}<SquareArrowOutUpRight
-            size={16}
-          /></Link
+          >{#snippet content()}{$_(
+              "nostviewstr.kind30000"
+            )}<SquareArrowOutUpRight size={16} />{/snippet}</Link
         >
       </div>
     </div>

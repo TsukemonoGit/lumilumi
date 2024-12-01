@@ -149,7 +149,9 @@
           href="https://github.com/TsukemonoGit/lumilumi"
           className="flex gap-1 items-center underline"
         >
-          TsukemonoGit/lumilumi<Github size={24} />
+          {#snippet content()}TsukemonoGit/lumilumi<Github
+              size={24}
+            />{/snippet}
         </Link>
       </div>
     </li>
@@ -160,7 +162,7 @@
           href="https://lumilumi.vercel.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           className="flex gap-1 items-center underline"
         >
-          @mono
+          {#snippet content()}@mono{/snippet}
         </Link>
       </div>
     </li>
@@ -221,8 +223,9 @@
             <Link
               href="https://tsukemonogit.github.io/luminostr/"
               className="flex gap-1 items-center underline"
-            >
-              <BriefcaseMedical />Luminostr
+              >{#snippet content()}
+                <BriefcaseMedical />Luminostr
+              {/snippet}
             </Link>
             <span class="text-sm">{$_("about.luminostr")}</span>
           </div>
@@ -233,7 +236,7 @@
               href="https://github.com/TsukemonoGit/lumilumi/issues/new/choose"
               className="flex gap-1 items-center underline"
             >
-              {$_("about.houkoku")}
+              {#snippet content()}{$_("about.houkoku")}{/snippet}
             </Link>
           </div>
         </li>

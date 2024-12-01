@@ -9,8 +9,26 @@
   import type { EventPacket } from "rx-nostr";
   import { onDestroy } from "svelte";
 
-  export let id: string;
-  let _result: { data: EventPacket; status: any; error: any };
+  interface Props {
+    id: string;
+    error?: import("svelte").Snippet;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    content?: import("svelte").Snippet<
+      [
+        {
+          event: Nostr.Event;
+          status: ReqStatus;
+        },
+      ]
+    >;
+  }
+
+  let { id, error, nodata, loading, content }: Props = $props();
+
+  let _result: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
 
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", id, $loginUser],
@@ -33,25 +51,18 @@
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
 
-  $: data = _result?.data;
-  $: status = _result?.status;
-  $: error = _result?.error;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface $$Slots {
-    default: { event: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let data = $derived(_result?.data);
+  let status = $derived(_result?.status);
+  let errorData = $derived(_result?.error);
 </script>
 
-{#if error}
-  <slot name="error" {error} />
+{#if errorData}
+  {@render error?.()}
 {:else if data}
-  <slot event={data?.event} {status} />
+  {@render content?.({ event: data.event, status: status })}
+  <!-- <slot events={$data.event} {status} /> -->
 {:else if status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

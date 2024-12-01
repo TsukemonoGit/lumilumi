@@ -8,7 +8,7 @@
 
   import NaddrEvent from "./NaddrEvent.svelte";
   import { viewport } from "$lib/func/useViewportAction";
-  import { writable } from "svelte/store";
+
   interface Props {
     displayMenu: boolean;
     content: string | undefined;

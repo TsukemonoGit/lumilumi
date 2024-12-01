@@ -10,6 +10,15 @@
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
+  import { untrack, type Snippet } from "svelte";
+
+  interface Props {
+    error?: Snippet;
+    nodata?: Snippet;
+    content?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
+    loading?: Snippet;
+  }
+  let { error, nodata, content, loading }: Props = $props();
 
   // export let rxNostr: RxNostr | undefined = undefined;
 
@@ -23,15 +32,28 @@
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
   // $: console.log($viewEventIds);
-  $: etagList = Array.from(
-    new Set($viewEventIds.filter((tag) => tag[0] === "e").map((tag) => tag[1]))
+  let etagList = $derived(
+    Array.from(
+      new Set(
+        $viewEventIds.filter((tag) => tag[0] === "e").map((tag) => tag[1])
+      )
+    )
   );
-  $: atagList = Array.from(
-    new Set($viewEventIds.filter((tag) => tag[0] === "a").map((tag) => tag[1]))
+
+  let atagList = $derived(
+    Array.from(
+      new Set(
+        $viewEventIds.filter((tag) => tag[0] === "a").map((tag) => tag[1])
+      )
+    )
   );
-  $: if (etagList || atagList) {
-    debounceUpdate();
-  }
+
+  $effect(() => {
+    if (etagList || atagList) {
+      untrack(() => debounceUpdate());
+    }
+  });
+
   function debounceUpdate() {
     if (updating) {
       return;
@@ -85,16 +107,9 @@
 
   result = useRepReactionList();
 
-  $: data = result?.data;
-  $: status = result?.status;
-  $: error = result?.error;
-
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let data = $derived(result?.data);
+  let status = $derived(result?.status);
+  let errorData = $derived(result?.error);
 
   //なんかたまにリアクション取得されないときの対策でビジブル変わったときにフィルター再設置してみる
   function onVisibilityChange() {
@@ -105,12 +120,13 @@
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
-{#if $error}
-  <slot name="error" {error} />
+{#if $errorData}
+  {@render error?.()}
 {:else if $data}
-  <slot events={$data.event} {status} />
+  {@render content({ events: $data.event, status: status })}
+  <!-- <slot events={$data.event} {status} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}
