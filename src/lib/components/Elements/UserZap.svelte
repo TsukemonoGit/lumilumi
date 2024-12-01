@@ -10,13 +10,14 @@
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import DisplayName from "./DisplayName.svelte";
   import { writable, type Writable } from "svelte/store";
+  import { untrack } from "svelte";
   interface Props {
     metadata: Nostr.Event;
   }
 
   let { metadata }: Props = $props();
   let invoice: string | undefined = $state();
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
   let invoiceOpen: Writable<boolean> = writable(false);
@@ -27,7 +28,7 @@
     console.log(zapComment);
     if (zapAmount <= 0) {
       //toast dasite
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
     $nowProgress = true;
@@ -50,7 +51,7 @@
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $invoiceOpen = true;
   };
   invoiceOpen.subscribe((value: boolean) => {
@@ -60,13 +61,16 @@
   });
 
   let amountEle: HTMLInputElement | undefined = $state();
-  dialogOpen.subscribe((value: boolean) => {
-    if (!value) {
-      setTimeout(() => {
-        amountEle?.focus();
-      }, 1);
+  $effect(() => {
+    if (!dialogOpen) {
+      untrack(() => () => {
+        setTimeout(() => {
+          amountEle?.focus();
+        }, 1);
+      });
     }
   });
+
   // run(() => {
   //   if ($dialogOpen) {
   //     setTimeout(() => {
@@ -77,11 +81,15 @@
 </script>
 
 <button
-  onclick={() => ($dialogOpen = true)}
+  onclick={() => dialogOpen?.(true)}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
   title="zap"><Zap /></button
 >
-<AlertDialog open={dialogOpen} onClickOK={() => onClickOK()} title="Zap">
+<AlertDialog
+  bind:openDialog={dialogOpen}
+  onClickOK={() => onClickOK()}
+  title="Zap"
+>
   {#snippet main()}
     <div class=" text-neutral-200">
       <div class="rounded-md">

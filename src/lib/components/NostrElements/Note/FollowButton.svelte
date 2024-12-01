@@ -48,7 +48,7 @@
   let afterEventParameters: Nostr.EventParameters | undefined = $state();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
 
   let contactsQueryKey: QueryKey = $derived([
     "timeline",
@@ -80,7 +80,7 @@
     $toastSettings = { title, description, color };
   };
 
-  let dialogCreateKind3Open: Writable<boolean> = writable(false);
+  let dialogCreateKind3Open: (bool: boolean) => void = $state(() => {});
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
@@ -94,7 +94,7 @@
 
     if (!beforeKind3) {
       //新しいKind3作っていいですかを出す
-      $dialogCreateKind3Open = true;
+      dialogCreateKind3Open?.(true);
       return;
     }
 
@@ -162,12 +162,12 @@
     };
 
     $nowProgress = false;
-    $dialogOpen = true;
+    dialogOpen?.(true);
   };
 
   // Handle event publishing
   const publishEvent = async () => {
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
     const { event: ev, res } = await promisePublishEvent(
@@ -218,7 +218,7 @@
   };
 
   // Handle petname dialog
-  let openPetnameDialog: Writable<boolean> = writable(false);
+  let openPetnameDialog: (bool: boolean) => void = $state(() => {});
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
@@ -226,7 +226,7 @@
       $queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
     petnameInput = $followList.get(pubkey) ?? "";
-    $openPetnameDialog = true;
+    openPetnameDialog?.(true);
     $nowProgress = false;
   };
 
@@ -258,12 +258,12 @@
       pubkey: beforeKind3.pubkey,
     };
     publishEvent();
-    $openPetnameDialog = false;
+    openPetnameDialog?.(false);
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    $dialogCreateKind3Open = false;
+    dialogCreateKind3Open?.(false);
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -331,7 +331,7 @@
   {/if}
 {/if}
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
@@ -402,7 +402,7 @@
 </AlertDialog>
 
 <AlertDialog
-  open={openPetnameDialog}
+  bind:openDialog={openPetnameDialog}
   onClickOK={updatePetname}
   title={$_("user.petname.petname")}
   okButtonName="OK"
@@ -434,7 +434,7 @@
 </AlertDialog>
 
 <AlertDialog
-  open={dialogCreateKind3Open}
+  bind:openDialog={dialogCreateKind3Open}
   {onClickOK}
   title={$_("create_kind3.create")}
   >{#snippet main()}

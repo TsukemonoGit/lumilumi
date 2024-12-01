@@ -88,6 +88,7 @@
     // svelte-ignore state_referenced_locally
     defaultValue: settings.useRelaySet,
   });
+
   relaySetValue.subscribe((value) => {
     if (value) {
       settings.useRelaySet = $relaySetValue;

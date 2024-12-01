@@ -43,7 +43,7 @@
     },
   });
 
-  let dialogOpen: any = writable(false);
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
   let addTag: string[] = [];
   async function handleClickAdd() {
     console.log("[type]", $selectedLabel, "[str]", muteInput);
@@ -118,7 +118,7 @@
 
       $nowProgress = false;
 
-      $dialogOpen = true;
+      dialogOpen?.(true);
       return;
     }
     //本当に含まれていないか探す
@@ -169,7 +169,7 @@
   }
 
   async function handleClickOk() {
-    $dialogOpen = false;
+    dialogOpen?.(false);
 
     if (addTag.length <= 0) {
       $toastSettings = {
@@ -264,7 +264,7 @@
   >
 </div>
 <AlertDialog
-  open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickOk}
   title={$_("create.kind10000.title")}
   okButtonName="OK"

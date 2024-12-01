@@ -96,22 +96,7 @@
     $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined
   );
 
-  let dialogOpen:
-    | {
-        update: (
-          updater: Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: Subscriber<boolean>,
-          invalidate?: any
-        ): Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      }
-    | undefined = $state();
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
 
   let kind: number | undefined;
   let dtag: string | undefined;
@@ -142,7 +127,7 @@
         text = $_("create.kind10000.text");
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -203,7 +188,7 @@
         text = $_("create.kind30007.6.text");
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -269,7 +254,7 @@
 
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
 
         return;
       }
@@ -336,7 +321,7 @@
 
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
 
         return;
       }
@@ -700,7 +685,7 @@
   async function handleClickOk() {
     //データないけど新しく作っていいよのとこ
     console.log("kind", kind, "dtag", dtag);
-    $dialogOpen = false;
+    dialogOpen?.(false);
     if (!kind) {
       $toastSettings = {
         title: "Error",
@@ -807,7 +792,7 @@
   </div>
 {/if}
 <AlertDialog
-  open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickOk}
   {title}
   okButtonName="OK"

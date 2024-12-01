@@ -46,26 +46,11 @@
     )
   );
 
-  let dialogOpen:
-    | {
-        update: (
-          updater: Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: Subscriber<boolean>,
-          invalidate?: any
-        ): Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      }
-    | undefined = $state();
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
 
   async function handleClickMakeKind10030() {
     console.log("make new 10030");
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $nowProgress = true;
     disabled = true;
 
@@ -112,7 +97,7 @@
     if (!newestKind10030) {
       //データないけど新しく作っていいですかnoyatu
       $nowProgress = false;
-      $dialogOpen = true;
+      dialogOpen?.(true);
       return;
     }
     //新しいリストにほんとに含まれてないか確認
@@ -300,7 +285,7 @@
 </div>
 
 <AlertDialog
-  open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickMakeKind10030}
   title={$_("create.10030.title")}
   okButtonName="OK"

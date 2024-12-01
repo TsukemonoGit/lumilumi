@@ -27,7 +27,7 @@
   import { datetime } from "$lib/func/util";
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { _ } from "svelte-i18n";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
 
   // 設定をアップロード
   // 設定をダウンロード
@@ -46,15 +46,25 @@
     sig: "e537869f83f0dddb85c1add7e307116be1428d66cbc101a21cf355ba4b4722db6c511337258899916968da76406594ee0db5ab3ad6dd8d36972732af3fe4c276",
   }; */
 
-  export let settingsChanged: () => boolean;
-  export let saveLumiSettings: () => void;
-  export let settings: LumiSetting;
+  interface Props {
+    settingsChanged: () => boolean;
+    saveLumiSettings: () => void;
+    settings: LumiSetting;
+  }
+  let {
+    settingsChanged,
+    saveLumiSettings,
+    settings = $bindable(),
+  }: Props = $props();
+  // export let settingsChanged: () => boolean;
+  // export let saveLumiSettings: () => void;
+  // export let settings: LumiSetting;
 
-  let kind30078LumiSettings: Kind30078LumiSetting[] = [];
+  let kind30078LumiSettings: Kind30078LumiSetting[] = $state([]);
   let localLumisetting: Kind30078LumiSettingObj;
 
-  let dialogOpen: any = writable(false);
-  let alertdialogOpen: any;
+  let dialogOpen: Writable<boolean> = writable(false);
+  let alertdialogOpen: (bool: boolean) => void = $state(() => {});
 
   async function handleClickUpDownload() {
     if (settingsChanged()) {
@@ -91,7 +101,7 @@
   //   event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
   // ) {}
 
-  let saveName: string = "";
+  let saveName: string = $state("");
 
   async function get30078() {
     const relays = await getQueryRelays($loginUser);
@@ -136,11 +146,11 @@
       return;
     }
 
-    $alertdialogOpen = true;
+    alertdialogOpen?.(true);
   };
 
   const handleClickPublish = async () => {
-    $alertdialogOpen = false;
+    alertdialogOpen?.(false);
     const sameIndex = kind30078LumiSettings.findIndex(
       (data) => data.name === saveName
     );
@@ -305,12 +315,12 @@
 <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickUpDownload}>{$_("settings.load")}</button
+  onclick={handleClickUpDownload}>{$_("settings.load")}</button
 >
 <!-- <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickDownload}>リレーから設定を読み込む</button
+  onclick={handleClickDownload}>リレーから設定を読み込む</button
 > -->
 
 <Dialog bind:open={dialogOpen}>
@@ -324,7 +334,7 @@
         bind:value={saveName}
       /><button
         class="h-8 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickSave}>SAVE</button
+        onclick={handleClickSave}>SAVE</button
       >
     </div>
 
@@ -347,13 +357,13 @@
               <td
                 ><button
                   class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-                  on:click={() => handleClickLoad(name)}>LOAD</button
+                  onclick={() => handleClickLoad(name)}>LOAD</button
                 ></td
               >
               <td
                 ><button
                   class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
-                  on:click={() => handleClickDelete(name)}>DELETE</button
+                  onclick={() => handleClickDelete(name)}>DELETE</button
                 ></td
               >
             </tr>{/each}
@@ -368,7 +378,7 @@
 </Dialog>
 
 <AlertDialog
-  open={alertdialogOpen}
+  bind:openDialog={alertdialogOpen}
   onClickOK={handleClickPublish}
   title={`SAVE`}
   okButtonName="OK"

@@ -290,7 +290,7 @@
   });
 
   let invoice: string | undefined = $state(undefined);
-  let dialogOpen: any = writable(false);
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
   let invoiceOpen: Writable<boolean> = writable(false);
@@ -303,7 +303,7 @@
   let unsubscribe: () => void;
 
   const handleClickZap = () => {
-    $dialogOpen = true;
+    dialogOpen?.(true);
     //zapの量決めるダイアログ出す
     setTimeout(() => {
       amountEle?.focus();
@@ -320,7 +320,7 @@
     console.log(zapComment);
     if (zapAmount <= 0) {
       //toast dasite
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
 
@@ -343,12 +343,12 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $invoiceOpen = true;
     //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
     const date = now();
@@ -596,7 +596,7 @@
             >
           </div>
           <AlertDialog
-            bind:open={dialogOpen}
+            bind:openDialog={dialogOpen}
             onClickOK={() => onClickOK(metadata)}
             title="Zap"
             >{#snippet main()}
