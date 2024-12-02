@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { page } from "$app/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { AlignJustify, House, TrendingUp } from "lucide-svelte";

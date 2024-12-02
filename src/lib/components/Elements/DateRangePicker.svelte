@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { createDateRangePicker, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-svelte";

@@ -1,12 +1,10 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
   import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
   import { filesUpload } from "$lib/func/util";
   import { nowProgress, uploader } from "$lib/stores/stores";
   import type { FileUploadResponse } from "nostr-tools/nip96";
-  import { mediaUploader } from "$lib/func/constants";
+
   import { writable, type Writable } from "svelte/store";
 
   interface Props {

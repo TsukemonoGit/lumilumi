@@ -16,21 +16,16 @@
     tieKey: string | undefined;
   }
 
-  let {
-    text,
-    tags,
-    displayMenu,
-    depth,
-    repostable,
-    tieKey
-  }: Props = $props();
+  let { text, tags, displayMenu, depth, repostable, tieKey }: Props = $props();
   //プレビューにも使ってるからconstだとだめ
   let parts = $derived(parseText(text, tags));
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  let mediaList = $derived(parts.filter(
-    (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-  ));
+  let mediaList = $derived(
+    parts.filter(
+      (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+    )
+  );
 
   //let modalIndex = 0;
   const openModal = (index: number) => {
@@ -111,7 +106,8 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
       <audio
@@ -124,12 +120,14 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
   {:else if part.type === "url"}<Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80 "
-      href={part.content ?? ""}>{part.content}</Link
+      href={part.content ?? ""}
+      >{#snippet content()}{part.content}{/snippet}</Link
     >{:else if part.type === "emoji"}{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
@@ -155,7 +153,7 @@
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</Link
+      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
     >{:else}<span
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span

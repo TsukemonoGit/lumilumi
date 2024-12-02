@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
   import NostrContent from "./NostrContent.svelte";
-  import { untrack } from "svelte";
 
   interface Props {
     part: Token;

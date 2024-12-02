@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,

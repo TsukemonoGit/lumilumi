@@ -1,5 +1,4 @@
 <script lang="ts">
-  //import { run } from "svelte/legacy";
   import type { ConnectionState } from "rx-nostr";
   import { defaultRelays, relayStateMap } from "$lib/stores/stores";
   import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";

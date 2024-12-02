@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { slicedEvent, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
@@ -65,7 +63,7 @@
       pubkey: note.pubkey,
       relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     };
-    const naddr = nip19.naddrEncode(naddrpointer);
+    //const naddr = nip19.naddrEncode(naddrpointer);
 
     switch (menuTexts[index].num) {
       case 0:

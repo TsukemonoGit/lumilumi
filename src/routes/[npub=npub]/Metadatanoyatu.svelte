@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import Kind0Note from "$lib/components/NostrElements/Note/EventCard/Kind0Note.svelte";
 
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";

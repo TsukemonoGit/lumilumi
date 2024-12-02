@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import * as Nostr from "nostr-typedef";
   import { showImg } from "$lib/stores/stores";
   import Avatar from "svelte-boring-avatars";

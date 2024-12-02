@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { page } from "$app/stores";
   import logo from "$lib/images/favicon.svg";
   import { loginUser, showImg } from "$lib/stores/stores";

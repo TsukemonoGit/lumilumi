@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import type Nostr from "nostr-typedef";
 
   import { userStatusStore } from "$lib/stores/stores";

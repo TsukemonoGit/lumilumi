@@ -90,7 +90,20 @@
     tieKey,
   }: Props = $props();
 
-  let atag: string | undefined = $state();
+  let atag: string | undefined = $derived.by(() => {
+    if (
+      (note.kind >= 10000 && note.kind < 20000) ||
+      (note.kind >= 30000 && note.kind < 40000) ||
+      note.kind === 0 ||
+      note.kind === 3
+    ) {
+      //atag　で　りぽすと
+      const dtag = note.tags.find((tag) => tag[0] === "d");
+      return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+    } else {
+      return undefined;
+    }
+  });
 
   function getIDbyParam(str: string) {
     const { type, data } = nip19.decode(str);
@@ -148,19 +161,6 @@
   //   $page.url.pathname !== "/"
   //     ? true
   //     : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
-
-  if (
-    (note.kind >= 10000 && note.kind < 20000) ||
-    (note.kind >= 30000 && note.kind < 40000) ||
-    note.kind === 0 ||
-    note.kind === 3
-  ) {
-    //atag　で　りぽすと
-    const dtag = note.tags.find((tag) => tag[0] === "d");
-    atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
-  } else {
-    atag = undefined;
-  }
 
   let paramNoteId = $derived(
     $page.params.note ? getIDbyParam($page.params.note) : undefined

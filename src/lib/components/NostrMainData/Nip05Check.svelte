@@ -1,14 +1,6 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
-  import { queryClient, showImg } from "$lib/stores/stores";
-  import {
-    CircleMinus,
-    BadgeAlert,
-    ShieldCheck,
-    Loader,
-    AtSign,
-  } from "lucide-svelte";
+  import { queryClient } from "$lib/stores/stores";
+  import { BadgeAlert, ShieldCheck, Loader, AtSign } from "lucide-svelte";
   import UseNip05Check from "./UseNip05Check.svelte";
   import { _ } from "svelte-i18n";
   import { untrack } from "svelte";

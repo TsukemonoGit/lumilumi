@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { createPagination, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
 

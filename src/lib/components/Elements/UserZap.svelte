@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
   import { Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import AlertDialog from "./AlertDialog.svelte";

@@ -74,46 +74,35 @@
   );
   let textareaReply: HTMLTextAreaElement;
   let textareaQuote: HTMLTextAreaElement;
-  let dtag: string[] | undefined = $state();
-  let atag: string | undefined = $state();
-
-  let queryId = $derived(atag ?? note?.id);
-  $effect(() => {
-    if (note.kind) {
-      untrack(() => () => {
-        if (
-          (note.kind >= 10000 && note.kind < 20000) ||
-          (note.kind >= 30000 && note.kind < 40000) ||
-          note.kind === 0 ||
-          note.kind === 3
-        ) {
-          //atag　で　りぽすと
-          dtag = note.tags.find((tag) => tag[0] === "d");
-          atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
-        } else {
-          dtag = undefined;
-          atag = undefined;
-        }
-      });
+  let dtag: string[] | undefined = $derived.by(() => {
+    if (
+      (note.kind >= 10000 && note.kind < 20000) ||
+      (note.kind >= 30000 && note.kind < 40000) ||
+      note.kind === 0 ||
+      note.kind === 3
+    ) {
+      //atag　で　りぽすと
+      return note.tags.find((tag) => tag[0] === "d");
+    } else {
+      return undefined;
+    }
+  });
+  let atag: string | undefined = $derived.by(() => {
+    if (
+      (note.kind >= 10000 && note.kind < 20000) ||
+      (note.kind >= 30000 && note.kind < 40000) ||
+      note.kind === 0 ||
+      note.kind === 3
+    ) {
+      //atag　で　りぽすと
+      const dtag = note.tags.find((tag) => tag[0] === "d");
+      return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+    } else {
+      return undefined;
     }
   });
 
-  // $: {
-  //   if (
-  //     (note.kind >= 10000 && note.kind < 20000) ||
-  //     (note.kind >= 30000 && note.kind < 40000) ||
-  //     note.kind === 0 ||
-  //     note.kind === 3
-  //   ) {
-  //     //atag　で　りぽすと
-  //     dtag = note.tags.find((tag) => tag[0] === "d");
-  //     atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
-  //   } else {
-  //     dtag = undefined;
-  //     atag = undefined;
-  //   }
-  // }
-  // let reaction = writable<string | null>(null);
+  let queryId = $derived(atag ?? note?.id);
 
   const handleClickReaction = async () => {
     const tags: string[][] = root ? [root] : [];
