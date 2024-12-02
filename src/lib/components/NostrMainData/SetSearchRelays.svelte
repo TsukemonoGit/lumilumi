@@ -98,16 +98,6 @@
   //     relayChange(value);
   //   }
   // });
-
-  interface $$Slots {
-    default: {
-      relays: string[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 <!-- Slot management based on data, status, and error -->

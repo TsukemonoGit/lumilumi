@@ -458,17 +458,19 @@
   };
 
   //--------------userlist
-  let metadataList: MetadataList = $state({});
-
-  function setMetadataList() {
-    try {
-      const metadataStr = localStorage.getItem("metadata");
-      let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
-        ? JSON.parse(metadataStr)
-        : [];
-      metadataList = getMetadataList(metadataQueryData);
-    } catch (error) {}
-  }
+  let metadataList: MetadataList = $derived.by(() => {
+    if (viewMetadataList) {
+      try {
+        const metadataStr = localStorage.getItem("metadata");
+        let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
+          ? JSON.parse(metadataStr)
+          : [];
+        return getMetadataList(metadataQueryData);
+      } catch (error) {
+        return {};
+      }
+    } else return {};
+  });
 
   let viewMetadataList: boolean = $state(false);
   let inputMetadata: string = $state("");
@@ -624,12 +626,6 @@
   selectedUploader.subscribe((value) => {
     if (value) {
       $uploader = value;
-    }
-  });
-
-  $effect(() => {
-    if (viewMetadataList) {
-      untrack(() => setMetadataList());
     }
   });
 </script>

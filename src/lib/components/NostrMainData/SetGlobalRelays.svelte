@@ -85,16 +85,6 @@
   //   console.log($data);
   //   dispatch("relayChange", { relays: $data });
   // }
-
-  interface $$Slots {
-    default: {
-      relays: string[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 {#if $errorData}

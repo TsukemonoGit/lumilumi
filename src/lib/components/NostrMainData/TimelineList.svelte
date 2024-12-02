@@ -327,13 +327,6 @@
     }
   }
 
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus; len: number };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
-
   const handleNext = async () => {
     // console.log(length, viewIndex, amount, sift);
     if (

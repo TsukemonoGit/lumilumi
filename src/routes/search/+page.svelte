@@ -5,7 +5,6 @@
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
-  import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import {
     defaultRelays,
@@ -15,7 +14,7 @@
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { onMount, untrack, type SvelteComponent } from "svelte";
+  import { onMount, type SvelteComponent } from "svelte";
   import SetSearchRelays from "$lib/components/NostrMainData/SetSearchRelays.svelte";
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
@@ -276,22 +275,6 @@
         .map((config) => config.url);
     }
   });
-
-  // $effect(() => {
-  //   console.log(searchWord);
-  //   if (
-  //     searchKind === searchKind ||
-  //     searchHashtag ||
-  //     searchWord ||
-  //     searchPubkey ||
-  //     searchPubkeyTo ||
-  //     searchSince ||
-  //     searchUntil ||
-  //     followee
-  //   ) {
-  //     untrack(() => createFilter());
-  //   }
-  // });
 </script>
 
 <section>

@@ -43,6 +43,7 @@
     endTimeUnix = $bindable(),
   }: Props = $props();
   export { startSegment, endSegment };
+
   $effect(() => {
     if (value && $value.start && $value.end) {
       untrack(() => {

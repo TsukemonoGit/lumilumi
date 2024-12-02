@@ -1,6 +1,7 @@
 <script lang="ts">
   import { splitHexColorString } from "$lib/func/util";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
+  import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
   interface Props {
     url: string | undefined;
@@ -39,9 +40,11 @@
     onLoadingStatusChange: handleState,
   });
 
-  $effect.pre(() => {
+  $effect(() => {
     if (url) {
-      src.set(url);
+      untrack(() => {
+        src.set(url);
+      });
     }
   });
 </script>
