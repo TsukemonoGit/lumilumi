@@ -204,7 +204,7 @@
   };
 
   // svelte-ignore non_reactive_update
-  let updateViewEvent: () => void = () => {};
+  let updateViewEvent: () => void = $state(() => {});
 
   value?.subscribe((val) => {
     if (val && updateViewEvent) {

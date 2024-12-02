@@ -134,14 +134,14 @@
   }
 
   // svelte-ignore non_reactive_update
-  let updateViewEvent: () => void = () => {};
+  let updateViewEvent: () => void = $state(() => {});
 
-  timelineFilter.subscribe((value) => {
-    //設定が変わったら更新
-    if (value) {
-      updateViewEvent?.();
-    }
-  });
+  // timelineFilter.subscribe((value) => {
+  //   //設定が変わったら更新
+  //   if (value) {
+  //     updateViewEvent?.();
+  //   }
+  // });
 
   //kind0がTLに流れるのをあれするやつ
   const excludeKind0 = (note: Nostr.Event): boolean => {
