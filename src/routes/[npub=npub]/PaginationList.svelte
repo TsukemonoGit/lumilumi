@@ -12,6 +12,7 @@
 
   let { list, tieKey, children }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
+
   onMount(() => {
     paginationElement = document?.querySelector("#pagination");
   });

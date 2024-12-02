@@ -46,7 +46,8 @@
     )
   );
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  // svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
 
   async function handleClickMakeKind10030() {
     console.log("make new 10030");

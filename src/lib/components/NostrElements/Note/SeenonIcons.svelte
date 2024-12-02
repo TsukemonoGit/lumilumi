@@ -23,7 +23,7 @@
 
   let size = 16;
   let viewAll = $state(false);
-  let relays: string[] = $state.raw([]);
+  let relays: string[] = $state([]);
   slicedEvent.subscribe(() => {
     relays = tieKey ? getRelaysById(id, tieKey) : [];
   });

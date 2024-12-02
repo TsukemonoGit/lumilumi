@@ -141,7 +141,7 @@
   };
 
   // const { kind, tag } = repostedId(note.tags);
-  let replyTag: string[] | undefined = $state();
+  let replyTag: string[] | undefined = $state.raw();
   let replyUsers: string[] = $state.raw([]);
   const handleClickToChannel = (id: string) => {
     if (!id) {

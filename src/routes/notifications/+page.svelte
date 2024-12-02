@@ -202,12 +202,16 @@
       }
     });
   };
-  let updateViewEvent: any = $state();
+
+  // svelte-ignore non_reactive_update
+  let updateViewEvent: () => void = () => {};
+
   value?.subscribe((val) => {
     if (val && updateViewEvent) {
       updateViewEvent();
     }
   });
+
   onlyFollowee?.subscribe(() => {
     if (updateViewEvent) {
       updateViewEvent();

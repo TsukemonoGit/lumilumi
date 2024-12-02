@@ -135,28 +135,31 @@
     }
   };
 
-  let naddr: string | undefined = $state(undefined);
-  let encodedPubkey: string | undefined = $state(undefined);
-  $effect(() => {
-    if (note) {
-      untrack(() => () => {
-        try {
-          encodedPubkey = nip19.npubEncode(note.pubkey);
-        } catch {
-          encodedPubkey = undefined;
-        }
-        try {
-          const naddrpointer: nip19.AddressPointer = {
-            kind: note.kind,
-            identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-            pubkey: note.pubkey,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-          };
-          naddr = nip19.naddrEncode(naddrpointer);
-        } catch (error) {
-          naddr = undefined;
-        }
-      });
+  let encodedPubkey: string | undefined = $derived.by(() => {
+    if (!note) {
+      return undefined;
+    }
+    try {
+      return nip19.npubEncode(note.pubkey);
+    } catch {
+      return undefined;
+    }
+  });
+
+  let naddr: string | undefined = $derived.by(() => {
+    if (!note) {
+      return undefined;
+    }
+    try {
+      const naddrpointer: nip19.AddressPointer = {
+        kind: note.kind,
+        identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+        pubkey: note.pubkey,
+        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      };
+      return nip19.naddrEncode(naddrpointer);
+    } catch (error) {
+      return undefined;
     }
   });
 </script>

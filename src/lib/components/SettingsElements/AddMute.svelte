@@ -43,7 +43,8 @@
     },
   });
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  // svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
   let addTag: string[] = [];
   async function handleClickAdd() {
     console.log("[type]", $selectedLabel, "[str]", muteInput);

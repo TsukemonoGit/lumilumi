@@ -28,20 +28,29 @@
 
   import { relayRegex2 } from "$lib/func/regex";
   import { type PageData } from "./$types";
+  import { SvelteMap } from "svelte/reactivity";
+
   let { data }: { data: PageData } = $props();
 
   // const data={pubkey:$page.params.npub};
   console.log(data.pubkey);
 
+  //svelte-ignore non_reactive_update
   let kind10002: Nostr.Event;
-  let newTags = writable<string[][]>([]);
+  let newTags: string[][] = $state([]);
 
   // Read/Write状態を保存するためのMap
-  let relayStates: Map<string, { read: boolean; write: boolean }> = new Map();
+
+  //svelte-ignore non_reactive_update
+  let relayStates: SvelteMap<string, { read: boolean; write: boolean }> =
+    new SvelteMap();
 
   let isError = false;
   let isMount = false;
   let newRelay: string = $state("");
+  let writeLen: number = $state(0);
+  let readLen: number = $state(0);
+
   onMount(async () => {
     if (!isMount) {
       isMount = true;
@@ -100,7 +109,7 @@
     if (relayEvent && relayEvent.event) {
       kind10002 = relayEvent.event;
 
-      $newTags = getTags(kind10002);
+      newTags = getTags(kind10002);
       // newKind10002.tagsの値に基づいてread/writeの初期値を設定
 
       setAllStates();
@@ -110,15 +119,17 @@
     $nowProgress = false;
   }
   function setAllStates() {
-    relayStates = new Map();
-    $newTags.forEach(([r, url, rw], index) => {
+    relayStates = new SvelteMap();
+    newTags.forEach(([r, url, rw], index) => {
       // "rw" の値を解析して初期値を設定
       relayStates.set(url, {
         read: !rw || rw === "read" ? true : false,
         write: !rw || rw === "write" ? true : false,
       });
     });
+    updateRelayCounts();
   }
+
   function getTags(ev: Nostr.Event): string[][] {
     //タグの末尾を揃える
     return ev.tags.reduce((before, tag) => {
@@ -208,8 +219,8 @@
     }
 
     // Duplicate check
-    console.log($newTags);
-    if ($newTags.find((tag) => tag[1] === newRelay)) {
+    console.log(newTags);
+    if (newTags.find((tag) => tag[1] === newRelay)) {
       $toastSettings = {
         title: "Warning",
         description: "The entered relay is already included",
@@ -219,35 +230,31 @@
     }
 
     // 新しいリレーを追加
-    // $newTags.push(["r", newRelay]);
-    newTags.update((before) => {
-      return [...before, ["r", newRelay]];
-    });
+    // newTags.push(["r", newRelay]);
+    newTags = [...newTags, ["r", newRelay]];
     relayStates.set(newRelay, { read: true, write: true });
     updateRelayCounts();
     newRelay = "";
   }
 
   function removeRelay(url: string) {
-    newTags.update((before) => {
-      return before.filter((tag) => tag[1] !== url);
-    });
+    newTags = newTags.filter((tag) => tag[1] !== url);
     relayStates.delete(url);
     updateRelayCounts();
   }
 
   function reset() {
     //
-    $newTags = getTags(kind10002);
+    newTags = getTags(kind10002);
     setAllStates();
     updateRelayCounts();
   }
 
   async function save() {
-    // console.log($newTags);
+    // console.log(newTags);
     $nowProgress = true;
     // 新しいタグを生成
-    $newTags = relayStates.entries().reduce((before, [url, state]) => {
+    newTags = relayStates.entries().reduce((before, [url, state]) => {
       if (state.read && state.write) {
         before.push(["r", url]);
       } else if (state.read) {
@@ -265,10 +272,10 @@
         relayStates.delete(url);
       }
     });
-    console.log($newTags);
+    console.log(newTags);
     const eventParam: Nostr.EventParameters = {
       content: "",
-      tags: $newTags,
+      tags: newTags,
       kind: 10002,
       pubkey: $loginUser,
     };
@@ -294,20 +301,14 @@
     // setRelays(relays);
 
     //reset押したときに戻るデータを更新
+    updateRelayCounts();
     kind10002 = event;
     $nowProgress = false;
   }
-  let writeLen: number = 0;
-  let readLen: number = 0;
-
-  newTags.subscribe((value) => {
-    if (value) {
-      updateRelayCounts();
-    }
-  });
 
   // 状態を更新する関数
   function updateRelayCounts() {
+    // console.log(relayStates);
     writeLen = Array.from(relayStates.values()).filter(
       (state) => state.write
     ).length;
@@ -377,7 +378,7 @@
         <tr>
           <th class="text-center"
             >relay
-            <div class=" text-xs font-normal">{$newTags.length}</div></th
+            <div class=" text-xs font-normal">{newTags.length}</div></th
           ><th class="text-center"
             >read
             <div class=" text-xs font-normal">
@@ -391,7 +392,7 @@
           ><th class="text-center"></th>
         </tr></thead
       ><tbody>
-        {#each $newTags as [r, url, rw], index}
+        {#each newTags as [r, url, rw], index}
           <tr>
             <td class="text-left break-all"
               >{url}

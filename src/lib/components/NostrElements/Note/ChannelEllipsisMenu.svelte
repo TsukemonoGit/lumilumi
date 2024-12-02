@@ -153,28 +153,31 @@
     }
   };
 
-  let nevent: string | undefined = $state(undefined);
-  let encodedPubkey: string | undefined = $state(undefined);
-  $effect(() => {
-    if (note) {
-      untrack(() => () => {
-        try {
-          encodedPubkey = nip19.npubEncode(note.pubkey);
-        } catch {
-          encodedPubkey = undefined;
-        }
-        try {
-          const eventpointer: nip19.EventPointer = {
-            id: note.id,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-            author: note.pubkey,
-            kind: note.kind,
-          };
-          nevent = nip19.neventEncode(eventpointer);
-        } catch {
-          nevent = undefined;
-        }
-      });
+  let encodedPubkey: string | undefined = $derived.by(() => {
+    if (!note) {
+      return undefined;
+    }
+    try {
+      return nip19.npubEncode(note.pubkey);
+    } catch {
+      return undefined;
+    }
+  });
+
+  let nevent: string | undefined = $derived.by(() => {
+    if (!note) {
+      return undefined;
+    }
+    try {
+      const eventpointer: nip19.EventPointer = {
+        id: note.id,
+        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        author: note.pubkey,
+        kind: note.kind,
+      };
+      return nip19.neventEncode(eventpointer);
+    } catch {
+      return undefined;
     }
   });
 </script>

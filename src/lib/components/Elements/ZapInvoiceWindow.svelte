@@ -39,7 +39,8 @@
 
   let zapped: { data: EventPacket; status: any; error: any } | undefined =
     $state();
-  let unsubscribe: (() => void) | undefined = $state(); // Start as undefined
+
+  let unsubscribe: (() => void) | undefined = undefined; // Start as undefined
 
   const observer:
     | QueryObserver<unknown, Error, unknown, unknown, string[]>

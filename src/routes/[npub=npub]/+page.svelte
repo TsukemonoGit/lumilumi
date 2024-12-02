@@ -53,7 +53,9 @@
 
   let componentKey = 0; // Key to force re-render
   let view: boolean = $state(false);
-  let req = $state(createRxForwardReq());
+
+  // svelte-ignore non_reactive_update
+  let req = createRxForwardReq();
   const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
   };

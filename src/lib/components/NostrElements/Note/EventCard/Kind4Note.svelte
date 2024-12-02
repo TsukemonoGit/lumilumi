@@ -12,7 +12,6 @@
   import UserName from "../UserName.svelte";
   import Reply from "../Reply.svelte";
 
-
   interface Props {
     note: Nostr.Event;
     metadata: Nostr.Event | undefined;
@@ -38,16 +37,18 @@
     warning,
     replyUsers,
     thread,
-    replyTag
+    replyTag,
   }: Props = $props();
+
   let decrypt: string | undefined = $state(undefined);
 
   //自分宛て？もしくは自分が書いた？
-  let forme =
-    $derived(note.pubkey === $loginUser ||
-    note.tags.find(
-      (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === $loginUser
-    ));
+  let forme = $derived(
+    note.pubkey === $loginUser ||
+      note.tags.find(
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === $loginUser
+      )
+  );
 
   //どっちがどっち
   async function decryptMessage() {

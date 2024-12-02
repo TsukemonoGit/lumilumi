@@ -11,7 +11,7 @@
 
   let { invoice = $bindable() }: Props = $props();
   // svelte-ignore non_reactive_update
-  let invoiceOpen: (bool: boolean) => void = $state(() => {});
+  let invoiceOpen: (bool: boolean) => void = () => {};
 
   const invoiceDecode = (
     str: string | undefined

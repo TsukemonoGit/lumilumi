@@ -46,8 +46,10 @@
   let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;
 
+  // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
-  let alertdialogOpen: (bool: boolean) => void = $state(() => {});
+  // svelte-ignore non_reactive_update
+  let alertdialogOpen: (bool: boolean) => void = () => {};
 
   async function handleClickUpDownload() {
     if (settingsChanged()) {

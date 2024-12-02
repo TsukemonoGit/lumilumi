@@ -22,12 +22,12 @@
   } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
-  import { writable, type Writable } from "svelte/store";
+
   import {
     datetime,
-    delay,
     formatAbsoluteDate,
     formatRelativeDate,
+    formatToEventPacket,
     generateResultMessage,
   } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
@@ -46,7 +46,7 @@
   let afterEventParameters: Nostr.EventParameters | undefined = $state();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen: (bool: boolean) => void = () => {};
 
   let contactsQueryKey: QueryKey = $derived([
     "timeline",
@@ -189,15 +189,9 @@
     );
 
     if (isSuccess.length > 0) {
-      // $queryClient.refetchQueries({ queryKey: contactsQueryKey });//これやったらnullになるなぜか
+      //$queryClient.refetchQueries({ queryKey: contactsQueryKey }); //これやったらnullになるはなおってるかもだけど別にリフェッチしなくていいか
 
-      const packetEv: EventPacket = {
-        event: ev,
-        from: isSuccess[0],
-        type: "EVENT",
-        subId: "",
-        message: ["EVENT", "", ev],
-      };
+      const packetEv = formatToEventPacket(ev, isSuccess[0]);
 
       $queryClient.setQueryData(contactsQueryKey, packetEv);
       pubkeysIn(ev);
@@ -216,7 +210,8 @@
   };
 
   // Handle petname dialog
-  let openPetnameDialog: (bool: boolean) => void = $state(() => {});
+  // svelte-ignore non_reactive_update
+  let openPetnameDialog: (bool: boolean) => void = () => {};
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {

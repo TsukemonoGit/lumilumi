@@ -28,7 +28,9 @@
 
   let customReactionError: boolean = $state(false);
   let customReactionErrorMessage: string = $state("");
-  let openPopover: (bool: boolean) => void = $state(() => {});
+
+  // svelte-ignore non_reactive_update
+  let openPopover: (bool: boolean) => void = () => {};
 
   const handleClickCustomReaction = async () => {
     const textLen = split(customReaction).length; //countSymbolsIgnoringCombiningMarks(customReaction);

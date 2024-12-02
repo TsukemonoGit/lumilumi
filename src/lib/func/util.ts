@@ -500,3 +500,16 @@ export const translateText = (text: string) => {
     .replace(urlRegex, "[🔗]");
   return encodeURIComponent(replacedText);
 };
+
+export function formatToEventPacket(
+  ev: Nostr.Event,
+  from: string = ""
+): EventPacket {
+  return {
+    event: ev,
+    from: from,
+    type: "EVENT",
+    subId: "",
+    message: ["EVENT", "", ev],
+  } as EventPacket;
+}

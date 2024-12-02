@@ -132,7 +132,10 @@
       return true;
     }
   }
-  let updateViewEvent: any = $state();
+
+  // svelte-ignore non_reactive_update
+  let updateViewEvent: () => void = () => {};
+
   timelineFilter.subscribe((value) => {
     //設定が変わったら更新
     if (value) {
