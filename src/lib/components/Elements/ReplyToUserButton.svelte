@@ -18,7 +18,7 @@
       warningText: undefined,
       addableUserList: [],
     };
-    $additionalPostOptions = options;
+    additionalPostOptions.set(options);
     setTimeout(() => {
       $postWindowOpen = true;
     }, 1);

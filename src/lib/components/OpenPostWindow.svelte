@@ -72,7 +72,7 @@
       kind: 1,
       content: "",
     },
-    signPubkey = $bindable(undefined),
+    signPubkey = $bindable(),
   }: Props = $props();
 
   let text: string = $state(options.content ?? "");
@@ -104,13 +104,11 @@
   const additionalReplyUsers: Writable<string[]> = writable([]);
   let clickEscape: number = $state(0);
 
-  async function signPubkeyCheck() {
-    if ($nowProgress) {
-      return;
-    }
+  async function getSignPubkey() {
     $nowProgress = true;
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+
       if (pub) {
         console.log(pub);
         signPubkey = pub;
@@ -291,9 +289,9 @@
 
     // カーソル位置を更新
     textarea?.focus();
-    setTimeout(() => {
+    () => {
       textarea?.setSelectionRange(cursorPosition, cursorPosition);
-    });
+    };
   };
 
   const handleFileUpload = async (fileList: FileList) => {
@@ -543,7 +541,7 @@
   postWindowOpen.subscribe((value) => {
     if (value) {
       const addOption = $state.snapshot($additionalPostOptions);
-      console.log(addOption);
+      // console.log(addOption);
 
       if (addOption) {
         // タグをコピー
@@ -583,7 +581,9 @@
           warningText = initOptions.warningText;
           onWarning = true;
         }
-        $additionalPostOptions = undefined;
+        setTimeout(() => {
+          $additionalPostOptions = undefined;
+        }, 0);
       }
 
       $open = true;
@@ -591,9 +591,12 @@
     }
   });
   open.subscribe((value) => {
+    console.log(value);
     if (value) {
       //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
-      signPubkeyCheck();
+      if (!signPubkey) {
+        getSignPubkey();
+      }
       clickEscape = 0;
       // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       // metadata = $queryClient.getQueryData(["metadata", pubkey]);

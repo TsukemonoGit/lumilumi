@@ -61,13 +61,13 @@
 
     setSettings();
     if (paramSharedContent) {
-      $additionalPostOptions = {
+      additionalPostOptions.set({
         tags: tags,
         addableUserList: [],
         defaultUsers: [],
         warningText: undefined,
         content: paramSharedContent,
-      };
+      });
 
       // ポストウィンドウを開く
       setTimeout(() => {
@@ -86,13 +86,13 @@
           .join("\n");
         if (!data.media || data.media.length <= 0) {
           // Svelteのストアに新しいオプションをセット
-          $additionalPostOptions = {
+          additionalPostOptions.set({
             tags: tags,
             addableUserList: [],
             defaultUsers: [],
             warningText: undefined,
             content: sharedContent,
-          };
+          });
 
           // ポストウィンドウを開く
           setTimeout(() => {
@@ -208,13 +208,13 @@
         });
       }
       // Svelteのストアに新しいオプションをセット
-      $additionalPostOptions = {
+      additionalPostOptions.set({
         tags: tags,
         addableUserList: [],
         defaultUsers: [],
         warningText: undefined,
         content: sharedContent,
-      };
+      });
 
       // ポストウィンドウを開く
       setTimeout(() => {

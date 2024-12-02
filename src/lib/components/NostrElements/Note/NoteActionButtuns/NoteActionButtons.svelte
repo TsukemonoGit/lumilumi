@@ -243,10 +243,10 @@
           addableUserList: [note.pubkey],
           warningText: warning ? warning[1] : undefined,
         };
-        $additionalPostOptions = options;
+        additionalPostOptions.set(options);
         setTimeout(() => {
           $postWindowOpen = true;
-        }, 1);
+        }, 2);
         // replyText = atag
         //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
         //   : ` nostr:${nevent} \n`;
@@ -412,11 +412,13 @@
       addableUserList: allPtag,
       warningText: warning ? warning[1] : undefined,
     };
-    $additionalPostOptions = options;
+    additionalPostOptions.set(options);
     setTimeout(() => {
-      console.log($state.snapshot($additionalPostOptions));
-      $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
-    }, 1);
+      if (!$postWindowOpen) {
+        // console.log($state.snapshot($additionalPostOptions));
+        $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
+      }
+    }, 2);
 
     // openReplyWindow = !openReplyWindow;
 
