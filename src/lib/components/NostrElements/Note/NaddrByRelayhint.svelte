@@ -35,15 +35,23 @@
     "naddr",
     `${data.kind}:${data.pubkey}:${data.identifier}`,
   ] as QueryKey);
-  const queryCheck = (queryKey: QueryKey) => {
+  const queryCheck = async (queryKey: QueryKey) => {
     //console.log(queryKey, relayhint);
     // if (!$queryClient.getQueryData(queryKey)) {//見つかんないときにリレーヒントから探すからない
     $queryClient.removeQueries({ queryKey: queryKey });
     //   }
+    return;
   };
 </script>
 
-{#await queryCheck(queryKey) then}
+{#await queryCheck(queryKey)}
+  <div
+    class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
+  >
+    <div>Loading {content ?? ""}</div>
+    {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
+  </div>
+{:then}
   <LatestEvent
     relays={relayhint}
     {queryKey}
@@ -87,6 +95,7 @@
       </div>
     {/snippet}
     {#snippet children({ event })}
+      {event}
       <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
         {#snippet loading()}
           <div>

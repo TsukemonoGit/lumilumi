@@ -32,14 +32,23 @@
     relayhint,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
-  const queryCheck = (id: string) => {
+  const queryCheck = async (id: string) => {
     //if (!$queryClient.getQueryData(["timeline", id])) {//見つかんないときにリレーヒントから探すからない
     $queryClient.removeQueries({ queryKey: ["timeline", id] });
+    return;
     //  }
   };
 </script>
 
-{#await queryCheck(id) then}
+{#await queryCheck(id)}
+  <div
+    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+  >
+    Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
+        notestr={loadingText}
+      />{/if}
+  </div>
+{:then}
   <Text queryKey={["timeline", id]} {id} relays={relayhint}>
     {#snippet loading()}
       <div
@@ -69,6 +78,7 @@
       </div>
     {/snippet}
     {#snippet content({ data: text, status })}
+      {text}
       <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
         {#snippet loading()}
           <div>
