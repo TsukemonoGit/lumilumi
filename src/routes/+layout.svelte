@@ -173,9 +173,14 @@
     }
   });
 
-  $effect(() => {
-    if ($page && nlBanner && $showBanner) {
-      untrack(() => baddrCheck($page, nlBanner, $showBanner));
+  //オプションから設定変えたとき
+  showBanner.subscribe((value) => {
+    if (nlBanner) {
+      if (value) {
+        nlBanner.style.display = "";
+      } else {
+        nlBanner.style.display = "none";
+      }
     }
   });
 
