@@ -598,15 +598,18 @@
       // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       // metadata = $queryClient.getQueryData(["metadata", pubkey]);
       // console.log(metadata);
+      setTimeout(() => {
+        //これしないとtextareaがundefinedとかnullになる
+        //console.log(textarea);
+        if (textarea) {
+          textarea.selectionEnd = 0;
+          textarea?.scroll({
+            top: 0,
+          });
 
-      if (textarea) {
-        textarea.focus();
-
-        textarea.selectionEnd = 0;
-        textarea?.scroll({
-          top: 0,
-        });
-      }
+          textarea?.focus();
+        }
+      }, 0);
     } else {
       if (uploadAbortController) {
         uploadAbortController.abort(); // アップロードを中断
