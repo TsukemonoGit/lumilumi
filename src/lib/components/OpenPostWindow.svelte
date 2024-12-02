@@ -365,6 +365,7 @@
     event.preventDefault();
   };
   const onChangeHandler = async (e: Event): Promise<void> => {
+    console.log(e);
     const _files = (e.target as HTMLInputElement).files;
     if (_files) {
       await handleFileUpload(_files);
@@ -711,7 +712,7 @@
           <X size={32} />
         </button>
         <div class="flex flex-row gap-2 mb-2">
-          <MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
+          <MediaPicker bind:files bind:fileInput onchange={onChangeHandler} />
 
           <UploaderSelect bind:selectedUploader={$selectedUploader} />
         </div>

@@ -1,18 +1,17 @@
 <script lang="ts">
-  import { createBubbler } from "svelte/legacy";
-
-  const bubble = createBubbler();
   import { Image } from "lucide-svelte";
 
   interface Props {
     files?: FileList | undefined;
     fileInput?: HTMLInputElement | undefined;
     [key: string]: any;
+    onchange: any;
   }
 
   let {
     files = $bindable(undefined),
     fileInput = $bindable(undefined),
+    onchange,
     ...rest
   }: Props = $props();
 
@@ -32,8 +31,8 @@
       type="file"
       bind:this={fileInput}
       bind:files
+      {onchange}
       {...prunedRestProps()}
-      onchange={bubble("change")}
       accept="image/*,video/*,audio/*"
       multiple
     />
@@ -44,9 +43,6 @@
       bg-zinc-900 px-4 font-medium leading-none text-zinc-100 align-middle my-auto hover:opacity-75 active:opacity-50"
     disabled={rest.disabled}
     onclick={onButtonClick}
-    onkeydown={bubble("keydown")}
-    onkeyup={bubble("keyup")}
-    onkeypress={bubble("keypress")}
   >
     <Image size="20" class="stroke-magnum-300" />
   </button>
