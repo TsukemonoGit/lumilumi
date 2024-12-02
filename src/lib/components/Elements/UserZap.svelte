@@ -20,6 +20,7 @@
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
   const prof = profile(metadata);
+
   const onClickOK = async () => {
     invoice = undefined;
     console.log(zapAmount);
@@ -51,6 +52,9 @@
     invoice = zapInvoice;
     dialogOpen?.(false);
     invoiceOpen?.(true);
+
+    //サップの量保存
+    localStorage.setItem("zap", zapAmount.toString());
   };
 
   let amountEle: HTMLInputElement | undefined = $state();
@@ -63,6 +67,8 @@
   //   }
   // });
   const handleClickZap = async () => {
+    const storagezap = localStorage.getItem("zap");
+    zapAmount = Number(storagezap);
     //amount comment画面を開いてamountのinputにfocus
     dialogOpen?.(true);
     setTimeout(() => {

@@ -78,7 +78,6 @@
       </div>
     {/snippet}
     {#snippet content({ data: text, status })}
-      {text}
       <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
         {#snippet loading()}
           <div>

@@ -321,8 +321,9 @@
           ...(olddata ?? []),
           ...older,
         ]);
-
-        updateViewEvent?.($globalData);
+        setTimeout(() => {
+          updateViewEvent?.($globalData);
+        }, 10); //ProfileがめんのTLが読み込み終わっても表示されない
       }
     }
   }

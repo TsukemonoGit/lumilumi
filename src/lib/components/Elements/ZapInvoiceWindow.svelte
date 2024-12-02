@@ -50,33 +50,23 @@
       })
     : undefined;
 
-  $effect(() => {
-    if (observer && !$open) {
-      untrack(() => {
-        unsubscribe?.(); // Call the unsubscribe function if it exists
-        unsubscribe = undefined; // Reset unsubscribe after calling
+  //ザップ完了したら画面を閉じる（$open=falseにするためのやつ
+  //idでしかみてないからユーザーへのザップの場合は閉じない
+  open.subscribe((openState) => {
+    if (openState && !zapped) {
+      //ザップ一回したら押せなくなるけど
+      unsubscribe = observer?.subscribe((value: any) => {
+        if (value?.data?.event) {
+          zapped = value;
+          console.log(zapped);
+          unsubscribe?.();
+        }
       });
-    } else if (observer && $open && !zapped) {
-      untrack(() => {
-        unsubscribe = observer.subscribe((result: any) => {
-          if (result?.data?.event) {
-            zapped = result;
-            console.log(zapped);
-            unsubscribe?.(); // Unsubscribe after receiving data
-          }
-        });
-      });
-    } else if ($open && zapped) {
-      untrack(() => {
-        $toastSettings = {
-          title: "Zapped",
-          description: "Success to zap",
-          color: "bg-green-500",
-        };
-        $open = false;
-      });
+    } else {
+      unsubscribe?.();
     }
   });
+
   onDestroy(() => {
     unsubscribe?.(); // Ensure unsubscribe is only called if it exists
   });

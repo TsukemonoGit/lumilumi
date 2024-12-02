@@ -289,25 +289,27 @@
   let invoiceOpen: (bool: boolean) => void = () => {};
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
-  const observer = $derived(
-    new QueryObserver($queryClient, {
-      queryKey: ["reactions", "zapped", queryId, $loginUser],
-    })
-  );
-  let unsubscribe: () => void;
+  // const observer = $derived(
+  //   new QueryObserver($queryClient, {
+  //     queryKey: ["reactions", "zapped", queryId, $loginUser],
+  //   })
+  // );
+  // let unsubscribe: () => void;
 
   const handleClickZap = () => {
+    const storagezap = localStorage.getItem("zap");
+    zapAmount = Number(storagezap);
     dialogOpen?.(true);
     //zapの量決めるダイアログ出す
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
   };
-  onMount(() => {
-    const storagezap = localStorage.getItem("zap");
+  // onMount(() => {
+  //   const storagezap = localStorage.getItem("zap");
 
-    zapAmount = Number(storagezap);
-  });
+  //   zapAmount = Number(storagezap);
+  // });
 
   const onClickOK = async (metadata: Nostr.Event) => {
     invoice = undefined;
@@ -346,15 +348,16 @@
     dialogOpen?.(false);
     invoiceOpen?.(true);
 
+    //ザップウィンドウ閉じる処理ZapInvoiceOpenの方にかいてあったよ
     //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
-    const date = now();
-    unsubscribe = observer.subscribe((result: any) => {
-      console.log(result);
-      if (result?.data?.event && result.data.event.created_at >= date) {
-        invoiceOpen?.(false);
-        unsubscribe?.();
-      }
-    });
+    // const date = now();
+    // unsubscribe = observer.subscribe((result: any) => {
+    //   console.log(result);
+    //   if (result?.data?.event && result.data.event.created_at >= date) {
+    //     invoiceOpen?.(false);
+    //     unsubscribe?.();
+    //   }
+    // });
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
