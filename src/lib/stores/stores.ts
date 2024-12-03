@@ -56,8 +56,6 @@ export const mutes = writable<LumiMute>();
 export const mutebykinds = writable<LumiMuteByKind>();
 export const nowProgress = writable<boolean>(false);
 
-export const viewEventIds = writable<string[][]>([]);
-
 //export const tieMapStore = writable<Map<string, Set<string>>>();
 export const tieMapStore = writable<{
   [key: string]:

@@ -9,7 +9,6 @@
     mutebykinds,
     mutes,
     showUserStatus,
-    viewEventIds,
   } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
@@ -56,7 +55,11 @@
   import OtherKindNote from "./OtherKindNote.svelte";
 
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    followList,
+    timelineFilter,
+    viewEventIds,
+  } from "$lib/stores/globalRunes.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -116,11 +119,13 @@
   }
 
   onDestroy(() => {
+    // console.log("destroy mae", viewEventIds.get.length);
     // コンポーネント破棄時に現在のタグを削除
-    removeFirstMatchingId($viewEventIds, currentNoteTag);
-    $viewEventIds = $viewEventIds;
+    removeFirstMatchingId(viewEventIds.get, currentNoteTag);
+    //  console.log("destoroy ato", viewEventIds.get.length);
+    // viewEventIds.get = viewEventIds.get;
   });
-  // $: console.log($viewEventIds);
+  // $: console.log(viewEventIds.get);
   //eかa
 
   const baseClass = " overflow-hidden ";
@@ -189,7 +194,11 @@
   //atag
   $effect(() => {
     if (note) {
-      untrack(() => noteIDchange(note));
+      untrack(() => {
+        //console.log("effectまえ:", viewEventIds.get.length);
+        noteIDchange(note);
+        //console.log("effectあと:", viewEventIds.get.length);
+      });
     }
   });
 
@@ -201,14 +210,16 @@
       ) {
         // 現在のタグを削除
         if (currentNoteTag) {
-          removeFirstMatchingId($viewEventIds, currentNoteTag);
+          console.log(viewEventIds.get.length);
+          removeFirstMatchingId(viewEventIds.get, currentNoteTag);
+          console.log(viewEventIds.get.length);
         }
         // 新しいタグがまだ存在しなければ追加
-        //if (!tagExists($viewEventIds, "a", atag)) {
-        $viewEventIds.push(["a", atag]);
+        //if (!tagExists(viewEventIds.get, "a", atag)) {
+        viewEventIds.get.push(["a", atag]);
         //}
         currentNoteTag = ["a", atag];
-        $viewEventIds = $viewEventIds;
+        // viewEventIds.get = viewEventIds.get;
       } else if (
         atag === undefined &&
         note &&
@@ -218,14 +229,14 @@
         //etag
         // 現在のタグを削除
         if (currentNoteTag) {
-          removeFirstMatchingId($viewEventIds, currentNoteTag);
+          removeFirstMatchingId(viewEventIds.get, currentNoteTag);
         }
         // 新しいタグがまだ存在しなければ追加
-        // if (!tagExists($viewEventIds, "e", note.id)) {
-        $viewEventIds.push(["e", note.id]);
+        // if (!tagExists(viewEventIds.get, "e", note.id)) {
+        viewEventIds.get.push(["e", note.id]);
         //}
         currentNoteTag = ["e", note.id];
-        $viewEventIds = $viewEventIds;
+        //viewEventIds.get = viewEventIds.get;
       }
     }
     if (

@@ -7,7 +7,6 @@
     queryClient,
     showImg,
     toastSettings,
-    viewEventIds,
   } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
@@ -20,6 +19,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
+  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   const handleClickShare = async () => {
     //share link
@@ -108,11 +108,11 @@
           unsubscribe?.();
 
           //購読対象から削除
-          const index = $viewEventIds.findIndex(
+          const index = viewEventIds.get.findIndex(
             (item) => item[0] === "e" && item[1] === monoZap.noteId
           );
           if (index !== -1) {
-            $viewEventIds.splice(index, 1);
+            viewEventIds.get.splice(index, 1);
           }
           $toastSettings = {
             title: "Success",
@@ -122,8 +122,8 @@
         }
       });
       //購読対象に追加
-      $viewEventIds.push(["e", monoZap.noteId]);
-      $viewEventIds = $viewEventIds;
+      viewEventIds.get.push(["e", monoZap.noteId]);
+      // viewEventIds.get = viewEventIds.get;
     } catch (error) {
       $toastSettings = {
         title: "Error",

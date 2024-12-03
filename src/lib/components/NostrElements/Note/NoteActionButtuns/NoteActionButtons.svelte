@@ -31,7 +31,6 @@
     additionalPostOptions,
     queryClient,
     addClientTag,
-    viewEventIds,
     showAllReactions,
     loginUser,
   } from "$lib/stores/stores";
@@ -52,6 +51,7 @@
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
   import { clientTag } from "$lib/func/constants";
   import { nip33Regex } from "$lib/func/regex";
+  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   let {
     note,
@@ -457,13 +457,19 @@
       updating = false;
     }, updateInterval); // 連続で実行されるのを防ぐ
   }
-  viewEventIds.subscribe(() => {
-    debounceUpdate();
+
+  $effect(() => {
+    if (viewEventIds) {
+      untrack(() => {
+        debounceUpdate();
+      });
+    }
   });
+
   showAllReactions.subscribe(() => {
     debounceUpdate();
   });
-  // $: if ($showAllReactions && $viewEventIds) {
+  // $: if ($showAllReactions && viewEventIds.get) {
   //   debounceUpdate();
   // }
 

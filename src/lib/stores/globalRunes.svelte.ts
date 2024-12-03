@@ -9,6 +9,7 @@ export const timelineFilter = createTimelineFilter();
 export const followList = createFollowList();
 export const relayStateMap = createRelayStateMap();
 export const userStatusMap = createUserStatusMap();
+export const viewEventIds = createViewEventIds();
 
 //-------------------------------------
 
@@ -94,6 +95,24 @@ function createUserStatusMap() {
     // 新しい値を直接設定する
     set: (status: SvelteMap<string, SvelteMap<string, Nostr.Event>>) => {
       _userStatusMap = status;
+    },
+  };
+}
+
+function createViewEventIds() {
+  let _viewEventIds: string[][] = $state([]);
+
+  return {
+    get get() {
+      return _viewEventIds;
+    },
+    update: (updater: (current: string[][]) => string[][]) => {
+      _viewEventIds = updater(_viewEventIds);
+    },
+    // 新しい値を直接設定する
+    set: (ids: string[][]) => {
+      _viewEventIds = ids;
+      // console.log(_viewEventIds.length);
     },
   };
 }

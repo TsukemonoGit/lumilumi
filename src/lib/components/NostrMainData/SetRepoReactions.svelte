@@ -1,16 +1,13 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import {
-    viewEventIds,
-    loginUser,
-    showAllReactions,
-  } from "$lib/stores/stores";
+  import { loginUser, showAllReactions } from "$lib/stores/stores";
   import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
   import { untrack, type Snippet } from "svelte";
+  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     error?: Snippet;
@@ -31,11 +28,11 @@
   const updateInterval = 2000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
-  // $: console.log($viewEventIds);
+  // $: console.log(viewEventIds.get);
   let etagList = $derived(
     Array.from(
       new Set(
-        $viewEventIds.filter((tag) => tag[0] === "e").map((tag) => tag[1])
+        viewEventIds.get.filter((tag) => tag[0] === "e").map((tag) => tag[1])
       )
     )
   );
@@ -43,7 +40,7 @@
   let atagList = $derived(
     Array.from(
       new Set(
-        $viewEventIds.filter((tag) => tag[0] === "a").map((tag) => tag[1])
+        viewEventIds.get.filter((tag) => tag[0] === "a").map((tag) => tag[1])
       )
     )
   );
