@@ -144,6 +144,3 @@ export const showAllReactions = writable<boolean>(false);
 export const ogTitle = writable<string>("Lumilumi");
 
 export const ogDescription = writable<string>("the nostr client");
-
-//localstorage "timelineFilter"
-export const timelineFilter = writable<TimelineFilter>(timelineFilterInit);

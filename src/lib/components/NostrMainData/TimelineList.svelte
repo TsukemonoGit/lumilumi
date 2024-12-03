@@ -31,7 +31,7 @@
   import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
 

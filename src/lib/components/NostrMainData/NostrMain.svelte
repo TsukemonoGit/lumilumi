@@ -22,7 +22,6 @@
     addClientTag,
     showClientTag,
     showAllReactions,
-    timelineFilter,
     kind42inTL,
   } from "$lib/stores/stores";
 
@@ -45,6 +44,7 @@
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -79,7 +79,7 @@
     const timeline = localStorage.getItem("timelineFilter");
     if (timeline) {
       try {
-        $timelineFilter = JSON.parse(timeline);
+        timelineFilter.set(JSON.parse(timeline));
       } catch (error) {
         console.log("timelineFilter parse error");
       }

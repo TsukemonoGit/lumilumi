@@ -48,7 +48,7 @@
     setRxNostr3,
   } from "$lib/func/reactions";
   import { writable, type Writable } from "svelte/store";
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   let { data, children } = $props<{
     data:

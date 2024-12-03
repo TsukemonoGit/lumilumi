@@ -5,9 +5,10 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { createRadioGroup, melt } from "@melt-ui/svelte";
   import { _ } from "svelte-i18n";
-  import { showBanner, timelineFilter } from "$lib/stores/stores";
+  import { showBanner } from "$lib/stores/stores";
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
@@ -15,20 +16,20 @@
     ["2", $_("filter.canversation.none")],
   ];
   const selected = writable<string>(
-    optionsArr[$timelineFilter.selectCanversation][0]
+    optionsArr[timelineFilter.get.selectCanversation][0]
   );
 
   const {
     elements: { root, item, hiddenInput },
     helpers: { isChecked },
   } = createRadioGroup({
-    defaultValue: optionsArr[$timelineFilter.selectCanversation][0],
+    defaultValue: optionsArr[timelineFilter.get.selectCanversation][0],
     value: selected,
   });
-  // $: console.log($timelineFilter.adaptMute);
+  // $: console.log(timelineFilter.get.adaptMute);
   selected.subscribe((value) => {
     if (value !== undefined && value !== null) {
-      $timelineFilter.selectCanversation = Number(value);
+      timelineFilter.get.selectCanversation = Number(value);
     }
   });
 
@@ -107,7 +108,7 @@
                         <input
                           type="checkbox"
                           class="rounded-checkbox"
-                          bind:checked={$timelineFilter.adaptMute}
+                          bind:checked={timelineFilter.get.adaptMute}
                         />
                         {$_("filter.menu.muteOn")}
                       </label>

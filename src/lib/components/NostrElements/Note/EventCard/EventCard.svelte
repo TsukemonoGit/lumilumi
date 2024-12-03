@@ -10,7 +10,6 @@
     mutebykinds,
     mutes,
     showUserStatus,
-    timelineFilter,
     viewEventIds,
   } from "$lib/stores/stores";
 
@@ -58,6 +57,7 @@
   import OtherKindNote from "./OtherKindNote.svelte";
 
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -166,8 +166,8 @@
     $page.params.note ? getIDbyParam($page.params.note) : undefined
   );
   let muteType = $derived.by(() => {
-    if ($mutes || $mutebykinds || $timelineFilter) {
-      return !$timelineFilter.adaptMute
+    if ($mutes || $mutebykinds || timelineFilter.get) {
+      return !timelineFilter.get.adaptMute
         ? "null"
         : paramNoteId === note.id || excludefunc(note)
           ? "null"

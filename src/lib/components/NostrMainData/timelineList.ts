@@ -1,7 +1,7 @@
 // timelineList.ts
 
 import { usePromiseReq } from "$lib/func/nostr";
-import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+import { displayEvents } from "$lib/stores/globalRunes.svelte";
 import { scanArray } from "$lib/stores/operators";
 
 import type { Filter } from "nostr-typedef";

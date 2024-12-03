@@ -33,7 +33,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { writable, type Writable } from "svelte/store";
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
 

@@ -5,12 +5,7 @@
 
   import { makeMainFilters } from "$lib/func/nostr";
 
-  import {
-    followList,
-    loginUser,
-    queryClient,
-    timelineFilter,
-  } from "$lib/stores/stores";
+  import { followList, loginUser, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -24,6 +19,7 @@
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
   import MainTimeline from "./NostrMainData/MainTimeline.svelte";
   import { page } from "$app/stores";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -185,7 +181,7 @@
           {amount}
           eventFilter={(note) => {
             return (
-              checkCanvasation(note, $timelineFilter.selectCanversation) &&
+              checkCanvasation(note, timelineFilter.get.selectCanversation) &&
               excludeKind0(note)
             );
           }}

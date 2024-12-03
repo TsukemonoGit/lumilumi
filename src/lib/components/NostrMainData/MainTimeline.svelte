@@ -10,7 +10,6 @@
     showReactioninTL,
     showUserStatus,
     tieMapStore,
-    timelineFilter,
   } from "$lib/stores/stores";
 
   import type { ReqStatus } from "$lib/types";
@@ -32,7 +31,10 @@
 
   import { useMainTimeline } from "$lib/stores/useMainTimeline";
   import { get } from "svelte/store";
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import {
+    displayEvents,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -368,13 +370,21 @@
     console.log("test");
   });
   // $inspect($slicedEvent);
-
-  timelineFilter.subscribe((value) => {
-    if (value) {
-      updateViewEvent($data);
-      localStorage.setItem("timelineFilter", JSON.stringify(value));
+  $effect(() => {
+    if (timelineFilter.get) {
+      untrack(() => updateViewEvent($data));
+      localStorage.setItem(
+        "timelineFilter",
+        JSON.stringify(timelineFilter.get)
+      );
     }
   });
+  // timelineFilter.get()((value) => {
+  //   if (value) {
+  //     updateViewEvent($data);
+  //     localStorage.setItem("timelineFilter", JSON.stringify(value));
+  //   }
+  // });
 </script>
 
 {#if viewIndex !== 0}

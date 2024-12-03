@@ -34,7 +34,7 @@
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
   let untilTime: number = 0;

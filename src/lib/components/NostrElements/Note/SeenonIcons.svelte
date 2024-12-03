@@ -8,7 +8,7 @@
   import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import { getRelaysById } from "$lib/func/nostr";
 
-  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     id: string;
@@ -25,15 +25,21 @@
       return getRelaysById(id, tieKey);
     } else return [];
   });
-  // slicedEvent.subscribe(() => {
-  //   relays = tieKey ? getRelaysById(id, tieKey) : [];
+
+  // let relays: string[] = $derived.by(async () => {
+  //   await setRelay(id, tieKey);
   // });
-  // onMount(() => {
-  //でてすぐはちょっとしかリレーないから１秒後にもっかい取得し直してみる
-  // setTimeout(() => {
-  //   relays = tieKey ? getRelaysById(id, tieKey) : [];
-  // }, 1000);
-  //});
+
+  // async function setRelay(
+  //   id: string,
+  //   tiekey: string | undefined
+  // ): Promise<string[]> {
+  //   if (displayEvents.get && tiekey) {
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  //     return getRelaysById(id, tiekey) as string[];
+  //   } else return [];
+  // }
 
   const handleStateError = (url: string) => {
     if (!$relayIconErrorStore.includes(url)) {
