@@ -1,11 +1,13 @@
 import { timelineFilterInit, type TimelineFilter } from "$lib/types";
 import * as Nostr from "nostr-typedef";
+import type { ConnectionState } from "rx-nostr";
 import { SvelteMap } from "svelte/reactivity";
 
 export const displayEvents = createSlicedEvent();
 //localstorage "timelineFilter"
 export const timelineFilter = createTimelineFilter();
 export const followList = createFollowList();
+export const relayStateMap = createRelayStateMap();
 //-------------------------------------
 
 // カスタムストアの作成関数
@@ -48,6 +50,17 @@ function createFollowList() {
   };
 }
 
-// export const followList: Writable<Map<string, string | undefined>> = writable<
-//   Map<string, string | undefined>
-// >(new Map());
+function createRelayStateMap() {
+  let _relayStates: SvelteMap<string, ConnectionState> = $state.raw(
+    new SvelteMap()
+  );
+
+  return {
+    get get() {
+      return _relayStates;
+    },
+    set: (states: SvelteMap<string, ConnectionState>) => {
+      _relayStates = states;
+    },
+  };
+}

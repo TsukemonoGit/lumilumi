@@ -1,13 +1,14 @@
 <script lang="ts">
   import type { ConnectionState } from "rx-nostr";
-  import { defaultRelays, relayStateMap } from "$lib/stores/stores";
+  import { defaultRelays } from "$lib/stores/stores";
   import { Circle, RadioTower, RefreshCcw } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import RelayStatusColor from "./RelayStatusColor.svelte";
   import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
-  import { untrack } from "svelte";
+
+  import { relayStateMap } from "$lib/stores/globalRunes.svelte";
 
   let readRelays = $derived(
     $defaultRelays
@@ -20,12 +21,11 @@
       : []
   );
 
-  let overallStateColor: string = $state("");
-
+  let overallStateColor: string = $derived.by(() => setAllStatusState());
   // allStatus 内の state を設定する関数
-  function setAllStatusState() {
+  function setAllStatusState(): string {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
-      $relayStateMap.get(cleanRelayUrl(relay.url))
+      relayStateMap.get.get(cleanRelayUrl(relay.url))
     );
 
     const stateCount: Record<string, number> = {};
@@ -47,34 +47,10 @@
       }
     }
 
-    overallStateColor = getColor(overallState);
+    return getColor(overallState);
     //console.log(overallStateColor);
   }
 
-  let derivedStateMap = $derived($relayStateMap);
-
-  $effect(() => {
-    if ($relayStateMap) {
-      untrack(() => stateMapChange(derivedStateMap));
-    }
-  });
-
-  function stateMapChange(map: Map<string, ConnectionState>) {
-    if (readRelays?.length > 0 || writeRelays?.length > 0) {
-      setAllStatusState();
-    }
-  }
-
-  // let overallStateColor: string;
-  // afterUpdate(updateOverallStateColor);
-  // function updateOverallStateColor() {
-  //   if ($app?.rxNostr && $app.rxNostr.getAllRelayStatus()) {
-  //     overallStateColor =
-  //       !readRelays || !writeRelays
-  //         ? getColor("initialized")
-  //         : getColor(getOverallConnectionState());
-  //   }
-  // }
   let disabledButton: string | undefined = $state();
   const handleClickReconnect = (url: string) => {
     reconnectRelay(url);
@@ -105,7 +81,7 @@
               <RelayStatusColor relay={relay.url} /><span class="inline w-60"
                 >{relayUrl}</span
               >
-              {#if $relayStateMap.get(relayUrl) === "error"}<button
+              {#if relayStateMap.get.get(relayUrl) === "error"}<button
                   onclick={() => handleClickReconnect(relayUrl)}
                   class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
@@ -116,7 +92,7 @@
               <RelayStatusColor3 relay={relay.url} /><span class="inline w-60"
                 >{relayUrl}</span
               >
-              {#if $relayStateMap3.get(relayUrl) === "error"}<button
+              {#if relayStateMap.get3.get(relayUrl) === "error"}<button
                   on:click={() => handleClickReconnect(relayUrl)}
                   class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
@@ -134,12 +110,12 @@
                 <Circle
                   size="20"
                   class="{getColor(
-                    $relayStateMap.get(relayUrl)
+                    relayStateMap.get.get(relayUrl)
                   )} fill-current  min-w-[20px] mr-1"
                 />
                 {#snippet popoverContent()}
                   <div class="mr-8">
-                    {$relayStateMap.get(relayUrl)}
+                    {relayStateMap.get.get(relayUrl)}
                   </div>
                 {/snippet}</Popover
               ><span class="inline w-60">{relayUrl}</span>

@@ -6,7 +6,6 @@
     loginUser,
     nowProgress,
     queryClient,
-    relayStateMap,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -31,7 +30,7 @@
   import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
 
@@ -301,8 +300,8 @@
 
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
       // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
-      // console.log($relayStateMap);
+      await waitForConnections(readUrls, relayStateMap.get, 10000); // maxWaitTime set to 10 seconds
+      // console.log(relayStateMap.get);
 
       const older = await firstLoadOlderEvents(
         50,

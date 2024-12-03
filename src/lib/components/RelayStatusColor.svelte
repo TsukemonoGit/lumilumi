@@ -2,7 +2,7 @@
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import { Circle } from "lucide-svelte";
   import Popover from "./Elements/Popover.svelte";
-  import { relayStateMap } from "$lib/stores/stores";
+  import { relayStateMap } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     relay: string;
@@ -16,12 +16,12 @@
   <Circle
     size="20"
     class="{getColor(
-      $relayStateMap.get(relayUrl)
+      relayStateMap.get.get(relayUrl)
     )} fill-current  min-w-[20px] mr-1"
   />
   {#snippet popoverContent()}
-    <div  class="mr-8">
-      {$relayStateMap.get(relayUrl)}
+    <div class="mr-8">
+      {relayStateMap.get.get(relayUrl)}
     </div>
   {/snippet}</Popover
 >

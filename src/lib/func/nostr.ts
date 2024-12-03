@@ -5,7 +5,6 @@ import {
   loginUser,
   metadataQueue,
   queryClient,
-  relayStateMap,
   showImg,
   showKind16,
   showReactioninTL,
@@ -39,7 +38,7 @@ import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
-import { followList } from "$lib/stores/globalRunes.svelte";
+import { followList, relayStateMap } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 
 let rxNostr: RxNostr;
@@ -58,7 +57,7 @@ export function setRxNostr() {
 
   rxNostr.createConnectionStateObservable().subscribe((packet) => {
     //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-    relayStateMap.update((value) => value.set(packet.from, packet.state));
+    relayStateMap.set(relayStateMap.get.set(packet.from, packet.state));
   });
 }
 

@@ -6,7 +6,6 @@
     nowProgress,
     onlyFollowee,
     queryClient,
-    relayStateMap,
     tieMapStore,
   } from "$lib/stores/stores";
 
@@ -33,7 +32,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { writable, type Writable } from "svelte/store";
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
 
@@ -193,8 +192,8 @@
 
     //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
     // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-    await waitForConnections(readUrls, $relayStateMap, 5000); // maxWaitTime set to 10 seconds
-    // console.log($relayStateMap);
+    await waitForConnections(readUrls, relayStateMap.get, 5000); // maxWaitTime set to 10 seconds
+    // console.log(relayStateMap.get);
 
     const older = await usePromiseReq(
       { filters: filters, operator, req: undefined },
