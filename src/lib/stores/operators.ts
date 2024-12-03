@@ -10,7 +10,6 @@ import {
   onlyFollowee,
   queryClient,
   reactionToast,
-  userStatusStore,
 } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
@@ -18,7 +17,8 @@ import { sortEventPackets } from "$lib/func/util";
 import { type QueryKey } from "@tanstack/svelte-query";
 
 import { muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
-import { followList } from "$lib/stores/globalRunes.svelte";
+import { followList, userStatusMap } from "$lib/stores/globalRunes.svelte";
+import { SvelteMap } from "svelte/reactivity";
 
 export function filterId(
   id: string
@@ -157,18 +157,18 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
     //console.log(packet);
 
     // 現在の store から pubkey と dtag に対応するイベントを取得
-    const pre: Nostr.Event | undefined = get(userStatusStore)
+    const pre: Nostr.Event | undefined = userStatusMap.get
       .get(packet.event.pubkey)
       ?.get(dtag);
 
     // 以前のイベントが存在しないか、作成日時が新しい場合に更新
     if (!pre || packet.event.created_at > pre.created_at) {
       // store を更新
-      userStatusStore.update((store) => {
+      userStatusMap.update((store) => {
         // pubkey に対応する Map を取得または初期化
         let pubkeyMap = store.get(packet.event.pubkey);
         if (!pubkeyMap) {
-          pubkeyMap = new Map<string, Nostr.Event>();
+          pubkeyMap = new SvelteMap<string, Nostr.Event>();
           store.set(packet.event.pubkey, pubkeyMap);
         }
 

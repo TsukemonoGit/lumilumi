@@ -1,7 +1,6 @@
 <script lang="ts">
+  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
   import type Nostr from "nostr-typedef";
-
-  import { userStatusStore } from "$lib/stores/stores";
 
   interface Props {
     pubkey: string;
@@ -10,13 +9,9 @@
   }
 
   let { pubkey, loading, children }: Props = $props();
-  let data: Nostr.Event | undefined = $state();
-
-  userStatusStore.subscribe((value) => {
-    if (value) {
-      data = value.get(pubkey)?.get("music");
-    }
-  });
+  let data: Nostr.Event | undefined = $derived(
+    userStatusMap.get.get(pubkey)?.get("music")
+  );
 </script>
 
 {#if !data}

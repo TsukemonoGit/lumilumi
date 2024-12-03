@@ -8,6 +8,8 @@ export const displayEvents = createSlicedEvent();
 export const timelineFilter = createTimelineFilter();
 export const followList = createFollowList();
 export const relayStateMap = createRelayStateMap();
+export const userStatusMap = createUserStatusMap();
+
 //-------------------------------------
 
 // カスタムストアの作成関数
@@ -51,16 +53,47 @@ function createFollowList() {
 }
 
 function createRelayStateMap() {
-  let _relayStates: SvelteMap<string, ConnectionState> = $state.raw(
+  let _relayStatus: SvelteMap<string, ConnectionState> = $state.raw(
     new SvelteMap()
   );
 
   return {
     get get() {
-      return _relayStates;
+      return _relayStatus;
+    }, // 現在の値を基に新しい値を生成する
+    update: (
+      updater: (
+        current: SvelteMap<string, ConnectionState>
+      ) => SvelteMap<string, ConnectionState>
+    ) => {
+      _relayStatus = updater(_relayStatus);
     },
-    set: (states: SvelteMap<string, ConnectionState>) => {
-      _relayStates = states;
+    set: (status: SvelteMap<string, ConnectionState>) => {
+      _relayStatus = status;
+    },
+  };
+}
+
+function createUserStatusMap() {
+  let _userStatusMap: SvelteMap<
+    string,
+    SvelteMap<string, Nostr.Event>
+  > = $state(new SvelteMap());
+
+  return {
+    get get() {
+      return _userStatusMap;
+    },
+    update: (
+      updater: (
+        current: SvelteMap<string, SvelteMap<string, Nostr.Event>>
+      ) => SvelteMap<string, SvelteMap<string, Nostr.Event>>
+    ) => {
+      _userStatusMap = updater(_userStatusMap);
+    },
+    // 新しい値を直接設定する
+    set: (status: SvelteMap<string, SvelteMap<string, Nostr.Event>>) => {
+      _userStatusMap = status;
     },
   };
 }

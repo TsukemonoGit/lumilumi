@@ -5,7 +5,6 @@
     nowProgress,
     showImg,
     toastSettings,
-    userStatusStore,
   } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { SmilePlus, X } from "lucide-svelte";
@@ -20,6 +19,7 @@
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
+  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -65,7 +65,7 @@
         // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
         //   ["userStatus", "general", pubkey]
         // );
-        const statusEvent: Nostr.Event | undefined = $userStatusStore
+        const statusEvent: Nostr.Event | undefined = userStatusMap.get
           .get(pubkey)
           ?.get("general");
         console.log(statusEvent);

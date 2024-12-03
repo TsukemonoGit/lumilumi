@@ -132,9 +132,6 @@ export const addClientTag = writable<boolean>(false);
 export const showClientTag = writable<boolean>(true);
 export const kind42inTL = writable<boolean>(false);
 
-export const userStatusStore: Writable<Map<string, Map<string, Nostr.Event>>> =
-  writable<Map<string, Map<string, Nostr.Event>>>(new Map());
-
 export const showAllReactions = writable<boolean>(false);
 
 export const ogTitle = writable<string>("Lumilumi");

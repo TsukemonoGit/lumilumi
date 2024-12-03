@@ -57,7 +57,9 @@ export function setRxNostr() {
 
   rxNostr.createConnectionStateObservable().subscribe((packet) => {
     //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-    relayStateMap.set(relayStateMap.get.set(packet.from, packet.state));
+    relayStateMap.update((value) => {
+      return value.set(packet.from, packet.state);
+    });
   });
 }
 
