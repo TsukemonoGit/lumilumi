@@ -791,9 +791,9 @@
 {/if}
 
 <!-- {/if} -->
-<style>
+<!-- <style>
   article {
     content-visibility: auto;
     contain-intrinsic-size: auto 100px;
   }
-</style>
+</style> -->

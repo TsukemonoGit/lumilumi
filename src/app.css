@@ -300,3 +300,8 @@ input:-webkit-autofill:focus {
 /* main  {
   overflow-anchor: auto;
 } */
+
+article {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100px;
+}
