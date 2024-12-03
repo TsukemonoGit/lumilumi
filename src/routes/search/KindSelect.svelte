@@ -5,7 +5,11 @@
   import { locale } from "svelte-i18n";
   import { fly } from "svelte/transition";
 
-  export let selectedKind: number | undefined = undefined;
+  interface Props {
+    selectedKind?: number | undefined;
+  }
+
+  let { selectedKind = $bindable(undefined) }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow },
 
@@ -14,9 +18,17 @@
     forceVisible: true,
     loop: true,
   });
-  $: console.log($item);
-  $: console.log($locale);
-  locale;
+  // run(() => {
+  //   console.log($item);
+  // });
+  // run(() => {
+  //   console.log($locale);
+  // });
+  // locale;
+
+  const handleClickKind = (kind: number) => {
+    selectedKind = kind;
+  };
 </script>
 
 <button type="button" class="trigger" use:melt={$trigger}>
@@ -33,9 +45,7 @@
       <div
         class="item"
         use:melt={$item}
-        on:m-click={(e) => {
-          selectedKind = kind;
-        }}
+        onm-click={() => handleClickKind(kind)}
       >
         {kind}
         {$locale === "ja" ? ja : en}

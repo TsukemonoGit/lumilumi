@@ -6,8 +6,8 @@
   import { now, getLocalTimeZone } from "@internationalized/date";
 
   import { locale } from "svelte-i18n";
+  import { untrack } from "svelte";
 
-  export let title: string;
   const {
     elements: {
       calendar,
@@ -31,20 +31,32 @@
     defaultPlaceholder: now(getLocalTimeZone()),
     maxValue: now(getLocalTimeZone()),
   });
-  export let startTimeUnix: number | undefined;
-  export let endTimeUnix: number | undefined;
-  export { startSegment, endSegment };
-  $: {
-    if (value && $value.start && $value.end) {
-      startTimeUnix = Math.floor(
-        ($value.start as ZonedDateTime).toDate().getTime() / 1000
-      );
-
-      endTimeUnix = Math.floor(
-        ($value.end as ZonedDateTime).toDate().getTime() / 1000
-      );
-    }
+  interface Props {
+    title: string;
+    startTimeUnix: number | undefined;
+    endTimeUnix: number | undefined;
   }
+
+  let {
+    title,
+    startTimeUnix = $bindable(),
+    endTimeUnix = $bindable(),
+  }: Props = $props();
+  export { startSegment, endSegment };
+
+  $effect(() => {
+    if (value && $value.start && $value.end) {
+      untrack(() => {
+        startTimeUnix = Math.floor(
+          ($value.start as ZonedDateTime).toDate().getTime() / 1000
+        );
+
+        endTimeUnix = Math.floor(
+          ($value.end as ZonedDateTime).toDate().getTime() / 1000
+        );
+      });
+    }
+  });
 </script>
 
 <div class="picker-container">

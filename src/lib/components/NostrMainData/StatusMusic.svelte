@@ -1,44 +1,21 @@
 <script lang="ts">
+  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
   import type Nostr from "nostr-typedef";
 
-  import { userStatusStore } from "$lib/stores/stores";
-
-  export let pubkey: string;
-  let data: Nostr.Event | undefined;
-
-  $: if ($userStatusStore) {
-    data = $userStatusStore.get(pubkey)?.get("music");
+  interface Props {
+    pubkey: string;
+    loading?: import("svelte").Snippet;
+    children?: import("svelte").Snippet<[any]>;
   }
 
-  // $: if ($slicedEvent) {
-  //   const res: EventPacket | undefined = $queryClient.getQueryData([
-  //     "userStatus",
-  //     "music",
-  //     pubkey,
-  //   ]);
-  //   if (res) {
-  //     data = res;
-  //     // console.log(data);
-  //     createQuery({
-  //       queryKey: ["userStatus", "music", pubkey],
-  //       queryFn: () => res,
-  //       //initialData: res,
-  //       staleTime: Infinity,
-  //       gcTime: Infinity,
-  //     });
-  //   }
-  // }
-
-  interface $$Slots {
-    default: { event: Nostr.Event };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let { pubkey, loading, children }: Props = $props();
+  let data: Nostr.Event | undefined = $derived(
+    userStatusMap.get.get(pubkey)?.get("music")
+  );
 </script>
 
 {#if !data}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else if data}
-  <slot event={data} />
+  {@render children?.({ event: data })}
 {/if}

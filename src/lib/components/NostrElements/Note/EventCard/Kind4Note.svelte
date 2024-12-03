@@ -12,26 +12,43 @@
   import UserName from "../UserName.svelte";
   import Reply from "../Reply.svelte";
 
-  export let note: Nostr.Event;
-  export let metadata: Nostr.Event | undefined;
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let maxHeight: string;
-  export let tieKey: string | undefined;
-  export let mini: boolean;
-  export let warning: string[] | undefined;
-  export let replyUsers: string[];
-  export let thread: boolean;
+  interface Props {
+    note: Nostr.Event;
+    metadata: Nostr.Event | undefined;
+    displayMenu: boolean;
+    depth: number;
+    maxHeight: string;
+    tieKey: string | undefined;
+    mini: boolean;
+    warning: string[] | undefined;
+    replyUsers: string[];
+    thread: boolean;
+    replyTag: string[] | undefined;
+  }
 
-  export let replyTag: string[] | undefined;
-  let decrypt: string | undefined = undefined;
+  let {
+    note,
+    metadata,
+    displayMenu,
+    depth,
+    maxHeight,
+    tieKey,
+    mini,
+    warning,
+    replyUsers,
+    thread,
+    replyTag,
+  }: Props = $props();
+
+  let decrypt: string | undefined = $state(undefined);
 
   //自分宛て？もしくは自分が書いた？
-  $: forme =
+  let forme = $derived(
     note.pubkey === $loginUser ||
-    note.tags.find(
-      (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === $loginUser
-    );
+      note.tags.find(
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === $loginUser
+      )
+  );
 
   //どっちがどっち
   async function decryptMessage() {
@@ -79,7 +96,7 @@
         {#if !decrypt}
           <button
             class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-            on:click={decryptMessage}>{$_("event.kind4.decrypt")}</button
+            onclick={decryptMessage}>{$_("event.kind4.decrypt")}</button
           >{:else}
           <!--複合できたら内容を表示-->
           <Content

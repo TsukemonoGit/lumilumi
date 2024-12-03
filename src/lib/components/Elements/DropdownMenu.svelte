@@ -3,8 +3,13 @@
 
   import { fly } from "svelte/transition";
 
-  export let menuTexts: { icon: any; text: string }[] = [];
-  export let handleSelectItem: (arg0: number) => any;
+  interface Props {
+    menuTexts?: { icon: any; text: string }[];
+    handleSelectItem: (arg0: number) => any;
+    children?: import("svelte").Snippet;
+  }
+
+  let { menuTexts = [], handleSelectItem, children }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow, overlay },
 
@@ -20,11 +25,11 @@
   class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
   use:melt={$trigger}
   aria-label="Update dimensions"
-  ><slot /><span class="sr-only">Open Popover</span></button
+  >{@render children?.()}<span class="sr-only">Open Popover</span></button
 >
 
 {#if $open}
-  <div use:melt={$overlay} class="fixed inset-0 z-40" />
+  <div use:melt={$overlay} class="fixed inset-0 z-40"></div>
   <div
     class=" menu"
     use:melt={$menu}
@@ -34,7 +39,7 @@
       <div
         class="item"
         use:melt={$item}
-        on:m-click={() => handleSelectItem(index)}
+        onm-click={() => handleSelectItem(index)}
       >
         <Icon class="icon mr-2 size-4 " />{text}
       </div>
@@ -97,7 +102,7 @@
       Quit Melt UI
       <div class="rightSlot">⌘Q</div>
     </div> -->
-    <div use:melt={$arrow} />
+    <div use:melt={$arrow}></div>
   </div>
 {/if}
 

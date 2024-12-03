@@ -22,12 +22,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import AlertDialog from "./AlertDialog.svelte";
-  import type {
-    Invalidator,
-    Subscriber,
-    Unsubscriber,
-    Updater,
-  } from "svelte/store";
+  import type { Subscriber, Unsubscriber, Updater } from "svelte/store";
   import {
     updateMuteByList,
     toMuteList,
@@ -35,7 +30,12 @@
     encryptPrvTags,
   } from "$lib/func/settings";
   import { refetchKind10000 } from "$lib/func/mute";
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+    children?: import("svelte").Snippet;
+  }
+
+  let { pubkey, children }: Props = $props();
 
   //-------------------------------------mute menu
   const {
@@ -92,27 +92,16 @@
     },
   ];
 
-  $: muteStatus = $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined;
+  let muteStatus = $derived(
+    $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined
+  );
 
-  let dialogOpen: {
-    update: (
-      updater: Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: Subscriber<boolean>,
-      invalidate?: Invalidator<boolean> | undefined
-    ): Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
 
   let kind: number | undefined;
   let dtag: string | undefined;
-  let title: string;
-  let text: string;
+  let title: string = $state("");
+  let text: string = $state("");
   function reset() {
     kind = undefined;
     dtag = undefined;
@@ -138,7 +127,7 @@
         text = $_("create.kind10000.text");
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -199,7 +188,7 @@
         text = $_("create.kind30007.6.text");
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -265,7 +254,7 @@
 
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
 
         return;
       }
@@ -332,7 +321,7 @@
 
         $nowProgress = false;
 
-        $dialogOpen = true;
+        dialogOpen?.(true);
 
         return;
       }
@@ -696,7 +685,7 @@
   async function handleClickOk() {
     //データないけど新しく作っていいよのとこ
     console.log("kind", kind, "dtag", dtag);
-    $dialogOpen = false;
+    dialogOpen?.(false);
     if (!kind) {
       $toastSettings = {
         title: "Error",
@@ -757,7 +746,7 @@
   }
 </script>
 
-<button use:melt={$trigger}><slot /></button>
+<button use:melt={$trigger}>{@render children?.()}</button>
 
 {#if $open}
   <div
@@ -774,7 +763,7 @@
       {#each muteMenu as { id, addText, removeText, Icon }}
         {#if !muteStatus?.[id]}
           <button
-            on:click={() => handleAddMute(id)}
+            onclick={() => handleAddMute(id)}
             class="
      flex
      font-medium leading-none bg-neutral-800 text-magnum-300 hover:bg-magnum-500/25 active:opacity-50 disabled:opacity-15 py-1 items-center"
@@ -783,7 +772,7 @@
           </button>
         {:else}
           <button
-            on:click={() => handleRemoveMute(id)}
+            onclick={() => handleRemoveMute(id)}
             class="flex
      font-medium leading-none bg-neutral-700 text-magnum-300 hover:bg-magnum-400/25 active:opacity-50 disabled:opacity-15 py-1 items-center"
           >
@@ -803,8 +792,11 @@
   </div>
 {/if}
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickOk}
   {title}
-  okButtonName="OK"><div slot="main">{text}</div></AlertDialog
+  okButtonName="OK"
+  >{#snippet main()}
+    <div>{text}</div>
+  {/snippet}</AlertDialog
 >

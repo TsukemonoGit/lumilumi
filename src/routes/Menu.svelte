@@ -8,11 +8,11 @@
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
-  import type { MeltActionReturn } from "@melt-ui/svelte/internal/types";
-  import type { MeltElement } from "@melt-ui/svelte/internal/helpers";
+
   import logo from "$lib/images/favicon.svg";
   import { goto } from "$app/navigation";
   import { mainMenuItems } from "./menu";
+  import { writable, type Writable } from "svelte/store";
   const {
     elements: {
       trigger,
@@ -28,10 +28,7 @@
     forceVisible: true,
   });
 
-  let encodedPub: string;
-  $: if ($loginUser) {
-    pubCheck();
-  }
+  let encodedPub: string = $state("");
 
   const pubCheck = () => {
     try {
@@ -41,33 +38,7 @@
       }
     } catch (error) {}
   };
-  $: menuPosition = $menuLeft ? "left-2 flex flex-row-reverse" : "right-2 ";
-  $: menuPosition2 = $menuLeft ? "right-5 " : "left-5";
-  let editStatustrigger: MeltElement<
-    [
-      {
-        update: (
-          updater: import("svelte/store").Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: import("svelte/store").Subscriber<boolean>,
-          invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-        ): import("svelte/store").Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      },
-    ],
-    (node: HTMLElement) => MeltActionReturn<any>,
-    ([$open]: [boolean]) => {
-      readonly "aria-haspopup": "dialog";
-      readonly "aria-expanded": boolean;
-      readonly type: "button";
-    },
-    string
-  >;
+
   // beforeNavigate(() => ($open = false));
 
   function handleClickHome() {
@@ -78,9 +49,24 @@
       goto("/");
     }
   }
+  loginUser.subscribe((value) => {
+    if (value) {
+      pubCheck();
+    }
+  });
+  let menuPosition = $derived(
+    $menuLeft ? "left-2 flex flex-row-reverse" : "right-2 "
+  );
+  let menuPosition2 = $derived($menuLeft ? "right-5 " : "left-5");
+
+  // svelte-ignore non_reactive_update
+  let editStatusOpen: Writable<boolean> = writable(false);
+  const openEditStatusDialog = () => {
+    $editStatusOpen = true;
+  };
 </script>
 
-<EditUserStatus bind:trigger={editStatustrigger} />
+<EditUserStatus bind:dialogOpen={editStatusOpen} />
 <div
   class="menuGroup fixed bottom-0 z-10 w-full h-14 bg-neutral-900 border-t border-magnum-300/50"
 >
@@ -99,7 +85,7 @@
       aria-label="Update dimensions"
       ><AlignJustify class="size-6" />
     </button>
-    <button on:click={handleClickHome} class="trigger" title="Home"
+    <button onclick={handleClickHome} class="trigger" title="Home"
       ><House class="size-6" />
     </button>
   </div>
@@ -112,7 +98,7 @@
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-    />
+    ></div>
     <div
       use:melt={$content}
       class={`fixed ${$menuLeft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
@@ -136,11 +122,9 @@
           {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
             {#if alt === "edit status"}
               <li>
-                {#if $trigger}<button
-                    use:melt={$editStatustrigger}
-                    use:melt={$close}
-                    ><TrendingUp /><span class="ml-2">Edit status</span></button
-                  >{/if}
+                <button onclick={openEditStatusDialog} use:melt={$close}
+                  ><TrendingUp /><span class="ml-2">Edit status</span></button
+                >
               </li>
             {:else}
               <li
@@ -155,16 +139,12 @@
                     use:melt={$close}
                     title={alt}
                   >
-                    <svelte:component this={Icon} /><span class="ml-2"
-                      >{alt}</span
-                    >
+                    <Icon /><span class="ml-2">{alt}</span>
                   </a>
                 {:else}
                   <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
                   <div class="disabledLink" use:melt={$close} title={alt}>
-                    <svelte:component this={Icon} /><span class="ml-2"
-                      >{alt}</span
-                    >
+                    <Icon /><span class="ml-2">{alt}</span>
                   </div>
                 {/if}
               </li>{/if}

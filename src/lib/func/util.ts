@@ -500,3 +500,31 @@ export const translateText = (text: string) => {
     .replace(urlRegex, "[🔗]");
   return encodeURIComponent(replacedText);
 };
+
+export function formatToEventPacket(
+  ev: Nostr.Event,
+  from: string = ""
+): EventPacket {
+  return {
+    event: ev,
+    from: from,
+    type: "EVENT",
+    subId: "",
+    message: ["EVENT", "", ev],
+  } as EventPacket;
+}
+
+export function debounce<T extends (...args: any[]) => Promise<void> | void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return (...args: Parameters<T>): void => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}

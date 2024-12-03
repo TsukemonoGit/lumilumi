@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useReplaceableEventList } from "$lib/stores/useReplaceableEventList";
   import type { ReqStatus } from "$lib/types";
@@ -10,36 +11,62 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
-  export let queryKey: QueryKey;
-  export let pubkey: string;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  $: result = useReplaceableEventList(queryKey, pubkey, 30000, req);
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
-  $: console.log($data);
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
+
+  interface Props {
+    queryKey: QueryKey;
+    pubkey: string;
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    children?: import("svelte").Snippet<
+      [{ events: Nostr.Event[]; status: ReqStatus }]
+    >;
   }
+
+  let {
+    req = undefined,
+
+    queryKey,
+    pubkey,
+    error,
+    loading,
+    nodata,
+    children,
+  }: Props = $props();
+
+  let result = $derived(useReplaceableEventList(queryKey, pubkey, 30000, req));
+  let data = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
+  //$: console.log($data);
+
+  // interface $$Slots {
+  //   default: { events: Nostr.Event[]; status: ReqStatus };
+  //   loading: Record<never, never>;
+  //   error: { error: Error };
+  //   nodata: Record<never, never>;
+  // }
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
+{#if $errorData}
+  {@render error?.($errorData)}
 {:else if $data && $data.length > 0}
-  <slot events={$data.map(({ event }) => event)} status={$status} />
+  {@render children?.({
+    events: $data.map(({ event }) => event),
+    status: $status,
+  })}
+  <!-- <slot events={$data.map(({ event }) => event)} status={$status} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

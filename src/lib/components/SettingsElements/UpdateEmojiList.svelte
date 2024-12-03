@@ -19,13 +19,18 @@
   import type { EventPacket } from "rx-nostr";
 
   import { createRxNostr } from "rx-nostr/src";
-  import { get } from "svelte/store";
+  import { get, writable, type Writable } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
   import { emojiShortcodeRegex, nip33Regex } from "$lib/func/regex";
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+  }
+
+  let { pubkey = $bindable() }: Props = $props();
   // export let emojiList: LumiEmoji | undefined;
-  let dialogOpen: any;
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
   async function handleClickEmoji() {
     const beforeEvent = $emojis?.event;
     let list: string[][] = [];
@@ -72,22 +77,27 @@
       $nowProgress = false;
       return;
     }
-    const event =
+    const kind10030event =
       !beforeEvent ||
       beforeEvent.pubkey !== pk.event.pubkey ||
       pk.event.created_at >= beforeEvent.created_at
         ? pk.event
         : beforeEvent;
-    list = event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
-      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-        return [...acc, [shortcode, url]];
-      } else {
-        return acc;
-      }
-    }, []);
+    list = kind10030event.tags.reduce(
+      (acc: string[][], [tag, shortcode, url]) => {
+        if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+          return [...acc, [shortcode, url]];
+        } else {
+          return acc;
+        }
+      },
+      []
+    );
 
-    const naddrFilters = event.tags.reduce(
-      (acc: Nostr.Filter[], [tag, value]) => {
+    const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
+      kind10030event.tags as string[][]
+    ).reduce(
+      (acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
         console.log(tag, value);
         if (tag === "a") {
           const matches = value.match(nip33Regex);
@@ -97,24 +107,33 @@
               kinds: [Number(matches[1])],
               authors: [matches[2]],
               "#d": [matches[3]],
-              //limit: 1,
+              limit: 1,
             };
 
-            return [...acc, filter];
-          } else {
-            return acc;
+            // フィルタを結果に追加
+            acc.push({ id: value, filter: filter });
           }
-        } else {
-          return acc;
         }
+        return acc;
       },
-      []
+      [] as { id: string; filter: Nostr.Filter }[]
     );
 
-    const chunkedFilters = chunkArray(naddrFilters, 10);
+    console.log(naddrFilters);
+    const chunkedFilters = chunkArray(
+      naddrFilters.map((fil) => fil.filter),
+      20
+    );
     const rxNostr = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
     });
+    // const latestEventsMap = await getNaddrEmojiList(
+    //   rxNostr,
+    //   naddrFilters.map((filter) => filter.filter),
+    //   relays
+    // );//これするとでーたとれない
+    // console.log(latestEventsMap);
+
     // 全てのチャンクを並列で処理する
     const pkListArray = await Promise.all(
       chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
@@ -142,7 +161,19 @@
       });
 
       // 各チャンクの結果を結合する
-      latestEventsMap.forEach((pk) => {
+      const sortedLatestEvents = naddrFilters.map((filter) => {
+        const id = filter.id;
+        const event = latestEventsMap.values().find((pk) => {
+          const kind = pk.event.kind;
+          const pubkey = pk.event.pubkey;
+          const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
+          return `${kind}:${pubkey}:${dTag}` === id;
+        });
+        return event;
+      });
+
+      // 各チャンクの結果を結合する
+      sortedLatestEvents.forEach((pk) => {
         if (pk && pk.event) {
           list = [
             ...list,
@@ -160,11 +191,34 @@
         }
       });
 
-      // console.log(list.length);
+      //   // console.log(list.length);
+      //   $emojis = {
+      //     list: list,
+      //     updated: Math.floor(Date.now() / 1000),
+      //     event: event,
+      //   };
+
+      //   localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+      // }
+
+      // sortedLatestEvents.forEach((pk) => {
+      //   if (pk && pk.event) {
+      //     list = [
+      //       ...list,
+      //       ...pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+      //         if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+      //           return [...acc, [shortcode, url]];
+      //         } else {
+      //           return acc;
+      //         }
+      //       }, []),
+      //     ];
+      //   }
+      // });
       $emojis = {
         list: list,
         updated: Math.floor(Date.now() / 1000),
-        event: event,
+        event: kind10030event,
       };
 
       localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
@@ -183,43 +237,47 @@
 <button
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickEmoji}>Emoji</button
+  onclick={handleClickEmoji}>Emoji</button
 ><time class="ml-2"
   >{$_("settings.lastUpdated")}: {$emojis
     ? formatAbsoluteDate($emojis?.updated)
     : ""}</time
 >{#if $emojis}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    on:click={() => ($dialogOpen = true)}>view data</button
+    onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
-    {#if $emojis}
-      <h2 class="m-0 text-lg font-medium">EmojiList</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
-      >
-        {#each $emojis.list as e, index}
-          <div
-            class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
-          >
-            {#if $showImg}<img
-                loading="lazy"
-                class="h-12 object-contain justify-self-center"
-                src={e[1]}
-                alt={e[0]}
-              />{:else}{e[1]}{/if}
-            <div class="break-keep">{e[0]}</div>
-          </div>
-        {/each}
-      </div>
-    {/if}<a
-      class="underline text-magnum-300 break-all ml-4 text-sm"
-      target="_blank"
-      rel="noopener noreferrer"
-      href="https://nostviewstr.vercel.app/{nip19.npubEncode($loginUser)}/10030"
-      >{$_("settings.nostviewstr.kind10030")}
-    </a>
-  </div>
+  {#snippet main()}
+    <div>
+      {#if $emojis}
+        <h2 class="m-0 text-lg font-medium">EmojiList</h2>
+        <div
+          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
+        >
+          {#each $emojis.list as e, index}
+            <div
+              class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
+            >
+              {#if $showImg}<img
+                  loading="lazy"
+                  class="h-12 object-contain justify-self-center"
+                  src={e[1]}
+                  alt={e[0]}
+                />{:else}{e[1]}{/if}
+              <div class="break-keep">{e[0]}</div>
+            </div>
+          {/each}
+        </div>
+      {/if}<a
+        class="underline text-magnum-300 break-all ml-4 text-sm"
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+          $loginUser
+        )}/10030"
+        >{$_("settings.nostviewstr.kind10030")}
+      </a>
+    </div>
+  {/snippet}
 </Dialog>

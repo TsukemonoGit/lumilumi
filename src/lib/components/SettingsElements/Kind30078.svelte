@@ -1,9 +1,9 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import {
     loginUser,
     nowProgress,
     showBanner,
-    timelineFilter,
     toastSettings,
     uploader,
   } from "$lib/stores/stores";
@@ -26,33 +26,30 @@
   import { datetime } from "$lib/func/util";
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { _ } from "svelte-i18n";
+  import { writable, type Writable } from "svelte/store";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
-  // 設定をアップロード
-  // 設定をダウンロード
-  // //設定ごとにd作ったら消したりしにくくなるから一個にまとめよ
-  // tags:["d","lumi-settings"]
+  interface Props {
+    settingsChanged: () => boolean;
+    saveLumiSettings: () => void;
+    settings: LumiSetting;
+  }
+  let {
+    settingsChanged,
+    saveLumiSettings,
+    settings = $bindable(),
+  }: Props = $props();
+  // export let settingsChanged: () => boolean;
+  // export let saveLumiSettings: () => void;
+  // export let settings: LumiSetting;
 
-  /* 
-  const event = {
-    content:
-      '[{"name":"normal","lumiSetting":{"relays":[],"useRelaySet":"0","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":true,"menuleft":true,"showRelayIcon":true,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":true,"showKind16":true,"addClientTag":true,"showClientTag":true,"showAllReactions":true,"kind42inTL":true},"showBanner":false,"theme":"light","timelineFilter":{"adaptMute":false,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730722071},{"name":"test","lumiSetting":{"relays":[{"url":"wss://nos.lol/","read":true,"write":true}],"useRelaySet":"1","pubkey":"84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5","showPreview":true,"defaultReaction":{"content":"+","tag":[]},"showImg":false,"menuleft":false,"showRelayIcon":false,"showReactioninTL":true,"nostrWalletConnect":"","showUserStatus":false,"showKind16":false,"addClientTag":false,"showClientTag":true,"showAllReactions":false,"kind42inTL":false},"showBanner":false,"theme":"system","timelineFilter":{"adaptMute":true,"selectCanversation":0},"uploader":"https://nostrcheck.me","created_at":1730773127}]',
-    tags: [["d", "lumi-settings"]],
-    kind: 30078,
-    pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
-    created_at: 1730773127,
-    id: "9a13e329f30d4223568e686794c864dab485fdab9ff1d7be20792076bafd3953",
-    sig: "e537869f83f0dddb85c1add7e307116be1428d66cbc101a21cf355ba4b4722db6c511337258899916968da76406594ee0db5ab3ad6dd8d36972732af3fe4c276",
-  }; */
-
-  export let settingsChanged: () => boolean;
-  export let saveLumiSettings: () => void;
-  export let settings: LumiSetting;
-
-  let kind30078LumiSettings: Kind30078LumiSetting[] = [];
+  let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;
 
-  let dialogOpen: any;
-  let alertdialogOpen: any;
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+  // svelte-ignore non_reactive_update
+  let alertdialogOpen: (bool: boolean) => void = () => {};
 
   async function handleClickUpDownload() {
     if (settingsChanged()) {
@@ -72,7 +69,7 @@
       lumiSetting: settings,
       showBanner: $showBanner,
       theme: localStorage.getItem("theme") ?? "system",
-      timelineFilter: $timelineFilter,
+      timelineFilter: timelineFilter.get,
       uploader: $uploader,
     };
 
@@ -89,7 +86,7 @@
   //   event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
   // ) {}
 
-  let saveName: string = "";
+  let saveName: string = $state("");
 
   async function get30078() {
     const relays = await getQueryRelays($loginUser);
@@ -134,11 +131,11 @@
       return;
     }
 
-    $alertdialogOpen = true;
+    alertdialogOpen?.(true);
   };
 
   const handleClickPublish = async () => {
-    $alertdialogOpen = false;
+    alertdialogOpen?.(false);
     const sameIndex = kind30078LumiSettings.findIndex(
       (data) => data.name === saveName
     );
@@ -224,7 +221,7 @@
     }
 
     if (loadData.timelineFilter) {
-      $timelineFilter = loadData.timelineFilter;
+      timelineFilter.set(loadData.timelineFilter);
       localStorage?.setItem(
         "timelineFilter",
         JSON.stringify(loadData.timelineFilter)
@@ -303,16 +300,16 @@
 <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickUpDownload}>{$_("settings.load")}</button
+  onclick={handleClickUpDownload}>{$_("settings.load")}</button
 >
 <!-- <button
   disabled={$nowProgress}
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  on:click={handleClickDownload}>リレーから設定を読み込む</button
+  onclick={handleClickDownload}>リレーから設定を読み込む</button
 > -->
 
 <Dialog bind:open={dialogOpen}>
-  <div slot="main">
+  {#snippet main()}
     <div class="flex gap-1 items-center">
       <input
         type="text"
@@ -322,52 +319,55 @@
         bind:value={saveName}
       /><button
         class="h-8 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickSave}>SAVE</button
+        onclick={handleClickSave}>SAVE</button
       >
     </div>
 
     <div class="rounded-md border border-magnum-600 mt-2">
       <table>
-        <tr>
-          <th>name</th><th>created_at</th><th>load</th><th>delete</th>
-        </tr>
-
-        {#each kind30078LumiSettings as { name, ...value }}
-          <tr
-            ><td>{name}</td>
-            <td
-              ><time datetime={datetime(value.created_at)}
-                >{new Date(value.created_at * 1000).toLocaleString()}</time
-              ></td
-            >
-            <td
-              ><button
-                class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-                on:click={() => handleClickLoad(name)}>LOAD</button
-              ></td
-            >
-            <td
-              ><button
-                class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
-                on:click={() => handleClickDelete(name)}>DELETE</button
-              ></td
-            >
-          </tr>{/each}
+        <thead>
+          <tr>
+            <th>name</th><th>created_at</th><th>load</th><th>delete</th>
+          </tr></thead
+        >
+        <tbody>
+          {#each kind30078LumiSettings as { name, ...value }}
+            <tr
+              ><td>{name}</td>
+              <td
+                ><time datetime={datetime(value.created_at)}
+                  >{new Date(value.created_at * 1000).toLocaleString()}</time
+                ></td
+              >
+              <td
+                ><button
+                  class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                  onclick={() => handleClickLoad(name)}>LOAD</button
+                ></td
+              >
+              <td
+                ><button
+                  class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
+                  onclick={() => handleClickDelete(name)}>DELETE</button
+                ></td
+              >
+            </tr>{/each}
+        </tbody>
       </table>
       {#if kind30078LumiSettings.length <= 0}
         <!---->
         <p class="text-center">no data</p>
       {/if}
     </div>
-  </div>
+  {/snippet}
 </Dialog>
 
 <AlertDialog
-  bind:open={alertdialogOpen}
+  bind:openDialog={alertdialogOpen}
   onClickOK={handleClickPublish}
   title={`SAVE`}
   okButtonName="OK"
-  ><div slot="main">
+  >{#snippet main()}
     {#if kind30078LumiSettings.find((data) => data.name === saveName)}
       <p class="font-bold py-2">name: {saveName}</p>
       <p>
@@ -377,7 +377,7 @@
       <p class="font-bold py-2">name: {saveName}</p>
       <p>{$_("settings.save.new")}</p>
     {/if}
-  </div></AlertDialog
+  {/snippet}</AlertDialog
 >
 
 <style>

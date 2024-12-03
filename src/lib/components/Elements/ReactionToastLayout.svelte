@@ -7,9 +7,12 @@
   import UserName from "../NostrElements/Note/UserName.svelte";
   import { extractKind9734, extractAmount } from "$lib/func/zap";
   import Content from "../NostrElements/Note/Content.svelte";
-  export let event: Nostr.Event;
+  interface Props {
+    event: Nostr.Event;
+  }
 
-  $: handledTag = getHandledTag(event);
+  let { event }: Props = $props();
+
 
   const getHandledTag = (event: Nostr.Event): string[] | undefined => {
     switch (event.kind) {
@@ -26,6 +29,7 @@
         return replyTag;
     }
   };
+  let handledTag = $derived(getHandledTag(event));
 </script>
 
 {#if handledTag}

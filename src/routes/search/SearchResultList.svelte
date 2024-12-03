@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import {
@@ -5,7 +6,6 @@
     loginUser,
     nowProgress,
     queryClient,
-    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -22,8 +22,9 @@
     type RxReqOverable,
     type RxReqPipeable,
     createTie,
+    type LazyFilter,
   } from "rx-nostr";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
@@ -33,25 +34,58 @@
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
+  let untilTime: number = 0;
 
-  export let queryKey: QueryKey;
-  export let filters: Nostr.Filter[];
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  export let viewIndex: number;
-  export let amount: number; //1ページに表示する量
-  export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
-  export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  export let tieKey: string;
+  interface Props {
+    queryKey: QueryKey;
+    filters: Nostr.Filter[];
+    viewIndex: number;
+    amount: number;
+    req: RxReq<"forward"> & RxReqEmittable & RxReqPipeable;
+    relays?: string[];
+    tieKey: string;
+    eventFilter?: (event: Nostr.Event) => boolean;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    children?: import("svelte").Snippet<
+      [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
+    >;
+  }
+  let {
+    queryKey,
+    filters,
+    viewIndex,
+    amount,
+    req,
+    relays = undefined,
+    tieKey,
+    eventFilter = () => true,
+    error,
+    loading,
+    nodata,
+    children,
+  }: Props = $props();
+  // export let queryKey: QueryKey;
+  // export let filters: Nostr.Filter[];
+  // export let req:
+  //   | (RxReq<"backward"> &
+  //       RxReqEmittable<{
+  //         relays: string[];
+  //       }> &
+  //       RxReqOverable &
+  //       RxReqPipeable)
+  //   | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
+  //   | undefined = undefined;
+  // export let viewIndex: number;
+  // export let amount: number; //1ページに表示する量
+  // export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
+  // export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
+  // export let tieKey: string;
   // export let tie: OperatorFunction<
   //   EventPacket,
   //   EventPacket & {
@@ -77,33 +111,60 @@
   const operator = pipe(uniq, userStatus(), reactionCheck(), scanArray());
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
-  const reqFilters = filters.map((filter: Nostr.Filter) => ({
-    ...filter,
-    since: filter.since === undefined ? now() : filter.since,
+  let reqFilters = $derived(
+    filters.map((filter: Nostr.Filter) => ({
+      ...filter,
+      since: filter.since === undefined ? now() : filter.since,
 
-    limit: 50,
-  }));
-  $: result =
+      limit: 50,
+    }))
+  );
+  let result = $derived(
     filters[0].since === undefined
       ? useTimelineEventList(queryKey, reqFilters, operator, req, relays)
       : {
           data: undefined,
           status: readable("loading" as ReqStatus),
           error: undefined,
-        };
-  $: data = result.data;
-  $: status = result.status;
-  $: error = result.error;
+        }
+  );
+  let data = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
   let readUrls: string[] = [];
-  $: if ($defaultRelays) {
+  if ($defaultRelays) {
     readUrls = Object.values($defaultRelays)
       .filter((config) => config.read)
       .map((config) => config.url);
   }
-  $: if (($data && viewIndex >= 0) || !$nowProgress) {
-    updateViewEvent($data);
+  $effect(() => {
+    if (($data && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => dataChange($data, viewIndex, $nowProgress));
+    }
+  });
+
+  function dataChange(
+    data: EventPacket[] | null | undefined,
+    index: number,
+    progress: boolean
+  ) {
+    if ((data && index >= 0) || !progress) {
+      updateViewEvent?.(data);
+    }
   }
-  $: console.log($data);
+  // data?.subscribe((value) => {
+  //   updateViewEvent(value);
+  // });
+
+  // $effect(() => {
+  //   console.log("test");
+  //   updateViewEvent($data);
+  // });
+  // if (($data && viewIndex >= 0) || !$nowProgress) {
+  //   updateViewEvent($data);
+  // }
+  //});
+  //$: console.log($data);
 
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);
@@ -113,14 +174,24 @@
   let isOnMount = false;
 
   const [tie, tieMap] = createTie();
-  $: if (tieKey) {
-    //$tieMapStore = { undefined: undefined };
-    if (!$tieMapStore) {
-      $tieMapStore = { [tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+  // $effect.pre(() => {
+  $effect(() => {
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
+  });
+
+  function setTie(_tieKey: string) {
+    if (_tieKey) {
+      //$tieMapStore = { undefined: undefined };
+      if (!$tieMapStore) {
+        $tieMapStore = { [_tieKey]: [tie, tieMap] };
+      } else if (!$tieMapStore?.[_tieKey]) {
+        $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
+      }
     }
   }
+  //});
 
   onMount(async () => {
     if (!isOnMount) {
@@ -202,13 +273,6 @@
     }
   }
 
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus; len: number };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
-  let untilTime: number;
   const handleNext = async () => {
     // console.log(length, viewIndex, amount, sift);
     if (
@@ -280,7 +344,7 @@
     }
   };
 
-  function updateViewEvent(data: EventPacket[] | undefined) {
+  function updateViewEvent(data: EventPacket[] | undefined | null) {
     const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
       ...queryKey,
       "olderData",
@@ -303,11 +367,9 @@
 
     allUniqueEvents = uniqueEvents.filter(eventFilter);
 
-    slicedEvent.update((value) =>
-      allUniqueEvents.slice(viewIndex, viewIndex + amount)
-    );
+    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
 
-    console.log($slicedEvent);
+    //  console.log($slicedEvent);
   }
 
   function handleClickTop() {
@@ -323,7 +385,7 @@
 {#if viewIndex !== 0}
   <button
     class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
-    on:click={() => handleClickTop()}
+    onclick={() => handleClickTop()}
     disabled={$nowProgress}
     ><SkipForward
       size={20}
@@ -334,7 +396,7 @@
   <button
     disabled={$nowProgress}
     class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
-    on:click={() => handlePrev()}
+    onclick={() => handlePrev()}
     ><Triangle
       size={20}
       class="mx-auto stroke-magnum-200 fill-magnum-200"
@@ -344,21 +406,26 @@
 {#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
-{#if $error}
-  <slot name="error" error={$error} />
-{:else if $slicedEvent && $slicedEvent?.length > 0}
-  <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} />
+{#if $errorData}
+  {@render error?.($errorData)}
+{:else if displayEvents.get && displayEvents.get.length > 0}
+  {@render children?.({
+    events: displayEvents.get,
+    status: $status,
+    len: $data?.length ?? 0,
+  })}
+  <!-- <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}
 
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
-    on:click={() => handleNext()}
+    onclick={() => handleNext()}
     ><Triangle
       size={20}
       class="rotate-180 stroke-magnum-200 fill-magnum-200"

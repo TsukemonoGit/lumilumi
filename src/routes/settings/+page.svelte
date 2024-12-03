@@ -7,6 +7,6 @@
 <Settings />
 <div class="flex justify-center mt-2 mb-32">
   <Link href="https://github.com/TsukemonoGit/lumilumi">
-    <Github size={24} />
+    {#snippet content()}<Github size={24} />{/snippet}
   </Link>
 </div>

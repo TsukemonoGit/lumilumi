@@ -4,124 +4,147 @@
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import EventCard from "./EventCard/EventCard.svelte";
-  import { relayRegex } from "$lib/func/regex";
+
   import NaddrByRelayhint from "./NaddrByRelayhint.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
 
-  export let data: nip19.AddressPointer;
-  export let content: string | undefined;
-  export let depth: number;
-  export let displayMenu: boolean;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
-  export let mini: boolean = false;
-  export let thread: boolean = false;
-  $: queryKey = [
+  interface Props {
+    data: nip19.AddressPointer;
+    content: string | undefined;
+    depth: number;
+    displayMenu: boolean;
+    repostable: boolean;
+    tieKey: string | undefined;
+    mini?: boolean;
+    thread?: boolean;
+  }
+
+  let {
+    data,
+    content,
+    depth,
+    displayMenu,
+    repostable,
+    tieKey,
+    mini = false,
+    thread = false,
+  }: Props = $props();
+  let queryKey = $derived([
     "naddr",
     `${data.kind}:${data.pubkey}:${data.identifier}`,
-  ] as QueryKey;
+  ] as QueryKey);
 </script>
 
-<LatestEvent
-  {queryKey}
-  filters={[
-    data.identifier !== ""
-      ? {
-          kinds: [data.kind],
-          authors: [data.pubkey],
-          "#d": [data.identifier],
-        }
-      : {
-          kinds: [data.kind],
-          authors: [data.pubkey],
-        },
-  ]}
-  let:event
->
-  <div
-    slot="loading"
-    class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
+{#if queryKey}
+  <LatestEvent
+    {queryKey}
+    filters={[
+      data.identifier !== ""
+        ? {
+            kinds: [data.kind],
+            authors: [data.pubkey],
+            "#d": [data.identifier],
+          }
+        : {
+            kinds: [data.kind],
+            authors: [data.pubkey],
+          },
+    ]}
   >
-    <div>Loading {content ?? ""}</div>
-    {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
-  </div>
-  <div slot="nodata">
-    {@const relayhint = data.relays}
-    {#if relayhint && relayhint.length > 0}
-      <NaddrByRelayhint
-        {data}
-        {content}
-        {mini}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-        {relayhint}
-      />
-    {:else}
+    {#snippet loading()}
+      <div
+        class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
+      >
+        <div>Loading {content ?? ""}</div>
+        {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
+      </div>
+    {/snippet}
+    {#snippet nodata()}
+      <div>
+        {#if data.relays && data.relays.length > 0}
+          <NaddrByRelayhint
+            {data}
+            {content}
+            {mini}
+            {displayMenu}
+            {depth}
+            {repostable}
+            {tieKey}
+            relayhint={data.relays}
+          />
+        {:else}
+          <div
+            class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+          >
+            Nodata {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
+                naddr={content?.slice(6)}
+              />{/if}
+          </div>{/if}
+      </div>
+    {/snippet}
+    {#snippet error()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        Nodata {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
+        {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
             naddr={content?.slice(6)}
           />{/if}
-      </div>{/if}
-  </div>
-  <div
-    slot="error"
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-  >
-    {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
-        naddr={content?.slice(6)}
-      />{/if}
-  </div>
-  <Metadata
-    queryKey={["metadata", event.pubkey]}
-    pubkey={event.pubkey}
-    let:metadata
-  >
-    <div slot="loading">
-      <EventCard
-        note={event}
-        {displayMenu}
-        {repostable}
-        {tieKey}
-        {depth}
-        {mini}
-        {thread}
-      />
-    </div>
-    <div slot="nodata">
-      <EventCard
-        note={event}
-        {displayMenu}
-        {repostable}
-        {tieKey}
-        {depth}
-        {mini}
-        {thread}
-      />
-    </div>
-    <div slot="error">
-      <EventCard
-        note={event}
-        {displayMenu}
-        {repostable}
-        {tieKey}
-        {depth}
-        {mini}
-        {thread}
-      />
-    </div>
-    <EventCard
-      {metadata}
-      {displayMenu}
-      note={event}
-      {repostable}
-      {tieKey}
-      {depth}
-      {mini}
-      {thread}
-    /></Metadata
-  >
-</LatestEvent>
+      </div>
+    {/snippet}
+    {#snippet children({ event })}
+      <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+        {#snippet loading()}
+          <div>
+            <EventCard
+              note={event}
+              {displayMenu}
+              {repostable}
+              {tieKey}
+              {depth}
+              {mini}
+              {thread}
+            />
+          </div>
+        {/snippet}
+        {#snippet nodata()}
+          <div>
+            <EventCard
+              note={event}
+              {displayMenu}
+              {repostable}
+              {tieKey}
+              {depth}
+              {mini}
+              {thread}
+            />
+          </div>
+        {/snippet}
+        {#snippet error()}
+          <div>
+            <EventCard
+              note={event}
+              {displayMenu}
+              {repostable}
+              {tieKey}
+              {depth}
+              {mini}
+              {thread}
+            />
+          </div>
+        {/snippet}
+        {#snippet content({ metadata })}
+          <EventCard
+            {metadata}
+            {displayMenu}
+            note={event}
+            {repostable}
+            {tieKey}
+            {depth}
+            {mini}
+            {thread}
+          />
+        {/snippet}
+      </Metadata>
+    {/snippet}
+  </LatestEvent>
+{/if}

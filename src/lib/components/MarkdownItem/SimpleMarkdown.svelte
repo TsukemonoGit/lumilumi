@@ -14,18 +14,30 @@
   import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
 
-  export let text: string;
-  export let tags: string[][];
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let nolist: boolean = false;
-  export let tieKey: string | undefined;
+  interface Props {
+    text: string;
+    tags: string[][];
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    nolist?: boolean;
+    tieKey: string | undefined;
+  }
+
+  let {
+    text,
+    tags,
+    displayMenu,
+    depth,
+    repostable,
+    nolist = false,
+    tieKey
+  }: Props = $props();
 
   const md = markdownit();
 
   //プレビューにも使ってるからconstだとだめ
-  $: tokens = md
+  let tokens = $derived(md
 
     .use(markdownImgPlugin)
 
@@ -38,8 +50,8 @@
     .use(markdownDlPlugin)
     .use(markdownDdPlugin)
     .use(markdownDtPlugin)
-    .parse(text, {});
-  $: parts = transformTokens(tokens);
+    .parse(text, {}));
+  let parts = $derived(transformTokens(tokens));
 
   //let modalIndex = 0;
   const openModal = (index: number) => {

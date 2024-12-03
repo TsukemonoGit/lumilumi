@@ -17,6 +17,7 @@ import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
 import { app } from "./stores";
 import { useReq } from "$lib/func/useReq";
+import type { ReqResult } from "$lib/types";
 
 //今設定されてるdefaultRelayConfigのreadだけ30002で上書きする
 export function useGlobalRelaySet(
@@ -30,7 +31,7 @@ export function useGlobalRelaySet(
         RxReqOverable &
         RxReqPipeable)
     | undefined
-): any {
+): ReqResult<string[]> {
   if (Object.entries(get(app).rxNostr.getDefaultRelays()).length <= 0) {
     setRelays(relaySearchRelays);
   }
@@ -48,8 +49,8 @@ export function useGlobalRelaySet(
   };
 }
 function toGlobalRelaySet(
-  value: EventPacket | EventPacket[] | undefined
-): DefaultRelayConfig[] {
+  value: EventPacket | EventPacket[] | undefined | null
+): string[] {
   console.log(value);
 
   if (!value) {

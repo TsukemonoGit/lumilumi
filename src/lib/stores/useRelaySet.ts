@@ -10,14 +10,14 @@ import {
   type RxReqOverable,
   type RxReqPipeable,
 } from "rx-nostr";
-import type { ReqResult } from "$lib/types.js";
+import type { ReqResult, ReqStatus } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
-import { derived, get } from "svelte/store";
+import { derived, get, readable } from "svelte/store";
 import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app } from "./stores";
+import { app, queryClient } from "./stores";
 import { scanArray } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
@@ -33,9 +33,11 @@ export function useRelaySet(
         RxReqPipeable)
     | undefined
 ): ReqResult<DefaultRelayConfig[]> | undefined {
+  console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
 
   const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
+  console.log(queryKey, filters, operator, req);
   const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
     staleTime: Infinity,
     gcTime: Infinity,
@@ -55,9 +57,9 @@ let kind10002: Nostr.Event;
 let kind3: Nostr.Event;
 let relay: DefaultRelayConfig[] = [];
 export function toRelaySet(
-  value: EventPacket | EventPacket[] | undefined
+  value: EventPacket | EventPacket[] | undefined | null
 ): DefaultRelayConfig[] {
-  console.log(value);
+  // console.log(value);
   if (!value) {
     return [];
   } else if (Array.isArray(value)) {

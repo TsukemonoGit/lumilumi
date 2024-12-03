@@ -5,14 +5,15 @@
   import { X } from "lucide-svelte";
 
   import QRCode from "qrcode";
-  import { onDestroy } from "svelte";
+  import { onDestroy, untrack } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
 
-  export let invoice: string | undefined;
-  export let id: string | undefined;
-
-  $: url = invoice ? `lightning:${invoice}` : undefined;
+  interface Props {
+    invoice: string | undefined;
+    id: string | undefined;
+    openZapwindow: (bool: boolean) => void;
+  }
 
   const {
     elements: {
@@ -28,11 +29,18 @@
   } = createDialog({
     forceVisible: true,
   });
+  let { invoice, id, openZapwindow = $bindable() }: Props = $props();
 
-  export { open };
+  openZapwindow = (bool: boolean) => {
+    $open = bool;
+  };
 
-  let zapped: { data: EventPacket; status: any; error: any };
-  let unsubscribe: (() => void) | undefined; // Start as undefined
+  let url = $derived(invoice ? `lightning:${invoice}` : undefined);
+
+  let zapped: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
+
+  let unsubscribe: (() => void) | undefined = undefined; // Start as undefined
 
   const observer:
     | QueryObserver<unknown, Error, unknown, unknown, string[]>
@@ -42,25 +50,22 @@
       })
     : undefined;
 
-  $: if (observer && !$open && unsubscribe) {
-    unsubscribe(); // Call the unsubscribe function if it exists
-    unsubscribe = undefined; // Reset unsubscribe after calling
-  } else if (observer && $open && !zapped) {
-    unsubscribe = observer.subscribe((result: any) => {
-      if (result?.data?.event) {
-        zapped = result;
-        console.log(zapped);
-        unsubscribe?.(); // Unsubscribe after receiving data
-      }
-    });
-  } else if ($open && zapped) {
-    $toastSettings = {
-      title: "Zapped",
-      description: "Success to zap",
-      color: "bg-green-500",
-    };
-    $open = false;
-  }
+  //ザップ完了したら画面を閉じる（$open=falseにするためのやつ
+  //idでしかみてないからユーザーへのザップの場合は閉じない
+  open.subscribe((openState) => {
+    if (openState && !zapped) {
+      //ザップ一回したら押せなくなるけど
+      unsubscribe = observer?.subscribe((value: any) => {
+        if (value?.data?.event) {
+          zapped = value;
+          console.log(zapped);
+          unsubscribe?.();
+        }
+      });
+    } else {
+      unsubscribe?.();
+    }
+  });
 
   onDestroy(() => {
     unsubscribe?.(); // Ensure unsubscribe is only called if it exists
@@ -73,7 +78,7 @@
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-    />
+    ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
             max-w-[450px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-800
@@ -101,7 +106,7 @@
             {/await}
           </div>
           <div class="break-all">{invoice}</div>
-          <iframe src={url} title="Lightning" width="0" height="0" />
+          <iframe src={url} title="Lightning" width="0" height="0"></iframe>
         </fieldset>
       {/if}
       <div class="mt-6 flex justify-end gap-4">

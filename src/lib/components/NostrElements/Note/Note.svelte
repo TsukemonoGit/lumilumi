@@ -7,105 +7,128 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
-  export let id: string;
-  export let mini: boolean = false;
-  export let maxHeight: string = "24rem";
-  export let displayMenu: boolean;
-  export let thread: boolean = false;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
-  export let relayhint: string[] | undefined = undefined;
-  $: loadingText = encodetoNote(id);
+  interface Props {
+    id: string;
+    mini?: boolean;
+    maxHeight?: string;
+    displayMenu: boolean;
+    thread?: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+    relayhint?: string[] | undefined;
+  }
+
+  let {
+    id,
+    mini = false,
+    maxHeight = "24rem",
+    displayMenu,
+    thread = false,
+    depth,
+    repostable,
+    tieKey,
+    relayhint = undefined,
+  }: Props = $props();
+  let loadingText = $derived(encodetoNote(id));
 </script>
 
-<Text queryKey={["timeline", id]} {id} let:text let:status>
-  <div
-    slot="loading"
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-  >
-    Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
-        notestr={loadingText}
-      />{/if}
-  </div>
-  <div slot="nodata">
-    {#if relayhint && relayhint.length > 0}
-      <NoteByRelayhint
-        {id}
-        {mini}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-        {relayhint}
-      />
-    {:else}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-      >
-        nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
-            notestr={loadingText}
-          />{/if}
-      </div>
-    {/if}
-  </div>
-  <div
-    slot="error"
-    let:error
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-  >
-    {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
-        notestr={nip19.noteEncode(id)}
-      />{/if}
-  </div>
-  <Metadata
-    queryKey={["metadata", text.pubkey]}
-    pubkey={text.pubkey}
-    let:metadata
-  >
-    <div slot="loading">
-      <EventCard
-        note={text}
-        {mini}
-        {maxHeight}
-        {thread}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
+<Text queryKey={["timeline", id]} {id}>
+  {#snippet loading()}
+    <div
+      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    >
+      Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
+          notestr={loadingText}
+        />{/if}
     </div>
-    <div slot="nodata">
-      <EventCard
-        note={text}
-        {mini}
-        {maxHeight}
-        {thread}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
+  {/snippet}
+  {#snippet nodata()}
+    <div>
+      {#if relayhint && relayhint.length > 0}
+        <NoteByRelayhint
+          {id}
+          {mini}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+          {relayhint}
+        />
+      {:else}
+        <div
+          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+        >
+          nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
+              notestr={loadingText}
+            />{/if}
+        </div>
+      {/if}
     </div>
-    <div slot="error" let:error>
-      <EventCard
-        note={text}
-        {mini}
-        {maxHeight}
-        {thread}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
+  {/snippet}
+  {#snippet error()}
+    <div
+      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    >
+      {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
+          notestr={nip19.noteEncode(id)}
+        />{/if}
     </div>
-    <EventCard
-      note={text}
-      {metadata}
-      {mini}
-      {maxHeight}
-      {thread}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    />
-  </Metadata>
+  {/snippet}
+  {#snippet content({ data: text, status })}
+    <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
+      {#snippet loading()}
+        <div>
+          <EventCard
+            note={text}
+            {mini}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {tieKey}
+          />
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>
+          <EventCard
+            note={text}
+            {mini}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {tieKey}
+          />
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div>
+          <EventCard
+            note={text}
+            {mini}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {tieKey}
+          />
+        </div>
+      {/snippet}
+      {#snippet content({ metadata })}
+        <EventCard
+          note={text}
+          {metadata}
+          {mini}
+          {maxHeight}
+          {thread}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+        />
+      {/snippet}
+    </Metadata>
+  {/snippet}
 </Text>

@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import {
     app,
@@ -10,7 +11,6 @@
     showPreview,
     showRelayIcon,
     defaultReaction,
-    nostrWalletConnect,
     showReactioninTL,
     defaultRelays,
     queryClient,
@@ -21,7 +21,6 @@
     addClientTag,
     showClientTag,
     showAllReactions,
-    timelineFilter,
     kind42inTL,
   } from "$lib/stores/stores";
 
@@ -44,14 +43,28 @@
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
-  let localRelays: DefaultRelayConfig[] = [];
-  let pubkey: string = "";
-  let loading = true; // ローディング状態を追跡する変数を追加
+
+  let {
+    contents,
+    loading,
+  }: {
+    loading: import("svelte").Snippet;
+    contents: import("svelte").Snippet<
+      [{ pubkey: string; localRelays: DefaultRelayConfig[] }]
+    >;
+  } = $props();
+
+  let localRelays: DefaultRelayConfig[] = $state.raw([]);
+  // svelte-ignore non_reactive_update
+  let pubkey: string = $state("");
+
+  let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
   onMount(async () => {
     console.log($defaultRelays);
@@ -65,7 +78,7 @@
     const timeline = localStorage.getItem("timelineFilter");
     if (timeline) {
       try {
-        $timelineFilter = JSON.parse(timeline);
+        timelineFilter.set(JSON.parse(timeline));
       } catch (error) {
         console.log("timelineFilter parse error");
       }
@@ -88,7 +101,7 @@
       }
     }
 
-    loading = false; // 初期化処理が完了したらローディングを終了
+    nowLoading = false; // 初期化処理が完了したらローディングを終了
     console.log($defaultRelays);
   });
 
@@ -151,7 +164,7 @@
       ? savedDefaultReaction
       : { content: "+", tag: [] };
     $showReactioninTL = savedReactionTL ?? true;
-    $nostrWalletConnect = savedNostrWalletConnect ?? "";
+    //$nostrWalletConnect = savedNostrWalletConnect ?? "";
     $showUserStatus = savedShowUserStatus ?? false;
 
     // if (!$showImg) {
@@ -205,8 +218,9 @@
   }
 </script>
 
-{#if loading}
-  <slot name="loading" />
+{#if nowLoading}
+  {@render loading()}
 {:else}
-  <slot {pubkey} {localRelays}></slot>
+  {@render contents({ pubkey, localRelays })}
+  <!-- <slot {pubkey} {localRelays}></slot> -->
 {/if}

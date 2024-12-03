@@ -3,10 +3,14 @@
   import { showImg } from "$lib/stores/stores";
   import Avatar from "svelte-boring-avatars";
 
-  export let contents: Ogp;
-  export let url: string;
+  interface Props {
+    contents: Ogp;
+    url: string;
+  }
 
-  let imageURL = contents.image;
+  let { contents, url }: Props = $props();
+
+  let imageURL = $state(contents.image);
 </script>
 
 <!--bg-magnum-200 text-magnum-800  text-magnum-700 drop-shadow-md-->
@@ -32,7 +36,7 @@
           class="object-contain max-h-[8rem] max-w-full overflow-hidden"
           src={imageURL}
           alt=""
-          on:error={() => (imageURL = "")}
+          onerror={() => (imageURL = "")}
         />
       </figure>
 

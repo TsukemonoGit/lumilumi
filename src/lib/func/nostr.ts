@@ -1,12 +1,10 @@
 import {
   app,
   defaultRelays,
-  followList,
   kind42inTL,
   loginUser,
   metadataQueue,
   queryClient,
-  relayStateMap,
   showImg,
   showKind16,
   showReactioninTL,
@@ -40,6 +38,8 @@ import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
+import { followList, relayStateMap } from "$lib/stores/globalRunes.svelte";
+import { SvelteMap } from "svelte/reactivity";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -57,13 +57,18 @@ export function setRxNostr() {
 
   rxNostr.createConnectionStateObservable().subscribe((packet) => {
     //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-    relayStateMap.update((value) => value.set(packet.from, packet.state));
+    relayStateMap.update((value) => {
+      return value.set(packet.from, packet.state);
+    });
   });
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  rxNostr.setDefaultRelays(relays);
-  defaultRelays.set(rxNostr.getDefaultRelays());
+  console.log(relays);
+  if (rxNostr && defaultRelays) {
+    rxNostr.setDefaultRelays(relays);
+    defaultRelays.set(rxNostr.getDefaultRelays());
+  }
   set3Relays(relays);
 }
 export function getDefaultWriteRelays(): string[] {
@@ -75,7 +80,7 @@ export function getDefaultWriteRelays(): string[] {
 
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
-  if (get(followList).size > 0) {
+  if (followList.get.size > 0) {
     // まず、現在のローカルストレージのデータを取得
     const metadataStr = localStorage.getItem("metadata");
     let currentMetadata: [QueryKey, EventPacket][] = metadataStr
@@ -108,9 +113,9 @@ metadataQueue.subscribe((queue) => {
 export function pubkeysIn(
   contacts: Nostr.Event,
   pubkey: string | undefined = undefined
-): Map<string, string | undefined> {
-  const followingMap: Map<string, string | undefined> = contacts.tags.reduce(
-    (acc, [tag, value, relay, petname]) => {
+): SvelteMap<string, string | undefined> {
+  const followingMap: SvelteMap<string, string | undefined> =
+    contacts.tags.reduce((acc, [tag, value, relay, petname]) => {
       // "p" タグのチェック
       //ちゃんとvalueがpubhexかかくにんしないといけない
       if (tag === "p" && !acc.has(value) && hexRegex.test(value)) {
@@ -118,9 +123,7 @@ export function pubkeysIn(
         acc.set(value, petname || undefined);
       }
       return acc;
-    },
-    new Map<string, string | undefined>()
-  );
+    }, new SvelteMap<string, string | undefined>());
 
   // 指定された pubkey が Map に存在しない場合、追加
   if (pubkey && !followingMap.has(pubkey)) {
@@ -130,8 +133,11 @@ export function pubkeysIn(
   setFollowingList(followingMap);
   return followingMap;
 }
-export function setFollowingList(data: Map<string, string | undefined>) {
-  followList.set(data);
+export function setFollowingList(data: SvelteMap<string, string | undefined>) {
+  // console.log(followList.get, data);
+  if (followList.get) {
+    followList.set(data);
+  }
   // console.log(followingList);
 }
 
@@ -145,7 +151,7 @@ const saveMetadataToLocalStorage = (
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
-  if (get(followList).has(data.event.pubkey)) {
+  if (followList.get.has(data.event.pubkey)) {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
@@ -199,7 +205,7 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
   const result = metadata.find(
     ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
   );
-
+  //console.log(result);
   return result ? result[1] : undefined;
 };
 
@@ -218,6 +224,7 @@ export const makeMainFilters = (
   since: number
 ): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
+
   const pubkeyList = pubkeysIn(contacts, get(loginUser));
   const kinds = [1, 6];
   if (get(showKind16)) {
@@ -265,7 +272,7 @@ export const makeMainFilters = (
       authors: Array.from(pubkeyList.keys()),
     });
   }
-  // console.log(filters);
+  console.log(filters);
 
   return { mainFilters: filters, olderFilters: olderFilters };
 };
@@ -554,7 +561,7 @@ export function getMetadataList(
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
-      const petname = get(followList).get(packet.event.pubkey);
+      const petname = followList.get.get(packet.event.pubkey);
       // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,

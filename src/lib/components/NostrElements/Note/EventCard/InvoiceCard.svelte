@@ -1,14 +1,17 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { nowProgress } from "$lib/stores/stores";
   import { decode, type DecodedInvoice } from "light-bolt11-decoder";
   import { Zap } from "lucide-svelte";
+  import { writable, type Writable } from "svelte/store";
 
-  export let invoice: string;
-  let invoiceOpen: any;
+  interface Props {
+    invoice: string;
+  }
 
-  $: decoded = invoiceDecode(invoice);
+  let { invoice = $bindable() }: Props = $props();
+  // svelte-ignore non_reactive_update
+  let invoiceOpen: (bool: boolean) => void = () => {};
 
   const invoiceDecode = (
     str: string | undefined
@@ -25,9 +28,10 @@
   };
   const handleClickPay = () => {
     console.log("pay");
-    $invoiceOpen = true;
+    invoiceOpen?.(true);
   };
-  $: amount = 1;
+  let decoded = $derived(invoiceDecode(invoice));
+  let amount = $derived(1);
   // decoded?.sections
   //   ? Math.floor(
   //       Number(
@@ -57,11 +61,11 @@
         sats
       </div>
       <button
-        on:click={handleClickPay}
+        onclick={handleClickPay}
         disabled={$nowProgress}
         class="rounded-md p-2 m-1 w-16 bg-magnum-600 border border-magnum-600 text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-15 font-bold"
         >Pay</button
       >
     </div>
   </div>{/if}
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={undefined} />
+<ZapInvoiceWindow bind:openZapwindow={invoiceOpen} {invoice} id={undefined} />

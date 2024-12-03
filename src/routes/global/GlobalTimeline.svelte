@@ -11,11 +11,15 @@
   import { onMount } from "svelte";
 
   let isOnMount = false;
-  export let timelineQuery: QueryKey;
   let amount = 50;
   let viewIndex = 0;
-  export let tieKey = "global";
-  export let globalRelays;
+  interface Props {
+    timelineQuery: QueryKey;
+    tieKey?: string;
+    globalRelays: any;
+  }
+
+  let { timelineQuery, tieKey = "global", globalRelays }: Props = $props();
 
   onMount(async () => {
     if (!isOnMount) {
@@ -34,7 +38,7 @@
     }
   });
 
-  let since: number | undefined = undefined;
+  let since: number | undefined = $state(undefined);
   async function init() {
     since = undefined;
 
@@ -68,51 +72,60 @@
       },
     ]}
     req={createRxForwardReq()}
-    let:events
     {viewIndex}
     {amount}
-    let:len
     {tieKey}
     relays={globalRelays}
   >
-    <!-- <SetRepoReactions /> -->
-    <div slot="loading">
-      <p>Loading...</p>
-    </div>
-
-    <div slot="error" let:error>
-      <p>{error}</p>
-    </div>
-
-    <div
-      class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-    >
-      {#if events && events.length > 0}
-        {#each events as event, index (event.id)}
-          <!-- <div
+    {#snippet content({ events, len })}
+      <!-- <SetRepoReactions /> -->
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+      >
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <!-- <div
         class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
         events.length - 1
           ? 'last-visible'
           : ''} {index === 0 ? 'first-visible' : ''}"
       > -->
-          <Metadata
-            queryKey={["metadata", event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <div slot="loading" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <div slot="nodata" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <div slot="error" class="w-full">
-              <EventCard note={event} {tieKey} />
-            </div>
-            <EventCard {metadata} note={event} {tieKey} /></Metadata
-          >
-          <!-- </div> -->
-        {/each}{/if}
-    </div>
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet loading()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet error()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard {metadata} note={event} {tieKey} />
+              {/snippet}
+            </Metadata>
+            <!-- </div> -->
+          {/each}{/if}
+      </div>{/snippet}
+    {#snippet loading()}
+      <div>
+        <p>Loading...</p>
+      </div>
+    {/snippet}
+
+    {#snippet error()}
+      <div>
+        <p>{error}</p>
+      </div>
+    {/snippet}
   </TimelineList>
 {/if}

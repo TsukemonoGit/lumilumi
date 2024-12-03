@@ -7,7 +7,6 @@
     queryClient,
     showImg,
     toastSettings,
-    viewEventIds,
   } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
@@ -20,6 +19,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
+  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   const handleClickShare = async () => {
     //share link
@@ -33,11 +33,11 @@
       // await navigator.clipboard.writeText(
       //   `${$page.url.origin}/channel/${nevent}`
       // );
-      $toastSettings = {
-        title: "Success",
-        description: `shared successfully`,
-        color: "bg-green-500",
-      };
+      // $toastSettings = {
+      //   title: "Success",
+      //   description: `shared successfully`,
+      //   color: "bg-green-500",
+      // };
     } catch (error: any) {
       console.error(error.message);
       $toastSettings = {
@@ -47,22 +47,22 @@
       };
     }
   };
-  let loadImage: boolean = false;
+  let loadImage: boolean = $state(false);
 
-  let dialogOpen: any;
-  let zapAmount: number;
-  let zapComment: string;
-  let invoice: string | undefined = undefined;
-  let invoiceOpen: any;
+  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let zapAmount: number = $state(0);
+  let zapComment: string = $state("");
+  let invoice: string | undefined = $state(undefined);
+  let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
   });
-  let unsubscribe: () => void;
+  let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {
     invoice = undefined;
     if (zapAmount <= 0) {
       //toast dasite
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
     $nowProgress = true;
@@ -94,8 +94,8 @@
         console.error("[zap failed]", payment);
         throw Error;
       }
-      $dialogOpen = false;
-      $invoiceOpen = true;
+      dialogOpen?.(false);
+      invoiceOpen?.(true);
       invoice = zapInvoice;
       $nowProgress = false;
 
@@ -104,14 +104,15 @@
       unsubscribe = observer2.subscribe((result: any) => {
         console.log(result);
         if (result?.data?.event && result.data.event.created_at >= date) {
-          $invoiceOpen = false;
+          invoiceOpen?.(false);
           unsubscribe?.();
+
           //購読対象から削除
-          const index = $viewEventIds.findIndex(
+          const index = viewEventIds.get.findIndex(
             (item) => item[0] === "e" && item[1] === monoZap.noteId
           );
           if (index !== -1) {
-            $viewEventIds.splice(index, 1);
+            viewEventIds.get.splice(index, 1);
           }
           $toastSettings = {
             title: "Success",
@@ -121,8 +122,8 @@
         }
       });
       //購読対象に追加
-      $viewEventIds.push(["e", monoZap.noteId]);
-      $viewEventIds = $viewEventIds;
+      viewEventIds.get.push(["e", monoZap.noteId]);
+      // viewEventIds.get = viewEventIds.get;
     } catch (error) {
       $toastSettings = {
         title: "Error",
@@ -132,9 +133,6 @@
       $nowProgress = false;
       //toast
     }
-  }
-  $: if (!$invoiceOpen) {
-    unsubscribe?.();
   }
 </script>
 
@@ -149,7 +147,9 @@
           href="https://github.com/TsukemonoGit/lumilumi"
           className="flex gap-1 items-center underline"
         >
-          TsukemonoGit/lumilumi<Github size={24} />
+          {#snippet content()}TsukemonoGit/lumilumi<Github
+              size={24}
+            />{/snippet}
         </Link>
       </div>
     </li>
@@ -160,7 +160,7 @@
           href="https://lumilumi.vercel.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           className="flex gap-1 items-center underline"
         >
-          @mono
+          {#snippet content()}@mono{/snippet}
         </Link>
       </div>
     </li>
@@ -207,7 +207,7 @@
           {:else}
             <button
               class="my-2 flex items-center w-fit px-2 py-1 max-w-full rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
-              on:click={() => (loadImage = true)}>load images</button
+              onclick={() => (loadImage = true)}>load images</button
             >
           {/if}
         </div>
@@ -221,8 +221,9 @@
             <Link
               href="https://tsukemonogit.github.io/luminostr/"
               className="flex gap-1 items-center underline"
-            >
-              <BriefcaseMedical />Luminostr
+              >{#snippet content()}
+                <BriefcaseMedical />Luminostr
+              {/snippet}
             </Link>
             <span class="text-sm">{$_("about.luminostr")}</span>
           </div>
@@ -233,7 +234,7 @@
               href="https://github.com/TsukemonoGit/lumilumi/issues/new/choose"
               className="flex gap-1 items-center underline"
             >
-              {$_("about.houkoku")}
+              {#snippet content()}{$_("about.houkoku")}{/snippet}
             </Link>
           </div>
         </li>
@@ -244,7 +245,7 @@
               data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
               data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
               data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
-              on:click={() => ($dialogOpen = true)}
+              onclick={() => dialogOpen?.(true)}
             >
               Zap⚡️@mono
             </button>
@@ -253,7 +254,7 @@
         <li>
           <div class="item">
             <button
-              on:click={handleClickShare}
+              onclick={handleClickShare}
               class="flex gap-1 items-center underline"
               >{$_("about.share")}<Share size="20" class="text-magnum-500 " /> Lumilumi</button
             >
@@ -273,32 +274,38 @@
 </section>
 
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={() => onClickZap()}
   title="Zap to mono"
 >
-  <div slot="main" class=" text-neutral-200">
-    <div class="mt-4 rounded-md">
-      <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
-      <input
-        type="number"
-        id="amount"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-        placeholder="amount"
-        bind:value={zapAmount}
-      />
-      <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
-      <input
-        type="text"
-        id="comment"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-        placeholder="comment"
-        bind:value={zapComment}
-      />
+  {#snippet main()}
+    <div class=" text-neutral-200">
+      <div class="mt-4 rounded-md">
+        <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+        <input
+          type="number"
+          id="amount"
+          class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+          placeholder="amount"
+          bind:value={zapAmount}
+        />
+        <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
+        <input
+          type="text"
+          id="comment"
+          class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+          placeholder="comment"
+          bind:value={zapComment}
+        />
+      </div>
     </div>
-  </div></AlertDialog
+  {/snippet}</AlertDialog
 >
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={monoZap.noteId} />
+<ZapInvoiceWindow
+  bind:openZapwindow={invoiceOpen}
+  {invoice}
+  id={monoZap.noteId}
+/>
 
 <style lang="postcss">
   li {

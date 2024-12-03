@@ -7,18 +7,24 @@
   import DecodedContent from "$lib/components/NostrElements/Note/DecodedContent.svelte";
   import ContentImage from "$lib/components/NostrElements/Note/content/ContentImage.svelte";
 
-  export let text: string;
-  export let tags: string[][];
-  export let displayMenu: boolean;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    text: string;
+    tags: string[][];
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
+
+  let { text, tags, displayMenu, depth, repostable, tieKey }: Props = $props();
   //プレビューにも使ってるからconstだとだめ
-  $: parts = parseText(text, tags);
+  let parts = $derived(parseText(text, tags));
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  $: mediaList = parts.filter(
-    (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+  let mediaList = $derived(
+    parts.filter(
+      (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+    )
   );
 
   //let modalIndex = 0;
@@ -64,8 +70,8 @@
       return undefined;
     }
   };
-  let imgError: boolean = false;
-  let imgLoad: boolean = false;
+  let imgError: boolean = $state(false);
+  let imgLoad: boolean = $state(false);
 </script>
 
 <!-- <MediaDisplay
@@ -100,7 +106,8 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "audio"}
     {#if $showImg}
       <audio
@@ -113,12 +120,14 @@
     {:else}<Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}>{part.content}</Link
+        href={part.content ?? ""}
+        >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
   {:else if part.type === "url"}<Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80 "
-      href={part.content ?? ""}>{part.content}</Link
+      href={part.content ?? ""}
+      >{#snippet content()}{part.content}{/snippet}</Link
     >{:else if part.type === "emoji"}{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
@@ -126,8 +135,8 @@
         src={part.url}
         title={`:${part.content}:`}
         class="inline h-[24px] object-contain m-0 overflow-hidden"
-        on:load={() => (imgLoad = true)}
-        on:error={() => (imgError = true)}
+        onload={() => (imgLoad = true)}
+        onerror={() => (imgError = true)}
       />{:else}:{part.content}:{/if}{:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
@@ -144,7 +153,7 @@
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</Link
+      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
     >{:else}<span
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span

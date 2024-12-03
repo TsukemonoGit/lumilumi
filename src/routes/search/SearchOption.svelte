@@ -1,30 +1,59 @@
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
-  import { followList, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, ChevronsUpDown, Share } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
-  import type { Writable } from "svelte/store";
+
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
   import { eventKinds } from "$lib/func/kinds";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
+  import { followList } from "$lib/stores/globalRunes.svelte";
+  interface Props {
+    searchWord: string | undefined;
+    followee: boolean;
+    createFilter: () => void;
+    searchKind: number | undefined;
+    searchPubkey: string | undefined;
+    searchPubkeyTo: string | undefined;
+    searchHashtag: string | undefined;
+    searchSince: number | undefined;
+    searchUntil: number | undefined;
+    resetValue: () => void;
+    filters: Nostr.Filter[];
+    handleClickSearch: () => void;
+  }
 
-  export let searchWord: string | undefined;
-  export let followee: boolean;
-  export let createFilter;
-  export let searchKind: number | undefined = undefined;
-  export let searchPubkey: string | undefined;
-  export let searchPubkeyTo: string | undefined;
-  export let searchHashtag: string | undefined;
-  export let searchSince: number | undefined;
-  export let searchUntil: number | undefined;
-  export let resetValue;
-  export let filters: Writable<Nostr.Filter[]>;
-  export let handleClickSearch;
+  let {
+    searchWord = $bindable(),
+    followee = $bindable(),
+    createFilter,
+    searchKind = $bindable(undefined),
+    searchPubkey = $bindable(),
+    searchPubkeyTo = $bindable(),
+    searchHashtag = $bindable(),
+    searchSince = $bindable(),
+    searchUntil = $bindable(),
+    resetValue,
+    filters,
+    handleClickSearch,
+  }: Props = $props();
+  // export let searchWord: string | undefined;
+  // export let followee: boolean;
+  // export let createFilter;
+  // export let searchKind: number | undefined = undefined;
+  // export let searchPubkey: string | undefined;
+  // export let searchPubkeyTo: string | undefined;
+  // export let searchHashtag: string | undefined;
+  // export let searchSince: number | undefined;
+  // export let searchUntil: number | undefined;
+  // export let resetValue;
+  // export let filters: Writable<Nostr.Filter[]>;
+  // export let handleClickSearch;
 
   const getKindLabel = (
     kind: number | undefined,
@@ -44,6 +73,7 @@
     console.log(pubkey);
     searchPubkey = pubkey;
   };
+
   const handleClickSearchPubkeyTo = (pubkey: string) => {
     console.log(pubkey);
     searchPubkeyTo = pubkey;
@@ -57,11 +87,11 @@
       // await navigator.clipboard.writeText(
       //   `${$page.url.origin}/channel/${nevent}`
       // );
-      $toastSettings = {
-        title: "Success",
-        description: `shared successfully`,
-        color: "bg-green-500",
-      };
+      // $toastSettings = {
+      //   title: "Success",
+      //   description: `shared successfully`,
+      //   color: "bg-green-500",
+      // };
     } catch (error: any) {
       console.error(error.message);
       $toastSettings = {
@@ -84,14 +114,14 @@
       bind:value={searchWord}
     />
   </div>
-  {#if $followList !== undefined && $followList.size > 0}
+  {#if followList.get !== undefined && followList.get.size > 0}
     <div class="flex flex-col items-start justify-center mt-auto py-2">
       <label>
         <input
           type="checkbox"
           class="rounded-checkbox"
           bind:checked={followee}
-          on:change={createFilter}
+          onchange={createFilter}
         />
         only followee
       </label>
@@ -104,18 +134,18 @@
     class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
   >
     <span class="font-semibold text-magnum-400">Options</span>
-    <button
+    <div
       class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600"
       aria-label="Toggle"
     >
-      <div class="justify-center flex">
+      <div class="justify-center flex items-center w-full h-full">
         {#if $open}
           <X class="size-5" />
         {:else}
           <ChevronsUpDown class="size-5" />
         {/if}
       </div>
-    </button>
+    </div>
   </button>
 
   <div>
@@ -196,7 +226,7 @@
             title={"Date"}
           />
           <button
-            on:click={resetValue}
+            onclick={resetValue}
             class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
           >
             <X class="size-5" /></button
@@ -211,7 +241,7 @@
     class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
   >
     <div class="font-semibold text-magnum-400">Filters</div>
-    {#each $filters as filter}
+    {#each filters as filter}
       {JSON.stringify(filter, null, 2)}
     {/each}
   </div>
@@ -221,12 +251,12 @@
   <button
     class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
     disabled={$nowProgress}
-    on:click={handleClickSearch}>Search</button
+    onclick={handleClickSearch}>Search</button
   >
 
   <button
     class="absolute right-0 top-[2px] w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    on:click={handleClickShare}
+    onclick={handleClickShare}
     disabled={$nowProgress}
     ><Share size={16} />{$_("about.share")}
   </button>

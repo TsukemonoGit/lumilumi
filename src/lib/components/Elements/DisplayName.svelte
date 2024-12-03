@@ -2,14 +2,18 @@
   import { parseEmojiText } from "$lib/func/displayname";
   import CustomEmoji from "../NostrElements/Note/content/CustomEmoji.svelte";
 
-  export let tags: string[][];
-  export let name: string;
-  export let height: number;
+  interface Props {
+    tags: string[][];
+    name: string;
+    height: number;
+  }
 
-  $: emojiTags = tags.filter((tag) => tag[0] === "emoji" && tag.length > 2);
+  let { tags, name, height }: Props = $props();
 
-  $: parts =
-    emojiTags.length >= 0 ? parseEmojiText(name, emojiTags) : undefined;
+  let emojiTags = $derived(tags.filter((tag) => tag[0] === "emoji" && tag.length > 2));
+
+  let parts =
+    $derived(emojiTags.length >= 0 ? parseEmojiText(name, emojiTags) : undefined);
 </script>
 
 {#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji

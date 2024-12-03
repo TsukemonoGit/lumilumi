@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   import {
     Repeat2,
@@ -30,7 +31,6 @@
     additionalPostOptions,
     queryClient,
     addClientTag,
-    viewEventIds,
     showAllReactions,
     loginUser,
   } from "$lib/stores/stores";
@@ -39,7 +39,7 @@
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard/EventCard.svelte";
-  import { afterUpdate, onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import { _ } from "svelte-i18n";
@@ -51,21 +51,42 @@
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
   import { clientTag } from "$lib/func/constants";
   import { nip33Regex } from "$lib/func/regex";
+  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
 
-  export let note: Nostr.Event;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  let {
+    note,
+    repostable,
+    tieKey,
+  }: { note: Nostr.Event; repostable: boolean; tieKey?: string | undefined } =
+    $props();
+  // export let note: Nostr.Event;
+  // export let repostable: boolean;
+  // export let tieKey: string | undefined;
 
-  let dtag: string[] | undefined;
-  let atag: string | undefined;
-
-  $: warning = note.tags.find((item) => item[0] === "content-warning");
-  $: root = note.tags.find(
-    (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
-  ) as string[] | undefined;
+  let warning = $derived(
+    note.tags.find((item) => item[0] === "content-warning")
+  );
+  let root = $derived(
+    note.tags.find(
+      (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
+    ) as string[] | undefined
+  );
   let textareaReply: HTMLTextAreaElement;
   let textareaQuote: HTMLTextAreaElement;
-  $: {
+  // let dtag: string[] | undefined = $derived.by(() => {
+  //   if (
+  //     (note.kind >= 10000 && note.kind < 20000) ||
+  //     (note.kind >= 30000 && note.kind < 40000) ||
+  //     note.kind === 0 ||
+  //     note.kind === 3
+  //   ) {
+  //     //atag　で　りぽすと
+  //     return note.tags.find((tag) => tag[0] === "d");
+  //   } else {
+  //     return undefined;
+  //   }
+  // });
+  let atag: string | undefined = $derived.by(() => {
     if (
       (note.kind >= 10000 && note.kind < 20000) ||
       (note.kind >= 30000 && note.kind < 40000) ||
@@ -73,14 +94,14 @@
       note.kind === 3
     ) {
       //atag　で　りぽすと
-      dtag = note.tags.find((tag) => tag[0] === "d");
-      atag = `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+      const dtag = note.tags.find((tag) => tag[0] === "d");
+      return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
     } else {
-      dtag = undefined;
-      atag = undefined;
+      return undefined;
     }
-  }
-  // let reaction = writable<string | null>(null);
+  });
+
+  let queryId = $derived(atag ?? note?.id);
 
   const handleClickReaction = async () => {
     const tags: string[][] = root ? [root] : [];
@@ -107,7 +128,7 @@
 
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
 
-    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
+    await publishAndSetQuery(ev, ["reactions", "reaction", queryId]);
   };
 
   async function publishAndSetQuery(
@@ -195,7 +216,7 @@
                 tags: tags,
                 content: "",
               };
-        await publishAndSetQuery(ev, ["reactions", "repost", atag ?? note.id]);
+        await publishAndSetQuery(ev, ["reactions", "repost", queryId]);
 
         break;
       case 1:
@@ -210,8 +231,10 @@
           addableUserList: [note.pubkey],
           warningText: warning ? warning[1] : undefined,
         };
-        $additionalPostOptions = options;
-        $postWindowOpen = true;
+        additionalPostOptions.set(options);
+        setTimeout(() => {
+          $postWindowOpen = true;
+        }, 2);
         // replyText = atag
         //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
         //   : ` nostr:${nevent} \n`;
@@ -248,7 +271,7 @@
   //   textareaReply.focus();
   // }
   let fix: boolean = false;
-  afterUpdate(() => {
+  $effect(() => {
     //textareaが開いていて、テキストエリアがアクティブの場合真ん中に固定
     if (fix) {
       textareaReply?.focus();
@@ -256,36 +279,45 @@
     }
   });
 
-  let invoice: string | undefined = undefined;
-  let dialogOpen: any;
-  let zapAmount: number = 50;
-  let zapComment: string;
-  let invoiceOpen: any;
-  let amountEle: HTMLInputElement;
-  const observer = new QueryObserver($queryClient, {
-    queryKey: ["reactions", "zapped", atag ?? note.id, $loginUser],
-  });
-  let unsubscribe: () => void;
+  let invoice: string | undefined = $state(undefined);
+
+  //svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
+  let zapAmount: number = $state(50);
+  let zapComment: string = $state("");
+  //svelte-ignore non_reactive_update
+  let invoiceOpen: (bool: boolean) => void = () => {};
+  let amountEle: HTMLInputElement | undefined = $state(undefined);
+
+  // const observer = $derived(
+  //   new QueryObserver($queryClient, {
+  //     queryKey: ["reactions", "zapped", queryId, $loginUser],
+  //   })
+  // );
+  // let unsubscribe: () => void;
 
   const handleClickZap = () => {
-    $dialogOpen = true;
+    const storagezap = localStorage.getItem("zap");
+    zapAmount = Number(storagezap);
+    dialogOpen?.(true);
     //zapの量決めるダイアログ出す
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
   };
-  onMount(() => {
-    const storagezap = localStorage.getItem("zap");
+  // onMount(() => {
+  //   const storagezap = localStorage.getItem("zap");
 
-    zapAmount = Number(storagezap);
-  });
+  //   zapAmount = Number(storagezap);
+  // });
 
   const onClickOK = async (metadata: Nostr.Event) => {
+    invoice = undefined;
     console.log(zapAmount);
     console.log(zapComment);
     if (zapAmount <= 0) {
       //toast dasite
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
 
@@ -308,30 +340,39 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
-      $dialogOpen = false;
+      dialogOpen?.(false);
       return;
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    $dialogOpen = false;
-    $invoiceOpen = true;
+    dialogOpen?.(false);
+    invoiceOpen?.(true);
+
+    //ザップウィンドウ閉じる処理ZapInvoiceOpenの方にかいてあったよ
     //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
-    const date = now();
-    unsubscribe = observer.subscribe((result: any) => {
-      console.log(result);
-      if (result?.data?.event && result.data.event.created_at >= date) {
-        $invoiceOpen = false;
-        unsubscribe?.();
-      }
-    });
+    // const date = now();
+    // unsubscribe = observer.subscribe((result: any) => {
+    //   console.log(result);
+    //   if (result?.data?.event && result.data.event.created_at >= date) {
+    //     invoiceOpen?.(false);
+    //     unsubscribe?.();
+    //   }
+    // });
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
 
-  $: if (!$invoiceOpen) {
-    invoice = undefined;
-    unsubscribe?.();
-  }
+  // $: if (!$invoiceOpen) {
+  //   invoice = undefined;
+  //   unsubscribe?.();
+  // }
+
+  // invoiceOpen.subscribe((value: boolean) => {
+  //   if (!value) {
+  //     invoice = undefined;
+  //     unsubscribe?.();
+  //   }
+  // });
 
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
@@ -366,8 +407,14 @@
       addableUserList: allPtag,
       warningText: warning ? warning[1] : undefined,
     };
-    $additionalPostOptions = options;
-    $postWindowOpen = true;
+    additionalPostOptions.set(options);
+    setTimeout(() => {
+      if (!$postWindowOpen) {
+        // console.log($state.snapshot($additionalPostOptions));
+        $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
+      }
+    }, 2);
+
     // openReplyWindow = !openReplyWindow;
 
     // replyText = "";
@@ -388,9 +435,9 @@
     repost: Nostr.Event[];
     reaction: Nostr.Event[];
     zap: Nostr.Event[];
-  } = { repost: [], reaction: [], zap: [] };
+  } = $state({ repost: [], reaction: [], zap: [] });
 
-  let hasReactions: boolean;
+  let hasReactions: boolean = $state(false);
 
   const updateInterval = 3000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
@@ -411,15 +458,26 @@
     }, updateInterval); // 連続で実行されるのを防ぐ
   }
 
-  $: if ($showAllReactions && $viewEventIds) {
+  $effect(() => {
+    if (viewEventIds) {
+      untrack(() => {
+        debounceUpdate();
+      });
+    }
+  });
+
+  showAllReactions.subscribe(() => {
     debounceUpdate();
-  }
+  });
+  // $: if ($showAllReactions && viewEventIds.get) {
+  //   debounceUpdate();
+  // }
 
   function updateReactionsData() {
     allReactions.repost = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "repost", atag ?? note.id],
+          queryKey: ["reactions", "repost", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -430,7 +488,7 @@
     allReactions.reaction = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "reaction", atag ?? note.id],
+          queryKey: ["reactions", "reaction", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -441,7 +499,7 @@
     allReactions.zap = (
       $queryClient
         .getQueriesData({
-          queryKey: ["reactions", "zapped", atag ?? note.id],
+          queryKey: ["reactions", "zapped", queryId],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -459,7 +517,7 @@
     );
   }
   //$: console.log(allReactions);
-  let viewAllReactions: boolean;
+  let viewAllReactions: boolean = $state(false);
 </script>
 
 <div
@@ -468,24 +526,19 @@
   <div class="flex gap-1 overflow-hidden">
     {#if $showAllReactions}{#if hasReactions}
         <button
-          on:click={() => {
+          class="actionButton"
+          onclick={() => {
             viewAllReactions = !viewAllReactions;
           }}
         >
           {#if !viewAllReactions}
-            <SquareChevronDown
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
+            <SquareChevronDown size="20" />
           {:else}
-            <SquareChevronUp
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
+            <SquareChevronUp size="20" />
           {/if}
         </button>
       {:else}
-        <div class="w-[20px] overflow-hidden" />
+        <div class="w-[20px] overflow-hidden"><!----></div>
       {/if}{/if}
     <!--メニュー-->
 
@@ -494,94 +547,111 @@
   <!---->
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
-    <Metadata
-      queryKey={["metadata", note.pubkey]}
-      pubkey={note.pubkey}
-      let:metadata
-      ><div slot="loading" class="w-[20px]"></div>
-      <div slot="nodata" class="w-[20px]"></div>
-      <div slot="error" class="w-[20px]"></div>
-      {@const prof = profile(metadata)}
-      {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
-        <div class="flex items-end">
-          <Zapped id={atag ?? note.id} let:event>
-            <button slot="loading" on:click={handleClickZap} aria-label="zap">
-              <Zap
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-              />
-            </button>
-
-            <button aria-label="zap" slot="nodata" on:click={handleClickZap}>
-              <Zap
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-              />
-            </button>
-
-            <button aria-label="zap" slot="error" on:click={handleClickZap}>
-              <Zap
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-              />
-            </button>
-
-            {#if event === undefined}
-              <button aria-label="zap" on:click={handleClickZap}>
-                <Zap
-                  size="20"
-                  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                />
-              </button>
-            {:else}
-              <Zap
-                size="20"
-                class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
-              />
-            {/if}
-          </Zapped><span class="text-sm"
-            >{#if allReactions.zap.length > 0}{allReactions.zap
-                .length}{/if}</span
+    <Metadata queryKey={["metadata", note.pubkey]} pubkey={note.pubkey}
+      >{#snippet loading()}
+        <div class="w-[20px]"></div>
+      {/snippet}
+      {#snippet nodata()}
+        <div class="w-[20px]"></div>
+      {/snippet}
+      {#snippet error()}
+        <div class="w-[20px]"></div>
+      {/snippet}
+      {#snippet content({ metadata })}
+        {@const prof = profile(metadata)}
+        {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
+          <div class="flex items-end">
+            <Zapped id={atag ?? note.id}>
+              {#snippet loading()}
+                <button
+                  class="actionButton"
+                  onclick={handleClickZap}
+                  aria-label="zap"
+                >
+                  <Zap size="20" />
+                </button>
+              {/snippet}
+              {#snippet nodata()}
+                <button
+                  aria-label="zap"
+                  class="actionButton"
+                  onclick={handleClickZap}
+                >
+                  <Zap size="20" />
+                </button>
+              {/snippet}
+              {#snippet error()}
+                <button
+                  aria-label="zap"
+                  class="actionButton"
+                  onclick={handleClickZap}
+                >
+                  <Zap size="20" />
+                </button>
+              {/snippet}
+              {#snippet content({ event })}
+                {#if event === undefined}
+                  <button
+                    class="actionButton"
+                    aria-label="zap"
+                    onclick={handleClickZap}
+                  >
+                    <Zap size="20" />
+                  </button>
+                {:else}
+                  <Zap size="20" class="actionButton fill-magnum-500/75" />
+                {/if}
+              {/snippet}
+            </Zapped><span class="text-sm"
+              >{#if allReactions.zap.length > 0}{allReactions.zap
+                  .length}{/if}</span
+            >
+          </div>
+          <AlertDialog
+            bind:openDialog={dialogOpen}
+            onClickOK={() => onClickOK(metadata)}
+            title="Zap"
+            >{#snippet main()}
+              <div class=" text-neutral-200">
+                <div class="rounded-md">
+                  <EventCard
+                    maxHeight={"12rem"}
+                    {note}
+                    {metadata}
+                    displayMenu={false}
+                    repostable={false}
+                    {tieKey}
+                  />
+                </div>
+                <div class="mt-4 rounded-md">
+                  <div class="pt-2 font-bold text-magnum-300 text-lg">
+                    amount
+                  </div>
+                  <input
+                    bind:this={amountEle}
+                    type="number"
+                    id="amount"
+                    class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+                    placeholder="amount"
+                    bind:value={zapAmount}
+                  />
+                  <div class="pt-1 text-magnum-300 font-bold text-lg">
+                    comment
+                  </div>
+                  <input
+                    type="text"
+                    id="comment"
+                    class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+                    placeholder="comment"
+                    bind:value={zapComment}
+                  />
+                </div>
+              </div>
+            {/snippet}</AlertDialog
           >
-        </div>
-        <AlertDialog
-          bind:open={dialogOpen}
-          onClickOK={() => onClickOK(metadata)}
-          title="Zap"
-        >
-          <div slot="main" class=" text-neutral-200">
-            <div class="rounded-md">
-              <EventCard
-                maxHeight={"12rem"}
-                {note}
-                {metadata}
-                displayMenu={false}
-                repostable={false}
-                {tieKey}
-              />
-            </div>
-            <div class="mt-4 rounded-md">
-              <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
-              <input
-                bind:this={amountEle}
-                type="number"
-                id="amount"
-                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-                placeholder="amount"
-                bind:value={zapAmount}
-              />
-              <div class="pt-1 text-magnum-300 font-bold text-lg">comment</div>
-              <input
-                type="text"
-                id="comment"
-                class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-                placeholder="comment"
-                bind:value={zapComment}
-              />
-            </div>
-          </div></AlertDialog
-        >
-      {:else}<div class="w-[20px] overflow-hidden" />{/if}</Metadata
+        {:else}<div class="w-[20px] overflow-hidden">
+            <!---->
+          </div>{/if}{/snippet}</Metadata
     >
   {/if}
   <!---->
@@ -590,49 +660,28 @@
     <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
-      <Reactioned id={atag ?? note.id} let:event>
-        <button
-          aria-label="reaction"
-          slot="loading"
-          on:click={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-          />
-        </button>
+      <Reactioned id={atag ?? note.id}>
+        {#snippet loading()}
+          <button
+            class="actionButton"
+            aria-label="reaction"
+            onclick={handleClickReaction}
+          >
+            <Heart size="20" class=" mt-auto overflow-hidden" />
+          </button>
+        {/snippet}
 
-        <button
-          aria-label="reaction"
-          slot="nodata"
-          on:click={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        <button
-          aria-label="reaction"
-          slot="error"
-          on:click={handleClickReaction}
-        >
-          <Heart
-            size="20"
-            class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-          />
-        </button>
-
-        {#if event === undefined}
-          <button aria-label="reaction" on:click={handleClickReaction}
-            ><Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-            /></button
-          >{:else}<div class="overflow-hidden">
-            <Reaction {event} />
-          </div>{/if}</Reactioned
+        {#snippet content({ event })}
+          {#if event === undefined}
+            <button
+              class="actionButton"
+              aria-label="reaction"
+              onclick={handleClickReaction}
+            >
+              <Heart size="20" class=" mt-auto overflow-hidden" />
+            </button>{:else}<div class="overflow-hidden">
+              <Reaction {event} />
+            </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
         >{#if allReactions.reaction.length > 0}{allReactions.reaction
             .length}{/if}</span
@@ -644,39 +693,40 @@
     <!--リポスト-->
     {#if repostable && !noReactionKind.includes(note.kind)}
       <div class="flex items-end">
-        <Reposted id={atag ?? note.id} let:event>
-          <DropdownMenu slot="loading" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
+        <Reposted id={atag ?? note.id}>
+          {#snippet loading()}
+            <DropdownMenu {menuTexts} {handleSelectItem}>
+              <Repeat2 size="21" class="actionButton" />
+            </DropdownMenu>{/snippet}
 
-          <DropdownMenu slot="nodata" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu slot="error" {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" />
-          </DropdownMenu>
-          <DropdownMenu {menuTexts} {handleSelectItem}>
-            <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
-          </DropdownMenu>
+          {#snippet content({ event })}
+            <DropdownMenu {menuTexts} {handleSelectItem}>
+              <Repeat2
+                size="21"
+                class={event ? "text-magnum-200 actionButton" : "actionButton"}
+              />
+            </DropdownMenu>{/snippet}
         </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
             >{allReactions.repost.length}</span
           >{/if}
       </div>
-    {:else}<button aria-label="quote" on:click={() => handleSelectItem(1)}>
+    {:else}<button
+        aria-label="quote"
+        class="actionButton"
+        onclick={() => handleSelectItem(1)}
+      >
         <Quote size="20" class={"stroke-magnum-500/75"} />
       </button>
     {/if}
     <!--リプライ-->
     <button
       aria-label="reply"
-      on:click={() => {
+      onclick={() => {
         onClickReplyIcon();
       }}
+      class="actionButton"
     >
-      <MessageSquare
-        size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-      />
+      <MessageSquare size="20" />
     </button>
   {/if}
 </div>
@@ -703,13 +753,21 @@
   {/if}
 {/if}
 
-<ZapInvoiceWindow bind:open={invoiceOpen} bind:invoice id={atag ?? note.id} />
+<ZapInvoiceWindow
+  bind:openZapwindow={invoiceOpen}
+  {invoice}
+  id={atag ?? note.id}
+/>
 
-<style>
+<style lang="postcss">
   input[type="text"] {
     background-color: rgb(var(--color-neutral-800) / 1);
   }
   input[type="number"] {
     background-color: rgb(var(--color-neutral-800) / 1);
+  }
+
+  .actionButton {
+    @apply hover:opacity-75 active:ring active:bg-magnum-400/20 ring-magnum-400/20  rounded-full text-magnum-500/75 overflow-hidden;
   }
 </style>

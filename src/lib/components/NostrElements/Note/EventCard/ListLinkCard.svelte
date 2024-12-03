@@ -8,9 +8,13 @@
   import ListEllipsisMenu from "../ListEllipsisMenu.svelte";
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
-  export let event: Nostr.Event;
-  export let depth: number;
-  export let tieKey: string | undefined;
+  interface Props {
+    event: Nostr.Event;
+    depth: number;
+    tieKey: string | undefined;
+  }
+
+  let { event, depth, tieKey }: Props = $props();
 
   const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
   const title = event.tags.find((tag) => tag[0] === "title")?.[1];
@@ -35,7 +39,7 @@
   <button
     title={`/list/${nip19.naddrEncode(naddr)}`}
     class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"
-    on:click={() => handleClickToList(event)}
+    onclick={() => handleClickToList(event)}
   >
     <div class="relative">
       {#if $showImg && image}
@@ -69,43 +73,38 @@
   </button>
 
   <div class="flex flex-col justify-between items-center">
-    <Metadata
-      queryKey={["metadata", event.pubkey]}
-      pubkey={event.pubkey}
-      let:metadata
-    >
-      <UserMenu
-        slot="loading"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={40}
-        {depth}
-        {tieKey}
-      />
-      <UserMenu
-        slot="nodata"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={40}
-        {depth}
-        {tieKey}
-      />
-      <UserMenu
-        slot="error"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={40}
-        {depth}
-        {tieKey}
-      />
-      <UserMenu
-        pubkey={event.pubkey}
-        {metadata}
-        size={40}
-        {depth}
-        {tieKey}
-      /></Metadata
-    >
+    <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+      {#snippet loading()}
+        <UserMenu
+          pubkey={event.pubkey}
+          metadata={undefined}
+          size={40}
+          {depth}
+          {tieKey}
+        />
+      {/snippet}
+      {#snippet nodata()}
+        <UserMenu
+          pubkey={event.pubkey}
+          metadata={undefined}
+          size={40}
+          {depth}
+          {tieKey}
+        />
+      {/snippet}
+      {#snippet error()}
+        <UserMenu
+          pubkey={event.pubkey}
+          metadata={undefined}
+          size={40}
+          {depth}
+          {tieKey}
+        />
+      {/snippet}
+      {#snippet content({ metadata })}
+        <UserMenu pubkey={event.pubkey} {metadata} size={40} {depth} {tieKey} />
+      {/snippet}
+    </Metadata>
     <button class="text-magnum-400"
       ><ListEllipsisMenu
         note={event}

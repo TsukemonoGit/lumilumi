@@ -8,13 +8,23 @@
   import { splitHexColorString } from "$lib/func/util";
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import ChannelEllipsisMenu from "./ChannelEllipsisMenu.svelte";
-  export let id: string; //40
-  export let handleClickToChannel: (() => void) | undefined = undefined;
-  export let linkButtonTitle: string;
 
   let size = 96;
-  export let event: Nostr.Event; //40か41
-  export let tieKey: string | undefined;
+  interface Props {
+    id: string; //40
+    handleClickToChannel?: (() => void) | undefined;
+    linkButtonTitle: string;
+    event: Nostr.Event; //40か41
+    tieKey: string | undefined;
+  }
+
+  let {
+    id,
+    handleClickToChannel = undefined,
+    linkButtonTitle,
+    event,
+    tieKey,
+  }: Props = $props();
 
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
@@ -31,7 +41,7 @@
     <button
       title={linkButtonTitle}
       class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"
-      on:click={handleClickToChannel}
+      onclick={handleClickToChannel}
     >
       <!--がぞう-->
 
@@ -68,50 +78,51 @@
         <div class="text-magnum-100">{channelData.about}</div>
       </div></button
     >
-    <Metadata
-      queryKey={["metadata", event.pubkey]}
-      pubkey={event.pubkey}
-      let:metadata
-    >
-      <UserMenu
-        slot="loading"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={24}
-        depth={0}
-        {tieKey}
-      />
-
-      <UserMenu
-        slot="error"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={24}
-        depth={0}
-        {tieKey}
-      />
-
-      <UserMenu
-        slot="nodata"
-        pubkey={event.pubkey}
-        metadata={undefined}
-        size={24}
-        depth={0}
-        {tieKey}
-      />
-
-      <div class="flex flex-col justify-between items-center">
+    <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+      {#snippet loading()}
         <UserMenu
           pubkey={event.pubkey}
-          {metadata}
-          size={40}
+          metadata={undefined}
+          size={24}
           depth={0}
           {tieKey}
         />
-        <button class="text-magnum-400"
-          ><ChannelEllipsisMenu note={event} {channelData} {tieKey} /></button
-        >
-      </div>
+      {/snippet}
+
+      {#snippet error()}
+        <UserMenu
+          pubkey={event.pubkey}
+          metadata={undefined}
+          size={24}
+          depth={0}
+          {tieKey}
+        />
+      {/snippet}
+
+      {#snippet nodata()}
+        <UserMenu
+          pubkey={event.pubkey}
+          metadata={undefined}
+          size={24}
+          depth={0}
+          {tieKey}
+        />
+      {/snippet}
+
+      {#snippet content({ metadata })}
+        <div class="flex flex-col justify-between items-center">
+          <UserMenu
+            pubkey={event.pubkey}
+            {metadata}
+            size={40}
+            depth={0}
+            {tieKey}
+          />
+          <button class="text-magnum-400"
+            ><ChannelEllipsisMenu note={event} {channelData} {tieKey} /></button
+          >
+        </div>
+      {/snippet}
     </Metadata>
   </div>
 {/if}

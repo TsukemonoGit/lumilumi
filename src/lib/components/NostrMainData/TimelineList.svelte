@@ -1,14 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
     loginUser,
     nowProgress,
     queryClient,
-    relayStateMap,
-    showReactioninTL,
-    showUserStatus,
-    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -24,47 +21,103 @@
   import {
     createTie,
     now,
+    type DefaultRelayConfig,
     type EventPacket,
-    type RxReq,
-    type RxReqEmittable,
-    type RxReqOverable,
-    type RxReqPipeable,
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import { sortEvents } from "$lib/func/util";
-  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
+  import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
 
   const sift = 40; //スライドする量
 
-  export let queryKey: QueryKey;
-  export let filters: Nostr.Filter[];
-  export let olderFilters: Nostr.Filter[];
-  // export let lastfavcheck: boolean = true;
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  export let viewIndex: number = 0;
-  export let amount: number; //1ページに表示する量
-  export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
-  export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  // export let tie: OperatorFunction<
-  //   EventPacket,
-  //   EventPacket & {
-  //     seenOn: Set<string>;
-  //     isNew: boolean;
-  //   }
-  // >;
+  interface Props {
+    queryKey: QueryKey;
+    filters: Nostr.Filter[];
+    olderFilters: Nostr.Filter[];
+    req?: any;
+    viewIndex?: number;
+    amount: number;
+    relays?: string[] | undefined;
+    tieKey: string;
+    eventFilter?: (event: Nostr.Event) => boolean;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  export let tieKey: string;
+    content?: import("svelte").Snippet<
+      [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
+    >;
+    updateViewEvent?: (_data?: EventPacket[] | undefined | null) => void;
+  }
+
+  let {
+    queryKey,
+    filters,
+    olderFilters,
+    req,
+    viewIndex = 0,
+    amount,
+    relays = undefined,
+    tieKey,
+    eventFilter = () => true,
+    error,
+    loading,
+    nodata,
+    content,
+    updateViewEvent = $bindable(),
+  }: Props = $props();
+
+  let untilTime: number;
+  let updating: boolean = false;
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  updateViewEvent = (data: EventPacket[] | undefined | null = $globalData) => {
+    if (updating) {
+      return;
+    }
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    timeoutId = setTimeout(() => {
+      updating = true;
+
+      const olderdatas: EventPacket[] | undefined =
+        $queryClient.getQueryData(olderQueryKey);
+      console.log("updateViewEvent");
+      const allEvents: EventPacket[] = data ?? [];
+
+      if (olderdatas) {
+        allEvents.push(...olderdatas);
+      }
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+      const uniqueEvents = sortEvents(
+        Array.from(
+          new Map(
+            allEvents.map((event) => [event.event.id, event.event])
+          ).values()
+        )
+      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+
+      allUniqueEvents = uniqueEvents
+        .filter(eventFilter)
+        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+
+      // slicedEvent.update((value) =>
+      //   allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      // );
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+      updating = false;
+    }, 50); // 連続で実行されるのを防ぐ
+    //console.log($slicedEvent);
+  };
 
   createQuery({
     queryKey: [...queryKey, "olderData"],
@@ -76,15 +129,23 @@
   });
 
   const [tie, tieMap] = createTie();
-  $: if (tieKey) {
-    //$tieMapStore = { undefined: undefined };
-    if (!$tieMapStore) {
-      $tieMapStore = { [tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+
+  $effect(() => {
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
+  });
+
+  function setTie(_tieKey: string) {
+    if (_tieKey) {
+      //$tieMapStore = { undefined: undefined };
+      if (!$tieMapStore) {
+        $tieMapStore = { [_tieKey]: [tie, tieMap] };
+      } else if (!$tieMapStore?.[_tieKey]) {
+        $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
+      }
     }
   }
-
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
 
@@ -113,26 +174,51 @@
   //   //最後に配列にする
   //   return pipe(operator, scanArray());
   // }
-  $: result = useTimelineEventList(
-    queryKey,
-    filters,
-    pipe(tie, uniq, scanArray()),
-    req,
-    relays
+  let result = $derived(
+    useTimelineEventList(
+      queryKey,
+      filters,
+      pipe(tie, uniq, scanArray()),
+      req,
+      relays
+    )
   );
-  $: globalData = result.data;
-  $: status = result.status;
-  $: error = result.error;
+  let globalData = $derived(result.data);
+  let status = $derived(result.status);
+  let errorData = $derived(result.error);
   let readUrls: string[] = [];
-  $: if ($defaultRelays) {
-    readUrls = Object.values($defaultRelays)
-      .filter((config) => config.read)
-      .map((config) => config.url);
+
+  $effect(() => {
+    if ($defaultRelays) {
+      untrack(() => defaultRelayChange($defaultRelays));
+    }
+  });
+
+  function defaultRelayChange(relays: Record<string, DefaultRelayConfig>) {
+    if (relays) {
+      readUrls = Object.values(relays)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
   }
-  $: if (($globalData && viewIndex >= 0) || !$nowProgress) {
-    updateViewEvent($globalData);
+
+  $effect(() => {
+    if (($globalData && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => dataChange($globalData, viewIndex, $nowProgress));
+    }
+  });
+
+  function dataChange(
+    data: EventPacket[] | null | undefined,
+    index: number,
+    progress: boolean
+  ) {
+    if ((data && index >= 0) || !progress) {
+      updateViewEvent?.(data);
+    }
   }
-  $: olderQueryKey = [...queryKey, "olderData"];
+
+  let olderQueryKey = $derived([...queryKey, "olderData"]);
   //$: console.log($globalData);
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);
@@ -214,8 +300,8 @@
 
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
       // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
-      console.log($relayStateMap);
+      await waitForConnections(readUrls, relayStateMap.get, 10000); // maxWaitTime set to 10 seconds
+      // console.log(relayStateMap.get);
 
       const older = await firstLoadOlderEvents(
         50,
@@ -234,17 +320,11 @@
           ...(olddata ?? []),
           ...older,
         ]);
-
-        updateViewEvent($globalData);
+        setTimeout(() => {
+          updateViewEvent?.($globalData);
+        }, 10); //ProfileがめんのTLが読み込み終わっても表示されない
       }
     }
-  }
-
-  interface $$Slots {
-    default: { events: Nostr.Event[]; status: ReqStatus; len: number };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
   }
 
   const handleNext = async () => {
@@ -284,7 +364,7 @@
       viewIndex += sift; //スライドする量
     }
 
-    updateViewEvent($globalData);
+    updateViewEvent?.($globalData);
     $nowProgress = false;
   };
 
@@ -296,62 +376,14 @@
 
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
-        updateViewEvent($globalData);
+        updateViewEvent?.($globalData);
       }, 100);
     }
-  };
-  let untilTime: number;
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
-  export let updateViewEvent = (
-    data: EventPacket[] | undefined = $globalData
-  ) => {
-    if (updating) {
-      return;
-    }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(() => {
-      updating = true;
-
-      const olderdatas: EventPacket[] | undefined =
-        $queryClient.getQueryData(olderQueryKey);
-      console.log("updateViewEvent");
-      const allEvents: EventPacket[] = data ?? [];
-
-      if (olderdatas) {
-        allEvents.push(...olderdatas);
-      }
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
-      const uniqueEvents = sortEvents(
-        Array.from(
-          new Map(
-            allEvents.map((event) => [event.event.id, event.event])
-          ).values()
-        )
-      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
-
-      allUniqueEvents = uniqueEvents
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
-
-      // slicedEvent.update((value) =>
-      //   allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      // );
-      $slicedEvent = allUniqueEvents.slice(viewIndex, viewIndex + amount);
-      updating = false;
-    }, 50); // 連続で実行されるのを防ぐ
-    //console.log($slicedEvent);
   };
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent($globalData);
+    updateViewEvent?.($globalData);
   }
 
   onDestroy(() => {
@@ -363,7 +395,7 @@
   <div class=" w-full">
     <button
       class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      on:click={() => handleClickTop()}
+      onclick={() => handleClickTop()}
       disabled={$nowProgress}
       ><SkipForward
         size={20}
@@ -373,7 +405,7 @@
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      on:click={() => handlePrev()}
+      onclick={() => handlePrev()}
       ><Triangle
         size={20}
         class="mx-auto stroke-magnum-100 fill-magnum-100"
@@ -384,20 +416,25 @@
 {#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
-{#if $error}
-  <slot name="error" error={$error} />
-{:else if $slicedEvent && $slicedEvent?.length > 0}
-  <slot events={$slicedEvent} status={$status} len={$globalData?.length ?? 0} />
+{#if $errorData}
+  {@render error?.($errorData)}
+{:else if displayEvents.get && displayEvents.get.length > 0}
+  {@render content?.({
+    events: displayEvents.get,
+    status: $status,
+    len: $globalData?.length ?? 0,
+  })}
+  <!-- <slot events={$slicedEvent} status={$status} len={$globalData?.length ?? 0} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    on:click={() => handleNext()}
+    onclick={() => handleNext()}
     ><Triangle
       size={20}
       class="rotate-180 stroke-magnum-100 fill-magnum-100"

@@ -10,11 +10,15 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";
-  export let filters: Nostr.Filter[];
 
   let amount = 50;
   let viewIndex = 0;
-  export let relays: string[];
+  interface Props {
+    filters: Nostr.Filter[];
+    relays: string[];
+  }
+
+  let { filters, relays }: Props = $props();
 
   //$: console.log(filters);
   const tieKey = "search";
@@ -44,49 +48,61 @@
       queryKey={["search"]}
       {filters}
       req={createRxForwardReq()}
-      let:events
       {viewIndex}
       {amount}
       {tieKey}
-      let:len
       relays={relays.length > 0 ? relays : nip50relays}
     >
-      <!-- <SetRepoReactions /> -->
-      <div slot="loading">loading</div>
-
-      <div slot="error" let:error>
-        {error}
-      </div>
-      <div slot="nodata">nodata</div>
-      <div class=" break-words divide-y divide-magnum-600/30">
-        {#if events && events.length > 0}
-          {#each events as event, index (event.id)}
-            <div
-              class="break-words whitespace-pre-line overflow-hidden {index ===
-              events.length - 1
-                ? 'last-visible'
-                : ''} {index === 0 ? 'first-visible' : ''}"
-            >
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
+      {#snippet children({ events, len })}
+        <!-- <SetRepoReactions /> -->
+        <div class=" break-words divide-y divide-magnum-600/30">
+          {#if events && events.length > 0}
+            {#each events as event, index (event.id)}
+              <div
+                class="break-words whitespace-pre-line overflow-hidden {index ===
+                events.length - 1
+                  ? 'last-visible'
+                  : ''} {index === 0 ? 'first-visible' : ''}"
               >
-                <div slot="loading" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="nodata" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <div slot="error" class="w-full">
-                  <EventCard note={event} {tieKey} />
-                </div>
-                <EventCard {metadata} note={event} {tieKey} />
-              </Metadata>
-            </div>
-          {/each}
-        {/if}
-      </div>
+                <Metadata
+                  queryKey={["metadata", event.pubkey]}
+                  pubkey={event.pubkey}
+                >
+                  {#snippet loading()}
+                    <div class="w-full">
+                      <EventCard note={event} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet nodata()}
+                    <div class="w-full">
+                      <EventCard note={event} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet error()}
+                    <div class="w-full">
+                      <EventCard note={event} {tieKey} />
+                    </div>
+                  {/snippet}
+                  {#snippet content({ metadata })}
+                    <EventCard {metadata} note={event} {tieKey} />
+                  {/snippet}
+                </Metadata>
+              </div>
+            {/each}
+          {/if}
+        </div>{/snippet}
+      {#snippet loading()}
+        <div>loading</div>
+      {/snippet}
+
+      {#snippet error()}
+        <div>
+          {error}
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>nodata</div>
+      {/snippet}
     </SearchResultList>
   </div>
 {/if}

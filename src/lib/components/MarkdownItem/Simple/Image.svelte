@@ -2,20 +2,24 @@
   import { showImg } from "$lib/stores/stores";
   import type { Token } from "markdown-it/index.js";
 
-  export let part: Token;
+  interface Props {
+    part: Token;
+  }
+
+  let { part }: Props = $props();
 
   // console.log("[image]", part);
 
-  let view = false;
+  let view = $state(false);
 
-  $: src = part?.attrs?.find((attr) => attr[0] === "src")?.[1];
-  $: alt = part?.attrs?.find((attr) => attr[0] === "alt")?.[1];
-  $: title = part?.attrs?.find((attr) => attr[0] === "title")?.[1];
-  $: button = `View Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`;
+  let src = $derived(part?.attrs?.find((attr) => attr[0] === "src")?.[1]);
+  let alt = $derived(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]);
+  let title = $derived(part?.attrs?.find((attr) => attr[0] === "title")?.[1]);
+  let button = $derived(`View Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`);
   //$: console.log(part);
 
-  $: width = part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288";
-  $: height = part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288";
+  let width = $derived(part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288");
+  let height = $derived(part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288");
 </script>
 
 {#if $showImg || view}
@@ -32,5 +36,5 @@
 {:else}
   <button
     class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50"
-    on:click={() => (view = true)}>{button}</button
+    onclick={() => (view = true)}>{button}</button
   >{/if}

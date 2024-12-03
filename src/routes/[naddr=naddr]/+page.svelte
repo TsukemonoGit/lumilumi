@@ -18,13 +18,10 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
   import { page } from "$app/stores";
+  import type { PageData } from "./$types";
 
-  export let data: {
-    identifier: string;
-    pubkey: string;
-    kind: number;
-    relays?: string[] | undefined;
-  };
+  let { data }: { data: PageData } = $props();
+
   const atag = `${data.kind}:${data.pubkey}:${data.identifier}`;
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
@@ -33,7 +30,7 @@
   //let amount = 50;
   //let viewIndex = 0;
   const tieKey = "naddr";
-  let loading = true;
+  let loading = $state(true);
 
   let isOnMount = false;
   let since: number | undefined = undefined;
@@ -76,156 +73,173 @@
   loading
 {:else}
   <section class="container">
-    <LatestEvent queryKey={["naddr", atag]} {filters} let:event>
-      <div slot="loading">loading</div>
-      <div slot="error">error</div>
-      <div slot="nodata">nodata</div>
+    <LatestEvent queryKey={["naddr", atag]} {filters}>
+      {#snippet loading()}
+        <div>loading</div>
+      {/snippet}
+      {#snippet error()}
+        <div>error</div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>nodata</div>
+      {/snippet}
 
-      <Metadata
-        queryKey={["metadata", event.pubkey]}
-        pubkey={event.pubkey}
-        let:metadata
-      >
-        <div
-          slot="loading"
-          class=" w-full ivide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+      {#snippet children({ event })}
+        <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+          {#snippet loading()}
+            <div
+              class=" w-full ivide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+            >
+              <EventCard
+                note={event}
+                depth={0}
+                repostable={true}
+                {maxHeight}
+                {tieKey}
+              /><NoteInfo note={event} />
+            </div>
+          {/snippet}
+          {#snippet nodata()}
+            <div
+              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+            >
+              <EventCard
+                note={event}
+                depth={0}
+                repostable={true}
+                {maxHeight}
+                {tieKey}
+              /><NoteInfo note={event} />
+            </div>
+          {/snippet}
+          {#snippet error()}
+            <div
+              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+            >
+              <EventCard
+                note={event}
+                depth={0}
+                repostable={true}
+                {maxHeight}
+                {tieKey}
+              /><NoteInfo note={event} />
+            </div>
+          {/snippet}
+          {#snippet content({ metadata })}
+            <div
+              class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
+            >
+              <EventCard
+                {metadata}
+                note={event}
+                depth={0}
+                repostable={true}
+                {maxHeight}
+                {tieKey}
+              /><NoteInfo note={event} />
+            </div>
+          {/snippet}
+        </Metadata>
+
+        <!-- <Metadata
+          queryKey={["metadata", event.pubkey]}
+          pubkey={event.pubkey}
+          let:metadata
         >
-          <EventCard
-            note={event}
-            depth={0}
-            repostable={true}
-            {maxHeight}
-            {tieKey}
-          /><NoteInfo note={event} />
-        </div>
-        <div
-          slot="nodata"
-          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
-        >
-          <EventCard
-            note={event}
-            depth={0}
-            repostable={true}
-            {maxHeight}
-            {tieKey}
-          /><NoteInfo note={event} />
-        </div>
-        <div
-          slot="error"
-          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
-        >
-          <EventCard
-            note={event}
-            depth={0}
-            repostable={true}
-            {maxHeight}
-            {tieKey}
-          /><NoteInfo note={event} />
-        </div>
-        <div
-          class=" w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"
-        >
-          <EventCard
-            {metadata}
-            note={event}
-            depth={0}
-            repostable={true}
-            {maxHeight}
-            {tieKey}
-          /><NoteInfo note={event} />
-        </div>
-      </Metadata>
-
-      <!-- <Metadata
-        queryKey={["metadata", event.pubkey]}
-        pubkey={event.pubkey}
-        let:metadata
-      >
-        <div slot="loading" class="w-full">
-          <EventCardNaddr note={event} repostable={true} />
-        </div>
-        <div slot="nodata" class="w-full">
-          <EventCardNaddr note={event} repostable={true} />
-        </div>
-        <div slot="error" class="w-full">
-          <EventCardNaddr note={event} repostable={true} />
-        </div>
-        <EventCardNaddr {metadata} note={event} repostable={true} />
-      </Metadata> -->
-
-      <AllReactions
-        queryKey={["allreactions", atag]}
-        {atag}
-        let:kind1
-        let:kind6
-        let:kind7
-        let:kind9735
-      >
-        <div slot="loading">loading</div>
-        <div slot="nodata">nodata</div>
-        <div slot="error">error</div>
-
-        <!--kind6-->
-        <NoteRepostList events={kind6} {tieKey} />
-
-        <!--kind7-->
-        <NoteReactionList events={kind7} {tieKey} />
-
-        <!--zap レシート-->
-        <ZapReactionList events={kind9735} {tieKey} />
-
-        <!--kind1,42-->
-        <CollapsibleList title="Kind1,42" amount={kind1.length}>
-          <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-          >
-            {#each sortEvents(kind1).reverse() as event (event.id)}
-              <!-- <div
-          class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
-        > -->
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-                let:metadata
-              >
-                <div slot="loading">
-                  <EventCard
-                    note={event}
-                    depth={0}
-                    repostable={true}
-                    {tieKey}
-                  />
-                </div>
-                <div slot="nodata">
-                  <EventCard
-                    note={event}
-                    depth={0}
-                    repostable={true}
-                    {tieKey}
-                  />
-                </div>
-                <div slot="error">
-                  <EventCard
-                    note={event}
-                    depth={0}
-                    repostable={true}
-                    {maxHeight}
-                    {tieKey}
-                  />
-                </div>
-                <EventCard
-                  {metadata}
-                  note={event}
-                  depth={0}
-                  repostable={true}
-                  {tieKey}
-                />
-              </Metadata>
-              <!-- </div> -->
-            {/each}
+          <div slot="loading" class="w-full">
+            <EventCardNaddr note={event} repostable={true} />
           </div>
-        </CollapsibleList>
-      </AllReactions>
+          <div slot="nodata" class="w-full">
+            <EventCardNaddr note={event} repostable={true} />
+          </div>
+          <div slot="error" class="w-full">
+            <EventCardNaddr note={event} repostable={true} />
+          </div>
+          <EventCardNaddr {metadata} note={event} repostable={true} />
+        </Metadata> -->
+
+        <AllReactions queryKey={["allreactions", atag]} {atag}>
+          {#snippet loading()}
+            <div>loading</div>
+          {/snippet}
+          {#snippet nodata()}
+            <div>nodata</div>
+          {/snippet}
+          {#snippet error()}
+            <div>error</div>
+          {/snippet}
+
+          {#snippet children({ kind1, kind6, kind7, kind9735 })}
+            <!--kind6-->
+            <NoteRepostList events={kind6} {tieKey} />
+
+            <!--kind7-->
+            <NoteReactionList events={kind7} {tieKey} />
+
+            <!--zap レシート-->
+            <ZapReactionList events={kind9735} {tieKey} />
+
+            <!--kind1,42-->
+            <CollapsibleList title="Kind1,42" amount={kind1.length}>
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              >
+                {#each sortEvents(kind1).reverse() as event (event.id)}
+                  <!-- <div
+              class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card"
+            > -->
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                  >
+                    {#snippet loading()}
+                      <div>
+                        <EventCard
+                          note={event}
+                          depth={0}
+                          repostable={true}
+                          {tieKey}
+                        />
+                      </div>
+                    {/snippet}
+                    {#snippet nodata()}
+                      <div>
+                        <EventCard
+                          note={event}
+                          depth={0}
+                          repostable={true}
+                          {tieKey}
+                        />
+                      </div>
+                    {/snippet}
+                    {#snippet error()}
+                      <div>
+                        <EventCard
+                          note={event}
+                          depth={0}
+                          repostable={true}
+                          {maxHeight}
+                          {tieKey}
+                        />
+                      </div>
+                    {/snippet}
+                    {#snippet content({ metadata })}
+                      <EventCard
+                        {metadata}
+                        note={event}
+                        depth={0}
+                        repostable={true}
+                        {tieKey}
+                      />
+                    {/snippet}
+                  </Metadata>
+                  <!-- </div> -->
+                {/each}
+              </div>
+            </CollapsibleList>
+          {/snippet}
+        </AllReactions>
+      {/snippet}
     </LatestEvent>
   </section>
   <div class="postWindow">

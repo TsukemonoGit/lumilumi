@@ -1,11 +1,15 @@
 <script lang="ts">
   import { mediaUploader } from "$lib/func/constants";
+  import { uploader } from "$lib/stores/stores";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
-  export let defaultValue: string | undefined;
-  export let selectedUploader: string;
+  interface Props {
+    selectedUploader: string;
+  }
+
+  let { selectedUploader = $bindable() }: Props = $props();
 
   const options = mediaUploader.map((url, index) => ({
     value: url,
@@ -37,11 +41,13 @@
       sameWidth: true,
     },
   });
-
-  $: if ($selected) {
-    selectedUploader = $selected.value;
-    localStorage?.setItem("uploader", selectedUploader);
-  }
+  //console.log($uploader);
+  const handleClickSelect = (value: string) => {
+    if (value) {
+      selectedUploader = value;
+      localStorage?.setItem("uploader", value);
+    }
+  };
 </script>
 
 <div class="flex flex-col gap-1 w-full">
@@ -51,8 +57,8 @@
     use:melt={$trigger}
     aria-label="Food"
   >
-    {($selected?.label ?? defaultValue !== undefined)
-      ? getHostname(defaultValue ?? "")
+    {($selected?.label ?? $uploader !== undefined)
+      ? getHostname($uploader ?? "")
       : options[0].label}
     <ChevronDown class="size-5" />
   </button>
@@ -66,6 +72,7 @@
     >
       {#each options as item}
         <div
+          onm-click={() => handleClickSelect(item.value)}
           class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-100
           hover:bg-magnum-100 focus:z-10
           focus:text-magnum-700

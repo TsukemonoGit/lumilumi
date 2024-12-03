@@ -4,22 +4,36 @@
   import { transformTokens } from "$lib/func/markdown";
   import NostrContent from "./NostrContent.svelte";
 
-  export let part: Token;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  export let tieKey: string | undefined;
-
-  let children: Token[] = [];
-
-  // トークンが存在する場合、変換して子トークンを取得
-  $: if (part?.children && Array.isArray(part.children)) {
-    children = transformTokens(part.children);
-    //console.log("[Transformed List]", children);
+  interface Props {
+    part: Token;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    tieKey: string | undefined;
   }
+
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey,
+  }: Props = $props();
+
+  let children: Token[] = $derived.by(() => {
+    if (part?.children && Array.isArray(part.children)) {
+      if (part?.children) {
+        return transformTokens(part.children);
+      }
+    }
+    return [];
+  });
 </script>
 
 <ul>

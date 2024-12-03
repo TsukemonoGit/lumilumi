@@ -1,28 +1,47 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useNip05Check } from "$lib/func/nip05check";
   import type { ReqStatus } from "$lib/types";
 
-  export let pubkey: string;
-  export let nip05Address: string;
-  $: nip05 = useNip05Check(nip05Address, pubkey);
-  $: data = nip05.data;
-  $: status = nip05.status;
-  $: error = nip05.error;
-  $: console.log($data);
-  interface $$Slots {
-    default: { nip05: { result: boolean; error?: string }; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
+  interface Props {
+    pubkey: string;
+    nip05Address: string;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
+
+    content?: import("svelte").Snippet<
+      [
+        {
+          nip05: {
+            result: boolean;
+            error?: string;
+          };
+          status: ReqStatus;
+        },
+      ]
+    >;
   }
+
+  let { pubkey, nip05Address, loading, error, nodata, content }: Props =
+    $props();
+
+  //export let pubkey: string;
+  //export let nip05Address: string;
+  let nip05 = $derived(useNip05Check(nip05Address, pubkey));
+  let data = $derived(nip05.data);
+  let status = $derived(nip05.status);
+  let errorData = $derived(nip05.error);
+  // $: console.log($data);
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
+{#if $errorData}
+  {@render error?.($errorData)}
 {:else if $data !== null && $data !== undefined}
-  <slot nip05={$data} status={$status} />
+  {@render content?.({ nip05: $data, status: $status })}
+  <!-- <slot nip05={$data} status={$status} /> -->
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

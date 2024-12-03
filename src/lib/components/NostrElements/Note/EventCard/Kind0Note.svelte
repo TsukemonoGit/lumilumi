@@ -7,27 +7,31 @@
   import FollowButton from "../FollowButton.svelte";
   import Content from "../Content.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import { followList } from "$lib/stores/stores";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
-  export let displayMenu: boolean;
-  export let note: Nostr.Event;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    displayMenu: boolean;
+    note: Nostr.Event;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
 
-  $: prof = profile(note);
-  $: petname = $followList.get(note.pubkey);
+  let {
+    displayMenu,
+    note = $bindable(),
+    depth,
+    repostable,
+    tieKey,
+  }: Props = $props();
+
+  let prof = $derived(profile(note));
+  let petname = $derived(followList.get.get(note.pubkey));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">
   <div class="p-1">
-    <UserMenu
-      pubkey={note.pubkey}
-      bind:metadata={note}
-      size={40}
-      {depth}
-      {tieKey}
-    />
+    <UserMenu pubkey={note.pubkey} metadata={note} size={40} {depth} {tieKey} />
   </div>
   <div class="p-1">
     <div

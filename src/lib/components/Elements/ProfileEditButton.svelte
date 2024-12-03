@@ -5,7 +5,11 @@
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
-  export let metadata: Nostr.Event;
+  interface Props {
+    metadata: Nostr.Event;
+  }
+
+  let { metadata }: Props = $props();
 
   const handleClickEdit = () => {
     console.log($page.params);
@@ -17,7 +21,7 @@
 <button
   disabled={$nowProgress}
   class="rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow active:opacity-50 hover:opacity-75 opacity-100"
-  on:click={handleClickEdit}
+  onclick={handleClickEdit}
 >
   {$_("user.profileEdit")}
 </button>

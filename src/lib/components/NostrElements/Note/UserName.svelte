@@ -1,42 +1,53 @@
 <script lang="ts">
-  import { nip19 } from "nostr-tools";
-
   import { profile } from "$lib/func/util";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { followList } from "$lib/stores/stores";
-  import { encodetoNpub } from "$lib/func/encode";
-  import viewport from "$lib/func/useViewportAction";
-  export let pubhex: string;
 
-  $: petname = $followList?.get(pubhex);
-  $: loadingText = encodetoNpub(pubhex);
-  $: encodePub = encodetoNpub(pubhex);
-  let hasLoaded = false;
+  import { encodetoNpub } from "$lib/func/encode";
+  import { viewport } from "$lib/func/useViewportAction";
+  import { followList } from "$lib/stores/globalRunes.svelte";
+
+  interface Props {
+    pubhex: string;
+  }
+
+  let { pubhex }: Props = $props();
+
+  let petname = $derived(followList.get?.get(pubhex));
+  let loadingText = $derived(encodetoNpub(pubhex));
+  let encodePub = $derived(encodetoNpub(pubhex));
+  let hasLoaded = $state(false);
   const handleEnterViewport = () => {
-    hasLoaded = true;
+    if (!hasLoaded) {
+      //console.log("user name enter viewport", hasLoaded);
+      hasLoaded = true;
+    }
   };
-  //$: console.log(petname);
+  // console.log(pubhex);
 </script>
 
-<span use:viewport on:enterViewport={handleEnterViewport} class="inline-flex"
+<span use:viewport onenterViewport={handleEnterViewport} class="inline-flex"
   >{#if hasLoaded}{#if petname}📛{petname}{:else}@<Metadata
         queryKey={["metadata", pubhex]}
         pubkey={pubhex}
-        let:metadata
-        ><span
-          slot="loading"
-          class="text-sm text-neutral-500 inline-flex break-all"
-          >{loadingText}</span
-        ><span
-          slot="nodata"
-          class="text-sm text-neutral-500 inline-flex break-all"
-          >{loadingText}</span
-        ><span
-          slot="error"
-          class="text-sm text-neutral-500 inline-flex break-all"
-          let:error>{loadingText}</span
-        >{profile(metadata)?.name && profile(metadata)?.name !== ""
-          ? profile(metadata)?.name
-          : profile(metadata)?.display_name}</Metadata
-      >{/if}{:else}{encodePub}{/if}</span
+      >
+        {#snippet loading()}
+          <span class="text-sm text-neutral-500 inline-flex break-all"
+            >{loadingText}</span
+          >{/snippet}
+        {#snippet nodata()}
+          <span class="text-sm text-neutral-500 inline-flex break-all"
+            >{loadingText}</span
+          >
+        {/snippet}
+        {#snippet error()}
+          <span class="text-sm text-neutral-500 inline-flex break-all"
+            >{loadingText}</span
+          >
+        {/snippet}
+        {#snippet content({ metadata })}
+          {profile(metadata)?.name && profile(metadata)?.name !== ""
+            ? profile(metadata)?.name
+            : profile(metadata)?.display_name}
+        {/snippet}
+      </Metadata>{/if}{:else}{encodePub}{/if}</span
 >

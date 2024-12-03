@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import type { ReqStatus } from "$lib/types";
 
@@ -8,18 +9,31 @@
   import type { EventPacket } from "rx-nostr";
   import { onDestroy } from "svelte";
 
-  export let id: string;
-  let _result: { data: EventPacket; status: any; error: any };
+  interface Props {
+    id: string;
+
+    loading?: import("svelte").Snippet;
+
+    content?: import("svelte").Snippet<
+      [
+        {
+          event: Nostr.Event;
+        },
+      ]
+    >;
+  }
+
+  let { id, loading, content }: Props = $props();
+  // export let id: string;
+  let _result: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
+
+  let data = $derived(_result?.data);
 
   const observer1 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "reaction", id, $loginUser],
   });
 
-  // let unsubscribe: () => void;
-  // onMount(() => {
-  //   const data = $queryClient?.getQueryData(queryKey);
-  //   console.log(data);
-  //   console.log($queryClient?.getQueriesData({ queryKey: queryKey }));
   const unsubscribe = observer1.subscribe((result: any) => {
     if (
       !_result?.data?.event ||
@@ -39,17 +53,8 @@
     unsubscribe();
     // $queryClient.removeQueries({ queryKey: queryKey });
   });
-  $: data = _result?.data;
-  $: status = _result?.status;
-  $: error = _result?.error;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface $$Slots {
-    default: { event: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 <!-- {observer1?.hasListeners()}
@@ -58,11 +63,8 @@
 <div class="break-all">error:{error}</div> -->
 
 {#if data?.event}
-  <slot event={data?.event} {status} />
-{:else if error}
-  <slot name="error" {error} />
-{:else if status === "loading"}
-  <slot name="loading" />
+  {@render content?.({ event: data?.event })}
+  <!-- <slot event={data?.event} {status} /> -->
 {:else}
-  <slot name="nodata" />
+  {@render loading?.()}
 {/if}

@@ -6,9 +6,13 @@
   import { locale } from "svelte-i18n";
   import type { DateValue } from "@internationalized/date";
 
-  export let title: string = "Date";
-  export let minValue: DateValue | undefined = undefined;
-  export let maxValue: DateValue | undefined = undefined;
+  interface Props {
+    title?: string;
+    minValue?: DateValue | undefined;
+    maxValue?: DateValue | undefined;
+  }
+
+  let { title = "Date", minValue = undefined, maxValue = undefined }: Props = $props();
 
   let {
     elements: {

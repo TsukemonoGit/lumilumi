@@ -1,13 +1,7 @@
 <script lang="ts">
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import { nip19 } from "nostr-tools";
-  import * as Nostr from "nostr-typedef";
 
-  import { MessagesSquare } from "lucide-svelte";
-  import Text from "$lib/components/NostrMainData/Text.svelte";
-  import type { ChannelData } from "$lib/types";
-  import { getRelaysById } from "$lib/func/nostr";
-  import { goto } from "$app/navigation";
+  import * as Nostr from "nostr-typedef";
 
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import Content from "../Content.svelte";
@@ -17,23 +11,29 @@
   import { replyedEvent } from "$lib/func/event";
   import ChannelTag from "./ChannelTag.svelte";
 
-  export let thread: boolean;
-  export let displayMenu: boolean;
-  export let note: Nostr.Event;
-  export let depth: number;
-  export let repostable: boolean;
-  export let tieKey: string | undefined;
+  interface Props {
+    thread: boolean;
+    displayMenu: boolean;
+    note: Nostr.Event;
+    depth: number;
+    repostable: boolean;
+    tieKey: string | undefined;
+  }
+
+  let { thread, displayMenu, note, depth, repostable, tieKey }: Props =
+    $props();
 
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
 
-  $: res = replyedEvent(note.tags);
-  $: replyTag =
+  let res = $derived(replyedEvent(note.tags));
+  let replyTag = $derived(
     res.replyTag && res.replyTag.length > 3 && res.replyTag[3] === "root"
       ? undefined
-      : res.replyTag; //rootは部屋ID
-  $: replyUsers = res.replyUsers;
+      : res.replyTag
+  ); //rootは部屋ID
+  let replyUsers = $derived(res.replyUsers);
   // const replyedEvent = (
   //   tags: string[][]
   // ): { replyID: string | undefined; replyUsers: string[] } => {
@@ -56,7 +56,7 @@
   const checkContentWarning = (tags: string[][]): string[] | undefined => {
     return tags.find((item) => item[0] === "content-warning");
   };
-  $: warningTag = checkContentWarning(note.tags);
+  let warningTag = $derived(checkContentWarning(note.tags));
 </script>
 
 {#if replyUsers.length > 0}

@@ -14,12 +14,7 @@
   } from "$lib/stores/stores";
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "../Elements/AlertDialog.svelte";
-  import type {
-    Updater,
-    Subscriber,
-    Invalidator,
-    Unsubscriber,
-  } from "svelte/motion";
+
   import * as Nostr from "nostr-typedef";
   import {
     decryptContent,
@@ -27,10 +22,11 @@
     toMuteList,
   } from "$lib/func/settings";
   import { promisePublishEvent } from "$lib/func/nostr";
+  import { writable } from "svelte/store";
 
   //export let muteList: LumiMute;
 
-  let muteInput: string = "";
+  let muteInput: string = $state("");
 
   const options = ["Word", "Hashtag", "User", "Thread"];
 
@@ -47,20 +43,8 @@
     },
   });
 
-  let dialogOpen: {
-    update: (
-      updater: Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: Subscriber<boolean>,
-      invalidate?: Invalidator<boolean> | undefined
-    ): Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  // svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
   let addTag: string[] = [];
   async function handleClickAdd() {
     console.log("[type]", $selectedLabel, "[str]", muteInput);
@@ -135,7 +119,7 @@
 
       $nowProgress = false;
 
-      $dialogOpen = true;
+      dialogOpen?.(true);
       return;
     }
     //本当に含まれていないか探す
@@ -186,7 +170,7 @@
   }
 
   async function handleClickOk() {
-    $dialogOpen = false;
+    dialogOpen?.(false);
 
     if (addTag.length <= 0) {
       $toastSettings = {
@@ -275,17 +259,19 @@
     bind:value={muteInput}
   />
   <button
-    on:click={handleClickAdd}
+    onclick={handleClickAdd}
     class=" rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     >ADD</button
   >
 </div>
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickOk}
   title={$_("create.kind10000.title")}
   okButtonName="OK"
-  ><div slot="main">{$_("create.kind10000.text")}</div></AlertDialog
+  >{#snippet main()}
+    <div>{$_("create.kind10000.text")}</div>
+  {/snippet}</AlertDialog
 >
 
 <style lang="postcss">

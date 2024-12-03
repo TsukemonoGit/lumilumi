@@ -1,14 +1,27 @@
 <script lang="ts">
   import { splitHexColorString } from "$lib/func/util";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
+  import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
-  export let url: string | undefined;
-  export let name: string | undefined;
-  export let pubkey: string | undefined;
-  export let size: number = 40;
-  export let square: boolean = false;
-  export let title: string = "";
-  export let handleStateError = () => {};
+  interface Props {
+    url: string | undefined;
+    name: string | undefined;
+    pubkey: string | undefined;
+    size?: number;
+    square?: boolean;
+    title?: string;
+    handleStateError?: any;
+  }
+
+  let {
+    url,
+    name,
+    pubkey,
+    size = 40,
+    square = false,
+    title = "",
+    handleStateError = () => {},
+  }: Props = $props();
   export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
     curr,
     next,
@@ -26,9 +39,14 @@
     src: url ?? "",
     onLoadingStatusChange: handleState,
   });
-  $: if (url) {
-    src.set(url);
-  }
+
+  $effect(() => {
+    if (url) {
+      untrack(() => {
+        src.set(url);
+      });
+    }
+  });
 </script>
 
 <div

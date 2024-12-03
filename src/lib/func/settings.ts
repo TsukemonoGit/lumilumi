@@ -118,7 +118,7 @@ export async function getQueryRelays(
   console.log(defaultRelayData);
 
   if (!defaultRelayData) {
-    console.log("t");
+    // console.log("t");
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
     if (relayList.length > 0) {

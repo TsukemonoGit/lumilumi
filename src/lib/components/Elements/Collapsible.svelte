@@ -2,6 +2,12 @@
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { ChevronsUpDown, X } from "lucide-svelte";
   import { slide } from "svelte/transition";
+  interface Props {
+    title?: import('svelte').Snippet;
+    contentEle?: import('svelte').Snippet;
+  }
+
+  let { title, contentEle }: Props = $props();
 
   const {
     elements: { root, content, trigger },
@@ -13,7 +19,7 @@
 
 <div use:melt={$root} class="relative max-w-full">
   <button use:melt={$trigger} class="flex items-center justify-between w-full">
-    <div><slot name="title"></slot></div>
+    <div>{@render title?.()}</div>
     <div
       class="relative h-6 w-6 place-items-center rounded-md bg-white text-sm
         text-magnum-800 shadow hover:opacity-75 data-[disabled]:cursor-not-allowed
@@ -33,7 +39,7 @@
   <div>
     {#if $open}
       <div use:melt={$content} transition:slide>
-        <slot name="contentEle"></slot>
+        {@render contentEle?.()}
       </div>
     {/if}
   </div>

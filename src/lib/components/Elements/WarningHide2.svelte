@@ -2,7 +2,11 @@
   import { TriangleAlert } from "lucide-svelte";
   import { createSlider, melt } from "@melt-ui/svelte";
 
-  export let text: string;
+  interface Props {
+    text: string;
+  }
+
+  let { text }: Props = $props();
 
   const {
     elements: { root, range, thumbs },
@@ -46,11 +50,11 @@
   class="relative flex h-[24px] w-[calc(100%-24px)] mx-auto items-center"
 >
   <span class="h-[3px] w-full bg-magnum-100/40">
-    <span use:melt={$range} class="h-[3px] bg-neutral-900/80" />
+    <span use:melt={$range} class="h-[3px] bg-neutral-900/80"></span>
   </span>
 
   <span
     use:melt={$thumbs[0]}
     class="h-5 w-5 rounded-full bg-magnum-500 focus:ring-4 focus:!ring-magnum-400/40"
-  />
+></span>
 </span>

@@ -4,10 +4,12 @@
 
   import * as Nostr from "nostr-typedef";
 
-  export let events: Nostr.Event<number>[];
-  export let tieKey: string;
+  interface Props {
+    events: Nostr.Event<number>[];
+    tieKey: string; // const followFilteredEvents = writable<Nostr.Event[]>();
+  }
 
-  // const followFilteredEvents = writable<Nostr.Event[]>();
+  let { events, tieKey }: Props = $props();
 
   // export const getFollowFilteredEvents = (
   //   events: Nostr.Event[],
@@ -39,21 +41,25 @@
     <!-- <div
                 class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card "
               > -->
-    <Metadata
-      queryKey={["metadata", event.pubkey]}
-      pubkey={event.pubkey}
-      let:metadata
-    >
-      <div slot="loading" class="w-full">
-        <EventCard note={event} repostable={true} {tieKey} />
-      </div>
-      <div slot="nodata" class="w-full">
-        <EventCard note={event} repostable={true} {tieKey} />
-      </div>
-      <div slot="error" class="w-full">
-        <EventCard note={event} repostable={true} {tieKey} />
-      </div>
-      <EventCard {metadata} note={event} repostable={true} {tieKey} />
+    <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+      {#snippet loading()}
+        <div class="w-full">
+          <EventCard note={event} repostable={true} {tieKey} />
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div class="w-full">
+          <EventCard note={event} repostable={true} {tieKey} />
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div class="w-full">
+          <EventCard note={event} repostable={true} {tieKey} />
+        </div>
+      {/snippet}
+      {#snippet content({ metadata })}
+        <EventCard {metadata} note={event} repostable={true} {tieKey} />
+      {/snippet}
     </Metadata>
     <!-- </div> -->
   {/each}

@@ -5,41 +5,48 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { createRadioGroup, melt } from "@melt-ui/svelte";
   import { _ } from "svelte-i18n";
-  import { showBanner, timelineFilter } from "$lib/stores/stores";
+  import { showBanner } from "$lib/stores/stores";
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
-  let openPopover: any;
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],
     ["2", $_("filter.canversation.none")],
   ];
   const selected = writable<string>(
-    optionsArr[$timelineFilter.selectCanversation][0]
+    optionsArr[timelineFilter.get.selectCanversation][0]
   );
 
   const {
     elements: { root, item, hiddenInput },
     helpers: { isChecked },
   } = createRadioGroup({
-    defaultValue: optionsArr[$timelineFilter.selectCanversation][0],
+    defaultValue: optionsArr[timelineFilter.get.selectCanversation][0],
     value: selected,
   });
-  // $: console.log($timelineFilter.adaptMute);
-  $: $timelineFilter.selectCanversation = Number($selected);
-  $: if ($timelineFilter) {
-    localStorage.setItem("timelineFilter", JSON.stringify($timelineFilter));
-  }
-  $: localStorage.setItem("showBanner", $showBanner.toString());
+  // $: console.log(timelineFilter.get.adaptMute);
+  selected.subscribe((value) => {
+    if (value !== undefined && value !== null) {
+      timelineFilter.get.selectCanversation = Number(value);
+    }
+  });
+
+  showBanner.subscribe((value) => {
+    if (value !== undefined && value !== null) {
+      localStorage.setItem("showBanner", value.toString());
+    }
+  });
 </script>
 
 <header>
   <div class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
     <div class="flex w-full h-8 justify-center items-center gap-4">
       {#if $currentPage?.Icon}
+        {@const SvelteComponent = $currentPage.Icon}
         <div>
-          <svelte:component this={$currentPage.Icon} />
+          <SvelteComponent />
         </div>
       {/if}
       <div class="uppercase font-bold">
@@ -52,76 +59,73 @@
       <div class="fixed w-full top-0">
         <div class="container relative">
           <div class="option">
-            <Popover
-              bind:open={openPopover}
-              ariaLabel="timeline filter setting"
-              showCloseButton={true}
-            >
+            <Popover ariaLabel="timeline filter setting" showCloseButton={true}>
               <div
                 class=" flex items-center font-bold text-sm gap-1 rounded-full border text-magnum-200 border-magnum-300
                 hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
               >
                 <SlidersHorizontal size={16} />Options
               </div>
-              <div
-                slot="popoverContent"
-                class="w-[320px] max-w-full flex flex-col"
-              >
-                <ul>
-                  {#if $currentPage?.alt === "home"}
-                    <li class="mb-2">
-                      <div class="label">{$_("filter.menu.canversation")}</div>
-                      <div
-                        use:melt={$root}
-                        class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
-                        aria-label="View density"
-                      >
-                        {#each optionsArr as [index, option]}
-                          <div class="flex items-center gap-3">
-                            <button
-                              use:melt={$item(index)}
-                              class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
-      hover:bg-magnum-800"
-                              id={option}
-                              aria-labelledby="{option}-label"
-                            >
-                              {#if $isChecked(index)}
-                                <div
-                                  class="h-3 w-3 rounded-full bg-magnum-400"
-                                />
-                              {/if}
-                            </button>
-                            <label for={option} id="{option}-label">
-                              {option}
-                            </label>
-                          </div>
-                        {/each}
-                        <input name="line-height" use:melt={$hiddenInput} />
-                      </div>
+              {#snippet popoverContent()}
+                <div class="w-[320px] max-w-full flex flex-col">
+                  <ul>
+                    {#if $currentPage?.alt === "home"}
+                      <li class="mb-2">
+                        <div class="label">
+                          {$_("filter.menu.canversation")}
+                        </div>
+                        <div
+                          use:melt={$root}
+                          class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
+                          aria-label="View density"
+                        >
+                          {#each optionsArr as [index, option]}
+                            <div class="flex items-center gap-3">
+                              <button
+                                use:melt={$item(index)}
+                                class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
+        hover:bg-magnum-800"
+                                id={option}
+                                aria-labelledby="{option}-label"
+                              >
+                                {#if $isChecked(index)}
+                                  <div
+                                    class="h-3 w-3 rounded-full bg-magnum-400"
+                                  ></div>
+                                {/if}
+                              </button>
+                              <label for={option} id="{option}-label">
+                                {option}
+                              </label>
+                            </div>
+                          {/each}
+                          <input name="line-height" use:melt={$hiddenInput} />
+                        </div>
+                      </li>
+                    {/if}
+                    <li>
+                      <label class="label">
+                        <input
+                          type="checkbox"
+                          class="rounded-checkbox"
+                          bind:checked={timelineFilter.get.adaptMute}
+                        />
+                        {$_("filter.menu.muteOn")}
+                      </label>
                     </li>
-                  {/if}
-                  <li>
-                    <label class="label">
-                      <input
-                        type="checkbox"
-                        class="rounded-checkbox"
-                        bind:checked={$timelineFilter.adaptMute}
-                      />
-                      {$_("filter.menu.muteOn")}
-                    </label>
-                  </li>
-                  <li>
-                    <label class="label">
-                      <input
-                        type="checkbox"
-                        class="rounded-checkbox"
-                        bind:checked={$showBanner}
-                      />
-                      {$_("settings.display.banner")}
-                    </label>
-                  </li>
-                </ul>
-              </div></Popover
+                    <li>
+                      <label class="label">
+                        <input
+                          type="checkbox"
+                          class="rounded-checkbox"
+                          bind:checked={$showBanner}
+                        />
+                        {$_("settings.display.banner")}
+                      </label>
+                    </li>
+                  </ul>
+                </div>
+              {/snippet}</Popover
             >
           </div>
         </div>

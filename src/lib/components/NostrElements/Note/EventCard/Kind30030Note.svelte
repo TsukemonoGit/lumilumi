@@ -15,50 +15,43 @@
   import { createEmojiListFrom10030 } from "$lib/func/settings";
   import { _ } from "svelte-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import type {
-    Invalidator,
-    Subscriber,
-    Unsubscriber,
-    Updater,
-  } from "svelte/store";
+  import type { Subscriber, Unsubscriber, Updater } from "svelte/store";
   import ClientTag from "../ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  export let note: Nostr.Event;
-  export let repostable: boolean;
-  export let maxHeight: string;
-  export let tieKey: string | undefined;
-  $: dtag = note?.tags?.find((tag) => tag[0] === "d")?.[1];
-  $: title = note?.tags?.find((tag) => tag[0] === "title")?.[1];
-  $: description = note.tags.find(
-    (tag) =>
-      (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-  )?.[1];
-  $: image = note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1];
-  $: atag = `${note.kind}:${note.pubkey}:${dtag}`;
+  interface Props {
+    note: Nostr.Event;
+    repostable: boolean;
+    maxHeight: string;
+    tieKey: string | undefined;
+  }
+
+  let { note, repostable, maxHeight, tieKey }: Props = $props();
+  let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
+  let title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
+  let description = $derived(
+    note.tags.find(
+      (tag) =>
+        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
+    )?.[1]
+  );
+  let image = $derived(
+    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+  );
+  let atag = $derived(`${note.kind}:${note.pubkey}:${dtag}`);
   //このカスタム絵文字が10030に含まれるかチェック
-  $: inMyCustomEmoji = $emojis.event?.tags.find(
-    (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
+  let inMyCustomEmoji = $derived(
+    $emojis.event?.tags.find(
+      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
+    )
   );
 
-  let dialogOpen: {
-    update: (
-      updater: Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: Subscriber<boolean>,
-      invalidate?: Invalidator<boolean> | undefined
-    ): Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  // svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
 
   async function handleClickMakeKind10030() {
     console.log("make new 10030");
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $nowProgress = true;
     disabled = true;
 
@@ -105,7 +98,7 @@
     if (!newestKind10030) {
       //データないけど新しく作っていいですかnoyatu
       $nowProgress = false;
-      $dialogOpen = true;
+      dialogOpen?.(true);
       return;
     }
     //新しいリストにほんとに含まれてないか確認
@@ -153,7 +146,7 @@
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
-  let disabled = false;
+  let disabled = $state(false);
   async function handleClickRemove() {
     console.log("myEmojiListから", inMyCustomEmoji, "を削除");
     $nowProgress = true;
@@ -277,13 +270,13 @@
   {#if inMyCustomEmoji}
     <button
       disabled={$nowProgress || disabled}
-      on:click={handleClickRemove}
+      onclick={handleClickRemove}
       class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
       >{$_("customEmoji.remove")}</button
     >
   {:else}
     <button
-      on:click={handleClickAdd}
+      onclick={handleClickAdd}
       disabled={$nowProgress || disabled}
       class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
       >{$_("customEmoji.add")}</button
@@ -293,9 +286,11 @@
 </div>
 
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={handleClickMakeKind10030}
   title={$_("create.10030.title")}
   okButtonName="OK"
-  ><div slot="main">{$_("create.10030.text")}</div></AlertDialog
+  >{#snippet main()}
+    <div>{$_("create.10030.text")}</div>
+  {/snippet}</AlertDialog
 >

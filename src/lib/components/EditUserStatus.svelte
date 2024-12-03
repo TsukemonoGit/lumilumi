@@ -1,10 +1,10 @@
+<!--edituserstatus.svelte-->
 <script lang="ts">
   import {
     emojis,
     nowProgress,
     showImg,
     toastSettings,
-    userStatusStore,
   } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { SmilePlus, X } from "lucide-svelte";
@@ -19,6 +19,11 @@
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
+  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
+
+  let { dialogOpen = $bindable() } = $props();
+
+  let openPopover: (bool: boolean) => void = $state(() => {});
   const {
     elements: {
       trigger,
@@ -33,11 +38,16 @@
   } = createDialog({
     forceVisible: true,
   });
+  dialogOpen?.subscribe((value: boolean) => {
+    console.log(value);
+    if (value) {
+      $open = value;
+      $dialogOpen = false;
+    }
+  });
 
-  export { trigger };
-
-  let userStatus: string = "";
-  let userURL: string = "";
+  let userStatus: string = $state("");
+  let userURL: string = $state("");
   //  $open = true;
 
   open.subscribe(async (value) => {
@@ -55,7 +65,7 @@
         // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
         //   ["userStatus", "general", pubkey]
         // );
-        const statusEvent: Nostr.Event | undefined = $userStatusStore
+        const statusEvent: Nostr.Event | undefined = userStatusMap.get
           .get(pubkey)
           ?.get("general");
         console.log(statusEvent);
@@ -141,9 +151,11 @@
       $open = false;
     }
   };
-  let displayNameEmojiOpen: any;
+
   let emojiTags: string[][] = [];
   const handleClickEmojiDisplayName = (e: string[]) => {
+    openPopover?.(false);
+
     const emojiTag = ["emoji", ...e];
     if (!emojiTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
       emojiTags.push(emojiTag);
@@ -203,7 +215,7 @@
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-    />
+    ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
             max-w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
@@ -227,37 +239,35 @@
           bind:value={userStatus}
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
-            <Popover
-              bind:open={displayNameEmojiOpen}
-              ariaLabel="custom emoji"
-              zIndex={100}
-            >
+            <Popover bind:openPopover ariaLabel="custom emoji" zIndex={100}>
               <SmilePlus size="20" />
-              <div slot="popoverContent">
-                <div
-                  class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
-                >
-                  {#each $emojis.list as e, index}
-                    {#if customReaction === "" || e[0]
-                        .toLowerCase()
-                        .includes(customReaction.toLowerCase())}
-                      <button
-                        on:click={() => handleClickEmojiDisplayName(e)}
-                        class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                      >
-                        {#if $showImg}
-                          <img
-                            loading="lazy"
-                            class="h-6 object-contain justify-self-center"
-                            src={e[1]}
-                            alt={e[0]}
-                            title={e[0]}
-                          />{:else}{e[0]}{/if}
-                      </button>
-                    {/if}
-                  {/each}
+              {#snippet popoverContent()}
+                <div>
+                  <div
+                    class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+                  >
+                    {#each $emojis.list as e, index}
+                      {#if customReaction === "" || e[0]
+                          .toLowerCase()
+                          .includes(customReaction.toLowerCase())}
+                        <button
+                          onclick={() => handleClickEmojiDisplayName(e)}
+                          class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                        >
+                          {#if $showImg}
+                            <img
+                              loading="lazy"
+                              class="h-6 object-contain justify-self-center"
+                              src={e[1]}
+                              alt={e[0]}
+                              title={e[0]}
+                            />{:else}{e[0]}{/if}
+                        </button>
+                      {/if}
+                    {/each}
+                  </div>
                 </div>
-              </div>
+              {/snippet}
             </Popover>
           </div>
         {/if}
@@ -283,7 +293,7 @@
           Cancel
         </button>
         <button
-          on:click={handleClickSave}
+          onclick={handleClickSave}
           class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
         >

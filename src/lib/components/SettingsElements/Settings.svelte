@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { writable } from "svelte/store";
+  import { onMount } from "svelte";
+  import { writable, type Writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
   import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
@@ -16,7 +16,6 @@
     showRelayIcon,
     defaultReaction,
     showReactioninTL,
-    nostrWalletConnect,
     nowProgress,
     showUserStatus,
     showKind16,
@@ -40,7 +39,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image } from "lucide-svelte";
+  import { Save, X, Image, RotateCw } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -63,7 +62,7 @@
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
-  let settings: LumiSetting = { ...initSettings };
+  let settings: LumiSetting = $state({ ...initSettings });
 
   //以下3つは同期した時点で保存
   // let lumiEmoji: LumiEmoji;
@@ -83,11 +82,15 @@
     states: { value: relaySetValue },
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
+    // svelte-ignore state_referenced_locally
     defaultValue: settings.useRelaySet,
   });
-  $: if ($relaySetValue) {
-    settings.useRelaySet = $relaySetValue;
-  }
+
+  relaySetValue.subscribe((value) => {
+    if (value) {
+      settings.useRelaySet = value;
+    }
+  });
 
   const optionsArr = ["0", "1"];
   const optionsArrStr = [
@@ -175,7 +178,7 @@
     }
   }
 
-  let relayInput: string = "";
+  let relayInput: string = $state("");
 
   function addRelay() {
     if (!relayInput) return;
@@ -250,7 +253,7 @@
 
     $defaultReaction = settings.defaultReaction;
     $showReactioninTL = settings.showReactioninTL;
-    $nostrWalletConnect = settings.nostrWalletConnect;
+    // $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
 
     $showKind16 = settings.showKind16;
@@ -336,7 +339,7 @@
     return true;
   }
 
-  let inputPubkey: string;
+  let inputPubkey: string = $state("");
 
   function cancelSettings() {
     console.log("cancel");
@@ -404,12 +407,12 @@
     return false;
   }
 
-  // let shouldReload = false;
-  // // リロード前にフラグを設定してイベントリスナーを無効にする関数
-  // function reloadWithoutWarning() {
-  //   shouldReload = true;
-  //   location.reload();
-  // }
+  let shouldReload = false;
+  // リロード前にフラグを設定してイベントリスナーを無効にする関数
+  function reloadWithoutWarning() {
+    shouldReload = true;
+    location.reload();
+  }
 
   // function handleBeforeUnload(e: BeforeUnloadEvent) {
   //   if (!shouldReload && settingsChanged()) {
@@ -440,16 +443,18 @@
     //  shouldReload = false;
   });
 
-  let emojiTag: string[] | undefined;
-  let customString: string | undefined;
+  const emojiTag: Writable<string[]> = writable([]);
+  let customString: string = $state("");
 
-  $: if (emojiTag && emojiTag.length > 0) {
-    console.log(emojiTag);
-    settings.defaultReaction = {
-      content: `:${emojiTag[0]}:`,
-      tag: ["emoji", ...emojiTag],
-    };
-  }
+  emojiTag.subscribe((value) => {
+    if (value && value.length > 0) {
+      console.log(value);
+      settings.defaultReaction = {
+        content: `:${value[0]}:`,
+        tag: ["emoji", ...value],
+      };
+    }
+  });
   const handleClickOk = () => {
     console.log(customString);
     if (customString) {
@@ -457,20 +462,8 @@
     }
   };
 
-  let open: {
-    update: (
-      updater: import("svelte/store").Updater<boolean>,
-      sideEffect?: ((newValue: boolean) => void) | undefined
-    ) => void;
-    set: (this: void, value: boolean) => void;
-    subscribe(
-      this: void,
-      run: import("svelte/store").Subscriber<boolean>,
-      invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-    ): import("svelte/store").Unsubscriber;
-    get: () => boolean;
-    destroy?: (() => void) | undefined;
-  };
+  // svelte-ignore non_reactive_update
+  let open: Writable<boolean> = writable(false);
 
   let displayimage = writable<string>();
   const onClickglobalImageOpen = () => {
@@ -491,7 +484,7 @@
     <div class="ml-2">
       <button
         class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        on:click={handleClickLogin}>Get Pubkey</button
+        onclick={handleClickLogin}>Get Pubkey</button
       >
       <input
         type="text"
@@ -519,7 +512,7 @@
             aria-labelledby="{option}-label"
           >
             {#if $radioGroupisChecked(option)}
-              <div class="h-3 w-3 rounded-full bg-magnum-500" />
+              <div class="h-3 w-3 rounded-full bg-magnum-500"></div>
             {/if}
           </button>
           <label
@@ -552,7 +545,7 @@
             </label>
             <button
               class="hover:opacity-75 active:opacity-50"
-              on:click={() => removeRelay(relay.url)}><X /></button
+              onclick={() => removeRelay(relay.url)}><X /></button
             >
           </div>
           <hr />
@@ -570,7 +563,7 @@
 
             <button
               class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-              on:click={addRelay}>Add</button
+              onclick={addRelay}>Add</button
             >
           </div>
         </div>
@@ -601,7 +594,7 @@
         <div class="flex">
           {$_("settings.globalRelay")}<button
             class="inline-flex mt-auto rounded-md px-2 bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-            on:click={onClickglobalImageOpen}><Image /></button
+            onclick={onClickglobalImageOpen}><Image /></button
           >
         </div>
       </div>
@@ -645,7 +638,7 @@
               root={undefined}
               atag={undefined}
               {handleClickOk}
-              bind:emoji={emojiTag}
+              bind:emoji={$emojiTag}
               bind:customReaction={customString}
             />{#if settings.defaultReaction?.tag?.length > 0}
               {#if $showImg}
@@ -810,7 +803,7 @@
           >{$_("settings.nostviewstr.kind30007")}
         </a><button
           class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-          on:click={onClickkindImageOpen}><Image /></button
+          onclick={onClickkindImageOpen}><Image /></button
         >
       </div>
     {/if}
@@ -826,7 +819,7 @@
       <Link
         className="underline text-magnum-300"
         href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
-        >(NIP-30)</Link
+        >{#snippet content()}(NIP-30){/snippet}</Link
       >
     </div>
     {#if $loginUser}
@@ -865,26 +858,28 @@
   <div
     class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
   >
-    <!-- <button
+    <button
       class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
-      on:click={reloadWithoutWarning}><RotateCw /></button
-    > -->
+      onclick={reloadWithoutWarning}><RotateCw /></button
+    >
 
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
-      on:click={saveSettings}><Save />SAVE</button
+      onclick={saveSettings}><Save />SAVE</button
     >
     <button
       class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
-      on:click={cancelSettings}>CANCEL</button
+      onclick={cancelSettings}>CANCEL</button
     >
   </div>
 </div>
 
 <Dialog bind:open
-  ><div slot="main" class="flex w-full justify-center">
-    <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />
-  </div></Dialog
+  >{#snippet main()}
+    <div class="flex w-full justify-center">
+      <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />
+    </div>
+  {/snippet}</Dialog
 >
 
 <style>

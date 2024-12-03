@@ -15,17 +15,19 @@
     actions: { portal },
   } = createToaster<ToastData>();
 
-  $: if (
-    $reactionToast &&
-    !(
-      (!$reactionToast.title || $reactionToast.title === "") &&
-      (!$reactionToast.description || $reactionToast.description === "")
-    )
-  ) {
-    addToast({
-      data: $reactionToast,
-    });
-  }
+  reactionToast.subscribe((value) => {
+    if (
+      value &&
+      !(
+        (!value.title || value.title === "") &&
+        (!value.description || value.description === "")
+      )
+    ) {
+      addToast({
+        data: value,
+      });
+    }
+  });
 
   const getEvent = (data: ToastData): Nostr.Event | undefined => {
     try {

@@ -1,12 +1,6 @@
 <script lang="ts">
   import { now, type EventPacket } from "rx-nostr";
-  import {
-    defaultRelays,
-    followList,
-    loginUser,
-    onlyFollowee,
-    queryClient,
-  } from "$lib/stores/stores";
+  import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -22,6 +16,7 @@
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   import { _ } from "svelte-i18n";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50;
   let viewIndex = 0;
@@ -42,13 +37,20 @@
       limit: undefined,
     },
   ];
-  $: readRelays = $defaultRelays
-    ? Object.values($defaultRelays)
-        .filter((config) => config.read)
-        .map((value) => value.url)
-    : [];
-  $: console.log(readRelays);
-  let view = false;
+
+  // let readRelays = $derived(
+  //   $defaultRelays
+  //     ? Object.values($defaultRelays)
+  //         .filter((config) => config.read)
+  //         .map((value) => value.url)
+  //     : []
+  // );
+
+  // run(() => {
+  //   console.log(readRelays);
+  // });
+
+  let view = $state(false);
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
@@ -75,6 +77,7 @@
   async function init() {
     const ev: EventPacket[] | undefined =
       $queryClient?.getQueryData(timelineQuery);
+    console.log(ev);
     if (!ev || ev.length <= 0) {
       filters[0].since = undefined;
       filters[0].limit = 100;
@@ -82,6 +85,7 @@
     } else {
       filters[0].since = ev[0].event.created_at;
       filters[0].until = now();
+      //updateViewEvent();
     }
   }
 
@@ -114,7 +118,9 @@
   //   easing: cubicInOut,
   // });
 
-  $: console.log($value); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
+  //  run(() => {
+  //    console.log($value);
+  //  }); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
   const handleClickAll = () => {
     value.set(triggers.map((trigger) => trigger.id));
@@ -127,13 +133,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    if (onlyFollowee && $followList) {
+    if (onlyFollowee && followList.get) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return $followList.has(event.pubkey);
+          return followList.get.has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && $followList.has(kind9734.pubkey);
+          return kind9734 && followList.get.has(kind9734.pubkey);
         }
       });
     } else {
@@ -141,17 +147,17 @@
     }
   };
 
-  let notifilter = (event: Nostr.Event): boolean => {
+  const notifilter = (event: Nostr.Event): boolean => {
     if (event.pubkey === $loginUser) {
       return false;
     }
-    if ($onlyFollowee && $followList) {
+    if ($onlyFollowee && followList.get) {
       //フォロイーのみ
       if (event.kind !== 9735) {
-        if (!$followList.has(event.pubkey)) return false;
+        if (!followList.get.has(event.pubkey)) return false;
       } else {
         const kind9734 = extractKind9734(event);
-        if (kind9734 !== undefined && !$followList.has(kind9734.pubkey)) {
+        if (kind9734 !== undefined && !followList.get.has(kind9734.pubkey)) {
           return false;
         }
       }
@@ -194,12 +200,18 @@
       }
     });
   };
-  let updateViewEvent: any;
-  $: if ($value || $onlyFollowee) {
-    if (updateViewEvent) {
-      updateViewEvent();
-    }
-  }
+
+  // svelte-ignore non_reactive_update
+  let updateViewEvent: () => void = () => {};
+
+  value?.subscribe((val) => {
+    setTimeout(() => {
+      console.log($value);
+      if (val !== undefined && updateViewEvent) {
+        updateViewEvent();
+      }
+    }, 0); //これしないとvalueの値が変になる
+  });
 </script>
 
 <!-- <svelte:head>
@@ -222,7 +234,7 @@
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === triggers.length}
-          on:click={handleClickAll}
+          onclick={handleClickAll}
         >
           All
         </button>
@@ -236,14 +248,14 @@
             {#if typeof triggerItem.title === "string"}
               {triggerItem.title}
             {:else}
-              <svelte:component this={triggerItem.title} />
+              <triggerItem.title />
             {/if}
           </button>
         {/each}
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === 0}
-          on:click={handleClickNone}
+          onclick={handleClickNone}
         >
           None
         </button>
@@ -252,42 +264,50 @@
         <NotificationList
           queryKey={timelineQuery}
           {filters}
-          let:events
           {viewIndex}
           {amount}
-          bind:eventFilter={notifilter}
+          eventFilter={notifilter}
           {tieKey}
           bind:updateViewEvent
         >
-          <!-- <div slot="loading">
-          <p>Loading...</p>
-        </div> -->
+          {#snippet children({ events })}
+            <!-- <div slot="loading">
+            <p>Loading...</p>
+          </div> -->
 
-          <!-- <SetRepoReactions /> -->
-          <div
-            class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-          >
-            {#if events && events.length > 0}
-              {#each events as event, index (event.id)}
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                  let:metadata
-                >
-                  <div slot="loading" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <div slot="nodata" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <div slot="error" class="w-full">
-                    <EventCard note={event} {tieKey} />
-                  </div>
-                  <EventCard {metadata} note={event} {tieKey} /></Metadata
-                >
-              {/each}
-            {/if}
-          </div>
+            <!-- <SetRepoReactions /> -->
+            <div
+              class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+            >
+              {#if events && events.length > 0}
+                {#each events as event, index (event.id)}
+                  <Metadata
+                    queryKey={["metadata", event.pubkey]}
+                    pubkey={event.pubkey}
+                  >
+                    {#snippet loading()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet nodata()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet error()}
+                      <div class="w-full">
+                        <EventCard note={event} {tieKey} />
+                      </div>
+                    {/snippet}
+                    {#snippet content({ metadata })}
+                      <EventCard {metadata} note={event} {tieKey} />
+                    {/snippet}
+                  </Metadata>
+                {/each}
+              {/if}
+            </div>
+          {/snippet}
         </NotificationList>{/if}
     </div>
   </section>

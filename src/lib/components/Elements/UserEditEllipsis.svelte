@@ -7,9 +7,13 @@
   import { nip19 } from "nostr-tools";
 
   import { goto } from "$app/navigation";
-  export let metadata: Nostr.Event;
+  interface Props {
+    metadata: Nostr.Event;
+  }
 
-  let menuTexts = [
+  let { metadata }: Props = $props();
+
+  const menuTexts = [
     { text: `${$_("user.profileEdit")}`, icon: User, num: 0 },
 
     { text: `${$_("settings.kind10002")}`, icon: RadioTower, num: 2 },

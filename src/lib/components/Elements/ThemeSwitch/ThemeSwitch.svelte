@@ -8,7 +8,7 @@
   import { setTheme } from "$lib/func/settings";
   import { onMount } from "svelte";
 
-  let userPrefersMode: Theme = "system";
+  let userPrefersMode: Theme = $state("system");
   onMount(() => {
     userPrefersMode = (localStorage?.getItem("theme") as Theme) ?? "system";
   });
@@ -30,7 +30,9 @@
   const select = createSelect({
     positioning: { placement: "bottom", gutter: 10 },
     forceVisible: true,
-    defaultSelected: modeToOption(userPrefersMode),
+    defaultSelected: modeToOption(
+      (localStorage?.getItem("theme") as Theme) ?? "system"
+    ),
     loop: false,
     onSelectedChange: ({ curr, next }) => {
       const definedNext = next ?? curr ?? themes[0];
@@ -69,7 +71,7 @@
     use:melt={$menu}
     class="z-50 flex w-32 flex-col rounded-md bg-neutral-700 px-1 py-1 shadow-sm shadow-neutral-800"
   >
-    <div use:melt={$arrow} />
+    <div use:melt={$arrow}></div>
     {#each themes as { value, label }}
       <button
         use:melt={$option({ value, label })}

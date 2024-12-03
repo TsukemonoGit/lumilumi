@@ -5,11 +5,9 @@
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
-  import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   import {
     defaultRelays,
-    followList,
     loginUser,
     nowProgress,
     queryClient,
@@ -24,32 +22,27 @@
   import { nip50relays } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";
 
-  export let data: {
-    searchWord: string;
-    searchKind: number | undefined;
-    searchPubkey: string;
-    searchHashtag: string;
-    searchSince: number | undefined;
-    searchUntil: number | undefined;
-    searchPubkeyTo: string;
-    followee: boolean;
-  };
+  import type { PageData } from "./$types";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
-  let searchWord = "";
-  let searchKind: number | undefined;
-  let searchPubkey = "";
-  let searchSince: number | undefined;
-  let searchUntil: number | undefined;
-  let searchHashtag: string | undefined;
-  let searchPubkeyTo: string = "";
-  let followee = false;
-  const filters: Writable<Nostr.Filter[]> = writable([]);
-  let showFilters: Nostr.Filter[];
+  let { data }: { data: PageData } = $props();
 
-  let compRef: SvelteComponent;
-  let openSearchResult = false;
+  let searchWord: string | undefined = $state();
+  let searchKind: number | undefined = $state();
+  let searchPubkey = $state("");
+  let searchSince: number | undefined = $state();
+  let searchUntil: number | undefined = $state();
+  let searchHashtag: string | undefined = $state();
+  let searchPubkeyTo: string = $state("");
+  let followee = $state(false);
+  // const filters: Writable<Nostr.Filter[]> = writable([]);
+  let filters = $derived(createFilter());
+  let showFilters: Nostr.Filter[] = $state.raw([]);
 
-  let searchRelays = nip50relays;
+  let compRef: SvelteComponent | undefined = $state();
+  let openSearchResult = $state(false);
+
+  let searchRelays = $state(nip50relays);
   function updateQueryParams() {
     const params = new URLSearchParams(window.location.search);
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
@@ -80,12 +73,7 @@
       init();
     }
   });
-  let readUrls: string[];
-  $: if ($defaultRelays) {
-    readUrls = Object.values($defaultRelays)
-      .filter((config) => config.read)
-      .map((config) => config.url);
-  }
+  let readUrls: string[] = $state.raw([]);
 
   async function waitForDefaultRelays(maxWaitTime: number) {
     const interval = 100; // 100ms ごとにチェック
@@ -138,8 +126,8 @@
     ) {
       await waitForDefaultRelays(5000);
 
-      createFilter();
-      // showFilters = $filters.map((filter) => {
+      // filters = createFilter();
+      // showFilters = filters.map((filter) => {
       //   return { ...filter, limit: 50 };
       // });
       console.log("showFilters", showFilters);
@@ -156,19 +144,6 @@
     }
   });
 
-  $: if (
-    searchKind === searchKind ||
-    searchHashtag ||
-    searchWord ||
-    searchPubkey ||
-    searchPubkeyTo ||
-    searchSince ||
-    searchUntil ||
-    followee
-  ) {
-    createFilter();
-  }
-
   function getHex(str: string): string {
     try {
       return nip19.decode(str).data as string;
@@ -178,32 +153,31 @@
     }
   }
 
-  function createFilter() {
-    searchPubkey = searchPubkey.trim();
-    searchPubkeyTo = searchPubkeyTo.trim();
-    $filters = [
-      {
-        search: searchWord || undefined,
+  function createFilter(): Nostr.Filter[] {
+    let filter: Nostr.Filter;
 
-        authors: npubRegex.test(searchPubkey)
-          ? [getHex(searchPubkey)]
-          : followee && $followList
-            ? Array.from($followList.keys())
-            : undefined,
-        since: !Number.isNaN(searchSince) ? searchSince : undefined,
-        until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-        // "#t": searchHashtag ? [searchHashtag] : [],
-        // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
-      },
-    ];
+    filter = {
+      search: searchWord || undefined,
+
+      authors: npubRegex.test(searchPubkey?.trim() ?? "")
+        ? [getHex(searchPubkey?.trim() ?? "")]
+        : followee && followList.get
+          ? Array.from(followList.get.keys())
+          : undefined,
+      since: !Number.isNaN(searchSince) ? searchSince : undefined,
+      until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
+      // "#t": searchHashtag ? [searchHashtag] : [],
+      // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
+    };
+
     if (searchHashtag) {
-      $filters[0] = { ...$filters[0], "#t": [searchHashtag] };
+      filter = { ...filter, "#t": [searchHashtag] };
     }
-    if (npubRegex.test(searchPubkeyTo)) {
-      $filters[0] = { ...$filters[0], "#p": [getHex(searchPubkeyTo)] };
+    if (npubRegex.test(searchPubkeyTo?.trim() ?? "")) {
+      filter = { ...filter, "#p": [getHex(searchPubkeyTo?.trim() ?? "")] };
     }
 
-    $filters[0].kinds =
+    filter.kinds =
       searchKind === undefined || searchKind === null
         ? undefined
         : [searchKind];
@@ -216,17 +190,18 @@
     // ) {
     //   const splitList = splitArray(followingList, chunk);
     //   // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
-    //   $filters = splitList.map((list) => ({
-    //     ...$filters[0], // $filters[0] のその他のデータを維持
+    //   filters = splitList.map((list) => ({
+    //     ...filters[0], // filters[0] のその他のデータを維持
     //     authors: list, // authors を分割されたリストに置き換える
     //   }));
     // }
+    return [filter];
   }
 
   function handleClickSearch() {
     $nowProgress = true;
     updateQueryParams();
-    showFilters = $filters.map((filter) => {
+    showFilters = filters.map((filter) => {
       return { ...filter, limit: 50 };
     });
 
@@ -289,18 +264,31 @@
     $nowProgress = false;
   };
 
-  const setRelay = (event: { detail: { relays: string[] } }) => {
-    console.log(event);
-    searchRelays = event.detail.relays;
+  const setRelay = (relays: string[]) => {
+    console.log(relays);
+    searchRelays = relays;
   };
+  defaultRelays.subscribe((value) => {
+    if (value) {
+      readUrls = Object.values(value)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
+  });
 </script>
 
 <section>
   {#if $loginUser}
-    <SetSearchRelays pubkey={$loginUser} let:relays on:relayChange={setRelay}>
-      <div slot="loading" class="w-full"></div>
-      <div slot="error" class="w-full"></div>
-      <div slot="nodata" class="w-full"></div>
+    <SetSearchRelays pubkey={$loginUser} relayChange={setRelay}>
+      {#snippet loading()}
+        <div class="w-full"></div>
+      {/snippet}
+      {#snippet error()}
+        <div class="w-full"></div>
+      {/snippet}
+      {#snippet nodata()}
+        <div class="w-full"></div>
+      {/snippet}
     </SetSearchRelays>
 
     <Settei
@@ -322,10 +310,11 @@
     {resetValue}
     {filters}
   />
+
   {#if openSearchResult}
     <SearchResult
       bind:this={compRef}
-      bind:filters={showFilters}
+      filters={showFilters}
       relays={searchRelays}
     />
   {/if}

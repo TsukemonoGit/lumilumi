@@ -9,16 +9,19 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";
 
-  let inputMetadata = "";
+  let inputMetadata = $state("");
 
-  export let viewMetadataList = false;
+  interface Props {
+    viewMetadataList?: (bool: boolean) => void;
+    handleClickUser: any;
+  }
 
-  export let handleClickUser;
+  let { viewMetadataList = $bindable(), handleClickUser }: Props = $props();
 
-  let metadataInput: HTMLInputElement;
+  let metadataInput: HTMLInputElement | undefined = $state();
 
   //--------------userlist
-  let metadataList: MetadataList = {};
+  let metadataList: MetadataList = $state({});
 
   function setMetadataList() {
     try {
@@ -29,10 +32,19 @@
       metadataList = getMetadataList(metadataQueryData);
     } catch (error) {}
   }
+  let onOpenStateChange = (bool: boolean) => {
+    if (bool) {
+      setMetadataList();
+    }
+  };
+  // $effect(() => {
+  //   if (viewMetadataList) {
+  //     untrack(() => {
+  //       setMetadataList();
+  //     });
+  //   }
+  // });
 
-  $: if (viewMetadataList) {
-    setMetadataList();
-  }
   function checkUserInput(inputMetadata: string, arg1: UserData) {
     if (inputMetadata === "") {
       return true;
@@ -55,35 +67,40 @@
   }
 </script>
 
-<Popover ariaLabel="user datalist" bind:open={viewMetadataList}>
+<Popover
+  ariaLabel="user datalist"
+  bind:openPopover={viewMetadataList}
+  {onOpenStateChange}
+>
   <UserPlus size="20" class={"w-12 stroke-magnum-600 "} />
 
   <!--metadataList-->
 
-  <div
-    slot="popoverContent"
-    class="max-w-full w-[600px] rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2"
-  >
-    <input
-      bind:this={metadataInput}
-      type="text"
-      class="h-8 w-full m-2 rounded-md text-magnum-100 border-2
-         border-magnum-400"
-      bind:value={inputMetadata}
-    />
-    <div class="max-h-40 overflow-y-auto">
-      {#each Object.entries(metadataList) as [pubkey, profile], index}
-        {#if checkUserInput(inputMetadata, profile)}
-          <button
-            aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
-            on:click={() => handleClickUser(pubkey)}
-            class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-            >{#if profile.petname}
-              📛{profile.petname}
-            {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
-          </button>
-        {/if}
-      {/each}
+  {#snippet popoverContent()}
+    <div
+      class="max-w-full w-[600px] rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2"
+    >
+      <input
+        bind:this={metadataInput}
+        type="text"
+        class="h-8 w-full m-2 rounded-md text-magnum-100 border-2
+           border-magnum-400"
+        bind:value={inputMetadata}
+      />
+      <div class="max-h-40 overflow-y-auto">
+        {#each Object.entries(metadataList) as [pubkey, profile], index}
+          {#if checkUserInput(inputMetadata, profile)}
+            <button
+              aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
+              onclick={() => handleClickUser(pubkey)}
+              class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              >{#if profile.petname}
+                📛{profile.petname}
+              {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
+            </button>
+          {/if}
+        {/each}
+      </div>
     </div>
-  </div>
+  {/snippet}
 </Popover>

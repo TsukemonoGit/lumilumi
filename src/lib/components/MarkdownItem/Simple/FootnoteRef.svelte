@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
 
-  export let part: Token;
+  interface Props {
+    part: Token; // $: console.log(part);
+  }
 
-  // $: console.log(part);
+  let { part }: Props = $props();
+
+  
 </script>
 
 <a

@@ -1,44 +1,27 @@
 <script lang="ts">
+  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
   import type Nostr from "nostr-typedef";
 
-  import { userStatusStore } from "$lib/stores/stores";
-
-  export let pubkey: string;
-  let data: Nostr.Event | undefined;
-
-  $: if ($userStatusStore) {
-    data = $userStatusStore.get(pubkey)?.get("general");
+  interface Props {
+    pubkey: string;
+    loading?: import("svelte").Snippet;
+    children?: import("svelte").Snippet<[any]>;
   }
-  //$: if ($slicedEvent) {
-  // const res: EventPacket | undefined = $queryClient.getQueryData([
-  //   "userStatus",
-  //   "general",
-  //   pubkey,
-  // ]);
-  // if (res) {
-  //   data = res;
-  //   //console.log(data);
-  //   //これだと一回TLに出てこないと設定変わらない
-  //   createQuery({
-  //     queryKey: ["userStatus", "general", pubkey],
-  //     queryFn: () => res,
-  //     //initialData: res,
-  //     staleTime: Infinity,
-  //     gcTime: Infinity,
-  //   });
-  // }
-  //}
 
-  interface $$Slots {
-    default: { event: Nostr.Event };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let { pubkey, loading, children }: Props = $props();
+  let data: Nostr.Event | undefined = $derived(
+    userStatusMap.get.get(pubkey)?.get("general")
+  );
+
+  // userStatusStore.subscribe((value) => {
+  //   if (value) {
+  //     data = value.get(pubkey)?.get("general");
+  //   }
+  // });
 </script>
 
 {#if !data}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else if data}
-  <slot event={data} />
+  {@render children?.({ event: data })}
 {/if}

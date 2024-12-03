@@ -6,21 +6,29 @@
 
   import NotabPart from "./NotabPart.svelte";
 
-  export let part: Token;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  export let tieKey: string | undefined;
-
-  let children: Token[];
-  $: if (part.children) {
-    children = transformTokens(part.children);
-    console.log(children);
+  interface Props {
+    part: Token;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    tieKey: string | undefined;
   }
-  $: console.log(part);
+
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey,
+  }: Props = $props();
+
+  let children: Token[] = $derived(transformTokens(part.children ?? []));
 </script>
 
 <dl>

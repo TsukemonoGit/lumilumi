@@ -13,11 +13,13 @@
     actions: { portal },
   } = createToaster<ToastData>();
 
-  $: if ($toastSettings) {
-    addToast({
-      data: $toastSettings,
-    });
-  }
+  toastSettings.subscribe((value) => {
+    if (value) {
+      addToast({
+        data: value,
+      });
+    }
+  });
 </script>
 
 <div
@@ -42,9 +44,8 @@
               class="flex items-center gap-2 font-semibold"
             >
               {data.title}
-              <span
-                class="size-1.5 rounded-full {data.color ?? 'bg-green-500'}"
-              />
+              <span class="size-1.5 rounded-full {data.color ?? 'bg-green-500'}"
+              ></span>
             </h3>
             <div
               use:melt={$description(id)}

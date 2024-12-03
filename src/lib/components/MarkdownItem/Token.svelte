@@ -3,16 +3,30 @@
 
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
 
-  export let part;
-  export let displayMenu;
-  export let depth;
-  export let repostable;
-  export let tags;
-  export let openModal;
-  export let nolist: boolean;
-  //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
+  
 
-  export let tieKey: string | undefined;
+  interface Props {
+    part: any;
+    displayMenu: any;
+    depth: any;
+    repostable: any;
+    tags: any;
+    openModal: any;
+    nolist: boolean;
+    //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
+    tieKey: string | undefined;
+  }
+
+  let {
+    part,
+    displayMenu,
+    depth,
+    repostable,
+    tags,
+    openModal,
+    nolist,
+    tieKey
+  }: Props = $props();
 </script>
 
 <SimpleContentBlock

@@ -3,12 +3,16 @@
   import Reaction from "../Note/Reaction.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import UserPopupMenu from "$lib/components/Elements/UserPopupMenu.svelte";
-  export let events: Nostr.Event[];
-  export let tieKey: string | undefined;
+  interface Props {
+    events: Nostr.Event[];
+    tieKey: string | undefined;
+  }
+
+  let { events, tieKey }: Props = $props();
 
   // undefined や null を除外した配列を作成
-  $: validEvents = events.filter(
-    (event) => event !== undefined && event !== null
+  let validEvents = $derived(
+    events.filter((event) => event !== undefined && event !== null)
   );
 
   // content の一致でフィルタリングする関数
@@ -17,9 +21,9 @@
   };
 
   // ユニークな内容を取得する部分
-  $: uniqueContents = [
-    ...new Set(validEvents.map((event) => event.content || "+")),
-  ].sort(); // Get unique contents and sort them
+  let uniqueContents = $derived(
+    [...new Set(validEvents.map((event) => event.content || "+"))].sort()
+  ); // Get unique contents and sort them
 
   // content に一致するイベントを見つける関数
   const findEvent = (content: string): Nostr.Event => {
@@ -40,45 +44,46 @@
       {#each filterEventsByContent(validEvents, content) as event (event.id)}
         <!-- 修正: validEvents を使用 -->
         {#if event.pubkey}
-          <Metadata
-            queryKey={["metadata", event.pubkey]}
-            pubkey={event.pubkey}
-            let:metadata
-          >
-            <UserPopupMenu
-              slot="loading"
-              pubkey={event.pubkey}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+            {#snippet loading()}
+              <UserPopupMenu
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              slot="error"
-              pubkey={event.pubkey}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet error()}
+              <UserPopupMenu
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              slot="nodata"
-              pubkey={event.pubkey}
-              metadata={undefined}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet nodata()}
+              <UserPopupMenu
+                pubkey={event.pubkey}
+                metadata={undefined}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
 
-            <UserPopupMenu
-              pubkey={event.pubkey}
-              {metadata}
-              size={24}
-              depth={0}
-              {tieKey}
-            />
+            {#snippet content({ metadata })}
+              <UserPopupMenu
+                pubkey={event.pubkey}
+                {metadata}
+                size={24}
+                depth={0}
+                {tieKey}
+              />
+            {/snippet}
           </Metadata>
         {/if}
       {/each}

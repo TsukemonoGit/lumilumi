@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
-  import type { ReqStatus } from "$lib/types";
-  import { readable } from "svelte/store";
+  import type { ReqResult, ReqStatus } from "$lib/types";
+  import { derived, readable, type Readable } from "svelte/store";
   import type Nostr from "nostr-typedef";
   import {
     type DefaultRelayConfig,
@@ -12,117 +12,129 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
-  import { loginUser } from "$lib/stores/stores";
+  import { app, loginUser } from "$lib/stores/stores";
 
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
-  let relays: DefaultRelayConfig[] | undefined = undefined;
-  export let paramRelays: string[] | undefined;
-  export let localRelays: DefaultRelayConfig[];
-  export let pubkey: string;
-  console.log(pubkey);
-  $: result = pubkey
-    ? deriveResult(localRelays, pubkey, req)
-    : $loginUser !== ""
-      ? deriveResult(localRelays, $loginUser, req)
-      : setLoadRelays();
-
-  //個々に来た段階でpubkeyがないってことは設定がないで、homeに来てたら設定に飛ぶから、それ以外のnoteのページとかに直できたときだから、
-  //paramにリレーが設定されてたらそれを使ってなかったらなんか適当にデフォルトリレーセットしよう
-  function setLoadRelays() {
-    if (paramRelays) {
-      setRelays(paramRelays);
-      //適当にデータ返しておこう
-      return {
-        data: readable(paramRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    } else {
-      setRelays(defaultRelays);
-      //適当にデータ返しておこう
-      return {
-        data: readable(defaultRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    }
-  }
-
-  function deriveResult(
-    localRelays: DefaultRelayConfig[],
-    pubkey: string,
-    req:
+  interface Props {
+    pubkey: string;
+    localRelays: DefaultRelayConfig[];
+    paramRelays: string[] | undefined;
+    req?:
       | (RxReq<"backward"> &
           RxReqEmittable<{
             relays: string[];
           }> &
           RxReqOverable &
           RxReqPipeable)
-      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-      | undefined
-  ) {
-    if (!localRelays || localRelays.length <= 0) {
-      return useRelaySet(
-        ["defaultRelay", pubkey],
-        [
-          // { authors: [pubkey], kinds: [3], limit: 1 },
-          { authors: [pubkey], kinds: [10002], limit: 1 },
-        ] as Nostr.Filter[],
-        req
-      );
-    } else {
-      return {
-        data: readable(localRelays),
-        status: readable("success" as ReqStatus),
-        error: readable(undefined),
-      };
-    }
-  }
+      | undefined;
+    //relayChange: (data: string[]) => void;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  $: data = result?.data;
-  $: status = result?.status;
-  $: error = result?.error;
-  $: console.log($status);
-  $: if (
-    ($status === "success" && !$data) ||
-    ($data !== undefined && $data.length <= 0)
-  ) {
-    //ノーデータだったときにデフォルトリレーをセット
-    setRelays(defaultRelays);
-    //適当にデータ返しておこう
-    result = {
-      data: readable(defaultRelays),
-      status: readable("success" as ReqStatus),
-      error: readable(undefined),
-    };
+    contents?: import("svelte").Snippet<
+      [{ relays: DefaultRelayConfig[] | string[]; status: ReqStatus }]
+    >;
   }
-  interface $$Slots {
-    default: {
-      relays: DefaultRelayConfig[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  let {
+    req = undefined,
+    pubkey,
+    localRelays,
+    paramRelays = undefined,
+    // relayChange,
+    error,
+    loading,
+    nodata,
+    contents,
+  }: Props = $props();
+
+  //$inspect(derivedUser);
+  let queryKey = ["defaultRelay", pubkey];
+  let filters = [
+    // { authors: [pubkey], kinds: [3], limit: 1 },
+    { authors: [pubkey], kinds: [10002], limit: 1 },
+  ] as Nostr.Filter[];
+
+  //パラムリレーがあったりlocalリレーがあるときはそれを返す。なかったら10002リレーを探す。
+  //返すのとSetrelaysもしないといけないっぽい？
+
+  let result =
+    localRelays.length === 0 && (!paramRelays || paramRelays.length === 0)
+      ? useRelaySet(queryKey, filters, req)
+      : undefined;
+  let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
+  let status: ReqStatus | undefined = $state();
+  let errorData: Error | undefined = $state();
+
+  result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
+    // console.log(value);
+    if (value && value.length > 0) {
+      data = value;
+      //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
+    }
+  });
+  result?.status.subscribe((value: ReqStatus | undefined) => {
+    // console.log(value);
+    if (value) {
+      status = value;
+      if (value === "success" && !result.data) {
+        // console.log(defaultRelays);
+        setRelays(defaultRelays);
+        data = defaultRelays;
+      }
+    }
+  });
+  result?.error.subscribe((value: Error | undefined) => {
+    if (value) {
+      errorData = value;
+    }
+  });
+  app.subscribe((value) => {
+    // console.log(value, localRelays, paramRelays);
+    if (
+      value &&
+      (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
+    ) {
+      const relays =
+        localRelays.length > 0
+          ? localRelays
+          : paramRelays && paramRelays.length > 0
+            ? paramRelays
+            : [];
+      //console.log(localRelays, paramRelays);
+      setRelays($state.snapshot(relays));
+    }
+  });
+  // $inspect(data, localRelays, paramRelays, errorData);
 </script>
 
-{#if relays}
-  <slot {relays} status="success" />
-{:else if $error}
-  <slot name="error" error={$error} />
-{:else if $data && $data.length > 0}
-  <slot relays={localRelays ?? $data} status={$status ?? "error"} />
-{:else if $status === "loading"}
-  <slot name="loading" />
+{#if errorData}
+  {@render error?.(errorData)}
+{:else if data && data.length > 0}
+  <!-- {@const relays = setRelays(data)} -->
+  {@render contents?.({
+    relays: data,
+    status: status ?? "success",
+  })}
+{:else if status === "loading"}
+  {@render loading?.()}
+{:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
+  {@const relays =
+    localRelays.length > 0
+      ? localRelays
+      : paramRelays && paramRelays.length > 0
+        ? paramRelays
+        : []}
+  <!-- {@const relaysset = setRelays($state.snapshot(relays))} -->
+  <!-- {#await setRelays(localRelays || paramRelays) then} -->
+  {@render contents?.({
+    relays: $state.snapshot(relays),
+    status: "success",
+  })}
+  <!-- {/await} -->
 {:else}
-  <slot name="nodata" />
+  <!-- {@const relays = setRelays(defaultRelays)} -->
+  {@render contents?.({
+    relays: defaultRelays,
+    status: status ?? "success",
+  })}
 {/if}

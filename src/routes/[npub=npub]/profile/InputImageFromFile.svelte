@@ -5,14 +5,22 @@
   import { nowProgress, uploader } from "$lib/stores/stores";
   import type { FileUploadResponse } from "nostr-tools/nip96";
 
-  export let inputText: string | undefined;
+  import { writable, type Writable } from "svelte/store";
 
-  let selectedUploader: string;
-  let files: FileList | undefined;
-  let fileInput: HTMLInputElement | undefined;
-  $: if (selectedUploader) {
-    $uploader = selectedUploader;
+  interface Props {
+    inputText: string | undefined;
   }
+
+  let { inputText = $bindable() }: Props = $props();
+
+  const selectedUploader: Writable<string> = writable();
+  let files: FileList | undefined = $state();
+  let fileInput: HTMLInputElement | undefined = $state();
+  selectedUploader.subscribe((value) => {
+    if (value) {
+      $uploader = value;
+    }
+  });
   // アップロードキャンセル用のコントローラーを作成
   let uploadAbortController: AbortController | null = null;
 
@@ -65,8 +73,9 @@
 </script>
 
 <div class="flex w-fit gap-1">
-  <UploaderSelect
-    bind:defaultValue={$uploader}
-    bind:selectedUploader
-  /><MediaPicker bind:files bind:fileInput on:change={onChangeHandler} />
+  <UploaderSelect bind:selectedUploader={$selectedUploader} /><MediaPicker
+    bind:files
+    bind:fileInput
+    on:change={onChangeHandler}
+  />
 </div>

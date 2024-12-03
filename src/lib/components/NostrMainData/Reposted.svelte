@@ -1,17 +1,21 @@
 <script lang="ts">
-  import type { ReqStatus } from "$lib/types";
-
-  import type Nostr from "nostr-typedef";
-
-  import { loginUser, queryClient, slicedEvent } from "$lib/stores/stores";
+  import * as Nostr from "nostr-typedef";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
-  import { onDestroy } from "svelte";
+  import { onDestroy, type Snippet } from "svelte";
 
-  export let id: string;
+  interface Props {
+    id: string;
+    content: Snippet<[{ event: Nostr.Event }]>;
+    loading: Snippet;
+  }
+  let { id, content, loading }: Props = $props();
   //export let req: RxReqBase | undefined = undefined;
-  let _result: { data: EventPacket; status: any; error: any };
+  let _result: { data: EventPacket; status: any; error: any } | undefined =
+    $state();
 
+  let data = $derived(_result?.data);
   const observer2 = new QueryObserver($queryClient, {
     queryKey: ["reactions", "repost", id, $loginUser],
   });
@@ -34,25 +38,11 @@
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
 
-  $: data = _result?.data;
-  $: status = _result?.status;
-  $: error = _result?.error;
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface $$Slots {
-    default: { event: Nostr.Event; status: ReqStatus };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
 </script>
 
 {#if data?.event}
-  <slot event={data?.event} {status} />
-{:else if error}
-  <slot name="error" {error} />
-{:else if status === "loading"}
-  <slot name="loading" />
+  {@render content({ event: data.event })}
 {:else}
-  <slot name="nodata" />
+  {@render loading?.()}
 {/if}

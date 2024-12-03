@@ -5,10 +5,14 @@
 
   import ReactionList from "./ReactionList.svelte";
 
-  export let events: Nostr.Event[];
-  export let tieKey: string | undefined;
+  interface Props {
+    events: Nostr.Event[];
+    tieKey: string | undefined;
+  }
+
+  let { events, tieKey }: Props = $props();
 </script>
 
-<CollapsibleList title="Reaction" bind:amount={events.length}>
+<CollapsibleList title="Reaction" amount={events.length}>
   <ReactionList {events} {tieKey} />
 </CollapsibleList>

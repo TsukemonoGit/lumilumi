@@ -4,6 +4,7 @@
 
   import { fade } from "svelte/transition";
   import { X } from "lucide-svelte";
+  import type { Writable } from "svelte/store";
 
   const {
     elements: {
@@ -15,22 +16,35 @@
       close,
       portalled,
     },
-    states: { open },
+    states: { open: dialogOpen },
   } = createDialog({
     forceVisible: true,
   });
 
-  export { open };
-  export let dialogTitle: string | undefined = undefined;
+  //export { open };
+  interface Props {
+    dialogTitle?: string | undefined;
+    main?: import("svelte").Snippet;
+    open?: Writable<boolean>;
+  }
+
+  let { open = $bindable(), dialogTitle = undefined, main }: Props = $props();
+  open?.subscribe((value: boolean) => {
+    // console.log(value);
+    if (value) {
+      $dialogOpen = true;
+      $open = false;
+    }
+  });
 </script>
 
-{#if $open}
+{#if $dialogOpen}
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
       class="fixed inset-0 z-50 bg-black/50"
       transition:fade={{ duration: 150 }}
-    />
+    ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] max-w-[90vw]
            w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
@@ -41,7 +55,7 @@
         <h2 use:melt={$title} class="m-0 text-lg font-medium">{dialogTitle}</h2>
       {/if}
       <div class="mb-4">
-        <slot name="main" />
+        {@render main?.()}
       </div>
 
       <div class="mt-6 flex justify-end gap-4">

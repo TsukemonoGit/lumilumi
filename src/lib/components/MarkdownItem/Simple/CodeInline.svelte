@@ -1,7 +1,11 @@
 <script lang="ts">
   import type { Token } from "markdown-it/index.js";
 
-  export let part: Token;
+  interface Props {
+    part: Token;
+  }
+
+  let { part }: Props = $props();
 </script>
 
 <pre class="inline"><code>{part.content}</code></pre>

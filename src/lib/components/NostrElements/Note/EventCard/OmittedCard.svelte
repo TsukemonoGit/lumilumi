@@ -10,15 +10,27 @@
   import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
   import UserName from "../UserName.svelte";
 
-  export let repostable: boolean;
-  export let displayMenu: boolean;
 
-  //export let kind: number | undefined;
-  export let depth: number;
-  export let tieKey: string | undefined;
-  export let maxHeight: string;
+  
 
-  export let text: Nostr.Event;
+  interface Props {
+    repostable: boolean;
+    displayMenu: boolean;
+    //export let kind: number | undefined;
+    depth: number;
+    tieKey: string | undefined;
+    maxHeight: string;
+    text: Nostr.Event;
+  }
+
+  let {
+    repostable,
+    displayMenu,
+    depth,
+    tieKey,
+    maxHeight,
+    text
+  }: Props = $props();
 </script>
 
 <div

@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import type { ReqStatus } from "$lib/types";
 
@@ -9,25 +10,41 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { useGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
-  import { createEventDispatcher } from "svelte";
+  import { untrack } from "svelte";
 
-  export let req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-    | undefined = undefined;
+  interface Props {
+    pubkey: string;
 
-  export let pubkey: string;
+    req?:
+      | (RxReq<"backward"> &
+          RxReqEmittable<{
+            relays: string[];
+          }> &
+          RxReqOverable &
+          RxReqPipeable)
+      | undefined;
+    error?: import("svelte").Snippet<[Error]>;
+    nodata?: import("svelte").Snippet;
+    loading?: import("svelte").Snippet;
 
-  // Create event dispatcher
-  const dispatch = createEventDispatcher();
+    children?: import("svelte").Snippet<
+      [{ relays: string[]; status: ReqStatus }]
+    >;
+    relayChange: (relays: string[]) => void;
+  }
+  let {
+    pubkey,
 
-  $: result = deriveResult(pubkey, req);
-  $: console.log(result);
+    req = undefined,
+    relayChange,
+    error,
+    loading,
+    nodata,
+    children,
+  }: Props = $props();
+
+  let result = $derived(deriveResult(pubkey, req));
+
   function deriveResult(
     pubkey: string,
     req:
@@ -37,7 +54,6 @@
           }> &
           RxReqOverable &
           RxReqPipeable)
-      | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
       | undefined
   ) {
     return useGlobalRelaySet(
@@ -49,32 +65,34 @@
     );
   }
 
-  $: data = result?.data;
-  $: status = result?.status;
-  $: error = result?.error;
+  let data = $derived(result?.data);
+  let status = $derived(result?.status);
+  let errorData = $derived(result?.error);
 
-  $: if ($data && $data.length > 0) {
-    console.log($data);
-    dispatch("relayChange", { relays: $data });
+  $effect(() => {
+    if ($data) {
+      untrack(() => dataChange($data));
+    }
+  });
+  function dataChange(data: string[] | null | undefined) {
+    if (data && data.length > 0) {
+      //console.log(data);
+      relayChange(data);
+    }
   }
 
-  interface $$Slots {
-    default: {
-      relays: string[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
+  // $: if ($data && $data.length > 0) {
+  //   console.log($data);
+  //   dispatch("relayChange", { relays: $data });
+  // }
 </script>
 
-{#if $error}
-  <slot name="error" error={$error} />
+{#if $errorData}
+  {@render error?.($errorData)}
 {:else if $data && $data.length > 0}
-  <slot relays={$data} status={$status ?? "error"} />
+  {@render children?.({ relays: $data, status: $status ?? "error" })}
 {:else if $status === "loading"}
-  <slot name="loading" />
+  {@render loading?.()}
 {:else}
-  <slot name="nodata" />
+  {@render nodata?.()}
 {/if}

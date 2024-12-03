@@ -8,7 +8,6 @@
     changeMainEmit,
   } from "$lib/func/nostr";
   import {
-    followList,
     loginUser,
     nowProgress,
     queryClient,
@@ -22,27 +21,39 @@
   } from "rx-nostr";
   import { _, locale } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
-  import { writable } from "svelte/store";
+
   import {
     datetime,
-    delay,
     formatAbsoluteDate,
     formatRelativeDate,
+    formatToEventPacket,
     generateResultMessage,
   } from "$lib/func/util";
   import { ArrowBigDown } from "lucide-svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr/src";
+  import { type QueryKey } from "@tanstack/svelte-query";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
-  export let pubkey: string;
+  interface Props {
+    pubkey: string;
+  }
 
-  const beforeKind3 = writable<Nostr.Event | undefined>();
-  const afterEventParameters = writable<Nostr.EventParameters | undefined>();
-  let dialogOpen: any;
+  let { pubkey }: Props = $props();
 
-  $: contactsQueryKey = ["timeline", "contacts", $loginUser];
-  $: isfollowee = $followList.has(pubkey);
+  let beforeKind3: Nostr.Event | undefined = $state();
+  let afterEventParameters: Nostr.EventParameters | undefined = $state();
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: (bool: boolean) => void = () => {};
+
+  let contactsQueryKey: QueryKey = $derived([
+    "timeline",
+    "contacts",
+    $loginUser,
+  ]);
+  let isfollowee: boolean = $derived(followList.get.has(pubkey));
 
   // Public key validation
   const validateLoginPubkey = async (): Promise<boolean> => {
@@ -67,27 +78,27 @@
     $toastSettings = { title, description, color };
   };
 
-  let dialogCreateKind3Open: any;
+  let dialogCreateKind3Open: (bool: boolean) => void = $state(() => {});
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
     if (!(await validateLoginPubkey())) return;
 
-    const followState = $followList.has(pubkey);
+    const followState = followList.get.has(pubkey);
     const kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
 
     await refreshContactsData(kind3Event);
 
-    if (!$beforeKind3) {
+    if (!beforeKind3) {
       //新しいKind3作っていいですかを出す
-      $dialogCreateKind3Open = true;
+      dialogCreateKind3Open?.(true);
       return;
     }
 
-    isfollowee = $followList.has(pubkey);
+    //isfollowee = followList.get.has(pubkey);
 
-    if (followState !== isfollowee) {
+    if (followState !== followList.get.has(pubkey)) {
       $nowProgress = false;
       return;
     }
@@ -123,46 +134,50 @@
       );
 
       pubkeysIn(newKind3[0].event);
-      $beforeKind3 = newKind3[0].event;
+      beforeKind3 = newKind3[0].event;
     } else if (kind3Event) {
-      $beforeKind3 = kind3Event.event;
+      beforeKind3 = kind3Event.event;
     }
 
-    // console.log("$beforeKind3", $beforeKind3);
+    // console.log("beforeKind3", beforeKind3);
   };
 
   const handleFollowStateChange = () => {
-    if (!$beforeKind3) return;
+    const snapbefore = $state.snapshot(beforeKind3);
+    if (!snapbefore) return;
 
     const tags = isfollowee
-      ? $beforeKind3.tags.filter(
+      ? snapbefore.tags.filter(
           ([tagName, pub]) => !(tagName === "p" && pub === pubkey)
         )
-      : [...$beforeKind3.tags, ["p", pubkey]];
+      : [...snapbefore.tags, ["p", pubkey]];
 
-    $afterEventParameters = {
-      content: $beforeKind3.content,
+    afterEventParameters = {
+      content: snapbefore.content,
       tags,
       kind: 3,
-      pubkey: $beforeKind3.pubkey,
+      pubkey: snapbefore.pubkey,
     };
 
     $nowProgress = false;
-    $dialogOpen = true;
+    dialogOpen?.(true);
   };
 
   // Handle event publishing
   const publishEvent = async () => {
-    $dialogOpen = false;
+    dialogOpen?.(false);
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
     const { event: ev, res } = await promisePublishEvent(
-      $afterEventParameters as Nostr.Event
+      $state.snapshot(afterEventParameters) as Nostr.Event
     );
     handlePublishResult(res, ev);
   };
 
-  const handlePublishResult = (res: any[], ev: Nostr.Event) => {
+  const handlePublishResult = (
+    res: OkPacketAgainstEvent[],
+    ev: Nostr.Event
+  ) => {
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
     const message = generateResultMessage(isSuccess, isFailed);
@@ -174,61 +189,51 @@
     );
 
     if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+      //$queryClient.refetchQueries({ queryKey: contactsQueryKey }); //これやったらnullになるはなおってるかもだけど別にリフェッチしなくていいか
+
+      const packetEv = formatToEventPacket(ev, isSuccess[0]);
+
+      $queryClient.setQueryData(contactsQueryKey, packetEv);
       pubkeysIn(ev);
       const filters = makeMainFilters(ev, now());
       changeMainEmit(filters.mainFilters);
     }
 
-    isfollowee = $followList.has(pubkey);
+    //  isfollowee = followList.get.has(pubkey);
     resetState();
   };
 
   const resetState = () => {
-    $beforeKind3 = undefined;
-    $afterEventParameters = undefined;
+    beforeKind3 = undefined;
+    afterEventParameters = undefined;
     $nowProgress = false;
   };
 
   // Handle petname dialog
-  let openPetnameDialog:
-    | {
-        update: (
-          updater: import("svelte/store").Updater<boolean>,
-          sideEffect?: ((newValue: boolean) => void) | undefined
-        ) => void;
-        set: (this: void, value: boolean) => void;
-        subscribe(
-          this: void,
-          run: import("svelte/store").Subscriber<boolean>,
-          invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-        ): import("svelte/store").Unsubscriber;
-        get: () => boolean;
-        destroy?: (() => void) | undefined;
-      }
-    | undefined;
-  let petnameInput: string = "";
+  // svelte-ignore non_reactive_update
+  let openPetnameDialog: (bool: boolean) => void = () => {};
+  let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
     let kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey);
-    await refreshContactsData(kind3Event!);
-    petnameInput = $followList.get(pubkey) ?? "";
-    $openPetnameDialog = true;
+    await refreshContactsData(kind3Event);
+    petnameInput = followList.get.get(pubkey) ?? "";
+    openPetnameDialog?.(true);
     $nowProgress = false;
   };
 
   const updatePetname = async () => {
-    if (!$beforeKind3) return;
+    if (!beforeKind3) return;
 
-    const beforePetname = $followList.get(pubkey);
+    const beforePetname = followList.get.get(pubkey);
     if (
       (!beforePetname && petnameInput === "") ||
       beforePetname === petnameInput
     )
       return;
 
-    const updatedTags = $beforeKind3.tags.map((tag) => {
+    const updatedTags = beforeKind3.tags.map((tag) => {
       if (tag[0] === "p" && tag[1] === pubkey) {
         return petnameInput === ""
           ? tag.slice(0, 3)
@@ -239,19 +244,19 @@
       return tag;
     });
 
-    $afterEventParameters = {
-      content: $beforeKind3.content,
+    afterEventParameters = {
+      content: beforeKind3.content,
       tags: updatedTags,
       kind: 3,
-      pubkey: $beforeKind3.pubkey,
+      pubkey: beforeKind3.pubkey,
     };
     publishEvent();
-    $openPetnameDialog = false;
+    openPetnameDialog?.(false);
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    $dialogCreateKind3Open = false;
+    dialogCreateKind3Open?.(false);
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -296,14 +301,14 @@
         disabled={$nowProgress}
         class={`rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
         title={$_("user.petname.edit")}
-        on:click={handlePetnameClick}
+        onclick={handlePetnameClick}
       >
         📛
       </button>
       <button
         disabled={$nowProgress}
         class={`rounded-full h-[32px] border border-magnum-300 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300 bg-zinc-800 shadow hover:opacity-60 `}
-        on:click={handleFollow}
+        onclick={handleFollow}
       >
         {$_("user.following")}
       </button>
@@ -311,7 +316,7 @@
       <button
         disabled={$nowProgress}
         class={`rounded-full bg-white border border-magnum-700 p-2 break-keep disabled:opacity-25 font-medium leading-none text-magnum-700 shadow hover:opacity-60 h-[32px] `}
-        on:click={handleFollow}
+        onclick={handleFollow}
       >
         {$_("user.follow")}
       </button>
@@ -319,103 +324,115 @@
   {/if}
 {/if}
 <AlertDialog
-  bind:open={dialogOpen}
+  bind:openDialog={dialogOpen}
   onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
-  <div slot="main">
-    <div class="text-magnum-500 font-bold text-lg mt-2">Before</div>
-    {#if $beforeKind3}
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
-      >
-        <ul class="leading-4">
-          <li>
-            Updated at <time
-              class="font-semibold text-magnum-300"
-              datetime={datetime($beforeKind3?.created_at)}
-              >{formatAbsoluteDate($beforeKind3?.created_at, true)}</time
-            ><span class="ml-2"
-              >({formatRelativeDate($beforeKind3?.created_at, $locale)})</span
-            >
-          </li>
-          <li>
-            List length <span class="font-semibold text-zinc-200"
-              >{$beforeKind3?.tags.length}</span
-            >
-          </li>
-          <li>
-            Followee <span class="font-semibold text-zinc-200"
-              >{pubkeysIn($beforeKind3).size}</span
-            >
-          </li>
-        </ul>
-      </div>
-    {/if}
-    {#if $afterEventParameters}
-      <ArrowBigDown />
-      <div class="text-magnum-500 font-bold text-lg mt-2">After</div>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
-      >
-        <ul class="leading-4">
-          <li>
-            List length <span class="font-semibold text-magnum-300"
-              >{$afterEventParameters?.tags?.length}</span
-            >
-          </li>
-          <li>
-            Followee <span class="font-semibold text-magnum-300"
-              >{$afterEventParameters?.tags?.reduce((acc, [tag, value]) => {
-                if (tag === "p") {
-                  return [...acc, value];
-                } else {
-                  return acc;
-                }
-              }, []).length}</span
-            >
-          </li>
-        </ul>
-      </div>
-    {/if}
-  </div>
+  {#snippet main()}
+    <div>
+      <div class="text-magnum-500 font-bold text-lg mt-2">Before</div>
+      {#if beforeKind3}
+        <div
+          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
+        >
+          <ul class="leading-4">
+            <li>
+              Updated at <time
+                class="font-semibold text-magnum-300"
+                datetime={datetime(beforeKind3?.created_at)}
+                >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
+              ><span class="ml-2"
+                >({formatRelativeDate(beforeKind3?.created_at, $locale)})</span
+              >
+            </li>
+            <li>
+              List length <span class="font-semibold text-zinc-200"
+                >{beforeKind3?.tags.length}</span
+              >
+            </li>
+            <li>
+              Followee <span class="font-semibold text-zinc-200"
+                >{beforeKind3?.tags?.reduce((acc, [tag, value]) => {
+                  if (tag === "p") {
+                    return [...acc, value];
+                  } else {
+                    return acc;
+                  }
+                }, []).length}</span
+              >
+            </li>
+          </ul>
+        </div>
+      {/if}
+      {#if afterEventParameters}
+        <ArrowBigDown />
+        <div class="text-magnum-500 font-bold text-lg mt-2">After</div>
+        <div
+          class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
+        >
+          <ul class="leading-4">
+            <li>
+              List length <span class="font-semibold text-magnum-300"
+                >{afterEventParameters?.tags?.length}</span
+              >
+            </li>
+            <li>
+              Followee <span class="font-semibold text-magnum-300"
+                >{afterEventParameters?.tags?.reduce((acc, [tag, value]) => {
+                  if (tag === "p") {
+                    return [...acc, value];
+                  } else {
+                    return acc;
+                  }
+                }, []).length}</span
+              >
+            </li>
+          </ul>
+        </div>
+      {/if}
+    </div>
+  {/snippet}
 </AlertDialog>
 
 <AlertDialog
-  bind:open={openPetnameDialog}
+  bind:openDialog={openPetnameDialog}
   onClickOK={updatePetname}
   title={$_("user.petname.petname")}
   okButtonName="OK"
 >
-  <div slot="main">
-    {#if $beforeKind3}
-      <div class="flex flex-col items-start justify-center">
-        <div class="font-medium text-magnum-400">
-          {$_("user.petname.write")} (NIP-02)
+  {#snippet main()}
+    <div>
+      {#if beforeKind3}
+        <div class="flex flex-col items-start justify-center">
+          <div class="font-medium text-magnum-400">
+            {$_("user.petname.write")} (NIP-02)
+          </div>
+          <input
+            type="text"
+            class="h-10 w-full rounded-md px-3 py-2 mt-2 border border-magnum-600 bg-neutral-900"
+            bind:value={petnameInput}
+          />
         </div>
-        <input
-          type="text"
-          class="h-10 w-full rounded-md px-3 py-2 mt-2 border border-magnum-600 bg-neutral-900"
-          bind:value={petnameInput}
-        />
-      </div>
-      <div class="text-sm mt-6 bg-neutral-700 rounded-sm p-2">
-        Follow List Updated at<time
-          class="font-semibold text-magnum-300 ml-2"
-          datetime={datetime($beforeKind3?.created_at)}
-          >{formatAbsoluteDate($beforeKind3?.created_at, true)}</time
-        >
-        ({formatRelativeDate($beforeKind3?.created_at, $locale)})
-      </div>
-    {/if}
-  </div>
+        <div class="text-sm mt-6 bg-neutral-700 rounded-sm p-2">
+          Follow List Updated at<time
+            class="font-semibold text-magnum-300 ml-2"
+            datetime={datetime(beforeKind3?.created_at)}
+            >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
+          >
+          ({formatRelativeDate(beforeKind3?.created_at, $locale)})
+        </div>
+      {/if}
+    </div>
+  {/snippet}
 </AlertDialog>
 
 <AlertDialog
-  bind:open={dialogCreateKind3Open}
+  bind:openDialog={dialogCreateKind3Open}
   {onClickOK}
   title={$_("create_kind3.create")}
-  ><div slot="main" class=" text-neutral-200 whitespace-pre-wrap">
-    {$_("create_kind3.newMessage")}
-  </div></AlertDialog
+  >{#snippet main()}
+    <div class=" text-neutral-200 whitespace-pre-wrap">
+      {$_("create_kind3.newMessage")}
+    </div>
+  {/snippet}</AlertDialog
 >

@@ -10,8 +10,12 @@
   import { showImg } from "$lib/stores/stores";
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
   const size = 20;
-  export let pubkey: string;
-  export let tieKey: string | undefined;
+  interface Props {
+    pubkey: string;
+    tieKey: string | undefined;
+  }
+
+  let { pubkey, tieKey }: Props = $props();
 
   const picture = (content: string): string | undefined => {
     try {
@@ -29,56 +33,72 @@
 
 <Popover ariaLabel="user profile">
   <div class="inline-flex">
-    <Metadata queryKey={["metadata", pubkey]} {pubkey} let:metadata>
-      <div slot="loading">
-        <Avatar
-          {size}
-          name={pubkey}
-          variant="beam"
-          colors={splitHexColorString(pubkey)}
-        />
-      </div>
-      <div slot="nodata">
-        <Avatar
-          {size}
-          name={pubkey}
-          variant="beam"
-          colors={splitHexColorString(pubkey)}
-        />
-      </div>
-      <div slot="error">
-        <Avatar
-          {size}
-          name={pubkey}
-          variant="beam"
-          colors={splitHexColorString(pubkey)}
-        />
-      </div>
+    <Metadata queryKey={["metadata", pubkey]} {pubkey}>
+      {#snippet loading()}
+        <div>
+          <Avatar
+            {size}
+            name={pubkey}
+            variant="beam"
+            colors={splitHexColorString(pubkey)}
+          />
+        </div>
+      {/snippet}
+      {#snippet nodata()}
+        <div>
+          <Avatar
+            {size}
+            name={pubkey}
+            variant="beam"
+            colors={splitHexColorString(pubkey)}
+          />
+        </div>
+      {/snippet}
+      {#snippet error()}
+        <div>
+          <Avatar
+            {size}
+            name={pubkey}
+            variant="beam"
+            colors={splitHexColorString(pubkey)}
+          />
+        </div>
+      {/snippet}
 
-      {#if $showImg}
-        {#await picture(metadata.content) then picture}
-          {#if picture !== undefined}
-            <UserAvatar {size} name={pubkey} url={picture} {pubkey} />
-          {:else}
-            <Avatar
-              {size}
-              name={pubkey}
-              variant="beam"
-              colors={splitHexColorString(pubkey)}
-            />
-          {/if}
-        {/await}
-      {:else}
-        <Avatar
-          {size}
-          name={pubkey}
-          variant="beam"
-          colors={splitHexColorString(pubkey)}
-        />
-      {/if}
+      {#snippet content({ metadata })}
+        {#if $showImg}
+          {#await picture(metadata.content) then picture}
+            {#if picture !== undefined}
+              <UserAvatar {size} name={pubkey} url={picture} {pubkey} />
+            {:else}
+              <Avatar
+                {size}
+                name={pubkey}
+                variant="beam"
+                colors={splitHexColorString(pubkey)}
+              />
+            {/if}
+          {/await}
+        {:else}
+          <Avatar
+            {size}
+            name={pubkey}
+            variant="beam"
+            colors={splitHexColorString(pubkey)}
+          />
+        {/if}
+      {/snippet}
     </Metadata>
   </div>
-  <div slot="popoverContent">
-    <UserProfile {pubkey} bannerHeight={80} iconSize={60} depth={0} {tieKey} />
-  </div>
+  {#snippet popoverContent()}
+    <div>
+      <UserProfile
+        {pubkey}
+        bannerHeight={80}
+        iconSize={60}
+        depth={0}
+        {tieKey}
+      />
+    </div>
+  {/snippet}
 </Popover>
