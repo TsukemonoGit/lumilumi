@@ -1,17 +1,18 @@
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
-  import { followList, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, ChevronsUpDown, Share } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
-  import type { Writable } from "svelte/store";
+
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
   import { eventKinds } from "$lib/func/kinds";
   import { _ } from "svelte-i18n";
   import { page } from "$app/stores";
+  import { followList } from "$lib/stores/globalRunes.svelte";
   interface Props {
     searchWord: string | undefined;
     followee: boolean;
@@ -113,7 +114,7 @@
       bind:value={searchWord}
     />
   </div>
-  {#if $followList !== undefined && $followList.size > 0}
+  {#if followList.get !== undefined && followList.get.size > 0}
     <div class="flex flex-col items-start justify-center mt-auto py-2">
       <label>
         <input

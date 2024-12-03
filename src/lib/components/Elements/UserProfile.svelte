@@ -2,12 +2,7 @@
   import Metadata from "../NostrMainData/Metadata.svelte";
   import { profile, splitHexColorString } from "$lib/func/util";
 
-  import {
-    followList,
-    loginUser,
-    showImg,
-    showUserStatus,
-  } from "$lib/stores/stores";
+  import { loginUser, showImg, showUserStatus } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
   import Nip05Check from "../NostrMainData/Nip05Check.svelte";
@@ -26,6 +21,7 @@
   import DisplayName from "./DisplayName.svelte";
   import { encodetoNpub } from "$lib/func/encode";
   import { hexRegex } from "$lib/func/regex";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     // import * as Nostr from "nostr-typedef";
@@ -43,7 +39,7 @@
     depth,
     tieKey,
   }: Props = $props();
-  let petname = $derived($followList?.get(pubkey));
+  let petname = $derived(followList.get?.get(pubkey));
 
   let pubcheck = $derived(hexRegex.test(pubkey));
 
@@ -168,7 +164,9 @@
 
             {#if prof.website}<Link
                 className="text-sm underline text-magnum-300 break-all  "
-                href={prof.website}>{prof.website}</Link
+                href={prof.website}
+                >{#snippet content()}
+                  {prof.website}{/snippet}</Link
               >{/if}
 
             {#if $showUserStatus}<ShowStatus {pubkey} {tieKey} />{/if}

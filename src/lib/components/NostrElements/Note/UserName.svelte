@@ -1,9 +1,10 @@
 <script lang="ts">
   import { profile } from "$lib/func/util";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { followList } from "$lib/stores/stores";
+
   import { encodetoNpub } from "$lib/func/encode";
   import { viewport } from "$lib/func/useViewportAction";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubhex: string;
@@ -11,7 +12,7 @@
 
   let { pubhex }: Props = $props();
 
-  let petname = $derived($followList?.get(pubhex));
+  let petname = $derived(followList.get?.get(pubhex));
   let loadingText = $derived(encodetoNpub(pubhex));
   let encodePub = $derived(encodetoNpub(pubhex));
   let hasLoaded = $state(false);

@@ -4,7 +4,6 @@
     loginUser,
     nowProgress,
     showBanner,
-    timelineFilter,
     toastSettings,
     uploader,
   } from "$lib/stores/stores";
@@ -28,6 +27,7 @@
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { _ } from "svelte-i18n";
   import { writable, type Writable } from "svelte/store";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -69,7 +69,7 @@
       lumiSetting: settings,
       showBanner: $showBanner,
       theme: localStorage.getItem("theme") ?? "system",
-      timelineFilter: $timelineFilter,
+      timelineFilter: timelineFilter.get,
       uploader: $uploader,
     };
 
@@ -221,7 +221,7 @@
     }
 
     if (loadData.timelineFilter) {
-      $timelineFilter = loadData.timelineFilter;
+      timelineFilter.set(loadData.timelineFilter);
       localStorage?.setItem(
         "timelineFilter",
         JSON.stringify(loadData.timelineFilter)

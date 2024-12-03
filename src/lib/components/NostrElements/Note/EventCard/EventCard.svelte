@@ -5,7 +5,6 @@
   import Reaction from "../Reaction.svelte";
 
   import {
-    followList,
     loginUser,
     mutebykinds,
     mutes,
@@ -57,7 +56,7 @@
   import OtherKindNote from "./OtherKindNote.svelte";
 
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -245,7 +244,7 @@
 
   let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
 
-  let petname = $derived($followList.get(note.pubkey));
+  let petname = $derived(followList.get.get(note.pubkey));
 </script>
 
 <!-- {#if showCanvasationCheck} -->

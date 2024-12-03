@@ -16,7 +16,6 @@
     showRelayIcon,
     defaultReaction,
     showReactioninTL,
-    nostrWalletConnect,
     nowProgress,
     showUserStatus,
     showKind16,
@@ -254,7 +253,7 @@
 
     $defaultReaction = settings.defaultReaction;
     $showReactioninTL = settings.showReactioninTL;
-    $nostrWalletConnect = settings.nostrWalletConnect;
+    // $nostrWalletConnect = settings.nostrWalletConnect;
     $showUserStatus = settings.showUserStatus;
 
     $showKind16 = settings.showKind16;

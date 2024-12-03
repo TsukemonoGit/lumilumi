@@ -8,7 +8,6 @@
     changeMainEmit,
   } from "$lib/func/nostr";
   import {
-    followList,
     loginUser,
     nowProgress,
     queryClient,
@@ -35,6 +34,7 @@
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr/src";
   import { type QueryKey } from "@tanstack/svelte-query";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -53,7 +53,7 @@
     "contacts",
     $loginUser,
   ]);
-  let isfollowee: boolean = $derived($followList.has(pubkey));
+  let isfollowee: boolean = $derived(followList.get.has(pubkey));
 
   // Public key validation
   const validateLoginPubkey = async (): Promise<boolean> => {
@@ -84,7 +84,7 @@
   const handleFollow = async () => {
     if (!(await validateLoginPubkey())) return;
 
-    const followState = $followList.has(pubkey);
+    const followState = followList.get.has(pubkey);
     const kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
 
@@ -96,9 +96,9 @@
       return;
     }
 
-    //isfollowee = $followList.has(pubkey);
+    //isfollowee = followList.get.has(pubkey);
 
-    if (followState !== $followList.has(pubkey)) {
+    if (followState !== followList.get.has(pubkey)) {
       $nowProgress = false;
       return;
     }
@@ -199,7 +199,7 @@
       changeMainEmit(filters.mainFilters);
     }
 
-    //  isfollowee = $followList.has(pubkey);
+    //  isfollowee = followList.get.has(pubkey);
     resetState();
   };
 
@@ -218,7 +218,7 @@
     let kind3Event: EventPacket | undefined =
       $queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
-    petnameInput = $followList.get(pubkey) ?? "";
+    petnameInput = followList.get.get(pubkey) ?? "";
     openPetnameDialog?.(true);
     $nowProgress = false;
   };
@@ -226,7 +226,7 @@
   const updatePetname = async () => {
     if (!beforeKind3) return;
 
-    const beforePetname = $followList.get(pubkey);
+    const beforePetname = followList.get.get(pubkey);
     if (
       (!beforePetname && petnameInput === "") ||
       beforePetname === petnameInput

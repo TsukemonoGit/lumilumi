@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { followList, onlyFollowee } from "$lib/stores/stores";
+  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { onlyFollowee } from "$lib/stores/stores";
 
   import { _ } from "svelte-i18n";
 
@@ -9,7 +10,7 @@
   };
 </script>
 
-{#if $followList && $followList.size > 0}
+{#if followList.get && followList.get.size > 0}
   <label class="ml-auto my-2">
     <input
       type="checkbox"

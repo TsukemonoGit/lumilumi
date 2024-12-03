@@ -100,16 +100,20 @@ export const defaultReaction = writable<{ content: string; tag: string[] }>({
 
 export const showReactioninTL = writable<boolean>(true);
 
-export const nostrWalletConnect = writable<string>("");
+//export const nostrWalletConnect = writable<string>("");
 
 export const postWindowOpen = writable<boolean>();
+
 export const additionalPostOptions = writable<
   AdditionalPostOptions | undefined
 >(); //投稿したあとでundefinedにする
+
 export const showUserStatus = writable<boolean>();
+
 export const relayStateMap = writable<Map<string, ConnectionState>>(
   new Map<string, ConnectionState>()
 );
+
 // export const relayStateMap3 = writable<Map<string, ConnectionState>>(
 //   new Map<string, ConnectionState>()
 // );
@@ -131,10 +135,6 @@ export const reactionToast = writable<{
 export const addClientTag = writable<boolean>(false);
 export const showClientTag = writable<boolean>(true);
 export const kind42inTL = writable<boolean>(false);
-
-export const followList: Writable<Map<string, string | undefined>> = writable<
-  Map<string, string | undefined>
->(new Map());
 
 export const userStatusStore: Writable<Map<string, Map<string, Nostr.Event>>> =
   writable<Map<string, Map<string, Nostr.Event>>>(new Map());

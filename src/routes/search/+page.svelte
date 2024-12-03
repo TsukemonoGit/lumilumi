@@ -8,7 +8,6 @@
   import * as Nostr from "nostr-typedef";
   import {
     defaultRelays,
-    followList,
     loginUser,
     nowProgress,
     queryClient,
@@ -24,6 +23,7 @@
   import { npubRegex } from "$lib/func/regex";
 
   import type { PageData } from "./$types";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -161,8 +161,8 @@
 
       authors: npubRegex.test(searchPubkey?.trim() ?? "")
         ? [getHex(searchPubkey?.trim() ?? "")]
-        : followee && $followList
-          ? Array.from($followList.keys())
+        : followee && followList.get
+          ? Array.from(followList.get.keys())
           : undefined,
       since: !Number.isNaN(searchSince) ? searchSince : undefined,
       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,

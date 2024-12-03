@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { followList, showRelayIcon } from "$lib/stores/stores";
+  import { showRelayIcon } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
 
@@ -12,6 +12,7 @@
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -35,7 +36,7 @@
     tieKey,
     children,
   }: Props = $props();
-  let petname = $derived($followList.get(note.pubkey));
+  let petname = $derived(followList.get.get(note.pubkey));
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);

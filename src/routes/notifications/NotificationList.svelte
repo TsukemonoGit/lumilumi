@@ -22,7 +22,7 @@
   import { createTie, now, type EventPacket } from "rx-nostr";
 
   import { onDestroy, onMount } from "svelte";
-  import { sortEvents } from "$lib/func/util";
+  import { debounce, sortEvents } from "$lib/func/util";
   import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
@@ -38,8 +38,7 @@
   const sift = 40; //スライドする量
 
   let untilTime: number;
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
+
   interface Props {
     queryKey: QueryKey;
     filters: Nostr.Filter[];
@@ -66,22 +65,14 @@
     children,
   }: Props = $props();
 
-  updateViewEvent = () => {
-    console.log("updateViewEvent");
-
-    if (updating) {
-      return;
-    }
-    updating = true;
-    $nowProgress = true;
-
+  updateViewEvent = debounce(async () => {
     //   console.time();
-
+    $nowProgress = true;
+    console.log("updateViewEvent");
     const allEvents: EventPacket[] | undefined =
       $queryClient.getQueryData(queryKey);
 
     if (!allEvents) {
-      updating = false;
       return;
     }
 
@@ -106,12 +97,8 @@
 
     // console.timeEnd();
     $nowProgress = false;
+  }, 20);
 
-    //console.log($slicedEvent);
-    setTimeout(() => {
-      updating = false;
-    }, 10);
-  };
   // export let tie: OperatorFunction<
   //   EventPacket,
   //   EventPacket & {

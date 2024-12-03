@@ -11,7 +11,6 @@
     showPreview,
     showRelayIcon,
     defaultReaction,
-    nostrWalletConnect,
     showReactioninTL,
     defaultRelays,
     queryClient,
@@ -165,7 +164,7 @@
       ? savedDefaultReaction
       : { content: "+", tag: [] };
     $showReactioninTL = savedReactionTL ?? true;
-    $nostrWalletConnect = savedNostrWalletConnect ?? "";
+    //$nostrWalletConnect = savedNostrWalletConnect ?? "";
     $showUserStatus = savedShowUserStatus ?? false;
 
     // if (!$showImg) {

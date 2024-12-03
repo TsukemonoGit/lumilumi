@@ -3,7 +3,6 @@ import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
-  followList,
   loginUser,
   metadataQueue,
   mutebykinds,
@@ -19,6 +18,7 @@ import { sortEventPackets } from "$lib/func/util";
 import { type QueryKey } from "@tanstack/svelte-query";
 
 import { muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
+import { followList } from "$lib/stores/globalRunes.svelte";
 
 export function filterId(
   id: string
@@ -350,7 +350,7 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
 
 export function reactionCheck() {
   return filter((packet: EventPacket) => {
-    const followListSet = get(followList);
+    const followListSet = followList.get;
     const loginUserPubkey = get(loginUser);
     const isFollowingUser = (pubkey: string) =>
       followListSet && followListSet.has(pubkey);

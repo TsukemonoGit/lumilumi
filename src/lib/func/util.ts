@@ -513,3 +513,18 @@ export function formatToEventPacket(
     message: ["EVENT", "", ev],
   } as EventPacket;
 }
+
+export function debounce<T extends (...args: any[]) => Promise<void> | void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return (...args: Parameters<T>): void => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}

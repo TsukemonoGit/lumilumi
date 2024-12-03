@@ -5,7 +5,7 @@
 
   import { makeMainFilters } from "$lib/func/nostr";
 
-  import { followList, loginUser, queryClient } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "./OpenPostWindow.svelte";
@@ -19,7 +19,7 @@
   import SampleGlobalLink from "./NostrElements/Note/SampleGlobalLink.svelte";
   import MainTimeline from "./NostrMainData/MainTimeline.svelte";
   import { page } from "$app/stores";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
@@ -70,13 +70,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    if (onlyFollowee && $followList) {
+    if (onlyFollowee && followList.get) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return $followList.has(event.pubkey);
+          return followList.get.has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && $followList.has(kind9734.pubkey);
+          return kind9734 && followList.get.has(kind9734.pubkey);
         }
       });
     } else {
@@ -122,7 +122,7 @@
         return true;
       }
       // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((pub) => $followList.has(pub));
+      const hasFollowed = pTags.some((pub) => followList.get.has(pub));
       return hasFollowed;
     } else {
       return true;
