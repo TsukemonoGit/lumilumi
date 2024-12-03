@@ -81,6 +81,7 @@
   async function init() {
     const ev: EventPacket[] | undefined =
       $queryClient?.getQueryData(timelineQuery);
+    console.log(ev);
     if (!ev || ev.length <= 0) {
       filters[0].since = undefined;
       filters[0].limit = 100;
@@ -88,6 +89,7 @@
     } else {
       filters[0].since = ev[0].event.created_at;
       filters[0].until = now();
+      updateViewEvent();
     }
   }
 
@@ -207,9 +209,12 @@
   let updateViewEvent: () => void = () => {};
 
   value?.subscribe((val) => {
-    if (val && updateViewEvent) {
-      updateViewEvent();
-    }
+    setTimeout(() => {
+      console.log($value);
+      if (val !== undefined && updateViewEvent) {
+        updateViewEvent();
+      }
+    }, 0); //これしないとvalueの値が変になる
   });
 
   onlyFollowee?.subscribe(() => {

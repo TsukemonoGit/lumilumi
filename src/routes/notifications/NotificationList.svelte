@@ -74,45 +74,43 @@
     }
     updating = true;
     $nowProgress = true;
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+
+    //   console.time();
+
+    const allEvents: EventPacket[] | undefined =
+      $queryClient.getQueryData(queryKey);
+
+    if (!allEvents) {
+      updating = false;
+      return;
     }
 
-    timeoutId = setTimeout(() => {
-      //   console.time();
+    untilTime =
+      allEvents.length > 0
+        ? allEvents[allEvents.length - 1].event.created_at
+        : now();
+    const uniqueEvents = sortEvents(
+      Array.from(
+        new Map(
+          allEvents.map((event) => [event.event.id, event.event])
+        ).values()
+      )
+    ); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
-      const allEvents: EventPacket[] | undefined =
-        $queryClient.getQueryData(queryKey);
-      console.log("updateViewEvent");
+    allUniqueEvents = uniqueEvents
+      .filter(eventFilter)
+      .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
-      if (!allEvents) {
-        updating = false;
-        return;
-      }
+    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+    // $slicedEvent = $slicedEvent;
 
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
-      const uniqueEvents = sortEvents(
-        Array.from(
-          new Map(
-            allEvents.map((event) => [event.event.id, event.event])
-          ).values()
-        )
-      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+    // console.timeEnd();
+    $nowProgress = false;
 
-      allUniqueEvents = uniqueEvents
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
-
-      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
-      // $slicedEvent = $slicedEvent;
-      updating = false;
-      // console.timeEnd();
-      $nowProgress = false;
-    }, 10); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
+    setTimeout(() => {
+      updating = false;
+    }, 10);
   };
   // export let tie: OperatorFunction<
   //   EventPacket,
@@ -152,7 +150,7 @@
   });
   const data: Writable<EventPacket[]> = writable<EventPacket[]>();
   observer.subscribe((result: QueryObserverResult<unknown, Error>) => {
-    console.log(result);
+    // console.log(result);
     if (result.data) {
       $data = result.data as EventPacket[];
     }
@@ -208,7 +206,7 @@
 
     //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
     // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-    await waitForConnections(readUrls, $relayStateMap, 10000); // maxWaitTime set to 10 seconds
+    await waitForConnections(readUrls, $relayStateMap, 5000); // maxWaitTime set to 10 seconds
     // console.log($relayStateMap);
 
     const older = await usePromiseReq(
@@ -228,9 +226,9 @@
         (before: EventPacket[] | undefined) => [...olderdata, ...(before ?? [])]
       );
       // console.log($queryClient.getQueryData(queryKey));
-      // updateViewEvent();
     }
     isOnMount = false;
+    // updateViewEvent();
   }
 
   interface $$Slots {
