@@ -526,20 +526,15 @@
   <div class="flex gap-1 overflow-hidden">
     {#if $showAllReactions}{#if hasReactions}
         <button
+          class="actionButton"
           onclick={() => {
             viewAllReactions = !viewAllReactions;
           }}
         >
           {#if !viewAllReactions}
-            <SquareChevronDown
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
+            <SquareChevronDown size="20" />
           {:else}
-            <SquareChevronUp
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-            />
+            <SquareChevronUp size="20" />
           {/if}
         </button>
       {:else}
@@ -568,42 +563,43 @@
           <div class="flex items-end">
             <Zapped id={atag ?? note.id}>
               {#snippet loading()}
-                <button onclick={handleClickZap} aria-label="zap">
-                  <Zap
-                    size="20"
-                    class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-                  />
+                <button
+                  class="actionButton"
+                  onclick={handleClickZap}
+                  aria-label="zap"
+                >
+                  <Zap size="20" />
                 </button>
               {/snippet}
               {#snippet nodata()}
-                <button aria-label="zap" onclick={handleClickZap}>
-                  <Zap
-                    size="20"
-                    class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                  />
+                <button
+                  aria-label="zap"
+                  class="actionButton"
+                  onclick={handleClickZap}
+                >
+                  <Zap size="20" />
                 </button>
               {/snippet}
               {#snippet error()}
-                <button aria-label="zap" onclick={handleClickZap}>
-                  <Zap
-                    size="20"
-                    class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                  />
+                <button
+                  aria-label="zap"
+                  class="actionButton"
+                  onclick={handleClickZap}
+                >
+                  <Zap size="20" />
                 </button>
               {/snippet}
               {#snippet content({ event })}
                 {#if event === undefined}
-                  <button aria-label="zap" onclick={handleClickZap}>
-                    <Zap
-                      size="20"
-                      class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-                    />
+                  <button
+                    class="actionButton"
+                    aria-label="zap"
+                    onclick={handleClickZap}
+                  >
+                    <Zap size="20" />
                   </button>
                 {:else}
-                  <Zap
-                    size="20"
-                    class="text-magnum-500/75 overflow-hidden fill-magnum-500/75"
-                  />
+                  <Zap size="20" class="actionButton fill-magnum-500/75" />
                 {/if}
               {/snippet}
             </Zapped><span class="text-sm"
@@ -666,22 +662,24 @@
     <div class="flex max-w-[40%] items-end">
       <Reactioned id={atag ?? note.id}>
         {#snippet loading()}
-          <button aria-label="reaction" onclick={handleClickReaction}>
-            <Heart
-              size="20"
-              class="hover:opacity-75 active:opacity-50 text-magnum-500/75 mt-auto overflow-hidden"
-            />
+          <button
+            class="actionButton"
+            aria-label="reaction"
+            onclick={handleClickReaction}
+          >
+            <Heart size="20" class=" mt-auto overflow-hidden" />
           </button>
         {/snippet}
 
         {#snippet content({ event })}
           {#if event === undefined}
-            <button aria-label="reaction" onclick={handleClickReaction}
-              ><Heart
-                size="20"
-                class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
-              /></button
-            >{:else}<div class="overflow-hidden">
+            <button
+              class="actionButton"
+              aria-label="reaction"
+              onclick={handleClickReaction}
+            >
+              <Heart size="20" class=" mt-auto overflow-hidden" />
+            </button>{:else}<div class="overflow-hidden">
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
@@ -698,18 +696,25 @@
         <Reposted id={atag ?? note.id}>
           {#snippet loading()}
             <DropdownMenu {menuTexts} {handleSelectItem}>
-              <Repeat2 size="21" />
+              <Repeat2 size="21" class="actionButton" />
             </DropdownMenu>{/snippet}
 
           {#snippet content({ event })}
             <DropdownMenu {menuTexts} {handleSelectItem}>
-              <Repeat2 size="21" class={event ? "text-magnum-200 " : ""} />
+              <Repeat2
+                size="21"
+                class={event ? "text-magnum-200 actionButton" : "actionButton"}
+              />
             </DropdownMenu>{/snippet}
         </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
             >{allReactions.repost.length}</span
           >{/if}
       </div>
-    {:else}<button aria-label="quote" onclick={() => handleSelectItem(1)}>
+    {:else}<button
+        aria-label="quote"
+        class="actionButton"
+        onclick={() => handleSelectItem(1)}
+      >
         <Quote size="20" class={"stroke-magnum-500/75"} />
       </button>
     {/if}
@@ -719,11 +724,9 @@
       onclick={() => {
         onClickReplyIcon();
       }}
+      class="actionButton"
     >
-      <MessageSquare
-        size="20"
-        class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden "
-      />
+      <MessageSquare size="20" />
     </button>
   {/if}
 </div>
@@ -756,11 +759,15 @@
   id={atag ?? note.id}
 />
 
-<style>
+<style lang="postcss">
   input[type="text"] {
     background-color: rgb(var(--color-neutral-800) / 1);
   }
   input[type="number"] {
     background-color: rgb(var(--color-neutral-800) / 1);
+  }
+
+  .actionButton {
+    @apply hover:opacity-75 active:ring active:bg-magnum-400/20 ring-magnum-400/20  rounded-full text-magnum-500/75 overflow-hidden;
   }
 </style>
