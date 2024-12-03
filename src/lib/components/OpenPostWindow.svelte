@@ -62,7 +62,7 @@
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
     options?: DefaultPostOptions;
-    signPubkey?: string | undefined;
+    propSignPubkey?: string | undefined;
   }
   let {
     options = {
@@ -70,7 +70,7 @@
       kind: 1,
       content: "",
     },
-    signPubkey = $bindable(),
+    propSignPubkey, //画像共有のときに画像をアップするときにsignPub取得するからその時にある
   }: Props = $props();
 
   let text: string = $state(options.content ?? "");
@@ -101,9 +101,16 @@
 
   const additionalReplyUsers: Writable<string[]> = writable([]);
   let clickEscape: number = $state(0);
+  let signPubkey: string | undefined = $state();
 
   async function getSignPubkey() {
     $nowProgress = true;
+    if (propSignPubkey) {
+      //共有からポストウィンドウを開いたとき
+      signPubkey = propSignPubkey;
+      return;
+    }
+
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
 
@@ -539,6 +546,7 @@
       viewCustomEmojis = false;
     }
   };
+
   postWindowOpen.subscribe((value) => {
     if (value) {
       const addOption = $state.snapshot($additionalPostOptions);
@@ -591,13 +599,14 @@
       $postWindowOpen = false;
     }
   });
+
   open.subscribe((value) => {
     console.log(value);
     if (value) {
       //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
-      if (!signPubkey) {
-        getSignPubkey();
-      }
+      // if (!signPubkey) {
+      getSignPubkey();
+      //}
       clickEscape = 0;
       // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       // metadata = $queryClient.getQueryData(["metadata", pubkey]);

@@ -15,13 +15,6 @@
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/stores";
 
-  const paramTitle = $page.url.searchParams.get("title");
-  const paramText = $page.url.searchParams.get("text");
-  const paramUrl = $page.url.searchParams.get("url");
-  const paramSharedContent = [paramTitle, paramText, paramUrl]
-    .filter((param) => param !== null)
-    .join("\n");
-
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
   let sharedContent: string; // = [data.title, data.text, data.url]
@@ -41,6 +34,7 @@
     } catch (error) {
       console.log(error);
     }
+
     let savedUploader = localStorage.getItem("uploader");
     if (!savedUploader) {
       $uploader = mediaUploader[0];
@@ -60,7 +54,15 @@
     console.log("onMount");
 
     setSettings();
-    if (paramSharedContent) {
+
+    const paramTitle = $page.url.searchParams.get("title");
+    const paramText = $page.url.searchParams.get("text");
+    const paramUrl = $page.url.searchParams.get("url");
+    const paramSharedContent = [paramTitle, paramText, paramUrl]
+      .filter((param) => param && param !== "undefined")
+      .join("\n");
+
+    if (paramSharedContent && paramSharedContent !== "") {
       additionalPostOptions.set({
         tags: tags,
         addableUserList: [],
@@ -232,6 +234,6 @@
       tags: [],
       kind: 1,
     }}
-    {signPubkey}
+    propSignPubkey={signPubkey}
   />
 </div>
