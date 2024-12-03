@@ -6,7 +6,6 @@
     loginUser,
     nowProgress,
     queryClient,
-    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -35,6 +34,7 @@
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   const sift = 40; //スライドする量
   let untilTime: number = 0;
@@ -367,9 +367,7 @@
 
     allUniqueEvents = uniqueEvents.filter(eventFilter);
 
-    slicedEvent.update((value) =>
-      allUniqueEvents.slice(viewIndex, viewIndex + amount)
-    );
+    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
 
     //  console.log($slicedEvent);
   }
@@ -410,9 +408,9 @@
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}
-{:else if $slicedEvent && $slicedEvent?.length > 0}
+{:else if displayEvents.get && displayEvents.get.length > 0}
   {@render children?.({
-    events: $slicedEvent,
+    events: displayEvents.get,
     status: $status,
     len: $data?.length ?? 0,
   })}
@@ -423,7 +421,7 @@
   {@render nodata?.()}
 {/if}
 
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"

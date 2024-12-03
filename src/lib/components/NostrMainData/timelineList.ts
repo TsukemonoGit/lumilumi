@@ -1,14 +1,13 @@
 // timelineList.ts
 
 import { usePromiseReq } from "$lib/func/nostr";
+import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 import { scanArray } from "$lib/stores/operators";
-import type { QueryKey } from "@tanstack/svelte-query";
+
 import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
 import { pipe, type OperatorFunction } from "rxjs";
 //import * as Nostr from "nostr-typedef";
-import { get } from "svelte/store";
-import { slicedEvent } from "$lib/stores/stores";
 
 export async function loadOlderEvents(
   sift: number,
@@ -26,7 +25,7 @@ export async function loadOlderEvents(
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   //console.log(get(slicedEvent));
-  if (!get(slicedEvent) || get(slicedEvent).length < 0) {
+  if (!displayEvents.get || displayEvents.get.length < 0) {
     console.log("sliced eventがないから古いイベントトルの失敗");
     return [];
   }

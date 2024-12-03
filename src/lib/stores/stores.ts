@@ -92,7 +92,7 @@ export const tieMapStore = writable<{
 
 export const uploader = writable<string>();
 export const showRelayIcon = writable<boolean>(false);
-export const slicedEvent = writable<Nostr.Event[]>();
+//export const slicedEvent = writable<Nostr.Event[]>();
 export const defaultReaction = writable<{ content: string; tag: string[] }>({
   content: "+",
   tag: [],

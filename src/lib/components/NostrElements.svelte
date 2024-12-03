@@ -134,7 +134,7 @@
   }
 
   // svelte-ignore non_reactive_update
-  let updateViewEvent: () => void = $state(() => {});
+  let updateViewEvent: () => void = () => {};
 
   // timelineFilter.subscribe((value) => {
   //   //設定が変わったら更新

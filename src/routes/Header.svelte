@@ -31,11 +31,7 @@
       $timelineFilter.selectCanversation = Number(value);
     }
   });
-  timelineFilter.subscribe((value) => {
-    if (value) {
-      localStorage.setItem("timelineFilter", JSON.stringify(value));
-    }
-  });
+
   showBanner.subscribe((value) => {
     if (value !== undefined && value !== null) {
       localStorage.setItem("showBanner", value.toString());

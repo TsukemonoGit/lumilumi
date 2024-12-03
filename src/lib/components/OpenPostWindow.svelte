@@ -682,6 +682,7 @@
                   kind: initOptions.kind,
                   created_at: now(),
                 }}
+                depth={1}
                 displayMenu={false}
                 repostable={false}
                 maxHeight={"10rem"}
@@ -697,7 +698,7 @@
                   {tags}
                   displayMenu={false}
                   repostable={false}
-                  depth={0}
+                  depth={1}
                   tieKey={undefined}
                 />
               </div>

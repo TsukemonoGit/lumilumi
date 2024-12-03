@@ -7,7 +7,6 @@
     nowProgress,
     queryClient,
     relayStateMap,
-    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
@@ -32,6 +31,7 @@
   import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   const sift = 40; //スライドする量
 
@@ -114,7 +114,7 @@
       // slicedEvent.update((value) =>
       //   allUniqueEvents.slice(viewIndex, viewIndex + amount)
       // );
-      $slicedEvent = allUniqueEvents.slice(viewIndex, viewIndex + amount);
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
       updating = false;
     }, 50); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
@@ -419,9 +419,9 @@
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}
-{:else if $slicedEvent && $slicedEvent?.length > 0}
+{:else if displayEvents.get && displayEvents.get.length > 0}
   {@render content?.({
-    events: $slicedEvent,
+    events: displayEvents.get,
     status: $status,
     len: $globalData?.length ?? 0,
   })}
@@ -431,7 +431,7 @@
 {:else}
   {@render nodata?.()}
 {/if}
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"

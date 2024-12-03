@@ -9,8 +9,8 @@
     relayStateMap,
     showReactioninTL,
     showUserStatus,
-    slicedEvent,
     tieMapStore,
+    timelineFilter,
   } from "$lib/stores/stores";
 
   import type { ReqStatus } from "$lib/types";
@@ -32,6 +32,7 @@
 
   import { useMainTimeline } from "$lib/stores/useMainTimeline";
   import { get } from "svelte/store";
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -152,9 +153,7 @@
         .filter(eventFilter)
         .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
-      slicedEvent.update((value) =>
-        allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      );
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
       updating = false;
     }, 50); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
@@ -369,6 +368,13 @@
     console.log("test");
   });
   // $inspect($slicedEvent);
+
+  timelineFilter.subscribe((value) => {
+    if (value) {
+      updateViewEvent($data);
+      localStorage.setItem("timelineFilter", JSON.stringify(value));
+    }
+  });
 </script>
 
 {#if viewIndex !== 0}
@@ -398,9 +404,9 @@
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}
-{:else if $slicedEvent && $slicedEvent?.length > 0}
+{:else if displayEvents.get && displayEvents.get.length > 0}
   {@render content?.({
-    events: $slicedEvent,
+    events: displayEvents.get,
     status: $status,
     len: $data?.length ?? 0,
   })}
@@ -410,7 +416,7 @@
 {:else}
   {@render nodata?.()}
 {/if}
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"

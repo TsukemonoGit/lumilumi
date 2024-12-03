@@ -4,13 +4,12 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, untrack, type Component } from "svelte";
+  import { onMount } from "svelte";
 
   import {
     app,
     nowProgress,
     queryClient,
-    slicedEvent,
     uploader,
     verifier,
     showBanner,
@@ -49,6 +48,7 @@
     setRxNostr3,
   } from "$lib/func/reactions";
   import { writable, type Writable } from "svelte/store";
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   let { data, children } = $props<{
     data:
@@ -169,7 +169,7 @@
     console.log("afterNavigate", navigate.type);
     //ページが変わったらリセット
     if (navigate.type !== "form") {
-      $slicedEvent = [];
+      displayEvents.set([]);
     }
   });
 

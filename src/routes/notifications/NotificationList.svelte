@@ -4,9 +4,9 @@
     defaultRelays,
     loginUser,
     nowProgress,
+    onlyFollowee,
     queryClient,
     relayStateMap,
-    slicedEvent,
     tieMapStore,
   } from "$lib/stores/stores";
 
@@ -19,12 +19,7 @@
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
 
-  import {
-    createTie,
-    now,
-    type DefaultRelayConfig,
-    type EventPacket,
-  } from "rx-nostr";
+  import { createTie, now, type EventPacket } from "rx-nostr";
 
   import { onDestroy, onMount } from "svelte";
   import { sortEvents } from "$lib/func/util";
@@ -38,6 +33,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { writable, type Writable } from "svelte/store";
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   const sift = 40; //スライドする量
 
@@ -70,16 +66,20 @@
     children,
   }: Props = $props();
 
-  (updateViewEvent = () => {
+  updateViewEvent = () => {
+    console.log("updateViewEvent");
+
     if (updating) {
       return;
     }
+    updating = true;
+    $nowProgress = true;
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
-      updating = true;
+      //   console.time();
 
       const allEvents: EventPacket[] | undefined =
         $queryClient.getQueryData(queryKey);
@@ -106,29 +106,29 @@
         .filter(eventFilter)
         .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
-      slicedEvent.update((value) =>
-        allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      );
-      $slicedEvent = $slicedEvent;
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+      // $slicedEvent = $slicedEvent;
       updating = false;
-    }, 50); // 連続で実行されるのを防ぐ
+      // console.timeEnd();
+      $nowProgress = false;
+    }, 10); // 連続で実行されるのを防ぐ
     //console.log($slicedEvent);
-  }),
-    // export let tie: OperatorFunction<
-    //   EventPacket,
-    //   EventPacket & {
-    //     seenOn: Set<string>;
-    //     isNew: boolean;
-    //   }
+  };
+  // export let tie: OperatorFunction<
+  //   EventPacket,
+  //   EventPacket & {
+  //     seenOn: Set<string>;
+  //     isNew: boolean;
+  //   }
 
-    createQuery({
-      queryKey: queryKey,
-      queryFn: undefined,
-      staleTime: Infinity, // 4 hour
-      gcTime: Infinity, // 4 hour
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    });
+  createQuery({
+    queryKey: queryKey,
+    queryFn: undefined,
+    staleTime: Infinity, // 4 hour
+    gcTime: Infinity, // 4 hour
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
   const [tie, tieMap] = createTie();
 
@@ -160,7 +160,14 @@
 
   // $: status = result.status;
   // $: error = result.error;
-  let readUrls: string[] = $state.raw([]);
+  let readUrls: string[] = $derived.by(() => {
+    if ($defaultRelays) {
+      return Object.values($defaultRelays)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
+    return [];
+  }); //.raw([]);
   //$: console.log(data);
   // beforeNavigate((navigate) => {
   //   console.log("beforeNavigate", navigate.type);
@@ -300,18 +307,20 @@
   }
   // });
   let operator = $derived(pipe(tie, uniq, scanArray()));
-  defaultRelays.subscribe((value: Record<string, DefaultRelayConfig>) => {
-    if (value) {
-      readUrls = Object.values(value)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
-  });
+
+  //表示更新---
+
   data.subscribe((value) => {
     if (value && value.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
       updateViewEvent();
     }
   });
+
+  onlyFollowee.subscribe((value) => {
+    updateViewEvent();
+  });
+
+  //------
 </script>
 
 {#if viewIndex !== 0}
@@ -340,10 +349,10 @@
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
 
-{#if $slicedEvent && $slicedEvent?.length > 0}
-  {@render children?.({ events: $slicedEvent, len: $data?.length ?? 0 })}
+{#if displayEvents.get && displayEvents.get?.length > 0}
+  {@render children?.({ events: displayEvents.get, len: $data?.length ?? 0 })}
 {/if}
-{#if $slicedEvent && $slicedEvent?.length > 0}
+{#if displayEvents.get && displayEvents.get.length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"

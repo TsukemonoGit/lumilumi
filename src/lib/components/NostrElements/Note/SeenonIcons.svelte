@@ -1,17 +1,14 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
-  import {
-    slicedEvent,
-    showImg,
-    relayIconErrorStore,
-  } from "$lib/stores/stores";
+  import { showImg, relayIconErrorStore } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import Avatar from "svelte-boring-avatars";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import { getRelaysById } from "$lib/func/nostr";
-  import { onMount } from "svelte";
+
+  import { displayEvents } from "$lib/stores/displayTLEvents.svelte";
 
   interface Props {
     id: string;
@@ -23,16 +20,20 @@
 
   let size = 16;
   let viewAll = $state(false);
-  let relays: string[] = $state([]);
-  slicedEvent.subscribe(() => {
-    relays = tieKey ? getRelaysById(id, tieKey) : [];
+  let relays: string[] = $derived.by(() => {
+    if (displayEvents.get && tieKey) {
+      return getRelaysById(id, tieKey);
+    } else return [];
   });
-  onMount(() => {
-    //でてすぐはちょっとしかリレーないから１秒後にもっかい取得し直してみる
-    setTimeout(() => {
-      relays = tieKey ? getRelaysById(id, tieKey) : [];
-    }, 1000);
-  });
+  // slicedEvent.subscribe(() => {
+  //   relays = tieKey ? getRelaysById(id, tieKey) : [];
+  // });
+  // onMount(() => {
+  //でてすぐはちょっとしかリレーないから１秒後にもっかい取得し直してみる
+  // setTimeout(() => {
+  //   relays = tieKey ? getRelaysById(id, tieKey) : [];
+  // }, 1000);
+  //});
 
   const handleStateError = (url: string) => {
     if (!$relayIconErrorStore.includes(url)) {

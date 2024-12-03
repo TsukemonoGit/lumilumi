@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { loginUser, queryClient, slicedEvent } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
   import { onDestroy, type Snippet } from "svelte";

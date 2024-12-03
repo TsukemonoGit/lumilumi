@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { slicedEvent, toastSettings } from "$lib/stores/stores";
+  import { toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -101,10 +101,10 @@
       case 6:
         //broadcast
         publishEvent(note);
-        setTimeout(() => {
-          slicedEvent.update((value) => value);
-          console.log("こうしんしたよ");
-        }, 1000);
+        // setTimeout(() => {
+        //   slicedEvent.update((value) => value);
+        //   console.log("こうしんしたよ");
+        // }, 1000);
         break;
       case 7:
         //share link
