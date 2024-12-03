@@ -74,8 +74,6 @@
   });
   let userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
-  const tieKey = "npub";
-
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   let timelineQuery = $derived(["user", "post", userPubkey]);
@@ -272,14 +270,14 @@
                           displayMenu={true}
                           depth={1}
                           repostable={true}
-                          {tieKey}
+                          tieKey={userPubkey}
                         />{:else}
                         <NaddrEvent
                           data={parseNaddr([e, id])}
                           displayMenu={true}
                           depth={1}
                           repostable={true}
-                          {tieKey}
+                          tieKey={userPubkey}
                           content={id}
                         />
                       {/if}
@@ -309,7 +307,7 @@
                 ]}
                 {req}
                 {amount}
-                {tieKey}
+                tieKey={userPubkey}
               >
                 {#snippet content({ events, len })}
                   <!-- <SetRepoReactions /> -->
@@ -333,7 +331,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -342,7 +340,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -351,7 +349,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -360,7 +358,7 @@
                               {metadata}
                               note={event}
                               excludefunc={excludeKind1}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           {/snippet}
                         </Metadata>
@@ -405,7 +403,7 @@
                 ]}
                 {req}
                 {amount}
-                {tieKey}
+                tieKey={userPubkey}
               >
                 {#snippet content({ events })}
                   <!-- <SetRepoReactions /> -->
@@ -429,7 +427,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -438,7 +436,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -447,7 +445,7 @@
                               <EventCard
                                 note={event}
                                 excludefunc={excludeKind1}
-                                {tieKey}
+                                tieKey={userPubkey}
                               />
                             </div>
                           {/snippet}
@@ -456,7 +454,7 @@
                               {metadata}
                               note={event}
                               excludefunc={excludeKind1}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           {/snippet}
                         </Metadata>
@@ -500,7 +498,7 @@
               ]}
               {req}
               {amount}
-              {tieKey}
+              tieKey={userPubkey}
             >
               {#snippet content({ events })}
                 <!-- <SetRepoReactions /> -->
@@ -524,7 +522,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -533,7 +531,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -542,7 +540,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -551,7 +549,7 @@
                             {metadata}
                             note={event}
                             excludefunc={excludeKind7}
-                            {tieKey}
+                            tieKey={userPubkey}
                           />
                         {/snippet}
                       </Metadata>
@@ -598,7 +596,7 @@
               {req}
               viewIndex={0}
               {amount}
-              {tieKey}
+              tieKey={userPubkey}
             >
               {#snippet content({ events })}
                 <!-- <SetRepoReactions /> -->
@@ -622,7 +620,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -631,7 +629,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -640,7 +638,7 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              {tieKey}
+                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -649,7 +647,7 @@
                             {metadata}
                             note={event}
                             excludefunc={excludeKind7}
-                            {tieKey}
+                            tieKey={userPubkey}
                           />
                         {/snippet}
                       </Metadata>
@@ -748,9 +746,9 @@
                     list={contacts.tags
                       .filter((tag) => tag[0] === "p" && tag.length > 1)
                       .map((tag) => tag[1])}
-                    {tieKey}
+                    tieKey={userPubkey}
                     >{#snippet children({ id })}
-                      <Metadatanoyatu pubkey={id} {tieKey} />
+                      <Metadatanoyatu pubkey={id} tieKey={userPubkey} />
                     {/snippet}
                   </PaginationList>{/if}
               {/snippet}
@@ -789,7 +787,7 @@
                   )}
                   <PaginationList
                     list={filteredList.map((tag) => tag[1])}
-                    {tieKey}
+                    tieKey={userPubkey}
                   >
                     {#snippet children({ id, index })}
                       {#if filteredList[index][0] === "e"}
@@ -799,7 +797,7 @@
                           displayMenu={true}
                           depth={0}
                           repostable={true}
-                          {tieKey}
+                          tieKey={userPubkey}
                         />
                         <!---->
                       {:else if filteredList[index][0] === "a"}
@@ -860,7 +858,7 @@
                                     note={event}
                                     displayMenu={true}
                                     repostable={true}
-                                    {tieKey}
+                                    tieKey={userPubkey}
                                   />
                                 </div>
                               {/snippet}
@@ -870,7 +868,7 @@
                                     note={event}
                                     displayMenu={true}
                                     repostable={true}
-                                    {tieKey}
+                                    tieKey={userPubkey}
                                   />
                                 </div>
                               {/snippet}
@@ -880,7 +878,7 @@
                                     note={event}
                                     displayMenu={true}
                                     repostable={true}
-                                    {tieKey}
+                                    tieKey={userPubkey}
                                   />
                                 </div>
                               {/snippet}
@@ -890,7 +888,7 @@
                                   displayMenu={true}
                                   repostable={true}
                                   note={event}
-                                  {tieKey}
+                                  tieKey={userPubkey}
                                 />
                               {/snippet}
                             </Metadata>

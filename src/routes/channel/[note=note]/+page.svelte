@@ -7,12 +7,7 @@
   import { setRelays } from "$lib/func/nostr";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
-  import {
-    defaultRelays,
-    loginUser,
-    queryClient,
-    timelineFilter,
-  } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -22,6 +17,7 @@
   import { mutes } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
   import type { PageData } from "./$types";
+  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   // interface Props {
   //   data: {
@@ -91,7 +87,9 @@
     return eMutes.includes(id);
   }
   let timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
-  let isMute = $derived(channelMuteCheck(data.id, $timelineFilter.adaptMute));
+  let isMute = $derived(
+    channelMuteCheck(data.id, timelineFilter.get.adaptMute)
+  );
 </script>
 
 {#if view}
