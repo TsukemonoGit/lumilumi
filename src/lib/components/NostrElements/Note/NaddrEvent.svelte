@@ -92,7 +92,6 @@
       </div>
     {/snippet}
     {#snippet children({ event })}
-      {event}
       <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
         {#snippet loading()}
           <div>
