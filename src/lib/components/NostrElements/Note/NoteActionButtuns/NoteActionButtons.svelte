@@ -686,7 +686,7 @@
               onclick={handleClickReaction}
             >
               <Heart size="20" class=" mt-auto overflow-hidden" />
-            </button>{:else}<div class="overflow-hidden">
+            </button>{:else}<div class="overflow-hidden py-0.5">
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
