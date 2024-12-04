@@ -278,7 +278,11 @@
   });
 </script>
 
-<DropdownMenu {menuTexts} {handleSelectItem}>
+<DropdownMenu
+  buttonClass="actionButton flex items-center"
+  {menuTexts}
+  {handleSelectItem}
+>
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
 

@@ -7,9 +7,15 @@
     menuTexts?: { icon: any; text: string }[];
     handleSelectItem: (arg0: number) => any;
     children?: import("svelte").Snippet;
+    buttonClass?: string;
   }
 
-  let { menuTexts = [], handleSelectItem, children }: Props = $props();
+  let {
+    menuTexts = [],
+    handleSelectItem,
+    children,
+    buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden",
+  }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow, overlay },
 
@@ -22,7 +28,7 @@
 
 <button
   type="button"
-  class="hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden"
+  class={buttonClass}
   use:melt={$trigger}
   aria-label="Update dimensions"
   >{@render children?.()}<span class="sr-only">Open Popover</span></button

@@ -68,7 +68,10 @@
 
 <!--reconnect relayは readable default relayだけ-->
 <Popover ariaLabel={"relays status"}>
-  <RadioTower size="20" class={overallStateColor} />
+  <RadioTower
+    size="20"
+    class={`${overallStateColor}  hover:opacity-75 active:opacity-50`}
+  />
 
   {#snippet popoverContent()}
     <div class="max-h-80 overflow-x-auto max-w-80">

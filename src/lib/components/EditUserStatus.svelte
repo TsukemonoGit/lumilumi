@@ -240,7 +240,9 @@
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
             <Popover bind:openPopover ariaLabel="custom emoji" zIndex={100}>
-              <SmilePlus size="20" />
+              <div class="actionButton">
+                <SmilePlus size="20" />
+              </div>
               {#snippet popoverContent()}
                 <div>
                   <div
