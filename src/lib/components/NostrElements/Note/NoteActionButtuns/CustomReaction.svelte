@@ -99,8 +99,13 @@
   }
 </script>
 
-<Popover bind:openPopover ariaLabel="Open emoji picker">
+<Popover
+  bind:openPopover
+  buttonClass={"actionButton"}
+  ariaLabel="Open emoji picker"
+>
   <SmilePlus size="20" class="stroke-magnum-500/75" />
+
   {#snippet popoverContent()}
     <div>
       <div class="flex gap-1 pr-8 pl-2 max-w-80">

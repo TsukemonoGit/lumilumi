@@ -523,7 +523,7 @@
 </script>
 
 <div
-  class="flex flex-row-reverse justify-between py-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
+  class="flex flex-row-reverse justify-between pt-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
 >
   <div class="flex gap-1 overflow-hidden">
     {#if $showAllReactions}{#if hasReactions}
@@ -544,7 +544,7 @@
       {/if}{/if}
     <!--メニュー-->
 
-    <EllipsisMenu {note} {tieKey} />
+    <EllipsisMenu iconSize={20} {note} {tieKey} />
   </div>
   <!---->
 
@@ -662,7 +662,9 @@
   <!---->
   {#if note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
     <!--カスタムリアクション-->
+
     <CustomReaction {note} {root} {atag} {publishAndSetQuery} />
+
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
       <Reactioned id={atag ?? note.id}>
@@ -700,16 +702,21 @@
       <div class="flex items-end">
         <Reposted id={atag ?? note.id}>
           {#snippet loading()}
-            <DropdownMenu {menuTexts} {handleSelectItem}>
-              <Repeat2 size="21" class="actionButton" />
+            <DropdownMenu
+              buttonClass={"actionButton"}
+              {menuTexts}
+              {handleSelectItem}
+            >
+              <Repeat2 size="22" />
             </DropdownMenu>{/snippet}
 
           {#snippet content({ event })}
-            <DropdownMenu {menuTexts} {handleSelectItem}>
-              <Repeat2
-                size="21"
-                class={event ? "text-magnum-200 actionButton" : "actionButton"}
-              />
+            <DropdownMenu
+              buttonClass={"actionButton"}
+              {menuTexts}
+              {handleSelectItem}
+            >
+              <Repeat2 size="22" class={event ? "text-magnum-200 " : ""} />
             </DropdownMenu>{/snippet}
         </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
             >{allReactions.repost.length}</span
@@ -770,9 +777,5 @@
   }
   input[type="number"] {
     background-color: rgb(var(--color-neutral-800) / 1);
-  }
-
-  .actionButton {
-    @apply hover:opacity-75 active:ring active:bg-magnum-400/20 ring-magnum-400/20  rounded-full text-magnum-500/75 overflow-hidden;
   }
 </style>

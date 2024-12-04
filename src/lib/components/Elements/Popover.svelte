@@ -18,6 +18,7 @@
     children?: import("svelte").Snippet;
     popoverContent?: import("svelte").Snippet;
     onOpenStateChange?: (bool: boolean) => void;
+    buttonClass?: string;
   }
 
   let {
@@ -28,6 +29,7 @@
     children,
     popoverContent,
     onOpenStateChange,
+    buttonClass = "hover:opacity-75 active:opacity-50 w-fit",
   }: Props = $props();
 
   openPopover = (bool: boolean) => {
@@ -40,10 +42,8 @@
   });
 </script>
 
-<button
-  class="hover:opacity-75 active:opacity-50 w-fit"
-  aria-label={ariaLabel}
-  use:melt={$trigger}>{@render children?.()}</button
+<button class={buttonClass} aria-label={ariaLabel} use:melt={$trigger}
+  >{@render children?.()}</button
 >{#if $open}<div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
