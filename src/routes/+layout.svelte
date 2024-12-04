@@ -199,7 +199,7 @@
   let mediaList: string[] = $state.raw([]);
   viewMediaModal.subscribe((e) => {
     if (e && e.mediaList.length > 0) {
-      console.log(e);
+      //  console.log(e);
       modalIndex = e.index;
       mediaList = e.mediaList;
       setTimeout(() => {
