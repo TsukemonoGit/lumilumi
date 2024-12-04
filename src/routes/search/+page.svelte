@@ -43,22 +43,23 @@
   let openSearchResult = $state(false);
 
   let searchRelays = $state(nip50relays);
-  function updateQueryParams() {
-    const params = new URLSearchParams(window.location.search);
-    searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
-    searchWord ? params.set("word", searchWord) : params.delete("word");
-    searchKind !== undefined && searchKind !== null
-      ? params.set("k", String(searchKind))
-      : params.delete("k");
-    searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
-    searchPubkeyTo ? params.set("p", searchPubkey) : params.delete("p");
-    searchSince ? params.set("s", String(searchSince)) : params.delete("s");
-    searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
-    followee ? params.set("f", String(followee)) : params.delete("f");
+  // function updateQueryParams() {
+  //   const params = new URLSearchParams(window.location.search);
+  //   searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
+  //   searchWord ? params.set("word", searchWord) : params.delete("word");
+  //   searchKind !== undefined && searchKind !== null
+  //     ? params.set("k", String(searchKind))
+  //     : params.delete("k");
+  //   searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
+  //   searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
+  //   searchSince ? params.set("s", String(searchSince)) : params.delete("s");
+  //   searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
+  //   followee ? params.set("f", String(followee)) : params.delete("f");
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    pushState(newUrl, {});
-  }
+  //   const newUrl = `${window.location.pathname}?${params.toString()}`;
+  //   pushState(newUrl, {});
+  // }
+
   let isMount = false;
   afterNavigate((navigate) => {
     openSearchResult = false;
@@ -200,7 +201,7 @@
 
   function handleClickSearch() {
     $nowProgress = true;
-    updateQueryParams();
+    // updateQueryParams();
     showFilters = filters.map((filter) => {
       return { ...filter, limit: 50 };
     });

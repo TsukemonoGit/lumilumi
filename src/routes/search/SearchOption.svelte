@@ -80,8 +80,8 @@
   };
 
   async function handleClickShare() {
-    const shareData = { url: $page.url.href };
-    //console.log($page);
+    const shareData = { url: sharaParam() };
+    console.log($page.url);
     try {
       await navigator.share(shareData);
       // await navigator.clipboard.writeText(
@@ -100,6 +100,25 @@
         color: "bg-orange-500",
       };
     }
+  }
+
+  function sharaParam() {
+    const url = new URL($page.url.origin + $page.url.pathname);
+    const params = url.searchParams;
+
+    searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
+    searchWord ? params.set("word", searchWord) : params.delete("word");
+    searchKind !== undefined && searchKind !== null
+      ? params.set("k", String(searchKind))
+      : params.delete("k");
+    searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
+    searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
+    searchSince ? params.set("s", String(searchSince)) : params.delete("s");
+    searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
+    followee ? params.set("f", String(followee)) : params.delete("f");
+
+    console.log(url.toString());
+    return url.toString();
   }
 </script>
 
