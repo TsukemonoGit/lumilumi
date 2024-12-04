@@ -439,7 +439,7 @@
 
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 3000; // 1秒（ミリ秒）
+  const updateInterval = 2000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
 
@@ -453,13 +453,12 @@
     updating = true;
     timeoutId = setTimeout(() => {
       updateReactionsData();
-
-      updating = false;
     }, updateInterval); // 連続で実行されるのを防ぐ
   }
 
   $effect(() => {
-    if (viewEventIds) {
+    if (viewEventIds.get.length > 0) {
+      //   console.log($state.snapshot(viewEventIds.get.length));
       untrack(() => {
         debounceUpdate();
       });
@@ -508,7 +507,10 @@
     ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
 
     hasReactions = hasAnyReaction();
+    updating = false;
+    timeoutId = undefined;
   }
+
   function hasAnyReaction(): boolean {
     return (
       allReactions.repost.length > 0 ||

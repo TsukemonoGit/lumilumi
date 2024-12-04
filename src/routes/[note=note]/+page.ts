@@ -6,6 +6,7 @@ import { ogDescription, ogTitle } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
 import { locale } from "svelte-i18n";
 import { get } from "svelte/store";
+import { relayRegex, relayRegex2 } from "$lib/func/regex";
 
 interface CustomParams {
   note: string;
@@ -40,8 +41,14 @@ export const load: PageLoad<{
       }
 noteID:${nip19.noteEncode(data.id)}
 ${data.author ? `pubkey:${nip19.npubEncode(data.author)}` : ""}`);
+      const nrelays = nevent.relays?.filter((relay) => relayRegex2.test(relay));
 
-      return nevent;
+      return {
+        id: nevent.id,
+        relays: nrelays && nrelays.length > 0 ? nrelays : undefined,
+        kind: nevent.kind,
+        author: nevent.author,
+      };
     } else if (type === "note") {
       ogTitle.set(`Lumilumi - note:${nip19.noteEncode(data)}`);
       ogDescription.set(`noteID:${nip19.noteEncode(data)}`);

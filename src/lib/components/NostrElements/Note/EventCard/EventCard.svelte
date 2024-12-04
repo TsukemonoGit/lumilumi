@@ -19,7 +19,7 @@
   import Reply from "../Reply.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy, untrack } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
 
@@ -121,10 +121,17 @@
   onDestroy(() => {
     // console.log("destroy mae", viewEventIds.get.length);
     // コンポーネント破棄時に現在のタグを削除
-    removeFirstMatchingId(viewEventIds.get, currentNoteTag);
-    //  console.log("destoroy ato", viewEventIds.get.length);
-    // viewEventIds.get = viewEventIds.get;
+    //console.log("destoroy", $state.snapshot(currentNoteTag));
+    if (currentNoteTag) {
+      viewEventIds.update((value) => {
+        return removeFirstMatchingId(value, currentNoteTag);
+      });
+    }
   });
+  //   //  console.log("destoroy ato", viewEventIds.get.length);
+  //   // viewEventIds.get = viewEventIds.get;
+  // });
+
   // $: console.log(viewEventIds.get);
   //eかa
 
@@ -211,12 +218,17 @@
         // 現在のタグを削除
         if (currentNoteTag) {
           console.log(viewEventIds.get.length);
-          removeFirstMatchingId(viewEventIds.get, currentNoteTag);
+          viewEventIds.update((value) => {
+            return removeFirstMatchingId(value, currentNoteTag);
+          });
           console.log(viewEventIds.get.length);
         }
         // 新しいタグがまだ存在しなければ追加
         //if (!tagExists(viewEventIds.get, "a", atag)) {
-        viewEventIds.get.push(["a", atag]);
+        viewEventIds.update((value) => {
+          value.push(["a", atag]);
+          return value;
+        });
         //}
         currentNoteTag = ["a", atag];
         // viewEventIds.get = viewEventIds.get;
@@ -229,11 +241,16 @@
         //etag
         // 現在のタグを削除
         if (currentNoteTag) {
-          removeFirstMatchingId(viewEventIds.get, currentNoteTag);
+          viewEventIds.update((value) => {
+            return removeFirstMatchingId(value, currentNoteTag);
+          });
         }
         // 新しいタグがまだ存在しなければ追加
         // if (!tagExists(viewEventIds.get, "e", note.id)) {
-        viewEventIds.get.push(["e", note.id]);
+        viewEventIds.update((value) => {
+          value.push(["e", note.id]);
+          return value;
+        });
         //}
         currentNoteTag = ["e", note.id];
         //viewEventIds.get = viewEventIds.get;

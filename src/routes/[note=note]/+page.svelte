@@ -3,7 +3,7 @@
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
 
   import { defaultRelays } from "$lib/stores/stores";
-
+  import { defaultRelays as defoRelay } from "$lib/stores/relays";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
 
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
@@ -41,9 +41,12 @@
       return;
     }
     isMount = true;
-    if (!$defaultRelays && data.relays) {
-      setRelays(data.relays);
-    }
+    // const nrelays = data?.relays?.filter((relay) => relay.startsWith("ws"));
+    // if (!$defaultRelays && data.relays && nrelays && nrelays.length > 0) {
+    //   //setRelays(nrelays);
+    // } else if (!$defaultRelays) {
+    //   setRelays(defoRelay);
+    // }
 
     isMount = false;
   }
