@@ -114,7 +114,14 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     },
   ],
   //
-
+  [
+    20,
+    {
+      ja: "画像フィード",
+      en: "Picture-first feeds",
+    },
+  ],
+  //
   [
     40,
     {

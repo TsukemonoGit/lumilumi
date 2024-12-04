@@ -601,7 +601,10 @@
                     <Zap size="20" />
                   </button>
                 {:else}
-                  <Zap size="20" class="actionButton fill-magnum-500/75" />
+                  <Zap
+                    size="20"
+                    class="actionButton fill-magnum-500/75 text-magnum-500"
+                  />
                 {/if}
               {/snippet}
             </Zapped><span class="text-sm"

@@ -116,7 +116,10 @@ export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);
 export const showBanner = writable<boolean>(true);
-export const viewMediaModal = writable<{ index: number; mediaList: Part[] }>();
+export const viewMediaModal = writable<{
+  index: number;
+  mediaList: string[];
+}>();
 export const showKind16 = writable<boolean>(false);
 export const onlyFollowee = writable<boolean>(false);
 //export const reactionList = writable<Nostr.Event[]>([]);

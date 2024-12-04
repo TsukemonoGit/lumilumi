@@ -1,6 +1,5 @@
 <!-- src/lib/components/Modal.svelte -->
 <script lang="ts">
-  import type { Part } from "$lib/func/content";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
   import { fade } from "svelte/transition";
@@ -8,7 +7,7 @@
 
   interface Props {
     open: Writable<boolean>;
-    images?: Part[];
+    images?: string[];
     currentIndex?: number;
   }
   let {
@@ -33,13 +32,13 @@
   });
 
   const goToNext = () => {
-    if (images) {
+    if (images && images.length > 0) {
       currentIndex = (currentIndex + 1) % images.length;
     }
   };
 
   const goToPrev = () => {
-    if (images) {
+    if (images && images.length > 0) {
       currentIndex = (currentIndex - 1 + images.length) % images.length;
     }
   };
@@ -75,7 +74,7 @@
       <!-- {#if images[currentIndex].type === "image"} -->
       <img
         alt=""
-        src={images[currentIndex].url}
+        src={images[currentIndex]}
         class="max-h-[100vh] max-w-[100vw] object-contain"
       />
       <!-- {:else if images[currentIndex].type === "movie"}<video

@@ -1,21 +1,23 @@
+<!--https://github.com/nostr-protocol/nips/blob/master/68.md-->
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
-  import { showImg } from "$lib/stores/stores";
 
-  import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
 
-  import { eventKinds } from "$lib/func/kinds";
   import Content from "../Content.svelte";
-  import ClientTag from "../ClientTag.svelte";
+
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { reverseConvertMetaTags, type Imeta } from "$lib/func/imeta";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import ContentImage from "../content/ContentImage.svelte";
+  import { viewMediaModal } from "$lib/stores/stores";
+  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -25,6 +27,7 @@
     maxHeight: string;
     repostable: boolean;
     tieKey: string | undefined;
+    warning: string[] | undefined;
   }
 
   let {
@@ -35,52 +38,44 @@
     maxHeight,
     repostable,
     tieKey,
+    warning,
   }: Props = $props();
 
-  let title = $derived(
-    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
+  let imeta: Imeta[] | undefined = $derived(
+    note?.tags
+      .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
+      ?.map((imeta) => reverseConvertMetaTags(imeta))
+      .filter((tag) => tag !== undefined)
   );
-  let dtag = $derived(
-    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+  //console.log(imeta);
+  let imageList = $derived(
+    imeta.map((i) => i.url).filter((tag) => tag !== undefined)
   );
-  let description = $derived(
-    note.tags.find(
-      (tag) =>
-        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-    )?.[1]
-  );
-  let image = $derived(
-    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
-  );
-
-  const replaceable =
-    (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000) ||
-    note.kind === 0 ||
-    note.kind === 3;
-  const eventpointer: nip19.EventPointer = {
+  //console.log(imageList);
+  let eventpointer: nip19.EventPointer = {
     id: note.id,
     relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     author: note.pubkey,
     kind: note.kind,
   };
-  const naddrpointer: nip19.AddressPointer = {
-    kind: note.kind,
-    identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-    pubkey: note.pubkey,
-    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-  };
-  const naddr = nip19.naddrEncode(naddrpointer);
-  const nevent = nip19.neventEncode(eventpointer);
+
+  let nevent = nip19.neventEncode(eventpointer);
 
   const handleClickToNotepage = () => {
     //Goto Note page
 
-    goto(`/${replaceable ? naddr : nevent}`);
+    goto(`/${nevent}`);
   };
 
   let prof = $derived(profile(metadata));
   let petname = $derived(followList.get.get(note.pubkey));
+  const openModal = (index: number) => {
+    // modalIndex = index;
+    // if (showModal) $showModal = true;
+    //   console.log("viewmedia");
+    $viewMediaModal = { index: index, mediaList: imageList };
+  };
+  let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
 </script>
 
 <div
@@ -126,9 +121,6 @@
         @{nip19.npubEncode(note.pubkey)}</span
       >
     {/if}
-    <div class="text-neutral-300/50 text-sm">
-      {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
-    </div>
     {#if displayMenu}
       <button
         onclick={handleClickToNotepage}
@@ -140,43 +132,19 @@
       </button>
     {/if}
   </div>
-  {#if title || dtag || description}
-    <div class="rounded-md bg-neutral-800 p-2">
-      {#if (title && title !== "") || dtag}
+  <div class="relative overflow-hidden mb-1.5">
+    <div
+      class="mt-0.5 overflow-y-auto overflow-x-hidden"
+      style="max-height:{maxHeight ?? 'none'}"
+    >
+      {#if title && title !== ""}
         <div class="text-lg font-bold">
-          {title && title !== "" ? title : dtag}
+          {title}
         </div>{/if}
-      <div
-        class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
-      >
-        {#if description && description !== ""}<div
-            class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
-          >
-            {description}
-          </div>{/if}
-
-        {#if image && $showImg}
-          <img
-            loading="lazy"
-            src={image}
-            alt=""
-            class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
-          />{/if}
-      </div>
-    </div>{/if}
-  <div
-    class="mt-0.5 overflow-y-auto overflow-x-hidden"
-    style="max-height:{maxHeight ?? 'none'}"
-  >
-    {#if note.kind === 30023 || note.kind === 30024}
-      <SimpleMarkdown
-        text={note.content}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      /><ClientTag tags={note.tags} {depth} />{:else}
+      {#if imageList.length > 0}
+        {#each imageList as url, number}
+          <ContentImage src={url} {url} {number} {openModal} />
+        {/each}{/if}
       <Content
         text={note.content}
         tags={note.tags}
@@ -184,7 +152,13 @@
         {depth}
         {repostable}
         {tieKey}
-      />{/if}
+      />
+      {#if warning}
+        <!-- <WarningHide1 text={tag[1]} /> -->
+
+        <WarningHide2 text={warning[1]} />
+      {/if}
+    </div>
   </div>
   {#if displayMenu}
     <NoteActionButtons {note} {repostable} {tieKey} />
