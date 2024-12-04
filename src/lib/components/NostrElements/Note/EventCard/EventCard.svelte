@@ -490,6 +490,8 @@
       {:else if note.kind === 20}
         <Kind20Note
           {tieKey}
+          {replyUsers}
+          {mini}
           {note}
           {metadata}
           {displayMenu}
