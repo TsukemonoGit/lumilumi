@@ -53,10 +53,7 @@
   let { data, children } = $props<{
     data:
       | {
-          id: string;
           relays?: string[] | undefined;
-          kind?: number | undefined;
-          author?: string | undefined;
         }
       | undefined;
     children: import("svelte").Snippet;
@@ -184,17 +181,17 @@
     }
   });
 
-  function baddrCheck(page: any, banner: any, showbnr: any) {
-    if (page.route.id === "/settings" && nlBanner) {
-      nlBanner.style.display = "";
-    } else if (nlBanner) {
-      if ($showBanner) {
-        nlBanner.style.display = "";
-      } else {
-        nlBanner.style.display = "none";
-      }
-    }
-  }
+  // function baddrCheck(page: any, banner: any, showbnr: any) {
+  //   if (page.route.id === "/settings" && nlBanner) {
+  //     nlBanner.style.display = "";
+  //   } else if (nlBanner) {
+  //     if ($showBanner) {
+  //       nlBanner.style.display = "";
+  //     } else {
+  //       nlBanner.style.display = "none";
+  //     }
+  //   }
+  // }
 
   // svelte-ignore non_reactive_update
   let showModal: Writable<boolean> = writable(false);
