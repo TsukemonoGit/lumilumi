@@ -196,9 +196,9 @@
   // svelte-ignore non_reactive_update
   let showModal: Writable<boolean> = writable(false);
   let modalIndex: number = $state(0);
-  let mediaList: Part[] = $state.raw([]);
+  let mediaList: string[] = $state.raw([]);
   viewMediaModal.subscribe((e) => {
-    if (e) {
+    if (e && e.mediaList.length > 0) {
       console.log(e);
       modalIndex = e.index;
       mediaList = e.mediaList;

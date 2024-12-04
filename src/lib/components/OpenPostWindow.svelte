@@ -36,12 +36,7 @@
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import {
-    convertMetaTags,
-    filesUpload,
-    delay,
-    normalizeRelayURL,
-  } from "$lib/func/util";
+  import { filesUpload, delay, normalizeRelayURL } from "$lib/func/util";
 
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
@@ -58,6 +53,7 @@
   import { clientTag, mediaUploader } from "$lib/func/constants";
   import { untrack } from "svelte";
   import Content from "./NostrElements/Note/Content.svelte";
+  import { convertMetaTags } from "$lib/func/imeta";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする

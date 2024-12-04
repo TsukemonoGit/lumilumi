@@ -60,6 +60,7 @@
     timelineFilter,
     viewEventIds,
   } from "$lib/stores/globalRunes.svelte";
+  import Kind20Note from "./Kind20Note.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -486,6 +487,17 @@
       {:else if note.kind === 0}
         <!--kind0-->
         <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
+      {:else if note.kind === 20}
+        <Kind20Note
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {warning}
+        />
       {:else if note.kind === 40}
         <!--kind40 パブ茶部屋-->
         <LatestEvent

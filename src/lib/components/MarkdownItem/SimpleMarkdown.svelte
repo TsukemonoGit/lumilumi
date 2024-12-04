@@ -31,26 +31,28 @@
     depth,
     repostable,
     nolist = false,
-    tieKey
+    tieKey,
   }: Props = $props();
 
   const md = markdownit();
 
   //プレビューにも使ってるからconstだとだめ
-  let tokens = $derived(md
+  let tokens = $derived(
+    md
 
-    .use(markdownImgPlugin)
+      .use(markdownImgPlugin)
 
-    .use(markdownItFootnote)
-    .use(markdownItSub)
-    .use(markdownItSup)
-    .use(markdownItMark)
-    .use(markdownBrPlugin)
-    .use(markdownLinkPlugin)
-    .use(markdownDlPlugin)
-    .use(markdownDdPlugin)
-    .use(markdownDtPlugin)
-    .parse(text, {}));
+      .use(markdownItFootnote)
+      .use(markdownItSub)
+      .use(markdownItSup)
+      .use(markdownItMark)
+      .use(markdownBrPlugin)
+      .use(markdownLinkPlugin)
+      .use(markdownDlPlugin)
+      .use(markdownDdPlugin)
+      .use(markdownDtPlugin)
+      .parse(text, {})
+  );
   let parts = $derived(transformTokens(tokens));
 
   //let modalIndex = 0;

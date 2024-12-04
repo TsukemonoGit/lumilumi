@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { convertMetaTags, delay, filesUpload } from "$lib/func/util";
+  import { delay, filesUpload } from "$lib/func/util";
   import {
     additionalPostOptions,
     nowProgress,
@@ -14,6 +14,7 @@
   import { onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/stores";
+  import { convertMetaTags } from "$lib/func/imeta";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();

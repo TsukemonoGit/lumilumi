@@ -22,16 +22,21 @@
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   let mediaList = $derived(
-    parts.filter(
-      (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-    )
+    parts
+      .filter(
+        (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+      )
+      .map((p) => p.url)
+      .filter((t) => t !== undefined)
   );
 
   //let modalIndex = 0;
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
-    $viewMediaModal = { index: index, mediaList: mediaList };
+    if (mediaList.length > 0) {
+      $viewMediaModal = { index: index, mediaList: mediaList };
+    }
   };
 
   const nip19Decode = (
@@ -93,7 +98,12 @@
         {tieKey}
       />{:else}{part.content}{/if}
   {:else if part.type === "image" && part.content}
-    <ContentImage {part} {openModal} />
+    <ContentImage
+      src={part.content}
+      url={part.url}
+      number={part.number}
+      {openModal}
+    />
   {:else if part.type === "movie"}
     {#if $showImg}
       <video
