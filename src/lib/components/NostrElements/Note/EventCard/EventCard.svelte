@@ -121,7 +121,7 @@
   onDestroy(() => {
     // console.log("destroy mae", viewEventIds.get.length);
     // コンポーネント破棄時に現在のタグを削除
-    console.log("destoroy", $state.snapshot(currentNoteTag));
+    //console.log("destoroy", $state.snapshot(currentNoteTag));
     if (currentNoteTag) {
       viewEventIds.update((value) => {
         return removeFirstMatchingId(value, currentNoteTag);
