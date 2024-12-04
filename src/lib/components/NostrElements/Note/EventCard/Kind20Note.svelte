@@ -2,8 +2,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
-  import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
+  import { profile } from "$lib/func/util";
 
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
@@ -12,14 +11,20 @@
   import Content from "../Content.svelte";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+
   import { reverseConvertMetaTags, type Imeta } from "$lib/func/imeta";
   import { followList } from "$lib/stores/globalRunes.svelte";
   import ContentImage from "../content/ContentImage.svelte";
-  import { viewMediaModal } from "$lib/stores/stores";
+  import { showUserStatus, viewMediaModal } from "$lib/stores/stores";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
+  import NoteTemplate from "../NoteTemplate.svelte";
+  import ShowStatus from "../ShowStatus.svelte";
+  import UserName from "../UserName.svelte";
+  import PopupUserName from "$lib/components/Elements/PopupUserName.svelte";
 
   interface Props {
+    replyUsers: string[];
+    mini: boolean;
     note: Nostr.Event;
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
@@ -31,6 +36,8 @@
   }
 
   let {
+    replyUsers,
+    mini,
     note,
     metadata,
     displayMenu,
@@ -78,60 +85,20 @@
   let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
 </script>
 
-<div
-  class="break-words overflow-x-hidden gap-4 p-1"
-  style="word-break: break-word;"
->
-  <div class="w-full flex gap-1">
-    {#if metadata}
-      <div>
-        <UserMenu
-          pubkey={note.pubkey}
-          {metadata}
-          size={20}
-          {displayMenu}
-          {depth}
-          {tieKey}
-        />
-      </div>
-      <div class="text-magnum-100 text-sm">
-        {#if petname}<span class="text-magnum-100">📛{petname}</span>
-        {:else if metadata && prof}
-          <DisplayName
-            height={21}
-            name={prof.display_name ?? ""}
-            tags={metadata.tags}
-          />
-          {#if prof.name && prof.name !== ""}<span
-              class="inline text-magnum-100 text-sm"
-              ><DisplayName
-                height={21}
-                name={`@${prof.name}`}
-                tags={metadata.tags}
-              /></span
-            >{/if}
-        {:else}
-          <span class="text-magnum-100 text-sm break-all">
-            @{nip19.npubEncode(note.pubkey)}</span
-          >
-        {/if}
-      </div>
-    {:else}
-      <span class="text-magnum-100 text-sm break-all">
-        @{nip19.npubEncode(note.pubkey)}</span
-      >
-    {/if}
-    {#if displayMenu}
-      <button
-        onclick={handleClickToNotepage}
-        class="  ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
-      >
-        <time datetime={datetime(note.created_at)}
-          >{formatAbsoluteDate(note.created_at)}</time
-        >
-      </button>
-    {/if}
-  </div>
+<NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+  {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
+  <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+  {#if replyUsers.length > 0}
+    <div
+      class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
+    >
+      <span class="text-sm text-neutral-50">To:</span>{#each replyUsers as user}
+        {#if !displayMenu}<UserName pubhex={user} />{:else}
+          <PopupUserName pubkey={user} {tieKey} />{/if}
+      {/each}
+    </div>
+  {/if}
+
   <div class="relative overflow-hidden mb-1.5">
     <div
       class="mt-0.5 overflow-y-auto overflow-x-hidden"
@@ -153,6 +120,12 @@
         {repostable}
         {tieKey}
       />
+      <span
+        class={"float-end text-neutral-400    text-sm font-semibold px-1"}
+        title="kind:20"
+      >
+        Picture</span
+      >
       {#if warning}
         <!-- <WarningHide1 text={tag[1]} /> -->
 
@@ -163,4 +136,4 @@
   {#if displayMenu}
     <NoteActionButtons {note} {repostable} {tieKey} />
   {/if}
-</div>
+</NoteTemplate>
