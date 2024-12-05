@@ -28,6 +28,7 @@
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
+  // $inspect($page.url.pathname);
 </script>
 
 <div class="sidebar fixed top-28 bottom-12">
@@ -61,12 +62,7 @@
             >
           </li>
         {:else}
-          <li
-            aria-current={$page.url?.pathname ===
-            (link === undefined && $loginUser ? `/${encodedPub}` : link)
-              ? "page"
-              : undefined}
-          >
+          <li aria-current={$page.url.pathname === link ? "page" : undefined}>
             {#if noPubkey || $loginUser}
               <a href={link} title={alt}>
                 <Icon /><span class="ml-2">{alt}</span>

@@ -38,15 +38,16 @@
       localStorage.setItem("showBanner", value.toString());
     }
   });
+  //$inspect($currentPage?.link);
+  let Icon = $derived($currentPage?.Icon);
 </script>
 
 <header>
   <div class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
     <div class="flex w-full h-8 justify-center items-center gap-4">
-      {#if $currentPage?.Icon}
-        {@const SvelteComponent = $currentPage.Icon}
+      {#if Icon}
         <div>
-          <SvelteComponent />
+          <Icon />
         </div>
       {/if}
       <div class="uppercase font-bold">

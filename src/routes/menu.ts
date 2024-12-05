@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Users,
 } from "lucide-svelte";
+
 import { derived } from "svelte/store";
 
 export const mainMenuItems: {
@@ -17,15 +18,55 @@ export const mainMenuItems: {
   alt: string;
   noPubkey: boolean; //Pubkey設定してないときもクリックできるメニューか？
 }[] = [
-  { Icon: House, link: "/", alt: "home", noPubkey: true },
-  { Icon: Bell, link: "/notifications", alt: "notifications", noPubkey: false },
-  { Icon: Search, link: "/search", alt: "search", noPubkey: true },
-  { Icon: Globe, link: "/global", alt: "global", noPubkey: true },
-  { Icon: MessagesSquare, link: "/channel", alt: "channel", noPubkey: true },
-  { Icon: Users, link: "/list", alt: "list", noPubkey: false },
+  {
+    Icon: House,
+    link: "/",
+    alt: "home",
+    noPubkey: true,
+  },
+  {
+    Icon: Bell,
+    link: "/notifications",
+    alt: "notifications",
+    noPubkey: false,
+  },
+  {
+    Icon: Search,
+    link: "/search",
+    alt: "search",
+    noPubkey: true,
+  },
+  {
+    Icon: Globe,
+    link: "/global",
+    alt: "global",
+    noPubkey: true,
+  },
+  {
+    Icon: MessagesSquare,
+    link: "/channel",
+    alt: "channel",
+    noPubkey: true,
+  },
+  {
+    Icon: Users,
+    link: "/list",
+    alt: "list",
+    noPubkey: false,
+  },
   { Icon: undefined, link: undefined, alt: "profile", noPubkey: false },
-  { Icon: TrendingUp, link: undefined, alt: "edit status", noPubkey: true },
-  { Icon: Settings, link: "/settings", alt: "settings", noPubkey: true },
+  {
+    Icon: TrendingUp,
+    link: undefined,
+    alt: "edit status",
+    noPubkey: true,
+  },
+  {
+    Icon: Settings,
+    link: "/settings",
+    alt: "settings",
+    noPubkey: true,
+  },
 ];
 
 // 現在のページに基づいてアイコンを設定

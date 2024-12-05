@@ -217,20 +217,19 @@
       description: $_("settings.refleshPage"),
       color: "bg-green-500",
     });
-    // console.log($selectedRelayset);
-    // console.log(settings.useRelaySet);
-    // console.log($loginUser);
-    // console.log($originalSettings?.pubkey);
-    // if (
-    //   ($originalSettings?.pubkey &&
-    //     settings.pubkey !== $originalSettings?.pubkey) ||
-    //   settings?.useRelaySet !== $originalSettings?.useRelaySet ||
-    //   JSON.stringify($originalSettings?.relays) !==
-    //     JSON.stringify(settings.relays)
-    // ) {
-    //   reloadWithoutWarning();
-
-    // }
+    console.log($selectedRelayset);
+    console.log(settings.useRelaySet);
+    console.log($loginUser);
+    console.log($originalSettings?.pubkey);
+    if (
+      ($originalSettings?.pubkey &&
+        settings.pubkey !== $originalSettings?.pubkey) ||
+      settings?.useRelaySet !== $originalSettings?.useRelaySet ||
+      JSON.stringify($originalSettings?.relays) !==
+        JSON.stringify(settings.relays)
+    ) {
+      reloadWithoutWarning();
+    }
 
     $loginUser = settings.pubkey;
 
