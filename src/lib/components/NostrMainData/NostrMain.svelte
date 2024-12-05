@@ -135,7 +135,7 @@
       // mutebykinds: savedMutebykinds,
       defaultReaction: savedDefaultReaction,
       showReactioninTL: savedReactionTL,
-      nostrWalletConnect: savedNostrWalletConnect,
+      //  nostrWalletConnect: savedNostrWalletConnect,
       showUserStatus: savedShowUserStatus,
 
       showKind16: savedShowKind16,

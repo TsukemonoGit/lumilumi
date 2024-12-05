@@ -122,7 +122,7 @@ export interface LumiSetting {
   showRelayIcon: boolean;
   showReactioninTL: boolean;
   showUserStatus: boolean;
-  nostrWalletConnect: string;
+
   emoji?: LumiEmoji;
   mute?: LumiMute;
   mutebykinds?: LumiMuteByKind;

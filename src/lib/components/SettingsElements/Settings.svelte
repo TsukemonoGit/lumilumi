@@ -45,8 +45,9 @@
   import Link from "../Elements/Link.svelte";
   import Dialog from "../Elements/Dialog.svelte";
   import { migrateSettings } from "$lib/func/settings";
-  import { setRelays } from "$lib/func/nostr";
-  import type { DefaultRelayConfig } from "rx-nostr";
+  import { setRelays, usePromiseReq } from "$lib/func/nostr";
+  import { type DefaultRelayConfig, latest } from "rx-nostr";
+  import { pipe } from "rxjs";
   import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
   import Kind30078 from "./Kind30078.svelte";
@@ -64,12 +65,21 @@
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = $state({ ...initSettings });
 
-  //以下3つは同期した時点で保存
-  // let lumiEmoji: LumiEmoji;
-  // let lumiMute: LumiMute;
-  // let lumiMuteByKind: LumiMuteByKind;
+  let originalSettings: LumiSetting | undefined = undefined;
 
-  const originalSettings = writable<LumiSetting | null>(null);
+  const optionsArr = ["0", "1"];
+  const optionsArrStr = [
+    $_("settings.relayMenuText0"),
+    $_("settings.relayMenuText1"),
+  ];
+  //inputurl
+  const {
+    elements: { root: relayInputroot },
+  } = createLabel();
+
+  let beforeRelays: DefaultRelayConfig[];
+  let relayInput: string = $state("");
+  let inputPubkey: string = $state("");
 
   const selectedRelayset = writable<string>();
   // ラジオボタン設定
@@ -92,18 +102,6 @@
     }
   });
 
-  const optionsArr = ["0", "1"];
-  const optionsArrStr = [
-    $_("settings.relayMenuText0"),
-    $_("settings.relayMenuText1"),
-  ];
-  //inputurl
-  const {
-    elements: { root: relayInputroot },
-  } = createLabel();
-
-  let beforeRelays: DefaultRelayConfig[];
-
   onMount(async () => {
     await migrateSettings();
     const savedSettings = loadSettings();
@@ -112,12 +110,8 @@
       settings = { ...settings, ...savedSettings };
       inputPubkey = nip19.npubEncode(settings.pubkey);
     } else {
-      initializeSettings();
+      initializeSettings(); //nostr-loginよぶだけ
     }
-    settings.defaultReaction = settings.defaultReaction ?? {
-      content: "+",
-      tag: [],
-    };
 
     const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
     const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
@@ -129,16 +123,8 @@
     $mutebykinds = mutebykind
       ? (JSON.parse(mutebykind) as LumiMuteByKind)
       : initLumiMuteByKind;
-    // ///なｎ
-    // lumiMute = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-    // console.log($mutes);
-    // lumiEmoji = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
-    // lumiMuteByKind = mutebykind
-    //   ? (JSON.parse(mutebykind) as LumiMuteByKind)
-    //   : initLumiMuteByKind;
 
-    // window?.addEventListener("beforeunload", handleBeforeUnload);
-    originalSettings.set({ ...settings });
+    originalSettings = $state.snapshot(settings);
   });
 
   function loadSettings() {
@@ -178,8 +164,6 @@
     }
   }
 
-  let relayInput: string = $state("");
-
   function addRelay() {
     if (!relayInput) return;
     let input = relayInput.trim();
@@ -202,35 +186,80 @@
   function saveSettings() {
     console.log("save");
     if (isRelaySelectionInvalid()) return;
-    if (!isPubkeyValid()) return;
+    if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
     $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    // localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(lumiMute));
-    // localStorage.setItem(
-    //   lumiMuteByKind_STORAGE_KEY,
-    //   JSON.stringify(lumiMuteByKind)
-    // );
-    // localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(lumiEmoji));
+
     $nowProgress = true;
     toastSettings.set({
       title: "Success",
       description: $_("settings.refleshPage"),
       color: "bg-green-500",
     });
+
     console.log($selectedRelayset);
     console.log(settings.useRelaySet);
     console.log($loginUser);
-    console.log($originalSettings?.pubkey);
-    if (
-      ($originalSettings?.pubkey &&
-        settings.pubkey !== $originalSettings?.pubkey) ||
-      settings?.useRelaySet !== $originalSettings?.useRelaySet ||
-      JSON.stringify($originalSettings?.relays) !==
-        JSON.stringify(settings.relays)
-    ) {
-      reloadWithoutWarning();
-    }
+    console.log(originalSettings?.pubkey);
 
+    //  const original = $state.snapshot($originalSettings);
+    // if (
+    //   (original?.pubkey && settings.pubkey !== original?.pubkey) ||
+    //   settings?.useRelaySet !== original?.useRelaySet ||
+    //   JSON.stringify(original?.relays) !== JSON.stringify(settings.relays)
+    // ) {
+    //   // reloadWithoutWarning();
+    // }
+    updateStores(settings);
+
+    originalSettings = $state.snapshot(settings);
+    //  location.reload();
+    $nowProgress = false;
+  }
+
+  async function resetDefaultRelay(settings: LumiSetting) {
+    if (settings.useRelaySet === "1" && settings.relays.length > 0) {
+      setRelays(settings.relays as DefaultRelayConfig[]);
+    } else {
+      // queryKey: ["defaultRelay", $loginUser] のデータがあるか確認
+
+      const data: EventPacket[] | undefined = $queryClient.getQueryData([
+        "defaultRelay",
+        $loginUser,
+      ]);
+      console.log(data);
+      if (data) {
+        // データがある場合はイベントの形を整えてセット
+        const relays = setRelaysByKind10002(data[0].event);
+        setRelays(relays);
+      } else {
+        const relays = await usePromiseReq(
+          {
+            filters: [{ authors: [$loginUser], kinds: [10002], limit: 1 }],
+            operator: pipe(latest()),
+          },
+          undefined,
+          undefined
+        );
+        console.log(relays);
+
+        setRelays(setRelaysByKind10002(relays[0].event));
+      }
+      //else {
+      // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
+      //コンポーネント外やでerrorがでる
+      // useRelaySet(
+      //   ["defaultRelay", $loginUser],
+      //   [
+      //     { authors: [$loginUser], kinds: [10002], limit: 1 },
+      //   ] as Nostr.Filter[],
+      //   undefined
+      // );
+      //}
+    }
+  }
+
+  function updateStores(settings: LumiSetting) {
     $loginUser = settings.pubkey;
 
     //relayset情報を更新する前に確認
@@ -252,7 +281,7 @@
 
     $defaultReaction = settings.defaultReaction;
     $showReactioninTL = settings.showReactioninTL;
-    // $nostrWalletConnect = settings.nostrWalletConnect;
+
     $showUserStatus = settings.showUserStatus;
 
     $showKind16 = settings.showKind16;
@@ -260,44 +289,8 @@
     $showClientTag = settings.showClientTag;
     $showAllReactions = settings.showAllReactions;
     $kind42inTL = settings.kind42inTL;
-    // $mutes = lumiMute;
-    // $emojis = lumiEmoji;
-    // $mutebykinds = lumiMuteByKind;
-    //リレーの設定やり直すためにリロードするリロードしてくださいを出す
-
-    originalSettings.set({ ...settings });
-    //  location.reload();
-    $nowProgress = false;
   }
 
-  function resetDefaultRelay(settings: LumiSetting) {
-    if (settings.useRelaySet === "1" && settings.relays.length > 0) {
-      setRelays(settings.relays as DefaultRelayConfig[]);
-    } else {
-      // queryKey: ["defaultRelay", $loginUser] のデータがあるか確認
-      const data: EventPacket[] | undefined = $queryClient.getQueryData([
-        "defaultRelay",
-        $loginUser,
-      ]);
-      console.log(data);
-      if (data) {
-        // データがある場合はイベントの形を整えてセット
-        const relays = setRelaysByKind10002(data[0].event);
-        setRelays(relays);
-      }
-      //else {
-      // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
-      //コンポーネント外やでerrorがでる
-      // useRelaySet(
-      //   ["defaultRelay", $loginUser],
-      //   [
-      //     { authors: [$loginUser], kinds: [10002], limit: 1 },
-      //   ] as Nostr.Filter[],
-      //   undefined
-      // );
-      //}
-    }
-  }
   function isRelaySelectionInvalid() {
     if (settings.useRelaySet === "1") {
       const currentRelays = settings.relays;
@@ -325,6 +318,7 @@
       return false;
     }
     try {
+      console.log(inputPubkey);
       settings.pubkey = nip19.decode(inputPubkey).data as string;
     } catch (error) {
       console.log(error);
@@ -338,12 +332,14 @@
     return true;
   }
 
-  let inputPubkey: string = $state("");
-
   function cancelSettings() {
     console.log("cancel");
     const savedSettings = loadSettings();
+
     settings = { ...initSettings };
+
+    originalSettings = $state.snapshot(settings);
+
     $relaySetValue = settings.useRelaySet; //ラジオボタンの状態更新
     if (savedSettings) {
       settings = savedSettings;
@@ -372,25 +368,30 @@
   //変更があったらtrue
   function settingsChanged(): boolean {
     const changedFields: string[] = [];
-    if (!$originalSettings) {
+    if (!originalSettings) {
       //公開鍵が設定されてないとロードするデータが探せないからね
       return true;
     }
-    const currentSettings = { ...settings };
+    let currentSettings = $state.snapshot(settings);
     try {
-      currentSettings.pubkey = nip19.decode(inputPubkey).data as string;
+      currentSettings = {
+        ...currentSettings,
+        pubkey: nip19.decode(inputPubkey).data as string,
+      };
     } catch (error) {
       return true;
     }
     console.log("currentSettings", currentSettings);
-    console.log("$originalSettings", $originalSettings);
+    console.log("$originalSettings", originalSettings);
     // オリジナル設定のプロパティをループ
-    for (const key in $originalSettings) {
-      if ($originalSettings.hasOwnProperty(key) && key in currentSettings) {
+    for (const key in originalSettings) {
+      if (originalSettings.hasOwnProperty(key) && key in currentSettings) {
         if (
-          $originalSettings[key as keyof LumiSetting] !==
-          currentSettings[key as keyof LumiSetting]
+          originalSettings[key as keyof LumiSetting]?.toString() !==
+          currentSettings[key as keyof LumiSetting]?.toString()
         ) {
+          // console.log(originalSettings[key as keyof LumiSetting]);
+          // console.log(currentSettings[key as keyof LumiSetting]);
           changedFields.push(key as keyof LumiSetting);
         }
       } else {
