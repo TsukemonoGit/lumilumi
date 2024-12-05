@@ -12,53 +12,54 @@
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
 
-  let encodedPub: string = $state("");
+  let encodedPub: string | undefined = $derived.by(() => pubCheck($loginUser));
 
-  const pubCheck = () => {
-    try {
-      const pub = nip19.npubEncode($loginUser);
-      if (pub) {
-        encodedPub = pub;
-      }
-    } catch (error) {}
-  };
+  function pubCheck(hex: string | undefined): string | undefined {
+    if (hex) {
+      try {
+        const pub = nip19.npubEncode(hex);
+        if (pub) {
+          return pub;
+        }
+      } catch (error) {}
+    }
+    return undefined;
+  }
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
-
-  loginUser.subscribe((value) => {
-    if (value) {
-      pubCheck();
-    }
-  });
 </script>
 
 <div class="sidebar fixed top-28 bottom-12">
   <nav class="h-full overflow-hidden">
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
       {#each mainMenuItems as { Icon, link, alt, noPubkey }}
-        {#if !link}
-          {#if !Icon}
+        {#if alt === "profile"}
+          {#if $loginUser && encodedPub}
             <li
               aria-current={$page.url.pathname === `/${encodedPub}`
                 ? "page"
                 : undefined}
             >
-              {#if $loginUser}<a href={`/${encodedPub}`}
-                  ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
-                </a>{:else}<div class="disabledLink">
-                  <User /><span class="ml-2">profile</span>
-                </div>{/if}
+              <a href={`/${encodedPub}`}
+                ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
+              </a>
             </li>
           {:else}
             <li>
-              <button
-                onclick={() => {
-                  $dialogOpen = true;
-                }}><TrendingUp /><span class="ml-2">Edit status</span></button
-              >
+              <div class="disabledLink">
+                <User /><span class="ml-2">profile</span>
+              </div>
             </li>
           {/if}
+        {:else if alt === "edit status"}
+          <li>
+            <button
+              onclick={() => {
+                $dialogOpen = true;
+              }}><TrendingUp /><span class="ml-2">Edit status</span></button
+            >
+          </li>
         {:else}
           <li
             aria-current={$page.url?.pathname ===
@@ -67,7 +68,7 @@
               : undefined}
           >
             {#if noPubkey || $loginUser}
-              <a href={link ?? `/${encodedPub}`} title={alt}>
+              <a href={link} title={alt}>
                 <Icon /><span class="ml-2">{alt}</span>
               </a>
             {:else}
