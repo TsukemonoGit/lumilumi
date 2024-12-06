@@ -2,7 +2,7 @@
   import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
-  import { X } from "lucide-svelte";
+  import { ClipboardCopy, X } from "lucide-svelte";
 
   import QRCode from "qrcode";
   import { onDestroy, untrack } from "svelte";
@@ -70,6 +70,28 @@
   onDestroy(() => {
     unsubscribe?.(); // Ensure unsubscribe is only called if it exists
   });
+
+  const handleClickCopy = async () => {
+    try {
+      if (invoice) {
+        await navigator.clipboard.writeText(invoice);
+        $toastSettings = {
+          title: "Success",
+          description: "Copied to clipboard",
+          color: "bg-green-500",
+        };
+      } else {
+        throw new Error("No invoice");
+      }
+    } catch (error: any) {
+      console.error(error.message);
+      $toastSettings = {
+        title: "Warning",
+        description: "Failed to copy",
+        color: "bg-orange-500",
+      };
+    }
+  };
 </script>
 
 {#if $open}
@@ -87,7 +109,17 @@
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium">Invoice</h2>
       {#if invoice && url}
-        <fieldset class="mb-4 flex flex-col items-center gap-5">
+        <fieldset class="my-2 flex flex-col items-center gap-6">
+          <div
+            class="grid grid-cols-[auto_1fr] items-center rounded-md bg-neutral-700"
+          >
+            <div class="break-all h-12 overflow-y-auto p-1">{invoice}</div>
+            <button
+              onclick={handleClickCopy}
+              class="w-8 h-full flex justify-center items-center overflow-hidden bg-magnum-600 hover:opacity-75 active:opacity-50 rounded-r-md"
+              ><ClipboardCopy /></button
+            >
+          </div>
           <div class="flex justify-center">
             {#await QRCode.toDataURL(url)}
               loading
@@ -95,17 +127,17 @@
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="shadow hover:opacity-75 p-2 rounded-md bg-magnum-500 dark:bg-magnum-500"
+                class="shadow hover:opacity-75 p-1 rounded-md bg-magnum-500 dark:bg-magnum-500 h-fit w-fit"
               >
                 <img
                   src={dataUrl}
                   alt="invoice"
-                  class="w-52 h-52 max-w-full object-contain"
+                  class="w-80 h-80 max-w-full max-h-[40vh] object-contain"
                 />
               </a>
             {/await}
           </div>
-          <div class="break-all">{invoice}</div>
+
           <iframe src={url} title="Lightning" width="0" height="0"></iframe>
         </fieldset>
       {/if}

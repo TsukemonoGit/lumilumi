@@ -68,7 +68,9 @@
   // });
   const handleClickZap = async () => {
     const storagezap = localStorage.getItem("zap");
-    zapAmount = Number(storagezap);
+    if (storagezap) {
+      zapAmount = Number(storagezap);
+    }
     //amount comment画面を開いてamountのinputにfocus
     dialogOpen?.(true);
     setTimeout(() => {
