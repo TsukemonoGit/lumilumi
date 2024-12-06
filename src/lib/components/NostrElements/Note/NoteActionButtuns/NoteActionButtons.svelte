@@ -605,7 +605,7 @@
                 {:else}
                   <Zap
                     size="20"
-                    class="actionButton fill-magnum-500/75 text-magnum-500"
+                    class=" fill-magnum-500/75 text-magnum-500  min-w-4 my-auto"
                   />
                 {/if}
               {/snippet}
@@ -688,7 +688,7 @@
               onclick={handleClickReaction}
             >
               <Heart size="20" class=" mt-auto overflow-hidden" />
-            </button>{:else}<div class="overflow-hidden p-0.5">
+            </button>{:else}<div class="overflow-hidden my-auto">
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
