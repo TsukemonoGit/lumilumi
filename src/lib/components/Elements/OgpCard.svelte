@@ -13,12 +13,12 @@
   let imageURL = $state(contents.image);
 </script>
 
-<!--bg-magnum-200 text-magnum-800  text-magnum-700 drop-shadow-md-->
+<!--bg-magnum-300 text-magnum-800  text-magnum-700 drop-shadow-md-->
 <!-- <div
-  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-200 overflow-hidden"
+  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-300 overflow-hidden"
 > -->
 <a
-  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-200 overflow-hidden flex w-auto"
+  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-400 overflow-hidden flex w-auto"
   href={url}
   title={url}
   target="_blank"
@@ -26,7 +26,7 @@
 >
   {#if $showImg && imageURL && imageURL !== ""}
     <blockquote
-      class="grid grid-cols-[0.5fr_1.5fr] divide-x divide-magnum-200 w-full"
+      class="grid grid-cols-[0.5fr_1.5fr] divide-x divide-magnum-400 w-full"
     >
       <figure class=" overflow-hidden flex items-center justify-center">
         <img
@@ -45,7 +45,7 @@
           {contents.title}
         </h2>
         <p
-          class="line-clamp-6 text-xs text-magnum-300 max-w-full"
+          class="line-clamp-6 text-xs text-magnum-400 max-w-full"
           style="	white-space: pre-wrap; word-break: break-word;"
         >
           {contents.description}
@@ -59,7 +59,7 @@
             src={contents.favicon}
             alt=""
           />
-          <p class="text-xs text-magnum-200">
+          <p class="text-xs text-magnum-300">
             {#if contents.memo}
               {contents.memo} /
             {/if}
@@ -69,11 +69,11 @@
       </div>
     </blockquote>
   {:else}<blockquote class="p-0.5 grid grid-rows-[auto_1fr] w-full">
-      <h2 class="line-clamp-2 text-sm font-bold text-magnum-200">
+      <h2 class="line-clamp-2 text-sm font-bold text-magnum-300">
         {contents.title}
       </h2>
       <p
-        class="line-clamp-6 text-xs text-magnum-300 max-w-full"
+        class="line-clamp-6 text-xs text-magnum-400 max-w-full"
         style="	white-space: pre-wrap; word-break: break-word;"
       >
         {contents.description}
@@ -81,7 +81,7 @@
       <div class="flex flex-row-reverse">
         <Avatar size={20} name={contents.favicon} variant="beam" />
 
-        <p class="text-xs text-magnum-200">
+        <p class="text-xs text-magnum-300">
           {#if contents.memo}
             {contents.memo} /
           {/if}

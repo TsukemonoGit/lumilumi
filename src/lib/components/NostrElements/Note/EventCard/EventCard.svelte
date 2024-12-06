@@ -403,7 +403,7 @@
             {/if}
           </div>
 
-          <div class="ml-auto mr-2">
+          <div class="ml-auto">
             {#if displayMenu}
               <NoteActionButtons {note} {repostable} {tieKey} />{/if}
           </div>
