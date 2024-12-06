@@ -14,6 +14,7 @@
   import { _ } from "svelte-i18n";
   import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
@@ -157,3 +158,7 @@
         />{/snippet}</Link
     >{/if}
 </section>
+<!--部屋番号わかんないしグローバル見ながら引用するとkind1引用になる-->
+<div class="postWindow">
+  <OpenPostWindow visible={false} />
+</div>

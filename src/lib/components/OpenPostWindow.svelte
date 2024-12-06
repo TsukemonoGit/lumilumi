@@ -50,8 +50,8 @@
   import Metadata from "./NostrMainData/Metadata.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
-  import { clientTag, mediaUploader } from "$lib/func/constants";
-  import { untrack } from "svelte";
+  import { clientTag } from "$lib/func/constants";
+
   import Content from "./NostrElements/Note/Content.svelte";
   import { convertMetaTags } from "$lib/func/imeta";
 
@@ -59,6 +59,7 @@
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
     options?: DefaultPostOptions;
     propSignPubkey?: string | undefined;
+    visible?: boolean;
   }
   let {
     options = {
@@ -67,6 +68,7 @@
       content: "",
     },
     propSignPubkey, //画像共有のときに画像をアップするときにsignPub取得するからその時にある
+    visible = true, //ポストアイコン非表示だけど返信とかはできる
   }: Props = $props();
 
   let text: string = $state(options.content ?? "");
@@ -637,15 +639,16 @@
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
-<button
-  title="open post window"
-  use:melt={$trigger}
-  class="inline-flex items-center justify-center rounded-full bg-neutral-900 border border-magnum-300 p-3.5
+{#if visible}
+  <button
+    title="open post window"
+    use:melt={$trigger}
+    class="inline-flex items-center justify-center rounded-full bg-neutral-900 border border-magnum-300 p-3.5
   font-medium leading-none text-magnum-300 shadow hover:opacity-75 z-30"
->
-  <SquarePen size={28} />
-</button>
-
+  >
+    <SquarePen size={28} />
+  </button>
+{/if}
 {#if $open}
   <div use:melt={$portalled}>
     <button
