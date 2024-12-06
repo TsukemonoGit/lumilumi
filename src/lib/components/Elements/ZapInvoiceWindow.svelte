@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { queryClient, toastSettings } from "$lib/stores/stores";
+  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { ClipboardCopy, X } from "lucide-svelte";
@@ -42,23 +42,24 @@
 
   let unsubscribe: (() => void) | undefined = undefined; // Start as undefined
 
-  const observer:
-    | QueryObserver<unknown, Error, unknown, unknown, string[]>
-    | undefined = id
-    ? new QueryObserver($queryClient, {
-        queryKey: ["reactions", "zapped", id],
-      })
-    : undefined;
-
   //ザップ完了したら画面を閉じる（$open=falseにするためのやつ
   //idでしかみてないからユーザーへのザップの場合は閉じない
   open.subscribe((openState) => {
+    console.log(openState);
     if (openState && !zapped) {
+      const observer:
+        | QueryObserver<unknown, Error, unknown, unknown, string[]>
+        | undefined = id
+        ? new QueryObserver($queryClient, {
+            queryKey: ["reactions", "zapped", id, $loginUser],
+          })
+        : undefined;
       //ザップ一回したら押せなくなるけど
       unsubscribe = observer?.subscribe((value: any) => {
         if (value?.data?.event) {
           zapped = value;
           console.log(zapped);
+          $open = false;
           unsubscribe?.();
         }
       });
