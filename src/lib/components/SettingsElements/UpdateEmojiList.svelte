@@ -163,7 +163,7 @@
       // 各チャンクの結果を結合する
       const sortedLatestEvents = naddrFilters.map((filter) => {
         const id = filter.id;
-        const event = latestEventsMap.values().find((pk) => {
+        const event = Array.from(latestEventsMap.values()).find((pk) => {
           const kind = pk.event.kind;
           const pubkey = pk.event.pubkey;
           const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
