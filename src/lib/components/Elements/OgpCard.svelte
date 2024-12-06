@@ -69,7 +69,7 @@
       </div>
     </blockquote>
   {:else}<blockquote class="p-0.5 grid grid-rows-[auto_1fr] w-full">
-      <h2 class="line-clamp-2 text-sm font-bold text-magnum-300">
+      <h2 class="line-clamp-2 text-sm font-bold text-magnum-200">
         {contents.title}
       </h2>
       <p
