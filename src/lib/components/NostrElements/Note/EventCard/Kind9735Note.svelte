@@ -219,7 +219,7 @@
                       {depth}
                       {tieKey}
                     />
-                    <div class="ml-auto mr-2">
+                    <div class="ml-auto">
                       <NoteActionButtons {note} {repostable} {tieKey} />
                     </div>
                   </div>
