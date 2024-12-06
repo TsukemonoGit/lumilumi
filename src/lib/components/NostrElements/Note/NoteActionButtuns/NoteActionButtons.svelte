@@ -298,7 +298,9 @@
 
   const handleClickZap = () => {
     const storagezap = localStorage.getItem("zap");
-    zapAmount = Number(storagezap);
+    if (storagezap) {
+      zapAmount = Number(storagezap);
+    }
     dialogOpen?.(true);
     //zapの量決めるダイアログ出す
     setTimeout(() => {
