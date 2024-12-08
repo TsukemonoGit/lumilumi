@@ -12,16 +12,16 @@ import {
   type EventVerifier,
 } from "rx-nostr";
 import {
-  timelineFilterInit,
+  // timelineFilterInit,
   type AdditionalPostOptions,
   type LumiEmoji,
   type LumiMute,
   type LumiMuteByKind,
-  type TimelineFilter,
+  //type TimelineFilter,
 } from "$lib/types";
-import * as Nostr from "nostr-typedef";
+//import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
-import type { Part } from "$lib/func/content";
+//import type { Part } from "$lib/func/content";
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -130,7 +130,7 @@ export const reactionToast = writable<{
 }>();
 
 export const addClientTag = writable<boolean>(false);
-export const showClientTag = writable<boolean>(true);
+//export const showClientTag = writable<boolean>(true);
 export const kind42inTL = writable<boolean>(false);
 
 export const showAllReactions = writable<boolean>(false);

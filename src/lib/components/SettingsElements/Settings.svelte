@@ -20,7 +20,7 @@
     showUserStatus,
     showKind16,
     addClientTag,
-    showClientTag,
+    //showClientTag,
     showAllReactions,
     queryClient,
     kind42inTL,
@@ -286,7 +286,7 @@
 
     $showKind16 = settings.showKind16;
     $addClientTag = settings.addClientTag;
-    $showClientTag = settings.showClientTag;
+    // $showClientTag = settings.showClientTag;
     $showAllReactions = settings.showAllReactions;
     $kind42inTL = settings.kind42inTL;
   }
@@ -754,7 +754,8 @@
         />
         {$_("settings.display.showRelayIcon")}
       </label>
-
+      <!-- 常にTLにクライアントタグ表示しておいて良くない❔️-->
+      <!--
       <label>
         <input
           type="checkbox"
@@ -762,7 +763,7 @@
           bind:checked={settings.showClientTag}
         />
         {$_("settings.display.showClientTag")}
-      </label>
+      </label> -->
     </div>
   </fieldset>
 

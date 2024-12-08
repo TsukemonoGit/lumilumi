@@ -130,7 +130,7 @@ export interface LumiSetting {
   //showBanner: boolean;
   showKind16: boolean;
   addClientTag: boolean;
-  showClientTag: boolean;
+  //showClientTag: boolean;
   showAllReactions: boolean;
   kind42inTL: boolean;
 }

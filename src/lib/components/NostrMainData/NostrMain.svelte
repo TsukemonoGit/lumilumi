@@ -19,7 +19,7 @@
     showKind16,
     onlyFollowee,
     addClientTag,
-    showClientTag,
+    //showClientTag,
     showAllReactions,
     kind42inTL,
   } from "$lib/stores/stores";
@@ -140,7 +140,7 @@
 
       showKind16: savedShowKind16,
       addClientTag: savedAddClientTag,
-      showClientTag: savedShowClientTag,
+      //showClientTag: savedShowClientTag,
       showAllReactions: savedShowAllReactions,
       kind42inTL: savedKind42inTL,
     } = settings;
@@ -185,7 +185,7 @@
     //   }
     // }
     $addClientTag = savedAddClientTag;
-    $showClientTag = savedShowClientTag ? savedShowClientTag : true;
+    //$showClientTag = savedShowClientTag ? savedShowClientTag : true;
     $showAllReactions = savedShowAllReactions;
     $kind42inTL = savedKind42inTL;
   }

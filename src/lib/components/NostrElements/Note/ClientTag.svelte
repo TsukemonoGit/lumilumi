@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import { parseNaddr } from "$lib/func/util";
-  import { showClientTag } from "$lib/stores/stores";
+  //import { showClientTag } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
 
   interface Props {
@@ -20,7 +20,7 @@
   };
 </script>
 
-{#if clientTag && isShowClientTag && $showClientTag && !($page.route.id === "/[note=note]" || ($page.route.id === "/[naddr=naddr]" && depth === 0))}
+{#if clientTag && isShowClientTag && !($page.route.id === "/[note=note]" || ($page.route.id === "/[naddr=naddr]" && depth === 0))}
   {#if clientTag.length > 2}<button
       title={"open in nostrapp.link"}
       onclick={() => onClickClientTag(clientTag.slice(2))}
