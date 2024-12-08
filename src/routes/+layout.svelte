@@ -12,7 +12,6 @@
     queryClient,
     uploader,
     verifier,
-    showBanner,
     viewMediaModal,
     ogDescription,
     ogTitle,
@@ -48,7 +47,7 @@
     setRxNostr3,
   } from "$lib/func/reactions";
   import { writable, type Writable } from "svelte/store";
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, showBanner } from "$lib/stores/globalRunes.svelte";
 
   let { data, children } = $props<{
     data:
@@ -151,7 +150,7 @@
       )?.[0] as HTMLElement | null;
       if (nlBanner) console.log(nlBanner);
     }
-    if (!$showBanner && nlBanner) {
+    if (!showBanner.get() && nlBanner) {
       nlBanner.style.display = "none";
     }
   });
@@ -171,12 +170,14 @@
   });
 
   //オプションから設定変えたとき
-  showBanner.subscribe((value) => {
-    if (nlBanner) {
-      if (value) {
-        nlBanner.style.display = "";
-      } else {
-        nlBanner.style.display = "none";
+  $effect(() => {
+    if (showBanner.get() !== undefined && showBanner.get() !== null) {
+      if (nlBanner) {
+        if (showBanner.get()) {
+          nlBanner.style.display = "";
+        } else {
+          nlBanner.style.display = "none";
+        }
       }
     }
   });

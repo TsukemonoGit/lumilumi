@@ -95,7 +95,7 @@ export const additionalPostOptions = writable<
 export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);
-export const showBanner = writable<boolean>(true);
+
 export const viewMediaModal = writable<{
   index: number;
   mediaList: string[];

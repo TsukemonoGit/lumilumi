@@ -6,8 +6,6 @@
     mutebykinds,
     mutes,
     defaultRelays,
-    queryClient,
-    showBanner,
     onlyFollowee,
     loginUser,
   } from "$lib/stores/stores";
@@ -31,7 +29,11 @@
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
-  import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    lumiSetting,
+    showBanner,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -73,7 +75,7 @@
       }
     }
 
-    $showBanner = localStorage.getItem("showBanner") === "true";
+    showBanner.set(localStorage.getItem("showBanner") === "true");
 
     //  await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();

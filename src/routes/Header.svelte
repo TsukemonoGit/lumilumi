@@ -5,11 +5,12 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { createRadioGroup, melt } from "@melt-ui/svelte";
   import { _ } from "svelte-i18n";
-  import { showBanner } from "$lib/stores/stores";
   import { writable } from "svelte/store";
   import { page } from "$app/stores";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { untrack } from "svelte";
 
+  let _showBanner: boolean = $state(false);
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],
@@ -33,9 +34,12 @@
     }
   });
 
-  showBanner.subscribe((value) => {
-    if (value !== undefined && value !== null) {
-      localStorage.setItem("showBanner", value.toString());
+  $effect(() => {
+    if (_showBanner !== undefined && _showBanner !== null) {
+      untrack(() => {
+        showBanner.set(_showBanner);
+        localStorage.setItem("showBanner", showBanner.get().toString());
+      });
     }
   });
   //$inspect($currentPage?.link);
@@ -119,7 +123,7 @@
                         <input
                           type="checkbox"
                           class="rounded-checkbox"
-                          bind:checked={$showBanner}
+                          bind:checked={_showBanner}
                         />
                         {$_("settings.display.banner")}
                       </label>

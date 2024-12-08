@@ -16,7 +16,7 @@ export const relayStateMap = createRelayStateMap();
 export const userStatusMap = createUserStatusMap();
 export const viewEventIds = createViewEventIds();
 export const lumiSetting = createLumiSetting();
-
+export const showBanner = createShowBanner();
 //-------------------------------------
 
 // カスタムストアの作成関数
@@ -134,6 +134,22 @@ function createLumiSetting() {
     // 新しい値を直接設定する
     set: (ids: LumiSetting) => {
       _lumiSetting = ids;
+      // console.log(_viewEventIds.length);
+    },
+  };
+}
+
+function createShowBanner() {
+  let _showBanner: boolean = $state(true);
+
+  return {
+    get: () => _showBanner,
+    update: (updater: (current: boolean) => boolean) => {
+      _showBanner = updater(_showBanner);
+    },
+    // 新しい値を直接設定する
+    set: (ids: boolean) => {
+      _showBanner = ids;
       // console.log(_viewEventIds.length);
     },
   };

@@ -3,7 +3,6 @@
   import {
     loginUser,
     nowProgress,
-    showBanner,
     toastSettings,
     uploader,
   } from "$lib/stores/stores";
@@ -27,7 +26,7 @@
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { _ } from "svelte-i18n";
   import { writable, type Writable } from "svelte/store";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -67,7 +66,7 @@
 
     localLumisetting = {
       lumiSetting: settings,
-      showBanner: $showBanner,
+      showBanner: showBanner.get(),
       theme: localStorage.getItem("theme") ?? "system",
       timelineFilter: timelineFilter.get,
       uploader: $uploader,
@@ -210,7 +209,7 @@
     $nowProgress = true;
 
     if (loadData.showBanner) {
-      $showBanner = loadData.showBanner;
+      showBanner.set(loadData.showBanner);
       localStorage?.setItem("showBanner", loadData.showBanner.toString());
     }
 
