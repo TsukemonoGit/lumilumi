@@ -30,7 +30,7 @@
 
   let data = $derived(_result?.data);
 
-  const observer1 = new QueryObserver($queryClient, {
+  const observer1 = new QueryObserver(queryClient, {
     queryKey: ["reactions", "reaction", id, $loginUser],
   });
 
@@ -42,7 +42,7 @@
         result.data.event.created_at > _result.data.event.created_at)
     ) {
       _result = result;
-      //  const data = $queryClient?.getQueryData(queryKey);
+      //  const data = queryClient?.getQueryData(queryKey);
       //  console.log(data);
       status = "success";
     }
@@ -51,7 +51,7 @@
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
     unsubscribe();
-    // $queryClient.removeQueries({ queryKey: queryKey });
+    // queryClient.removeQueries({ queryKey: queryKey });
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

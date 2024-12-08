@@ -53,27 +53,13 @@ export const initSettings: LumiSetting = {
   showImg: false,
   menuleft: false,
   showRelayIcon: false,
-  // emoji: {
-  //   list: [],
-  //   updated: 0,
-  //   event: undefined,
-  // },
-  // mute: {
-  //   list: { p: [], word: [], t: [], e: [] },
-  //   updated: 0,
-  //   event: undefined,
-  // },
-  // mutebykinds: {
-  //   list: [],
-  //   updated: 0,
-  // },
+
   showReactioninTL: true,
-  // nostrWalletConnect: "",
+
   showUserStatus: false,
-  // showBanner: true,
+
   showKind16: false,
   addClientTag: false,
-  // showClientTag: true,
   showAllReactions: false,
   kind42inTL: false,
 };

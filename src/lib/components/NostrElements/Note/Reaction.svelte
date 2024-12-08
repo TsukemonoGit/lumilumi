@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { showImg } from "$lib/stores/stores";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+
   import * as Nostr from "nostr-typedef";
   interface Props {
     event: Nostr.Event;
@@ -33,7 +34,7 @@
   {:else if /^:.*:$/.test(event.content)}
     {@const emoji = getEmoji(event)}
     {#if emoji}
-      {#if $showImg}
+      {#if lumiSetting.get().showImg}
         <img
           loading="lazy"
           alt={`:${emoji.alt}:`}

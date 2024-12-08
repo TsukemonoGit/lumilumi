@@ -75,7 +75,7 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
 } {
   //console.log(filters);
 
-  const _queryClient = get(queryClient);
+  const _queryClient = queryClient;
 
   if (!_queryClient) {
     throw new Error("Query client is not available");
@@ -148,20 +148,17 @@ function handleEvent(v: EventPacket) {
   );
 
   if (v.event.kind === 7 && etag) {
-    get(queryClient).setQueryData(
+    queryClient.setQueryData(
       ["reactions", "reaction", etag[1], v.event.pubkey],
       v
     );
   } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-    get(queryClient).setQueryData(
+    queryClient.setQueryData(
       ["reactions", "repost", etag[1], v.event.pubkey],
       v
     );
   } else if (v.event.kind === 9735 && etag) {
     const zappedUser = zappedPubkey(v.event);
-    get(queryClient).setQueryData(
-      ["reactions", "zapped", etag[1], zappedUser],
-      v
-    );
+    queryClient.setQueryData(["reactions", "zapped", etag[1], zappedUser], v);
   }
 }

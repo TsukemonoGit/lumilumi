@@ -214,7 +214,7 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);
@@ -232,7 +232,7 @@
     //   }));
     //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
     //   if (older.length > 0) {
-    //     $queryClient.setQueryData(
+    //     queryClient.setQueryData(
     //       [...queryKey, "olderData"],
     //       [...ev, ...older]
     //     );
@@ -256,12 +256,12 @@
       );
 
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
+        const olddata: EventPacket[] | undefined = queryClient.getQueryData([
           ...queryKey,
           "olderData",
         ]);
 
-        $queryClient.setQueryData(
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olddata ?? []), ...older]
         );
@@ -293,10 +293,11 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
-          [...queryKey, "olderData"]
-        );
-        $queryClient.setQueryData(
+        const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
+          ...queryKey,
+          "olderData",
+        ]);
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olderdatas ?? []), ...older]
         );
@@ -343,7 +344,7 @@
   };
 
   function updateViewEvent(data: EventPacket[] | undefined | null) {
-    const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
+    const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);

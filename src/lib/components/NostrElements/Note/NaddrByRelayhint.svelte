@@ -37,8 +37,8 @@
   ] as QueryKey);
   const queryCheck = async (queryKey: QueryKey) => {
     //console.log(queryKey, relayhint);
-    // if (!$queryClient.getQueryData(queryKey)) {//見つかんないときにリレーヒントから探すからない
-    $queryClient.removeQueries({ queryKey: queryKey });
+    // if (!queryClient.getQueryData(queryKey)) {//見つかんないときにリレーヒントから探すからない
+    queryClient.removeQueries({ queryKey: queryKey });
     //   }
     return;
   };

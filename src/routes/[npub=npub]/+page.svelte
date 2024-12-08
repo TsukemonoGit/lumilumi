@@ -112,7 +112,7 @@
       setRelays(data.relays);
     }
     since = undefined;
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);
@@ -123,7 +123,7 @@
     }
     console.log(data.nip05Address);
     if (data.nip05Address) {
-      $queryClient?.setQueryData(
+      queryClient?.setQueryData(
         ["nip05", data.pubkey, data.nip05Address.toLowerCase()],
         {
           result: true,

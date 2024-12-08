@@ -76,6 +76,6 @@
   <UploaderSelect bind:selectedUploader={$selectedUploader} /><MediaPicker
     bind:files
     bind:fileInput
-    on:change={onChangeHandler}
+    onchange={onChangeHandler}
   />
 </div>

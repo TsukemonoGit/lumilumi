@@ -58,7 +58,7 @@
     } else if (!$defaultRelays && data.relays) {
       setRelays(data.relays);
     }
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);

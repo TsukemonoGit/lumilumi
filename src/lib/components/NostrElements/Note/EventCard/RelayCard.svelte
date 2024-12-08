@@ -5,7 +5,8 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
-  import { showImg, toastSettings } from "$lib/stores/stores";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -178,14 +179,14 @@
       <div
         class="w-12 h-12 rounded-full bg-zinc-800 text-center flex items-center justify-center text-lg"
       >
-        {#if $showImg && relayInfo.icon}
+        {#if lumiSetting.get().showImg && relayInfo.icon}
           <UserAvatar
             url={relayInfo.icon}
             name={url ?? ""}
             pubkey={undefined}
             {size}
           />
-        {:else if $showImg && imageLoaded}
+        {:else if lumiSetting.get().showImg && imageLoaded}
           <UserAvatar
             url={formatUrl(url) + "favicon.ico"}
             name={url ?? ""}

@@ -6,8 +6,6 @@
     loginUser,
     nowProgress,
     queryClient,
-    showReactioninTL,
-    showUserStatus,
     tieMapStore,
   } from "$lib/stores/stores";
 
@@ -32,6 +30,7 @@
   import { get } from "svelte/store";
   import {
     displayEvents,
+    lumiSetting,
     relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
@@ -130,7 +129,7 @@
     }
 
     timeoutId = setTimeout(() => {
-      const olderdatas: EventPacket[] | undefined = $queryClient?.getQueryData([
+      const olderdatas: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]);
@@ -220,11 +219,11 @@
 
   function setOperator() {
     let operator = pipe(tie, uniq);
-    if (tieKey === "timeline" && $showUserStatus) {
+    if (tieKey === "timeline" && lumiSetting.get().showUserStatus) {
       //めいんTLのとき
       operator = pipe(operator, userStatus());
     }
-    if (tieKey === "timeline" && $showReactioninTL) {
+    if (tieKey === "timeline" && lumiSetting.get().showReactioninTL) {
       operator = pipe(operator, reactionCheck());
     }
     //最後に配列にする
@@ -256,7 +255,7 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...queryKey,
       "olderData",
     ]);
@@ -291,12 +290,12 @@
       );
       console.log("first older", older);
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
+        const olddata: EventPacket[] | undefined = queryClient.getQueryData([
           ...queryKey,
           "olderData",
         ]);
 
-        $queryClient.setQueryData(
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olddata ?? []), ...older]
         );
@@ -328,10 +327,11 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
-          [...queryKey, "olderData"]
-        );
-        $queryClient.setQueryData(
+        const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
+          ...queryKey,
+          "olderData",
+        ]);
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olderdatas ?? []), ...older]
         );

@@ -91,7 +91,7 @@
   }
 
   async function init() {
-    const queryData: EventPacket | undefined = $queryClient.getQueryData([
+    const queryData: EventPacket | undefined = queryClient.getQueryData([
       "searchRelay",
       $loginUser,
     ]);
@@ -253,12 +253,12 @@
     };
 
     if (isSuccess.length > 0) {
-      $queryClient.refetchQueries({
+      queryClient.refetchQueries({
         queryKey: ["searchRelay", $loginUser],
       });
     }
     // if (isSuccess.length > 0) {
-    //   $queryClient.refetchQueries({
+    //   queryClient.refetchQueries({
     //     queryKey: key,
     //   });
     // }

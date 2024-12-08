@@ -38,7 +38,7 @@ export function useReq(
   }
 ): ReqResult<EventPacket | EventPacket[]> {
   // console.log(filters);
-  const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
+  const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
   //console.log(_queryClient);
 
   if (!_queryClient) {
@@ -189,7 +189,7 @@ export function useForwardReq(
     refetchInterval: Infinity,
   }
 ): ReqResult<EventPacket | EventPacket[]> {
-  const _queryClient = useQueryClient(); //get(queryClient); //useQueryClient();
+  const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
 
   if (!_queryClient) {
     console.log("!_queryClient error");

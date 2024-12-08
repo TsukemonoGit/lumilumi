@@ -42,7 +42,7 @@
   async function init() {
     since = undefined;
 
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);

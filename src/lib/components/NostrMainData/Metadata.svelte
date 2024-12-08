@@ -3,7 +3,7 @@
   //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
   import type { ReqStatus } from "$lib/types";
-  import { app, showImg } from "$lib/stores/stores";
+  import { app } from "$lib/stores/stores";
 
   import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
@@ -15,6 +15,7 @@
     type RxReqPipeable,
   } from "rx-nostr";
   import { getMetadata } from "$lib/func/nostr";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -52,9 +53,11 @@
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
   const localData = getMetadata(queryKey);
   //console.log(localData);
-  const initData: EventPacket | undefined = $showImg ? undefined : localData; //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
+  const initData: EventPacket | undefined = lumiSetting.get().showImg
+    ? undefined
+    : localData; //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
   //console.log(initData);
-  //if (!$showImg) {
+  //if (!lumiSetting.get().showImg) {
   // staleTime = Infinity;
   // }
   //else {

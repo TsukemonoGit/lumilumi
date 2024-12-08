@@ -18,7 +18,6 @@
   import { _ } from "svelte-i18n";
 
   import { X, Save } from "lucide-svelte";
-  import { writable } from "svelte/store";
   import { page } from "$app/stores";
   import { generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
@@ -72,7 +71,7 @@
   });
 
   async function init() {
-    if (!$queryClient) {
+    if (!queryClient) {
       console.log("error");
       return;
     }
@@ -146,7 +145,7 @@
     pubkey: string
   ): Promise<EventPacket | undefined> {
     const defaultRelayData: EventPacket[] | undefined =
-      $queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+      queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
     if (defaultRelayData) {
       console.log(defaultRelayData);
       return defaultRelayData[0];
@@ -161,7 +160,7 @@
       );
       //console.log(relaydata);
       if (relaydata && relaydata.length > 0) {
-        $queryClient.setQueryData(
+        queryClient.setQueryData(
           ["defaultRelay", pubkey],
           (oldData: any) => relaydata[0]
         );

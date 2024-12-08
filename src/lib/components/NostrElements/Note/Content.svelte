@@ -3,7 +3,7 @@
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "./DecodedContent.svelte";
-  import { showImg, viewMediaModal } from "$lib/stores/stores";
+  import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
@@ -15,6 +15,7 @@
   import ProxyTag from "$lib/components/Elements/ProxyTag.svelte";
 
   import InvoiceCard from "./EventCard/InvoiceCard.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     text: string;
@@ -132,7 +133,7 @@
       {openModal}
     />
   {:else if part.type === "movie"}
-    {#if $showImg}
+    {#if lumiSetting.get().showImg}
       <video
         aria-label="video contents"
         controls
@@ -146,7 +147,7 @@
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "audio"}
-    {#if $showImg}
+    {#if lumiSetting.get().showImg}
       <audio
         aria-label="audio contents"
         controls
@@ -160,7 +161,8 @@
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
-  {:else if part.type === "url"}{#if $showImg}<OGP url={part.content ?? ""}
+  {:else if part.type === "url"}{#if lumiSetting.get().showImg}<OGP
+        url={part.content ?? ""}
         >{#snippet renderContent(contents)}
           {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
             <OgpCard {contents} url={part.content ?? ""} />{:else}<Link

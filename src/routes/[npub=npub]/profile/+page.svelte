@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
     emojis,
     nowProgress,
     queryClient,
-    showImg,
     toastSettings,
   } from "$lib/stores/stores";
   import type { Profile } from "$lib/types";
@@ -28,6 +27,7 @@
   import InputImageFromFile from "./InputImageFromFile.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     data: {
@@ -51,7 +51,7 @@
   let newTags: string[][] = $state.raw([]);
   let isError = $state(false);
   onMount(async () => {
-    if (!$queryClient) {
+    if (!queryClient) {
       console.log("error");
       return;
     }
@@ -78,7 +78,7 @@
       return;
     }
     $nowProgress = true;
-    const queryData: EventPacket | undefined = $queryClient.getQueryData(key);
+    const queryData: EventPacket | undefined = queryClient.getQueryData(key);
     if (queryData) {
       metadata = queryData.event;
     } else {
@@ -182,7 +182,7 @@
       };
 
       if (isSuccess.length > 0) {
-        $queryClient.refetchQueries({
+        queryClient.refetchQueries({
           queryKey: key,
         });
       }
@@ -364,7 +364,7 @@
                         onclick={() => handleClickEmojiDisplayName(e)}
                         class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                       >
-                        {#if $showImg}
+                        {#if lumiSetting.get().showImg}
                           <img
                             loading="lazy"
                             class="h-6 object-contain justify-self-center"
@@ -452,7 +452,7 @@
                         onclick={() => handleClickEmoji(e)}
                         class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                       >
-                        {#if $showImg}
+                        {#if lumiSetting.get().showImg}
                           <img
                             loading="lazy"
                             class="h-6 object-contain justify-self-center"

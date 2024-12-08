@@ -5,7 +5,6 @@
     loginUser,
     nowProgress,
     queryClient,
-    showImg,
     toastSettings,
   } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
@@ -19,7 +18,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
-  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   const handleClickShare = async () => {
     //share link
@@ -54,7 +53,7 @@
   let zapComment: string = $state("");
   let invoice: string | undefined = $state(undefined);
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
-  const observer2 = new QueryObserver($queryClient, {
+  const observer2 = new QueryObserver(queryClient, {
     queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
   });
   let unsubscribe: () => void = $state(() => {});
@@ -174,7 +173,7 @@
           @stok</a
         >
         <div class=" flex flex-wrap whitespace-pre-wrap">
-          {#if $showImg || loadImage}
+          {#if lumiSetting.get().showImg || loadImage}
             <img
               loading="lazy"
               class="object-contain"

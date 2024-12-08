@@ -50,7 +50,7 @@
       const observer:
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
         | undefined = id
-        ? new QueryObserver($queryClient, {
+        ? new QueryObserver(queryClient, {
             queryKey: ["reactions", "zapped", id, $loginUser],
           })
         : undefined;

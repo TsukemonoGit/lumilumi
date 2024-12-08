@@ -244,7 +244,7 @@
   ></script> -->
 </svelte:head>
 
-<QueryClientProvider client={$queryClient}>
+<QueryClientProvider client={queryClient}>
   <NostrMain>
     {#snippet loading()}
       <!---->

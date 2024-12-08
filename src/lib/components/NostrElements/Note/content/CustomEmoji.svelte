@@ -1,7 +1,6 @@
 <script lang="ts">
   import { type Part } from "$lib/func/content";
-
-  import { showImg } from "$lib/stores/stores";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   import { _ } from "svelte-i18n";
 
@@ -17,7 +16,7 @@
   //console.log(imgLoad);
 </script>
 
-{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
+{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
     height={`${height}px`}
     loading="lazy"
     alt={`:${part.content}:`}

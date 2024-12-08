@@ -3,12 +3,11 @@ import {
   type QueryClientConfig,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { writable, type Writable } from "svelte/store";
+import { writable } from "svelte/store";
 import {
   type RxNostr,
   type EventPacket,
   type DefaultRelayConfig,
-  type ConnectionState,
   type EventVerifier,
 } from "rx-nostr";
 import {
@@ -35,7 +34,7 @@ const config: QueryClientConfig = {
   },
 };
 export const metadataQueue = writable<[QueryKey, EventPacket][]>([]);
-export const queryClient = writable(new QueryClient(config));
+export const queryClient = new QueryClient(config);
 
 export const app = writable<{ rxNostr: RxNostr; rxNostr3: RxNostr }>();
 
@@ -46,14 +45,28 @@ export const toastSettings = writable<{
 }>();
 
 export const loginUser = writable<string>();
+// export const showImg = writable<boolean>(false);
+// export const showPreview = writable<boolean>(false);
+// export const menuLeft = writable<boolean>(false);
+//export const showKind16 = writable<boolean>(false);
+// export const showRelayIcon = writable<boolean>(false);
+// export const defaultReaction = writable<{ content: string; tag: string[] }>({
+//   content: "+",
+//   tag: [],
+// });
+//export const showReactioninTL = writable<boolean>(true);
+//export const showUserStatus = writable<boolean>();
+//export const addClientTag = writable<boolean>(false);
+// export const kind42inTL = writable<boolean>(false);
+// export const showAllReactions = writable<boolean>(false);
 
-export const showImg = writable<boolean>(false);
-export const showPreview = writable<boolean>(false);
-export const menuLeft = writable<boolean>(false);
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
+
 export const emojis = writable<LumiEmoji>();
 export const mutes = writable<LumiMute>();
+
 export const mutebykinds = writable<LumiMuteByKind>();
+
 export const nowProgress = writable<boolean>(false);
 
 //export const tieMapStore = writable<Map<string, Set<string>>>();
@@ -71,46 +84,13 @@ export const tieMapStore = writable<{
       ];
 }>();
 
-// export let openPostWindow:
-//   | {
-//       update: (
-//         updater: import("svelte/store").Updater<boolean>,
-//         sideEffect?: ((newValue: boolean) => void) | undefined
-//       ) => void;
-//       set: (this: void, value: boolean) => void;
-//       subscribe(
-//         this: void,
-//         run: import("svelte/store").Subscriber<boolean>,
-//         invalidate?: import("svelte/store").Invalidator<boolean> | undefined
-//       ): import("svelte/store").Unsubscriber;
-//       get: () => boolean;
-//       destroy?: (() => void) | undefined;
-//     }
-//   | undefined;
-
 export const uploader = writable<string>();
-export const showRelayIcon = writable<boolean>(false);
-//export const slicedEvent = writable<Nostr.Event[]>();
-export const defaultReaction = writable<{ content: string; tag: string[] }>({
-  content: "+",
-  tag: [],
-});
-
-export const showReactioninTL = writable<boolean>(true);
-
-//export const nostrWalletConnect = writable<string>("");
 
 export const postWindowOpen = writable<boolean>();
 
 export const additionalPostOptions = writable<
   AdditionalPostOptions | undefined
 >(); //投稿したあとでundefinedにする
-
-export const showUserStatus = writable<boolean>();
-
-// export const relayStateMap3 = writable<Map<string, ConnectionState>>(
-//   new Map<string, ConnectionState>()
-// );
 
 export const verifier = writable<EventVerifier>();
 
@@ -120,7 +100,7 @@ export const viewMediaModal = writable<{
   index: number;
   mediaList: string[];
 }>();
-export const showKind16 = writable<boolean>(false);
+
 export const onlyFollowee = writable<boolean>(false);
 //export const reactionList = writable<Nostr.Event[]>([]);
 export const reactionToast = writable<{
@@ -128,12 +108,6 @@ export const reactionToast = writable<{
   description: string;
   color: string;
 }>();
-
-export const addClientTag = writable<boolean>(false);
-//export const showClientTag = writable<boolean>(true);
-export const kind42inTL = writable<boolean>(false);
-
-export const showAllReactions = writable<boolean>(false);
 
 export const ogTitle = writable<string>("Lumilumi");
 

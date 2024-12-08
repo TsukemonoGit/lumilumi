@@ -30,7 +30,7 @@
   let _result: { data: EventPacket; status: any; error: any } | undefined =
     $state();
 
-  const observer2 = new QueryObserver($queryClient, {
+  const observer2 = new QueryObserver(queryClient, {
     queryKey: ["reactions", "zapped", id, $loginUser],
   });
   const unsubscribe = observer2.subscribe((result: any) => {
@@ -47,7 +47,7 @@
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
     unsubscribe();
-    // $queryClient.removeQueries({ queryKey: ["reactions", "zapped", id] });//まだこのIDがTLにいるかもしれないからけさない
+    // queryClient.removeQueries({ queryKey: ["reactions", "zapped", id] });//まだこのIDがTLにいるかもしれないからけさない
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
 

@@ -67,13 +67,12 @@ export async function makeInvoice({
 export const getZapLNURLPubkey = async (
   metadata: Nostr.Event
 ): Promise<{ pub: string | undefined; error?: string }> => {
-  const data: { pub: string | undefined; error?: string } | undefined = get(
-    queryClient
-  )?.getQueryData(["zapLNURLPubkey", metadata.pubkey]);
+  const data: { pub: string | undefined; error?: string } | undefined =
+    queryClient.getQueryData(["zapLNURLPubkey", metadata.pubkey]);
   if (data) {
     return data;
   }
-  const result = await get(queryClient)?.fetchQuery({
+  const result = await queryClient.fetchQuery({
     queryKey: ["zapLNURLPubkey", metadata.pubkey] as QueryKey,
     queryFn: () => fetchZapLNURLPubkey(metadata),
     staleTime: Infinity,
@@ -132,14 +131,14 @@ export async function fetchZapLNURLPubkey(
 }
 
 async function getNurlFetch(lnurl: string): Promise<Response | undefined> {
-  const data: Response | undefined = get(queryClient)?.getQueryData([
+  const data: Response | undefined = queryClient?.getQueryData([
     "fetchNnurl",
     lnurl,
   ]);
   if (data) return data;
 
   try {
-    const response = await get(queryClient)?.fetchQuery({
+    const response = await queryClient?.fetchQuery({
       queryKey: ["fetchNnurl", lnurl] as QueryKey,
       queryFn: async () => {
         const res = await fetch(lnurl);
@@ -178,7 +177,7 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
   }
 }
 export async function getZapRelay(pubkey: string): Promise<string[]> {
-  let queryRelay: EventPacket | undefined = get(queryClient).getQueryData([
+  let queryRelay: EventPacket | undefined = queryClient.getQueryData([
     "defaultRelay",
     pubkey,
   ]);
@@ -198,12 +197,12 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
       undefined
     );
     if (relayData.length > 0) {
-      get(queryClient).setQueryData(
+      queryClient.setQueryData(
         ["relays", pubkey],
         (oldData: any) => relayData[0]
       );
       queryRelay = relayData[0];
-      console.log(get(queryClient).getQueryData(["relays", pubkey]));
+      console.log(queryClient.getQueryData(["relays", pubkey]));
     }
   }
 

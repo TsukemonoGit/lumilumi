@@ -3,7 +3,6 @@
     emojis,
     loginUser,
     nowProgress,
-    showImg,
     toastSettings,
   } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
@@ -15,9 +14,9 @@
   import { createEmojiListFrom10030 } from "$lib/func/settings";
   import { _ } from "svelte-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import type { Subscriber, Unsubscriber, Updater } from "svelte/store";
   import ClientTag from "../ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -239,7 +238,7 @@
         <div class=" text-neutral-300/80">{description}</div>{/if}
     </div>
     {#if image}
-      {#if $showImg}
+      {#if lumiSetting.get().showImg}
         <img
           loading="lazy"
           src={image}
@@ -254,7 +253,7 @@
   </div>
   <div class="flex gap-1 flex-wrap" style="max-height:{maxHeight ?? 'none'}">
     {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
-      {#if $showImg}
+      {#if lumiSetting.get().showImg}
         <img
           title={`:${shortcode}:`}
           loading="lazy"

@@ -49,7 +49,7 @@
   async function init() {
     since = undefined;
 
-    const ev: EventPacket[] | undefined = $queryClient?.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);
@@ -57,7 +57,7 @@
       since = now() - 15 * 60; //15分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する
     } else {
       const data: EventPacket[] | undefined =
-        $queryClient?.getQueryData(timelineQuery);
+        queryClient?.getQueryData(timelineQuery);
       if (data && data.length <= 0) {
         since = data[0].event.created_at;
       } else {

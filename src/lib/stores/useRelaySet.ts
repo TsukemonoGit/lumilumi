@@ -10,14 +10,14 @@ import {
   type RxReqOverable,
   type RxReqPipeable,
 } from "rx-nostr";
-import type { ReqResult, ReqStatus } from "$lib/types.js";
+import type { ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
-import { derived, get, readable } from "svelte/store";
+import { derived, get } from "svelte/store";
 import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app, queryClient } from "./stores";
+import { app } from "./stores";
 import { scanArray } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";

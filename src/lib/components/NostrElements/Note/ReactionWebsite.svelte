@@ -8,11 +8,12 @@
 
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { showImg } from "$lib/stores/stores";
+
   import { isvalidURL } from "$lib/func/ogp";
   import OGP from "$lib/components/Elements/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -85,7 +86,7 @@
 
 {#if website}
   <div class="p-2">
-    {#if $showImg && isvalidURL(website)}
+    {#if lumiSetting.get().showImg && isvalidURL(website)}
       <OGP url={website}>
         {#snippet nodata()}
           <Link className="underline text-magnum-300 break-all " href={website}

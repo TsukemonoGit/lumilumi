@@ -2,7 +2,7 @@
   import Metadata from "../NostrMainData/Metadata.svelte";
   import { profile, splitHexColorString } from "$lib/func/util";
 
-  import { loginUser, showImg, showUserStatus } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
   import { _ } from "svelte-i18n";
 
   import Nip05Check from "../NostrMainData/Nip05Check.svelte";
@@ -21,7 +21,7 @@
   import DisplayName from "./DisplayName.svelte";
   import { encodetoNpub } from "$lib/func/encode";
   import { hexRegex } from "$lib/func/regex";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     // import * as Nostr from "nostr-typedef";
@@ -81,7 +81,7 @@
               class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
             >
               <div class="border border-magnum-400 rounded-full">
-                {#if $showImg && prof.picture && prof.picture !== ""}
+                {#if lumiSetting.get().showImg && prof.picture && prof.picture !== ""}
                   <UserAvatar
                     url={prof.picture}
                     name={pubkey}
@@ -103,7 +103,7 @@
               class="bg-magnum-800 w-full border-b border-magnum-400"
               style="height:{bannerHeight}px"
             >
-              {#if $showImg && prof.banner}
+              {#if lumiSetting.get().showImg && prof.banner}
                 <img
                   src={prof.banner}
                   alt="banner"
@@ -169,7 +169,10 @@
                   {prof.website}{/snippet}</Link
               >{/if}
 
-            {#if $showUserStatus}<ShowStatus {pubkey} {tieKey} />{/if}
+            {#if lumiSetting.get().showUserStatus}<ShowStatus
+                {pubkey}
+                {tieKey}
+              />{/if}
           </div>
 
           {#if prof.about}

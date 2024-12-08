@@ -2,12 +2,13 @@
   import * as Nostr from "nostr-typedef";
   import type { ChannelData } from "$lib/types";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { showImg } from "$lib/stores/stores";
+
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { splitHexColorString } from "$lib/func/util";
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import ChannelEllipsisMenu from "./ChannelEllipsisMenu.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   let size = 96;
   interface Props {
@@ -46,7 +47,7 @@
       <!--がぞう-->
 
       <div class="relative">
-        {#if $showImg && channelData.picture}
+        {#if lumiSetting.get().showImg && channelData.picture}
           <UserAvatar
             url={channelData.picture}
             name={id}

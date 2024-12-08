@@ -33,8 +33,8 @@
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
   const queryCheck = async (id: string) => {
-    //if (!$queryClient.getQueryData(["timeline", id])) {//見つかんないときにリレーヒントから探すからない
-    $queryClient.removeQueries({ queryKey: ["timeline", id] });
+    //if (!queryClient.getQueryData(["timeline", id])) {//見つかんないときにリレーヒントから探すからない
+    queryClient.removeQueries({ queryKey: ["timeline", id] });
     return;
     //  }
   };

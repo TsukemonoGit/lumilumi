@@ -22,14 +22,11 @@
   import {
     emojis,
     nowProgress,
-    showImg,
-    showPreview,
     uploader,
     postWindowOpen,
     additionalPostOptions,
     queryClient,
     toastSettings,
-    addClientTag,
   } from "$lib/stores/stores";
   import { contentCheck } from "$lib/func/contentCheck";
 
@@ -54,6 +51,7 @@
 
   import Content from "./NostrElements/Note/Content.svelte";
   import { convertMetaTags } from "$lib/func/imeta";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -117,7 +115,7 @@
         signPubkey = pub;
 
         metadata = (
-          $queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
+          queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
         )?.event;
       }
     } catch (error) {
@@ -162,7 +160,7 @@
       ]);
       checkedTags.push(...replyUsersArray);
     }
-    if ($addClientTag) {
+    if (lumiSetting.get().addClientTag) {
       checkedTags.push(clientTag);
     }
     const newev: Nostr.EventParameters = {
@@ -607,7 +605,7 @@
       //}
       clickEscape = 0;
       // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      // metadata = $queryClient.getQueryData(["metadata", pubkey]);
+      // metadata = queryClient.getQueryData(["metadata", pubkey]);
       // console.log(metadata);
       setTimeout(() => {
         //これしないとtextareaがundefinedとかnullになる
@@ -663,7 +661,7 @@
             max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      {#if $showImg && $showPreview}
+      {#if lumiSetting.get().showImg && lumiSetting.get().showPreview}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
@@ -925,7 +923,7 @@
                   onclick={() => handleClickEmoji(e)}
                   class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                 >
-                  {#if $showImg}
+                  {#if lumiSetting.get().showImg}
                     <img
                       loading="lazy"
                       class="h-6 object-contain justify-self-center"

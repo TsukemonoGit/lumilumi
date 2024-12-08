@@ -24,15 +24,11 @@
   import Reposted from "$lib/components/NostrMainData/Reposted.svelte";
   import Reactioned from "$lib/components/NostrMainData/Reactioned.svelte";
   import {
-    defaultReaction,
     nowProgress,
     toastSettings,
     postWindowOpen,
     additionalPostOptions,
     queryClient,
-    addClientTag,
-    showAllReactions,
-    loginUser,
   } from "$lib/stores/stores";
   import { noReactionKind, normalizeRelayURL, profile } from "$lib/func/util";
 
@@ -51,7 +47,7 @@
   import ZapList from "../../AllReactionsElement/ZapList.svelte";
   import { clientTag } from "$lib/func/constants";
   import { nip33Regex } from "$lib/func/regex";
-  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   let {
     note,
@@ -114,16 +110,16 @@
         ["k", note.kind.toString()]
       );
     }
-    if ($addClientTag) {
+    if (lumiSetting.get().addClientTag) {
       tags.push(clientTag);
     }
     const ev: Nostr.EventParameters = {
       kind: 7,
       tags: tags,
-      content: $defaultReaction?.content ?? "+",
+      content: lumiSetting.get().defaultReaction?.content ?? "+",
     };
-    if ($defaultReaction?.tag?.length > 0) {
-      ev.tags?.push($defaultReaction?.tag);
+    if (lumiSetting.get().defaultReaction?.tag?.length > 0) {
+      ev.tags?.push(lumiSetting.get().defaultReaction?.tag);
     }
 
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
@@ -142,7 +138,7 @@
       .map((item) => normalizeRelayURL(item.from));
 
     if (isSuccessRelays.length > 0) {
-      $queryClient.setQueriesData({ queryKey: queryKey }, (before) => ev);
+      queryClient.setQueriesData({ queryKey: queryKey }, (before) => ev);
     }
   }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
@@ -201,7 +197,7 @@
         if (note.kind !== 1) {
           tags.push(["k", note.kind.toString()]);
         }
-        if ($addClientTag) {
+        if (lumiSetting.get().addClientTag) {
           tags.push(clientTag);
         }
         const ev: Nostr.EventParameters =
@@ -290,7 +286,7 @@
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
   // const observer = $derived(
-  //   new QueryObserver($queryClient, {
+  //   new QueryObserver(queryClient, {
   //     queryKey: ["reactions", "zapped", queryId, $loginUser],
   //   })
   // );
@@ -459,7 +455,7 @@
   }
 
   $effect(() => {
-    if (viewEventIds.get.length > 0) {
+    if (viewEventIds.get.length > 0 || lumiSetting.get().showAllReactions) {
       //   console.log($state.snapshot(viewEventIds.get.length));
       untrack(() => {
         debounceUpdate();
@@ -467,16 +463,9 @@
     }
   });
 
-  showAllReactions.subscribe(() => {
-    debounceUpdate();
-  });
-  // $: if ($showAllReactions && viewEventIds.get) {
-  //   debounceUpdate();
-  // }
-
   function updateReactionsData() {
     allReactions.repost = (
-      $queryClient
+      queryClient
         .getQueriesData({
           queryKey: ["reactions", "repost", queryId],
         })
@@ -487,7 +476,7 @@
     ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
 
     allReactions.reaction = (
-      $queryClient
+      queryClient
         .getQueriesData({
           queryKey: ["reactions", "reaction", queryId],
         })
@@ -498,7 +487,7 @@
     ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
 
     allReactions.zap = (
-      $queryClient
+      queryClient
         .getQueriesData({
           queryKey: ["reactions", "zapped", queryId],
         })
@@ -528,7 +517,7 @@
   class="flex flex-row-reverse justify-between pt-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
 >
   <div class="flex gap-1 overflow-hidden">
-    {#if $showAllReactions}{#if hasReactions}
+    {#if lumiSetting.get().showAllReactions}{#if hasReactions}
         <button
           class="actionButton"
           onclick={() => {

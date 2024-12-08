@@ -111,7 +111,7 @@ export async function getDoukiList(
 export async function getQueryRelays(
   pubkey: string
 ): Promise<DefaultRelayConfig[] | undefined> {
-  let defaultRelayData = get(queryClient)?.getQueryData([
+  let defaultRelayData = queryClient?.getQueryData([
     "defaultRelay",
     pubkey,
   ] as QueryKey);
@@ -122,13 +122,13 @@ export async function getQueryRelays(
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
     if (relayList.length > 0) {
-      get(queryClient).setQueryData(["defaultRelay", pubkey], relayList);
+      queryClient.setQueryData(["defaultRelay", pubkey], relayList);
     } else {
       console.log("failed to get relay data");
       return;
     }
   }
-  defaultRelayData = get(queryClient)?.getQueryData([
+  defaultRelayData = queryClient?.getQueryData([
     "defaultRelay",
     pubkey,
   ] as QueryKey);
@@ -356,43 +356,43 @@ export async function encryptPrvTags(
   }
 }
 
-export async function migrateSettings() {
-  const STORAGE_KEY = "lumiSetting";
-  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
-  const lumiMute_STORAGE_KEY = "lumiMute";
-  const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
-  let savedSettings = localStorage.getItem(STORAGE_KEY);
+// export async function migrateSettings() {
+//   const STORAGE_KEY = "lumiSetting";
+//   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+//   const lumiMute_STORAGE_KEY = "lumiMute";
+//   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
+//   let savedSettings = localStorage.getItem(STORAGE_KEY);
 
-  if (!savedSettings) return;
+//   if (!savedSettings) return;
 
-  const settings: LumiSetting = JSON.parse(savedSettings);
+//   const settings: LumiSetting = JSON.parse(savedSettings);
 
-  // LumiEmojiを別のキーに移動
-  if (settings.emoji) {
-    localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(settings.emoji));
-    delete settings.emoji; // lumisettingから削除
-  }
+//   // LumiEmojiを別のキーに移動
+//   if (settings.emoji) {
+//     localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(settings.emoji));
+//     delete settings.emoji; // lumisettingから削除
+//   }
 
-  // LumiMuteを別のキーに移動
-  if (settings.mute) {
-    localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(settings.mute));
-    delete settings.mute; // lumisettingから削除
-  }
+//   // LumiMuteを別のキーに移動
+//   if (settings.mute) {
+//     localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(settings.mute));
+//     delete settings.mute; // lumisettingから削除
+//   }
 
-  // LumiMuteByKindを別のキーに移動
-  if (settings.mutebykinds) {
-    localStorage.setItem(
-      lumiMuteByKind_STORAGE_KEY,
-      JSON.stringify(settings.mutebykinds)
-    );
-    delete settings.mutebykinds; // lumisettingから削除
-  }
+//   // LumiMuteByKindを別のキーに移動
+//   if (settings.mutebykinds) {
+//     localStorage.setItem(
+//       lumiMuteByKind_STORAGE_KEY,
+//       JSON.stringify(settings.mutebykinds)
+//     );
+//     delete settings.mutebykinds; // lumisettingから削除
+//   }
 
-  // 変更後の設定を再保存
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+//   // 変更後の設定を再保存
+//   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 
-  console.log("Settings migration completed.");
-}
+//   console.log("Settings migration completed.");
+// }
 
 export async function createEmojiListFrom10030(
   event: Nostr.Event
