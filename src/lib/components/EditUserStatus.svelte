@@ -1,11 +1,6 @@
 <!--edituserstatus.svelte-->
 <script lang="ts">
-  import {
-    emojis,
-    nowProgress,
-    showImg,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { SmilePlus, X } from "lucide-svelte";
 
@@ -19,7 +14,7 @@
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
-  import { userStatusMap } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, userStatusMap } from "$lib/stores/globalRunes.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -256,7 +251,7 @@
                           onclick={() => handleClickEmojiDisplayName(e)}
                           class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                         >
-                          {#if $showImg}
+                          {#if lumiSetting.get().showImg}
                             <img
                               loading="lazy"
                               class="h-6 object-contain justify-self-center"

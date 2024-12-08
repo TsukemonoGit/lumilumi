@@ -13,9 +13,9 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   import { reverseConvertMetaTags, type Imeta } from "$lib/func/imeta";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ContentImage from "../content/ContentImage.svelte";
-  import { showUserStatus, viewMediaModal } from "$lib/stores/stores";
+  import { viewMediaModal } from "$lib/stores/stores";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import NoteTemplate from "../NoteTemplate.svelte";
   import ShowStatus from "../ShowStatus.svelte";
@@ -86,7 +86,10 @@
 </script>
 
 <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-  {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
+  {#if lumiSetting.get().showUserStatus}<ShowStatus
+      pubkey={note.pubkey}
+      {tieKey}
+    />{/if}
   <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
   {#if replyUsers.length > 0}
     <div

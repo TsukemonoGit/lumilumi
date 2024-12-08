@@ -16,7 +16,7 @@
     $state();
 
   let data = $derived(_result?.data);
-  const observer2 = new QueryObserver($queryClient, {
+  const observer2 = new QueryObserver(queryClient, {
     queryKey: ["reactions", "repost", id, $loginUser],
   });
   const unsubscribe = observer2.subscribe((result: any) => {
@@ -34,7 +34,7 @@
   onDestroy(() => {
     //console.log("destroy");
     unsubscribe();
-    // $queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });//まだこのIDがTLにいるかもしれないからけさない
+    // queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });//まだこのIDがTLにいるかもしれないからけさない
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
 

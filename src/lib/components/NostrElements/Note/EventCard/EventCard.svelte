@@ -4,12 +4,7 @@
   import { Repeat2 } from "lucide-svelte";
   import Reaction from "../Reaction.svelte";
 
-  import {
-    loginUser,
-    mutebykinds,
-    mutes,
-    showUserStatus,
-  } from "$lib/stores/stores";
+  import { loginUser, mutebykinds, mutes } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
   import Content from "../Content.svelte";
@@ -19,7 +14,7 @@
   import Reply from "../Reply.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, untrack } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
 
@@ -36,7 +31,7 @@
   import ShowStatus from "../ShowStatus.svelte";
 
   import ReplyThread from "../ReplyThread.svelte";
-  import { muteCheck, type MuteCheck } from "$lib/func/muteCheck";
+  import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "../ReactionWebsite.svelte";
 
@@ -57,6 +52,7 @@
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
   import {
     followList,
+    lumiSetting,
     timelineFilter,
     viewEventIds,
   } from "$lib/stores/globalRunes.svelte";
@@ -305,7 +301,10 @@
     <article class="{noteClass()} w-full">
       {#if note.kind === 1}
         <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          {#if $showUserStatus}<ShowStatus pubkey={note.pubkey} {tieKey} />{/if}
+          {#if lumiSetting.get().showUserStatus}<ShowStatus
+              pubkey={note.pubkey}
+              {tieKey}
+            />{/if}
           <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
           {#if replyUsers.length > 0}
             <div
@@ -759,7 +758,7 @@
             {/if}
             {#if urls}
               {#each urls as url}
-                {#if $showImg}
+                {#if lumiSetting.get().showImg}
                   <OGP {url} let:contents>
                     <Link
                       slot="nodata"

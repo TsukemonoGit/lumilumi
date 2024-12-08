@@ -1,6 +1,6 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
-  import { loginUser, showImg } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
 
   import Avatar from "svelte-boring-avatars";
   import * as Nostr from "nostr-typedef";
@@ -8,6 +8,7 @@
   import { splitHexColorString } from "$lib/func/util";
 
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   //let metadata: Nostr.Event;
 
@@ -85,7 +86,7 @@
           style={`width:${size}px;height:${size}px`}
           class="flex justify-center items-center"
         >
-          {#if $showImg && metadata && url && url !== ""}
+          {#if lumiSetting.get().showImg && metadata && url && url !== ""}
             <UserAvatar
               {url}
               name={metadata.pubkey}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { isvalidURL, type Ogp } from "$lib/func/ogp";
-  import { showImg } from "$lib/stores/stores";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+
   import Avatar from "svelte-boring-avatars";
 
   interface Props {
@@ -24,7 +25,7 @@
   target="_blank"
   rel="noopener noreferrer"
 >
-  {#if $showImg && imageURL && imageURL !== ""}
+  {#if lumiSetting.get().showImg && imageURL && imageURL !== ""}
     <blockquote
       class="grid grid-cols-[0.5fr_1.5fr] divide-x divide-magnum-400 w-full"
     >
@@ -69,7 +70,7 @@
       </div>
     </blockquote>
   {:else}<blockquote class="p-0.5 grid grid-rows-[auto_1fr] w-full">
-      <h2 class="line-clamp-2 text-sm font-bold text-magnum-300">
+      <h2 class="line-clamp-2 text-sm font-bold text-magnum-200">
         {contents.title}
       </h2>
       <p

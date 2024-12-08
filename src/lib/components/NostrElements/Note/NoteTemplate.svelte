@@ -1,8 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { showRelayIcon } from "$lib/stores/stores";
-
   import { nip19 } from "nostr-tools";
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
@@ -12,7 +10,7 @@
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -80,7 +78,7 @@
         {tieKey}
       />
     </div>
-    {#if $showRelayIcon && displayMenu}
+    {#if lumiSetting.get().showRelayIcon && displayMenu}
       <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
   </div>
 

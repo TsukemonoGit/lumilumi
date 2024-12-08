@@ -10,7 +10,6 @@
     emojis,
     loginUser,
     nowProgress,
-    showImg,
     toastSettings,
     verifier,
   } from "$lib/stores/stores";
@@ -23,6 +22,7 @@
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
   import { emojiShortcodeRegex, nip33Regex } from "$lib/func/regex";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   interface Props {
     pubkey: string;
   }
@@ -259,7 +259,7 @@
             <div
               class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
             >
-              {#if $showImg}<img
+              {#if lumiSetting.get().showImg}<img
                   loading="lazy"
                   class="h-12 object-contain justify-self-center"
                   src={e[1]}

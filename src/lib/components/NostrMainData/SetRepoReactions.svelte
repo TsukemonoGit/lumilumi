@@ -1,13 +1,13 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import { loginUser, showAllReactions } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
   import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
   import { untrack, type Snippet } from "svelte";
-  import { viewEventIds } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     error?: Snippet;
@@ -74,7 +74,9 @@
         ? [
             {
               "#e": etagList,
-              authors: $showAllReactions ? undefined : [$loginUser],
+              authors: lumiSetting.get().showAllReactions
+                ? undefined
+                : [$loginUser],
               kinds: [7, 6, 16],
             },
             {
@@ -87,7 +89,9 @@
       filters.push(
         {
           "#a": atagList,
-          authors: $showAllReactions ? undefined : [$loginUser],
+          authors: lumiSetting.get().showAllReactions
+            ? undefined
+            : [$loginUser],
           kinds: [7, 6, 16],
         },
         {

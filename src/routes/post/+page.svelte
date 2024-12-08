@@ -7,14 +7,13 @@
     nowProgress,
     postWindowOpen,
     uploader,
-    showPreview,
-    showImg,
   } from "$lib/stores/stores";
   import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/stores";
   import { convertMetaTags } from "$lib/func/imeta";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -29,8 +28,8 @@
       if (lumi) {
         const savedSettings: LumiSetting = JSON.parse(lumi);
 
-        $showImg = savedSettings.showImg;
-        $showPreview = savedSettings.showPreview;
+        lumiSetting.get().showImg = savedSettings.showImg;
+        lumiSetting.get().showPreview = savedSettings.showPreview;
       }
     } catch (error) {
       console.log(error);

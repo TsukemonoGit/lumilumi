@@ -122,17 +122,12 @@ export interface LumiSetting {
   showRelayIcon: boolean;
   showReactioninTL: boolean;
   showUserStatus: boolean;
-
-  emoji?: LumiEmoji;
-  mute?: LumiMute;
-  mutebykinds?: LumiMuteByKind;
-  defaultReaction: { content: string; tag: string[] };
-  //showBanner: boolean;
   showKind16: boolean;
-  addClientTag: boolean;
-  showClientTag: boolean;
   showAllReactions: boolean;
   kind42inTL: boolean;
+  addClientTag: boolean;
+
+  defaultReaction: { content: string; tag: string[] };
 }
 export interface LumiEmoji {
   list: string[][];

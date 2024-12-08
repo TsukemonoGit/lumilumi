@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
     loginUser,
@@ -19,10 +19,8 @@
     type EventPacket,
     type RxReq,
     type RxReqEmittable,
-    type RxReqOverable,
     type RxReqPipeable,
     createTie,
-    type LazyFilter,
   } from "rx-nostr";
   import { onDestroy, onMount, untrack } from "svelte";
   import {
@@ -216,7 +214,7 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = $queryClient.getQueryData([
+    const ev: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);
@@ -234,7 +232,7 @@
     //   }));
     //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
     //   if (older.length > 0) {
-    //     $queryClient.setQueryData(
+    //     queryClient.setQueryData(
     //       [...queryKey, "olderData"],
     //       [...ev, ...older]
     //     );
@@ -258,12 +256,12 @@
       );
 
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = $queryClient.getQueryData([
+        const olddata: EventPacket[] | undefined = queryClient.getQueryData([
           ...queryKey,
           "olderData",
         ]);
 
-        $queryClient.setQueryData(
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olddata ?? []), ...older]
         );
@@ -295,10 +293,11 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData(
-          [...queryKey, "olderData"]
-        );
-        $queryClient.setQueryData(
+        const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
+          ...queryKey,
+          "olderData",
+        ]);
+        queryClient.setQueryData(
           [...queryKey, "olderData"],
           [...(olderdatas ?? []), ...older]
         );
@@ -345,7 +344,7 @@
   };
 
   function updateViewEvent(data: EventPacket[] | undefined | null) {
-    const olderdatas: EventPacket[] | undefined = $queryClient.getQueryData([
+    const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);

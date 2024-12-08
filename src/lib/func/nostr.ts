@@ -1,14 +1,9 @@
 import {
   app,
   defaultRelays,
-  kind42inTL,
   loginUser,
   metadataQueue,
   queryClient,
-  showImg,
-  showKind16,
-  showReactioninTL,
-  showUserStatus,
   tieMapStore,
   verifier,
 } from "$lib/stores/stores";
@@ -38,7 +33,11 @@ import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
-import { followList, relayStateMap } from "$lib/stores/globalRunes.svelte";
+import {
+  followList,
+  lumiSetting,
+  relayStateMap,
+} from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 
 let rxNostr: RxNostr;
@@ -160,12 +159,12 @@ const saveMetadataToLocalStorage = (
       ) {
         //新しいデータだったら上書き
         currentMetadata[existingIndex] = [key, data];
-        get(queryClient).setQueryData(key, (oldData: any) => data);
+        queryClient.setQueryData(key, (oldData: any) => data);
         metadataChanged = true;
       } else {
         //古いデータだったら保存されてる方を返す
         // 保存されているメタデータの方をクエリにセット（？）
-        get(queryClient).setQueryData(
+        queryClient.setQueryData(
           key,
           (oldData: any) => currentMetadata[existingIndex][1]
         );
@@ -173,7 +172,7 @@ const saveMetadataToLocalStorage = (
     } else {
       // 保存されていない場合、新しいデータを追加する
       currentMetadata.push([key, data]);
-      get(queryClient).setQueryData(key, (oldData: any) => data);
+      queryClient.setQueryData(key, (oldData: any) => data);
       metadataChanged = true;
     }
     // // 更新されたデータをローカルストレージに保存
@@ -227,12 +226,12 @@ export const makeMainFilters = (
 
   const pubkeyList = pubkeysIn(contacts, get(loginUser));
   const kinds = [1, 6];
-  if (get(showKind16)) {
+  if (lumiSetting.get().showKind16) {
     kinds.push(16);
   }
 
-  console.log("kind42inTL", get(kind42inTL));
-  if (get(kind42inTL)) {
+  console.log("kind42inTL", lumiSetting.get().kind42inTL);
+  if (lumiSetting.get().kind42inTL) {
     kinds.push(42);
   }
   const olderFilters: Nostr.Filter[] = [
@@ -242,7 +241,7 @@ export const makeMainFilters = (
       since: since,
     },
   ];
-  if (get(showImg)) {
+  if (lumiSetting.get().showImg) {
     //画像読み込みのときはkind:0リアルタイム更新
     kinds.push(0);
   }
@@ -254,7 +253,7 @@ export const makeMainFilters = (
     },
   ];
 
-  if (get(showReactioninTL)) {
+  if (lumiSetting.get().showReactioninTL) {
     filters.push({
       kinds: [
         42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
@@ -266,7 +265,7 @@ export const makeMainFilters = (
     });
   } //とりあえず通知をTLに流したくないときは フィルターから外してみる
 
-  if (get(showUserStatus)) {
+  if (lumiSetting.get().showUserStatus) {
     filters.push({
       kinds: [30315],
       authors: Array.from(pubkeyList.keys()),
@@ -290,7 +289,7 @@ export function useMainTimelineReq(
 } {
   //console.log(filters);
 
-  const _queryClient = get(queryClient);
+  const _queryClient = queryClient;
 
   if (!_queryClient) {
     throw new Error("Query client is not available");

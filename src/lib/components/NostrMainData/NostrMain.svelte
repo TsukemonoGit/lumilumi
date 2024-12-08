@@ -3,25 +3,11 @@
   import {
     app,
     emojis,
-    loginUser,
-    menuLeft,
     mutebykinds,
     mutes,
-    showImg,
-    showPreview,
-    showRelayIcon,
-    defaultReaction,
-    showReactioninTL,
     defaultRelays,
-    queryClient,
-    showUserStatus,
-    showBanner,
-    showKind16,
     onlyFollowee,
-    addClientTag,
-    showClientTag,
-    showAllReactions,
-    kind42inTL,
+    loginUser,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -36,14 +22,18 @@
     LumiSetting,
   } from "$lib/types";
   import { page } from "$app/stores";
-  import { migrateSettings } from "$lib/func/settings";
+
   import {
     initLumiEmoji,
     initLumiMute,
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
-  import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    lumiSetting,
+    showBanner,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -68,7 +58,8 @@
 
   onMount(async () => {
     console.log($defaultRelays);
-    console.log($queryClient?.getQueryData(["defaultRelay", $loginUser]));
+    // console.log(queryClient?.getQueryData(["defaultRelay", $loginUser]));
+
     initializeRxNostr();
 
     const followee = localStorage.getItem("onlyFollowee");
@@ -84,9 +75,9 @@
       }
     }
 
-    $showBanner = localStorage.getItem("showBanner") === "true";
+    showBanner.set(localStorage.getItem("showBanner") === "true");
 
-    await migrateSettings();
+    //  await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
     loadMutetokanoSettei();
     if (savedSettings) {
@@ -97,7 +88,9 @@
         goto("/settings");
       } else {
         //設定なし。閲覧モードのときは画像表示してみる
-        $showImg = true;
+        lumiSetting.update((cur) => {
+          return { ...cur, showImg: true };
+        });
       }
     }
 
@@ -121,73 +114,19 @@
   }
 
   function applySavedSettings(settings: LumiSetting) {
-    const {
-      relays: savedRelays,
-      useRelaySet: savedRelaySet,
-      pubkey: savedPubkey,
-      showImg: savedShowImg,
-      showPreview: savedShowPreview,
-
-      menuleft: savedMenuLeft,
-      showRelayIcon: savedShowRelayIcon,
-      // mute: savedMute,
-      // emoji: savedEmoji,
-      // mutebykinds: savedMutebykinds,
-      defaultReaction: savedDefaultReaction,
-      showReactioninTL: savedReactionTL,
-      //  nostrWalletConnect: savedNostrWalletConnect,
-      showUserStatus: savedShowUserStatus,
-
-      showKind16: savedShowKind16,
-      addClientTag: savedAddClientTag,
-      showClientTag: savedShowClientTag,
-      showAllReactions: savedShowAllReactions,
-      kind42inTL: savedKind42inTL,
-    } = settings;
+    lumiSetting.set(settings);
     //  console.log(savedRelays);
-    if (savedRelaySet === "1" && savedRelays.length > 0) {
-      localRelays = savedRelays;
+    if (
+      lumiSetting.get().useRelaySet === "1" &&
+      lumiSetting.get().relays.length > 0
+    ) {
+      localRelays = lumiSetting.get().relays;
       setRelays(localRelays as DefaultRelayConfig[]);
     } else {
       localRelays = [];
       setRelays(relaySearchRelays);
     }
-    pubkey = savedPubkey;
-    $loginUser = pubkey;
-
-    $showImg = savedShowImg ? savedShowImg : false;
-
-    $showPreview = savedShowPreview ? savedShowPreview : false;
-    $menuLeft = savedMenuLeft ? savedMenuLeft : false;
-    $showRelayIcon = savedShowRelayIcon ? savedShowRelayIcon : false;
-    $defaultReaction = savedDefaultReaction
-      ? savedDefaultReaction
-      : { content: "+", tag: [] };
-    $showReactioninTL = savedReactionTL ?? true;
-    //$nostrWalletConnect = savedNostrWalletConnect ?? "";
-    $showUserStatus = savedShowUserStatus ?? false;
-
-    // if (!$showImg) {
-    //省エネモードのときはローカルストレージのメタデータ使って、そうじゃないときは新しくメタデータ取ってくる感じ。とおもったけど処理重くなりそうだから使い回しでいいか省エネじゃないときはqueryclientのでーたが古くなる判定のとこ変えたらいい？←まだやってない
-    //とりあえずfunctionの方でget(showImg)の値によってよみこむ設定
-    // getMetadataFromLocalStorage();
-    //}
-    $showKind16 = savedShowKind16;
-    // $mutes = savedMute ? savedMute.list : undefined;
-
-    // $emojis = savedEmoji && savedEmoji.list ? savedEmoji.list : [];
-
-    // if (savedMutebykinds && savedMutebykinds.list) {
-    //   try {
-    //     $mutebykinds = savedMutebykinds.list;
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-    $addClientTag = savedAddClientTag;
-    $showClientTag = savedShowClientTag ? savedShowClientTag : true;
-    $showAllReactions = savedShowAllReactions;
-    $kind42inTL = savedKind42inTL;
+    pubkey = $loginUser = lumiSetting.get().pubkey;
   }
 
   function loadMutetokanoSettei() {

@@ -45,12 +45,12 @@
   //ザップ完了したら画面を閉じる（$open=falseにするためのやつ
   //idでしかみてないからユーザーへのザップの場合は閉じない
   open.subscribe((openState) => {
-    console.log(openState);
+    //console.log(openState);
     if (openState && !zapped) {
       const observer:
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
         | undefined = id
-        ? new QueryObserver($queryClient, {
+        ? new QueryObserver(queryClient, {
             queryKey: ["reactions", "zapped", id, $loginUser],
           })
         : undefined;

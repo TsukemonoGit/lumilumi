@@ -15,7 +15,7 @@
   let doCheck = $state(false);
 
   let data = $derived(
-    $queryClient?.getQueryData(["nip05", pubkey, nip05Address])
+    queryClient?.getQueryData(["nip05", pubkey, nip05Address])
   );
   $effect(() => {
     if (data) {

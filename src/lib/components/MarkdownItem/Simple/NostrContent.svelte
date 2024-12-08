@@ -1,11 +1,12 @@
 <script lang="ts">
   import { parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
-  import { showImg, viewMediaModal } from "$lib/stores/stores";
+  import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import { _ } from "svelte-i18n";
   import DecodedContent from "$lib/components/NostrElements/Note/DecodedContent.svelte";
   import ContentImage from "$lib/components/NostrElements/Note/content/ContentImage.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     text: string;
@@ -105,7 +106,7 @@
       {openModal}
     />
   {:else if part.type === "movie"}
-    {#if $showImg}
+    {#if lumiSetting.get().showImg}
       <video
         aria-label="video contents"
         controls
@@ -119,7 +120,7 @@
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}{:else if part.type === "audio"}
-    {#if $showImg}
+    {#if lumiSetting.get().showImg}
       <audio
         aria-label="audio contents"
         controls
@@ -138,7 +139,7 @@
       className="underline text-magnum-300 break-all hover:opacity-80 "
       href={part.content ?? ""}
       >{#snippet content()}{part.content}{/snippet}</Link
-    >{:else if part.type === "emoji"}{#if $showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
+    >{:else if part.type === "emoji"}{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
         alt={`:${part.content}:`}

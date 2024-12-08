@@ -7,8 +7,8 @@
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import type { Profile } from "$lib/types";
   import Popover from "$lib/components/Elements/Popover.svelte";
-  import { showImg } from "$lib/stores/stores";
   import UserProfile from "$lib/components/Elements/UserProfile.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   const size = 20;
   interface Props {
     pubkey: string;
@@ -66,7 +66,7 @@
       {/snippet}
 
       {#snippet content({ metadata })}
-        {#if $showImg}
+        {#if lumiSetting.get().showImg}
           {#await picture(metadata.content) then picture}
             {#if picture !== undefined}
               <UserAvatar {size} name={pubkey} url={picture} {pubkey} />

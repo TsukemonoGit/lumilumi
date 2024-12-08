@@ -86,7 +86,7 @@
 
     const followState = followList.get.has(pubkey);
     const kind3Event: EventPacket | undefined =
-      $queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
+      queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
 
     await refreshContactsData(kind3Event);
 
@@ -109,10 +109,10 @@
   const refreshContactsData = async (kind3Event: EventPacket | undefined) => {
     $nowProgress = true;
     console.log($loginUser);
-    // await $queryClient.refetchQueries({ queryKey: contactsQueryKey });
+    // await queryClient.refetchQueries({ queryKey: contactsQueryKey });
     // await delay(1000);
     // const newKind3: EventPacket | undefined =
-    //   $queryClient.getQueryData(contactsQueryKey);
+    //   queryClient.getQueryData(contactsQueryKey);
     const newKind3: EventPacket[] = await usePromiseReq(
       {
         filters: [{ kinds: [3], authors: [$loginUser], limit: 1 }],
@@ -128,10 +128,7 @@
       (newKind3.length > 0 &&
         newKind3[0].event.created_at > kind3Event.event.created_at)
     ) {
-      $queryClient.setQueryData(
-        contactsQueryKey,
-        (oldData: any) => newKind3[0]
-      );
+      queryClient.setQueryData(contactsQueryKey, (oldData: any) => newKind3[0]);
 
       pubkeysIn(newKind3[0].event);
       beforeKind3 = newKind3[0].event;
@@ -189,11 +186,11 @@
     );
 
     if (isSuccess.length > 0) {
-      //$queryClient.refetchQueries({ queryKey: contactsQueryKey }); //これやったらnullになるはなおってるかもだけど別にリフェッチしなくていいか
+      //queryClient.refetchQueries({ queryKey: contactsQueryKey }); //これやったらnullになるはなおってるかもだけど別にリフェッチしなくていいか
 
       const packetEv = formatToEventPacket(ev, isSuccess[0]);
 
-      $queryClient.setQueryData(contactsQueryKey, packetEv);
+      queryClient.setQueryData(contactsQueryKey, packetEv);
       pubkeysIn(ev);
       const filters = makeMainFilters(ev, now());
       changeMainEmit(filters.mainFilters);
@@ -216,7 +213,7 @@
 
   const handlePetnameClick = async () => {
     let kind3Event: EventPacket | undefined =
-      $queryClient.getQueryData(contactsQueryKey);
+      queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
     petnameInput = followList.get.get(pubkey) ?? "";
     openPetnameDialog?.(true);

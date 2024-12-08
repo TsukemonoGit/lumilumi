@@ -55,14 +55,14 @@
 
     if (isSuccess.length > 0) {
       console.log("removeQueries");
-      $queryClient.refetchQueries({
+      queryClient.refetchQueries({
         queryKey: ["globalRelay", $loginUser],
       });
 
-      $queryClient.removeQueries({
+      queryClient.removeQueries({
         queryKey: timelineQuery,
       });
-      $queryClient.removeQueries({
+      queryClient.removeQueries({
         queryKey: [...timelineQuery, "olderData"],
       });
       tieKey = generateRandomId(2);
@@ -118,7 +118,7 @@
       relaySettei = true;
 
       //すでにあるならデータをセットする
-      const data: EventPacket | undefined = $queryClient.getQueryData([
+      const data: EventPacket | undefined = queryClient.getQueryData([
         "globalRelay",
         $loginUser,
       ]);

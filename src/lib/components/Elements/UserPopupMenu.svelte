@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { showImg } from "$lib/stores/stores";
+
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
@@ -13,6 +13,7 @@
 
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -47,7 +48,7 @@
 
 {#if !displayMenu || !pubcheck}
   <!-- <div title={$title}> -->
-  {#if $showImg && url && url !== ""}
+  {#if lumiSetting.get().showImg && url && url !== ""}
     <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
   {:else}
     <Avatar
@@ -60,7 +61,7 @@
   <!-- </div> -->
 {:else}
   <Popover ariaLabel="user profile">
-    {#if $showImg && url && url !== ""}
+    {#if lumiSetting.get().showImg && url && url !== ""}
       <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
     {:else}
       <Avatar

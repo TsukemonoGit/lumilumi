@@ -1,14 +1,14 @@
 <script lang="ts">
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import { formatUrl, relayInfoFun } from "$lib/func/util";
-  import { showImg, relayIconErrorStore } from "$lib/stores/stores";
+  import { relayIconErrorStore } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import Avatar from "svelte-boring-avatars";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
   import { getRelaysById } from "$lib/func/nostr";
 
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     id: string;
@@ -61,7 +61,7 @@
           {:then relayInfo}
             {#if !relayInfo}
               <Avatar {size} name={url} variant="beam" />
-            {:else if $showImg && relayInfo.icon}
+            {:else if lumiSetting.get().showImg && relayInfo.icon}
               <UserAvatar
                 url={relayInfo.icon}
                 name={url ?? ""}
@@ -69,7 +69,7 @@
                 title={url}
                 {size}
               />
-            {:else if $showImg && !$relayIconErrorStore.includes(url)}
+            {:else if lumiSetting.get().showImg && !$relayIconErrorStore.includes(url)}
               <UserAvatar
                 url={formatUrl(url) + "favicon.ico"}
                 name={url ?? ""}

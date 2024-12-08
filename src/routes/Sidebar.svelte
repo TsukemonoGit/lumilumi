@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import logo from "$lib/images/favicon.svg";
-  import { loginUser, showImg } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
 
   import { TrendingUp, User } from "lucide-svelte";
 
@@ -11,6 +11,7 @@
   //  import { melt } from "@melt-ui/svelte";
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   let encodedPub: string | undefined = $derived.by(() => pubCheck($loginUser));
 
@@ -81,7 +82,7 @@
         aria-current={$page.url.pathname === `/about` ? "page" : undefined}
       >
         <a href={`/about`}>
-          {#if $showImg}
+          {#if lumiSetting.get().showImg}
             <img
               loading="lazy"
               src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"

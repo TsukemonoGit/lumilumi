@@ -31,12 +31,12 @@
   // });
   onDestroy(() => {
     console.log("onDestroy");
-    // $queryClient.cancelQueries({
+    // queryClient.cancelQueries({
     //   queryKey: ["search"],
     // });
-    // $queryClient.cancelQueries({ queryKey: ["search", "olderData"] });
-    $queryClient.removeQueries({ queryKey: ["search"] });
-    $queryClient.removeQueries({ queryKey: ["search", "olderData"] });
+    // queryClient.cancelQueries({ queryKey: ["search", "olderData"] });
+    queryClient.removeQueries({ queryKey: ["search"] });
+    queryClient.removeQueries({ queryKey: ["search", "olderData"] });
     //console.log("cancelQueries");
   });
 </script>

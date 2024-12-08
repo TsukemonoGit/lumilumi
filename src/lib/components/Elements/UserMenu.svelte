@@ -121,7 +121,7 @@
       case 4:
         $nowProgress = true;
         const key: QueryKey = ["metadata", pubkey];
-        $queryClient.invalidateQueries({ queryKey: key });
+        queryClient.invalidateQueries({ queryKey: key });
         setTimeout(() => {
           $nowProgress = false;
         }, 1000);
@@ -148,13 +148,13 @@
         const nip05 = profile?.nip05;
         if (nip05) {
           const data: { result: boolean; error?: string } | undefined =
-            $queryClient.getQueryData(["nip05", pubkey, nip05.toLowerCase()]);
+            queryClient.getQueryData(["nip05", pubkey, nip05.toLowerCase()]);
           if (data && data.result) {
             urlData = nip05;
           } else {
             const data = await useNip05PromiseCheck(nip05, pubkey);
             if (data) {
-              $queryClient.setQueryData(
+              queryClient.setQueryData(
                 ["nip05", pubkey, nip05.toLowerCase()],
                 data
               );

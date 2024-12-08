@@ -1,6 +1,6 @@
 <script lang="ts">
   import { datetime, parseNaddr } from "$lib/func/util";
-  import { showClientTag } from "$lib/stores/stores";
+  //import { showClientTag } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   interface Props {
@@ -23,7 +23,7 @@
     >{new Date(note.created_at * 1000).toLocaleString()}</time
   >
 
-  {#if clientTag && $showClientTag}
+  {#if clientTag}
     - {#if clientTag.length > 2}<button
         title={"open in nostrapp.link"}
         onclick={() => onClickClientTag(clientTag.slice(2))}

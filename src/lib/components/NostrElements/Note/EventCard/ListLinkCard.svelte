@@ -2,12 +2,13 @@
   import UserAvatar from "$lib/components/Elements/UserAvatar.svelte";
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import { showImg } from "$lib/stores/stores";
+
   import * as Nostr from "nostr-typedef";
   import Avatar from "svelte-boring-avatars";
   import ListEllipsisMenu from "../ListEllipsisMenu.svelte";
   import { nip19 } from "nostr-tools";
   import { goto } from "$app/navigation";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   interface Props {
     event: Nostr.Event;
     depth: number;
@@ -42,7 +43,7 @@
     onclick={() => handleClickToList(event)}
   >
     <div class="relative">
-      {#if $showImg && image}
+      {#if lumiSetting.get().showImg && image}
         <UserAvatar
           url={image}
           name={dtag}

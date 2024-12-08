@@ -76,7 +76,7 @@
   });
   async function init() {
     const ev: EventPacket[] | undefined =
-      $queryClient?.getQueryData(timelineQuery);
+      queryClient?.getQueryData(timelineQuery);
     console.log(ev);
     if (!ev || ev.length <= 0) {
       filters[0].since = undefined;

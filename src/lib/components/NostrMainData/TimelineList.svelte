@@ -87,7 +87,7 @@
       updating = true;
 
       const olderdatas: EventPacket[] | undefined =
-        $queryClient.getQueryData(olderQueryKey);
+        queryClient.getQueryData(olderQueryKey);
       console.log("updateViewEvent");
       const allEvents: EventPacket[] = data ?? [];
 
@@ -254,7 +254,7 @@
   async function init() {
     updating = false;
     const ev: EventPacket[] | undefined =
-      $queryClient.getQueryData(olderQueryKey);
+      queryClient.getQueryData(olderQueryKey);
 
     //if (ev) {
     //   console.log(ev);
@@ -269,7 +269,7 @@
     //   }));
     //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
     //   if (older.length > 0) {
-    //     $queryClient.setQueryData(
+    //     queryClient.setQueryData(
     //       [...queryKey, "olderData"],
     //       [...ev, ...older]
     //     );
@@ -314,12 +314,9 @@
 
       if (older.length > 0) {
         const olddata: EventPacket[] | undefined =
-          $queryClient.getQueryData(olderQueryKey);
+          queryClient.getQueryData(olderQueryKey);
 
-        $queryClient.setQueryData(olderQueryKey, [
-          ...(olddata ?? []),
-          ...older,
-        ]);
+        queryClient.setQueryData(olderQueryKey, [...(olddata ?? []), ...older]);
         setTimeout(() => {
           updateViewEvent?.($globalData);
         }, 10); //ProfileがめんのTLが読み込み終わっても表示されない
@@ -350,8 +347,8 @@
       console.log(older);
       if (older.length > 0) {
         const olderdatas: EventPacket[] | undefined =
-          $queryClient.getQueryData(olderQueryKey);
-        $queryClient.setQueryData(olderQueryKey, [
+          queryClient.getQueryData(olderQueryKey);
+        queryClient.setQueryData(olderQueryKey, [
           ...(olderdatas ?? []),
           ...older,
         ]);

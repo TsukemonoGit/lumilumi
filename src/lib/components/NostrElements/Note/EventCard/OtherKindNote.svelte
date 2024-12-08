@@ -3,7 +3,6 @@
 
   import UserMenu from "$lib/components/Elements/UserPopupMenu.svelte";
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
-  import { showImg } from "$lib/stores/stores";
 
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
   import { nip19 } from "nostr-tools";
@@ -15,7 +14,7 @@
   import ClientTag from "../ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/Elements/DisplayName.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -155,7 +154,7 @@
             {description}
           </div>{/if}
 
-        {#if image && $showImg}
+        {#if image && lumiSetting.get().showImg}
           <img
             loading="lazy"
             src={image}

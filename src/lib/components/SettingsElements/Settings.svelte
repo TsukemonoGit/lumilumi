@@ -9,21 +9,9 @@
     loginUser,
     mutes,
     mutebykinds,
-    showImg,
-    showPreview,
     toastSettings,
-    menuLeft,
-    showRelayIcon,
-    defaultReaction,
-    showReactioninTL,
     nowProgress,
-    showUserStatus,
-    showKind16,
-    addClientTag,
-    showClientTag,
-    showAllReactions,
     queryClient,
-    kind42inTL,
   } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
 
@@ -44,11 +32,10 @@
   import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
   import Dialog from "../Elements/Dialog.svelte";
-  import { migrateSettings } from "$lib/func/settings";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
   import Kind30078 from "./Kind30078.svelte";
   import {
@@ -58,6 +45,7 @@
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { relayRegex2, npubRegex } from "$lib/func/regex";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -103,7 +91,7 @@
   });
 
   onMount(async () => {
-    await migrateSettings();
+    //await migrateSettings();
     const savedSettings = loadSettings();
     console.log(savedSettings);
     if (savedSettings) {
@@ -223,7 +211,7 @@
     } else {
       // queryKey: ["defaultRelay", $loginUser] のデータがあるか確認
 
-      const data: EventPacket[] | undefined = $queryClient.getQueryData([
+      const data: EventPacket[] | undefined = queryClient.getQueryData([
         "defaultRelay",
         $loginUser,
       ]);
@@ -273,22 +261,7 @@
     }
     beforeRelays = settings.relays;
     $selectedRelayset = settings.useRelaySet;
-
-    $showImg = settings.showImg;
-    $showPreview = settings.showPreview;
-    $menuLeft = settings.menuleft;
-    $showRelayIcon = settings.showRelayIcon;
-
-    $defaultReaction = settings.defaultReaction;
-    $showReactioninTL = settings.showReactioninTL;
-
-    $showUserStatus = settings.showUserStatus;
-
-    $showKind16 = settings.showKind16;
-    $addClientTag = settings.addClientTag;
-    $showClientTag = settings.showClientTag;
-    $showAllReactions = settings.showAllReactions;
-    $kind42inTL = settings.kind42inTL;
+    lumiSetting.set(settings);
   }
 
   function isRelaySelectionInvalid() {
@@ -600,31 +573,7 @@
       </div>
       <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
   </fieldset>
-  <!--投稿の設定-->
-  <!-- <fieldset class="border border-magnum-500 rounded-md p-2">
-    <legend class="text-magnum-200 font-bold text-lg">Default Reaction</legend>
-    <div class="w-fit grid grid-cols-[auto_1fr] gap-2 items-center">
-      <CustomReaction
-        note={undefined}
-        root={undefined}
-        atag={undefined}
-        {handleClickOk}
-        bind:emoji={emojiTag}
-        bind:customReaction={customString}
-      />{#if settings.defaultReaction?.tag?.length > 0}
-        {#if $showImg}
-          <img
-            loading="lazy"
-            class="h-4 object-contain justify-self-center"
-            src={settings.defaultReaction.tag[2]}
-            alt={settings.defaultReaction.tag[1]}
-            title={settings.defaultReaction.tag[1]}
-          />{:else}{settings.defaultReaction.tag[1]}{/if}
-      {:else if settings.defaultReaction?.content}
-        {settings.defaultReaction.content}
-      {/if}
-    </div>
-  </fieldset> -->
+
   <fieldset class="border border-magnum-500 rounded-md p-2">
     <legend class="text-magnum-200 font-bold text-lg">Post</legend>
     <ul>
@@ -641,7 +590,7 @@
               bind:emoji={$emojiTag}
               bind:customReaction={customString}
             />{#if settings.defaultReaction?.tag?.length > 0}
-              {#if $showImg}
+              {#if lumiSetting.get().showImg}
                 <img
                   loading="lazy"
                   class="h-6 object-contain justify-self-center"
@@ -754,7 +703,8 @@
         />
         {$_("settings.display.showRelayIcon")}
       </label>
-
+      <!-- 常にTLにクライアントタグ表示しておいて良くない❔️-->
+      <!--
       <label>
         <input
           type="checkbox"
@@ -762,7 +712,7 @@
           bind:checked={settings.showClientTag}
         />
         {$_("settings.display.showClientTag")}
-      </label>
+      </label> -->
     </div>
   </fieldset>
 

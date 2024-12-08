@@ -3,7 +3,7 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { AlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
-  import { loginUser, menuLeft, showImg } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
@@ -13,6 +13,7 @@
   import { goto } from "$app/navigation";
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   const {
     elements: {
       trigger,
@@ -55,9 +56,11 @@
     }
   });
   let menuPosition = $derived(
-    $menuLeft ? "left-2 flex flex-row-reverse" : "right-2 "
+    lumiSetting.get().menuleft ? "left-2 flex flex-row-reverse" : "right-2 "
   );
-  let menuPosition2 = $derived($menuLeft ? "right-5 " : "left-5");
+  let menuPosition2 = $derived(
+    lumiSetting.get().menuleft ? "right-5 " : "left-5"
+  );
 
   // svelte-ignore non_reactive_update
   let editStatusOpen: Writable<boolean> = writable(false);
@@ -101,9 +104,9 @@
     ></div>
     <div
       use:melt={$content}
-      class={`fixed ${$menuLeft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
+      class={`fixed ${lumiSetting.get().menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
             shadow-lg focus:outline-none`}
-      transition:fly={$menuLeft
+      transition:fly={lumiSetting.get().menuleft
         ? {
             x: -350,
             duration: 300,
@@ -154,7 +157,7 @@
             aria-current={$page.url?.pathname === "/about" ? "page" : undefined}
           >
             <a href="/about" use:melt={$close}
-              >{#if $showImg}
+              >{#if lumiSetting.get().showImg}
                 <img
                   loading="lazy"
                   src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"

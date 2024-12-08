@@ -69,7 +69,7 @@
     $nowProgress = true;
     console.log("updateViewEvent");
     const allEvents: EventPacket[] | undefined =
-      $queryClient.getQueryData(queryKey);
+      queryClient.getQueryData(queryKey);
 
     if (!allEvents) {
       return;
@@ -131,7 +131,7 @@
   let allUniqueEvents: Nostr.Event[];
 
   // $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
-  const observer = new QueryObserver($queryClient, {
+  const observer = new QueryObserver(queryClient, {
     queryKey: queryKey,
   });
   const data: Writable<EventPacket[]> = writable<EventPacket[]>();
@@ -186,7 +186,7 @@
   });
 
   async function init() {
-    // const ev: EventPacket[] | undefined = $queryClient.getQueryData(queryKey);
+    // const ev: EventPacket[] | undefined = queryClient.getQueryData(queryKey);
 
     console.log(readUrls);
 
@@ -206,12 +206,12 @@
         ? older.slice(0, filters[0].limit)
         : older; //sinceとuntilがめっちゃ離れてるときのこと考えてない
 
-      $queryClient.setQueryData(
+      queryClient.setQueryData(
         //古いやつより新しいやつ
         queryKey,
         (before: EventPacket[] | undefined) => [...olderdata, ...(before ?? [])]
       );
-      // console.log($queryClient.getQueryData(queryKey));
+      // console.log(queryClient.getQueryData(queryKey));
     }
     isOnMount = false;
     // updateViewEvent();
@@ -243,7 +243,7 @@
       );
       console.log(older);
       if (older.length > 0) {
-        $queryClient.setQueryData(
+        queryClient.setQueryData(
           queryKey,
           (before: EventPacket[] | undefined) => [...(before ?? []), ...older]
         );

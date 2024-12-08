@@ -22,7 +22,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import AlertDialog from "./AlertDialog.svelte";
-  import type { Subscriber, Unsubscriber, Updater } from "svelte/store";
+
   import {
     updateMuteByList,
     toMuteList,

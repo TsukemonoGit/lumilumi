@@ -77,9 +77,9 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
       a.event &&
       a.event.id &&
       //   a.event.kind !== 30315 &&
-      !get(queryClient).getQueryData(queryKey)
+      !queryClient.getQueryData(queryKey)
     ) {
-      // if (get(queryClient)) {
+      // if (queryClient) {
       //   createQuery({
       //     queryKey: queryKey,
       //     staleTime: 2 * 60 * 60 * 1000,
@@ -88,7 +88,7 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
       //     refetchInterval: Infinity,
       //     queryFn: () => a,
       //   });}
-      get(queryClient).setQueryData(queryKey, a);
+      queryClient.setQueryData(queryKey, a);
     }
 
     // 新しい順にソート
@@ -178,14 +178,14 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
         return store;
       });
 
-      //  const pre: EventPacket | undefined = get(queryClient).getQueryData([
+      //  const pre: EventPacket | undefined = queryClient.getQueryData([
       //     "userStatus",
       //     dtag,
       //     packet.event.pubkey,
       //   ]);
       //   //const updatedAt = Date.now() + 12 * 60 * 60 * 1000;
       //   if (!pre || packet.event.created_at > pre.event.created_at) {
-      //     get(queryClient).setQueryData(
+      //     queryClient.setQueryData(
       //       ["userStatus", dtag, packet.event.pubkey],
       //       packet
       //     );
@@ -194,7 +194,7 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
       //   "key:",
       //   ["userStatus", dtag, packet.event.pubkey],
       //   "data:",
-      //   get(queryClient).getQueryData([
+      //   queryClient.getQueryData([
       //     "userStatus",
       //     dtag,
       //     packet.event.pubkey,
