@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
     loginUser,
@@ -19,10 +19,8 @@
     type EventPacket,
     type RxReq,
     type RxReqEmittable,
-    type RxReqOverable,
     type RxReqPipeable,
     createTie,
-    type LazyFilter,
   } from "rx-nostr";
   import { onDestroy, onMount, untrack } from "svelte";
   import {

@@ -14,7 +14,6 @@
     toastSettings,
   } from "$lib/stores/stores";
   import {
-    updateMuteByList,
     toMuteList,
     decryptContent,
     encryptPrvTags,
@@ -29,12 +28,14 @@
   } = createTabs({
     defaultValue: "tab-1",
   });
+
   const triggers = [
     { id: "tab-1", title: `Word (${$mutes?.list.word.length})` },
     { id: "tab-2", title: `Hashtag (${$mutes?.list.t.length})` },
     { id: "tab-3", title: `User (${$mutes?.list.p.length})` },
     { id: "tab-4", title: `Thread (${$mutes?.list.e.length})` },
   ];
+
   const [send, receive] = crossfade({
     duration: 250,
     easing: cubicInOut,
@@ -49,7 +50,9 @@
     $nowProgress = true;
     //10000の最新データを取得
     let kind10000 = await refetchKind10000();
+
     console.log(kind10000);
+
     if (!kind10000) {
       $nowProgress = false;
       $toastSettings = {
@@ -90,9 +93,12 @@
         content:
           (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",
       };
+
       const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       console.log(isSuccess);
+
       if (isSuccess.length <= 0) {
         //しっぱい
         $toastSettings = {
@@ -136,7 +142,7 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
             in:send={{ key: "trigger" }}
             out:receive={{ key: "trigger" }}
             class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400"
-></div>
+          ></div>
         {/if}
       </button>
     {/each}

@@ -19,7 +19,7 @@
   import Reply from "../Reply.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, untrack } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
 
@@ -36,7 +36,7 @@
   import ShowStatus from "../ShowStatus.svelte";
 
   import ReplyThread from "../ReplyThread.svelte";
-  import { muteCheck, type MuteCheck } from "$lib/func/muteCheck";
+  import { muteCheck } from "$lib/func/muteCheck";
   import { page } from "$app/stores";
   import ReactionWebsite from "../ReactionWebsite.svelte";
 

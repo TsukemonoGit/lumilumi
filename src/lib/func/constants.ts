@@ -73,7 +73,7 @@ export const initSettings: LumiSetting = {
   // showBanner: true,
   showKind16: false,
   addClientTag: false,
-  showClientTag: true,
+  // showClientTag: true,
   showAllReactions: false,
   kind42inTL: false,
 };

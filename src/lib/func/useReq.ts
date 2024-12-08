@@ -17,7 +17,7 @@ import {
   type RxReqStrategy,
   createRxBackwardReq,
 } from "rx-nostr";
-import { get, writable, derived, type Writable } from "svelte/store";
+import { get, writable, derived } from "svelte/store";
 import { generateRandomId } from "./nostr";
 import { type Observable } from "rxjs";
 

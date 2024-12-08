@@ -48,7 +48,7 @@
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import { setRelaysByKind10002, useRelaySet } from "$lib/stores/useRelaySet";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { EventPacket } from "rx-nostr/src";
   import Kind30078 from "./Kind30078.svelte";
   import {

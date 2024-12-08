@@ -9,7 +9,7 @@ import { binarySearch } from "nostr-tools/utils";
 import { nip19 } from "nostr-tools";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
-import { nip19Regex, urlRegex } from "./regex";
+import { urlRegex } from "./regex";
 
 export let noReactionKind = [3, 10000, 30000];
 
