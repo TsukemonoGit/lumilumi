@@ -138,7 +138,14 @@
       .map((item) => normalizeRelayURL(item.from));
 
     if (isSuccessRelays.length > 0) {
-      queryClient.setQueriesData({ queryKey: queryKey }, (before) => ev);
+      queryClient.setQueriesData(
+        { queryKey: [...queryKey, ev.pubkey] },
+        (before) => {
+          //console.log(before);
+          return ev;
+          //  before.push(ev)});
+        }
+      );
     }
   }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
