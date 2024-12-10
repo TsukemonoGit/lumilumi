@@ -30,7 +30,12 @@
     additionalPostOptions,
     queryClient,
   } from "$lib/stores/stores";
-  import { noReactionKind, normalizeRelayURL, profile } from "$lib/func/util";
+  import {
+    formatToEventPacket,
+    noReactionKind,
+    normalizeRelayURL,
+    profile,
+  } from "$lib/func/util";
 
   import Zapped from "$lib/components/NostrMainData/Zapped.svelte";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -137,17 +142,18 @@
       .filter((item) => item.ok)
       .map((item) => normalizeRelayURL(item.from));
 
-    if (isSuccessRelays.length > 0) {
-      queryClient.setQueriesData(
-        { queryKey: [...queryKey, ev.pubkey] },
-        (before) => {
-          //console.log(before);
-          return ev;
-          //  before.push(ev)});
-        }
+    const queryData = queryClient.getQueryData([...queryKey, ev.pubkey]);
+    //データセットされてないときだけするにする
+    if (isSuccessRelays.length > 0 && !queryData) {
+      queryClient.setQueryData(
+        [...queryKey, ev.pubkey],
+        formatToEventPacket(ev, isSuccessRelays[0])
       );
+      console.log(queryClient.getQueryData([...queryKey, ev.pubkey]));
     }
-    debounceUpdate();
+    setTimeout(() => {
+      debounceUpdate();
+    }, 100);
   }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
@@ -450,13 +456,14 @@
   let updating = false;
 
   function debounceUpdate() {
+    //console.log("debounceupdate", updating);
     if (updating) {
       return;
     }
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    // console.log("debounceupdate");
+
     updating = true;
     timeoutId = setTimeout(() => {
       updateReactionsData();
