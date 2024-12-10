@@ -51,7 +51,7 @@
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
         | undefined = id
         ? new QueryObserver(queryClient, {
-            queryKey: ["reactions", "zapped", id, $loginUser],
+            queryKey: ["reactions", id, "zapped", $loginUser],
           })
         : undefined;
       //ザップ一回したら押せなくなるけど

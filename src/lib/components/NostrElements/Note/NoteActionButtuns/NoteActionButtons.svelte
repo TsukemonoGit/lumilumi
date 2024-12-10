@@ -124,7 +124,7 @@
 
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
 
-    await publishAndSetQuery(ev, ["reactions", "reaction", queryId]);
+    await publishAndSetQuery(ev, ["reactions", queryId, "reaction"]);
   };
 
   async function publishAndSetQuery(
@@ -138,8 +138,16 @@
       .map((item) => normalizeRelayURL(item.from));
 
     if (isSuccessRelays.length > 0) {
-      queryClient.setQueriesData({ queryKey: queryKey }, (before) => ev);
+      queryClient.setQueriesData(
+        { queryKey: [...queryKey, ev.pubkey] },
+        (before) => {
+          //console.log(before);
+          return ev;
+          //  before.push(ev)});
+        }
+      );
     }
+    debounceUpdate();
   }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
@@ -212,7 +220,7 @@
                 tags: tags,
                 content: "",
               };
-        await publishAndSetQuery(ev, ["reactions", "repost", queryId]);
+        await publishAndSetQuery(ev, ["reactions", queryId, "repost"]);
 
         break;
       case 1:
@@ -437,7 +445,7 @@
 
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 2000; // 1秒（ミリ秒）
+  const updateInterval = 1000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
 
@@ -448,6 +456,7 @@
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
+    // console.log("debounceupdate");
     updating = true;
     timeoutId = setTimeout(() => {
       updateReactionsData();
@@ -457,6 +466,11 @@
   $effect(() => {
     if (viewEventIds.get.length > 0 || lumiSetting.get().showAllReactions) {
       //   console.log($state.snapshot(viewEventIds.get.length));
+      // console.log(
+      //   queryClient.getQueriesData({
+      //     queryKey: ["reactions", queryId],
+      //   })
+      // );//これで立ったら複数クエリーの結果が出るけどqueryObserverでは複数のやつ同時にサブスクライブできない
       untrack(() => {
         debounceUpdate();
       });
@@ -467,7 +481,7 @@
     allReactions.repost = (
       queryClient
         .getQueriesData({
-          queryKey: ["reactions", "repost", queryId],
+          queryKey: ["reactions", queryId, "repost"],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -478,7 +492,7 @@
     allReactions.reaction = (
       queryClient
         .getQueriesData({
-          queryKey: ["reactions", "reaction", queryId],
+          queryKey: ["reactions", queryId, "reaction"],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,
@@ -489,7 +503,7 @@
     allReactions.zap = (
       queryClient
         .getQueriesData({
-          queryKey: ["reactions", "zapped", queryId],
+          queryKey: ["reactions", queryId, "zapped"],
         })
         .filter(([key, value]) => (value as EventPacket)?.event) as [
         QueryKey,

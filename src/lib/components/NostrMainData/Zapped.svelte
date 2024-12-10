@@ -31,7 +31,7 @@
     $state();
 
   const observer2 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", "zapped", id, $loginUser],
+    queryKey: ["reactions", id, "zapped", $loginUser],
   });
   const unsubscribe = observer2.subscribe((result: any) => {
     if (

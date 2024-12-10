@@ -31,7 +31,7 @@
   let data = $derived(_result?.data);
 
   const observer1 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", "reaction", id, $loginUser],
+    queryKey: ["reactions", id, "reaction", $loginUser],
   });
 
   const unsubscribe = observer1.subscribe((result: any) => {
