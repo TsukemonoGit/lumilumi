@@ -17,7 +17,7 @@
 
   let data = $derived(_result?.data);
   const observer2 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", "repost", id, $loginUser],
+    queryKey: ["reactions", id, "repost", $loginUser],
   });
   const unsubscribe = observer2.subscribe((result: any) => {
     if (

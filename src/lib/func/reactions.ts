@@ -149,16 +149,16 @@ function handleEvent(v: EventPacket) {
 
   if (v.event.kind === 7 && etag) {
     queryClient.setQueryData(
-      ["reactions", "reaction", etag[1], v.event.pubkey],
+      ["reactions", etag[1], "reaction", v.event.pubkey],
       v
     );
   } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
     queryClient.setQueryData(
-      ["reactions", "repost", etag[1], v.event.pubkey],
+      ["reactions", etag[1], "repost", v.event.pubkey],
       v
     );
   } else if (v.event.kind === 9735 && etag) {
     const zappedUser = zappedPubkey(v.event);
-    queryClient.setQueryData(["reactions", "zapped", etag[1], zappedUser], v);
+    queryClient.setQueryData(["reactions", etag[1], "zapped", zappedUser], v);
   }
 }

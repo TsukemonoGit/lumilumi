@@ -54,7 +54,7 @@
   let invoice: string | undefined = $state(undefined);
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", "zapped", monoZap.noteId, $loginUser],
+    queryKey: ["reactions", monoZap.noteId, "zapped", $loginUser],
   });
   let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {

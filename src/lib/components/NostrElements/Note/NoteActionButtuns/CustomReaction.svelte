@@ -68,7 +68,7 @@
       tags: tags,
       content: customReaction,
     };
-    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
+    await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
     openPopover?.(false);
     customReaction = "";
   };
@@ -89,7 +89,7 @@
       ],
       content: `:${e[0]}:`,
     };
-    await publishAndSetQuery(ev, ["reactions", "reaction", atag ?? note.id]);
+    await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
     openPopover?.(false);
     customReaction = "";
   };
