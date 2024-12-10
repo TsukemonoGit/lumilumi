@@ -456,7 +456,7 @@
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    console.log("debounceupdate");
+    // console.log("debounceupdate");
     updating = true;
     timeoutId = setTimeout(() => {
       updateReactionsData();
