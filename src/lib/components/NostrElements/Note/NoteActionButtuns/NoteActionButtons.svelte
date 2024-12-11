@@ -742,16 +742,20 @@
         <Quote size="20" class={"stroke-magnum-500/75"} />
       </button>
     {/if}
-    <!--リプライ-->
-    <button
-      aria-label="reply"
-      onclick={() => {
-        onClickReplyIcon();
-      }}
-      class="actionButton"
-    >
-      <MessageSquare size="20" />
-    </button>
+    <!--リプライ, kind1,42以外は NIP-22 により kind1111 -->
+    <!--とりあえず1,42以外消す-->
+    {#if note.kind === 1 || note.kind === 42}
+      <button
+        aria-label="reply"
+        onclick={() => {
+          onClickReplyIcon();
+        }}
+        class="actionButton"
+      >
+        <MessageSquare size="20" />
+      </button>
+    {:else}<div class="w-[20px] overflow-hidden"></div>
+    {/if}
   {/if}
 </div>
 
