@@ -1,8 +1,9 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import Reaction from "../Note/Reaction.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import UserPopupMenu from "$lib/components/Elements/UserPopupMenu.svelte";
+  import Reaction from "../kindEvents/Reaction.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import UserPopupMenu from "../user/UserPopupMenu.svelte";
+
   interface Props {
     events: Nostr.Event[];
     tieKey: string | undefined;

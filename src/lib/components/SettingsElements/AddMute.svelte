@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { LumiMute } from "$lib/types";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
@@ -22,9 +21,6 @@
     toMuteList,
   } from "$lib/func/settings";
   import { promisePublishEvent } from "$lib/func/nostr";
-  import { writable } from "svelte/store";
-
-  //export let muteList: LumiMute;
 
   let muteInput: string = $state("");
 

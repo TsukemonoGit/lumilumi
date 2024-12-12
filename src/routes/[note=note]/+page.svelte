@@ -1,10 +1,10 @@
 <script lang="ts">
-  import AllReactions from "$lib/components/NostrMainData/AllReactions.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import AllReactions from "$lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { defaultRelays } from "$lib/stores/stores";
-  import { defaultRelays as defoRelay } from "$lib/stores/relays";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
@@ -16,10 +16,10 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { sortEvents } from "$lib/func/util";
 
-  import Text from "$lib/components/NostrMainData/Text.svelte";
+  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
-  import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
+  import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { type PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();

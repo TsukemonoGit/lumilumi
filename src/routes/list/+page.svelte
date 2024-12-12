@@ -1,8 +1,8 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/Note/EventCard/ListLinkCard.svelte";
-  import ListMain from "$lib/components/NostrMainData/ListMain.svelte";
+  import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
+  import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
   import { _ } from "svelte-i18n";
 
   import { nip19 } from "nostr-tools";

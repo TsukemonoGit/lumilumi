@@ -1,6 +1,6 @@
 <script lang="ts">
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import * as Nostr from "nostr-typedef";
 

@@ -4,8 +4,8 @@
   import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import { _ } from "svelte-i18n";
-  import DecodedContent from "$lib/components/NostrElements/Note/DecodedContent.svelte";
-  import ContentImage from "$lib/components/NostrElements/Note/content/ContentImage.svelte";
+  import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
+  import ContentImage from "$lib/components/NostrElements/content/ContentImage.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {

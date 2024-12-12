@@ -1,0 +1,28 @@
+<!--カスタム絵文字展開付きのName-->
+<script lang="ts">
+  import { parseEmojiText } from "$lib/func/displayname";
+  import CustomEmoji from "../content/CustomEmoji.svelte";
+
+  interface Props {
+    tags: string[][];
+    name: string;
+    height: number;
+  }
+
+  let { tags, name, height }: Props = $props();
+
+  let emojiTags = $derived(
+    tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
+  );
+
+  let parts = $derived(
+    emojiTags.length >= 0 ? parseEmojiText(name, emojiTags) : undefined
+  );
+</script>
+
+{#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
+        {part}
+        {height}
+      />{:else}<span class="inline align-middle">{part.content}</span>{/if}
+  {/each}
+{/if}

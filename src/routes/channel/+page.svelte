@@ -1,8 +1,8 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
-  import ChannelMetadata from "$lib/components/NostrElements/Note/ChannelMetadata.svelte";
-  import ChannelMain from "$lib/components/NostrMainData/ChannelMain.svelte";
+  import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
+  import ChannelMain from "$lib/components/renderSnippets/nostr/ChannelMain.svelte";
 
   import { loginUser } from "$lib/stores/stores";
   import { SquareArrowOutUpRight } from "lucide-svelte";

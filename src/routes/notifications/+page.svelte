@@ -12,8 +12,8 @@
   import NotificationFilter from "./NotificationFilter.svelte";
 
   import { extractKind9734 } from "$lib/func/zap";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   import { _ } from "svelte-i18n";
   import { followList } from "$lib/stores/globalRunes.svelte";

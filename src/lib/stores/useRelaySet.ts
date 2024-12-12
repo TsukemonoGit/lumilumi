@@ -68,12 +68,15 @@ export function toRelaySet(
         if (
           !kind10002 &&
           (!kind3 || packet.event.created_at > kind3.created_at)
-        )
+        ) {
           relay = setRelaysByKind3(packet.event);
-        kind3 = packet.event;
+          kind3 = packet.event;
+        }
       } else if (packet.event.kind === 10002) {
-        if (!kind10002 || packet.event.created_at > kind10002.created_at)
+        if (!kind10002 || packet.event.created_at > kind10002.created_at) {
           relay = setRelaysByKind10002(packet.event);
+          kind10002 = packet.event;
+        }
       }
     });
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）

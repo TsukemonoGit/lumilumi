@@ -29,7 +29,7 @@
   import UpdateMuteList from "./UpdateMuteList.svelte";
   import { Save, X, Image, RotateCw } from "lucide-svelte";
 
-  import CustomReaction from "../NostrElements/Note/NoteActionButtuns/CustomReaction.svelte";
+  import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
   import Dialog from "../Elements/Dialog.svelte";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";

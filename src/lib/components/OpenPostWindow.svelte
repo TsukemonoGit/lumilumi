@@ -41,15 +41,15 @@
     MargePostOptions,
     Profile,
   } from "$lib/types";
-  import EventCard from "./NostrElements/Note/EventCard/EventCard.svelte";
+  import EventCard from "./NostrElements/kindEvents/EventCard/EventCard.svelte";
   import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
-  import Metadata from "./NostrMainData/Metadata.svelte";
+  import Metadata from "./renderSnippets/nostr/Metadata.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
-  import Content from "./NostrElements/Note/Content.svelte";
+  import Content from "./NostrElements/content/Content.svelte";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 

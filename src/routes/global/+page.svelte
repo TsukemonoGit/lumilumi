@@ -1,6 +1,4 @@
 <script lang="ts">
-  import SetGlobalRelays from "$lib/components/NostrMainData/SetGlobalRelays.svelte";
-
   import {
     loginUser,
     nowProgress,
@@ -23,6 +21,7 @@
   import type { EventPacket } from "rx-nostr";
   import { page } from "$app/stores";
   import { writable, type Writable } from "svelte/store";
+  import SetGlobalRelays from "$lib/components/renderSnippets/nostr/relay/SetGlobalRelays.svelte";
 
   let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);

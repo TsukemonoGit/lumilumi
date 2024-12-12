@@ -20,10 +20,10 @@
   import { X, Save } from "lucide-svelte";
   import { page } from "$app/stores";
   import { generateResultMessage } from "$lib/func/util";
-  import EllipsisMenu from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenu.svelte";
+  import EllipsisMenu from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
-  import NoteTemplate from "$lib/components/NostrElements/Note/NoteTemplate.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import NoteTemplate from "$lib/components/NostrElements/kindEvents/NoteTemplate.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { relayRegex2 } from "$lib/func/regex";
   import { type PageData } from "./$types";
