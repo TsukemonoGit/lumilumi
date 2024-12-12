@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
@@ -9,14 +9,14 @@
   import * as Nostr from "nostr-typedef";
 
   import { onMount } from "svelte";
-  import AllReactions from "$lib/components/NostrMainData/AllReactions.svelte";
+  import AllReactions from "$lib/components/renderSnippets/nostr/reaction/AllReactions.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
   import ZapReactionList from "$lib/components/NostrElements/AllReactionsElement/ZapReactionList.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
   import { sortEvents } from "$lib/func/util";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import NoteInfo from "$lib/components/NostrElements/Note/NoteInfo.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { page } from "$app/stores";
   import type { PageData } from "./$types";
 

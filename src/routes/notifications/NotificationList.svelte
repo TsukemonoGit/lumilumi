@@ -28,8 +28,8 @@
   import {
     waitForConnections,
     loadOlderEvents,
-  } from "$lib/components/NostrMainData/timelineList";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  } from "$lib/components/renderSnippets/nostr/timelineList";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { writable, type Writable } from "svelte/store";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";

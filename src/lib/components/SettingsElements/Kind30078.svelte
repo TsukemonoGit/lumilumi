@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import {
     loginUser,
@@ -38,9 +37,6 @@
     saveLumiSettings,
     settings = $bindable(),
   }: Props = $props();
-  // export let settingsChanged: () => boolean;
-  // export let saveLumiSettings: () => void;
-  // export let settings: LumiSetting;
 
   let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;

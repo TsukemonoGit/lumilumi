@@ -17,7 +17,7 @@
   import { _ } from "svelte-i18n";
 
   import Link from "$lib/components/Elements/Link.svelte";
-  import Content from "$lib/components/NostrElements/Note/Content.svelte";
+  import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { generateResultMessage } from "$lib/func/util";
 
   import { nip19 } from "nostr-tools";
@@ -25,7 +25,7 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
 
   import InputImageFromFile from "./InputImageFromFile.svelte";
-  import DisplayName from "$lib/components/Elements/DisplayName.svelte";
+  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 

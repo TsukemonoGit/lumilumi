@@ -1,12 +1,12 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import ListLinkCard from "$lib/components/NostrElements/Note/EventCard/ListLinkCard.svelte";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-  import ListUsersCard from "$lib/components/NostrMainData/ListUsersCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
+  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import ListUsersCard from "$lib/components/NostrElements/ListUsersCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";

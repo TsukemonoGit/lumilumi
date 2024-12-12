@@ -2,7 +2,7 @@
   import { afterNavigate, goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
 
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
   import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -12,8 +12,8 @@
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
   import { _ } from "svelte-i18n";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   const timelineQuery: QueryKey = ["globalchannel"];

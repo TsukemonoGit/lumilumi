@@ -1,8 +1,8 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";

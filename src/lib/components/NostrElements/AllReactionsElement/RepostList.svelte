@@ -1,8 +1,7 @@
 <script lang="ts">
-  import UserPopupMenu from "$lib/components/Elements/UserPopupMenu.svelte";
-
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
+  import UserPopupMenu from "../user/UserPopupMenu.svelte";
 
   interface Props {
     events: Nostr.Event[];

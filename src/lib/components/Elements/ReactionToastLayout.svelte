@@ -1,18 +1,17 @@
 <script lang="ts">
   import { Repeat, Reply, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import Reaction from "../NostrElements/Note/Reaction.svelte";
+  import Reaction from "../NostrElements/kindEvents/Reaction.svelte";
   import { extractZappedId, replyedEvent, repostedId } from "$lib/func/event";
-  import ReactionToastContent from "../NostrElements/Note/ReactionToastContent.svelte";
-  import UserName from "../NostrElements/Note/UserName.svelte";
+  import ReactionToastContent from "../NostrElements/kindEvents/ReactionToastContent.svelte";
+  import UserName from "../NostrElements/user/UserName.svelte";
   import { extractKind9734, extractAmount } from "$lib/func/zap";
-  import Content from "../NostrElements/Note/Content.svelte";
+  import Content from "../NostrElements/content/Content.svelte";
   interface Props {
     event: Nostr.Event;
   }
 
   let { event }: Props = $props();
-
 
   const getHandledTag = (event: Nostr.Event): string[] | undefined => {
     switch (event.kind) {

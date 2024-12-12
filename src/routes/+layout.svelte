@@ -25,12 +25,12 @@
   import Toast from "$lib/components/Elements/Toast.svelte";
 
   import { QueryClientProvider } from "@tanstack/svelte-query";
-  import LoadingElement from "$lib/components/NostrMainData/LoadingElement.svelte";
+  import LoadingElement from "$lib/components/LoadingElement.svelte";
   import Menu from "./Menu.svelte";
   import Sidebar from "./Sidebar.svelte";
   import { afterNavigate } from "$app/navigation";
-  import NostrMain from "$lib/components/NostrMainData/NostrMain.svelte";
-  import SetDefaultRelays from "$lib/components/NostrMainData/SetDefaultRelays.svelte";
+  import NostrMain from "$lib/components/renderSnippets/nostr/NostrMain.svelte";
+  import SetDefaultRelays from "$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
   import { page } from "$app/stores";
   import workerUrl from "$lib/worker?worker&url";
   import {
@@ -40,7 +40,7 @@
   import { mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
   import type { Part } from "$lib/func/content";
-  import SetRepoReactions from "$lib/components/NostrMainData/SetRepoReactions.svelte";
+  import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
   import {
     rxNostr3RelaysReconnectChallenge,

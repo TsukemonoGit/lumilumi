@@ -26,8 +26,8 @@
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
-  } from "$lib/components/NostrMainData/timelineList";
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  } from "$lib/components/renderSnippets/nostr/timelineList";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { readable } from "svelte/store";
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";

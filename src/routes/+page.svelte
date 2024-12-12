@@ -1,5 +1,5 @@
 <script lang="ts">
-  import NostrElements from "$lib/components/NostrElements.svelte";
+  import NostrElements from "./NostrElements.svelte";
 </script>
 
 <section class="w-full break-words overflow-hidden">

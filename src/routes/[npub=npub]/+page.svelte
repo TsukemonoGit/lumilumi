@@ -1,18 +1,18 @@
 <script lang="ts">
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
-  import TimelineList from "$lib/components/NostrMainData/TimelineList.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import UserProfile from "$lib/components/Elements/UserProfile.svelte";
+  import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
   import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId, setRelays } from "$lib/func/nostr";
-  import EventCard from "$lib/components/NostrElements/Note/EventCard/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
-  import LatestEvent from "$lib/components/NostrMainData/LatestEvent.svelte";
-  import Note from "$lib/components/NostrElements/Note/Note.svelte";
-  import RelayCard from "$lib/components/NostrElements/Note/EventCard/RelayCard.svelte";
+  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import Note from "$lib/components/NostrElements/kindEvents/Note.svelte";
+  import RelayCard from "$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
 
   import {
     Pin,
@@ -30,14 +30,14 @@
   import { loginUser, queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
-  import Contacts from "$lib/components/NostrMainData/Contacts.svelte";
+  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
   import PaginationList from "./PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
-  import EllipsisMenuNaddr from "$lib/components/NostrElements/Note/NoteActionButtuns/EllipsisMenuNaddr.svelte";
+  import EllipsisMenuNaddr from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
-  import NaddrEvent from "$lib/components/NostrElements/Note/NaddrEvent.svelte";
+  import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
 
   interface Props {
     data: {

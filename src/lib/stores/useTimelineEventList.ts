@@ -4,16 +4,13 @@ import type {
   EventPacket,
   RxReq,
   RxReqEmittable,
-  RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
 
 import type { OperatorFunction } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
-import { useForwardReq, useReq } from "$lib/func/useReq";
-
-//import { useReq } from "$lib/func/useReq.js";
+import { useForwardReq } from "$lib/func/useReq";
 
 export function useTimelineEventList(
   queryKey: QueryKey,

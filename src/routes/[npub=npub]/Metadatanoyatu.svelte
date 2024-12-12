@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Kind0Note from "$lib/components/NostrElements/Note/EventCard/Kind0Note.svelte";
+  import Kind0Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
 
-  import Metadata from "$lib/components/NostrMainData/Metadata.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { nip19 } from "nostr-tools";
   import { untrack } from "svelte";
 
