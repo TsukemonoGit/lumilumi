@@ -14,7 +14,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
-  import SetSearchRelays from "$lib/components/NostrMainData/SetSearchRelays.svelte";
+
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
@@ -24,6 +24,7 @@
 
   import type { PageData } from "./$types";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import SetSearchRelays from "$lib/components/renderSnippets/nostr/relay/SetSearchRelays.svelte";
 
   let { data }: { data: PageData } = $props();
 

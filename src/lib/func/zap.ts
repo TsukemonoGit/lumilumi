@@ -4,7 +4,7 @@ import * as Nostr from "nostr-typedef";
 import { getDefaultWriteRelays, usePromiseReq } from "./nostr";
 import { bech32 } from "@scure/base";
 import { type QueryKey } from "@tanstack/svelte-query";
-import { get } from "svelte/store";
+
 import { queryClient } from "$lib/stores/stores";
 import { latest, uniq, type EventPacket } from "rx-nostr";
 import { pipe } from "rxjs";
