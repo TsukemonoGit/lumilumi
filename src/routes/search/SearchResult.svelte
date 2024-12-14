@@ -10,6 +10,7 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import { unsucscribeSearch } from "$lib/func/useReq";
 
   let amount = 50;
   let viewIndex = 0;
@@ -23,15 +24,15 @@
   $inspect(filters);
   const tieKey = "search";
 
-  onMount(() => {
-    console.log("relays", relays);
-  });
+  // onMount(() => {
+  //   console.log("relays", relays);
+  // });
   // afterNavigate(() => {
   //   console.log("relays", relays);
   // });
   onDestroy(() => {
     console.log("onDestroy");
-
+    unsucscribeSearch();
     // queryClient.cancelQueries({
     //   queryKey: ["search"],
     // });
