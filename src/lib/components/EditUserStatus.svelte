@@ -275,7 +275,7 @@
         <input
           class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
-          id="URL"
+          id="statusURL"
           type="url"
           bind:value={userURL}
           placeholder="https,note,npub,naddr,etc"

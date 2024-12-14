@@ -109,7 +109,12 @@
             </div>
           {/each}
           <div class="flex my-1 gap-1">
-            <input type="text" placeholder="wss://" bind:value={newRelayURL} />
+            <input
+              id="relay"
+              type="text"
+              placeholder="wss://"
+              bind:value={newRelayURL}
+            />
             <button
               class="rounded-full px-1 bg-magnum-700 hover:opacity-75 active:opacity-50"
               onclick={handleClickAdd}>ADD</button

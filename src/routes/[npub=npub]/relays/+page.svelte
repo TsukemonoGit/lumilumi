@@ -428,6 +428,7 @@
     </table>
     <div class="mt-2 flex items-center w-full">
       <input
+        id="relay"
         type="text"
         class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
         placeholder="wss://"

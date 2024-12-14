@@ -853,6 +853,7 @@
                 <input
                   bind:this={emojiInput}
                   type="text"
+                  id="emoji"
                   class="h-8 w-full rounded-md text-magnum-100 border-2
             border-magnum-400"
                   bind:value={customReaction}
@@ -878,6 +879,7 @@
               <input
                 bind:this={metadataInput}
                 type="text"
+                id="npub"
                 class="h-8 w-full rounded-md text-magnum-100 border-2
          border-magnum-400"
                 bind:value={inputMetadata}
