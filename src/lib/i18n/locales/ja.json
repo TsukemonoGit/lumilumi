@@ -242,5 +242,15 @@
       "fetchError": "データの取得中にエラーが発生しました",
       "corsError": "CORSエラー"
     }
-  }
+  },
+  "shortcut": {
+    "title": "キーボードショートカット",
+    "N": "投稿作成画面を開く",
+    "CtrlEnter": "投稿を送信（投稿作成画面で）",
+    "EscEsc": "投稿作成画面を閉じる"
+  },
+  "sourceCode": "ソースコード",
+  "author": "作",
+  "mascot": "マスコット",
+  "others": "他"
 }

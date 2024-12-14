@@ -639,7 +639,7 @@
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
 {#if visible}
   <button
-    title="open post window"
+    title="Open post window (N)"
     use:melt={$trigger}
     class="inline-flex items-center justify-center rounded-full bg-neutral-900 border border-magnum-300 p-3.5
   font-medium leading-none text-magnum-300 shadow hover:opacity-75 z-30"
@@ -712,6 +712,7 @@
         <button
           use:melt={$close}
           aria-label="close"
+          title="Close (Esc)"
           class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
                 items-center justify-center rounded-full text-magnum-800 bg-magnum-100
                 hover:bg-magnum-100/75 active:shadow-magnum-400"
@@ -902,7 +903,8 @@
             <!---->
             <button
               disabled={isPosting || text.trim() === ""}
-              aria-label="post note"
+              aria-label="post"
+              title="Post (Ctrl+Enter)"
               class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-20"
               onclick={postNote}
