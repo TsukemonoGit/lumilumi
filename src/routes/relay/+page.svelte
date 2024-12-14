@@ -2,4 +2,4 @@
   let { relayURL } = $props();
 </script>
 
-<input value={relayURL} />
+<input id="relay" value={relayURL} />

@@ -127,7 +127,7 @@
     <div class="font-medium text-magnum-400">keyword</div>
     <input
       type="text"
-      id="word"
+      id="search"
       class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
       placeholder=""
       bind:value={searchWord}

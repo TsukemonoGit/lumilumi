@@ -111,6 +111,7 @@
     <div>
       <div class="flex gap-1 pr-8 pl-2 max-w-80">
         <input
+          id="emoji"
           type="text"
           class="h-10 w-32 rounded-md px-3 py-2 text-magnum-100 border
                {customReactionError ? 'border-red-500' : 'border-neutral-900'}"

@@ -8,7 +8,7 @@
     queryClient,
     tieMapStore,
   } from "$lib/stores/stores";
-  import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
+
   import type { ReqStatus } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
@@ -33,6 +33,7 @@
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { useSearchEventList } from "$lib/stores/useSearchEventList";
 
   const sift = 40; //スライドする量
   let untilTime: number = 0;
@@ -119,7 +120,7 @@
   );
   let result = $derived(
     filters[0].since === undefined
-      ? useTimelineEventList(queryKey, reqFilters, operator, req, relays)
+      ? useSearchEventList(queryKey, reqFilters, operator, req, relays)
       : {
           data: undefined,
           status: readable("loading" as ReqStatus),
