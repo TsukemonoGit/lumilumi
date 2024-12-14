@@ -19,7 +19,7 @@ import {
 } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
 import { generateRandomId } from "./nostr";
-import { type Observable } from "rxjs";
+import { Subscription, type Observable } from "rxjs";
 
 export function useReq(
   {
@@ -225,6 +225,113 @@ export function useForwardReq(
         let fulfilled = false;
 
         obs.subscribe({
+          next: (v: EventPacket | EventPacket[]) => {
+            //console.log(v);
+            if (fulfilled) {
+              _queryClient.setQueryData(queryKey, v);
+            } else {
+              resolve(v);
+              fulfilled = true;
+            }
+          },
+
+          complete: () => status.set("success"),
+          error: (e) => {
+            console.error("[rx-nostr]", e);
+            status.set("error");
+            error.set(e);
+
+            if (!fulfilled) {
+              console.log("fulfilled");
+              reject(e);
+              fulfilled = true;
+            }
+          },
+        });
+        req.emit(filters);
+      });
+    },
+  });
+
+  return {
+    data: derived(query, ($query) => $query.data, initData),
+    status: derived([query, status], ([$query, $status]) => {
+      //console.log($query.data);
+      if ($query.isSuccess) {
+        return "success";
+      } else if ($query.isError) {
+        return "error";
+      } else {
+        return $status;
+      }
+    }),
+    error: derived([query, error], ([$query, $error]) => {
+      if ($query.isError) {
+        return $query.error;
+      } else {
+        return $error;
+      }
+    }),
+  };
+}
+
+let searchSubscription: Subscription;
+export function useSearchReq(
+  {
+    queryKey,
+    filters,
+    operator,
+    req,
+    initData,
+  }: UseForwardReqOpts<EventPacket | EventPacket[]>,
+  relays: string[] | undefined = undefined,
+  { staleTime, gcTime, initialDataUpdatedAt, refetchInterval }: UseQueryOpt = {
+    staleTime: Infinity,
+    gcTime: Infinity,
+    initialDataUpdatedAt: undefined,
+    refetchInterval: Infinity,
+  }
+): ReqResult<EventPacket | EventPacket[]> {
+  if (searchSubscription) {
+    //前回のサーチのサブスクリプションを終わらせる
+    searchSubscription.unsubscribe();
+  }
+  const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
+
+  if (!_queryClient) {
+    console.log("!_queryClient error");
+    throw Error();
+  }
+  const _rxNostr = get(app).rxNostr;
+  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+    console.log("DefaultRelays error", queryKey);
+    throw Error();
+  }
+
+  const status = writable<ReqStatus>("loading");
+  const error = writable<Error>();
+  //const tie = get(tieMapStore)?.[tieKey]?.[0];
+  // const obs: Observable<EventPacket | EventPacket[]> = tie
+  //   ? _rxNostr.use(_req, { relays: relays }).pipe(tie, metadata(), operator) //muteCheck(),
+  //   : _rxNostr.use(_req, { relays: relays }).pipe(metadata(), operator); //metadataのほぞんnextのとこにかいたら処理間に合わなくて全然保存されなかったからpipeにかいてみる//muteCheck(),
+
+  //一定時間立って削除したデータの再取得できるように
+  const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
+    .use(req, { relays: relays })
+    .pipe(metadata(), operator);
+
+  const query = createQuery({
+    queryKey: queryKey,
+    staleTime: staleTime,
+    initialData: initData,
+    initialDataUpdatedAt: initialDataUpdatedAt,
+    refetchInterval: refetchInterval,
+    gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
+    queryFn: (): Promise<EventPacket | EventPacket[]> => {
+      return new Promise((resolve, reject) => {
+        let fulfilled = false;
+
+        searchSubscription = obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
             //console.log(v);
             if (fulfilled) {

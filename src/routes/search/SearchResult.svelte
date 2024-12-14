@@ -19,18 +19,19 @@
   }
 
   let { filters, relays }: Props = $props();
-
-  //$: console.log(filters);
+  const req = createRxForwardReq();
+  $inspect(filters);
   const tieKey = "search";
 
-  // onMount(() => {
-  //   console.log("relays", relays);
-  // });
+  onMount(() => {
+    console.log("relays", relays);
+  });
   // afterNavigate(() => {
   //   console.log("relays", relays);
   // });
   onDestroy(() => {
     console.log("onDestroy");
+
     // queryClient.cancelQueries({
     //   queryKey: ["search"],
     // });
@@ -47,7 +48,7 @@
     <SearchResultList
       queryKey={["search"]}
       {filters}
-      req={createRxForwardReq()}
+      {req}
       {viewIndex}
       {amount}
       {tieKey}
