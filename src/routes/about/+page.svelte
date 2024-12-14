@@ -138,9 +138,27 @@
 <!-- <h1 class="title my-4">ABOUT</h1> -->
 <section class="border border-magnum-500 rounded-md h-full my-4 mx-2 p-2">
   <h1 class="title my-4 text-center">lumilumi the nostr client</h1>
-  <ul>
+  <ul class="w-full px-4">
     <li>
-      <div class="list">Source code</div>
+      <div class="list">{$_("shortcut.title")}</div>
+      <div class="item">
+        <table>
+          <thead>
+            <tr>
+              <th> Key </th>
+              <th> Command </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr> <td>N</td><td>{$_("shortcut.N")}</td></tr>
+            <tr><td>Ctrl+Enter</td><td>{$_("shortcut.CtrlEnter")}</td></tr>
+            <tr><td>Esc Esc</td><td>{$_("shortcut.EscEsc")}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </li>
+    <li>
+      <div class="list">{$_("sourceCode")}</div>
       <div class="item">
         <Link
           href="https://github.com/TsukemonoGit/lumilumi"
@@ -153,7 +171,7 @@
       </div>
     </li>
     <li>
-      <div class="list">Author</div>
+      <div class="list">{$_("author")}</div>
       <div class="item">
         <Link
           href="https://lumilumi.vercel.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
@@ -164,7 +182,7 @@
       </div>
     </li>
     <li>
-      <div class="list">Mascot of lumilumi</div>
+      <div class="list">{$_("mascot")}</div>
       <div class="item">
         Illustration by <a
           class="underline"
@@ -213,7 +231,7 @@
       </div>
     </li>
     <li>
-      <div class="list">Others</div>
+      <div class="list">{$_("others")}</div>
       <ul>
         <li>
           <div class="item flex flex-wrap gap-2 items-center">
@@ -324,7 +342,7 @@
     text-decoration: none;
   }
   .list {
-    @apply font-bold my-2 text-lg;
+    @apply font-bold  mt-6 mb-2 text-lg border-b border-magnum-500 p-1 text-magnum-500;
   }
   .item {
     @apply ml-4;
@@ -432,5 +450,23 @@
 
   makibishi-component::part(ellipsis) {
     padding-inline: 6px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    /* background-color: theme("colors.neutral.800"); */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  th,
+  td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid theme("colors.neutral.600");
+  }
+  th {
+    background-color: theme("colors.neutral.700");
+    font-weight: bold;
   }
 </style>

@@ -243,5 +243,15 @@
       "fetchError": "An error occurred during fetch",
       "corsError": "CORS error."
     }
-  }
+  },
+  "shortcut": {
+    "title": "Keyboard Shortcut",
+    "N": "Open Create Post Window",
+    "CtrlEnter": "Submit the post (from the Create Post Window)",
+    "EscEsc": "Close the Create Post Window"
+  },
+  "sourceCode": "Source code",
+  "author": "Author",
+  "mascot": "Mascot of lumilumi",
+  "others": "Others"
 }
