@@ -10,6 +10,7 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import { unsucscribeSearch } from "$lib/func/useReq";
 
   let amount = 50;
   let viewIndex = 0;
@@ -31,7 +32,7 @@
   // });
   onDestroy(() => {
     console.log("onDestroy");
-
+    unsucscribeSearch();
     // queryClient.cancelQueries({
     //   queryKey: ["search"],
     // });

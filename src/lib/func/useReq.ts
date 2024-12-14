@@ -276,6 +276,13 @@ export function useForwardReq(
 }
 
 let searchSubscription: Subscription;
+
+export function unsucscribeSearch() {
+  if (searchSubscription) {
+    //前回のサーチのサブスクリプションを終わらせる
+    searchSubscription.unsubscribe();
+  }
+}
 export function useSearchReq(
   {
     queryKey,
