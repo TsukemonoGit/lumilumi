@@ -37,7 +37,7 @@ export function useRelaySet(
   setRelays(relaySearchRelays);
 
   const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
-  console.log(queryKey, filters, operator, req);
+  //console.log(queryKey, filters, operator, req);
   const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
     staleTime: Infinity,
     gcTime: Infinity,

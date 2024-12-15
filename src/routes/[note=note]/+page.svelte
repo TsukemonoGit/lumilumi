@@ -10,9 +10,9 @@
   import NoteReactionList from "$lib/components/NostrElements/AllReactionsElement/NoteReactionList.svelte";
   import NoteRepostList from "$lib/components/NostrElements/AllReactionsElement/NoteRepostList.svelte";
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
-  import { setRelays } from "$lib/func/nostr";
-  import { afterNavigate, goto } from "$app/navigation";
-  import { onDestroy, onMount } from "svelte";
+
+  import { goto } from "$app/navigation";
+  //import { onDestroy, onMount } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { sortEvents } from "$lib/func/util";
 
@@ -24,35 +24,37 @@
 
   let { data }: { data: PageData } = $props();
 
-  let tieKey = $derived(data.id);
-  let isMount = false;
-  onMount(() => {
-    init();
-  });
-  afterNavigate((navigate) => {
-    console.log("afterNavigate", navigate.type);
-    if (navigate.type !== "form") {
-      init();
-    }
-  });
+  let tieKey = undefined;
 
-  function init() {
-    if (isMount) {
-      return;
-    }
-    isMount = true;
-    // const nrelays = data?.relays?.filter((relay) => relay.startsWith("ws"));
-    // if (!$defaultRelays && data.relays && nrelays && nrelays.length > 0) {
-    //   //setRelays(nrelays);
-    // } else if (!$defaultRelays) {
-    //   setRelays(defoRelay);
-    // }
+  //デフォリレーの設定はrootのSetDefaultRelayのとこでやってるはず
+  // let isMount = false;
+  // onMount(() => {
+  //   init();
+  // });
+  // afterNavigate((navigate) => {
+  //   console.log("afterNavigate", navigate.type);
+  //   if (navigate.type !== "form") {
+  //     init();
+  //   }
+  // });
 
-    isMount = false;
-  }
-  onDestroy(() => {
-    console.log("destroy");
-  });
+  // function init() {
+  //   if (isMount) {
+  //     return;
+  //   }
+  //   isMount = true;
+  //   // const nrelays = data?.relays?.filter((relay) => relay.startsWith("ws"));
+  //   // if (!$defaultRelays && data.relays && nrelays && nrelays.length > 0) {
+  //   //   //setRelays(nrelays);
+  //   // } else if (!$defaultRelays) {
+  //   //   setRelays(defoRelay);
+  //   // }
+
+  //   isMount = false;
+  // }
+  // onDestroy(() => {
+  //   console.log("destroy");
+  // });
   const repostable = true;
 
   const maxHeight = "none";
@@ -69,7 +71,7 @@
   };
 </script>
 
-{#if Object.entries($defaultRelays).length > 0}
+{#if $defaultRelays && Object.entries($defaultRelays).length > 0}
   <section class="mb-20">
     <!-- <SetRepoReactions /> -->
     <div class="max-w-[100vw] break-words box-border w-full">

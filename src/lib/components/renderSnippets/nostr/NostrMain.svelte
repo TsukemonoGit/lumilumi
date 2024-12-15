@@ -124,7 +124,7 @@
       setRelays(localRelays as DefaultRelayConfig[]);
     } else {
       localRelays = [];
-      setRelays(relaySearchRelays);
+      // setRelays(relaySearchRelays);
     }
     pubkey = $loginUser = lumiSetting.get().pubkey;
   }

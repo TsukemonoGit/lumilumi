@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { setRelays } from "$lib/func/nostr";
+  //import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
@@ -33,7 +33,7 @@
   let loading = $state(true);
 
   let isOnMount = false;
-  let since: number | undefined = undefined;
+  //let since: number | undefined = undefined;
   const maxHeight = "none";
   onMount(() => {
     if (!isOnMount) {
@@ -57,13 +57,13 @@
     if (data.kind === 30000) {
       goto(`list/${$page.params.naddr}`);
     }
-    since = undefined;
+    // since = undefined;
 
-    if ($defaultRelays) {
-      setRelays($defaultRelays);
-    } else if (!$defaultRelays && data.relays) {
-      setRelays(data.relays);
-    }
+    // if ($defaultRelays) {
+    //   setRelays($defaultRelays);
+    // } else if (!$defaultRelays && data.relays) {
+    //   setRelays(data.relays);
+    // }
 
     loading = false;
   }
@@ -71,7 +71,7 @@
 
 {#if loading}
   loading
-{:else}
+{:else if Object.entries($defaultRelays).length > 0}
   <section class="container">
     <LatestEvent queryKey={["naddr", atag]} {filters}>
       {#snippet loading()}
@@ -140,23 +140,6 @@
             </div>
           {/snippet}
         </Metadata>
-
-        <!-- <Metadata
-          queryKey={["metadata", event.pubkey]}
-          pubkey={event.pubkey}
-          let:metadata
-        >
-          <div slot="loading" class="w-full">
-            <EventCardNaddr note={event} repostable={true} />
-          </div>
-          <div slot="nodata" class="w-full">
-            <EventCardNaddr note={event} repostable={true} />
-          </div>
-          <div slot="error" class="w-full">
-            <EventCardNaddr note={event} repostable={true} />
-          </div>
-          <EventCardNaddr {metadata} note={event} repostable={true} />
-        </Metadata> -->
 
         <AllReactions queryKey={["allreactions", atag]} {atag}>
           {#snippet loading()}

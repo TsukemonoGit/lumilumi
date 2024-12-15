@@ -39,7 +39,7 @@
   } from "rx-nostr-crypto";
   import { mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
-  import type { Part } from "$lib/func/content";
+
   import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
   import {
@@ -48,6 +48,7 @@
   } from "$lib/func/reactions";
   import { writable, type Writable } from "svelte/store";
   import { displayEvents, showBanner } from "$lib/stores/globalRunes.svelte";
+  import { defaultRelays } from "$lib/stores/relays";
 
   let { data, children } = $props<{
     data:
@@ -208,6 +209,15 @@
       }, 0);
     }
   });
+
+  let dataRelays = $derived(
+    data?.relays && data?.relays.length > 0
+      ? [...data.relays, ...defaultRelays].slice(
+          0,
+          Math.max(data.relays.length, 3)
+        )
+      : undefined
+  ); //data.relaysにちょっとしかなかったらデフォリレーから足す
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -251,13 +261,11 @@
       <!---->
     {/snippet}
     {#snippet contents({ pubkey, localRelays })}
-      <SetDefaultRelays paramRelays={data?.relays} {pubkey} {localRelays}>
+      <SetDefaultRelays paramRelays={dataRelays} {pubkey} {localRelays}>
         {#snippet loading()}
           loading
         {/snippet}
-        {#snippet nodata()}
-          nodata
-        {/snippet}
+
         {#snippet error()}error
         {/snippet}
         {#snippet contents({ relays, status })}
