@@ -574,84 +574,82 @@
       {/snippet}
       {#snippet content({ metadata })}
         {@const prof = profile(metadata)}
-        {#if prof && (prof.lud16 || prof.lud06)}<!--lud16がある人のみ⚡️表示lud06もあるよ-->
-          <div class="flex items-end">
-            <Zapped id={atag ?? note.id}>
-              {#snippet loading()}
+        <!--lud16がある人のみ⚡️表示lud06もあるよ-->
+        <div class="flex items-end">
+          <Zapped id={atag ?? note.id}>
+            {#snippet loading()}
+              <button
+                class="actionButton"
+                disabled={!prof || (!prof.lud16 && !prof.lud06)}
+                onclick={handleClickZap}
+                aria-label="zap"
+              >
+                <Zap size="20" />
+              </button>
+            {/snippet}
+            {#snippet content({ event })}
+              {#if event === undefined}
                 <button
+                  disabled={!prof || (!prof.lud16 && !prof.lud06)}
                   class="actionButton"
-                  onclick={handleClickZap}
                   aria-label="zap"
+                  onclick={handleClickZap}
                 >
                   <Zap size="20" />
                 </button>
-              {/snippet}
-              {#snippet content({ event })}
-                {#if event === undefined}
-                  <button
-                    class="actionButton"
-                    aria-label="zap"
-                    onclick={handleClickZap}
-                  >
-                    <Zap size="20" />
-                  </button>
-                {:else}
-                  <Zap
-                    size="20"
-                    class=" fill-magnum-500/75 text-magnum-500  min-w-4 my-auto"
-                  />
-                {/if}
-              {/snippet}
-            </Zapped><span class="text-sm"
-              >{#if allReactions.zap.length > 0}{allReactions.zap
-                  .length}{/if}</span
-            >
-          </div>
-          <AlertDialog
-            bind:openDialog={dialogOpen}
-            onClickOK={() => onClickOK(metadata)}
-            title="Zap"
-            >{#snippet main()}
-              <div class=" text-neutral-200">
-                <div class="rounded-md">
-                  <EventCard
-                    maxHeight={"12rem"}
-                    {note}
-                    {metadata}
-                    displayMenu={false}
-                    repostable={false}
-                    {tieKey}
-                  />
-                </div>
-                <div class="mt-4 rounded-md">
-                  <div class="pt-2 font-bold text-magnum-300 text-lg">
-                    amount
-                  </div>
-                  <input
-                    bind:this={amountEle}
-                    type="number"
-                    id="amount"
-                    class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-                    placeholder="amount"
-                    bind:value={zapAmount}
-                  />
-                  <div class="pt-1 text-magnum-300 font-bold text-lg">
-                    comment
-                  </div>
-                  <input
-                    type="text"
-                    id="comment"
-                    class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
-                    placeholder="comment"
-                    bind:value={zapComment}
-                  />
-                </div>
-              </div>
-            {/snippet}</AlertDialog
+              {:else}
+                <Zap
+                  size="20"
+                  class=" fill-magnum-500/75 text-magnum-500  min-w-4 my-auto"
+                />
+              {/if}
+            {/snippet}
+          </Zapped><span class="text-sm"
+            >{#if allReactions.zap.length > 0}{allReactions.zap
+                .length}{/if}</span
           >
-        {:else}<div class="w-[20px] overflow-hidden">
-            <!---->
-          </div>{/if}{/snippet}</Metadata
+        </div>
+        <AlertDialog
+          bind:openDialog={dialogOpen}
+          onClickOK={() => onClickOK(metadata)}
+          title="Zap"
+          >{#snippet main()}
+            <div class=" text-neutral-200">
+              <div class="rounded-md">
+                <EventCard
+                  maxHeight={"12rem"}
+                  {note}
+                  {metadata}
+                  displayMenu={false}
+                  repostable={false}
+                  {tieKey}
+                />
+              </div>
+              <div class="mt-4 rounded-md">
+                <div class="pt-2 font-bold text-magnum-300 text-lg">amount</div>
+                <input
+                  bind:this={amountEle}
+                  type="number"
+                  id="amount"
+                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+                  placeholder="amount"
+                  bind:value={zapAmount}
+                />
+                <div class="pt-1 text-magnum-300 font-bold text-lg">
+                  comment
+                </div>
+                <input
+                  type="text"
+                  id="comment"
+                  class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500/75"
+                  placeholder="comment"
+                  bind:value={zapComment}
+                />
+              </div>
+            </div>
+          {/snippet}</AlertDialog
+        >
+      {/snippet}</Metadata
     >
   {/if}
   <!---->
@@ -727,18 +725,17 @@
     {/if}
     <!--リプライ, kind1,42以外は NIP-22 により kind1111 -->
     <!--とりあえず1,42以外消す-->
-    {#if note.kind === 1 || note.kind === 42}
-      <button
-        aria-label="reply"
-        onclick={() => {
-          onClickReplyIcon();
-        }}
-        class="actionButton"
-      >
-        <MessageSquare size="20" />
-      </button>
-    {:else}<div class="w-[20px] overflow-hidden"></div>
-    {/if}
+
+    <button
+      aria-label="reply"
+      onclick={() => {
+        onClickReplyIcon();
+      }}
+      disabled={note.kind !== 1 && note.kind !== 42}
+      class="actionButton"
+    >
+      <MessageSquare size="20" />
+    </button>
   {/if}
 </div>
 
