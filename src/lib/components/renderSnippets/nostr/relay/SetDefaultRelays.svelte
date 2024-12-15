@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
-  import type { ReqResult, ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
   import {
@@ -12,7 +12,7 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
-  import { app } from "$lib/stores/stores";
+  import { app, loginUser } from "$lib/stores/stores";
 
   interface Props {
     pubkey: string;
@@ -28,7 +28,7 @@
       | undefined;
     //relayChange: (data: string[]) => void;
     error?: import("svelte").Snippet<[Error]>;
-    nodata?: import("svelte").Snippet;
+
     loading?: import("svelte").Snippet;
 
     contents?: import("svelte").Snippet<
@@ -43,7 +43,6 @@
     // relayChange,
     error,
     loading,
-    nodata,
     contents,
   }: Props = $props();
 
@@ -54,54 +53,68 @@
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ] as Nostr.Filter[];
 
-  //パラムリレーがあったりlocalリレーがあるときはそれを返す。なかったら10002リレーを探す。
-  //返すのとSetrelaysもしないといけないっぽい？
+  //パラムリレーがあったりlocalリレーがあるときはそれを返す。なくて、ログインしてるときに10002とる。ログインしてなかったらデフォリレーをセットする。
 
-  let result =
-    localRelays.length === 0 && (!paramRelays || paramRelays.length === 0)
-      ? useRelaySet(queryKey, filters, req)
-      : undefined;
+  let zyouken =
+    localRelays.length > 0 ||
+    (paramRelays && paramRelays.length > 0) ||
+    !$loginUser;
+  console.log(zyouken);
+  let _relays: DefaultRelayConfig[] | string[] =
+    paramRelays && paramRelays.length > 0 //neventとかのやつ
+      ? paramRelays
+      : localRelays.length > 0 //設定でローカルのリレー使うことにしてるときのやつ
+        ? localRelays
+        : [];
+
+  let result = zyouken ? undefined : useRelaySet(queryKey, filters, req);
+
   let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();
   let errorData: Error | undefined = $state();
 
-  result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
-    // console.log(value);
-    if (value && value.length > 0) {
-      data = value;
-      //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
-    }
-  });
-  result?.status.subscribe((value: ReqStatus | undefined) => {
-    // console.log(value);
-    if (value) {
-      status = value;
-      if (value === "success" && !result.data) {
-        // console.log(defaultRelays);
-        setRelays(defaultRelays);
-        data = defaultRelays;
+  if (result) {
+    result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
+      // console.log(value);
+      if (value && value.length > 0) {
+        data = value;
+        //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
       }
-    }
-  });
-  result?.error.subscribe((value: Error | undefined) => {
-    if (value) {
-      errorData = value;
-    }
-  });
+    });
+    result?.status.subscribe((value: ReqStatus | undefined) => {
+      // console.log(value);
+      //resultがsuccessなのにdataがない（りれーがせっとされてない）ときはデフォリレーをいれる。
+      if (value) {
+        status = value;
+        if (value === "success" && !result.data) {
+          // console.log(defaultRelays);
+          setRelays(defaultRelays);
+          data = defaultRelays;
+        }
+      }
+    });
+    result?.error.subscribe((value: Error | undefined) => {
+      if (value) {
+        errorData = value;
+      }
+    });
+  } else if (_relays.length > 0) {
+    setRelays(_relays);
+  } else if (!$loginUser) {
+    //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
+    setRelays(defaultRelays);
+  }
+
   app.subscribe((value) => {
     // console.log(value, localRelays, paramRelays);
     if (
       value &&
       (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
     ) {
-      const relays =
-        localRelays.length > 0
-          ? localRelays
-          : paramRelays && paramRelays.length > 0
-            ? paramRelays
-            : [];
-      //console.log(localRelays, paramRelays);
-      setRelays($state.snapshot(relays));
+      //localかparamにリレーがあるときは10002じゃなくてlocalかparamのリレーがセットされるところ
+
+      console.log(localRelays, paramRelays);
+      setRelays(_relays);
     }
   });
   // $inspect(data, localRelays, paramRelays, errorData);
@@ -118,16 +131,10 @@
 {:else if status === "loading"}
   {@render loading?.()}
 {:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
-  {@const relays =
-    localRelays.length > 0
-      ? localRelays
-      : paramRelays && paramRelays.length > 0
-        ? paramRelays
-        : []}
   <!-- {@const relaysset = setRelays($state.snapshot(relays))} -->
   <!-- {#await setRelays(localRelays || paramRelays) then} -->
   {@render contents?.({
-    relays: $state.snapshot(relays),
+    relays: _relays,
     status: "success",
   })}
   <!-- {/await} -->

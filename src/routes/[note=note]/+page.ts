@@ -6,7 +6,7 @@ import { ogDescription, ogTitle } from "$lib/stores/stores";
 import { eventKinds } from "$lib/func/kinds";
 import { locale } from "svelte-i18n";
 import { get } from "svelte/store";
-import { relayRegex, relayRegex2 } from "$lib/func/regex";
+import { relayRegex2 } from "$lib/func/regex";
 
 interface CustomParams {
   note: string;
