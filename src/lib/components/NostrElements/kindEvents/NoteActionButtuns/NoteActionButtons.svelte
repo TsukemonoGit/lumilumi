@@ -536,25 +536,24 @@
 </script>
 
 <div
-  class="flex flex-row-reverse justify-between pt-0.5 mr-2 max-w-full overflow-x-hidden gap-1"
+  class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden gap-1"
 >
-  <div class="flex gap-1 overflow-hidden">
-    {#if lumiSetting.get().showAllReactions}{#if hasReactions}
-        <button
-          class="actionButton"
-          onclick={() => {
-            viewAllReactions = !viewAllReactions;
-          }}
-        >
-          {#if !viewAllReactions}
-            <SquareChevronDown size="20" />
-          {:else}
-            <SquareChevronUp size="20" />
-          {/if}
-        </button>
-      {:else}
-        <div class="w-[20px] overflow-hidden"><!----></div>
-      {/if}{/if}
+  <div class="flex gap-0.5 overflow-hidden">
+    {#if lumiSetting.get().showAllReactions}
+      <button
+        disabled={!hasReactions}
+        class="actionButton"
+        onclick={() => {
+          viewAllReactions = !viewAllReactions;
+        }}
+      >
+        {#if !viewAllReactions}
+          <SquareChevronDown size="20" />
+        {:else}
+          <SquareChevronUp size="20" />
+        {/if}
+      </button>
+    {/if}
     <!--メニュー-->
 
     <EllipsisMenu iconSize={20} {note} {tieKey} />
