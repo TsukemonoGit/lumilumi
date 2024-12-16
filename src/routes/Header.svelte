@@ -10,7 +10,7 @@
   import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
 
-  let _showBanner: boolean = $state(false);
+  let _showBanner: boolean = $state(showBanner.get());
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],

@@ -34,7 +34,7 @@
     forceVisible: true,
   });
   dialogOpen?.subscribe((value: boolean) => {
-    console.log(value);
+    // console.log(value);
     if (value) {
       $open = value;
       $dialogOpen = false;
