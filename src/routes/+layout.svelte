@@ -168,9 +168,18 @@
   }
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);
+    console.log(navigate.to?.route.id === "/settings");
     //ページが変わったらリセット
     if (navigate.type !== "form") {
       displayEvents.set([]);
+
+      //設定ページに変わった場合バナーを表示
+      if (navigate.to?.route.id === "/settings" && nlBanner) {
+        nlBanner.style.display = "";
+        //設定ページ以外に変わった場合はshowBannerの値によっていれる
+      } else if (nlBanner) {
+        nlBanner.style.display = showBanner.get() ? "" : "none";
+      }
     }
   });
 
