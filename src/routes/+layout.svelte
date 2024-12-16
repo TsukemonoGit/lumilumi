@@ -151,7 +151,11 @@
       )?.[0] as HTMLElement | null;
       if (nlBanner) console.log(nlBanner);
     }
-    if (!showBanner.get() && nlBanner) {
+    const banner: boolean = localStorage.getItem("showBanner") == "true";
+
+    // console.log(banner);
+    showBanner.set(banner);
+    if (!banner && nlBanner) {
       nlBanner.style.display = "none";
     }
   });
