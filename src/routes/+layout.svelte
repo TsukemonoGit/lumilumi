@@ -149,15 +149,15 @@
       nlBanner = document.getElementsByTagName(
         "nl-banner"
       )?.[0] as HTMLElement | null;
-      if (nlBanner) console.log(nlBanner);
+      if (nlBanner) {
+        showBanner.setBanner(nlBanner);
+        console.log(nlBanner);
+      }
     }
     const banner: boolean = localStorage.getItem("showBanner") == "true";
 
     // console.log(banner);
     showBanner.set(banner);
-    if (!banner && nlBanner) {
-      nlBanner.style.display = "none";
-    }
   });
 
   function onVisibilityChange() {
@@ -166,9 +166,10 @@
       rxNostr3RelaysReconnectChallenge();
     }
   }
+
   afterNavigate((navigate) => {
     console.log("afterNavigate", navigate.type);
-    console.log(navigate.to?.route.id === "/settings");
+
     //ページが変わったらリセット
     if (navigate.type !== "form") {
       displayEvents.set([]);
@@ -182,31 +183,6 @@
       }
     }
   });
-
-  //オプションから設定変えたとき
-  $effect(() => {
-    if (showBanner.get() !== undefined && showBanner.get() !== null) {
-      if (nlBanner) {
-        if (showBanner.get()) {
-          nlBanner.style.display = "";
-        } else {
-          nlBanner.style.display = "none";
-        }
-      }
-    }
-  });
-
-  // function baddrCheck(page: any, banner: any, showbnr: any) {
-  //   if (page.route.id === "/settings" && nlBanner) {
-  //     nlBanner.style.display = "";
-  //   } else if (nlBanner) {
-  //     if ($showBanner) {
-  //       nlBanner.style.display = "";
-  //     } else {
-  //       nlBanner.style.display = "none";
-  //     }
-  //   }
-  // }
 
   // svelte-ignore non_reactive_update
   let showModal: Writable<boolean> = writable(false);

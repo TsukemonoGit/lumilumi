@@ -11,6 +11,7 @@
   import { untrack } from "svelte";
 
   let _showBanner: boolean = $state(showBanner.get());
+
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
     ["1", $_("filter.canversation.onlyFollowee")],
@@ -36,13 +37,14 @@
 
   $effect(() => {
     if (_showBanner !== undefined && _showBanner !== null) {
+      //console.log(_showBanner);
       untrack(() => {
         showBanner.set(_showBanner);
         localStorage.setItem("showBanner", showBanner.get().toString());
       });
     }
   });
-  //$inspect($currentPage?.link);
+  // $inspect(_showBanner);
   let Icon = $derived($currentPage?.Icon);
 </script>
 
