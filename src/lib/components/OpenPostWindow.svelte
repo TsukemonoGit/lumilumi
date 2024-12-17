@@ -749,14 +749,6 @@
             {#each initOptions.defaultUsers as user}
               <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
                 <UserName pubhex={user} />
-                <!-- @<Metadata
-                queryKey={["metadata", user]}
-                pubkey={user}
-              >
-                {#snippet content({ metadata })}
-                  {metadataName(metadata)}
-                {/snippet}
-              </Metadata> -->
               </div>
             {/each}
           {/if}
