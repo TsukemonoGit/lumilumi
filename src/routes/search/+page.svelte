@@ -3,7 +3,7 @@
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
-  import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -77,7 +77,6 @@
       init();
     }
   });
-  let readUrls: string[] = $state.raw([]);
 
   async function waitForDefaultRelays(maxWaitTime: number) {
     const interval = 100; // 100ms ごとにチェック
@@ -275,18 +274,6 @@
     // }
     $nowProgress = false;
   };
-
-  const setRelay = (relays: string[]) => {
-    console.log(relays);
-    searchRelays = relays;
-  };
-  defaultRelays.subscribe((value) => {
-    if (value) {
-      readUrls = Object.values(value)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
-  });
 </script>
 
 <section>
