@@ -24,6 +24,15 @@ export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   }
 };
 
+//profileがなかったときとかに画面に表示させるpubの省略文字
+export const displayShortPub = (hex: string) => {
+  try {
+    const pub = nip19.npubEncode(hex);
+    return `${pub.slice(0, 13)}...${pub.slice(pub.length - 2)}`;
+  } catch (error) {
+    return `${hex.slice(0, 13)}...${hex.slice(hex.length - 2)}`;
+  }
+};
 export const splitHexColorString = (hexString: string): string[] => {
   if (hexString) {
     return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
@@ -257,7 +266,7 @@ export const generateResultMessage = (
   return str;
 };
 
-export const relayInfoFun = async (
+export const getRelayInfo = async (
   url: string
 ): Promise<Nip11.RelayInfo | undefined> => {
   const relayInfo = Nip11Registry.get(url);
@@ -278,6 +287,10 @@ export function formatUrl(url: string) {
 
   return httpsUrl.endsWith("/") ? httpsUrl : httpsUrl + "/";
 }
+//末尾に"/"をつける
+export const normalizeRelayURL = (str: string) => {
+  return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
+};
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");
 
@@ -446,11 +459,6 @@ export const initUserMuteStatus: UserMuteStatus = {
   repost: false,
   reaction: false,
   zap: false,
-};
-
-//末尾に"/"をつける
-export const normalizeRelayURL = (str: string) => {
-  return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
 };
 
 export const nip19UserRegex =

@@ -33,7 +33,12 @@
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { filesUpload, delay, normalizeRelayURL } from "$lib/func/util";
+  import {
+    filesUpload,
+    delay,
+    normalizeRelayURL,
+    displayShortPub,
+  } from "$lib/func/util";
 
   import type { FileUploadResponse } from "nostr-tools/nip96";
   import type {
@@ -52,6 +57,8 @@
   import Content from "./NostrElements/content/Content.svelte";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import UserName from "./NostrElements/user/UserName.svelte";
+  import { nip19 } from "nostr-tools";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -634,6 +641,19 @@
       $uploader = value;
     }
   });
+
+  const userName = (pubkey: string, profile: UserData) => {
+    if (profile.petname) {
+      return `📛${profile.petname}`;
+    }
+    if (
+      (!profile.display_name || profile.display_name === "") &&
+      (!profile.name || profile.name === "")
+    ) {
+      return displayShortPub(pubkey);
+    }
+    return `${profile.display_name ?? ""}${profile.name ? `@${profile.name}` : ""}`;
+  };
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -726,16 +746,11 @@
         </div>
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
-            <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
-              @<Metadata
-                queryKey={["metadata", initOptions.defaultUsers[0]]}
-                pubkey={initOptions.defaultUsers[0]}
-              >
-                {#snippet content({ metadata })}
-                  {metadataName(metadata)}
-                {/snippet}
-              </Metadata>
-            </div>
+            {#each initOptions.defaultUsers as user}
+              <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+                <UserName pubhex={user} />
+              </div>
+            {/each}
           {/if}
           {#if initOptions.addableUserList}
             {#each initOptions.addableUserList as replyuser, index}
@@ -744,14 +759,8 @@
                   ? 'bg-magnum-300'
                   : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
               >
-                @<Metadata
-                  queryKey={["metadata", replyuser]}
-                  pubkey={replyuser}
-                >
-                  {#snippet content({ metadata })}
-                    {metadataName(metadata)}
-                  {/snippet}
-                </Metadata>
+                <UserName pubhex={replyuser} />
+
                 {#if $additionalReplyUsers.includes(replyuser)}
                   <button
                     class=" inline-flex h-6 w-6 appearance-none align-middle
@@ -951,9 +960,8 @@
                   aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
                   onclick={() => handleClickUser(pubkey)}
                   class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                  >{#if profile.petname}
-                    📛{profile.petname}
-                  {:else}{profile.display_name ?? ""}@{profile.name ?? ""}{/if}
+                >
+                  {userName(pubkey, profile)}
                 </button>
               {/if}
             {/each}

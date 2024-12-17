@@ -15,10 +15,10 @@
   } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
-  import type { LumiMuteByKind } from "$lib/types";
+
   import { eventKinds } from "$lib/func/kinds";
   import { locale } from "svelte-i18n";
-  import { Image } from "lucide-svelte";
+
   import { writable, type Writable } from "svelte/store";
 
   interface Props {

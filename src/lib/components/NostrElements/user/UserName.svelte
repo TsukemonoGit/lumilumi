@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { profile } from "$lib/func/util";
+  import { profile, displayShortPub } from "$lib/func/util";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import * as Nostr from "nostr-typedef";
 
-  import { encodetoNpub } from "$lib/func/encode";
   import { viewport } from "$lib/func/useViewportAction";
   import { followList } from "$lib/stores/globalRunes.svelte";
 
@@ -13,8 +13,7 @@
   let { pubhex }: Props = $props();
 
   let petname = $derived(followList.get?.get(pubhex));
-  let loadingText = $derived(encodetoNpub(pubhex));
-  let encodePub = $derived(encodetoNpub(pubhex));
+  let pubString = $derived(displayShortPub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {
     if (!hasLoaded) {
@@ -23,6 +22,23 @@
     }
   };
   // console.log(pubhex);
+
+  const userName = (metadata: Nostr.Event) => {
+    const usrProfile = profile(metadata);
+
+    if (
+      usrProfile &&
+      usrProfile.display_name &&
+      usrProfile.display_name !== ""
+    ) {
+      return usrProfile.display_name;
+    }
+    if (usrProfile && usrProfile.name && usrProfile.name !== "") {
+      return usrProfile.name;
+    }
+
+    return pubString;
+  };
 </script>
 
 <span use:viewport onenterViewport={handleEnterViewport} class="inline-flex"
@@ -31,23 +47,16 @@
         pubkey={pubhex}
       >
         {#snippet loading()}
-          <span class="text-sm text-neutral-500 inline-flex break-all"
-            >{loadingText}</span
+          <span class="text-sm inline-flex break-all">{pubString}</span
           >{/snippet}
         {#snippet nodata()}
-          <span class="text-sm text-neutral-500 inline-flex break-all"
-            >{loadingText}</span
-          >
+          <span class="text-sm inline-flex break-all">{pubString}</span>
         {/snippet}
         {#snippet error()}
-          <span class="text-sm text-neutral-500 inline-flex break-all"
-            >{loadingText}</span
-          >
+          <span class="text-sm inline-flex break-all">{pubString}</span>
         {/snippet}
         {#snippet content({ metadata })}
-          {profile(metadata)?.name && profile(metadata)?.name !== ""
-            ? profile(metadata)?.name
-            : profile(metadata)?.display_name}
+          {userName(metadata)}
         {/snippet}
-      </Metadata>{/if}{:else}{encodePub}{/if}</span
+      </Metadata>{/if}{:else}{pubString}{/if}</span
 >
