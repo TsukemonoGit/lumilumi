@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { profile, toPubString } from "$lib/func/util";
+  import { profile, displayShortPub } from "$lib/func/util";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
 
   import { viewport } from "$lib/func/useViewportAction";
   import { followList } from "$lib/stores/globalRunes.svelte";
-  import { encodetoNpub } from "$lib/func/encode";
 
   interface Props {
     pubhex: string;
@@ -14,7 +13,7 @@
   let { pubhex }: Props = $props();
 
   let petname = $derived(followList.get?.get(pubhex));
-  let pubString = $derived(toPubString(pubhex));
+  let pubString = $derived(displayShortPub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {
     if (!hasLoaded) {

@@ -37,7 +37,7 @@
     filesUpload,
     delay,
     normalizeRelayURL,
-    toPubString,
+    displayShortPub,
   } from "$lib/func/util";
 
   import type { FileUploadResponse } from "nostr-tools/nip96";
@@ -650,7 +650,7 @@
       (!profile.display_name || profile.display_name === "") &&
       (!profile.name || profile.name === "")
     ) {
-      return toPubString(pubkey);
+      return displayShortPub(pubkey);
     }
     return `${profile.display_name ?? ""}${profile.name ? `@${profile.name}` : ""}`;
   };

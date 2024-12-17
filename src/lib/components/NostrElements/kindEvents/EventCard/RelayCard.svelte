@@ -4,7 +4,7 @@
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
 
-  import { formatUrl, relayInfoFun } from "$lib/func/util";
+  import { formatUrl, getRelayInfo } from "$lib/func/util";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { toastSettings } from "$lib/stores/stores";
   import {
@@ -169,7 +169,7 @@
   };
 </script>
 
-{#await relayInfoFun(url)}
+{#await getRelayInfo(url)}
   {url} read:{read} write:{write}
 {:then relayInfo}
   {#if !relayInfo}

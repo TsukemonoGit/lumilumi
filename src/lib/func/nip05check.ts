@@ -1,5 +1,5 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { nip05 } from "nostr-tools";
+
 import { derived, writable, type Readable, type Writable } from "svelte/store";
 import type { ReqStatus } from "$lib/types";
 import { NIP05_REGEX } from "nostr-tools/nip05";

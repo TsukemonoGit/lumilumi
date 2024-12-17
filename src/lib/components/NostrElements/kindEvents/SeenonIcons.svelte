@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatUrl, relayInfoFun } from "$lib/func/util";
+  import { formatUrl, getRelayInfo } from "$lib/func/util";
   import { relayIconErrorStore } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
   import Avatar from "svelte-boring-avatars";
@@ -56,7 +56,7 @@
     {#each viewAll ? relays : relays.slice(0, 2) as url}
       <Popover ariaLabel="relay Info">
         <div title={url}>
-          {#await relayInfoFun(url)}
+          {#await getRelayInfo(url)}
             <Avatar {size} name={url} variant="beam" />
           {:then relayInfo}
             {#if !relayInfo}
