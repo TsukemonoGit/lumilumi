@@ -24,6 +24,15 @@ export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   }
 };
 
+//profileがなかったときとかに画面に表示させるpubの省略文字
+export const toPubString = (hex: string) => {
+  try {
+    const pub = nip19.npubEncode(hex);
+    return `${pub.slice(0, 13)}...${pub.slice(pub.length - 2)}`;
+  } catch (error) {
+    return `${hex.slice(0, 13)}...${hex.slice(hex.length - 2)}`;
+  }
+};
 export const splitHexColorString = (hexString: string): string[] => {
   if (hexString) {
     return hexString.match(/.{1,6}/g)?.map((segment) => `#${segment}`) || [];
