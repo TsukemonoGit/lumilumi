@@ -160,7 +160,7 @@
         if (relaylist.length > 0) {
           queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
           $globalRelays = relaylist;
-          unsucscribeGlobal();
+          // unsucscribeGlobal();
         }
       }
     }

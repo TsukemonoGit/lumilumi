@@ -173,6 +173,7 @@ export function useReq(
   };
 }
 
+//メインTL以外のリアルタイムReq
 export function useForwardReq(
   {
     queryKey,

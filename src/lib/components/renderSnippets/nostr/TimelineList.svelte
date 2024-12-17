@@ -1,3 +1,4 @@
+<!--メインTL以外のTL（グローバルとか、リストとか、ユーザーページのやつとか）-->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import {
