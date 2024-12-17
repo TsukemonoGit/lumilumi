@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { promisePublishEvent } from "$lib/func/nostr";
+  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
-  import { afterNavigate, beforeNavigate, pushState } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -18,13 +18,15 @@
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
   import { _ } from "svelte-i18n";
-  import type { EventPacket } from "rx-nostr";
+
   import { nip50relays } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";
 
   import type { PageData } from "./$types";
   import { followList } from "$lib/stores/globalRunes.svelte";
-  import SetSearchRelays from "$lib/components/renderSnippets/nostr/relay/SetSearchRelays.svelte";
+  import { pipe } from "rxjs";
+  import { latest } from "rx-nostr";
+  import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
 
   let { data }: { data: PageData } = $props();
 
@@ -75,7 +77,6 @@
       init();
     }
   });
-  let readUrls: string[] = $state.raw([]);
 
   async function waitForDefaultRelays(maxWaitTime: number) {
     const interval = 100; // 100ms ごとにチェック
@@ -92,20 +93,7 @@
   }
 
   async function init() {
-    const queryData: EventPacket | undefined = queryClient.getQueryData([
-      "searchRelay",
-      $loginUser,
-    ]);
-    console.log("afterNavigate", queryData);
-    if (queryData) {
-      searchRelays = (queryData.event.tags as string[][])
-        .filter((tag: string[]) => tag[0] === "relay" && tag.length > 1)
-        .map((tag: string[]) => tag[1]);
-    }
-
-    // // const params = get(page).url.searchParams;
-    // const params = new URLSearchParams(window.location.search);
-    // console.log(params);
+    setSearchRelay();
 
     searchHashtag = data.searchHashtag;
     searchWord = data.searchWord;
@@ -138,6 +126,38 @@
     }
     isMount = false;
   }
+
+  const setSearchRelay = async () => {
+    //すでにあるならデータをセットする
+    const data: string[] | undefined = queryClient.getQueryData([
+      "searchRelay",
+      $loginUser,
+    ]);
+
+    if (data) {
+      searchRelays = data;
+    } else {
+      $nowProgress = true;
+      const fetchRelays = await usePromiseReq(
+        {
+          filters: [
+            { authors: [$loginUser], kinds: [10007], limit: 1 },
+          ] as Nostr.Filter[],
+          operator: pipe(latest()),
+        },
+        undefined,
+        undefined
+      );
+      $nowProgress = false;
+      if (fetchRelays.length > 0) {
+        const relaylist = toGlobalRelaySet(fetchRelays[0].event);
+        if (relaylist.length > 0) {
+          queryClient.setQueryData(["searchRelay", $loginUser], relaylist);
+          searchRelays = relaylist;
+        }
+      }
+    }
+  };
 
   beforeNavigate((navigate) => {
     console.log("beforeNavigate", navigate.type);
@@ -184,19 +204,6 @@
         ? undefined
         : [searchKind];
 
-    // const chunk = 100;
-    // if (
-    //   followee &&
-    //   followingList !== undefined &&
-    //   followingList.length > chunk
-    // ) {
-    //   const splitList = splitArray(followingList, chunk);
-    //   // filters配列に、authorsの値をそれぞれのチャンクごとに分割して追加
-    //   filters = splitList.map((list) => ({
-    //     ...filters[0], // filters[0] のその他のデータを維持
-    //     authors: list, // authors を分割されたリストに置き換える
-    //   }));
-    // }
     return [filter];
   }
 
@@ -254,9 +261,11 @@
     };
 
     if (isSuccess.length > 0) {
-      queryClient.refetchQueries({
-        queryKey: ["searchRelay", $loginUser],
-      });
+      const relaylist = toGlobalRelaySet(event);
+      if (relaylist.length > 0) {
+        queryClient.setQueryData(["searchRelay", $loginUser], relaylist);
+        searchRelays = relaylist;
+      }
     }
     // if (isSuccess.length > 0) {
     //   queryClient.refetchQueries({
@@ -265,34 +274,10 @@
     // }
     $nowProgress = false;
   };
-
-  const setRelay = (relays: string[]) => {
-    console.log(relays);
-    searchRelays = relays;
-  };
-  defaultRelays.subscribe((value) => {
-    if (value) {
-      readUrls = Object.values(value)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
-  });
 </script>
 
 <section>
   {#if $loginUser}
-    <SetSearchRelays pubkey={$loginUser} relayChange={setRelay}>
-      {#snippet loading()}
-        <div class="w-full"></div>
-      {/snippet}
-      {#snippet error()}
-        <div class="w-full"></div>
-      {/snippet}
-      {#snippet nodata()}
-        <div class="w-full"></div>
-      {/snippet}
-    </SetSearchRelays>
-
     <Settei
       title={"Search"}
       relays={searchRelays}
