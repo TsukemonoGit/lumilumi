@@ -15,7 +15,6 @@
 
   let petname = $derived(followList.get?.get(pubhex));
   let pubString = $derived(toPubString(pubhex));
-  let encodedPub = $derived(encodetoNpub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {
     if (!hasLoaded) {
