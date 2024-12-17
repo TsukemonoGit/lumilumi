@@ -141,8 +141,11 @@ function createLumiSetting() {
 
 function createShowBanner() {
   let _showBanner: boolean = $state(true);
-
+  let nlBanner: HTMLElement | null;
   return {
+    setBanner: (banner: HTMLElement) => {
+      nlBanner = banner;
+    },
     get: () => _showBanner,
     update: (updater: (current: boolean) => boolean) => {
       _showBanner = updater(_showBanner);
@@ -150,6 +153,14 @@ function createShowBanner() {
     // 新しい値を直接設定する
     set: (ids: boolean) => {
       _showBanner = ids;
+      if (!nlBanner) {
+        nlBanner = document.getElementsByTagName(
+          "nl-banner"
+        )?.[0] as HTMLElement | null;
+      }
+      if (nlBanner) {
+        nlBanner.style.display = showBanner.get() ? "" : "none";
+      }
       // console.log(_viewEventIds.length);
     },
   };
