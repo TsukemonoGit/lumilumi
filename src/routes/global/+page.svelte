@@ -8,7 +8,7 @@
   } from "$lib/stores/stores";
 
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
-  import { onMount, type SvelteComponent } from "svelte";
+  import { onMount, untrack, type SvelteComponent } from "svelte";
 
   import { _ } from "svelte-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -28,7 +28,7 @@
 
   let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);
-  let globalRelays: Writable<string[]> = writable([]);
+  let globalRelays: string[] = $state.raw([]);
   const tieKey = "global";
   let timelineQuery = $derived(["global", "feed"]);
 
@@ -61,7 +61,7 @@
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
         queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
-        $globalRelays = relaylist;
+        globalRelays = relaylist;
       }
 
       queryClient.removeQueries({
@@ -78,7 +78,7 @@
         const [, seenOn] = globalTie;
         seenOn.clear();
       }
-      $globalRelays = relays;
+      globalRelays = relays;
     }
     $nowProgress = false;
   };
@@ -86,16 +86,18 @@
   // run(() => {
   //   console.log(openGlobalTimeline);
   // });
-  globalRelays.subscribe((value) => {
-    if (value.length > 0) {
-      console.log("global");
-      openGlobalTimeline = false;
+  $effect(() => {
+    if (globalRelays.length > 0) {
+      untrack(() => {
+        openGlobalTimeline = false;
 
-      setTimeout(() => {
-        openGlobalTimeline = true;
-      }, 1);
+        setTimeout(() => {
+          openGlobalTimeline = true;
+        }, 1);
+      });
     }
   });
+
   let relaySettei = $state(false);
   onMount(async () => {
     //paramにリレーがあったらそれをセットする
@@ -103,7 +105,7 @@
     const relay = params.getAll("relay");
     console.log(relay);
     if (relay.length > 0) {
-      $globalRelays = relay;
+      globalRelays = relay;
     } else {
       relaySettei = true;
       setGlobalRelay();
@@ -114,13 +116,13 @@
     if (navigate.type === "form") {
       return;
     }
-    $globalRelays = [];
+    globalRelays = [];
     //paramにリレーがあったらそれをセットする
     const params = new URLSearchParams(window.location.search);
     const relay = params.getAll("relay");
     console.log(relay);
     if (relay.length > 0) {
-      $globalRelays = relay;
+      globalRelays = relay;
     } else {
       relaySettei = true;
       setGlobalRelay();
@@ -136,7 +138,7 @@
     ]);
 
     if (data) {
-      $globalRelays = data;
+      globalRelays = data;
     } else {
       $nowProgress = true;
       const fetchRelays = await usePromiseReq(
@@ -159,7 +161,7 @@
         const relaylist = toGlobalRelaySet(fetchRelays[0].event);
         if (relaylist.length > 0) {
           queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
-          $globalRelays = relaylist;
+          globalRelays = relaylist;
           // unsucscribeGlobal();
         }
       }
@@ -167,7 +169,7 @@
   };
 </script>
 
-{#if !$loginUser && $globalRelays.length <= 0}
+{#if !$loginUser && globalRelays.length <= 0}
   <p class="whitespace-pre-wrap break-words p-2">
     {$_("global.explain")}
 
@@ -189,17 +191,17 @@
 
       <Settei
         title={"Global"}
-        relays={$globalRelays}
+        relays={globalRelays}
         {onClickSave}
         Description={GlobalDescription}
       />
     {/if}
 
     <!-- {#snippet children()} -->
-    {#if openGlobalTimeline && $globalRelays.length > 0}
+    {#if openGlobalTimeline && globalRelays.length > 0}
       <GlobalTimeline
         bind:this={compRef}
-        globalRelays={$globalRelays}
+        globalRelays={$state.snapshot(globalRelays)}
         {timelineQuery}
       />
     {/if}
