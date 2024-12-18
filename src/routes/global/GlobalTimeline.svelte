@@ -8,7 +8,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { now, type EventPacket } from "rx-nostr/src";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   let isOnMount = false;
   let amount = 50;
@@ -18,7 +18,7 @@
     tieKey?: string;
     globalRelays: any;
   }
-
+  const req = createRxForwardReq("global");
   let { timelineQuery, tieKey = "global", globalRelays }: Props = $props();
 
   onMount(async () => {
@@ -46,15 +46,25 @@
       ...timelineQuery,
       "olderData",
     ]);
+
     if (!ev || ev.length <= 0) {
       since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
     } else {
       since = ev[0].event.created_at;
     }
   }
+  onDestroy(() => {
+    queryClient.removeQueries({
+      queryKey: timelineQuery,
+    });
+    queryClient.removeQueries({
+      queryKey: [...timelineQuery, "olderData"],
+    });
+    console.log("GlobalTimelineDestroy");
+  });
 </script>
 
-{#if since}
+{#if since && globalRelays.length > 0}
   <TimelineList
     queryKey={timelineQuery}
     filters={[
@@ -71,7 +81,7 @@
         since: since,
       },
     ]}
-    req={createRxForwardReq()}
+    {req}
     {viewIndex}
     {amount}
     {tieKey}

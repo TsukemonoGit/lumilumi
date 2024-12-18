@@ -25,12 +25,12 @@
 
   import * as Nostr from "nostr-typedef";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
-  import { unsucscribeGlobal } from "$lib/func/useReq";
+
   let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);
   let globalRelays: Writable<string[]> = writable([]);
   const tieKey = "global";
-  let timelineQuery = $derived(["global", "feed", tieKey]);
+  let timelineQuery = $derived(["global", "feed"]);
 
   const onClickSave = async (relays: string[]) => {
     $nowProgress = true;

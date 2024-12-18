@@ -384,7 +384,7 @@
   }
 
   onDestroy(() => {
-    console.log("test");
+    console.log("onDestroy");
   });
 </script>
 

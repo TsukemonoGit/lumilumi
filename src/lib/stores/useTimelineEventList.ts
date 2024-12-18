@@ -21,11 +21,7 @@ export function useTimelineEventList(
 
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
-  // const operator = reaCheck
-  //   ? pipe(pipe(), userStatus(), reactionCheck(), scanArray())
-  //   : pipe(pipe(), userStatus(), scanArray());
-  //フィルターに自分へのリプライを取得するフィルターが含まれているか
-
+  console.log(relays);
   return relays
     ? (useGlobalReq({ queryKey, filters, operator, req }, relays, {
         staleTime: Infinity,
