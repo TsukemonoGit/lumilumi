@@ -53,15 +53,15 @@
       since = ev[0].event.created_at;
     }
   }
-  // onDestroy(() => {
-  //   queryClient.removeQueries({
-  //     queryKey: timelineQuery,
-  //   });
-  //   queryClient.removeQueries({
-  //     queryKey: [...timelineQuery, "olderData"],
-  //   });
-  //   console.log("GlobalTimelineDestroy");
-  // });
+  onDestroy(() => {
+    queryClient.removeQueries({
+      queryKey: timelineQuery,
+    });
+    queryClient.removeQueries({
+      queryKey: [...timelineQuery, "olderData"],
+    });
+    console.log("GlobalTimelineDestroy");
+  });
 </script>
 
 {#if since && globalRelays.length > 0}
