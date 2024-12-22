@@ -15,13 +15,17 @@ export default defineConfig({
     sveltekit(),
     SvelteKitPWA({
       // サービスワーカーの戦略を指定
-      strategies: "generateSW", // ここでサービスワーカーを生成する設定
+      strategies: "injectManifest", // ここでサービスワーカーを生成する設定
+      srcDir: "./src",
       filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
 
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
       registerType: "autoUpdate", // サービスワーカーが更新されるたびに自動で更新
-
+      injectManifest: {
+        injectionPoint: undefined,
+        rollupFormat: "iife",
+      },
       // 開発オプション（開発環境でもPWAを確認するための設定）
       devOptions: {
         enabled: true, // 開発時でもPWAが有効

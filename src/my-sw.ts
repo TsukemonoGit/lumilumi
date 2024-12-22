@@ -1,9 +1,21 @@
-/// <reference lib="webworker" />
-// src/service-worker.js (例)
-(self as any).__WB_MANIFEST; // Workbox がマニフェストを自動的に挿入します
-importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/6.1.5/workbox-sw.js"
-);
+/// <reference lib="WebWorker" />
+/// <reference types="vite/client" />
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
+
+declare let self: ServiceWorkerGlobalScope;
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
+// self.__WB_MANIFEST is default injection point
+precacheAndRoute(self.__WB_MANIFEST);
+
+// clean old assets
+cleanupOutdatedCaches();
+
 let data: {
   url: string | undefined;
   text: string | undefined;

@@ -84,7 +84,7 @@
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
-    console.log(import.meta.env.MODE);
+    // console.log(import.meta.env.MODE);
     // PWA プラグインによる登録を優先
 
     // try {
