@@ -1046,6 +1046,6 @@
     bg-zinc-900 font-medium leading-none text-zinc-200 hover:opacity-75 active:opacity-50;
   }
   .sendButton {
-    @apply inline-flex h-9 items-center  justify-center   border-magnum-800 bg-magnum-600  px-4 font-medium leading-none  disabled:opacity-50;
+    @apply inline-flex h-10 items-center  justify-center   border-magnum-800 bg-magnum-600  px-4 font-medium leading-none  disabled:opacity-50;
   }
 </style>
