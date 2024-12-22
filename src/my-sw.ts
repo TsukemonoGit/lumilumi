@@ -18,20 +18,33 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   console.log("Service Worker: Activated");
-  // Activate the new service worker and clean old caches, etc.
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          // 不要なキャッシュを削除する
+          if (cacheName !== "media-cache") {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
 
 self.addEventListener("fetch", async (event) => {
   if (
-    event.request && // 追加: event.request が undefined でないことを確認
+    event.request &&
     event.request.method === "POST" &&
     new URL(event.request.url).pathname === "/post"
   ) {
-    console.log("fetch", event);
+    console.log("fetch event:", event);
     return handlePostRequest(event.request);
   }
 });
+
 let media;
+
 async function handlePostRequest(request) {
   if (!request) {
     console.error("Request is undefined");
@@ -67,10 +80,6 @@ async function handlePostRequest(request) {
   const allClients = await (self as any).clients.matchAll({
     includeUncontrolled: true,
   });
-  media = data.media
-    ? data.media.map((file, index) => `/cached-media/${file.name}-${index}`)
-    : null;
-  console.log(media);
   await Promise.all(
     allClients.map((client) => {
       return client.postMessage({

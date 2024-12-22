@@ -49,8 +49,8 @@ export default defineConfig({
           },
         },
       },
-      injectRegister: "auto", //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
-      registerType: "prompt",
+      injectRegister: false, //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
+      registerType: "autoUpdate",
       //registerType: "autoUpdate",
       workbox: {
         globPatterns: [
