@@ -69,18 +69,18 @@
     bottom: 0;
     margin: 16px;
     padding: 12px;
-    border: 1px solid #8885;
+    border: 1px solid rgb(var(--color-neutral-400) / 1);
     border-radius: 4px;
     z-index: 2;
     text-align: left;
-    box-shadow: 3px 4px 5px 0 #8885;
-    background-color: white;
+    box-shadow: 3px 4px 5px 0 rgb(var(--color-neutral-900) / 0.5);
+    background-color: rgb(var(--color-neutral-900) / 1);
   }
   .pwa-toast .message {
     margin-bottom: 8px;
   }
   .pwa-toast button {
-    border: 1px solid #8885;
+    border: 1px solid rgb(var(--color-neutral-600) / 1);
     outline: none;
     margin-right: 5px;
     border-radius: 2px;
