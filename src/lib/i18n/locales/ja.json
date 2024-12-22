@@ -76,7 +76,8 @@
   "post": {
     "confirm": "投稿されていないテキストがあります。閉じますか？",
     "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています",
-    "placeholder": "いま どうしてる？"
+    "placeholder": "いま どうしてる？",
+    "quote": "nostr:npub... , nostr:nevent1... ,  で ユーザー、投稿を引用できます。"
   },
   "profile": {
     "display_name": "表示名",

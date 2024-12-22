@@ -39,7 +39,7 @@
   </div>
   <button
     type="button"
-    class="file-button-btn inline-flex h-8 items-center justify-center rounded-sm border border-magnum-500
+    class="file-button-btn inline-flex h-8 items-center justify-center rounded-md border border-magnum-500
       bg-zinc-900 px-4 font-medium leading-none text-zinc-100 align-middle my-auto hover:opacity-75 active:opacity-50"
     disabled={rest.disabled}
     onclick={onButtonClick}

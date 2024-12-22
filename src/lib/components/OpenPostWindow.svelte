@@ -10,6 +10,7 @@
     TriangleAlert,
     Plus,
     UserPlus,
+    Quote,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -386,7 +387,7 @@
     console.log("[paste]", event.type, event.clipboardData);
     if (!event.clipboardData) return;
 
-    const files = [...event.clipboardData.items]
+    const files = Array.from(event.clipboardData.items)
       .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
       .map((item) => item.getAsFile())
       .filter((file): file is File => file !== null);
@@ -654,6 +655,16 @@
     }
     return `${profile.display_name ?? ""}${profile.name ? `@${profile.name}` : ""}`;
   };
+
+  const handleClickQuote = () => {
+    text =
+      text.slice(0, cursorPosition) + " nostr:" + text.slice(cursorPosition);
+    cursorPosition += " nostr:".length;
+    textarea?.focus();
+  };
+
+  //でばっぐよう
+  // $open = true;
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -678,7 +689,7 @@
     ></button>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[640px]
-            max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
+            max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
       {#if lumiSetting.get().showImg && lumiSetting.get().showPreview}
@@ -739,11 +750,48 @@
         >
           <X size={32} />
         </button>
-        <div class="flex flex-row gap-2 mb-2">
-          <MediaPicker bind:files bind:fileInput onchange={onChangeHandler} />
+
+        <div class="flex flex-row gap-1 md:gap-2 mb-1">
+          <button
+            onclick={() => {
+              onWarning = !onWarning;
+            }}
+            class="button"
+          >
+            <TriangleAlert
+              size="20"
+              class={onWarning ? "stroke-magnum-500  " : "stroke-magnum-300"}
+            />
+          </button>
+
+          <button
+            aria-label="open name list"
+            onclick={handleClickQuote}
+            class="button"
+          >
+            <Quote size="20" class="stroke-magnum-300 " /><!-- N-->
+          </button>
 
           <UploaderSelect bind:selectedUploader={$selectedUploader} />
+
+          <MediaPicker
+            class="button"
+            bind:files
+            bind:fileInput
+            onchange={onChangeHandler}
+          />
         </div>
+        {#if onWarning}
+          <div class="flex">
+            <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
+            <input
+              type="text"
+              class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
+          border-magnum-400"
+              bind:value={warningText}
+            />
+          </div>
+          <!--{:else}<div class="h-4" />-->{/if}
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             {#each initOptions.defaultUsers as user}
@@ -791,6 +839,7 @@
             {/each}
           {/if}
         </div>
+
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
             disabled={isPosting}
@@ -825,103 +874,78 @@
             placeholder={$_("post.placeholder")}
           ></textarea>
         </fieldset>
+        <!-- <div class="text-sm">
+          {$_("post.quote")}
+        </div> -->
 
-        {#if onWarning}
-          <div class="flex">
-            <div class="mt-auto mb-auto text-sm break-keep">理由：</div>
-            <input
-              type="text"
-              class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
-            border-magnum-400"
-              bind:value={warningText}
-            />
-          </div>
-          <!--{:else}<div class="h-4" />-->{/if}
         {#if nsecCheck}
           <div class="text-sm text-red-500　">
             {$_("post.nsecAlart")}
           </div>
         {/if}
-        <div class="mt-2 flex justify-between gap-2">
+        <div class="mt-2 flex justify-end gap-1 md:gap-2">
+          <!--emojis-->
+          {#if $emojis && $emojis.list.length > 0}
+            {#if viewCustomEmojis}
+              <input
+                bind:this={emojiInput}
+                type="text"
+                id="emoji"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+            border-magnum-400"
+                bind:value={customReaction}
+              />
+            {/if}
+            <button
+              aria-label="open custom emoji list"
+              onclick={handleClickCustomReaction}
+              class="button"
+            >
+              <SmilePlus
+                size="20"
+                class={viewCustomEmojis
+                  ? "stroke-magnum-500"
+                  : "stroke-magnum-300"}
+              />
+            </button>
+          {/if}
+          <!--userdata-->
+
+          {#if viewMetadataList}
+            <input
+              bind:this={metadataInput}
+              type="text"
+              id="npub"
+              class="h-8 w-full rounded-md text-magnum-100 border-2
+         border-magnum-400"
+              bind:value={inputMetadata}
+            />
+          {/if}
           <button
-            onclick={() => {
-              onWarning = !onWarning;
-            }}
-            class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
-                    bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
+            aria-label="open name list"
+            onclick={handleClickMetadata}
+            class="button"
           >
-            <TriangleAlert
+            <UserPlus
               size="20"
-              class="stroke-magnum-500 {onWarning ? 'fill-magnum-700 ' : ''}"
+              class={viewMetadataList
+                ? "stroke-magnum-500"
+                : "stroke-magnum-300"}
             />
           </button>
 
-          <div class=" flex gap-2">
-            <!--emojis-->
-            {#if $emojis && $emojis.list.length > 0}
-              {#if viewCustomEmojis}
-                <input
-                  bind:this={emojiInput}
-                  type="text"
-                  id="emoji"
-                  class="h-8 w-full rounded-md text-magnum-100 border-2
-            border-magnum-400"
-                  bind:value={customReaction}
-                />
-              {/if}
-              <button
-                aria-label="open custom emoji list"
-                onclick={handleClickCustomReaction}
-                class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
-                    bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
-              >
-                <SmilePlus
-                  size="20"
-                  class={viewCustomEmojis
-                    ? "fill-magnum-700 stroke-magnum-500"
-                    : ""}
-                />
-              </button>
-            {/if}
-            <!--userdata-->
-
-            {#if viewMetadataList}
-              <input
-                bind:this={metadataInput}
-                type="text"
-                id="npub"
-                class="h-8 w-full rounded-md text-magnum-100 border-2
-         border-magnum-400"
-                bind:value={inputMetadata}
-              />
-            {/if}
-            <button
-              aria-label="open name list"
-              onclick={handleClickMetadata}
-              class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm
-                 bg-zinc-100 font-medium leading-none text-zinc-600 hover:opacity-75 active:opacity-50"
-            >
-              <UserPlus
-                size="20"
-                class={viewMetadataList
-                  ? "fill-magnum-700 stroke-magnum-500"
-                  : ""}
-              />
-            </button>
-
-            <!---->
-            <button
-              disabled={isPosting || text.trim() === ""}
-              aria-label="post"
-              title="Post (Ctrl+Enter)"
-              class="inline-flex h-8 items-center justify-center rounded-sm
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-20"
-              onclick={postNote}
-            >
-              <Send size="20" />
-            </button>
-          </div>
+          <!---->
+          <button
+            disabled={isPosting || text.trim() === ""}
+            aria-label="post"
+            title="Post (Ctrl+Enter)"
+            class="sendButton"
+            onclick={postNote}
+          >
+            <Send size="20" class="stroke-zinc-100" />
+          </button>
         </div>
+
         <!--emojis-->
         {#if viewCustomEmojis}
           <div
@@ -1014,3 +1038,14 @@
     </div>
   </div>
 {/if}
+
+<style lang="postcss">
+  .button,
+  .sendButton {
+    @apply inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-magnum-500
+    bg-zinc-900 font-medium leading-none text-zinc-200 hover:opacity-75 active:opacity-50;
+  }
+  .sendButton {
+    @apply inline-flex h-8 items-center  justify-center bg-magnum-600  px-4 font-medium leading-none  disabled:opacity-50;
+  }
+</style>
