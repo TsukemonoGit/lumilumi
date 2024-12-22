@@ -94,12 +94,6 @@
       >
         {#if events && events.length > 0}
           {#each events as event, index (event.id)}
-            <!-- <div
-        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-        events.length - 1
-          ? 'last-visible'
-          : ''} {index === 0 ? 'first-visible' : ''}"
-      > -->
             <Metadata
               queryKey={["metadata", event.pubkey]}
               pubkey={event.pubkey}

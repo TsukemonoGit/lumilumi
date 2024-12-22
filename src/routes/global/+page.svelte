@@ -17,14 +17,14 @@
   import { generateResultMessage } from "$lib/func/util";
   import GlobalDescription from "./GlobalDescription.svelte";
   import GlobalTimeline from "./GlobalTimeline.svelte";
-  import { afterNavigate } from "$app/navigation";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { page } from "$app/stores";
-  import { writable, type Writable } from "svelte/store";
 
   import * as Nostr from "nostr-typedef";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
+  import { unsucscribeGlobal } from "$lib/func/useReq";
 
   let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);
@@ -167,6 +167,10 @@
       }
     }
   };
+  beforeNavigate(() => {
+    //離れるときはサブスクライブ終わっとく
+    unsucscribeGlobal();
+  });
 </script>
 
 {#if !$loginUser && globalRelays.length <= 0}
