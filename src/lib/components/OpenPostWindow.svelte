@@ -1042,7 +1042,7 @@
 <style lang="postcss">
   .button,
   .sendButton {
-    @apply inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-magnum-500
+    @apply inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-magnum-500
     bg-zinc-900 font-medium leading-none text-zinc-200 hover:opacity-75 active:opacity-50;
   }
   .sendButton {
