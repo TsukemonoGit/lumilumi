@@ -32,19 +32,16 @@
     },
   });
   const close = () => {
-    offlineReady.set(false);
     needRefresh.set(false);
   };
 
-  let toast = $derived($offlineReady || $needRefresh);
+  let toast = $derived($needRefresh);
 </script>
 
 {#if toast}
   <div class="pwa-toast" role="alert">
     <div class="message">
-      {#if $offlineReady}
-        <span> App ready to work offline </span>
-      {:else}
+      {#if $needRefresh}
         <span> New content available, click on reload button to update. </span>
       {/if}
     </div>

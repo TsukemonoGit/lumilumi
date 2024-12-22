@@ -451,9 +451,6 @@
 
 <form class=" flex flex-col gap-3">
   <fieldset class="text-sm break-all">
-    <legend>[pubkey]</legend>
-    <!-- {nip19.npubEncode($pubkey)} -->
-
     <div class="ml-2">
       <button
         class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
