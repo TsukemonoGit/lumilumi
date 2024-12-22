@@ -63,7 +63,8 @@
   "post": {
     "confirm": "There is unposted text. Are you sure you want to close?",
     "nsecAlart": "Warning: Input contains private key (nsec)",
-    "placeholder": "What's happening?"
+    "placeholder": "What's happening?",
+    "quote": "You can cite users and posts with nostr:npub..., nostr:nevent...."
   },
   "user": {
     "profileEdit": "Edit profile",
