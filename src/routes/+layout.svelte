@@ -84,46 +84,56 @@
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
-    //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#auto-update
-    if (pwaInfo) {
-      // @ts-ignore
-      const { registerSW } = await import("virtual:pwa-register");
-      registerSW({
-        immediate: true,
-        onRegistered(r: any) {
-          // uncomment following code if you want check for updates
-          // r && setInterval(() => {
-          //    console.log('Checking for sw update')
-          //    r.update()
-          // }, 20000 /* 20s for testing purposes */)
-          console.log(`SW Registered: ${r}`);
-        },
-        onRegisterError(error: any) {
-          console.log("SW registration error", error);
-        },
-      });
-    }
+    console.log(import.meta.env.MODE);
+    // PWA プラグインによる登録を優先
 
-    // ブラウザがサービスワーカーをサポートしている場合
-    //  // ホームページにいるときにサービスワーカーを更新
-    if ("serviceWorker" in navigator && $page.url.pathname === "/") {
-      try {
-        const registration = await navigator.serviceWorker.register(
-          "/my-sw.js",
-          {
-            updateViaCache: "none", // キャッシュ更新を強制
-          }
-        );
-        console.log(
-          "Service Worker registered with scope:",
-          registration.scope
-        );
+    // try {
+    //   //@ts-ignore
+    //   const { registerSW } = await import("virtual:pwa-register");
+    //   registerSW({
+    //     immediate: true,
+    //     registrationOptions: {
+    //       type: "module", // ここで type を 'module' または 'classic' に設定
+    //     },
+    //     onRegistered(r: { update: () => void }) {
+    //       console.log("Service Worker registered:", r);
+    //       // 定期的に更新チェックを行う場合
+    //       if (r) {
+    //         setInterval(() => {
+    //           console.log("Checking for SW update");
+    //           r.update();
+    //         }, 20 * 1000); // 20秒ごとに更新チェック
+    //       }
+    //     },
+    //     onRegisterError(error: any) {
+    //       console.error("SW registration error:", error);
+    //     },
+    //   });
+    // } catch (error) {
+    //   console.error("Failed to import virtual:pwa-register:", error);
+    // }
 
-        registration.update();
-      } catch (error) {
-        console.error("Service Worker registration failed:", error);
-      }
-    }
+    // // ブラウザがサービスワーカーをサポートしている場合
+    // //  // ホームページにいるときにサービスワーカーを更新
+    // if ("serviceWorker" in navigator && $page.url.pathname === "/") {
+    //   try {
+    //     const registration = await navigator.serviceWorker.register(
+    //       "/my-sw.js",
+    //       {
+    //         type: "module", // ここで type を明示
+    //         updateViaCache: "none", // キャッシュ更新を強制
+    //       }
+    //     );
+    //     console.log(
+    //       "Service Worker registered with scope:",
+    //       registration.scope
+    //     );
+
+    //     registration.update();
+    //   } catch (error) {
+    //     console.error("Service Worker registration failed:", error);
+    //   }
+    // }
 
     // make sure this is called before any
     // window.nostr calls are made
