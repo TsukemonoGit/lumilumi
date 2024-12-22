@@ -1,3 +1,4 @@
+<!--メインTL以外のTL（グローバルとか、リストとか、ユーザーページのやつとか）-->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import {
@@ -383,7 +384,7 @@
   }
 
   onDestroy(() => {
-    console.log("test");
+    console.log("onDestroy");
   });
 </script>
 

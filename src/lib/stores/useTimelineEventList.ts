@@ -10,7 +10,7 @@ import type {
 import type { OperatorFunction } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
-import { useForwardReq } from "$lib/func/useReq";
+import { useForwardReq, useGlobalReq } from "$lib/func/useReq";
 
 export function useTimelineEventList(
   queryKey: QueryKey,
@@ -21,15 +21,18 @@ export function useTimelineEventList(
 
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
-  // const operator = reaCheck
-  //   ? pipe(pipe(), userStatus(), reactionCheck(), scanArray())
-  //   : pipe(pipe(), userStatus(), scanArray());
-  //フィルターに自分へのリプライを取得するフィルターが含まれているか
-
-  return useForwardReq({ queryKey, filters, operator, req }, relays, {
-    staleTime: Infinity,
-    gcTime: Infinity,
-    initialDataUpdatedAt: undefined,
-    refetchInterval: Infinity,
-  }) as ReqResult<EventPacket[]>;
+  console.log(relays);
+  return relays
+    ? (useGlobalReq({ queryKey, filters, operator, req }, relays, {
+        staleTime: Infinity,
+        gcTime: Infinity,
+        initialDataUpdatedAt: undefined,
+        refetchInterval: Infinity,
+      }) as ReqResult<EventPacket[]>)
+    : (useForwardReq({ queryKey, filters, operator, req }, relays, {
+        staleTime: Infinity,
+        gcTime: Infinity,
+        initialDataUpdatedAt: undefined,
+        refetchInterval: Infinity,
+      }) as ReqResult<EventPacket[]>);
 }

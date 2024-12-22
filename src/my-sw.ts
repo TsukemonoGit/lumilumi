@@ -1,9 +1,21 @@
-/// <reference lib="webworker" />
-// src/service-worker.js (例)
-(self as any).__WB_MANIFEST; // Workbox がマニフェストを自動的に挿入します
-importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/6.1.5/workbox-sw.js"
-);
+/// <reference lib="WebWorker" />
+/// <reference types="vite/client" />
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
+
+declare let self: ServiceWorkerGlobalScope;
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
+// self.__WB_MANIFEST is default injection point
+precacheAndRoute(self.__WB_MANIFEST);
+
+// clean old assets
+cleanupOutdatedCaches();
+
 let data: {
   url: string | undefined;
   text: string | undefined;
@@ -18,20 +30,33 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   console.log("Service Worker: Activated");
-  // Activate the new service worker and clean old caches, etc.
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          // 不要なキャッシュを削除する
+          if (cacheName !== "media-cache") {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
 
 self.addEventListener("fetch", async (event) => {
   if (
-    event.request && // 追加: event.request が undefined でないことを確認
+    event.request &&
     event.request.method === "POST" &&
     new URL(event.request.url).pathname === "/post"
   ) {
-    console.log("fetch", event);
+    console.log("fetch event:", event);
     return handlePostRequest(event.request);
   }
 });
+
 let media;
+
 async function handlePostRequest(request) {
   if (!request) {
     console.error("Request is undefined");
@@ -67,10 +92,6 @@ async function handlePostRequest(request) {
   const allClients = await (self as any).clients.matchAll({
     includeUncontrolled: true,
   });
-  media = data.media
-    ? data.media.map((file, index) => `/cached-media/${file.name}-${index}`)
-    : null;
-  console.log(media);
   await Promise.all(
     allClients.map((client) => {
       return client.postMessage({

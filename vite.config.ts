@@ -5,21 +5,24 @@ import { svelteTesting } from "@testing-library/svelte/vite";
 export default defineConfig({
   server: {
     host: true,
+    headers: {
+      "Content-Security-Policy":
+        "worker-src 'self' http://localhost:5173; script-src 'self';",
+    },
   },
   plugins: [
     svelteTesting(),
     sveltekit(),
     SvelteKitPWA({
-      strategies: "injectManifest", //これ入れないと作った方のサービスワーカー登録されない
-      // srcDir: "./src",
-      filename: "my-sw.ts", //自分の作ったサービスワーカーの名前
-      injectManifest: { injectionPoint: undefined },
-      scope: "/",
-      base: "/",
-      devOptions: {
-        //devで確認したい場合は、プラグイン設定にdevOptionsオプションを追加してください（Web App Manifestと生成されたサービスワーカーが得られます）：
-        enabled: true,
-      },
+      // サービスワーカーの戦略を指定
+      strategies: "injectManifest", // ここでサービスワーカーを生成する設定
+      srcDir: "./src",
+      filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
+
+      // サービスワーカーの登録に関連する設定
+      injectRegister: "auto", // サービスワーカーを自動的にインジェクト
+      registerType: "autoUpdate", // サービスワーカーが更新されるたびに自動で更新
+
       pwaAssets: {
         config: true,
       },
@@ -49,27 +52,23 @@ export default defineConfig({
           },
         },
       },
-      injectRegister: "auto", //vite-plugin-pwa プラグインは、injectRegister 設定オプション (オプション) を使って、サービスワーカーを自動的に登録します。 injectRegister プラグインオプションを設定したい場合：
-      registerType: "prompt",
-      //registerType: "autoUpdate",
+
+      injectManifest: {
+        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
+      },
       workbox: {
-        globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-          "prerendered/**/*.html",
-        ],
+        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
       }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
+      devOptions: {
+        enabled: true,
+        suppressWarnings: process.env.SUPPRESS_WARNING === "true",
+        type: "module",
+        navigateFallback: "/",
+      },
+      // if you have shared info in svelte config file put in a separate module and use it also here
+      kit: {
+        includeVersionFile: true,
+      },
     }),
-    //   {
-    //   registerType: "autoUpdate",
-    //   devOptions: {
-    //     enabled: true,
-    //   },
-    //   workbox: {
-    //     globPatterns: [
-    //       "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-    //       "prerendered/**/*.html",
-    //     ],
-    //   },
-    // }
   ],
 });
