@@ -302,3 +302,6 @@
   {/if}
   <!-- <SvelteQueryDevtools initialIsOpen={false} /> -->
 </QueryClientProvider>
+{#await import("$lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
+  <ReloadPrompt />
+{/await}

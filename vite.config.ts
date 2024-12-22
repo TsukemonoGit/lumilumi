@@ -22,14 +22,6 @@ export default defineConfig({
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
       registerType: "autoUpdate", // サービスワーカーが更新されるたびに自動で更新
-      injectManifest: {
-        injectionPoint: undefined,
-        rollupFormat: "iife",
-      },
-      // 開発オプション（開発環境でもPWAを確認するための設定）
-      devOptions: {
-        enabled: true, // 開発時でもPWAが有効
-      },
 
       pwaAssets: {
         config: true,
@@ -61,12 +53,22 @@ export default defineConfig({
         },
       },
 
+      injectManifest: {
+        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
+      },
       workbox: {
-        globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-          "prerendered/**/*.html",
-        ],
+        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
       }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
+      devOptions: {
+        enabled: true,
+        suppressWarnings: process.env.SUPPRESS_WARNING === "true",
+        type: "module",
+        navigateFallback: "/",
+      },
+      // if you have shared info in svelte config file put in a separate module and use it also here
+      kit: {
+        includeVersionFile: true,
+      },
     }),
   ],
 });
