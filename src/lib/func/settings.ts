@@ -185,12 +185,16 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
 }
 
 export async function getNaddrEmojiList(
-  rxNostr: RxNostr,
+  _rxNostr: RxNostr | undefined,
   filters: Filter[],
   relays: DefaultRelayConfig[] | undefined
 ): Promise<EventPacket[]> {
   // const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
+  let rxNostr = get(app).rxNostr;
+  if (_rxNostr) {
+    rxNostr = _rxNostr;
+  }
   if (relays) {
     rxNostr.setDefaultRelays(relays);
   }
@@ -395,7 +399,9 @@ export async function encryptPrvTags(
 // }
 
 export async function createEmojiListFrom10030(
-  event: Nostr.Event
+  event: Nostr.Event,
+  rxNostr: RxNostr | undefined = undefined,
+  relays: DefaultRelayConfig[] | undefined = undefined
 ): Promise<string[][]> {
   //10030に直emojiになってるやつをまずlistに追加
   let list: string[][] = event.tags.reduce(
@@ -410,41 +416,38 @@ export async function createEmojiListFrom10030(
   );
 
   //10030のatagたちをフィルターにする
-  const naddrFilters = event.tags.reduce(
-    (acc: Nostr.Filter[], [tag, value]) => {
-      console.log(tag, value);
-      if (tag === "a") {
-        const matches = value.match(nip33Regex);
-        console.log(matches);
-        if (matches) {
-          const filter: Nostr.Filter = {
-            kinds: [Number(matches[1])],
-            authors: [matches[2]],
-            "#d": [matches[3]],
-            //limit: 1,
-          };
+  const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
+    event.tags as string[][]
+  ).reduce((acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
+    console.log(tag, value);
+    if (tag === "a") {
+      const matches = value.match(nip33Regex);
+      console.log(matches);
+      if (matches) {
+        const filter: Nostr.Filter = {
+          kinds: [Number(matches[1])],
+          authors: [matches[2]],
+          "#d": [matches[3]],
+          limit: 1,
+        };
 
-          return [...acc, filter];
-        } else {
-          return acc;
-        }
-      } else {
-        return acc;
+        // フィルタを結果に追加
+        acc.push({ id: value, filter: filter });
       }
-    },
-    []
-  );
+    }
+    return acc;
+  }, [] as { id: string; filter: Nostr.Filter }[]);
 
-  //チャンクに分ける
-  const chunkedFilters: Filter[][] = chunkArray(naddrFilters, 10);
+  console.log(naddrFilters);
+  const chunkedFilters = chunkArray(
+    naddrFilters.map((fil) => fil.filter),
+    20
+  );
 
   // 全てのチャンクを並列で処理する
   const pkListArray = await Promise.all(
-    chunkedFilters.map((chunk) =>
-      getNaddrEmojiList(get(app).rxNostr, chunk, undefined)
-    )
+    chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
   );
-
   if (pkListArray.length > 0) {
     //重複しないように整える
 
@@ -468,7 +471,19 @@ export async function createEmojiListFrom10030(
     });
 
     // 各チャンクの結果を結合する
-    latestEventsMap.forEach((pk) => {
+    const sortedLatestEvents = naddrFilters.map((filter) => {
+      const id = filter.id;
+      const event = Array.from(latestEventsMap.values()).find((pk) => {
+        const kind = pk.event.kind;
+        const pubkey = pk.event.pubkey;
+        const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
+        return `${kind}:${pubkey}:${dTag}` === id;
+      });
+      return event;
+    });
+
+    // 各チャンクの結果を結合する
+    sortedLatestEvents.forEach((pk) => {
       if (pk && pk.event) {
         list = [
           ...list,
