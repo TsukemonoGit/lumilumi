@@ -224,7 +224,7 @@
     ) {
       return kind10030[0].event;
     } else {
-      return $emojis.event;
+      return $state.snapshot($emojis.event);
     }
   }
 </script>

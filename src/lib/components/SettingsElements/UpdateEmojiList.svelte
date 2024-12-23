@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import {
+    createEmojiListFrom10030,
     getDoukiList,
     getNaddrEmojiList,
     getQueryRelays,
@@ -33,7 +34,7 @@
   let dialogOpen: Writable<boolean> = writable(false);
   async function handleClickEmoji() {
     const beforeEvent = $emojis?.event;
-    let list: string[][] = [];
+
     try {
       const gotPubkey = await (
         window.nostr as Nostr.Nip07.Nostr
@@ -83,154 +84,25 @@
       pk.event.created_at >= beforeEvent.created_at
         ? pk.event
         : beforeEvent;
-    list = kind10030event.tags.reduce(
-      (acc: string[][], [tag, shortcode, url]) => {
-        if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-          return [...acc, [shortcode, url]];
-        } else {
-          return acc;
-        }
-      },
-      []
-    );
 
-    const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
-      kind10030event.tags as string[][]
-    ).reduce(
-      (acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
-        console.log(tag, value);
-        if (tag === "a") {
-          const matches = value.match(nip33Regex);
-          console.log(matches);
-          if (matches) {
-            const filter: Nostr.Filter = {
-              kinds: [Number(matches[1])],
-              authors: [matches[2]],
-              "#d": [matches[3]],
-              limit: 1,
-            };
-
-            // フィルタを結果に追加
-            acc.push({ id: value, filter: filter });
-          }
-        }
-        return acc;
-      },
-      [] as { id: string; filter: Nostr.Filter }[]
-    );
-
-    console.log(naddrFilters);
-    const chunkedFilters = chunkArray(
-      naddrFilters.map((fil) => fil.filter),
-      20
-    );
     const rxNostr = createRxNostr({
       verifier: get(verifier) ?? cryptoVerifier,
     });
-    // const latestEventsMap = await getNaddrEmojiList(
-    //   rxNostr,
-    //   naddrFilters.map((filter) => filter.filter),
-    //   relays
-    // );//これするとでーたとれない
-    // console.log(latestEventsMap);
-
-    // 全てのチャンクを並列で処理する
-    const pkListArray = await Promise.all(
-      chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
+    const list = await createEmojiListFrom10030(
+      kind10030event,
+      rxNostr,
+      relays
     );
-    if (pkListArray.length > 0) {
-      //重複しないように整える
 
-      // フラット化して一つの配列にする
-      const flattenedList = pkListArray.flat();
+    $emojis = {
+      list: list,
+      updated: Math.floor(Date.now() / 1000),
+      event: kind10030event,
+    };
 
-      // dtag をキーとして最新のイベントをマップに格納
-      const latestEventsMap = new Map<string, EventPacket>();
+    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
 
-      flattenedList.forEach((packet) => {
-        const dTag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
-        if (dTag) {
-          const existingEvent = latestEventsMap.get(dTag);
-          if (
-            !existingEvent ||
-            packet.event.created_at > existingEvent.event.created_at
-          ) {
-            latestEventsMap.set(dTag, packet);
-          }
-        }
-      });
-
-      // 各チャンクの結果を結合する
-      const sortedLatestEvents = naddrFilters.map((filter) => {
-        const id = filter.id;
-        const event = Array.from(latestEventsMap.values()).find((pk) => {
-          const kind = pk.event.kind;
-          const pubkey = pk.event.pubkey;
-          const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
-          return `${kind}:${pubkey}:${dTag}` === id;
-        });
-        return event;
-      });
-
-      // 各チャンクの結果を結合する
-      sortedLatestEvents.forEach((pk) => {
-        if (pk && pk.event) {
-          list = [
-            ...list,
-            ...pk.event.tags.reduce(
-              (acc: string[][], [tag, shortcode, url]) => {
-                if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-                  return [...acc, [shortcode, url]];
-                } else {
-                  return acc;
-                }
-              },
-              []
-            ),
-          ];
-        }
-      });
-
-      //   // console.log(list.length);
-      //   $emojis = {
-      //     list: list,
-      //     updated: Math.floor(Date.now() / 1000),
-      //     event: event,
-      //   };
-
-      //   localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
-      // }
-
-      // sortedLatestEvents.forEach((pk) => {
-      //   if (pk && pk.event) {
-      //     list = [
-      //       ...list,
-      //       ...pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
-      //         if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-      //           return [...acc, [shortcode, url]];
-      //         } else {
-      //           return acc;
-      //         }
-      //       }, []),
-      //     ];
-      //   }
-      // });
-      $emojis = {
-        list: list,
-        updated: Math.floor(Date.now() / 1000),
-        event: kind10030event,
-      };
-
-      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
-    }
     $nowProgress = false;
-  }
-
-  // フィルターを5個ずつのチャンクに分割する関数
-  function chunkArray(array: any[], chunkSize: number) {
-    return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
-      array.slice(i * chunkSize, i * chunkSize + chunkSize)
-    );
   }
 </script>
 
@@ -269,15 +141,16 @@
             </div>
           {/each}
         </div>
-      {/if}<a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
-        )}/10030"
-        >{$_("settings.nostviewstr.kind10030")}
-      </a>
+      {/if}
+      {#if $loginUser}<a
+          class="underline text-magnum-300 break-all ml-4 text-sm"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+            $loginUser
+          )}/10030"
+          >{$_("settings.nostviewstr.kind10030")}
+        </a>{/if}
     </div>
   {/snippet}
 </Dialog>

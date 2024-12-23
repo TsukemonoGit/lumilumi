@@ -123,15 +123,15 @@
         {/each}
       {/if}
 
-      <a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
-        )}/30007"
-        >{$_("settings.nostviewstr.kind30007")}
-      </a>
+      {#if $loginUser}<a
+          class="underline text-magnum-300 break-all ml-4 text-sm"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+            $loginUser
+          )}/30007"
+          >{$_("settings.nostviewstr.kind30007")}
+        </a>{/if}
     </div>
   {/snippet}
 </Dialog>

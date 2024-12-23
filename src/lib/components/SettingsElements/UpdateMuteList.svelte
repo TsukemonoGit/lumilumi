@@ -107,16 +107,17 @@
       {#if $mutes}
         <AddMute />
         <MuteTabList />
-      {/if}<a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
-        )}/10000"
-      >
-        {$_("settings.nostviewstr.kind10000")}
-      </a>
+      {/if}
+      {#if $loginUser}<a
+          class="underline text-magnum-300 break-all ml-4 text-sm"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
+            $loginUser
+          )}/10000"
+        >
+          {$_("settings.nostviewstr.kind10000")}
+        </a>{/if}
     </div>
   {/snippet}
 </Dialog>
