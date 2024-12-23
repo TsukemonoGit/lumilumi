@@ -34,6 +34,8 @@
   let openPopover: (bool: boolean) => void = () => {};
 
   const handleClickCustomReaction = async () => {
+    // console.log("atag:", atag);
+
     const textLen = split(customReaction).length; //countSymbolsIgnoringCombiningMarks(customReaction);
 
     if (textLen !== 1) {
@@ -51,6 +53,7 @@
     }
 
     const tags: string[][] = root ? [root] : [];
+
     if (atag) {
       tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
     } else {
@@ -79,14 +82,22 @@
       return;
     }
 
-    const ev: Nostr.EventParameters = {
-      kind: 7,
-      tags: [
+    const tags: string[][] = root ? [root] : [];
+
+    if (atag) {
+      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
+    } else {
+      tags.push(
         ["p", note.pubkey],
         ["e", note.id],
-        ["k", note.kind.toString()],
-        ["emoji", ...e],
-      ],
+        ["k", note.kind.toString()]
+      );
+    }
+    tags.push(["emoji", ...e]);
+
+    const ev: Nostr.EventParameters = {
+      kind: 7,
+      tags: tags,
       content: `:${e[0]}:`,
     };
     await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);

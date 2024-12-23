@@ -106,6 +106,7 @@
   let queryId = $derived(atag ?? note?.id);
 
   const handleClickReaction = async () => {
+    //console.log("atag:", atag);
     const tags: string[][] = root ? [root] : [];
     if (atag) {
       tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
