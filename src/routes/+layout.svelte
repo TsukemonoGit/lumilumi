@@ -219,6 +219,8 @@
         )
       : undefined
   ); //data.relaysにちょっとしかなかったらデフォリレーから足す
+
+  console.log($page.url.origin);
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />

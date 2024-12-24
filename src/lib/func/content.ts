@@ -409,7 +409,7 @@ export function parseText(input: string, tags: string[][]): Part[] {
           break;
         case "url":
           const url = match[0];
-          const lastUnpairedParenIndex = url.split("").reduce(
+          let lastUnpairedParenIndex = url.split("").reduce(
             (acc, char, idx) => {
               if (char === "(") acc.openParenCount++;
               if (char === ")") acc.closeParenCount++;
@@ -423,7 +423,24 @@ export function parseText(input: string, tags: string[][]): Part[] {
             },
             { openParenCount: 0, closeParenCount: 0, index: url.length }
           ).index;
-
+          if (lastUnpairedParenIndex === url.length) {
+            //()のぺあなし
+            //（）のペアを探してみる
+            lastUnpairedParenIndex = url.split("").reduce(
+              (acc, char, idx) => {
+                if (char === "（") acc.openParenCount++;
+                if (char === "）") acc.closeParenCount++;
+                if (
+                  acc.closeParenCount > acc.openParenCount &&
+                  acc.index === url.length
+                ) {
+                  acc.index = idx;
+                }
+                return acc;
+              },
+              { openParenCount: 0, closeParenCount: 0, index: url.length }
+            ).index;
+          }
           // Split the URL into its proper parts
           const urlPart = url.slice(0, lastUnpairedParenIndex);
           const textPart = url.slice(lastUnpairedParenIndex);
