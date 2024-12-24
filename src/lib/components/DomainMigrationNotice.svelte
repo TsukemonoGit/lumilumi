@@ -31,12 +31,15 @@
                 hover:bg-magnum-100 focus:shadow-magnum-400"
       onclick={handleClickClose}><X /></button
     >
-    <div class=" notice-content">
-      <h2>{$_("domainnotice.title")}</h2>
-      <p><strong>https://lumilumi.app</strong></p>
-      <p>今後は新しいドメインをご利用いただきますようお願い申し上げます。</p>
-      <p>{$_("domainnotice.message.1")}</p>
-      <p>{$_("domainnotice.message.2")}</p>
+    <div class="flex flex-col gap-2 items-center notice-content">
+      <div>
+        <h2>{$_("domainnotice.title")}</h2>
+        <div class="mb-4"><strong>https://lumilumi.app</strong></div>
+        <p>今後は新しいドメインをご利用いただきますようお願い申し上げます。</p>
+        <p>{$_("domainnotice.message.1")}</p>
+        <p>{$_("domainnotice.message.2")}</p>
+      </div>
+
       <a href={newDomain} class="button">{$_("domainnotice.movebutton")}</a>
     </div>
   </div>
@@ -53,22 +56,26 @@
 
     border-radius: 8px;
     max-width: 90vw;
-    width: 480px;
+    width: 520px;
     text-align: center;
     @apply bg-neutral-800 border border-neutral-300;
   }
 
   .notice-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
   }
 
   .notice-content p {
-    font-size: 1rem;
+    @apply text-sm;
     margin-bottom: 15px;
+    text-align: left;
+    text-indent: 1em;
+    height: fit-content;
   }
 
   .button {
+    width: fit-content;
     background-color: #0277bd;
     color: white;
     padding: 10px 20px;

@@ -258,8 +258,8 @@
   "domainnotice": {
     "title": "Domain transfer announcement",
     "message": {
-      "1": "If you want to transfer your settings, please upload them to the relay from the settings page, and then download them on the new domain. ",
-      "2": "Please note that synchronization will not be carried over, so you will need to press the sync button on the new domain."
+      "1": "If you want to transfer your settings, you can save and restore them by clicking the \"Upload/Download current configuration to relay\" button at the bottom of the settings page.",
+      "2": "The \"Sync\" settings will not be transferred, so please click each button again to synchronize."
     },
     "movebutton": "Move to a new domain"
   }
