@@ -3,7 +3,10 @@ import type { Handle } from "@sveltejs/kit";
 import { locale } from "svelte-i18n";
 
 // 許可するオリジンを設定（必要に応じて）
-const allowedOrigins = ["https://lumilumi.vercel.app/"]; //, "https://another-example.com"];
+const allowedOrigins = [
+  "https://lumilumi.vercel.app/",
+  "https://lumilumi.app/",
+]; //, "https://another-example.com"];
 
 export const handle: Handle = async ({ event, resolve }) => {
   // Accept-Language ヘッダーを使用して言語設定

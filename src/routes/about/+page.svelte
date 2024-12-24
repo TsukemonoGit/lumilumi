@@ -174,7 +174,7 @@
       <div class="list">{$_("author")}</div>
       <div class="item">
         <Link
-          href="https://lumilumi.vercel.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
+          href="https://lumilumi.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           className="flex gap-1 items-center underline"
         >
           {#snippet content()}@mono{/snippet}
