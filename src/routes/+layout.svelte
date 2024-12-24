@@ -307,6 +307,6 @@
   <ReloadPrompt />
 {/await}
 
-{#if $page.url.origin === "https://lumilumi.vercel.app" || "http://localhost:5173"}
+{#if $page.url.origin === "https://lumilumi.vercel.app" || $page.url.origin === "http://localhost:5173"}
   <DomainMigrationNotice />
 {/if}
