@@ -31,7 +31,7 @@
   import { afterNavigate } from "$app/navigation";
   import NostrMain from "$lib/components/renderSnippets/nostr/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
-  import { page } from "$app/stores";
+
   import workerUrl from "$lib/worker?worker&url";
   import {
     createNoopClient,
@@ -50,6 +50,7 @@
   import { displayEvents, showBanner } from "$lib/stores/globalRunes.svelte";
   import { defaultRelays } from "$lib/stores/relays";
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
+  import { page } from "$app/state";
 
   let { data, children } = $props<{
     data:
@@ -228,7 +229,7 @@
   ><!--ここを{$ogTitle}にするとMenubarの項目をホバーするだけでタイトル変わる謎になる-->
 
   <meta property="og:title" content={$ogTitle} />
-  <meta property="og:image" content={`${$page.url.origin}/ogp.webp`} />
+  <meta property="og:image" content={`${page.url.origin}/ogp.webp`} />
 
   <meta name="description" content={$ogDescription} />
 
@@ -307,6 +308,6 @@
   <ReloadPrompt />
 {/await}
 
-{#if $page.url.origin === "https://lumilumi.vercel.app" || $page.url.origin === "http://localhost:5173"}
+{#if page.url.origin === "https://lumilumi.vercel.app" || page.url.origin === "http://localhost:5173"}
   <DomainMigrationNotice />
 {/if}
