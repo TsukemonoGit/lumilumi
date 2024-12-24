@@ -254,5 +254,14 @@
   "sourceCode": "Source code",
   "author": "Author",
   "mascot": "Mascot of lumilumi",
-  "others": "Others"
+  "others": "Others",
+  "domainnotice": {
+    "title": "Domain transfer announcement",
+    "message": {
+      "0": "Thank you for using Lumilumi. Please use the new domain https://lumilumi.app from now on.",
+      "1": "If you want to transfer your settings, you can save and restore them by clicking the \"Upload/Download current configuration to relay\" button at the bottom of the settings page.",
+      "2": "The \"Sync\" settings will not be transferred, so please click each button again to synchronize."
+    },
+    "movebutton": "Move to a new domain"
+  }
 }

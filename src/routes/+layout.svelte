@@ -49,6 +49,7 @@
   import { writable, type Writable } from "svelte/store";
   import { displayEvents, showBanner } from "$lib/stores/globalRunes.svelte";
   import { defaultRelays } from "$lib/stores/relays";
+  import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
 
   let { data, children } = $props<{
     data:
@@ -219,8 +220,6 @@
         )
       : undefined
   ); //data.relaysにちょっとしかなかったらデフォリレーから足す
-
-  console.log($page.url.origin);
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -307,3 +306,7 @@
 {#await import("$lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
   <ReloadPrompt />
 {/await}
+
+{#if $page.url.origin === "https://lumilumi.vercel.app" || "http://localhost:5173"}
+  <DomainMigrationNotice />
+{/if}
