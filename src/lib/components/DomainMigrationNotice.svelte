@@ -27,7 +27,7 @@
 {:else}
   <div class="migration-notice">
     <button
-      class="absolute top-0 right-0 rounded-full p-1 m-1 text-magnum-800 bg-magnum-100/70
+      class="absolute top-0 right-0 rounded-full p-1 m-1 text-magnum-800 bg-magnum-100
                 hover:bg-magnum-100 focus:shadow-magnum-400"
       onclick={handleClickClose}><X /></button
     >
@@ -55,7 +55,7 @@
     max-width: 90vw;
     width: 480px;
     text-align: center;
-    @apply bg-neutral-700 border border-neutral-300;
+    @apply bg-neutral-800 border border-neutral-300;
   }
 
   .notice-content h2 {
