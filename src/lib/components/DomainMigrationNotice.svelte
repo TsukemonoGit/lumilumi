@@ -35,7 +35,8 @@
       <div>
         <h2>{$_("domainnotice.title")}</h2>
         <div class="mb-4"><strong>https://lumilumi.app</strong></div>
-        <p>今後は新しいドメインをご利用いただきますようお願い申し上げます。</p>
+        <p>{$_("domainnotice.message.0")}</p>
+
         <p>{$_("domainnotice.message.1")}</p>
         <p>{$_("domainnotice.message.2")}</p>
       </div>
