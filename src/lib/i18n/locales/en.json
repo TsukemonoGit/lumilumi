@@ -254,5 +254,13 @@
   "sourceCode": "Source code",
   "author": "Author",
   "mascot": "Mascot of lumilumi",
-  "others": "Others"
+  "others": "Others",
+  "domainnotice": {
+    "title": "Domain transfer announcement",
+    "message": {
+      "1": "If you want to transfer your settings, please upload them to the relay from the settings page, and then download them on the new domain. ",
+      "2": "Please note that synchronization will not be carried over, so you will need to press the sync button on the new domain."
+    },
+    "movebutton": "Move to a new domain"
+  }
 }
