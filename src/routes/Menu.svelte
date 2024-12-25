@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { AlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
@@ -11,9 +11,9 @@
 
   import logo from "$lib/images/favicon.svg";
   import { goto } from "$app/navigation";
-  import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { mainMenuItems } from "./menu";
   const {
     elements: {
       trigger,
@@ -44,7 +44,7 @@
 
   function handleClickHome() {
     // 現在のパスが `/` ならトップにスクロール
-    if ($page.url?.pathname === "/") {
+    if (page.url?.pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       goto("/");
@@ -131,7 +131,7 @@
               </li>
             {:else}
               <li
-                aria-current={$page.url?.pathname ===
+                aria-current={page.url?.pathname ===
                 (link === undefined && $loginUser ? `/${encodedPub}` : link)
                   ? "page"
                   : undefined}
@@ -154,7 +154,7 @@
           {/each}
 
           <li
-            aria-current={$page.url?.pathname === "/about" ? "page" : undefined}
+            aria-current={page.url?.pathname === "/about" ? "page" : undefined}
           >
             <a href="/about" use:melt={$close}
               >{#if lumiSetting.get().showImg}

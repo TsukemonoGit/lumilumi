@@ -12,7 +12,7 @@
   import EllipsisMenuNote from "../NoteActionButtuns/EllipsisMenuNote.svelte";
   import EventCard from "./EventCard.svelte";
   import OmittedCard from "./OmittedCard.svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { loginUser } from "$lib/stores/stores";
   import { nip33Regex, relayRegex } from "$lib/func/regex";
   import NoteByRelayhint from "../NoteByRelayhint.svelte";
@@ -112,7 +112,7 @@
       </div>
     {/snippet}
     {#snippet content({ data: text })}
-      {#if $page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
+      {#if page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
         <OmittedCard
           {text}
           {depth}
@@ -211,7 +211,7 @@
         </div>
       {/snippet}
       {#snippet children({ event })}
-        {#if $page.route.id === "/notifications" && depth === 1 && event.pubkey === $loginUser}
+        {#if page.route.id === "/notifications" && depth === 1 && event.pubkey === $loginUser}
           <OmittedCard
             text={event}
             {depth}

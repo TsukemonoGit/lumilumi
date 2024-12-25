@@ -1,4 +1,4 @@
-import { page } from "$app/stores";
+import { page } from "$app/state";
 import {
   Bell,
   Globe,
@@ -9,8 +9,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-svelte";
-
-import { derived } from "svelte/store";
 
 export const mainMenuItems: {
   Icon: any;
@@ -68,19 +66,3 @@ export const mainMenuItems: {
     noPubkey: true,
   },
 ];
-
-// 現在のページに基づいてアイコンを設定
-export const currentPage = derived(page, ($page) => {
-  const { pathname } = $page.url;
-  // アイテムを部分一致でチェック
-  const matchedItem = mainMenuItems.find((item) => {
-    if (item.link === "/" && pathname === "/") return true;
-
-    if (item.link !== "/" && item.link && pathname.startsWith(item.link))
-      return true;
-
-    return false;
-  });
-
-  return matchedItem || null;
-});

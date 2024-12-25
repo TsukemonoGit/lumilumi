@@ -20,7 +20,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
 
   import * as Nostr from "nostr-typedef";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
@@ -128,7 +128,7 @@
       setGlobalRelay();
     }
   });
-  console.log($page);
+  console.log(page);
 
   const setGlobalRelay = async () => {
     //すでにあるならデータをセットする
@@ -178,7 +178,7 @@
     {$_("global.explain")}
 
     <code class="block p-2 rounded">
-      {`${$page.url.origin}${$page.url.pathname}?relay=[relayUrl]&relay=[relayUrl]`}
+      {`${page.url.origin}${page.url.pathname}?relay=[relayUrl]&relay=[relayUrl]`}
     </code>
     <br />
     <a

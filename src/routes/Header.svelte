@@ -1,16 +1,34 @@
 <script lang="ts">
   import RelayStatus from "$lib/components/RelayStatus.svelte";
   import { SlidersHorizontal } from "lucide-svelte";
-  import { currentPage } from "./menu";
+
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { createRadioGroup, melt } from "@melt-ui/svelte";
   import { _ } from "svelte-i18n";
   import { writable } from "svelte/store";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
+  import { mainMenuItems } from "./menu";
 
   let _showBanner: boolean = $state(showBanner.get());
+
+  //-----
+  // 現在のページに基づいてアイコンを設定
+  let currentPage = $derived.by(() => {
+    const { pathname } = page.url;
+    // アイテムを部分一致でチェック
+    const matchedItem = mainMenuItems.find((item) => {
+      if (item.link === "/" && pathname === "/") return true;
+
+      if (item.link !== "/" && item.link && pathname.startsWith(item.link))
+        return true;
+
+      return false;
+    });
+
+    return matchedItem || null;
+  });
 
   const optionsArr = [
     ["0", $_("filter.canversation.all")],
@@ -45,7 +63,7 @@
     }
   });
   // $inspect(_showBanner);
-  let Icon = $derived($currentPage?.Icon);
+  let Icon = $derived(currentPage?.Icon);
 </script>
 
 <header>
@@ -57,12 +75,11 @@
         </div>
       {/if}
       <div class="uppercase font-bold">
-        {$currentPage?.alt ??
-          ($page.route.id === "/post" ? "share" : "lumilumi")}
+        {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
       </div>
       <RelayStatus />
     </div>
-    {#if $currentPage?.alt !== "settings"}<!--&& $currentPage?.alt !== "about"-->
+    {#if currentPage?.alt !== "settings"}<!--&& currentPage?.alt !== "about"-->
       <div class="fixed w-full top-0">
         <div class="container relative">
           <div class="option">
@@ -76,7 +93,7 @@
               {#snippet popoverContent()}
                 <div class="w-[320px] max-w-full flex flex-col">
                   <ul>
-                    {#if $currentPage?.alt === "home"}
+                    {#if currentPage?.alt === "home"}
                       <li class="mb-2">
                         <div class="label">
                           {$_("filter.menu.canversation")}

@@ -18,7 +18,7 @@
   import MakeNewKind3 from "../lib/components/NostrElements/kindEvents/MakeNewKind3.svelte";
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
   import MainTimeline from "../lib/components/renderSnippets/nostr/MainTimeline.svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50; //1ページに表示する量
@@ -89,7 +89,7 @@
 
     select: number
   ): boolean {
-    if ($page.url.pathname !== "/") {
+    if (page.url.pathname !== "/") {
       return true;
     }
 

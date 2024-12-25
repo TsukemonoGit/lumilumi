@@ -24,7 +24,7 @@
   import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { nostviewstrable } from "$lib/func/constants";
 
   import { translateText } from "$lib/func/util";
@@ -172,13 +172,13 @@
         const shareData = {
           title: "",
           //text: "lumilumi",
-          url: `${$page.url.origin}/${replaceable ? naddr : nevent}`,
+          url: `${page.url.origin}/${replaceable ? naddr : nevent}`,
         };
         //console.log(shareData);
         try {
           await navigator.share(shareData);
           // await navigator.clipboard.writeText(
-          //   `${$page.url.origin}/${replaceable ? naddr : nevent}`
+          //   `${page.url.origin}/${replaceable ? naddr : nevent}`
           // );
           // $toastSettings = {
           //   title: "Success",

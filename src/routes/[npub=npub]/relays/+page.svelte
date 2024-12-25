@@ -18,7 +18,7 @@
   import { _ } from "svelte-i18n";
 
   import { X, Save } from "lucide-svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
@@ -31,7 +31,7 @@
 
   let { data }: { data: PageData } = $props();
 
-  // const data={pubkey:$page.params.npub};
+  // const data={pubkey:page.params.npub};
   console.log(data.pubkey);
 
   //svelte-ignore non_reactive_update
@@ -88,7 +88,7 @@
         };
         isError = true;
         // 現在のURLの親階層に戻る
-        const currentUrl = $page.url.pathname; // 現在のURLパスを取得
+        const currentUrl = page.url.pathname; // 現在のURLパスを取得
         const parentUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/")); // 一つ前の階層を取得
         goto(parentUrl); // 一つ前の階層に移動
         return;

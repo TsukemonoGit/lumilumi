@@ -117,7 +117,7 @@
 
     // // ブラウザがサービスワーカーをサポートしている場合
     // //  // ホームページにいるときにサービスワーカーを更新
-    // if ("serviceWorker" in navigator && $page.url.pathname === "/") {
+    // if ("serviceWorker" in navigator && page.url.pathname === "/") {
     //   try {
     //     const registration = await navigator.serviceWorker.register(
     //       "/my-sw.js",

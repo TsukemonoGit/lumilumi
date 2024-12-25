@@ -11,7 +11,7 @@
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
   import { eventKinds } from "$lib/func/kinds";
   import { _ } from "svelte-i18n";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { followList } from "$lib/stores/globalRunes.svelte";
   interface Props {
     searchWord: string | undefined;
@@ -81,11 +81,11 @@
 
   async function handleClickShare() {
     const shareData = { url: sharaParam() };
-    console.log($page.url);
+    console.log(page.url);
     try {
       await navigator.share(shareData);
       // await navigator.clipboard.writeText(
-      //   `${$page.url.origin}/channel/${nevent}`
+      //   `${page.url.origin}/channel/${nevent}`
       // );
       // $toastSettings = {
       //   title: "Success",
@@ -103,7 +103,7 @@
   }
 
   function sharaParam() {
-    const url = new URL($page.url.origin + $page.url.pathname);
+    const url = new URL(page.url.origin + page.url.pathname);
     const params = url.searchParams;
 
     searchHashtag ? params.set("t", searchHashtag) : params.delete("t");

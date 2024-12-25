@@ -15,7 +15,7 @@
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { writable, type Writable } from "svelte/store";
 
   interface Props {
@@ -110,12 +110,12 @@
         const shareData = {
           title: `【List】${listData.title ?? listData.dtag ?? ""}`,
           text: listData.description ?? undefined,
-          url: `${$page.url.origin}/list/${naddr}`,
+          url: `${page.url.origin}/list/${naddr}`,
         };
         try {
           await navigator.share(shareData);
           // await navigator.clipboard.writeText(
-          //   `${$page.url.origin}/list/${naddr}`
+          //   `${page.url.origin}/list/${naddr}`
           // );
           // $toastSettings = {
           //   title: "Success",

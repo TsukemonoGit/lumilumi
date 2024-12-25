@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
 
@@ -39,7 +39,7 @@
 
   // svelte-ignore non_reactive_update
   const menuTexts =
-    //$page.params.relay !== encodedUrl
+    //page.params.relay !== encodedUrl
     //?
     [
       { text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 },
@@ -135,13 +135,13 @@
           const shareData = {
             title: "",
             //text: "lumilumi",
-            url: `${$page.url.origin}/relay/${encodedUrl}`,
+            url: `${page.url.origin}/relay/${encodedUrl}`,
           };
 
           try {
             await navigator.share(shareData);
             // await navigator.clipboard.writeText(
-            //   `${$page.url.origin}/${replaceable ? naddr : nevent}`
+            //   `${page.url.origin}/${replaceable ? naddr : nevent}`
             // );
             // $toastSettings = {
             //   title: "Success",

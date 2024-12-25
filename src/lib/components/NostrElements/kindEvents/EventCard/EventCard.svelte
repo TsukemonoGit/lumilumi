@@ -32,7 +32,7 @@
 
   import ReplyThread from "../ReplyThread.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import ReactionWebsite from "../ReactionWebsite.svelte";
 
   import Kind31990Note from "./Kind31990Note.svelte";
@@ -167,12 +167,12 @@
 
   //canvasationcheck
   // $: showCanvasationCheck =
-  //   $page.url.pathname !== "/"
+  //   page.url.pathname !== "/"
   //     ? true
   //     : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
 
   let paramNoteId = $derived(
-    $page.params.note ? getIDbyParam($page.params.note) : undefined
+    page.params.note ? getIDbyParam(page.params.note) : undefined
   );
   let muteType = $derived.by(() => {
     if ($mutes || $mutebykinds || timelineFilter.get) {

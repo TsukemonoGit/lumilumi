@@ -1,3 +1,4 @@
+import { page } from "$app/state";
 import { initSettings } from "$lib/func/constants";
 import {
   timelineFilterInit,
@@ -7,6 +8,7 @@ import {
 import * as Nostr from "nostr-typedef";
 import type { ConnectionState } from "rx-nostr";
 import { SvelteMap } from "svelte/reactivity";
+import { mainMenuItems } from "../../routes/menu";
 
 export const displayEvents = createSlicedEvent();
 //localstorage "timelineFilter"
