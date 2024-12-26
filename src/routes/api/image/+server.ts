@@ -1,53 +1,47 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import sharp from "sharp";
 
-export const POST: RequestHandler = async ({ request }) => {
-  // FormDataからファイルを取得
-  const formData = await request.formData();
-  const file = formData.get("file") as File;
-  if (!file) {
-    return new Response(JSON.stringify({ message: "File is required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+// EXIFデータをログに出力する関数
+const logExifData = async (image: sharp.Sharp, stage: string) => {
+  const metadata = await image.metadata();
+  if (process.env.NODE_ENV === "development") {
+    if (metadata.exif) {
+      console.log(`${stage} EXIF data:`, metadata.exif);
+    } else {
+      console.log(`${stage} EXIF data not found`);
+    }
   }
+  return metadata;
+};
 
-  // sharpでEXIF情報を取得
+export const POST: RequestHandler = async ({ request }) => {
   try {
+    // FormDataからファイルを取得
+    const formData = await request.formData();
+    const file = formData.get("file") as File;
+    if (!file) {
+      return new Response(JSON.stringify({ message: "File is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     // ファイルをBufferに変換
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-    const image = sharp(buffer);
-    const beforeMetadata = await image.metadata();
-    //変換前の回転情報
-    const rotationInfo = beforeMetadata.orientation;
+    // sharpインスタンスの作成と回転情報適用
+    const image = sharp(buffer).rotate();
 
-    // EXIFデータが存在するか確認
-    if (process.env.NODE_ENV === "development") {
-      if (beforeMetadata.exif) {
-        console.log("Before EXIF data:", beforeMetadata.exif);
-      } else {
-        console.log("Before EXIF data not found");
-      }
-    }
-    // sharpでEXIFを削除  //回転情報は残す
-    const imageWithoutExif = await sharp(buffer).toBuffer();
+    // 変換前のEXIFデータをログ出力
+    await logExifData(image, "Before");
 
-    // 画像形式を推測
-    const afterMetadata = await sharp(imageWithoutExif)
-      .rotate(rotationInfo)
-      .metadata();
+    // EXIFを削除した画像を生成
+    const imageWithoutExif = await image.toBuffer();
 
-    // EXIFデータが存在するか確認
-    if (process.env.NODE_ENV === "development") {
-      if (afterMetadata.exif) {
-        console.log("After EXIF data:", afterMetadata.exif);
-      } else {
-        console.log("After EXIF data not found");
-      }
-    }
+    // 変換後のEXIFデータをログ出力
+    const afterMetadata = await logExifData(sharp(imageWithoutExif), "After");
 
+    // MIMEタイプを決定
     const mimeType = afterMetadata.format
       ? `image/${afterMetadata.format}`
       : "application/octet-stream";
@@ -57,11 +51,14 @@ export const POST: RequestHandler = async ({ request }) => {
       status: 200,
       headers: { "Content-Type": mimeType },
     });
-  } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ message: "Error processing image" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+  } catch (error: any) {
+    console.error("Error processing image:", error);
+    return new Response(
+      JSON.stringify({
+        message: "Error processing image",
+        error: error.message,
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 };
