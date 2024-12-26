@@ -19,25 +19,21 @@ export const POST: RequestHandler = async ({ request }) => {
     const buffer = Buffer.from(arrayBuffer);
 
     const image = sharp(buffer);
-    const beforeMetadata = await image.metadata();
-    //変換前の回転情報
-    const rotationInfo = beforeMetadata.orientation;
 
     // EXIFデータが存在するか確認
     if (process.env.NODE_ENV === "development") {
+      const beforeMetadata = await image.metadata();
       if (beforeMetadata.exif) {
         console.log("Before EXIF data:", beforeMetadata.exif);
       } else {
         console.log("Before EXIF data not found");
       }
     }
-    // sharpでEXIFを削除  //回転情報は残す
-    const imageWithoutExif = await sharp(buffer).toBuffer();
+    // sharpでEXIFを削除
+    const imageWithoutExif = await sharp(buffer).rotate().toBuffer();
 
     // 画像形式を推測
-    const afterMetadata = await sharp(imageWithoutExif)
-      .rotate(rotationInfo)
-      .metadata();
+    const afterMetadata = await sharp(imageWithoutExif).metadata();
 
     // EXIFデータが存在するか確認
     if (process.env.NODE_ENV === "development") {
