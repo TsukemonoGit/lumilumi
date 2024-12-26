@@ -24,7 +24,7 @@
   import type { Profile } from "$lib/types";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
   import { writable, type Writable } from "svelte/store";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
@@ -70,7 +70,7 @@
   ];
 
   let menuTexts = $derived([
-    ...($page.url.pathname === `/${encodedPubkey}`
+    ...(page.url.pathname === `/${encodedPubkey}`
       ? baseMenuTexts.filter((item) => item.num !== 0) // "userPage" を削除
       : baseMenuTexts),
     ...(metadata
@@ -169,13 +169,13 @@
         const shareData = {
           //title: "",
           text: "",
-          url: `${$page.url.origin}/${urlData}`,
+          url: `${page.url.origin}/${urlData}`,
         };
 
         try {
           await navigator.share(shareData);
           // await navigator.clipboard.writeText(
-          //   `${$page.url.origin}/${replaceable ? naddr : nevent}`
+          //   `${page.url.origin}/${replaceable ? naddr : nevent}`
           // );
         } catch (error: any) {
           console.error(error.message);

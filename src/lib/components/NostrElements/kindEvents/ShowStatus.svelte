@@ -9,7 +9,7 @@
   import * as Nostr from "nostr-typedef";
   import { parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
 
   interface Props {
@@ -34,9 +34,9 @@
       if (raeTags[0] === "r") {
         return raeTags[1];
       } else if (raeTags[0] === "e" && hexRegex.test(raeTags[1])) {
-        return `${$page.url.origin}/${nip19.noteEncode(raeTags[1])}`;
+        return `${page.url.origin}/${nip19.noteEncode(raeTags[1])}`;
       } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
-        return `${$page.url.origin}/${nip19.naddrEncode(parseNaddr(raeTags))}`;
+        return `${page.url.origin}/${nip19.naddrEncode(parseNaddr(raeTags))}`;
       }
     }
   }

@@ -16,7 +16,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
@@ -129,12 +129,12 @@
         const shareData = {
           title: `【Channel】${channelData.name}`,
           text: channelData.about,
-          url: `${$page.url.origin}/channel/${nevent}`,
+          url: `${page.url.origin}/channel/${nevent}`,
         };
         try {
           await navigator.share(shareData);
           // await navigator.clipboard.writeText(
-          //   `${$page.url.origin}/channel/${nevent}`
+          //   `${page.url.origin}/channel/${nevent}`
           // );
           // $toastSettings = {
           //   title: "Success",

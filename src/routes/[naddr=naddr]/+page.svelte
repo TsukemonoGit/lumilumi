@@ -17,7 +17,7 @@
   import { sortEvents } from "$lib/func/util";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -55,7 +55,7 @@
 
   async function init() {
     if (data.kind === 30000) {
-      goto(`list/${$page.params.naddr}`);
+      goto(`list/${page.params.naddr}`);
     }
     // since = undefined;
 

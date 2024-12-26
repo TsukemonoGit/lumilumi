@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
   import {
     loginUser,
@@ -25,12 +25,12 @@
     const shareData = {
       title: `LUMILUMI the NOSTR client`,
       //  text:  undefined,
-      url: $page.url.origin,
+      url: page.url.origin,
     };
     try {
       await navigator.share(shareData);
       // await navigator.clipboard.writeText(
-      //   `${$page.url.origin}/channel/${nevent}`
+      //   `${page.url.origin}/channel/${nevent}`
       // );
       // $toastSettings = {
       //   title: "Success",
@@ -279,9 +279,7 @@
         </li>
         <li>
           <div class="item">
-            <makibishi-component
-              url={$page.url.origin}
-              hide-reaction-list={true}
+            <makibishi-component url={page.url.origin} hide-reaction-list={true}
             ></makibishi-component>
           </div>
         </li>

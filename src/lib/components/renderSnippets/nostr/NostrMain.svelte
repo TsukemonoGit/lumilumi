@@ -12,7 +12,6 @@
 
   import { goto } from "$app/navigation";
   import { setRxNostr, setRelays } from "$lib/func/nostr";
-  import { relaySearchRelays } from "$lib/stores/relays";
   import type { DefaultRelayConfig } from "rx-nostr";
   import { onMount } from "svelte";
   import type {
@@ -21,7 +20,7 @@
     LumiMuteByKind,
     LumiSetting,
   } from "$lib/types";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
 
   import {
     initLumiEmoji,
@@ -86,7 +85,7 @@
     if (savedSettings) {
       applySavedSettings(savedSettings);
     } else {
-      if ($page.url.pathname === "/") {
+      if (page.url.pathname === "/") {
         //ホームに居るときだけ設定ないときは設定に飛ばす
         goto("/settings");
       } else {

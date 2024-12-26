@@ -28,6 +28,7 @@ export async function uploadFile(
   optionalFormDataFields?: OptionalFormDataFields,
   signal?: AbortSignal // signal を追加
 ): Promise<FileUploadResponse> {
+  const checkedfile = await removeExif(file);
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
 
@@ -86,5 +87,37 @@ export async function uploadFile(
 
     // それ以外の場合は、ループを終了
     throw new Error("Unexpected status code during file upload process!");
+  }
+}
+
+export async function removeExif(file: File): Promise<File> {
+  // FormDataを作成してファイルを追加
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    // POSTリクエストをAPIに送信
+    const response = await fetch("/api/image", {
+      method: "POST",
+      body: formData,
+    });
+
+    // レスポンスが正常でない場合エラーをスロー
+    if (!response.ok) {
+      throw new Error("Failed to remove EXIF data");
+    }
+
+    // EXIFを削除した画像のバイナリデータを取得
+    const imageBlob = await response.blob();
+
+    // BlobをFileオブジェクトに変換
+    const fileName = file.name; // オリジナルのファイル名を使用
+    const mimeType = imageBlob.type; // BlobからmimeTypeを取得
+    const newFile = new File([imageBlob], fileName, { type: mimeType }); //file.type
+
+    return newFile; // 新しいFileオブジェクトを返す
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to remove EXIF data");
   }
 }

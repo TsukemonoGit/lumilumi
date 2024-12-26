@@ -11,7 +11,7 @@
   import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
@@ -55,9 +55,9 @@
 
     setSettings();
 
-    const paramTitle = $page.url.searchParams.get("title");
-    const paramText = $page.url.searchParams.get("text");
-    const paramUrl = $page.url.searchParams.get("url");
+    const paramTitle = page.url.searchParams.get("title");
+    const paramText = page.url.searchParams.get("text");
+    const paramUrl = page.url.searchParams.get("url");
     const paramSharedContent = [paramTitle, paramText, paramUrl]
       .filter((param) => param && param !== "undefined")
       .join("\n");

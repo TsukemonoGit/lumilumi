@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import logo from "$lib/images/favicon.svg";
   import { loginUser } from "$lib/stores/stores";
 
@@ -29,7 +29,7 @@
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
-  // $inspect($page.url.pathname);
+  // $inspect(page.url.pathname);
 </script>
 
 <div class="sidebar fixed top-28 bottom-12">
@@ -39,7 +39,7 @@
         {#if alt === "profile"}
           {#if $loginUser && encodedPub}
             <li
-              aria-current={$page.url.pathname === `/${encodedPub}`
+              aria-current={page.url.pathname === `/${encodedPub}`
                 ? "page"
                 : undefined}
             >
@@ -63,7 +63,7 @@
             >
           </li>
         {:else}
-          <li aria-current={$page.url.pathname === link ? "page" : undefined}>
+          <li aria-current={page.url.pathname === link ? "page" : undefined}>
             {#if noPubkey || $loginUser}
               <a href={link} title={alt}>
                 <Icon /><span class="ml-2">{alt}</span>
@@ -79,7 +79,7 @@
 
       <li
         class=" mt-auto"
-        aria-current={$page.url.pathname === `/about` ? "page" : undefined}
+        aria-current={page.url.pathname === `/about` ? "page" : undefined}
       >
         <a href={`/about`}>
           {#if lumiSetting.get().showImg}
