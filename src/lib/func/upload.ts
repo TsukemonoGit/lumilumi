@@ -91,17 +91,21 @@ export async function uploadFile(
 }
 
 export async function removeExif(file: File): Promise<File> {
-  const arrayBuffer = await file.arrayBuffer();
+  try {
+    const arrayBuffer = await file.arrayBuffer();
 
-  if (file.type === "image/jpeg") {
-    const cleanedFile = removeExifFromJPEG(arrayBuffer);
-    return new File([cleanedFile], file.name, { type: file.type });
-  } else if (file.type === "image/png") {
-    const cleanedFile = removeMetadataFromPNG(arrayBuffer);
-    return new File([cleanedFile], file.name, { type: file.type });
+    if (file.type === "image/jpeg") {
+      const cleanedFile = removeExifFromJPEG(arrayBuffer);
+      return new File([cleanedFile], file.name, { type: file.type });
+    } else if (file.type === "image/png") {
+      const cleanedFile = removeMetadataFromPNG(arrayBuffer);
+      return new File([cleanedFile], file.name, { type: file.type });
+    }
+  } catch (error) {
+    console.error("Failed to remove Exif data:", error);
   }
 
-  return file; // 他の形式の場合
+  return file; // エラーが発生した場合や他の形式の場合、元のファイルを返す
 }
 
 function removeExifFromJPEG(data: ArrayBuffer): ArrayBuffer {

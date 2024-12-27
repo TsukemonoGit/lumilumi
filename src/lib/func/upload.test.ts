@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { removeExif, uploadFile } from "./upload";
+import { describe, it } from "vitest";
+import { removeExif } from "./upload";
 import fs from "fs";
 import path from "path";
 
