@@ -161,20 +161,20 @@ export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
 
   const chunks: Uint8Array[] = [];
   let offset = 8; // 最初の8バイトはシグネチャ
-  let orientationChunk: Uint8Array | null = null;
 
   while (offset < data.length) {
     const length = new DataView(data.buffer).getUint32(offset); // チャンク長
     const type = String.fromCharCode(...data.subarray(offset + 4, offset + 8));
 
     // メタデータに関連するチャンクを除外
-    if (type !== "tEXt" && type !== "iTXt" && type !== "zTXt") {
-      chunks.push(data.subarray(offset, offset + 12 + length)); // 長さ + タイプ + データ + CRC
-    } else if (
-      type === "tEXt" &&
-      data.subarray(offset + 8, offset + 12).toString() === "Orientation"
+    if (
+      type !== "tEXt" &&
+      type !== "iTXt" &&
+      type !== "zTXt" &&
+      type !== "gAMA" &&
+      type !== "pHYs"
     ) {
-      orientationChunk = data.subarray(offset, offset + 12 + length); // Orientationチャンクを保持
+      chunks.push(data.subarray(offset, offset + 12 + length)); // 長さ + タイプ + データ + CRC
     }
 
     offset += 12 + length; // チャンク長さ+12バイト(ヘッダ+CRC)
@@ -182,8 +182,7 @@ export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
 
   const cleanedBuffer = new Uint8Array(
     pngSignature.byteLength +
-      chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0) +
-      (orientationChunk ? orientationChunk.byteLength : 0)
+      chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)
   );
   cleanedBuffer.set(pngSignature, 0);
 
@@ -191,11 +190,6 @@ export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
   for (const chunk of chunks) {
     cleanedBuffer.set(chunk, position);
     position += chunk.byteLength;
-  }
-
-  // Orientationチャンクを追加
-  if (orientationChunk) {
-    cleanedBuffer.set(orientationChunk, position);
   }
 
   return cleanedBuffer.buffer;

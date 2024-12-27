@@ -16,3 +16,4 @@ src/routes/api/getOtp
 /.vscode
 test*.jpg
 test*.jpeg
+test*.png
