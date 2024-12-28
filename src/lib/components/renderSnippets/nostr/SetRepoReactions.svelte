@@ -121,6 +121,7 @@
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
+
 {#if $errorData}
   {@render error?.()}
 {:else if $data}
