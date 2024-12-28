@@ -14,3 +14,6 @@ src/routes/api/datastore.ts
 src/routes/api/setOtp
 src/routes/api/getOtp
 /.vscode
+test*.jpg
+test*.jpeg
+test*.png
