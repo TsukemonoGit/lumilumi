@@ -5,36 +5,19 @@
   // // replaced dynamically
   // const buildDate = __DATE__;
 
+  //https://vite-pwa-org.netlify.app/frameworks/svelte.html#prompt-for-update
   const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegisteredSW(
-      swUrl: string | URL | Request,
-      r: { installing: any; update: () => any }
-    ) {
-      r &&
-        setInterval(async () => {
-          if (r.installing || !navigator) return;
-
-          if ("connection" in navigator && !navigator.onLine) return;
-
-          const resp = await fetch(swUrl, {
-            cache: "no-store",
-            headers: {
-              cache: "no-store",
-              "cache-control": "no-cache",
-            },
-          });
-
-          if (resp?.status === 200) await r.update();
-        }, 20000 /* 20s for testing purposes */);
+    onRegistered(swr: any) {
+      console.log(`SW registered: ${swr}`);
     },
     onRegisterError(error: any) {
       console.log("SW registration error", error);
     },
   });
-  const close = () => {
-    needRefresh.set(false);
-  };
 
+  function close() {
+    needRefresh.set(false);
+  }
   let toast = $derived($needRefresh);
 </script>
 

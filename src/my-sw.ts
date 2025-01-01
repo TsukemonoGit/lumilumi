@@ -6,10 +6,6 @@ import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
 
 declare let self: ServiceWorkerGlobalScope;
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
-});
-
 // self.__WB_MANIFEST is default injection point
 precacheAndRoute(self.__WB_MANIFEST);
 
@@ -26,6 +22,7 @@ let data: {
 self.addEventListener("install", (event) => {
   console.log("Service Worker: Installed");
   // Cache assets, perform other setup tasks here
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
@@ -107,6 +104,10 @@ async function handlePostRequest(request) {
 }
 
 self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+    return;
+  }
   console.log(event);
   if (event.data && event.data.type === "requestLatestData") {
     // 以前キャッシュされたデータを再送信する

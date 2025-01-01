@@ -7,10 +7,6 @@ let data: { title: any; text: any; url?: any; media?: any } = {
   text: "",
 };
 
-// export async function load() {
-//   return data;
-// }
-
 export const actions = {
   default: async ({ request }) => {
     try {
@@ -28,7 +24,7 @@ export const actions = {
       }
 
       // フロントエンドにデータを返す
-      return { success: true };
+      return { success: true, data }; // 成功時にデータも返す
     } catch (err) {
       console.error(err);
       return fail(400, { message: "invalid" });
