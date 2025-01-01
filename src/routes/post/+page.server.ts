@@ -24,7 +24,7 @@ export const actions = {
       }
 
       // フロントエンドにデータを返す
-      return { success: true, data }; // 成功時にデータも返す
+      return { success: true };
     } catch (err) {
       console.error(err);
       return fail(400, { message: "invalid" });
