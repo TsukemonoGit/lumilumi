@@ -18,10 +18,10 @@ export default defineConfig({
       strategies: "injectManifest", // ここでサービスワーカーを生成する設定
       srcDir: "./src",
       filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
-
+      scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
-      registerType: "autoUpdate", // サービスワーカーが更新されるたびに自動で更新
+      registerType: "prompt", // サービスワーカーが更新されるたびに自動で更新
 
       pwaAssets: {
         config: true,
@@ -52,12 +52,18 @@ export default defineConfig({
           },
         },
       },
-
+      //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
       injectManifest: {
-        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
+        globPatterns: [
+          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+          "prerendered/**/*.{html,json}",
+        ],
       },
       workbox: {
-        globPatterns: ["client/**/*.{js,css,ico,png,svg,webp,woff,woff2}"],
+        globPatterns: [
+          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+          "prerendered/**/*.{html,json}",
+        ],
       }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
       devOptions: {
         enabled: true,
