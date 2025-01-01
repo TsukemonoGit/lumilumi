@@ -14,15 +14,12 @@
   import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { type PageData } from "./$types";
 
-  let { data }: { data: PageData } = $props();
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
   let sharedContent: string; // = [data.title, data.text, data.url]
   //   .filter(Boolean)
   //   .join("\n");
-  $inspect(data);
   const setSettings = async () => {
     $nowProgress = true;
     const lumi = localStorage.getItem("lumiSetting");
