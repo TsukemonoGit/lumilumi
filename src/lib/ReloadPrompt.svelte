@@ -6,31 +6,41 @@
   // const buildDate = __DATE__;
 
   //https://vite-pwa-org.netlify.app/frameworks/svelte.html#prompt-for-update
-  const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
+  //const { offlineReady, needRefresh, updateServiceWorker } =
+
+  let needRefresh = $state(false);
+  const { updateServiceWorker } = useRegisterSW({
     onRegistered(swr: any) {
       console.log(`SW registered: ${swr}`);
     },
     onRegisterError(error: any) {
       console.log("SW registration error", error);
     },
+    onNeedRefresh() {
+      needRefresh = true;
+    },
   });
 
   function close() {
-    needRefresh.set(false);
+    needRefresh = false;
   }
-  let toast = $derived($needRefresh);
 </script>
 
-{#if toast}
+{#if needRefresh}
   <div class="pwa-toast" role="alert">
     <div class="message">
-      {#if $needRefresh}
-        <span> New content available, click on reload button to update. </span>
-      {/if}
+      <span> New content available, click on reload button to update. </span>
     </div>
-    {#if $needRefresh}
-      <button onclick={() => updateServiceWorker(true)}> Reload </button>
-    {/if}
+
+    <button
+      onclick={() => {
+        updateServiceWorker(true);
+        close();
+      }}
+    >
+      Reload
+    </button>
+
     <button onclick={close}> Close </button>
   </div>
 {/if}

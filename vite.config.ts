@@ -21,7 +21,7 @@ export default defineConfig({
       scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
-      registerType: "prompt", // サービスワーカーが更新されるたびに自動で更新
+      registerType: "prompt", //"prompt", // サービスワーカーが更新されるたびに自動で更新
 
       pwaAssets: {
         config: true,
@@ -59,12 +59,13 @@ export default defineConfig({
           "prerendered/**/*.{html,json}",
         ],
       },
-      workbox: {
-        globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-          "prerendered/**/*.{html,json}",
-        ],
-      }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
+      //(workbox or injectManifest)
+      // workbox: {
+      //   globPatterns: [
+      //     "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+      //     "prerendered/**/*.{html,json}",
+      //   ],
+      // }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
       devOptions: {
         enabled: true,
         suppressWarnings: process.env.SUPPRESS_WARNING === "true",
