@@ -48,7 +48,7 @@
     relays?: string[] | undefined; //emitにしていするいちじりれー
     // >;
     tieKey: string;
-    updateViewEvent?: any;
+    updateViewNotifi?: any;
     children?: import("svelte").Snippet<[any]>;
   }
 
@@ -60,14 +60,14 @@
     eventFilter = () => true,
     relays = undefined,
     tieKey,
-    updateViewEvent = $bindable<() => void>(),
+    updateViewNotifi = $bindable<() => void>(),
     children,
   }: Props = $props();
 
-  updateViewEvent = debounce(async () => {
+  updateViewNotifi = debounce(async () => {
     //   console.time();
     $nowProgress = true;
-    console.log("updateViewEvent");
+    console.log("updateViewNotifi");
     const allEvents: EventPacket[] | undefined =
       queryClient.getQueryData(queryKey);
 
@@ -87,11 +87,11 @@
       )
     ); //.sort((a, b) => b.event.created_at - a.event.created_at);
 
-    allUniqueEvents = uniqueEvents
+    allUniqueNotifi = uniqueEvents
       .filter(eventFilter)
       .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
-    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+    displayEvents.set(allUniqueNotifi.slice(viewIndex, viewIndex + amount));
     // $slicedEvent = $slicedEvent;
 
     // console.timeEnd();
@@ -128,7 +128,7 @@
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   // export let lastVisible: Element | null;
-  let allUniqueEvents: Nostr.Event[];
+  let allUniqueNotifi: Nostr.Event[];
 
   // $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
   const observer = new QueryObserver(queryClient, {
@@ -214,7 +214,7 @@
       // console.log(queryClient.getQueryData(queryKey));
     }
     isOnMount = false;
-    // updateViewEvent();
+    // updateViewNotifi();
   }
 
   interface $$Slots {
@@ -224,12 +224,12 @@
   const handleNext = async () => {
     // console.log(length, viewIndex, amount, sift);
     if (
-      !allUniqueEvents ||
-      allUniqueEvents?.length < viewIndex + amount + sift
+      !allUniqueNotifi ||
+      allUniqueNotifi?.length < viewIndex + amount + sift
     ) {
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       const syutokusururyou =
-        viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
+        viewIndex + amount - allUniqueNotifi?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
       //nevent1qvzqqqqqqypzqv33pxtldvmmdntqhv269r56zjadmhalpp660h3yc6gj8gxpuexvqyv8wumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5qs6amnwvaz7tmev9382tndv5q3zamnwvaz7tmj9e4k76nfwfsju6t0qyxhwumn8ghj7mn0wvhxcmmvqqszykcw73dgzvupxwnktv7lvndtn5n4rxwzas7jm88zkh3zpknkqws0ayy00
       $nowProgress = true;
       const older = await loadOlderEvents(
@@ -249,14 +249,14 @@
         );
       }
     }
-    //console.log(allUniqueEvents?.length);
-    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
+    //console.log(allUniqueNotifi?.length);
+    if (allUniqueNotifi?.length >= viewIndex + amount - 10) {
       //４０にしてても39とかになって微妙に足りてない時がある（なんで？）から
       //表示量のイベントなかったらスライドしない
       viewIndex += sift; //スライドする量
     }
 
-    updateViewEvent();
+    updateViewNotifi();
     $nowProgress = false;
   };
 
@@ -267,14 +267,14 @@
       });
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
-        updateViewEvent();
+        updateViewNotifi();
       }, 100);
     }
   };
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent();
+    updateViewNotifi();
   }
 
   onDestroy(() => {
@@ -296,12 +296,12 @@
 
   data.subscribe((value) => {
     if (value && value.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
-      updateViewEvent();
+      updateViewNotifi();
     }
   });
 
   onlyFollowee.subscribe((value) => {
-    updateViewEvent();
+    updateViewNotifi();
   });
 
   //------
