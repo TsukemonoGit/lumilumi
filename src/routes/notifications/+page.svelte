@@ -38,18 +38,6 @@
     },
   ];
 
-  // let readRelays = $derived(
-  //   $defaultRelays
-  //     ? Object.values($defaultRelays)
-  //         .filter((config) => config.read)
-  //         .map((value) => value.url)
-  //     : []
-  // );
-
-  // run(() => {
-  //   console.log(readRelays);
-  // });
-
   let view = $state(false);
   onMount(async () => {
     if (!isOnMount) {
@@ -85,7 +73,7 @@
     } else {
       filters[0].since = ev[0].event.created_at;
       filters[0].until = now();
-      //updateViewEvent();
+      //updateViewNotifi();
     }
   }
 
@@ -202,13 +190,14 @@
   };
 
   // svelte-ignore non_reactive_update
-  let updateViewEvent: () => void = () => {};
+  let updateViewNotifi: () => void = () => {};
 
   value?.subscribe((val) => {
     setTimeout(() => {
       console.log($value);
-      if (val !== undefined && updateViewEvent) {
-        updateViewEvent();
+      if (val !== undefined && updateViewNotifi) {
+        updateViewNotifi();
+        console.log("notifi");
       }
     }, 0); //これしないとvalueの値が変になる
   });
@@ -268,7 +257,7 @@
           {amount}
           eventFilter={notifilter}
           {tieKey}
-          bind:updateViewEvent
+          bind:updateViewNotifi
         >
           {#snippet children({ events })}
             <!-- <div slot="loading">
