@@ -59,7 +59,7 @@ export async function loadOlderEvents(
   const newFilters = filters.map((filter) => {
     return {
       ...filter,
-      limit: sift + 1,
+      limit: sift + 4,
       until: until,
       since: undefined,
     };
@@ -79,8 +79,8 @@ export async function loadOlderEvents(
   //console.log(olderEvents);
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
 
-  console.log("sift", sift);
-  console.log("olderEvents", olderEvents.length);
+  console.log("limit:", sift);
+  console.log("取得できたイベントの数", olderEvents.length);
   return olderEvents.slice(0, sift);
 }
 
