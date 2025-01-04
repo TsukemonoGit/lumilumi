@@ -13,7 +13,7 @@ export type Ogp = {
 export let isvalidURL = (str: string): boolean => {
   try {
     const url = new URL(str);
-    return url.protocol === "https:" || url.protocol === "http:";
+    return url.protocol === "https:";
   } catch {
     return false;
   }

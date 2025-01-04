@@ -15,6 +15,7 @@
 
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { isvalidURL } from "$lib/func/ogp";
 
   interface Props {
     text: string;
@@ -160,7 +161,9 @@
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
-  {:else if part.type === "url"}{#if lumiSetting.get().showImg}<OGP
+  {:else if part.type === "url"}
+    <!--http://はなし httpsだけ-->
+    {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
         url={part.content ?? ""}
         >{#snippet renderContent(contents)}
           {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->

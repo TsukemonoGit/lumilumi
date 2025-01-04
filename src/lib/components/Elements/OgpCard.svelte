@@ -12,6 +12,8 @@
   let { contents, url }: Props = $props();
 
   let imageURL = $state(contents.image);
+  //  {#if isvalidURL(url)}{new URL(url).hostname}{/if}
+  let hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");
 </script>
 
 <!--bg-magnum-300 text-magnum-800  text-magnum-700 drop-shadow-md-->
@@ -64,7 +66,7 @@
             {#if contents.memo}
               {contents.memo} /
             {/if}
-            {#if isvalidURL(url)}{new URL(url).hostname}{/if}
+            {hostname}
           </p>
         </div>
       </div>
@@ -86,7 +88,7 @@
           {#if contents.memo}
             {contents.memo} /
           {/if}
-          {#if isvalidURL(url)}{new URL(url).hostname}{/if}
+          {hostname}
         </p>
       </div>
     </blockquote>{/if}

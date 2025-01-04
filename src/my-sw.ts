@@ -103,7 +103,7 @@ async function handlePostRequest(request) {
   return new Response("", { status: 200 });
 }
 
-self.addEventListener("message", (event) => {
+self.addEventListener("message", async (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
@@ -112,7 +112,8 @@ self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "requestLatestData") {
     // 以前キャッシュされたデータを再送信する
     //event.source?.postMessage(clonedRequest);
-    sendLatestDataToClient(event.source);
+    await sendLatestDataToClient(event.source);
+    return;
   }
 });
 async function sendLatestDataToClient(client) {
