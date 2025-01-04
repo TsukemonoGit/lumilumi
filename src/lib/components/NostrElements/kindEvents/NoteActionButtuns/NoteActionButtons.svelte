@@ -445,12 +445,18 @@
   //   reaction: Nostr.Event[];
   //   zap: Nostr.Event[];
   // }>({ repost: [], reaction: [], zap: [] });
-  let allReactions: {
-    repost: Nostr.Event[];
-    reaction: Nostr.Event[];
-    zap: Nostr.Event[];
-  } = $state({ repost: [], reaction: [], zap: [] });
+  // let allReactions: {
+  //   repost: Nostr.Event[];
+  //   reaction: Nostr.Event[];
+  //   zap: Nostr.Event[];
+  // } = $state({ repost: [], reaction: [], zap: [] });
 
+  let repost: Nostr.Event[] = $state([]);
+  let reaction: Nostr.Event[] = $state([]);
+  let zap: Nostr.Event[] = $state([]);
+  let repost_length: number = $derived(repost.length);
+  let reaction_length: number = $derived(reaction.length);
+  let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
   const updateInterval = 1000; // 1秒（ミリ秒）
@@ -487,38 +493,41 @@
   });
 
   function updateReactionsData() {
-    allReactions.repost = (
-      queryClient
-        .getQueriesData({
-          queryKey: ["reactions", queryId, "repost"],
-        })
-        .filter(([key, value]) => (value as EventPacket)?.event) as [
-        QueryKey,
-        EventPacket,
-      ][]
-    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+    repost = queryClient
+      .getQueriesData({
+        queryKey: ["reactions", queryId, "repost"],
+      })
+      .filter(
+        ([key, value]) =>
+          Array.isArray(value) &&
+          value.every((item) => (item as EventPacket).event)
+      ) // EventPacket[]をチェック
+      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
+      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
 
-    allReactions.reaction = (
-      queryClient
-        .getQueriesData({
-          queryKey: ["reactions", queryId, "reaction"],
-        })
-        .filter(([key, value]) => (value as EventPacket)?.event) as [
-        QueryKey,
-        EventPacket,
-      ][]
-    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+    reaction = queryClient
+      .getQueriesData({
+        queryKey: ["reactions", queryId, "reaction"],
+      })
+      .filter(
+        ([key, value]) =>
+          Array.isArray(value) &&
+          value.every((item) => (item as EventPacket).event)
+      ) // EventPacket[]をチェック
+      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
+      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
 
-    allReactions.zap = (
-      queryClient
-        .getQueriesData({
-          queryKey: ["reactions", queryId, "zapped"],
-        })
-        .filter(([key, value]) => (value as EventPacket)?.event) as [
-        QueryKey,
-        EventPacket,
-      ][]
-    ).map(([key, value]: [QueryKey, EventPacket]) => value.event);
+    zap = queryClient
+      .getQueriesData({
+        queryKey: ["reactions", queryId, "zapped"],
+      })
+      .filter(
+        ([key, value]) =>
+          Array.isArray(value) &&
+          value.every((item) => (item as EventPacket).event)
+      ) // EventPacket[]をチェック
+      .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
+      .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
 
     hasReactions = hasAnyReaction();
     updating = false;
@@ -526,11 +535,7 @@
   }
 
   function hasAnyReaction(): boolean {
-    return (
-      allReactions.repost.length > 0 ||
-      allReactions.reaction.length > 0 ||
-      allReactions.zap.length > 0
-    );
+    return repost_length > 0 || reaction_length > 0 || zap_length > 0;
   }
   //$: console.log(allReactions);
   let viewAllReactions: boolean = $state(false);
@@ -605,8 +610,7 @@
               {/if}
             {/snippet}
           </Zapped><span class="text-sm"
-            >{#if allReactions.zap.length > 0}{allReactions.zap
-                .length}{/if}</span
+            >{#if zap_length > 0}{zap_length}{/if}</span
           >
         </div>
         <AlertDialog
@@ -683,8 +687,7 @@
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
-        >{#if allReactions.reaction.length > 0}{allReactions.reaction
-            .length}{/if}</span
+        >{#if reaction_length > 0}{reaction_length}{/if}</span
       >
     </div>
   {/if}
@@ -711,8 +714,8 @@
             >
               <Repeat2 size="22" class={event ? "text-magnum-200 " : ""} />
             </DropdownMenu>{/snippet}
-        </Reposted>{#if allReactions.repost.length > 0}<span class="text-sm"
-            >{allReactions.repost.length}</span
+        </Reposted>{#if repost_length > 0}<span class="text-sm"
+            >{repost_length}</span
           >{/if}
       </div>
     {:else}<button
@@ -741,23 +744,23 @@
 
 {#if viewAllReactions}
   <!--kind6-->
-  {#if allReactions.repost.length > 0}
+  {#if repost_length > 0}
     <div class="flex gap-1 p-1">
       <Repeat2 size="20" class="text-magnum-500/75 mr-2 min-w-5" />
       <div class="flex flex-wrap gap-1">
-        <RepostList events={allReactions.repost} {tieKey} />
+        <RepostList events={repost} {tieKey} />
       </div>
     </div>
   {/if}
 
-  {#if allReactions.reaction.length > 0}
+  {#if reaction_length > 0}
     <!--kind7-->
-    <ReactionList events={allReactions.reaction} {tieKey} />
+    <ReactionList events={reaction} {tieKey} />
   {/if}
 
-  {#if allReactions.zap.length > 0}
+  {#if zap_length > 0}
     <!--zap レシート-->
-    <ZapList events={allReactions.zap} {tieKey} />
+    <ZapList events={zap} {tieKey} />
   {/if}
 {/if}
 

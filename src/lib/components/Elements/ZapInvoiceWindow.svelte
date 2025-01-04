@@ -56,8 +56,10 @@
         : undefined;
       //ザップ一回したら押せなくなるけど
       unsubscribe = observer?.subscribe((value: any) => {
-        if (value?.data?.event) {
-          zapped = value;
+        if (!value) return;
+        const data = value?.data as EventPacket[];
+        if (data.length > 0) {
+          zapped = value[0];
           console.log(zapped);
           $open = false;
           unsubscribe?.();

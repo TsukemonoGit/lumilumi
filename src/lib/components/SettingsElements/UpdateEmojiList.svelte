@@ -22,7 +22,7 @@
   import { get, writable, type Writable } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
-  import { emojiShortcodeRegex, nip33Regex } from "$lib/func/regex";
+
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   interface Props {
     pubkey: string;

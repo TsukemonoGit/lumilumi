@@ -232,10 +232,6 @@
     searchUntil = undefined;
   }
 
-  // const handleReload = () => {
-  //   console.log("reload");
-  // };
-
   const onClickSave = async (relays: string[]) => {
     console.log("save");
     $nowProgress = true;

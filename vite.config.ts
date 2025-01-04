@@ -21,7 +21,7 @@ export default defineConfig({
       scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
-      registerType: "prompt", //"prompt", // サービスワーカーが更新されるたびに自動で更新
+      registerType: "prompt", //"prompt", // サービスワーカーが更新されるたびに自動で更新,
 
       pwaAssets: {
         config: true,
@@ -70,7 +70,6 @@ export default defineConfig({
         enabled: true,
         suppressWarnings: process.env.SUPPRESS_WARNING === "true",
         type: "module",
-        navigateFallback: "/",
       },
       // if you have shared info in svelte config file put in a separate module and use it also here
       kit: {

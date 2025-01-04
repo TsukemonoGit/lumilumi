@@ -10,6 +10,8 @@
 
   let needRefresh = $state(false);
   const { updateServiceWorker } = useRegisterSW({
+    autoReload: false, // 自動リロードを無効化
+    immediate: false, // 手動でチェックを行うように設定
     onRegistered(swr: any) {
       console.log(`SW registered: ${swr}`);
     },
