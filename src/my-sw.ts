@@ -22,7 +22,7 @@ let data: {
 self.addEventListener("install", (event) => {
   console.log("Service Worker: Installed");
   // Cache assets, perform other setup tasks here
-  event.waitUntil(self.skipWaiting());
+  //event.waitUntil(self.skipWaiting());//無限リロしなくなった？
 });
 
 self.addEventListener("activate", (event) => {

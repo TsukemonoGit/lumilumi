@@ -48,6 +48,7 @@ export function setRxNostr() {
   rxNostr = createRxNostr({
     verifier: get(verifier) ?? cryptoVerifier,
     connectionStrategy: "lazy-keep",
+    authenticator: "auto", //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
     eoseTimeout: 10000, //フォワードはEOSEで終わらないから影響しない
   });
   app.update((be) => {

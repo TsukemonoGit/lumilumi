@@ -52,7 +52,7 @@
   onMount(async () => {
     console.log("onMount");
 
-    setSettings();
+    await setSettings();
 
     const paramTitle = page.url.searchParams.get("title");
     const paramText = page.url.searchParams.get("text");
@@ -85,6 +85,7 @@
           .filter((data) => data !== undefined)
           .filter(Boolean)
           .join("\n");
+        //URL共有
         if (!data.media || data.media.length <= 0) {
           // Svelteのストアに新しいオプションをセット
           additionalPostOptions.set({
@@ -101,6 +102,7 @@
           }, 1);
           return;
         }
+        //画像共有
         if (data.media) {
           // キャッシュからファイルを取得し FileList を作成
           const cache = await caches.open("media-cache");

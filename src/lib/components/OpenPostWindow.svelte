@@ -50,7 +50,7 @@
   import EventCard from "./NostrElements/kindEvents/EventCard/EventCard.svelte";
   import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
-  import Metadata from "./renderSnippets/nostr/Metadata.svelte";
+
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
@@ -108,13 +108,12 @@
   let signPubkey: string | undefined = $state();
 
   async function getSignPubkey() {
-    $nowProgress = true;
     if (propSignPubkey) {
       //共有からポストウィンドウを開いたとき
       signPubkey = propSignPubkey;
       return;
     }
-
+    $nowProgress = true;
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
 
@@ -139,18 +138,6 @@
   // アップロードキャンセル用のコントローラーを作成
   let uploadAbortController: AbortController | null = $state(null);
 
-  const metadataName = (ev: Nostr.Event): string => {
-    try {
-      const profile: Profile = JSON.parse(ev.content);
-      if (profile.name) {
-        return profile.name;
-      } else {
-        return "";
-      }
-    } catch (error) {
-      return "";
-    }
-  };
   let isPosting: boolean = $state(false);
   const postNote = async () => {
     if (text.trim().length <= 0) return;
@@ -304,7 +291,10 @@
   };
 
   const handleFileUpload = async (fileList: FileList) => {
-    if (!fileList || fileList.length <= 0 || !$uploader) return;
+    if (!fileList || fileList.length <= 0 || !$uploader) {
+      $nowProgress = false;
+      return;
+    }
     $nowProgress = true;
 
     // 既存のアップロードがある場合はキャンセルする
