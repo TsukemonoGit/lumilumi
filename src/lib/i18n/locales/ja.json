@@ -40,7 +40,7 @@
       "title": "データの同期"
     },
     "lastUpdated": "最終更新日時",
-    "refleshPage": "設定を保存しました。",
+    "refreshPage": "設定を保存しました。",
     "emoji": {
       "notes": "NIP違反のショートコードを含む絵文字は除外されます。"
     },

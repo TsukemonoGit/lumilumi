@@ -34,9 +34,7 @@
     });
     unsubscribe = observer1.subscribe((result: any) => {
       const packets = result?.data as EventPacket[];
-      if (packets) {
-        console.log(packets);
-      }
+
       if (
         packets &&
         packets.length > 0 &&
