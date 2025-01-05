@@ -440,28 +440,7 @@
         $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
       }
     }, 2);
-
-    // openReplyWindow = !openReplyWindow;
-
-    // replyText = "";
-    // if (openReplyWindow) {
-    //   openQuoteWindow = false;
-    //   setTimeout(() => {
-    //     textareaReply?.focus();
-    //   }, 20);
-    // }
   };
-
-  // let allReactions = writable<{
-  //   repost: Nostr.Event[];
-  //   reaction: Nostr.Event[];
-  //   zap: Nostr.Event[];
-  // }>({ repost: [], reaction: [], zap: [] });
-  // let allReactions: {
-  //   repost: Nostr.Event[];
-  //   reaction: Nostr.Event[];
-  //   zap: Nostr.Event[];
-  // } = $state({ repost: [], reaction: [], zap: [] });
 
   let repost: Nostr.Event[] = $state([]);
   let reaction: Nostr.Event[] = $state([]);
@@ -471,7 +450,7 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 1000; // 1秒（ミリ秒）
+  const updateInterval = 2000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
 

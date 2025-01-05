@@ -73,13 +73,7 @@
         console.log("timelineFilter parse error");
       }
     }
-    //layout.svelteでbannerが表示されたときにやるからここではやんなくていい
-    // const banner: boolean = localStorage.getItem("showBanner") == "true";
-    // console.log();
-    // console.log(banner);
-    // showBanner.set(banner);
 
-    //  await migrateSettings();
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
     loadMutetokanoSettei();
     if (savedSettings) {

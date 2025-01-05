@@ -144,6 +144,7 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
 }
 
 function handleEvent(v: EventPacket) {
+  //console.log(v.event);
   const etag = v.event.tags.findLast(
     (item) => item[0] === "e" || item[0] === "a"
   );
