@@ -35,6 +35,7 @@
     noReactionKind,
     normalizeRelayURL,
     profile,
+    sortEventPackets,
   } from "$lib/func/util";
 
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -144,14 +145,25 @@
       .filter((item) => item.ok)
       .map((item) => normalizeRelayURL(item.from));
 
-    const queryData = queryClient.getQueryData([...queryKey, ev.pubkey]);
+    queryKey = [...queryKey, ev.pubkey];
+
+    const queryData = queryClient.getQueryData(queryKey);
+    const packet = formatToEventPacket(ev, isSuccessRelays[0]);
+
     //データセットされてないときだけするにする
     if (isSuccessRelays.length > 0 && !queryData) {
-      queryClient.setQueryData(
-        [...queryKey, ev.pubkey],
-        formatToEventPacket(ev, isSuccessRelays[0])
-      );
-      console.log(queryClient.getQueryData([...queryKey, ev.pubkey]));
+      queryClient.setQueryData(queryKey, (oldData: EventPacket[] = []) => {
+        // データの重複を排除し、新しいデータを追加//古いデータがすでにあるならそっちが保持されるようにする。
+        const uniqueData = [
+          ...oldData.filter((item) => item.event.id !== ev.id),
+          packet,
+        ];
+
+        // created_at の降順でソート
+        return sortEventPackets(uniqueData);
+      });
+
+      // console.log(queryClient.getQueryData(queryKey));
     }
     setTimeout(() => {
       debounceUpdate();
