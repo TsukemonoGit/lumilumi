@@ -181,14 +181,14 @@
     $nowProgress = true;
     toastSettings.set({
       title: "Success",
-      description: $_("settings.refleshPage"),
+      description: $_("settings.refreshPage"),
       color: "bg-green-500",
     });
 
-    console.log($selectedRelayset);
-    console.log(settings.useRelaySet);
-    console.log($loginUser);
-    console.log(originalSettings?.pubkey);
+    // console.log($selectedRelayset);
+    // console.log(settings.useRelaySet);
+    // console.log($loginUser);
+    // console.log(originalSettings?.pubkey);
 
     //  const original = $state.snapshot($originalSettings);
     // if (

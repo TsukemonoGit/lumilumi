@@ -121,7 +121,7 @@
     } else {
       since = ev[0].event.created_at;
     }
-    console.log(data.nip05Address);
+    // console.log(data.nip05Address);
     if (data.nip05Address) {
       queryClient?.setQueryData(
         ["nip05", data.pubkey, data.nip05Address.toLowerCase()],

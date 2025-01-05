@@ -595,7 +595,7 @@
   });
 
   open.subscribe((value) => {
-    console.log(value);
+    // console.log(value);
     if (value) {
       //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
       // if (!signPubkey) {
