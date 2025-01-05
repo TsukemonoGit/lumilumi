@@ -258,7 +258,7 @@ export const generateResultMessage = (
     isSuccess.map((item) => (str += `${item}\n`));
     str += "\n";
   }
-  console.log(isFailed);
+  // console.log(isFailed);
   if (isFailed.length > 0) {
     str += "Failed\n";
     isFailed.map((item) => (str += `${item}\n`));

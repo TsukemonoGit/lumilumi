@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
@@ -274,7 +273,7 @@
     console.log(newTags);
     const eventParam: Nostr.EventParameters = {
       content: "",
-      tags: newTags,
+      tags: $state.snapshot(newTags),
       kind: 10002,
       pubkey: $loginUser,
     };
@@ -290,14 +289,6 @@
       description: str,
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
-
-    // if (isSuccess.length > 0) {
-    //   $queryClient.refetchQueries({
-    //     queryKey: ["defaultRelay", data.pubkey],
-    //   });
-    // }
-    // const relays = setRelaysByKind10002(event);
-    // setRelays(relays);
 
     //reset押したときに戻るデータを更新
     updateRelayCounts();
@@ -320,12 +311,6 @@
 
 <section class="w-full mb-20">
   <div class="w-full border border-magnum-400 rounded-md p-1">
-    <!-- {#if kind10002}<EventCard
-      note={kind10002}
-      metadata={undefined}
-      tieKey={undefined}
-      displayMenu={false}
-    />{/if} -->
     {#if kind10002}
       <Metadata pubkey={data.pubkey} queryKey={["metadata", data.pubkey]}>
         {#snippet loading()}
@@ -366,12 +351,7 @@
           </NoteTemplate>{/snippet}
       </Metadata>
     {/if}
-    <!-- <div class="flex font-bold justify-between w-full h-8 items-center">
-    kind: 10002 Relays {#if kind10002}<EllipsisMenu
-        note={kind10002}
-        tieKey={undefined}
-      />{/if}
-  </div> -->
+
     <table>
       <thead>
         <tr>
@@ -393,14 +373,7 @@
       ><tbody>
         {#each newTags as [r, url, rw], index}
           <tr>
-            <td class="text-left break-all"
-              >{url}
-              <!-- <RelayCard
-              {url}
-              read={readStates[index]}
-              write={writeStates[index]}
-            /> -->
-            </td>
+            <td class="text-left break-all">{url} </td>
             <td class="text-center"
               ><input
                 type="checkbox"
