@@ -158,7 +158,7 @@ export async function filesUpload(
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
   let res: FileUploadResponse[] = [];
-  for (const file of files) {
+  for (const file of Array.from(files)) {
     try {
       const serverConfig = await readServerConfig(uploader);
       console.log(serverConfig);

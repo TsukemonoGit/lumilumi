@@ -8,6 +8,7 @@ import * as Nostr from "nostr-typedef";
 //import { zapCheck } from "$lib/stores/operators";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
+import { sortEventPackets } from "./util";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -143,22 +144,36 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
 }
 
 function handleEvent(v: EventPacket) {
+  //console.log(v.event);
   const etag = v.event.tags.findLast(
     (item) => item[0] === "e" || item[0] === "a"
   );
+  if (etag) {
+    let queryKey: [string, string, string, string] | undefined;
 
-  if (v.event.kind === 7 && etag) {
-    queryClient.setQueryData(
-      ["reactions", etag[1], "reaction", v.event.pubkey],
-      v
-    );
-  } else if ((v.event.kind === 6 || v.event.kind === 16) && etag) {
-    queryClient.setQueryData(
-      ["reactions", etag[1], "repost", v.event.pubkey],
-      v
-    );
-  } else if (v.event.kind === 9735 && etag) {
-    const zappedUser = zappedPubkey(v.event);
-    queryClient.setQueryData(["reactions", etag[1], "zapped", zappedUser], v);
+    if (v.event.kind === 7) {
+      queryKey = ["reactions", etag[1], "reaction", v.event.pubkey];
+    } else if (v.event.kind === 6 || v.event.kind === 16) {
+      queryKey = ["reactions", etag[1], "repost", v.event.pubkey];
+    } else if (v.event.kind === 9735) {
+      const zappedUser = zappedPubkey(v.event);
+      if (zappedUser) {
+        queryKey = ["reactions", etag[1], "zapped", zappedUser];
+      }
+    }
+
+    if (queryKey) {
+      //queryClient.setQueryData([...queryKey, v.event.id], v);
+      queryClient.setQueryData(queryKey, (oldData: EventPacket[] = []) => {
+        // データの重複を排除し、新しいデータを追加
+        const uniqueData = [
+          ...oldData.filter((item) => item.event.id !== v.event.id),
+          v,
+        ];
+
+        // created_at の降順でソート
+        return sortEventPackets(uniqueData);
+      });
+    }
   }
 }

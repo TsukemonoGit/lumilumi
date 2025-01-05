@@ -4,6 +4,7 @@
   import { QueryObserver } from "@tanstack/svelte-query";
 
   import { onDestroy, onMount, type Snippet } from "svelte";
+  import type { EventPacket } from "rx-nostr";
 
   interface Props {
     id: string;
@@ -21,13 +22,14 @@
       queryKey: ["reactions", id, "repost", $loginUser],
     });
     unsubscribe = observer1.subscribe((result: any) => {
+      const packets = result?.data as EventPacket[];
       if (
-        result?.data &&
-        result.data.event &&
-        (!data || result.data.event.created_at > data.created_at)
+        packets &&
+        packets.length > 0 &&
+        (!data || packets[0].event.created_at > data.created_at)
       ) {
         // console.log(result);
-        data = result.data.event;
+        data = packets[0].event;
         //  const data = queryClient?.getQueryData(queryKey);
         //  console.log(data);
         //status = "success";
