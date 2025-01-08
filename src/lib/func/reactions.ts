@@ -1,4 +1,4 @@
-import { app, defaultRelays, queryClient, verifier } from "$lib/stores/stores";
+import { app, defaultRelays, queryClient } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
 import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
@@ -9,6 +9,7 @@ import * as Nostr from "nostr-typedef";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
+import { verifier } from "$lib/stores/globalRunes.svelte";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -20,7 +21,7 @@ export function setRxNostr3() {
     return;
   }
   const rxNostr3 = createRxNostr({
-    verifier: get(verifier) ?? cryptoVerifier,
+    verifier: verifier.get() ?? cryptoVerifier,
     connectionStrategy: "lazy-keep",
   });
   app.update((be) => {
@@ -35,7 +36,7 @@ export function setRxNostr3() {
 export function set3Relays(relays: any) {
   if (!get(app).rxNostr3) {
     get(app).rxNostr3 = createRxNostr({
-      verifier: get(verifier) ?? cryptoVerifier,
+      verifier: verifier.get() ?? cryptoVerifier,
       connectionStrategy: "lazy-keep",
     }); //reaction repost用
   }

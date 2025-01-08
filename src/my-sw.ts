@@ -22,7 +22,8 @@ let data: {
 self.addEventListener("install", (event) => {
   console.log("Service Worker: Installed");
   // Cache assets, perform other setup tasks here
-  //event.waitUntil(self.skipWaiting());//無限リロしなくなった？
+  self.skipWaiting(); //無限リロしなくなった？//skipWaiting() は ServiceWorkerGlobalScope インターフェイスのメソッドで、待機しているサービスワーカーがアクティブになるように強制します。
+  //https://developer.mozilla.org/ja/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting
 });
 
 self.addEventListener("activate", (event) => {
@@ -129,3 +130,7 @@ async function sendLatestDataToClient(client) {
     : null;
   client.postMessage(response);
 }
+
+self.addEventListener("backgroundfetchabort", (event) => {
+  console.log("backgroundfetchabort", event);
+});

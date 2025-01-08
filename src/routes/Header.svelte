@@ -36,20 +36,23 @@
     ["2", $_("filter.canversation.none")],
   ];
   const selected = writable<string>(
-    optionsArr[timelineFilter.get.selectCanversation][0]
+    optionsArr[timelineFilter.get().selectCanversation][0]
   );
 
   const {
     elements: { root, item, hiddenInput },
     helpers: { isChecked },
   } = createRadioGroup({
-    defaultValue: optionsArr[timelineFilter.get.selectCanversation][0],
+    defaultValue: optionsArr[timelineFilter.get().selectCanversation][0],
     value: selected,
   });
   // $: console.log(timelineFilter.get.adaptMute);
   selected.subscribe((value) => {
     if (value !== undefined && value !== null) {
-      timelineFilter.get.selectCanversation = Number(value);
+      timelineFilter.update((cur) => {
+        console.log(cur);
+        return { ...cur, selectCanversation: Number(value) };
+      });
     }
   });
 
@@ -64,6 +67,12 @@
   });
   // $inspect(_showBanner);
   let Icon = $derived(currentPage?.Icon);
+  const onMuteChange = () => {
+    timelineFilter.update((cur) => {
+      console.log(cur);
+      return { ...cur, adaptMute: !cur.adaptMute };
+    });
+  };
 </script>
 
 <header>
@@ -132,7 +141,8 @@
                         <input
                           type="checkbox"
                           class="rounded-checkbox"
-                          bind:checked={timelineFilter.get.adaptMute}
+                          checked={timelineFilter.get().adaptMute}
+                          onchange={onMuteChange}
                         />
                         {$_("filter.menu.muteOn")}
                       </label>

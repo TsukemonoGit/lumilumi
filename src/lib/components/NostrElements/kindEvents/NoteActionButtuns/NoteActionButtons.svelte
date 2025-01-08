@@ -470,7 +470,7 @@
   }
 
   $effect(() => {
-    if (viewEventIds.get.length > 0 || lumiSetting.get().showAllReactions) {
+    if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
       //   console.log($state.snapshot(viewEventIds.get.length));
       // console.log(
       //   queryClient.getQueriesData({

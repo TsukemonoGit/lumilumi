@@ -1,13 +1,8 @@
 import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
-import { app, loginUser, queryClient, verifier } from "$lib/stores/stores";
+import { app, loginUser, queryClient } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-import type {
-  LumiMuteByKindList,
-  LumiSetting,
-  MuteList,
-  Theme,
-} from "$lib/types";
+import type { LumiMuteByKindList, MuteList, Theme } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type { Filter } from "nostr-typedef";
 import * as Nostr from "nostr-typedef";
@@ -24,6 +19,7 @@ import {
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { get } from "svelte/store";
 import { emojiShortcodeRegex, nip33Regex } from "./regex";
+import { verifier } from "$lib/stores/globalRunes.svelte";
 
 export function setTheme(theme: Theme) {
   if (
@@ -38,7 +34,7 @@ export function setTheme(theme: Theme) {
 }
 
 export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relaySearchRelays);
   let res: EventPacket[] = [];
@@ -73,7 +69,7 @@ export async function getDoukiList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket> {
-  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 
@@ -228,7 +224,7 @@ export async function getMutebykindList(
   filters: Filter[],
   relays: DefaultRelayConfig[]
 ): Promise<EventPacket[]> {
-  const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
+  const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relays);
 

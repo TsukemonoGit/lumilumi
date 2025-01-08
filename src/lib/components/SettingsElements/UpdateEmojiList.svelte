@@ -3,7 +3,6 @@
   import {
     createEmojiListFrom10030,
     getDoukiList,
-    getNaddrEmojiList,
     getQueryRelays,
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
@@ -12,18 +11,16 @@
     loginUser,
     nowProgress,
     toastSettings,
-    verifier,
   } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { _ } from "svelte-i18n";
-  import type { EventPacket } from "rx-nostr";
 
   import { createRxNostr } from "rx-nostr/src";
   import { get, writable, type Writable } from "svelte/store";
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
   import { nip19 } from "nostr-tools";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, verifier } from "$lib/stores/globalRunes.svelte";
   interface Props {
     pubkey: string;
   }
@@ -86,7 +83,7 @@
         : beforeEvent;
 
     const rxNostr = createRxNostr({
-      verifier: get(verifier) ?? cryptoVerifier,
+      verifier: verifier.get() ?? cryptoVerifier,
     });
     const list = await createEmojiListFrom10030(
       kind10030event,

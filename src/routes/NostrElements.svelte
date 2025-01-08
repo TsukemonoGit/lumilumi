@@ -70,13 +70,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    if (onlyFollowee && followList.get) {
+    if (onlyFollowee && followList.get()) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return followList.get.has(event.pubkey);
+          return followList.get().has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && followList.get.has(kind9734.pubkey);
+          return kind9734 && followList.get().has(kind9734.pubkey);
         }
       });
     } else {
@@ -122,7 +122,7 @@
         return true;
       }
       // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((pub) => followList.get.has(pub));
+      const hasFollowed = pTags.some((pub) => followList.get().has(pub));
       return hasFollowed;
     } else {
       return true;
@@ -181,7 +181,7 @@
           {amount}
           eventFilter={(note) => {
             return (
-              checkCanvasation(note, timelineFilter.get.selectCanversation) &&
+              checkCanvasation(note, timelineFilter.get().selectCanversation) &&
               excludeKind0(note)
             );
           }}

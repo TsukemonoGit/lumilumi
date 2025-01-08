@@ -41,12 +41,19 @@ export function muteCheck(event: Nostr.Event): MuteCheck {
 }
 
 function shouldMuteByP(event: Nostr.Event): boolean {
+  if (!event) {
+    return false;
+  }
+
   const pMutes = get(mutes)?.list.p || [];
 
   return pMutes.includes(event.pubkey); // Replace with actual property check
 }
 
 function shouldMuteByWord(event: Nostr.Event): boolean {
+  if (!event) {
+    return false;
+  }
   const wordMutes = get(mutes)?.list.word || [];
   //----------------------------------------------------------------------ワードミュートはとりあえずkind:1,7,42に限ってみる
   //表示もできるようになったからやっぱKind何でも隠すにしてみる
@@ -55,6 +62,9 @@ function shouldMuteByWord(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByT(event: Nostr.Event): boolean {
+  if (!event) {
+    return false;
+  }
   const tMutes = get(mutes)?.list.t || [];
 
   // Find all tags in event.tags where tag[0] is "t"
@@ -65,6 +75,9 @@ function shouldMuteByT(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByE(event: Nostr.Event): boolean {
+  if (!event) {
+    return false;
+  }
   const eMutes = get(mutes)?.list.e || [];
   const tagsWithE = event.tags.filter(
     (tag) => tag[0] === "e" || tag[0] === "q"
@@ -76,6 +89,9 @@ function shouldMuteByE(event: Nostr.Event): boolean {
 }
 
 function shouldMuteByKinds(event: Nostr.Event): boolean {
+  if (!event) {
+    return false;
+  }
   const kindsMutes = get(mutebykinds).list || [];
 
   // Implement logic to check if event.kind and other properties match mutebykinds criteria

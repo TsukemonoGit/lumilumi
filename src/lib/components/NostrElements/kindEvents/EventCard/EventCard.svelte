@@ -175,7 +175,7 @@
     page.params.note ? getIDbyParam(page.params.note) : undefined
   );
   let muteType = $derived.by(() => {
-    if ($mutes || $mutebykinds || timelineFilter.get) {
+    if ($mutes || $mutebykinds || timelineFilter.get()) {
       return !timelineFilter.get().adaptMute
         ? "null"
         : paramNoteId === note.id || excludefunc(note)
@@ -215,11 +215,11 @@
       ) {
         // 現在のタグを削除
         if (currentNoteTag) {
-          console.log(viewEventIds.get.length);
+          console.log(viewEventIds.get().length);
           viewEventIds.update((value) => {
             return removeFirstMatchingId(value, currentNoteTag);
           });
-          console.log(viewEventIds.get.length);
+          console.log(viewEventIds.get().length);
         }
         // 新しいタグがまだ存在しなければ追加
         //if (!tagExists(viewEventIds.get, "a", atag)) {
