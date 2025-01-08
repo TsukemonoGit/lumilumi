@@ -21,7 +21,7 @@
   let size = 16;
   let viewAll = $state(false);
   let relays: string[] = $derived.by(() => {
-    if (displayEvents.get && tieKey) {
+    if (displayEvents.get() && tieKey) {
       return getRelaysById(id, tieKey);
     } else return [];
   });

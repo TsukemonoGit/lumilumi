@@ -64,7 +64,7 @@
       lumiSetting: settings,
       showBanner: showBanner.get(),
       theme: localStorage.getItem("theme") ?? "system",
-      timelineFilter: timelineFilter.get,
+      timelineFilter: timelineFilter.get(),
       uploader: $uploader,
     };
 
@@ -297,11 +297,6 @@
   class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   onclick={handleClickUpDownload}>{$_("settings.load")}</button
 >
-<!-- <button
-  disabled={$nowProgress}
-  class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-bold text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-  onclick={handleClickDownload}>リレーから設定を読み込む</button
-> -->
 
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
@@ -326,24 +321,24 @@
           </tr></thead
         >
         <tbody>
-          {#each kind30078LumiSettings as { name, ...value }}
+          {#each kind30078LumiSettings as setting}
             <tr
-              ><td>{name}</td>
+              ><td>{setting.name}</td>
               <td
-                ><time datetime={datetime(value.created_at)}
-                  >{new Date(value.created_at * 1000).toLocaleString()}</time
+                ><time datetime={datetime(setting.created_at)}
+                  >{new Date(setting.created_at * 1000).toLocaleString()}</time
                 ></td
               >
               <td
                 ><button
                   class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-                  onclick={() => handleClickLoad(name)}>LOAD</button
+                  onclick={() => handleClickLoad(setting.name)}>LOAD</button
                 ></td
               >
               <td
                 ><button
                   class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
-                  onclick={() => handleClickDelete(name)}>DELETE</button
+                  onclick={() => handleClickDelete(setting.name)}>DELETE</button
                 ></td
               >
             </tr>{/each}

@@ -75,7 +75,7 @@
   };
 
   let prof = $derived(profile(metadata));
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;

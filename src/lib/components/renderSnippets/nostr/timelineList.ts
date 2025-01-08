@@ -25,7 +25,7 @@ export async function loadOlderEvents(
   relays: string[] | undefined
 ): Promise<EventPacket[]> {
   //console.log(get(slicedEvent));
-  if (!displayEvents.get || displayEvents.get.length < 0) {
+  if (!displayEvents.get() || displayEvents.get().length < 0) {
     console.log("sliced eventがないから古いイベントトルの失敗");
     return [];
   }

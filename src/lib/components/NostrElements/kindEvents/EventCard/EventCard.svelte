@@ -176,7 +176,7 @@
   );
   let muteType = $derived.by(() => {
     if ($mutes || $mutebykinds || timelineFilter.get) {
-      return !timelineFilter.get.adaptMute
+      return !timelineFilter.get().adaptMute
         ? "null"
         : paramNoteId === note.id || excludefunc(note)
           ? "null"
@@ -270,7 +270,7 @@
 
   let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
 
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
 </script>
 
 <!-- {#if showCanvasationCheck} -->

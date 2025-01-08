@@ -60,7 +60,8 @@
         // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
         //   ["userStatus", "general", pubkey]
         // );
-        const statusEvent: Nostr.Event | undefined = userStatusMap.get
+        const statusEvent: Nostr.Event | undefined = userStatusMap
+          .get()
           .get(pubkey)
           ?.get("general");
         console.log(statusEvent);

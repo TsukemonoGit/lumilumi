@@ -266,7 +266,7 @@
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
       // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
       if (readUrls) {
-        await waitForConnections(readUrls, relayStateMap.get, 5000);
+        await waitForConnections(readUrls, relayStateMap.get(), 5000);
       } // maxWaitTime set to 10 seconds
       // console.log(relayStateMap.get);
 
@@ -405,7 +405,7 @@
   {@render error?.($errorData)}
 {:else if displayEvents.get && displayEvents.get.length > 0}
   {@render content?.({
-    events: displayEvents.get,
+    events: displayEvents.get(),
     status: $status,
     len: $data?.length ?? 0,
   })}

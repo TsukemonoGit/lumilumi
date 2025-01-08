@@ -34,7 +34,7 @@
     tieKey,
     children,
   }: Props = $props();
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);

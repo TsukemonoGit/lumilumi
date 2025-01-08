@@ -92,7 +92,7 @@ export const additionalPostOptions = writable<
   AdditionalPostOptions | undefined
 >(); //投稿したあとでundefinedにする
 
-export const verifier = writable<EventVerifier>();
+//export const verifier = writable<EventVerifier>();
 
 export const relayIconErrorStore = writable<string[]>([]);
 

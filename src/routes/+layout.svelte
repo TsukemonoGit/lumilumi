@@ -11,7 +11,6 @@
     nowProgress,
     queryClient,
     uploader,
-    verifier,
     viewMediaModal,
     ogDescription,
     ogTitle,
@@ -47,7 +46,11 @@
     setRxNostr3,
   } from "$lib/func/reactions";
   import { writable, type Writable } from "svelte/store";
-  import { displayEvents, showBanner } from "$lib/stores/globalRunes.svelte";
+  import {
+    displayEvents,
+    showBanner,
+    verifier,
+  } from "$lib/stores/globalRunes.svelte";
   import { defaultRelays } from "$lib/stores/relays";
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
@@ -81,7 +84,7 @@
       })
     : createNoopClient();
   verificationClient.start();
-  $verifier = verificationClient.verifier;
+  verifier.set(verificationClient.verifier);
 
   let nlBanner: HTMLElement | null = null;
 

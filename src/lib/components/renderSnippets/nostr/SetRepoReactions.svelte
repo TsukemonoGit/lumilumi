@@ -32,7 +32,10 @@
   let etagList = $derived(
     Array.from(
       new Set(
-        viewEventIds.get.filter((tag) => tag[0] === "e").map((tag) => tag[1])
+        viewEventIds
+          .get()
+          .filter((tag) => tag[0] === "e")
+          .map((tag) => tag[1])
       )
     )
   );
@@ -40,7 +43,10 @@
   let atagList = $derived(
     Array.from(
       new Set(
-        viewEventIds.get.filter((tag) => tag[0] === "a").map((tag) => tag[1])
+        viewEventIds
+          .get()
+          .filter((tag) => tag[0] === "a")
+          .map((tag) => tag[1])
       )
     )
   );

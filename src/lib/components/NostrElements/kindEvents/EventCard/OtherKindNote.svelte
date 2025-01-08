@@ -79,7 +79,7 @@
   };
 
   let prof = $derived(profile(metadata));
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
 </script>
 
 <div

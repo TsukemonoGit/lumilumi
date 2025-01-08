@@ -1,7 +1,5 @@
 <!-- tukattenai -->
 <script lang="ts">
-  import Metadata from "../../NostrMainData/Metadata.svelte";
-
   import Avatar from "svelte-boring-avatars";
   import { splitHexColorString } from "$lib/func/util";
 
@@ -11,6 +9,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserAvatar from "./UserAvatar.svelte";
   import UserProfile from "./UserProfile.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   const size = 20;
   interface Props {
     pubkey: string;
@@ -19,7 +18,7 @@
 
   let { pubkey, tieKey }: Props = $props();
 
-  const picture = (content: string): string | undefined => {
+  const getPicture = (content: string): string | undefined => {
     try {
       const profile: Profile = JSON.parse(content);
       if (profile?.picture !== "") {
@@ -69,18 +68,17 @@
 
       {#snippet content({ metadata })}
         {#if lumiSetting.get().showImg}
-          {#await picture(metadata.content) then picture}
-            {#if picture !== undefined}
-              <UserAvatar {size} name={pubkey} url={picture} {pubkey} />
-            {:else}
-              <Avatar
-                {size}
-                name={pubkey}
-                variant="beam"
-                colors={splitHexColorString(pubkey)}
-              />
-            {/if}
-          {/await}
+          {@const picture = getPicture(metadata.content)}
+          {#if picture !== undefined}
+            <UserAvatar {size} name={pubkey} url={picture} {pubkey} />
+          {:else}
+            <Avatar
+              {size}
+              name={pubkey}
+              variant="beam"
+              colors={splitHexColorString(pubkey)}
+            />
+          {/if}
         {:else}
           <Avatar
             {size}
