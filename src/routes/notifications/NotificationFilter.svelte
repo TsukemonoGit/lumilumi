@@ -10,7 +10,7 @@
   };
 </script>
 
-{#if followList.get && followList.get.size > 0}
+{#if followList.get() && followList.get().size > 0}
   <label class="ml-auto my-2">
     <input
       type="checkbox"

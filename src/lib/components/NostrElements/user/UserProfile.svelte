@@ -39,7 +39,7 @@
     depth,
     tieKey,
   }: Props = $props();
-  let petname = $derived(followList.get?.get(pubkey));
+  let petname = $derived(followList.get()?.get(pubkey));
 
   let pubcheck = $derived(hexRegex.test(pubkey));
 

@@ -133,7 +133,7 @@
       bind:value={searchWord}
     />
   </div>
-  {#if followList.get !== undefined && followList.get.size > 0}
+  {#if followList.get() !== undefined && followList.get().size > 0}
     <div class="flex flex-col items-start justify-center mt-auto py-2">
       <label>
         <input

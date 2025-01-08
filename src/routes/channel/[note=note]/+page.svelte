@@ -88,7 +88,7 @@
   }
   let timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
   let isMute = $derived(
-    channelMuteCheck(data.id, timelineFilter.get.adaptMute)
+    channelMuteCheck(data.id, timelineFilter.get().adaptMute)
   );
 </script>
 

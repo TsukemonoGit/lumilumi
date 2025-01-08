@@ -183,8 +183,8 @@
 
       authors: npubRegex.test(searchPubkey?.trim() ?? "")
         ? [getHex(searchPubkey?.trim() ?? "")]
-        : followee && followList.get
-          ? Array.from(followList.get.keys())
+        : followee && followList.get()
+          ? Array.from(followList.get().keys())
           : undefined,
       since: !Number.isNaN(searchSince) ? searchSince : undefined,
       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,

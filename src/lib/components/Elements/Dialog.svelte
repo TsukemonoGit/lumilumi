@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  /** Internal helpers */
+  import type { Snippet } from "svelte";
 
   import { fade } from "svelte/transition";
   import { X } from "lucide-svelte";
@@ -24,7 +24,7 @@
   //export { open };
   interface Props {
     dialogTitle?: string | undefined;
-    main?: import("svelte").Snippet;
+    main?: Snippet;
     open?: Writable<boolean>;
   }
 

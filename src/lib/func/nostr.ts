@@ -5,7 +5,6 @@ import {
   metadataQueue,
   queryClient,
   tieMapStore,
-  verifier,
 } from "$lib/stores/stores";
 import type { ReqStatus, Profile, UsePromiseReqOpts } from "$lib/types";
 import { createQuery, type QueryKey } from "@tanstack/svelte-query";
@@ -37,6 +36,7 @@ import {
   followList,
   lumiSetting,
   relayStateMap,
+  verifier,
 } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 
@@ -46,7 +46,7 @@ export function setRxNostr() {
     return;
   }
   rxNostr = createRxNostr({
-    verifier: get(verifier) ?? cryptoVerifier,
+    verifier: verifier.get() ?? cryptoVerifier,
     connectionStrategy: "lazy-keep",
     authenticator: "auto", //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
     eoseTimeout: 10000, //フォワードはEOSEで終わらないから影響しない
@@ -80,7 +80,7 @@ export function getDefaultWriteRelays(): string[] {
 
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
-  if (followList.get.size > 0) {
+  if (followList.get().size > 0) {
     // まず、現在のローカルストレージのデータを取得
     const metadataStr = localStorage.getItem("metadata");
     let currentMetadata: [QueryKey, EventPacket][] = metadataStr
@@ -134,8 +134,8 @@ export function pubkeysIn(
   return followingMap;
 }
 export function setFollowingList(data: SvelteMap<string, string | undefined>) {
-  // console.log(followList.get, data);
-  if (followList.get) {
+  // console.log(followList.get(), data);
+  if (followList.get()) {
     followList.set(data);
   }
   // console.log(followingList);
@@ -151,7 +151,7 @@ const saveMetadataToLocalStorage = (
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
-  if (followList.get.has(data.event.pubkey)) {
+  if (followList.get().has(data.event.pubkey)) {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
@@ -561,7 +561,7 @@ export function getMetadataList(
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
-      const petname = followList.get.get(packet.event.pubkey);
+      const petname = followList.get().get(packet.event.pubkey);
       // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,

@@ -24,7 +24,7 @@
   // allStatus 内の state を設定する関数
   function setAllStatusState(): string {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
-      relayStateMap.get.get(cleanRelayUrl(relay.url))
+      relayStateMap.get().get(cleanRelayUrl(relay.url))
     );
 
     const stateCount: Record<string, number> = {};
@@ -83,7 +83,7 @@
               <RelayStatusColor relay={relay.url} /><span class="inline w-60"
                 >{relayUrl}</span
               >
-              {#if relayStateMap.get.get(relayUrl) === "error"}<button
+              {#if relayStateMap.get().get(relayUrl) === "error"}<button
                   onclick={() => handleClickReconnect(relayUrl)}
                   class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
@@ -101,12 +101,12 @@
                 <Circle
                   size="20"
                   class="{getColor(
-                    relayStateMap.get.get(relayUrl)
+                    relayStateMap.get().get(relayUrl)
                   )} fill-current  min-w-[20px] mr-1"
                 />
                 {#snippet popoverContent()}
                   <div class="mr-8">
-                    {relayStateMap.get.get(relayUrl)}
+                    {relayStateMap.get().get(relayUrl)}
                   </div>
                 {/snippet}</Popover
               ><span class="inline w-60">{relayUrl}</span>

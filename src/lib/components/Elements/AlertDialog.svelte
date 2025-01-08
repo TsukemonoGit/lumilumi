@@ -1,7 +1,6 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
-  import type { Writable } from "svelte/store";
 
   interface Props {
     onClickOK: () => void;

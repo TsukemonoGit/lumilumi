@@ -79,7 +79,7 @@
   };
 
   let prof = $derived(profile(metadata));
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
 </script>
 
 <div
@@ -176,14 +176,15 @@
         {repostable}
         {tieKey}
       /><ClientTag tags={note.tags} {depth} />{:else}
-      <Content
+      <!-- <Content
         text={note.content}
         tags={note.tags}
         {displayMenu}
         {depth}
         {repostable}
         {tieKey}
-      />{/if}
+      /> -->
+    {/if}
   </div>
   {#if displayMenu}
     <NoteActionButtons {note} {repostable} {tieKey} />

@@ -300,7 +300,7 @@
 
       //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
       // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      await waitForConnections(readUrls, relayStateMap.get, 10000); // maxWaitTime set to 10 seconds
+      await waitForConnections(readUrls, relayStateMap.get(), 10000); // maxWaitTime set to 10 seconds
       // console.log(relayStateMap.get);
 
       const older = await firstLoadOlderEvents(
@@ -415,9 +415,9 @@
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}
-{:else if displayEvents.get && displayEvents.get.length > 0}
+{:else if displayEvents.get() && displayEvents.get().length > 0}
   {@render content?.({
-    events: displayEvents.get,
+    events: displayEvents.get(),
     status: $status,
     len: $globalData?.length ?? 0,
   })}
@@ -427,7 +427,7 @@
 {:else}
   {@render nodata?.()}
 {/if}
-{#if displayEvents.get && displayEvents.get.length > 0}
+{#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"

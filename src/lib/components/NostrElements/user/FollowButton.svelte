@@ -53,7 +53,7 @@
     "contacts",
     $loginUser,
   ]);
-  let isfollowee: boolean = $derived(followList.get.has(pubkey));
+  let isfollowee: boolean = $derived(followList.get().has(pubkey));
 
   // Public key validation
   const validateLoginPubkey = async (): Promise<boolean> => {
@@ -84,7 +84,7 @@
   const handleFollow = async () => {
     if (!(await validateLoginPubkey())) return;
 
-    const followState = followList.get.has(pubkey);
+    const followState = followList.get().has(pubkey);
     const kind3Event: EventPacket | undefined =
       queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
 
@@ -98,7 +98,7 @@
 
     //isfollowee = followList.get.has(pubkey);
 
-    if (followState !== followList.get.has(pubkey)) {
+    if (followState !== followList.get().has(pubkey)) {
       $nowProgress = false;
       return;
     }
@@ -215,7 +215,7 @@
     let kind3Event: EventPacket | undefined =
       queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
-    petnameInput = followList.get.get(pubkey) ?? "";
+    petnameInput = followList.get().get(pubkey) ?? "";
     openPetnameDialog?.(true);
     $nowProgress = false;
   };
@@ -223,7 +223,7 @@
   const updatePetname = async () => {
     if (!beforeKind3) return;
 
-    const beforePetname = followList.get.get(pubkey);
+    const beforePetname = followList.get().get(pubkey);
     if (
       (!beforePetname && petnameInput === "") ||
       beforePetname === petnameInput

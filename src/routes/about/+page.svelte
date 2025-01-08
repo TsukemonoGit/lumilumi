@@ -107,11 +107,11 @@
           unsubscribe?.();
 
           //購読対象から削除
-          const index = viewEventIds.get.findIndex(
-            (item) => item[0] === "e" && item[1] === monoZap.noteId
-          );
+          const index = viewEventIds
+            .get()
+            .findIndex((item) => item[0] === "e" && item[1] === monoZap.noteId);
           if (index !== -1) {
-            viewEventIds.get.splice(index, 1);
+            viewEventIds.get().splice(index, 1);
           }
           $toastSettings = {
             title: "Success",
@@ -121,7 +121,7 @@
         }
       });
       //購読対象に追加
-      viewEventIds.get.push(["e", monoZap.noteId]);
+      viewEventIds.get().push(["e", monoZap.noteId]);
       // viewEventIds.get = viewEventIds.get;
     } catch (error) {
       $toastSettings = {

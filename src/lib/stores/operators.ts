@@ -157,7 +157,8 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
     //console.log(packet);
 
     // 現在の store から pubkey と dtag に対応するイベントを取得
-    const pre: Nostr.Event | undefined = userStatusMap.get
+    const pre: Nostr.Event | undefined = userStatusMap
+      .get()
       .get(packet.event.pubkey)
       ?.get(dtag);
 
@@ -353,7 +354,7 @@ export function reactionCheck() {
     const followListSet = followList.get;
     const loginUserPubkey = get(loginUser);
     const isFollowingUser = (pubkey: string) =>
-      followListSet && followListSet.has(pubkey);
+      followListSet && followListSet().has(pubkey);
 
     const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind);
     const isSelfPost = packet.event.pubkey === loginUserPubkey;

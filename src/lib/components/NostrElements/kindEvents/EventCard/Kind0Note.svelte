@@ -26,7 +26,7 @@
   }: Props = $props();
 
   let prof = $derived(profile(note));
-  let petname = $derived(followList.get.get(note.pubkey));
+  let petname = $derived(followList.get().get(note.pubkey));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">

@@ -328,36 +328,23 @@
                         >
                           {#snippet loading()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet nodata()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet error()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet content({ metadata })}
                             <EventCard
                               {metadata}
                               note={event}
-                              excludefunc={excludeKind1}
                               tieKey={userPubkey}
                             />
                           {/snippet}
@@ -412,48 +399,29 @@
                   >
                     {#if events && events.length > 0}
                       {#each events as event, index (event.id)}
-                        <!-- <div
-                        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                        events.length - 1
-                          ? 'last-visible'
-                          : ''} {index === 0 ? 'first-visible' : ''}"
-                      > -->
                         <Metadata
                           queryKey={["metadata", event.pubkey]}
                           pubkey={event.pubkey}
                         >
                           {#snippet loading()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet nodata()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet error()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind1}
-                                tieKey={userPubkey}
-                              />
+                              <EventCard note={event} tieKey={userPubkey} />
                             </div>
                           {/snippet}
                           {#snippet content({ metadata })}
                             <EventCard
                               {metadata}
                               note={event}
-                              excludefunc={excludeKind1}
                               tieKey={userPubkey}
                             />
                           {/snippet}

@@ -124,10 +124,10 @@
     if (onlyFollowee && followList.get) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return followList.get.has(event.pubkey);
+          return followList.get().has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && followList.get.has(kind9734.pubkey);
+          return kind9734 && followList.get().has(kind9734.pubkey);
         }
       });
     } else {
@@ -142,10 +142,10 @@
     if ($onlyFollowee && followList.get) {
       //フォロイーのみ
       if (event.kind !== 9735) {
-        if (!followList.get.has(event.pubkey)) return false;
+        if (!followList.get().has(event.pubkey)) return false;
       } else {
         const kind9734 = extractKind9734(event);
-        if (kind9734 !== undefined && !followList.get.has(kind9734.pubkey)) {
+        if (kind9734 !== undefined && !followList.get().has(kind9734.pubkey)) {
           return false;
         }
       }
