@@ -15,6 +15,7 @@ import {
   setCatchHandler,
   setDefaultHandler,
 } from "workbox-routing";
+import { ExpirationPlugin } from "workbox-expiration";
 
 import type { ManifestEntry } from "workbox-build";
 import type { StrategyHandler } from "workbox-strategies";
@@ -23,6 +24,7 @@ import type { StrategyHandler } from "workbox-strategies";
 declare let self: ServiceWorkerGlobalScope;
 declare type ExtendableEvent = any;
 
+const mediaCacheName = "media-cache";
 const cacheName = cacheNames.runtime;
 let media: string[] | null;
 const config = {
@@ -43,18 +45,14 @@ let targetData: {
 const manifest = self.__WB_MANIFEST as Array<
   ManifestEntry & { revision: string }
 >;
-
-const cacheEntries: RequestInfo[] = [];
-
-const manifestURLs = manifest.map((entry) => {
+const cacheEntries: RequestInfo[] = manifest.map((entry) => {
   const url = new URL(entry.url, self.location.href);
-  cacheEntries.push(
-    new Request(url.href, {
-      credentials: config.credentials as any,
-    })
-  );
-  return url.href;
+  return new Request(url.href, { credentials: config.credentials as any });
 });
+
+const manifestURLs = manifest.map(
+  (entry) => new URL(entry.url, self.location.href).href
+);
 
 // --- Event Listeners ---
 self.addEventListener("install", handleInstallEvent);
@@ -65,20 +63,16 @@ self.addEventListener("message", handleMessageEvent);
 //リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 
-setDefaultHandler(new NetworkOnly());
+setDefaultHandler(new NetworkFirst({ cacheName }));
 
 // fallback to app-shell for document request
 setCatchHandler(
   async (options: RouteHandlerCallbackOptions): Promise<Response> => {
-    switch (options.request.destination) {
-      case "document":
-        const r = await caches.match(config.fallback).catch(() => null);
-        return await (r
-          ? Promise.resolve(r)
-          : Promise.resolve(Response.error()));
-      default:
-        return Promise.resolve(Response.error());
+    if (options.request.destination === "document") {
+      const fallback = await caches.match(config.fallback);
+      return fallback || Response.error();
     }
+    return Response.error();
   }
 );
 
@@ -117,29 +111,24 @@ function buildStrategy(): Strategy {
       }
     }
     return new CacheNetworkRace();
-  } else {
-    if (config.networkTimeoutSeconds > 0) {
-      const networkTimeoutSeconds = config.networkTimeoutSeconds;
-      return new NetworkFirst({ cacheName, networkTimeoutSeconds });
-    } else {
-      return new NetworkFirst({ cacheName });
-    }
   }
+  return config.networkTimeoutSeconds > 0
+    ? new NetworkFirst({
+        cacheName,
+        networkTimeoutSeconds: config.networkTimeoutSeconds,
+      })
+    : new NetworkFirst({ cacheName });
 }
 
-function handleInstallEvent(event: ExtendableEvent) {
+async function handleInstallEvent(event: ExtendableEvent) {
   event.waitUntil(
     caches.open(cacheName).then(async (cache) => {
       const existingRequests = await cache.keys();
       const existingURLs = new Set(existingRequests.map((req) => req.url));
+      const newEntries = cacheEntries.filter(
+        (entry) => !existingURLs.has((entry as Request).url)
+      );
 
-      // cacheEntriesがstringまたはRequestオブジェクトの配列である前提
-      const newEntries = cacheEntries.filter((entry) => {
-        const url = typeof entry === "string" ? entry : entry.url;
-        return !existingURLs.has(url);
-      });
-
-      // newEntriesが空でない場合にのみキャッシュに追加
       if (newEntries.length > 0) {
         try {
           await cache.addAll(newEntries);
@@ -151,40 +140,30 @@ function handleInstallEvent(event: ExtendableEvent) {
   );
 }
 
-function handleActivateEvent(event: ExtendableEvent) {
-  // - clean up outdated runtime cache
+async function handleActivateEvent(event: ExtendableEvent) {
   event.waitUntil(
-    caches.open(cacheName).then((cache) => {
-      // clean up those who are not listed in manifestURLs
-      cache.keys().then((keys) => {
-        keys.forEach((request) => {
-          config.debug &&
-            console.log(`Checking cache entry to be removed: ${request.url}`);
-          if (!manifestURLs.includes(request.url)) {
-            cache.delete(request).then((deleted) => {
-              if (config.debug) {
-                if (deleted)
-                  console.log(
-                    `Precached data removed: ${request.url || request}`
-                  );
-                else
-                  console.log(`No precache found: ${request.url || request}`);
-              }
-            });
-          }
-        });
-      });
+    caches.open(cacheName).then(async (cache) => {
+      const cacheKeys = await cache.keys();
+      for (const request of cacheKeys) {
+        if (!manifestURLs.includes(request.url)) {
+          await cache.delete(request);
+        }
+      }
+    }),
+    caches.open(mediaCacheName).then(async (cache) => {
+      const cacheKeys = await cache.keys();
+      for (const request of cacheKeys) {
+        await cache.delete(request);
+      }
     })
   );
 }
 
-async function handleFetchEvent(event) {
+async function handleFetchEvent(event: FetchEvent) {
   if (
-    event.request &&
     event.request.method === "POST" &&
     new URL(event.request.url).pathname === "/post"
   ) {
-    console.log("fetch event:", event);
     return handlePostRequest(event.request);
   }
 }
@@ -205,15 +184,19 @@ async function handlePostRequest(request) {
   console.log("data", targetData);
   // メディアキャッシュ処理
   if (targetData.media && targetData.media.length > 0) {
-    const cache = await caches.open("media-cache");
+    const cache = await caches.open(mediaCacheName);
     await Promise.all(
       targetData.media.map(async (file, index) => {
         const cacheRequest = new Request(
           `/cached-media/${file.name}-${index}`,
-          { method: "GET" }
+          {
+            method: "GET",
+          }
         );
         const cacheResponse = new Response(file, {
-          headers: { "Content-Type": file.type },
+          headers: {
+            "Content-Type": file.type,
+          },
         });
         await cache.put(cacheRequest, cacheResponse);
       })
