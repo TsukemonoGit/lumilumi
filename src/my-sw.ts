@@ -132,11 +132,21 @@ function handleInstallEvent(event: ExtendableEvent) {
     caches.open(cacheName).then(async (cache) => {
       const existingRequests = await cache.keys();
       const existingURLs = new Set(existingRequests.map((req) => req.url));
-      const newEntries = cacheEntries.filter(
-        (entry) =>
-          !existingURLs.has(typeof entry === "string" ? entry : entry.url)
-      );
-      return cache.addAll(newEntries);
+
+      // cacheEntriesがstringまたはRequestオブジェクトの配列である前提
+      const newEntries = cacheEntries.filter((entry) => {
+        const url = typeof entry === "string" ? entry : entry.url;
+        return !existingURLs.has(url);
+      });
+
+      // newEntriesが空でない場合にのみキャッシュに追加
+      if (newEntries.length > 0) {
+        try {
+          await cache.addAll(newEntries);
+        } catch (err) {
+          console.error("Failed to cache some resources:", err);
+        }
+      }
     })
   );
 }
