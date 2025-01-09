@@ -24,7 +24,7 @@ declare let self: ServiceWorkerGlobalScope;
 declare type ExtendableEvent = any;
 
 const cacheName = cacheNames.runtime;
-
+let media: string[] | null;
 const config = {
   race: false,
   debug: false,
@@ -39,12 +39,6 @@ let targetData: {
   title: string | undefined;
   media: File[] | undefined;
 };
-
-// --- Event Listeners ---
-self.addEventListener("install", handleInstallEvent);
-self.addEventListener("activate", handleActivateEvent);
-self.addEventListener("fetch", handleFetchEvent);
-self.addEventListener("message", handleMessageEvent);
 
 const manifest = self.__WB_MANIFEST as Array<
   ManifestEntry & { revision: string }
@@ -61,6 +55,12 @@ const manifestURLs = manifest.map((entry) => {
   );
   return url.href;
 });
+
+// --- Event Listeners ---
+self.addEventListener("install", handleInstallEvent);
+self.addEventListener("activate", handleActivateEvent);
+self.addEventListener("fetch", handleFetchEvent);
+self.addEventListener("message", handleMessageEvent);
 
 //リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
@@ -178,8 +178,6 @@ async function handleFetchEvent(event) {
     return handlePostRequest(event.request);
   }
 }
-
-let media;
 
 async function handlePostRequest(request) {
   if (!request) {
