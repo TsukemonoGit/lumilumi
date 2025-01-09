@@ -2,12 +2,14 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import { svelteTesting } from "@testing-library/svelte/vite";
+
+import crypto from "crypto";
+
 export default defineConfig({
   server: {
     host: true,
     headers: {
-      "Content-Security-Policy":
-        "worker-src 'self' http://localhost:5173; script-src 'self';",
+      "Content-Security-Policy": "worker-src 'self'; script-src 'self';",
     },
   },
   plugins: [
@@ -55,17 +57,26 @@ export default defineConfig({
       //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
       injectManifest: {
         globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+          "client/**/*.{js,css,ico,webmanifest}", //アイコン画像とかもキャッシュされる？,png,svg,webp
           "prerendered/**/*.{html,json}",
         ],
+        globIgnores: ["node_modules/**/*"],
+        // ↓ここでリビジョン情報を有効にする
+        manifestTransforms: [
+          async (entries) => {
+            return {
+              manifest: entries.map((entry) => ({
+                ...entry,
+                revision: crypto
+                  .createHash("md5")
+                  .update(entry.url)
+                  .digest("hex"),
+              })),
+            };
+          },
+        ],
       },
-      //(workbox or injectManifest)
-      // workbox: {
-      //   globPatterns: [
-      //     "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
-      //     "prerendered/**/*.{html,json}",
-      //   ],
-      // }, //https://vite-pwa-org.netlify.app/guide/service-worker-precache.html#precache-manifest
+
       devOptions: {
         enabled: true,
         suppressWarnings: process.env.SUPPRESS_WARNING === "true",

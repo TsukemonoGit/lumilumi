@@ -1,48 +1,174 @@
+//my-sw
 /// <reference lib="WebWorker" />
 /// <reference types="vite/client" />
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
-import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
+import { precacheAndRoute } from "workbox-precaching";
+import {
+  cacheNames,
+  clientsClaim,
+  type RouteHandlerCallbackOptions,
+} from "workbox-core";
+import { NetworkFirst, NetworkOnly, Strategy } from "workbox-strategies";
+import {
+  registerRoute,
+  setCatchHandler,
+  setDefaultHandler,
+} from "workbox-routing";
 
+import type { ManifestEntry } from "workbox-build";
+import type { StrategyHandler } from "workbox-strategies";
+
+// Give TypeScript the correct global.
 declare let self: ServiceWorkerGlobalScope;
+declare type ExtendableEvent = any;
 
-// self.__WB_MANIFEST is default injection point
-precacheAndRoute(self.__WB_MANIFEST);
+const cacheName = cacheNames.runtime;
 
-// clean old assets
-cleanupOutdatedCaches();
+const config = {
+  race: false,
+  debug: false,
+  credentials: "same-origin",
+  networkTimeoutSeconds: 0,
+  fallback: "index.html",
+};
 
-let data: {
+let targetData: {
   url: string | undefined;
   text: string | undefined;
   title: string | undefined;
   media: File[] | undefined;
 };
 
-self.addEventListener("install", (event) => {
-  console.log("Service Worker: Installed");
-  // Cache assets, perform other setup tasks here
-  self.skipWaiting(); //無限リロしなくなった？//skipWaiting() は ServiceWorkerGlobalScope インターフェイスのメソッドで、待機しているサービスワーカーがアクティブになるように強制します。
-  //https://developer.mozilla.org/ja/docs/Web/API/ServiceWorkerGlobalScope/skipWaiting
-});
+// --- Event Listeners ---
+self.addEventListener("install", handleInstallEvent);
+self.addEventListener("activate", handleActivateEvent);
+self.addEventListener("fetch", handleFetchEvent);
+self.addEventListener("message", handleMessageEvent);
 
-self.addEventListener("activate", (event) => {
-  console.log("Service Worker: Activated");
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          // 不要なキャッシュを削除する
-          if (cacheName !== "media-cache") {
-            return caches.delete(cacheName);
-          }
-        })
-      );
+const manifest = self.__WB_MANIFEST as Array<
+  ManifestEntry & { revision: string }
+>;
+
+const cacheEntries: RequestInfo[] = [];
+
+const manifestURLs = manifest.map((entry) => {
+  const url = new URL(entry.url, self.location.href);
+  cacheEntries.push(
+    new Request(url.href, {
+      credentials: config.credentials as any,
     })
   );
+  return url.href;
 });
 
-self.addEventListener("fetch", async (event) => {
+//リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
+registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
+
+setDefaultHandler(new NetworkOnly());
+
+// fallback to app-shell for document request
+setCatchHandler(
+  async (options: RouteHandlerCallbackOptions): Promise<Response> => {
+    switch (options.request.destination) {
+      case "document":
+        const r = await caches.match(config.fallback).catch(() => null);
+        return await (r
+          ? Promise.resolve(r)
+          : Promise.resolve(Response.error()));
+      default:
+        return Promise.resolve(Response.error());
+    }
+  }
+);
+
+function buildStrategy(): Strategy {
+  if (config.race) {
+    class CacheNetworkRace extends Strategy {
+      _handle(
+        request: Request,
+        handler: StrategyHandler
+      ): Promise<Response | undefined> {
+        const fetchAndCachePutDone: Promise<Response> =
+          handler.fetchAndCachePut(request);
+        const cacheMatchDone: Promise<Response | undefined> =
+          handler.cacheMatch(request);
+
+        return new Promise((resolve, reject) => {
+          fetchAndCachePutDone.then(resolve).catch((e) => {
+            if (config.debug)
+              console.log(`Cannot fetch resource: ${request.url}`, e);
+          });
+          cacheMatchDone.then((response) => response && resolve(response));
+
+          // Reject if both network and cache error or find no response.
+          Promise.allSettled([fetchAndCachePutDone, cacheMatchDone]).then(
+            (results) => {
+              const [fetchAndCachePutResult, cacheMatchResult] = results;
+              if (
+                fetchAndCachePutResult.status === "rejected" &&
+                cacheMatchResult.status === "fulfilled" &&
+                !cacheMatchResult.value
+              )
+                reject(fetchAndCachePutResult.reason);
+            }
+          );
+        });
+      }
+    }
+    return new CacheNetworkRace();
+  } else {
+    if (config.networkTimeoutSeconds > 0) {
+      const networkTimeoutSeconds = config.networkTimeoutSeconds;
+      return new NetworkFirst({ cacheName, networkTimeoutSeconds });
+    } else {
+      return new NetworkFirst({ cacheName });
+    }
+  }
+}
+
+function handleInstallEvent(event: ExtendableEvent) {
+  event.waitUntil(
+    caches.open(cacheName).then(async (cache) => {
+      const existingRequests = await cache.keys();
+      const existingURLs = new Set(existingRequests.map((req) => req.url));
+      const newEntries = cacheEntries.filter(
+        (entry) =>
+          !existingURLs.has(typeof entry === "string" ? entry : entry.url)
+      );
+      return cache.addAll(newEntries);
+    })
+  );
+}
+
+function handleActivateEvent(event: ExtendableEvent) {
+  // - clean up outdated runtime cache
+  event.waitUntil(
+    caches.open(cacheName).then((cache) => {
+      // clean up those who are not listed in manifestURLs
+      cache.keys().then((keys) => {
+        keys.forEach((request) => {
+          config.debug &&
+            console.log(`Checking cache entry to be removed: ${request.url}`);
+          if (!manifestURLs.includes(request.url)) {
+            cache.delete(request).then((deleted) => {
+              if (config.debug) {
+                if (deleted)
+                  console.log(
+                    `Precached data removed: ${request.url || request}`
+                  );
+                else
+                  console.log(`No precache found: ${request.url || request}`);
+              }
+            });
+          }
+        });
+      });
+    })
+  );
+}
+
+async function handleFetchEvent(event) {
   if (
     event.request &&
     event.request.method === "POST" &&
@@ -51,7 +177,7 @@ self.addEventListener("fetch", async (event) => {
     console.log("fetch event:", event);
     return handlePostRequest(event.request);
   }
-});
+}
 
 let media;
 
@@ -62,18 +188,18 @@ async function handlePostRequest(request) {
   }
 
   const formData = await request.clone().formData();
-  data = {
+  targetData = {
     url: formData.get("url"),
     text: formData.get("text"),
     title: formData.get("title"),
     media: formData.getAll("media"),
   };
-  console.log("data", data);
+  console.log("data", targetData);
   // メディアキャッシュ処理
-  if (data.media && data.media.length > 0) {
+  if (targetData.media && targetData.media.length > 0) {
     const cache = await caches.open("media-cache");
     await Promise.all(
-      data.media.map(async (file, index) => {
+      targetData.media.map(async (file, index) => {
         const cacheRequest = new Request(
           `/cached-media/${file.name}-${index}`,
           { method: "GET" }
@@ -90,12 +216,18 @@ async function handlePostRequest(request) {
   const allClients = await (self as any).clients.matchAll({
     includeUncontrolled: true,
   });
+  media = targetData.media
+    ? targetData.media.map(
+        (file, index) => `/cached-media/${file.name}-${index}`
+      )
+    : null;
+  console.log(media);
   await Promise.all(
     allClients.map((client) => {
       return client.postMessage({
-        title: data.title,
-        text: data.text,
-        url: data.url,
+        title: targetData.title,
+        text: targetData.text,
+        url: targetData.url,
         media: media,
       });
     })
@@ -104,7 +236,7 @@ async function handlePostRequest(request) {
   return new Response("", { status: 200 });
 }
 
-self.addEventListener("message", async (event) => {
+async function handleMessageEvent(event) {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
@@ -116,21 +248,23 @@ self.addEventListener("message", async (event) => {
     await sendLatestDataToClient(event.source);
     return;
   }
-});
+}
+
 async function sendLatestDataToClient(client) {
   // キャッシュから最新データを取得して送信
 
-  const response = data
+  const response = targetData
     ? {
-        title: data.title,
-        text: data.text,
-        url: data.url,
+        title: targetData.title,
+        text: targetData.text,
+        url: targetData.url,
         media: media,
       }
     : null;
   client.postMessage(response);
 }
 
-self.addEventListener("backgroundfetchabort", (event) => {
-  console.log("backgroundfetchabort", event);
-});
+// this is necessary, since the new service worker will keep on skipWaiting state
+// and then, caches will not be cleared since it is not activated
+self.skipWaiting();
+clientsClaim();
