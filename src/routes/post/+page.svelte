@@ -123,12 +123,15 @@
           handleFilesUpload(fileList, sharedContent);
         }
       });
-      if (navigator.serviceWorker.controller) {
-        // サービスワーカーに最新データをリクエスト
-        navigator.serviceWorker.controller.postMessage({
-          type: "requestLatestData",
-        });
-      }
+      console.log(navigator.serviceWorker.controller);
+      setTimeout(() => {
+        if (navigator.serviceWorker.controller) {
+          // サービスワーカーに最新データをリクエスト
+          navigator.serviceWorker.controller.postMessage({
+            type: "requestLatestData",
+          });
+        }
+      }, 100);
     }
   });
 
