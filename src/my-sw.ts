@@ -239,11 +239,30 @@ async function handleMessageEvent(event) {
     return;
   }
   console.log(event);
+
+  // 以前キャッシュされたデータを再送信する
   if (event.data && event.data.type === "requestLatestData") {
-    // 以前キャッシュされたデータを再送信する
     //event.source?.postMessage(clonedRequest);
     await sendLatestDataToClient(event.source);
     return;
+  }
+
+  //共有用メディアキャッシュ削除
+  if (event.data && event.data.type === "DELETE_CACHE") {
+    caches
+      .open(mediaCacheName)
+      .then(async (cache) => {
+        const cacheKeys = await cache.keys();
+        for (const request of cacheKeys) {
+          await cache.delete(request);
+        }
+      })
+      .finally(() => {
+        event.ports[0].postMessage({ success: true });
+      });
+    //const cache = await caches.open("media-cache");
+    //await cache.delete(event.data.url);
+    //event.ports[0].postMessage({ success: true });
   }
 }
 
