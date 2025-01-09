@@ -42,13 +42,9 @@ let targetData: {
   media: File[] | undefined;
 };
 
-const manifest = self.__WB_MANIFEST as Array<
-  ManifestEntry & { revision: string }
->;
-const cacheEntries: RequestInfo[] = manifest.map((entry) => {
-  const url = new URL(entry.url, self.location.href);
-  return new Request(url.href, { credentials: config.credentials as any });
-});
+const manifest = self.__WB_MANIFEST as Array<ManifestEntry>;
+
+const cacheEntries: RequestInfo[] = [];
 
 const manifestURLs = manifest.map(
   (entry) => new URL(entry.url, self.location.href).href
@@ -75,6 +71,10 @@ setCatchHandler(
     return Response.error();
   }
 );
+// this is necessary, since the new service worker will keep on skipWaiting state
+// and then, caches will not be cleared since it is not activated
+self.skipWaiting();
+clientsClaim();
 
 function buildStrategy(): Strategy {
   if (config.race) {
@@ -122,21 +122,27 @@ function buildStrategy(): Strategy {
 
 async function handleInstallEvent(event: ExtendableEvent) {
   event.waitUntil(
-    caches.open(cacheName).then(async (cache) => {
-      const existingRequests = await cache.keys();
-      const existingURLs = new Set(existingRequests.map((req) => req.url));
-      const newEntries = cacheEntries.filter(
-        (entry) => !existingURLs.has((entry as Request).url)
-      );
+    caches
+      .open(cacheName)
+      .then(async (cache) => {
+        const existingRequests = await cache.keys();
+        const existingURLs = new Set(existingRequests.map((req) => req.url));
+        const newEntries = cacheEntries.filter(
+          (entry) => !existingURLs.has((entry as Request).url)
+        );
 
-      if (newEntries.length > 0) {
-        try {
-          await cache.addAll(newEntries);
-        } catch (err) {
-          console.error("Failed to cache some resources:", err);
+        if (newEntries.length > 0) {
+          try {
+            await cache.addAll(newEntries);
+          } catch (err) {
+            console.error("Failed to cache some resources:", err);
+          }
         }
-      }
-    })
+      })
+      .then(() => {
+        // キャッシュ追加後にサービスワーカーをすぐにアクティブにする
+        self.skipWaiting();
+      })
   );
 }
 
@@ -254,8 +260,3 @@ async function sendLatestDataToClient(client) {
     : null;
   client.postMessage(response);
 }
-
-// this is necessary, since the new service worker will keep on skipWaiting state
-// and then, caches will not be cleared since it is not activated
-self.skipWaiting();
-clientsClaim();
