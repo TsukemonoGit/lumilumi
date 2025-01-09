@@ -57,7 +57,7 @@ export default defineConfig({
       //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
       injectManifest: {
         globPatterns: [
-          "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
+          "client/**/*.{js,css,ico,webmanifest}", //アイコン画像とかもキャッシュされる？,png,svg,webp
           "prerendered/**/*.{html,json}",
         ],
         globIgnores: ["node_modules/**/*"],
