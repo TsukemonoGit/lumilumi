@@ -26,6 +26,17 @@
   function close() {
     needRefresh = false;
   }
+
+  function handleClickReload() {
+    updateServiceWorker(true)
+      .then(() => {
+        console.log("Service Worker updated successfully");
+      })
+      .catch((error: any) => {
+        console.error("Failed to update Service Worker:", error);
+      });
+    close();
+  }
 </script>
 
 {#if needRefresh}
@@ -34,14 +45,7 @@
       <span> New content available, click on reload button to update. </span>
     </div>
 
-    <button
-      onclick={() => {
-        updateServiceWorker(true);
-        close();
-      }}
-    >
-      Reload
-    </button>
+    <button onclick={handleClickReload}> Reload </button>
 
     <button onclick={close}> Close </button>
   </div>
