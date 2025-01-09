@@ -123,15 +123,13 @@
           handleFilesUpload(fileList, sharedContent);
         }
       });
-      console.log(navigator.serviceWorker.controller);
-      setTimeout(() => {
-        if (navigator.serviceWorker.controller) {
-          // サービスワーカーに最新データをリクエスト
-          navigator.serviceWorker.controller.postMessage({
-            type: "requestLatestData",
-          });
+      // サービスワーカーが準備完了した後にメッセージを送信
+      navigator.serviceWorker.ready.then((registration) => {
+        if (registration.active) {
+          console.log("Service Worker is active");
+          registration.active.postMessage({ type: "requestLatestData" });
         }
-      }, 100);
+      });
     }
   });
 
