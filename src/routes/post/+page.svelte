@@ -9,11 +9,12 @@
     uploader,
   } from "$lib/stores/stores";
   import type { LumiSetting } from "$lib/types";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { beforeNavigate } from "$app/navigation";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -133,46 +134,6 @@
     }
   });
 
-  // // サービスワーカーのメッセージ受信処理
-  // onMount(() => {
-  //   if (navigator?.serviceWorker) {
-  //     navigator.serviceWorker
-  //       .register("/service-worker.js")
-  //       .then((registration) => {
-  //         console.log(
-  //           "Service Worker registered with scope:",
-  //           registration.scope
-  //         );
-  //       })
-  //       .catch((error) => {
-  //         console.error("サービスワーカーの登録に失敗しました:", error);
-  //       });
-
-  //     navigator.serviceWorker.ready
-  //       .then((registration) => {
-  //         console.log("サービスワーカーが準備完了:", registration);
-
-  //         // メッセージリスナーを設定
-  //         navigator.serviceWorker.addEventListener("message", (event) => {
-  //           console.log("サービスワーカーからのメッセージ:", event.data);
-
-  //           const { title, text, url, media } = event.data;
-  //           // メッセージの内容を処理
-  //           console.log("Received data:", { title, text, url, media });
-  //           fileList = media;
-  //           sharedContent = [title, text, url].filter(Boolean).join("\n");
-
-  //           // ファイルアップロードの処理を開始
-  //           handleFileUpload(fileList, sharedContent);
-  //         });
-  //       })
-  //       .catch((error) => {
-  //         console.error("サービスワーカーの準備に失敗しました:", error);
-  //       });
-  //   } else {
-  //     console.log("サービスワーカーはサポートされていません。");
-  //   }
-  // });
   // FileListを作成するためのユーティリティ関数
   function createFileList(files: File[]): FileList {
     const dataTransfer = new DataTransfer();
@@ -228,6 +189,28 @@
       console.error("ファイルアップロードの処理でエラーが発生しました:", error);
     }
   }
+
+  function deleteCache() {
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      const messageChannel = new MessageChannel();
+      messageChannel.port1.onmessage = (event) => {
+        if (event.data.success) {
+          console.log("キャッシュが削除されました");
+        }
+      };
+      navigator.serviceWorker.controller.postMessage({ type: "DELETE_CACHE" }, [
+        messageChannel.port2,
+      ]);
+    }
+  }
+
+  beforeNavigate((nav) => {
+    deleteCache();
+  });
+
+  window.addEventListener("beforeunload", (event) => {
+    deleteCache();
+  });
 </script>
 
 <div class="postWindow">
