@@ -62,19 +62,19 @@ export default defineConfig({
         ],
         globIgnores: ["node_modules/**/*"],
         // ↓ここでリビジョン情報を有効にする
-        manifestTransforms: [
-          async (entries) => {
-            return {
-              manifest: entries.map((entry) => ({
-                ...entry,
-                revision: crypto
-                  .createHash("md5")
-                  .update(entry.url)
-                  .digest("hex"),
-              })),
-            };
-          },
-        ],
+        // manifestTransforms: [
+        //   async (entries) => {
+        //     return {
+        //       manifest: entries.map((entry) => ({
+        //         ...entry,
+        //         revision: crypto
+        //           .createHash("md5")
+        //           .update(entry.url)
+        //           .digest("hex"),
+        //       })),
+        //     };
+        //   },
+        // ],
       },
 
       devOptions: {
