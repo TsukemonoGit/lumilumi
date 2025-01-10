@@ -31,7 +31,7 @@ const config = {
   race: false,
   debug: false,
   credentials: "same-origin",
-  networkTimeoutSeconds: 0,
+  networkTimeoutSeconds: 10,
   fallback: "app.html",
 };
 
@@ -58,6 +58,8 @@ self.addEventListener("message", handleMessageEvent);
 
 //リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
+//これmanifestURLsがvite.configのglobPatternsの部分？
+
 // ?type=avatar を含む URL だけをキャッシュ
 registerRoute(
   ({ url }) => url.searchParams.get("type") === "avatar",

@@ -24,9 +24,18 @@
   }: Props = $props();
   let avatarUrl = $derived.by(() => {
     if (!url) return "";
-    const aUrl = new URL(url);
-    aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
-    return aUrl.toString(); // 修正した URL を設定
+    try {
+      const aUrl = new URL(url);
+      if (aUrl.protocol === "data:") {
+        // data: URLの場合はクエリパラメータを追加しない
+        return url;
+      }
+      aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
+      return aUrl.toString(); // 修正した URL を設定
+    } catch (e) {
+      // URLのパースに失敗した場合は元のURLを返す
+      return url;
+    }
   });
   export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
     curr,
