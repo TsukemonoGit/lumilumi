@@ -76,7 +76,7 @@
   <!--/90 backdrop-blur-->
   <div class="absolute {menuPosition2} h-full mt-2">
     <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
-      <UserAvatar2 size={40} /></a
+      <UserAvatar2 size={36} /></a
     >
   </div>
   <div class="absolute {menuPosition} mt-1">

@@ -247,6 +247,7 @@
         // if (!tagExists(viewEventIds.get, "e", note.id)) {
         viewEventIds.update((value) => {
           value.push(["e", note.id]);
+          //console.log(value);
           return value;
         });
         //}

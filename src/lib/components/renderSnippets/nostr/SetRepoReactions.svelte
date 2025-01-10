@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
   import { loginUser } from "$lib/stores/stores";
@@ -29,27 +28,46 @@
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
   // $: console.log(viewEventIds.get);
-  let etagList = $derived(
-    Array.from(
-      new Set(
-        viewEventIds
-          .get()
-          .filter((tag) => tag[0] === "e")
-          .map((tag) => tag[1])
-      )
-    )
-  );
+  let etagList: string[] = $state([]);
+  let atagList: string[] = $state([]);
 
-  let atagList = $derived(
-    Array.from(
+  viewEventIds.subscribe((value) => {
+    etagList = Array.from(
+      new Set(value.filter((tag) => tag[0] === "e").map((tag) => tag[1]))
+    );
+
+    atagList = Array.from(
       new Set(
         viewEventIds
           .get()
           .filter((tag) => tag[0] === "a")
           .map((tag) => tag[1])
       )
-    )
-  );
+    );
+
+    debounceUpdate();
+  });
+  //  $derived(
+  //   Array.from(
+  //     new Set(
+  //       viewEventIds
+  //         .get()
+  //         .filter((tag) => tag[0] === "e")
+  //         .map((tag) => tag[1])
+  //     )
+  //   )
+  // );
+
+  //  $derived(
+  //   Array.from(
+  //     new Set(
+  //       viewEventIds
+  //         .get()
+  //         .filter((tag) => tag[0] === "a")
+  //         .map((tag) => tag[1])
+  //     )
+  //   )
+  // );
 
   $effect(() => {
     if (etagList || atagList) {
@@ -59,17 +77,16 @@
 
   function debounceUpdate() {
     if (updating) {
-      return;
+      clearTimeout(timeoutId); // 前のタイマーをクリアして最後の1回だけ実行
     }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    updating = true;
+
     timeoutId = setTimeout(() => {
       performUpdate();
       console.log(etagList.length, atagList.length);
       updating = false;
-    }, updateInterval); // 連続で実行されるのを防ぐ
+    }, updateInterval);
+
+    updating = true;
   }
 
   function performUpdate() {
@@ -79,14 +96,14 @@
       etagList.length > 0
         ? [
             {
-              "#e": etagList,
+              "#e": $state.snapshot(etagList),
               authors: lumiSetting.get().showAllReactions
                 ? undefined
                 : [$loginUser],
               kinds: [7, 6, 16],
             },
             {
-              "#e": etagList,
+              "#e": $state.snapshot(etagList),
               kinds: [9735],
             },
           ]
@@ -94,14 +111,14 @@
     if (atagList.length > 0) {
       filters.push(
         {
-          "#a": atagList,
+          "#a": $state.snapshot(atagList),
           authors: lumiSetting.get().showAllReactions
             ? undefined
             : [$loginUser],
           kinds: [7, 6, 16],
         },
         {
-          "#a": atagList,
+          "#a": $state.snapshot(atagList),
           kinds: [9735],
         }
       );

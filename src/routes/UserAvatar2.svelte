@@ -15,9 +15,10 @@
   interface Props {
     //let url = writable<string>();
     size?: number;
+    square?: boolean;
   }
 
-  let { size = 24 }: Props = $props();
+  let { size = 24, square = false }: Props = $props();
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {
       return null;
@@ -53,7 +54,8 @@
       {#snippet loading()}
         <div>
           <Avatar
-            size={size - 4}
+            {square}
+            {size}
             name={$loginUser}
             variant="beam"
             colors={splitHexColorString($loginUser)}
@@ -63,7 +65,8 @@
       {#snippet nodata()}
         <div>
           <Avatar
-            size={size - 4}
+            {square}
+            {size}
             name={$loginUser}
             variant="beam"
             colors={splitHexColorString($loginUser)}
@@ -73,7 +76,8 @@
       {#snippet error()}
         <div>
           <Avatar
-            size={size - 4}
+            {square}
+            {size}
             name={$loginUser}
             variant="beam"
             colors={splitHexColorString($loginUser)}
@@ -88,14 +92,16 @@
         >
           {#if lumiSetting.get().showImg && metadata && url && url !== ""}
             <UserAvatar
+              {square}
               {url}
               name={metadata.pubkey}
               pubkey={metadata.pubkey}
-              size={size - 4}
+              {size}
             />
           {:else}
             <Avatar
-              size={size - 4}
+              {square}
+              {size}
               name={$loginUser}
               variant="beam"
               colors={splitHexColorString($loginUser)}
