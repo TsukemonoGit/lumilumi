@@ -77,7 +77,8 @@
     "confirm": "投稿されていないテキストがあります。閉じますか？",
     "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています",
     "placeholder": "いま どうしてる？",
-    "quote": "nostr:npub... , nostr:nevent1... ,  で ユーザー、投稿を引用できます。"
+    "quote": "nostr:npub... , nostr:nevent1... ,  で ユーザー、投稿を引用できます。",
+    "hell": "30人以上にリプライを送ろうとしています。本当に送信してもよろしいですか？"
   },
   "profile": {
     "display_name": "表示名",

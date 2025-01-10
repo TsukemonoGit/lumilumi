@@ -64,7 +64,8 @@
     "confirm": "There is unposted text. Are you sure you want to close?",
     "nsecAlart": "Warning: Input contains private key (nsec)",
     "placeholder": "What's happening?",
-    "quote": "You can cite users and posts with nostr:npub..., nostr:nevent...."
+    "quote": "You can cite users and posts with nostr:npub..., nostr:nevent....",
+    "hell": "You are about to reply to more than 30 people. Are you sure you want to proceed?"
   },
   "user": {
     "profileEdit": "Edit profile",

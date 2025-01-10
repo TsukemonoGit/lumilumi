@@ -59,7 +59,8 @@
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserName from "./NostrElements/user/UserName.svelte";
-  import { nip19 } from "nostr-tools";
+
+  import AlertDialog from "./Elements/AlertDialog.svelte";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -77,6 +78,7 @@
     visible = true, //ポストアイコン非表示だけど返信とかはできる
   }: Props = $props();
 
+  const bulkReplyThreshold = 30; // 30人以上でクソでか人数ライン
   let text: string = $state(options.content ?? "");
   let tags: string[][] = $state([...options.tags]);
   let cursorPosition: number = 0;
@@ -139,10 +141,13 @@
   let uploadAbortController: AbortController | null = $state(null);
 
   let isPosting: boolean = $state(false);
+  // svelte-ignore non_reactive_update
+  let openHellConfirm: (bool: boolean) => void;
+  let newev: Nostr.EventParameters | undefined;
+
   const postNote = async () => {
     if (text.trim().length <= 0) return;
-    isPosting = true;
-    $nowProgress = true;
+
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
       tags
@@ -158,11 +163,28 @@
     if (lumiSetting.get().addClientTag) {
       checkedTags.push(clientTag);
     }
-    const newev: Nostr.EventParameters = {
+
+    newev = {
       kind: initOptions.kind,
       content: checkedText,
       tags: checkedTags,
     };
+    //くそながpタグチェック
+    const plen = checkedTags.filter((tag) => tag[0] === "p").length;
+    if (plen > bulkReplyThreshold) {
+      //pが長いけど送信していいかのチェック画面
+      openHellConfirm(true);
+      return;
+    }
+    await sendEvent();
+  };
+
+  async function sendEvent() {
+    if (!newev) {
+      return;
+    }
+    isPosting = true;
+    $nowProgress = true;
     const signer = nip07Signer();
     try {
       const event = await signer.signEvent($state.snapshot(newev));
@@ -227,7 +249,8 @@
       $nowProgress = false;
       isPosting = false;
     }
-  };
+    newev = undefined;
+  }
 
   const resetState = () => {
     text = options.content ?? "";
@@ -388,29 +411,14 @@
   };
 
   let textarea: HTMLTextAreaElement | undefined = $state();
-
-  //Close確認用
-  const {
-    elements: {
-      trigger: triggerConfirm,
-      overlay: overlayConfirm,
-      content: contentConfirm,
-      title: titleConfirm,
-      description: descriptionConfirm,
-      close: closeConfirm,
-      portalled: portalledConfirm,
-    },
-    states: { open: openConfirm },
-  } = createDialog({
-    forceVisible: true,
-    closeOnOutsideClick: false,
-  }); //overlay押したときに閉じない});
+  // svelte-ignore non_reactive_update
+  let openConfirm: (bool: boolean) => void = () => {};
 
   // オーバーレイクリック時の処理を追加
   const handleOverlayClick = (event: MouseEvent) => {
     if (text.trim().length > 0) {
       // テキストエリアに入力がある場合、アラートを表示
-      $openConfirm = true;
+      openConfirm?.(true);
     } else {
       // テキストエリアが空の場合、ダイアログを閉じる
       $open = false;
@@ -986,48 +994,34 @@
   </div>
 {/if}
 
-{#if $openConfirm}
-  <div use:melt={$portalledConfirm}>
-    <div
-      use:melt={$overlayConfirm}
-      class="fixed inset-0 z-50 bg-black/50"
-    ></div>
-    <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[450px] -translate-x-1/2 -translate-y-1/2 bg-neutral-900 p-2"
-      use:melt={$contentConfirm}
-    >
-      <h2
-        use:melt={$titleConfirm}
-        class="m-0 text-lg font-medium text-magnum-400"
-      >
-        Confirm close
-      </h2>
-      <p use:melt={$descriptionConfirm} class="mb-5 mt-2 leading-normal">
-        {$_("post.confirm")}
-      </p>
+<AlertDialog
+  okButtonName="Yes, close"
+  bind:openDialog={openConfirm}
+  closeOnOutsideClick={true}
+  onClickOK={() => {
+    open.set(false);
+    openConfirm?.(false);
+  }}
+  title="Confirm close"
+>
+  {#snippet main()}{$_("post.confirm")}
+  {/snippet}
+</AlertDialog>
 
-      <div class="mt-6 flex justify-end gap-4">
-        <button
-          class="inline-flex h-8 items-center justify-center rounded-[4px] px-4 font-medium leading-none bg-zinc-100 text-zinc-600 hover:opacity-75"
-          use:melt={$closeConfirm}
-        >
-          Cancel
-        </button>
-        <button
-          class="inline-flex h-8 items-center justify-center rounded-[4px]
-                    bg-magnum-100 px-4 font-medium leading-none text-magnum-900 hover:opacity-75"
-          onclick={() => {
-            open.set(false);
-            openConfirm.set(false);
-          }}
-        >
-          Yes, close
-        </button>
-      </div>
-    </div>
-  </div>
-{/if}
+<AlertDialog
+  okButtonName="Yes, send"
+  bind:openDialog={openHellConfirm}
+  closeOnOutsideClick={true}
+  onClickOK={async () => {
+    //いっぱいPでもおくってOK
+    await sendEvent();
+    openHellConfirm?.(false);
+  }}
+  title="Confirm Reply to Many People"
+>
+  {#snippet main()}{$_("post.hell")}
+  {/snippet}
+</AlertDialog>
 
 <style lang="postcss">
   .button,
