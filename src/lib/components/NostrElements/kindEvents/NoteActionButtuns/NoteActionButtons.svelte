@@ -74,21 +74,7 @@
       (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
     ) as string[] | undefined
   );
-  let textareaReply: HTMLTextAreaElement;
-  let textareaQuote: HTMLTextAreaElement;
-  // let dtag: string[] | undefined = $derived.by(() => {
-  //   if (
-  //     (note.kind >= 10000 && note.kind < 20000) ||
-  //     (note.kind >= 30000 && note.kind < 40000) ||
-  //     note.kind === 0 ||
-  //     note.kind === 3
-  //   ) {
-  //     //atag　で　りぽすと
-  //     return note.tags.find((tag) => tag[0] === "d");
-  //   } else {
-  //     return undefined;
-  //   }
-  // });
+
   let atag: string | undefined = $derived.by(() => {
     if (
       (note.kind >= 10000 && note.kind < 20000) ||
@@ -289,19 +275,6 @@
       return nevent;
     }
   }
-
-  // $: if (textareaReply) {
-  //   console.log("textareaReply");
-  //   textareaReply.focus();
-  // }
-  let fix: boolean = false;
-  $effect(() => {
-    //textareaが開いていて、テキストエリアがアクティブの場合真ん中に固定
-    if (fix) {
-      textareaReply?.focus();
-      textareaQuote?.focus();
-    }
-  });
 
   let invoice: string | undefined = $state(undefined);
 

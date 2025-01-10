@@ -9,7 +9,18 @@
     okButtonName?: string | undefined;
     main?: import("svelte").Snippet;
     openDialog?: (bool: boolean) => void;
+    closeOnOutsideClick?: boolean;
   }
+
+  let {
+    onClickOK,
+    title = "",
+    description = "",
+    okButtonName = undefined,
+    main,
+    openDialog = $bindable(),
+    closeOnOutsideClick = true,
+  }: Props = $props();
 
   const {
     elements: {
@@ -25,21 +36,9 @@
   } = createDialog({
     role: "alertdialog",
     forceVisible: true,
+    closeOnOutsideClick: closeOnOutsideClick,
   });
-  let {
-    onClickOK,
-    title = "",
-    description = "",
-    okButtonName = undefined,
-    main,
-    openDialog = $bindable(),
-  }: Props = $props();
-  // open?.subscribe((value: boolean) => {
-  //   if (value) {
-  //     $openEle = true;
-  //     $open = false;
-  //   }
-  // });
+
   openDialog = (bool: boolean) => {
     $openEle = bool;
   };
