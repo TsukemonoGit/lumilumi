@@ -22,6 +22,12 @@
     title = "",
     handleStateError = () => {},
   }: Props = $props();
+  let avatarUrl = $derived.by(() => {
+    if (!url) return "";
+    const aUrl = new URL(url);
+    aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
+    return aUrl.toString(); // 修正した URL を設定
+  });
   export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
     curr,
     next,
@@ -41,9 +47,9 @@
   });
 
   $effect(() => {
-    if (url) {
+    if (avatarUrl) {
       untrack(() => {
-        src.set(url);
+        src.set(avatarUrl);
       });
     }
   });
