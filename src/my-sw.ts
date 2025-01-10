@@ -72,15 +72,11 @@ registerRoute(
   })
 );
 
-// その他の画像はキャッシュしない
+// その他の画像、動画はキャッシュしない
 registerRoute(
-  ({ request }) => request.destination === "image",
+  ({ request }) =>
+    request.destination === "image" || request.destination === "video",
   new NetworkOnly()
-);
-// 動画リクエストに対してキャッシュしない
-registerRoute(
-  ({ request }) => request.destination === "video",
-  new NetworkOnly() // 動画リクエストはキャッシュしない
 );
 
 setDefaultHandler(new NetworkFirst({ cacheName }));
