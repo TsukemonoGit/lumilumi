@@ -31,7 +31,7 @@ const config = {
   race: false,
   debug: false,
   credentials: "same-origin",
-  networkTimeoutSeconds: 10,
+  networkTimeoutSeconds: 0,
   fallback: "app.html",
 };
 
