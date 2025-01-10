@@ -32,7 +32,7 @@ const config = {
   debug: false,
   credentials: "same-origin",
   networkTimeoutSeconds: 0,
-  fallback: "index.html",
+  fallback: "app.html",
 };
 
 let targetData: {
