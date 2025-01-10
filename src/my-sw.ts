@@ -58,6 +58,30 @@ self.addEventListener("message", handleMessageEvent);
 
 //リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
+// ?type=avatar を含む URL だけをキャッシュ
+registerRoute(
+  ({ url }) => url.searchParams.get("type") === "avatar",
+  new NetworkFirst({
+    cacheName: "avatar-cache",
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 60 * 60 * 24 * 7, // 7日
+      }),
+    ],
+  })
+);
+
+// その他の画像はキャッシュしない
+registerRoute(
+  ({ request }) => request.destination === "image",
+  new NetworkOnly()
+);
+// 動画リクエストに対してキャッシュしない
+registerRoute(
+  ({ request }) => request.destination === "video",
+  new NetworkOnly() // 動画リクエストはキャッシュしない
+);
 
 setDefaultHandler(new NetworkFirst({ cacheName }));
 
