@@ -446,7 +446,9 @@
   let reaction: Nostr.Event[] = $state([]);
   let zap: Nostr.Event[] = $state([]);
   let repost_length: number = $derived(repost.length);
+
   let reaction_length: number = $derived(reaction.length);
+
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
@@ -455,20 +457,19 @@
   let updating = false;
 
   function debounceUpdate() {
-    //console.log("debounceupdate", updating);
     if (updating) {
-      return;
+      clearTimeout(timeoutId); // 前のタイマーをクリアして最後の1回だけ実行
     }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    updating = true;
     timeoutId = setTimeout(() => {
       updateReactionsData();
+      updating = false;
     }, updateInterval); // 連続で実行されるのを防ぐ
-  }
 
+    updating = true;
+  }
+  viewEventIds.subscribe((value) => {
+    debounceUpdate();
+  });
   $effect(() => {
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
       //   console.log($state.snapshot(viewEventIds.get.length));
