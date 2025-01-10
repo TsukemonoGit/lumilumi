@@ -33,6 +33,7 @@
   import { usePromiseReq } from "$lib/func/nostr";
   import { writable, type Writable } from "svelte/store";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import { page } from "$app/state";
 
   const sift = 40; //スライドする量
 
@@ -65,7 +66,10 @@
   }: Props = $props();
 
   updateViewNotifi = debounce(async () => {
-    //   console.time();
+    console.log(page.route);
+    if (page.route.id !== "/notifications") {
+      return;
+    }
     $nowProgress = true;
     console.log("updateViewNotifi");
     const allEvents: EventPacket[] | undefined =
