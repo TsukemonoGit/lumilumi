@@ -44,7 +44,7 @@
                 : undefined}
             >
               <a href={`/${encodedPub}`}
-                ><UserAvatar2 size={28} /><span class="ml-2">profile</span>
+                ><UserAvatar2 size={24} /><span class="ml-2">profile</span>
               </a>
             </li>
           {:else}
