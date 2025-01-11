@@ -154,10 +154,10 @@
   >
     <span class="font-semibold text-magnum-400">Options</span>
     <div
-      class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600"
+      class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
       aria-label="Toggle"
     >
-      <div class="justify-center flex items-center w-full h-full">
+      <div class=" my-auto w-fit h-fit">
         {#if $open}
           <X class="size-5" />
         {:else}
