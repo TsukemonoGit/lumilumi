@@ -11,7 +11,7 @@
   let { link, event, tieKey }: Props = $props();
 </script>
 
-{#if link !== ""}<div class=" min-w-[16px] mt-auto">
+{#if link !== ""}<div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       {tieKey}
       TriggerIcon={Music}
@@ -33,7 +33,7 @@
       {event.content ?? "link"}
     </div></a
   >
-{:else if event.content.trim() !== ""}<div class=" min-w-[16px] mt-auto">
+{:else if event.content.trim() !== ""}<div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       {tieKey}
       TriggerIcon={Music}
