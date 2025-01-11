@@ -15,7 +15,7 @@
   //有効なリンクかのチェックもする
   const checkSafe = () => {
     try {
-      const check = href.match(/^http?s:\/\//);
+      const check = href.match(/^https?:\/\//);
       if (!check) {
         href = "https://" + href;
       }
