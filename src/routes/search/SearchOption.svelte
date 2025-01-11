@@ -157,7 +157,7 @@
       class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
       aria-label="Toggle"
     >
-      <div class=" my-auto w-fit h-fit">
+      <div class="w-fit h-fit">
         {#if $open}
           <X class="size-5" />
         {:else}
