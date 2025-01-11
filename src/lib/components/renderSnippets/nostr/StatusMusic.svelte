@@ -5,7 +5,7 @@
   interface Props {
     pubkey: string;
     loading?: import("svelte").Snippet;
-    children?: import("svelte").Snippet<[any]>;
+    children?: import("svelte").Snippet<[{ event: Nostr.Event }]>;
   }
 
   let { pubkey, loading, children }: Props = $props();

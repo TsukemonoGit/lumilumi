@@ -58,7 +58,7 @@
       unsubscribe = observer?.subscribe((value: any) => {
         if (!value) return;
         const data = value?.data as EventPacket[];
-        if (data.length > 0) {
+        if (data && data.length > 0) {
           zapped = value[0];
           console.log(zapped);
           $open = false;
