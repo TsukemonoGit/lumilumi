@@ -11,6 +11,7 @@
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
+  import { eventKinds } from "$lib/func/kinds";
 
   interface Props {
     note: Nostr.Event;
@@ -23,6 +24,7 @@
     displayMenu?: boolean;
     tieKey: string | undefined;
     children?: import("svelte").Snippet;
+    kindInfo?: boolean;
   }
 
   let {
@@ -33,6 +35,7 @@
     displayMenu = true,
     tieKey,
     children,
+    kindInfo = false,
   }: Props = $props();
   let petname = $derived(followList.get().get(note.pubkey));
   // $: replaceable =
@@ -93,7 +96,7 @@
             tags={metadata.tags}
           />
           {#if prof.name && prof.name !== ""}<span
-              class="inline text-magnum-100 text-sm"
+              class="text-magnum-100 text-sm"
               ><DisplayName
                 height={21}
                 name={`@${prof.name}`}
@@ -105,7 +108,12 @@
             @{nip19.npubEncode(note.pubkey)}</span
           >
         {/if}
+        {#if kindInfo}
+          <span class=" text-neutral-300/50 text-sm whitespace-nowrap">
+            {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
+          </span>{/if}
       </div>
+
       {#if displayMenu}
         <button
           title="goto note page"

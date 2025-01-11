@@ -18,7 +18,7 @@
   import UserEditEllipsis from "./UserEditEllipsis.svelte";
   import FollowButton from "./FollowButton.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
-  import ShowStatus from "../kindEvents/ShowStatus.svelte";
+  import ShowStatus from "../kindEvents/Status/ShowStatus.svelte";
   import Content from "../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";

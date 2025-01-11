@@ -28,7 +28,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
   import { goto } from "$app/navigation";
-  import ShowStatus from "../ShowStatus.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
 
   import ReplyThread from "../ReplyThread.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
@@ -58,6 +58,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import Kind20Note from "./Kind20Note.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import Kind30315Note from "./Kind30315Note.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -641,6 +642,22 @@
       {:else if note.kind === 1059}
         <!---->
         Gift Wrap
+      {:else if note.kind === 30315}
+        <!---->
+        <Kind30315Note
+          {tieKey}
+          {mini}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {warning}
+          {replyUsers}
+          {thread}
+          {replyTag}
+          {repostable}
+        />
       {:else}
         <!-- その他
       {@const clientData = findClientTag(note)}
