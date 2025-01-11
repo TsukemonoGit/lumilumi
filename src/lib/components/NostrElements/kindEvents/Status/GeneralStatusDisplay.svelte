@@ -13,7 +13,7 @@
 </script>
 
 {#if link && link !== ""}
-  <div class=" min-w-[16px] flex items-center justify-center">
+  <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       TriggerIcon={TrendingUp}
       note={event}
@@ -36,7 +36,7 @@
     </div></a
   >
 {:else if event.content.trim() !== ""}
-  <div class=" min-w-[16px] flex items-center justify-center">
+  <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       {tieKey}
       TriggerIcon={TrendingUp}
