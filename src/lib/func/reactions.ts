@@ -70,7 +70,7 @@ export function changeEmit(filters: Nostr.Filter[]) {
   req3.emit(filters);
 }
 
-export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
+export function useReq3(): {
   data: Readable<EventPacket | undefined>;
   status: Readable<ReqStatus>;
   error: Readable<Error>;
@@ -86,9 +86,7 @@ export function useReq3({ operator }: UseReqOpts3<EventPacket>): {
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = get(app)
-    .rxNostr3.use(req3)
-    .pipe(operator);
+  const obs: Observable<EventPacket> = get(app).rxNostr3.use(req3);
 
   const query = createQuery({
     queryKey: ["reactions"], //TLに表示されているノートたちへのリアクションの監視だからinfinity?
