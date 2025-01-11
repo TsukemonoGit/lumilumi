@@ -51,7 +51,8 @@
     elements: { image, fallback },
     options: { src },
   } = createAvatar({
-    src: url ?? "",
+    // svelte-ignore state_referenced_locally
+    src: avatarUrl ?? "",
     onLoadingStatusChange: handleState,
   });
 
