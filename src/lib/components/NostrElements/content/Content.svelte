@@ -16,6 +16,7 @@
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { isvalidURL } from "$lib/func/ogp";
+  import Truncate from "./Truncate.svelte";
 
   interface Props {
     text: string;
@@ -25,6 +26,7 @@
     repostable: boolean;
     tieKey: string | undefined;
     isShowClientTag?: boolean;
+    maxHeight?: number | undefined;
   }
 
   let {
@@ -35,6 +37,7 @@
     repostable,
     tieKey,
     isShowClientTag = true,
+    maxHeight,
   }: Props = $props();
   // export let text: string;
   // export let tags: string[][];
@@ -112,105 +115,106 @@
   images={mediaList}
   bind:currentIndex={modalIndex}
 /> -->
-
-{#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
-      part.url
-    )}
-    {#if decoded}
-      <DecodedContent
-        {decoded}
-        content={part.content}
-        {displayMenu}
-        depth={depth + 1}
-        {repostable}
-        {tieKey}
-      />{:else}{part.content}{/if}
-  {:else if part.type === "image" && part.content}
-    <ContentImage
-      src={part.content}
-      url={part.url}
-      number={part.number}
-      {openModal}
-    />
-  {:else if part.type === "movie"}
-    {#if lumiSetting.get().showImg}
-      <video
-        aria-label="video contents"
-        controls
+<Truncate {maxHeight}>
+  {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
+        part.url
+      )}
+      {#if decoded}
+        <DecodedContent
+          {decoded}
+          content={part.content}
+          {displayMenu}
+          depth={depth + 1}
+          {repostable}
+          {tieKey}
+        />{:else}{part.content}{/if}
+    {:else if part.type === "image" && part.content}
+      <ContentImage
         src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></video
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}{:else if part.type === "audio"}
-    {#if lumiSetting.get().showImg}
-      <audio
-        aria-label="audio contents"
-        controls
-        src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></audio
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}
-  {:else if part.type === "url"}
-    <!--http://はなし httpsだけ-->
-    {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
-        url={part.content ?? ""}
-        >{#snippet renderContent(contents)}
-          {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-            <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
+        url={part.url}
+        number={part.number}
+        {openModal}
+      />
+    {:else if part.type === "movie"}
+      {#if lumiSetting.get().showImg}
+        <video
+          aria-label="video contents"
+          controls
+          src={part.content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+          ><track default kind="captions" /></video
+        >
+      {:else}<Link
+          props={{ "aria-label": `External Links: ${part.url}` }}
+          className="underline text-magnum-300 break-all hover:opacity-80"
+          href={part.content ?? ""}
+          >{#snippet content()}{part.content}{/snippet}</Link
+        >{/if}{:else if part.type === "audio"}
+      {#if lumiSetting.get().showImg}
+        <audio
+          aria-label="audio contents"
+          controls
+          src={part.content}
+          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
+          ><track default kind="captions" /></audio
+        >
+      {:else}<Link
+          props={{ "aria-label": `External Links: ${part.url}` }}
+          className="underline text-magnum-300 break-all hover:opacity-80"
+          href={part.content ?? ""}
+          >{#snippet content()}{part.content}{/snippet}</Link
+        >{/if}
+    {:else if part.type === "url"}
+      <!--http://はなし httpsだけ-->
+      {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
+          url={part.content ?? ""}
+          >{#snippet renderContent(contents)}
+            {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
+              <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
+                props={{ "aria-label": `External Links: ${part.url}` }}
+                className="underline text-magnum-300 break-all "
+                href={part.content ?? ""}
+                >{#snippet content()}{part.content ?? ""}{/snippet}</Link
+              >{/if}{/snippet}
+          {#snippet nodata()}
+            <Link
               props={{ "aria-label": `External Links: ${part.url}` }}
-              className="underline text-magnum-300 break-all "
+              className="underline text-magnum-300 break-all hover:opacity-80"
               href={part.content ?? ""}
               >{#snippet content()}{part.content ?? ""}{/snippet}</Link
-            >{/if}{/snippet}
-        {#snippet nodata()}
-          <Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
-            className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}
-            >{#snippet content()}{part.content ?? ""}{/snippet}</Link
-          >{/snippet}
-      </OGP>{:else}<Link
+            >{/snippet}
+        </OGP>{:else}<Link
+          props={{ "aria-label": `External Links: ${part.url}` }}
+          className="underline text-magnum-300 break-all hover:opacity-80"
+          href={part.content ?? ""}
+          >{#snippet content()}{part.content}{/snippet}</Link
+        >{/if}{:else if part.type === "emoji"}
+      <CustomEmoji {part} />
+    {:else if part.type === "hashtag"}
+      <a
+        aria-label={"Search for events containing the hashtag"}
+        href={`/search?t=${part.url}`}
+        class="underline text-magnum-300 break-all">#{part.content}</a
+      >
+    {:else if part.type === "relay"}
+      <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
+        >{part.content}</a
+      >
+    {:else if part.type === "nip"}
+      <Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}{:else if part.type === "emoji"}
-    <CustomEmoji {part} />
-  {:else if part.type === "hashtag"}
-    <a
-      aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.url}`}
-      class="underline text-magnum-300 break-all">#{part.content}</a
-    >
-  {:else if part.type === "relay"}
-    <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
-      >{part.content}</a
-    >
-  {:else if part.type === "nip"}
-    <Link
-      props={{ "aria-label": `External Links: ${part.url}` }}
-      className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
-    >{:else if part.type === "invoice" && part.content}
-    <InvoiceCard invoice={part.content} />
-  {:else}<span
-      class="whitespace-pre-wrap break-words"
-      style="word-break: break-word;">{part.content}</span
-    >{/if}{/each}
-<ClientTag {tags} {isShowClientTag} {depth} />
-{#if geohash}
-  <Geohash {geohash} />{/if}
-{#if proxy}
-  <ProxyTag proxyTag={proxy} />
-{/if}
+        href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
+      >{:else if part.type === "invoice" && part.content}
+      <InvoiceCard invoice={part.content} />
+    {:else}<span
+        class="whitespace-pre-wrap break-words"
+        style="word-break: break-word;">{part.content}</span
+      >{/if}{/each}
+  <ClientTag {tags} {isShowClientTag} {depth} />
+  {#if geohash}
+    <Geohash {geohash} />{/if}
+  {#if proxy}
+    <ProxyTag proxyTag={proxy} />
+  {/if}</Truncate
+>

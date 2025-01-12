@@ -16,7 +16,7 @@
     //export let kind: number | undefined;
     depth: number;
     tieKey: string | undefined;
-    maxHeight: string;
+    maxHeight: number;
     text: Nostr.Event;
   }
 
@@ -24,10 +24,7 @@
     $props();
 </script>
 
-<div
-  class="ml-6 my-1 text-sm opacity-80 overflow-y-auto overflow-x-hidden"
-  style="max-height:{maxHeight ?? 'none'}"
->
+<div class="ml-6 text-sm opacity-80">
   {#if text && (text.kind === 1 || text.kind === 42 || text.kind === 4) && text.tags.length > 0}
     {@const { replyUsers } = replyedEvent(text.tags)}
     {#if replyUsers.length > 0}
@@ -43,6 +40,7 @@
     {/if}
   {/if}
   {#if text.kind === 30023 || text.kind === 30024}<SimpleMarkdown
+      {maxHeight}
       text={text.content ?? ""}
       tags={text.tags}
       {displayMenu}
@@ -56,6 +54,7 @@
       <OgpCard contents={data.ogp} url={data.url} />
     {:else}
       <Content
+        {maxHeight}
         text={text.content ?? ""}
         tags={text.tags}
         {displayMenu}

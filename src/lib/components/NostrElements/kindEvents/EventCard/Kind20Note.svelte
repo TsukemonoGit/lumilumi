@@ -29,7 +29,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: string;
+    maxHeight: number;
     repostable: boolean;
     tieKey: string | undefined;
     warning: string[] | undefined;
@@ -103,38 +103,34 @@
   {/if}
 
   <div class="relative overflow-hidden mb-1.5">
-    <div
-      class="mt-0.5 overflow-y-auto overflow-x-hidden"
-      style="max-height:{maxHeight ?? 'none'}"
+    {#if title && title !== ""}
+      <div class="text-lg font-bold">
+        {title}
+      </div>{/if}
+    {#if imageList.length > 0}
+      {#each imageList as url, number}
+        <ContentImage src={url} {url} {number} {openModal} />
+      {/each}{/if}
+    <Content
+      {maxHeight}
+      text={note.content}
+      tags={note.tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {tieKey}
+    />
+    <span
+      class={"float-end text-neutral-400    text-sm font-semibold px-1"}
+      title="kind:20"
     >
-      {#if title && title !== ""}
-        <div class="text-lg font-bold">
-          {title}
-        </div>{/if}
-      {#if imageList.length > 0}
-        {#each imageList as url, number}
-          <ContentImage src={url} {url} {number} {openModal} />
-        {/each}{/if}
-      <Content
-        text={note.content}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
-      <span
-        class={"float-end text-neutral-400    text-sm font-semibold px-1"}
-        title="kind:20"
-      >
-        Picture</span
-      >
-      {#if warning}
-        <!-- <WarningHide1 text={tag[1]} /> -->
+      Picture</span
+    >
+    {#if warning}
+      <!-- <WarningHide1 text={tag[1]} /> -->
 
-        <WarningHide2 text={warning[1]} />
-      {/if}
-    </div>
+      <WarningHide2 text={warning[1]} />
+    {/if}
   </div>
   {#if displayMenu}
     <NoteActionButtons {note} {repostable} {tieKey} />

@@ -13,6 +13,7 @@
   import markdownLinkPlugin from "$lib/func/markdown-it/markdown-it-link";
   import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
+  import Truncate from "../NostrElements/content/Truncate.svelte";
 
   interface Props {
     text: string;
@@ -22,6 +23,7 @@
     repostable: boolean;
     nolist?: boolean;
     tieKey: string | undefined;
+    maxHeight?: number | undefined;
   }
 
   let {
@@ -32,6 +34,7 @@
     repostable,
     nolist = false,
     tieKey,
+    maxHeight,
   }: Props = $props();
 
   const md = markdownit();
@@ -70,17 +73,19 @@
 /> -->
 <article class="contentBlock overflow-hidden">
   {#if parts}
-    {#each parts as token}
-      <SimpleContentBlock
-        part={token}
-        {repostable}
-        {depth}
-        {displayMenu}
-        {tags}
-        {openModal}
-        {nolist}
-        {tieKey}
-      />
-    {/each}
+    <Truncate {maxHeight}>
+      {#each parts as token}
+        <SimpleContentBlock
+          part={token}
+          {repostable}
+          {depth}
+          {displayMenu}
+          {tags}
+          {openModal}
+          {nolist}
+          {tieKey}
+        />
+      {/each}</Truncate
+    >
   {/if}
 </article>

@@ -27,7 +27,7 @@
     depth: number;
     excludefunc?: any;
     repostable: boolean;
-    maxHeight: string;
+    maxHeight: number;
     displayMenu: boolean;
     tieKey: string | undefined;
     mini: any;

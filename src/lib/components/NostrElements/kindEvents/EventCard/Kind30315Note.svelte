@@ -24,7 +24,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: string;
+    maxHeight: number;
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;

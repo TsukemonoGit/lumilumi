@@ -587,7 +587,7 @@
             <div class=" text-neutral-200">
               <div class="rounded-md">
                 <EventCard
-                  maxHeight={"12rem"}
+                  maxHeight={192}
                   {note}
                   {metadata}
                   displayMenu={false}
