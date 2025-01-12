@@ -67,20 +67,21 @@
   // export let tieKey: string | undefined;
 
   let warning = $derived(
-    note.tags.find((item) => item[0] === "content-warning")
+    note?.tags.find((item) => item[0] === "content-warning")
   );
   let root = $derived(
-    note.tags.find(
+    note?.tags.find(
       (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
     ) as string[] | undefined
   );
 
   let atag: string | undefined = $derived.by(() => {
     if (
-      (note.kind >= 10000 && note.kind < 20000) ||
-      (note.kind >= 30000 && note.kind < 40000) ||
-      note.kind === 0 ||
-      note.kind === 3
+      note &&
+      ((note.kind >= 10000 && note.kind < 20000) ||
+        (note.kind >= 30000 && note.kind < 40000) ||
+        note.kind === 0 ||
+        note.kind === 3)
     ) {
       //atag　で　りぽすと
       const dtag = note.tags.find((tag) => tag[0] === "d");

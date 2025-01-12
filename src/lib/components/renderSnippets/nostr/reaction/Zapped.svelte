@@ -28,11 +28,21 @@
   let unsubscribe: () => void;
 
   onMount(() => {
+    //subscribeする前にデータ持ってたらsubscribeしても取得できない？
+    const queryData: EventPacket[] | undefined = queryClient.getQueryData([
+      "reactions",
+      id,
+      "zapped",
+      $loginUser,
+    ]);
+    if (queryData) {
+      data = queryData[0].event;
+    }
     const observer1 = new QueryObserver(queryClient, {
       queryKey: ["reactions", id, "zapped", $loginUser],
     });
     unsubscribe = observer1.subscribe((result: any) => {
-      const packets = result?.data as EventPacket[];
+      const packets = result?.data as EventPacket[] | undefined;
       if (
         packets &&
         packets.length > 0 &&

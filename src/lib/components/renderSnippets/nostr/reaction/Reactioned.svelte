@@ -29,18 +29,27 @@
   let unsubscribe: () => void;
 
   onMount(() => {
+    const queryData: EventPacket[] | undefined = queryClient.getQueryData([
+      "reactions",
+      id,
+      "reaction",
+      $loginUser,
+    ]);
+    if (queryData) {
+      data = queryData[0].event;
+    }
     const observer1 = new QueryObserver(queryClient, {
       queryKey: ["reactions", id, "reaction", $loginUser],
     });
     unsubscribe = observer1.subscribe((result: any) => {
-      const packets = result?.data as EventPacket[];
+      const packets = result?.data as EventPacket[] | undefined;
 
       if (
         packets &&
         packets.length > 0 &&
         (!data || packets[0].event.created_at > data.created_at)
       ) {
-        // console.log(result);
+        console.log(result);
         data = packets[0].event;
         //  const data = queryClient?.getQueryData(queryKey);
         //  console.log(data);
@@ -52,7 +61,7 @@
   //});
   // Cleanup the subscription when the component is destroyed
   onDestroy(() => {
-    unsubscribe();
+    unsubscribe?.();
     // queryClient.removeQueries({ queryKey: queryKey });
   });
 
