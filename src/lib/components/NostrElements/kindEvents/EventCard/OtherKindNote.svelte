@@ -175,7 +175,11 @@
         {depth}
         {repostable}
         {tieKey}
-      /><ClientTag tags={note.tags} {depth} />{:else}
+      /><ClientTag
+        tags={note.tags}
+        {depth}
+      />{:else if note.content.includes("?iv=")}
+      <!--なんか暗号化したやつっぽいから表示しないでおく-->
       <!-- <Content
         text={note.content}
         tags={note.tags}
@@ -184,6 +188,15 @@
         {repostable}
         {tieKey}
       /> -->
+    {:else}
+      <Content
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
     {/if}
   </div>
   {#if displayMenu}

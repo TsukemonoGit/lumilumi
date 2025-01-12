@@ -29,6 +29,7 @@
   let unsubscribe: () => void;
 
   onMount(() => {
+    //subscribeする前にデータ持ってたらsubscribeしても取得できない？
     const queryData: EventPacket[] | undefined = queryClient.getQueryData([
       "reactions",
       id,
