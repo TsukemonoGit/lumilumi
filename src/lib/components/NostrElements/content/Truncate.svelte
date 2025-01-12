@@ -3,10 +3,10 @@
   import { useTruncate } from "$lib/func/useTruncate";
 
   interface Props {
-    maxHeight?: number | undefined;
+    maxHeight?: number;
     children: any;
   }
-  let { maxHeight = 100, children }: Props = $props();
+  let { maxHeight = 320, children }: Props = $props();
   const threshold = 100; // 例えば20px以上大きい場合にのみ"Show More"ボタンを表示
   let showFullContent = $state(false);
 
@@ -17,30 +17,35 @@
   }
 </script>
 
-<div
-  use:useTruncate={{
-    maxHeight,
-    isTruncated: (value) => (isTruncated = value),
-    threshold,
-  }}
-  class="mt-0.5 overflow-y-auto overflow-x-hidden"
-  style={!isTruncated || showFullContent
-    ? ""
-    : `max-height: ${maxHeight}px; overflow: hidden;`}
->
-  {@render children?.()}
-</div>
-{#if isTruncated}
-  <button
-    onclick={toggleShowMore}
-    class="h-8 items-center justify-center rounded-full border border-zinc-600
-bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+{#if maxHeight !== 0}
+  <div
+    use:useTruncate={{
+      maxHeight,
+      isTruncated: (value) => (isTruncated = value),
+      threshold,
+    }}
+    class="mt-0.5 overflow-y-auto overflow-x-hidden"
+    style={!isTruncated || showFullContent
+      ? ""
+      : `max-height: ${maxHeight}px; overflow: hidden;`}
   >
-    {#if showFullContent}
-      Show Less
-    {/if}
-    {#if !showFullContent}
-      Show More
-    {/if}
-  </button>
+    {@render children?.()}
+  </div>
+  {#if isTruncated}
+    <button
+      onclick={toggleShowMore}
+      class="h-8 items-center justify-center rounded-full border border-zinc-600
+bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+    >
+      {#if showFullContent}
+        Show Less
+      {/if}
+      {#if !showFullContent}
+        Show More
+      {/if}
+    </button>
+  {/if}
+{:else}<div class="mt-0.5 overflow-y-auto overflow-x-hidden">
+    {@render children?.()}
+  </div>
 {/if}
