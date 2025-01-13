@@ -63,7 +63,7 @@
   />
 {/if}
 <!--Show more no Dialog-->
-<Dialog bind:open={showMore} dialogTitle="Content">
+<Dialog bind:open={showMore}>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 max-w-full overflow-x-hidden">
       <ContentParts
