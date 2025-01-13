@@ -101,17 +101,19 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore} dialogTitle="Content">
   {#snippet main()}
-    {#each parts as token}
-      <SimpleContentBlock
-        part={token}
-        {repostable}
-        {depth}
-        {displayMenu}
-        {tags}
-        {openModal}
-        {nolist}
-        {tieKey}
-      />
-    {/each}
+    <div class=" rounded-md p-2 bg-zinc-800/50">
+      {#each parts as token}
+        <SimpleContentBlock
+          part={token}
+          {repostable}
+          {depth}
+          {displayMenu}
+          {tags}
+          {openModal}
+          {nolist}
+          {tieKey}
+        />
+      {/each}
+    </div>
   {/snippet}</Dialog
 >

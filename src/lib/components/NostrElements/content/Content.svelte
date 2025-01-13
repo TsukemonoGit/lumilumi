@@ -65,15 +65,17 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore} dialogTitle="Content">
   {#snippet main()}
-    <ContentParts
-      {maxHeight}
-      {text}
-      {tags}
-      {isShowClientTag}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    />
+    <div class=" rounded-md p-2 bg-zinc-800/50">
+      <ContentParts
+        {maxHeight}
+        {text}
+        {tags}
+        {isShowClientTag}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
+    </div>
   {/snippet}</Dialog
 >

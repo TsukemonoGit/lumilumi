@@ -35,6 +35,7 @@ export function useTruncate(
 
   onMount(() => {
     checkHeight();
+
     const images = node.querySelectorAll("img");
     images.forEach((img) => {
       img.addEventListener("load", handleImageLoad);
