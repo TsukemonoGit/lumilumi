@@ -65,7 +65,7 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore} dialogTitle="Content">
   {#snippet main()}
-    <div class=" rounded-md p-2 bg-zinc-800/50">
+    <div class=" rounded-md p-2 bg-zinc-800/40 max-w-full overflow-x-hidden">
       <ContentParts
         {maxHeight}
         {text}

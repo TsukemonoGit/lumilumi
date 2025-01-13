@@ -8,11 +8,10 @@ function debounce(func: () => void, wait: number) {
   };
 }
 
-// カスタムアクション：truncate
 export function useTruncate(
   node: HTMLElement,
   {
-    maxHeight = 320,
+    maxHeight = 380,
     isTruncated,
     threshold = 200,
   }: {
@@ -21,7 +20,6 @@ export function useTruncate(
     threshold?: number;
   }
 ) {
-  // 高さをチェックしてボタン表示を制御
   const checkHeight = debounce(() => {
     const truncated = node.scrollHeight > maxHeight + threshold;
     if (isTruncated) {
@@ -29,22 +27,19 @@ export function useTruncate(
     }
   }, 100);
 
-  function handleImageLoad() {
-    checkHeight();
-  }
+  let resizeObserver: ResizeObserver;
 
   onMount(() => {
     checkHeight();
 
-    const images = node.querySelectorAll("img");
-    images.forEach((img) => {
-      img.addEventListener("load", handleImageLoad);
+    // ResizeObserver で高さや幅の変化を監視
+    resizeObserver = new ResizeObserver(() => {
+      checkHeight();
     });
+    resizeObserver.observe(node);
 
     return () => {
-      images.forEach((img) => {
-        img.removeEventListener("load", handleImageLoad);
-      });
+      resizeObserver.disconnect();
     };
   });
 

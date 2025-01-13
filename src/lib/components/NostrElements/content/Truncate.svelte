@@ -25,12 +25,15 @@
     isTruncated: (value) => (isTruncated = value),
     threshold,
   }}
-  class="mt-0.5 overflow-y-auto overflow-x-hidden"
+  class="mt-0.5 overflow-y-auto overflow-x-hidden max-w-full"
   style={!isTruncated || showFullContent
     ? ""
     : `max-height: ${maxHeight}px; overflow: hidden;`}
 >
   {@render children?.()}
+  {#if isTruncated && !showFullContent}
+    <div class="truncate-overlay"></div>
+  {/if}
 </div>
 {#if isTruncated}
   <button
@@ -46,3 +49,19 @@ bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
     {/if}
   </button>
 {/if}
+
+<style>
+  .truncate-overlay {
+    position: absolute;
+    bottom: 2rem; /* ボタンの高さに合わせて調整 */
+    left: 0;
+    right: 0;
+    height: 3rem; /* フェードアウトの高さ */
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--color-neutral-900) / 0),
+      rgb(var(--color-neutral-900) / 0.6)
+    );
+    pointer-events: none;
+  }
+</style>

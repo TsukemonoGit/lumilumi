@@ -82,7 +82,7 @@
     metadata = $bindable(undefined),
     mini = false,
     displayMenu = true,
-    maxHeight = 320,
+    maxHeight = 380,
     thread = false,
     depth = 0,
     viewMuteEvent = $bindable(false),

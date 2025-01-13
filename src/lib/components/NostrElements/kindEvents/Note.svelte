@@ -22,7 +22,7 @@
   let {
     id,
     mini = false,
-    maxHeight = 320,
+    maxHeight,
     displayMenu,
     thread = false,
     depth,
