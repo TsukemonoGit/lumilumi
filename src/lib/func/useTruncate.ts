@@ -25,9 +25,13 @@ export function useTruncate(
     if (isTruncated) {
       isTruncated(truncated);
     }
-  }, 100);
+  }, 200);
 
   let resizeObserver: ResizeObserver;
+
+  function handleImageLoad() {
+    checkHeight();
+  }
 
   onMount(() => {
     checkHeight();
@@ -38,8 +42,17 @@ export function useTruncate(
     });
     resizeObserver.observe(node);
 
+    // 画像の読み込みが終わったときに高さをチェック
+    const images = node.querySelectorAll("img");
+    images.forEach((img) => {
+      img.addEventListener("load", handleImageLoad);
+    });
+
     return () => {
       resizeObserver.disconnect();
+      images.forEach((img) => {
+        img.removeEventListener("load", handleImageLoad);
+      });
     };
   });
 
