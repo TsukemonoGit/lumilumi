@@ -35,7 +35,7 @@
       ><img
         loading="lazy"
         width="288"
-        height="288"
+        height="200"
         alt="img"
         {src}
         class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
