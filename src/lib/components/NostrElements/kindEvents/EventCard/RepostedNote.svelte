@@ -21,7 +21,7 @@
   interface Props {
     displayMenu: boolean;
     repostable: boolean;
-    maxHeight: number;
+    maxHeight: number | undefined;
     //tagはaかe
     tag: string[];
     //export let kind: number | undefined;

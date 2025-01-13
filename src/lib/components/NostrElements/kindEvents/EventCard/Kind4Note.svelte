@@ -17,7 +17,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: number;
+    maxHeight: number | undefined;
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;

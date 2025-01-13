@@ -2,21 +2,17 @@
   import * as Nostr from "nostr-typedef";
 
   import { _ } from "svelte-i18n";
-  import { loginUser } from "$lib/stores/stores";
 
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
-  import Content from "../../content/Content.svelte";
   import NoteTemplate from "../NoteTemplate.svelte";
-  import UserName from "../../user/UserName.svelte";
-  import Reply from "../Reply.svelte";
+
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { getStatusLink } from "$lib/func/status";
   import { page } from "$app/state";
   import GeneralStatusDisplay from "../Status/GeneralStatusDisplay.svelte";
   import MusicStatusDisplay from "../Status/MusicStatusDisplay.svelte";
-  import { eventKinds } from "$lib/func/kinds";
+
   import OtherStatusDisplay from "../Status/OtherStatusDisplay.svelte";
 
   interface Props {
@@ -24,7 +20,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: number;
+    maxHeight: number | undefined;
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;

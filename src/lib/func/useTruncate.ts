@@ -11,13 +11,13 @@ function debounce(func: () => void, wait: number) {
 export function useTruncate(
   node: HTMLElement,
   {
-    maxHeight = 380,
+    maxHeight,
     isTruncated,
-    threshold = 200,
+    threshold,
   }: {
-    maxHeight?: number;
+    maxHeight: number;
     isTruncated?: (value: boolean) => void;
-    threshold?: number;
+    threshold: number;
   }
 ) {
   const checkHeight = debounce(() => {
