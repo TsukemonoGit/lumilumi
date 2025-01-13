@@ -15,9 +15,11 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
+    maxHeight: number | undefined;
   }
 
-  let { text, tags, displayMenu, depth, repostable, tieKey }: Props = $props();
+  let { text, tags, displayMenu, depth, repostable, tieKey, maxHeight }: Props =
+    $props();
   //プレビューにも使ってるからconstだとだめ
   let parts = $derived(parseText(text, tags));
 
@@ -91,6 +93,7 @@
     )}
     {#if decoded}
       <DecodedContent
+        {maxHeight}
         {decoded}
         content={part.content}
         {displayMenu}

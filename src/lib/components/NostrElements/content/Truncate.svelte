@@ -5,25 +5,41 @@
   interface Props {
     maxHeight?: number;
     children: any;
+    depth: number;
     onClickShowMore: () => void;
   }
-  let { maxHeight = 380, children, onClickShowMore }: Props = $props();
+  let {
+    maxHeight = 380,
+    children,
+    onClickShowMore,
+    depth = 0,
+  }: Props = $props();
   const threshold = 100; // 例えば20px以上大きい場合にのみ"Show More"ボタンを表示
   let isTruncated = $state(false);
 
   function toggleShowMore() {
     onClickShowMore?.();
   }
+
+  // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
+  const minHeight = 100; // 最小の高さを設定
+  let contentHeight = $derived(
+    Math.max(maxHeight * Math.pow(0.7, depth), minHeight)
+  );
+  // maxHeight = 380のとき、
+  // depth が 4 以上 のときに contentHeight が 100 を下回ります。
 </script>
 
 <div
   use:useTruncate={{
-    maxHeight,
+    maxHeight: contentHeight,
     isTruncated: (value) => (isTruncated = value),
     threshold,
   }}
   class="mt-0.5 overflow-y-auto overflow-x-hidden max-w-full"
-  style={!isTruncated ? "" : `max-height: ${maxHeight}px; overflow: hidden;`}
+  style={!isTruncated
+    ? ""
+    : `max-height: ${contentHeight}px; overflow: hidden;`}
 >
   {@render children?.()}
   {#if isTruncated}

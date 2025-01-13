@@ -83,7 +83,7 @@
 <article class="contentBlock overflow-hidden">
   {#if parts}
     {#if maxHeight !== 0}
-      <Truncate {maxHeight} {onClickShowMore}>
+      <Truncate {maxHeight} {depth} {onClickShowMore}>
         {#each parts as token}
           <SimpleContentBlock
             part={token}

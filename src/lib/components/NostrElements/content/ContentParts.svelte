@@ -36,6 +36,7 @@
     repostable,
     tieKey,
     isShowClientTag = true,
+    maxHeight,
   }: Props = $props();
 
   //プレビューにも使ってるからconstだとだめ
@@ -107,6 +108,7 @@
     )}
     {#if decoded}
       <DecodedContent
+        {maxHeight}
         {decoded}
         content={part.content}
         {displayMenu}

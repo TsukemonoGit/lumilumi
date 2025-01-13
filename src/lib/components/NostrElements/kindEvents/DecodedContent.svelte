@@ -15,6 +15,7 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
+    maxHeight: number | undefined;
     decoded:
       | {
           type: "naddr";
@@ -38,8 +39,15 @@
         };
   }
 
-  let { displayMenu, content, depth, repostable, tieKey, decoded }: Props =
-    $props();
+  let {
+    displayMenu,
+    content,
+    depth,
+    repostable,
+    tieKey,
+    decoded,
+    maxHeight,
+  }: Props = $props();
 
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {
