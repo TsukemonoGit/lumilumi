@@ -38,7 +38,7 @@
 </script>
 
 {#if maxHeight !== 0}
-  <Truncate {maxHeight} {onClickShowMore}>
+  <Truncate {maxHeight} {onClickShowMore} {depth}>
     <ContentParts
       {maxHeight}
       {text}
