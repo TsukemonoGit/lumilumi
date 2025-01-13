@@ -7,7 +7,7 @@
     children: any;
     onClickShowMore: () => void;
   }
-  let { maxHeight = 320, children, onClickShowMore }: Props = $props();
+  let { maxHeight = 380, children, onClickShowMore }: Props = $props();
   const threshold = 100; // 例えば20px以上大きい場合にのみ"Show More"ボタンを表示
   let showFullContent = $state(false);
 

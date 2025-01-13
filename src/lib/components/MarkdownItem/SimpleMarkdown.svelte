@@ -82,7 +82,21 @@
 /> -->
 <article class="contentBlock overflow-hidden">
   {#if parts}
-    <Truncate {maxHeight} {onClickShowMore}>
+    {#if maxHeight !== 0}
+      <Truncate {maxHeight} {onClickShowMore}>
+        {#each parts as token}
+          <SimpleContentBlock
+            part={token}
+            {repostable}
+            {depth}
+            {displayMenu}
+            {tags}
+            {openModal}
+            {nolist}
+            {tieKey}
+          />
+        {/each}</Truncate
+      >{:else}
       {#each parts as token}
         <SimpleContentBlock
           part={token}
@@ -94,8 +108,8 @@
           {nolist}
           {tieKey}
         />
-      {/each}</Truncate
-    >
+      {/each}
+    {/if}
   {/if}
 </article>
 <!--Show more no Dialog-->

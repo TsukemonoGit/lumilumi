@@ -57,7 +57,7 @@
       <div class="max-h-full overflow-y-auto">
         {@render main?.()}
       </div>
-      <div class="mt-6 flex justify-end gap-4">
+      <div class="mt-4 flex justify-end gap-4">
         <button
           use:melt={$close}
           class="inline-flex h-8 items-center justify-center rounded-sm
