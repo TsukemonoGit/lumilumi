@@ -46,9 +46,9 @@
       transition:fade={{ duration: 150 }}
     ></div>
     <div
-      class="fixed left-1/2 top-1/2 z-10 max-h-[85vh] max-w-[90vw]
+      class="fixed left-1/2 top-1/2 z-10 max-h-[85vh] max-w-[96vw]
            w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-            p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]"
+            p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]"
       use:melt={$content}
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium">
