@@ -75,16 +75,16 @@
 {/if}
 
 <div class="relative">
-  <div class=" max-h-64 overflow-y-auto overflow-x-auto">
-    <Content
-      text={note.content}
-      tags={note.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    />
-  </div>
+  <Content
+    maxHeight={256}
+    text={note.content}
+    tags={note.tags}
+    {displayMenu}
+    {depth}
+    {repostable}
+    {tieKey}
+  />
+
   {#if warningTag}
     <WarningHide2 text={warningTag[1]} />
   {/if}

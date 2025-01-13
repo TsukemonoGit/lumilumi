@@ -67,18 +67,15 @@
         <FollowButton pubkey={note.pubkey} />
       </div>
     </div>
-    <div
-      class="max-h-48 overflow-y-auto whitespace-pre-wrap break-words"
-      style="word-break: break-word;"
-    >
-      <Content
-        text={prof?.about?.trim() ?? ""}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
-    </div>
+
+    <Content
+      maxHeight={192}
+      text={prof?.about?.trim() ?? ""}
+      tags={note.tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {tieKey}
+    />
   </div>
 </div>

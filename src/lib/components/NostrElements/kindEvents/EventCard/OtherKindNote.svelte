@@ -21,7 +21,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: string;
+    maxHeight: number;
     repostable: boolean;
     tieKey: string | undefined;
   }
@@ -163,24 +163,22 @@
           />{/if}
       </div>
     </div>{/if}
-  <div
-    class="mt-0.5 overflow-y-auto overflow-x-hidden"
-    style="max-height:{maxHeight ?? 'none'}"
-  >
-    {#if note.kind === 30023 || note.kind === 30024}
-      <SimpleMarkdown
-        text={note.content}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      /><ClientTag
-        tags={note.tags}
-        {depth}
-      />{:else if note.content.includes("?iv=")}
-      <!--なんか暗号化したやつっぽいから表示しないでおく-->
-      <!-- <Content
+
+  {#if note.kind === 30023 || note.kind === 30024}
+    <SimpleMarkdown
+      {maxHeight}
+      text={note.content}
+      tags={note.tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {tieKey}
+    /><ClientTag
+      tags={note.tags}
+      {depth}
+    />{:else if note.content.includes("?iv=")}
+    <!--なんか暗号化したやつっぽいから表示しないでおく-->
+    <!-- <Content
         text={note.content}
         tags={note.tags}
         {displayMenu}
@@ -188,17 +186,18 @@
         {repostable}
         {tieKey}
       /> -->
-    {:else}
-      <Content
-        text={note.content}
-        tags={note.tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      />
-    {/if}
-  </div>
+  {:else}
+    <Content
+      {maxHeight}
+      text={note.content}
+      tags={note.tags}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {tieKey}
+    />
+  {/if}
+
   {#if displayMenu}
     <NoteActionButtons {note} {repostable} {tieKey} />
   {/if}

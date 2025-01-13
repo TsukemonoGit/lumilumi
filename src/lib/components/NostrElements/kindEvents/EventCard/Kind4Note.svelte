@@ -17,7 +17,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: string;
+    maxHeight: number;
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;
@@ -87,29 +87,26 @@
   {/if}
 
   <div class="relative overflow-hidden mb-1.5">
-    <div
-      class="mt-0.5 overflow-y-auto overflow-x-hidden"
-      style="max-height:{maxHeight ?? 'none'}"
-    >
-      <div class="text-sm text-neutral-400">{$_("event.kind4.text")}</div>
-      {#if forme}
-        {#if !decrypt}
-          <button
-            class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-            onclick={decryptMessage}>{$_("event.kind4.decrypt")}</button
-          >{:else}
-          <!--複合できたら内容を表示-->
-          <Content
-            text={decrypt}
-            tags={note.tags}
-            {displayMenu}
-            {depth}
-            repostable={false}
-            {tieKey}
-          />
-        {/if}
+    <div class="text-sm text-neutral-400">{$_("event.kind4.text")}</div>
+    {#if forme}
+      {#if !decrypt}
+        <button
+          class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+          onclick={decryptMessage}>{$_("event.kind4.decrypt")}</button
+        >{:else}
+        <!--複合できたら内容を表示-->
+        <Content
+          {maxHeight}
+          text={decrypt}
+          tags={note.tags}
+          {displayMenu}
+          {depth}
+          repostable={false}
+          {tieKey}
+        />
       {/if}
-    </div>
+    {/if}
+
     {#if warning}
       <!-- <WarningHide1 text={tag[1]} /> -->
       <WarningHide2 text={warning[1]} />

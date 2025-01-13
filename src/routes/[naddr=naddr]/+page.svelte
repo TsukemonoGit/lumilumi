@@ -34,7 +34,7 @@
 
   let isOnMount = false;
   //let since: number | undefined = undefined;
-  const maxHeight = "none";
+  const maxHeight = 0;
   onMount(() => {
     if (!isOnMount) {
       isOnMount = true;

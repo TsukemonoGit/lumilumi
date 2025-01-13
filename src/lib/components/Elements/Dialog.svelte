@@ -42,23 +42,22 @@
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
-      class="fixed inset-0 z-50 bg-black/50"
+      class="fixed inset-0 z-10 bg-black/50"
       transition:fade={{ duration: 150 }}
     ></div>
     <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] max-w-[90vw]
-           w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-            p-6 shadow-lg"
+      class="fixed left-1/2 top-1/2 z-10 max-h-[85vh] max-w-[96vw]
+           w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
+            p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]"
       use:melt={$content}
     >
-      {#if dialogTitle}
-        <h2 use:melt={$title} class="m-0 text-lg font-medium">{dialogTitle}</h2>
-      {/if}
-      <div class="mb-4">
+      <h2 use:melt={$title} class="m-0 text-lg font-medium">
+        {dialogTitle || ""}
+      </h2>
+      <div class="max-h-full overflow-y-auto">
         {@render main?.()}
       </div>
-
-      <div class="mt-6 flex justify-end gap-4">
+      <div class="mt-4 flex justify-end gap-4">
         <button
           use:melt={$close}
           class="inline-flex h-8 items-center justify-center rounded-sm

@@ -11,7 +11,7 @@
   interface Props {
     id: string;
     mini?: boolean;
-    maxHeight?: string;
+    maxHeight?: number;
     displayMenu: boolean;
     thread?: boolean;
     depth: number;
@@ -23,7 +23,7 @@
   let {
     id,
     mini = false,
-    maxHeight = "24rem",
+    maxHeight,
     displayMenu,
     thread = false,
     depth,

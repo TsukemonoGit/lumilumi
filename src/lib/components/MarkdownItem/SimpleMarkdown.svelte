@@ -13,6 +13,9 @@
   import markdownLinkPlugin from "$lib/func/markdown-it/markdown-it-link";
   import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
+  import Truncate from "../NostrElements/content/Truncate.svelte";
+  import Dialog from "../Elements/Dialog.svelte";
+  import { type Writable, writable } from "svelte/store";
 
   interface Props {
     text: string;
@@ -22,6 +25,7 @@
     repostable: boolean;
     nolist?: boolean;
     tieKey: string | undefined;
+    maxHeight?: number | undefined;
   }
 
   let {
@@ -32,6 +36,7 @@
     repostable,
     nolist = false,
     tieKey,
+    maxHeight,
   }: Props = $props();
 
   const md = markdownit();
@@ -61,6 +66,13 @@
     // if (showModal) $showModal = true;
     // $viewMediaModal = { index: index, mediaList: mediaList };
   };
+
+  // svelte-ignore non_reactive_update
+  let showMore: Writable<boolean> = writable(false);
+  const onClickShowMore = () => {
+    console.log("showMore");
+    $showMore = true;
+  };
 </script>
 
 <!-- <MediaDisplay
@@ -70,17 +82,52 @@
 /> -->
 <article class="contentBlock overflow-hidden">
   {#if parts}
-    {#each parts as token}
-      <SimpleContentBlock
-        part={token}
-        {repostable}
-        {depth}
-        {displayMenu}
-        {tags}
-        {openModal}
-        {nolist}
-        {tieKey}
-      />
-    {/each}
+    {#if maxHeight !== 0}
+      <Truncate {maxHeight} {onClickShowMore}>
+        {#each parts as token}
+          <SimpleContentBlock
+            part={token}
+            {repostable}
+            {depth}
+            {displayMenu}
+            {tags}
+            {openModal}
+            {nolist}
+            {tieKey}
+          />
+        {/each}</Truncate
+      >{:else}
+      {#each parts as token}
+        <SimpleContentBlock
+          part={token}
+          {repostable}
+          {depth}
+          {displayMenu}
+          {tags}
+          {openModal}
+          {nolist}
+          {tieKey}
+        />
+      {/each}
+    {/if}
   {/if}
 </article>
+<!--Show more no Dialog-->
+<Dialog bind:open={showMore}>
+  {#snippet main()}
+    <div class=" rounded-md p-2 bg-zinc-800/40 max-w-full overflow-x-hidden">
+      {#each parts as token}
+        <SimpleContentBlock
+          part={token}
+          {repostable}
+          {depth}
+          {displayMenu}
+          {tags}
+          {openModal}
+          {nolist}
+          {tieKey}
+        />
+      {/each}
+    </div>
+  {/snippet}</Dialog
+>

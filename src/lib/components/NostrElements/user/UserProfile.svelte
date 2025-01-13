@@ -176,19 +176,15 @@
           </div>
 
           {#if prof.about}
-            <div
-              class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
-              style="word-break: break-word; max-height:{bannerHeight * 1.5}px"
-            >
-              <Content
-                text={prof.about}
-                tags={metadata.tags}
-                displayMenu={true}
-                {depth}
-                repostable={false}
-                {tieKey}
-              />
-            </div>
+            <Content
+              maxHeight={bannerHeight * 1.5}
+              text={prof.about}
+              tags={metadata.tags}
+              displayMenu={true}
+              {depth}
+              repostable={false}
+              {tieKey}
+            />
           {/if}
         </div>
       {/if}

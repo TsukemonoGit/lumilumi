@@ -68,7 +68,7 @@
     //export let status: string | undefined = undefined;
     mini?: boolean;
     displayMenu?: boolean;
-    maxHeight?: string;
+    maxHeight?: number;
     thread?: boolean;
     depth?: number;
     viewMuteEvent?: boolean;
@@ -82,7 +82,7 @@
     metadata = $bindable(undefined),
     mini = false,
     displayMenu = true,
-    maxHeight = "24rem",
+    maxHeight = 380,
     thread = false,
     depth = 0,
     viewMuteEvent = $bindable(false),
@@ -326,19 +326,20 @@
           {/if}
 
           <div class="relative overflow-hidden mb-1.5">
-            <div
+            <!-- <div
               class="mt-0.5 overflow-y-auto overflow-x-hidden"
               style="max-height:{maxHeight ?? 'none'}"
-            >
-              <Content
-                text={note.content}
-                tags={note.tags}
-                {displayMenu}
-                {depth}
-                {repostable}
-                {tieKey}
-              />
-            </div>
+            > -->
+            <Content
+              {maxHeight}
+              text={note.content}
+              tags={note.tags}
+              {displayMenu}
+              {depth}
+              {repostable}
+              {tieKey}
+            />
+            <!-- </div> -->
             {#if warning}
               <!-- <WarningHide1 text={tag[1]} /> -->
               <WarningHide2 text={warning[1]} />

@@ -28,6 +28,7 @@
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
   import { writable, type Writable } from "svelte/store";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
     tieKey: string | undefined;
@@ -44,18 +45,6 @@
     if (pubkey) {
       try {
         return nip19.npubEncode(pubkey);
-      } catch {
-        return undefined;
-      }
-    }
-  });
-  let nevent = $derived.by(() => {
-    if (metadata) {
-      try {
-        return nip19.neventEncode({
-          id: metadata.id,
-          relays: tieKey ? getRelaysById(metadata.id, tieKey) : [],
-        });
       } catch {
         return undefined;
       }
@@ -214,7 +203,9 @@
     </div></UserMuteMenu
   >{/if}
 
-<Dialog bind:open={dialogOpen}>
+{#if metadata}
+  <ModalJson bind:dialogOpen note={metadata} {profile} {tieKey} />{/if}
+<!-- <Dialog bind:open={dialogOpen}>
   {#snippet main()}
     <div>
       <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
@@ -224,7 +215,7 @@
         {JSON.stringify(metadata, null, 2)}
       </div>
       <div class="my-1 break-all overflow-auto">
-        <!-- <div class="text-lg font-medium">Encoded</div> -->
+ 
         <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
         <div class=" font-mono font-bold text-xs">{nevent}</div>
       </div>
@@ -253,4 +244,4 @@
       </div>
     </div>
   {/snippet}
-</Dialog>
+</Dialog> -->

@@ -57,7 +57,7 @@
   // });
   const repostable = true;
 
-  const maxHeight = "none";
+  const maxHeight = 0;
   const displayMenu = true;
   const thread = true;
   const depth = 0;

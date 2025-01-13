@@ -711,23 +711,19 @@
                 depth={1}
                 displayMenu={false}
                 repostable={false}
-                maxHeight={"10rem"}
+                maxHeight={160}
                 tieKey={undefined}
               />
             {:else}
-              <div
-                class="mt-0.5 overflow-y-auto overflow-x-hidden"
-                style="max-height:10rem; min-height:1rem"
-              >
-                <Content
-                  {text}
-                  {tags}
-                  displayMenu={false}
-                  repostable={false}
-                  depth={1}
-                  tieKey={undefined}
-                />
-              </div>
+              <Content
+                maxHeight={160}
+                {text}
+                {tags}
+                displayMenu={false}
+                repostable={false}
+                depth={1}
+                tieKey={undefined}
+              />
             {/if}
           </div>
           <!-- <div

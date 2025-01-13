@@ -313,19 +313,15 @@
       </div>
 
       {#if newProfile.about}
-        <div
-          class="whitespace-pre-wrap break-words overflow-y-auto mt-2 rounded-sm"
-          style="word-break: break-word; max-height:{bannerHeight}px"
-        >
-          <Content
-            text={newProfile.about}
-            tags={newTags}
-            displayMenu={true}
-            depth={0}
-            repostable={true}
-            tieKey={undefined}
-          />
-        </div>
+        <Content
+          maxHeight={bannerHeight}
+          text={newProfile.about}
+          tags={newTags}
+          displayMenu={true}
+          depth={0}
+          repostable={true}
+          tieKey={undefined}
+        />
       {/if}
     </div>
 

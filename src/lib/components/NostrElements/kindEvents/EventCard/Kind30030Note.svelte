@@ -21,7 +21,7 @@
   interface Props {
     note: Nostr.Event;
     repostable: boolean;
-    maxHeight: string;
+    maxHeight: number;
     tieKey: string | undefined;
   }
 
