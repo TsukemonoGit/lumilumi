@@ -20,6 +20,7 @@
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
+  import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -153,17 +154,6 @@
     }
   };
 
-  let encodedPubkey: string | undefined = $derived.by(() => {
-    if (!note) {
-      return undefined;
-    }
-    try {
-      return nip19.npubEncode(note.pubkey);
-    } catch {
-      return undefined;
-    }
-  });
-
   let nevent: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
@@ -187,24 +177,22 @@
 </DropdownMenu>
 
 <!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen}>
+<ModalJson bind:dialogOpen {note} {tieKey} />
+<!-- <Dialog bind:open={dialogOpen} dialogTitle="EVENT JSON">
   {#snippet main()}
-    <div>
-      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-      >
-        {JSON.stringify(note, null, 2)}
-      </div>
-      <div class="my-1 break-all overflow-auto">
-        <!-- <div class="text-lg font-medium">Encoded</div> -->
-        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-        <div class=" font-mono font-bold text-xs">{nevent}</div>
-      </div>
-      <h2 class="m-0 text-lg font-medium">Seen on</h2>
-      <div class="break-words whitespace-pre-wrap">
-        {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-      </div>
+    <div
+      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+    >
+      {JSON.stringify(note, null, 2)}
+    </div>
+    <div class="my-1 break-all overflow-auto">
+    
+      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
+      <div class=" font-mono font-bold text-xs">{nevent}</div>
+    </div>
+    <h2 class="m-0 text-lg font-medium">Seen on</h2>
+    <div class="break-words whitespace-pre-wrap">
+      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
     </div>
   {/snippet}</Dialog
->
+> -->

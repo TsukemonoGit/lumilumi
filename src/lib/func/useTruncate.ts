@@ -1,5 +1,13 @@
 import { onMount } from "svelte";
 
+function debounce(func: () => void, wait: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(func, wait);
+  };
+}
+
 // カスタムアクション：truncate
 export function useTruncate(
   node: HTMLElement,
@@ -14,12 +22,12 @@ export function useTruncate(
   }
 ) {
   // 高さをチェックしてボタン表示を制御
-  function checkHeight() {
+  const checkHeight = debounce(() => {
     const truncated = node.scrollHeight > maxHeight + threshold;
     if (isTruncated) {
       isTruncated(truncated);
     }
-  }
+  }, 100);
 
   function handleImageLoad() {
     checkHeight();

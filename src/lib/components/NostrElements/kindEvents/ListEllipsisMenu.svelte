@@ -17,6 +17,7 @@
   import { _ } from "svelte-i18n";
   import { page } from "$app/state";
   import { writable, type Writable } from "svelte/store";
+  import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -134,17 +135,6 @@
     }
   };
 
-  let encodedPubkey: string | undefined = $derived.by(() => {
-    if (!note) {
-      return undefined;
-    }
-    try {
-      return nip19.npubEncode(note.pubkey);
-    } catch {
-      return undefined;
-    }
-  });
-
   let naddr: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
@@ -168,7 +158,8 @@
 </DropdownMenu>
 
 <!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen}>
+<ModalJson bind:dialogOpen {note} {tieKey} />
+<!-- <Dialog bind:open={dialogOpen}>
   {#snippet main()}
     <div>
       <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
@@ -178,7 +169,7 @@
         {JSON.stringify(note, null, 2)}
       </div>
       <div class="my-1 break-all overflow-auto">
-        <!-- <div class="text-lg font-medium">Encoded</div> -->
+  
         <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
         <div class=" font-mono font-bold text-xs">{naddr}</div>
       </div>
@@ -188,4 +179,4 @@
       </div>
     </div>
   {/snippet}</Dialog
->
+> -->

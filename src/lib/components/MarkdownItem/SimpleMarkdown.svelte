@@ -14,6 +14,8 @@
   import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
   import Truncate from "../NostrElements/content/Truncate.svelte";
+  import Dialog from "../Elements/Dialog.svelte";
+  import { type Writable, writable } from "svelte/store";
 
   interface Props {
     text: string;
@@ -64,6 +66,13 @@
     // if (showModal) $showModal = true;
     // $viewMediaModal = { index: index, mediaList: mediaList };
   };
+
+  // svelte-ignore non_reactive_update
+  let showMore: Writable<boolean> = writable(false);
+  const onClickShowMore = () => {
+    console.log("showMore");
+    $showMore = true;
+  };
 </script>
 
 <!-- <MediaDisplay
@@ -73,7 +82,7 @@
 /> -->
 <article class="contentBlock overflow-hidden">
   {#if parts}
-    <Truncate {maxHeight}>
+    <Truncate {maxHeight} {onClickShowMore}>
       {#each parts as token}
         <SimpleContentBlock
           part={token}
@@ -89,3 +98,20 @@
     >
   {/if}
 </article>
+<!--Show more no Dialog-->
+<Dialog bind:open={showMore} dialogTitle="Content">
+  {#snippet main()}
+    {#each parts as token}
+      <SimpleContentBlock
+        part={token}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {tags}
+        {openModal}
+        {nolist}
+        {tieKey}
+      />
+    {/each}
+  {/snippet}</Dialog
+>
