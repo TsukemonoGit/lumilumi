@@ -16,7 +16,7 @@
     //export let kind: number | undefined;
     depth: number;
     tieKey: string | undefined;
-    maxHeight: number;
+    maxHeight: number | undefined;
     text: Nostr.Event;
   }
 

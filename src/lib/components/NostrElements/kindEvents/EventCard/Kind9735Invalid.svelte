@@ -8,7 +8,7 @@
     note: Nostr.Event;
     depth: number;
     repostable: boolean;
-    maxHeight: number;
+    maxHeight: number | undefined;
     displayMenu: boolean;
     tieKey: string | undefined;
     mini: any;

@@ -29,7 +29,7 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    maxHeight: number;
+    maxHeight: number | undefined;
     repostable: boolean;
     tieKey: string | undefined;
     warning: string[] | undefined;
