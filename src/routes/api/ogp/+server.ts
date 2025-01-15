@@ -1,8 +1,6 @@
 import { error } from "@sveltejs/kit";
-//import { unfurl } from "unfurl.js";
+import { unfurl } from "unfurl.js";
 import type { RequestHandler } from "./$types";
-
-import { unfurl } from "./unfurlWrapper"; // ラッパーをインポート
 
 export const GET: RequestHandler = async ({ url: request }) => {
   const url = request.searchParams.get("url");
