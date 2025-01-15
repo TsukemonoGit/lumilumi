@@ -29,17 +29,19 @@
     forceVisible: true,
   });
 
-  let encodedPub: string = $state("");
+  let encodedPub: string | undefined = $derived(pubCheck($loginUser));
 
-  const pubCheck = () => {
-    try {
-      const pub = nip19.npubEncode($loginUser);
-      if (pub) {
-        encodedPub = pub;
-      }
-    } catch (error) {}
-  };
-
+  function pubCheck(hex: string | undefined): string | undefined {
+    if (hex) {
+      try {
+        const pub = nip19.npubEncode(hex);
+        if (pub) {
+          return pub;
+        }
+      } catch (error) {}
+    }
+    return undefined;
+  }
   // beforeNavigate(() => ($open = false));
 
   function handleClickHome() {
@@ -50,11 +52,7 @@
       goto("/");
     }
   }
-  loginUser.subscribe((value) => {
-    if (value) {
-      pubCheck();
-    }
-  });
+
   let menuPosition = $derived(
     lumiSetting.get().menuleft ? "left-2 flex flex-row-reverse" : "right-2 "
   );
