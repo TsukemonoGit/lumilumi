@@ -1,5 +1,5 @@
 <script lang="ts">
-  import logo from "$lib/images/favicon.svg";
+  import logo from "$lib/assets/favicon.svg";
 </script>
 
 <img src={logo} alt="home" class={"transform-rotate "} />

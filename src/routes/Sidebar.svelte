@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import logo from "$lib/images/favicon.svg";
+  import logo from "$lib/assets/favicon.svg";
   import { loginUser } from "$lib/stores/stores";
 
   import { TrendingUp, User } from "lucide-svelte";
@@ -12,6 +12,7 @@
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import LumiIcon from "$lib/assets/lumi-chan.webp";
 
   let encodedPub: string | undefined = $derived.by(() => pubCheck($loginUser));
 
@@ -85,11 +86,11 @@
           {#if lumiSetting.get().showImg}
             <img
               loading="lazy"
-              src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
+              src={LumiIcon}
               alt="lumi"
               width={80}
               height={80}
-            />
+            /><!--https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp-->
           {:else}
             <img src={logo} alt="logo" width={40} height={40} />{/if}<span
             class="ml-2">about</span

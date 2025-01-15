@@ -9,7 +9,7 @@
   import { nip19 } from "nostr-tools";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
 
-  import logo from "$lib/images/favicon.svg";
+  import logo from "$lib/assets/favicon.svg";
   import { goto } from "$app/navigation";
   import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
