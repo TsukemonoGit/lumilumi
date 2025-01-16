@@ -54,16 +54,13 @@
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        {loadingText}<EllipsisMenuNote notestr={loadingText} />
-      </div>
-      <div class="flex flex-col gap-2">
+        {loadingText}
         <div class="flex flex-row ml-auto gap-2">
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} {tieKey} />
-        </div>
-        <div class="flex flex-row ml-auto gap-2">
+
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
@@ -73,16 +70,13 @@
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        {loadingText}<EllipsisMenuNote notestr={loadingText} />
-      </div>
-      <div class="flex flex-col gap-2">
+        {loadingText}
         <div class="flex flex-row ml-auto gap-2">
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} {tieKey} />
-        </div>
-        <div class="flex flex-row ml-auto gap-2">
+
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
@@ -92,16 +86,13 @@
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        {loadingText}<EllipsisMenuNote notestr={loadingText} />
-      </div>
-      <div class="flex flex-col gap-2">
+        {loadingText}
         <div class="flex flex-row ml-auto gap-2">
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} {tieKey} />
-        </div>
-        <div class="flex flex-row ml-auto gap-2">
+
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
