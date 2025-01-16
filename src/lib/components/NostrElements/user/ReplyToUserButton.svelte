@@ -2,19 +2,19 @@
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
   import type { AdditionalPostOptions } from "$lib/types";
   import { Reply } from "lucide-svelte";
-  import * as Nostr from "nostr-typedef";
+
   interface Props {
-    metadata: Nostr.Event;
+    pubkey: string;
   }
 
-  let { metadata }: Props = $props();
+  let { pubkey }: Props = $props();
 
   function handleClickRelayToUser() {
     const options: AdditionalPostOptions = {
       kind: 1,
-      tags: [["p", metadata.pubkey]],
+      tags: [["p", pubkey]],
       content: "", //`nostr:${nip19.npubEncode(metadata.pubkey)}`,
-      defaultUsers: [metadata.pubkey], //[metadata.pubkey],
+      defaultUsers: [pubkey], //[metadata.pubkey],
       warningText: undefined,
       addableUserList: [],
     };

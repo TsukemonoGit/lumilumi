@@ -7,12 +7,13 @@
   import Popover from "$lib/components/Elements/Popover.svelte";
 
   interface Props {
-    metadata: Nostr.Event;
-    prof: Profile;
+    pubkey: string;
+    metadata?: Nostr.Event;
+    prof?: Profile;
     tieKey: string | undefined;
   }
 
-  let { metadata, prof, tieKey }: Props = $props();
+  let { pubkey, metadata, prof, tieKey }: Props = $props();
 </script>
 
 <Popover ariaLabel="user menu" showCloseButton={false}>
@@ -26,7 +27,7 @@
     <div
       class="menu flex flex-col flex-wrap divide-y divide-zinc-500 bg-neutral-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
     >
-      <UserMenu pubkey={metadata.pubkey} {metadata} profile={prof} {tieKey} />
+      <UserMenu {pubkey} {metadata} profile={prof} {tieKey} />
     </div>
   {/snippet}
 </Popover>

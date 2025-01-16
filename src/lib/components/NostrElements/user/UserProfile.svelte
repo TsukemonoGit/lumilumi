@@ -56,6 +56,18 @@
       >
         {loadingText}<EllipsisMenuNote notestr={loadingText} />
       </div>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser !== pubkey}<MuteStatusIcons
+              {pubkey}
+            /><ReplyToUserButton {pubkey} />{/if}
+          <UserPofileEllipsis {pubkey} {tieKey} />
+        </div>
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+            <FollowButton {pubkey} />{/if}
+        </div>
+      </div>
     {/snippet}
     {#snippet nodata()}
       <div
@@ -63,12 +75,36 @@
       >
         {loadingText}<EllipsisMenuNote notestr={loadingText} />
       </div>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser !== pubkey}<MuteStatusIcons
+              {pubkey}
+            /><ReplyToUserButton {pubkey} />{/if}
+          <UserPofileEllipsis {pubkey} {tieKey} />
+        </div>
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+            <FollowButton {pubkey} />{/if}
+        </div>
+      </div>
     {/snippet}
     {#snippet error()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
         {loadingText}<EllipsisMenuNote notestr={loadingText} />
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser !== pubkey}<MuteStatusIcons
+              {pubkey}
+            /><ReplyToUserButton {pubkey} />{/if}
+          <UserPofileEllipsis {pubkey} {tieKey} />
+        </div>
+        <div class="flex flex-row ml-auto gap-2">
+          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+            <FollowButton {pubkey} />{/if}
+        </div>
       </div>
     {/snippet}
     {#snippet content({ metadata })}
@@ -148,14 +184,19 @@
                 <div class="flex flex-row ml-auto gap-2">
                   {#if $loginUser !== pubkey}<MuteStatusIcons
                       {pubkey}
-                    /><ReplyToUserButton {metadata} />{/if}
+                    /><ReplyToUserButton {pubkey} />{/if}
                   {#if prof.lud16 || prof.lud06}
                     <div class=" w-fit"><UserZap {metadata} /></div>
-                  {/if}<UserPofileEllipsis {metadata} {prof} {tieKey} />
+                  {/if}<UserPofileEllipsis
+                    {pubkey}
+                    {metadata}
+                    {prof}
+                    {tieKey}
+                  />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">
                   {#if $loginUser === pubkey}<UserEditEllipsis
-                      {metadata}
+                      {pubkey}
                     />{:else}
                     <FollowButton {pubkey} />{/if}
                 </div>
