@@ -95,18 +95,21 @@
     }
     //metadata = sample2;
     if (!metadata) {
-      console.error("failed to get metadata event");
+       console.log("failed to get metadata event");
       $nowProgress = false;
+      metadata = {pubkey:data.pubkey,content:"{}",tags:[]};
+      // console.error("failed to get metadata event");
+      // $nowProgress = false;
 
-      $toastSettings = {
-        title: "Warning",
-        description: `failed to get metadata event`,
-        color: "bg-orange-500",
-      };
-      setTimeout(() => {
-        goto(`/${nip19.npubEncode(data.pubkey)}`);
-      });
-      return;
+      // $toastSettings = {
+      //   title: "Warning",
+      //   description: `failed to get metadata event`,
+      //   color: "bg-orange-500",
+      // };
+      // setTimeout(() => {
+      //   goto(`/${nip19.npubEncode(data.pubkey)}`);
+      // });
+      // return;
     }
     newTags = metadata.tags;
     try {
@@ -333,7 +336,7 @@
       @<input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.name}
+        value={newProfile.name}
         placeholder="name"
       />
 
@@ -341,7 +344,7 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.display_name}
+        value={newProfile.display_name}
         placeholder="display_name"
       />{#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
@@ -379,13 +382,13 @@
       {/if}
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.picture")}<InputImageFromFile
-          bind:inputText={newProfile.picture}
+          inputText={newProfile.picture}
         />
       </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.picture}
+        value={newProfile.picture}
         placeholder="https://example.com/picture.webp"
       />
       <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
@@ -403,12 +406,12 @@
       </div> -->
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.banner")}
-        <InputImageFromFile bind:inputText={newProfile.banner} />
+        <InputImageFromFile inputText={newProfile.banner} />
       </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.banner}
+        value={newProfile.banner}
         placeholder="https://example.com/banner.webp"
       />
       <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
@@ -427,7 +430,7 @@
       {$_("profile.about")}
       <textarea
         class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800 mb-2"
-        bind:value={newProfile.about}
+        value={newProfile.about}
         oninput={handleTextareaInput}
         onclick={handleTextareaInput}
       ></textarea>
@@ -469,14 +472,14 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.nip05}
+        value={newProfile.nip05}
         placeholder="name@domain.example.com"
       />
       {$_("profile.website")}
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={newProfile.website}
+        value={newProfile.website}
         placeholder="https://example.com"
       />
 
@@ -484,7 +487,7 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        bind:value={lud}
+        value={lud}
         placeholder="LURL1XXXXXX / example@wallet.example.com"
       />
     </div>
