@@ -14,7 +14,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import LumiIcon from "$lib/assets/lumi-chan.webp";
 
-  let encodedPub: string | undefined = $derived.by(() => pubCheck($loginUser));
+  let encodedPub: string | undefined = $derived(pubCheck($loginUser));
 
   function pubCheck(hex: string | undefined): string | undefined {
     if (hex) {

@@ -8,10 +8,10 @@
   import { goto } from "$app/navigation";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   interface Props {
-    metadata: Nostr.Event;
+    pubkey: string;
   }
 
-  let { metadata }: Props = $props();
+  let { pubkey }: Props = $props();
 
   const menuTexts = [
     { text: `${$_("user.profileEdit")}`, icon: User, num: 0 },
@@ -21,12 +21,12 @@
   ];
 
   const handleSelectItem = async (index: number) => {
-    const encodedPub = nip19.npubEncode(metadata.pubkey);
+    const encodedPub = nip19.npubEncode(pubkey);
 
     switch (menuTexts[index].num) {
       case 0:
         //edit profile
-        goto(`${nip19.npubEncode(metadata.pubkey)}/profile`);
+        goto(`${nip19.npubEncode(pubkey)}/profile`);
         break;
 
       case 1:
