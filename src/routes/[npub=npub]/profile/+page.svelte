@@ -46,7 +46,7 @@
   const filters = [{ kinds: [0], authors: [data.pubkey], limit: 1 }];
   const operator = pipe(latest(), uniq());
 
-  let newProfile: Profile | undefined = $state.raw();
+  let newProfile: Profile | undefined = $state();
   let lud: string = $state("");
   let newTags: string[][] = $state.raw([]);
   let isError = $state(false);
@@ -95,7 +95,7 @@
     }
     //metadata = sample2;
     if (!metadata) {
-       console.log("failed to get metadata event");
+       console.error("failed to get metadata event");
       $nowProgress = false;
       metadata = {pubkey:data.pubkey,content:"{}",tags:[]};
       // console.error("failed to get metadata event");
@@ -336,7 +336,7 @@
       @<input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.name}
+        bind:value={newProfile.name}
         placeholder="name"
       />
 
@@ -344,7 +344,7 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.display_name}
+        bind:value={newProfile.display_name}
         placeholder="display_name"
       />{#if $emojis && $emojis.list.length > 0}
         <div class="w-fit flex self-end">
@@ -382,13 +382,13 @@
       {/if}
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.picture")}<InputImageFromFile
-          inputText={newProfile.picture}
+          bind:inputText={newProfile.picture}
         />
       </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.picture}
+        bind:value={newProfile.picture}
         placeholder="https://example.com/picture.webp"
       />
       <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
@@ -406,12 +406,12 @@
       </div> -->
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.banner")}
-        <InputImageFromFile inputText={newProfile.banner} />
+        <InputImageFromFile bind:inputText={newProfile.banner} />
       </div>
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.banner}
+        bind:value={newProfile.banner}
         placeholder="https://example.com/banner.webp"
       />
       <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
@@ -430,7 +430,7 @@
       {$_("profile.about")}
       <textarea
         class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800 mb-2"
-        value={newProfile.about}
+        bind:value={newProfile.about}
         oninput={handleTextareaInput}
         onclick={handleTextareaInput}
       ></textarea>
@@ -472,14 +472,14 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.nip05}
+        bind:value={newProfile.nip05}
         placeholder="name@domain.example.com"
       />
       {$_("profile.website")}
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={newProfile.website}
+        bind:value={newProfile.website}
         placeholder="https://example.com"
       />
 
@@ -487,7 +487,7 @@
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
-        value={lud}
+        bind:value={lud}
         placeholder="LURL1XXXXXX / example@wallet.example.com"
       />
     </div>
