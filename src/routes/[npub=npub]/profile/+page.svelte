@@ -46,7 +46,7 @@
   const filters = [{ kinds: [0], authors: [data.pubkey], limit: 1 }];
   const operator = pipe(latest(), uniq());
 
-  let newProfile: Profile | undefined = $state.raw();
+  let newProfile: Profile | undefined = $state();
   let lud: string = $state("");
   let newTags: string[][] = $state.raw([]);
   let isError = $state(false);
@@ -95,18 +95,21 @@
     }
     //metadata = sample2;
     if (!metadata) {
-      console.error("failed to get metadata event");
+       console.error("failed to get metadata event");
       $nowProgress = false;
+      metadata = {pubkey:data.pubkey,content:"{}",tags:[]};
+      // console.error("failed to get metadata event");
+      // $nowProgress = false;
 
-      $toastSettings = {
-        title: "Warning",
-        description: `failed to get metadata event`,
-        color: "bg-orange-500",
-      };
-      setTimeout(() => {
-        goto(`/${nip19.npubEncode(data.pubkey)}`);
-      });
-      return;
+      // $toastSettings = {
+      //   title: "Warning",
+      //   description: `failed to get metadata event`,
+      //   color: "bg-orange-500",
+      // };
+      // setTimeout(() => {
+      //   goto(`/${nip19.npubEncode(data.pubkey)}`);
+      // });
+      // return;
     }
     newTags = metadata.tags;
     try {
