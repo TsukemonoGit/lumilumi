@@ -1,37 +1,25 @@
-<svg 
+<svg  
   xmlns="http://www.w3.org/2000/svg"
   width="160"
   height="160"
   viewBox="0 0 160 160"
   
-  stroke-width="1"
-
 >
+  <!-- 背景を塗りつぶし -->
+  <rect x="0" y="0" width="160" height="160" fill="lightgray" />
+
   <!-- Loading... テキスト -->
   <text
     x="80"
     y="80"
     text-anchor="middle"
     font-size="20"
- 
+    fill="black"
+    
     font-family="Arial, sans-serif"
     dominant-baseline="middle"
     letter-spacing="1.5px"
   >
     Loading...
   </text>
-  <style>
-  @media (prefers-color-scheme: dark) {
-    svg text {
- stroke:black;  
-    }
-  }
-
-  @media (prefers-color-scheme: light) {
-    svg text {
- 
-      stroke:white;
-    }
-  }
-</style>
 </svg>
