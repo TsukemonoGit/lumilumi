@@ -475,7 +475,7 @@
       aria-label="View density"
     >
       {#each optionsArrStr as option, index}
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 w-fix">
           <button
             use:melt={$radioGroupitem(index.toString())}
             class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
@@ -491,15 +491,14 @@
             for={index.toString()}
             id="{index.toString()}-label"
           >
-            {option}
+            {option}{#if index === 0 && $loginUser}
+              <a
+                class="underline text-magnum-300 break-all flex-wrap inline-flex"
+                href={`/${inputPubkey}/relays`}
+                >{$_("settings.kind10002")}<ArrowUpRight size={18} /></a
+              >
+            {/if}
           </label>
-          {#if index === 0 && $loginUser}
-            <a
-              class="underline text-magnum-300 break-all flex"
-              href={`/${inputPubkey}/relays`}
-              >{$_("settings.kind10002")}<ArrowUpRight /></a
-            >
-          {/if}
         </div>
       {/each}
       <input use:melt={$radioGrouphiddenInput} />
