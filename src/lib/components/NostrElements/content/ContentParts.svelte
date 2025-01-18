@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { parseText } from "$lib/func/content";
+  import { parseText, type Part } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import DecodedContent from "../kindEvents/DecodedContent.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
@@ -16,6 +16,8 @@
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { isvalidURL } from "$lib/func/ogp";
+  import { untrack } from "svelte";
+  import Content3D from "./Content3D.svelte";
 
   interface Props {
     text: string;
@@ -39,8 +41,17 @@
     maxHeight,
   }: Props = $props();
 
+  let parts: Part[] = $state([]);
   //プレビューにも使ってるからconstだとだめ
-  let parts = $derived(parseText(text, tags));
+  $effect(() => {
+    if (text || tags) {
+      untrack(async () => {
+        parts = await parseText(text, tags);
+      });
+    }
+  });
+  // let parts = $derived.by(async()=>{
+  //   return await parseText(text, tags)});
   //$: console.log(parts);
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
@@ -137,7 +148,8 @@
         className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}{:else if part.type === "audio"}
+      >{/if}
+  {:else if part.type === "audio"}
     {#if lumiSetting.get().showImg}
       <audio
         aria-label="audio contents"
@@ -152,6 +164,13 @@
         href={part.content ?? ""}
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
+  {:else if part.type === "3D"}
+    <Content3D
+      src={part.content}
+      url={part.url}
+      number={part.number}
+      {openModal}
+    />
   {:else if part.type === "url"}
     <!--http://はなし httpsだけ-->
     {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP

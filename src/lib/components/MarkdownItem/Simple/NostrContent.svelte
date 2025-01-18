@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { parseText } from "$lib/func/content";
+  import { parseText, type Part } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
@@ -7,6 +7,7 @@
   import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
   import ContentImage from "$lib/components/NostrElements/content/ContentImage.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     text: string;
@@ -15,14 +16,20 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
-    maxHeight: number | undefined;
+    maxHeight?: number | undefined;
   }
 
   let { text, tags, displayMenu, depth, repostable, tieKey, maxHeight }: Props =
     $props();
+  let parts: Part[] = $state([]);
   //プレビューにも使ってるからconstだとだめ
-  let parts = $derived(parseText(text, tags));
-
+  $effect(() => {
+    if (text || tags) {
+      untrack(async () => {
+        parts = await parseText(text, tags);
+      });
+    }
+  });
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   let mediaList = $derived(
     parts
