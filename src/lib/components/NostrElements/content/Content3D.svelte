@@ -29,6 +29,7 @@
 {#if view}
   <div class="relative w-fit h-fit">
     <model-viewer
+      style="width:18rem; height:18rem; "
       lazy={true}
       alt="3D"
       src={src ?? ""}
