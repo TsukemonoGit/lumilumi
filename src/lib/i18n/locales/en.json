@@ -1,7 +1,7 @@
 {
   "settings": {
-    "relayMenuText0": "Use kind:10002 relays",
-    "relayMenuText1": "Use relays you set up.",
+    "relayMenuText0": "Use the Nostr common relay setting (kind: 10002)",
+    "relayMenuText1": "Use custom relay settings",
     "toast": {
       "relayError": "The list of relays must include at least one read and one writeable relay.",
       "resetData": "Settings have been reset.",

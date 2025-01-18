@@ -27,7 +27,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image, RotateCw } from "lucide-svelte";
+  import { Save, X, Image, RotateCw, ArrowUpRight } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -495,8 +495,9 @@
           </label>
           {#if index === 0 && $loginUser}
             <a
-              class="underline text-magnum-300 break-all"
-              href={`/${inputPubkey}/relays`}>{$_("settings.kind10002")}</a
+              class="underline text-magnum-300 break-all flex"
+              href={`/${inputPubkey}/relays`}
+              >{$_("settings.kind10002")}<ArrowUpRight /></a
             >
           {/if}
         </div>
@@ -546,8 +547,8 @@
         </div>
       </div>
     {/if}
-    {#if $loginUser}
-      <a
+    <!--るみるみから両方とも修正できるようになったからいらん{#if $loginUser}
+       <a
         class="underline text-magnum-300 break-all ml-4 text-sm"
         target="_blank"
         rel="noopener noreferrer"
@@ -574,8 +575,8 @@
             onclick={onClickglobalImageOpen}><Image /></button
           >
         </div>
-      </div>
-      <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
+      </div>{/if} 
+    <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>-->
   </fieldset>
 
   <fieldset class="border border-magnum-500 rounded-md p-2">
