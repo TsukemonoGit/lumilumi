@@ -1,6 +1,10 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import {
+    promisePublishEvent,
+    setRelays,
+    usePromiseReq,
+  } from "$lib/func/nostr";
   import {
     loginUser,
     nowProgress,
@@ -17,8 +21,7 @@
   import { _ } from "svelte-i18n";
 
   import { X, Save } from "lucide-svelte";
-  import { page } from "$app/state";
-  import { generateResultMessage } from "$lib/func/util";
+  import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
   import NoteTemplate from "$lib/components/NostrElements/kindEvents/NoteTemplate.svelte";
@@ -27,6 +30,8 @@
   import { relayRegex2 } from "$lib/func/regex";
   import { type PageData } from "./$types";
   import { SvelteMap } from "svelte/reactivity";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
 
   let { data }: { data: PageData } = $props();
 
@@ -289,7 +294,7 @@
       description: str,
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
-
+    checkDefaultRelay(event, isSuccess[0]);
     //reset押したときに戻るデータを更新
     updateRelayCounts();
     kind10002 = event;
@@ -306,6 +311,19 @@
       (state) => state.read
     ).length;
     console.log("writeLen:", writeLen, "readLen:", readLen);
+  }
+
+  function checkDefaultRelay(ev: Nostr.Event, from: string) {
+    if (lumiSetting.get().useRelaySet !== "0") {
+      return;
+    }
+    //10002を使う設定にしてる場合デフォリレー更新
+    queryClient.setQueryData(["defaultRelay", ev.pubkey], (oldData: any) =>
+      formatToEventPacket(ev, from)
+    );
+    // イベントの形を整えてセット
+    const relays = setRelaysByKind10002(ev);
+    setRelays(relays);
   }
 </script>
 
