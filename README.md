@@ -11,7 +11,9 @@
   
   chromeだと拡張機能が使えないけど[Amber](https://github.com/greenart7c3/Amber)をいれると簡単にNIP-46が使えます
 
-
+- 3D view 機能
+![3DView](https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/22b7e93adb62e4f99a655724914bffd6837dee1b00002142ef0bb49a38e9135e.mp4)
+[実際のページ](https://lumilumi.app/nevent1qvzqqqqqqypzq4jsz7zew5j7jr4pdfxh483nwq9vyw9ph6wm706sjwrzj2we58nqqyxhwumn8ghj77tpvf6jumt9qywhwumn8ghj7un9d3shjtnwdaehgu3wwa5hyetydejhgtn2wqqjqamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6nsqyxhwumn8ghj7mn0wvhxcmmvqqsgn5eef652pzj07a2c0adfcazr23exkuhl09nldms9qv9cr4xvr3qk57wkh)
 - kind:10000 の Mute、kind:30007 の Mute by kind に対応
 - kind:10030 custom emoji に対応
 - 通信量が気になる方のための、画像を表示しない、のモード

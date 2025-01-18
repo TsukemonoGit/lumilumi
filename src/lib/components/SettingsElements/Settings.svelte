@@ -55,7 +55,7 @@
 
   let originalSettings: LumiSetting | undefined = undefined;
 
-  const optionsArr = ["0", "1"];
+  //const optionsArr = ["0", "1"];
   const optionsArrStr = [
     $_("settings.relayMenuText0"),
     $_("settings.relayMenuText1"),
@@ -474,25 +474,31 @@
       class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
       aria-label="View density"
     >
-      {#each optionsArr as option}
+      {#each optionsArrStr as option, index}
         <div class="flex items-center gap-3">
           <button
-            use:melt={$radioGroupitem(option)}
+            use:melt={$radioGroupitem(index.toString())}
             class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
-            id={option}
-            aria-labelledby="{option}-label"
+            id={index.toString()}
+            aria-labelledby="{index.toString()}-label"
           >
-            {#if $radioGroupisChecked(option)}
+            {#if $radioGroupisChecked(index.toString())}
               <div class="h-3 w-3 rounded-full bg-magnum-500"></div>
             {/if}
           </button>
           <label
             class="font-medium capitalize leading-none cursor-pointer"
-            for={option}
-            id="{option}-label"
+            for={index.toString()}
+            id="{index.toString()}-label"
           >
-            {optionsArrStr[Number(option)]}
+            {option}
           </label>
+          {#if index === 0 && $loginUser}
+            <a
+              class="underline text-magnum-300 break-all"
+              href={`/${inputPubkey}/relays`}>{$_("settings.kind10002")}</a
+            >
+          {/if}
         </div>
       {/each}
       <input use:melt={$radioGrouphiddenInput} />
