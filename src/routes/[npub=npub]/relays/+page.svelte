@@ -43,7 +43,7 @@
   let relayStates: SvelteMap<string, { read: boolean; write: boolean }> =
     new SvelteMap();
 
-  let isError = false;
+  let isError = $state(false);
   let isMount = false;
   let newRelay: string = $state("");
   let writeLen: number = $state(0);
@@ -86,10 +86,10 @@
           color: "bg-red-500",
         };
         isError = true;
-        // 現在のURLの親階層に戻る
-        const currentUrl = page.url.pathname; // 現在のURLパスを取得
-        const parentUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/")); // 一つ前の階層を取得
-        goto(parentUrl); // 一つ前の階層に移動
+        //   // 現在のURLの親階層に戻る
+        //   const currentUrl = page.url.pathname; // 現在のURLパスを取得
+        //   const parentUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/")); // 一つ前の階層を取得
+        //  // goto(parentUrl); // 一つ前の階層に移動
         return;
       }
     } catch (error) {
@@ -391,7 +391,8 @@
               ><button
                 class="m-auto h-6 w-6 flex justify-center items-center
             rounded-full text-magnum-800 bg-magnum-100
-            hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300"
+            hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300 disabled:opacity-25"
+                disabled={isError}
                 onclick={() => removeRelay(url)}><X size={20} /></button
               ></td
             >
@@ -403,14 +404,15 @@
       <input
         id="relay"
         type="text"
-        class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100"
+        class="flex-grow h-10 rounded-md border border-magnum-300 px-1 leading-none text-zinc-100 disabled:opacity-25"
+        disabled={isError}
         placeholder="wss://"
         bind:value={newRelay}
       />
       <button
         class="h-10 ml-2 rounded-md bg-magnum-600 px-6 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 w-fit disabled:opacity-25"
         onclick={addNewRelay}
-        disabled={$nowProgress}
+        disabled={$nowProgress || isError}
       >
         Add
       </button>
@@ -419,13 +421,13 @@
   <div class="w-full flex gap-2 mt-8">
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50 disabled:opacity-25"
-      disabled={$nowProgress}
+      disabled={$nowProgress || isError}
       onclick={save}
     >
       <Save />Save
     </button><button
       class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50 disabled:opacity-25"
-      disabled={$nowProgress}
+      disabled={$nowProgress || isError}
       onclick={reset}
     >
       Reset
