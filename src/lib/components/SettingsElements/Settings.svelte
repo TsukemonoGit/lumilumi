@@ -27,7 +27,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image, RotateCw } from "lucide-svelte";
+  import { Save, X, Image, RotateCw, ArrowUpRight } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -475,7 +475,7 @@
       aria-label="View density"
     >
       {#each optionsArrStr as option, index}
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 w-fix">
           <button
             use:melt={$radioGroupitem(index.toString())}
             class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
@@ -491,14 +491,14 @@
             for={index.toString()}
             id="{index.toString()}-label"
           >
-            {option}
+            {option}{#if index === 0 && $loginUser}
+              <a
+                class="underline text-magnum-300 break-all flex-wrap inline-flex"
+                href={`/${inputPubkey}/relays`}
+                >{$_("settings.kind10002")}<ArrowUpRight size={18} /></a
+              >
+            {/if}
           </label>
-          {#if index === 0 && $loginUser}
-            <a
-              class="underline text-magnum-300 break-all"
-              href={`/${inputPubkey}/relays`}>{$_("settings.kind10002")}</a
-            >
-          {/if}
         </div>
       {/each}
       <input use:melt={$radioGrouphiddenInput} />
@@ -546,8 +546,8 @@
         </div>
       </div>
     {/if}
-    {#if $loginUser}
-      <a
+    <!--るみるみから両方とも修正できるようになったからいらん{#if $loginUser}
+       <a
         class="underline text-magnum-300 break-all ml-4 text-sm"
         target="_blank"
         rel="noopener noreferrer"
@@ -574,8 +574,8 @@
             onclick={onClickglobalImageOpen}><Image /></button
           >
         </div>
-      </div>
-      <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>{/if}
+      </div>{/if} 
+    <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>-->
   </fieldset>
 
   <fieldset class="border border-magnum-500 rounded-md p-2">

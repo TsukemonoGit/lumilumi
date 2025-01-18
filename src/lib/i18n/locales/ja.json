@@ -1,7 +1,7 @@
 {
   "settings": {
-    "relayMenuText0": "Kind:10002 を使う",
-    "relayMenuText1": "設定したリレーを使う",
+    "relayMenuText0": "Nostr共通のリレー設定 (Kind:10002) を使う",
+    "relayMenuText1": "固有のリレー設定を使う",
     "toast": {
       "relayError": "リレーのリストには少なくとも1つの読み取りと書き込み可能なリレーが含まれている必要があります。",
       "resetData": "設定がリセットされました。",
