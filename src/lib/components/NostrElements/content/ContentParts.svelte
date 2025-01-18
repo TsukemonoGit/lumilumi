@@ -165,12 +165,7 @@
         >{#snippet content()}{part.content}{/snippet}</Link
       >{/if}
   {:else if part.type === "3D"}
-    <Content3D
-      src={part.content}
-      url={part.url}
-      number={part.number}
-      {openModal}
-    />
+    <Content3D content={part.content} url={part.url} />
   {:else if part.type === "url"}
     <!--http://はなし httpsだけ-->
     {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
