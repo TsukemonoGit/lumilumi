@@ -95,9 +95,17 @@
     }
     //metadata = sample2;
     if (!metadata) {
-       console.error("failed to get metadata event");
+      console.error("failed to get metadata event");
       $nowProgress = false;
-      metadata = {pubkey:data.pubkey,content:"{}",tags:[]};
+      metadata = {
+        pubkey: data.pubkey,
+        content: "{}",
+        tags: [] as Nostr.Tag.Any[],
+        id: "",
+        sig: "",
+        created_at: Date.now() * 1000,
+        kind: 0,
+      };
       // console.error("failed to get metadata event");
       // $nowProgress = false;
 

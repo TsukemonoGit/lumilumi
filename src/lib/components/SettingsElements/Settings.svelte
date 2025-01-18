@@ -230,8 +230,9 @@
           undefined
         );
         console.log(relays);
-
-        setRelays(setRelaysByKind10002(relays[0].event));
+        if (relays) {
+          setRelays(setRelaysByKind10002(relays[0].event));
+        }
       }
       //else {
       // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
