@@ -44,69 +44,60 @@
 </script>
 
 {#if filters && Object.values($defaultRelays).length > 0}
-  <div class="w-full break-words overflow-x-hidden max-w-full">
-    <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
-    <SearchResultList
-      queryKey={["search"]}
-      {filters}
-      {req}
-      {viewIndex}
-      {amount}
-      {tieKey}
-      relays={relays.length > 0 ? relays : nip50relays}
-    >
-      {#snippet children({ events, len })}
-        <!-- <SetRepoReactions /> -->
-        <div class=" break-words divide-y divide-magnum-600/30">
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <div
-                class="break-words whitespace-pre-line overflow-hidden {index ===
-                events.length - 1
-                  ? 'last-visible'
-                  : ''} {index === 0 ? 'first-visible' : ''}"
-              >
-                <Metadata
-                  queryKey={["metadata", event.pubkey]}
-                  pubkey={event.pubkey}
-                >
-                  {#snippet loading()}
-                    <div class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                  {/snippet}
-                  {#snippet nodata()}
-                    <div class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                  {/snippet}
-                  {#snippet error()}
-                    <div class="w-full">
-                      <EventCard note={event} {tieKey} />
-                    </div>
-                  {/snippet}
-                  {#snippet content({ metadata })}
-                    <EventCard {metadata} note={event} {tieKey} />
-                  {/snippet}
-                </Metadata>
-              </div>
-            {/each}
-          {/if}
-        </div>{/snippet}
-      {#snippet loading()}
-        <div>loading</div>
-      {/snippet}
+  <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
+  <SearchResultList
+    queryKey={["search"]}
+    {filters}
+    {req}
+    {viewIndex}
+    {amount}
+    {tieKey}
+    relays={relays.length > 0 ? relays : nip50relays}
+  >
+    {#snippet children({ events, len })}
+      <!-- <SetRepoReactions /> -->
+      <div class="w-full break-words divide-y divide-magnum-600/30">
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet loading()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet error()}
+                <div class="w-full">
+                  <EventCard note={event} {tieKey} />
+                </div>
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard {metadata} note={event} {tieKey} />
+              {/snippet}
+            </Metadata>
+          {/each}
+        {/if}
+      </div>{/snippet}
+    {#snippet loading()}
+      <div>loading</div>
+    {/snippet}
 
-      {#snippet error()}
-        <div>
-          {error}
-        </div>
-      {/snippet}
-      {#snippet nodata()}
-        <div>nodata</div>
-      {/snippet}
-    </SearchResultList>
-  </div>
+    {#snippet error()}
+      <div>
+        {error}
+      </div>
+    {/snippet}
+    {#snippet nodata()}
+      <div>nodata</div>
+    {/snippet}
+  </SearchResultList>
 {/if}
 <div class="postWindow">
   <OpenPostWindow
