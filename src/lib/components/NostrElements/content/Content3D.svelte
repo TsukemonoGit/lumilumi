@@ -20,7 +20,6 @@
   let showMore: Writable<boolean> = writable(false);
 </script>
 
-<img src={loaderIcon} alt="logo" />
 {#if view}
   <div class="relative w-fit h-fit">
     <model-viewer
