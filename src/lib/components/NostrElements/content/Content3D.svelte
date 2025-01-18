@@ -49,7 +49,7 @@
   </div>
 {:else}
   <button
-    class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 px-2 py-4 m-1 hover:opacity-75 active:opacity-50 flex flex-col items-center"
+    class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-2 m-1 hover:opacity-75 active:opacity-50 flex-col items-center flex gap-1"
     onclick={() => (view = true)}><Box size={42} />View 3D model</button
   >{/if}
 
