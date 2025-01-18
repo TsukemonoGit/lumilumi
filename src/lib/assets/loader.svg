@@ -4,7 +4,6 @@
   height="160"
   viewBox="0 0 160 160"
   
-  stroke="currentColor"
   stroke-width="1"
 
 >
@@ -14,11 +13,25 @@
     y="80"
     text-anchor="middle"
     font-size="20"
-    fill="currentColor"
+ 
     font-family="Arial, sans-serif"
     dominant-baseline="middle"
     letter-spacing="1.5px"
   >
     Loading...
   </text>
+  <style>
+  @media (prefers-color-scheme: dark) {
+    svg text {
+ stroke:black;  
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    svg text {
+ 
+      stroke:white;
+    }
+  }
+</style>
 </svg>
