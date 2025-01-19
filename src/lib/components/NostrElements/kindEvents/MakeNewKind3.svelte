@@ -2,11 +2,17 @@
   import { _ } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
 
-  import { loginUser, nowProgress, toastSettings } from "$lib/stores/stores";
+  import {
+    loginUser,
+    nowProgress,
+    queryClient,
+    toastSettings,
+  } from "$lib/stores/stores";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import { promisePublishSignedEvent } from "$lib/func/nostr";
+  import { promisePublishSignedEvent, pubkeysIn } from "$lib/func/nostr";
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import SampleGlobalLink from "./SampleGlobalLink.svelte";
+  import { formatToEventPacket } from "$lib/func/util";
 
   let dialogOpen: (bool: boolean) => void = $state(() => {});
 
@@ -47,7 +53,13 @@
           color: "bg-red-500",
         };
       } else {
-        location.reload();
+        //location.reload();
+        queryClient.setQueryData(
+          ["timeline", "contacts", $loginUser],
+          (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from)
+        );
+
+        pubkeysIn(ev);
       }
     }
     $nowProgress = false;
@@ -72,7 +84,7 @@
   >{#snippet main()}
     <div class=" text-neutral-200 whitespace-pre-wrap">
       {$_("create_kind3.newMessage")}
-      {$_("create_kind3.reload")}
+      <!--    {$_("create_kind3.reload")} -->
     </div>
   {/snippet}</AlertDialog
 >
