@@ -29,13 +29,9 @@
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
-  interface Props {
-    data: {
-      pubkey: string;
-    };
-  }
+  import type { LayoutData } from "../$types";
 
-  let { data }: Props = $props();
+  let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
   console.log(data.pubkey);
   const bannerHeight = 120;

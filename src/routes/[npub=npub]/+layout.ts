@@ -1,9 +1,8 @@
 import { nip19 } from "nostr-tools";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
-import type { PageLoad, RouteParams } from "./$types";
+import type { LayoutLoad, RouteParams } from "./$types";
 import { ogDescription, ogTitle } from "$lib/stores/stores";
-
 import { queryProfile } from "nostr-tools/nip05";
 
 interface CustomParams {
@@ -11,7 +10,7 @@ interface CustomParams {
 }
 //https://kit.svelte.jp/docs/load
 //ページを読み込む前に有効なparamかチェック
-export const load: PageLoad<{
+export const load: LayoutLoad<{
   pubkey: string;
   relays?: string[] | undefined;
   nip05Address?: string;
@@ -45,14 +44,19 @@ export const load: PageLoad<{
     }
   } else {
     //nip05
-    const prof: nip19.ProfilePointer | null = await queryProfile(npub);
-    if (!prof) {
+    try {
+      const prof: nip19.ProfilePointer | null = await queryProfile(npub);
+      if (!prof) {
+        throw error(400, "Bad Request");
+      }
+      //  console.log(prof.pubkey);
+      //  console.log(npub);
+      ogTitle.set(`Lumilumi - User:${npub}`);
+      ogDescription.set(`User:${npub}`);
+
+      return { ...prof, nip05Address: npub };
+    } catch (e) {
       throw error(400, "Bad Request");
     }
-    console.log(npub);
-    ogTitle.set(`Lumilumi - User:${npub}`);
-    ogDescription.set(`User:${npub}`);
-
-    return { ...prof, nip05Address: npub };
   }
 };

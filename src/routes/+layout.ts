@@ -82,8 +82,9 @@ export const load: LayoutLoad = async (
         throw Error;
       }
     } catch (e) {
+      return undefined;
       //  console.error("[note decode error]", e);
-      throw error(400, "Bad Request");
+      // throw error(400, "Bad Request");
     }
   }
 };

@@ -28,12 +28,13 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { relayRegex2 } from "$lib/func/regex";
-  import { type PageData } from "./$types";
+
   import { SvelteMap } from "svelte/reactivity";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  import type { LayoutData } from "../$types";
 
-  let { data }: { data: PageData } = $props();
+  let { data }: { data: LayoutData } = $props();
 
   // const data={pubkey:page.params.npub};
   console.log(data.pubkey);
