@@ -33,7 +33,7 @@
     depth,
     tieKey,
   }: Props = $props();
-
+  const zIndex = 30;
   let profile = $derived(getProfile(metadata));
   let url = $derived(profile?.picture);
   let title = $derived.by(() => {
@@ -75,6 +75,7 @@
     {#snippet popoverContent()}
       <div class="p-1 w-[24rem] max-w-full">
         <UserProfile
+          {zIndex}
           {pubkey}
           bannerHeight={80}
           iconSize={60}
