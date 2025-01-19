@@ -711,9 +711,9 @@
 {#if viewAllReactions}
   <!--kind6-->
   {#if repost_length > 0}
-    <div class="flex gap-1 p-1">
-      <Repeat2 size="20" class="text-magnum-500/75 mr-2 min-w-5" />
-      <div class="flex flex-wrap gap-1">
+    <div class="flex gap-1 p-1 items-center">
+      <Repeat2 size="20" class="text-magnum-500/75  min-w-5 mx-0.5" />
+      <div class="flex flex-wrap">
         <RepostList events={repost} {tieKey} />
       </div>
     </div>
