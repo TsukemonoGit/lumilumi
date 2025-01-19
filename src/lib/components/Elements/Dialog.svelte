@@ -26,9 +26,15 @@
     dialogTitle?: string | undefined;
     main?: Snippet;
     open?: Writable<boolean>;
+    zIndex?: number;
   }
 
-  let { open = $bindable(), dialogTitle = undefined, main }: Props = $props();
+  let {
+    open = $bindable(),
+    dialogTitle = undefined,
+    main,
+    zIndex = 10,
+  }: Props = $props();
   open?.subscribe((value: boolean) => {
     // console.log(value);
     if (value) {
@@ -42,13 +48,15 @@
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
-      class="fixed inset-0 z-10 bg-black/50"
+      class={`fixed inset-0  bg-black/50`}
+      style={`z-index:${zIndex}`}
       transition:fade={{ duration: 150 }}
     ></div>
     <div
-      class="fixed left-1/2 top-1/2 z-10 max-h-[90vh] max-w-[96vw]
+      class={`fixed left-1/2 top-1/2  max-h-[90vh] max-w-[96vw]
            w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-            p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]"
+            p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
+      style={`z-index:${zIndex}`}
       use:melt={$content}
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium">

@@ -15,6 +15,7 @@
     tieKey: string | undefined;
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -26,6 +27,7 @@
     tieKey,
     isShowClientTag,
     maxHeight,
+    zIndex = 0,
   }: Props = $props();
 
   // svelte-ignore non_reactive_update
@@ -63,7 +65,8 @@
   />
 {/if}
 <!--Show more no Dialog-->
-<Dialog bind:open={showMore}>
+
+<Dialog bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 max-w-full overflow-x-hidden">
       <ContentParts

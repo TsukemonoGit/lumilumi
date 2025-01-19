@@ -77,7 +77,7 @@
     propSignPubkey, //画像共有のときに画像をアップするときにsignPub取得するからその時にある
     visible = true, //ポストアイコン非表示だけど返信とかはできる
   }: Props = $props();
-
+  const zIndex = 50;
   const bulkReplyThreshold = 30; // 30人以上でクソでか人数ライン
   let text: string = $state(options.content ?? "");
   let tags: string[][] = $state([...options.tags]);
@@ -698,6 +698,7 @@
           <div class="font-medium text-magnum-400">preview</div>
           <div class="border border-magnum-500 rounded-md">
             {#if signPubkey}<EventCard
+                {zIndex}
                 {metadata}
                 note={{
                   sig: "",
@@ -716,6 +717,7 @@
               />
             {:else}
               <Content
+                {zIndex}
                 maxHeight={160}
                 {text}
                 {tags}

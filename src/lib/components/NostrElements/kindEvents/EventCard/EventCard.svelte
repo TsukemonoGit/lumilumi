@@ -75,6 +75,7 @@
     excludefunc?: any;
     repostable?: boolean;
     tieKey: string | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -89,6 +90,7 @@
     excludefunc = (event: Nostr.Event) => false,
     repostable = true,
     tieKey,
+    zIndex = 0,
   }: Props = $props();
 
   let atag: string | undefined = $derived.by(() => {
@@ -331,6 +333,7 @@
               style="max-height:{maxHeight ?? 'none'}"
             > -->
             <Content
+              {zIndex}
               {maxHeight}
               text={note.content}
               tags={note.tags}

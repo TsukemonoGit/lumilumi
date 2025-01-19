@@ -6,7 +6,6 @@
   import { profile, splitHexColorString } from "$lib/func/util";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import Avatar from "svelte-boring-avatars";
-  import EllipsisMenuNote from "../kindEvents/NoteActionButtuns/EllipsisMenuNote.svelte";
   import UserAvatar from "./UserAvatar.svelte";
 
   import Nip05Check from "./Nip05Check.svelte";
@@ -30,6 +29,7 @@
     iconSize?: number;
     depth: number;
     tieKey: string | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -38,6 +38,7 @@
     iconSize = 80,
     depth,
     tieKey,
+    zIndex = 0,
   }: Props = $props();
   let petname = $derived(followList.get()?.get(pubkey));
 
@@ -209,6 +210,7 @@
 
           {#if prof.about}
             <Content
+              {zIndex}
               maxHeight={bannerHeight * 1.5}
               text={prof.about}
               tags={metadata.tags}
