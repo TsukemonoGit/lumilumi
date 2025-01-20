@@ -26,7 +26,7 @@
   let contentHeight = $derived(
     Math.max(maxHeight * Math.pow(0.8, depth * 1.8), minHeight)
   );
-  $inspect(contentHeight);
+  //$inspect(contentHeight);
   // maxHeight = 380のとき、
   // depth が 4 以上 のときに contentHeight が 100 を下回ります。
 </script>

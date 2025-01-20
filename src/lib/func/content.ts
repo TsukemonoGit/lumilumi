@@ -21,19 +21,19 @@ export interface Part {
     | "audio"
     | "movie"
     | "3D"
-    | "horizontal"
-    | "italic"
-    | "bold"
-    | "header"
-    | "table"
-    | "unorderedList"
-    | "orderedList"
+    //  | "horizontal"
+    //  | "italic"
+    //  | "bold"
+    //  | "header"
+    //  | "table"
+    //  | "unorderedList"
+    //  | "orderedList"
     | "quote"
-    | "codeBlock"
-    | "imageLink"
-    | "footnoteRef"
-    | "footnoteDef"
-    | "explicitLineBreak"
+    //   | "codeBlock"
+    //    | "imageLink"
+    //   | "footnoteRef"
+    //  | "footnoteDef"
+    //   | "explicitLineBreak"
     | "invoice";
   content: string | undefined;
   url?: string;
@@ -59,7 +59,9 @@ export const numberRegex = /(#\[\d+\])/i;
 //
 
 // パスから拡張子をチェックする関数
-const checkFileExtension = async (url: string): Promise<Part["type"]> => {
+export const checkFileExtension = async (
+  url: string
+): Promise<Part["type"]> => {
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
@@ -297,31 +299,42 @@ export async function parseText(
           // Split the URL into its proper parts
           const urlPart = url.slice(0, lastUnpairedParenIndex);
           const textPart = url.slice(lastUnpairedParenIndex);
-
-          const urlType = await checkFileExtension(urlPart);
-          if (urlType === "image") {
-            parts.push({
-              type: urlType,
-              content: urlPart,
-              url: urlPart,
-              number: mediaNum,
-            });
-            mediaNum++;
-          } else {
-            //|| urlType === "audio" || urlType === "movie"
-            parts.push({
-              type: urlType,
-              url: urlPart,
-              content: urlPart,
-            });
-          }
-
+          parts.push({
+            type: "url",
+            content: urlPart,
+            url: urlPart,
+            number: mediaNum,
+          });
           if (textPart) {
             parts.push({
               type: "text",
               content: textPart,
             });
           }
+          // const urlType = await checkFileExtension(urlPart);
+          // if (urlType === "image") {
+          //   parts.push({
+          //     type: urlType,
+          //     content: urlPart,
+          //     url: urlPart,
+          //     number: mediaNum,
+          //   });
+          //   mediaNum++;
+          // } else {
+          //   //|| urlType === "audio" || urlType === "movie"
+          //   parts.push({
+          //     type: urlType,
+          //     url: urlPart,
+          //     content: urlPart,
+          //   });
+          // }
+
+          // if (textPart) {
+          //   parts.push({
+          //     type: "text",
+          //     content: textPart,
+          //   });
+          // }
           break;
         case "emoji":
           const emojiContent = match[0].slice(1, -1); // Remove surrounding colons

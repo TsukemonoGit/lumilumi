@@ -54,7 +54,7 @@
     ></div>
     <div
       class={`fixed left-1/2 top-1/2  max-h-[90vh] max-w-[96vw]
-           w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
+            -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
             p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
       style={`z-index:${zIndex}`}
       use:melt={$content}
@@ -62,9 +62,9 @@
       <h2 use:melt={$title} class="m-0 text-lg font-medium">
         {dialogTitle || ""}
       </h2>
-      <div class="max-h-full overflow-y-auto">
-        {@render main?.()}
-      </div>
+
+      {@render main?.()}
+
       <div class="mt-4 flex justify-end gap-4">
         <button
           use:melt={$close}
