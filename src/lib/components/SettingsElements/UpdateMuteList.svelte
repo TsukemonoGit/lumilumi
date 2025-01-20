@@ -104,7 +104,7 @@
 <Dialog open={dialogOpen}>
   {#snippet main()}
     <div
-      class="w-[630px] h-[420px] max-w-[90vw] max-h-[90vh] overflow-x-hidden"
+      class="w-[630px] h-[480px] max-w-[90vw] max-h-[90vh] overflow-x-hidden"
     >
       {#if $mutes}
         <AddMute />
