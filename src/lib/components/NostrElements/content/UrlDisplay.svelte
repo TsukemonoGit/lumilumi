@@ -12,8 +12,9 @@
 
   interface Props {
     part: Part;
+    openModal: (index: number) => void;
   }
-  let { part }: Props = $props();
+  let { part, openModal }: Props = $props();
 </script>
 
 {#if part.url}
@@ -28,13 +29,13 @@
     {/snippet}
     {#snippet content(type)}
       {#if type === "image"}
-        <ContentOneImage url={part.url ?? ""} />
-        <!-- <ContentImage
-          src={part.content}
+        <!-- <ContentOneImage url={part.url ?? ""} /> -->
+        <ContentImage
+          src={part.url}
           url={part.url}
-          number={imageNumber}
+          number={part.number}
           {openModal}
-        /> -->
+        />
       {:else if type === "movie"}
         {#if lumiSetting.get().showImg}
           <video

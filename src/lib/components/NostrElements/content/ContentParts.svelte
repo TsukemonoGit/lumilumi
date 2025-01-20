@@ -54,7 +54,14 @@
   // let parts = $derived.by(async()=>{
   //   return await parseText(text, tags)});
   //$: console.log(parts);
-
+  let mediaList = $derived(
+    parts
+      .filter(
+        (part) => part.type === "url" //|| part.type === "movie" || part.type === "audio"
+      )
+      .map((p) => p.url)
+      .filter((t) => t !== undefined)
+  );
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   // let mediaList = $derived(
   //   parts
@@ -64,9 +71,9 @@
   //     .map((p) => p.url)
   //     .filter((t) => t !== undefined)
   // );
-  let mediaList: string[] = $state([]);
+  // let mediaList: string[] = $state([]);
   //let modalIndex = 0;
-  let openModal = (index: number) => {
+  const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
     //   console.log("viewmedia");
@@ -130,7 +137,7 @@
         {tieKey}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}
-    <UrlDisplay {part} />
+    <UrlDisplay {part} {openModal} />
   {:else if part.type === "emoji"}
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
