@@ -55,7 +55,7 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showImage}>
   {#snippet main()}
-    <div class="w-full h-full overflow-hidden">
+    <div class="w-[90vw] h-[80vh] overflow-hidden">
       <img
         alt=""
         src={url}
