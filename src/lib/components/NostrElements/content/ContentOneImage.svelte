@@ -14,6 +14,8 @@
 
   let { url }: Props = $props();
   let view = $state(false);
+
+  //svelte-ignore non_reactive_update
   let showImage: Writable<boolean> = writable(false);
 </script>
 
