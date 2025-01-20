@@ -21,7 +21,7 @@
 </script>
 
 {#if view}
-  <div class="relative w-fit h-fit">
+  <div class="relative w-fit h-fit overflow-hidden">
     <model-viewer
       style="width:18rem; height:18rem; "
       lazy={true}
@@ -55,7 +55,9 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore}>
   {#snippet main()}
-    <div class="flex items-center justify-center overflow-hidden">
+    <div
+      class="flex items-center justify-center max-w-[90vw] w-[640px] overflow-hidden"
+    >
       <model-viewer
         style="width:90vw; height:74vh; max-width:560px"
         lazy={true}
