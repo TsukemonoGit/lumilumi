@@ -11,27 +11,17 @@
     images?: string[];
     currentIndex?: number;
   }
+
   let {
     open = $bindable(),
     images,
     currentIndex = $bindable(0),
   }: Props = $props();
-  let displayImages: { url: string; originalIndex: number }[] = $state([]); //imagesにはurl全部入る
+  let displayImages: { url: string; originalIndex: number }[] = $state([]);
 
-  const {
-    elements: {
-      trigger,
-      overlay,
-      content,
-      title,
-      description,
-      close,
-      portalled,
-    },
-    states: { open: dialogOpen },
-  } = createDialog({
-    forceVisible: true,
-  });
+  const { elements, states } = createDialog({ forceVisible: true });
+  const { trigger, overlay, content, close, portalled } = elements;
+  const { open: dialogOpen } = states;
 
   const goToNext = () => {
     if (displayImages.length > 0) {
@@ -47,11 +37,8 @@
   };
 
   open.subscribe((value: boolean) => {
-    //  console.log(value);
     if (value && images) {
-      //開いたタイミングでimages（url全部入っててurl全部番号振られてる）からimageを抽出（？）
       displayImages = mediaCheck(images);
-
       $dialogOpen = true;
       $open = false;
     }
@@ -66,7 +53,7 @@
   }
 </script>
 
-{#if $dialogOpen && displayImages && displayImages.length > 0}
+{#if $dialogOpen && displayImages.length > 0}
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
@@ -75,11 +62,9 @@
     ></div>
     <div
       class="fixed left-1/2 top-1/2 z-50 max-h-[100vh] max-w-[100vw]
-             -translate-x-1/2 -translate-y-1/2
-            "
+             -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      <!-- {#if images[currentIndex].type === "image"} -->
       <img
         alt=""
         src={$state.snapshot(
@@ -87,19 +72,6 @@
         )?.url}
         class="max-h-[100vh] max-w-[100vw] object-contain"
       />
-      <!-- {:else if images[currentIndex].type === "movie"}<video
-          controls
-          src={images[currentIndex].content}
-          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        >
-          <track default kind="captions" />
-        </video>{:else if images[currentIndex].type === "audio"}<audio
-          controls
-          src={images[currentIndex].content}
-          class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        >
-          <track default kind="captions" />
-        </audio>{/if} -->
     </div>
     {#if displayImages.length > 1}
       <button
@@ -108,14 +80,13 @@
             -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
         onclick={goToPrev}><ChevronLeft /></button
       >
-
       <button
         use:melt={$content}
         class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
             -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
         onclick={goToNext}><ChevronRight /></button
-      >{/if}
-
+      >
+    {/if}
     <button
       use:melt={$close}
       aria-label="close"
