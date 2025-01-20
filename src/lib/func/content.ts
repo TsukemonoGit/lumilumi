@@ -17,23 +17,7 @@ export interface Part {
     | "nip"
     | "relay"
     | "text"
-    | "image"
-    | "audio"
-    | "movie"
-    | "3D"
-    | "horizontal"
-    | "italic"
-    | "bold"
-    | "header"
-    | "table"
-    | "unorderedList"
-    | "orderedList"
     | "quote"
-    | "codeBlock"
-    | "imageLink"
-    | "footnoteRef"
-    | "footnoteDef"
-    | "explicitLineBreak"
     | "invoice";
   content: string | undefined;
   url?: string;
@@ -44,59 +28,9 @@ export interface Part {
   imageUrl?: string;
 }
 
-/** ImageFile_Check_正規表現_パターン */
-const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
-//movie
-const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
-
-const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
-
-//3Dモデルビューアで表示できるやつ
-const threeDRegex = /\.(obj|fbx|gltf|glb|stl)$/i;
-
 //旧引用
 export const numberRegex = /(#\[\d+\])/i;
 //
-
-// パスから拡張子をチェックする関数
-const checkFileExtension = async (url: string): Promise<Part["type"]> => {
-  try {
-    const urlObj = new URL(url);
-    const path = urlObj.pathname;
-
-    if (imageRegex.test(path)) {
-      return "image";
-    } else if (movieRegex.test(path)) {
-      return "movie";
-    } else if (audioRegex.test(path)) {
-      return "audio";
-    } else if (threeDRegex.test(path)) {
-      return "3D";
-    } else {
-      try {
-        // HEADリクエストを送信してContent-Typeを取得
-        const response = await fetch(url, { method: "HEAD" });
-        const contentType = response.headers.get("Content-Type");
-
-        if (contentType?.startsWith("image/")) {
-          return "image";
-        } else if (contentType?.startsWith("video/")) {
-          return "movie";
-        } else if (contentType?.startsWith("audio/")) {
-          return "audio";
-        } else if (contentType?.includes("model/")) {
-          return "3D";
-        } else {
-          return "url";
-        }
-      } catch (error) {
-        return "url";
-      }
-    }
-  } catch (error) {
-    return "text";
-  }
-};
 
 export const numberQuoteEncode = (text: string, tags: string[][]): string => {
   try {
@@ -297,31 +231,19 @@ export async function parseText(
           // Split the URL into its proper parts
           const urlPart = url.slice(0, lastUnpairedParenIndex);
           const textPart = url.slice(lastUnpairedParenIndex);
-
-          const urlType = await checkFileExtension(urlPart);
-          if (urlType === "image") {
-            parts.push({
-              type: urlType,
-              content: urlPart,
-              url: urlPart,
-              number: mediaNum,
-            });
-            mediaNum++;
-          } else {
-            //|| urlType === "audio" || urlType === "movie"
-            parts.push({
-              type: urlType,
-              url: urlPart,
-              content: urlPart,
-            });
-          }
-
+          parts.push({
+            type: "url",
+            content: urlPart,
+            url: urlPart,
+            number: mediaNum,
+          });
           if (textPart) {
             parts.push({
               type: "text",
               content: textPart,
             });
           }
+
           break;
         case "emoji":
           const emojiContent = match[0].slice(1, -1); // Remove surrounding colons

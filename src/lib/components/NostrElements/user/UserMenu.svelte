@@ -204,7 +204,13 @@
   >{/if}
 
 {#if metadata}
-  <ModalJson bind:dialogOpen note={metadata} {profile} {tieKey} />{/if}
+  <ModalJson
+    bind:dialogOpen
+    note={metadata}
+    {profile}
+    {tieKey}
+    zIndex={50}
+  />{/if}
 <!-- <Dialog bind:open={dialogOpen}>
   {#snippet main()}
     <div>

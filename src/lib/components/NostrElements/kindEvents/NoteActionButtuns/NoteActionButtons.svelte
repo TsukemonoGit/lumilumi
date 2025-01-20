@@ -196,7 +196,7 @@
           tags.push([
             "a",
             atag,
-            relayhints[0] ?? "",
+            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
             "" /*marker*/,
             note.pubkey,
           ]);
@@ -204,7 +204,7 @@
           tags.push([
             "e",
             note.id,
-            relayhints[0] ?? "",
+            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
             "" /*marker*/,
             note.pubkey,
           ]);
@@ -384,10 +384,10 @@
         item.length > 2 &&
         item[3] === "root"
     );
-
+    const hint = relaylist.filter((r) => r.startsWith("wss://")); //ws://は除く
     const addTag = atag
-      ? ["a", atag, relaylist?.[0] ?? ""]
-      : ["e", note.id, relaylist?.[0] ?? ""];
+      ? ["a", atag, hint?.[0] ?? ""]
+      : ["e", note.id, hint?.[0] ?? ""];
 
     if (root) {
       // if (note.kind !== 42) {

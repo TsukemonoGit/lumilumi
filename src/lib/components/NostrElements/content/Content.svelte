@@ -68,7 +68,9 @@
 
 <Dialog bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
-    <div class=" rounded-md p-2 bg-zinc-800/40 max-w-full overflow-x-hidden">
+    <div
+      class=" rounded-md p-2 bg-zinc-800/40 max-w-[90vw] w-[640px] overflow-x-hidden"
+    >
       <ContentParts
         {maxHeight}
         {text}

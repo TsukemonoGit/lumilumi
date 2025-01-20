@@ -300,54 +300,61 @@
 
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
-    <div class="flex gap-1 items-center">
-      <input
-        type="text"
-        class=" rounded-md h-8 px-2 border border-magnum-300 disabled:opacity-25"
-        maxlength="32"
-        placeholder="name"
-        bind:value={saveName}
-      /><button
-        class="h-8 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-        onclick={handleClickSave}>SAVE</button
-      >
-    </div>
-
-    <div class="rounded-md border border-magnum-600 mt-2">
-      <table>
-        <thead>
-          <tr>
-            <th>name</th><th>created_at</th><th>load</th><th>delete</th>
-          </tr></thead
+    <div
+      class="w-[600px] h-[400px] max-w-[90vw] max-h-[90vh] overflow-x-hidden p-1"
+    >
+      <div class="flex gap-1 items-center">
+        <input
+          type="text"
+          class=" rounded-md h-8 px-2 border border-magnum-300 disabled:opacity-25"
+          maxlength="32"
+          placeholder="name"
+          bind:value={saveName}
+        /><button
+          class="h-8 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+          onclick={handleClickSave}>SAVE</button
         >
-        <tbody>
-          {#each kind30078LumiSettings as setting}
-            <tr
-              ><td>{setting.name}</td>
-              <td
-                ><time datetime={datetime(setting.created_at)}
-                  >{new Date(setting.created_at * 1000).toLocaleString()}</time
-                ></td
-              >
-              <td
-                ><button
-                  class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-                  onclick={() => handleClickLoad(setting.name)}>LOAD</button
-                ></td
-              >
-              <td
-                ><button
-                  class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
-                  onclick={() => handleClickDelete(setting.name)}>DELETE</button
-                ></td
-              >
-            </tr>{/each}
-        </tbody>
-      </table>
-      {#if kind30078LumiSettings.length <= 0}
-        <!---->
-        <p class="text-center">no data</p>
-      {/if}
+      </div>
+
+      <div class="rounded-md border border-magnum-600 mt-2">
+        <table>
+          <thead>
+            <tr>
+              <th>name</th><th>created_at</th><th>load</th><th>delete</th>
+            </tr></thead
+          >
+          <tbody>
+            {#each kind30078LumiSettings as setting}
+              <tr
+                ><td>{setting.name}</td>
+                <td
+                  ><time datetime={datetime(setting.created_at)}
+                    >{new Date(
+                      setting.created_at * 1000
+                    ).toLocaleString()}</time
+                  ></td
+                >
+                <td
+                  ><button
+                    class="h-6 px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+                    onclick={() => handleClickLoad(setting.name)}>LOAD</button
+                  ></td
+                >
+                <td
+                  ><button
+                    class="h-6 px-2 rounded-md bg-magnum-400 font-medium text-magnum-800 hover:opacity-75 active:opacity-50"
+                    onclick={() => handleClickDelete(setting.name)}
+                    >DELETE</button
+                  ></td
+                >
+              </tr>{/each}
+          </tbody>
+        </table>
+        {#if kind30078LumiSettings.length <= 0}
+          <!---->
+          <p class="text-center">no data</p>
+        {/if}
+      </div>
     </div>
   {/snippet}
 </Dialog>

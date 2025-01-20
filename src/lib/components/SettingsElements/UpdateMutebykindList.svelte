@@ -102,7 +102,9 @@
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
-    <div>
+    <div
+      class="w-[630px] h-[480px] max-w-[90vw] max-h-[90vh] overflow-x-hidden"
+    >
       {#if $mutebykinds}
         <h2 class="m-0 text-lg font-medium">Mute By Kind</h2>
         {#each $mutebykinds.list as list, index}

@@ -18,6 +18,7 @@
   import { isvalidURL } from "$lib/func/ogp";
   import { untrack } from "svelte";
   import Content3D from "./Content3D.svelte";
+  import UrlDisplay from "./UrlDisplay.svelte";
 
   interface Props {
     text: string;
@@ -55,21 +56,22 @@
   //$: console.log(parts);
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  let mediaList = $derived(
-    parts
-      .filter(
-        (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-      )
-      .map((p) => p.url)
-      .filter((t) => t !== undefined)
-  );
-
+  // let mediaList = $derived(
+  //   parts
+  //     .filter(
+  //       (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
+  //     )
+  //     .map((p) => p.url)
+  //     .filter((t) => t !== undefined)
+  // );
+  let mediaList: string[] = $state([]);
   //let modalIndex = 0;
-  const openModal = (index: number) => {
+  let openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
     //   console.log("viewmedia");
-    $viewMediaModal = { index: index, mediaList: mediaList };
+    $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
+    console.log(index, $state.snapshot(mediaList));
   };
 
   const nip19Decode = (
@@ -127,70 +129,9 @@
         {repostable}
         {tieKey}
       />{:else}{part.content}{/if}
-  {:else if part.type === "image" && part.content}
-    <ContentImage
-      src={part.content}
-      url={part.url}
-      number={part.number}
-      {openModal}
-    />
-  {:else if part.type === "movie"}
-    {#if lumiSetting.get().showImg}
-      <video
-        aria-label="video contents"
-        controls
-        src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></video
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}
-  {:else if part.type === "audio"}
-    {#if lumiSetting.get().showImg}
-      <audio
-        aria-label="audio contents"
-        controls
-        src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></audio
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}
-  {:else if part.type === "3D"}
-    <Content3D content={part.content} url={part.url} />
   {:else if part.type === "url"}
-    <!--http://はなし httpsだけ-->
-    {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
-        url={part.content ?? ""}
-        >{#snippet renderContent(contents)}
-          {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-            <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
-              props={{ "aria-label": `External Links: ${part.url}` }}
-              className="underline text-magnum-300 break-all "
-              href={part.content ?? ""}
-              >{#snippet content()}{part.content ?? ""}{/snippet}</Link
-            >{/if}{/snippet}
-        {#snippet nodata()}
-          <Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
-            className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}
-            >{#snippet content()}{part.content ?? ""}{/snippet}</Link
-          >{/snippet}
-      </OGP>{:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}{:else if part.type === "emoji"}
+    <UrlDisplay {part} />
+  {:else if part.type === "emoji"}
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
     <a
