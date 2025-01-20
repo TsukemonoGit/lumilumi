@@ -53,7 +53,7 @@
       transition:fade={{ duration: 150 }}
     ></div>
     <div
-      class={`fixed left-1/2 top-1/2  max-h-[90vh] max-w-[96vw]
+      class={`fixed left-1/2 top-1/2  max-h-[90vh] max-w-[96vw] 
             -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
             p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
       style={`z-index:${zIndex}`}

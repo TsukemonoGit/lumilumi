@@ -55,7 +55,7 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore}>
   {#snippet main()}
-    <div class="flex items-center justify-center overflow-hidden w-hull">
+    <div class="flex items-center justify-center overflow-hidden">
       <model-viewer
         style="width:90vw; height:74vh; max-width:560px"
         lazy={true}
