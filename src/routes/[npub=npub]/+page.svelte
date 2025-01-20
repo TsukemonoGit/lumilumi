@@ -260,9 +260,7 @@
                   class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
                 >
                   {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
-                    <div
-                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden"
-                    >
+                    <div>
                       <Pin
                         class="-rotate-45 text-magnum-400"
                       />{#if e === "e"}<Note
