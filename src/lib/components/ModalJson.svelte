@@ -71,7 +71,7 @@
 <Dialog bind:open={dialogOpen} dialogTitle="EVENT JSON" zIndex={zIndex + 10}>
   {#snippet main()}
     <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
+      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh] max-w-[90vw] w-[640px]"
     >
       {JSON.stringify(note, null, 2)}
     </div>
