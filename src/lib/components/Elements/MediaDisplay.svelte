@@ -5,7 +5,6 @@
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
   import { queryClient } from "$lib/stores/stores";
-  import type { SvelteMap } from "svelte/reactivity";
 
   interface Props {
     open: Writable<boolean>;
@@ -50,7 +49,7 @@
   open.subscribe((value: boolean) => {
     //  console.log(value);
     if (value && images) {
-      //開いたタイミングでimagesからimageを抽出（？）
+      //開いたタイミングでimages（url全部入っててurl全部番号振られてる）からimageを抽出（？）
       displayImages = mediaCheck(images);
 
       $dialogOpen = true;
