@@ -237,6 +237,7 @@ export async function parseText(
             url: urlPart,
             number: mediaNum,
           });
+          mediaNum++;
           if (textPart) {
             parts.push({
               type: "text",

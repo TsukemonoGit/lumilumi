@@ -10,7 +10,7 @@
     src?: string | undefined;
     url?: string | undefined;
     number?: number | undefined;
-    openModal: any;
+    openModal: (index: number) => void;
   }
 
   let {

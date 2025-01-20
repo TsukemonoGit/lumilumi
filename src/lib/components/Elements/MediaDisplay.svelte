@@ -4,6 +4,8 @@
   import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
+  import { queryClient } from "$lib/stores/stores";
+  import type { SvelteMap } from "svelte/reactivity";
 
   interface Props {
     open: Writable<boolean>;
@@ -15,6 +17,7 @@
     images,
     currentIndex = $bindable(0),
   }: Props = $props();
+  let displayImages: { url: string; originalIndex: number }[] = $state([]); //imagesにはurl全部入る
 
   const {
     elements: {
@@ -32,33 +35,39 @@
   });
 
   const goToNext = () => {
-    if (images && images.length > 0) {
-      currentIndex = (currentIndex + 1) % images.length;
+    if (displayImages.length > 0) {
+      currentIndex = (currentIndex + 1) % displayImages.length;
     }
   };
 
   const goToPrev = () => {
-    if (images && images.length > 0) {
-      currentIndex = (currentIndex - 1 + images.length) % images.length;
+    if (displayImages.length > 0) {
+      currentIndex =
+        (currentIndex - 1 + displayImages.length) % displayImages.length;
     }
   };
 
   open.subscribe((value: boolean) => {
     //  console.log(value);
-    if (value) {
+    if (value && images) {
+      //開いたタイミングでimagesからimageを抽出（？）
+      displayImages = mediaCheck(images);
+
       $dialogOpen = true;
       $open = false;
     }
   });
 
-  // dialogOpen?.subscribe((value: boolean) => {
-  //   if (!value) {
-  //     images = undefined;
-  //   }
-  // });
+  function mediaCheck(images: string[]) {
+    return images
+      .map((url, index) => ({ url, originalIndex: index }))
+      .filter(
+        (item) => queryClient.getQueryData(["useUrl", item.url]) === "image"
+      );
+  }
 </script>
 
-{#if $dialogOpen && images && images.length > 0}
+{#if $dialogOpen && displayImages && displayImages.length > 0}
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
@@ -74,7 +83,9 @@
       <!-- {#if images[currentIndex].type === "image"} -->
       <img
         alt=""
-        src={images[currentIndex]}
+        src={$state.snapshot(
+          displayImages.find((img) => img.originalIndex === currentIndex)
+        )?.url}
         class="max-h-[100vh] max-w-[100vw] object-contain"
       />
       <!-- {:else if images[currentIndex].type === "movie"}<video
@@ -91,7 +102,7 @@
           <track default kind="captions" />
         </audio>{/if} -->
     </div>
-    {#if images && images.length > 1}
+    {#if displayImages.length > 1}
       <button
         use:melt={$content}
         class="fixed left-1 top-1/2 z-50 bg-neutral-100/75
@@ -118,7 +129,10 @@
     <div
       class="fixed bottom-0 right-0 z-50 text-neutral-800 px-1 bg-neutral-100/50"
     >
-      {currentIndex + 1}/{images?.length ?? 0}
+      {#if displayImages.length > 0}
+        {displayImages.findIndex((img) => img.originalIndex === currentIndex) +
+          1}/{displayImages.length}
+      {/if}
     </div>
   </div>
 {/if}
