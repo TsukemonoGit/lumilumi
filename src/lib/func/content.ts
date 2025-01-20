@@ -28,6 +28,10 @@ export interface Part {
   imageUrl?: string;
 }
 
+//旧引用
+export const numberRegex = /(#\[\d+\])/i;
+//
+
 export const numberQuoteEncode = (text: string, tags: string[][]): string => {
   try {
     const num = parseInt(text.slice(2, -1));
