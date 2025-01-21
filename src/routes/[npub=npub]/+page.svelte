@@ -41,6 +41,7 @@
   import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
   import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
+  import { page } from "$app/state";
 
   interface Props {
     data: {
@@ -65,21 +66,39 @@
   const excludeKind7 = (event: Nostr.Event) => {
     return event.kind === 7 && event.pubkey === data.pubkey;
   };
-  afterNavigate((navigate) => {
-    if (navigate.type !== "form") {
-      view = false;
-      req = createRxForwardReq(generateRandomId());
 
-      setTimeout(() => {
-        view = true;
-      }, 100);
-    }
-  });
   let userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   let timelineQuery = $derived(["user", "post", userPubkey]);
+
+  const {
+    elements: { root, list, content, trigger },
+    states: { value },
+  } = createTabs({
+    // defaultValue: "post",
+    //  onValueChange: handleChange,
+  });
+
+  const triggers = [
+    { id: "post", title: "Post", Icon: ReceiptText },
+    { id: "chat", title: "Chat", Icon: MessageSquareText },
+    { id: "reactions", title: "Reaction", Icon: Sticker },
+
+    { id: "followee", title: "Follow", Icon: Users },
+    { id: "emojis", title: "Emojis", Icon: SmilePlus },
+    { id: "bookmark", title: "Bookmark", Icon: BookMarked },
+
+    { id: "zap", title: "Zapped", Icon: Zap },
+    // { id: "pin", title: "Pin" },
+    { id: "relays", title: "Relay", Icon: RadioTower },
+  ];
+
+  const [send, receive] = crossfade({
+    duration: 150,
+    easing: cubicInOut,
+  });
 
   onMount(async () => {
     if (!isOnMount) {
@@ -90,8 +109,9 @@
     }
     view = true;
   });
+
   afterNavigate(async (navigate) => {
-    console.log("afterNavigate", navigate.type);
+    // console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form") {
       view = false;
       if (!isOnMount) {
@@ -104,12 +124,19 @@
     }
   });
   beforeNavigate((navigate) => {
-    console.log("beforeNavigate", navigate.type);
+    //console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
       $value = "post";
     }
   });
   async function init() {
+    console.log(page.url.hash);
+    const hash = triggers.find((t) => `#${t.id}` === page.url.hash);
+    if (hash) {
+      value.set(hash.id);
+    } else {
+      value.set("post");
+    }
     //ログインしてない＝10002リレーないから
     if (!$loginUser && data.relays && data.relays.length > 0) {
       setRelays(data.relays);
@@ -141,37 +168,10 @@
   // return next;
   // };
 
-  const {
-    elements: { root, list, content, trigger },
-    states: { value },
-  } = createTabs({
-    defaultValue: "post",
-    //  onValueChange: handleChange,
-  });
-
-  const triggers = [
-    { id: "post", title: "Post", Icon: ReceiptText },
-    { id: "chat", title: "Chat", Icon: MessageSquareText },
-    { id: "reactions", title: "Reaction", Icon: Sticker },
-
-    { id: "followee", title: "Follow", Icon: Users },
-    { id: "emojis", title: "Emojis", Icon: SmilePlus },
-    { id: "bookmark", title: "Bookmark", Icon: BookMarked },
-
-    { id: "zap", title: "Zapped", Icon: Zap },
-    // { id: "pin", title: "Pin" },
-    { id: "relays", title: "Relay", Icon: RadioTower },
-  ];
-
-  const [send, receive] = crossfade({
-    duration: 250,
-    easing: cubicInOut,
-  });
-
   value.subscribe((v) => {
     if (v) {
+      window.location.hash = v;
       const tabsElement = document?.querySelector("#userTabs");
-      console.log(v);
       setTimeout(() => {
         tabsElement?.scrollIntoView({
           block: "start",

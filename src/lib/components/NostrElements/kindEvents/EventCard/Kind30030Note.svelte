@@ -266,21 +266,22 @@
       {/if}
     {/each}<ClientTag depth={0} tags={note.tags} />
   </div>
-  {#if inMyCustomEmoji}
-    <button
-      disabled={$nowProgress || disabled}
-      onclick={handleClickRemove}
-      class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
-      >{$_("customEmoji.remove")}</button
-    >
-  {:else}
-    <button
-      onclick={handleClickAdd}
-      disabled={$nowProgress || disabled}
-      class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
-      >{$_("customEmoji.add")}</button
-    >
-  {/if}
+  {#if $loginUser}
+    {#if inMyCustomEmoji}
+      <button
+        disabled={$nowProgress || disabled}
+        onclick={handleClickRemove}
+        class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
+        >{$_("customEmoji.remove")}</button
+      >
+    {:else}
+      <button
+        onclick={handleClickAdd}
+        disabled={$nowProgress || disabled}
+        class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
+        >{$_("customEmoji.add")}</button
+      >
+    {/if}{/if}
   <NoteActionButtons {note} {repostable} {tieKey} />
 </div>
 
