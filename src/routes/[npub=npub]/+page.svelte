@@ -24,6 +24,7 @@
     BookMarked,
     Users,
     RadioTower,
+    SmilePlus,
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -31,13 +32,15 @@
   import * as Nostr from "nostr-typedef";
 
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
-  import PaginationList from "./PaginationList.svelte";
+  import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
-  import EllipsisMenuNaddr from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenuNaddr.svelte";
+
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
-  import { nip19 } from "nostr-tools";
+
   import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
+  import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
+  import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
 
   interface Props {
     data: {
@@ -152,7 +155,9 @@
     { id: "reactions", title: "Reaction", Icon: Sticker },
 
     { id: "followee", title: "Follow", Icon: Users },
+    { id: "emojis", title: "Emojis", Icon: SmilePlus },
     { id: "bookmark", title: "Bookmark", Icon: BookMarked },
+
     { id: "zap", title: "Zapped", Icon: Zap },
     // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relay", Icon: RadioTower },
@@ -723,155 +728,12 @@
         </div>
         <div use:melt={$content("bookmark")} class="content">
           {#if $value === "bookmark"}
-            <!---->
-            <LatestEvent
-              queryKey={["bookmark", data.pubkey]}
-              filters={[{ authors: [data.pubkey], kinds: [10003], limit: 1 }]}
-            >
-              {#snippet loading()}
-                <div class="p-1">
-                  <p>Loading...</p>
-                </div>
-              {/snippet}
-
-              {#snippet error()}
-                <div class="p-1">
-                  <p>{error}</p>
-                </div>
-              {/snippet}
-              {#snippet nodata()}
-                <div class="p-1">
-                  <p>Loading...</p>
-                </div>
-              {/snippet}
-              {#snippet children({ event, status })}
-                {#if event}
-                  {@const filteredList = event.tags.filter(
-                    (tag) =>
-                      (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") &&
-                      tag.length > 1
-                  )}
-                  <PaginationList
-                    list={filteredList.map((tag) => tag[1])}
-                    tieKey={userPubkey}
-                  >
-                    {#snippet children({ id, index })}
-                      {#if filteredList[index][0] === "e"}
-                        <Note
-                          {id}
-                          mini={false}
-                          displayMenu={true}
-                          depth={0}
-                          repostable={true}
-                          tieKey={userPubkey}
-                        />
-                        <!---->
-                      {:else if filteredList[index][0] === "a"}
-                        {@const naddr = parseNaddr(filteredList[index])}
-                        <LatestEvent
-                          queryKey={[
-                            "naddr",
-                            `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`,
-                          ]}
-                          filters={[
-                            naddr.identifier !== ""
-                              ? {
-                                  kinds: [naddr.kind],
-                                  authors: [naddr.pubkey],
-                                  "#d": [naddr.identifier],
-                                }
-                              : {
-                                  kinds: [naddr.kind],
-                                  authors: [naddr.pubkey],
-                                },
-                          ]}
-                        >
-                          {#snippet loading()}
-                            <div
-                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                            >
-                              {filteredList[index]}<EllipsisMenuNaddr
-                                naddr={nip19.naddrEncode(naddr)}
-                              />
-                            </div>
-                          {/snippet}
-                          {#snippet nodata()}
-                            <div
-                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                            >
-                              {filteredList[index]}<EllipsisMenuNaddr
-                                naddr={nip19.naddrEncode(naddr)}
-                              />
-                            </div>
-                          {/snippet}
-                          {#snippet error()}
-                            <div
-                              class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-                            >
-                              {filteredList[index]}<EllipsisMenuNaddr
-                                naddr={nip19.naddrEncode(naddr)}
-                              />
-                            </div>
-                          {/snippet}
-                          {#snippet children({ event })}
-                            <Metadata
-                              queryKey={["metadata", event.pubkey]}
-                              pubkey={event.pubkey}
-                            >
-                              {#snippet loading()}
-                                <div>
-                                  <EventCard
-                                    note={event}
-                                    displayMenu={true}
-                                    repostable={true}
-                                    tieKey={userPubkey}
-                                  />
-                                </div>
-                              {/snippet}
-                              {#snippet nodata()}
-                                <div>
-                                  <EventCard
-                                    note={event}
-                                    displayMenu={true}
-                                    repostable={true}
-                                    tieKey={userPubkey}
-                                  />
-                                </div>
-                              {/snippet}
-                              {#snippet error()}
-                                <div>
-                                  <EventCard
-                                    note={event}
-                                    displayMenu={true}
-                                    repostable={true}
-                                    tieKey={userPubkey}
-                                  />
-                                </div>
-                              {/snippet}
-                              {#snippet content({ metadata })}
-                                <EventCard
-                                  {metadata}
-                                  displayMenu={true}
-                                  repostable={true}
-                                  note={event}
-                                  tieKey={userPubkey}
-                                />
-                              {/snippet}
-                            </Metadata>
-                          {/snippet}
-                        </LatestEvent>
-                        <!---->
-                      {:else if filteredList[index][0] === "t"}
-                        [t,{id}]
-                        <!---->
-                      {:else}
-                        <!---->
-                        [r,{id}]
-                      {/if}
-                    {/snippet}
-                  </PaginationList>{/if}
-              {/snippet}
-            </LatestEvent>
+            <BookmarkTab pubkey={userPubkey} />
+          {/if}
+        </div>
+        <div use:melt={$content("emojis")} class="content">
+          {#if $value === "emojis"}
+            <CustomEmojiTab pubkey={userPubkey} />
           {/if}
         </div>
       </div>
