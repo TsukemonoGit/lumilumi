@@ -21,6 +21,7 @@
   import { nip19 } from "nostr-tools";
 
   import { lumiSetting, verifier } from "$lib/stores/globalRunes.svelte";
+  import { SmilePlus } from "lucide-svelte";
   interface Props {
     pubkey: string;
   }
@@ -118,9 +119,11 @@
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
-    <div>
+    <div class="w-[630px] max-w-[90vw] overflow-x-hidden">
       {#if $emojis}
-        <h2 class="m-0 text-lg font-medium">EmojiList</h2>
+        <h2 class="text-magnum-200 m-0 text-lg font-bold flex gap-1">
+          <SmilePlus />{$_("customEmoji.title")}
+        </h2>
         <div
           class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[60vh] flex flex-wrap"
         >

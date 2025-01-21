@@ -17,6 +17,8 @@
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { SmilePlus, Trash2 } from "lucide-svelte";
+  import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
 
   interface Props {
     note: Nostr.Event;
@@ -48,7 +50,27 @@
   // svelte-ignore non_reactive_update
   let dialogOpen: (bool: boolean) => void = () => {};
 
+  // Public key validation
+  const CheckLoginPubkey = async (): Promise<boolean> => {
+    const res = await validateLoginPubkey();
+    if (res.status) {
+      return true;
+    } else if (res.message) {
+      $toastSettings = {
+        title: "Error",
+        description: res.message,
+        color: "bg-red-500",
+      };
+    }
+    return false;
+  };
+
   async function handleClickMakeKind10030() {
+    //追加押してfetchしてデータなかったときにここだからすでにlogin signチェックされてるはず
+    // const checkPub = await CheckLoginPubkey();
+    // if (!checkPub) {
+    //   return;
+    // }
     console.log("make new 10030");
     dialogOpen?.(false);
     $nowProgress = true;
@@ -89,6 +111,10 @@
   }
 
   async function handleClickAdd() {
+    const checkPub = await CheckLoginPubkey();
+    if (!checkPub) {
+      return;
+    }
     console.log("myEmojiListに", atag, "を追加");
     $nowProgress = true;
     disabled = true;
@@ -145,8 +171,14 @@
     localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
+
   let disabled = $state(false);
+
   async function handleClickRemove() {
+    const checkPub = await CheckLoginPubkey();
+    if (!checkPub) {
+      return;
+    }
     console.log("myEmojiListから", inMyCustomEmoji, "を削除");
     $nowProgress = true;
     disabled = true;
@@ -271,15 +303,15 @@
       <button
         disabled={$nowProgress || disabled}
         onclick={handleClickRemove}
-        class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15"
-        >{$_("customEmoji.remove")}</button
+        class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
+        ><Trash2 />{$_("customEmoji.remove")}</button
       >
     {:else}
       <button
         onclick={handleClickAdd}
         disabled={$nowProgress || disabled}
-        class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15"
-        >{$_("customEmoji.add")}</button
+        class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
+        ><SmilePlus />{$_("customEmoji.add")}</button
       >
     {/if}{/if}
   <NoteActionButtons {note} {repostable} {tieKey} />

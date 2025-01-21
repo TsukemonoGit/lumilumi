@@ -35,6 +35,7 @@
   import { latest } from "rx-nostr/src";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
 
   interface Props {
     pubkey: string;
@@ -56,21 +57,14 @@
   let isfollowee: boolean = $derived(followList.get().has(pubkey));
 
   // Public key validation
-  const validateLoginPubkey = async (): Promise<boolean> => {
-    if (!$loginUser || $loginUser === "") return false;
-    try {
-      const signPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      )?.getPublicKey();
-      if ($loginUser !== signPubkey) {
-        showToast("Error", "login pubkey ≠ sign pubkey", "bg-red-500");
-        return false;
-      }
+  const CheckLoginPubkey = async (): Promise<boolean> => {
+    const res = await validateLoginPubkey();
+    if (res.status) {
       return true;
-    } catch (error) {
-      showToast("Error", "failed to get sign pubkey", "bg-red-500");
-      return false;
+    } else if (res.message) {
+      showToast("Error", res.message, "bg-red-500");
     }
+    return false;
   };
 
   // Show toast notification
@@ -82,7 +76,7 @@
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
-    if (!(await validateLoginPubkey())) return;
+    if (!(await CheckLoginPubkey())) return;
 
     const followState = followList.get().has(pubkey);
     const kind3Event: EventPacket | undefined =

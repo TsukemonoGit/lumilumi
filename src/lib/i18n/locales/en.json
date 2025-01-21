@@ -158,8 +158,9 @@
     }
   },
   "customEmoji": {
-    "remove": "Remove from My Custom Emoji List.",
-    "add": "Add to My Custom Emoji List."
+    "remove": "Remove from My Emojis",
+    "add": "Add to My Emojis",
+    "title": "Emojis"
   },
   "create": {
     "10030": {
