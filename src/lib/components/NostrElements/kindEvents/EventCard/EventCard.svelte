@@ -357,6 +357,7 @@
 
         <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
           <Kind42Note
+            {zIndex}
             {tieKey}
             {note}
             {displayMenu}
