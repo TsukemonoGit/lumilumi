@@ -18,10 +18,18 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
+    zIndex?: number;
   }
 
-  let { thread, displayMenu, note, depth, repostable, tieKey }: Props =
-    $props();
+  let {
+    thread,
+    displayMenu,
+    note,
+    depth,
+    repostable,
+    tieKey,
+    zIndex = 0,
+  }: Props = $props();
 
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
@@ -76,6 +84,7 @@
 
 <div class="relative">
   <Content
+    {zIndex}
     maxHeight={256}
     text={note.content}
     tags={note.tags}

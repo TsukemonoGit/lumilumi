@@ -4,20 +4,16 @@
   import DecodedContent from "../kindEvents/DecodedContent.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-  import OGP from "$lib/components/renderSnippets/OGP.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import { _ } from "svelte-i18n";
-  import ContentImage from "./ContentImage.svelte";
+
   import CustomEmoji from "./CustomEmoji.svelte";
   import ClientTag from "./ClientTag.svelte";
   import Geohash from "./geohash/Geohash.svelte";
   import ProxyTag from "$lib/components/NostrElements/content/ProxyTag.svelte";
 
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { isvalidURL } from "$lib/func/ogp";
+
   import { untrack } from "svelte";
-  import Content3D from "./Content3D.svelte";
+
   import UrlDisplay from "./UrlDisplay.svelte";
 
   interface Props {
