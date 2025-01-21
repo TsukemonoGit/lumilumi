@@ -1,5 +1,6 @@
 <script lang="ts">
   import { splitHexColorString } from "$lib/func/util";
+  import { followList } from "$lib/stores/globalRunes.svelte";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
   import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
@@ -22,6 +23,12 @@
     title = "",
     handleStateError = () => {},
   }: Props = $props();
+
+  const isfollowee = (pubkey: string | undefined) => {
+    if (!pubkey) return false;
+    return followList.get().has(pubkey);
+  };
+
   let avatarUrl = $derived.by(() => {
     if (!url) return "";
     try {
@@ -30,7 +37,11 @@
         // data: URLの場合はクエリパラメータを追加しない
         return url;
       }
-      aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
+      //フォロイーアイコンだけキャッシュ
+      if (isfollowee(pubkey)) {
+        aUrl.hash = "cache"; // ハッシュを "cache" に設定
+        //  aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
+      }
       return aUrl.toString(); // 修正した URL を設定
     } catch (e) {
       // URLのパースに失敗した場合は元のURLを返す

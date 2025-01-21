@@ -60,14 +60,15 @@ self.addEventListener("message", handleMessageEvent);
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 //これmanifestURLsがvite.configのglobPatternsの部分？
 
-// ?type=avatar を含む URL だけをキャッシュ
+// #cache を含む URL だけをキャッシュ
 registerRoute(
-  ({ url }) => url.searchParams.get("type") === "avatar",
+  ({ url }) => url.hash === "#cache",
+  //({ url }) => url.searchParams.get("type") === "avatar",
   new NetworkFirst({
     cacheName: "avatar-cache",
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 100,
+        maxEntries: 200,
         maxAgeSeconds: 60 * 60 * 24 * 7, // 7日
       }),
     ],
