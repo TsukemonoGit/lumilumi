@@ -54,7 +54,7 @@ export function extractZappedId(tags: string[][]): {
       (tag[0] === "e" && hexRegex.test(tag[1])) ||
       (tag[0] === "a" && nip33Regex.test(tag[1]))
   );
-  //console.log(eTag);
+  console.log(eTag);
   return {
     tag: eTag ? (eTag as string[]) : [],
   };
