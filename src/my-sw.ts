@@ -62,8 +62,7 @@ registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 
 // #cache を含む URL だけをキャッシュ
 registerRoute(
-  ({ url }) => url.hash === "#cache",
-  //({ url }) => url.searchParams.get("type") === "avatar",
+  ({ url }) => url.hash === "#cache", // #cache を含む URL をキャッシュ対象
   new NetworkFirst({
     cacheName: "avatar-cache",
     plugins: [
@@ -71,9 +70,17 @@ registerRoute(
         maxEntries: 200,
         maxAgeSeconds: 60 * 60 * 24 * 7, // 7日
       }),
+      {
+        cacheKeyWillBeUsed: async ({ request }) => {
+          const url = new URL(request.url);
+          url.hash = ""; // ハッシュ部分を削除
+          return url.toString(); // ハッシュを除外したURLをキャッシュキーとして利用
+        },
+      },
     ],
   })
 );
+//この修正により、https://example.com/image.jpg#cache という形式のリクエストでもキャッシュを利用可能になります。同時に、https://example.com/image.jpg のリクエストも同じキャッシュを利用できるため、柔軟な対応が可能です。
 
 // その他の画像、動画はキャッシュしない
 registerRoute(
