@@ -13,7 +13,10 @@ export const clientTag = [
   "wss://relay.nostr.band",
 ];
 export const monoZap = {
-  endoiunt: "https://coinos.io/api/lnurl/cea7d54f-ac93-4c5b-91c8-8d29c7f51510",
+  //https://${domain}/.well-known/lnurlp/${name} の callback の部分
+  //
+  endoiunt:
+    "https://livingroomofsatoshi.com/api/v1/lnurl/payreq/60920800-8f5c-4bcf-887c-789c24bd3f73",
 
   relays: [
     "wss://nostr.mutinywallet.com",
