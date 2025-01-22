@@ -123,10 +123,8 @@
         "olderData",
       ]);
       console.log("updateViewEvent");
-      const allEvents = _data ?? [];
-      if (olderdatas && olderdatas.length > 0) {
-        allEvents.push(...olderdatas);
-      }
+      const allEvents = [...(_data || []), ...(olderdatas || [])];
+
       untilTime =
         allEvents.length > 0
           ? allEvents[allEvents.length - 1].event.created_at
@@ -278,14 +276,14 @@
       );
       console.log("first older", older);
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined = queryClient.getQueryData([
-          ...queryKey,
-          "olderData",
-        ]);
+        // const olddata: EventPacket[] | undefined = queryClient.getQueryData([
+        //   ...queryKey,
+        //   "olderData",
+        // ]);
 
         queryClient.setQueryData(
           [...queryKey, "olderData"],
-          [...(olddata ?? []), ...older]
+          (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
         );
         //updateViewEvent($data);
       }
@@ -315,13 +313,16 @@
       );
       console.log(older);
       if (older.length > 0) {
-        const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
-          ...queryKey,
-          "olderData",
-        ]);
+        // const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
+        //   ...queryKey,
+        //   "olderData",
+        // ]);
         queryClient.setQueryData(
           [...queryKey, "olderData"],
-          [...(olderdatas ?? []), ...older]
+          (olderdatas: EventPacket[] | undefined) => [
+            ...(olderdatas ?? []),
+            ...older,
+          ]
         );
       }
     }

@@ -134,11 +134,10 @@
 
     queryKey = [...queryKey, ev.pubkey];
 
-    const queryData = queryClient.getQueryData(queryKey);
     const packet = formatToEventPacket(ev, isSuccessRelays[0]);
 
     //データセットされてないときだけするにする
-    if (isSuccessRelays.length > 0 && !queryData) {
+    if (isSuccessRelays.length > 0) {
       queryClient.setQueryData(queryKey, (oldData: EventPacket[] = []) => {
         // データの重複を排除し、新しいデータを追加//古いデータがすでにあるならそっちが保持されるようにする。
         const uniqueData = [
