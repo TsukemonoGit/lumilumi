@@ -4,7 +4,7 @@
   import * as Nostr from "nostr-typedef";
 
   import { viewport } from "$lib/func/useViewportAction";
-  import { followList } from "$lib/func/nostr";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubhex: string;
@@ -12,7 +12,7 @@
 
   let { pubhex }: Props = $props();
 
-  let petname = $derived(followList.get(pubhex));
+  let petname = $derived(followList.get().get(pubhex));
   let pubString = $derived(displayShortPub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {

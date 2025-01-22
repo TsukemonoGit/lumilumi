@@ -17,9 +17,8 @@ import { sortEventPackets } from "$lib/func/util";
 import { type QueryKey } from "@tanstack/svelte-query";
 
 import { muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
-import { userStatusMap } from "$lib/stores/globalRunes.svelte";
+import { followList, userStatusMap } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
-import { followList } from "$lib/func/nostr";
 
 export function filterId(
   id: string
@@ -354,7 +353,7 @@ export function reactionCheck() {
   return filter((packet: EventPacket) => {
     const loginUserPubkey = get(loginUser);
     const isFollowingUser = (pubkey: string) =>
-      followList && followList.has(pubkey);
+      followList.get() && followList.get().has(pubkey);
 
     const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind);
     const isSelfPost = packet.event.pubkey === loginUserPubkey;

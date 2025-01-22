@@ -33,6 +33,7 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
 import {
+  followList,
   lumiSetting,
   relayStateMap,
   verifier,
@@ -75,13 +76,10 @@ export function getDefaultWriteRelays(): string[] {
     .filter((config) => config.write)
     .map((config) => config.url);
 }
-export let followList: Map<string, string | undefined> = new Map<
-  string,
-  string | undefined
->();
+
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
-  if (followList.size > 0) {
+  if (followList.get().size > 0) {
     // まず、現在のローカルストレージのデータを取得
     const metadataStr = localStorage.getItem("metadata");
     let currentMetadata: [QueryKey, EventPacket][] = metadataStr
@@ -134,7 +132,7 @@ export function pubkeysIn(
     followingMap.set(pubkey, undefined);
   }
 
-  followList = followingMap;
+  //followList.set(new Map(followingMap));
   return followingMap;
 }
 
@@ -148,7 +146,7 @@ const saveMetadataToLocalStorage = (
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
-  if (followList.has(data.event.pubkey)) {
+  if (followList.get().has(data.event.pubkey)) {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
@@ -223,6 +221,7 @@ export const makeMainFilters = (
   //console.log(contacts);
 
   const pubkeyList = pubkeysIn(contacts, get(loginUser));
+
   const kinds = [1, 6];
   if (lumiSetting.get().showKind16) {
     kinds.push(16);
@@ -558,7 +557,7 @@ export function getMetadataList(
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
-      const petname = followList.get(packet.event.pubkey);
+      const petname = followList.get().get(packet.event.pubkey);
       // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,

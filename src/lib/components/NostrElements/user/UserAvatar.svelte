@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { followList } from "$lib/func/nostr";
   import { splitHexColorString } from "$lib/func/util";
+  import { followList } from "$lib/stores/globalRunes.svelte";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
   import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
@@ -33,7 +33,7 @@
         return url;
       }
       //フォロイーアイコンだけキャッシュ
-      if (pubkey && pubkey in followList) {
+      if (pubkey && pubkey in followList.get()) {
         aUrl.hash = "cache"; // ハッシュを "cache" に設定
         //  aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
       }

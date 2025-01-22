@@ -16,7 +16,7 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   import { _ } from "svelte-i18n";
-  import { followList } from "$lib/func/nostr";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50;
   let viewIndex = 0;
@@ -121,13 +121,13 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    if (onlyFollowee && followList) {
+    if (onlyFollowee && followList.get()) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return followList.has(event.pubkey);
+          return followList.get().has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && followList.has(kind9734.pubkey);
+          return kind9734 && followList.get().has(kind9734.pubkey);
         }
       });
     } else {
@@ -139,13 +139,13 @@
     if (event.pubkey === $loginUser) {
       return false;
     }
-    if ($onlyFollowee && followList) {
+    if ($onlyFollowee && followList.get()) {
       //フォロイーのみ
       if (event.kind !== 9735) {
-        if (!followList.has(event.pubkey)) return false;
+        if (!followList.get().has(event.pubkey)) return false;
       } else {
         const kind9734 = extractKind9734(event);
-        if (kind9734 !== undefined && !followList.has(kind9734.pubkey)) {
+        if (kind9734 !== undefined && !followList.get().has(kind9734.pubkey)) {
           return false;
         }
       }

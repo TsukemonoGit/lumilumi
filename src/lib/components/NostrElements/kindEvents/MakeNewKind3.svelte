@@ -13,6 +13,7 @@
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import SampleGlobalLink from "./SampleGlobalLink.svelte";
   import { formatToEventPacket } from "$lib/func/util";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   let dialogOpen: (bool: boolean) => void = $state(() => {});
 
@@ -59,7 +60,8 @@
           (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from)
         );
 
-        pubkeysIn(ev);
+        const pubkeyList = pubkeysIn(ev);
+        followList.set(pubkeyList);
       }
     }
     $nowProgress = false;
