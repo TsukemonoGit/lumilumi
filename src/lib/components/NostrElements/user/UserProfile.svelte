@@ -4,7 +4,7 @@
   import { encodetoNpub } from "$lib/func/encode";
   import { hexRegex } from "$lib/func/regex";
   import { profile, splitHexColorString } from "$lib/func/util";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import Avatar from "svelte-boring-avatars";
   import UserAvatar from "./UserAvatar.svelte";
 
@@ -21,6 +21,7 @@
   import Content from "../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";
+  import { followList } from "$lib/func/nostr";
 
   interface Props {
     // import * as Nostr from "nostr-typedef";
@@ -40,7 +41,7 @@
     tieKey,
     zIndex = 0,
   }: Props = $props();
-  let petname = $derived(followList.get()?.get(pubkey));
+  let petname = $derived(followList.get(pubkey));
 
   let pubcheck = $derived(hexRegex.test(pubkey));
 

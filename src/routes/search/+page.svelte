@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import {
+    followList,
+    promisePublishEvent,
+    usePromiseReq,
+  } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
   import SearchResult from "./SearchResult.svelte";
@@ -23,7 +27,6 @@
   import { npubRegex } from "$lib/func/regex";
 
   import type { PageData } from "./$types";
-  import { followList } from "$lib/stores/globalRunes.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
@@ -183,8 +186,8 @@
 
       authors: npubRegex.test(searchPubkey?.trim() ?? "")
         ? [getHex(searchPubkey?.trim() ?? "")]
-        : followee && followList.get()
-          ? Array.from(followList.get().keys())
+        : followee && followList
+          ? Array.from(followList.keys())
           : undefined,
       since: !Number.isNaN(searchSince) ? searchSince : undefined,
       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,

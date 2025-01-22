@@ -6,8 +6,8 @@
   import FollowButton from "../../user/FollowButton.svelte";
   import Content from "../../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import { followList } from "$lib/func/nostr";
 
   interface Props {
     displayMenu: boolean;
@@ -26,7 +26,7 @@
   }: Props = $props();
 
   let prof = $derived(profile(note));
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get(note.pubkey));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">

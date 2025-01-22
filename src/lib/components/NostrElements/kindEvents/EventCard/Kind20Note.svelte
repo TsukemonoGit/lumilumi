@@ -13,7 +13,7 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   import { reverseConvertMetaTags, type Imeta } from "$lib/func/imeta";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ContentImage from "../../content/ContentImage.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
@@ -66,16 +66,6 @@
     kind: note.kind,
   };
 
-  let nevent = nip19.neventEncode(eventpointer);
-
-  const handleClickToNotepage = () => {
-    //Goto Note page
-
-    goto(`/${nevent}`);
-  };
-
-  let prof = $derived(profile(metadata));
-  let petname = $derived(followList.get().get(note.pubkey));
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;

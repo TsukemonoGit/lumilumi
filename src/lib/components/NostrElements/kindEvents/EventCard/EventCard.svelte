@@ -25,7 +25,7 @@
   import Kind42Note from "./Kind42Note.svelte";
   import NoteTemplate from "../NoteTemplate.svelte";
   import Kind9735Note from "./Kind9735Note.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { followList, getRelaysById } from "$lib/func/nostr";
   import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
   import { goto } from "$app/navigation";
   import ShowStatus from "../Status/ShowStatus.svelte";
@@ -51,7 +51,6 @@
 
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import {
-    followList,
     lumiSetting,
     timelineFilter,
     viewEventIds,
@@ -274,7 +273,7 @@
 
   let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
 
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get(note.pubkey));
 </script>
 
 <!-- {#if showCanvasationCheck} -->

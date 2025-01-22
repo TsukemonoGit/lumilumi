@@ -5,11 +5,11 @@
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
-  import { getRelaysById } from "$lib/func/nostr";
+  import { followList, getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
   import SeenonIcons from "./SeenonIcons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
   import { eventKinds } from "$lib/func/kinds";
 
@@ -37,7 +37,7 @@
     children,
     kindInfo = false,
   }: Props = $props();
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get(note.pubkey));
   // $: replaceable =
   //   (note.kind >= 30000 && note.kind < 40000) ||
   //   (note.kind >= 10000 && note.kind < 20000);

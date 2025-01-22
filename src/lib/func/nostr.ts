@@ -33,12 +33,10 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
 import {
-  followList,
   lumiSetting,
   relayStateMap,
   verifier,
 } from "$lib/stores/globalRunes.svelte";
-import { SvelteMap } from "svelte/reactivity";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -77,10 +75,13 @@ export function getDefaultWriteRelays(): string[] {
     .filter((config) => config.write)
     .map((config) => config.url);
 }
-
+export let followList: Map<string, string | undefined> = new Map<
+  string,
+  string | undefined
+>();
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
-  if (followList.get().size > 0) {
+  if (followList.size > 0) {
     // まず、現在のローカルストレージのデータを取得
     const metadataStr = localStorage.getItem("metadata");
     let currentMetadata: [QueryKey, EventPacket][] = metadataStr
@@ -110,12 +111,13 @@ metadataQueue.subscribe((queue) => {
 //   // +layout.svelteがstoreのgetMetadataFromLocalStorageでsetSavedMetadata
 //   savedMetadata = data;
 // }
+
 export function pubkeysIn(
   contacts: Nostr.Event,
   pubkey: string | undefined = undefined
-): SvelteMap<string, string | undefined> {
-  const followingMap: SvelteMap<string, string | undefined> =
-    contacts.tags.reduce((acc, [tag, value, relay, petname]) => {
+): Map<string, string | undefined> {
+  const followingMap = contacts.tags.reduce(
+    (acc, [tag, value, relay, petname]) => {
       // "p" タグのチェック
       //ちゃんとvalueがpubhexかかくにんしないといけない
       if (tag === "p" && !acc.has(value) && hexRegex.test(value)) {
@@ -123,22 +125,17 @@ export function pubkeysIn(
         acc.set(value, petname || undefined);
       }
       return acc;
-    }, new SvelteMap<string, string | undefined>());
+    },
+    new Map<string, string | undefined>()
+  );
 
   // 指定された pubkey が Map に存在しない場合、追加
   if (pubkey && !followingMap.has(pubkey)) {
     followingMap.set(pubkey, undefined);
   }
 
-  setFollowingList(followingMap);
+  followList = followingMap;
   return followingMap;
-}
-export function setFollowingList(data: SvelteMap<string, string | undefined>) {
-  // console.log(followList.get(), data);
-  if (followList.get()) {
-    followList.set(data);
-  }
-  // console.log(followingList);
 }
 
 const saveMetadataToLocalStorage = (
@@ -151,7 +148,7 @@ const saveMetadataToLocalStorage = (
     ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
   );
 
-  if (followList.get().has(data.event.pubkey)) {
+  if (followList.has(data.event.pubkey)) {
     if (existingIndex !== -1) {
       // 既に保存されているデータがある場合、上書きする
       if (
@@ -561,7 +558,7 @@ export function getMetadataList(
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
-      const petname = followList.get().get(packet.event.pubkey);
+      const petname = followList.get(packet.event.pubkey);
       // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,

@@ -5,7 +5,7 @@
 
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
   import { nip19 } from "nostr-tools";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { followList, getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
 
   import { eventKinds } from "$lib/func/kinds";
@@ -13,7 +13,7 @@
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
   interface Props {
@@ -79,7 +79,7 @@
   };
 
   let prof = $derived(profile(metadata));
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get(note.pubkey));
 </script>
 
 <div

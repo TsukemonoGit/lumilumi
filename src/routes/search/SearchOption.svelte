@@ -12,7 +12,7 @@
   import { eventKinds } from "$lib/func/kinds";
   import { _ } from "svelte-i18n";
   import { page } from "$app/state";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList } from "$lib/func/nostr";
   interface Props {
     searchWord: string | undefined;
     followee: boolean;
@@ -133,7 +133,7 @@
       bind:value={searchWord}
     />
   </div>
-  {#if followList.get() !== undefined && followList.get().size > 0}
+  {#if followList !== undefined && followList.size > 0}
     <div class="flex flex-col items-start justify-center mt-auto py-2">
       <label>
         <input
