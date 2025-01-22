@@ -47,7 +47,6 @@ export const replyedEvent = (
 };
 
 export function extractZappedId(tags: string[][]): {
-  kind: number | undefined;
   tag: string[];
 } {
   const eTag = tags?.find(
@@ -55,8 +54,8 @@ export function extractZappedId(tags: string[][]): {
       (tag[0] === "e" && hexRegex.test(tag[1])) ||
       (tag[0] === "a" && nip33Regex.test(tag[1]))
   );
+  console.log(eTag);
   return {
-    kind: undefined,
     tag: eTag ? (eTag as string[]) : [],
   };
 }

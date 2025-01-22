@@ -328,7 +328,7 @@
 
     const zapInvoice = await makeInvoice({
       metadata,
-      id: note.id,
+      eventTag: atag ? ["a", atag] : ["e", note.id],
       amount: amount,
       comment: zapComment,
       zapRelays: zapRelays,

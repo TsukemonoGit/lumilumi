@@ -22,7 +22,10 @@ export const monoZap = {
     "wss://relay.nostr.wirednet.jp",
   ],
   pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
-  noteId: "df6034a5676deca7bc687abc7dc2ea703a8de01954f0d87879cbc790a5ead234",
+  eventTag: [
+    "a",
+    "31990:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:1727506446612",
+  ],
 };
 export const nip50relays = [
   //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる

@@ -1,5 +1,5 @@
 import { verifyEvent, type EventTemplate } from "nostr-tools";
-import { getZapEndpoint, makeZapRequest } from "nostr-tools/nip57";
+import { getZapEndpoint } from "nostr-tools/nip57";
 import * as Nostr from "nostr-typedef";
 import { getDefaultWriteRelays, usePromiseReq } from "./nostr";
 import { bech32 } from "@scure/base";
@@ -12,14 +12,14 @@ import { decode } from "light-bolt11-decoder";
 
 export interface InvoiceProp {
   metadata: Nostr.Event;
-  id?: string;
+  eventTag?: string[];
   amount: number;
   comment: string;
   zapRelays: string[];
 }
 export async function makeInvoice({
   metadata,
-  id,
+  eventTag,
   amount, //1000かけたやつをいれる
   comment,
   zapRelays,
@@ -33,7 +33,7 @@ export async function makeInvoice({
 
     const zapRequest: EventTemplate = makeZapRequest({
       profile: metadata.pubkey,
-      event: id ?? null,
+      eventTag: eventTag ?? null,
       amount: amount,
       relays: zapRelays,
       comment: comment,
@@ -271,4 +271,38 @@ export function extractAmount(
     console.error("Error decoding bolt11 tag:", error);
     return;
   }
+}
+
+export function makeZapRequest({
+  profile,
+  eventTag,
+  amount,
+  relays,
+  comment = "",
+}: {
+  profile: string;
+  eventTag: string[] | null;
+  amount: number;
+  comment: string;
+  relays: string[];
+}): EventTemplate {
+  if (!amount) throw new Error("amount not given");
+  if (!profile) throw new Error("profile not given");
+
+  let zr: EventTemplate = {
+    kind: 9734,
+    created_at: Math.round(Date.now() / 1000),
+    content: comment,
+    tags: [
+      ["p", profile],
+      ["amount", amount.toString()],
+      ["relays", ...relays],
+    ],
+  };
+
+  if (eventTag) {
+    zr.tags.push(eventTag);
+  }
+
+  return zr;
 }
