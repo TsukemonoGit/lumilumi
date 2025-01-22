@@ -23,10 +23,10 @@
   import { npubRegex } from "$lib/func/regex";
 
   import type { PageData } from "./$types";
-  import { followList } from "$lib/stores/globalRunes.svelte";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   let { data }: { data: PageData } = $props();
 

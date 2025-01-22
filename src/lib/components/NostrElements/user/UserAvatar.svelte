@@ -24,11 +24,6 @@
     handleStateError = () => {},
   }: Props = $props();
 
-  const isfollowee = (pubkey: string | undefined) => {
-    if (!pubkey) return false;
-    return followList.get().has(pubkey);
-  };
-
   let avatarUrl = $derived.by(() => {
     if (!url) return "";
     try {
@@ -38,7 +33,7 @@
         return url;
       }
       //フォロイーアイコンだけキャッシュ
-      if (isfollowee(pubkey)) {
+      if (pubkey && pubkey in followList.get()) {
         aUrl.hash = "cache"; // ハッシュを "cache" に設定
         //  aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
       }

@@ -12,7 +12,7 @@
 
   let { pubhex }: Props = $props();
 
-  let petname = $derived(followList.get()?.get(pubhex));
+  let petname = $derived(followList.get().get(pubhex));
   let pubString = $derived(displayShortPub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {

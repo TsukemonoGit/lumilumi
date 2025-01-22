@@ -121,7 +121,7 @@
     events: Nostr.Event[],
     onlyFollowee: boolean
   ) => {
-    if (onlyFollowee && followList.get) {
+    if (onlyFollowee && followList.get()) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
           return followList.get().has(event.pubkey);
@@ -139,7 +139,7 @@
     if (event.pubkey === $loginUser) {
       return false;
     }
-    if ($onlyFollowee && followList.get) {
+    if ($onlyFollowee && followList.get()) {
       //フォロイーのみ
       if (event.kind !== 9735) {
         if (!followList.get().has(event.pubkey)) return false;

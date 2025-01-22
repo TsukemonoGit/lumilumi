@@ -34,8 +34,8 @@
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr/src";
   import { type QueryKey } from "@tanstack/svelte-query";
-  import { followList } from "$lib/stores/globalRunes.svelte";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -72,15 +72,16 @@
     $toastSettings = { title, description, color };
   };
 
-  let dialogCreateKind3Open: (bool: boolean) => void = $state(() => {});
+  // svelte-ignore non_reactive_update
+  let dialogCreateKind3Open: (bool: boolean) => void = () => {};
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
     if (!(await CheckLoginPubkey())) return;
 
-    const followState = followList.get().has(pubkey);
+    const followState = pubkey in followList.get();
     const kind3Event: EventPacket | undefined =
-      queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowListを持っていない可能性があるので取得する
+      queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowList.get()を持っていない可能性があるので取得する
 
     await refreshContactsData(kind3Event);
 
@@ -90,9 +91,9 @@
       return;
     }
 
-    //isfollowee = followList.get.has(pubkey);
+    //isfollowee = followList.get().get.has(pubkey);
 
-    if (followState !== followList.get().has(pubkey)) {
+    if (followState !== pubkey in followList.get()) {
       $nowProgress = false;
       return;
     }
@@ -124,7 +125,8 @@
     ) {
       queryClient.setQueryData(contactsQueryKey, (oldData: any) => newKind3[0]);
 
-      pubkeysIn(newKind3[0].event);
+      const pubkeyList = pubkeysIn(newKind3[0].event);
+      followList.set(pubkeyList);
       beforeKind3 = newKind3[0].event;
     } else if (kind3Event) {
       beforeKind3 = kind3Event.event;
@@ -185,12 +187,15 @@
       const packetEv = formatToEventPacket(ev, isSuccess[0]);
 
       queryClient.setQueryData(contactsQueryKey, packetEv);
-      pubkeysIn(ev);
+
+      const pubkeyList = pubkeysIn(ev);
+      followList.set(pubkeyList);
+
       const filters = makeMainFilters(ev, now());
       changeMainEmit(filters.mainFilters);
     }
 
-    //  isfollowee = followList.get.has(pubkey);
+    //  isfollowee = followList.get().get.has(pubkey);
     resetState();
   };
 
@@ -317,7 +322,7 @@
 <AlertDialog
   bind:openDialog={dialogOpen}
   onClickOK={publishEvent}
-  title={$_("user.followList.update")}
+  title={$_("user.followList.get().update")}
 >
   {#snippet main()}
     <div>

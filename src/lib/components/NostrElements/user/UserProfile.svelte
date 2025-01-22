@@ -40,7 +40,7 @@
     tieKey,
     zIndex = 0,
   }: Props = $props();
-  let petname = $derived(followList.get()?.get(pubkey));
+  let petname = $derived(followList.get().get(pubkey));
 
   let pubcheck = $derived(hexRegex.test(pubkey));
 

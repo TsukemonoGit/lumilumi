@@ -6,8 +6,8 @@
   import FollowButton from "../../user/FollowButton.svelte";
   import Content from "../../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { followList } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import { followList } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     displayMenu: boolean;

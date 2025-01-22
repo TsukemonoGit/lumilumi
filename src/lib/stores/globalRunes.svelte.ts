@@ -12,9 +12,9 @@ import { SvelteMap } from "svelte/reactivity";
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
 export const timelineFilter =
   createCustomStore<TimelineFilter>(timelineFilterInit);
-export const followList = createCustomStore<
-  SvelteMap<string, string | undefined>
->(new SvelteMap());
+export const followList = createCustomStore<Map<string, string | undefined>>(
+  new Map()
+);
 export const relayStateMap = createCustomStore<
   SvelteMap<string, ConnectionState>
 >(new SvelteMap());

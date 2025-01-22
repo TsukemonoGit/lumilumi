@@ -1,5 +1,6 @@
 <script lang="ts">
   import { followList } from "$lib/stores/globalRunes.svelte";
+
   import { onlyFollowee } from "$lib/stores/stores";
 
   import { _ } from "svelte-i18n";

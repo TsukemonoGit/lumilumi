@@ -13,6 +13,7 @@
   import { _ } from "svelte-i18n";
   import { page } from "$app/state";
   import { followList } from "$lib/stores/globalRunes.svelte";
+
   interface Props {
     searchWord: string | undefined;
     followee: boolean;

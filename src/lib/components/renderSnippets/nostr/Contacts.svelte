@@ -1,7 +1,9 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { app } from "$lib/stores/stores";
+  import { pubkeysIn } from "$lib/func/nostr";
+  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { app, loginUser } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
   import type { ReqStatus } from "$lib/types";
 
@@ -14,7 +16,8 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
+  import { get } from "svelte/store";
 
   interface Props {
     relays?: string[] | undefined;
@@ -97,6 +100,12 @@
   });
   $effect(() => {
     localStorage.setItem(kind3key, JSON.stringify(kind3Data));
+    if (kind3Data) {
+      untrack(() => {
+        const pubkeyList = pubkeysIn(kind3Data, get(loginUser));
+        followList.set(pubkeyList);
+      });
+    }
   });
 </script>
 

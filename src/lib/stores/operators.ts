@@ -351,10 +351,9 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
 
 export function reactionCheck() {
   return filter((packet: EventPacket) => {
-    const followListSet = followList.get;
     const loginUserPubkey = get(loginUser);
     const isFollowingUser = (pubkey: string) =>
-      followListSet && followListSet().has(pubkey);
+      followList.get() && followList.get().has(pubkey);
 
     const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind);
     const isSelfPost = packet.event.pubkey === loginUserPubkey;
