@@ -313,10 +313,10 @@
       console.log("first older", older);
 
       if (older.length > 0) {
-        const olddata: EventPacket[] | undefined =
-          queryClient.getQueryData(olderQueryKey);
-
-        queryClient.setQueryData(olderQueryKey, [...(olddata ?? []), ...older]);
+        queryClient.setQueryData(
+          olderQueryKey,
+          (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
+        );
         setTimeout(() => {
           updateViewEvent?.($globalData);
         }, 10); //ProfileがめんのTLが読み込み終わっても表示されない
