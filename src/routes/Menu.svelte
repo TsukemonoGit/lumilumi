@@ -4,7 +4,7 @@
   import { AlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
   import { loginUser } from "$lib/stores/stores";
-  import LumiIcon from "$lib/assets/lumi-chan.webp";
+
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
@@ -158,7 +158,7 @@
               >{#if lumiSetting.get().showImg}
                 <img
                   loading="lazy"
-                  src={LumiIcon}
+                  src="https://nostpic.com/media/cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a/419b9c108bea83bdbe5e4a17fd25f4bc401cfca547a49c1e99be2ebec8f5a203.webp"
                   alt="lumi"
                   width={80}
                   height={80}
