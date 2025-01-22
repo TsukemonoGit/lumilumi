@@ -61,8 +61,10 @@ registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 //これmanifestURLsがvite.configのglobPatternsの部分？
 
 // #cache を含む URL だけをキャッシュ
+let lastCheckedTime = 0; // 最後にチェックしたタイムスタンプ
+
 registerRoute(
-  ({ url }) => url.hash === "#cache", // #cache を含む URL をキャッシュ対象
+  ({ url }) => url.hash === "#cache",
   new NetworkFirst({
     cacheName: "avatar-cache",
     plugins: [
@@ -73,14 +75,54 @@ registerRoute(
       {
         cacheKeyWillBeUsed: async ({ request }) => {
           const url = new URL(request.url);
-          url.hash = ""; // ハッシュ部分を削除
-          return url.toString(); // ハッシュを除外したURLをキャッシュキーとして利用
+          url.hash = ""; // ハッシュを削除
+          return url.toString();
+        },
+      },
+      {
+        cachedResponseWillBeUsed: async ({
+          cacheName,
+          cachedResponse,
+          request,
+        }) => {
+          const now = Date.now();
+
+          // チェック間隔を制御 (例: 最小30秒間隔)
+          if (now - lastCheckedTime < 30 * 1000) {
+            return cachedResponse; // 前回チェックから30秒以内ならキャッシュをそのまま利用
+          }
+
+          lastCheckedTime = now; // チェック時間を更新
+
+          if (!cachedResponse) return null;
+
+          const cache = await caches.open(cacheName);
+          const url = new URL(request.url);
+          url.hash = "";
+          const cacheKey = new Request(url.toString());
+          const dateHeader = cachedResponse.headers.get("date");
+
+          if (dateHeader) {
+            const cachedTime = new Date(dateHeader).getTime();
+            const maxAge = 60 * 60 * 24 * 7 * 1000; // 7日
+            const remainingTime = cachedTime + maxAge - now;
+
+            if (remainingTime < 60 * 60 * 24 * 1000) {
+              const response = await fetch(request);
+              if (response.ok) {
+                await cache.put(cacheKey, response.clone());
+                return response;
+              }
+            }
+          }
+          return cachedResponse;
         },
       },
     ],
   })
 );
 //この修正により、https://example.com/image.jpg#cache という形式のリクエストでもキャッシュを利用可能になります。同時に、https://example.com/image.jpg のリクエストも同じキャッシュを利用できるため、柔軟な対応が可能です。
+//一定間隔（例: 30秒）以内のリクエストでは期限チェックをスキップし、キャッシュをそのまま返します。
 
 // その他の画像、動画はキャッシュしない
 registerRoute(
