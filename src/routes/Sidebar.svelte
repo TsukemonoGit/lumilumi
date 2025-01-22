@@ -12,7 +12,6 @@
   import { mainMenuItems } from "./menu";
   import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import LumiIcon from "$lib/assets/lumi-chan.webp";
 
   let encodedPub: string | undefined = $derived(pubCheck($loginUser));
 
@@ -86,7 +85,7 @@
           {#if lumiSetting.get().showImg}
             <img
               loading="lazy"
-              src={LumiIcon}
+              src={"./lumi-chan.webp"}
               alt="lumi"
               width={80}
               height={80}
