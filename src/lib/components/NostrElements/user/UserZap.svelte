@@ -37,7 +37,7 @@
     const zapRelays = await getZapRelay(metadata.pubkey);
     const zapInvoice = await makeInvoice({
       metadata,
-      id: undefined,
+      eventTag: undefined,
       amount: amount,
       comment: zapComment,
       zapRelays: zapRelays,

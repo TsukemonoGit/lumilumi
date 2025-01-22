@@ -11,7 +11,7 @@
   import Github from "../settings/Github.svelte";
   import { _ } from "svelte-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import { makeZapRequest } from "nostr-tools/nip57";
+
   import type { EventTemplate } from "nostr-tools";
   import { monoZap } from "$lib/func/constants";
   import * as Nostr from "nostr-typedef";
@@ -19,6 +19,7 @@
   import { QueryObserver } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
+  import { makeZapRequest } from "$lib/func/zap";
 
   const handleClickShare = async () => {
     //share link
@@ -54,7 +55,7 @@
   let invoice: string | undefined = $state(undefined);
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", monoZap.noteId, "zapped", $loginUser],
+    queryKey: ["reactions", monoZap.eventTag[1], "zapped", $loginUser],
   });
   let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {
@@ -70,7 +71,7 @@
     try {
       const zapRequest: EventTemplate = makeZapRequest({
         profile: monoZap.pubkey,
-        event: monoZap.noteId,
+        eventTag: monoZap.eventTag,
         amount: amount,
         relays: monoZap.relays,
         comment: zapComment,
@@ -109,7 +110,9 @@
           //購読対象から削除
           const index = viewEventIds
             .get()
-            .findIndex((item) => item[0] === "e" && item[1] === monoZap.noteId);
+            .findIndex(
+              (item) => item[0] === "a" && item[1] === monoZap.eventTag[1]
+            );
           if (index !== -1) {
             viewEventIds.get().splice(index, 1);
           }
@@ -121,7 +124,7 @@
         }
       });
       //購読対象に追加
-      viewEventIds.get().push(["e", monoZap.noteId]);
+      viewEventIds.get().push(monoZap.eventTag);
       // viewEventIds.get = viewEventIds.get;
     } catch (error) {
       $toastSettings = {
@@ -319,7 +322,7 @@
 <ZapInvoiceWindow
   bind:openZapwindow={invoiceOpen}
   {invoice}
-  id={monoZap.noteId}
+  id={monoZap.eventTag[1]}
 />
 
 <style lang="postcss">

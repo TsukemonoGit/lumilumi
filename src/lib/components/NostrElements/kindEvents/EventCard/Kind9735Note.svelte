@@ -48,9 +48,8 @@
   const zapRequestEvent = extractKind9734(note);
 
   const zappedId: {
-    kind: number | undefined;
     tag: string[];
-  } = extractZappedId(note.tags);
+  } = extractZappedId(zapRequestEvent?.tags || []);
 
   const amount: number | undefined = extractAmount(note, zapRequestEvent);
   //console.log(amount);
