@@ -33,7 +33,7 @@
         return url;
       }
       //フォロイーアイコンだけキャッシュ
-      if (pubkey && pubkey in followList.get()) {
+      if (pubkey && followList.get().has(pubkey)) {
         aUrl.hash = "cache"; // ハッシュを "cache" に設定
         //  aUrl.searchParams.set("type", "avatar"); // クエリパラメータを追加
       }
