@@ -79,7 +79,7 @@
   const handleFollow = async () => {
     if (!(await CheckLoginPubkey())) return;
 
-    const followState = pubkey in followList.get();
+    const followState = followList.get().has(pubkey);
     const kind3Event: EventPacket | undefined =
       queryClient.getQueryData(contactsQueryKey); //この時点ではまだfollowList.get()を持っていない可能性があるので取得する
 
@@ -93,7 +93,7 @@
 
     //isfollowee = followList.get().get.has(pubkey);
 
-    if (followState !== pubkey in followList.get()) {
+    if (followState !== followList.get().has(pubkey)) {
       $nowProgress = false;
       return;
     }

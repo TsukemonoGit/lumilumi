@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import {
     app,
@@ -28,11 +27,7 @@
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
-  import {
-    lumiSetting,
-    showBanner,
-    timelineFilter,
-  } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";

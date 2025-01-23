@@ -73,10 +73,10 @@
     if (onlyFollowee && followList.get()) {
       return events.filter((event) => {
         if (event.kind !== 9735) {
-          return event.pubkey in followList.get();
+          return followList.get().has(event.pubkey);
         } else {
           const kind9734 = extractKind9734(event);
-          return kind9734 && kind9734.pubkey in followList.get();
+          return kind9734 && followList.get().has(kind9734.pubkey);
         }
       });
     } else {
@@ -109,7 +109,7 @@
     if (note.pubkey === $loginUser || pTags.includes($loginUser)) {
       return true;
     }
-    //自分以外のopTags
+    //自分以外のpTags
     if (select === 2) {
       if (pTags.length > 0) {
         return false;
@@ -122,7 +122,7 @@
         return true;
       }
       // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((pub) => pub in followList.get());
+      const hasFollowed = pTags.some((pub) => followList.get().has(pub));
       return hasFollowed;
     } else {
       return true;
