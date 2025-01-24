@@ -54,6 +54,7 @@
   import { defaultRelays } from "$lib/stores/relays";
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
+  import { _ } from "svelte-i18n";
 
   let { data, children } = $props<{
     data:
@@ -147,6 +148,8 @@
       await nostrLogin.init({
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
+
+        description: $_("nostrlogin.description"),
       });
 
       //await nostrLogin.launch();
