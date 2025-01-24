@@ -98,10 +98,11 @@
     }
     return undefined;
   });
+
   $effect(() => {
-    localStorage.setItem(kind3key, JSON.stringify(kind3Data));
-    if (kind3Data) {
+    if (kind3Data && pubkey === $loginUser) {
       untrack(() => {
+        localStorage.setItem(kind3key, JSON.stringify(kind3Data));
         const pubkeyList = pubkeysIn(kind3Data, get(loginUser));
         followList.set(pubkeyList);
       });
