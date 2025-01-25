@@ -265,5 +265,8 @@
       "2": "The \"Sync\" settings will not be transferred, so please click each button again to synchronize."
     },
     "movebutton": "Move to a new domain"
+  },
+  "nostrlogin": {
+    "description": "This website is part of the Nostr network. Log in with your Nostr profile or sign up to join."
   }
 }

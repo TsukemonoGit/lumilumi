@@ -134,11 +134,11 @@
   }
 
   async function initializeSettings() {
-    //設定がまだないとき
-    if (browser) {
-      const nostrLogin = await import("nostr-login");
-      await nostrLogin.init({});
-    }
+    // //設定がまだないとき
+    // if (browser) {
+    //   const nostrLogin = await import("nostr-login");
+    //   await nostrLogin.init({});
+    // }
 
     try {
       const gotPubkey = await (
