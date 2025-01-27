@@ -21,6 +21,11 @@
   import Content from "../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";
+  import { _ } from "svelte-i18n";
+  import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import { type Writable, writable } from "svelte/store";
+  import type { Profile } from "$lib/types";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     // import * as Nostr from "nostr-typedef";
@@ -45,12 +50,21 @@
   let pubcheck = $derived(hexRegex.test(pubkey));
 
   let loadingText = $derived(encodetoNpub(pubkey));
+
+  // svelte-ignore non_reactive_update
+  let dialogOpen: Writable<boolean> = writable(false);
+
+  let prof: Profile | undefined = $state();
+
+  const metadataChange = (metadata: Nostr.Event) => {
+    prof = profile(metadata);
+  };
 </script>
 
 {#if !pubcheck}
   invalid pubkey
 {:else}
-  <Metadata queryKey={["metadata", pubkey]} {pubkey}>
+  <Metadata queryKey={["metadata", pubkey]} {pubkey} onChange={metadataChange}>
     {#snippet loading()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
@@ -100,22 +114,22 @@
       </div>
     {/snippet}
     {#snippet content({ metadata })}
-      {@const prof = profile(metadata)}
-
       {#if prof}
         <div class="flex flex-col">
           <div class="relative w-full">
             <div
               class="absolute bottom-0 left-1 flex flex-col h-fit justify-center items-center gap-2"
             >
-              <div class="border border-magnum-400 rounded-full">
+              <div class=" border border-magnum-400 rounded-full">
                 {#if lumiSetting.get().showImg && prof.picture && prof.picture !== ""}
-                  <UserAvatar
-                    url={prof.picture}
-                    name={pubkey}
-                    {pubkey}
-                    size={iconSize}
-                  />
+                  <button class="flex" onclick={() => ($dialogOpen = true)}>
+                    <UserAvatar
+                      url={prof.picture}
+                      name={pubkey}
+                      {pubkey}
+                      size={iconSize}
+                    /></button
+                  >
                 {:else}
                   <Avatar
                     size={iconSize}
@@ -126,7 +140,6 @@
                 {/if}
               </div>
             </div>
-
             <div
               class="bg-magnum-800 w-full border-b border-magnum-400"
               style="height:{bannerHeight}px"
@@ -199,7 +212,7 @@
                 className="text-sm underline text-magnum-300 break-all  "
                 href={prof.website}
                 >{#snippet content()}
-                  {prof.website}{/snippet}</Link
+                  {prof?.website}{/snippet}</Link
               >{/if}
 
             {#if lumiSetting.get().showUserStatus}<ShowStatus
@@ -225,3 +238,15 @@
     {/snippet}
   </Metadata>
 {/if}
+<!--JSON no Dialog-->
+<Dialog bind:open={dialogOpen} zIndex={zIndex + 10}>
+  {#snippet main()}
+    <div class="w-full h-full overflow-hidden flex justify-center items-center">
+      <img
+        alt=""
+        src={prof?.picture || ""}
+        class="max-h-full max-full object-contain"
+      />
+    </div>
+  {/snippet}
+</Dialog>

@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
+<!--Metadata.svelte-->
 <script lang="ts">
   //proxyをあれするやつ
   import { useMetadata } from "$lib/stores/useMetadata";
@@ -16,6 +16,7 @@
   } from "rx-nostr";
   import { getMetadata } from "$lib/func/nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -35,6 +36,7 @@
     content?: import("svelte").Snippet<
       [{ metadata: Nostr.Event; status: ReqStatus }]
     >;
+    onChange?: (metadata: Nostr.Event) => void;
   }
   let {
     req = undefined,
@@ -45,6 +47,7 @@
     loading,
     nodata,
     content,
+    onChange,
   }: Props = $props();
 
   //let initialDataUpdatedAt: number;
@@ -88,6 +91,11 @@
   let errorData = $derived(result.error);
 
   let metadata = $derived($data?.event ?? localData?.event);
+  $effect(() => {
+    if (metadata) {
+      untrack(() => onChange?.(metadata));
+    }
+  });
   //$inspect(metadata);
 </script>
 
