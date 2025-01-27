@@ -241,7 +241,9 @@
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen} zIndex={zIndex + 10}>
   {#snippet main()}
-    <div class="w-full h-full overflow-hidden flex justify-center items-center">
+    <div
+      class="w-[400px] h-[400px] max-w-[90vw] max-h-[80vh] overflow-hidden flex justify-center items-center p-1"
+    >
       <img
         alt=""
         src={prof?.picture || ""}
