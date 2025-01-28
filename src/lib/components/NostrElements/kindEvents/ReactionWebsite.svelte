@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Element with a slot='...' attribute must be a child of a component or a descendant of a custom element -->
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import Reaction from "./Reaction.svelte";
@@ -24,13 +23,6 @@
     tieKey: string | undefined;
   }
   let { note, metadata, displayMenu, tieKey, depth }: Props = $props();
-
-  // export let note: Nostr.Event;
-  // export let metadata: Nostr.Event | undefined;
-  // export let displayMenu: boolean;
-  // export let depth: number;
-
-  // export let tieKey: string | undefined;
 
   let website = $derived(reactionWebsite(note));
   function reactionWebsite(note: Nostr.Event): string | undefined {

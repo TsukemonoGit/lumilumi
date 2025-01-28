@@ -7,6 +7,7 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
+
   interface Props {
     id: string;
     mini?: boolean;

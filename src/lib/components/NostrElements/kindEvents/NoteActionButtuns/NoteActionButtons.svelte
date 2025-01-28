@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   import {
     Repeat2,
@@ -45,7 +44,7 @@
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import { _ } from "svelte-i18n";
   import { type QueryKey } from "@tanstack/svelte-query";
-  import { type EventPacket, now } from "rx-nostr";
+  import { type EventPacket } from "rx-nostr";
 
   import RepostList from "../../AllReactionsElement/RepostList.svelte";
   import ReactionList from "../../AllReactionsElement/ReactionList.svelte";
@@ -55,6 +54,10 @@
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import Reposted from "$lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
   import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
+  import {
+    isReplaceableKind,
+    isParameterizedReplaceableKind,
+  } from "nostr-tools/kinds";
 
   let {
     note,
@@ -62,9 +65,6 @@
     tieKey,
   }: { note: Nostr.Event; repostable: boolean; tieKey?: string | undefined } =
     $props();
-  // export let note: Nostr.Event;
-  // export let repostable: boolean;
-  // export let tieKey: string | undefined;
 
   let warning = $derived(
     note?.tags.find((item) => item[0] === "content-warning")
@@ -78,10 +78,8 @@
   let atag: string | undefined = $derived.by(() => {
     if (
       note &&
-      ((note.kind >= 10000 && note.kind < 20000) ||
-        (note.kind >= 30000 && note.kind < 40000) ||
-        note.kind === 0 ||
-        note.kind === 3)
+      (isReplaceableKind(note.kind) ||
+        isParameterizedReplaceableKind(note.kind))
     ) {
       //atag　で　りぽすと
       const dtag = note.tags.find((tag) => tag[0] === "d");
@@ -245,17 +243,7 @@
         setTimeout(() => {
           $postWindowOpen = true;
         }, 2);
-        // replyText = atag
-        //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
-        //   : ` nostr:${nevent} \n`;
 
-        // openReplyWindow = false;
-        // openQuoteWindow = true;
-        // setTimeout(() => {
-        //   textareaQuote.selectionEnd = 0;
-        //   cursorPosition = 0;
-        //   textareaQuote.focus();
-        // }, 60);
         break;
     }
   };
@@ -286,13 +274,6 @@
   let invoiceOpen: (bool: boolean) => void = () => {};
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
-  // const observer = $derived(
-  //   new QueryObserver(queryClient, {
-  //     queryKey: ["reactions", "zapped", queryId, $loginUser],
-  //   })
-  // );
-  // let unsubscribe: () => void;
-
   const handleClickZap = () => {
     const storagezap = localStorage.getItem("zap");
     if (storagezap) {
@@ -304,11 +285,6 @@
       amountEle?.focus();
     }, 1);
   };
-  // onMount(() => {
-  //   const storagezap = localStorage.getItem("zap");
-
-  //   zapAmount = Number(storagezap);
-  // });
 
   const onClickOK = async (metadata: Nostr.Event) => {
     invoice = undefined;
@@ -347,31 +323,9 @@
     dialogOpen?.(false);
     invoiceOpen?.(true);
 
-    //ザップウィンドウ閉じる処理ZapInvoiceOpenの方にかいてあったよ
-    //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
-    // const date = now();
-    // unsubscribe = observer.subscribe((result: any) => {
-    //   console.log(result);
-    //   if (result?.data?.event && result.data.event.created_at >= date) {
-    //     invoiceOpen?.(false);
-    //     unsubscribe?.();
-    //   }
-    // });
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
-
-  // $: if (!$invoiceOpen) {
-  //   invoice = undefined;
-  //   unsubscribe?.();
-  // }
-
-  // invoiceOpen.subscribe((value: boolean) => {
-  //   if (!value) {
-  //     invoice = undefined;
-  //     unsubscribe?.();
-  //   }
-  // });
 
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
@@ -409,7 +363,6 @@
     additionalPostOptions.set(options);
     setTimeout(() => {
       if (!$postWindowOpen) {
-        // console.log($state.snapshot($additionalPostOptions));
         $postWindowOpen = true; //trueにしたときにadditionalがundefinedにならないように
       }
     }, 2);
@@ -445,12 +398,6 @@
   });
   $effect(() => {
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
-      //   console.log($state.snapshot(viewEventIds.get.length));
-      // console.log(
-      //   queryClient.getQueriesData({
-      //     queryKey: ["reactions", queryId],
-      //   })
-      // );//これで立ったら複数クエリーの結果が出るけどqueryObserverでは複数のやつ同時にサブスクライブできない
       untrack(() => {
         debounceUpdate();
       });
@@ -502,12 +449,12 @@
   function hasAnyReaction(): boolean {
     return repost_length > 0 || reaction_length > 0 || zap_length > 0;
   }
-  //$: console.log(allReactions);
+
   let viewAllReactions: boolean = $state(false);
 </script>
 
 <div
-  class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden gap-1"
+  class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden"
 >
   <div class="flex gap-0.5 overflow-hidden">
     {#if lumiSetting.get().showAllReactions}

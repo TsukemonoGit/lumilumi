@@ -8,7 +8,7 @@
     note: Nostr.Event;
     depth: number;
     repostable: boolean;
-    maxHeight: number | undefined;
+
     displayMenu: boolean;
     tieKey: string | undefined;
     mini: any;
@@ -19,7 +19,7 @@
     note,
     depth,
     repostable,
-    maxHeight,
+
     displayMenu,
     tieKey,
     mini,

@@ -5,32 +5,23 @@ export const viewport: Action<
   HTMLElement,
   null,
   {
-    onenterViewport?: (e: CustomEvent) => void; // ビューポートに入った際のコールバック
-    onexitViewport?: (e: CustomEvent) => void; // ビューポートから出た際のコールバック
+    onenterViewport?: (e: CustomEvent) => void;
+    onexitViewport?: (e: CustomEvent) => void;
   }
-> = (node) => {
-  // IntersectionObserver のコールバック
+> = (node, parameter) => {
   const callback: IntersectionObserverCallback = (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        //   console.log("enter");
-        node.dispatchEvent(new CustomEvent("enterViewport"));
-      } else {
-        //    console.log("exit");
-        node.dispatchEvent(new CustomEvent("exitViewport"));
-      }
+      node.dispatchEvent(
+        new CustomEvent(entry.isIntersecting ? "enterViewport" : "exitViewport")
+      );
     });
   };
 
-  // 各ノードごとに個別の IntersectionObserver を作成
   const intersectionObserver = new IntersectionObserver(callback);
-
-  // このノードを監視対象に追加
   intersectionObserver.observe(node);
 
   return {
     destroy() {
-      // ノードの監視を解除
       intersectionObserver.unobserve(node);
     },
   };

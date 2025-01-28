@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Link from "$lib/components/Elements/Link.svelte";
-  import { Box, ExternalLink, ZoomIn } from "lucide-svelte";
+  import { Box, ZoomIn } from "lucide-svelte";
   import loaderIcon from "$lib/assets/loader.svg";
   import { _ } from "svelte-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
@@ -33,11 +32,6 @@
       touch-action="pan-y"
     ></model-viewer>
     <div class="absolute bottom-0 right-0 flex flex-col gap-2">
-      <!-- <Link
-        props={{ "aria-label": `External Links: ${url}` }}
-        className="text-magnum-300  hover:opacity-80"
-        href={src ?? ""}>{#snippet content()}<ExternalLink />{/snippet}</Link
-      > -->
       <button
         class="text-magnum-300 hover:opacity-80"
         onclick={() => ($showMore = true)}

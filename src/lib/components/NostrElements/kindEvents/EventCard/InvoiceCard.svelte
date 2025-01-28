@@ -3,7 +3,6 @@
   import { nowProgress } from "$lib/stores/stores";
   import { decode, type DecodedInvoice } from "light-bolt11-decoder";
   import { Zap } from "lucide-svelte";
-  import { writable, type Writable } from "svelte/store";
 
   interface Props {
     invoice: string;
@@ -32,13 +31,6 @@
   };
   let decoded = $derived(invoiceDecode(invoice));
   let amount = $derived(1);
-  // decoded?.sections
-  //   ? Math.floor(
-  //       Number(
-  //         decoded.sections.find((section) => section.name === "amount")?.value
-  //       ) / 1000
-  //     )
-  //   : undefined;
 </script>
 
 {#if !decoded || !amount}

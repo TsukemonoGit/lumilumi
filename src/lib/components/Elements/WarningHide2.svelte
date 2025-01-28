@@ -26,11 +26,6 @@
     : ''}"
   style=" opacity:{1 - $value[0] / 100}"
 >
-  <!-- TriangleAlertアイコン 
- <TriangleAlert
- size={"100%"}
- class="relative text-magnum-500/35 min-w-4  left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-h-52"
-/>-->
   <!-- スクロール可能なテキスト領域 -->
   <div
     class="absolute w-full top-0 text-magnum-500 font-bold text-xs flex justify-center items-center gap-1"
@@ -56,5 +51,5 @@
   <span
     use:melt={$thumbs[0]}
     class="h-5 w-5 rounded-full bg-magnum-500 focus:ring-4 focus:!ring-magnum-400/40"
-></span>
+  ></span>
 </span>

@@ -12,7 +12,7 @@
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
+
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { page } from "$app/state";
@@ -87,24 +87,11 @@
           };
         }
         break;
-      // case 4:
-      //   //Goto Note page
-      //   goto(`/${replaceable ? naddr : nevent}`);
-      //   break;
-      // case 5:
-      //   //open in emojito
-      //   const emojito = `https://emojito.meme/a/${naddr}`;
-
-      //   window.open(emojito, "_blank", "noreferrer");
-      //   break;
 
       case 6:
         //broadcast
         publishEvent(note);
-        // setTimeout(() => {
-        //   slicedEvent.update((value) => value);
-        //   console.log("こうしんしたよ");
-        // }, 1000);
+
         break;
       case 7:
         //share link
@@ -115,14 +102,6 @@
         };
         try {
           await navigator.share(shareData);
-          // await navigator.clipboard.writeText(
-          //   `${page.url.origin}/list/${naddr}`
-          // );
-          // $toastSettings = {
-          //   title: "Success",
-          //   description: `shared successfully`,
-          //   color: "bg-green-500",
-          // };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
@@ -159,24 +138,3 @@
 
 <!--JSON no Dialog-->
 <ModalJson bind:dialogOpen {note} {tieKey} />
-<!-- <Dialog bind:open={dialogOpen}>
-  {#snippet main()}
-    <div>
-      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-      >
-        {JSON.stringify(note, null, 2)}
-      </div>
-      <div class="my-1 break-all overflow-auto">
-  
-        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-        <div class=" font-mono font-bold text-xs">{naddr}</div>
-      </div>
-      <h2 class="m-0 text-lg font-medium">Seen on</h2>
-      <div class="break-words whitespace-pre-wrap">
-        {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-      </div>
-    </div>
-  {/snippet}</Dialog
-> -->

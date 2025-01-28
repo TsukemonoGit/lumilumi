@@ -41,7 +41,10 @@
   };
 </script>
 
-<span use:viewport onenterViewport={handleEnterViewport} class="inline-flex"
+<span
+  use:viewport={null}
+  onenterViewport={handleEnterViewport}
+  class="inline-flex"
   >{#if hasLoaded}{#if petname}📛{petname}{:else}@<Metadata
         queryKey={["metadata", pubhex]}
         pubkey={pubhex}

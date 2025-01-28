@@ -1,11 +1,8 @@
 <script lang="ts">
-  import { Music, TrendingUp } from "lucide-svelte";
   import StatusGeneral from "../../../renderSnippets/nostr/StatusGeneral.svelte";
 
-  import EllipsisMenu from "../NoteActionButtuns/EllipsisMenu.svelte";
   import { beforeNavigate } from "$app/navigation";
   import StatusMusic from "$lib/components/renderSnippets/nostr/StatusMusic.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
 
   import { page } from "$app/state";
 

@@ -754,12 +754,9 @@
     transition:fade={{ duration: 100 }}
     class=" z-20 rounded-lg bg-white shadow"
   >
-    <!-- <div use:melt={$arrow} /> -->
     <div
       class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
     >
-      <!-- <div class="text-zinc-300 font-bold pl-2 text-md py-2">Mute Type</div> -->
-
       {#each muteMenu as { id, addText, removeText, Icon }}
         {#if !muteStatus?.[id]}
           <button

@@ -12,18 +12,23 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
   import { eventKinds } from "$lib/func/kinds";
+  import type { Snippet } from "svelte";
+  import {
+    isReplaceableKind,
+    isParameterizedReplaceableKind,
+  } from "nostr-tools/kinds";
 
   interface Props {
     note: Nostr.Event;
     metadata?: Nostr.Event | undefined;
-    //export let status: string | undefined = undefined;
+
     mini?: boolean;
-    //export let tag: string[] | undefined;
+
     depth: number;
-    //const bech32Pattern = /<bech32>/;
+
     displayMenu?: boolean;
     tieKey: string | undefined;
-    children?: import("svelte").Snippet;
+    children?: Snippet;
     kindInfo?: boolean;
   }
 
@@ -38,34 +43,35 @@
     kindInfo = false,
   }: Props = $props();
   let petname = $derived(followList.get().get(note.pubkey));
-  // $: replaceable =
-  //   (note.kind >= 30000 && note.kind < 40000) ||
-  //   (note.kind >= 10000 && note.kind < 20000);
 
-  const replaceable =
-    (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000) ||
-    note.kind === 0 ||
-    note.kind === 3;
-  const eventpointer: nip19.EventPointer = {
+  let replaceable = $derived(
+    note &&
+      (isReplaceableKind(note.kind) ||
+        isParameterizedReplaceableKind(note.kind))
+  );
+
+  let eventpointer: nip19.EventPointer = $derived({
     id: note.id,
     relays: tieKey ? getRelaysById(note.id, tieKey) : [],
     author: note.pubkey,
     kind: note.kind,
-  };
-  const naddrpointer: nip19.AddressPointer = {
+  });
+
+  let naddrpointer: nip19.AddressPointer = $derived({
     kind: note.kind,
     identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
     pubkey: note.pubkey,
     relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-  };
-  const naddr = nip19.naddrEncode(naddrpointer);
-  const nevent = nip19.neventEncode(eventpointer);
+  });
+  let naddr = $derived(nip19.naddrEncode(naddrpointer));
+  let nevent = $derived(nip19.neventEncode(eventpointer));
+
   const handleClickToNotepage = () => {
     //Goto Note page
 
     goto(`/${replaceable ? naddr : nevent}`);
   };
+
   let prof = $derived(profile(metadata));
 </script>
 
@@ -126,7 +132,7 @@
         </button>
       {/if}
     </div>
-    <!--<hr />-->
+
     {@render children?.()}
   </div>
 </div>

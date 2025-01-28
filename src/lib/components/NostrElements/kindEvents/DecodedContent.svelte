@@ -59,7 +59,7 @@
 </script>
 
 <div
-  use:viewport
+  use:viewport={null}
   onenterViewport={handleEnterViewport}
   class="inline overflow-hidden"
 >
@@ -79,6 +79,7 @@
             {depth}
             {repostable}
             {tieKey}
+            {maxHeight}
           />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
@@ -93,6 +94,7 @@
             {depth}
             {repostable}
             {tieKey}
+            {maxHeight}
           />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span

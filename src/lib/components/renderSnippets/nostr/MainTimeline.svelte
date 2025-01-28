@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot subscribe to stores that are not declared at the top level of the component -->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import {
@@ -91,6 +90,7 @@
 
   let result = useMainTimeline(queryKey, setOperator(), filters);
   let data = $derived(result.data);
+  let deriveaData = $derived($data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
@@ -102,7 +102,7 @@
     }
   });
 
-  let isOnMount = false;
+  let isOnMount: boolean = false;
 
   let untilTime: number;
   let updating: boolean = false;
@@ -118,24 +118,27 @@
     }
 
     timeoutId = setTimeout(() => {
+      console.log("updateViewEvent");
+
       const olderdatas: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]);
-      console.log("updateViewEvent");
+
       const allEvents = [...(_data || []), ...(olderdatas || [])];
 
       untilTime =
         allEvents.length > 0
           ? allEvents[allEvents.length - 1].event.created_at
           : now();
+
       const uniqueEvents = sortEvents(
         Array.from(
           new Map(
             allEvents.map((event) => [event.event.id, event.event])
           ).values()
         )
-      ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+      );
 
       allUniqueEvents = uniqueEvents
         .filter(eventFilter)
@@ -143,44 +146,31 @@
 
       displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
       updating = false;
-    }, 50); // 連続で実行されるのを防ぐ
+    }, 20); // 連続で実行されるのを防ぐ
   };
 
   createQuery({
     queryKey: [...queryKey, "olderData"],
     queryFn: undefined,
-    staleTime: Infinity, // 4 hour
-    gcTime: Infinity, // 4 hour
+    staleTime: Infinity,
+    gcTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
 
-  // data?.subscribe((value) => {
-  //   if (updateViewEvent && ((value && viewIndex >= 0) || !$nowProgress)) {
-  //     updateViewEvent(value);
-  //   }
-  // });
-
-  let deriveaData = $derived($data);
-
   $effect(() => {
-    if ((deriveaData && viewIndex >= 0) || !$nowProgress)
-      untrack(() => dataChange(deriveaData, viewIndex, $nowProgress));
-  });
-
-  function dataChange(
-    data: EventPacket[] | null | undefined,
-    index: number,
-    progress: boolean
-  ) {
-    if ((data && index >= 0) || !progress) {
-      updateViewEvent(data);
+    if ((deriveaData && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => updateViewEvent(deriveaData));
     }
-  }
-
-  $effect(() => {
     if (tieKey) {
       untrack(() => setTie(tieKey));
+    }
+    if (timelineFilter.get()) {
+      untrack(() => updateViewEvent(deriveaData));
+      localStorage.setItem(
+        "timelineFilter",
+        JSON.stringify(timelineFilter.get())
+      );
     }
   });
 
@@ -194,14 +184,6 @@
       }
     }
   }
-  // if (tieKey) {
-  //   //$tieMapStore = { undefined: undefined };
-  //   if (!$tieMapStore) {
-  //     $tieMapStore = { [tieKey]: [tie, tieMap] };
-  //   } else if (!$tieMapStore?.[tieKey]) {
-  //     $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
-  //   }
-  // }
 
   function setOperator() {
     let operator = pipe(tie, uniq);
@@ -238,6 +220,10 @@
       isOnMount = false;
       $nowProgress = false;
     }
+  });
+
+  onDestroy(() => {
+    console.log("onDestroy");
   });
 
   async function init() {
@@ -285,7 +271,7 @@
           [...queryKey, "olderData"],
           (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
         );
-        //updateViewEvent($data);
+        //updateViewEvent(deriveaData);
       }
     }
     updateViewEvent();
@@ -313,10 +299,6 @@
       );
       console.log(older);
       if (older.length > 0) {
-        // const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
-        //   ...queryKey,
-        //   "olderData",
-        // ]);
         queryClient.setQueryData(
           [...queryKey, "olderData"],
           (olderdatas: EventPacket[] | undefined) => [
@@ -333,7 +315,7 @@
       viewIndex += sift; //スライドする量
     }
 
-    updateViewEvent($data);
+    updateViewEvent(deriveaData);
     $nowProgress = false;
   };
 
@@ -345,35 +327,15 @@
 
       viewIndex = Math.max(viewIndex - sift, 0);
       setTimeout(() => {
-        updateViewEvent($data);
+        updateViewEvent(deriveaData);
       }, 100);
     }
   };
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent($data);
+    updateViewEvent(deriveaData);
   }
-
-  onDestroy(() => {
-    console.log("test");
-  });
-  // $inspect($slicedEvent);
-  $effect(() => {
-    if (timelineFilter.get()) {
-      untrack(() => updateViewEvent($data));
-      localStorage.setItem(
-        "timelineFilter",
-        JSON.stringify(timelineFilter.get())
-      );
-    }
-  });
-  // timelineFilter.get()((value) => {
-  //   if (value) {
-  //     updateViewEvent($data);
-  //     localStorage.setItem("timelineFilter", JSON.stringify(value));
-  //   }
-  // });
 </script>
 
 {#if viewIndex !== 0}
@@ -407,9 +369,9 @@
   {@render content?.({
     events: displayEvents.get(),
     status: $status,
-    len: $data?.length ?? 0,
+    len: deriveaData?.length ?? 0,
   })}
-  <!-- <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} /> -->
+  <!-- <slot events={$slicedEvent} status={$status} len={deriveaData?.length ?? 0} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

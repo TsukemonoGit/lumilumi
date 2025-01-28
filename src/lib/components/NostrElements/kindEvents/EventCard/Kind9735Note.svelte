@@ -13,14 +13,9 @@
     getZapLNURLPubkey,
     extractAmount,
   } from "$lib/func/zap";
-  import { extractZappedId } from "$lib/func/event";
 
   import Kind9735Invalid from "./Kind9735Invalid.svelte";
-  import RepostedNote from "./RepostedNote.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-
-  import { encodetoNpub } from "$lib/func/encode";
-  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import ZappedNote from "./ZappedNote.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -43,32 +38,19 @@
     tieKey,
     mini,
   }: Props = $props();
-  let viewMuteEvent: boolean = $state(false);
+
   //kind9734の取得と検証
   const zapRequestEvent = extractKind9734(note);
 
-  const zappedId: {
-    tag: string[];
-  } = extractZappedId(zapRequestEvent?.tags || []);
-
   const amount: number | undefined = extractAmount(note, zapRequestEvent);
-  //console.log(amount);
-  //muteの値が変わったら更新する
-  const muteType = !zapRequestEvent
-    ? "null"
-    : excludefunc(zapRequestEvent)
-      ? "null"
-      : $mutes || $mutebykinds
-        ? muteCheck(zapRequestEvent)
-        : "null";
 </script>
 
-{#if !zapRequestEvent || !amount}<Kind9735Invalid
+{#if !zapRequestEvent || !amount}
+  <Kind9735Invalid
     {note}
     {repostable}
     {displayMenu}
     {depth}
-    {maxHeight}
     {tieKey}
     {mini}
     message={!zapRequestEvent
@@ -78,167 +60,171 @@
         : undefined}
   />{:else}
   {@const receivepub = zapRequestEvent?.tags.find((tag) => tag[0] === "p")?.[1]}
-  {#if !receivepub}<Kind9735Invalid
+  {#if !receivepub}
+    <ZappedNote
+      {zapRequestEvent}
+      {excludefunc}
+      {amount}
       {note}
-      {repostable}
-      {displayMenu}
       {depth}
+      {repostable}
       {maxHeight}
+      {displayMenu}
       {tieKey}
       {mini}
       message={"failed to get zapped user"}
     />
+
+    <!-- <Kind9735Invalid
+      {note}
+      {repostable}
+      {displayMenu}
+      {depth}
+      {tieKey}
+      {mini}
+      message={"failed to get zapped user"}
+    /> -->
   {:else}
     <Metadata queryKey={["metadata", receivepub]} pubkey={receivepub}>
       {#snippet loading()}
-        <div>
-          <Kind9735Invalid
+        <ZappedNote
+          {zapRequestEvent}
+          {excludefunc}
+          {amount}
+          {note}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+          {mini}
+          message={"loading zap recipient's data..."}
+        />
+
+        <!-- <Kind9735Invalid
             {note}
             {repostable}
             {displayMenu}
             {depth}
-            {maxHeight}
             {tieKey}
             {mini}
             message={"loading zap recipient's data..."}
-          />
-        </div>
+          /> -->
       {/snippet}
       {#snippet nodata()}
-        <div>
-          <Kind9735Invalid
+        <ZappedNote
+          {zapRequestEvent}
+          {excludefunc}
+          {amount}
+          {note}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+          {mini}
+          message={"failed to get zap recipient's data."}
+        />
+
+        <!-- <Kind9735Invalid
             {note}
             {repostable}
             {displayMenu}
             {depth}
-            {maxHeight}
             {tieKey}
             {mini}
             message={"failed to get zap recipient's data."}
-          />
-        </div>
+          /> -->
       {/snippet}
       {#snippet error()}
-        <div>
-          <Kind9735Invalid
+        <ZappedNote
+          {zapRequestEvent}
+          {excludefunc}
+          {amount}
+          {note}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {displayMenu}
+          {tieKey}
+          {mini}
+          message={"error to get zap recipient's data."}
+        />
+
+        <!-- <Kind9735Invalid
             {note}
             {repostable}
             {displayMenu}
             {depth}
-            {maxHeight}
             {tieKey}
             {mini}
             message={"error to get zap recipient's data."}
-          />
-        </div>
+          /> -->
       {/snippet}
       {#snippet content({ metadata: receiverMetadata })}
         {#await getZapLNURLPubkey(receiverMetadata)}
-          <Kind9735Invalid
+          <ZappedNote
+            {zapRequestEvent}
+            {excludefunc}
+            {amount}
             {note}
-            {repostable}
-            {displayMenu}
             {depth}
+            {repostable}
             {maxHeight}
+            {displayMenu}
             {tieKey}
             {mini}
             message={"Checking the LNURL Server's pubkey..."}
           />
+
+          <!-- <Kind9735Invalid
+            {note}
+            {repostable}
+            {displayMenu}
+            {depth}
+            {tieKey}
+            {mini}
+            message={"Checking the LNURL Server's pubkey..."}
+          /> -->
         {:then isValidEvent9735}
-          {#if !isValidEvent9735.pub}<Kind9735Invalid
+          {#if !isValidEvent9735.pub}
+            <ZappedNote
+              {zapRequestEvent}
+              {excludefunc}
+              {amount}
               {note}
-              {repostable}
-              {displayMenu}
               {depth}
+              {repostable}
               {maxHeight}
+              {displayMenu}
               {tieKey}
               {mini}
               message={isValidEvent9735.error}
             />
+
+            <!-- <Kind9735Invalid
+              {note}
+              {repostable}
+              {displayMenu}
+              {depth}
+              {tieKey}
+              {mini}
+              message={isValidEvent9735.error}
+            /> -->
           {:else}
-            {#if muteType !== "null" && depth >= 1}
-              <button
-                class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-                onclick={() => (viewMuteEvent = !viewMuteEvent)}
-              >
-                {viewMuteEvent ? "hide" : "view"} Mute: {muteType}
-              </button>
-            {/if}
-
-            {#if muteType === "null" || viewMuteEvent}
-              <Metadata
-                queryKey={["metadata", zapRequestEvent.pubkey]}
-                pubkey={zapRequestEvent.pubkey}
-              >
-                {#snippet content({ metadata })}
-                  <div class="flex gap-1 items-center align-middle">
-                    <Zap
-                      class="min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400"
-                      size={20}
-                    />
-                    {amount}
-
-                    <div class="self-center">
-                      <UserPopupMenu
-                        pubkey={zapRequestEvent.pubkey}
-                        {metadata}
-                        size={20}
-                        {depth}
-                        {tieKey}
-                      />
-                    </div>
-                    <div
-                      class="inline-block break-all break-words whitespace-pre-line"
-                    >
-                      {#if metadata}
-                        {@const prof = profile(metadata)}
-                        {#if prof}
-                          <DisplayName
-                            height={21}
-                            name={prof.display_name ?? ""}
-                            tags={metadata.tags}
-                          />{#if prof && prof.name && prof.name !== ""}<span
-                              class="text-magnum-100 text-sm"
-                              ><DisplayName
-                                height={21}
-                                name={`@${prof.name}`}
-                                tags={metadata.tags}
-                              />
-                            </span>{/if}{/if}
-                      {:else}
-                        <span class="text-magnum-100 text-sm"
-                          >@{encodetoNpub(zapRequestEvent.pubkey)}</span
-                        >
-                      {/if}
-                    </div>
-                    <UserPopupMenu
-                      pubkey={note.pubkey}
-                      metadata={undefined}
-                      size={20}
-                      {depth}
-                      {tieKey}
-                    />
-                    <div class="ml-auto">
-                      <NoteActionButtons {note} {repostable} {tieKey} />
-                    </div>
-                  </div>
-                  <div class="break-all text-sm px-2">
-                    {zapRequestEvent.content}
-                  </div>
-
-                  {#if zappedId.tag.length > 0}
-                    <RepostedNote
-                      tag={zappedId.tag}
-                      depth={depth + 1}
-                      {repostable}
-                      {displayMenu}
-                      {maxHeight}
-                      {tieKey}
-                    />
-                  {/if}
-                {/snippet}
-              </Metadata>
-            {/if}{/if}
+            <ZappedNote
+              {zapRequestEvent}
+              {excludefunc}
+              {amount}
+              {note}
+              {depth}
+              {repostable}
+              {maxHeight}
+              {displayMenu}
+              {tieKey}
+              {mini}
+            />
+          {/if}
         {/await}
       {/snippet}
     </Metadata>{/if}{/if}

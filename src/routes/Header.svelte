@@ -75,96 +75,92 @@
   };
 </script>
 
-<header>
-  <div class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
-    <div class="flex w-full h-8 justify-center items-center gap-4">
-      {#if Icon}
-        <div>
-          <Icon />
-        </div>
-      {/if}
-      <div class="uppercase font-bold">
-        {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
+<header class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
+  <div class="flex w-full h-8 justify-center items-center gap-4">
+    {#if Icon}
+      <div>
+        <Icon />
       </div>
-      <RelayStatus />
+    {/if}
+    <div class="uppercase font-bold">
+      {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
     </div>
-    {#if currentPage?.alt !== "settings"}<!--&& currentPage?.alt !== "about"-->
-      <div class="fixed w-full top-0">
-        <div class="container relative">
-          <div class="option">
-            <Popover ariaLabel="timeline filter setting" showCloseButton={true}>
-              <div
-                class=" flex items-center font-bold text-sm gap-1 rounded-full border text-magnum-200 border-magnum-300
-                hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
-              >
-                <SlidersHorizontal size={16} />Options
-              </div>
-              {#snippet popoverContent()}
-                <div class="w-[320px] max-w-full flex flex-col">
-                  <ul>
-                    {#if currentPage?.alt === "home"}
-                      <li class="mb-2">
-                        <div class="label">
-                          {$_("filter.menu.canversation")}
-                        </div>
-                        <div
-                          use:melt={$root}
-                          class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
-                          aria-label="View density"
-                        >
-                          {#each optionsArr as [index, option]}
-                            <div class="flex items-center gap-3">
-                              <button
-                                use:melt={$item(index)}
-                                class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
-        hover:bg-magnum-800"
-                                id={option}
-                                aria-labelledby="{option}-label"
-                              >
-                                {#if $isChecked(index)}
-                                  <div
-                                    class="h-3 w-3 rounded-full bg-magnum-400"
-                                  ></div>
-                                {/if}
-                              </button>
-                              <label for={option} id="{option}-label">
-                                {option}
-                              </label>
-                            </div>
-                          {/each}
-                          <input name="line-height" use:melt={$hiddenInput} />
-                        </div>
-                      </li>
-                    {/if}
-                    <li>
-                      <label class="label">
-                        <input
-                          type="checkbox"
-                          class="rounded-checkbox"
-                          checked={timelineFilter.get().adaptMute}
-                          onchange={onMuteChange}
-                        />
-                        {$_("filter.menu.muteOn")}
-                      </label>
-                    </li>
-                    <li>
-                      <label class="label">
-                        <input
-                          type="checkbox"
-                          class="rounded-checkbox"
-                          bind:checked={_showBanner}
-                        />
-                        {$_("settings.display.banner")}
-                      </label>
-                    </li>
-                  </ul>
-                </div>
-              {/snippet}</Popover
-            >
-          </div>
-        </div>
-      </div>{/if}
+    <RelayStatus />
   </div>
+  {#if currentPage?.alt !== "settings"}<!--&& currentPage?.alt !== "about"-->
+    <div class="fixed w-full top-0">
+      <div class="container relative">
+        <div class="option">
+          <Popover ariaLabel="timeline filter setting" showCloseButton={true}>
+            <div
+              class=" flex items-center font-bold text-sm gap-1 rounded-full border text-magnum-200 border-magnum-300
+                hover:bg-magnum-800/25 active:bg-magnum-700/25 px-3 py-1"
+            >
+              <SlidersHorizontal size={16} />Options
+            </div>
+            {#snippet popoverContent()}
+              <ul class="w-[320px] max-w-full flex flex-col">
+                {#if currentPage?.alt === "home"}
+                  <li class="mb-2">
+                    <div class="label">
+                      {$_("filter.menu.canversation")}
+                    </div>
+                    <div
+                      use:melt={$root}
+                      class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
+                      aria-label="View density"
+                    >
+                      {#each optionsArr as [index, option]}
+                        <div class="flex items-center gap-3">
+                          <button
+                            use:melt={$item(index)}
+                            class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
+        hover:bg-magnum-800"
+                            id={option}
+                            aria-labelledby="{option}-label"
+                          >
+                            {#if $isChecked(index)}
+                              <div
+                                class="h-3 w-3 rounded-full bg-magnum-400"
+                              ></div>
+                            {/if}
+                          </button>
+                          <label for={option} id="{option}-label">
+                            {option}
+                          </label>
+                        </div>
+                      {/each}
+                      <input name="line-height" use:melt={$hiddenInput} />
+                    </div>
+                  </li>
+                {/if}
+                <li>
+                  <label class="label">
+                    <input
+                      type="checkbox"
+                      class="rounded-checkbox"
+                      checked={timelineFilter.get().adaptMute}
+                      onchange={onMuteChange}
+                    />
+                    {$_("filter.menu.muteOn")}
+                  </label>
+                </li>
+                <li>
+                  <label class="label">
+                    <input
+                      type="checkbox"
+                      class="rounded-checkbox"
+                      bind:checked={_showBanner}
+                    />
+                    {$_("settings.display.banner")}
+                  </label>
+                </li>
+              </ul>
+            {/snippet}</Popover
+          >
+        </div>
+      </div>
+    </div>{/if}
 </header>
 
 <style lang="postcss">

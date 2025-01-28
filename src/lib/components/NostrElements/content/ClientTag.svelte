@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { parseNaddr } from "$lib/func/util";
-  //import { showClientTag } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
 
   interface Props {
@@ -31,4 +30,5 @@
       class={`inline float-end text-sm font-semibold text-neutral-200/50 w-fit whitespace-pre-wrap break-words`}
       style="word-break: break-word;"
       >via {clientTag[1]}
-    </span>{/if}{/if}
+    </span>{/if}
+{/if}

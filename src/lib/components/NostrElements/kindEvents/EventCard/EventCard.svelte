@@ -59,6 +59,10 @@
   import Kind20Note from "./Kind20Note.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import Kind30315Note from "./Kind30315Note.svelte";
+  import {
+    isReplaceableKind,
+    isParameterizedReplaceableKind,
+  } from "nostr-tools/kinds";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -95,10 +99,9 @@
 
   let atag: string | undefined = $derived.by(() => {
     if (
-      (note.kind >= 10000 && note.kind < 20000) ||
-      (note.kind >= 30000 && note.kind < 40000) ||
-      note.kind === 0 ||
-      note.kind === 3
+      note &&
+      (isReplaceableKind(note.kind) ||
+        isParameterizedReplaceableKind(note.kind))
     ) {
       //atag　で　りぽすと
       const dtag = note.tags.find((tag) => tag[0] === "d");
@@ -658,9 +661,6 @@
           {depth}
           {maxHeight}
           {warning}
-          {replyUsers}
-          {thread}
-          {replyTag}
           {repostable}
         />
       {:else}
