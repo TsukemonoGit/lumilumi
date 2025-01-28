@@ -130,12 +130,6 @@
 
   const [tie, tieMap] = createTie();
 
-  $effect(() => {
-    if (tieKey) {
-      untrack(() => setTie(tieKey));
-    }
-  });
-
   function setTie(_tieKey: string) {
     if (_tieKey) {
       //$tieMapStore = { undefined: undefined };
@@ -192,6 +186,12 @@
     if ($defaultRelays) {
       untrack(() => defaultRelayChange($defaultRelays));
     }
+    if (($globalData && viewIndex >= 0) || !$nowProgress) {
+      untrack(() => dataChange($globalData, viewIndex, $nowProgress));
+    }
+    if (tieKey) {
+      untrack(() => setTie(tieKey));
+    }
   });
 
   function defaultRelayChange(relays: Record<string, DefaultRelayConfig>) {
@@ -201,12 +201,6 @@
         .map((config) => config.url);
     }
   }
-
-  $effect(() => {
-    if (($globalData && viewIndex >= 0) || !$nowProgress) {
-      untrack(() => dataChange($globalData, viewIndex, $nowProgress));
-    }
-  });
 
   function dataChange(
     data: EventPacket[] | null | undefined,
@@ -256,35 +250,7 @@
     const ev: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
-    //if (ev) {
-    //   console.log(ev);
-
-    //  updateViewEvent($globalData);
-
-    //   //olderEventsから、今の時間までのあいだのイベントをとるやつ
-    //   const newFilters = filters.map((filter: Nostr.Filter) => ({
-    //     ...filter,
-    //     since: ev[0].event.created_at,
-    //     until: now(),
-    //   }));
-    //   const older = await firstLoadOlderEvents(0, newFilters, queryKey, relays);
-    //   if (older.length > 0) {
-    //     queryClient.setQueryData(
-    //       [...queryKey, "olderData"],
-    //       [...ev, ...older]
-    //     );
-    //   }
-    //   updateViewEvent($globalData);
-    //   }
-
     if (!ev || ev?.length <= 0) {
-      // const newFilters = filters.map((filter: Nostr.Filter) => ({
-      //   ...filter,
-      //   since: undefined,
-      //   until:
-      //     filter.until === undefined ? (filter.since ?? now()) : filter.until,
-      //   limit: 50,
-      // }));
       const newFilters: Nostr.Filter[] = olderFilters.map((filter) => {
         return {
           ...filter,

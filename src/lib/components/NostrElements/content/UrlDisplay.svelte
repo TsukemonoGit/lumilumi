@@ -8,7 +8,6 @@
   import ContentImage from "./ContentImage.svelte";
   import OGP from "$lib/components/renderSnippets/OGP.svelte";
   import { isvalidURL } from "$lib/func/ogp";
-  import ContentOneImage from "./ContentOneImage.svelte";
 
   interface Props {
     part: Part;

@@ -19,7 +19,7 @@
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
+
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
@@ -30,6 +30,10 @@
   import { translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import {
+    isReplaceableKind,
+    isParameterizedReplaceableKind,
+  } from "nostr-tools/kinds";
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -51,11 +55,11 @@
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
 
-  const replaceable =
-    (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000) ||
-    note.kind === 0 ||
-    note.kind === 3;
+  let replaceable = $derived(
+    note &&
+      (isReplaceableKind(note.kind) ||
+        isParameterizedReplaceableKind(note.kind))
+  );
 
   let menuTexts = $derived.by(() => {
     let menu = [
@@ -178,14 +182,6 @@
         //console.log(shareData);
         try {
           await navigator.share(shareData);
-          // await navigator.clipboard.writeText(
-          //   `${page.url.origin}/${replaceable ? naddr : nevent}`
-          // );
-          // $toastSettings = {
-          //   title: "Success",
-          //   description: `shared successfully`,
-          //   color: "bg-green-500",
-          // };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
@@ -234,10 +230,6 @@
         break;
     }
   };
-
-  // let nevent: string | undefined = $state();
-  // let naddr: string | undefined = $state();
-  // let encodedPubkey: string | undefined = $state(undefined);
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
     let nevent: string | undefined = undefined;
@@ -289,26 +281,3 @@
 
 <!--JSON no Dialog-->
 <ModalJson bind:dialogOpen {note} {tieKey} />
-<!-- <Dialog bind:open={dialogOpen}>
-  {#snippet main()}
-    <div>
-      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-      >
-        {JSON.stringify(note, null, 2)}
-      </div>
-      <div class="my-1 break-all overflow-auto">
-       
-        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-        <div class=" font-mono font-bold text-xs">
-          {replaceable ? naddr : nevent}
-        </div>
-      </div>
-      <h2 class="m-0 text-lg font-medium">Seen on</h2>
-      <div class="break-words whitespace-pre-wrap">
-        {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-      </div>
-    </div>
-  {/snippet}</Dialog
-> -->

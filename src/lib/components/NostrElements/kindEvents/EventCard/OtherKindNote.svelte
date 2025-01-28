@@ -15,6 +15,10 @@
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import {
+    isReplaceableKind,
+    isParameterizedReplaceableKind,
+  } from "nostr-tools/kinds"; //isAddressableKind
 
   interface Props {
     note: Nostr.Event;
@@ -52,11 +56,12 @@
     note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
   );
 
-  const replaceable =
-    (note.kind >= 30000 && note.kind < 40000) ||
-    (note.kind >= 10000 && note.kind < 20000) ||
-    note.kind === 0 ||
-    note.kind === 3;
+  let replaceable = $derived(
+    note &&
+      (isReplaceableKind(note.kind) ||
+        isParameterizedReplaceableKind(note.kind))
+  );
+
   const eventpointer: nip19.EventPointer = {
     id: note.id,
     relays: tieKey ? getRelaysById(note.id, tieKey) : [],

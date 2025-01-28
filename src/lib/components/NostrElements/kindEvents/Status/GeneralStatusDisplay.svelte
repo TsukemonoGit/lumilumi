@@ -12,7 +12,7 @@
   let { link, event, tieKey }: Props = $props();
 </script>
 
-{#if link && link !== ""}
+{#if (link && link !== "") || event.content.trim() !== ""}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       TriggerIcon={TrendingUp}
@@ -22,33 +22,31 @@
       {tieKey}
     />
   </div>
-  <a
-    class="underline"
-    target="_blank"
-    rel="noopener noreferrer"
-    title={link}
-    href={link}
-    ><div
-      class="truncate line-clamp-2 max-w-full"
-      style="	white-space: pre-wrap; word-break: break-word;"
+  {#if link && link !== ""}
+    <a
+      class="underline"
+      target="_blank"
+      rel="noopener noreferrer"
+      title={link}
+      href={link}
     >
-      <DisplayName height={20} name={event.content || link} tags={event.tags} />
-    </div></a
-  >
-{:else if event.content.trim() !== ""}
-  <div class=" min-w-[16px] h-[16px]">
-    <EllipsisMenu
-      {tieKey}
-      TriggerIcon={TrendingUp}
-      note={event}
-      iconSize={16}
-      iconClass="text-zinc-500"
-    />
-  </div>
-  <div
-    class="truncate line-clamp-2 max-w-full"
-    style="	white-space: pre-wrap; word-break: break-word;"
-  >
-    <DisplayName height={20} name={event.content} tags={event.tags} />
-  </div>
+      <div
+        class="truncate line-clamp-2 max-w-full"
+        style="white-space: pre-wrap; word-break: break-word;"
+      >
+        <DisplayName
+          height={20}
+          name={event.content || link}
+          tags={event.tags}
+        />
+      </div>
+    </a>
+  {:else}
+    <div
+      class="truncate line-clamp-2 max-w-full"
+      style="white-space: pre-wrap; word-break: break-word;"
+    >
+      <DisplayName height={20} name={event.content} tags={event.tags} />
+    </div>
+  {/if}
 {/if}

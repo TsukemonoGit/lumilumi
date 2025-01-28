@@ -1,6 +1,6 @@
 <script lang="ts">
   import { datetime, parseNaddr } from "$lib/func/util";
-  //import { showClientTag } from "$lib/stores/stores";
+
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   interface Props {

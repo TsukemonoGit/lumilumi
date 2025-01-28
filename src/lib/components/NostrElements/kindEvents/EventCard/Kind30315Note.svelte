@@ -24,9 +24,7 @@
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;
-    replyUsers: string[];
-    thread: boolean;
-    replyTag: string[] | undefined;
+
     repostable?: boolean | undefined;
   }
 
@@ -39,9 +37,7 @@
     tieKey,
     mini,
     warning,
-    replyUsers,
-    thread,
-    replyTag,
+
     repostable = true,
   }: Props = $props();
 

@@ -26,21 +26,6 @@
     } else return [];
   });
 
-  // let relays: string[] = $derived.by(async () => {
-  //   await setRelay(id, tieKey);
-  // });
-
-  // async function setRelay(
-  //   id: string,
-  //   tiekey: string | undefined
-  // ): Promise<string[]> {
-  //   if (displayEvents.get && tiekey) {
-  //     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  //     return getRelaysById(id, tiekey) as string[];
-  //   } else return [];
-  // }
-
   const handleStateError = (url: string) => {
     if (!$relayIconErrorStore.includes(url)) {
       $relayIconErrorStore.push(url);

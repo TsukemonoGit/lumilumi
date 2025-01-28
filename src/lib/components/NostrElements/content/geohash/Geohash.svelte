@@ -39,10 +39,7 @@
         {#snippet children({ contents })}
           {contents.display_name ?? "Location not found"}
         {/snippet}
-      </UseGeohash><MapPinned
-        size={20}
-        class="min-w-4"
-      /><!--<ExternalLink size={12} />-->
+      </UseGeohash><MapPinned size={20} class="min-w-4" />
     {/snippet}</Link
   >
 {/if}

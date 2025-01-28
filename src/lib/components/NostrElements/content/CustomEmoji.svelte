@@ -12,8 +12,6 @@
   let { part, height = 24 }: Props = $props();
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
-  ///console.log(imgError);
-  //console.log(imgLoad);
 </script>
 
 {#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
@@ -25,12 +23,9 @@
     class={`inline object-contain m-0 overflow-hidden align-bottom`}
     style={`height:${height}px`}
     onload={() => {
-      //console.log("load");
-
       imgLoad = true;
     }}
     onerror={() => {
-      //console.log("error");
       imgError = true;
     }}
   />{:else}:{part.content}:{/if}

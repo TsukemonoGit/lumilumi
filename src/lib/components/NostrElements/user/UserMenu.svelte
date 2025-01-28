@@ -22,12 +22,11 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+  import { publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import { page } from "$app/state";
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
   import { writable, type Writable } from "svelte/store";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
   import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
@@ -163,9 +162,6 @@
 
         try {
           await navigator.share(shareData);
-          // await navigator.clipboard.writeText(
-          //   `${page.url.origin}/${replaceable ? naddr : nevent}`
-          // );
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
@@ -211,43 +207,3 @@
     {tieKey}
     zIndex={50}
   />{/if}
-<!-- <Dialog bind:open={dialogOpen}>
-  {#snippet main()}
-    <div>
-      <h2 class="m-0 text-lg font-medium">EVENT JSON</h2>
-      <div
-        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-      >
-        {JSON.stringify(metadata, null, 2)}
-      </div>
-      <div class="my-1 break-all overflow-auto">
- 
-        <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-        <div class=" font-mono font-bold text-xs">{nevent}</div>
-      </div>
-      <h2 class="mt-1 text-lg font-medium">User Data</h2>
-      <div
-        class=" overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[25vh]"
-      >
-        {#if profile}
-          {#each Object.entries(profile) as [data, index]}
-            <div class="flex flex-col py-1">
-              <div class="font-bold whitespace-pre-wrap break-wards">
-                {data}
-              </div>
-              <div class="ml-2 whitespace-pre-wrap break-all">
-                {profile[data]}
-              </div>
-            </div>
-          {/each}
-        {/if}
-      </div>
-      <h2 class="mt-1 text-lg font-medium">Seen on</h2>
-      <div class="break-words whitespace-pre-wrap">
-        {metadata && tieKey
-          ? getRelaysById(metadata.id, tieKey).join(", ")
-          : ""}
-      </div>
-    </div>
-  {/snippet}
-</Dialog> -->

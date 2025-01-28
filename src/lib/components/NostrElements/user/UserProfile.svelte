@@ -247,7 +247,7 @@
       <img
         alt=""
         src={prof?.picture || ""}
-        class="max-h-full max-full object-contain"
+        class="max-h-full max-w-full object-contain"
       />
     </div>
   {/snippet}

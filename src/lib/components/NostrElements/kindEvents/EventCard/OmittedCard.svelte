@@ -13,7 +13,7 @@
   interface Props {
     repostable: boolean;
     displayMenu: boolean;
-    //export let kind: number | undefined;
+
     depth: number;
     tieKey: string | undefined;
     maxHeight: number | undefined;

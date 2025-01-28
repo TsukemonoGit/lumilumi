@@ -12,7 +12,7 @@
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
+
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { locale } from "svelte-i18n";
@@ -56,16 +56,6 @@
   });
 
   const handleSelectItem = async (index: number) => {
-    //  console.log(menuTexts[index]);
-
-    // const naddrpointer: nip19.AddressPointer = {
-    //   kind: note.kind,
-    //   identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-    //   pubkey: note.pubkey,
-    //   relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-    // };
-    //const naddr = nip19.naddrEncode(naddrpointer);
-
     switch (menuTexts[index].num) {
       case 0:
         //view json
@@ -134,14 +124,6 @@
         };
         try {
           await navigator.share(shareData);
-          // await navigator.clipboard.writeText(
-          //   `${page.url.origin}/channel/${nevent}`
-          // );
-          // $toastSettings = {
-          //   title: "Success",
-          //   description: `shared successfully`,
-          //   color: "bg-green-500",
-          // };
         } catch (error: any) {
           console.error(error.message);
           $toastSettings = {
@@ -178,21 +160,3 @@
 
 <!--JSON no Dialog-->
 <ModalJson bind:dialogOpen {note} {tieKey} />
-<!-- <Dialog bind:open={dialogOpen} dialogTitle="EVENT JSON">
-  {#snippet main()}
-    <div
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-    >
-      {JSON.stringify(note, null, 2)}
-    </div>
-    <div class="my-1 break-all overflow-auto">
-    
-      <div class=" font-mono font-bold text-xs">{encodedPubkey}</div>
-      <div class=" font-mono font-bold text-xs">{nevent}</div>
-    </div>
-    <h2 class="m-0 text-lg font-medium">Seen on</h2>
-    <div class="break-words whitespace-pre-wrap">
-      {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
-    </div>
-  {/snippet}</Dialog
-> -->

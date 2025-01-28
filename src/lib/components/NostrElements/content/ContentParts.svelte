@@ -47,32 +47,15 @@
       });
     }
   });
-  // let parts = $derived.by(async()=>{
-  //   return await parseText(text, tags)});
-  //$: console.log(parts);
+
   let mediaList = $derived(
     parts
-      .filter(
-        (part) => part.type === "url" //|| part.type === "movie" || part.type === "audio"
-      )
+      .filter((part) => part.type === "url")
       .map((p) => p.url)
       .filter((t) => t !== undefined)
   );
-  //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
-  // let mediaList = $derived(
-  //   parts
-  //     .filter(
-  //       (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-  //     )
-  //     .map((p) => p.url)
-  //     .filter((t) => t !== undefined)
-  // );
-  // let mediaList: string[] = $state([]);
-  //let modalIndex = 0;
+
   const openModal = (index: number) => {
-    // modalIndex = index;
-    // if (showModal) $showModal = true;
-    //   console.log("viewmedia");
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
     console.log(index, $state.snapshot(mediaList));
   };

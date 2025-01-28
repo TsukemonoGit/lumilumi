@@ -24,7 +24,7 @@
     maxHeight: number | undefined;
     //tagはaかe
     tag: string[];
-    //export let kind: number | undefined;
+
     depth: number;
     tieKey: string | undefined;
   }
@@ -66,10 +66,6 @@
 </script>
 
 {#if tag[0] === "e"}
-  <!-- {#if kind}
-      {kind}
-    {/if} -->
-
   <Text queryKey={["timeline", tag[1]]} id={tag[1]}>
     {#snippet loading()}
       <div
