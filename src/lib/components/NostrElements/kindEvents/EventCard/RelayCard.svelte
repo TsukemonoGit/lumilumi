@@ -57,7 +57,7 @@
         icon: SquareArrowOutUpRight,
         num: 1,
       },
-      // { text: `${$_("menu.nostrrr")}`, icon: SquareArrowOutUpRight, num: 2 },
+
       { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
     ];
 
@@ -81,26 +81,13 @@
             "_blank",
             "noreferrer"
           );
-          //`https://nostrrr.com/relay/${html.hostname}`,
+
           // `https://nostr.watch/relay/${html.hostname}`,
           //const njumpURL = `https://njump.me/${encodedrelay}`;
 
           //  window.open(njumpURL, "_blank", "noreferrer");
           break;
-        case 2:
-          //nostrrr
 
-          window.open(
-            `https://nostrrr.com/relay/${hostname}`,
-            "_blank",
-            "noreferrer"
-          );
-          //`https://nostrrr.com/relay/${html.hostname}`,
-          // `https://nostr.watch/relay/${html.hostname}`,
-          //const njumpURL = `https://njump.me/${encodedrelay}`;
-
-          //  window.open(njumpURL, "_blank", "noreferrer");
-          break;
         case 3:
           //Copy relayURL
           try {
