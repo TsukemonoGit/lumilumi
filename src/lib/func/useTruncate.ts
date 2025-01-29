@@ -34,7 +34,7 @@ export function useTruncate(
   }
 
   onMount(() => {
-    //checkHeight();
+    checkHeight();
 
     // ResizeObserver で高さや幅の変化を監視
     resizeObserver = new ResizeObserver(() => {
