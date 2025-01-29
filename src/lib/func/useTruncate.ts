@@ -20,12 +20,12 @@ export function useTruncate(
     threshold: number;
   }
 ) {
-  const checkHeight = debounce(() => {
+  const checkHeight = /* debounce(*/ () => {
     const truncated = node.scrollHeight > maxHeight + threshold;
     if (isTruncated) {
       isTruncated(truncated);
     }
-  }, 200);
+  }; /*, 200);*/
 
   let resizeObserver: ResizeObserver;
 
@@ -34,7 +34,7 @@ export function useTruncate(
   }
 
   onMount(() => {
-    checkHeight();
+    //checkHeight();
 
     // ResizeObserver で高さや幅の変化を監視
     resizeObserver = new ResizeObserver(() => {

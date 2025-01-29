@@ -26,7 +26,16 @@ declare type ExtendableEvent = any;
 
 const mediaCacheName = "media-cache";
 const cacheName = cacheNames.runtime;
+
+//avaratのキャッシュ
+const CACHE_NAME = "avatar-cache";
+const MAX_ENTRIES = 200;
+const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7日
+const CHECK_INTERVAL = 30 * 1000; // 30秒
+const REMAINING_TIME_THRESHOLD = 60 * 60 * 24 * 1000; // 1日
+
 let media: string[] | null;
+
 const config = {
   race: false,
   debug: false,
@@ -63,61 +72,59 @@ registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 // #cache を含む URL だけをキャッシュ
 let lastCheckedTime = 0; // 最後にチェックしたタイムスタンプ
 
+const cacheKeyWillBeUsed = async ({ request }): Promise<string> => {
+  const url = new URL(request.url);
+  url.hash = ""; // ハッシュを削除
+  return url.toString();
+};
+
+const cachedResponseWillBeUsed = async ({
+  cacheName,
+  cachedResponse,
+  request,
+}: {
+  cacheName: string;
+  cachedResponse?: Response;
+  request: Request;
+}) => {
+  const now = Date.now();
+
+  // チェック間隔を制御 (例: 最小30秒間隔)
+  if (now - lastCheckedTime < CHECK_INTERVAL) {
+    return cachedResponse; // 前回チェックから30秒以内ならキャッシュをそのまま利用
+  }
+
+  lastCheckedTime = now; // チェック時間を更新
+
+  if (!cachedResponse) return null;
+
+  const cache = await caches.open(cacheName);
+  const url = new URL(request.url);
+  url.hash = "";
+  const dateHeader = cachedResponse.headers.get("date");
+
+  if (dateHeader) {
+    const cachedTime = new Date(dateHeader).getTime();
+    const remainingTime = cachedTime + MAX_AGE_SECONDS * 1000 - now;
+
+    if (remainingTime < REMAINING_TIME_THRESHOLD) {
+      await cache.put(request, cachedResponse.clone());
+    }
+  }
+  return cachedResponse;
+};
+
 registerRoute(
   ({ url }) => url.hash === "#cache",
   new NetworkFirst({
-    cacheName: "avatar-cache",
+    cacheName: CACHE_NAME,
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 200,
-        maxAgeSeconds: 60 * 60 * 24 * 7, // 7日
+        maxEntries: MAX_ENTRIES,
+        maxAgeSeconds: MAX_AGE_SECONDS,
       }),
-      {
-        cacheKeyWillBeUsed: async ({ request }) => {
-          const url = new URL(request.url);
-          url.hash = ""; // ハッシュを削除
-          return url.toString();
-        },
-      },
-      {
-        cachedResponseWillBeUsed: async ({
-          cacheName,
-          cachedResponse,
-          request,
-        }) => {
-          const now = Date.now();
-
-          // チェック間隔を制御 (例: 最小30秒間隔)
-          if (now - lastCheckedTime < 30 * 1000) {
-            return cachedResponse; // 前回チェックから30秒以内ならキャッシュをそのまま利用
-          }
-
-          lastCheckedTime = now; // チェック時間を更新
-
-          if (!cachedResponse) return null;
-
-          const cache = await caches.open(cacheName);
-          const url = new URL(request.url);
-          url.hash = "";
-          const cacheKey = new Request(url.toString());
-          const dateHeader = cachedResponse.headers.get("date");
-
-          if (dateHeader) {
-            const cachedTime = new Date(dateHeader).getTime();
-            const maxAge = 60 * 60 * 24 * 7 * 1000; // 7日
-            const remainingTime = cachedTime + maxAge - now;
-
-            if (remainingTime < 60 * 60 * 24 * 1000) {
-              const response = await fetch(request);
-              if (response.ok) {
-                await cache.put(cacheKey, response.clone());
-                return response;
-              }
-            }
-          }
-          return cachedResponse;
-        },
-      },
+      { cacheKeyWillBeUsed },
+      { cachedResponseWillBeUsed },
     ],
   })
 );
