@@ -5,6 +5,7 @@
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
   import { queryClient } from "$lib/stores/stores";
+  import type { UrlType } from "$lib/func/useUrl";
 
   interface Props {
     open: Writable<boolean>;
@@ -43,13 +44,18 @@
       $open = false;
     }
   });
-
+  let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
   function mediaCheck(images: string[]) {
     return images
       .map((url, index) => ({ url, originalIndex: index }))
-      .filter(
-        (item) => queryClient.getQueryData(["useUrl", item.url]) === "image"
-      );
+      .filter((item) => {
+        const data: UrlType | undefined = queryClient.getQueryData([
+          "useUrl",
+          item.url,
+        ]);
+        //kind20の場合はurlチェックしてないからundefined
+        return data === undefined || data === "image";
+      });
   }
 </script>
 
@@ -65,13 +71,21 @@
              -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
-      <img
-        alt=""
-        src={$state.snapshot(
-          displayImages.find((img) => img.originalIndex === currentIndex)
-        )?.url}
-        class="max-h-[100vh] max-w-[100vw] object-contain"
-      />
+      <div class="relative w-full h-full">
+        <img
+          onload={() => (loadingStatus = "loaded")}
+          onerror={() => (loadingStatus = "error")}
+          alt=""
+          src={$state.snapshot(
+            displayImages.find((img) => img.originalIndex === currentIndex)
+          )?.url}
+          class="max-h-[100vh] max-w-[100vw] object-contain"
+        />
+        <!--もしかしたら画像じゃないやつもあるかもしれないし-->
+        {#if loadingStatus === "error" || loadingStatus === "loading"}
+          <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span
+          >{/if}
+      </div>
     </div>
     {#if displayImages.length > 1}
       <button
