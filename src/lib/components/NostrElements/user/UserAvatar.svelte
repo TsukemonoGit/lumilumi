@@ -55,12 +55,13 @@
 
   const {
     elements: { image, fallback },
+    states: { loadingStatus },
     options: { src },
   } = createAvatar({
     // svelte-ignore state_referenced_locally
     src: avatarUrl ?? "",
     onLoadingStatusChange: handleState,
-    delayMs: 100,
+    delayMs: 20,
   });
 
   $effect(() => {
@@ -69,8 +70,10 @@
         src.set(avatarUrl);
       });
     }
+    if ($loadingStatus === "error") {
+      console.log(avatarUrl, "error");
+    }
   });
-  $inspect($fallback);
 </script>
 
 {#if avatarUrl !== ""}
