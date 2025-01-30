@@ -8,6 +8,7 @@
   import ContentImage from "$lib/components/NostrElements/content/ContentImage.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
+  import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";
 
   interface Props {
     text: string;
@@ -33,20 +34,14 @@
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
   let mediaList = $derived(
     parts
-      .filter(
-        (part) => part.type === "image" //|| part.type === "movie" || part.type === "audio"
-      )
+      .filter((part) => part.type === "url")
       .map((p) => p.url)
       .filter((t) => t !== undefined)
   );
 
-  //let modalIndex = 0;
   const openModal = (index: number) => {
-    // modalIndex = index;
-    // if (showModal) $showModal = true;
-    if (mediaList.length > 0) {
-      $viewMediaModal = { index: index, mediaList: mediaList };
-    }
+    $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
+    console.log(index, $state.snapshot(mediaList));
   };
 
   const nip19Decode = (
@@ -108,48 +103,11 @@
         {repostable}
         {tieKey}
       />{:else}{part.content}{/if}
-  {:else if part.type === "image" && part.content}
-    <ContentImage
-      src={part.content}
-      url={part.url}
-      number={part.number}
+  {:else if part.type === "url"}
+    <UrlDisplay
+      {part}
       {openModal}
-    />
-  {:else if part.type === "movie"}
-    {#if lumiSetting.get().showImg}
-      <video
-        aria-label="video contents"
-        controls
-        src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></video
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}{:else if part.type === "audio"}
-    {#if lumiSetting.get().showImg}
-      <audio
-        aria-label="audio contents"
-        controls
-        src={part.content}
-        class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-        ><track default kind="captions" /></audio
-      >
-    {:else}<Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
-        className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
-      >{/if}
-  {:else if part.type === "url"}<Link
-      props={{ "aria-label": `External Links: ${part.url}` }}
-      className="underline text-magnum-300 break-all hover:opacity-80 "
-      href={part.content ?? ""}
-      >{#snippet content()}{part.content}{/snippet}</Link
-    >{:else if part.type === "emoji"}{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
+    />{:else if part.type === "emoji"}{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"
         alt={`:${part.content}:`}

@@ -2,8 +2,10 @@
   import { splitHexColorString } from "$lib/func/util";
   import { followList } from "$lib/stores/globalRunes.svelte";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
+  import type { MeltElement, WithGet } from "@melt-ui/svelte/internal/helpers";
   import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
+  import type { Writable } from "svelte/store";
   interface Props {
     url: string | undefined;
     name: string | undefined;
@@ -43,54 +45,56 @@
       return url;
     }
   });
-  export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
-    curr,
-    next,
-  }) => {
-    if (next === "error") {
-      handleStateError();
-    }
-    return next;
-  };
 
-  const {
-    elements: { image, fallback },
-    options: { src },
-  } = createAvatar({
-    // svelte-ignore state_referenced_locally
-    src: avatarUrl ?? "",
-    onLoadingStatusChange: handleState,
-  });
+  // const {
+  //   elements: { image, fallback },
+  //   states: { loadingStatus },
+  //   options: { src },
+  // } =
+
+  let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
 
   $effect(() => {
-    if (avatarUrl) {
-      untrack(() => {
-        src.set(avatarUrl);
-      });
+    if (loadingStatus === "error") {
+      handleStateError();
     }
   });
 </script>
 
-<div
-  {title}
-  class="relative flex items-center justify-center {!square
-    ? 'rounded-full'
-    : ''} bg-neutral-800 overflow-hidden"
-  style="height: {size}px; width: {size}px;"
->
-  <img
-    use:melt={$image}
-    alt="Avatar"
-    class=" object-cover {!square ? 'rounded-full' : ''}"
-    style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
-  />
-  <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
-    ><Avatar
-      {size}
-      {name}
-      variant="beam"
-      colors={pubkey ? splitHexColorString(pubkey) : undefined}
-      {square}
-    /></span
+{#if avatarUrl && avatarUrl !== ""}
+  <div
+    {title}
+    class="relative flex items-center justify-center {!square
+      ? 'rounded-full'
+      : ''} bg-neutral-800 overflow-hidden"
+    style="height: {size}px; width: {size}px;"
   >
-</div>
+    <img
+      src={avatarUrl}
+      onload={() => (loadingStatus = "loaded")}
+      onerror={() => (loadingStatus = "error")}
+      alt={name}
+      class=" object-cover {!square ? 'rounded-full' : ''}"
+      style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
+      loading="lazy"
+    />
+    {#if loadingStatus === "error" || loadingStatus === "loading"}
+      <span class="absolute t-0 l-0 overflow-hidden"
+        ><Avatar
+          {size}
+          {name}
+          variant="beam"
+          colors={pubkey ? splitHexColorString(pubkey) : undefined}
+          {square}
+        /></span
+      >{/if}
+  </div>
+{:else}
+  <Avatar
+    {size}
+    {name}
+    variant="beam"
+    colors={pubkey ? splitHexColorString(pubkey) : undefined}
+    {square}
+  />
+{/if}
