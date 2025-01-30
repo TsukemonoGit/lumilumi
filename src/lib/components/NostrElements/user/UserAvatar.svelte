@@ -89,4 +89,12 @@
         /></span
       >{/if}
   </div>
+{:else}
+  <Avatar
+    {size}
+    {name}
+    variant="beam"
+    colors={pubkey ? splitHexColorString(pubkey) : undefined}
+    {square}
+  />
 {/if}
