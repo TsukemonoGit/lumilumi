@@ -9,9 +9,9 @@
 
   <img src="./image/13.png" width=300>
 
-  windowsならedgeで、Androidならchromeでpwaしないとメニューにでないかも？
+  windowsを使用している場合はedgeで、Androidを使用している場合はchromeでPWAをインストールしないと共有メニューに表示されないかもしれません。
   
-  chromeだと拡張機能が使えないけど[Amber](https://github.com/greenart7c3/Amber)をいれると簡単にNIP-46が使えます
+  Android版chromeでは拡張機能が使えないけど[Amber](https://github.com/greenart7c3/Amber)をいれると簡単にNIP-46が使えます
 
 - 3D view 機能
 ![3DView](./image/test.gif)
@@ -33,7 +33,7 @@
 
     メタデータはフォロー分だけキャッシュしてます
 
-- NIP-19入りの記事（kind:30023）も割とちゃんと見れる
+- 記事 [NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md) も割と見れる
 
 - petname📛がつけれる
 
