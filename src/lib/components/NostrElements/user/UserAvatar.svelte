@@ -60,7 +60,7 @@
     // svelte-ignore state_referenced_locally
     src: avatarUrl ?? "",
     onLoadingStatusChange: handleState,
-    delayMs: 20,
+    delayMs: 100,
   });
 
   $effect(() => {
