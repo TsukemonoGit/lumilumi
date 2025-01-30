@@ -60,6 +60,7 @@
     // svelte-ignore state_referenced_locally
     src: avatarUrl ?? "",
     onLoadingStatusChange: handleState,
+    delayMs: 20,
   });
 
   $effect(() => {
@@ -69,28 +70,32 @@
       });
     }
   });
+  $inspect($fallback);
 </script>
 
-<div
-  {title}
-  class="relative flex items-center justify-center {!square
-    ? 'rounded-full'
-    : ''} bg-neutral-800 overflow-hidden"
-  style="height: {size}px; width: {size}px;"
->
-  <img
-    use:melt={$image}
-    alt="Avatar"
-    class=" object-cover {!square ? 'rounded-full' : ''}"
-    style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
-  />
-  <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
-    ><Avatar
-      {size}
-      {name}
-      variant="beam"
-      colors={pubkey ? splitHexColorString(pubkey) : undefined}
-      {square}
-    /></span
+{#if avatarUrl !== ""}
+  <div
+    {title}
+    class="relative flex items-center justify-center {!square
+      ? 'rounded-full'
+      : ''} bg-neutral-800 overflow-hidden"
+    style="height: {size}px; width: {size}px;"
   >
-</div>
+    <img
+      use:melt={$image}
+      alt="Avatar"
+      class=" object-cover {!square ? 'rounded-full' : ''}"
+      style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
+      loading="lazy"
+    />
+    <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
+      ><Avatar
+        {size}
+        {name}
+        variant="beam"
+        colors={pubkey ? splitHexColorString(pubkey) : undefined}
+        {square}
+      /></span
+    >
+  </div>
+{/if}
