@@ -2,8 +2,10 @@
   import { splitHexColorString } from "$lib/func/util";
   import { followList } from "$lib/stores/globalRunes.svelte";
   import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
+  import type { MeltElement, WithGet } from "@melt-ui/svelte/internal/helpers";
   import { untrack } from "svelte";
   import Avatar from "svelte-boring-avatars";
+  import type { Writable } from "svelte/store";
   interface Props {
     url: string | undefined;
     name: string | undefined;
@@ -43,40 +45,23 @@
       return url;
     }
   });
-  export const handleState: CreateAvatarProps["onLoadingStatusChange"] = ({
-    curr,
-    next,
-  }) => {
-    if (next === "error") {
-      handleStateError();
-    }
-    return next;
-  };
 
-  const {
-    elements: { image, fallback },
-    states: { loadingStatus },
-    options: { src },
-  } = createAvatar({
-    // svelte-ignore state_referenced_locally
-    src: avatarUrl ?? "",
-    onLoadingStatusChange: handleState,
-    delayMs: 20,
-  });
+  // const {
+  //   elements: { image, fallback },
+  //   states: { loadingStatus },
+  //   options: { src },
+  // } =
+
+  let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
 
   $effect(() => {
-    if (avatarUrl) {
-      untrack(() => {
-        src.set(avatarUrl);
-      });
-    }
-    if ($loadingStatus === "error") {
-      console.log(avatarUrl, "error");
+    if (loadingStatus === "error") {
+      handleStateError();
     }
   });
 </script>
 
-{#if avatarUrl !== ""}
+{#if avatarUrl && avatarUrl !== ""}
   <div
     {title}
     class="relative flex items-center justify-center {!square
@@ -85,20 +70,23 @@
     style="height: {size}px; width: {size}px;"
   >
     <img
-      use:melt={$image}
-      alt="Avatar"
+      src={avatarUrl}
+      onload={() => (loadingStatus = "loaded")}
+      onerror={() => (loadingStatus = "error")}
+      alt={name}
       class=" object-cover {!square ? 'rounded-full' : ''}"
       style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
       loading="lazy"
     />
-    <span use:melt={$fallback} class="absolute t-0 l-0 overflow-hidden"
-      ><Avatar
-        {size}
-        {name}
-        variant="beam"
-        colors={pubkey ? splitHexColorString(pubkey) : undefined}
-        {square}
-      /></span
-    >
+    {#if loadingStatus === "error" || loadingStatus === "loading"}
+      <span class="absolute t-0 l-0 overflow-hidden"
+        ><Avatar
+          {size}
+          {name}
+          variant="beam"
+          colors={pubkey ? splitHexColorString(pubkey) : undefined}
+          {square}
+        /></span
+      >{/if}
   </div>
 {/if}
