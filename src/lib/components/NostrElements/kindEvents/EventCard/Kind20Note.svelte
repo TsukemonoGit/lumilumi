@@ -2,11 +2,8 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { profile } from "$lib/func/util";
-
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
-  import { goto } from "$app/navigation";
 
   import Content from "../../content/Content.svelte";
 
@@ -58,18 +55,11 @@
   let imageList = $derived(
     imeta.map((i) => i.url).filter((tag) => tag !== undefined)
   );
-  //console.log(imageList);
-  let eventpointer: nip19.EventPointer = {
-    id: note.id,
-    relays: tieKey ? getRelaysById(note.id, tieKey) : [],
-    author: note.pubkey,
-    kind: note.kind,
-  };
 
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
-    //   console.log("viewmedia");
+    // console.log(imageList, index);
     $viewMediaModal = { index: index, mediaList: imageList };
   };
   let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
