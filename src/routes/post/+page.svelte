@@ -9,7 +9,7 @@
     uploader,
   } from "$lib/stores/stores";
   import type { LumiSetting } from "$lib/types";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
@@ -163,7 +163,7 @@
               if (data.nip94_event) {
                 tags.push(convertMetaTags(data.nip94_event));
               }
-              sharedContent = `\n${url}`;
+              sharedContent = `${sharedContent}\n${url}`;
               // 500ms待機するPromise //image not foundになるのを避けるため
               await delay(2000);
               console.log(sharedContent);

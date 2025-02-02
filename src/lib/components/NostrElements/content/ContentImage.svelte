@@ -30,7 +30,7 @@
     >{/if}
   <div>
     <button
-      class="w-fit h-fit"
+      class="w-fit h-fit overflow-hidden"
       aria-label={$_("alia.label.image")}
       onclick={() => openModal(number ?? 0)}
       ><img
@@ -39,7 +39,7 @@
         height="200"
         alt="img"
         {src}
-        class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain"
+        class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain overflow-hidden"
         onload={() => (imgLoad = true)}
         onerror={() => (imgError = true)}
       /></button
