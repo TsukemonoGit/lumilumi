@@ -950,7 +950,7 @@
             {#each $emojis.list as e, index}
               {#if customReaction === "" || e[0]
                   .toLowerCase()
-                  .includes(customReaction.toLowerCase())}
+                  .includes(customReaction.replace(":", "").toLowerCase())}
                 <button
                   aria-label={`Select emoji ${e[0]}`}
                   onclick={() => handleClickEmoji(e)}

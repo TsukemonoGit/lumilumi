@@ -247,7 +247,9 @@
                     {#each $emojis.list as e, index}
                       {#if customReaction === "" || e[0]
                           .toLowerCase()
-                          .includes(customReaction.toLowerCase())}
+                          .includes(customReaction
+                              .replace(":", "")
+                              .toLowerCase())}
                         <button
                           onclick={() => handleClickEmojiDisplayName(e)}
                           class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
