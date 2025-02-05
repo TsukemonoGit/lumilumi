@@ -120,32 +120,34 @@
 
   {#snippet popoverContent()}
     <div>
-      <div class="flex gap-1 pr-8 pl-2 max-w-80">
+      <div class="flex gap-1 pr-8 max-w-80">
         <input
           id="emoji"
           type="text"
-          class="h-10 w-32 rounded-md px-3 py-2 text-magnum-100 border
+          class="h-10 w-full rounded-md px-2 py-2 text-magnum-100 border
                {customReactionError ? 'border-red-500' : 'border-neutral-900'}"
           bind:value={customReaction}
           onkeydown={handleKeyDown}
           aria-label="Enter custom reaction"
+          placeholder="Enter an emoji🌞"
         />
         <button
           aria-label="Submit custom reaction"
           onclick={handleClickCustomReaction}
-          class="flex items-center w-fit px-2 rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
+          class="h-10 w-14 flex items-center justify-center rounded-md bg-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         >
           OK
         </button>
       </div>
+
       {#if $emojis && $emojis.list.length > 0}
         <div
-          class="border border-magnum-600 flex flex-wrap max-w-80 max-h-80 overflow-y-auto"
+          class=" mt-1 border border-magnum-600 flex flex-wrap max-w-80 max-h-80 overflow-y-auto"
         >
           {#each $emojis.list as e, index}
             {#if customReaction === "" || e[0]
                 .toLowerCase()
-                .includes(customReaction.toLowerCase())}
+                .includes(customReaction.replace(":", "").toLowerCase())}
               <button
                 aria-label={`Select emoji ${e[0]}`}
                 onclick={() => handleClickEmoji(e)}
