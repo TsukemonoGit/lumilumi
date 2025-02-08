@@ -1,4 +1,5 @@
 <script lang="ts">
+  import UniqueEventList from "$lib/components/renderSnippets/nostr/UniqueEventList.svelte";
   import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
   import {
@@ -16,10 +17,11 @@
   import { monoZap } from "$lib/func/constants";
   import * as Nostr from "nostr-typedef";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { QueryObserver } from "@tanstack/svelte-query";
+  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
   import { now } from "rx-nostr";
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import { makeZapRequest } from "$lib/func/zap";
+  import ZapList from "$lib/components/NostrElements/AllReactionsElement/ZapList.svelte";
 
   const handleClickShare = async () => {
     //share link
@@ -136,12 +138,84 @@
       //toast
     }
   }
+  const zappedQuery: QueryKey = ["reactions", monoZap.eventTag[1], "zapped"]; //atag
+  const zappedFilters: Nostr.Filter[] = [
+    {
+      kinds: [9735],
+      "#a": [monoZap.eventTag[1]],
+    },
+    {
+      kinds: [9735],
+
+      "#e": [
+        "df6034a5676deca7bc687abc7dc2ea703a8de01954f0d87879cbc790a5ead234",
+      ],
+    },
+  ];
+
+  const zapperEvent = (event: Nostr.Event): Nostr.Event | undefined => {
+    const desc = event.tags.find((tag) => tag[0] === "description");
+    if (!desc || desc.length <= 1) {
+      return;
+    }
+    try {
+      return JSON.parse(desc[1]);
+    } catch (error) {
+      return;
+    }
+  };
+
+  const filteredEvents = (events: Nostr.Event[]) => {
+    return events.filter(
+      (event) =>
+        zapperEvent(event)?.pubkey !==
+          "5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60" &&
+        zapperEvent(event)?.pubkey !==
+          "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5"
+    );
+  };
 </script>
 
 <!-- <h1 class="title my-4">ABOUT</h1> -->
 <section class="border border-magnum-500 rounded-md h-full my-4 mx-2 p-2">
   <h1 class="title my-4 text-center">lumilumi the nostr client</h1>
   <ul class="w-full px-4">
+    <li>
+      <div class="list">Thanks for the Zaps!</div>
+      <div class="item">
+        <UniqueEventList
+          queryKey={zappedQuery}
+          filters={zappedFilters}
+          req={undefined}
+        >
+          {#snippet nodata()}
+            <!---->
+          {/snippet}
+          {#snippet loading()}
+            <!---->
+          {/snippet}
+          {#snippet content({ events: events, status })}
+            <!---->
+            <div class="max-h-42 overflow-y-auto">
+              <ZapList events={filteredEvents(events)} tieKey={undefined} />
+            </div>
+          {/snippet}
+          {#snippet error()}
+            <!---->
+          {/snippet}
+        </UniqueEventList>
+
+        <button
+          class="flex gap-1 items-center rounded-full border-magnum-300 border m-2 px-2 py-1 text-magnum-300 hover:opacity-75 active:opacity-50"
+          data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
+          data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
+          data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
+          onclick={() => dialogOpen?.(true)}
+        >
+          Zap⚡️Lumilumi
+        </button>
+      </div>
+    </li>
     <li>
       <div class="list">{$_("shortcut.title")}</div>
       <div class="item">
@@ -237,19 +311,7 @@
             </Link>
           </div>
         </li>
-        <li>
-          <div class="item">
-            <button
-              class="flex gap-1 items-center underline"
-              data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
-              data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
-              data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
-              onclick={() => dialogOpen?.(true)}
-            >
-              Zap⚡️@mono
-            </button>
-          </div>
-        </li>
+
         <li>
           <div class="item">
             <button

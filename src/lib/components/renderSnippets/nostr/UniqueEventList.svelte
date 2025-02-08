@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useUniqueEventList } from "$lib/stores/useUniqueEventList";
   import type { ReqStatus } from "$lib/types";
@@ -39,17 +38,6 @@
     loading,
     content,
   }: Props = $props();
-  // export let queryKey: QueryKey;
-  // export let filters: Nostr.Filter[];
-  // export let req:
-  //   | (RxReq<"backward"> &
-  //       RxReqEmittable<{
-  //         relays: string[];
-  //       }> &
-  //       RxReqOverable &
-  //       RxReqPipeable)
-  //   | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-  //   | undefined = undefined;
 
   let result = $derived(useUniqueEventList(queryKey, filters, req));
   let data = $derived(result.data);

@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useAllReactions } from "$lib/stores/useAllReactions";
   import type { ReqStatus } from "$lib/types";
@@ -89,18 +88,6 @@
       .filter((event) => event.kind === 9735),
     status: $status,
   })}
-
-  <!-- <slot
-    kind1={$data
-      ?.map(({ event }) => event)
-      .filter((event) => event.kind === 1 || event.kind === 42)}
-    kind7={$data?.map(({ event }) => event).filter((event) => event.kind === 7)}
-    kind6={$data?.map(({ event }) => event).filter((event) => event.kind === 6)}
-    kind9735={$data
-      ?.map(({ event }) => event)
-      .filter((event) => event.kind === 9735)}
-    status={$status}
-  /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {/if}
