@@ -66,60 +66,62 @@
     <div class="min-w-8 flex justify-center">
       {amount === -1 ? "invalid event" : amount}
     </div>
-    <div class="flex flex-wrap px-2 gap-1 items-center">
+    <div class="flex flex-wrap px-2 gap-0.5 items-center">
       {#each filterEventsByAmount(events, amount) as event (event.id)}
         {@const zapper = zapperEvent(event)}
-        {#if zapper}
-          <Metadata
-            queryKey={["metadata", zapper?.pubkey]}
-            pubkey={zapper.pubkey ?? ""}
-          >
-            {#snippet loading()}
-              <UserPopupMenu
-                pubkey={zapper.pubkey ?? ""}
-                metadata={undefined}
-                size={24}
-                depth={0}
-                {tieKey}
-              />
-            {/snippet}
-
-            {#snippet error()}
-              <UserPopupMenu
-                pubkey={zapper.pubkey ?? ""}
-                metadata={undefined}
-                size={24}
-                depth={0}
-                {tieKey}
-              />
-            {/snippet}
-
-            {#snippet nodata()}
-              <UserPopupMenu
-                pubkey={zapper.pubkey ?? ""}
-                metadata={undefined}
-                size={24}
-                depth={0}
-                {tieKey}
-              />
-            {/snippet}
-
-            {#snippet content({ metadata })}
-              <UserPopupMenu
-                pubkey={zapper.pubkey ?? ""}
-                {metadata}
-                size={24}
-                depth={0}
-                {tieKey}
-              />
-            {/snippet}
-          </Metadata>
-          {#if zapper.content !== ""}<div
-              class="inline-flex break-all align-middle"
+        <div class="flex rounded-full my-0.5 border border-magnum-500/50">
+          {#if zapper}
+            <Metadata
+              queryKey={["metadata", zapper?.pubkey]}
+              pubkey={zapper.pubkey ?? ""}
             >
-              {zapper.content}
-            </div>{/if}
-        {/if}
+              {#snippet loading()}
+                <UserPopupMenu
+                  pubkey={zapper.pubkey ?? ""}
+                  metadata={undefined}
+                  size={24}
+                  depth={0}
+                  {tieKey}
+                />
+              {/snippet}
+
+              {#snippet error()}
+                <UserPopupMenu
+                  pubkey={zapper.pubkey ?? ""}
+                  metadata={undefined}
+                  size={24}
+                  depth={0}
+                  {tieKey}
+                />
+              {/snippet}
+
+              {#snippet nodata()}
+                <UserPopupMenu
+                  pubkey={zapper.pubkey ?? ""}
+                  metadata={undefined}
+                  size={24}
+                  depth={0}
+                  {tieKey}
+                />
+              {/snippet}
+
+              {#snippet content({ metadata })}
+                <UserPopupMenu
+                  pubkey={zapper.pubkey ?? ""}
+                  {metadata}
+                  size={24}
+                  depth={0}
+                  {tieKey}
+                />
+              {/snippet}
+            </Metadata>
+            {#if zapper.content !== ""}<div
+                class="inline-flex break-all my-0.5 mx-1"
+              >
+                {zapper.content}
+              </div>{/if}
+          {/if}
+        </div>
       {/each}
     </div>
   </div>
