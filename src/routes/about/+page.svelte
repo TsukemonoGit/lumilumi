@@ -172,7 +172,7 @@
           "5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60" &&
         zapperEvent(event)?.pubkey !==
           "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5"
-    );
+    ); //テストザップ除く
   };
 </script>
 
