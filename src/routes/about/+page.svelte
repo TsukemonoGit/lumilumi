@@ -181,8 +181,11 @@
   <h1 class="title my-4 text-center">lumilumi the nostr client</h1>
   <ul class="w-full px-4">
     <li>
-      <div class="list">Thanks for the Zaps!</div>
+      <div class="list">Many Thanks for the Zaps!</div>
       <div class="item">
+        <p>
+          Including those sent through other notes—your support means a lot!
+        </p>
         <UniqueEventList
           queryKey={zappedQuery}
           filters={zappedFilters}
@@ -196,7 +199,7 @@
           {/snippet}
           {#snippet content({ events: events, status })}
             <!---->
-            <div class="max-h-42 overflow-y-auto">
+            <div class="max-h-42 overflow-y-auto mt-1">
               <ZapList events={filteredEvents(events)} tieKey={undefined} />
             </div>
           {/snippet}
