@@ -66,11 +66,11 @@
   let naddr = $derived(nip19.naddrEncode(naddrpointer));
   let nevent = $derived(nip19.neventEncode(eventpointer));
 
-  const handleClickToNotepage = () => {
-    //Goto Note page
+  // const handleClickToNotepage = () => {
+  //   //Goto Note page
 
-    goto(`/${replaceable ? naddr : nevent}`);
-  };
+  //   goto(`/${replaceable ? naddr : nevent}`);
+  // };
 
   let prof = $derived(profile(metadata));
 </script>
@@ -121,15 +121,14 @@
       </div>
 
       {#if displayMenu}
-        <button
-          title="goto note page"
-          onclick={handleClickToNotepage}
+        <a
+          href={`/${replaceable ? naddr : nevent}`}
           class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
         >
           <time datetime={datetime(note.created_at)}
             >{formatAbsoluteDate(note.created_at)}</time
           >
-        </button>
+        </a>
       {/if}
     </div>
 
