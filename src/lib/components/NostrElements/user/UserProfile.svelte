@@ -245,16 +245,18 @@
           </div>
 
           {#if prof.about}
-            <Content
-              {zIndex}
-              maxHeight={bannerHeight * 1.5}
-              text={prof.about}
-              tags={metadata.tags}
-              displayMenu={true}
-              {depth}
-              repostable={false}
-              {tieKey}
-            />
+            <div class="mt-2">
+              <Content
+                {zIndex}
+                maxHeight={bannerHeight * 1.5}
+                text={prof.about}
+                tags={metadata.tags}
+                displayMenu={true}
+                {depth}
+                repostable={false}
+                {tieKey}
+              />
+            </div>
           {/if}
         </div>
       {/if}
