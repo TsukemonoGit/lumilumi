@@ -192,6 +192,8 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     },
   ],
   //
+  [1111, { ja: "コメント", en: "Comment" }],
+  //
   //～～～～～～
   //
   [

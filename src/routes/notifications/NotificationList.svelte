@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
     loginUser,
@@ -102,18 +102,11 @@
     $nowProgress = false;
   }, 20);
 
-  // export let tie: OperatorFunction<
-  //   EventPacket,
-  //   EventPacket & {
-  //     seenOn: Set<string>;
-  //     isNew: boolean;
-  //   }
-
   createQuery({
     queryKey: queryKey,
     queryFn: undefined,
-    staleTime: Infinity, // 4 hour
-    gcTime: Infinity, // 4 hour
+    staleTime: Infinity,
+    gcTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });

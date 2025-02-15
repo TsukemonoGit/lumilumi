@@ -26,7 +26,7 @@
 
 <div class="ml-6 text-sm opacity-80">
   {#if text && (text.kind === 1 || text.kind === 42 || text.kind === 4) && text.tags.length > 0}
-    {@const { replyUsers } = replyedEvent(text.tags)}
+    {@const { replyUsers } = replyedEvent(text.tags, text.kind)}
     {#if replyUsers.length > 0}
       <div
         class="my-1 text-xs text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"

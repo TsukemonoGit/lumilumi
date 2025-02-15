@@ -23,27 +23,68 @@ export const repostedId = (
 };
 
 export const replyedEvent = (
-  tags: string[][]
+  tags: string[][],
+  kind: number
 ): { replyTag: string[] | undefined; replyUsers: string[] } => {
-  const users = tags.reduce((acc, [tag, value]) => {
-    if (tag === "p" && hexRegex.test(value)) {
-      return [...acc, value];
-    } else {
-      return acc;
+  if (kind !== 1111) {
+    const users = tags.reduce((acc, [tag, value]) => {
+      if (tag === "p" && hexRegex.test(value)) {
+        return [...acc, value];
+      } else {
+        return acc;
+      }
+    }, []);
+
+    const IDs = tags?.filter(
+      (tag) =>
+        (tag[0] === "e" && hexRegex.test(tag[1])) ||
+        (tag[0] === "a" && nip33Regex.test(tag[1]))
+    );
+    const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
+    const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
+
+    return {
+      replyUsers: users,
+      replyTag:
+        reply ?? root ?? IDs.length > 0 ? IDs[IDs.length - 1] : undefined,
+    };
+  } else {
+    //comment NIP-22 https://github.com/nostr-protocol/nips/blob/master/22.md
+    const users = Array.from(
+      new Set(
+        tags.reduce((acc, [tag, value]) => {
+          if ((tag === "p" || tag === "P") && hexRegex.test(value)) {
+            acc.push(value);
+          }
+          return acc;
+        }, [] as string[])
+      )
+    );
+
+    const ID = tags?.find(
+      (tag) =>
+        (tag[0] === "e" && hexRegex.test(tag[1])) ||
+        (tag[0] === "a" && nip33Regex.test(tag[1])) ||
+        tag[0] === "i"
+    );
+    if (ID) {
+      return {
+        replyUsers: users,
+        replyTag: ID,
+      };
     }
-  }, []);
-  const IDs = tags?.filter(
-    (tag) =>
-      (tag[0] === "e" && hexRegex.test(tag[1])) ||
-      (tag[0] === "a" && nip33Regex.test(tag[1]))
-  );
-  const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
-  const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
-  //  console.log(root?.[1]);
-  return {
-    replyUsers: users,
-    replyTag: reply ?? root ?? IDs.length > 0 ? IDs[IDs.length - 1] : undefined,
-  };
+    const parentID = tags?.find(
+      (tag) =>
+        (tag[0] === "E" && hexRegex.test(tag[1])) ||
+        (tag[0] === "A" && nip33Regex.test(tag[1])) ||
+        tag[0] === "I"
+    );
+
+    return {
+      replyUsers: users,
+      replyTag: parentID ? parentID : undefined,
+    };
+  }
 };
 
 export function extractZappedId(tags: string[][]): {

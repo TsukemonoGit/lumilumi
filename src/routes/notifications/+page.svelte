@@ -29,7 +29,10 @@
   const timelineQuery: QueryKey = ["notifications"];
   let filters: Nostr.Filter[] = [
     {
-      kinds: [1, 6, 7, 16, 42, 9735, 4 /**初代DM*/, 1059 /** 三代目DM */],
+      kinds: [
+        1, 6, 7, 16, 42, 9735, 1111 /**Comment(NIP-22)*/, 4 /**初代DM*/,
+        1059 /** 三代目DM */,
+      ],
 
       "#p": [$loginUser],
       since: undefined,
@@ -78,12 +81,6 @@
   }
 
   //---------------------------
-  // const {
-  //   elements: { root, list, content, trigger },
-  //   states: { value },
-  // } = createTabs({
-  //   defaultValue: "all",
-  // });
 
   const triggers = [
     // { id: "all", title: "all" }, // <p> を削除し、単なる文字列として扱う
@@ -101,14 +98,6 @@
     type: "multiple",
     defaultValue: triggers.map((trigger) => trigger.id), //初期は全部選択
   });
-  // const [send, receive] = crossfade({
-  //   duration: 250,
-  //   easing: cubicInOut,
-  // });
-
-  //  run(() => {
-  //    console.log($value);
-  //  }); //= ['reply', 'reaction', 'repost']みたいに選択されてるIDのりすとになる
 
   const handleClickAll = () => {
     value.set(triggers.map((trigger) => trigger.id));
@@ -181,7 +170,8 @@
             event.kind === 42 ||
             event.kind === 4 ||
             //  event.kind === 14 ||
-            event.kind === 1059
+            event.kind === 1059 ||
+            event.kind === 1111
           );
         default:
           return false;
@@ -202,12 +192,6 @@
     }, 0); //これしないとvalueの値が変になる
   });
 </script>
-
-<!-- <svelte:head>
-  <title>Lumilumi-Notifications</title>
-  <meta property="og:description" content="Notifications" />
-  <meta name="description" content="Notifications" />
-</svelte:head> -->
 
 {#if !$loginUser}
   <a
@@ -260,11 +244,6 @@
           bind:updateViewNotifi
         >
           {#snippet children({ events })}
-            <!-- <div slot="loading">
-            <p>Loading...</p>
-          </div> -->
-
-            <!-- <SetRepoReactions /> -->
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >

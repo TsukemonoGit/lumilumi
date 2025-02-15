@@ -9,8 +9,8 @@ export const useUrl = (url: string) => {
   const query = createQuery({
     queryKey: genQueryKey(),
     queryFn: ({ queryKey: [, url] }) => checkFileExtension(url),
-    staleTime: 1 * 60 * 60 * 1000, // 4 hour
-    gcTime: 1 * 60 * 60 * 1000, // 4 hour
+    staleTime: 1 * 60 * 60 * 1000, // 1 hour
+    gcTime: 1 * 60 * 60 * 1000, // 1 hour
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
