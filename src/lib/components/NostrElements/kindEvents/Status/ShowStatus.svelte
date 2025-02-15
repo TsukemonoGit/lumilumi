@@ -13,9 +13,10 @@
   interface Props {
     pubkey: string | undefined;
     tieKey: string | undefined;
+    color?: string | undefined;
   }
 
-  let { pubkey = $bindable(), tieKey }: Props = $props();
+  let { pubkey = $bindable(), tieKey, color }: Props = $props();
   beforeNavigate((navigate) => {
     //console.log("beforeNavigate", navigate.type);
     if (navigate.type !== "form") {
@@ -25,12 +26,12 @@
 </script>
 
 {#if pubkey}
-  <div class="text-sm text-zinc-500">
+  <div class={`text-sm ${color ?? "text-zinc-500"}`}>
     <StatusGeneral {pubkey}>
       {#snippet children({ event })}
         {@const link = getStatusLink(event, page.url.origin)}
         <div class="flex gap-1 items-center">
-          <GeneralStatusDisplay {tieKey} {link} {event} />
+          <GeneralStatusDisplay {tieKey} {link} {event} {color} />
         </div>
       {/snippet}
     </StatusGeneral>
@@ -39,7 +40,7 @@
         {@const link =
           event.tags.find((tag: string[]) => tag[0] === "r")?.[1] ?? ""}
         <div class="flex gap-1 items-center">
-          <MusicStatusDisplay {tieKey} {event} {link} />
+          <MusicStatusDisplay {tieKey} {event} {link} {color} />
         </div>
       {/snippet}
     </StatusMusic>

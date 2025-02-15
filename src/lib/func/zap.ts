@@ -306,3 +306,21 @@ export function makeZapRequest({
 
   return zr;
 }
+
+export function lnurlToZapAddress(lud06: string): string | undefined {
+  try {
+    const { words } = bech32.decode(lud06, 1000);
+    const data = bech32.fromWords(words);
+    const lnurl = new TextDecoder().decode(data);
+
+    const match = lnurl.match(
+      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/(.+)$/
+    );
+    if (match) {
+      const [, domain, username] = match;
+      return `${username}@${domain}`;
+    }
+  } catch (error) {
+    return;
+  }
+}

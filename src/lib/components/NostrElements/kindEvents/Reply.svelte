@@ -81,11 +81,11 @@
           <UrlDisplay {part} {openModal} />
         {:else}
           <!---->
-          {replyTag[1]}
+          {replyTag.toString()}
         {/if}
       {:else}
         <!---->
-        {replyTag[1]}
+        {replyTag.toString()}
       {/if}
     </div>
   {/if}
