@@ -26,9 +26,10 @@
   import { type Writable, writable } from "svelte/store";
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
+  import { lnurlToZapAddress } from "$lib/func/zap";
+  import { Globe, Zap } from "lucide-svelte";
 
   interface Props {
-    // import * as Nostr from "nostr-typedef";
     pubkey: string;
     bannerHeight?: number;
     iconSize?: number;
@@ -59,6 +60,17 @@
   const metadataChange = (metadata: Nostr.Event) => {
     prof = profile(metadata);
   };
+  let zapAddress: string | undefined = $derived.by(() => {
+    if (prof?.lud16) {
+      return prof.lud16;
+    }
+
+    if (prof?.lud06) {
+      return lnurlToZapAddress(prof.lud06);
+    }
+    return undefined;
+  });
+  // $inspect(zapAddress);
 </script>
 
 {#if !pubcheck}
@@ -177,13 +189,24 @@
                   {#if petname}
                     <span class="align-middle">📛{petname}</span>{/if}
                 </div>
-                {#if prof.nip05}
-                  <div class="text-sm flex break-all flex-wrap items-center">
-                    {prof.nip05}<Nip05Check
-                      {pubkey}
-                      nip05Address={prof.nip05}
-                    />
-                  </div>{/if}
+                <div>
+                  {#if prof.nip05}
+                    <div class="text-sm flex break-all flex-wrap items-center">
+                      {prof.nip05}<Nip05Check
+                        {pubkey}
+                        nip05Address={prof.nip05}
+                      />
+                    </div>{/if}
+                  {#if zapAddress}
+                    <UserZap {metadata}>
+                      <div
+                        class="text-sm grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300"
+                      >
+                        <Zap class="fill-magnum-300" size={16} />{zapAddress}
+                      </div>
+                    </UserZap>
+                  {/if}
+                </div>
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-2">
@@ -191,7 +214,7 @@
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}
                   {#if prof.lud16 || prof.lud06}
-                    <div class=" w-fit"><UserZap {metadata} /></div>
+                    <UserZap {metadata} />
                   {/if}<UserPofileEllipsis
                     {pubkey}
                     {metadata}
@@ -209,10 +232,10 @@
             </div>
 
             {#if prof.website}<Link
-                className="text-sm underline text-magnum-300 break-all  "
+                className="text-sm underline text-magnum-300 break-all  flex gap-1 items-center"
                 href={prof.website}
                 >{#snippet content()}
-                  {prof?.website}{/snippet}</Link
+                  <Globe size={16} />{prof?.website}{/snippet}</Link
               >{/if}
 
             {#if lumiSetting.get().showUserStatus}<ShowStatus

@@ -12,9 +12,10 @@
 
   interface Props {
     metadata: Nostr.Event;
+    children?: () => any;
   }
 
-  let { metadata }: Props = $props();
+  let { metadata, children }: Props = $props();
   let invoice: string | undefined = $state();
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
@@ -81,11 +82,15 @@
   };
 </script>
 
-<button
-  onclick={handleClickZap}
-  class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-  title="zap"><Zap /></button
->
+<button onclick={handleClickZap} title="zap"
+  >{#if children}
+    {@render children()}
+  {:else}
+    <Zap
+      class="h-[32px] w-[32px] rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
+    />
+  {/if}
+</button>
 <AlertDialog
   bind:openDialog={dialogOpen}
   onClickOK={() => onClickOK()}

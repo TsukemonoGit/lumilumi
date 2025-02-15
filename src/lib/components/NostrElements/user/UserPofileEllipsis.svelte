@@ -19,7 +19,7 @@
 <Popover ariaLabel="user menu" showCloseButton={false}>
   <button
     type="button"
-    class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
+    class="h-[32px] w-[32px] rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
     title="menu"><Ellipsis /></button
   >
 
