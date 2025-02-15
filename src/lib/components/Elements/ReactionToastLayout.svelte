@@ -18,13 +18,14 @@
       case 6:
       case 16:
       case 7:
+      case 1111: //comment NIP-22
         return repostedId(event.tags)?.tag;
         break;
       case 9735:
         return extractZappedId(event.tags)?.tag;
         break;
       default:
-        const { replyTag, replyUsers } = replyedEvent(event.tags);
+        const { replyTag, replyUsers } = replyedEvent(event.tags, event.kind);
         return replyTag;
     }
   };

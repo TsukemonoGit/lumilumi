@@ -80,7 +80,9 @@
   {@render children?.({
     kind1: $data
       ?.map(({ event }) => event)
-      .filter((event) => event.kind === 1 || event.kind === 42),
+      .filter(
+        (event) => event.kind === 1 || event.kind === 42 || event.kind === 1111
+      ),
     kind7: $data?.map(({ event }) => event).filter((event) => event.kind === 7),
     kind6: $data?.map(({ event }) => event).filter((event) => event.kind === 6),
     kind9735: $data

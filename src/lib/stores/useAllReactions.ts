@@ -39,11 +39,11 @@ export function useAllReactions(
 
   const filters =
     atag !== undefined
-      ? [{ kinds: [1, 42, 6, 7, 9735], "#a": [atag] }]
+      ? [{ kinds: [1, 42, 6, 7, 9735, 1111], "#a": [atag] }]
       : id !== undefined
       ? [
-          { kinds: [1, 42, 6, 7, 9735], "#e": [id] },
-          { kinds: [1, 42, 6, 7, 9735], "#q": [id] },
+          { kinds: [1, 42, 6, 7, 9735, 1111], "#e": [id] },
+          { kinds: [1, 42, 6, 7, 9735, 1111], "#q": [id] },
         ]
       : [];
   console.log(filters);

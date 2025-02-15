@@ -263,10 +263,13 @@
     }
     if (
       note &&
-      (note.kind === 1 || note.kind === 42 || note.kind === 4) &&
+      (note.kind === 1 ||
+        note.kind === 42 ||
+        note.kind === 4 ||
+        note.kind === 1111) /**comment*/ &&
       note.tags.length > 0
     ) {
-      const res = replyedEvent(note.tags);
+      const res = replyedEvent(note.tags, note.kind);
       replyTag = res.replyTag;
       replyUsers = res.replyUsers;
     } else {
@@ -307,8 +310,16 @@
     {/if}
 
     <article class="{noteClass()} w-full">
-      {#if note.kind === 1}
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+      {#if note.kind === 1 || note.kind === 1111}
+        <NoteTemplate
+          {note}
+          {metadata}
+          {mini}
+          {displayMenu}
+          {depth}
+          {tieKey}
+          kindInfo={note.kind !== 1 ? true : false}
+        >
           {#if lumiSetting.get().showUserStatus}<ShowStatus
               pubkey={note.pubkey}
               {tieKey}

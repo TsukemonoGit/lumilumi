@@ -35,7 +35,7 @@
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
 
-  let res = $derived(replyedEvent(note.tags));
+  let res = $derived(replyedEvent(note.tags, note.kind));
   let replyTag = $derived(
     res.replyTag && res.replyTag.length > 3 && res.replyTag[3] === "root"
       ? undefined

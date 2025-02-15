@@ -163,7 +163,7 @@
             <ZapReactionList events={kind9735} {tieKey} />
 
             <!--kind1,42-->
-            <CollapsibleList title="Kind1,42" amount={kind1.length}>
+            <CollapsibleList title="Comments" amount={kind1.length}>
               <div
                 class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
               >

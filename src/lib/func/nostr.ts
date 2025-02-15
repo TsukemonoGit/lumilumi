@@ -255,7 +255,7 @@ export const makeMainFilters = (
       kinds: [
         42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/,
         /*16,kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/, 1059,
-        9735 /*zap receipt**/,
+        9735 /*zap receipt**/, 1111 /**comment NIP-22*/,
       ],
       "#p": [get(loginUser)],
       since: since,
