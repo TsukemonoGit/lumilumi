@@ -8,8 +8,9 @@
     link: string | undefined;
     event: Nostr.Event;
     tieKey: string | undefined;
+    color?: string | undefined;
   }
-  let { link, event, tieKey }: Props = $props();
+  let { link, event, tieKey, color }: Props = $props();
 </script>
 
 {#if (link && link !== "") || event.content.trim() !== ""}
@@ -18,7 +19,7 @@
       TriggerIcon={TrendingUp}
       note={event}
       iconSize={16}
-      iconClass="text-zinc-500"
+      iconClass={color ?? "text-zinc-500"}
       {tieKey}
     />
   </div>

@@ -171,7 +171,7 @@
           <div class=" flex flex-col justify-center mt-auto">
             <!--nameとか | アイコン-->
             <div class="flex flex-row items-center gap-2 mt-1 justify-between">
-              <div class="flex flex-col gap-2 mt-1">
+              <div class="flex flex-col mt-1">
                 <div class=" sm:text-xl text-md font-bold break-all text-left">
                   {#if prof.display_name}
                     <DisplayName
@@ -189,24 +189,23 @@
                   {#if petname}
                     <span class="align-middle">📛{petname}</span>{/if}
                 </div>
-                <div>
-                  {#if prof.nip05}
-                    <div class="text-sm flex break-all flex-wrap items-center">
-                      {prof.nip05}<Nip05Check
-                        {pubkey}
-                        nip05Address={prof.nip05}
-                      />
-                    </div>{/if}
-                  {#if zapAddress}
-                    <UserZap {metadata}>
-                      <div
-                        class="text-sm grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300"
-                      >
-                        <Zap class="fill-magnum-300" size={16} />{zapAddress}
-                      </div>
-                    </UserZap>
-                  {/if}
-                </div>
+
+                {#if prof.nip05}
+                  <div class="text-sm flex break-all flex-wrap items-center">
+                    {prof.nip05}<Nip05Check
+                      {pubkey}
+                      nip05Address={prof.nip05}
+                    />
+                  </div>{/if}
+                {#if zapAddress}
+                  <UserZap {metadata}>
+                    <div
+                      class="text-sm grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300"
+                    >
+                      <Zap class="fill-magnum-300" size={16} />{zapAddress}
+                    </div>
+                  </UserZap>
+                {/if}
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-2">
@@ -237,13 +236,10 @@
                 >{#snippet content()}
                   <Globe size={16} />{prof?.website}{/snippet}</Link
               >{/if}
-
-            {#if lumiSetting.get().showUserStatus}<ShowStatus
-                {pubkey}
-                {tieKey}
-              />{/if}
           </div>
-
+          {#if lumiSetting.get().showUserStatus}
+            <ShowStatus {pubkey} {tieKey} />
+          {/if}
           {#if prof.about}
             <div class="mt-2">
               <Content
