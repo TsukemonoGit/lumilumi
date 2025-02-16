@@ -22,7 +22,8 @@
   }
 
   onMount(() => {
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 20; i++) {
+      // 数を50から20に減らします
       characters.push({
         id: i,
         left: Math.random() * 100,
