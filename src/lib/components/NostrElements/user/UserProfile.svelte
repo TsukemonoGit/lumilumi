@@ -27,7 +27,8 @@
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
   import { lnurlToZapAddress } from "$lib/func/zap";
-  import { Cake, Globe, Zap } from "lucide-svelte";
+  import { Cake, Globe, PartyPopper, Zap } from "lucide-svelte";
+  import { checkBirthDay } from "$lib/func/event";
 
   interface Props {
     pubkey: string;
@@ -227,11 +228,19 @@
                 {/if}
                 {#if prof.birth}
                   {@const birthDay = formatBirth(prof.birth)}
+                  {@const isBirthday = checkBirthDay(prof)}
                   {#if birthDay}
                     <div
                       class="text-sm flex break-all flex-wrap items-center gap-1"
                     >
                       <Cake size={16} />{birthDay}
+
+                      {#if isBirthday}🎉
+                        <!-- <PartyPopper
+                          size={16}
+                          class={`${isBirthday ? "text-magnum-400 " : ""}`}
+                        /> -->
+                      {/if}
                     </div>{/if}{/if}
               </div>
               <div class="flex flex-col gap-2">

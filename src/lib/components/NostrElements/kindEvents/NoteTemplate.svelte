@@ -17,6 +17,8 @@
     isReplaceableKind,
     isParameterizedReplaceableKind,
   } from "nostr-tools/kinds";
+  import { checkBirthDay } from "$lib/func/event";
+  import { Cake } from "lucide-svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -73,6 +75,7 @@
   // };
 
   let prof = $derived(profile(metadata));
+  let isBirthDay = $derived(checkBirthDay(prof));
 </script>
 
 <div class={"grid grid-cols-[auto_1fr] max-w-full overflow-hidden my-1"}>
@@ -93,8 +96,13 @@
 
   <div class="pt-1 max-w-full overflow-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
-      <div>
-        {#if petname}<span class="text-magnum-100">📛{petname}</span>
+      <div class="flex items-center">
+        <!-- {#if isBirthDay}<Cake
+            size={16}
+            class="text-magnum-400"
+          />{/if} -->{#if petname}<span
+            class="text-magnum-100">📛{petname}</span
+          >
         {:else if metadata && prof}
           <DisplayName
             height={21}
@@ -113,7 +121,7 @@
           <span class="text-magnum-100 text-sm break-all">
             @{nip19.npubEncode(note.pubkey)}</span
           >
-        {/if}
+        {/if}{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}
         {#if kindInfo}
           <span class=" text-neutral-300/50 text-sm whitespace-nowrap">
             {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}

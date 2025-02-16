@@ -167,3 +167,15 @@ export const get31990Ogp = (
     return undefined;
   }
 };
+
+export const checkBirthDay = (prof: Profile | undefined): boolean => {
+  if (!prof) return false;
+  if (prof.birth && Array.isArray(prof.birth)) {
+    const [day, month] = prof.birth;
+    const now = new Date();
+    if (day === now.getDate() && month === now.getMonth() + 1) {
+      return true;
+    }
+  }
+  return false;
+};

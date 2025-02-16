@@ -3,7 +3,7 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { generateRandomId, setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
@@ -35,13 +35,16 @@
   import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
 
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr, profile } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
 
   import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
   import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
+  import type { Profile } from "$lib/types";
+  import BirthDayFestival from "./BirthDayFestival.svelte";
+  import { checkBirthDay } from "$lib/func/event";
 
   interface Props {
     data: {
@@ -162,12 +165,6 @@
     }
   }
 
-  // const handleChange: CreateTabsProps["onValueChange"] = ({ curr, next }) => {
-  //   console.log(curr, next);
-
-  // return next;
-  // };
-
   value.subscribe((v) => {
     if (v) {
       window.location.hash = v;
@@ -182,23 +179,16 @@
       }, 0);
     }
   });
+  let isBirthDay: boolean = $state(false);
+
+  const metadataChange = (metadata: Nostr.Event) => {
+    const prof = profile(metadata);
+    isBirthDay = checkBirthDay(prof);
+  };
+  beforeNavigate(() => {
+    isBirthDay = false;
+  });
 </script>
-
-<!-- <svelte:head>
-  <meta
-    name="description"
-    content="User:{data.pubkey
-      ? `pubkey:${nip19.npubEncode(data.pubkey)}`
-      : ''}"
-  />
-
-  <meta
-    property="og:description"
-    content="User:{data.pubkey
-      ? `pubkey:${nip19.npubEncode(data.pubkey)}`
-      : ''}"
-  /> 
-</svelte:head>-->
 
 <section>
   {#if userPubkey && view}
@@ -748,6 +738,16 @@
     }}
   />
 </div>
+<Metadata
+  queryKey={["metadata", data.pubkey]}
+  pubkey={data.pubkey}
+  onChange={metadataChange}
+></Metadata>
+{#if isBirthDay}
+  <div class="fixed top-0 left-0 w-full h-full z-50 pointer-events-none">
+    <BirthDayFestival />
+  </div>
+{/if}
 
 <style lang="postcss">
   .trigger {
