@@ -21,13 +21,14 @@
   import Content from "../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";
-  import { _ } from "svelte-i18n";
+  import { _, locale } from "svelte-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { type Writable, writable } from "svelte/store";
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
   import { lnurlToZapAddress } from "$lib/func/zap";
-  import { Globe, Zap } from "lucide-svelte";
+  import { Cake, Globe, PartyPopper, Zap } from "lucide-svelte";
+  import { checkBirthDay } from "$lib/func/event";
 
   interface Props {
     pubkey: string;
@@ -71,6 +72,25 @@
     return undefined;
   });
   // $inspect(zapAddress);
+
+  const formatBirth = (birth: number[]): string | undefined => {
+    try {
+      if (birth.length === 3) {
+        const date = new Date(birth[2], birth[1] - 1, birth[0]);
+        return date.toLocaleDateString();
+      } else if (birth.length === 2) {
+        const date = new Date(2025, birth[1] - 1, birth[0]);
+        return date.toLocaleDateString($locale || "en-US", {
+          month: "long",
+          day: "numeric",
+        });
+      } else {
+        return undefined;
+      }
+    } catch (e) {
+      return undefined;
+    }
+  };
 </script>
 
 {#if !pubcheck}
@@ -206,6 +226,22 @@
                     </div>
                   </UserZap>
                 {/if}
+                {#if prof.birth}
+                  {@const birthDay = formatBirth(prof.birth)}
+                  {@const isBirthday = checkBirthDay(prof)}
+                  {#if birthDay}
+                    <div
+                      class="text-sm flex break-all flex-wrap items-center gap-1"
+                    >
+                      <Cake size={16} />{birthDay}
+
+                      {#if isBirthday}🎉
+                        <!-- <PartyPopper
+                          size={16}
+                          class={`${isBirthday ? "text-magnum-400 " : ""}`}
+                        /> -->
+                      {/if}
+                    </div>{/if}{/if}
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-2">

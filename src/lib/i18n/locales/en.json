@@ -88,7 +88,8 @@
     "website": "Website",
     "nip05": "Domain authentication (NIP-05)",
     "lud": "LNURL address / Lightning address",
-    "about": "About"
+    "about": "About",
+    "birth": "Birthday"
   },
   "menu": {
     "json": "View Json",
