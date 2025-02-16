@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
     emojis,
@@ -20,7 +19,6 @@
   import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { generateResultMessage } from "$lib/func/util";
 
-  import { nip19 } from "nostr-tools";
   import { SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
 
@@ -30,6 +28,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   import type { LayoutData } from "../$types";
+  import Birth from "./Birth.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -46,6 +45,11 @@
   let lud: string = $state("");
   let newTags: string[][] = $state.raw([]);
   let isError = $state(false);
+
+  let birth_year: number | undefined = $state();
+  let birth_month: number | undefined = $state();
+  let birth_day: number | undefined = $state();
+
   onMount(async () => {
     if (!queryClient) {
       console.log("error");
@@ -119,6 +123,14 @@
     try {
       profile = JSON.parse(metadata.content);
       newProfile = { ...profile };
+      if (newProfile.birth && Array.isArray(newProfile.birth)) {
+        birth_day =
+          newProfile.birth.length > 0 ? newProfile.birth[0] : undefined;
+        birth_month =
+          newProfile.birth.length > 1 ? newProfile.birth[1] : undefined;
+        birth_year =
+          newProfile.birth.length > 2 ? newProfile.birth[2] : undefined;
+      }
       let { lud06, lud16 } = profile;
       if (lud16) {
         lud = lud16;
@@ -163,7 +175,12 @@
       }
       return true;
     });
-
+    if (birth_day && birth_month) {
+      const birthArray = birthToArray();
+      if (birthArray) {
+        newProfile = { ...newProfile, birth: birthArray };
+      }
+    }
     try {
       const content = JSON.stringify(newProfile);
       if (content === "") {
@@ -240,6 +257,25 @@
     // newProfile.display_name?.slice(cursorPosition);
     // cursorPosition += emojiText.length;
   };
+
+  function birthToArray(): number[] | undefined {
+    let birthArray: number[] = [];
+    console.log(birth_day);
+    if (birth_day && birth_day <= 31) {
+      birthArray.push(birth_day);
+    } else {
+      return undefined;
+    }
+    if (birth_month && birth_month <= 12) {
+      birthArray.push(birth_month);
+    } else {
+      return undefined;
+    }
+    if (birth_year && birth_year > 0) {
+      birthArray.push(birth_year);
+    }
+    return birthArray;
+  }
 </script>
 
 <section class=" w-full">
@@ -498,6 +534,9 @@
         bind:value={lud}
         placeholder="LURL1XXXXXX / example@wallet.example.com"
       />
+
+      {$_("profile.birth")}
+      <Birth bind:birth_day bind:birth_month bind:birth_year />
     </div>
 
     <button

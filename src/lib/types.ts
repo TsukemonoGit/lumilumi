@@ -105,6 +105,7 @@ export interface Profile {
   bot?: boolean;
   lud16?: string;
   lud06?: string;
+  birth?: number[]; //[day, month, year(optional)]
 }
 declare global {
   interface Window {

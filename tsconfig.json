@@ -10,7 +10,7 @@
     "sourceMap": true,
     "strict": true,
     "moduleResolution": "bundler",
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": ["./node_modules/@types", "./src/types", "./src/types.ts"],
     "lib": ["ESNext", "DOM", "WebWorker"]
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
