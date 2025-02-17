@@ -12,7 +12,14 @@ EN / [JA](./README-ja.md)
 
   - You can't use extensions on the Android version of Chrome, but you can easily use NIP-46 by installing [Amber](https://github.com/greenart7c3/Amber).
 
+- Birthday
+
+  A special birthday animation plays, and a cake 🎂 appears next to the name. (The animation may be subject to change.)
+
+  ![birthday festival](./image/birthdayfes.gif)
+
 - 3D view
+
   ![3DView](./image/test.gif)
   [Actual page](https://lumilumi.app/nevent1qvzqqqqqqypzq4jsz7zew5j7jr4pdfxh483nwq9vyw9ph6wm706sjwrzj2we58nqqyxhwumn8ghj77tpvf6jumt9qywhwumn8ghj7un9d3shjtnwdaehgu3wwa5hyetydejhgtn2wqqjqamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6nsqyxhwumn8ghj7mn0wvhxcmmvqqsgn5eef652pzj07a2c0adfcazr23exkuhl09nldms9qv9cr4xvr3qk57wkh)
 
