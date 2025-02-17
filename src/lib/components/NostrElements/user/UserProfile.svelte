@@ -226,22 +226,6 @@
                     </div>
                   </UserZap>
                 {/if}
-                {#if prof.birth}
-                  {@const birthDay = formatBirth(prof.birth)}
-                  {@const isBirthday = checkBirthDay(prof)}
-                  {#if birthDay}
-                    <div
-                      class="text-sm flex break-all flex-wrap items-center gap-1"
-                    >
-                      <Cake size={16} />{birthDay}
-
-                      {#if isBirthday}🎉
-                        <!-- <PartyPopper
-                          size={16}
-                          class={`${isBirthday ? "text-magnum-400 " : ""}`}
-                        /> -->
-                      {/if}
-                    </div>{/if}{/if}
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-2">
@@ -271,7 +255,22 @@
                 href={prof.website}
                 >{#snippet content()}
                   <Globe size={16} />{prof?.website}{/snippet}</Link
-              >{/if}
+              >{/if}{#if prof.birth}
+              {@const birthDay = formatBirth(prof.birth)}
+              {@const isBirthday = checkBirthDay(prof)}
+              {#if birthDay}
+                <div
+                  class="text-sm flex break-all flex-wrap items-center gap-1"
+                >
+                  <Cake size={16} />{birthDay}
+
+                  {#if isBirthday}🎉
+                    <!-- <PartyPopper
+                      size={16}
+                      class={`${isBirthday ? "text-magnum-400 " : ""}`}
+                    /> -->
+                  {/if}
+                </div>{/if}{/if}
           </div>
           {#if lumiSetting.get().showUserStatus}
             <ShowStatus {pubkey} {tieKey} />
