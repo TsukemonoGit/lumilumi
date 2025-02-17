@@ -5,6 +5,7 @@
 
   import { viewport } from "$lib/func/useViewportAction";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import DisplayName from "./DisplayName.svelte";
 
   interface Props {
     pubhex: string;
@@ -59,7 +60,11 @@
           <span class="text-sm inline-flex break-all">{pubString}</span>
         {/snippet}
         {#snippet content({ metadata })}
-          {userName(metadata)}
+          <DisplayName
+            height={21}
+            name={userName(metadata)}
+            tags={metadata.tags}
+          />
         {/snippet}
       </Metadata>{/if}{:else}{pubString}{/if}</span
 >
