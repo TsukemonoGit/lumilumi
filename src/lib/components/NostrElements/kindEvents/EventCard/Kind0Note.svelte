@@ -39,9 +39,9 @@
       {tieKey}
     />
   </div>
-  <div class="p-1">
+  <div class="p-1 overflow-x-hidden">
     <div
-      class="flex align-middle whitespace-pre-wrap break-words"
+      class="flex align-middle whitespace-pre-wrap break-words flex-wrap"
       style="word-break: break-word;"
     >
       <div class="mb-2">
