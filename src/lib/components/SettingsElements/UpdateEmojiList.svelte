@@ -119,7 +119,7 @@
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
-    <div class="w-[630px] max-w-[90vw] overflow-x-hidden">
+    <div class="w-full overflow-x-hidden">
       {#if $emojis}
         <h2 class="text-magnum-200 m-0 text-lg font-bold flex gap-1">
           <SmilePlus />{$_("customEmoji.title")}

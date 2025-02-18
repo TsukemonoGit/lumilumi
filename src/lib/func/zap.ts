@@ -1,5 +1,4 @@
 import { verifyEvent, type EventTemplate } from "nostr-tools";
-import { getZapEndpoint } from "nostr-tools/nip57";
 import * as Nostr from "nostr-typedef";
 import { getDefaultWriteRelays, usePromiseReq } from "./nostr";
 import { bech32 } from "@scure/base";
@@ -9,6 +8,7 @@ import { queryClient } from "$lib/stores/stores";
 import { latest, uniq, type EventPacket } from "rx-nostr";
 import { pipe } from "rxjs";
 import { decode } from "light-bolt11-decoder";
+import { utf8Decoder } from "nostr-tools/utils";
 
 export interface InvoiceProp {
   metadata: Nostr.Event;
@@ -89,16 +89,17 @@ export async function fetchZapLNURLPubkey(
     let lnurl: string = "";
     let { lud06, lud16 } = JSON.parse(metadata.content);
 
-    if (lud06) {
-      const { words } = bech32.decode(lud06, 1000);
-      const data = bech32.fromWords(words);
-      lnurl = new TextDecoder().decode(data);
-    } else if (lud16) {
+    //lud16( name@domain )優先
+    if (lud16) {
       const [name, domain] = lud16.split("@");
       lnurl = new URL(
         `/.well-known/lnurlp/${name}`,
         `https://${domain}`
       ).toString();
+    } else if (lud06) {
+      const { words } = bech32.decode(lud06, 1000);
+      const data = bech32.fromWords(words);
+      lnurl = new TextDecoder().decode(data);
     } else {
       return {
         pub: undefined,
@@ -323,4 +324,40 @@ export function lnurlToZapAddress(lud06: string): string | undefined {
   } catch (error) {
     return;
   }
+}
+
+//https://github.com/nbd-wtf/nostr-tools/blob/master/nip57.ts
+//lud16( name@domain )優先
+export async function getZapEndpoint(
+  metadata: Nostr.Event
+): Promise<null | string> {
+  try {
+    let lnurl: string = "";
+    let { lud06, lud16 } = JSON.parse(metadata.content);
+
+    if (lud16) {
+      let [name, domain] = lud16.split("@");
+      lnurl = new URL(
+        `/.well-known/lnurlp/${name}`,
+        `https://${domain}`
+      ).toString();
+    } else if (lud06) {
+      let { words } = bech32.decode(lud06, 1000);
+      let data = bech32.fromWords(words);
+      lnurl = utf8Decoder.decode(data);
+    } else {
+      return null;
+    }
+
+    let res = await fetch(lnurl);
+    let body = await res.json();
+
+    if (body.allowsNostr && body.nostrPubkey) {
+      return body.callback;
+    }
+  } catch (err) {
+    /*-*/
+  }
+
+  return null;
 }
