@@ -8,7 +8,8 @@
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import { followList } from "$lib/stores/globalRunes.svelte";
-
+  import { checkBirthDay } from "$lib/func/event";
+  import { Cake } from "lucide-svelte";
   interface Props {
     displayMenu: boolean;
     note: Nostr.Event;
@@ -27,6 +28,7 @@
 
   let prof = $derived(profile(note));
   let petname = $derived(followList.get().get(note.pubkey));
+  let isBirthDay = $derived(checkBirthDay(prof));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">
@@ -44,13 +46,14 @@
       class="flex align-middle whitespace-pre-wrap break-words flex-wrap"
       style="word-break: break-word;"
     >
-      <div class="mb-2">
+      <div class="mb-2 flex items-center">
         {#if prof}
           <DisplayName
             height={21}
             name={prof.display_name ?? ""}
             tags={note.tags}
           />
+
           {#if prof.name && prof.name !== ""}<span
               class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
               style="word-break: break-word;"
@@ -61,7 +64,7 @@
               />
             </span>{/if}{/if}{#if petname}<span class="text-magnum-100"
             >📛{petname}</span
-          >{/if}
+          >{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}{/if}
       </div>
       <div class="ml-auto">
         <FollowButton pubkey={note.pubkey} />
