@@ -115,9 +115,7 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore}>
   {#snippet main()}
-    <div
-      class=" rounded-md p-2 bg-zinc-800/40 max-w-[90vw] w-[640px] overflow-x-hidden"
-    >
+    <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       {#each parts as token}
         <SimpleContentBlock
           part={token}

@@ -103,9 +103,7 @@
 <!--JSON no Dialog-->
 <Dialog open={dialogOpen}>
   {#snippet main()}
-    <div
-      class="w-[630px] h-[480px] max-w-[90vw] max-h-[90vh] overflow-x-hidden"
-    >
+    <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
       {#if $mutes}
         <AddMute />
         <MuteTabList />

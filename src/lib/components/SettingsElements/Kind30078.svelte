@@ -300,9 +300,7 @@
 
 <Dialog bind:open={dialogOpen}>
   {#snippet main()}
-    <div
-      class="w-[600px] h-[400px] max-w-[90vw] max-h-[90vh] overflow-x-hidden p-1"
-    >
+    <div class="w-full h-[400px] max-h-[90vh] overflow-x-hidden p-1">
       <div class="flex gap-1 items-center">
         <input
           type="text"

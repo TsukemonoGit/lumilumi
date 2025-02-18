@@ -49,9 +49,7 @@
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore}>
   {#snippet main()}
-    <div
-      class="flex items-center justify-center max-w-[90vw] w-[640px] overflow-hidden"
-    >
+    <div class="flex items-center justify-center w-full overflow-hidden">
       <model-viewer
         style="width:90vw; height:74vh; max-width:560px"
         lazy={true}
