@@ -96,7 +96,7 @@
 
   <div class="pt-1 max-w-full overflow-hidden">
     <div class="flex align-middle max-w-full overflow-x-hidden">
-      <div class="flex items-center">
+      <div class="flex items-center flex-wrap overflow-hidden max-w-full">
         <!-- {#if isBirthDay}<Cake
             size={16}
             class="text-magnum-400"
@@ -104,13 +104,18 @@
             class="text-magnum-100">📛{petname}</span
           >
         {:else if metadata && prof}
-          <DisplayName
-            height={21}
-            name={prof.display_name ?? ""}
-            tags={metadata.tags}
-          />
+          <span
+            class="line-clamp-1 truncate overflow-hidden max-w-full"
+            style="white-space: normal; word-break: break-word;"
+            ><DisplayName
+              height={21}
+              name={prof.display_name ?? ""}
+              tags={metadata.tags}
+            /></span
+          >
           {#if prof.name && prof.name !== ""}<span
-              class="text-magnum-100 text-sm"
+              class="text-magnum-100 text-sm line-clamp-1 truncate overflow-hidden max-w-full"
+              style="white-space: normal; word-break: break-word;"
               ><DisplayName
                 height={21}
                 name={`@${prof.name}`}
