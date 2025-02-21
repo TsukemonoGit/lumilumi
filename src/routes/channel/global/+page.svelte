@@ -153,9 +153,7 @@
     <Link
       className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
       href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${10005}`}
-      >{#snippet content()}{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight
-          size={16}
-        />{/snippet}</Link
+      >{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight size={16} /></Link
     >{/if}
 </section>
 <!--部屋番号わかんないしグローバル見ながら引用するとkind1引用になる-->

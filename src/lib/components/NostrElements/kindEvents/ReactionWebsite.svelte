@@ -83,7 +83,7 @@
       <OGP url={website}>
         {#snippet nodata()}
           <Link className="underline text-magnum-300 break-all " href={website}
-            >{#snippet content()}{website}{/snippet}</Link
+            >{website}</Link
           >
         {/snippet}
         {#snippet renderContent(contents)}
@@ -92,14 +92,14 @@
           {:else}
             <Link
               className="underline text-magnum-300 break-all "
-              href={website}>{#snippet content()}{website}{/snippet}</Link
+              href={website}>{website}</Link
             >
           {/if}
         {/snippet}
       </OGP>
     {:else}
       <Link className="underline text-magnum-300 break-all " href={website}
-        >{#snippet content()}{website}{/snippet}</Link
+        >{website}</Link
       >{/if}
   </div>
 {/if}

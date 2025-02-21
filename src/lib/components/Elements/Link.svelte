@@ -7,10 +7,10 @@
     href: string;
     className?: string;
     props?: { [key: string]: any };
-    content: Snippet;
+    children: Snippet;
   }
 
-  let { href, className = "", props = {}, content }: Props = $props();
+  let { href, className = "", props = {}, children }: Props = $props();
 
   //有効なリンクかのチェックもする
   const checkSafe = () => {
@@ -39,6 +39,6 @@
     title={href}
     target="_blank"
     rel="noopener noreferrer"
-    {...props}>{@render content?.()}</a
+    {...props}>{@render children?.()}</a
   >
-{:else}{@render content?.()}{/if}
+{:else}{@render children?.()}{/if}

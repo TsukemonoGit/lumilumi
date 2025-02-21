@@ -773,7 +773,7 @@
       <Link
         className="underline text-magnum-300"
         href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
-        >{#snippet content()}(NIP-30){/snippet}</Link
+        >(NIP-30)</Link
       >
     </div>
     {#if $loginUser}

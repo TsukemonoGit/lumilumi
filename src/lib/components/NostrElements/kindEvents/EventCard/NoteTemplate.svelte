@@ -7,10 +7,10 @@
 
   import { getRelaysById } from "$lib/func/nostr";
   import { goto } from "$app/navigation";
-  import SeenonIcons from "./SeenonIcons.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import UserPopupMenu from "../user/UserPopupMenu.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import { eventKinds } from "$lib/func/kinds";
   import type { Snippet } from "svelte";
   import {
@@ -123,7 +123,7 @@
           >
         {/if}{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}
         {#if kindInfo}
-          <span class=" text-neutral-300/50 text-sm whitespace-nowrap">
+          <span class=" text-neutral-300/50 text-sm whitespace-nowrap ml-1">
             {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
           </span>{/if}
       </div>

@@ -132,8 +132,9 @@
               class="grid grid-rows-[auto_auto] border rounded-md border-magnum-500/50"
             >
               {#if lumiSetting.get().showImg}<img
+                  height="48px"
                   loading="lazy"
-                  class="h-12 object-contain justify-self-center"
+                  class="h-12 min-w-12 object-contain justify-self-center"
                   src={e[1]}
                   alt={e[0]}
                 />{:else}{e[1]}{/if}

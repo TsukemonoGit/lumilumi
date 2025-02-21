@@ -252,9 +252,7 @@
 
             {#if prof.website}<Link
                 className="text-sm underline text-magnum-300 break-all  flex gap-1 items-center"
-                href={prof.website}
-                >{#snippet content()}
-                  <Globe size={16} />{prof?.website}{/snippet}</Link
+                href={prof.website}><Globe size={16} />{prof?.website}</Link
               >{/if}{#if prof.birth}
               {@const birthDay = formatBirth(prof.birth)}
               {@const isBirthday = checkBirthDay(prof)}
