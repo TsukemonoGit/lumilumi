@@ -1,12 +1,7 @@
 <script lang="ts">
-  import { profile } from "$lib/func/util";
-  import { Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { muteCheck } from "$lib/func/muteCheck";
-  import { mutebykinds, mutes } from "$lib/stores/stores";
 
   import {
     extractKind9734,

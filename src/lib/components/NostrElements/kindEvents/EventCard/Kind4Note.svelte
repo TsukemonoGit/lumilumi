@@ -8,7 +8,7 @@
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
   import Content from "../../content/Content.svelte";
-  import NoteTemplate from "../NoteTemplate.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
   import UserName from "../../user/UserName.svelte";
   import Reply from "../Reply.svelte";
 

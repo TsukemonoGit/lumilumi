@@ -350,8 +350,7 @@
           </div>{/if}
         {#if newProfile.website}<Link
             className="text-sm underline text-magnum-300 break-all  "
-            href={newProfile.website}
-            >{#snippet content()}{newProfile?.website}{/snippet}</Link
+            href={newProfile.website}>{newProfile?.website}</Link
           >{/if}
       </div>
 
@@ -407,8 +406,9 @@
                       >
                         {#if lumiSetting.get().showImg}
                           <img
+                            height="24px"
                             loading="lazy"
-                            class="h-6 object-contain justify-self-center"
+                            class="h-6 min-w-6 object-contain justify-self-center"
                             src={e[1]}
                             alt={e[0]}
                             title={e[0]}
@@ -497,8 +497,9 @@
                       >
                         {#if lumiSetting.get().showImg}
                           <img
+                            height="24px"
                             loading="lazy"
-                            class="h-6 object-contain justify-self-center"
+                            class="h-6 min-w-6 object-contain justify-self-center"
                             src={e[1]}
                             alt={e[0]}
                             title={e[0]}

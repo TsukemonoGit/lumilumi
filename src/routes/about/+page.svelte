@@ -243,11 +243,8 @@
         <Link
           href="https://github.com/TsukemonoGit/lumilumi"
           className="flex gap-1 items-center underline"
+          >TsukemonoGit/lumilumi<Github size={24} /></Link
         >
-          {#snippet content()}TsukemonoGit/lumilumi<Github
-              size={24}
-            />{/snippet}
-        </Link>
       </div>
     </li>
     <li>
@@ -255,10 +252,8 @@
       <div class="item">
         <Link
           href="https://lumilumi.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
-          className="flex gap-1 items-center underline"
+          className="flex gap-1 items-center underline">@mono</Link
         >
-          {#snippet content()}@mono{/snippet}
-        </Link>
       </div>
     </li>
     <li>
@@ -297,10 +292,8 @@
             <Link
               href="https://tsukemonogit.github.io/luminostr/"
               className="flex gap-1 items-center underline"
-              >{#snippet content()}
-                <BriefcaseMedical />Luminostr
-              {/snippet}
-            </Link>
+              ><BriefcaseMedical />Luminostr</Link
+            >
             <span class="text-sm">{$_("about.luminostr")}</span>
           </div>
         </li>
@@ -309,9 +302,8 @@
             <Link
               href="https://github.com/TsukemonoGit/lumilumi/issues/new/choose"
               className="flex gap-1 items-center underline"
+              >{$_("about.houkoku")}</Link
             >
-              {#snippet content()}{$_("about.houkoku")}{/snippet}
-            </Link>
           </div>
         </li>
 

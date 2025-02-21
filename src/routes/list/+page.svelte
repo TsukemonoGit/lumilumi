@@ -63,7 +63,7 @@
             <Link
               className="underline text-magnum-300 break-all "
               href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
-              >{#snippet content()}{$_("nostviewstr.kind30000")}{/snippet}</Link
+              >{$_("nostviewstr.kind30000")}</Link
             >
           {:else}
             {#each peopleList as event}
@@ -83,9 +83,9 @@
         <Link
           className=" font-semibold text-magnum-300 break-all inline-flex"
           href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${30000}`}
-          >{#snippet content()}{$_(
-              "nostviewstr.kind30000"
-            )}<SquareArrowOutUpRight size={16} />{/snippet}</Link
+          >{$_("nostviewstr.kind30000")}<SquareArrowOutUpRight
+            size={16}
+          /></Link
         >
       </div>
     </div>

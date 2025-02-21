@@ -176,7 +176,14 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
     },
   ],
   //
-
+  [
+    1018,
+    {
+      ja: "投票の回答",
+      en: "Poll Response",
+    },
+  ],
+  //
   [
     1021,
     {
@@ -191,6 +198,9 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Bid confirmation",
     },
   ],
+  //
+  //
+  [1068, { ja: "投票", en: "Poll" }],
   //
   [1111, { ja: "コメント", en: "Comment" }],
   //

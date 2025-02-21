@@ -23,7 +23,7 @@
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";
-  import NoteTemplate from "../NoteTemplate.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
   import Kind9735Note from "./Kind9735Note.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
@@ -63,6 +63,9 @@
     isReplaceableKind,
     isParameterizedReplaceableKind,
   } from "nostr-tools/kinds";
+  import Kind1068Note from "./Kind1068Note.svelte";
+  import Kind40Note from "./Kind40Note.svelte";
+  import Kind41Note from "./Kind41Note.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -158,16 +161,6 @@
   // const { kind, tag } = repostedId(note.tags);
   let replyTag: string[] | undefined = $state.raw();
   let replyUsers: string[] = $state.raw([]);
-  const handleClickToChannel = (id: string) => {
-    if (!id) {
-      return;
-    }
-    const neventPointer: nip19.EventPointer = {
-      id: id,
-      relays: tieKey ? getRelaysById(id, tieKey) : [],
-    };
-    goto(`/channel/${nip19.neventEncode(neventPointer)}`);
-  };
 
   let loadThread = $state(false);
 
@@ -523,78 +516,30 @@
         />
       {:else if note.kind === 40}
         <!--kind40 パブ茶部屋-->
-        <LatestEvent
-          queryKey={["channel", "kind41", note.id]}
-          filters={[
-            { kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] },
-          ]}
-        >
-          {#snippet loading()}
-            <div>
-              <ChannelMetadataLayout
-                linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-                handleClickToChannel={() => handleClickToChannel(note.id)}
-                id={note.id}
-                event={note}
-                {tieKey}
-              />
-            </div>
-          {/snippet}
-          {#snippet nodata()}
-            <div>
-              <ChannelMetadataLayout
-                linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-                handleClickToChannel={() => handleClickToChannel(note.id)}
-                id={note.id}
-                event={note}
-                {tieKey}
-              />
-            </div>
-          {/snippet}
-          {#snippet error()}
-            <div>
-              <ChannelMetadataLayout
-                linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-                handleClickToChannel={() => handleClickToChannel(note.id)}
-                id={note.id}
-                event={note}
-                {tieKey}
-              />
-            </div>
-          {/snippet}
-          {#snippet children({ event })}
-            <ChannelMetadataLayout
-              linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
-              handleClickToChannel={() => handleClickToChannel(note.id)}
-              id={note.id}
-              {event}
-              {tieKey}
-            />
-          {/snippet}
-        </LatestEvent>
+        <Kind40Note {tieKey} {note} />
       {:else if note.kind === 41}
         <!--kind:40チャンネルroot-->
-        {@const root = note.tags.find((tag) => tag[0] === "e")?.[1]}
-        <!--kind40 パブ茶部屋-->
-        {#if root}
-          <ChannelMetadataLayout
-            linkButtonTitle={`/channel/${nip19.noteEncode(root)}`}
-            handleClickToChannel={() => handleClickToChannel(root)}
-            id={root}
-            event={note}
-            {tieKey}
-          />
-        {:else}
-          <OtherKindNote
-            {tieKey}
-            {note}
-            {metadata}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {maxHeight}
-          />
-        {/if}
+        <Kind41Note
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {replyUsers}
+        />
+      {:else if note.kind === 1068}
+        <Kind1068Note
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {mini}
+          {warning}
+        />
       {:else if note.kind === 30000}
         <ListLinkCard event={note} {depth} {tieKey} />
       {:else if note.kind === 30030}
@@ -675,173 +620,6 @@
           {repostable}
         />
       {:else}
-        <!-- その他
-      {@const clientData = findClientTag(note)}
-      {#if !clientData}
-     client tagがないやつここ
-        <div class="break-all overflow-x-hidden">
-          kind:{note.kind}{#if metadata}
-            {profile(metadata)?.name}
-          {/if}
-        </div>
-      
-        <div
-          class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-        >
-          {#each note.tags as tag}
-            {JSON.stringify(tag)}
-          {/each}
-        </div>
-
-       
-        <div
-          class="mt-0.5 overflow-y-auto overflow-x-hidden"
-          style="max-height:{maxHeight ?? 'none'}"
-        >
-          <Content text={note.content} tags={note.tags} {displayMenu} {depth} />
-        </div>
-        {#if displayMenu}<NoteActionButtons {note} />{/if}
-
-        
-      {:else}
-       client tag あったので 31990 を さがす とこたち
-        <LatestEvent
-          filters={[clientData.filter]}
-          queryKey={["naddr", clientData.aTag]}
-          let:event
-        >
-          <div slot="loading">
-            <div class="break-all overflow-x-hidden">
-              kind:{note.kind}{#if metadata}
-                {profile(metadata)?.name}
-              {/if}
-            </div>
-          
-            <div
-              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-            >
-              {#each note.tags as tag}
-                {JSON.stringify(tag)}
-              {/each}
-            </div>
-           
-            <Content
-              text={note.content}
-              tags={note.tags}
-              {displayMenu}
-              {depth}
-            />
-            {#if displayMenu}<NoteActionButtons {note} />{/if}
-          </div>
-          <div slot="nodata">
-            <div class="break-all overflow-x-hidden">
-              kind:{note.kind}{#if metadata}
-                {profile(metadata)?.name}
-              {/if}
-            </div>
-           
-            <div
-              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-            >
-              {#each note.tags as tag}
-                {JSON.stringify(tag)}
-              {/each}
-            </div>
-          
-            <Content
-              text={note.content}
-              tags={note.tags}
-              {displayMenu}
-              {depth}
-            />
-            {#if displayMenu}<NoteActionButtons {note} />{/if}
-          </div>
-          <div slot="error" let:error>
-            <div class="break-all overflow-x-hidden">
-              kind:{note.kind}{#if metadata}
-                {profile(metadata)?.name}
-              {/if}
-            </div>
-           
-            <div
-              class="flex flex-wrap overflow-x-hidden break-all max-h-32 overflow-y-auto"
-            >
-              {#each note.tags as tag}
-                {JSON.stringify(tag)}
-              {/each}
-            </div>
-            
-            <Content
-              text={note.content}
-              tags={note.tags}
-              {displayMenu}
-              {depth}
-            />
-            {#if displayMenu}<NoteActionButtons {note} />{/if}
-          </div>
-          client tag からURLさがすとこ
-          {#await findWebURL(event.tags, clientData) then urls}
-            <UserPopupMenu
-              pubkey={note.pubkey}
-              bind:metadata
-              size={20}
-              displayMenu={false}
-              {depth}
-            />kind:{note.kind}
-            {#if metadata}
-              @{profile(metadata)?.name}
-            {/if}
-            {#if urls}
-              {#each urls as url}
-                {#if lumiSetting.get().showImg}
-                  <OGP {url} let:contents>
-                    <Link
-                      slot="nodata"
-                      className="underline text-magnum-300 break-all "
-                      href={url}>{url}</Link
-                    >
-                    {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから
-                      <OgpCard {contents} {url} />
-                    {:else}
-                      <Link
-                        className="underline text-magnum-300 break-all"
-                        href={url}>{url}</Link
-                      >
-                    {/if}
-                  </OGP>
-                {:else}
-                  <Link
-                    className="underline text-magnum-300 break-all"
-                    href={url}>{url}</Link
-                  >{/if}
-              {/each}
-              {#if displayMenu}<NoteActionButtons {note} />{/if}
-            {:else}
-             client tag から対応したURL見つからなかったところ？
-              <div class="break-all overflow-x-hidden">
-                kind:{note.kind}{#if metadata}
-                  {profile(metadata)?.name}
-                {/if}
-              </div>
-             
-              <div
-                class="flex flex-wrap overflow-x-hidden break-word max-h-32 overflow-y-auto"
-              >
-                {#each note.tags as tag}
-                  {JSON.stringify(tag)}
-                {/each}
-              </div>
-             
-              <Content
-                text={note.content}
-                tags={note.tags}
-                {displayMenu}
-                {depth}
-              />
-              {#if displayMenu}<NoteActionButtons {note} />{/if}
-            {/if}
-          {/await}
-        </LatestEvent>-->
         <OtherKindNote
           {note}
           {metadata}

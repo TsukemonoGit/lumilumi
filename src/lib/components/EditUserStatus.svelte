@@ -256,8 +256,9 @@
                         >
                           {#if lumiSetting.get().showImg}
                             <img
+                              height="24px"
                               loading="lazy"
-                              class="h-6 object-contain justify-self-center"
+                              class="h-6 min-w-6 object-contain justify-self-center"
                               src={e[1]}
                               alt={e[0]}
                               title={e[0]}

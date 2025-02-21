@@ -5,7 +5,7 @@
 
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
 
-  import NoteTemplate from "../NoteTemplate.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { getStatusLink } from "$lib/func/status";

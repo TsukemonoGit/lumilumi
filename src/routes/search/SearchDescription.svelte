@@ -11,6 +11,6 @@
   <Link
     className="underline hover:opacity-75"
     href={"https://github.com/nostr-protocol/nips/blob/master/50.md"}
-    >{#snippet content()}(NIP-50){/snippet}</Link
+    >(NIP-50)</Link
   >
 </p>

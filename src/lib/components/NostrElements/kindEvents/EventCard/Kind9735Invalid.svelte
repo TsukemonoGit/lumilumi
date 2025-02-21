@@ -2,7 +2,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import * as Nostr from "nostr-typedef";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import NoteTemplate from "../NoteTemplate.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
 
   interface Props {
     note: Nostr.Event;

@@ -133,7 +133,7 @@
     <Link
       props={{ "aria-label": `External Links: ${part.url}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{#snippet content()}{part.content}{/snippet}</Link
+      href={part.url ?? ""}>{part.content}</Link
     >{:else if part.type === "invoice" && part.content}
     <InvoiceCard invoice={part.content} />
   {:else}<span

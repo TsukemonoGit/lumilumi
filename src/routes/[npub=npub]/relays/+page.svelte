@@ -24,7 +24,7 @@
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import EllipsisMenu from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
-  import NoteTemplate from "$lib/components/NostrElements/kindEvents/NoteTemplate.svelte";
+  import NoteTemplate from "$lib/components/NostrElements/kindEvents/EventCard/NoteTemplate.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { relayRegex2 } from "$lib/func/regex";

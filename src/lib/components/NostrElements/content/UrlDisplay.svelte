@@ -22,8 +22,7 @@
       <Link
         props={{ "aria-label": `External Links: ${part.url}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
-        href={part.content ?? ""}
-        >{#snippet content()}{part.content}{/snippet}</Link
+        href={part.content ?? ""}>{part.content}</Link
       >
     {/snippet}
     {#snippet content(type)}
@@ -47,8 +46,7 @@
         {:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}
-            >{#snippet content()}{part.content}{/snippet}</Link
+            href={part.content ?? ""}>{part.content}</Link
           >{/if}
       {:else if type === "audio"}
         {#if lumiSetting.get().showImg}
@@ -62,8 +60,7 @@
         {:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}
-            >{#snippet content()}{part.content}{/snippet}</Link
+            href={part.content ?? ""}>{part.content}</Link
           >{/if}
       {:else if type === "3D"}
         <Content3D content={part.content} url={part.url} />
@@ -75,21 +72,18 @@
                 <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
                   props={{ "aria-label": `External Links: ${part.url}` }}
                   className="underline text-magnum-300 break-all "
-                  href={part.content ?? ""}
-                  >{#snippet content()}{part.content ?? ""}{/snippet}</Link
+                  href={part.content ?? ""}>{part.content ?? ""}</Link
                 >{/if}{/snippet}
             {#snippet nodata()}
               <Link
                 props={{ "aria-label": `External Links: ${part.url}` }}
                 className="underline text-magnum-300 break-all hover:opacity-80"
-                href={part.content ?? ""}
-                >{#snippet content()}{part.content ?? ""}{/snippet}</Link
+                href={part.content ?? ""}>{part.content ?? ""}</Link
               >{/snippet}
           </OGP>{:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}
-            >{#snippet content()}{part.content}{/snippet}</Link
+            href={part.content ?? ""}>{part.content}</Link
           >{/if}
       {:else}
         <span

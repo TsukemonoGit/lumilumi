@@ -14,7 +14,7 @@
   import ContentImage from "../../content/ContentImage.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import NoteTemplate from "../NoteTemplate.svelte";
+  import NoteTemplate from "./NoteTemplate.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
   import UserName from "../../user/UserName.svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
