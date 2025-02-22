@@ -29,7 +29,7 @@
       </div>
     {:else}
       <div
-        class="mt-1 w-full flex items-center flex-wrap overflow-hidden h-10 bg-neutral-800"
+        class="mt-1 w-full flex items-center flex-wrap overflow-hidden h-10 bg-neutral-700"
       ></div>{/if}
     <div class=" mt-1 flex justify-between text-neutral-600">
       <MessageSquare size="20" /><Repeat2 size="22" /><Heart
