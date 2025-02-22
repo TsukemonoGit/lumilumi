@@ -7,6 +7,7 @@
 
   import NaddrByRelayhint from "./NaddrByRelayhint.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -51,14 +52,10 @@
           },
     ]}
   >
-    {#snippet loading()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
-      >
-        <div>Loading {content ?? ""}</div>
-        {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
-      </div>
-    {/snippet}
+    {#snippet loading()}<EmptyCard
+        naddr={displayMenu ? content?.slice(6) : undefined}
+        >Loading {content ?? ""}</EmptyCard
+      >{/snippet}
     {#snippet nodata()}
       <div>
         {#if data.relays && data.relays.length > 0}
@@ -82,14 +79,10 @@
           </div>{/if}
       </div>
     {/snippet}
-    {#snippet error()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    {#snippet error()}<EmptyCard
+        naddr={displayMenu ? content?.slice(6) : undefined}
+        >Nodata {content ?? ""}</EmptyCard
       >
-        {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
-            naddr={content?.slice(6)}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet children({ event })}
       <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>

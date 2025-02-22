@@ -6,7 +6,7 @@
   import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
   interface Props {
-    notestr: string;
+    encodedId: string;
     indexes?: number[] | undefined;
     TriggerIcon?: any;
     iconSize?: number;
@@ -14,7 +14,7 @@
   }
 
   let {
-    notestr,
+    encodedId,
     indexes = undefined,
     TriggerIcon = Ellipsis,
     iconSize = 20,
@@ -43,7 +43,7 @@
       case 1:
         //open in njump
 
-        const url = `https://njump.me/${notestr}`;
+        const url = `https://njump.me/${encodedId}`;
 
         window.open(url, "_blank", "noreferrer");
         break;
@@ -51,7 +51,7 @@
       case 3:
         //Copy EventID
         try {
-          await navigator.clipboard.writeText(notestr);
+          await navigator.clipboard.writeText(encodedId);
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
@@ -67,8 +67,8 @@
         }
         break;
       case 4:
-        //Goto notestr page
-        goto(`/${notestr}`);
+        //Goto encodedId page
+        goto(`/${encodedId}`);
         break;
     }
   };

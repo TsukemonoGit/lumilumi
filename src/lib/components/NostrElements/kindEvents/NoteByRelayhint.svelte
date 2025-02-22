@@ -7,6 +7,7 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import { queryClient } from "$lib/stores/stores";
+  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     id: string;
@@ -40,42 +41,25 @@
   };
 </script>
 
-{#await queryCheck(id)}
-  <div
-    class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+{#await queryCheck(id)}<EmptyCard nevent={displayMenu ? loadingText : undefined}
+    >Loading {loadingText}</EmptyCard
   >
-    Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
-        notestr={loadingText}
-      />{/if}
-  </div>
 {:then}
   <Text queryKey={["timeline", id]} {id} relays={relayhint}>
     {#snippet loading()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      <EmptyCard nevent={displayMenu ? loadingText : undefined}
+        >Loading {loadingText}</EmptyCard
       >
-        Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
-            notestr={loadingText}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet nodata()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      <EmptyCard nevent={displayMenu ? loadingText : undefined}
+        >Nodata {loadingText}</EmptyCard
       >
-        nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
-            notestr={loadingText}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet error()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      <EmptyCard nevent={displayMenu ? loadingText : undefined}
+        >Nodata {loadingText}</EmptyCard
       >
-        {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
-            notestr={nip19.noteEncode(id)}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet content({ data: text, status })}
       <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
