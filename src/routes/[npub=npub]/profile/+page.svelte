@@ -29,6 +29,7 @@
 
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
+  import { getNurlFetch } from "$lib/func/zap";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -106,18 +107,6 @@
         created_at: Date.now() * 1000,
         kind: 0,
       };
-      // console.error("failed to get metadata event");
-      // $nowProgress = false;
-
-      // $toastSettings = {
-      //   title: "Warning",
-      //   description: `failed to get metadata event`,
-      //   color: "bg-orange-500",
-      // };
-      // setTimeout(() => {
-      //   goto(`/${nip19.npubEncode(data.pubkey)}`);
-      // });
-      // return;
     }
     newTags = metadata.tags;
     try {
@@ -152,11 +141,34 @@
       if (newProfile && LUD06Regex.test(lud.trim())) {
         newProfile.lud06 = lud;
       } else if (newProfile && LUD16Regex.test(lud.trim())) {
-        newProfile.lud16 = lud;
+        //16が@の方。testだけだとemailアドレスでも通るので確認する
+        try {
+          let [name, domain] = lud.split("@");
+          const lnurl = new URL(
+            `/.well-known/lnurlp/${name}`,
+            `https://${domain}`
+          ).toString();
+
+          let res = await getNurlFetch(lnurl);
+          let body = await res?.json();
+
+          if (body && body.allowsNostr && body.nostrPubkey) {
+            newProfile.lud16 = lud;
+          } else {
+            throw Error();
+          }
+        } catch (error) {
+          $toastSettings = {
+            title: "Error",
+            description: `Error ${$_("profile.lud")}`,
+            color: "bg-orange-500",
+          };
+          return;
+        }
       } else {
         //ludに何かしら入力があるのに06でも16でもないとき
         $toastSettings = {
-          title: "Warning",
+          title: "Error",
           description: `Error ${$_("profile.lud")}`,
           color: "bg-orange-500",
         };
@@ -213,7 +225,7 @@
       $nowProgress = false;
     } catch (error) {
       $toastSettings = {
-        title: "Warning",
+        title: "Error",
         description: `Error  `,
         color: "bg-orange-500",
       };
@@ -433,19 +445,7 @@
         bind:value={newProfile.picture}
         placeholder="https://example.com/picture.webp"
       />
-      <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
-        preview
-        <div
-          class="h-24 min-w-24 w-fit max-w-full rounded-md px-3 py-2 border border-magnum-500"
-        >
-          <img
-            loading="lazy"
-            class="h-full object-contain justify-self-center"
-            src={newProfile.picture}
-            alt={""}
-          />
-        </div>
-      </div> -->
+
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.banner")}
         <InputImageFromFile bind:inputText={newProfile.banner} />
@@ -456,19 +456,7 @@
         bind:value={newProfile.banner}
         placeholder="https://example.com/banner.webp"
       />
-      <!-- <div class="flex justify-center flex-col items-center text-magnum-400">
-        preview
-        <div
-          class="h-24 w-fit min-w-24 max-w-full rounded-md px-3 py-2 border border-magnum-500"
-        >
-          <img
-            loading="lazy"
-            class="h-full object-contain justify-self-center"
-            src={newProfile.banner}
-            alt={""}
-          />
-        </div>
-      </div> -->
+
       {$_("profile.about")}
       <textarea
         class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800 mb-2"
@@ -528,12 +516,12 @@
         placeholder="https://example.com"
       />
 
-      {$_("profile.lud")}
+      {$_("profile.lud")} (⚠Not Email)
       <input
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
         bind:value={lud}
-        placeholder="LURL1XXXXXX / example@wallet.example.com"
+        placeholder="LURL1XXXXXX / lightning@wallet.com"
       />
 
       {$_("profile.birth")}
