@@ -8,6 +8,7 @@
   import EventCard from "../kindEvents/EventCard/EventCard.svelte";
   import CustomEmoji from "../content/CustomEmoji.svelte";
   import EmptyCardList from "../kindEvents/EventCard/EmptyCardList.svelte";
+  import EmptyCard from "../kindEvents/EventCard/EmptyCard.svelte";
 
   let { pubkey } = $props();
 </script>
@@ -69,32 +70,17 @@
                     },
               ]}
             >
-              {#snippet loading()}
-                <div
-                  class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+              {#snippet loading()}<EmptyCard naddr={nip19.naddrEncode(naddr)}
+                  >loading {filteredList[index]}</EmptyCard
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
-                    naddr={nip19.naddrEncode(naddr)}
-                  />
-                </div>
               {/snippet}
-              {#snippet nodata()}
-                <div
-                  class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+              {#snippet nodata()}<EmptyCard naddr={nip19.naddrEncode(naddr)}
+                  >not found {filteredList[index]}</EmptyCard
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
-                    naddr={nip19.naddrEncode(naddr)}
-                  />
-                </div>
               {/snippet}
-              {#snippet error()}
-                <div
-                  class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+              {#snippet error()}<EmptyCard naddr={nip19.naddrEncode(naddr)}
+                  >not found {filteredList[index]}</EmptyCard
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
-                    naddr={nip19.naddrEncode(naddr)}
-                  />
-                </div>
               {/snippet}
               {#snippet children({ event })}
                 <Metadata
