@@ -45,6 +45,8 @@
   import type { Profile } from "$lib/types";
   import BirthDayFestival from "./BirthDayFestival.svelte";
   import { checkBirthDay } from "$lib/func/event";
+  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
+  import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
 
   interface Props {
     data: {
@@ -239,18 +241,6 @@
               ]}
             >
               {#snippet children({ event })}
-                <!-- <SetRepoReactions />
-                    <div slot="loading" class="p-1">
-                      <p>pin Loading...</p>
-                    </div>
-
-                    <div slot="error" class="p-1" let:error>
-                      <p>{error}</p>
-                    </div>
-                    <div slot="nodata" class="p-1">
-                      <p>nodata</p>
-                    </div> -->
-
                 <div
                   class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
                 >
@@ -347,9 +337,7 @@
                     {/if}
                   </div>{/snippet}
                 {#snippet loading()}
-                  <div>
-                    <p class="px-2">timeline Loading...</p>
-                  </div>
+                  <EmptyCardList length={10} />
                 {/snippet}
 
                 {#snippet error()}
@@ -424,9 +412,7 @@
                     {/if}
                   </div>{/snippet}
                 {#snippet loading()}
-                  <div>
-                    <p class="px-2">public chat Loading...</p>
-                  </div>
+                  <EmptyCardList length={10} />
                 {/snippet}
 
                 {#snippet error()}
@@ -519,9 +505,7 @@
                   {/if}
                 </div>{/snippet}
               {#snippet loading()}
-                <div>
-                  <p class="px-2">timeline Loading...</p>
-                </div>
+                <EmptyCardList length={10} />
               {/snippet}
 
               {#snippet error()}
@@ -617,9 +601,7 @@
                   {/if}
                 </div>{/snippet}
               {#snippet loading()}
-                <div>
-                  <p class="px-2">timeline Loading...</p>
-                </div>
+                <EmptyCardList length={10} />
               {/snippet}
 
               {#snippet error()}
@@ -644,9 +626,7 @@
               ]}
             >
               {#snippet loading()}
-                <div class="p-1">
-                  <p>relays Loading...</p>
-                </div>
+                <EmptyCardList length={10} />
               {/snippet}
 
               {#snippet error()}
@@ -656,7 +636,7 @@
               {/snippet}
               {#snippet nodata()}
                 <div class="p-1">
-                  <p>relays Loading...</p>
+                  <p>relays nodata</p>
                 </div>
               {/snippet}
 
@@ -686,9 +666,7 @@
               pubkey={data.pubkey}
             >
               {#snippet loading()}
-                <div class="p-1">
-                  <p>Loading...</p>
-                </div>
+                <EmptyCardList length={10} />
               {/snippet}
 
               {#snippet error()}
@@ -698,7 +676,7 @@
               {/snippet}
               {#snippet nodata()}
                 <div class="p-1">
-                  <p>Loading...</p>
+                  <p>nodata</p>
                 </div>
               {/snippet}
               {#snippet content({ contacts, status })}
