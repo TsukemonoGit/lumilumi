@@ -19,7 +19,7 @@
   <div class="pt-1 max-w-full overflow-hidden">
     <!--name-->
     <div
-      class="flex items-center flex-wrap overflow-hidden w-24 h-5 bg-neutral-700 max-w-full"
+      class="flex items-center flex-wrap overflow-hidden w-24 h-4 bg-neutral-700 max-w-full"
     ></div>
 
     <!--text-->
