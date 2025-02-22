@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
   import Kind0Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
@@ -11,13 +12,15 @@
   }
 
   let { pubkey, tieKey }: Props = $props();
-  const getPub = (pubhex: string): string | null => {
+  let encodedPub: string | undefined = $derived.by(() => {
+    if (!pubkey) return undefined;
     try {
-      return nip19.npubEncode(pubhex);
+      return nip19.npubEncode(pubkey);
     } catch (error) {
-      return null;
+      return undefined;
     }
-  };
+  });
+
   let view = $state(true);
 
   $effect(() => {
@@ -33,22 +36,17 @@
 </script>
 
 {#if view}
-  <div class=" overflow-hidden">
+  <div class="w-full overflow-hidden">
     <Metadata queryKey={["metadata", pubkey]} {pubkey}>
-      {#snippet loading()}
-        <div class="w-full">
-          {getPub(pubkey)}
-        </div>
+      {#snippet loading()}<EmptyCard nevent={encodedPub}
+          >loading {encodedPub}</EmptyCard
+        >
       {/snippet}
       {#snippet nodata()}
-        <div class="w-full">
-          {getPub(pubkey)}
-        </div>
+        <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
       {/snippet}
       {#snippet error()}
-        <div class="w-full">
-          {getPub(pubkey)}
-        </div>
+        <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
       {/snippet}
       {#snippet content({ metadata })}
         <Kind0Note
