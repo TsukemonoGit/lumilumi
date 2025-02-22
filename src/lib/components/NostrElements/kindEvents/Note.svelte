@@ -7,6 +7,7 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
+  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     id: string;
@@ -36,14 +37,9 @@
 
 <Text queryKey={["timeline", id]} {id}>
   {#snippet loading()}
-    <div
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-    >
-      Loading {loadingText}{#if displayMenu}<EllipsisMenuNote
-          notestr={loadingText}
-        />{/if}
-    </div>
-  {/snippet}
+    <EmptyCard nevent={displayMenu ? loadingText : undefined}
+      >Loading {loadingText}</EmptyCard
+    >{/snippet}
   {#snippet nodata()}
     <div>
       {#if relayhint && relayhint.length > 0}
@@ -56,25 +52,15 @@
           {tieKey}
           {relayhint}
         />
-      {:else}
-        <div
-          class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-        >
-          nodata {loadingText}{#if displayMenu}<EllipsisMenuNote
-              notestr={loadingText}
-            />{/if}
-        </div>
-      {/if}
+      {:else}<EmptyCard nevent={displayMenu ? loadingText : undefined}
+          >nodata {loadingText}</EmptyCard
+        >{/if}
     </div>
   {/snippet}
   {#snippet error()}
-    <div
-      class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    <EmptyCard nevent={displayMenu ? loadingText : undefined}
+      >nodata {loadingText}</EmptyCard
     >
-      {nip19.noteEncode(id)}{#if displayMenu}<EllipsisMenuNote
-          notestr={nip19.noteEncode(id)}
-        />{/if}
-    </div>
   {/snippet}
   {#snippet content({ data: text, status })}
     <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>

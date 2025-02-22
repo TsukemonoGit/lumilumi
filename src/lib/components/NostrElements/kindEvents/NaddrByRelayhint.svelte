@@ -7,6 +7,7 @@
 
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -44,13 +45,10 @@
   };
 </script>
 
-{#await queryCheck(queryKey)}
-  <div
-    class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
+{#await queryCheck(queryKey)}<EmptyCard
+    naddr={displayMenu ? content?.slice(6) : undefined}
+    >Loading {content ?? ""}</EmptyCard
   >
-    <div>Loading {content ?? ""}</div>
-    {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
-  </div>
 {:then}
   <LatestEvent
     relays={relayhint}
@@ -69,30 +67,19 @@
     ]}
   >
     {#snippet loading()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all grid grid-cols-[1fr_20px] align-middle justify-between"
+      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+        >Loading {content ?? ""}</EmptyCard
       >
-        <div>Loading {content ?? ""}</div>
-        {#if displayMenu}<EllipsisMenuNaddr naddr={content?.slice(6)} />{/if}
-      </div>
     {/snippet}
     {#snippet nodata()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+        >Nodata {content ?? ""}</EmptyCard
       >
-        Nodata {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
-            naddr={content?.slice(6)}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet error()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+        >Nodata {content ?? ""}</EmptyCard
       >
-        {content}{#if displayMenu}<EllipsisMenuNaddr
-            naddr={content?.slice(6)}
-          />{/if}
-      </div>
     {/snippet}
     {#snippet children({ event })}
       <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
