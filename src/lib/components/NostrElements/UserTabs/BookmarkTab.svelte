@@ -8,6 +8,7 @@
   import EllipsisMenuNaddr from "../kindEvents/NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import PaginationList from "./PaginationList.svelte";
+  import EmptyCardList from "../kindEvents/EventCard/EmptyCardList.svelte";
 
   let { pubkey } = $props();
 </script>
@@ -18,9 +19,7 @@
   filters={[{ authors: [pubkey], kinds: [10003], limit: 1 }]}
 >
   {#snippet loading()}
-    <div class="p-1">
-      <p>Loading...</p>
-    </div>
+    <EmptyCardList length={10} />
   {/snippet}
 
   {#snippet error()}
@@ -30,7 +29,7 @@
   {/snippet}
   {#snippet nodata()}
     <div class="p-1">
-      <p>Loading...</p>
+      <p>nodata</p>
     </div>
   {/snippet}
   {#snippet children({ event, status })}
