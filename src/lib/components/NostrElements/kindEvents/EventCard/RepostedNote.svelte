@@ -17,6 +17,7 @@
   import { nip33Regex, relayRegex } from "$lib/func/regex";
   import NoteByRelayhint from "../NoteByRelayhint.svelte";
   import NaddrByRelayhint from "../NaddrByRelayhint.svelte";
+  import EmptyCard from "./EmptyCard.svelte";
 
   interface Props {
     displayMenu: boolean;
@@ -67,14 +68,10 @@
 
 {#if tag[0] === "e"}
   <Text queryKey={["timeline", tag[1]]} id={tag[1]}>
-    {#snippet loading()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    {#snippet loading()}<EmptyCard
+        nevent={displayMenu ? nip19.noteEncode(tag[1]) : undefined}
+        >Loading {nip19.noteEncode(tag[1])}</EmptyCard
       >
-        Loading {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-          notestr={nip19.noteEncode(tag[1])}
-        />
-      </div>
     {/snippet}
     {#snippet nodata()}
       <div>
@@ -87,25 +84,17 @@
             {tieKey}
             {relayhint}
           />
-        {:else}
-          <div
-            class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+        {:else}<EmptyCard
+            nevent={displayMenu ? nip19.noteEncode(tag[1]) : undefined}
+            >not found {nip19.noteEncode(tag[1])}</EmptyCard
           >
-            nodata {nip19.noteEncode(tag[1])}{#if displayMenu}<EllipsisMenuNote
-                notestr={nip19.noteEncode(tag[1])}
-              />{/if}
-          </div>
         {/if}
       </div>
     {/snippet}
-    {#snippet error()}
-      <div
-        class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
+    {#snippet error()}<EmptyCard
+        nevent={displayMenu ? nip19.noteEncode(tag[1]) : undefined}
+        >not found {nip19.noteEncode(tag[1])}</EmptyCard
       >
-        {nip19.noteEncode(tag[1])}<EllipsisMenuNote
-          notestr={nip19.noteEncode(tag[1])}
-        />
-      </div>
     {/snippet}
     {#snippet content({ data: text })}
       {#if page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}

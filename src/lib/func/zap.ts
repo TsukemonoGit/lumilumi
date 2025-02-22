@@ -131,7 +131,9 @@ export async function fetchZapLNURLPubkey(
   }
 }
 
-async function getNurlFetch(lnurl: string): Promise<Response | undefined> {
+export async function getNurlFetch(
+  lnurl: string
+): Promise<Response | undefined> {
   const data: Response | undefined = queryClient?.getQueryData([
     "fetchNnurl",
     lnurl,
@@ -349,10 +351,10 @@ export async function getZapEndpoint(
       return null;
     }
 
-    let res = await fetch(lnurl);
-    let body = await res.json();
+    let res = await getNurlFetch(lnurl);
+    let body = await res?.json();
 
-    if (body.allowsNostr && body.nostrPubkey) {
+    if (body && body.allowsNostr && body.nostrPubkey) {
       return body.callback;
     }
   } catch (err) {
