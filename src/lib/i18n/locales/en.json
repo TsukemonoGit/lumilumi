@@ -122,7 +122,8 @@
     "channel": "Open channel",
     "nostviewstr": "Open in nostviewstr",
     "nostrapp": "Open in App Manager",
-    "mention": "Send Mention"
+    "mention": "Send Mention",
+    "userSearch": "Search User"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",
