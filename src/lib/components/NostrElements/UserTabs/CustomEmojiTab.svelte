@@ -2,7 +2,7 @@
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import EllipsisMenuNaddr from "../kindEvents/NoteActionButtuns/EllipsisMenuNaddr.svelte";
+
   import PaginationList from "./PaginationList.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "../kindEvents/EventCard/EventCard.svelte";

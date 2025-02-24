@@ -8,6 +8,7 @@
 
   import NaddrEvent from "./NaddrEvent.svelte";
   import { viewport } from "$lib/func/useViewportAction";
+  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     displayMenu: boolean;
@@ -63,8 +64,8 @@
   onenterViewport={handleEnterViewport}
   class="inline overflow-hidden"
 >
-  {#if hasLoaded}{#if decoded.type === "npub"}<span
-        class="text-magnum-300 align-middle"
+  {#if hasLoaded}
+    {#if decoded.type === "npub"}<span class="text-magnum-300 align-middle"
         >{#if !displayMenu}<UserName
             pubhex={decoded.data}
           />{:else}<PopupUserName pubkey={decoded.data} {tieKey} />{/if}</span
@@ -121,5 +122,12 @@
             {tieKey}
           />{/if}</span
       >
-    {:else if decoded.type === "nsec"}{content}{/if}{:else}{content}{/if}
+    {:else if decoded.type === "nsec"}{content}{/if}{:else}<span
+      class="grid grid-cols-[auto_1fr_auto]"
+      ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      <div class="border rounded-md border-magnum-600/30">
+        <EmptyCard>Loading {content}</EmptyCard>
+      </div>
+      <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
+    >{/if}
 </div>
