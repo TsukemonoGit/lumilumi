@@ -40,8 +40,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@tanstack/svelte-query": "^5.66.4",
-		"@tanstack/svelte-query-devtools": "^5.66.4",
+		"@tanstack/svelte-query": "^5.66.9",
+		"@tanstack/svelte-query-devtools": "^5.66.9",
 		"graphemesplit": "^2.6.0",
 		"light-bolt11-decoder": "^3.2.0",
 		"lucide-svelte": "^0.475.0",
