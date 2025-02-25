@@ -148,7 +148,7 @@
       ><Share size={16} />{$_("about.share")}
     </button>
   </div>
-  {#if followList.get() !== undefined && followList.get().size > 0}
+  {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
     <div class="py-2">
       <span class="font-medium text-magnum-400 mr-2">Filter: </span><label>
         <input
