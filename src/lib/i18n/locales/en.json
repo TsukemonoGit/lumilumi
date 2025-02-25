@@ -270,5 +270,18 @@
   },
   "nostrlogin": {
     "description": "This website is part of the Nostr network. Log in with your Nostr profile or sign up to join."
+  },
+  "search": {
+    "ward": "Search word",
+    "followee": "only followee",
+    "options": "Options",
+    "search": "Search"
+  },
+  "settei": {
+    "search": "Search Relays",
+    "global": "Global Relays"
+  },
+  "status": {
+    "edit": "Edit status"
   }
 }

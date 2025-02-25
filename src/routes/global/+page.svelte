@@ -194,7 +194,7 @@
     {#if relaySettei}<!--パラムにリレーが設定されてるときはそれ表示させるだけ-->
 
       <Settei
-        title={"Global"}
+        title={$_("settei.global")}
         relays={globalRelays}
         {onClickSave}
         Description={GlobalDescription}

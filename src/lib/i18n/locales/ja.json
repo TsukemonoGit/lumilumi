@@ -269,5 +269,18 @@
   },
   "nostrlogin": {
     "description": "このサイトはNostrネットワークを利用しています。おもちのNostrアカウントでログインするか、新しくアカウントを作成して参加することができます。"
+  },
+  "search": {
+    "ward": "検索ワード",
+    "followee": "フォロイーのみ",
+    "options": "オプション",
+    "search": "検索"
+  },
+  "settei": {
+    "search": "検索リレー",
+    "global": "グローバルリレー"
+  },
+  "status": {
+    "edit": "ステータスの編集"
   }
 }

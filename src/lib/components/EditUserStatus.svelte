@@ -15,6 +15,7 @@
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
   import { lumiSetting, userStatusMap } from "$lib/stores/globalRunes.svelte";
+  import { _ } from "svelte-i18n";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -219,7 +220,7 @@
       use:melt={$content}
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium text-magnum-300">
-        Edit status
+        {$_("status.edit")}
       </h2>
       <!-- <p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
         Make changes to your profile here. Click save when you're done.

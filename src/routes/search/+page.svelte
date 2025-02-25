@@ -262,7 +262,7 @@
 <section>
   {#if $loginUser}
     <Settei
-      title={"Search"}
+      title={$_("settei.search")}
       relays={searchRelays}
       {onClickSave}
       Description={SearchDescription}

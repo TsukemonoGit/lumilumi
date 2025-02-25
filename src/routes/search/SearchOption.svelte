@@ -2,7 +2,7 @@
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
-  import { X, ChevronsUpDown, Share } from "lucide-svelte";
+  import { X, ChevronsUpDown, Share, Search } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
@@ -123,37 +123,51 @@
   }
 </script>
 
-<div class="flex flex-wrap gap-2 mb-2">
-  <div class="flex flex-col items-start justify-center">
-    <div class="font-medium text-magnum-400">keyword</div>
-    <input
-      type="text"
-      id="search"
-      class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-      placeholder=""
-      bind:value={searchWord}
-    />
+<div>
+  <div class="mt-1 flex flex-row max-w-full gap-2 mb-2 items-end">
+    <div class="flex flex-col items-start justify-center">
+      <div class="font-medium text-magnum-400">{$_("search.ward")}</div>
+      <input
+        type="text"
+        id="search"
+        class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
+        placeholder=""
+        bind:value={searchWord}
+      />
+    </div>
+    <button
+      class="h-10 rounded-md bg-magnum-200 w-24 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
+      disabled={$nowProgress}
+      onclick={handleClickSearch}><Search />{$_("search.search")}</button
+    >
+
+    <button
+      class=" w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+      onclick={handleClickShare}
+      disabled={$nowProgress}
+      ><Share size={16} />{$_("about.share")}
+    </button>
   </div>
   {#if followList.get() !== undefined && followList.get().size > 0}
-    <div class="flex flex-col items-start justify-center mt-auto py-2">
-      <label>
+    <div class="py-2">
+      <span class="font-medium text-magnum-400 mr-2">Filter: </span><label>
         <input
           type="checkbox"
           class="rounded-checkbox"
           bind:checked={followee}
           onchange={createFilter}
         />
-        only followee
+        {$_("search.followee")}
       </label>
     </div>{/if}
 </div>
-
-<div use:melt={$root} class="relative w-full">
+<div use:melt={$root} class="relative w-full mt-2">
   <button
     use:melt={$trigger}
     class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
   >
-    <span class="font-semibold text-magnum-400">Options</span>
+    <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span
+    >
     <div
       class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
       aria-label="Toggle"
@@ -175,7 +189,7 @@
         transition:slide
         class="flex gap-2 w-full flex-wrap"
       >
-        <div class="flex flex-col items-start justify-center">
+        <div class="flex flex-col items-start justify-center mt-2">
           <div class="font-medium text-magnum-400">kind</div>
           <div class="flex align-middle mt-1.5 gap-1 items-center">
             <input
@@ -204,12 +218,6 @@
               placeholder="npub"
               bind:value={searchPubkey}
             />
-
-            <!-- <button
-              on:click={() => handleClickPub("author")}
-              class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
-              >Set My Pubkey</button
-            > -->
           </div>
         </div>
         <div class="flex flex-col items-start justify-center w-full">
@@ -267,11 +275,11 @@
   </div>
 </div>
 
-<div class="relative w-full h-12">
+<!-- <div class="relative w-full h-12">
   <button
-    class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+    class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
     disabled={$nowProgress}
-    onclick={handleClickSearch}>Search</button
+    onclick={handleClickSearch}><Search />{$_("search.search")}</button
   >
 
   <button
@@ -280,4 +288,4 @@
     disabled={$nowProgress}
     ><Share size={16} />{$_("about.share")}
   </button>
-</div>
+</div> -->
