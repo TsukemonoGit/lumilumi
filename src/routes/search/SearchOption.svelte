@@ -123,31 +123,30 @@
   }
 </script>
 
-<div>
-  <div class="mt-1 flex flex-row max-w-full gap-2 mb-2 items-end">
-    <div class="flex flex-col items-start justify-center">
-      <div class="font-medium text-magnum-400">{$_("search.ward")}</div>
-      <input
-        type="text"
-        id="search"
-        class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-        placeholder=""
-        bind:value={searchWord}
-      />
-    </div>
-    <button
-      class="h-10 rounded-md bg-magnum-200 w-24 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
-      disabled={$nowProgress}
-      onclick={handleClickSearch}><Search />{$_("search.search")}</button
-    >
-
-    <button
-      class=" w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-      onclick={handleClickShare}
-      disabled={$nowProgress}
-      ><Share size={16} />{$_("about.share")}
-    </button>
+<div class="mt-1 grid grid-cols-[1fr_auto_auto] w-full gap-1 mb-2 items-end">
+  <div class="w-full flex flex-col items-start justify-center">
+    <div class="font-medium text-magnum-400">{$_("search.ward")}</div>
+    <input
+      type="text"
+      id="search"
+      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
+      placeholder=""
+      bind:value={searchWord}
+    />
   </div>
+  <button
+    class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
+    disabled={$nowProgress}
+    onclick={handleClickSearch}><Search />{$_("search.search")}</button
+  >
+
+  <button
+    class=" w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+    onclick={handleClickShare}
+    disabled={$nowProgress}
+    ><Share size={16} />{$_("about.share")}
+  </button>
+
   {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
     <div class="py-2">
       <span class="font-medium text-magnum-400 mr-2">Filter: </span><label>
