@@ -282,7 +282,7 @@
   />
   <div class="w-full mt-4 opacity-80">
     <div
-      class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto p-1"
+      class="border border-magnum-500/80 rounded-md max-h-40 break-all overflow-y-auto p-1"
     >
       <div class="font-semibold text-magnum-400">Filters</div>
       {#each filters as filter}

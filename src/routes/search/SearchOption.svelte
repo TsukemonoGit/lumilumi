@@ -160,7 +160,7 @@
     ><Share size={16} />{$_("about.share")}
   </button>
 </div>
-<div use:melt={$root} class="relative w-full">
+<div use:melt={$root} class="relative w-full mt-1">
   <button
     use:melt={$trigger}
     class="flex items-center justify-between border-b border-b-magnum-400"
