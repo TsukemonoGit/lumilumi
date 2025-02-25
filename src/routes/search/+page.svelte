@@ -27,6 +27,7 @@
   import { latest } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import { page } from "$app/state";
 
   let { data }: { data: PageData } = $props();
 
@@ -46,22 +47,6 @@
   let openSearchResult = $state(false);
 
   let searchRelays = $state(nip50relays);
-  // function updateQueryParams() {
-  //   const params = new URLSearchParams(window.location.search);
-  //   searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
-  //   searchWord ? params.set("word", searchWord) : params.delete("word");
-  //   searchKind !== undefined && searchKind !== null
-  //     ? params.set("k", String(searchKind))
-  //     : params.delete("k");
-  //   searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
-  //   searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
-  //   searchSince ? params.set("s", String(searchSince)) : params.delete("s");
-  //   searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
-  //   followee ? params.set("f", String(followee)) : params.delete("f");
-
-  //   const newUrl = `${window.location.pathname}?${params.toString()}`;
-  //   pushState(newUrl, {});
-  // }
 
   let isMount = false;
   afterNavigate((navigate) => {
@@ -94,7 +79,7 @@
 
   async function init() {
     setSearchRelay();
-
+    const load = page.url.searchParams.get("load");
     searchHashtag = data.searchHashtag;
     searchWord = data.searchWord;
     searchKind = data.searchKind;
@@ -122,7 +107,9 @@
       // });
       console.log("showFilters", showFilters);
       console.log("searchRelays", searchRelays);
-      handleClickSearch();
+      if (load !== "false") {
+        handleClickSearch();
+      }
     }
     isMount = false;
   }
@@ -275,7 +262,7 @@
 <section>
   {#if $loginUser}
     <Settei
-      title={"Search"}
+      title={$_("settei.search")}
       relays={searchRelays}
       {onClickSave}
       Description={SearchDescription}
@@ -293,7 +280,16 @@
     {resetValue}
     {filters}
   />
-
+  <div class="w-full mt-4 opacity-80">
+    <div
+      class="border border-magnum-500/80 rounded-md max-h-40 break-all overflow-y-auto p-1"
+    >
+      <div class="font-semibold text-magnum-400">Filters</div>
+      {#each filters as filter}
+        {JSON.stringify(filter, null, 2)}
+      {/each}
+    </div>
+  </div>
   {#if openSearchResult}
     <SearchResult
       bind:this={compRef}

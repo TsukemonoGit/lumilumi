@@ -14,6 +14,7 @@
     User,
     Radio,
     Share,
+    Search,
   } from "lucide-svelte";
   import UserMuteMenu from "./UserMuteMenu.svelte";
   import { goto } from "$app/navigation";
@@ -67,7 +68,8 @@
           { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
         ]
       : []),
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
+    /*    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 }, */
+    { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
   ]);
 
   const handleSelectItem = async (index: number) => {
@@ -170,6 +172,9 @@
             color: "bg-orange-500",
           };
         }
+        break;
+      case 8:
+        goto(`search?author=${encodedPubkey}&load=false`);
         break;
     }
   };

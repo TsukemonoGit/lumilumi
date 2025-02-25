@@ -2,7 +2,7 @@
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
-  import { X, ChevronsUpDown, Share } from "lucide-svelte";
+  import { X, Share, Search, ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
@@ -123,46 +123,59 @@
   }
 </script>
 
-<div class="flex flex-wrap gap-2 mb-2">
-  <div class="flex flex-col items-start justify-center">
-    <div class="font-medium text-magnum-400">keyword</div>
+<div
+  class="mt-1 grid grid-cols-[1fr_auto_auto] w-full gap-1 mb-1 overflow-x-hidden"
+>
+  <div class="w-full flex flex-col items-start justify-center">
     <input
       type="text"
       id="search"
-      class="h-10 w-[240px] rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-      placeholder=""
+      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+      placeholder="search"
       bind:value={searchWord}
     />
+    {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
+      <div class="py-2 self-start">
+        <label class="justify-center flex items-center gap-1">
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={followee}
+            onchange={createFilter}
+          />
+          {$_("search.followee")}
+        </label>
+      </div>{/if}
   </div>
-  {#if followList.get() !== undefined && followList.get().size > 0}
-    <div class="flex flex-col items-start justify-center mt-auto py-2">
-      <label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={followee}
-          onchange={createFilter}
-        />
-        only followee
-      </label>
-    </div>{/if}
-</div>
+  <button
+    class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
+    disabled={$nowProgress}
+    onclick={handleClickSearch}><Search />{$_("search.search")}</button
+  >
 
-<div use:melt={$root} class="relative w-full">
+  <button
+    class=" w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
+    onclick={handleClickShare}
+    disabled={$nowProgress}
+    ><Share size={16} />{$_("about.share")}
+  </button>
+</div>
+<div use:melt={$root} class="relative w-full mt-1">
   <button
     use:melt={$trigger}
-    class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
+    class="flex items-center justify-between border-b border-b-magnum-400"
   >
-    <span class="font-semibold text-magnum-400">Options</span>
+    <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span
+    >
     <div
-      class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
+      class="relative h-6 w-6 place-items-center rounded-full text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
       aria-label="Toggle"
     >
-      <div class="w-fit h-fit">
+      <div class="w-fit h-fit flex justify-center items-center">
         {#if $open}
           <X class="size-5" />
         {:else}
-          <ChevronsUpDown class="size-5" />
+          <ChevronDown class="size-5" />
         {/if}
       </div>
     </div>
@@ -173,15 +186,15 @@
       <div
         use:melt={$content}
         transition:slide
-        class="flex gap-2 w-full flex-wrap"
+        class="flex gap-2 w-full flex-wrap px-2"
       >
-        <div class="flex flex-col items-start justify-center">
+        <div class="flex flex-col items-start justify-center mt-2">
           <div class="font-medium text-magnum-400">kind</div>
           <div class="flex align-middle mt-1.5 gap-1 items-center">
             <input
               type="number"
               id="kind"
-              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900"
+              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-400/60"
               placeholder="1"
               min="0"
               bind:value={searchKind}
@@ -193,7 +206,7 @@
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">from</div>
           <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
           >
             <UserDataList {handleClickUser} />
 
@@ -204,18 +217,12 @@
               placeholder="npub"
               bind:value={searchPubkey}
             />
-
-            <!-- <button
-              on:click={() => handleClickPub("author")}
-              class="h-10 rounded-r-sm bg-magnum-600 px-3 py-2 font-medium text-magnum-200 hover:opacity-75 active:opacity-50"
-              >Set My Pubkey</button
-            > -->
           </div>
         </div>
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">to</div>
           <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
           >
             <UserDataList handleClickUser={handleClickSearchPubkeyTo} />
 
@@ -234,7 +241,7 @@
           <input
             type="text"
             id="hashtag"
-            class="h-10 w-full px-3 py-2 rounded-md border border-magnum-600"
+            class="h-10 w-full px-3 py-2 rounded-md border border-magnum-400/60"
             placeholder="hashtag"
             bind:value={searchHashtag}
           />
@@ -255,29 +262,4 @@
       </div>
     {/if}
   </div>
-</div>
-<div class="w-full">
-  <div
-    class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
-  >
-    <div class="font-semibold text-magnum-400">Filters</div>
-    {#each filters as filter}
-      {JSON.stringify(filter, null, 2)}
-    {/each}
-  </div>
-</div>
-
-<div class="relative w-full h-12">
-  <button
-    class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    disabled={$nowProgress}
-    onclick={handleClickSearch}>Search</button
-  >
-
-  <button
-    class="absolute right-0 top-[2px] w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    onclick={handleClickShare}
-    disabled={$nowProgress}
-    ><Share size={16} />{$_("about.share")}
-  </button>
 </div>

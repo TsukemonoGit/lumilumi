@@ -81,7 +81,7 @@
       class="flex flex-1 cursor-pointer items-center justify-between bg-neutral-800 py-2 text-base font-medium leading-none text-magnum-300 transition-colors hover:bg-neutral-800 focus:!ring-0 focus-visible:text-magnum-800 rounded-xl text-ellipsis
     w-full"
     >
-      {title}Relays<ChevronDown />
+      {title}<ChevronDown />
     </button>
   </h2>
   {#if $isSelected("item-1")}
