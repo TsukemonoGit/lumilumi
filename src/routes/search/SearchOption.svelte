@@ -2,7 +2,7 @@
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
-  import { X, ChevronsUpDown, Share, Search } from "lucide-svelte";
+  import { X, Share, Search, ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
@@ -168,14 +168,14 @@
     <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span
     >
     <div
-      class="relative h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
+      class="relative h-6 w-6 place-items-center rounded-full text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
       aria-label="Toggle"
     >
       <div class="w-fit h-fit">
         {#if $open}
           <X class="size-5" />
         {:else}
-          <ChevronsUpDown class="size-5" />
+          <ChevronDown class="size-5" />
         {/if}
       </div>
     </div>
@@ -186,7 +186,7 @@
       <div
         use:melt={$content}
         transition:slide
-        class="flex gap-2 w-full flex-wrap"
+        class="flex gap-2 w-full flex-wrap px-2"
       >
         <div class="flex flex-col items-start justify-center mt-2">
           <div class="font-medium text-magnum-400">kind</div>
@@ -194,7 +194,7 @@
             <input
               type="number"
               id="kind"
-              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-600 bg-neutral-900"
+              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-400/60"
               placeholder="1"
               min="0"
               bind:value={searchKind}
@@ -206,7 +206,7 @@
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">from</div>
           <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
           >
             <UserDataList {handleClickUser} />
 
@@ -222,7 +222,7 @@
         <div class="flex flex-col items-start justify-center w-full">
           <div class="font-medium text-magnum-400">to</div>
           <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-500 rounded-md border border-magnum-600 w-full"
+            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
           >
             <UserDataList handleClickUser={handleClickSearchPubkeyTo} />
 
@@ -241,7 +241,7 @@
           <input
             type="text"
             id="hashtag"
-            class="h-10 w-full px-3 py-2 rounded-md border border-magnum-600"
+            class="h-10 w-full px-3 py-2 rounded-md border border-magnum-400/60"
             placeholder="hashtag"
             bind:value={searchHashtag}
           />
