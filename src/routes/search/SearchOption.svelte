@@ -123,16 +123,29 @@
   }
 </script>
 
-<div class="mt-1 grid grid-cols-[1fr_auto_auto] w-full gap-1 mb-2 items-end">
+<div
+  class="mt-1 grid grid-cols-[1fr_auto_auto] w-full gap-1 mb-1 overflow-x-hidden"
+>
   <div class="w-full flex flex-col items-start justify-center">
-    <div class="font-medium text-magnum-400">{$_("search.ward")}</div>
     <input
       type="text"
       id="search"
-      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mt-1.5"
-      placeholder=""
+      class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
+      placeholder="search"
       bind:value={searchWord}
     />
+    {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
+      <div class="py-2 self-start">
+        <label class="justify-center flex items-center gap-1">
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={followee}
+            onchange={createFilter}
+          />
+          {$_("search.followee")}
+        </label>
+      </div>{/if}
   </div>
   <button
     class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
@@ -146,24 +159,11 @@
     disabled={$nowProgress}
     ><Share size={16} />{$_("about.share")}
   </button>
-
-  {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
-    <div class="py-2">
-      <span class="font-medium text-magnum-400 mr-2">Filter: </span><label>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={followee}
-          onchange={createFilter}
-        />
-        {$_("search.followee")}
-      </label>
-    </div>{/if}
 </div>
-<div use:melt={$root} class="relative w-full mt-2">
+<div use:melt={$root} class="relative w-full">
   <button
     use:melt={$trigger}
-    class="flex w-full items-center justify-between bg-magnum-900/50 p-1 rounded-md"
+    class="flex items-center justify-between border-b border-b-magnum-400"
   >
     <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span
     >
@@ -263,28 +263,3 @@
     {/if}
   </div>
 </div>
-<div class="w-full">
-  <div
-    class="border border-magnum-700 rounded-md max-h-40 break-all overflow-y-auto m-1 p-1"
-  >
-    <div class="font-semibold text-magnum-400">Filters</div>
-    {#each filters as filter}
-      {JSON.stringify(filter, null, 2)}
-    {/each}
-  </div>
-</div>
-
-<!-- <div class="relative w-full h-12">
-  <button
-    class="absolute left-1/2 -translate-x-1/2 rounded-md bg-magnum-200 px-3 w-40 py-3 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
-    disabled={$nowProgress}
-    onclick={handleClickSearch}><Search />{$_("search.search")}</button
-  >
-
-  <button
-    class="absolute right-0 top-[2px] w-10 h-10 text-xs text-center flex flex-col items-center justify-center rounded-full border border-magnum-300 text-magnum-300 hover:opacity-75 active:opacity-50 disabled:opacity-25"
-    onclick={handleClickShare}
-    disabled={$nowProgress}
-    ><Share size={16} />{$_("about.share")}
-  </button>
-</div> -->
