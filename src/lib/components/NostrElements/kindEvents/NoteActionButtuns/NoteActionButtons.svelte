@@ -188,22 +188,24 @@
         //repost
         let tags: string[][] = [["p", note.pubkey]];
 
+        //リポストはetagのことしか書いてない
+        //https://github.com/nostr-protocol/nips/blob/master/18.md
+        // atag etag 両方いれることにする(リアクションと同じに)
+
         //replaceable
+
+        tags.push([
+          "e",
+          note.id,
+          relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
+          "" /*marker*/,
+          note.pubkey,
+        ]);
         if (atag) {
           tags.push([
             "a",
             atag,
-            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
-            "" /*marker*/,
-            note.pubkey,
-          ]);
-        } else {
-          tags.push([
-            "e",
-            note.id,
-            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
-            "" /*marker*/,
-            note.pubkey,
+            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "",
           ]);
         }
         if (note.kind !== 1) {
