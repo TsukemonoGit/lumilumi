@@ -54,15 +54,12 @@
 
     const tags: string[][] = root ? [root] : [];
 
+    //atagでもetagもいれてリアクションするらしい
+    tags.push(["p", note.pubkey], ["e", note.id], ["k", note.kind.toString()]);
     if (atag) {
-      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
-    } else {
-      tags.push(
-        ["p", note.pubkey],
-        ["e", note.id],
-        ["k", note.kind.toString()]
-      );
+      tags.push(["a", atag]);
     }
+
     if (lumiSetting.get().addClientTag) {
       tags.push(clientTag);
     }
