@@ -161,11 +161,9 @@
   onMount(async () => {
     if (!isOnMount) {
       console.log("onMount");
-      $nowProgress = true;
+
       isOnMount = true;
       await init();
-
-      $nowProgress = false;
     }
   });
 
@@ -174,21 +172,19 @@
     if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
 
-      $nowProgress = true;
       isOnMount = true;
       await init();
-
-      $nowProgress = false;
     }
   });
 
   async function init() {
     // const ev: EventPacket[] | undefined = queryClient.getQueryData(queryKey);
-
+    $nowProgress = true;
     console.log(readUrls);
 
     //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
     // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
+
     await waitForConnections(readUrls, relayStateMap.get(), 5000); // maxWaitTime set to 10 seconds
     // console.log(relayStateMap.get);
 
@@ -210,6 +206,7 @@
       );
       // console.log(queryClient.getQueryData(queryKey));
     }
+    $nowProgress = false;
     isOnMount = false;
     // updateViewNotifi();
   }
