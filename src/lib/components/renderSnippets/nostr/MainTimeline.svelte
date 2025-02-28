@@ -20,7 +20,7 @@
   import { createTie, now, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { sortEvents } from "$lib/func/util";
+  import { sortEventPackets, sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
@@ -132,15 +132,16 @@
           ? allEvents[allEvents.length - 1].event.created_at
           : now();
 
-      const uniqueEvents = sortEvents(
-        Array.from(
-          new Map(
-            allEvents.map((event) => [event.event.id, event.event])
-          ).values()
-        )
-      );
+      // const uniqueEvents = sortEvents(
+      //   Array.from(
+      //     new Map(
+      //       allEvents.map((event) => [event.event.id, event.event])
+      //     ).values()
+      //   )
+      // );
 
-      allUniqueEvents = uniqueEvents
+      allUniqueEvents = allEvents
+        .map((event) => event.event)
         .filter(eventFilter)
         .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
@@ -266,10 +267,22 @@
         //   ...queryKey,
         //   "olderData",
         // ]);
-
+        //セットするときに重複チェック
         queryClient.setQueryData(
           [...queryKey, "olderData"],
-          (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
+          (olddata: EventPacket[] | undefined) => {
+            const uniqueEvents = sortEventPackets(
+              Array.from(
+                new Map(
+                  [...(olddata ?? []), ...older].map((packet) => [
+                    packet.event.id,
+                    packet,
+                  ])
+                ).values()
+              )
+            );
+            return uniqueEvents;
+          }
         );
         //updateViewEvent(deriveaData);
       }
