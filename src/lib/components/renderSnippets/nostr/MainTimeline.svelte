@@ -312,12 +312,22 @@
       );
       console.log(older);
       if (older.length > 0) {
+        //セットするときに重複チェック
         queryClient.setQueryData(
           [...queryKey, "olderData"],
-          (olderdatas: EventPacket[] | undefined) => [
-            ...(olderdatas ?? []),
-            ...older,
-          ]
+          (olddata: EventPacket[] | undefined) => {
+            const uniqueEvents = sortEventPackets(
+              Array.from(
+                new Map(
+                  [...(olddata ?? []), ...older].map((packet) => [
+                    packet.event.id,
+                    packet,
+                  ])
+                ).values()
+              )
+            );
+            return uniqueEvents;
+          }
         );
       }
     }
