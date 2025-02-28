@@ -144,9 +144,18 @@ export function useReq3(): {
 
 function handleEvent(v: EventPacket) {
   //console.log(v.event);
-  const etag = v.event.tags.findLast(
-    (item) => item[0] === "e" || item[0] === "a"
+  // const etag = v.event.tags.findLast(
+  //   (item) => item[0] === "e" || item[0] === "a"
+  // );
+  //"a" タグがあればそれを優先的に取得
+  const etag: string[] | null = v.event.tags.reduceRight(
+    (acc: string[] | null, item: string[]) => {
+      if (item[0] === "a") return item as string[]; // "a" が見つかったら即決定
+      return acc || ((item[0] === "e" ? item : null) as string[] | null); // "e" が見つかったらそれを記憶
+    },
+    null
   );
+
   if (etag) {
     let queryKey: [string, string, string, string] | undefined;
 
