@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@melt-ui/pp": "^0.3.2",
 		"@tanstack/svelte-query": "^5.66.11",
 		"@tanstack/svelte-query-devtools": "^5.66.11",
 		"graphemesplit": "^2.6.0",
