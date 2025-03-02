@@ -88,18 +88,18 @@
       </div>
     </div>
     {#if displayImages.length > 1}
-      <button
-        use:melt={$content}
-        class="fixed left-1 top-1/2 z-50 bg-neutral-100/75
-            -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
-        onclick={goToPrev}><ChevronLeft /></button
-      >
-      <button
-        use:melt={$content}
-        class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
-            -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400"
-        onclick={goToNext}><ChevronRight /></button
-      >
+      <div use:melt={$content}>
+        <button
+          class="fixed left-1 top-1/2 z-50 bg-neutral-100/75
+        -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
+          onclick={goToPrev}><ChevronLeft /></button
+        >
+        <button
+          class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
+            -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
+          onclick={goToNext}><ChevronRight /></button
+        >
+      </div>
     {/if}
     <button
       use:melt={$close}
