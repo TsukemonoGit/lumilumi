@@ -112,7 +112,12 @@
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));
     }
-    if (note.pubkey === $loginUser && note.kind !== 5) {
+    if (
+      note.pubkey === $loginUser &&
+      note.kind !== 5 &&
+      note.kind !==
+        62 /*消滅イベントhttps://github.com/nostr-protocol/nips/blob/master/62.md**/
+    ) {
       menu.push({
         text: `${$_("menu.delete")}`,
         icon: Trash,
