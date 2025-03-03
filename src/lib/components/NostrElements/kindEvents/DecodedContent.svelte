@@ -64,73 +64,64 @@
   onenterViewport={handleEnterViewport}
   class="inline overflow-hidden"
 >
-  {#if hasLoaded}
-    {#if decoded.type === "npub"}<span class="text-magnum-300 align-middle"
-        >{#if !displayMenu}<UserName
-            pubhex={decoded.data}
-          />{:else}<PopupUserName pubkey={decoded.data} {tieKey} />{/if}</span
-      >{:else if decoded.type === "nprofile"}<span
-        class="text-magnum-300 align-middle"
-        >{#if !displayMenu}<UserName
-            pubhex={decoded.data.pubkey}
-          />{:else}<PopupUserName
-            pubkey={decoded.data.pubkey}
-            {tieKey}
-          />{/if}</span
-      >{:else if decoded.type === "nevent"}<span
-        class="grid grid-cols-[auto_1fr_auto]"
-        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-        <div class="border rounded-md border-magnum-600/30">
-          <Note
-            id={decoded.data.id}
-            mini={true}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {tieKey}
-            {maxHeight}
-          />
-        </div>
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
-      >{:else if decoded.type === "note"}<span
-        class="grid grid-cols-[auto_1fr_auto]"
-        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-        <div class="border rounded-md border-magnum-600/30">
-          <Note
-            id={decoded.data}
-            mini={true}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {tieKey}
-            {maxHeight}
-          />
-        </div>
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
-      >{:else if decoded.type === "naddr"}<span
-        class="grid grid-cols-[auto_1fr_auto]"
-        ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-        <div class="border rounded-md border-magnum-600/30">
-          <NaddrEvent
-            data={decoded.data}
-            {displayMenu}
-            {depth}
-            {tieKey}
-            {repostable}
-            {content}
-          />
-        </div>
-        <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      </span>
-    {:else if decoded.type === "nsec"}{content}
-    {/if}
-    <!--noteとかのやつのときだけemptycard-->
-  {:else if decoded.type === "naddr" || decoded.type === "nevent" || decoded.type === "note"}<span
+  {#if decoded.type === "npub"}<span class="text-magnum-300 align-middle"
+      >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
+          pubkey={decoded.data}
+          {tieKey}
+        />{/if}</span
+    >{:else if decoded.type === "nprofile"}<span
+      class="text-magnum-300 align-middle"
+      >{#if !displayMenu}<UserName
+          pubhex={decoded.data.pubkey}
+        />{:else}<PopupUserName
+          pubkey={decoded.data.pubkey}
+          {tieKey}
+        />{/if}</span
+    >{:else if decoded.type === "nevent"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
       <div class="border rounded-md border-magnum-600/30">
-        <EmptyCard>Loading {content}</EmptyCard>
+        <Note
+          id={decoded.data.id}
+          mini={true}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+          {maxHeight}
+        />
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
-    >{:else}{content}{/if}
+    >{:else if decoded.type === "note"}<span
+      class="grid grid-cols-[auto_1fr_auto]"
+      ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      <div class="border rounded-md border-magnum-600/30">
+        <Note
+          id={decoded.data}
+          mini={true}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+          {maxHeight}
+        />
+      </div>
+      <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
+    >{:else if decoded.type === "naddr"}<span
+      class="grid grid-cols-[auto_1fr_auto]"
+      ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+      <div class="border rounded-md border-magnum-600/30">
+        <NaddrEvent
+          data={decoded.data}
+          {displayMenu}
+          {depth}
+          {tieKey}
+          {repostable}
+          {content}
+        />
+      </div>
+      <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
+    </span>
+  {:else if decoded.type === "nsec"}{content}
+  {/if}
 </div>
