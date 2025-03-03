@@ -112,7 +112,7 @@
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));
     }
-    if (note.pubkey === $loginUser) {
+    if (note.pubkey === $loginUser && note.kind !== 5) {
       menu.push({
         text: `${$_("menu.delete")}`,
         icon: Trash,
