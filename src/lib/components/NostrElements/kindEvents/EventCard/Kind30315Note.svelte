@@ -41,43 +41,48 @@
     repostable = true,
   }: Props = $props();
 
+  let deleted = $state(false);
   let statusTag = $derived(note.tags.find((tag) => tag[0] === "d")?.[1]);
 
   let statusLink = $derived(getStatusLink(note, page.url.origin));
 </script>
 
-<NoteTemplate
-  {note}
-  {metadata}
-  {mini}
-  {displayMenu}
-  {depth}
-  {tieKey}
-  kindInfo={true}
->
-  <div class="relative overflow-hidden mb-1.5">
-    <div
-      class="mt-0.5 overflow-y-auto overflow-x-hidden"
-      style="max-height:{maxHeight ?? 'none'}"
-    >
-      <div class="grid grid-cols-[auto_1fr] flex-wrap gap-1 items-center">
-        {#if statusTag === "general"}
-          <GeneralStatusDisplay link={statusLink} event={note} {tieKey} />
-        {:else if statusTag === "music"}<MusicStatusDisplay
-            link={statusLink}
-            event={note}
-            {tieKey}
-          />{:else}
-          <OtherStatusDisplay link={statusLink} event={note} {tieKey} />
-        {/if}
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else if note}
+  <NoteTemplate
+    {note}
+    {metadata}
+    {mini}
+    {displayMenu}
+    {depth}
+    {tieKey}
+    kindInfo={true}
+  >
+    <div class="relative overflow-hidden mb-1.5">
+      <div
+        class="mt-0.5 overflow-y-auto overflow-x-hidden"
+        style="max-height:{maxHeight ?? 'none'}"
+      >
+        <div class="grid grid-cols-[auto_1fr] flex-wrap gap-1 items-center">
+          {#if statusTag === "general"}
+            <GeneralStatusDisplay link={statusLink} event={note} {tieKey} />
+          {:else if statusTag === "music"}<MusicStatusDisplay
+              link={statusLink}
+              event={note}
+              {tieKey}
+            />{:else}
+            <OtherStatusDisplay link={statusLink} event={note} {tieKey} />
+          {/if}
+        </div>
       </div>
+      {#if warning}
+        <!-- <WarningHide1 text={tag[1]} /> -->
+        <WarningHide2 text={warning[1]} />
+      {/if}
     </div>
-    {#if warning}
-      <!-- <WarningHide1 text={tag[1]} /> -->
-      <WarningHide2 text={warning[1]} />
-    {/if}
-  </div>
 
-  {#if displayMenu}
-    <NoteActionButtons {note} {repostable} {tieKey} />{/if}
-</NoteTemplate>
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+  </NoteTemplate>
+{/if}

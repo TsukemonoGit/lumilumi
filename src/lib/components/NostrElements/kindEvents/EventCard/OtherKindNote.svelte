@@ -40,6 +40,7 @@
     tieKey,
   }: Props = $props();
 
+  let deleted = $state(false);
   let title = $derived(
     note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
   );
@@ -87,103 +88,106 @@
   let petname = $derived(followList.get().get(note.pubkey));
 </script>
 
-<div
-  class="break-words overflow-x-hidden gap-4 p-1"
-  style="word-break: break-word;"
->
-  <div class="w-full flex gap-1">
-    {#if metadata}
-      <div>
-        <UserPopupMenu
-          pubkey={note.pubkey}
-          {metadata}
-          size={20}
-          {displayMenu}
-          {depth}
-          {tieKey}
-        />
-      </div>
-      <div class="text-magnum-100 text-sm">
-        {#if petname}<span class="text-magnum-100">📛{petname}</span>
-        {:else if metadata && prof}
-          <DisplayName
-            height={21}
-            name={prof.display_name ?? ""}
-            tags={metadata.tags}
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else}
+  <div
+    class="break-words overflow-x-hidden gap-4 p-1"
+    style="word-break: break-word;"
+  >
+    <div class="w-full flex gap-1">
+      {#if metadata}
+        <div>
+          <UserPopupMenu
+            pubkey={note.pubkey}
+            {metadata}
+            size={20}
+            {displayMenu}
+            {depth}
+            {tieKey}
           />
-          {#if prof.name && prof.name !== ""}<span
-              class="inline text-magnum-100 text-sm"
-              ><DisplayName
-                height={21}
-                name={`@${prof.name}`}
-                tags={metadata.tags}
-              /></span
-            >{/if}
-        {:else}
-          <span class="text-magnum-100 text-sm break-all">
-            @{nip19.npubEncode(note.pubkey)}</span
-          >
-        {/if}
-      </div>
-    {:else}
-      <span class="text-magnum-100 text-sm break-all">
-        @{nip19.npubEncode(note.pubkey)}</span
-      >
-    {/if}
-    <div class="text-neutral-300/50 text-sm">
-      {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
-    </div>
-    {#if displayMenu}
-      <button
-        onclick={handleClickToNotepage}
-        class="  ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
-      >
-        <time datetime={datetime(note.created_at)}
-          >{formatAbsoluteDate(note.created_at)}</time
+        </div>
+        <div class="text-magnum-100 text-sm">
+          {#if petname}<span class="text-magnum-100">📛{petname}</span>
+          {:else if metadata && prof}
+            <DisplayName
+              height={21}
+              name={prof.display_name ?? ""}
+              tags={metadata.tags}
+            />
+            {#if prof.name && prof.name !== ""}<span
+                class="inline text-magnum-100 text-sm"
+                ><DisplayName
+                  height={21}
+                  name={`@${prof.name}`}
+                  tags={metadata.tags}
+                /></span
+              >{/if}
+          {:else}
+            <span class="text-magnum-100 text-sm break-all">
+              @{nip19.npubEncode(note.pubkey)}</span
+            >
+          {/if}
+        </div>
+      {:else}
+        <span class="text-magnum-100 text-sm break-all">
+          @{nip19.npubEncode(note.pubkey)}</span
         >
-      </button>
-    {/if}
-  </div>
-  {#if title || dtag || description}
-    <div class="rounded-md bg-neutral-800 p-2">
-      {#if (title && title !== "") || dtag}
-        <div class="text-lg font-bold">
-          {title && title !== "" ? title : dtag}
-        </div>{/if}
-      <div
-        class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
-      >
-        {#if description && description !== ""}<div
-            class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
-          >
-            {description}
-          </div>{/if}
-
-        {#if image && lumiSetting.get().showImg}
-          <img
-            loading="lazy"
-            src={image}
-            alt=""
-            class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
-          />{/if}
+      {/if}
+      <div class="text-neutral-300/50 text-sm">
+        {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
       </div>
-    </div>{/if}
+      {#if displayMenu}
+        <button
+          onclick={handleClickToNotepage}
+          class="  ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
+        >
+          <time datetime={datetime(note.created_at)}
+            >{formatAbsoluteDate(note.created_at)}</time
+          >
+        </button>
+      {/if}
+    </div>
+    {#if title || dtag || description}
+      <div class="rounded-md bg-neutral-800 p-2">
+        {#if (title && title !== "") || dtag}
+          <div class="text-lg font-bold">
+            {title && title !== "" ? title : dtag}
+          </div>{/if}
+        <div
+          class="grid grid-rows-[1fr_auto] xs:grid-cols-[1fr_auto] w-full gap-1 whitespace-pre-wrap"
+        >
+          {#if description && description !== ""}<div
+              class="px-1 text-neutral-300/80 max-h-32 xs:max-h-40 overflow-y-auto"
+            >
+              {description}
+            </div>{/if}
 
-  {#if note.kind === 30023 || note.kind === 30024}
-    <SimpleMarkdown
-      {maxHeight}
-      text={note.content}
-      tags={note.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    /><ClientTag
-      tags={note.tags}
-      {depth}
-    />{:else if note.content.includes("?iv=")}
-    <!--なんか暗号化したやつっぽいから表示しないでおく-->
-    <!-- <Content
+          {#if image && lumiSetting.get().showImg}
+            <img
+              loading="lazy"
+              src={image}
+              alt=""
+              class="object-contain overflow-hidden max-w-32 max-h-32 xs:max-w-40 xs:max-h-40 mx-auto"
+            />{/if}
+        </div>
+      </div>{/if}
+
+    {#if note.kind === 30023 || note.kind === 30024}
+      <SimpleMarkdown
+        {maxHeight}
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+      /><ClientTag
+        tags={note.tags}
+        {depth}
+      />{:else if note.content.includes("?iv=")}
+      <!--なんか暗号化したやつっぽいから表示しないでおく-->
+      <!-- <Content
         text={note.content}
         tags={note.tags}
         {displayMenu}
@@ -191,19 +195,20 @@
         {repostable}
         {tieKey}
       /> -->
-  {:else}
-    <Content
-      {maxHeight}
-      text={note.content}
-      tags={note.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    />
-  {/if}
+    {:else}
+      <Content
+        {maxHeight}
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
+    {/if}
 
-  {#if displayMenu}
-    <NoteActionButtons {note} {repostable} {tieKey} />
-  {/if}
-</div>
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
+    {/if}
+  </div>
+{/if}

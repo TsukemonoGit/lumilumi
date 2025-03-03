@@ -44,7 +44,7 @@
     tieKey,
     warning,
   }: Props = $props();
-
+  let deleted = $state(false);
   let imeta: Imeta[] | undefined = $derived(
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
@@ -65,54 +65,59 @@
   let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
 </script>
 
-<NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-  {#if lumiSetting.get().showUserStatus}<ShowStatus
-      pubkey={note.pubkey}
-      {tieKey}
-    />{/if}
-  <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
-  {#if replyUsers.length > 0}
-    <div
-      class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
-    >
-      <span class="text-sm text-neutral-50">To:</span>{#each replyUsers as user}
-        {#if !displayMenu}<UserName pubhex={user} />{:else}
-          <PopupUserName pubkey={user} {tieKey} />{/if}
-      {/each}
-    </div>
-  {/if}
-
-  <div class="relative overflow-hidden mb-1.5">
-    {#if title && title !== ""}
-      <div class="text-lg font-bold">
-        {title}
-      </div>{/if}
-    {#if imageList.length > 0}
-      {#each imageList as url, number}
-        <ContentImage src={url} {url} {number} {openModal} />
-      {/each}{/if}
-    <Content
-      {maxHeight}
-      text={note.content}
-      tags={note.tags}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {tieKey}
-    />
-    <span
-      class={"float-end text-neutral-400    text-sm font-semibold px-1"}
-      title="kind:20"
-    >
-      Picture</span
-    >
-    {#if warning}
-      <!-- <WarningHide1 text={tag[1]} /> -->
-
-      <WarningHide2 text={warning[1]} />
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else if note}
+  <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
+    {#if lumiSetting.get().showUserStatus}<ShowStatus
+        pubkey={note.pubkey}
+        {tieKey}
+      />{/if}
+    <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
+    {#if replyUsers.length > 0}
+      <div
+        class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
+      >
+        <span class="text-sm text-neutral-50">To:</span
+        >{#each replyUsers as user}
+          {#if !displayMenu}<UserName pubhex={user} />{:else}
+            <PopupUserName pubkey={user} {tieKey} />{/if}
+        {/each}
+      </div>
     {/if}
-  </div>
-  {#if displayMenu}
-    <NoteActionButtons {note} {repostable} {tieKey} />
-  {/if}
-</NoteTemplate>
+
+    <div class="relative overflow-hidden mb-1.5">
+      {#if title && title !== ""}
+        <div class="text-lg font-bold">
+          {title}
+        </div>{/if}
+      {#if imageList.length > 0}
+        {#each imageList as url, number}
+          <ContentImage src={url} {url} {number} {openModal} />
+        {/each}{/if}
+      <Content
+        {maxHeight}
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+      />
+      <span
+        class={"float-end text-neutral-400    text-sm font-semibold px-1"}
+        title="kind:20"
+      >
+        Picture</span
+      >
+      {#if warning}
+        <!-- <WarningHide1 text={tag[1]} /> -->
+
+        <WarningHide2 text={warning[1]} />
+      {/if}
+    </div>
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
+    {/if}
+  </NoteTemplate>
+{/if}

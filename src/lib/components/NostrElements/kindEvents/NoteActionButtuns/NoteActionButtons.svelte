@@ -60,11 +60,13 @@
     note,
     repostable,
     tieKey,
-  }: { note: Nostr.Event; repostable: boolean; tieKey?: string | undefined } =
-    $props();
-  // export let note: Nostr.Event;
-  // export let repostable: boolean;
-  // export let tieKey: string | undefined;
+    deleted = $bindable(),
+  }: {
+    note: Nostr.Event;
+    repostable: boolean;
+    tieKey?: string | undefined;
+    deleted: boolean;
+  } = $props();
 
   let warning = $derived(
     note?.tags.find((item) => item[0] === "content-warning")
@@ -527,7 +529,7 @@
     {/if}
     <!--メニュー-->
 
-    <EllipsisMenu iconSize={20} {note} {tieKey} />
+    <EllipsisMenu iconSize={20} {note} {tieKey} bind:deleted />
   </div>
   <!---->
 

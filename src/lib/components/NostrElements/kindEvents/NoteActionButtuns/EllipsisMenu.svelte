@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toastSettings } from "$lib/stores/stores";
+  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -14,10 +14,11 @@
     Squirrel,
     Layers,
     Notebook,
+    Trash,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
-  import { getRelaysById, publishEvent } from "$lib/func/nostr";
+  import { deleteEvent, getRelaysById, publishEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
@@ -27,13 +28,14 @@
   import { page } from "$app/state";
   import { nostviewstrable } from "$lib/func/constants";
 
-  import { translateText } from "$lib/func/util";
+  import { generateResultMessage, translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import {
     isReplaceableKind,
     isParameterizedReplaceableKind,
   } from "nostr-tools/kinds";
+  import type { OkPacketAgainstEvent } from "rx-nostr";
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -41,6 +43,7 @@
     iconSize?: number;
     iconClass?: string;
     tieKey: string | undefined;
+    deleted: boolean;
   }
 
   let {
@@ -50,6 +53,7 @@
     iconSize = 20,
     iconClass = "",
     tieKey,
+    deleted = $bindable(false),
   }: Props = $props();
 
   // svelte-ignore non_reactive_update
@@ -96,7 +100,7 @@
     }
     //replaceable のすとびうあのリンク
     if (nostviewstrable.includes(note.kind)) {
-      menu?.push({
+      menu.push({
         text: `${$_("menu.nostviewstr")}`,
         icon: Squirrel,
         num: 10,
@@ -104,6 +108,13 @@
     }
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));
+    }
+    if (note.pubkey === $loginUser) {
+      menu.push({
+        text: `${$_("menu.delete")}`,
+        icon: Trash,
+        num: 12,
+      });
     }
     return menu;
   });
@@ -227,6 +238,44 @@
         const nostrapp = `https://nostrapp.link/a/${naddr}`;
 
         window.open(nostrapp, "_blank", "noreferrer");
+        break;
+      case 12:
+        //delete
+        try {
+          const {
+            event,
+            res,
+          }: {
+            event: Nostr.Event;
+            res: OkPacketAgainstEvent[];
+          } = await deleteEvent([["e", note.id]]);
+          console.log(res);
+          const isSuccess = res
+            .filter((item) => item.ok)
+            .map((item) => item.from);
+          const isFailed = res
+            .filter((item) => !item.ok)
+            .map((item) => item.from);
+          let str = generateResultMessage(isSuccess, isFailed);
+          // console.log(str);
+
+          $toastSettings = {
+            title: isSuccess.length > 0 ? "Success" : "Failed",
+            description: str,
+            color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+          };
+          if (isSuccess.length > 0) {
+            queryClient.removeQueries({ queryKey: ["timeline", note.id] });
+            deleted = true;
+          }
+        } catch (error) {
+          console.error(error);
+          $toastSettings = {
+            title: "Error",
+            description: "Failed to delete",
+            color: "bg-orange-500",
+          };
+        }
         break;
     }
   };

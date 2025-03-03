@@ -39,6 +39,7 @@
   // const data={pubkey:page.params.npub};
   console.log(data.pubkey);
 
+  let deleted = $state(false);
   //svelte-ignore non_reactive_update
   let kind10002: Nostr.Event;
   let newTags: string[][] = $state([]);
@@ -336,7 +337,7 @@
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} />
+              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
             </div>
           </NoteTemplate>
         {/snippet}
@@ -344,7 +345,7 @@
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} />
+              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
             </div>
           </NoteTemplate>
         {/snippet}
@@ -352,7 +353,7 @@
           <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
             kind: 10002 Relays
             <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} />
+              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
             </div>
           </NoteTemplate>
         {/snippet}
@@ -365,7 +366,7 @@
           >
             kind: 10002 Relays
             <div class="inline-flex float-end pr-1">
-              <EllipsisMenu note={kind10002} tieKey={undefined} />
+              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
             </div>
           </NoteTemplate>{/snippet}
       </Metadata>

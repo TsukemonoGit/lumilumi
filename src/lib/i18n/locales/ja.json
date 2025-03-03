@@ -122,7 +122,8 @@
     "nostviewstr": "のすとびうあ で開く",
     "nostrapp": "App Manager で開く",
     "mention": "メンションを送る",
-    "userSearch": "ユーサー検索"
+    "userSearch": "ユーサー検索",
+    "delete": "削除"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",

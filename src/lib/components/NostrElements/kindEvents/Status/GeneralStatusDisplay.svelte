@@ -11,9 +11,10 @@
     color?: string | undefined;
   }
   let { link, event, tieKey, color }: Props = $props();
+  let deleted = $state(false);
 </script>
 
-{#if (link && link !== "") || event.content.trim() !== ""}
+{#if ((link && link !== "") || event.content.trim() !== "") && !deleted}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       TriggerIcon={TrendingUp}
@@ -21,6 +22,7 @@
       iconSize={16}
       iconClass={color ?? "text-zinc-500"}
       {tieKey}
+      bind:deleted
     />
   </div>
   {#if link && link !== ""}

@@ -39,6 +39,8 @@ import {
   verifier,
 } from "$lib/stores/globalRunes.svelte";
 
+import { validateLoginPubkey } from "./validateLoginPubkey";
+
 let rxNostr: RxNostr;
 export function setRxNostr() {
   if (get(app)?.rxNostr) {
@@ -570,4 +572,26 @@ export function getMetadataList(
     }
     return acc; // 蓄積された結果を返す
   }, {} as MetadataList);
+}
+
+export async function deleteEvent(tags: string[][]): Promise<{
+  event: Nostr.Event;
+  res: OkPacketAgainstEvent[];
+}> {
+  const checkPub = await validateLoginPubkey();
+  if (!checkPub.status) {
+    throw new Error(checkPub.message);
+  }
+  const eventParam: Nostr.EventParameters = {
+    kind: 5,
+    content: "",
+    tags: tags,
+  };
+  const relays = get(app)?.rxNostr?.getDefaultRelays();
+  console.log(relays);
+  if (!relays) {
+    throw new Error("No default relays found.");
+  }
+  const keys = Object.keys(relays);
+  return await promisePublishEvent(eventParam, keys);
 }
