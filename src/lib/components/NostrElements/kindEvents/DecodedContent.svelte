@@ -69,6 +69,14 @@
         >{#if !displayMenu}<UserName
             pubhex={decoded.data}
           />{:else}<PopupUserName pubkey={decoded.data} {tieKey} />{/if}</span
+      >{:else if decoded.type === "nprofile"}<span
+        class="text-magnum-300 align-middle"
+        >{#if !displayMenu}<UserName
+            pubhex={decoded.data.pubkey}
+          />{:else}<PopupUserName
+            pubkey={decoded.data.pubkey}
+            {tieKey}
+          />{/if}</span
       >{:else if decoded.type === "nevent"}<span
         class="grid grid-cols-[auto_1fr_auto]"
         ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
@@ -113,21 +121,16 @@
           />
         </div>
         <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      </span>{:else if decoded.type === "nprofile"}<span
-        class="text-magnum-300 align-middle"
-        >{#if !displayMenu}<UserName
-            pubhex={decoded.data.pubkey}
-          />{:else}<PopupUserName
-            pubkey={decoded.data.pubkey}
-            {tieKey}
-          />{/if}</span
-      >
-    {:else if decoded.type === "nsec"}{content}{/if}{:else}<span
+      </span>
+    {:else if decoded.type === "nsec"}{content}
+    {/if}
+    <!--noteとかのやつのときだけemptycard-->
+  {:else if decoded.type === "naddr" || decoded.type === "nevent" || decoded.type === "note"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
       <div class="border rounded-md border-magnum-600/30">
         <EmptyCard>Loading {content}</EmptyCard>
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
-    >{/if}
+    >{:else}{content}{/if}
 </div>
