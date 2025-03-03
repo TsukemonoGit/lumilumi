@@ -42,10 +42,10 @@
   import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
-  import type { Profile } from "$lib/types";
+
   import BirthDayFestival from "./BirthDayFestival.svelte";
   import { checkBirthDay } from "$lib/func/event";
-  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
+
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
 
   interface Props {
@@ -182,9 +182,10 @@
     }
   });
   let isBirthDay: boolean = $state(false);
-
-  const metadataChange = (metadata: Nostr.Event) => {
-    const prof = profile(metadata);
+  let metadata: Nostr.Event | undefined = $state(undefined);
+  const metadataChange = (_metadata: Nostr.Event) => {
+    metadata = _metadata;
+    const prof = profile(_metadata);
     isBirthDay = checkBirthDay(prof);
   };
   beforeNavigate(() => {
@@ -717,7 +718,7 @@
 ></Metadata>
 {#if isBirthDay}
   <div class="fixed top-0 left-0 w-full h-full z-50 pointer-events-none">
-    <BirthDayFestival />
+    <BirthDayFestival {metadata} />
   </div>
 {/if}
 

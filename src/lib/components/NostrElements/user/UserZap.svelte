@@ -70,6 +70,7 @@
   //   }
   // });
   const handleClickZap = async () => {
+    console.log("zap");
     const storagezap = localStorage.getItem("zap");
     if (storagezap) {
       zapAmount = Number(storagezap);
@@ -83,7 +84,7 @@
 </script>
 
 <button onclick={handleClickZap} title="zap"
-  >{#if children}
+  >{#if children !== undefined}
     {@render children()}
   {:else}
     <Zap
