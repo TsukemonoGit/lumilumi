@@ -40,7 +40,7 @@
     amount,
     message,
   }: Props = $props();
-
+  let deleted = $state(false);
   let viewMuteEvent: boolean = $state(false);
 
   const zappedId: {
@@ -56,102 +56,106 @@
         : "null";
 </script>
 
-{#if muteType !== "null" && depth >= 1}
-  <button
-    class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
-    onclick={() => (viewMuteEvent = !viewMuteEvent)}
-  >
-    {viewMuteEvent ? "hide" : "view"} Mute: {muteType}
-  </button>
-{/if}
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else}
+  {#if muteType !== "null" && depth >= 1}
+    <button
+      class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
+      onclick={() => (viewMuteEvent = !viewMuteEvent)}
+    >
+      {viewMuteEvent ? "hide" : "view"} Mute: {muteType}
+    </button>
+  {/if}
 
-{#if muteType === "null" || viewMuteEvent}
-  <Metadata
-    queryKey={["metadata", zapRequestEvent.pubkey]}
-    pubkey={zapRequestEvent.pubkey}
-  >
-    {#snippet content({ metadata })}
-      <div class="flex gap-1 items-center align-middle">
-        {#if message}
-          <Popover ariaLabel={`zap status`}>
-            <div
-              class="relative text-magnum-400 text-sm drop-shadow-md flex min-w-[20px] mt-auto mb-auto"
-            >
-              <Zap class={`stroke-magnum-600`} size={20} />
-              <X
-                class={`absolute right-0  bottom-0 stroke-magnum-300`}
-                size={10}
-              />
-            </div>
-            {#snippet popoverContent()}
-              <div class="mr-8">
-                {message}
+  {#if muteType === "null" || viewMuteEvent}
+    <Metadata
+      queryKey={["metadata", zapRequestEvent.pubkey]}
+      pubkey={zapRequestEvent.pubkey}
+    >
+      {#snippet content({ metadata })}
+        <div class="flex gap-1 items-center align-middle">
+          {#if message}
+            <Popover ariaLabel={`zap status`}>
+              <div
+                class="relative text-magnum-400 text-sm drop-shadow-md flex min-w-[20px] mt-auto mb-auto"
+              >
+                <Zap class={`stroke-magnum-600`} size={20} />
+                <X
+                  class={`absolute right-0  bottom-0 stroke-magnum-300`}
+                  size={10}
+                />
               </div>
-            {/snippet}</Popover
-          >
-        {:else}
-          <Zap
-            class={`min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400`}
-            size={20}
-          />{/if}
-        {amount}
+              {#snippet popoverContent()}
+                <div class="mr-8">
+                  {message}
+                </div>
+              {/snippet}</Popover
+            >
+          {:else}
+            <Zap
+              class={`min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400`}
+              size={20}
+            />{/if}
+          {amount}
 
-        <div class="self-center">
+          <div class="self-center">
+            <UserPopupMenu
+              pubkey={zapRequestEvent.pubkey}
+              {metadata}
+              size={20}
+              {depth}
+              {tieKey}
+            />
+          </div>
+          <div class="inline-block break-all break-words whitespace-pre-line">
+            {#if metadata}
+              {@const prof = profile(metadata)}
+              {#if prof}
+                <DisplayName
+                  height={21}
+                  name={prof.display_name ?? ""}
+                  tags={metadata.tags}
+                />{#if prof && prof.name && prof.name !== ""}<span
+                    class="text-magnum-100 text-sm"
+                    ><DisplayName
+                      height={21}
+                      name={`@${prof.name}`}
+                      tags={metadata.tags}
+                    />
+                  </span>{/if}{/if}
+            {:else}
+              <span class="text-magnum-100 text-sm"
+                >@{encodetoNpub(zapRequestEvent.pubkey)}</span
+              >
+            {/if}
+          </div>
           <UserPopupMenu
-            pubkey={zapRequestEvent.pubkey}
-            {metadata}
+            pubkey={note.pubkey}
+            metadata={undefined}
             size={20}
             {depth}
             {tieKey}
           />
+          <div class="ml-auto">
+            <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
+          </div>
         </div>
-        <div class="inline-block break-all break-words whitespace-pre-line">
-          {#if metadata}
-            {@const prof = profile(metadata)}
-            {#if prof}
-              <DisplayName
-                height={21}
-                name={prof.display_name ?? ""}
-                tags={metadata.tags}
-              />{#if prof && prof.name && prof.name !== ""}<span
-                  class="text-magnum-100 text-sm"
-                  ><DisplayName
-                    height={21}
-                    name={`@${prof.name}`}
-                    tags={metadata.tags}
-                  />
-                </span>{/if}{/if}
-          {:else}
-            <span class="text-magnum-100 text-sm"
-              >@{encodetoNpub(zapRequestEvent.pubkey)}</span
-            >
-          {/if}
+        <div class="break-all text-sm px-2">
+          {zapRequestEvent.content}
         </div>
-        <UserPopupMenu
-          pubkey={note.pubkey}
-          metadata={undefined}
-          size={20}
-          {depth}
-          {tieKey}
-        />
-        <div class="ml-auto">
-          <NoteActionButtons {note} {repostable} {tieKey} />
-        </div>
-      </div>
-      <div class="break-all text-sm px-2">
-        {zapRequestEvent.content}
-      </div>
 
-      {#if zappedId.tag.length > 0}
-        <RepostedNote
-          tag={zappedId.tag}
-          depth={depth + 1}
-          {repostable}
-          {displayMenu}
-          {maxHeight}
-          {tieKey}
-        />
-      {/if}
-    {/snippet}
-  </Metadata>
+        {#if zappedId.tag.length > 0}
+          <RepostedNote
+            tag={zappedId.tag}
+            depth={depth + 1}
+            {repostable}
+            {displayMenu}
+            {maxHeight}
+            {tieKey}
+          />
+        {/if}
+      {/snippet}
+    </Metadata>
+  {/if}
 {/if}

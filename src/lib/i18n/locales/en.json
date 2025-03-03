@@ -65,7 +65,8 @@
     "nsecAlart": "Warning: Input contains private key (nsec)",
     "placeholder": "What's happening?",
     "quote": "You can cite users and posts with nostr:npub..., nostr:nevent....",
-    "hell": "You are about to reply to more than 30 people. Are you sure you want to proceed?"
+    "hell": "You are about to reply to more than 30 people. Are you sure you want to proceed?",
+    "delete": "Are you sure you want to delete this? This action cannot be undone."
   },
   "user": {
     "profileEdit": "Edit profile",
@@ -123,7 +124,8 @@
     "nostviewstr": "Open in nostviewstr",
     "nostrapp": "Open in App Manager",
     "mention": "Send Mention",
-    "userSearch": "Search User"
+    "userSearch": "Search User",
+    "delete": "Delete"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",

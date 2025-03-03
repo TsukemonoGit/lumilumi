@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
-  import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
+
   import { encodetoNote } from "$lib/func/encode";
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
   import EmptyCard from "./EventCard/EmptyCard.svelte";

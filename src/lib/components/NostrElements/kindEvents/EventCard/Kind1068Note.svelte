@@ -41,6 +41,7 @@
     repostable,
   }: Props = $props();
 
+  let deleted = $state(false);
   let polltype: string | undefined = $derived(
     note.tags.find((tag) => tag[0] === "polltype" && tag.length > 1)?.[1]
   );
@@ -66,51 +67,55 @@
   });
 </script>
 
-<NoteTemplate
-  {note}
-  {metadata}
-  {mini}
-  {displayMenu}
-  {depth}
-  {tieKey}
-  kindInfo={note.kind !== 1 ? true : false}
->
-  {#if lumiSetting.get().showUserStatus}<ShowStatus
-      pubkey={note.pubkey}
-      {tieKey}
-    />{/if}
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else if note}
+  <NoteTemplate
+    {note}
+    {metadata}
+    {mini}
+    {displayMenu}
+    {depth}
+    {tieKey}
+    kindInfo={note.kind !== 1 ? true : false}
+  >
+    {#if lumiSetting.get().showUserStatus}<ShowStatus
+        pubkey={note.pubkey}
+        {tieKey}
+      />{/if}
 
-  <div class="relative overflow-hidden mb-1.5">
-    <div class="flex flex-col p-0.5 mt-1">
-      {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
-        <label>
-          <input type="radio" disabled={true} /><span class="ml-2 break-all"
-            >{itemTag[2]}</span
-          ></label
-        >
-      {/each}
-    </div>
-    <div class="mt-2">
-      {#if Math.floor(Date.now() / 1000) > endsAt}
-        <p class="text-neutral-500 font-sm">Voting period has ended</p>
-      {:else}
-        <p class="text-neutral-500 font-sm">
-          Ends at: {formatAbsoluteDate(endsAt)}
-        </p>
+    <div class="relative overflow-hidden mb-1.5">
+      <div class="flex flex-col p-0.5 mt-1">
+        {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
+          <label>
+            <input type="radio" disabled={true} /><span class="ml-2 break-all"
+              >{itemTag[2]}</span
+            ></label
+          >
+        {/each}
+      </div>
+      <div class="mt-2">
+        {#if Math.floor(Date.now() / 1000) > endsAt}
+          <p class="text-neutral-500 font-sm">Voting period has ended</p>
+        {:else}
+          <p class="text-neutral-500 font-sm">
+            Ends at: {formatAbsoluteDate(endsAt)}
+          </p>
+        {/if}
+
+        <p class="text-neutral-500 font-sm">Type: {polltype}</p>
+      </div>
+      <Link
+        className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
+        href={`https://nos-haiku.vercel.app/entry/${nevent}`}
+        >go to poll<SquareArrowOutUpRight size={12} /></Link
+      >
+      {#if warning}
+        <WarningHide2 text={warning[1]} />
       {/if}
-
-      <p class="text-neutral-500 font-sm">Type: {polltype}</p>
     </div>
-    <Link
-      className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
-      href={`https://nos-haiku.vercel.app/entry/${nevent}`}
-      >go to poll<SquareArrowOutUpRight size={12} /></Link
-    >
-    {#if warning}
-      <WarningHide2 text={warning[1]} />
-    {/if}
-  </div>
 
-  {#if displayMenu}
-    <NoteActionButtons {note} {repostable} {tieKey} />{/if}
-</NoteTemplate>
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+  </NoteTemplate>
+{/if}

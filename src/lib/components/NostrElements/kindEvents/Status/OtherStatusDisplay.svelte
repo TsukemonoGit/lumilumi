@@ -10,9 +10,10 @@
     tieKey: string | undefined;
   }
   let { link, event, tieKey }: Props = $props();
+  let deleted = $state(false);
 </script>
 
-{#if link && link !== ""}
+{#if link && link !== "" && !deleted}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
       TriggerIcon={CircleHelp}
@@ -20,6 +21,7 @@
       iconSize={16}
       iconClass="text-zinc-500"
       {tieKey}
+      bind:deleted
     />
   </div>
   <a
@@ -43,6 +45,7 @@
       note={event}
       iconSize={16}
       iconClass="text-zinc-500"
+      bind:deleted
     />
   </div>
   <div

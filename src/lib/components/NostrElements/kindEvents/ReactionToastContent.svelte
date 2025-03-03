@@ -69,21 +69,21 @@
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        Loading {loadingText}<EllipsisMenuNote notestr={loadingText} />
+        Loading {loadingText}<EllipsisMenuNote encodedId={loadingText} />
       </div>
     {/snippet}
     {#snippet nodata()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        nodata {loadingText}<EllipsisMenuNote notestr={loadingText} />
+        nodata {loadingText}<EllipsisMenuNote encodedId={loadingText} />
       </div>
     {/snippet}
     {#snippet error()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
       >
-        {loadingText}<EllipsisMenuNote notestr={loadingText} />
+        {loadingText}<EllipsisMenuNote encodedId={loadingText} />
       </div>
     {/snippet}
     {#snippet content({ data: text })}

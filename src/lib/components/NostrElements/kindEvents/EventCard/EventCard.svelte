@@ -100,6 +100,7 @@
     zIndex = 0,
   }: Props = $props();
 
+  let deleted = $state(false);
   let atag: string | undefined = $derived.by(() => {
     if (
       note &&
@@ -277,7 +278,9 @@
 </script>
 
 <!-- {#if showCanvasationCheck} -->
-{#if note}
+{#if deleted}
+  <div class="italic text-neutral-500 px-1">Deleted Note</div>
+{:else if note}
   {#if muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
@@ -357,7 +360,7 @@
           </div>
 
           {#if displayMenu}
-            <NoteActionButtons {note} {repostable} {tieKey} />{/if}
+            <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
         </NoteTemplate>
       {:else if note.kind === 42}
         <!--kind42 パブ茶コメント-->
@@ -419,7 +422,12 @@
 
           <div class="ml-auto">
             {#if displayMenu}
-              <NoteActionButtons {note} {repostable} {tieKey} />{/if}
+              <NoteActionButtons
+                {note}
+                {repostable}
+                {tieKey}
+                bind:deleted
+              />{/if}
           </div>
         </div>
         <!--リアクションしたノートの情報-->
@@ -478,7 +486,12 @@
 
           <div class="ml-auto">
             {#if displayMenu}
-              <NoteActionButtons {note} {repostable} {tieKey} />{/if}
+              <NoteActionButtons
+                {note}
+                {repostable}
+                {tieKey}
+                bind:deleted
+              />{/if}
           </div>
         </div>
         <!--リアクションしたノートの情報（リポストのを使いまわし）-->
@@ -632,7 +645,6 @@
     </article>
   {/if}
 {/if}
-
 <!-- {/if} -->
 <!-- <style>
   article {
