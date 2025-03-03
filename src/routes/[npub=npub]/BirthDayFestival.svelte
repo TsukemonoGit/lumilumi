@@ -17,15 +17,18 @@
       "🎂",
       "🎁",
       "🎈",
+      "🎈",
+      "🎈",
       "🍰",
       "🍾",
+      "⚡️",
       "⚡️",
     ];
     return characters[Math.floor(Math.random() * characters.length)];
   }
 
   onMount(() => {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       // 数を50から20に減らします
       characters.push({
         id: i,
@@ -43,12 +46,12 @@
   {#if character.character == "⚡️"}
     <div
       class="character"
-      style="left: {character.left}%; animation-delay: {character.delay}s; animation-duration: {character.duration}s;font-size: {character.size}rem; pointer-events: auto;"
+      style="left: {character.left}%; animation-delay: {character.delay}s; animation-duration: {character.duration}s; pointer-events: auto;"
     >
       <UserZap {metadata} />
     </div>{:else}<div
       class="character"
-      style="left: {character.left}%; animation-delay: {character.delay}s; animation-duration: {character.duration}s;"
+      style="left: {character.left}%; animation-delay: {character.delay}s; animation-duration: {character.duration}s; font-size: {character.size}"
     >
       {character.character}
     </div>
