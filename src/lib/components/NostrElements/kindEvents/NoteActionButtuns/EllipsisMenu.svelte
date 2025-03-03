@@ -302,8 +302,11 @@
       }: {
         event: Nostr.Event;
         res: OkPacketAgainstEvent[];
-      } = await deleteEvent([["e", note.id]]);
-      console.log(res);
+      } = await deleteEvent([
+        ["e", note.id],
+        ["k", note.kind.toString()],
+      ]);
+      // console.log(res);
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       let str = generateResultMessage(isSuccess, isFailed);
