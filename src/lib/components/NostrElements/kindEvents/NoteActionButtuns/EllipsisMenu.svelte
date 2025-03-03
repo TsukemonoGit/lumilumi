@@ -36,6 +36,9 @@
     isParameterizedReplaceableKind,
   } from "nostr-tools/kinds";
   import type { OkPacketAgainstEvent } from "rx-nostr";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import Content from "../../content/Content.svelte";
+  import Note from "../Note.svelte";
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -55,7 +58,7 @@
     tieKey,
     deleted = $bindable(false),
   }: Props = $props();
-
+  let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
 
@@ -241,41 +244,7 @@
         break;
       case 12:
         //delete
-        try {
-          const {
-            event,
-            res,
-          }: {
-            event: Nostr.Event;
-            res: OkPacketAgainstEvent[];
-          } = await deleteEvent([["e", note.id]]);
-          console.log(res);
-          const isSuccess = res
-            .filter((item) => item.ok)
-            .map((item) => item.from);
-          const isFailed = res
-            .filter((item) => !item.ok)
-            .map((item) => item.from);
-          let str = generateResultMessage(isSuccess, isFailed);
-          // console.log(str);
-
-          $toastSettings = {
-            title: isSuccess.length > 0 ? "Success" : "Failed",
-            description: str,
-            color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-          };
-          if (isSuccess.length > 0) {
-            queryClient.removeQueries({ queryKey: ["timeline", note.id] });
-            deleted = true;
-          }
-        } catch (error) {
-          console.error(error);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to delete",
-            color: "bg-orange-500",
-          };
-        }
+        deleteDialogOpen(true);
         break;
     }
   };
@@ -318,6 +287,42 @@
     }
     return { naddr, nevent, encodedPubkey };
   });
+
+  const onClickOK = async () => {
+    deleteDialogOpen(false);
+    try {
+      const {
+        event,
+        res,
+      }: {
+        event: Nostr.Event;
+        res: OkPacketAgainstEvent[];
+      } = await deleteEvent([["e", note.id]]);
+      console.log(res);
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+      const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+      let str = generateResultMessage(isSuccess, isFailed);
+      // console.log(str);
+
+      $toastSettings = {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: str,
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      };
+      if (isSuccess.length > 0) {
+        queryClient.removeQueries({ queryKey: ["timeline", note.id] });
+        deleted = true;
+      }
+    } catch (error) {
+      console.error(error);
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to delete",
+        color: "bg-orange-500",
+      };
+    }
+    return;
+  };
 </script>
 
 <DropdownMenu
@@ -330,3 +335,20 @@
 
 <!--JSON no Dialog-->
 <ModalJson bind:dialogOpen {note} {tieKey} />
+<AlertDialog
+  bind:openDialog={deleteDialogOpen}
+  onClickOK={() => onClickOK()}
+  title="Delete note"
+>
+  {#snippet main()}<p>{$_("post.delete")}</p>
+    <div class="rounded-md border-magnum-600/30 border">
+      <Note
+        id={note.id}
+        displayMenu={false}
+        depth={0}
+        repostable={false}
+        {tieKey}
+      />
+    </div>
+  {/snippet}
+</AlertDialog>
