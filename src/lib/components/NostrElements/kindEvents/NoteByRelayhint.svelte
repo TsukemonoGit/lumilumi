@@ -19,6 +19,7 @@
     repostable: boolean;
     tieKey: string | undefined;
     relayhint: string[];
+    zIndex?: number;
   }
 
   let {
@@ -31,6 +32,7 @@
     repostable,
     tieKey,
     relayhint,
+    zIndex,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
   const queryCheck = async (id: string) => {
@@ -73,6 +75,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -86,6 +89,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -99,6 +103,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -113,6 +118,7 @@
             {depth}
             {repostable}
             {tieKey}
+            {zIndex}
           />
         {/snippet}
       </Metadata>

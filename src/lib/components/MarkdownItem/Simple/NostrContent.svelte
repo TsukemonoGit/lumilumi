@@ -18,10 +18,19 @@
     repostable: boolean;
     tieKey: string | undefined;
     maxHeight?: number | undefined;
+    zIndex?: number | undefined;
   }
 
-  let { text, tags, displayMenu, depth, repostable, tieKey, maxHeight }: Props =
-    $props();
+  let {
+    text,
+    tags,
+    displayMenu,
+    depth,
+    repostable,
+    tieKey,
+    maxHeight,
+    zIndex,
+  }: Props = $props();
   let parts: Part[] = $state([]);
   //プレビューにも使ってるからconstだとだめ
   $effect(() => {
@@ -82,6 +91,7 @@
   };
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
+  $inspect(zIndex);
 </script>
 
 <!-- <MediaDisplay
@@ -102,6 +112,7 @@
         depth={depth + 1}
         {repostable}
         {tieKey}
+        {zIndex}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}
     <UrlDisplay

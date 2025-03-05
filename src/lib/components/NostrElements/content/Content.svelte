@@ -37,6 +37,7 @@
     console.log("showMore");
     $showMore = true;
   };
+  $inspect(zIndex);
 </script>
 
 {#if maxHeight !== 0}
@@ -78,6 +79,7 @@
         {depth}
         {repostable}
         {tieKey}
+        {zIndex}
       />
     </div>
   {/snippet}</Dialog

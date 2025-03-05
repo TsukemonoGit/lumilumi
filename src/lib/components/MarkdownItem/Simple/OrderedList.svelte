@@ -13,6 +13,7 @@
     openModal: any;
     nolist: boolean;
     tieKey: string | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -24,6 +25,7 @@
     openModal,
     nolist,
     tieKey,
+    zIndex,
   }: Props = $props();
 
   let children: Token[] = $derived(transformTokens(part.children ?? []));
@@ -48,6 +50,7 @@
                 {openModal}
                 {nolist}
                 {tieKey}
+                {zIndex}
               />
             {/each}
           {:else if child.content}
@@ -58,6 +61,7 @@
               {displayMenu}
               {tags}
               {tieKey}
+              {zIndex}
             />
           {/if}
         </li>
