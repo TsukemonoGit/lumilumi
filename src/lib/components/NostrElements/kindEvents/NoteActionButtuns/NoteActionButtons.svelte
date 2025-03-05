@@ -577,7 +577,7 @@
               {/if}
             {/snippet}
           </Zapped><span class="text-sm"
-            >{#if zap_length > 0}{zap_length}{/if}</span
+            >{#if lumiSetting.get().showAllReactions && zap_length > 0}{zap_length}{/if}</span
           >
         </div>
         <AlertDialog
@@ -654,7 +654,7 @@
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
-        >{#if reaction_length > 0}{reaction_length}{/if}</span
+        >{#if lumiSetting.get().showAllReactions && reaction_length > 0}{reaction_length}{/if}</span
       >
     </div>
   {/if}
@@ -681,8 +681,8 @@
             >
               <Repeat2 size="22" class={event ? "text-magnum-200 " : ""} />
             </DropdownMenu>{/snippet}
-        </Reposted>{#if repost_length > 0}<span class="text-sm"
-            >{repost_length}</span
+        </Reposted>{#if lumiSetting.get().showAllReactions && repost_length > 0}<span
+            class="text-sm">{repost_length}</span
           >{/if}
       </div>
     {:else}<button
