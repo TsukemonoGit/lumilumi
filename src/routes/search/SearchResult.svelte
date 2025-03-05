@@ -6,7 +6,7 @@
   import { nip50relays } from "$lib/func/constants";
   import EventCard from "../../lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";

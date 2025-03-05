@@ -26,7 +26,7 @@
     tags: any;
     openModal: any;
     nolist: boolean;
-    tieKey: string | undefined; // if (part.type === "hr") {
+    tieKey: string | undefined;
     zIndex?: number | undefined;
   }
 

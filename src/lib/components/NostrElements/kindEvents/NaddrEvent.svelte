@@ -44,7 +44,6 @@
       hasLoaded = true;
     }
   };
-  $inspect(zIndex);
 </script>
 
 {#if queryKey}
