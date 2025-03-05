@@ -11,7 +11,7 @@
 </script>
 
 <div
-  class={"grid grid-cols-[auto_1fr] w-full overflow-hidden my-1 justify-start gap-1 pt-0.5 px-1"}
+  class={"grid grid-cols-[auto_1fr] w-full overflow-hidden my-1 justify-start gap-1 pt-0.5 px-1 animate-pulse"}
 >
   <!--icon-->
   <div class="rounded-full bg-neutral-700 w-10 h-10"></div>
@@ -19,7 +19,7 @@
   <div class="pt-1 max-w-full overflow-hidden">
     <!--name-->
     <div
-      class="flex items-center flex-wrap overflow-hidden w-24 h-4 bg-neutral-700 max-w-full"
+      class="flex items-center flex-wrap overflow-hidden w-24 h-4 bg-neutral-700 max-w-full rounded-full"
     ></div>
 
     <!--text-->
@@ -29,7 +29,7 @@
       </div>
     {:else}
       <div
-        class="mt-1 w-full flex items-center flex-wrap overflow-hidden h-10 bg-neutral-700"
+        class="mt-1 w-full flex items-center flex-wrap overflow-hidden h-10 bg-neutral-700 rounded-full"
       ></div>{/if}
     <div class=" mt-1 flex justify-between text-neutral-600">
       <MessageSquare size="20" /><Repeat2 size="22" /><Heart
