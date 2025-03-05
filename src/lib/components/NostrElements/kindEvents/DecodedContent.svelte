@@ -8,7 +8,6 @@
 
   import NaddrEvent from "./NaddrEvent.svelte";
   import { viewport } from "$lib/func/useViewportAction";
-  import EmptyCard from "./EventCard/EmptyCard.svelte";
 
   interface Props {
     displayMenu: boolean;
@@ -38,6 +37,7 @@
           type: "npub" | "note";
           data: string;
         };
+    zIndex: number | undefined;
   }
 
   let {
@@ -48,6 +48,7 @@
     tieKey,
     decoded,
     maxHeight,
+    zIndex,
   }: Props = $props();
 
   let hasLoaded = $state(false);
@@ -89,6 +90,7 @@
           {repostable}
           {tieKey}
           {maxHeight}
+          {zIndex}
         />
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
@@ -104,6 +106,7 @@
           {repostable}
           {tieKey}
           {maxHeight}
+          {zIndex}
         />
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
@@ -118,6 +121,7 @@
           {tieKey}
           {repostable}
           {content}
+          {zIndex}
         />
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />

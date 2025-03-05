@@ -28,6 +28,7 @@
     maxHeight: number | undefined;
     repostable: boolean;
     tieKey: string | undefined;
+    zIndex: number | undefined;
   }
 
   let {
@@ -38,6 +39,7 @@
     maxHeight,
     repostable,
     tieKey,
+    zIndex,
   }: Props = $props();
 
   let deleted = $state(false);
@@ -182,6 +184,7 @@
         {depth}
         {repostable}
         {tieKey}
+        {zIndex}
       /><ClientTag
         tags={note.tags}
         {depth}
@@ -204,6 +207,7 @@
         {depth}
         {repostable}
         {tieKey}
+        {zIndex}
       />
     {/if}
 

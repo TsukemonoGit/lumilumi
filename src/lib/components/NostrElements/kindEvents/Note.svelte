@@ -20,6 +20,7 @@
     repostable: boolean;
     tieKey: string | undefined;
     relayhint?: string[] | undefined;
+    zIndex?: number;
   }
 
   let {
@@ -32,6 +33,7 @@
     repostable,
     tieKey,
     relayhint = undefined,
+    zIndex,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
 
@@ -60,6 +62,7 @@
             {repostable}
             {tieKey}
             {relayhint}
+            {zIndex}
           />
         {:else}<EmptyCard nevent={displayMenu ? loadingText : undefined}
             >nodata {loadingText}</EmptyCard
@@ -81,6 +84,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           {/snippet}
           {#snippet nodata()}
@@ -92,6 +96,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           {/snippet}
           {#snippet error()}
@@ -103,6 +108,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           {/snippet}
           {#snippet content({ metadata })}
@@ -116,6 +122,7 @@
               {depth}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           {/snippet}
         </Metadata>

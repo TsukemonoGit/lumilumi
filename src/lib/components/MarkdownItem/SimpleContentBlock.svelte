@@ -27,6 +27,7 @@
     openModal: any;
     nolist: boolean;
     tieKey: string | undefined; // if (part.type === "hr") {
+    zIndex?: number | undefined;
   }
 
   let {
@@ -37,9 +38,10 @@
     tags,
     openModal,
     nolist,
-    tieKey
+    tieKey,
+    zIndex,
   }: Props = $props();
-  
+
   //   console.log(part);
   // }
 </script>
@@ -54,6 +56,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "hr"}
   <hr class="my-6" />
@@ -67,6 +70,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
   <!---->
 {:else if part.type === "code_block"}
@@ -97,6 +101,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     />
   </blockquote>
 {:else if part.type === "ordered_list"}
@@ -109,6 +114,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "bullet_list"}
   <BulletList
@@ -120,6 +126,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "list_item"}
   <ListItem
@@ -131,6 +138,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "inline"}
   <span>
@@ -143,6 +151,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     /></span
   >
 {:else if part.type === "link"}
@@ -155,6 +164,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "image"}
   <Image {part} />
@@ -169,6 +179,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     /></strong
   >
 {:else if part.type === "s"}
@@ -182,6 +193,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     /></s
   >
 {:else if part.type === "text"}
@@ -192,6 +204,7 @@
     {displayMenu}
     {tags}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "em"}
   <em class="italic">
@@ -204,6 +217,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     /></em
   >
 {:else if part.type === "softbreak"}
@@ -220,6 +234,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else if part.type === "footnote"}
   {part.content}
@@ -244,6 +259,7 @@
       {openModal}
       {nolist}
       {tieKey}
+      {zIndex}
     /></mark
   >
 {:else if part.type === "hardbreak"}
@@ -258,6 +274,7 @@
     {openModal}
     {nolist}
     {tieKey}
+    {zIndex}
   />
 {:else}<b>{part.type}</b>
   <NostrContent
@@ -267,6 +284,7 @@
     {displayMenu}
     {tags}
     {tieKey}
+    {zIndex}
   />
 {/if}
 

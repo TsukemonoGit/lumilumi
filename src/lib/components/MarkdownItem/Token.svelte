@@ -3,8 +3,6 @@
 
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
 
-  
-
   interface Props {
     part: any;
     displayMenu: any;
@@ -15,6 +13,7 @@
     nolist: boolean;
     //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
     tieKey: string | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -25,7 +24,8 @@
     tags,
     openModal,
     nolist,
-    tieKey
+    tieKey,
+    zIndex,
   }: Props = $props();
 </script>
 
@@ -38,4 +38,5 @@
   {openModal}
   {nolist}
   {tieKey}
+  {zIndex}
 />

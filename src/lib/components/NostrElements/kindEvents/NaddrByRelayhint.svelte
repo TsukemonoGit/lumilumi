@@ -19,6 +19,7 @@
     mini?: boolean;
     thread?: boolean;
     relayhint: string[];
+    zIndex?: number;
   }
 
   let {
@@ -31,6 +32,7 @@
     mini = false,
     thread = false,
     relayhint,
+    zIndex,
   }: Props = $props();
   let queryKey = $derived([
     "naddr",
@@ -93,6 +95,7 @@
               {depth}
               {mini}
               {thread}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -106,6 +109,7 @@
               {depth}
               {mini}
               {thread}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -119,6 +123,7 @@
               {depth}
               {mini}
               {thread}
+              {zIndex}
             />
           </div>
         {/snippet}
@@ -132,6 +137,7 @@
             {depth}
             {mini}
             {thread}
+            {zIndex}
           />
         {/snippet}
       </Metadata>

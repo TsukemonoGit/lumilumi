@@ -19,6 +19,7 @@
     tieKey: string | undefined;
     mini?: boolean;
     thread?: boolean;
+    zIndex?: number;
   }
 
   let {
@@ -30,6 +31,7 @@
     tieKey,
     mini = false,
     thread = false,
+    zIndex,
   }: Props = $props();
   let queryKey = $derived([
     "naddr",
@@ -42,6 +44,7 @@
       hasLoaded = true;
     }
   };
+  $inspect(zIndex);
 </script>
 
 {#if queryKey}
@@ -78,6 +81,7 @@
                 {repostable}
                 {tieKey}
                 relayhint={data.relays}
+                {zIndex}
               />
             {:else}
               <div
@@ -106,6 +110,7 @@
                   {depth}
                   {mini}
                   {thread}
+                  {zIndex}
                 />
               </div>
             {/snippet}
@@ -119,6 +124,7 @@
                   {depth}
                   {mini}
                   {thread}
+                  {zIndex}
                 />
               </div>
             {/snippet}
@@ -132,6 +138,7 @@
                   {depth}
                   {mini}
                   {thread}
+                  {zIndex}
                 />
               </div>
             {/snippet}
@@ -145,6 +152,7 @@
                 {depth}
                 {mini}
                 {thread}
+                {zIndex}
               />
             {/snippet}
           </Metadata>

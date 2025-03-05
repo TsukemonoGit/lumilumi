@@ -26,6 +26,7 @@
     nolist?: boolean;
     tieKey: string | undefined;
     maxHeight?: number | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -37,6 +38,7 @@
     nolist = false,
     tieKey,
     maxHeight,
+    zIndex = 0,
   }: Props = $props();
 
   const md = markdownit();
@@ -73,6 +75,7 @@
     console.log("showMore");
     $showMore = true;
   };
+  $inspect(zIndex);
 </script>
 
 <!-- <MediaDisplay
@@ -94,6 +97,7 @@
             {openModal}
             {nolist}
             {tieKey}
+            {zIndex}
           />
         {/each}</Truncate
       >{:else}
@@ -107,13 +111,14 @@
           {openModal}
           {nolist}
           {tieKey}
+          {zIndex}
         />
       {/each}
     {/if}
   {/if}
 </article>
 <!--Show more no Dialog-->
-<Dialog bind:open={showMore}>
+<Dialog bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       {#each parts as token}
@@ -126,6 +131,7 @@
           {openModal}
           {nolist}
           {tieKey}
+          {zIndex}
         />
       {/each}
     </div>

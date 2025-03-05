@@ -97,7 +97,7 @@
     excludefunc = (event: Nostr.Event) => false,
     repostable = true,
     tieKey,
-    zIndex = 0,
+    zIndex,
   }: Props = $props();
 
   let deleted = $state(false);
@@ -275,6 +275,7 @@
   let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
 
   let petname = $derived(followList.get().get(note.pubkey));
+  $inspect(zIndex);
 </script>
 
 <!-- {#if showCanvasationCheck} -->
@@ -604,6 +605,7 @@
             {depth}
             {repostable}
             {maxHeight}
+            {zIndex}
           />
         {:else}
           <Kind31990Note
@@ -641,6 +643,7 @@
           {repostable}
           {maxHeight}
           {tieKey}
+          {zIndex}
         />{/if}
     </article>
   {/if}

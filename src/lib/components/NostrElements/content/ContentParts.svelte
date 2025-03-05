@@ -25,6 +25,7 @@
     tieKey: string | undefined;
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
+    zIndex?: number | undefined;
   }
 
   let {
@@ -36,6 +37,7 @@
     tieKey,
     isShowClientTag = true,
     maxHeight,
+    zIndex,
   }: Props = $props();
 
   let parts: Part[] = $state([]);
@@ -114,6 +116,7 @@
         depth={depth + 1}
         {repostable}
         {tieKey}
+        {zIndex}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}
     <UrlDisplay {part} {openModal} />
