@@ -63,11 +63,11 @@
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
-      class="fixed inset-0 z-50 bg-black/50"
+      class="fixed inset-0 z-[999] bg-black/50"
       transition:fade={{ duration: 150 }}
     ></div>
     <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[100vh] max-w-[100vw]
+      class="fixed left-1/2 top-1/2 z-[999] max-h-[100vh] max-w-[100vw]
              -translate-x-1/2 -translate-y-1/2"
       use:melt={$content}
     >
@@ -90,12 +90,12 @@
     {#if displayImages.length > 1}
       <div use:melt={$content}>
         <button
-          class="fixed left-1 top-1/2 z-50 bg-neutral-100/75
+          class="fixed left-1 top-1/2 z-[999] bg-neutral-100/75
         -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
           onclick={goToPrev}><ChevronLeft /></button
         >
         <button
-          class="fixed right-1 top-1/2 z-50 bg-neutral-100/75
+          class="fixed right-1 top-1/2 z-[999] bg-neutral-100/75
             -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
           onclick={goToNext}><ChevronRight /></button
         >
