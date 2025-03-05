@@ -91,7 +91,6 @@
   };
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
-  $inspect(zIndex);
 </script>
 
 <!-- <MediaDisplay

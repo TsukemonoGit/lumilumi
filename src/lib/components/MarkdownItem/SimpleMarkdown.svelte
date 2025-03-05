@@ -75,7 +75,6 @@
     console.log("showMore");
     $showMore = true;
   };
-  $inspect(zIndex);
 </script>
 
 <!-- <MediaDisplay

@@ -275,7 +275,6 @@
   let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
 
   let petname = $derived(followList.get().get(note.pubkey));
-  $inspect(zIndex);
 </script>
 
 <!-- {#if showCanvasationCheck} -->
