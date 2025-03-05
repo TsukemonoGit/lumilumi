@@ -13,13 +13,14 @@
   interface Props {
     metadata: Nostr.Event;
     children?: () => any;
+    comment?: string;
   }
 
-  let { metadata, children }: Props = $props();
+  let { metadata, children, comment }: Props = $props();
   let invoice: string | undefined = $state();
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
-  let zapComment: string = $state("");
+  let zapComment: string = $state(comment ?? "");
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
   const prof = profile(metadata);
