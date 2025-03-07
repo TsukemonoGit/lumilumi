@@ -107,12 +107,11 @@ export async function fetchZapLNURLPubkey(
       };
     }
 
-    const res = await getNurlFetch(lnurl);
-    if (!res) {
+    const body = await getNurlFetch(lnurl);
+    if (!body) {
       return { pub: undefined, error: `Failed to fetch from ${lnurl}` };
     }
 
-    const body = await res.json();
     if (body.allowsNostr && body.nostrPubkey) {
       return { pub: body.nostrPubkey };
     } else {
@@ -131,9 +130,7 @@ export async function fetchZapLNURLPubkey(
   }
 }
 
-export async function getNurlFetch(
-  lnurl: string
-): Promise<Response | undefined> {
+export async function getNurlFetch(lnurl: string): Promise<any | undefined> {
   const data: Response | undefined = queryClient?.getQueryData([
     "fetchNnurl",
     lnurl,
@@ -146,7 +143,7 @@ export async function getNurlFetch(
       queryFn: async () => {
         const res = await fetch(lnurl);
         if (!res.ok) throw new Error(`Failed to fetch from ${lnurl}`);
-        return res;
+        return await res?.json();
       },
       staleTime: Infinity,
       gcTime: Infinity,
@@ -351,8 +348,7 @@ export async function getZapEndpoint(
       return null;
     }
 
-    let res = await getNurlFetch(lnurl);
-    let body = await res?.json();
+    let body = await getNurlFetch(lnurl);
 
     if (body && body.allowsNostr && body.nostrPubkey) {
       return body.callback;

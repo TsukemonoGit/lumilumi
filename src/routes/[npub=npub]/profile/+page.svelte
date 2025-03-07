@@ -149,8 +149,7 @@
             `https://${domain}`
           ).toString();
 
-          let res = await getNurlFetch(lnurl);
-          let body = await res?.json();
+          let body = await getNurlFetch(lnurl);
 
           if (body && body.allowsNostr && body.nostrPubkey) {
             newProfile.lud16 = lud;
@@ -158,6 +157,7 @@
             throw Error();
           }
         } catch (error) {
+          console.log(error);
           $toastSettings = {
             title: "Error",
             description: `Error ${$_("profile.lud")}`,
@@ -175,7 +175,7 @@
         return;
       }
     }
-    $nowProgress = true;
+
     // newProfileに含まれていない絵文字タグを削除する
     newTags = newTags.filter((tag) => {
       if (tag[0] === "emoji") {
@@ -187,12 +187,24 @@
       }
       return true;
     });
+
+    // birthのバリデーション
     if (birth_day && birth_month) {
-      const birthArray = birthToArray();
-      if (birthArray) {
-        newProfile = { ...newProfile, birth: birthArray };
+      try {
+        const birthArray = birthToArray();
+        if (birthArray) {
+          newProfile = { ...newProfile, birth: birthArray };
+        }
+      } catch (error: any) {
+        $toastSettings = {
+          title: "Error",
+          description: `Invalid ${error.message}`,
+          color: "bg-orange-500",
+        };
+        return;
       }
     }
+    $nowProgress = true;
     try {
       const content = JSON.stringify(newProfile);
       if (content === "") {
@@ -273,18 +285,29 @@
   function birthToArray(): number[] | undefined {
     let birthArray: number[] = [];
     console.log(birth_day);
-    if (birth_day && birth_day <= 31) {
+
+    if (birth_day && birth_day > 0 && birth_day <= 31) {
       birthArray.push(birth_day);
+    } else if (birth_day) {
+      throw Error("birth day");
     } else {
       return undefined;
     }
-    if (birth_month && birth_month <= 12) {
+    if (birth_month && birth_month > 0 && birth_month <= 12) {
       birthArray.push(birth_month);
+    } else if (birth_month) {
+      throw Error("birth month");
     } else {
       return undefined;
     }
-    if (birth_year && birth_year > 0) {
+    if (
+      birth_year &&
+      birth_year > 0 &&
+      birth_year <= new Date().getFullYear()
+    ) {
       birthArray.push(birth_year);
+    } else if (birth_year) {
+      throw Error("birth year");
     }
     return birthArray;
   }
