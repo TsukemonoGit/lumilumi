@@ -312,7 +312,10 @@ export function useMainTimelineReq(
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
             if (fulfilled) {
-              _queryClient.setQueryData(queryKey, v);
+              _queryClient.setQueryData(
+                queryKey,
+                (v as EventPacket[]).map((packet) => packet.event.id)
+              );
             } else {
               resolve(v);
               fulfilled = true;

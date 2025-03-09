@@ -24,7 +24,7 @@
 </script>
 
 <!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->
-<Text queryKey={["timeline", id]} {id}>
+<Text queryKey={["event", id]} {id}>
   {#snippet loading()}
     <button onclick={handleClickToChannel} class="break-all"
       >loading {loadingText}

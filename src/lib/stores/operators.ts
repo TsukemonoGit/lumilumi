@@ -71,7 +71,7 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
 
 export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
-    const queryKey: QueryKey = ["timeline", a.event.id];
+    const queryKey: QueryKey = ["event", a.event.id];
     // クエリデータの設定
     if (
       a.event &&

@@ -14,13 +14,11 @@ export function useMainTimeline(
   queryKey: QueryKey,
   operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
   filters: Nostr.Filter[]
-): ReqResult<EventPacket[]> {
+): ReqResult<string[]> {
   // const operator = reaCheck
   //   ? pipe(pipe(), userStatus(), reactionCheck(), scanArray())
   //   : pipe(pipe(), userStatus(), scanArray());
   //フィルターに自分へのリプライを取得するフィルターが含まれているか
 
-  return useMainTimelineReq(operator, queryKey, filters) as ReqResult<
-    EventPacket[]
-  >;
+  return useMainTimelineReq(operator, queryKey, filters) as ReqResult<string[]>;
 }

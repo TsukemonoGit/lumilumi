@@ -67,7 +67,7 @@
 </script>
 
 {#if tag[0] === "e"}
-  <Text queryKey={["timeline", tag[1]]} id={tag[1]}>
+  <Text queryKey={["event", tag[1]]} id={tag[1]}>
     {#snippet loading()}<EmptyCard
         nevent={displayMenu ? nip19.noteEncode(tag[1]) : undefined}
         >Loading {nip19.noteEncode(tag[1])}</EmptyCard

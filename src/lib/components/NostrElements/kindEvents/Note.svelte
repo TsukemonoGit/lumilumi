@@ -47,7 +47,7 @@
 
 <div use:viewport={null} onenterViewport={handleEnterViewport}>
   {#if hasLoaded}
-    <Text queryKey={["timeline", id]} {id}>
+    <Text queryKey={["event", id]} {id}>
       {#snippet loading()}
         <EmptyCard nevent={displayMenu ? loadingText : undefined}
           >Loading {loadingText}</EmptyCard

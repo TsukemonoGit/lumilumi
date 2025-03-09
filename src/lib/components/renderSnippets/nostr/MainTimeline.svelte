@@ -50,7 +50,7 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
+    updateViewEvent: (_data?: string[] | undefined | null) => void;
   }
 
   let {
@@ -108,7 +108,13 @@
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
 
-  updateViewEvent = (_data: EventPacket[] | undefined | null = get(data)) => {
+  updateViewEvent = (_data: string[] | undefined | null = get(data)) => {
+    const events: EventPacket[] =
+      _data
+        ?.map((id) => queryClient.getQueryData(["event", id]) as EventPacket)
+        .filter((event) => event !== undefined)
+        .filter((event) => eventFilter(event.event))
+        .filter((event) => event.event.created_at <= now() + 10) ?? [];
     if (updating) {
       return;
     }
@@ -125,7 +131,7 @@
         "olderData",
       ]);
 
-      const allEvents = [...(_data || []), ...(olderdatas || [])];
+      const allEvents = [...(events || []), ...(olderdatas || [])];
 
       untilTime =
         allEvents.length > 0
@@ -142,8 +148,8 @@
 
       allUniqueEvents = allEvents
         .map((event) => event.event)
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+        .filter(eventFilter);
+      //   .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
 
       displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
       updating = false;

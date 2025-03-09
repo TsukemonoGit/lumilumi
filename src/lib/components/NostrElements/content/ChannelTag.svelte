@@ -46,7 +46,7 @@
 </script>
 
 {#if heyaId}
-  <Text queryKey={["timeline", heyaId]} id={heyaId}>
+  <Text queryKey={["event", heyaId]} id={heyaId}>
     {#snippet loading()}
       <button
         title={channelLink}

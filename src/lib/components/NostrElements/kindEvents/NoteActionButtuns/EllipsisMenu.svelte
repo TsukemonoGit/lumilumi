@@ -318,7 +318,7 @@
         color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
       };
       if (isSuccess.length > 0) {
-        queryClient.removeQueries({ queryKey: ["timeline", note.id] });
+        queryClient.removeQueries({ queryKey: ["event", note.id] });
         deleted = true;
       }
     } catch (error) {
