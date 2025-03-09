@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Repeat, Reply, Zap } from "lucide-svelte";
+  import { Mail, Repeat, Reply, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import Reaction from "../NostrElements/kindEvents/Reaction.svelte";
   import { extractZappedId, replyedEvent, repostedId } from "$lib/func/event";
@@ -30,6 +30,7 @@
     }
   };
   let handledTag = $derived(getHandledTag(event));
+  //$inspect(event.kind);
 </script>
 
 {#if handledTag}
@@ -71,3 +72,10 @@
     </div>
   {/if}
 {/if}
+
+{#if event.kind === 4}
+  <div class="flex w-full">
+    <Mail class="text-magnum-400" /><Reply class="text-magnum-400" /><UserName
+      pubhex={event.pubkey}
+    />
+  </div>{/if}

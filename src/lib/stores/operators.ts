@@ -355,7 +355,7 @@ export function reactionCheck() {
     const isFollowingUser = (pubkey: string) =>
       followList.get() && followList.get().has(pubkey);
 
-    const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind);
+    const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind); //TLに表示されるかもしれない
     const isSelfPost = packet.event.pubkey === loginUserPubkey;
     const containsUserTag = packet.event.tags.some(
       (tag) => tag[0] === "p" && tag[1] === loginUserPubkey
