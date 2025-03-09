@@ -75,7 +75,5 @@
 
 {#if event.kind === 4}
   <div class="flex w-full">
-    <Mail class="text-magnum-400" /><Reply class="text-magnum-400" /><UserName
-      pubhex={event.pubkey}
-    />
+    <Mail class="text-magnum-400" /><UserName pubhex={event.pubkey} />
   </div>{/if}
