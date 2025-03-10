@@ -21,7 +21,7 @@
   >{#snippet children()}<UserName pubhex={pubkey} />
   {/snippet}
   {#snippet popoverContent()}
-    <div class="w-[24rem] max-w-full break-all">
+    <div class="w-[24rem] max-w-full">
       <UserProfile
         {pubkey}
         bannerHeight={80}
