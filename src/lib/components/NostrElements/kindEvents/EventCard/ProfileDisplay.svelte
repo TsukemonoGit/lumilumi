@@ -47,7 +47,7 @@
   </span>
 {/if}
 {#if isBirthDay}
-  <Cake size={16} class="text-magnum-400" />
+  <Cake size={16} class="text-magnum-400 w-[16px]" />
 {/if}
 {#if kindInfo}
   <span class=" text-neutral-300/50 text-sm whitespace-nowrap ml-1">
