@@ -46,7 +46,7 @@
       class="flex align-middle whitespace-pre-wrap break-words flex-wrap"
       style="word-break: break-word;"
     >
-      <div class="mb-2 flex items-center">
+      <div class="mb-2 flex items-center flex-wrap">
         {#if prof}
           <DisplayName
             height={21}

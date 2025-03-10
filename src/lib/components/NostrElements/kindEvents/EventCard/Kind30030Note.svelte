@@ -307,7 +307,7 @@
         <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
     {/snippet}
     {#snippet name()}
-      <ProfileDisplay {note} {metadata} />
+      <ProfileDisplay {note} {metadata} kindInfo={true} />
     {/snippet}
     {#snippet time()}
       <DisplayTime {displayMenu} {note} {tieKey} />
@@ -322,10 +322,9 @@
     {#snippet content()}
       <div class="grid grid-cols-[1fr_auto] w-full gap-1">
         <div>
-          Emoji set: <span class="text-lg font-bold text-magnum-300"
-            >{title ?? dtag}</span
+          <span class="text-lg font-bold text-magnum-300">{title ?? dtag}</span
           >{#if description}
-            <div class=" text-neutral-300/80">{description}</div>{/if}
+            <div class="text-sm text-neutral-300/80">{description}</div>{/if}
         </div>
         {#if image}
           {#if lumiSetting.get().showImg}
