@@ -135,29 +135,16 @@
               />{/if}
           </div>
         </div>{/if}
-
-      {#if note.content.includes("?iv=")}
-        <!--なんか暗号化したやつっぽいから表示しないでおく-->
-        <!-- <Content
-    text={note.content}
-    tags={note.tags}
-    {displayMenu}
-    {depth}
-    {repostable}
-    {tieKey}
-  /> -->
-      {:else}
-        <Content
-          {maxHeight}
-          text={note.content}
-          tags={note.tags}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-          {zIndex}
-        />
-      {/if}
+      <SimpleMarkdown
+        {maxHeight}
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {zIndex}
+      /><ClientTag tags={note.tags} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}

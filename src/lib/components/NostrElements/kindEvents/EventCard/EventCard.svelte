@@ -7,28 +7,17 @@
   import { loginUser, mutebykinds, mutes } from "$lib/stores/stores";
 
   import { nip19 } from "nostr-tools";
-  import Content from "../../content/Content.svelte";
 
-  //import WarningHide1 from "../Elements/WarningHide1.svelte";
-  import { profile } from "$lib/func/util";
-  import Reply from "../Reply.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy, untrack } from "svelte";
 
   import Kind0Note from "./Kind0Note.svelte";
 
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import Kind30030Note from "./Kind30030Note.svelte";
   import Kind42Note from "./Kind42Note.svelte";
-  import NoteTemplate from "./NoteTemplate.svelte";
+
   import Kind9735Note from "./Kind9735Note.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
-  import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
-  import { goto } from "$app/navigation";
-  import ShowStatus from "../Status/ShowStatus.svelte";
 
   import ReplyThread from "../ReplyThread.svelte";
   import { muteCheck } from "$lib/func/muteCheck";
@@ -43,16 +32,13 @@
     replyedEvent,
     repostedId,
   } from "$lib/func/event";
-  import UserName from "../../user/UserName.svelte";
-  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+
   import Kind4Note from "./Kind4Note.svelte";
   import ListLinkCard from "./ListLinkCard.svelte";
   import OtherKindNote from "./OtherKindNote.svelte";
 
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import {
     followList,
-    lumiSetting,
     timelineFilter,
     viewEventIds,
   } from "$lib/stores/globalRunes.svelte";
@@ -66,6 +52,10 @@
   import Kind1068Note from "./Kind1068Note.svelte";
   import Kind40Note from "./Kind40Note.svelte";
   import Kind41Note from "./Kind41Note.svelte";
+  import Kind1Note from "./Kind1Note.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
+  import RepostComponent from "../layout/RepostComponent.svelte";
+  import Kind30023Note from "./Kind30023Note.svelte";
 
   let currentNoteTag: string[] | undefined = $state(undefined);
 
@@ -272,9 +262,7 @@
     }
   }
 
-  let warning = $derived(checkContentWarning(note.tags)); // string[] | undefined
-
-  let petname = $derived(followList.get().get(note.pubkey));
+  let warning = $derived(checkContentWarning(note?.tags));
 </script>
 
 <!-- {#if showCanvasationCheck} -->
@@ -307,85 +295,47 @@
 
     <article class="{noteClass()} w-full">
       {#if note.kind === 1 || note.kind === 1111}
-        <NoteTemplate
+        <Kind1Note
+          {replyUsers}
+          {repostable}
+          {zIndex}
+          {maxHeight}
           {note}
           {metadata}
           {mini}
           {displayMenu}
           {depth}
           {tieKey}
+          bind:deleted
+          {replyTag}
+          {thread}
           kindInfo={note.kind !== 1 ? true : false}
-        >
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
-              pubkey={note.pubkey}
-              {tieKey}
-            />{/if}
-          <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
-          {#if replyUsers.length > 0}
-            <div
-              class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
-            >
-              <span class="text-sm text-neutral-50">To:</span
-              >{#each replyUsers as user}
-                {#if !displayMenu}<UserName pubhex={user} />{:else}
-                  <PopupUserName pubkey={user} {tieKey} />{/if}
-              {/each}
-            </div>
-          {/if}
-          {#if !thread && (replyTag || replyUsers.length > 0)}
-            <Reply {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
-            <!--<hr />-->
-          {/if}
-
-          <div class="relative overflow-hidden mb-1.5">
-            <!-- <div
-              class="mt-0.5 overflow-y-auto overflow-x-hidden"
-              style="max-height:{maxHeight ?? 'none'}"
-            > -->
-            <Content
-              {zIndex}
-              {maxHeight}
-              text={note.content}
-              tags={note.tags}
-              {displayMenu}
-              {depth}
-              {repostable}
-              {tieKey}
-            />
-            <!-- </div> -->
-            {#if warning}
-              <!-- <WarningHide1 text={tag[1]} /> -->
-              <WarningHide2 text={warning[1]} />
-            {/if}
-          </div>
-
-          {#if displayMenu}
-            <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
-        </NoteTemplate>
+        />
       {:else if note.kind === 42}
         <!--kind42 パブ茶コメント-->
-
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          <Kind42Note
-            {zIndex}
-            {tieKey}
-            {note}
-            {displayMenu}
-            {depth}
-            {repostable}
-            {thread}
-          /></NoteTemplate
-        >
+        <Kind42Note
+          {zIndex}
+          {metadata}
+          {mini}
+          {tieKey}
+          {note}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {thread}
+        />
       {:else if note.kind === 6 || note.kind === 16}
         <!--リポスト-->
-        <div class="flex gap-1 items-center bg-magnum-800/25">
-          {#if note.kind === 16}<span class="text-xs text-magnum-500"
-              >{note.kind}</span
-            >{/if}<Repeat2
-            size="20"
-            class="min-w-[20px] mt-auto mb-auto stroke-magnum-400"
-          />
-          <div class="self-center">
+        <RepostComponent>
+          {#snippet kindIcon()}
+            {#if note.kind === 16}<span class="text-xs text-magnum-500"
+                >{note.kind}</span
+              >{/if}<Repeat2
+              size="20"
+              class="min-w-[20px] mt-auto mb-auto stroke-magnum-400"
+            />
+          {/snippet}
+          {#snippet userIcon()}
             <UserPopupMenu
               pubkey={note.pubkey}
               {metadata}
@@ -394,33 +344,12 @@
               {depth}
               {tieKey}
             />
-          </div>
-          <div class=" inline-block break-all break-words whitespace-pre-line">
-            {#if petname}<span class="text-magnum-100">📛{petname}</span
-              >{:else if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />
-                {#if prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    /></span
-                  >{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{nip19.npubEncode(note.pubkey)}</span
-              >
-            {/if}
-          </div>
+          {/snippet}
+          {#snippet name()}
+            <ProfileDisplay {note} {metadata} />
+          {/snippet}
 
-          <div class="ml-auto">
+          {#snippet actionButtons()}
             {#if displayMenu}
               <NoteActionButtons
                 {note}
@@ -428,8 +357,9 @@
                 {tieKey}
                 bind:deleted
               />{/if}
-          </div>
-        </div>
+          {/snippet}
+        </RepostComponent>
+
         <!--リアクションしたノートの情報-->
         {@const { kind, tag } = repostedId(note.tags)}
         {#if tag}
@@ -445,11 +375,13 @@
         {/if}
       {:else if note.kind === 7}
         <!--リアクション-->
-        <div class="flex gap-1 items-center bg-magnum-800/25">
-          <div class="w-fit max-w-[40%]">
-            <Reaction event={note} />
-          </div>
-          <div class="self-center">
+        <RepostComponent>
+          {#snippet kindIcon()}
+            <div class="w-fit min-w-[20px] max-w-[40%]">
+              <Reaction event={note} />
+            </div>
+          {/snippet}
+          {#snippet userIcon()}
             <UserPopupMenu
               pubkey={note.pubkey}
               {metadata}
@@ -458,33 +390,12 @@
               {depth}
               {tieKey}
             />
-          </div>
-          <div class="break-all break-words whitespace-pre-line">
-            {#if petname}<span class="text-magnum-100">📛{petname}</span
-              >{:else if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />
-                {#if prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm mt-auto"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    /></span
-                  >{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{nip19.npubEncode(note.pubkey)}</span
-              >
-            {/if}
-          </div>
+          {/snippet}
+          {#snippet name()}
+            <ProfileDisplay {note} {metadata} />
+          {/snippet}
 
-          <div class="ml-auto">
+          {#snippet actionButtons()}
             {#if displayMenu}
               <NoteActionButtons
                 {note}
@@ -492,8 +403,9 @@
                 {tieKey}
                 bind:deleted
               />{/if}
-          </div>
-        </div>
+          {/snippet}
+        </RepostComponent>
+
         <!--リアクションしたノートの情報（リポストのを使いまわし）-->
         {@const { kind, tag } = repostedId(note.tags)}
         <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある　nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
@@ -510,12 +422,20 @@
         {/if}
       {:else if note.kind === 17}
         <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-        <ReactionWebsite {note} {metadata} {displayMenu} {depth} {tieKey} />
+        <ReactionWebsite
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {tieKey}
+          {repostable}
+        />
       {:else if note.kind === 0}
         <!--kind0-->
         <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
       {:else if note.kind === 20}
         <Kind20Note
+          {zIndex}
           {tieKey}
           {replyUsers}
           {mini}
@@ -557,14 +477,16 @@
         <ListLinkCard event={note} {depth} {tieKey} />
       {:else if note.kind === 30030}
         <!--kind30030-->
-        <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-          <Kind30030Note
-            {note}
-            {repostable}
-            {maxHeight}
-            {tieKey}
-          /></NoteTemplate
-        >
+
+        <Kind30030Note
+          {note}
+          {repostable}
+          {maxHeight}
+          {tieKey}
+          {displayMenu}
+          {metadata}
+          {depth}
+        />
       {:else if note.kind === 9735}
         <!--kind9735 zap receipt-->
 
@@ -581,6 +503,7 @@
       {:else if note.kind === 4}
         <!--旧仕様のDMだよ-->
         <Kind4Note
+          bind:deleted
           {tieKey}
           {mini}
           {note}
@@ -592,12 +515,14 @@
           {replyUsers}
           {thread}
           {replyTag}
+          {repostable}
         />
       {:else if note.kind === 31990}
         {@const data = get31990Ogp(note)}
         {#if !data}
           <OtherKindNote
             {tieKey}
+            {mini}
             {note}
             {metadata}
             {displayMenu}
@@ -633,9 +558,22 @@
           {warning}
           {repostable}
         />
+      {:else if note.kind === 30023 || note.kind === 30024}
+        <Kind30023Note
+          {tieKey}
+          {mini}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {repostable}
+          {zIndex}
+        />
       {:else}
         <OtherKindNote
           {note}
+          {mini}
           {metadata}
           {displayMenu}
           {depth}

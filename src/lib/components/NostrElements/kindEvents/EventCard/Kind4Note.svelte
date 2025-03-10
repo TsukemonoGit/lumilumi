@@ -8,9 +8,16 @@
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
   import Content from "../../content/Content.svelte";
-  import NoteTemplate from "./NoteTemplate.svelte";
   import UserName from "../../user/UserName.svelte";
   import Reply from "../Reply.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -24,6 +31,8 @@
     replyUsers: string[];
     thread: boolean;
     replyTag: string[] | undefined;
+    repostable: boolean;
+    deleted: boolean;
   }
 
   let {
@@ -38,6 +47,8 @@
     replyUsers,
     thread,
     replyTag,
+    repostable,
+    deleted = $bindable(),
   }: Props = $props();
 
   let decrypt: string | undefined = $state(undefined);
@@ -70,23 +81,52 @@
   }
 </script>
 
-<NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-  {#if replyUsers.length > 0}
-    <div
-      class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
-    >
+<NoteComponent
+  warningText={warning !== undefined
+    ? warning.length > 1
+      ? warning[1]
+      : ""
+    : undefined}
+>
+  {#snippet icon()}
+    <UserPopupMenu
+      pubkey={note.pubkey}
+      {metadata}
+      size={mini ? 20 : 40}
+      {displayMenu}
+      {depth}
+      {tieKey}
+    />
+  {/snippet}
+  {#snippet seenOn()}
+    {#if lumiSetting.get().showRelayIcon && displayMenu}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+  {/snippet}
+  {#snippet name()}
+    <ProfileDisplay {note} {metadata} />
+  {/snippet}
+  {#snippet time()}
+    <DisplayTime {displayMenu} {note} {tieKey} />
+  {/snippet}
+  {#snippet status()}
+    {#if lumiSetting.get().showUserStatus}<ShowStatus
+        pubkey={note.pubkey}
+        {tieKey}
+      />{/if}
+  {/snippet}
+  {#snippet replyUser()}
+    {#if replyUsers.length > 0}
       <span class="text-sm text-neutral-50">To:</span>{#each replyUsers as user}
         {#if !displayMenu}<UserName pubhex={user} />{:else}
           <PopupUserName pubkey={user} {tieKey} />{/if}
-      {/each}
-    </div>
-  {/if}
-  {#if !thread && (replyTag || replyUsers.length > 0)}
-    <Reply {replyTag} {displayMenu} {depth} repostable={false} {tieKey} />
-    <!--<hr />-->
-  {/if}
-
-  <div class="relative overflow-hidden mb-1.5">
+      {/each}{/if}
+  {/snippet}
+  {#snippet reply()}
+    {#if !thread && (replyTag || replyUsers.length > 0)}
+      <Reply {replyTag} {displayMenu} depth={depth + 1} {repostable} {tieKey} />
+    {/if}
+  {/snippet}
+  {#snippet content()}
     <div class="text-sm text-neutral-400">{$_("event.kind4.text")}</div>
     {#if forme}
       {#if !decrypt}
@@ -106,10 +146,9 @@
         />
       {/if}
     {/if}
-
-    {#if warning}
-      <!-- <WarningHide1 text={tag[1]} /> -->
-      <WarningHide2 text={warning[1]} />
-    {/if}
-  </div>
-</NoteTemplate>
+  {/snippet}
+  {#snippet actionButtons()}
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+  {/snippet}
+</NoteComponent>

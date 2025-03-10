@@ -19,16 +19,36 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus, Trash2 } from "lucide-svelte";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
+  import { checkContentWarning } from "$lib/func/event";
 
   interface Props {
     note: Nostr.Event;
     repostable: boolean;
     maxHeight: number | undefined;
     tieKey: string | undefined;
+    displayMenu: boolean;
+    mini?: boolean;
+    metadata: Nostr.Event | undefined;
+    depth: number;
   }
 
   let deleted = $state(false);
-  let { note, repostable, maxHeight, tieKey }: Props = $props();
+  let {
+    note,
+    repostable,
+    maxHeight,
+    tieKey,
+    displayMenu,
+    mini,
+    metadata,
+    depth,
+  }: Props = $props();
   let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
   let title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
   let description = $derived(
@@ -260,74 +280,114 @@
       return $state.snapshot($emojis.event);
     }
   }
+  let warning = $derived(checkContentWarning(note?.tags));
 </script>
 
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <div class="flex flex-col w-full">
-    <div class="grid grid-cols-[1fr_auto] w-full gap-1">
-      <div>
-        Emoji set: <span class="text-lg font-bold text-magnum-300"
-          >{title ?? dtag}</span
-        >{#if description}
-          <div class=" text-neutral-300/80">{description}</div>{/if}
-      </div>
-      {#if image}
-        {#if lumiSetting.get().showImg}
-          <img
-            loading="lazy"
-            src={image}
-            alt=""
-            class="max-w-16 object-contain max-h-16"
-          />{:else}<Avatar
-            size={64}
-            name={image}
-            variant="beam"
-            square={true}
-          />{/if}{/if}
-    </div>
-    <div class="flex gap-1 flex-wrap" style="max-height:{maxHeight ?? 'none'}">
-      {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
-        {#if lumiSetting.get().showImg}
-          <img
-            title={`:${shortcode}:`}
-            loading="lazy"
-            alt={shortcode}
-            src={url}
-            class="inline h-[24px] object-contain m-0 overflow-hidden"
-          />
-        {:else}
-          <div>:{shortcode}:</div>
-        {/if}
-      {/each}<ClientTag depth={0} tags={note.tags} />
-    </div>
-    {#if $loginUser}
-      {#if inMyCustomEmoji}
-        <button
-          disabled={$nowProgress || disabled}
-          onclick={handleClickRemove}
-          class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
-          ><Trash2 />{$_("customEmoji.remove")}</button
-        >
-      {:else}
-        <button
-          onclick={handleClickAdd}
-          disabled={$nowProgress || disabled}
-          class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
-          ><SmilePlus />{$_("customEmoji.add")}</button
-        >
-      {/if}{/if}
-    <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
-  </div>
+  <NoteComponent
+    warningText={warning !== undefined
+      ? warning.length > 1
+        ? warning[1]
+        : ""
+      : undefined}
+    >{#snippet icon()}
+      <UserPopupMenu
+        pubkey={note.pubkey}
+        {metadata}
+        size={mini ? 20 : 40}
+        {displayMenu}
+        {depth}
+        {tieKey}
+      />
+    {/snippet}
+    {#snippet seenOn()}
+      {#if lumiSetting.get().showRelayIcon && displayMenu}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay {note} {metadata} />
+    {/snippet}
+    {#snippet time()}
+      <DisplayTime {displayMenu} {note} {tieKey} />
+    {/snippet}
+    {#snippet status()}
+      {#if lumiSetting.get().showUserStatus}<ShowStatus
+          pubkey={note.pubkey}
+          {tieKey}
+        />{/if}
+    {/snippet}
 
-  <AlertDialog
-    bind:openDialog={dialogOpen}
-    onClickOK={handleClickMakeKind10030}
-    title={$_("create.10030.title")}
-    okButtonName="OK"
-    >{#snippet main()}
-      <div>{$_("create.10030.text")}</div>
-    {/snippet}</AlertDialog
-  >
+    {#snippet content()}
+      <div class="grid grid-cols-[1fr_auto] w-full gap-1">
+        <div>
+          Emoji set: <span class="text-lg font-bold text-magnum-300"
+            >{title ?? dtag}</span
+          >{#if description}
+            <div class=" text-neutral-300/80">{description}</div>{/if}
+        </div>
+        {#if image}
+          {#if lumiSetting.get().showImg}
+            <img
+              loading="lazy"
+              src={image}
+              alt=""
+              class="max-w-16 object-contain max-h-16"
+            />{:else}<Avatar
+              size={64}
+              name={image}
+              variant="beam"
+              square={true}
+            />{/if}{/if}
+      </div>
+      <div
+        class="flex gap-1 flex-wrap"
+        style="max-height:{maxHeight ?? 'none'}"
+      >
+        {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
+          {#if lumiSetting.get().showImg}
+            <img
+              title={`:${shortcode}:`}
+              loading="lazy"
+              alt={shortcode}
+              src={url}
+              class="inline h-[24px] object-contain m-0 overflow-hidden"
+            />
+          {:else}
+            <div>:{shortcode}:</div>
+          {/if}
+        {/each}<ClientTag depth={0} tags={note.tags} />
+      </div>
+      {#if $loginUser}
+        {#if inMyCustomEmoji}
+          <button
+            disabled={$nowProgress || disabled}
+            onclick={handleClickRemove}
+            class="rounded-3xl w-fit p-2 bg-magnum-900/50 border border-magnum-200 ml-auto text-magnum-200 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
+            ><Trash2 />{$_("customEmoji.remove")}</button
+          >
+        {:else}
+          <button
+            onclick={handleClickAdd}
+            disabled={$nowProgress || disabled}
+            class="rounded-3xl w-fit p-2 bg-magnum-200 border border-magnum-900 ml-auto text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-15 flex gap-1 items-center"
+            ><SmilePlus />{$_("customEmoji.add")}</button
+          >
+        {/if}{/if}
+    {/snippet}
+    {#snippet actionButtons()}
+      {#if displayMenu}
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </NoteComponent>
 {/if}
+<AlertDialog
+  bind:openDialog={dialogOpen}
+  onClickOK={handleClickMakeKind10030}
+  title={$_("create.10030.title")}
+  okButtonName="OK"
+  >{#snippet main()}
+    <div>{$_("create.10030.text")}</div>
+  {/snippet}</AlertDialog
+>

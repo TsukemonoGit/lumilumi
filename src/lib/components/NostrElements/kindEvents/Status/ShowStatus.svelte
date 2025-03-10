@@ -26,23 +26,21 @@
 </script>
 
 {#if pubkey}
-  <div class={`text-sm ${color ?? "text-zinc-500"}`}>
-    <StatusGeneral {pubkey}>
-      {#snippet children({ event })}
-        {@const link = getStatusLink(event, page.url.origin)}
-        <div class="flex gap-1 items-center">
-          <GeneralStatusDisplay {tieKey} {link} {event} {color} />
-        </div>
-      {/snippet}
-    </StatusGeneral>
-    <StatusMusic {pubkey}>
-      {#snippet children({ event })}
-        {@const link =
-          event.tags.find((tag: string[]) => tag[0] === "r")?.[1] ?? ""}
-        <div class="flex gap-1 items-center">
-          <MusicStatusDisplay {tieKey} {event} {link} {color} />
-        </div>
-      {/snippet}
-    </StatusMusic>
-  </div>
+  <StatusGeneral {pubkey}>
+    {#snippet children({ event })}
+      {@const link = getStatusLink(event, page.url.origin)}
+      <div class="flex gap-1 items-center">
+        <GeneralStatusDisplay {tieKey} {link} {event} {color} />
+      </div>
+    {/snippet}
+  </StatusGeneral>
+  <StatusMusic {pubkey}>
+    {#snippet children({ event })}
+      {@const link =
+        event.tags.find((tag: string[]) => tag[0] === "r")?.[1] ?? ""}
+      <div class="flex gap-1 items-center">
+        <MusicStatusDisplay {tieKey} {event} {link} {color} />
+      </div>
+    {/snippet}
+  </StatusMusic>
 {/if}

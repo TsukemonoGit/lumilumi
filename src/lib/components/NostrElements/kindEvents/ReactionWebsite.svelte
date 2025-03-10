@@ -11,9 +11,11 @@
   import { isvalidURL } from "$lib/func/ogp";
   import OGP from "$lib/components/renderSnippets/OGP.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
+
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
+  import ProfileDisplay from "./EventCard/ProfileDisplay.svelte";
+  import RepostComponent from "./layout/RepostComponent.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -21,8 +23,10 @@
     displayMenu: boolean;
     depth: number;
     tieKey: string | undefined;
+    repostable: boolean;
   }
-  let { note, metadata, displayMenu, tieKey, depth }: Props = $props();
+  let { note, metadata, displayMenu, tieKey, depth, repostable }: Props =
+    $props();
   let deleted = $state(false);
   let website = $derived(reactionWebsite(note));
   function reactionWebsite(note: Nostr.Event): string | undefined {
@@ -33,15 +37,18 @@
       return undefined;
     }
   }
-  let prof = $derived(profile(metadata));
 </script>
 
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <div class="flex gap-1 items-center bg-magnum-800/25">
-    <div class="w-fit max-w-[40%]"><Reaction event={note} /></div>
-    <div class="self-center">
+  <RepostComponent>
+    {#snippet kindIcon()}
+      <div class="w-fit min-w-[20px] max-w-[40%]">
+        <Reaction event={note} />
+      </div>
+    {/snippet}
+    {#snippet userIcon()}
       <UserPopupMenu
         pubkey={note.pubkey}
         {metadata}
@@ -50,39 +57,16 @@
         {depth}
         {tieKey}
       />
-    </div>
-    <div class="break-all break-words whitespace-pre-line">
-      {#if metadata}
-        <DisplayName
-          height={21}
-          name={prof?.display_name ?? ""}
-          tags={metadata.tags}
-        />
-        {#if prof && prof.name && prof.name !== ""}
-          <span class="text-magnum-100 text-sm mt-auto"
-            ><DisplayName
-              height={21}
-              name={`@${prof.name}`}
-              tags={metadata.tags}
-            /></span
-          >{/if}
-      {:else}
-        <span class="text-magnum-100 text-sm"
-          >@{nip19.npubEncode(note.pubkey)}</span
-        >
-      {/if}
-    </div>
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay {note} {metadata} />
+    {/snippet}
 
-    <div class="ml-auto">
+    {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons
-          {note}
-          repostable={false}
-          {tieKey}
-          bind:deleted
-        />{/if}
-    </div>
-  </div>
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </RepostComponent>
   <!--リアクションしたノートの情報（リポストのを使いまわし）-->
 
   {#if website}

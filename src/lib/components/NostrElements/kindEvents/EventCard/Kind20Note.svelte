@@ -2,9 +2,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { nip19 } from "nostr-tools";
-  import { getRelaysById } from "$lib/func/nostr";
-
   import Content from "../../content/Content.svelte";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
@@ -13,11 +10,15 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ContentImage from "../../content/ContentImage.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-  import NoteTemplate from "./NoteTemplate.svelte";
+
   import ShowStatus from "../Status/ShowStatus.svelte";
   import UserName from "../../user/UserName.svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
 
   interface Props {
     replyUsers: string[];
@@ -30,6 +31,7 @@
     repostable: boolean;
     tieKey: string | undefined;
     warning: string[] | undefined;
+    zIndex?: number;
   }
 
   let {
@@ -43,6 +45,7 @@
     repostable,
     tieKey,
     warning,
+    zIndex,
   }: Props = $props();
   let deleted = $state(false);
   let imeta: Imeta[] | undefined = $derived(
@@ -68,25 +71,49 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <NoteTemplate {note} {metadata} {mini} {displayMenu} {depth} {tieKey}>
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+  <NoteComponent
+    warningText={warning !== undefined
+      ? warning.length > 1
+        ? warning[1]
+        : ""
+      : undefined}
+  >
+    {#snippet icon()}
+      <UserPopupMenu
         pubkey={note.pubkey}
+        {metadata}
+        size={mini ? 20 : 40}
+        {displayMenu}
+        {depth}
         {tieKey}
-      />{/if}
-    <!-- {@const { replyID, replyUsers } = replyedEvent(note.tags)}-->
-    {#if replyUsers.length > 0}
-      <div
-        class="my-1 text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
-      >
+      />
+    {/snippet}
+    {#snippet seenOn()}
+      {#if lumiSetting.get().showRelayIcon && displayMenu}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay {note} {metadata} />
+    {/snippet}
+    {#snippet time()}
+      <DisplayTime {displayMenu} {note} {tieKey} />
+    {/snippet}
+    {#snippet status()}
+      {#if lumiSetting.get().showUserStatus}<ShowStatus
+          pubkey={note.pubkey}
+          {tieKey}
+        />{/if}
+    {/snippet}
+    {#snippet replyUser()}
+      {#if replyUsers.length > 0}
         <span class="text-sm text-neutral-50">To:</span
         >{#each replyUsers as user}
           {#if !displayMenu}<UserName pubhex={user} />{:else}
             <PopupUserName pubkey={user} {tieKey} />{/if}
-        {/each}
-      </div>
-    {/if}
+        {/each}{/if}
+    {/snippet}
 
-    <div class="relative overflow-hidden mb-1.5">
+    {#snippet content()}
       {#if title && title !== ""}
         <div class="text-lg font-bold">
           {title}
@@ -103,6 +130,7 @@
         {depth}
         {repostable}
         {tieKey}
+        {zIndex}
       />
       <span
         class={"float-end text-neutral-400    text-sm font-semibold px-1"}
@@ -110,14 +138,10 @@
       >
         Picture</span
       >
-      {#if warning}
-        <!-- <WarningHide1 text={tag[1]} /> -->
-
-        <WarningHide2 text={warning[1]} />
-      {/if}
-    </div>
-    {#if displayMenu}
-      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
-    {/if}
-  </NoteTemplate>
+    {/snippet}
+    {#snippet actionButtons()}
+      {#if displayMenu}
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </NoteComponent>
 {/if}

@@ -271,7 +271,9 @@
                 </div>{/if}{/if}
           </div>
           {#if lumiSetting.get().showUserStatus}
-            <ShowStatus {pubkey} {tieKey} />
+            <div class={`text-sm text-zinc-500`}>
+              <ShowStatus {pubkey} {tieKey} />
+            </div>
           {/if}
           {#if prof.about}
             <div class="mt-2">
