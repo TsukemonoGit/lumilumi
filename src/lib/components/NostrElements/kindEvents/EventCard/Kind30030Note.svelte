@@ -26,6 +26,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import { checkContentWarning } from "$lib/func/event";
+  import CustomEmoji from "../../content/CustomEmoji.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -345,17 +346,7 @@
         style="max-height:{maxHeight ?? 'none'}"
       >
         {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
-          {#if lumiSetting.get().showImg}
-            <img
-              title={`:${shortcode}:`}
-              loading="lazy"
-              alt={shortcode}
-              src={url}
-              class="inline h-[24px] object-contain m-0 overflow-hidden"
-            />
-          {:else}
-            <div>:{shortcode}:</div>
-          {/if}
+          <CustomEmoji part={{ type: "emoji", content: shortcode, url: url }} />
         {/each}<ClientTag depth={0} tags={note.tags} />
       </div>
       {#if $loginUser}
