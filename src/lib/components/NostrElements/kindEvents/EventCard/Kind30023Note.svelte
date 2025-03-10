@@ -1,27 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
-
   import SimpleMarkdown from "$lib/components/MarkdownItem/SimpleMarkdown.svelte";
-  import { nip19 } from "nostr-tools";
-  import { getRelaysById } from "$lib/func/nostr";
-  import { goto } from "$app/navigation";
 
-  import { eventKinds } from "$lib/func/kinds";
-  import Content from "../../content/Content.svelte";
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
-  import {
-    isReplaceableKind,
-    isParameterizedReplaceableKind,
-  } from "nostr-tools/kinds"; //isAddressableKind
-  import { Reply } from "lucide-svelte";
-  import PopupUserName from "../../user/PopupUserName.svelte";
-  import UserName from "../../user/UserName.svelte";
+
   import NoteComponent from "../layout/NoteComponent.svelte";
   import SeenonIcons from "../SeenonIcons.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
@@ -135,29 +122,16 @@
               />{/if}
           </div>
         </div>{/if}
-
-      {#if note.content.includes("?iv=")}
-        <!--なんか暗号化したやつっぽいから表示しないでおく-->
-        <!-- <Content
-    text={note.content}
-    tags={note.tags}
-    {displayMenu}
-    {depth}
-    {repostable}
-    {tieKey}
-  /> -->
-      {:else}
-        <Content
-          {maxHeight}
-          text={note.content}
-          tags={note.tags}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-          {zIndex}
-        />
-      {/if}
+      <SimpleMarkdown
+        {maxHeight}
+        text={note.content}
+        tags={note.tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {zIndex}
+      /><ClientTag tags={note.tags} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}

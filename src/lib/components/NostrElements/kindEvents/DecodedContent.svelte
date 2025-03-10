@@ -122,6 +122,7 @@
           {repostable}
           {content}
           {zIndex}
+          mini={true}
         />
       </div>
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />

@@ -46,7 +46,7 @@
       class="flex align-middle whitespace-pre-wrap break-words flex-wrap"
       style="word-break: break-word;"
     >
-      <div class="mb-2 flex items-center">
+      <div class="mb-2 flex items-center flex-wrap">
         {#if prof}
           <DisplayName
             height={21}
@@ -55,7 +55,7 @@
           />
 
           {#if prof.name && prof.name !== ""}<span
-              class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words"
+              class="text-magnum-100 text-sm mt-auto mb-auto ml-1 inline-flex whitespace-pre-wrap break-words flex-wrap"
               style="word-break: break-word;"
               ><DisplayName
                 height={21}

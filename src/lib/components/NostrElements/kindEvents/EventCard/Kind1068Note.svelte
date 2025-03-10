@@ -1,19 +1,22 @@
 <script lang="ts">
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-
   import * as Nostr from "nostr-typedef";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
-  import NoteTemplate from "./NoteTemplate.svelte";
   import { formatAbsoluteDate } from "$lib/func/util";
 
   import Link from "$lib/components/Elements/Link.svelte";
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
   import { SquareArrowOutUpRight } from "lucide-svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -70,21 +73,45 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <NoteTemplate
-    {note}
-    {metadata}
-    {mini}
-    {displayMenu}
-    {depth}
-    {tieKey}
-    kindInfo={note.kind !== 1 ? true : false}
+  <NoteComponent
+    warningText={warning !== undefined
+      ? warning.length > 1
+        ? warning[1]
+        : ""
+      : undefined}
   >
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+    {#snippet icon()}
+      <UserPopupMenu
         pubkey={note.pubkey}
+        {metadata}
+        size={mini ? 20 : 40}
+        {displayMenu}
+        {depth}
         {tieKey}
-      />{/if}
+      />
+    {/snippet}
+    {#snippet seenOn()}
+      {#if lumiSetting.get().showRelayIcon && displayMenu}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay
+        {note}
+        {metadata}
+        kindInfo={note.kind !== 1 ? true : false}
+      />
+    {/snippet}
+    {#snippet time()}
+      <DisplayTime {displayMenu} {note} {tieKey} />
+    {/snippet}
+    {#snippet status()}
+      {#if lumiSetting.get().showUserStatus}<ShowStatus
+          pubkey={note.pubkey}
+          {tieKey}
+        />{/if}
+    {/snippet}
 
-    <div class="relative overflow-hidden mb-1.5">
+    {#snippet content()}
       <div class="flex flex-col p-0.5 mt-1">
         {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
           <label>
@@ -104,18 +131,17 @@
         {/if}
 
         <p class="text-neutral-500 font-sm">Type: {polltype}</p>
-      </div>
-      <Link
-        className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
-        href={`https://nos-haiku.vercel.app/entry/${nevent}`}
-        >go to poll<SquareArrowOutUpRight size={12} /></Link
-      >
-      {#if warning}
-        <WarningHide2 text={warning[1]} />
-      {/if}
-    </div>
 
-    {#if displayMenu}
-      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
-  </NoteTemplate>
+        <Link
+          className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
+          href={`https://nos-haiku.vercel.app/entry/${nevent}`}
+          >go to poll<SquareArrowOutUpRight size={12} /></Link
+        >
+      </div>
+    {/snippet}
+    {#snippet actionButtons()}
+      {#if displayMenu}
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </NoteComponent>
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import {
     promisePublishEvent,
     setRelays,
@@ -22,9 +22,7 @@
 
   import { X, Save } from "lucide-svelte";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
-  import EllipsisMenu from "$lib/components/NostrElements/kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
-  import NoteTemplate from "$lib/components/NostrElements/kindEvents/EventCard/NoteTemplate.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { relayRegex2 } from "$lib/func/regex";
@@ -33,6 +31,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { LayoutData } from "../$types";
+  import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
 
   let { data }: { data: LayoutData } = $props();
 
@@ -41,7 +40,7 @@
 
   let deleted = $state(false);
   //svelte-ignore non_reactive_update
-  let kind10002: Nostr.Event;
+  let kind10002: Nostr.Event | undefined = $state();
   let newTags: string[][] = $state([]);
 
   // Read/Write状態を保存するためのMap
@@ -250,7 +249,7 @@
 
   function reset() {
     //
-    newTags = getTags(kind10002);
+    newTags = kind10002 ? getTags(kind10002) : [];
     setAllStates();
     updateRelayCounts();
   }
@@ -334,41 +333,43 @@
     {#if kind10002}
       <Metadata pubkey={data.pubkey} queryKey={["metadata", data.pubkey]}>
         {#snippet loading()}
-          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
-            kind: 10002 Relays
-            <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
-            </div>
-          </NoteTemplate>
+          {#if kind10002}<Kind10002Note
+              note={kind10002}
+              depth={0}
+              tieKey={undefined}
+              repostable={false}
+              {deleted}
+            />{/if}
         {/snippet}
         {#snippet nodata()}
-          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
-            kind: 10002 Relays
-            <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
-            </div>
-          </NoteTemplate>
+          {#if kind10002}<Kind10002Note
+              note={kind10002}
+              depth={0}
+              tieKey={undefined}
+              repostable={false}
+              {deleted}
+            />{/if}
         {/snippet}
         {#snippet error()}
-          <NoteTemplate note={kind10002} depth={0} tieKey={undefined}>
-            kind: 10002 Relays
-            <div class="inline-flex float-end">
-              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
-            </div>
-          </NoteTemplate>
+          {#if kind10002}
+            <Kind10002Note
+              note={kind10002}
+              depth={0}
+              tieKey={undefined}
+              repostable={false}
+              {deleted}
+            />{/if}
         {/snippet}
         {#snippet content({ metadata })}
-          <NoteTemplate
-            note={kind10002}
-            depth={0}
-            tieKey={undefined}
-            {metadata}
-          >
-            kind: 10002 Relays
-            <div class="inline-flex float-end pr-1">
-              <EllipsisMenu note={kind10002} tieKey={undefined} bind:deleted />
-            </div>
-          </NoteTemplate>{/snippet}
+          {#if kind10002}
+            <Kind10002Note
+              note={kind10002}
+              depth={0}
+              tieKey={undefined}
+              repostable={false}
+              {deleted}
+              {metadata}
+            />{/if}{/snippet}
       </Metadata>
     {/if}
 

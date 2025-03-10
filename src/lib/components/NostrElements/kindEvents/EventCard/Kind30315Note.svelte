@@ -3,10 +3,6 @@
 
   import { _ } from "svelte-i18n";
 
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
-
-  import NoteTemplate from "./NoteTemplate.svelte";
-
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { getStatusLink } from "$lib/func/status";
   import { page } from "$app/state";
@@ -14,6 +10,13 @@
   import MusicStatusDisplay from "../Status/MusicStatusDisplay.svelte";
 
   import OtherStatusDisplay from "../Status/OtherStatusDisplay.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -50,39 +53,115 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <NoteTemplate
-    {note}
-    {metadata}
-    {mini}
-    {displayMenu}
-    {depth}
-    {tieKey}
-    kindInfo={true}
-  >
-    <div class="relative overflow-hidden mb-1.5">
-      <div
-        class="mt-0.5 overflow-y-auto overflow-x-hidden"
-        style="max-height:{maxHeight ?? 'none'}"
-      >
-        <div class="grid grid-cols-[auto_1fr] flex-wrap gap-1 items-center">
-          {#if statusTag === "general"}
-            <GeneralStatusDisplay link={statusLink} event={note} {tieKey} />
-          {:else if statusTag === "music"}<MusicStatusDisplay
-              link={statusLink}
-              event={note}
-              {tieKey}
-            />{:else}
-            <OtherStatusDisplay link={statusLink} event={note} {tieKey} />
-          {/if}
-        </div>
-      </div>
-      {#if warning}
-        <!-- <WarningHide1 text={tag[1]} /> -->
-        <WarningHide2 text={warning[1]} />
-      {/if}
-    </div>
+  <script lang="ts">
+    import * as Nostr from "nostr-typedef";
 
-    {#if displayMenu}
-      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
-  </NoteTemplate>
+    import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+    import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+
+    import { checkContentWarning } from "$lib/func/event";
+
+    import NoteComponent from "../layout/NoteComponent.svelte";
+    import Content from "../../content/Content.svelte";
+    import UserName from "../../user/UserName.svelte";
+    import PopupUserName from "../../user/PopupUserName.svelte";
+    import ShowStatus from "../Status/ShowStatus.svelte";
+    import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+    import ProfileDisplay from "./ProfileDisplay.svelte";
+    import SeenonIcons from "../SeenonIcons.svelte";
+    import Reply from "../Reply.svelte";
+    import DisplayTime from "./DisplayTime.svelte";
+
+    interface Props {
+      note: Nostr.Event;
+      metadata?: Nostr.Event | undefined;
+      zIndex?: number;
+      maxHeight?: number;
+      replyTag: string[] | undefined;
+      thread: boolean;
+      repostable: boolean;
+
+      mini?: boolean;
+
+      depth: number;
+
+      displayMenu?: boolean;
+      tieKey: string | undefined;
+      kindInfo?: boolean;
+      replyUsers: string[];
+      deleted: boolean;
+    }
+
+    let {
+      note,
+      metadata = $bindable(undefined),
+      mini = false,
+      depth,
+      displayMenu = true,
+      tieKey,
+      kindInfo = false,
+      zIndex,
+      maxHeight,
+      repostable,
+      replyUsers,
+      deleted = $bindable(),
+      replyTag,
+      thread,
+    }: Props = $props();
+
+    let warning = $derived(checkContentWarning(note?.tags));
+  </script>
+
+  <NoteComponent
+    warningText={warning !== undefined
+      ? warning.length > 1
+        ? warning[1]
+        : ""
+      : undefined}
+  >
+    {#snippet icon()}
+      <UserPopupMenu
+        pubkey={note.pubkey}
+        {metadata}
+        size={mini ? 20 : 40}
+        {displayMenu}
+        {depth}
+        {tieKey}
+      />
+    {/snippet}
+    {#snippet seenOn()}
+      {#if lumiSetting.get().showRelayIcon && displayMenu}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay {note} {metadata} kindInfo={true} />
+    {/snippet}
+    {#snippet time()}
+      <DisplayTime {displayMenu} {note} {tieKey} />
+    {/snippet}
+    {#snippet status()}
+      {#if lumiSetting.get().showUserStatus}<ShowStatus
+          pubkey={note.pubkey}
+          {tieKey}
+        />{/if}
+    {/snippet}
+
+    {#snippet content()}
+      <div class="grid grid-cols-[auto_1fr] flex-wrap gap-1 items-center">
+        {#if statusTag === "general"}
+          <GeneralStatusDisplay link={statusLink} event={note} {tieKey} />
+        {:else if statusTag === "music"}<MusicStatusDisplay
+            link={statusLink}
+            event={note}
+            {tieKey}
+          />{:else}
+          <OtherStatusDisplay link={statusLink} event={note} {tieKey} />
+        {/if}
+      </div>
+    {/snippet}
+    {#snippet actionButtons()}
+      {#if displayMenu}
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </NoteComponent>
 {/if}

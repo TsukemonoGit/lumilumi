@@ -3,6 +3,12 @@ import type { Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./regex";
 import type { Ogp } from "./ogp";
+import {
+  isParameterizedReplaceableKind,
+  isReplaceableKind,
+} from "nostr-tools/kinds";
+import { nip19 } from "nostr-tools";
+import { getRelaysById } from "./nostr";
 
 export const repostedId = (
   tags: string[][]
@@ -178,4 +184,34 @@ export const checkBirthDay = (prof: Profile | undefined): boolean => {
     }
   }
   return false;
+};
+export const checkContentWarning = (tags: string[][]): string[] | undefined => {
+  return tags.find((item) => item[0] === "content-warning");
+};
+
+export const noteLink = (
+  note: Nostr.Event,
+  tieKey: string | undefined = undefined
+): string /**nevent or naddr */ => {
+  let replaceable =
+    note &&
+    (isReplaceableKind(note.kind) || isParameterizedReplaceableKind(note.kind));
+
+  if (!replaceable) {
+    let eventpointer: nip19.EventPointer = {
+      id: note.id,
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      author: note.pubkey,
+      kind: note.kind,
+    };
+    return nip19.neventEncode(eventpointer);
+  } else {
+    let naddrpointer: nip19.AddressPointer = {
+      kind: note.kind,
+      identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+      pubkey: note.pubkey,
+      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+    };
+    return nip19.naddrEncode(naddrpointer);
+  }
 };
