@@ -45,14 +45,15 @@
       <div class={`text-sm text-zinc-500`}>
         {@render status?.()}
       </div>{/if}
+    <div class="max-w-full overflow-hidden flex flex-col gap-0.5">
+      <div
+        class=" text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
+      >
+        {@render replyUser?.()}
+      </div>
 
-    <div
-      class=" text-sm text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-12 overflow-y-auto"
-    >
-      {@render replyUser?.()}
+      {@render reply?.()}
     </div>
-
-    {@render reply?.()}
     <div class="relative overflow-hidden mb-1.5">
       {@render content?.()}
 

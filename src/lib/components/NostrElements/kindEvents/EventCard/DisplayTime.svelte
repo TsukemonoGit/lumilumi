@@ -15,7 +15,9 @@
     >
   </a>
 {:else}
-  <time datetime={datetime(note.created_at)}
-    >{formatAbsoluteDate(note.created_at)}</time
-  >
+  <div class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs">
+    <time datetime={datetime(note.created_at)}
+      >{formatAbsoluteDate(note.created_at)}</time
+    >
+  </div>
 {/if}

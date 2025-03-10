@@ -72,7 +72,7 @@
 </script>
 
 <div
-  class={"mx-auto w-full rounded-xl bg-neutral-800 shadow-lg overflow-hidden mb-1"}
+  class={"mx-auto w-full rounded-xl bg-neutral-800 shadow-md overflow-hidden mb-1"}
   {...$root}
 >
   <h2 class="flex w-full px-2">
