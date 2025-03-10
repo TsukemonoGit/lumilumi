@@ -18,6 +18,7 @@
   import ShowStatus from "../Status/ShowStatus.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
+  import ReplyTo from "../layout/ReplyTo.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -116,10 +117,12 @@
   {/snippet}
   {#snippet replyUser()}
     {#if replyUsers.length > 0}
-      <span class="text-sm text-neutral-50">To:</span>{#each replyUsers as user}
-        {#if !displayMenu}<UserName pubhex={user} />{:else}
-          <PopupUserName pubkey={user} {tieKey} />{/if}
-      {/each}{/if}
+      <ReplyTo
+        >{#each replyUsers as user}
+          {#if !displayMenu}<UserName pubhex={user} />{:else}
+            <PopupUserName pubkey={user} {tieKey} />{/if}
+        {/each}</ReplyTo
+      >{/if}
   {/snippet}
   {#snippet reply()}
     {#if !thread && (replyTag || replyUsers.length > 0)}

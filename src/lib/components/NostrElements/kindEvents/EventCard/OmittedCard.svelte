@@ -9,6 +9,7 @@
   import ChannelTag from "../../content/ChannelTag.svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
   import UserName from "../../user/UserName.svelte";
+  import ReplyTo from "../layout/ReplyTo.svelte";
 
   interface Props {
     repostable: boolean;
@@ -36,11 +37,12 @@
         <div
           class="my-1 text-xs text-magnum-300 flex break-all flex-wrap overflow-x-hidden gap-x-1 max-h-24 overflow-y-auto"
         >
-          <span class="text-xs text-neutral-50">To:</span
-          >{#each replyUsers as user}
-            {#if !displayMenu}<UserName pubhex={user} />{:else}
-              <PopupUserName pubkey={user} {tieKey} />{/if}
-          {/each}
+          <ReplyTo
+            >{#each replyUsers as user}
+              {#if !displayMenu}<UserName pubhex={user} />{:else}
+                <PopupUserName pubkey={user} {tieKey} />{/if}
+            {/each}</ReplyTo
+          >
         </div>
       {/if}
     {/if}
