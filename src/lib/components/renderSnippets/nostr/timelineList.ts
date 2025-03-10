@@ -140,7 +140,7 @@ export async function waitForConnections(
 
     console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
 
-    if (Math.floor(finalStateCount / totalRelays) >= 0.8) {
+    if (finalStateCount / totalRelays >= 0.8) {
       console.log("80% relays are in a final state. Proceeding...");
       break;
     }
