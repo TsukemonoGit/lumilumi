@@ -17,6 +17,7 @@
   import SeenonIcons from "../SeenonIcons.svelte";
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
+  import Content from "../../content/Content.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -27,7 +28,8 @@
     tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;
-
+    zIndex: number | undefined;
+    maxHeight: number | undefined;
     repostable: boolean;
   }
 
@@ -40,7 +42,8 @@
     tieKey,
     mini,
     warning,
-
+    zIndex,
+    maxHeight,
     repostable,
   }: Props = $props();
 
@@ -113,6 +116,16 @@
 
     {#snippet content()}
       <div class="flex flex-col p-0.5 mt-1">
+        <Content
+          {zIndex}
+          {maxHeight}
+          text={note.content}
+          tags={note.tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+        />
         {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
           <label>
             <input type="radio" disabled={true} /><span class="ml-2 break-all"
