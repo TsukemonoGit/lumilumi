@@ -342,7 +342,7 @@
             />{/if}{/if}
       </div>
       <div
-        class="flex gap-1 flex-wrap"
+        class="flex gap-1 flex-wrap break-all"
         style="max-height:{maxHeight ?? 'none'}"
       >
         {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
