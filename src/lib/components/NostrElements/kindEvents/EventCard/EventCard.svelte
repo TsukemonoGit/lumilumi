@@ -472,6 +472,8 @@
           {repostable}
           {mini}
           {warning}
+          {zIndex}
+          {maxHeight}
         />
       {:else if note.kind === 30000}
         <ListLinkCard event={note} {depth} {tieKey} />
