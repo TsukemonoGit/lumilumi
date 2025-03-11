@@ -108,6 +108,8 @@
   const additionalReplyUsers: Writable<string[]> = writable([]);
   let clickEscape: number = $state(0);
   let signPubkey: string | undefined = $state();
+  let textarea: HTMLTextAreaElement | undefined = $state();
+  let warningTextarea: HTMLInputElement | undefined = $state();
 
   async function getSignPubkey() {
     if (propSignPubkey) {
@@ -410,7 +412,6 @@
     await handleFileUpload(fileList.files);
   };
 
-  let textarea: HTMLTextAreaElement | undefined = $state();
   // svelte-ignore non_reactive_update
   let openConfirm: (bool: boolean) => void = () => {};
 
@@ -749,8 +750,12 @@
 
         <div class="flex flex-row gap-1 md:gap-2 mb-1">
           <button
-            onclick={() => {
+            onclick={async () => {
               onWarning = !onWarning;
+              if (onWarning) {
+                await delay(10);
+                warningTextarea?.focus();
+              }
             }}
             class="button"
           >
@@ -784,6 +789,7 @@
               type="text"
               class="px-1 h-8 w-full rounded-md text-magnum-100 border-2
           border-magnum-400"
+              bind:this={warningTextarea}
               bind:value={warningText}
             />
           </div>
