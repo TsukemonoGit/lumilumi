@@ -271,9 +271,7 @@
     const target = event.target as HTMLTextAreaElement;
     cursorPosition = target.selectionStart;
   };
-
-  const handleClickEmoji = (e: string[]) => {
-    const emoji = [...e];
+  const addEmojiTag = (emoji: string[]) => {
     // 1. URLが同じ絵文字を探す
     const sameEmoji = tags.find(
       (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
@@ -301,7 +299,10 @@
       // 同じ名前もURLもない場合、新しい絵文字として追加
       tags.push(["emoji", ...emoji]);
     }
-
+  };
+  const handleClickEmoji = (e: string[]) => {
+    const emoji = [...e];
+    addEmojiTag(emoji);
     // 絵文字をテキストに追加
     const emojiText = `:${emoji[0]}:`;
     text =
@@ -410,6 +411,21 @@
     const fileList = new DataTransfer();
     files.forEach((file) => fileList.items.add(file));
     await handleFileUpload(fileList.files);
+
+    // カスタム絵文字チェックの処理を追加
+    const pastedText = event.clipboardData.getData("text");
+    if (pastedText) {
+      const emojiMatches = pastedText.match(/:[a-zA-Z0-9_]+:/g);
+      if (emojiMatches) {
+        emojiMatches.forEach((emoji) => {
+          const emojiName = emoji.slice(1, -1);
+          const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
+          if (customEmoji) {
+            addEmojiTag(customEmoji);
+          }
+        });
+      }
+    }
   };
 
   // svelte-ignore non_reactive_update
@@ -729,11 +745,6 @@
               />
             {/if}
           </div>
-          <!-- <div
-            class="rounded-md border-magnum-500 border min-h-8 max-h-28 overflow-y-auto resize-y"
-          >
-            <Content bind:text bind:tags />
-          </div> -->
         </div>
       {/if}
       <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">

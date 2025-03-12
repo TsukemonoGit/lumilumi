@@ -101,6 +101,7 @@
     onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
+
 <Dialog open={dialogOpen}>
   {#snippet main()}
     <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
