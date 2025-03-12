@@ -266,10 +266,24 @@
     viewMetadataList = false;
     inputMetadata = "";
   };
-
+  // カスタム絵文字チェックの処理を追加
+  const checkCustomEmojis = (text: string) => {
+    const emojiMatches = text.match(/:[a-zA-Z0-9_]+:/g);
+    if (emojiMatches) {
+      emojiMatches.forEach((emoji) => {
+        const emojiName = emoji.slice(1, -1);
+        const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
+        if (customEmoji) {
+          addEmojiTag(customEmoji);
+        }
+      });
+    }
+  };
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;
     cursorPosition = target.selectionStart;
+
+    //checkCustomEmojis(text);
   };
   const addEmojiTag = (emoji: string[]) => {
     // 1. URLが同じ絵文字を探す
@@ -415,16 +429,7 @@
     // カスタム絵文字チェックの処理を追加
     const pastedText = event.clipboardData.getData("text");
     if (pastedText) {
-      const emojiMatches = pastedText.match(/:[a-zA-Z0-9_]+:/g);
-      if (emojiMatches) {
-        emojiMatches.forEach((emoji) => {
-          const emojiName = emoji.slice(1, -1);
-          const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-          if (customEmoji) {
-            addEmojiTag(customEmoji);
-          }
-        });
-      }
+      checkCustomEmojis(pastedText);
     }
   };
 
@@ -863,6 +868,9 @@
             oninput={(e) => {
               handleTextareaInput(e);
               clickEscape = 0;
+            }}
+            onchange={(e) => {
+              checkCustomEmojis(text);
             }}
             onclick={(e) => {
               handleTextareaInput(e);
