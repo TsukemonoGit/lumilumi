@@ -1,9 +1,15 @@
 import { redirect } from "@sveltejs/kit";
 
-export const load = async ({ params, setHeaders }) => {
-  // URL が "nostr:" または "nostr://" で始まる場合、リダイレクトを行う
+export const load = async ({ params }) => {
   const { nostr } = params;
+  let decodedNostr: string;
 
-  const newPath = nostr.replace(/^(?:web\+)?nostr:\/?\/?/, "");
-  throw redirect(302, newPath); // 302リダイレクトで新しいURLに移動
+  try {
+    decodedNostr = decodeURIComponent(nostr);
+  } catch {
+    decodedNostr = nostr; // デコード失敗時はそのまま使用
+  }
+
+  const newPath = decodedNostr.replace(/^(?:web\+)?nostr:\/?\/?/, "");
+  throw redirect(302, newPath);
 };
