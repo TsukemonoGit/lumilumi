@@ -98,6 +98,7 @@
         allEvents.length > 0
           ? allEvents[allEvents.length - 1].event.created_at
           : now();
+      //  console.log(untilTime);
       //.sort((a, b) => b.event.created_at - a.event.created_at);
 
       allUniqueEvents = allEvents
@@ -296,6 +297,7 @@
         viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
       //nevent1qvzqqqqqqypzqv33pxtldvmmdntqhv269r56zjadmhalpp660h3yc6gj8gxpuexvqyv8wumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5qs6amnwvaz7tmev9382tndv5q3zamnwvaz7tmj9e4k76nfwfsju6t0qyxhwumn8ghj7mn0wvhxcmmvqqszykcw73dgzvupxwnktv7lvndtn5n4rxwzas7jm88zkh3zpknkqws0ayy00
       $nowProgress = true;
+      // console.log("loadOlderEvents", untilTime);
       const older = await loadOlderEvents(
         syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
         olderFilters,
