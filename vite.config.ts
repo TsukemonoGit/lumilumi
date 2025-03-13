@@ -56,12 +56,8 @@ export default defineConfig({
         //https://developer.mozilla.org/en-US/docs/Web/Manifest/protocol_handlers
         protocol_handlers: [
           {
-            protocol: "nostr",
-            url: "/%s",
-          },
-          {
             protocol: "web+nostr",
-            url: "/%s",
+            url: "./%s",
           },
         ],
       },
