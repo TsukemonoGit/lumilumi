@@ -57,11 +57,11 @@ export default defineConfig({
         protocol_handlers: [
           {
             protocol: "nostr",
-            url: "/%s",
+            url: "./handler?data=%s",
           },
           {
             protocol: "web+nostr",
-            url: "/%s",
+            url: "./handler?data=%s",
           },
         ],
       },
