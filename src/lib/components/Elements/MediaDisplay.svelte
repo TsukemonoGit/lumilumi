@@ -104,7 +104,7 @@
     <button
       use:melt={$close}
       aria-label="close"
-      class="fixed z-50 right-4 top-4 inline-flex p-1appearance-none
+      class="fixed z-[999] right-4 top-4 inline-flex p-1appearance-none
                 items-center justify-center rounded-full p-1 text-magnum-800 bg-magnum-100/70
                 hover:bg-magnum-100 focus:shadow-magnum-400"
     >
