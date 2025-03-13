@@ -78,10 +78,12 @@ export async function loadOlderEvents(
   );
   //console.log(olderEvents);
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
-
+  const filteredOlderEvents = olderEvents.filter(
+    (pk) => pk.event.created_at <= until
+  );
   console.log("limit:", sift);
-  console.log("取得できたイベントの数", olderEvents.length);
-  return olderEvents.slice(0, sift);
+  console.log("取得できたイベントの数", filteredOlderEvents.length);
+  return filteredOlderEvents.slice(0, sift);
 }
 
 export async function firstLoadOlderEvents(
@@ -110,6 +112,7 @@ export async function firstLoadOlderEvents(
   );
   //新しいのからsift分だけもらう（飛び飛びのイベントとかで古いのが取得されてそれ採用するとあいだのイベントが抜けるから）
   //↑これoperator通したときに通さないやつとかいたら飛び飛びの古いのまで取得することになるから省かないようにしたデータからシフト分だけ取らないと
+
   console.log("sift", sift);
   console.log("olderEvents.length", olderEvents.length);
   return olderEvents.slice(0, sift === 0 ? undefined : sift);
