@@ -51,6 +51,15 @@ export default defineConfig({
             ],
           },
         },
+        protocol_handlers: [
+          {
+            protocol: "nostr",
+            url: "/%s",
+
+            //https://developer.chrome.com/docs/web-platform/best-practices/url-protocol-handler?hl=ja
+            //https://developer.mozilla.org/en-US/docs/Web/Manifest/protocol_handlers
+          },
+        ],
       },
       //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
       injectManifest: {
