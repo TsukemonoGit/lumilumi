@@ -79,13 +79,12 @@
     if (updating) {
       return;
     }
+    updating = true;
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
-      updating = true;
-
       const olderdatas: EventPacket[] | undefined =
         queryClient.getQueryData(olderQueryKey);
       console.log("updateViewEvent");
