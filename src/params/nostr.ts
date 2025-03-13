@@ -1,7 +1,12 @@
 import type { ParamMatcher } from "@sveltejs/kit";
 
 export const match = ((param) => {
-  // `nostr` パラメータを取得してデコード
-  const decodedNostr = decodeURIComponent(param);
-  return /^(?:web\+)?nostr:\/?\/?/.test(decodedNostr); //note nevent
+  let decodedNostr: string;
+  try {
+    decodedNostr = decodeURIComponent(param);
+  } catch {
+    decodedNostr = param; // デコードできなかった場合はそのまま使う
+  }
+
+  return /^(?:web\+)?nostr:\/?\/?/.test(decodedNostr);
 }) satisfies ParamMatcher;
