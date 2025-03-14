@@ -69,12 +69,14 @@
       >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
           pubkey={decoded.data}
           {tieKey}
+          {zIndex}
         />{/if}</span
     >{:else if decoded.type === "nprofile"}<span
       class="text-magnum-300 align-middle"
       >{#if !displayMenu}<UserName
           pubhex={decoded.data.pubkey}
         />{:else}<PopupUserName
+          {zIndex}
           pubkey={decoded.data.pubkey}
           {tieKey}
         />{/if}</span

@@ -9,7 +9,6 @@
 
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
   import EllipsisMenuNaddr from "../NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import EllipsisMenuNote from "../NoteActionButtuns/EllipsisMenuNote.svelte";
   import EventCard from "./EventCard.svelte";
   import OmittedCard from "./OmittedCard.svelte";
   import { page } from "$app/state";
@@ -25,13 +24,20 @@
     maxHeight: number | undefined;
     //tagはaかe
     tag: string[];
-
+    zIndex?: number;
     depth: number;
     tieKey: string | undefined;
   }
 
-  let { displayMenu, repostable, maxHeight, tag, depth, tieKey }: Props =
-    $props();
+  let {
+    displayMenu,
+    repostable,
+    maxHeight,
+    tag,
+    depth,
+    tieKey,
+    zIndex,
+  }: Props = $props();
 
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
@@ -105,6 +111,7 @@
           {maxHeight}
           {displayMenu}
           {tieKey}
+          {zIndex}
         />
       {:else}
         <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
@@ -204,6 +211,7 @@
             {maxHeight}
             {displayMenu}
             {tieKey}
+            {zIndex}
           />
         {:else}
           <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>

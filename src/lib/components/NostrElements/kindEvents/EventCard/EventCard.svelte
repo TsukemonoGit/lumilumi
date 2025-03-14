@@ -370,6 +370,7 @@
             {displayMenu}
             {maxHeight}
             {tieKey}
+            {zIndex}
           />
         {:else}<span class="italic">error</span>
         {/if}
@@ -417,6 +418,7 @@
             {displayMenu}
             {maxHeight}
             {tieKey}
+            {zIndex}
           />
         {:else}<span class="italic">error</span>
         {/if}
@@ -501,6 +503,7 @@
           {displayMenu}
           {tieKey}
           {mini}
+          {zIndex}
         />
       {:else if note.kind === 4}
         <!--旧仕様のDMだよ-->
@@ -518,6 +521,7 @@
           {thread}
           {replyTag}
           {repostable}
+          {zIndex}
         />
       {:else if note.kind === 31990}
         {@const data = get31990Ogp(note)}
