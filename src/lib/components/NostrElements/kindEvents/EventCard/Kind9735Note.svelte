@@ -21,6 +21,7 @@
     displayMenu: boolean;
     tieKey: string | undefined;
     mini: any;
+    zIndex?: number;
   }
 
   let {
@@ -32,6 +33,7 @@
     displayMenu,
     tieKey,
     mini,
+    zIndex,
   }: Props = $props();
 
   //kind9734の取得と検証
@@ -67,6 +69,7 @@
       {displayMenu}
       {tieKey}
       {mini}
+      {zIndex}
       message={"failed to get zapped user"}
     />
 
@@ -93,6 +96,7 @@
           {displayMenu}
           {tieKey}
           {mini}
+          {zIndex}
           message={"loading zap recipient's data..."}
         />
 
@@ -118,6 +122,7 @@
           {displayMenu}
           {tieKey}
           {mini}
+          {zIndex}
           message={"failed to get zap recipient's data."}
         />
 
@@ -143,6 +148,7 @@
           {displayMenu}
           {tieKey}
           {mini}
+          {zIndex}
           message={"error to get zap recipient's data."}
         />
 
@@ -169,6 +175,7 @@
             {displayMenu}
             {tieKey}
             {mini}
+            {zIndex}
             message={"Checking the LNURL Server's pubkey..."}
           />
 
@@ -194,6 +201,7 @@
               {displayMenu}
               {tieKey}
               {mini}
+              {zIndex}
               message={isValidEvent9735.error}
             />
 
@@ -218,6 +226,7 @@
               {displayMenu}
               {tieKey}
               {mini}
+              {zIndex}
             />
           {/if}
         {/await}

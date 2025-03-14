@@ -19,10 +19,18 @@
     tieKey: string | undefined;
     maxHeight: number | undefined;
     text: Nostr.Event;
+    zIndex?: number;
   }
 
-  let { repostable, displayMenu, depth, tieKey, maxHeight, text }: Props =
-    $props();
+  let {
+    repostable,
+    displayMenu,
+    depth,
+    tieKey,
+    maxHeight,
+    text,
+    zIndex,
+  }: Props = $props();
 
   let deleted = $state(false);
 </script>
@@ -40,7 +48,7 @@
           <ReplyTo
             >{#each replyUsers as user}
               {#if !displayMenu}<UserName pubhex={user} />{:else}
-                <PopupUserName pubkey={user} {tieKey} />{/if}
+                <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
             {/each}</ReplyTo
           >
         </div>

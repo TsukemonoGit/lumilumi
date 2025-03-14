@@ -110,7 +110,7 @@
         <ReplyTo
           >{#each replyUsers as user}
             {#if !displayMenu}<UserName pubhex={user} />{:else}
-              <PopupUserName pubkey={user} {tieKey} />{/if}
+              <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
           {/each}</ReplyTo
         >{/if}
     {/snippet}

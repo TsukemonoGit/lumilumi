@@ -25,6 +25,7 @@
     zapRequestEvent: Nostr.Event;
     amount: number;
     message?: string | undefined;
+    zIndex?: number;
   }
 
   let {
@@ -39,6 +40,7 @@
     zapRequestEvent,
     amount,
     message,
+    zIndex,
   }: Props = $props();
   let deleted = $state(false);
   let viewMuteEvent: boolean = $state(false);
@@ -153,6 +155,7 @@
             {displayMenu}
             {maxHeight}
             {tieKey}
+            {zIndex}
           />
         {/if}
       {/snippet}

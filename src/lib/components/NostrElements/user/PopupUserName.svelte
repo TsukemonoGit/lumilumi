@@ -12,9 +12,10 @@
   interface Props {
     pubkey: string;
     tieKey: string | undefined;
+    zIndex?: number;
   }
 
-  let { pubkey, tieKey }: Props = $props();
+  let { pubkey, tieKey, zIndex }: Props = $props();
 </script>
 
 <Popover ariaLabel="user profile"
@@ -28,6 +29,7 @@
         iconSize={60}
         depth={0}
         {tieKey}
+        zIndex={zIndex || 0 + 10}
       />
       <!--ユーザーポップアップのとこのUserMenu消してみる-->
       <div

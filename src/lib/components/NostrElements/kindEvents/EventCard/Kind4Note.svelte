@@ -34,6 +34,7 @@
     replyTag: string[] | undefined;
     repostable: boolean;
     deleted: boolean;
+    zIndex?: number;
   }
 
   let {
@@ -50,6 +51,7 @@
     replyTag,
     repostable,
     deleted = $bindable(),
+    zIndex,
   }: Props = $props();
 
   let decrypt: string | undefined = $state(undefined);
@@ -120,7 +122,7 @@
       <ReplyTo
         >{#each replyUsers as user}
           {#if !displayMenu}<UserName pubhex={user} />{:else}
-            <PopupUserName pubkey={user} {tieKey} />{/if}
+            <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
         {/each}</ReplyTo
       >{/if}
   {/snippet}
