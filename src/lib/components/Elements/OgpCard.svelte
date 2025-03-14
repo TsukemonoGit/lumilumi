@@ -9,7 +9,7 @@
   }
 
   let { contents, url }: Props = $props();
-
+  let loadFailed = $state(false);
   let imageURL = $state(contents.image);
   let hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");
 
@@ -22,7 +22,7 @@
   // 表示するメディアの種類を判定
   let showImageOrVideo = $derived(lumiSetting.get().showImg);
   let showYoutubeEmbed = $derived(
-    showImageOrVideo && isYoutube && youtubeVideoId
+    showImageOrVideo && isYoutube && youtubeVideoId && !loadFailed
   );
   let showImage = $derived(
     showImageOrVideo && imageURL && imageURL !== "" && !showYoutubeEmbed
@@ -32,6 +32,10 @@
   function getHostInfo() {
     const memoText = contents.memo ? `${contents.memo} / ` : "";
     return `${memoText}${hostname}`;
+  }
+
+  function handleYoutubeError() {
+    loadFailed = true;
   }
 </script>
 
@@ -56,6 +60,7 @@
           allowfullscreen
           loading="lazy"
           class="max-h-64"
+          onerror={handleYoutubeError}
         ></iframe>
       </div>
       <div class="p-0.5 pl-1 grid grid-rows-[auto_1fr] w-full">
