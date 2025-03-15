@@ -37,18 +37,11 @@
   import ListLinkCard from "./ListLinkCard.svelte";
   import OtherKindNote from "./OtherKindNote.svelte";
 
-  import {
-    followList,
-    timelineFilter,
-    viewEventIds,
-  } from "$lib/stores/globalRunes.svelte";
+  import { timelineFilter, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import Kind20Note from "./Kind20Note.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import Kind30315Note from "./Kind30315Note.svelte";
-  import {
-    isReplaceableKind,
-    isParameterizedReplaceableKind,
-  } from "nostr-tools/kinds";
+  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import Kind1068Note from "./Kind1068Note.svelte";
   import Kind40Note from "./Kind40Note.svelte";
   import Kind41Note from "./Kind41Note.svelte";
@@ -94,8 +87,7 @@
   let atag: string | undefined = $derived.by(() => {
     if (
       note &&
-      (isReplaceableKind(note.kind) ||
-        isParameterizedReplaceableKind(note.kind))
+      (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
     ) {
       //atag　で　りぽすと
       const dtag = note.tags.find((tag) => tag[0] === "d");
@@ -463,6 +455,8 @@
           {repostable}
           {maxHeight}
           {replyUsers}
+          {zIndex}
+          {mini}
         />
       {:else if note.kind === 1068}
         <Kind1068Note
