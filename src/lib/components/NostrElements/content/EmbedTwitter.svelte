@@ -10,10 +10,8 @@
 </script>
 
 <blockquote class="twitter-tweet">
-  <a
-    class="underline text-magnum-300 break-all hover:opacity-80"
-    data-chrome="noscrollbar noheader transparent"
-    href={url}><OgpLoad url={originalUrl} /></a
+  <a data-chrome="noscrollbar noheader transparent" href={url}
+    ><OgpLoad url={originalUrl} /></a
   ><script
     async
     src="https://platform.twitter.com/widgets.js"
