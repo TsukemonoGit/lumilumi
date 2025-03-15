@@ -57,6 +57,7 @@ export const initSettings: LumiSetting = {
     tag: [],
   },
   showImg: false,
+  embed: true,
   menuleft: false,
   showRelayIcon: false,
 

@@ -118,6 +118,7 @@ export interface LumiSetting {
   useRelaySet: string;
   pubkey: string;
   showImg: boolean;
+  embed: boolean;
   showPreview: boolean;
   menuleft: boolean;
   showRelayIcon: boolean;

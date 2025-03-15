@@ -26,12 +26,20 @@
   // 表示するメディアの種類を判定
   let showImageOrVideo: boolean = $derived(lumiSetting.get().showImg);
   let showYoutubeEmbed: boolean = $derived(
-    showImageOrVideo && isYoutube && youtubeVideoId !== null && !loadFailed
+    showImageOrVideo &&
+      lumiSetting.get().embed &&
+      isYoutube &&
+      youtubeVideoId !== null &&
+      !loadFailed
   );
 
   let twitterUrl: string | null = $derived(normalizeTwitterUrl(url));
   let showTwitterEmbed: boolean = $derived(
-    showImageOrVideo && isTwitter && twitterUrl !== null && !loadFailed
+    showImageOrVideo &&
+      lumiSetting.get().embed &&
+      isTwitter &&
+      twitterUrl !== null &&
+      !loadFailed
   );
 
   function handleOnError() {
