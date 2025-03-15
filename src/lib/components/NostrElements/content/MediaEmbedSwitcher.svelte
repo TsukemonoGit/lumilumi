@@ -47,7 +47,7 @@
 
 {#if showYoutubeEmbed}
   <!--tube-->
-  <EmbedYoutube id={youtubeVideoId} onError={handleOnError} />
+  <EmbedYoutube id={youtubeVideoId || ""} onError={handleOnError} />
 {:else if showTwitterEmbed}
   <!--twitter-->
   <EmbedTwitter url={twitterUrl} originalUrl={url} onError={handleOnError} />
