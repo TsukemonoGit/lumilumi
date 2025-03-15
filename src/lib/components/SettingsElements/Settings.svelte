@@ -612,7 +612,7 @@
           bind:checked={settings.embed}
           disabled={!settings.showImg}
         />
-        {$_("settings.display.embed")}(youtube, twitter)
+        {$_("settings.display.embed")}(youtube, twitter,bluesky)
       </label>
       <label>
         <input
