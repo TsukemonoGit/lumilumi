@@ -18,10 +18,10 @@
 
 <!--bg-magnum-300 text-magnum-800  text-magnum-700 drop-shadow-md-->
 <!-- <div
-  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-300 overflow-hidden"
+  class=" rounded-lg m-1 hover:opacity-80 break-all border border-magnum-300 overflow-hidden"
 > -->
 <a
-  class=" rounded-lg m-1 hover:opacity-80 z-20 break-all border border-magnum-400 overflow-hidden flex w-auto"
+  class=" rounded-lg m-1 hover:opacity-80 break-all border border-magnum-400 overflow-hidden flex w-auto"
   href={url}
   title={url}
   target="_blank"

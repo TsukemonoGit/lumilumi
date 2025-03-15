@@ -7,12 +7,14 @@
     onError: () => void;
   }
   let { url, onError, originalUrl }: Props = $props();
+  $inspect("twitterUrl:", url);
 </script>
 
 <blockquote class="twitter-tweet">
   <a data-chrome="noscrollbar noheader transparent" href={url}
-    ><OgpLoad url={originalUrl} /></a
-  ><script
+    ><OgpLoad {url} /></a
+  >
+  <script
     async
     src="https://platform.twitter.com/widgets.js"
     charset="utf-8"
