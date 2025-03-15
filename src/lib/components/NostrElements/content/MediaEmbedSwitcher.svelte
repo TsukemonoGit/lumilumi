@@ -4,8 +4,9 @@
 
   import EmbedYoutube from "./EmbedYoutube.svelte";
   import EmbedTwitter from "./EmbedTwitter.svelte";
+  import OgpLoad from "./OgpLoad.svelte";
 
-  let { url, children }: { url: string; children?: any } = $props();
+  let { url }: { url: string } = $props();
 
   let loadFailed: boolean = $state(false);
   let hostname: string = $derived(isvalidURL(url) ? new URL(url).hostname : "");
@@ -52,5 +53,5 @@
   <!--twitter-->
   <EmbedTwitter url={twitterUrl} originalUrl={url} onError={handleOnError} />
 {:else}
-  {@render children?.()}
+  <OgpLoad {url} />
 {/if}

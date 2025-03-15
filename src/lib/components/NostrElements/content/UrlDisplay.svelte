@@ -68,22 +68,7 @@
       {:else if type === "url"}
         {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<MediaEmbedSwitcher
             url={part.url || ""}
-            ><OGP url={part.content ?? ""}
-              >{#snippet renderContent(contents)}
-                {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-                  <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
-                    props={{ "aria-label": `External Links: ${part.url}` }}
-                    className="underline text-magnum-300 break-all "
-                    href={part.content ?? ""}>{part.content ?? ""}</Link
-                  >{/if}{/snippet}
-              {#snippet nodata()}
-                <Link
-                  props={{ "aria-label": `External Links: ${part.url}` }}
-                  className="underline text-magnum-300 break-all hover:opacity-80"
-                  href={part.content ?? ""}>{part.content ?? ""}</Link
-                >{/snippet}
-            </OGP></MediaEmbedSwitcher
-          >{:else}<Link
+          />{:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
             href={part.content ?? ""}>{part.content}</Link

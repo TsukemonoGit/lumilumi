@@ -73,26 +73,7 @@
   {#if website}
     <div class="p-2">
       {#if lumiSetting.get().showImg && isvalidURL(website)}
-        <MediaEmbedSwitcher url={website || ""}
-          ><OGP url={website}>
-            {#snippet nodata()}
-              <Link
-                className="underline text-magnum-300 break-all "
-                href={website}>{website}</Link
-              >
-            {/snippet}
-            {#snippet renderContent(contents)}
-              {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-                <OgpCard {contents} url={website} />
-              {:else}
-                <Link
-                  className="underline text-magnum-300 break-all "
-                  href={website}>{website}</Link
-                >
-              {/if}
-            {/snippet}
-          </OGP></MediaEmbedSwitcher
-        >
+        <MediaEmbedSwitcher url={website || ""} />
       {:else}
         <Link className="underline text-magnum-300 break-all " href={website}
           >{website}</Link

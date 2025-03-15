@@ -257,7 +257,11 @@
     type="module"
     src="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/makibishi-component.js"
   ></script>
-
+  <script
+    async
+    src="https://platform.twitter.com/widgets.js"
+    charset="utf-8"
+  ></script>
   <!-- <script
     type="module"
     src="https://cdn.jsdelivr.net/npm/nostr-zap@1.1.0"

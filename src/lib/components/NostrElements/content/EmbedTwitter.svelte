@@ -1,4 +1,6 @@
 <script lang="ts">
+  import OgpLoad from "./OgpLoad.svelte";
+
   interface Props {
     url: string;
     originalUrl: string;
@@ -11,11 +13,6 @@
   <a
     class="underline text-magnum-300 break-all hover:opacity-80"
     data-chrome="noscrollbar noheader transparent"
-    href={url}>{originalUrl}</a
-  ><script
-    async
-    src="https://platform.twitter.com/widgets.js"
-    charset="utf-8"
-    onerror={onError}
-  ></script>
+    href={url}><OgpLoad url={originalUrl} /></a
+  >
 </blockquote>
