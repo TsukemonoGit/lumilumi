@@ -1,5 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
+  import { page } from "$app/state";
   import {
     defaultRelays,
     loginUser,
@@ -8,7 +9,6 @@
     queryClient,
     tieMapStore,
   } from "$lib/stores/stores";
-
   import {
     type QueryKey,
     createQuery,
@@ -17,39 +17,36 @@
   } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
-
   import { createTie, now, type EventPacket } from "rx-nostr";
-
+  import { createUniq } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
+  import { writable, type Writable } from "svelte/store";
+  import { pipe } from "rxjs";
+
   import { debounce, sortEvents } from "$lib/func/util";
   import { scanArray } from "$lib/stores/operators";
-  import { pipe } from "rxjs";
-  import { createUniq } from "rx-nostr/src";
   import {
     waitForConnections,
     loadOlderEvents,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
-  import { writable, type Writable } from "svelte/store";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
-  import { page } from "$app/state";
 
-  const sift = 40; //スライドする量
+  // Constants
+  const SLIDE_AMOUNT = 40; // Amount to slide when navigating
+  const PREFETCH_MULTIPLIER = 5; // How many slides ahead to prefetch
 
-  let untilTime: number;
-
+  // Interface definitions
   interface Props {
     queryKey: QueryKey;
     filters: Nostr.Filter[];
-    // export let lastfavcheck: boolean = true;
     viewIndex: number;
-    amount: number; //1ページに表示する量
-    eventFilter?: (event: Nostr.Event) => boolean; // デフォルトフィルタ
-    relays?: string[] | undefined; //emitにしていするいちじりれー
-    // >;
+    amount: number; // Number of items to display per page
+    eventFilter?: (event: Nostr.Event) => boolean;
+    relays?: string[];
     tieKey: string;
-    updateViewNotifi?: any;
+    updateViewNotifi?: () => void;
     children?: import("svelte").Snippet<[any]>;
   }
 
@@ -65,43 +62,38 @@
     children,
   }: Props = $props();
 
-  updateViewNotifi = debounce(async () => {
-    console.log(page.route);
-    if (page.route.id !== "/notifications") {
-      return;
+  // State
+  let untilTime: number;
+  let allUniqueNotifi: Nostr.Event[] = [];
+  let isOnMount = false;
+
+  // Reactive declarations
+  let readUrls: string[] = $derived.by(() => {
+    if ($defaultRelays) {
+      return Object.values($defaultRelays)
+        .filter((config) => config.read)
+        .map((config) => config.url);
     }
-    $nowProgress = true;
-    console.log("updateViewNotifi");
-    const allEvents: EventPacket[] | undefined =
-      queryClient.getQueryData(queryKey);
+    return [];
+  });
 
-    if (!allEvents) {
-      return;
-    }
+  // Setup Nostr tie and data handling
+  const [tie, tieMap] = createTie();
 
-    untilTime =
-      allEvents.length > 0
-        ? allEvents[allEvents.length - 1].event.created_at
-        : now();
-    const uniqueEvents = sortEvents(
-      Array.from(
-        new Map(
-          allEvents.map((event) => [event.event.id, event.event])
-        ).values()
-      )
-    ); //.sort((a, b) => b.event.created_at - a.event.created_at);
+  // Create unique events filter
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+  const onCache = (packet: EventPacket): void => {
+    // Optional logging: console.log(`${packet.event.id} observed for the first time`);
+  };
+  const onHit = (packet: EventPacket): void => {
+    // Optional logging: console.log(`${packet.event.id} already observed`);
+  };
+  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
 
-    allUniqueNotifi = uniqueEvents
-      .filter(eventFilter)
-      .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+  // Setup query operator
+  let operator = $derived(pipe(tie, uniq, scanArray()));
 
-    displayEvents.set(allUniqueNotifi.slice(viewIndex, viewIndex + amount));
-    // $slicedEvent = $slicedEvent;
-
-    // console.timeEnd();
-    $nowProgress = false;
-  }, 20);
-
+  // Initialize query
   createQuery({
     queryKey: queryKey,
     queryFn: undefined,
@@ -111,236 +103,244 @@
     refetchOnMount: false,
   });
 
-  const [tie, tieMap] = createTie();
-
-  // イベントID に基づいて重複を排除する
-  const keyFn = (packet: EventPacket): string => packet.event.id;
-
-  const onCache = (packet: EventPacket): void => {
-    //console.log(`${packet.event.id} を初めて観測しました`);
-  };
-  const onHit = (packet: EventPacket): void => {
-    //  console.log(`${packet.event.id} はすでに観測されています`);
-  };
-
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  // export let lastVisible: Element | null;
-  let allUniqueNotifi: Nostr.Event[];
-
-  // $: result = useTimelineEventList(queryKey, filters, operator, req, relays);
-  const observer = new QueryObserver(queryClient, {
-    queryKey: queryKey,
-  });
+  // Observer setup for query data changes
+  const observer = new QueryObserver(queryClient, { queryKey });
   const data: Writable<EventPacket[]> = writable<EventPacket[]>();
   observer.subscribe((result: QueryObserverResult<unknown, Error>) => {
-    // console.log(result);
     if (result.data) {
       $data = result.data as EventPacket[];
     }
   });
 
-  // $: status = result.status;
-  // $: error = result.error;
-  let readUrls: string[] = $derived.by(() => {
-    if ($defaultRelays) {
-      return Object.values($defaultRelays)
-        .filter((config) => config.read)
-        .map((config) => config.url);
+  // Define update view function with debounce
+  updateViewNotifi = debounce(async () => {
+    // Return early if not on notifications page
+    if (page.route.id !== "/notifications") {
+      return;
     }
-    return [];
-  }); //.raw([]);
-  //$: console.log(data);
-  // beforeNavigate((navigate) => {
-  //   console.log("beforeNavigate", navigate.type);
-  //   if (navigate.type !== "form") {
-  //     $slicedEvent = [];
-  //   }
-  // });
 
-  let isOnMount = false;
+    $nowProgress = true;
+
+    // Get all events from query cache
+    const allEvents: EventPacket[] | undefined =
+      queryClient.getQueryData(queryKey);
+    if (!allEvents) {
+      $nowProgress = false;
+      return;
+    }
+
+    // Set time marker for pagination
+    untilTime =
+      allEvents.length > 0
+        ? allEvents[allEvents.length - 1].event.created_at
+        : now();
+
+    // Process and filter events
+    const uniqueEvents = sortEvents(
+      Array.from(
+        new Map(
+          allEvents.map((event) => [event.event.id, event.event])
+        ).values()
+      )
+    );
+
+    // Apply filters
+    allUniqueNotifi = uniqueEvents
+      .filter(eventFilter)
+      .filter((event) => event.created_at <= now() + 10); // Filter out future events with small tolerance
+
+    // Update display events
+    displayEvents.set(allUniqueNotifi.slice(viewIndex, viewIndex + amount));
+
+    $nowProgress = false;
+  }, 20);
+
+  // Lifecycle hooks
   onMount(async () => {
     if (!isOnMount) {
-      console.log("onMount");
-
       isOnMount = true;
-      await init();
+      await initializeTimeline();
     }
   });
 
   afterNavigate(async (navigate) => {
-    console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
-      console.log("afterNavigate");
-
       isOnMount = true;
-      await init();
+      await initializeTimeline();
     }
   });
-
-  async function init() {
-    // const ev: EventPacket[] | undefined = queryClient.getQueryData(queryKey);
-    $nowProgress = true;
-    console.log(readUrls);
-
-    //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
-    // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-
-    await waitForConnections(readUrls, relayStateMap.get(), 5000); // maxWaitTime set to 10 seconds
-    // console.log(relayStateMap.get);
-
-    const older = await usePromiseReq(
-      { filters: filters, operator, req: undefined },
-      undefined
-    );
-
-    console.log("first older", older);
-    if (older.length > 0) {
-      const olderdata = filters[0].limit
-        ? older.slice(0, filters[0].limit)
-        : older; //sinceとuntilがめっちゃ離れてるときのこと考えてない
-
-      queryClient.setQueryData(
-        //古いやつより新しいやつ
-        queryKey,
-        (before: EventPacket[] | undefined) => [...olderdata, ...(before ?? [])]
-      );
-      // console.log(queryClient.getQueryData(queryKey));
-    }
-    $nowProgress = false;
-    isOnMount = false;
-    // updateViewNotifi();
-  }
-
-  interface $$Slots {
-    default: { events: Nostr.Event[]; len: number };
-  }
-
-  const handleNext = async () => {
-    // console.log(length, viewIndex, amount, sift);
-    if (
-      !allUniqueNotifi ||
-      allUniqueNotifi?.length < viewIndex + amount + sift
-    ) {
-      //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
-      const syutokusururyou =
-        viewIndex + amount - allUniqueNotifi?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
-      //nevent1qvzqqqqqqypzqv33pxtldvmmdntqhv269r56zjadmhalpp660h3yc6gj8gxpuexvqyv8wumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5qs6amnwvaz7tmev9382tndv5q3zamnwvaz7tmj9e4k76nfwfsju6t0qyxhwumn8ghj7mn0wvhxcmmvqqszykcw73dgzvupxwnktv7lvndtn5n4rxwzas7jm88zkh3zpknkqws0ayy00
-      $nowProgress = true;
-      const older = await loadOlderEvents(
-        syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
-        filters,
-
-        //lastfavcheck,
-        untilTime,
-        tie,
-        relays
-      );
-      console.log(older);
-      if (older.length > 0) {
-        queryClient.setQueryData(
-          queryKey,
-          (before: EventPacket[] | undefined) => [...(before ?? []), ...older]
-        );
-      }
-    }
-    //console.log(allUniqueNotifi?.length);
-    if (allUniqueNotifi?.length >= viewIndex + amount - 10) {
-      //４０にしてても39とかになって微妙に足りてない時がある（なんで？）から
-      //表示量のイベントなかったらスライドしない
-      viewIndex += sift; //スライドする量
-    }
-
-    updateViewNotifi();
-    $nowProgress = false;
-  };
-
-  const handlePrev = () => {
-    if (viewIndex > 0) {
-      scroll({
-        top: 120,
-      });
-      viewIndex = Math.max(viewIndex - sift, 0);
-      setTimeout(() => {
-        updateViewNotifi();
-      }, 100);
-    }
-  };
-
-  function handleClickTop() {
-    viewIndex = 0;
-    updateViewNotifi();
-  }
 
   onDestroy(() => {
-    console.log("test");
+    // Cleanup code if needed
   });
-  // run(() => {
-  if (tieKey) {
-    //$tieMapStore = { undefined: undefined };
-    if (!$tieMapStore) {
-      $tieMapStore = { [tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+
+  // Store tie in global map
+  $effect(() => {
+    if (tieKey) {
+      if (!$tieMapStore) {
+        $tieMapStore = { [tieKey]: [tie, tieMap] };
+      } else if (!$tieMapStore?.[tieKey]) {
+        $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
+      }
     }
-  }
-  // });
-  let operator = $derived(pipe(tie, uniq, scanArray()));
+  });
 
-  //表示更新---
-
+  // Update view when data changes
   data.subscribe((value) => {
     if (value && value.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
       updateViewNotifi();
     }
   });
 
-  onlyFollowee.subscribe((value) => {
+  // Update view when follow filter changes
+  onlyFollowee.subscribe(() => {
     updateViewNotifi();
   });
 
-  //------
+  // Timeline initialization
+  async function initializeTimeline() {
+    $nowProgress = true;
+
+    try {
+      // Wait for relay connections
+      await waitForConnections(readUrls, relayStateMap.get(), 5000);
+
+      // Load initial events
+      const olderEvents = await usePromiseReq(
+        { filters, operator, req: undefined },
+        undefined
+      );
+
+      if (olderEvents.length > 0) {
+        const limitedOlderEvents = filters[0].limit
+          ? olderEvents.slice(0, filters[0].limit)
+          : olderEvents;
+
+        // Update query data with fetched events
+        queryClient.setQueryData(
+          queryKey,
+          (before: EventPacket[] | undefined) => [
+            ...limitedOlderEvents,
+            ...(before ?? []),
+          ]
+        );
+      }
+    } catch (error) {
+      console.error("Failed to initialize timeline:", error);
+    } finally {
+      $nowProgress = false;
+      isOnMount = false;
+    }
+  }
+
+  // Navigation handlers
+  async function handleLoadMore() {
+    if (
+      !allUniqueNotifi ||
+      allUniqueNotifi.length < viewIndex + amount + SLIDE_AMOUNT
+    ) {
+      $nowProgress = true;
+
+      try {
+        // Calculate how many events to fetch
+        const fetchAmount =
+          viewIndex +
+          amount -
+          (allUniqueNotifi?.length || 0) +
+          PREFETCH_MULTIPLIER * SLIDE_AMOUNT;
+
+        // Load older events
+        const olderEvents = await loadOlderEvents(
+          fetchAmount,
+          filters,
+          untilTime,
+          tie,
+          relays
+        );
+
+        if (olderEvents.length > 0) {
+          // Update query data with fetched events
+          queryClient.setQueryData(
+            queryKey,
+            (before: EventPacket[] | undefined) => [
+              ...(before ?? []),
+              ...olderEvents,
+            ]
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load more events:", error);
+      } finally {
+        $nowProgress = false;
+      }
+    }
+
+    // Only advance if we have enough events to display
+    if (allUniqueNotifi?.length >= viewIndex + amount - 10) {
+      viewIndex += SLIDE_AMOUNT;
+      updateViewNotifi();
+    }
+  }
+
+  function handlePrevious() {
+    if (viewIndex > 0) {
+      // Scroll to top of timeline
+      scroll({ top: 120 });
+
+      // Update view index
+      viewIndex = Math.max(viewIndex - SLIDE_AMOUNT, 0);
+
+      // Update view after a slight delay to allow for smooth scrolling
+      setTimeout(() => {
+        updateViewNotifi();
+      }, 100);
+    }
+  }
+
+  function handleScrollToTop() {
+    viewIndex = 0;
+    updateViewNotifi();
+  }
 </script>
 
 {#if viewIndex !== 0}
-  <div class=" w-full">
+  <div class="w-full">
     <button
-      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => handleClickTop()}
+      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      onclick={() => handleScrollToTop()}
       disabled={$nowProgress}
-      ><SkipForward
+    >
+      <SkipForward
         size={20}
         class="mx-auto -rotate-90 stroke-magnum-100 fill-magnum-100"
-      /></button
-    >
+      />
+    </button>
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => handlePrev()}
-      ><Triangle
-        size={20}
-        class="mx-auto stroke-magnum-100 fill-magnum-100"
-      /></button
+      onclick={() => handlePrevious()}
     >
+      <Triangle size={20} class="mx-auto stroke-magnum-100 fill-magnum-100" />
+    </button>
   </div>
 {/if}
-{#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+
+{#if $loginUser}
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
 
 {#if displayEvents.get() && displayEvents.get()?.length > 0}
   {@render children?.({ events: displayEvents.get(), len: $data?.length ?? 0 })}
 {/if}
+
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={$nowProgress}
-    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    onclick={() => handleNext()}
-    ><Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    />Load more<Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    /></button
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+    onclick={() => handleLoadMore()}
   >
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+    Load more
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+  </button>
 {/if}
