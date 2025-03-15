@@ -1,4 +1,13 @@
 <script lang="ts">
+  import { onMount, untrack, type SvelteComponent } from "svelte";
+  import { _ } from "svelte-i18n";
+  import { pipe } from "rxjs";
+  import { latest } from "rx-nostr";
+  import * as Nostr from "nostr-typedef";
+  import { afterNavigate, beforeNavigate } from "$app/navigation";
+  import { page } from "$app/state";
+
+  // Store imports
   import {
     loginUser,
     nowProgress,
@@ -7,169 +16,182 @@
     toastSettings,
   } from "$lib/stores/stores";
 
+  // Utility function imports
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
-  import { onMount, untrack, type SvelteComponent } from "svelte";
-
-  import { _ } from "svelte-i18n";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-
-  import Settei from "./Settei.svelte";
   import { generateResultMessage } from "$lib/func/util";
-  import GlobalDescription from "./GlobalDescription.svelte";
-  import GlobalTimeline from "./GlobalTimeline.svelte";
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { pipe } from "rxjs";
-  import { latest } from "rx-nostr";
-  import { page } from "$app/state";
-
-  import * as Nostr from "nostr-typedef";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { unsucscribeGlobal } from "$lib/func/useReq";
 
+  // Component imports
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import Settei from "./Settei.svelte";
+  import GlobalDescription from "./GlobalDescription.svelte";
+  import GlobalTimeline from "./GlobalTimeline.svelte";
+
+  // Constants
+  const TIE_KEY = "global";
+
+  // State variables
   let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);
   let globalRelays: string[] = $state.raw([]);
-  const tieKey = "global";
+  let relaySettei = $state(false);
+
+  // Derived values
   let timelineQuery = $derived(["global", "feed"]);
 
+  /**
+   * Handles saving the global relay configuration
+   * @param relays Array of relay URLs to save
+   */
   const onClickSave = async (relays: string[]) => {
     $nowProgress = true;
-    console.log(relays);
+
+    // Prepare tags for the event
     const newTags = [["d", "global"]];
-    relays.map((relay) => newTags.push(["relay", relay]));
-    console.log(newTags);
+    relays.forEach((relay) => newTags.push(["relay", relay]));
+
+    // Publish the event
     const { event, res } = await promisePublishEvent({
       content: "",
       tags: newTags,
       kind: 30002,
     });
+
+    // Process results
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+    const resultMessage = generateResultMessage(isSuccess, isFailed);
 
-    let str = generateResultMessage(isSuccess, isFailed);
-    console.log(str);
-
+    // Show toast notification
     $toastSettings = {
       title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
+      description: resultMessage,
       color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     };
 
     if (isSuccess.length > 0) {
-      console.log("removeQueries");
-
+      // Update relay list and clear queries
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
         queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
         globalRelays = relaylist;
       }
 
+      // Clean up existing queries
       queryClient.removeQueries({
         queryKey: timelineQuery,
       });
       queryClient.removeQueries({
         queryKey: [...timelineQuery, "olderData"],
       });
-      // tieMapStoreの中身にアクセス
-      const globalTie = $tieMapStore[tieKey];
 
-      // globalTieが存在し、Mapが正しい形式の場合にclear()を実行
+      // Clear tie map data
+      const globalTie = $tieMapStore[TIE_KEY];
       if (globalTie) {
         const [, seenOn] = globalTie;
         seenOn.clear();
       }
+
       globalRelays = relays;
     }
+
     $nowProgress = false;
   };
 
-  // run(() => {
-  //   console.log(openGlobalTimeline);
-  // });
-  $effect(() => {
+  /**
+   * Fetches the global relay configuration from the user's data
+   */
+  const fetchGlobalRelayConfig = async () => {
+    // Check if we already have the data in cache
+    const cachedData: string[] | undefined = queryClient.getQueryData([
+      "globalRelay",
+      $loginUser,
+    ]);
+
+    if (cachedData) {
+      globalRelays = cachedData;
+      return;
+    }
+
+    // If not in cache, fetch from the network
+    $nowProgress = true;
+
+    const fetchRelays = await usePromiseReq(
+      {
+        filters: [
+          {
+            authors: [$loginUser],
+            kinds: [30002],
+            "#d": ["global"],
+            limit: 1,
+          },
+        ] as Nostr.Filter[],
+        operator: pipe(latest()),
+      },
+      undefined,
+      undefined
+    );
+
+    $nowProgress = false;
+
+    if (fetchRelays.length > 0) {
+      const relayList = toGlobalRelaySet(fetchRelays[0].event);
+      if (relayList.length > 0) {
+        queryClient.setQueryData(["globalRelay", $loginUser], relayList);
+        globalRelays = relayList;
+      }
+    }
+  };
+
+  /**
+   * Reinitializes the timeline with the provided relay configuration
+   */
+  const reinitializeTimeline = () => {
     if (globalRelays.length > 0) {
       untrack(() => {
         openGlobalTimeline = false;
-
         setTimeout(() => {
           openGlobalTimeline = true;
         }, 1);
       });
     }
-  });
+  };
 
-  let relaySettei = $state(false);
-  onMount(async () => {
-    //paramにリレーがあったらそれをセットする
-    const params = new URLSearchParams(window.location.search);
-    const relay = params.getAll("relay");
-    console.log(relay);
-    if (relay.length > 0) {
-      globalRelays = relay;
-    } else {
-      relaySettei = true;
-      setGlobalRelay();
-    }
-  });
-
-  afterNavigate(async (navigate) => {
-    if (navigate.type === "form") {
-      return;
-    }
+  /**
+   * Initializes the global relay settings from URL parameters or stored settings
+   */
+  const initializeRelaySettings = async () => {
     globalRelays = [];
-    //paramにリレーがあったらそれをセットする
+
+    // Check URL parameters first
     const params = new URLSearchParams(window.location.search);
-    const relay = params.getAll("relay");
-    console.log(relay);
-    if (relay.length > 0) {
-      globalRelays = relay;
+    const relaysFromParams = params.getAll("relay");
+
+    if (relaysFromParams.length > 0) {
+      globalRelays = relaysFromParams;
     } else {
       relaySettei = true;
-      setGlobalRelay();
-    }
-  });
-  console.log(page);
-
-  const setGlobalRelay = async () => {
-    //すでにあるならデータをセットする
-    const data: string[] | undefined = queryClient.getQueryData([
-      "globalRelay",
-      $loginUser,
-    ]);
-
-    if (data) {
-      globalRelays = data;
-    } else {
-      $nowProgress = true;
-      const fetchRelays = await usePromiseReq(
-        {
-          filters: [
-            {
-              authors: [$loginUser],
-              kinds: [30002],
-              "#d": ["global"],
-              limit: 1,
-            },
-          ] as Nostr.Filter[],
-          operator: pipe(latest()),
-        },
-        undefined,
-        undefined
-      );
-      $nowProgress = false;
-      if (fetchRelays.length > 0) {
-        const relaylist = toGlobalRelaySet(fetchRelays[0].event);
-        if (relaylist.length > 0) {
-          queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
-          globalRelays = relaylist;
-          // unsucscribeGlobal();
-        }
-      }
+      await fetchGlobalRelayConfig();
     }
   };
+
+  // Lifecycle hooks
+  onMount(initializeRelaySettings);
+
+  afterNavigate(async (navigate) => {
+    if (navigate.type === "form") return;
+    await initializeRelaySettings();
+  });
+
   beforeNavigate(() => {
-    //離れるときはサブスクライブ終わっとく
+    // Unsubscribe from global events when navigating away
     unsucscribeGlobal();
+  });
+
+  // Effect to reinitialize the timeline when relays change
+  $effect(() => {
+    reinitializeTimeline();
   });
 </script>
 
