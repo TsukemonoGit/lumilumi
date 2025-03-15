@@ -16,8 +16,12 @@ import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
 import { type QueryKey } from "@tanstack/svelte-query";
 
-import { muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
-import { followList, userStatusMap } from "$lib/stores/globalRunes.svelte";
+import { muteCheck, muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
+import {
+  followList,
+  timelineFilter,
+  userStatusMap,
+} from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 
 export function filterId(
@@ -235,39 +239,39 @@ function getTagValue(
 
 //get(mutes),get(mutebykinds)
 //muteCheck
-export function muteCheck(): OperatorFunction<EventPacket, EventPacket> {
-  return filter((eventPacket) => {
-    if (get(mutes)) {
-      // Check if the eventPacket should be muted based on mutes.p
-      if (shouldMuteByP(eventPacket)) {
-        return false;
-      }
+// export function muteCheck(): OperatorFunction<EventPacket, EventPacket> {
+//   return filter((eventPacket) => {
+//     if (get(mutes)) {
+//       // Check if the eventPacket should be muted based on mutes.p
+//       if (shouldMuteByP(eventPacket)) {
+//         return false;
+//       }
 
-      // Check if the eventPacket should be muted based on mutes.word
-      if (shouldMuteByWord(eventPacket)) {
-        return false;
-      }
+//       // Check if the eventPacket should be muted based on mutes.word
+//       if (shouldMuteByWord(eventPacket)) {
+//         return false;
+//       }
 
-      // Check if the eventPacket should be muted based on mutes.t
-      if (shouldMuteByT(eventPacket)) {
-        return false;
-      }
+//       // Check if the eventPacket should be muted based on mutes.t
+//       if (shouldMuteByT(eventPacket)) {
+//         return false;
+//       }
 
-      // Check if the eventPacket should be muted based on mutes.e
-      if (shouldMuteByE(eventPacket)) {
-        return false;
-      }
-    }
+//       // Check if the eventPacket should be muted based on mutes.e
+//       if (shouldMuteByE(eventPacket)) {
+//         return false;
+//       }
+//     }
 
-    // Check if the eventPacket should be muted based on mutebykinds
-    if (shouldMuteByKinds(eventPacket)) {
-      return false;
-    }
+//     // Check if the eventPacket should be muted based on mutebykinds
+//     if (shouldMuteByKinds(eventPacket)) {
+//       return false;
+//     }
 
-    // If none of the mute conditions match, allow the eventPacket to pass through
-    return true;
-  });
-}
+//     // If none of the mute conditions match, allow the eventPacket to pass through
+//     return true;
+//   });
+// }
 
 function shouldMuteByP(eventPacket: EventPacket): boolean {
   const pMutes = get(mutes)?.list.p || [];
@@ -408,11 +412,14 @@ function setReactionEvent(packet: EventPacket) {
   }
 
   // 未観測の場合のみ追加
-  observedEvents.add(packet.event.id);
+  //ミュートチェックする
+  if (!timelineFilter.get().adaptMute || muteCheck(packet.event) === "null") {
+    observedEvents.add(packet.event.id);
 
-  reactionToast.set({
-    title: "",
-    description: JSON.stringify(packet.event),
-    color: "",
-  });
+    reactionToast.set({
+      title: "",
+      description: JSON.stringify(packet.event),
+      color: "",
+    });
+  }
 }

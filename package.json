@@ -11,7 +11,7 @@
 		"generate-pwa-assets": "pwa-assets-generator"
 	},
 	"devDependencies": {
-		"@melt-ui/svelte": "^0.86.4",
+		"@melt-ui/svelte": "^0.86.3",
 		"@neoconfetti/svelte": "^2.2.2",
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/adapter-cloudflare": "^5.0.3",

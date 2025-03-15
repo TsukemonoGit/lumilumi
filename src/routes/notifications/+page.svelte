@@ -3,37 +3,55 @@
   import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import type { QueryKey } from "@tanstack/svelte-query";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
-
-  import * as Nostr from "nostr-typedef";
+  import { _ } from "svelte-i18n";
+  import type { QueryKey } from "@tanstack/svelte-query";
+  import type * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
-  import NotificationFilter from "./NotificationFilter.svelte";
 
-  import { extractKind9734 } from "$lib/func/zap";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import NotificationFilter from "./NotificationFilter.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
-  import { _ } from "svelte-i18n";
+  import { extractKind9734 } from "$lib/func/zap";
   import { followList } from "$lib/stores/globalRunes.svelte";
 
-  let amount = 50;
+  // Constants
+  const TIMELINE_QUERY: QueryKey = ["notifications"];
+  const TIE_KEY = "notifications";
+  const DISPLAY_AMOUNT = 50;
+  const INITIAL_LOAD_LIMIT = 100;
+
+  // Notification types config
+  const NOTIFICATION_TYPES = [
+    { id: "reaction", title: Heart, kind: 7 },
+    { id: "reply", title: Reply, kind: 1 },
+    { id: "repost", title: Repeat2, kinds: [6, 16] },
+    { id: "zap", title: Zap, kind: 9735 },
+    { id: "other", title: "other", kinds: [42, 4, 1059, 1111] },
+  ];
+
+  // State
   let viewIndex = 0;
-  // const [tie, tieMap] = createTie();
-  // tieMapStore.set(tieMap);
-  const tieKey = "notifications";
-
   let isOnMount = false;
+  let view = $state(false);
+  let updateViewNotifi: () => void = () => {};
 
-  const timelineQuery: QueryKey = ["notifications"];
+  // Build initial filters
   let filters: Nostr.Filter[] = [
     {
       kinds: [
-        1, 6, 7, 16, 42, 9735, 1111 /**Comment(NIP-22)*/, 4 /**初代DM*/,
-        1059 /** 三代目DM */,
+        1, // Note
+        6, // Repost
+        7, // Reaction
+        16, // Generic repost
+        42, // Channel message
+        9735, // Zap receipt
+        1111, // Comment (NIP-22)
+        4, // Direct message (legacy)
+        1059, // Direct message (newer format)
       ],
-
       "#p": [$loginUser],
       since: undefined,
       until: undefined,
@@ -41,206 +59,188 @@
     },
   ];
 
-  let view = $state(false);
-  onMount(async () => {
-    if (!isOnMount) {
-      isOnMount = true;
-      await init();
-
-      isOnMount = false;
-      view = true;
-    }
-  });
-  afterNavigate(async (navigate) => {
-    if (navigate.type !== "form" && !isOnMount) {
-      isOnMount = true;
-      await init();
-
-      isOnMount = false;
-      view = true;
-    }
-  });
-  beforeNavigate((navigate) => {
-    if (navigate.type !== "form") {
-      view = false;
-    }
-  });
-  async function init() {
-    const ev: EventPacket[] | undefined =
-      queryClient?.getQueryData(timelineQuery);
-    console.log(ev);
-    if (!ev || ev.length <= 0) {
-      filters[0].since = undefined;
-      filters[0].limit = 100;
-      filters[0].until = now();
-    } else {
-      filters[0].since = ev[0].event.created_at;
-      filters[0].until = now();
-      //updateViewNotifi();
-    }
-  }
-
-  //---------------------------
-
-  const triggers = [
-    // { id: "all", title: "all" }, // <p> を削除し、単なる文字列として扱う
-
-    { id: "reaction", title: Heart }, // アイコンコンポーネント
-    { id: "reply", title: Reply }, // アイコンコンポーネント
-    { id: "repost", title: Repeat2 }, // アイコンコンポーネント
-    { id: "zap", title: Zap }, // Zapを追加
-    { id: "other", title: "other" },
-  ];
+  // Initialize toggle group for notification filtering
   const {
     elements: { root, item },
     states: { value },
   } = createToggleGroup({
     type: "multiple",
-    defaultValue: triggers.map((trigger) => trigger.id), //初期は全部選択
+    defaultValue: NOTIFICATION_TYPES.map((type) => type.id),
   });
 
-  const handleClickAll = () => {
-    value.set(triggers.map((trigger) => trigger.id));
-  };
-  const handleClickNone = () => {
-    value.set([]);
-  };
-
-  export const getFollowFilteredEvents = (
-    events: Nostr.Event[],
-    onlyFollowee: boolean
-  ) => {
-    if (onlyFollowee && followList.get()) {
-      return events.filter((event) => {
-        if (event.kind !== 9735) {
-          return followList.get().has(event.pubkey);
-        } else {
-          const kind9734 = extractKind9734(event);
-          return kind9734 && followList.get().has(kind9734.pubkey);
-        }
-      });
-    } else {
-      return events;
+  // Lifecycle hooks
+  onMount(async () => {
+    if (!isOnMount) {
+      isOnMount = true;
+      await initializeNotifications();
+      isOnMount = false;
+      view = true;
     }
-  };
+  });
 
-  const notifilter = (event: Nostr.Event): boolean => {
+  afterNavigate(async (navigate) => {
+    if (navigate.type !== "form" && !isOnMount) {
+      isOnMount = true;
+      await initializeNotifications();
+      isOnMount = false;
+      view = true;
+    }
+  });
+
+  beforeNavigate((navigate) => {
+    if (navigate.type !== "form") {
+      view = false;
+    }
+  });
+
+  // Subscribe to filter changes
+  value?.subscribe((val) => {
+    setTimeout(() => {
+      if (val !== undefined && updateViewNotifi) {
+        updateViewNotifi();
+      }
+    }, 0); // Delay to ensure value is updated
+  });
+
+  // Filter helpers
+  function getNotificationFilterPredicate(event: Nostr.Event): boolean {
+    // Skip self-notifications
     if (event.pubkey === $loginUser) {
       return false;
     }
+
+    // Apply follow filter if needed
     if ($onlyFollowee && followList.get()) {
-      //フォロイーのみ
-      if (event.kind !== 9735) {
-        if (!followList.get().has(event.pubkey)) return false;
-      } else {
-        const kind9734 = extractKind9734(event);
-        if (kind9734 !== undefined && !followList.get().has(kind9734.pubkey)) {
-          return false;
-        }
-      }
-    }
-    if (event.kind === 7 || event.kind === 6 || event.kind === 16) {
-      if (
-        event.tags.findLast((tag) => tag[0] === "p" && tag.length > 1)?.[1] !==
-        $loginUser
-      ) {
+      if (!isEventFromFollowedUser(event)) {
         return false;
       }
     }
-    //  return true;
-    return filterSelectedStates(event);
-  };
-  //tabの選択状況によってのフィルターもTimelineListの中でやろうかと思ったけどnext🔻押したときの挙動がー（allではにページ目だけど他のとこではまだ一ページ目でなんとかかんとかとか）だからやめておく
-  //filterしたあとの長さで考えたらへんになるねと思ったけどなんとかなったかも
-  const filterSelectedStates = (event: Nostr.Event): boolean => {
+
+    // Verify p-tag addresses the current user for certain event kinds
+    if ([7, 6, 16].includes(event.kind)) {
+      if (!isEventAddressedToUser(event)) {
+        return false;
+      }
+    }
+
+    // Apply selected notification type filters
+    return isSelectedNotificationType(event);
+  }
+
+  function isEventFromFollowedUser(event: Nostr.Event): boolean {
+    const followListSet = followList.get();
+    if (!followListSet) return false;
+
+    if (event.kind !== 9735) {
+      return followListSet.has(event.pubkey);
+    } else {
+      // For zap receipts, check the sender from kind 9734
+      const kind9734 = extractKind9734(event);
+      return (kind9734 && followListSet.has(kind9734.pubkey)) || false;
+    }
+  }
+
+  function isEventAddressedToUser(event: Nostr.Event): boolean {
+    const targetPubkey = event.tags.findLast(
+      (tag) => tag[0] === "p" && tag.length > 1
+    )?.[1];
+
+    return targetPubkey === $loginUser;
+  }
+
+  function isSelectedNotificationType(event: Nostr.Event): boolean {
     if (!$value || typeof $value === "string") return true;
 
-    return $value.some((state) => {
-      switch (state) {
-        case "reply":
-          return event.kind === 1;
-        case "reaction":
-          return event.kind === 7;
-        case "repost":
-          return event.kind === 6 || event.kind === 16;
-        case "zap":
-          return event.kind === 9735;
-        case "other":
-          return (
-            event.kind === 42 ||
-            event.kind === 4 ||
-            //  event.kind === 14 ||
-            event.kind === 1059 ||
-            event.kind === 1111
-          );
-        default:
-          return false;
+    return $value.some((selectedType) => {
+      const typeConfig = NOTIFICATION_TYPES.find((t) => t.id === selectedType);
+      if (!typeConfig) return false;
+
+      if ("kind" in typeConfig) {
+        return event.kind === typeConfig.kind;
+      } else if ("kinds" in typeConfig) {
+        return typeConfig.kinds?.includes(event.kind);
       }
+      return false;
     });
-  };
+  }
 
-  // svelte-ignore non_reactive_update
-  let updateViewNotifi: () => void = () => {};
+  // Toggle button handlers
+  function selectAllNotificationTypes() {
+    value.set(NOTIFICATION_TYPES.map((type) => type.id));
+  }
 
-  value?.subscribe((val) => {
-    setTimeout(() => {
-      console.log($value);
-      if (val !== undefined && updateViewNotifi) {
-        updateViewNotifi();
-        console.log("notifi");
-      }
-    }, 0); //これしないとvalueの値が変になる
-  });
+  function clearAllNotificationTypes() {
+    value.set([]);
+  }
+
+  // Initialization
+  async function initializeNotifications() {
+    const existingEvents: EventPacket[] | undefined =
+      queryClient?.getQueryData(TIMELINE_QUERY);
+
+    if (!existingEvents || existingEvents.length <= 0) {
+      // First load - get historical events
+      filters[0].since = undefined;
+      filters[0].limit = INITIAL_LOAD_LIMIT;
+      filters[0].until = now();
+    } else {
+      // Subsequent load - get new events since last known
+      filters[0].since = existingEvents[0].event.created_at;
+      filters[0].until = now();
+    }
+  }
 </script>
 
 {#if !$loginUser}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
-    style="word-break: break-word;">{$_("setting.pubkey")}</a
+    style="word-break: break-word;"
   >
+    {$_("setting.pubkey")}
+  </a>
 {:else}
   <section>
     <NotificationFilter />
+
     <div class="w-full break-words overflow-x-hidden">
-      <div use:melt={$root} class=" flex items-center">
+      <!-- Notification type filter buttons -->
+      <div use:melt={$root} class="flex items-center">
         <button
           class="toggle-item relative w-full"
-          disabled={$value?.length === triggers.length}
-          onclick={handleClickAll}
+          disabled={$value?.length === NOTIFICATION_TYPES.length}
+          on:click={selectAllNotificationTypes}
         >
           All
         </button>
 
-        {#each triggers as triggerItem}
-          <button
-            use:melt={$item(triggerItem.id)}
-            class="toggle-item relative w-full"
-          >
-            <!-- Svelteコンポーネントとしてアイコンを扱う -->
-            {#if typeof triggerItem.title === "string"}
-              {triggerItem.title}
+        {#each NOTIFICATION_TYPES as type}
+          <button use:melt={$item(type.id)} class="toggle-item relative w-full">
+            {#if typeof type.title === "string"}
+              {type.title}
             {:else}
-              <triggerItem.title />
+              <svelte:component this={type.title} />
             {/if}
           </button>
         {/each}
+
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === 0}
-          onclick={handleClickNone}
+          on:click={clearAllNotificationTypes}
         >
           None
         </button>
       </div>
+
       {#if view}
         <NotificationList
-          queryKey={timelineQuery}
+          queryKey={TIMELINE_QUERY}
           {filters}
           {viewIndex}
-          {amount}
-          eventFilter={notifilter}
-          {tieKey}
+          amount={DISPLAY_AMOUNT}
+          eventFilter={getNotificationFilterPredicate}
+          tieKey={TIE_KEY}
           bind:updateViewNotifi
         >
           {#snippet children({ events })}
@@ -255,30 +255,35 @@
                   >
                     {#snippet loading()}
                       <div class="w-full">
-                        <EventCard note={event} {tieKey} />
+                        <EventCard note={event} tieKey={TIE_KEY} />
                       </div>
                     {/snippet}
+
                     {#snippet nodata()}
                       <div class="w-full">
-                        <EventCard note={event} {tieKey} />
+                        <EventCard note={event} tieKey={TIE_KEY} />
                       </div>
                     {/snippet}
+
                     {#snippet error()}
                       <div class="w-full">
-                        <EventCard note={event} {tieKey} />
+                        <EventCard note={event} tieKey={TIE_KEY} />
                       </div>
                     {/snippet}
+
                     {#snippet content({ metadata })}
-                      <EventCard {metadata} note={event} {tieKey} />
+                      <EventCard {metadata} note={event} tieKey={TIE_KEY} />
                     {/snippet}
                   </Metadata>
                 {/each}
               {/if}
             </div>
           {/snippet}
-        </NotificationList>{/if}
+        </NotificationList>
+      {/if}
     </div>
   </section>
+
   <div class="postWindow">
     <OpenPostWindow
       options={{

@@ -26,13 +26,16 @@
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { sortEventPackets, sortEvents } from "$lib/func/util";
-  import { scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import { scanArray } from "$lib/stores/operators";
 
-  const sift = 40; //スライドする量
+  // Configuration constants
+  const SCROLL_AMOUNT = 40; // Amount to slide/scroll
+  const MAX_WAIT_TIME = 10000; // Maximum wait time for relay connections (10 seconds)
+  const BATCH_SIZE = 50; // Number of events to fetch per batch
+  const UPDATE_DELAY = 50; // Delay for update events to prevent continuous execution
 
   interface Props {
     queryKey: QueryKey;
@@ -47,7 +50,6 @@
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
     loading?: import("svelte").Snippet;
-
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
@@ -71,98 +73,39 @@
     updateViewEvent = $bindable(),
   }: Props = $props();
 
+  // State variables
   let untilTime: number;
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
+  let isOnMount = false;
+  let allUniqueEvents: Nostr.Event[];
+  let readUrls: string[] = [];
+  let olderQueryKey = $derived([...queryKey, "olderData"]);
 
-  updateViewEvent = (data: EventPacket[] | undefined | null = $globalData) => {
-    if (updating) {
-      return;
-    }
-    updating = true;
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    timeoutId = setTimeout(() => {
-      const olderdatas: EventPacket[] | undefined =
-        queryClient.getQueryData(olderQueryKey);
-      console.log("updateViewEvent");
-      const allEvents: EventPacket[] = data ?? [];
-
-      if (olderdatas) {
-        allEvents.push(...olderdatas);
-      }
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
-      //  console.log(untilTime);
-      //.sort((a, b) => b.event.created_at - a.event.created_at);
-
-      allUniqueEvents = allEvents
-        .map((event) => event.event)
-        .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
-
-      // slicedEvent.update((value) =>
-      //   allUniqueEvents.slice(viewIndex, viewIndex + amount)
-      // );
-      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
-      updating = false;
-    }, 50); // 連続で実行されるのを防ぐ
-    //console.log($slicedEvent);
-  };
-
-  createQuery({
-    queryKey: [...queryKey, "olderData"],
-    queryFn: undefined,
-    staleTime: Infinity, // 4 hour
-    gcTime: Infinity, // 4 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+  // Create query for older data
+  $effect(() => {
+    createQuery({
+      queryKey: olderQueryKey,
+      queryFn: undefined,
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
   });
 
+  // Create tie and uniq for event handling
   const [tie, tieMap] = createTie();
-
-  function setTie(_tieKey: string) {
-    if (_tieKey) {
-      //$tieMapStore = { undefined: undefined };
-      if (!$tieMapStore) {
-        $tieMapStore = { [_tieKey]: [tie, tieMap] };
-      } else if (!$tieMapStore?.[_tieKey]) {
-        $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
-      }
-    }
-  }
-  // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
-
   const onCache = (packet: EventPacket): void => {
-    //console.log(`${packet.event.id} を初めて観測しました`);
+    // Event observed for the first time
   };
   const onHit = (packet: EventPacket): void => {
-    //  console.log(`${packet.event.id} はすでに観測されています`);
+    // Event has already been observed
   };
-
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  // export let lastVisible: Element | null;
-  let allUniqueEvents: Nostr.Event[];
-  //$: operator = setOperator();
 
-  //maintlのやつはわけたからいらん
-  // function setOperator() {
-  //   let operator = pipe(tie, uniq);
-  //   if (tieKey === "timeline" && $showUserStatus) {
-  //     //めいんTLのとき
-  //     operator = pipe(operator, userStatus());
-  //   }
-  //   if (tieKey === "timeline" && $showReactioninTL) {
-  //     operator = pipe(operator, reactionCheck());
-  //   }
-  //   //最後に配列にする
-  //   return pipe(operator, scanArray());
-  // }
+  // Create the timeline event list
   let result = $derived(
     useTimelineEventList(
       queryKey,
@@ -175,21 +118,66 @@
   let globalData = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
-  let readUrls: string[] = [];
 
+  // Update the view with current events
+  updateViewEvent = (data: EventPacket[] | undefined | null = $globalData) => {
+    if (updating) return;
+
+    updating = true;
+    if (timeoutId) clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      const olderData: EventPacket[] | undefined =
+        queryClient.getQueryData(olderQueryKey);
+      const allEvents: EventPacket[] = data ?? [];
+
+      if (olderData) {
+        allEvents.push(...olderData);
+      }
+
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+
+      allUniqueEvents = allEvents
+        .map((event) => event.event)
+        .filter(eventFilter)
+        .filter((event) => event.created_at <= now() + 10); // Exclude future events (with small tolerance)
+
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+      updating = false;
+    }, UPDATE_DELAY);
+  };
+
+  // Set tie in the tie map store
+  function setTie(_tieKey: string) {
+    if (!_tieKey) return;
+
+    if (!$tieMapStore) {
+      $tieMapStore = { [_tieKey]: [tie, tieMap] };
+    } else if (!$tieMapStore[_tieKey]) {
+      $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
+    }
+  }
+
+  // Effect to handle reactive state changes
   $effect(() => {
     if ($defaultRelays) {
-      untrack(() => defaultRelayChange($defaultRelays));
+      untrack(() => updateRelayUrls($defaultRelays));
     }
+
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => dataChange($globalData, viewIndex, $nowProgress));
     }
+
     if (tieKey) {
       untrack(() => setTie(tieKey));
     }
   });
 
-  function defaultRelayChange(relays: Record<string, DefaultRelayConfig>) {
+  // Update relay URLs when default relays change
+  function updateRelayUrls(relays: Record<string, DefaultRelayConfig>) {
     if (relays) {
       readUrls = Object.values(relays)
         .filter((config) => config.read)
@@ -197,6 +185,7 @@
     }
   }
 
+  // Handle data changes
   function dataChange(
     data: EventPacket[] | null | undefined,
     index: number,
@@ -207,19 +196,52 @@
     }
   }
 
-  let olderQueryKey = $derived([...queryKey, "olderData"]);
-  //$: console.log($globalData);
-  // beforeNavigate((navigate) => {
-  //   console.log("beforeNavigate", navigate.type);
-  //   if (navigate.type !== "form") {
-  //     $slicedEvent = [];
-  //   }
-  // });
+  // Initialize the component
+  async function init() {
+    updating = false;
+    const existingEvents: EventPacket[] | undefined =
+      queryClient.getQueryData(olderQueryKey);
 
-  let isOnMount = false;
+    if (!existingEvents || existingEvents.length <= 0) {
+      const newFilters: Nostr.Filter[] = olderFilters.map((filter) => ({
+        ...filter,
+        since: undefined,
+        until:
+          filters[0].until === undefined
+            ? (filter.since ?? now())
+            : filter.until,
+        limit: BATCH_SIZE,
+      }));
+
+      // Wait for relay connections before proceeding
+      await waitForConnections(readUrls, relayStateMap.get(), MAX_WAIT_TIME);
+
+      const olderEvents = await firstLoadOlderEvents(
+        BATCH_SIZE,
+        newFilters,
+        tie,
+        relays
+      );
+
+      if (olderEvents.length > 0) {
+        queryClient.setQueryData(
+          olderQueryKey,
+          (oldData: EventPacket[] | undefined) => [
+            ...(oldData ?? []),
+            ...olderEvents,
+          ]
+        );
+
+        setTimeout(() => {
+          updateViewEvent?.($globalData);
+        }, 10);
+      }
+    }
+  }
+
+  // Lifecycle hooks
   onMount(async () => {
     if (!isOnMount) {
-      console.log("onMount");
       $nowProgress = true;
       isOnMount = true;
       await init();
@@ -229,9 +251,7 @@
   });
 
   afterNavigate(async (navigate) => {
-    console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
-      console.log("afterNavigate");
       $nowProgress = true;
       isOnMount = true;
       await init();
@@ -240,98 +260,54 @@
     }
   });
 
-  async function init() {
-    updating = false;
-    const ev: EventPacket[] | undefined =
-      queryClient.getQueryData(olderQueryKey);
+  onDestroy(() => {
+    // Cleanup if needed
+  });
 
-    if (!ev || ev?.length <= 0) {
-      const newFilters: Nostr.Filter[] = olderFilters.map((filter) => {
-        return {
-          ...filter,
-          since: undefined,
-          until:
-            filters[0].until === undefined
-              ? (filter.since ?? now())
-              : filter.until,
-          limit: 50,
-        };
-      });
-      console.log(readUrls);
-
-      //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
-      // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      await waitForConnections(readUrls, relayStateMap.get(), 10000); // maxWaitTime set to 10 seconds
-      // console.log(relayStateMap.get);
-
-      const older = await firstLoadOlderEvents(
-        50,
-        newFilters,
-
-        tie,
-        relays
-      );
-      console.log("first older", older);
-
-      if (older.length > 0) {
-        queryClient.setQueryData(
-          olderQueryKey,
-          (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
-        );
-        setTimeout(() => {
-          updateViewEvent?.($globalData);
-        }, 10); //ProfileがめんのTLが読み込み終わっても表示されない
-      }
-    }
-  }
-
+  // UI action handlers
   const handleNext = async () => {
-    // console.log(length, viewIndex, amount, sift);
     if (
       !allUniqueEvents ||
-      allUniqueEvents?.length < viewIndex + amount + sift
+      allUniqueEvents.length < viewIndex + amount + SCROLL_AMOUNT
     ) {
-      //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
-      const syutokusururyou =
-        viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
-      //nevent1qvzqqqqqqypzqv33pxtldvmmdntqhv269r56zjadmhalpp660h3yc6gj8gxpuexvqyv8wumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5qs6amnwvaz7tmev9382tndv5q3zamnwvaz7tmj9e4k76nfwfsju6t0qyxhwumn8ghj7mn0wvhxcmmvqqszykcw73dgzvupxwnktv7lvndtn5n4rxwzas7jm88zkh3zpknkqws0ayy00
-      $nowProgress = true;
-      // console.log("loadOlderEvents", untilTime);
-      const older = await loadOlderEvents(
-        syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
-        olderFilters,
+      const requiredAmount =
+        viewIndex + amount - allUniqueEvents?.length + 5 * SCROLL_AMOUNT;
 
-        //lastfavcheck,
+      $nowProgress = true;
+
+      const olderEvents = await loadOlderEvents(
+        requiredAmount,
+        olderFilters,
         untilTime,
         tie,
         relays
       );
-      console.log(older);
-      if (older.length > 0) {
-        //セットするときに重複チェック
+
+      if (olderEvents.length > 0) {
         queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (olddata: EventPacket[] | undefined) => {
-            const uniqueEvents = sortEventPackets(
-              Array.from(
-                new Map(
-                  [...(olddata ?? []), ...older].map((packet) => [
-                    packet.event.id,
-                    packet,
-                  ])
-                ).values()
-              )
+          olderQueryKey,
+          (oldData: EventPacket[] | undefined) => {
+            const existingEvents = oldData ?? [];
+            const allPackets = [...existingEvents, ...olderEvents];
+
+            // Remove duplicates based on event ID
+            const uniqueEvents = Array.from(
+              new Map(
+                allPackets.map((packet) => [packet.event.id, packet])
+              ).values()
             );
-            return uniqueEvents;
+
+            // Sort events by timestamp
+            return uniqueEvents.sort(
+              (a, b) => b.event.created_at - a.event.created_at
+            );
           }
         );
       }
     }
-    //console.log(allUniqueEvents?.length);
+
     if (allUniqueEvents?.length >= viewIndex + amount - 10) {
-      //４０にしてても39とかになって微妙に足りてない時がある（なんで？）から
-      //表示量のイベントなかったらスライドしない
-      viewIndex += sift; //スライドする量
+      viewIndex += SCROLL_AMOUNT;
     }
 
     updateViewEvent?.($globalData);
@@ -344,48 +320,46 @@
         top: window.scrollY + 120,
       });
 
-      viewIndex = Math.max(viewIndex - sift, 0);
+      viewIndex = Math.max(viewIndex - SCROLL_AMOUNT, 0);
+
       setTimeout(() => {
         updateViewEvent?.($globalData);
       }, 100);
     }
   };
 
-  function handleClickTop() {
+  const handleClickTop = () => {
     viewIndex = 0;
     updateViewEvent?.($globalData);
-  }
-
-  onDestroy(() => {
-    console.log("onDestroy");
-  });
+  };
 </script>
 
 {#if viewIndex !== 0}
-  <div class=" w-full">
+  <div class="w-full">
     <button
-      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
       onclick={() => handleClickTop()}
       disabled={$nowProgress}
-      ><SkipForward
+    >
+      <SkipForward
         size={20}
         class="mx-auto -rotate-90 stroke-magnum-100 fill-magnum-100"
-      /></button
-    >
+      />
+    </button>
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
       onclick={() => handlePrev()}
-      ><Triangle
-        size={20}
-        class="mx-auto stroke-magnum-100 fill-magnum-100"
-      /></button
     >
+      <Triangle size={20} class="mx-auto stroke-magnum-100 fill-magnum-100" />
+    </button>
   </div>
 {/if}
-{#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+
+{#if $loginUser}
   <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
 {/if}
+
 {#if $errorData}
   {@render error?.($errorData)}
 {:else if displayEvents.get() && displayEvents.get().length > 0}
@@ -394,23 +368,20 @@
     status: $status,
     len: $globalData?.length ?? 0,
   })}
-  <!-- <slot events={$slicedEvent} status={$status} len={$globalData?.length ?? 0} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}
   {@render nodata?.()}
 {/if}
+
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={$nowProgress}
-    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
     onclick={() => handleNext()}
-    ><Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    />Load more<Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    /></button
   >
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+    Load more
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+  </button>
 {/if}
