@@ -4,7 +4,6 @@
   import { _ } from "svelte-i18n";
   import { loginUser } from "$lib/stores/stores";
 
-  import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
   import Content from "../../content/Content.svelte";

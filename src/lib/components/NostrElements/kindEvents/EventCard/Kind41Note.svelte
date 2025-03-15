@@ -15,6 +15,8 @@
     maxHeight: number | undefined;
     repostable: boolean;
     tieKey: string | undefined;
+    mini: boolean;
+    zIndex?: number;
   }
 
   let {
@@ -25,6 +27,8 @@
     maxHeight,
     repostable,
     tieKey,
+    mini,
+    zIndex,
   }: Props = $props();
 
   let root = note.tags.find((tag) => tag[0] === "e")?.[1];
@@ -57,7 +61,9 @@
     {metadata}
     {displayMenu}
     {depth}
-    {repostable}
     {maxHeight}
+    {zIndex}
+    {mini}
+    {repostable}
   />
 {/if}

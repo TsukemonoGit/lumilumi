@@ -5,16 +5,12 @@
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
-  import { getRelaysById } from "$lib/func/nostr";
   import SeenonIcons from "../SeenonIcons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import { eventKinds } from "$lib/func/kinds";
-  import {
-    isReplaceableKind,
-    isParameterizedReplaceableKind,
-  } from "nostr-tools/kinds";
+  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import {
     checkBirthDay,
     checkContentWarning,
@@ -57,9 +53,7 @@
   let petname = $derived(followList.get().get(note.pubkey));
 
   let replaceable = $derived(
-    note &&
-      (isReplaceableKind(note.kind) ||
-        isParameterizedReplaceableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
   let prof = $derived(profile(metadata));

@@ -1,12 +1,10 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import UrlType from "$lib/components/renderSnippets/UrlType.svelte";
   import type { Part } from "$lib/func/content";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import Content3D from "./Content3D.svelte";
   import ContentImage from "./ContentImage.svelte";
-  import OGP from "$lib/components/renderSnippets/OGP.svelte";
   import { isvalidURL } from "$lib/func/ogp";
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
 

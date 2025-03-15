@@ -31,13 +31,10 @@
   import { generateResultMessage, translateText } from "$lib/func/util";
   import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
-  import {
-    isReplaceableKind,
-    isParameterizedReplaceableKind,
-  } from "nostr-tools/kinds";
+  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import type { OkPacketAgainstEvent } from "rx-nostr";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
-  import Content from "../../content/Content.svelte";
+
   import Note from "../Note.svelte";
   interface Props {
     note: Nostr.Event;
@@ -63,9 +60,7 @@
   let dialogOpen: Writable<boolean> = writable(false);
 
   let replaceable = $derived(
-    note &&
-      (isReplaceableKind(note.kind) ||
-        isParameterizedReplaceableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
   let menuTexts = $derived.by(() => {

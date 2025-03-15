@@ -3,10 +3,7 @@ import type { Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./regex";
 import type { Ogp } from "./ogp";
-import {
-  isParameterizedReplaceableKind,
-  isReplaceableKind,
-} from "nostr-tools/kinds";
+import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { nip19 } from "nostr-tools";
 import { getRelaysById } from "./nostr";
 
@@ -194,8 +191,7 @@ export const noteLink = (
   tieKey: string | undefined = undefined
 ): string /**nevent or naddr */ => {
   let replaceable =
-    note &&
-    (isReplaceableKind(note.kind) || isParameterizedReplaceableKind(note.kind));
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind));
 
   if (!replaceable) {
     let eventpointer: nip19.EventPointer = {
