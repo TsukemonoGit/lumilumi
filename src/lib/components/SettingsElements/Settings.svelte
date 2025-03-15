@@ -546,36 +546,6 @@
         </div>
       </div>
     {/if}
-    <!--るみるみから両方とも修正できるようになったからいらん{#if $loginUser}
-       <a
-        class="underline text-magnum-300 break-all ml-4 text-sm"
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
-        )}/10002"
-      >
-        {$_("settings.nostviewstr.kind10002")}
-      </a>
-      <div class="text-sm ml-4 flex flex-wrap gap-2">
-        <a
-          class="underline text-magnum-300 break-all"
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            $loginUser
-          )}/30002"
-        >
-          {$_("settings.nostviewstr.kind30002")}
-        </a>
-        <div class="flex">
-          {$_("settings.globalRelay")}<button
-            class="inline-flex mt-auto rounded-md px-2 bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-            onclick={onClickglobalImageOpen}><Image /></button
-          >
-        </div>
-      </div>{/if} 
-    <div class="text-magnum-500 mt-2">※{$_("settings.relay")}</div>-->
   </fieldset>
 
   <fieldset class="border border-magnum-500 rounded-md p-2">
@@ -634,6 +604,15 @@
           bind:checked={settings.showImg}
         />
         {$_("settings.display.loadImage")}
+      </label>
+      <label class={`ml-8 ${!settings.showImg ? "opacity-25" : ""}`}>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={settings.embed}
+          disabled={!settings.showImg}
+        />
+        {$_("settings.display.embed")}(youtube, twitter)
       </label>
       <label>
         <input
