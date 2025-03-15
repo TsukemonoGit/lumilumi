@@ -96,12 +96,10 @@
       untrack(() => onChange?.(metadata));
     }
   });
-  //$inspect(metadata);
 </script>
 
 {#if metadata}
   {@render content?.({ metadata: metadata, status: $status })}
-  <!-- <slot {metadata} status={$status} /> -->
 {:else if $errorData}
   {@render error?.($errorData)}
 {:else if $status === "loading"}

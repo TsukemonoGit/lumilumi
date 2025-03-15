@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useUniqueEventList } from "$lib/stores/useUniqueEventList";
   import type { ReqStatus } from "$lib/types";
@@ -48,7 +47,6 @@
     events: $data?.map(({ event }) => event),
     status: $status,
   })}
-  <!-- <slot events={$data?.map(({ event }) => event)} status={$status} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

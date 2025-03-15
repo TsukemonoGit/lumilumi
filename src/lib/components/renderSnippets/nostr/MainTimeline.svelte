@@ -1,5 +1,15 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
+  import { onDestroy, onMount, untrack } from "svelte";
+  import { get } from "svelte/store";
+  import { pipe } from "rxjs";
+  import { createTie, now, type EventPacket } from "rx-nostr";
+  import { createUniq } from "rx-nostr/src";
+  import { type QueryKey, createQuery } from "@tanstack/svelte-query";
+  import { SkipForward, Triangle } from "lucide-svelte";
+  import type Nostr from "nostr-typedef";
+
+  // Store imports
   import {
     defaultRelays,
     loginUser,
@@ -7,32 +17,34 @@
     queryClient,
     tieMapStore,
   } from "$lib/stores/stores";
-
-  import type { ReqStatus } from "$lib/types";
-  import { type QueryKey, createQuery } from "@tanstack/svelte-query";
-  import { SkipForward, Triangle } from "lucide-svelte";
-  import type Nostr from "nostr-typedef";
-  import {
-    firstLoadOlderEvents,
-    loadOlderEvents,
-    waitForConnections,
-  } from "./timelineList";
-  import { createTie, now, type EventPacket } from "rx-nostr";
-  import Metadata from "./Metadata.svelte";
-  import { onDestroy, onMount, untrack } from "svelte";
-  import { sortEventPackets, sortEvents } from "$lib/func/util";
-  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
-  import { pipe } from "rxjs";
-  import { createUniq } from "rx-nostr/src";
-
-  import { useMainTimeline } from "$lib/stores/useMainTimeline";
-  import { get } from "svelte/store";
   import {
     displayEvents,
     lumiSetting,
     relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
+
+  // Utility functions
+  import { sortEventPackets, sortEvents } from "$lib/func/util";
+  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import {
+    firstLoadOlderEvents,
+    loadOlderEvents,
+    waitForConnections,
+  } from "./timelineList";
+  import { useMainTimeline } from "$lib/stores/useMainTimeline";
+
+  // Component imports
+  import Metadata from "./Metadata.svelte";
+
+  // Types
+  import type { ReqStatus } from "$lib/types";
+
+  // Constants
+  const SLIDE_AMOUNT = 40; // Number of events to slide in pagination
+  const UPDATE_DELAY = 20; // Delay for debouncing view updates (ms)
+  const LOAD_LIMIT = 50; // Number of events to fetch in initial load
+  const CONNECTION_TIMEOUT = 5000; // Maximum time to wait for relay connections (ms)
 
   interface Props {
     queryKey: QueryKey;
@@ -46,7 +58,6 @@
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
     loading?: import("svelte").Snippet;
-
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
@@ -69,31 +80,34 @@
     updateViewEvent = $bindable(),
   }: Props = $props();
 
-  const sift = 40; //スライドする量
+  // State variables
+  let allUniqueEvents: Nostr.Event[] = [];
+  let untilTime: number;
+  let updating: boolean = false;
+  let timeoutId: NodeJS.Timeout | null = null;
+  let isOnMount: boolean = false;
 
+  // Create rx-nostr tie and uniq operator
   const [tie, tieMap] = createTie();
 
-  // イベントID に基づいて重複を排除する
+  // Event handlers for the uniq operator
   const keyFn = (packet: EventPacket): string => packet.event.id;
-
   const onCache = (packet: EventPacket): void => {
-    //console.log(`${packet.event.id} を初めて観測しました`);
+    // Called when a new unique event is received
   };
   const onHit = (packet: EventPacket): void => {
-    //  console.log(`${packet.event.id} はすでに観測されています`);
+    // Called when a duplicate event is received
   };
-
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  // export let lastVisible: Element | null;
 
-  let allUniqueEvents: Nostr.Event[];
-
-  let result = useMainTimeline(queryKey, setOperator(), filters);
+  // Query setup
+  let result = useMainTimeline(queryKey, configureOperators(), filters);
   let data = $derived(result.data);
   let deriveaData = $derived($data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
+  // Get read URLs from default relays
   let readUrls = $derived.by(() => {
     if ($defaultRelays) {
       return Object.values($defaultRelays)
@@ -102,54 +116,226 @@
     }
   });
 
-  let isOnMount: boolean = false;
+  /**
+   * Configures the rx-nostr operators pipeline based on settings
+   */
+  function configureOperators() {
+    let operator = pipe(tie, uniq);
 
-  let untilTime: number;
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
-
-  updateViewEvent = (_data: EventPacket[] | undefined | null = get(data)) => {
-    if (updating) {
-      return;
+    // Add user status operator for main timeline if enabled
+    if (tieKey === "timeline" && lumiSetting.get().showUserStatus) {
+      operator = pipe(operator, userStatus());
     }
+
+    // Add reaction check operator for main timeline if enabled
+    if (tieKey === "timeline" && lumiSetting.get().showReactioninTL) {
+      operator = pipe(operator, reactionCheck());
+    }
+
+    // Final operator to convert to array
+    return pipe(operator, scanArray());
+  }
+
+  /**
+   * Registers the tie in the global store
+   */
+  function registerTie(key: string) {
+    if (!key) return;
+
+    if (!$tieMapStore) {
+      $tieMapStore = { [key]: [tie, tieMap] };
+    } else if (!$tieMapStore?.[key]) {
+      $tieMapStore = { ...$tieMapStore, [key]: [tie, tieMap] };
+    }
+  }
+
+  /**
+   * Updates the view with current events
+   */
+  updateViewEvent = (_data: EventPacket[] | undefined | null = get(data)) => {
+    if (updating) return;
+
     updating = true;
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
-      console.log("updateViewEvent");
-
-      const olderdatas: EventPacket[] | undefined = queryClient?.getQueryData([
+      // Get older events data from query cache
+      const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]);
 
-      const allEvents = [...(_data || []), ...(olderdatas || [])];
+      // Combine current and older events
+      const allEvents = [...(_data || []), ...(olderEvents || [])];
 
+      // Update the until timestamp for pagination
       untilTime =
         allEvents.length > 0
           ? allEvents[allEvents.length - 1].event.created_at
           : now();
 
-      // const uniqueEvents = sortEvents(
-      //   Array.from(
-      //     new Map(
-      //       allEvents.map((event) => [event.event.id, event.event])
-      //     ).values()
-      //   )
-      // );
-
+      // Filter and process events
       allUniqueEvents = allEvents
         .map((event) => event.event)
         .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // 未来のイベントを除外 ちょっとだけ許容;
+        .filter((event) => event.created_at <= now() + 10); // Exclude future events with small tolerance
 
+      // Update the display with the current view window
       displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
       updating = false;
-    }, 20); // 連続で実行されるのを防ぐ
+    }, UPDATE_DELAY);
   };
 
+  /**
+   * Initialize the timeline
+   */
+  async function initializeTimeline() {
+    const existingEvents: EventPacket[] | undefined = queryClient?.getQueryData(
+      [...queryKey, "olderData"]
+    );
+
+    // Only fetch older events if we don't already have them
+    if (!existingEvents || existingEvents.length <= 0) {
+      // Prepare filters for initial load
+      const initialFilters: Nostr.Filter[] = olderFilters.map((filter) => ({
+        ...filter,
+        since: undefined,
+        until:
+          filters[0].until === undefined
+            ? (filter.since ?? now())
+            : filter.until,
+        limit: LOAD_LIMIT,
+      }));
+
+      // Wait for relay connections if we have read URLs
+      if (readUrls) {
+        await waitForConnections(
+          readUrls,
+          relayStateMap.get(),
+          CONNECTION_TIMEOUT
+        );
+      }
+
+      // Fetch initial batch of events
+      const olderEvents = await firstLoadOlderEvents(
+        LOAD_LIMIT,
+        initialFilters,
+        tie,
+        relays
+      );
+
+      // Store fetched events in query cache if we got any
+      if (olderEvents.length > 0) {
+        queryClient.setQueryData(
+          [...queryKey, "olderData"],
+          (oldData: EventPacket[] | undefined) => {
+            // Deduplicate events using a Map
+            return sortEventPackets(
+              Array.from(
+                new Map(
+                  [...(oldData ?? []), ...olderEvents].map((packet) => [
+                    packet.event.id,
+                    packet,
+                  ])
+                ).values()
+              )
+            );
+          }
+        );
+      }
+    }
+
+    // Update the view with all current events
+    updateViewEvent();
+  }
+
+  /**
+   * Load older events and move view down
+   */
+  const loadOlderAndMoveDown = async () => {
+    // Check if we need to load more events
+    const needToLoadMore =
+      !allUniqueEvents ||
+      allUniqueEvents.length < viewIndex + amount + SLIDE_AMOUNT;
+
+    if (needToLoadMore) {
+      // Calculate how many events we need to fetch
+      const fetchAmount =
+        viewIndex + amount - (allUniqueEvents?.length || 0) + 5 * SLIDE_AMOUNT;
+
+      $nowProgress = true;
+
+      // Fetch older events
+      const olderEvents = await loadOlderEvents(
+        fetchAmount,
+        olderFilters,
+        untilTime,
+        tie,
+        relays
+      );
+
+      // Store fetched events in query cache if we got any
+      if (olderEvents.length > 0) {
+        queryClient.setQueryData(
+          [...queryKey, "olderData"],
+          (oldData: EventPacket[] | undefined) => {
+            // Deduplicate events using a Map
+            return sortEventPackets(
+              Array.from(
+                new Map(
+                  [...(oldData ?? []), ...olderEvents].map((packet) => [
+                    packet.event.id,
+                    packet,
+                  ])
+                ).values()
+              )
+            );
+          }
+        );
+      }
+    }
+
+    // Only move the view if we have enough events
+    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
+      viewIndex += SLIDE_AMOUNT;
+    }
+
+    // Update the view with current events
+    updateViewEvent(deriveaData);
+    $nowProgress = false;
+  };
+
+  /**
+   * Move view up to more recent events
+   */
+  const moveUp = () => {
+    if (viewIndex > 0) {
+      // Slight scroll adjustment for better UX
+      scroll({
+        top: window.scrollY + 120,
+      });
+
+      // Update view index with minimum of 0
+      viewIndex = Math.max(viewIndex - SLIDE_AMOUNT, 0);
+
+      // Short delay to allow scroll to complete
+      setTimeout(() => {
+        updateViewEvent(deriveaData);
+      }, 100);
+    }
+  };
+
+  /**
+   * Move view to the top (most recent events)
+   */
+  const moveToTop = () => {
+    viewIndex = 0;
+    updateViewEvent(deriveaData);
+  };
+
+  // Create query for older data
   createQuery({
     queryKey: [...queryKey, "olderData"],
     queryFn: undefined,
@@ -159,13 +345,19 @@
     refetchOnMount: false,
   });
 
+  // Effects to handle data and state changes
   $effect(() => {
+    // Update view when data changes or progress completes
     if ((deriveaData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => updateViewEvent(deriveaData));
     }
+
+    // Register tie when tieKey changes
     if (tieKey) {
-      untrack(() => setTie(tieKey));
+      untrack(() => registerTie(tieKey));
     }
+
+    // Handle timeline filter changes
     if (timelineFilter.get()) {
       untrack(() => updateViewEvent(deriveaData));
       localStorage.setItem(
@@ -175,197 +367,37 @@
     }
   });
 
-  function setTie(_tieKey: string) {
-    if (_tieKey) {
-      //$tieMapStore = { undefined: undefined };
-      if (!$tieMapStore) {
-        $tieMapStore = { [_tieKey]: [tie, tieMap] };
-      } else if (!$tieMapStore?.[_tieKey]) {
-        $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
-      }
-    }
-  }
-
-  function setOperator() {
-    let operator = pipe(tie, uniq);
-    if (tieKey === "timeline" && lumiSetting.get().showUserStatus) {
-      //めいんTLのとき
-      operator = pipe(operator, userStatus());
-    }
-    if (tieKey === "timeline" && lumiSetting.get().showReactioninTL) {
-      operator = pipe(operator, reactionCheck());
-    }
-    //最後に配列にする
-    return pipe(operator, scanArray());
-  }
-
+  // Lifecycle hooks
   onMount(async () => {
     if (!isOnMount) {
-      console.log("onMount");
-      $nowProgress = true;
       isOnMount = true;
-      await init();
+      $nowProgress = true;
+      await initializeTimeline();
       isOnMount = false;
       $nowProgress = false;
     }
   });
 
   afterNavigate(async (navigate) => {
-    console.log(navigate);
-    console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
-      console.log("afterNavigate");
-      $nowProgress = true;
       isOnMount = true;
-      await init();
+      $nowProgress = true;
+      await initializeTimeline();
       isOnMount = false;
       $nowProgress = false;
     }
   });
 
   onDestroy(() => {
-    console.log("onDestroy");
+    // Clean up resources if needed
   });
-
-  async function init() {
-    const ev: EventPacket[] | undefined = queryClient?.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
-
-    if (!ev || ev?.length <= 0) {
-      const newFilters: Nostr.Filter[] = olderFilters.map((filter) => {
-        return {
-          ...filter,
-          since: undefined,
-          until:
-            filters[0].until === undefined
-              ? (filter.since ?? now())
-              : filter.until,
-          limit: 50,
-        };
-      });
-      console.log(readUrls);
-
-      //readUrlsのうち８割がconnectedになるまで待ってから、以下の処理を行う
-      // Wait until 80% of readUrls are connected or max wait time is reached (e.g., 10 seconds)
-      if (readUrls) {
-        await waitForConnections(readUrls, relayStateMap.get(), 5000);
-      } // maxWaitTime set to 10 seconds
-      // console.log(relayStateMap.get);
-
-      const older = await firstLoadOlderEvents(
-        50,
-        newFilters,
-
-        tie,
-        relays
-      );
-      console.log("first older", older);
-      if (older.length > 0) {
-        // const olddata: EventPacket[] | undefined = queryClient.getQueryData([
-        //   ...queryKey,
-        //   "olderData",
-        // ]);
-        //セットするときに重複チェック
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (olddata: EventPacket[] | undefined) => {
-            const uniqueEvents = sortEventPackets(
-              Array.from(
-                new Map(
-                  [...(olddata ?? []), ...older].map((packet) => [
-                    packet.event.id,
-                    packet,
-                  ])
-                ).values()
-              )
-            );
-            return uniqueEvents;
-          }
-        );
-        //updateViewEvent(deriveaData);
-      }
-    }
-    updateViewEvent();
-  }
-
-  const handleNext = async () => {
-    // console.log(length, viewIndex, amount, sift);
-    if (
-      !allUniqueEvents ||
-      allUniqueEvents?.length < viewIndex + amount + sift
-    ) {
-      //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
-      const syutokusururyou =
-        viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
-      //nevent1qvzqqqqqqypzqv33pxtldvmmdntqhv269r56zjadmhalpp660h3yc6gj8gxpuexvqyv8wumn8ghj7cn0wd68ytnwda4k7arpwfhjucm0d5qs6amnwvaz7tmev9382tndv5q3zamnwvaz7tmj9e4k76nfwfsju6t0qyxhwumn8ghj7mn0wvhxcmmvqqszykcw73dgzvupxwnktv7lvndtn5n4rxwzas7jm88zkh3zpknkqws0ayy00
-      $nowProgress = true;
-      const older = await loadOlderEvents(
-        syutokusururyou, //４０（sift）にしてても39とかになって微妙に足りてない時がある（なんで？）から//同じイベント取って省かれてるとか？
-        olderFilters,
-
-        //lastfavcheck,
-        untilTime,
-        tie,
-        relays
-      );
-      console.log(older);
-      if (older.length > 0) {
-        //セットするときに重複チェック
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (olddata: EventPacket[] | undefined) => {
-            const uniqueEvents = sortEventPackets(
-              Array.from(
-                new Map(
-                  [...(olddata ?? []), ...older].map((packet) => [
-                    packet.event.id,
-                    packet,
-                  ])
-                ).values()
-              )
-            );
-            return uniqueEvents;
-          }
-        );
-      }
-    }
-    //console.log(allUniqueEvents?.length);
-    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
-      //４０にしてても39とかになって微妙に足りてない時がある（なんで？）から
-      //表示量のイベントなかったらスライドしない
-      viewIndex += sift; //スライドする量
-    }
-
-    updateViewEvent(deriveaData);
-    $nowProgress = false;
-  };
-
-  const handlePrev = () => {
-    if (viewIndex > 0) {
-      scroll({
-        top: window.scrollY + 120,
-      });
-
-      viewIndex = Math.max(viewIndex - sift, 0);
-      setTimeout(() => {
-        updateViewEvent(deriveaData);
-      }, 100);
-    }
-  };
-
-  function handleClickTop() {
-    viewIndex = 0;
-    updateViewEvent(deriveaData);
-  }
 </script>
 
 {#if viewIndex !== 0}
   <div class=" w-full">
     <button
       class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => handleClickTop()}
+      onclick={() => moveToTop()}
       disabled={$nowProgress}
       ><SkipForward
         size={20}
@@ -375,7 +407,7 @@
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => handlePrev()}
+      onclick={() => moveUp()}
       ><Triangle
         size={20}
         class="mx-auto stroke-magnum-100 fill-magnum-100"
@@ -394,7 +426,6 @@
     status: $status,
     len: deriveaData?.length ?? 0,
   })}
-  <!-- <slot events={$slicedEvent} status={$status} len={deriveaData?.length ?? 0} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}
@@ -404,7 +435,7 @@
   <button
     disabled={$nowProgress}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    onclick={() => handleNext()}
+    onclick={() => loadOlderAndMoveDown()}
     ><Triangle
       size={20}
       class="rotate-180 stroke-magnum-100 fill-magnum-100"

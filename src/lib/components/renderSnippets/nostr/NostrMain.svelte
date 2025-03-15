@@ -45,14 +45,13 @@
   } = $props();
 
   let localRelays: DefaultRelayConfig[] = $state.raw([]);
-  // svelte-ignore non_reactive_update
+
   let pubkey: string = $state("");
 
   let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
   onMount(async () => {
     console.log($defaultRelays);
-    // console.log(queryClient?.getQueryData(["defaultRelay", $loginUser]));
 
     initializeRxNostr();
 
@@ -152,5 +151,4 @@
   {@render loading()}
 {:else}
   {@render contents({ pubkey, localRelays })}
-  <!-- <slot {pubkey} {localRelays}></slot> -->
 {/if}

@@ -4,10 +4,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
   import type { Profile } from "$lib/types";
-  import {
-    isParameterizedReplaceableKind,
-    isReplaceableKind,
-  } from "nostr-tools/kinds";
+  import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
   interface Props {
     dialogOpen: any;
@@ -25,9 +22,7 @@
   }: Props = $props();
 
   let replaceable = $derived(
-    note &&
-      (isReplaceableKind(note.kind) ||
-        isParameterizedReplaceableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {

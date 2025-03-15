@@ -215,7 +215,6 @@
   });
 </script>
 
-<!-- {#if showCanvasationCheck} -->
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
@@ -237,10 +236,8 @@
           Show more
         </button>
       {:else}
-        <!-- <div class="border-b border-magnum-600/30"> -->
         <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
       {/if}
-      <!-- </div> -->
     {/if}
 
     <article class="{noteClass()} w-full">
@@ -433,7 +430,6 @@
         <ListLinkCard event={note} {depth} {tieKey} />
       {:else if note.kind === 30030}
         <!--kind30030-->
-
         <Kind30030Note
           {note}
           {repostable}
@@ -445,7 +441,6 @@
         />
       {:else if note.kind === 9735}
         <!--kind9735 zap receipt-->
-
         <Kind9735Note
           {note}
           {depth}
@@ -543,7 +538,7 @@
     </article>
   {/if}
 {/if}
-<!-- {/if} -->
+
 <!-- <style>
   article {
     content-visibility: auto;
