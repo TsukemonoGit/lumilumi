@@ -2,9 +2,10 @@
   import { isvalidURL, getYoutubeVideoId } from "$lib/func/ogp";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
-  import EmbedYoutube from "./EmbedYoutube.svelte";
-  import EmbedTwitter from "./EmbedTwitter.svelte";
+  import EmbedYoutube from "./Embed/EmbedYoutube.svelte";
+  import EmbedTwitter from "./Embed/EmbedTwitter.svelte";
   import OgpLoad from "./OgpLoad.svelte";
+  import EmbedBluesky from "./Embed/EmbedBluesky.svelte";
 
   let { url }: { url: string } = $props();
 
@@ -42,6 +43,14 @@
       !loadFailed
   );
 
+  // Bluesky URLかどうかを判定
+  let isBluesky: boolean = $derived(
+    hostname.includes("bsky.app") || url.startsWith("at://")
+  );
+
+  let showBlueskyEmbed: boolean = $derived(
+    showImageOrVideo && lumiSetting.get().embed && isBluesky && !loadFailed
+  );
   function handleOnError() {
     loadFailed = true;
   }
@@ -59,6 +68,9 @@
   <EmbedYoutube id={youtubeVideoId || ""} onError={handleOnError} />
 {:else if showTwitterEmbed}<!--twitter-->
   <EmbedTwitter url={twitterUrl} originalUrl={url} onError={handleOnError} />
+{:else if showBlueskyEmbed}
+  <!--bluesky-->
+  <EmbedBluesky {url} onError={handleOnError} />
 {:else}
   <OgpLoad {url} />
 {/if}

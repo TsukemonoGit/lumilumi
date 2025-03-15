@@ -1,5 +1,5 @@
 <script lang="ts">
-  import OgpLoad from "./OgpLoad.svelte";
+  import OgpLoad from "../OgpLoad.svelte";
 
   interface Props {
     url: string;
