@@ -1,31 +1,17 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-
   import { Repeat2 } from "lucide-svelte";
-  import Reaction from "../Reaction.svelte";
-
-  import { loginUser, mutebykinds, mutes } from "$lib/stores/stores";
-
-  import { nip19 } from "nostr-tools";
-
-  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import RepostedNote from "./RepostedNote.svelte";
   import { onDestroy, untrack } from "svelte";
-
-  import Kind0Note from "./Kind0Note.svelte";
-
-  import Kind30030Note from "./Kind30030Note.svelte";
-  import Kind42Note from "./Kind42Note.svelte";
-
-  import Kind9735Note from "./Kind9735Note.svelte";
-
-  import ReplyThread from "../ReplyThread.svelte";
-  import { muteCheck } from "$lib/func/muteCheck";
+  import { nip19 } from "nostr-tools";
+  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { page } from "$app/state";
-  import ReactionWebsite from "../ReactionWebsite.svelte";
 
-  import Kind31990Note from "./Kind31990Note.svelte";
+  // Store imports
+  import { loginUser, mutebykinds, mutes } from "$lib/stores/stores";
+  import { timelineFilter, viewEventIds } from "$lib/stores/globalRunes.svelte";
 
+  // Utility function imports
+  import { muteCheck } from "$lib/func/muteCheck";
   import {
     get31990Ogp,
     removeFirstMatchingId,
@@ -33,41 +19,48 @@
     repostedId,
   } from "$lib/func/event";
 
+  // Component imports
+  import Reaction from "../Reaction.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import RepostedNote from "./RepostedNote.svelte";
+  import Kind0Note from "./Kind0Note.svelte";
+  import Kind1Note from "./Kind1Note.svelte";
   import Kind4Note from "./Kind4Note.svelte";
-  import ListLinkCard from "./ListLinkCard.svelte";
-  import OtherKindNote from "./OtherKindNote.svelte";
-
-  import { timelineFilter, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import Kind20Note from "./Kind20Note.svelte";
-  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import Kind30023Note from "./Kind30023Note.svelte";
+  import Kind30030Note from "./Kind30030Note.svelte";
   import Kind30315Note from "./Kind30315Note.svelte";
-  import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
-  import Kind1068Note from "./Kind1068Note.svelte";
+  import Kind31990Note from "./Kind31990Note.svelte";
   import Kind40Note from "./Kind40Note.svelte";
   import Kind41Note from "./Kind41Note.svelte";
-  import Kind1Note from "./Kind1Note.svelte";
+  import Kind42Note from "./Kind42Note.svelte";
+  import Kind1068Note from "./Kind1068Note.svelte";
+  import Kind9735Note from "./Kind9735Note.svelte";
+  import OtherKindNote from "./OtherKindNote.svelte";
+  import ListLinkCard from "./ListLinkCard.svelte";
+  import ReplyThread from "../ReplyThread.svelte";
+  import ReactionWebsite from "../ReactionWebsite.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import RepostComponent from "../layout/RepostComponent.svelte";
-  import Kind30023Note from "./Kind30023Note.svelte";
 
-  let currentNoteTag: string[] | undefined = $state(undefined);
-
+  // Component props interface
   interface Props {
     note: Nostr.Event;
     metadata?: Nostr.Event | undefined;
-    //export let status: string | undefined = undefined;
     mini?: boolean;
     displayMenu?: boolean;
     maxHeight?: number;
     thread?: boolean;
     depth?: number;
     viewMuteEvent?: boolean;
-    excludefunc?: any;
+    excludefunc?: (event: Nostr.Event) => boolean;
     repostable?: boolean;
     tieKey: string | undefined;
     zIndex?: number | undefined;
   }
 
+  // Props with defaults
   let {
     note,
     metadata = $bindable(undefined),
@@ -83,22 +76,52 @@
     zIndex,
   }: Props = $props();
 
+  // State variables
+  let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
+  let loadThread = $state(false);
+  let replyTag: string[] | undefined = $state.raw();
+  let replyUsers: string[] = $state.raw([]);
+
+  // Derived state
   let atag: string | undefined = $derived.by(() => {
     if (
-      note &&
-      (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+      !note ||
+      (!isReplaceableKind(note.kind) && !isAddressableKind(note.kind))
     ) {
-      //atag　で　りぽすと
-      const dtag = note.tags.find((tag) => tag[0] === "d");
-      return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
-    } else {
       return undefined;
     }
+
+    const dtag = note.tags.find((tag) => tag[0] === "d");
+    return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
   });
 
+  let paramNoteId = $derived(
+    page.params.note ? getIDbyParam(page.params.note) : undefined
+  );
+
+  let muteType = $derived.by(() => {
+    if (!$mutes && !$mutebykinds && !timelineFilter.get()) {
+      return "null";
+    }
+
+    if (!timelineFilter.get().adaptMute) {
+      return "null";
+    }
+
+    if (paramNoteId === note.id || excludefunc(note)) {
+      return "null";
+    }
+
+    return $mutes || $mutebykinds ? muteCheck(note) : "null";
+  });
+
+  let warning = $derived(checkContentWarning(note?.tags));
+
+  // Helper functions
   function getIDbyParam(str: string) {
     const { type, data } = nip19.decode(str);
+
     if (type === "note") {
       return data as string;
     } else if (type === "nevent") {
@@ -108,143 +131,55 @@
     }
   }
 
-  onDestroy(() => {
-    // console.log("destroy mae", viewEventIds.get.length);
-    // コンポーネント破棄時に現在のタグを削除
-    //console.log("destoroy", $state.snapshot(currentNoteTag));
-    if (currentNoteTag) {
-      viewEventIds.update((value) => {
-        return removeFirstMatchingId(value, currentNoteTag);
-      });
-    }
-  });
-  //   //  console.log("destoroy ato", viewEventIds.get.length);
-  //   // viewEventIds.get = viewEventIds.get;
-  // });
-
-  // $: console.log(viewEventIds.get);
-  //eかa
-
-  const baseClass = " overflow-hidden ";
-  const noteClass = () => {
-    const ptag = note.tags.filter((tag) => tag[0] === "p");
-    const user =
-      note.pubkey !== $loginUser && ptag.find((tag) => tag[1] === $loginUser);
-    // let ret = `${baseClass} ${user ? " bg-magnum-700/20" : "border-magnum-600/30"}`;
-    // return depth === 0
-    //   ? `border-magnum-600 ${ret}`
-    //   : `border-magnum-900 ${ret}`;
-    return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`; //border-l-2 border-magnum-700 //bg-magnum-700/10
-  };
-
-  const checkContentWarning = (tags: string[][]): string[] | undefined => {
+  function checkContentWarning(tags: string[][]): string[] | undefined {
     return tags.find((item) => item[0] === "content-warning");
-  };
-
-  // const { kind, tag } = repostedId(note.tags);
-  let replyTag: string[] | undefined = $state.raw();
-  let replyUsers: string[] = $state.raw([]);
-
-  let loadThread = $state(false);
-
-  //canvasationcheck
-  // $: showCanvasationCheck =
-  //   page.url.pathname !== "/"
-  //     ? true
-  //     : checkCanvasation(note.tags, $timelineFilter.selectCanversation);
-
-  let paramNoteId = $derived(
-    page.params.note ? getIDbyParam(page.params.note) : undefined
-  );
-  let muteType = $derived.by(() => {
-    if ($mutes || $mutebykinds || timelineFilter.get()) {
-      return !timelineFilter.get().adaptMute
-        ? "null"
-        : paramNoteId === note.id || excludefunc(note)
-          ? "null"
-          : $mutes || $mutebykinds
-            ? muteCheck(note)
-            : "null";
-    } else {
-      return "null";
-    }
-  });
-  // // 指定したタグが既に存在するか確認するヘルパー関数
-  // function tagExists(viewEventIds: string[][], tagType: string, tagId: string) {
-  //   return viewEventIds.some(
-  //     (item: string[]) => item[0] === tagType && item[1] === tagId
-  //   );
-  // }
-
-  //フィルター作る方で重複削除してるから自分の分だけ追加・削除する
-
-  //atag
-  $effect(() => {
-    if (note) {
-      untrack(() => {
-        //console.log("effectまえ:", viewEventIds.get.length);
-        noteIDchange(note);
-        //console.log("effectあと:", viewEventIds.get.length);
-      });
-    }
-  });
+  }
 
   function noteIDchange(note: Nostr.Event) {
-    if (note.id) {
-      if (
-        atag &&
-        (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
-      ) {
-        // 現在のタグを削除
-        if (currentNoteTag) {
-          console.log(viewEventIds.get().length);
-          viewEventIds.update((value) => {
-            return removeFirstMatchingId(value, currentNoteTag);
-          });
-          console.log(viewEventIds.get().length);
-        }
-        // 新しいタグがまだ存在しなければ追加
-        //if (!tagExists(viewEventIds.get, "a", atag)) {
-        viewEventIds.update((value) => {
-          value.push(["a", atag]);
-          return value;
-        });
-        //}
-        currentNoteTag = ["a", atag];
-        // viewEventIds.get = viewEventIds.get;
-      } else if (
-        atag === undefined &&
-        note &&
-        note.id !== "" && // プレビュー画面の無効なIDを除外
-        (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
-      ) {
-        //etag
-        // 現在のタグを削除
-        if (currentNoteTag) {
-          viewEventIds.update((value) => {
-            return removeFirstMatchingId(value, currentNoteTag);
-          });
-        }
-        // 新しいタグがまだ存在しなければ追加
-        // if (!tagExists(viewEventIds.get, "e", note.id)) {
-        viewEventIds.update((value) => {
-          value.push(["e", note.id]);
-          //console.log(value);
-          return value;
-        });
-        //}
-        currentNoteTag = ["e", note.id];
-        //viewEventIds.get = viewEventIds.get;
-      }
-    }
+    if (!note.id) return;
+
     if (
-      note &&
-      (note.kind === 1 ||
-        note.kind === 42 ||
-        note.kind === 4 ||
-        note.kind === 1111) /**comment*/ &&
-      note.tags.length > 0
+      atag &&
+      (currentNoteTag === undefined || atag !== currentNoteTag?.[1])
     ) {
+      // Remove current tag if exists
+      if (currentNoteTag) {
+        viewEventIds.update((value) =>
+          removeFirstMatchingId(value, currentNoteTag)
+        );
+      }
+
+      // Add new tag
+      viewEventIds.update((value) => {
+        value.push(["a", atag]);
+        return value;
+      });
+
+      currentNoteTag = ["a", atag];
+    } else if (
+      atag === undefined &&
+      note &&
+      note.id !== "" &&
+      (currentNoteTag === undefined || note.id !== currentNoteTag?.[1])
+    ) {
+      // Remove current tag if exists
+      if (currentNoteTag) {
+        viewEventIds.update((value) =>
+          removeFirstMatchingId(value, currentNoteTag)
+        );
+      }
+
+      // Add new tag
+      viewEventIds.update((value) => {
+        value.push(["e", note.id]);
+        return value;
+      });
+
+      currentNoteTag = ["e", note.id];
+    }
+
+    // Process reply tags
+    if (note && [1, 42, 4, 1111].includes(note.kind) && note.tags.length > 0) {
       const res = replyedEvent(note.tags, note.kind);
       replyTag = res.replyTag;
       replyUsers = res.replyUsers;
@@ -254,7 +189,30 @@
     }
   }
 
-  let warning = $derived(checkContentWarning(note?.tags));
+  // CSS classes
+  const baseClass = " overflow-hidden ";
+  const noteClass = () => {
+    const ptag = note.tags.filter((tag) => tag[0] === "p");
+    const user =
+      note.pubkey !== $loginUser && ptag.find((tag) => tag[1] === $loginUser);
+
+    return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`;
+  };
+
+  // Lifecycle hooks
+  $effect(() => {
+    if (note) {
+      untrack(() => noteIDchange(note));
+    }
+  });
+
+  onDestroy(() => {
+    if (currentNoteTag) {
+      viewEventIds.update((value) =>
+        removeFirstMatchingId(value, currentNoteTag)
+      );
+    }
+  });
 </script>
 
 <!-- {#if showCanvasationCheck} -->
