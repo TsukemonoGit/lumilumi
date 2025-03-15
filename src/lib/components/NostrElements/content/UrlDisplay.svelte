@@ -8,6 +8,7 @@
   import ContentImage from "./ContentImage.svelte";
   import OGP from "$lib/components/renderSnippets/OGP.svelte";
   import { isvalidURL } from "$lib/func/ogp";
+  import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
 
   interface Props {
     part: Part;
@@ -65,22 +66,9 @@
       {:else if type === "3D"}
         <Content3D content={part.content} url={part.url} />
       {:else if type === "url"}
-        {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<OGP
-            url={part.content ?? ""}
-            >{#snippet renderContent(contents)}
-              {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-                <OgpCard {contents} url={part.content ?? ""} />{:else}<Link
-                  props={{ "aria-label": `External Links: ${part.url}` }}
-                  className="underline text-magnum-300 break-all "
-                  href={part.content ?? ""}>{part.content ?? ""}</Link
-                >{/if}{/snippet}
-            {#snippet nodata()}
-              <Link
-                props={{ "aria-label": `External Links: ${part.url}` }}
-                className="underline text-magnum-300 break-all hover:opacity-80"
-                href={part.content ?? ""}>{part.content ?? ""}</Link
-              >{/snippet}
-          </OGP>{:else}<Link
+        {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<MediaEmbedSwitcher
+            url={part.url || ""}
+          />{:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
             href={part.content ?? ""}>{part.content}</Link

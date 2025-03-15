@@ -16,6 +16,7 @@
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
   import ProfileDisplay from "./EventCard/ProfileDisplay.svelte";
   import RepostComponent from "./layout/RepostComponent.svelte";
+  import MediaEmbedSwitcher from "../content/MediaEmbedSwitcher.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -72,24 +73,7 @@
   {#if website}
     <div class="p-2">
       {#if lumiSetting.get().showImg && isvalidURL(website)}
-        <OGP url={website}>
-          {#snippet nodata()}
-            <Link
-              className="underline text-magnum-300 break-all "
-              href={website}>{website}</Link
-            >
-          {/snippet}
-          {#snippet renderContent(contents)}
-            {#if contents.title !== "" || contents.image !== "" || contents.description !== ""}<!--OGP表示はTITLE必須にしておくと思ったけどそしたらXのOGPでてこなくなったから-->
-              <OgpCard {contents} url={website} />
-            {:else}
-              <Link
-                className="underline text-magnum-300 break-all "
-                href={website}>{website}</Link
-              >
-            {/if}
-          {/snippet}
-        </OGP>
+        <MediaEmbedSwitcher url={website || ""} />
       {:else}
         <Link className="underline text-magnum-300 break-all " href={website}
           >{website}</Link
