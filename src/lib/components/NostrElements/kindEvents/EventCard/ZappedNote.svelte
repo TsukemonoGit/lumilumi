@@ -156,6 +156,7 @@
             {maxHeight}
             {tieKey}
             {zIndex}
+            {mini}
           />
         {/if}
       {/snippet}
