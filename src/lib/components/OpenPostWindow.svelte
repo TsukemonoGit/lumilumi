@@ -622,7 +622,6 @@
 
       $open = true;
       $postWindowOpen = false;
-      console.log(tags);
     }
   });
 
