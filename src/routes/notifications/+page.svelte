@@ -36,7 +36,7 @@
   let viewIndex = 0;
   let isOnMount = false;
   let view = $state(false);
-  let updateViewNotifi: () => void = () => {};
+  let updateViewNotifi: () => void = $state(() => {});
 
   // Build initial filters
   let filters: Nostr.Filter[] = [
@@ -209,7 +209,7 @@
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === NOTIFICATION_TYPES.length}
-          on:click={selectAllNotificationTypes}
+          onclick={selectAllNotificationTypes}
         >
           All
         </button>
@@ -218,8 +218,8 @@
           <button use:melt={$item(type.id)} class="toggle-item relative w-full">
             {#if typeof type.title === "string"}
               {type.title}
-            {:else}
-              <svelte:component this={type.title} />
+            {:else if type.title}
+              <type.title />
             {/if}
           </button>
         {/each}
@@ -227,7 +227,7 @@
         <button
           class="toggle-item relative w-full"
           disabled={$value?.length === 0}
-          on:click={clearAllNotificationTypes}
+          onclick={clearAllNotificationTypes}
         >
           None
         </button>

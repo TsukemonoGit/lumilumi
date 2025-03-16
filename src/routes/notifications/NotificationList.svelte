@@ -119,16 +119,13 @@
       return;
     }
 
-    $nowProgress = true;
-
     // Get all events from query cache
     const allEvents: EventPacket[] | undefined =
       queryClient.getQueryData(queryKey);
     if (!allEvents) {
-      $nowProgress = false;
       return;
     }
-
+    $nowProgress = true;
     // Set time marker for pagination
     untilTime =
       allEvents.length > 0
