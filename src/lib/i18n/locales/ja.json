@@ -21,7 +21,7 @@
     "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
     "display": {
       "loadImage": "画像を読み込み表示する (プロフィールのリアルタイム更新ON/OFF)",
-      "preview": "ノート作成時にプレビューを表示する（画像読み込みが有効のときのみ）",
+      "preview": "ノート作成時にプレビューを表示する",
       "menu": "menuボタンを左側に表示する",
       "showRelayIcon": "アイコンの下にリレー情報を表示する",
       "showReactioninTL": "通知Toastを表示する",
