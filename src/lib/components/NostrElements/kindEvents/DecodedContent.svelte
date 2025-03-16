@@ -50,21 +50,9 @@
     maxHeight,
     zIndex,
   }: Props = $props();
-
-  let hasLoaded = $state(false);
-  const handleEnterViewport = () => {
-    if (!hasLoaded) {
-      //console.log("decoded content enter viewport", hasLoaded);
-      hasLoaded = true;
-    }
-  };
 </script>
 
-<div
-  use:viewport={null}
-  onenterViewport={handleEnterViewport}
-  class="inline overflow-hidden"
->
+<div class="inline overflow-hidden">
   {#if decoded.type === "npub"}<span class="text-magnum-300 align-middle"
       >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
           pubkey={decoded.data}

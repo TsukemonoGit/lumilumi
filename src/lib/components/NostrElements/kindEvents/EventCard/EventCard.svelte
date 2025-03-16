@@ -315,6 +315,7 @@
             {maxHeight}
             {tieKey}
             {zIndex}
+            {mini}
           />
         {:else}<span class="italic">error</span>
         {/if}
@@ -363,6 +364,7 @@
             {maxHeight}
             {tieKey}
             {zIndex}
+            {mini}
           />
         {:else}<span class="italic">error</span>
         {/if}
