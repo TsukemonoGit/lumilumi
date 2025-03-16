@@ -716,7 +716,7 @@
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      {#if lumiSetting.get().showImg && lumiSetting.get().showPreview}
+      {#if lumiSetting.get().showPreview}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
