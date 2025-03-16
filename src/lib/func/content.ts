@@ -8,6 +8,7 @@ import {
   invoiceRegex,
 } from "./regex";
 
+// インターフェース定義
 export interface Part {
   type:
     | "nip19"
@@ -28,28 +29,77 @@ export interface Part {
   imageUrl?: string;
 }
 
-//旧引用
+// 引用関連の定数と関数
 export const numberRegex = /(#\[\d+\])/i;
-//
 
 export const numberQuoteEncode = (text: string, tags: string[][]): string => {
   try {
     const num = parseInt(text.slice(2, -1));
     const tag = tags[num];
-    if (tag[0] === "e") {
-      return nip19.noteEncode(tag[1]);
-    } else if (tag[0] === "a") {
-      return nip19.naddrEncode(parseNaddr(tag));
-    } else if (tag[0] === "p") {
-      return nip19.npubEncode(tag[1]);
+    if (!tag) return "";
+
+    switch (tag[0]) {
+      case "e":
+        return nip19.noteEncode(tag[1]);
+      case "a":
+        return nip19.naddrEncode(parseNaddr(tag));
+      case "p":
+        return nip19.npubEncode(tag[1]);
+      default:
+        return "";
     }
-    return "";
   } catch (error) {
     return "";
   }
 };
 
-//---------------------------------------------------------------------------parseText
+// テキスト解析のヘルパー関数
+interface IndexResult<T> {
+  index: number;
+  item: T;
+}
+
+const findEarliestMatch = <T>(
+  text: string,
+  items: T[],
+  matchFn: (item: T, text: string) => number
+): IndexResult<T> | null => {
+  let earliestIndex = -1;
+  let foundItem: T | null = null;
+
+  for (const item of items) {
+    const index = matchFn(item, text);
+    if (index !== -1 && (earliestIndex === -1 || index < earliestIndex)) {
+      earliestIndex = index;
+      foundItem = item;
+    }
+  }
+
+  return earliestIndex !== -1 && foundItem
+    ? { index: earliestIndex, item: foundItem }
+    : null;
+};
+
+// URLの括弧チェック用関数
+const findLastUnpairedParenIndex = (
+  url: string,
+  openChar: string,
+  closeChar: string
+): number => {
+  return url.split("").reduce(
+    (acc, char, idx) => {
+      if (char === openChar) acc.openCount++;
+      if (char === closeChar) acc.closeCount++;
+      if (acc.closeCount > acc.openCount && acc.index === url.length) {
+        acc.index = idx;
+      }
+      return acc;
+    },
+    { openCount: 0, closeCount: 0, index: url.length }
+  ).index;
+};
+
+// メインのテキスト解析関数
 export async function parseText(
   input: string,
   tags: string[][]
@@ -57,241 +107,196 @@ export async function parseText(
   const parts: Part[] = [];
   let remainingText = input;
   let mediaNum = 0;
-  // Create emoji set from tags
-  const emojiSet = new Set(
-    tags
-      .filter((tag) => tag[0] === "emoji")
-      .map((tag) => `:${tag[1]}:`)
-      .sort((a, b) => b.length - a.length)
-  );
 
-  // Create hashtag set for exact matching
-  //lowercaseにして重複削除
-  const lowerHashtagSet = new Set(
-    tags
-      .filter((tag) => tag[0] === "t")
-      .map((tag) => `#${tag[1].toLowerCase()}`) // lowercaseに変換
-  );
+  // タグからデータセットを作成
+  const emojiSet: string[] = tags
+    .filter((tag) => tag[0] === "emoji")
+    .map((tag) => `:${tag[1]}:`)
+    .sort((a, b) => b.length - a.length);
 
-  const hashtagSet = Array.from(lowerHashtagSet).sort(
-    (a, b) => b.length - a.length
-  );
-
-  const findEmojiIndex = (
-    text: string
-  ): { index: number; emoji: string } | null => {
-    let earliestIndex = -1;
-    let foundEmoji = "";
-    emojiSet.forEach((emoji) => {
-      const index = text.indexOf(emoji);
-      if (index !== -1 && (earliestIndex === -1 || index < earliestIndex)) {
-        earliestIndex = index;
-        foundEmoji = emoji;
-      }
-    });
-    return earliestIndex !== -1
-      ? { index: earliestIndex, emoji: foundEmoji }
-      : null;
-  };
-
-  const findHashtagIndex = (
-    text: string
-  ): { index: number; hashtag: string } | null => {
-    let earliestIndex = -1;
-    let foundHashtag = "";
-    hashtagSet.forEach((hashtag) => {
-      const lowerCaseText = text.toLowerCase();
-      const index = lowerCaseText.indexOf(hashtag);
-
-      if (index !== -1 && (earliestIndex === -1 || index < earliestIndex)) {
-        earliestIndex = index;
-        // 元のテキストから一致部分を取得
-        foundHashtag = text.slice(index, index + hashtag.length);
-        // console.log(foundHashtag);
-      }
-    });
-    return earliestIndex !== -1
-      ? { index: earliestIndex, hashtag: foundHashtag }
-      : null;
-  };
+  const hashtagSet: string[] = Array.from(
+    new Set(
+      tags
+        .filter((tag) => tag[0] === "t")
+        .map((tag) => `#${tag[1].toLowerCase()}`)
+    )
+  ).sort((a, b) => b.length - a.length);
 
   while (remainingText.length > 0) {
-    const numberMatch = remainingText.match(numberRegex);
-    const nip19Match = remainingText.match(nip19Regex);
-    const urlMatch = remainingText.match(urlRegex);
-    const emojiResult = findEmojiIndex(remainingText);
-    const hashtagResult = findHashtagIndex(remainingText);
-    const nipMatch = remainingText.match(nipRegex);
-    const relayMatch = remainingText.match(relayRegex);
-    const invoiceMatch = remainingText.match(invoiceRegex);
-
-    const numberIndex = numberMatch
-      ? remainingText.indexOf(numberMatch[0])
-      : -1;
-    const nip19Index = nip19Match ? remainingText.indexOf(nip19Match[0]) : -1;
-    const urlIndex = urlMatch ? remainingText.indexOf(urlMatch[0]) : -1;
-    const emojiIndex = emojiResult ? emojiResult.index : -1;
-    const hashtagIndex = hashtagResult ? hashtagResult.index : -1;
-    const nipIndex = nipMatch ? remainingText.indexOf(nipMatch[0]) : -1;
-    const relayIndex = relayMatch ? remainingText.indexOf(relayMatch[0]) : -1;
-    const invoiceIndex = invoiceMatch
-      ? remainingText.indexOf(invoiceMatch[0])
-      : -1;
-    if (
-      numberIndex === -1 &&
-      nip19Index === -1 &&
-      urlIndex === -1 &&
-      emojiIndex === -1 &&
-      hashtagIndex === -1 &&
-      nipIndex === -1 &&
-      relayIndex === -1 &&
-      invoiceIndex === -1
-    ) {
-      // No more matches, add the remaining text as a normal text part
-      parts.push({ type: "text", content: remainingText });
-      break;
-    }
-
-    const earliestMatch = [
-      { type: "number", index: numberIndex, match: numberMatch },
-      { type: "nip19", index: nip19Index, match: nip19Match },
-      { type: "url", index: urlIndex, match: urlMatch },
+    // 全ての種類のマッチを探す
+    const matches = [
       {
-        type: "emoji",
-        index: emojiIndex,
-        match: emojiResult ? [emojiResult.emoji] : null,
+        type: "number",
+        match: remainingText.match(numberRegex),
+        process: (m: RegExpMatchArray) => ({
+          type: "nip19" as const,
+          content: m[0],
+          url: numberQuoteEncode(m[0], tags),
+        }),
       },
       {
-        type: "hashtag",
-        index: hashtagIndex,
-        match: hashtagResult ? [hashtagResult.hashtag] : null,
+        type: "nip19",
+        match: remainingText.match(nip19Regex),
+        process: (m: RegExpMatchArray) => ({
+          type: "nip19" as const,
+          content: m[0],
+          url: m[0].slice(6), // "nostr:" プレフィックスを削除
+        }),
       },
-      { type: "nip", index: nipIndex, match: nipMatch },
-      { type: "relay", index: relayIndex, match: relayMatch },
-      { type: "invoice", index: invoiceIndex, match: invoiceMatch },
-    ]
-      .filter(({ index }) => index !== -1)
-      .sort((a, b) => a.index - b.index)[0];
-
-    const { type, index, match } = earliestMatch;
-
-    if (index > 0) {
-      parts.push({ type: "text", content: remainingText.slice(0, index) });
-    }
-    if (match) {
-      switch (type) {
-        case "number":
-          parts.push({
-            type: "nip19",
-            content: match[0],
-            url: numberQuoteEncode(match[0], tags),
-          }); // Remove "nostr:" prefix
-          break;
-        case "nip19":
-          parts.push({
-            type: "nip19",
-            content: match[0],
-            url: match[0].slice(6),
-          }); // Remove "nostr:" prefix
-          break;
-        case "url":
-          const url = match[0];
-          let lastUnpairedParenIndex = url.split("").reduce(
-            (acc, char, idx) => {
-              if (char === "(") acc.openParenCount++;
-              if (char === ")") acc.closeParenCount++;
-              if (
-                acc.closeParenCount > acc.openParenCount &&
-                acc.index === url.length
-              ) {
-                acc.index = idx;
-              }
-              return acc;
-            },
-            { openParenCount: 0, closeParenCount: 0, index: url.length }
-          ).index;
+      {
+        type: "url",
+        match: remainingText.match(urlRegex),
+        process: (m: RegExpMatchArray) => {
+          const url = m[0];
+          // 括弧のペアをチェック
+          let lastUnpairedParenIndex = findLastUnpairedParenIndex(
+            url,
+            "(",
+            ")"
+          );
           if (lastUnpairedParenIndex === url.length) {
-            //()のぺあなし
-            //（）のペアを探してみる
-            lastUnpairedParenIndex = url.split("").reduce(
-              (acc, char, idx) => {
-                if (char === "（") acc.openParenCount++;
-                if (char === "）") acc.closeParenCount++;
-                if (
-                  acc.closeParenCount > acc.openParenCount &&
-                  acc.index === url.length
-                ) {
-                  acc.index = idx;
-                }
-                return acc;
-              },
-              { openParenCount: 0, closeParenCount: 0, index: url.length }
-            ).index;
+            // 日本語の括弧もチェック
+            lastUnpairedParenIndex = findLastUnpairedParenIndex(
+              url,
+              "（",
+              "）"
+            );
           }
-          // Split the URL into its proper parts
+
           const urlPart = url.slice(0, lastUnpairedParenIndex);
           const textPart = url.slice(lastUnpairedParenIndex);
-          parts.push({
-            type: "url",
-            content: urlPart,
-            url: urlPart,
-            number: mediaNum,
-          });
-          mediaNum++;
+
+          const result: Part[] = [
+            {
+              type: "url",
+              content: urlPart,
+              url: urlPart,
+              number: mediaNum++,
+            },
+          ];
+
           if (textPart) {
-            parts.push({
+            result.push({
               type: "text",
               content: textPart,
             });
           }
 
-          break;
-        case "emoji":
-          const emojiContent = match[0].slice(1, -1); // Remove surrounding colons
+          return result;
+        },
+      },
+      {
+        type: "emoji",
+        match: findEarliestMatch(remainingText, emojiSet, (emoji, text) =>
+          text.indexOf(emoji)
+        ),
+        process: (match: IndexResult<string>) => {
+          const emojiContent = match.item.slice(1, -1); // コロンを削除
           const matchingTag = tags.find(
             (tag) => tag[0] === "emoji" && tag[1] === emojiContent
           );
-          parts.push({
-            type: "emoji",
-            url: matchingTag ? matchingTag[2] : undefined,
+          return {
+            type: "emoji" as const,
+            url: matchingTag?.[2],
             content: emojiContent,
-          });
-          break;
-        case "hashtag":
-          parts.push({
-            type: "hashtag",
-            content: match[0].slice(1),
-            url: match[0].slice(1).toLowerCase(),
-          }); // Remove leading '#'
-          break;
-        case "nip":
-          parts.push({
-            type: "nip",
-            content: match[0],
-            url: `https://github.com/nostr-protocol/nips/blob/master/${match?.[0].slice(
-              4
-            )}.md`, // Remove "nip-" prefix
-          });
-          break;
-        case "relay":
-          parts.push({
-            type: "relay",
-            content: match[0],
-            url: `/relay/${encodeURIComponent(match[0])}`,
-          });
-          break;
-        case "invoice":
-          parts.push({
-            type: "invoice",
-            content: match[0],
-          });
-          break;
-      }
+          };
+        },
+      },
+      {
+        type: "hashtag",
+        match: findEarliestMatch(
+          remainingText.toLowerCase(),
+          hashtagSet,
+          (hashtag, text) => text.indexOf(hashtag)
+        ),
+        process: (match: IndexResult<string>) => {
+          const originalHashtag = remainingText.slice(
+            match.index,
+            match.index + match.item.length
+          );
+          return {
+            type: "hashtag" as const,
+            content: originalHashtag.slice(1), // #を削除
+            url: originalHashtag.slice(1).toLowerCase(),
+          };
+        },
+      },
+      {
+        type: "nip",
+        match: remainingText.match(nipRegex),
+        process: (m: RegExpMatchArray) => ({
+          type: "nip" as const,
+          content: m[0],
+          url: `https://github.com/nostr-protocol/nips/blob/master/${m[0].slice(
+            4
+          )}.md`, // "nip-" プレフィックスを削除
+        }),
+      },
+      {
+        type: "relay",
+        match: remainingText.match(relayRegex),
+        process: (m: RegExpMatchArray) => ({
+          type: "relay" as const,
+          content: m[0],
+          url: `/relay/${encodeURIComponent(m[0])}`,
+        }),
+      },
+      {
+        type: "invoice",
+        match: remainingText.match(invoiceRegex),
+        process: (m: RegExpMatchArray) => ({
+          type: "invoice" as const,
+          content: m[0],
+        }),
+      },
+    ];
 
-      remainingText = remainingText.slice(
-        index + (match as RegExpMatchArray)[0].length
-      );
+    // マッチした項目と位置を取得
+    const validMatches = matches
+      .map((match) => {
+        if (!match.match) return null;
+
+        const index =
+          match.match instanceof Array
+            ? remainingText.indexOf(match.match[0])
+            : match.match.index;
+
+        return {
+          type: match.type,
+          index,
+          match: match.match,
+          process: match.process,
+        };
+      })
+      .filter((m): m is NonNullable<typeof m> => m !== null);
+
+    // マッチが無ければ残りのテキストを追加して終了
+    if (validMatches.length === 0) {
+      parts.push({ type: "text", content: remainingText });
+      break;
     }
+
+    // 最も早い位置にあるマッチを選択
+    const earliestMatch = validMatches.sort((a, b) => a.index - b.index)[0];
+    const { type, index, match, process } = earliestMatch;
+
+    // マッチの前にテキストがあれば追加
+    if (index > 0) {
+      parts.push({ type: "text", content: remainingText.slice(0, index) });
+    }
+
+    // マッチした部分を処理
+    const processedParts = process(match as any);
+    if (Array.isArray(processedParts)) {
+      parts.push(...processedParts);
+    } else {
+      parts.push(processedParts);
+    }
+
+    // 処理済みの部分をスキップ
+    const matchLength =
+      match instanceof Array ? match[0].length : match.item.length;
+    remainingText = remainingText.slice(index + matchLength);
   }
 
   return parts;
