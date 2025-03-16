@@ -80,7 +80,12 @@
       <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
   {/snippet}
   {#snippet name()}
-    <ProfileDisplay {note} {metadata} {kindInfo} />
+    <ProfileDisplay
+      pubkey={note.pubkey}
+      kind={note.kind}
+      {metadata}
+      {kindInfo}
+    />
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} {tieKey} />

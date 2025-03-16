@@ -46,10 +46,19 @@ export const replyedEvent = (
     const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
     const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
 
+    let replyTag;
+    if (kind === 42 && root) {
+      // For kind 42, use reply if it exists, otherwise find a non-root ID
+      replyTag = reply ?? IDs.findLast((item) => item !== root);
+    } else {
+      // For other kinds, maintain priority order: reply > root > last ID
+      replyTag =
+        reply ?? root ?? (IDs.length > 0 ? IDs[IDs.length - 1] : undefined);
+    }
+
     return {
       replyUsers: users,
-      replyTag:
-        reply ?? root ?? IDs.length > 0 ? IDs[IDs.length - 1] : undefined,
+      replyTag: replyTag ?? undefined,
     };
   } else {
     //comment NIP-22 https://github.com/nostr-protocol/nips/blob/master/22.md
