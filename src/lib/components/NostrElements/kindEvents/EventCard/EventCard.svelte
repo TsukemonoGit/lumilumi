@@ -80,9 +80,16 @@
   let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
   let loadThread = $state(false);
-  let replyTag: string[] | undefined = $state.raw();
-  let replyUsers: string[] = $state.raw([]);
 
+  // Process reply tags
+  let { replyTag, replyUsers } = $derived.by(() => {
+    if (note && [1, 42, 4, 1111].includes(note.kind) && note.tags.length > 0) {
+      const res = replyedEvent(note.tags, note.kind);
+
+      return { replyTag: res.replyTag, replyUsers: res.replyUsers };
+    }
+    return { replyTag: undefined, replyUsers: [] };
+  });
   // Derived state
   let atag: string | undefined = $derived.by(() => {
     if (
@@ -176,16 +183,6 @@
       });
 
       currentNoteTag = ["e", note.id];
-    }
-
-    // Process reply tags
-    if (note && [1, 42, 4, 1111].includes(note.kind) && note.tags.length > 0) {
-      const res = replyedEvent(note.tags, note.kind);
-      replyTag = res.replyTag;
-      replyUsers = res.replyUsers;
-    } else {
-      replyTag = undefined;
-      replyUsers = [];
     }
   }
 
