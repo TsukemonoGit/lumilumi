@@ -61,6 +61,7 @@
   import UserName from "./NostrElements/user/UserName.svelte";
 
   import AlertDialog from "./Elements/AlertDialog.svelte";
+  import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -981,15 +982,9 @@
                   onclick={() => handleClickEmoji(e)}
                   class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                 >
-                  {#if lumiSetting.get().showImg}
-                    <img
-                      height="24px"
-                      loading="lazy"
-                      class="h-6 min-w-6 object-contain justify-self-center"
-                      src={e[1]}
-                      alt={e[0]}
-                      title={e[0]}
-                    />{:else}{e[0]}{/if}
+                  <CustomEmoji
+                    part={{ type: "emoji", content: e[0], url: e[1] }}
+                  />
                 </button>
               {/if}
             {/each}
