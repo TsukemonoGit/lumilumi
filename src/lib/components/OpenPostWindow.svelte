@@ -82,7 +82,7 @@
   const bulkReplyThreshold = 30; // 30人以上でクソでか人数ライン
   let text: string = $state(options.content ?? "");
   //let tags: string[][] = $state([...options.tags]);
-  let tags = $state(options.tags.map((subArray) => [...subArray]));
+  let tags = $state([...options.tags]);
   let cursorPosition: number = 0;
   let onWarning: boolean = $state<boolean>(false);
   let warningText = $state("");
@@ -730,7 +730,7 @@
                   id: "",
                   pubkey: signPubkey,
                   content: text ?? "",
-                  tags: [...tags],
+                  tags: tags,
                   kind: initOptions.kind,
                   created_at: now(),
                 }}
