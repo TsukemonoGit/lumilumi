@@ -67,14 +67,14 @@ async function adjustImageQuality(
   file: File,
   quality: number
 ): Promise<ProcessedImageInfo> {
-  if (quality === 100) {
-    return {
-      file,
-      originalSize: file.size,
-      processedSize: file.size,
-      quality: 100,
-    };
-  }
+  // if (quality === 100) {
+  //   return {
+  //     file,
+  //     originalSize: file.size,
+  //     processedSize: file.size,
+  //     quality: 100,
+  //   };
+  // }
   if (file.type === "image/jpeg" || file.type === "image/jpg") {
     // JPG処理
     return await processJpg(file, quality);
