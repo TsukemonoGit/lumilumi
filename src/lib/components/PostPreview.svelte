@@ -193,106 +193,99 @@
   };
 </script>
 
-{#if signPubkey}<NoteComponent
-    warningText={onWarning ? warningText : undefined}
-  >
-    {#snippet icon()}
+<NoteComponent warningText={onWarning ? warningText : undefined}>
+  {#snippet icon()}
+    {#if signPubkey}
       <UserPopupMenu
-        pubkey={signPubkey || ""}
+        pubkey={signPubkey}
         {metadata}
         size={40}
         displayMenu={false}
         depth={0}
         tieKey={undefined}
-      />
-    {/snippet}
+      />{/if}
+  {/snippet}
 
-    {#snippet name()}
-      <ProfileDisplay pubkey={signPubkey || ""} {metadata} />
-    {/snippet}
+  {#snippet name()}
+    {#if signPubkey}
+      <ProfileDisplay pubkey={signPubkey} {metadata} />{/if}
+  {/snippet}
 
-    {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
-          pubkey={signPubkey}
-          tieKey={undefined}
-        />{/if}
-    {/snippet}
-    {#snippet replyUser()}
-      {#if replyUsers.length > 0}
-        <ReplyTo
-          >{#each replyUsers as user}
-            <UserName pubhex={user} />
-          {/each}</ReplyTo
-        >{/if}
-    {/snippet}
-    {#snippet reply()}
-      {#if replyTag || replyUsers.length > 0}
-        <Reply
-          {replyTag}
-          {displayMenu}
-          depth={depth + 1}
-          {repostable}
-          {tieKey}
-        />
+  {#snippet status()}
+    {#if lumiSetting.get().showUserStatus}<ShowStatus
+        pubkey={signPubkey}
+        tieKey={undefined}
+      />{/if}
+  {/snippet}
+  {#snippet replyUser()}
+    {#if replyUsers.length > 0}
+      <ReplyTo
+        >{#each replyUsers as user}
+          <UserName pubhex={user} />
+        {/each}</ReplyTo
+      >{/if}
+  {/snippet}
+  {#snippet reply()}
+    {#if replyTag || replyUsers.length > 0}
+      <Reply {replyTag} {displayMenu} depth={depth + 1} {repostable} {tieKey} />
+    {/if}
+  {/snippet}
+  {#snippet content()}<!--ここのしょりによってたぐにpが追加されたりするのか？pがないnostr:noteとかにpをつけるquoteUsers に入れて渡す-->
+
+    <Truncate {maxHeight} {onClickShowMore} {depth}>
+      {#each parts as part}{#if part.type === "nip19"}{@const decoded =
+            nip19Decode(part.url)}
+
+          {#if decoded}
+            <DecodedContent
+              {maxHeight}
+              {decoded}
+              content={part.content}
+              {displayMenu}
+              depth={depth + 1}
+              {repostable}
+              {tieKey}
+              {zIndex}
+            />{:else}<span class="break-all">{part.content}</span>{/if}
+        {:else if part.type === "url"}
+          <UrlDisplay {part} {openModal} />
+        {:else if part.type === "emoji"}
+          <CustomEmoji {part} />
+        {:else if part.type === "hashtag"}
+          <a
+            aria-label={"Search for events containing the hashtag"}
+            href={`/search?t=${part.url}`}
+            class="underline text-magnum-300 break-all">#{part.content}</a
+          >
+        {:else if part.type === "relay"}
+          <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
+            >{part.content}</a
+          >
+        {:else if part.type === "nip"}
+          <Link
+            props={{ "aria-label": `External Links: ${part.url}` }}
+            className="underline text-magnum-300 break-all hover:opacity-80"
+            href={part.url ?? ""}>{part.content}</Link
+          >{:else if part.type === "invoice" && part.content}
+          <InvoiceCard invoice={part.content} />
+        {:else}<span
+            class="whitespace-pre-wrap break-words"
+            style="word-break: break-word;">{part.content}</span
+          >{/if}{/each}
+      <ClientTag {tags} isShowClientTag={true} {depth} />
+      {#if geohash}
+        <Geohash {geohash} />{/if}
+      {#if proxy}
+        <ProxyTag proxyTag={proxy} />
       {/if}
-    {/snippet}
-    {#snippet content()}<!--ここのしょりによってたぐにpが追加されたりするのか？pがないnostr:noteとかにpをつけるquoteUsers に入れて渡す-->
-
-      <Truncate {maxHeight} {onClickShowMore} {depth}>
-        {#each parts as part}{#if part.type === "nip19"}{@const decoded =
-              nip19Decode(part.url)}
-
-            {#if decoded}
-              <DecodedContent
-                {maxHeight}
-                {decoded}
-                content={part.content}
-                {displayMenu}
-                depth={depth + 1}
-                {repostable}
-                {tieKey}
-                {zIndex}
-              />{:else}<span class="break-all">{part.content}</span>{/if}
-          {:else if part.type === "url"}
-            <UrlDisplay {part} {openModal} />
-          {:else if part.type === "emoji"}
-            <CustomEmoji {part} />
-          {:else if part.type === "hashtag"}
-            <a
-              aria-label={"Search for events containing the hashtag"}
-              href={`/search?t=${part.url}`}
-              class="underline text-magnum-300 break-all">#{part.content}</a
-            >
-          {:else if part.type === "relay"}
-            <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
-              >{part.content}</a
-            >
-          {:else if part.type === "nip"}
-            <Link
-              props={{ "aria-label": `External Links: ${part.url}` }}
-              className="underline text-magnum-300 break-all hover:opacity-80"
-              href={part.url ?? ""}>{part.content}</Link
-            >{:else if part.type === "invoice" && part.content}
-            <InvoiceCard invoice={part.content} />
-          {:else}<span
-              class="whitespace-pre-wrap break-words"
-              style="word-break: break-word;">{part.content}</span
-            >{/if}{/each}
-        <ClientTag {tags} isShowClientTag={true} {depth} />
-        {#if geohash}
-          <Geohash {geohash} />{/if}
-        {#if proxy}
-          <ProxyTag proxyTag={proxy} />
-        {/if}
-      </Truncate>
-      {#if kind === 42}
-        {@const heyaId = tags.find(
-          (tag) => tag[0] === "e" && tag[3] === "root"
-        )?.[1]}
-        <ChannelTag {heyaId} {tieKey} />{/if}
-    {/snippet}
-  </NoteComponent>
-{/if}
+    </Truncate>
+    {#if kind === 42}
+      {@const heyaId = tags.find(
+        (tag) => tag[0] === "e" && tag[3] === "root"
+      )?.[1]}
+      <ChannelTag {heyaId} {tieKey} />{/if}
+  {/snippet}
+</NoteComponent>
 
 <Dialog bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
