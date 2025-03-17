@@ -9,6 +9,9 @@
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import { viewport } from "$lib/func/useViewportAction";
+  import { page } from "$app/state";
+  import { loginUser } from "$lib/stores/stores";
+  import OmittedCard from "./EventCard/OmittedCard.svelte";
 
   interface Props {
     id: string;
@@ -21,6 +24,7 @@
     tieKey: string | undefined;
     relayhint?: string[] | undefined;
     zIndex?: number;
+    omit?: boolean;
   }
 
   let {
@@ -34,6 +38,7 @@
     tieKey,
     relayhint = undefined,
     zIndex,
+    omit = false,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
 
@@ -74,58 +79,69 @@
         >
       {/snippet}
       {#snippet content({ data: text, status })}
-        <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
-          {#snippet loading()}
-            <EventCard
-              note={text}
-              {mini}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {tieKey}
-              {zIndex}
-            />
-          {/snippet}
-          {#snippet nodata()}
-            <EventCard
-              note={text}
-              {mini}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {tieKey}
-              {zIndex}
-            />
-          {/snippet}
-          {#snippet error()}
-            <EventCard
-              note={text}
-              {mini}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {tieKey}
-              {zIndex}
-            />
-          {/snippet}
-          {#snippet content({ metadata })}
-            <EventCard
-              note={text}
-              {metadata}
-              {mini}
-              {maxHeight}
-              {thread}
-              {displayMenu}
-              {depth}
-              {repostable}
-              {tieKey}
-              {zIndex}
-            />
-          {/snippet}
-        </Metadata>
+        {#if omit && text.pubkey === $loginUser}
+          <OmittedCard
+            {text}
+            {depth}
+            {repostable}
+            {maxHeight}
+            {displayMenu}
+            {tieKey}
+            {zIndex}
+          />
+        {:else}
+          <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
+            {#snippet loading()}
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+                {zIndex}
+              />
+            {/snippet}
+            {#snippet nodata()}
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+                {zIndex}
+              />
+            {/snippet}
+            {#snippet error()}
+              <EventCard
+                note={text}
+                {mini}
+                {maxHeight}
+                {thread}
+                {depth}
+                {repostable}
+                {tieKey}
+                {zIndex}
+              />
+            {/snippet}
+            {#snippet content({ metadata })}
+              <EventCard
+                note={text}
+                {metadata}
+                {mini}
+                {maxHeight}
+                {thread}
+                {displayMenu}
+                {depth}
+                {repostable}
+                {tieKey}
+                {zIndex}
+              />
+            {/snippet}
+          </Metadata>{/if}
       {/snippet}
     </Text>
   {:else}
