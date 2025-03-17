@@ -35,7 +35,8 @@
     },
     "post": {
       "addClientTag": "Add client tag (via) to post",
-      "defaultReaction": "Default Reaction"
+      "defaultReaction": "Default Reaction",
+      "picQuarity": "Upload Photo Quality (JPG Only)"
     },
     "douki": {
       "title": "Sync"

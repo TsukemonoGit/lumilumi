@@ -56,6 +56,7 @@ export const initSettings: LumiSetting = {
     content: "+",
     tag: [],
   },
+  picQuarity: 100,
   showImg: false,
   embed: true,
   menuleft: false,

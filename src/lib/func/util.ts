@@ -10,6 +10,7 @@ import { nip19 } from "nostr-tools";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
 import { urlRegex } from "./regex";
+import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
 export let noReactionKind = [3, 10000, 30000];
 
@@ -172,13 +173,13 @@ export async function filesUpload(
       console.log(header);
       console.log(serverConfig.api_url);
       console.log(file.type);
-      const response: FileUploadResponse = await uploadFile(
-        file,
-        serverConfig.api_url,
-        header,
-        { content_type: file.type },
-        signal // signal を渡す
-      );
+      const response: FileUploadResponse = await uploadFile(file, {
+        serverApiUrl: serverConfig.api_url,
+        nip98AuthorizationHeader: header,
+        optionalFormDataFields: { content_type: file.type },
+        imageQuality: lumiSetting.get().picQuarity,
+        signal: signal, // signal を渡す
+      });
       console.log(response);
       res.push(response);
     } catch (error: any) {
@@ -216,17 +217,17 @@ export async function fileUpload(
       async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
       true
     );
-    console.log(file);
-    console.log(header);
-    console.log(serverConfig.api_url);
-    console.log(file.type);
-    const response: FileUploadResponse = await uploadFile(
-      file,
-      serverConfig.api_url,
-      header,
-      { content_type: file.type },
-      signal // signal を渡す
-    );
+    // console.log(file);
+    //console.log(header);
+    // console.log(serverConfig.api_url);
+    //console.log(file.type);
+    const response: FileUploadResponse = await uploadFile(file, {
+      serverApiUrl: serverConfig.api_url,
+      nip98AuthorizationHeader: header,
+      optionalFormDataFields: { content_type: file.type },
+      signal: signal, // signal を渡す
+      imageQuality: lumiSetting.get().picQuarity,
+    });
     console.log(response);
     res.push(response);
   } catch (error: any) {

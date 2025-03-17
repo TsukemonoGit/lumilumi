@@ -1,13 +1,24 @@
-import { describe, it } from "vitest";
-import { removeExif } from "./upload";
+import { describe, it, test } from "vitest";
+import { checkImageQuality, formatFileSize, removeExif } from "./upload";
 import fs from "fs";
 import path from "path";
+
+test("画質調整の結果を確認するだけ（アップロードしない）", async () => {
+  const filePath = path.resolve(__dirname, "test.png");
+  const file = readTestFile(filePath);
+  // 画質調整の結果を確認するだけ（アップロードしない）
+  const checkResult = await checkImageQuality(file, 50);
+  console.log(`元のサイズ: ${formatFileSize(checkResult.originalSize)}`);
+  console.log(checkResult);
+});
 
 function readTestFile(filePath: string): File {
   const buffer = fs.readFileSync(filePath);
   const blob = new Blob([buffer], { type: "image/jpeg" });
   return new File([blob], path.basename(filePath), { type: "image/jpeg" });
 }
+/* 
+
 
 function readTestPNGFile(filePath: string): File {
   const buffer = fs.readFileSync(filePath);
@@ -56,3 +67,4 @@ describe("uploadFile", () => {
     console.log("メタデータが削除されたファイルがダウンロードされました");
   });
 });
+ */
