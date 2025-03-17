@@ -104,13 +104,6 @@
     if (text || tags) {
       untrack(async () => {
         parts = await parseText(text, tags);
-      });
-    }
-  });
-
-  $effect(() => {
-    if (parts) {
-      untrack(() => {
         parts
           .filter((part) => part.type === "nip19")
           .forEach((part) => addUserTag(nip19Decode(part.url)));
