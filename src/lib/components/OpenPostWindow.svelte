@@ -691,7 +691,7 @@
 
   const addUsr = (usr: string | undefined) => {
     if (!usr) return;
-    console.log(usr);
+    if (initOptions?.addableUserList?.includes(usr)) return;
     initOptions = {
       ...initOptions,
       addableUserList: Array.from(
