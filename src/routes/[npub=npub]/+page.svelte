@@ -128,12 +128,12 @@
       view = true;
     }
   });
-  beforeNavigate((navigate) => {
-    //console.log("beforeNavigate", navigate.type);
-    if (navigate.type !== "form") {
-      $value = "post";
-    }
-  });
+  // beforeNavigate((navigate) => {
+  //   //console.log("beforeNavigate", navigate.type);
+  //   if (navigate.type !== "form") {
+  //     $value = "post";
+  //   }
+  // });
   async function init() {
     console.log(page.url.hash);
     const hash = triggers.find((t) => `#${t.id}` === page.url.hash);
