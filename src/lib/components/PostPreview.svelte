@@ -30,6 +30,7 @@
   import { untrack } from "svelte";
   import type { DecodeResult } from "nostr-tools/nip19";
 
+  // Props definition
   interface Props {
     tags: string[][];
     text: string;
@@ -37,9 +38,11 @@
     warningText: string;
     signPubkey: string | undefined;
     kind: number;
-    addUsr: (usr: string | undefined) => void;
+    addUser: (usr: string | undefined) => void;
     replyUsers: string[];
   }
+
+  // Initialize props
   let {
     tags,
     text,
@@ -48,8 +51,10 @@
     signPubkey,
     kind,
     replyUsers,
-    addUsr,
+    addUser,
   }: Props = $props();
+
+  // Constants
   const displayMenu = false;
   const mini = false;
   const depth = 0;
@@ -58,7 +63,12 @@
   const zIndex = 50;
   const maxHeight = undefined;
 
-  let metadata: Nostr.Event | undefined = $derived(
+  // State
+  let parts: Part[] = $state([]);
+  let showMore: Writable<boolean> = $state(writable(false));
+
+  // Computed values
+  let metadata = $derived(
     signPubkey
       ? (
           queryClient?.getQueryData([
@@ -69,26 +79,27 @@
       : undefined
   );
 
-  // Process reply tags
   let replyTag = $derived.by(() => {
     if ([1, 42, 4, 1111].includes(kind) && tags.length > 0) {
-      const res = replyedEvent(tags, kind);
-
-      return res.replyTag;
+      return replyedEvent(tags, kind).replyTag;
     }
     return undefined;
   });
 
-  // svelte-ignore non_reactive_update
-  let showMore: Writable<boolean> = writable(false);
+  let mediaList = $derived(
+    parts
+      .filter((part) => part.type === "url")
+      .map((p) => p.url)
+      .filter((url) => url !== undefined)
+  );
 
-  const onClickShowMore = () => {
-    console.log("showMore");
-    $showMore = true;
-  };
+  let geohash = $derived(
+    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
+  );
 
-  let parts: Part[] = $state([]);
-  //プレビューにも使ってるからconstだとだめ
+  let proxy = $derived(tags.find((item) => item[0] === "proxy"));
+
+  // Effects
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
@@ -97,79 +108,88 @@
     }
   });
 
-  let mediaList = $derived(
-    parts
-      .filter((part) => part.type === "url")
-      .map((p) => p.url)
-      .filter((t) => t !== undefined)
-  );
-
-  const openModal = (index: number) => {
-    $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
-    console.log(index, $state.snapshot(mediaList));
-  };
-
-  const nip19Decode = (
-    content: string | undefined
-  ):
-    | { type: "naddr"; data: nip19.AddressPointer }
-    | { type: "nevent"; data: nip19.EventPointer }
-    | { type: "nprofile"; data: nip19.ProfilePointer }
-    | { type: "note" | "npub"; data: string }
-    | { type: "nsec"; data: Uint8Array }
-    | undefined => {
-    if (content === undefined) {
-      return undefined;
-    }
-    console.log("content", content);
-    try {
-      const decoded: nip19.DecodeResult = nip19.decode(content);
-
-      if (decoded.type === "naddr") {
-        return {
-          type: decoded.type,
-          data: decoded.data as nip19.AddressPointer,
-        };
-      } else if (decoded.type === "nevent") {
-        return { type: decoded.type, data: decoded.data as nip19.EventPointer };
-      } else if (decoded.type === "nprofile") {
-        return {
-          type: decoded.type,
-          data: decoded.data as nip19.ProfilePointer,
-        };
-      } else if (decoded.type === "nsec") {
-        return { type: decoded.type, data: decoded.data as Uint8Array };
-      } else {
-        return { type: decoded.type, data: decoded.data as string };
-      }
-    } catch (error) {
-      console.error("NIP-19 Decode Error:", error); // Log the error
-      return undefined;
-    }
-  };
-
-  let geohash = $derived(
-    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
-  ); // string | undefined
-  let proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
   $effect(() => {
     if (parts) {
       untrack(() => {
         parts
           .filter((part) => part.type === "nip19")
-          .map((part) => addUserTag(nip19Decode(part.url)));
+          .forEach((part) => addUserTag(nip19Decode(part.url)));
       });
     }
   });
+
+  // Helper functions
+  const nip19Decode = (
+    content: string | undefined
+  ): DecodeResult | undefined => {
+    if (!content) return undefined;
+
+    try {
+      const decoded: nip19.DecodeResult = nip19.decode(content);
+
+      switch (decoded.type) {
+        case "naddr":
+          return {
+            type: decoded.type,
+            data: decoded.data as nip19.AddressPointer,
+          };
+        case "nevent":
+          return {
+            type: decoded.type,
+            data: decoded.data as nip19.EventPointer,
+          };
+        case "nprofile":
+          return {
+            type: decoded.type,
+            data: decoded.data as nip19.ProfilePointer,
+          };
+        case "nsec":
+          return {
+            type: decoded.type,
+            data: decoded.data as Uint8Array,
+          };
+        default:
+          return {
+            type: decoded.type,
+            data: decoded.data as string,
+          };
+      }
+    } catch (error) {
+      console.error("NIP-19 Decode Error:", error);
+      return undefined;
+    }
+  };
+
   const addUserTag = (decode: DecodeResult | undefined) => {
     if (!decode) return;
-    if (decode.type === "naddr" || decode.type === "nprofile") {
-      addUsr(decode.data.pubkey);
-    } else if (decode.type === "nevent") {
-      addUsr(decode.data.author);
-    } else if (decode.type === "npub") {
-      addUsr(decode.data);
+
+    switch (decode.type) {
+      case "naddr":
+      case "nprofile":
+        addUser(decode.data.pubkey);
+        break;
+      case "nevent":
+        addUser(decode.data.author);
+        break;
+      case "npub":
+        addUser(decode.data);
+        break;
+      default:
+        break;
     }
+  };
+
+  const onClickShowMore = () => {
+    console.log("showMore");
+    $showMore = true;
+  };
+
+  const openModal = (index: number) => {
+    $viewMediaModal = {
+      index: index,
+      mediaList: $state.snapshot(mediaList),
+    };
+    console.log(index, $state.snapshot(mediaList));
   };
 </script>
 

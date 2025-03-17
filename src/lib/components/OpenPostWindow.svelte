@@ -32,7 +32,6 @@
   import { contentCheck } from "$lib/func/contentCheck";
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
-
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import {
     filesUpload,
@@ -65,23 +64,46 @@
   import PostPreview from "./PostPreview.svelte";
   import { untrack } from "svelte";
 
+  // ----------------------------------------
+  // Component Props
+  // ----------------------------------------
   interface Props {
-    //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
     options?: DefaultPostOptions;
     propSignPubkey?: string | undefined;
     visible?: boolean;
   }
+
   let {
     options = {
       tags: [],
       kind: 1,
       content: "",
     },
-    propSignPubkey, //画像共有のときに画像をアップするときにsignPub取得するからその時にある
-    visible = true, //ポストアイコン非表示だけど返信とかはできる
+    propSignPubkey,
+    visible = true,
   }: Props = $props();
+
+  // ----------------------------------------
+  // Constants
+  // ----------------------------------------
   const zIndex = 50;
-  const bulkReplyThreshold = 30; // 30人以上でクソでか人数ライン
+  const bulkReplyThreshold = 30;
+
+  // ----------------------------------------
+  // Dialog Setup
+  // ----------------------------------------
+  const { elements, states } = createDialog({
+    forceVisible: true,
+    closeOnOutsideClick: false,
+    escapeBehavior: "ignore",
+  });
+
+  const { trigger, overlay, content, close, portalled } = elements;
+  const { open } = states;
+
+  // ----------------------------------------
+  // State Management
+  // ----------------------------------------
   let text: string = $state(options.content ?? "");
   let tags: string[][] = $state([...options.tags]);
   let cursorPosition: number = 0;
@@ -89,175 +111,91 @@
   let warningText = $state("");
   let customReaction: string = $state("");
   let viewCustomEmojis: boolean = $state<boolean>(false);
-  const selectedUploader: Writable<string> = writable();
-  let files: FileList | undefined = $state();
-  let fileInput: HTMLInputElement | undefined = $state();
+  let viewMetadataList: boolean = $state(false);
+  let inputMetadata: string = $state("");
+  let metadata: Nostr.Event | undefined = $state(undefined);
+  let additionalReplyUsers: string[] = $state([]);
+  let clickEscape: number = $state(0);
+  let signPubkey: string | undefined = $state();
+  let isPosting: boolean = $state(false);
+  let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
   let initOptions: MargePostOptions = $state({
     ...options,
     kind: options.kind ?? 1,
   });
-  const { elements, states } = createDialog({
-    forceVisible: true,
-    closeOnOutsideClick: false, //overlay押したときに閉じない
 
-    escapeBehavior: "ignore",
-  });
-  const { trigger, overlay, content, close, portalled } = elements;
-  const { open } = states;
-
-  //$: console.log(initOptions.tags);
-  let metadata: Nostr.Event | undefined = $state(undefined);
-
-  let additionalReplyUsers: string[] = $state([]);
-  let clickEscape: number = $state(0);
-  let signPubkey: string | undefined = $state();
+  // DOM references
   let textarea: HTMLTextAreaElement | undefined = $state();
   let warningTextarea: HTMLInputElement | undefined = $state();
+  let emojiInput: HTMLInputElement | undefined = $state();
+  let metadataInput: HTMLInputElement | undefined = $state();
+  let fileInput: HTMLInputElement | undefined = $state();
 
+  // File handling
+  let files: FileList | undefined = $state();
+  let uploadAbortController: AbortController | null = $state(null);
+
+  // Event preparation
+  let newev: Nostr.EventParameters | undefined;
+
+  // Derived data
+  let metadataList: MetadataList = $derived.by(() => {
+    if (!viewMetadataList) return {};
+
+    try {
+      const metadataStr = localStorage.getItem("metadata");
+      if (!metadataStr) return {};
+
+      const metadataQueryData: [QueryKey, EventPacket][] =
+        JSON.parse(metadataStr);
+      return getMetadataList(metadataQueryData);
+    } catch (error) {
+      return {};
+    }
+  });
+
+  // Stores
+  const selectedUploader: Writable<string> = writable();
+
+  // Dialog handlers
+  let openConfirm: (bool: boolean) => void = () => {};
+  let openHellConfirm: (bool: boolean) => void;
+
+  // ----------------------------------------
+  // User Authentication
+  // ----------------------------------------
   async function getSignPubkey() {
     if (propSignPubkey) {
-      //共有からポストウィンドウを開いたとき
       signPubkey = propSignPubkey;
       return;
     }
+
     $nowProgress = true;
+
     try {
       const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
 
       if (pub) {
-        console.log(pub);
         signPubkey = pub;
-
         metadata = (
           queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
         )?.event;
       }
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "failed to get sign pubkey",
-        color: "bg-red-500",
-      };
+      showToast("Error", "Failed to get sign pubkey", "bg-red-500");
+    } finally {
+      $nowProgress = false;
     }
-    $nowProgress = false;
   }
 
-  // アップロードキャンセル用のコントローラーを作成
-  let uploadAbortController: AbortController | null = $state(null);
-
-  let isPosting: boolean = $state(false);
-  // svelte-ignore non_reactive_update
-  let openHellConfirm: (bool: boolean) => void;
-  let newev: Nostr.EventParameters | undefined;
-
-  const postNote = async () => {
-    if (text.trim().length <= 0) return;
-
-    const { text: checkedText, tags: checkedTags } = contentCheck(
-      text.trim(),
-      tags
-    );
-    if (onWarning) checkedTags.push(["content-warning", warningText]);
-    if (additionalReplyUsers.length > 0) {
-      const replyUsersArray: string[][] = additionalReplyUsers.map((user) => [
-        "p",
-        user,
-      ]);
-      checkedTags.push(...replyUsersArray);
-    }
-    if (lumiSetting.get().addClientTag) {
-      checkedTags.push(clientTag);
-    }
-
-    newev = {
-      kind: initOptions.kind,
-      content: checkedText,
-      tags: checkedTags,
-    };
-    //くそながpタグチェック
-    const plen = checkedTags.filter((tag) => tag[0] === "p").length;
-    if (plen > bulkReplyThreshold) {
-      //pが長いけど送信していいかのチェック画面
-      openHellConfirm(true);
-      return;
-    }
-    await sendEvent();
-  };
-
-  async function sendEvent() {
-    if (!newev) {
-      return;
-    }
-    isPosting = true;
-    $nowProgress = true;
-    const signer = nip07Signer();
-    try {
-      const event = await signer.signEvent($state.snapshot(newev));
-      console.log(event);
-      //publishEvent(newev);
-
-      const { event: ev, res } = await promisePublishSignedEvent(event);
-      console.log(res);
-
-      const isSuccessRelays: string[] = res
-        .filter((item) => item.ok)
-        .map((item) => normalizeRelayURL(item.from));
-      const isFailedRelays = res
-        .filter((item) => !item.ok)
-        .map((item) => normalizeRelayURL(item.from));
-
-      // let str = generateResultMessage(isSuccessRelays, isFailedRelays);
-
-      const writeRelays = getDefaultWriteRelays();
-
-      const pendingRelays = writeRelays.filter(
-        (relay) =>
-          !isSuccessRelays.includes(relay) && !isFailedRelays.includes(relay)
-      );
-      console.log(pendingRelays);
-      // if (pendingRelays.length > 0) {
-      //   str = str + `\nPending\n${pendingRelays.join("\n")}`;
-      // }
-      // $toastSettings = {
-      //   title: isSuccessRelays.length > 0 ? "Success" : "Failed",
-      //   description: str,
-      //   color: isSuccessRelays.length > 0 ? "bg-green-500" : "bg-red-500",
-      // };
-      if (isSuccessRelays.length <= 0) {
-        //再送チャレンジ
-        const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
-
-        const isSuccessRelays2: string[] = res2
-          .filter((item) => item.ok)
-          .map((item) => normalizeRelayURL(item.from));
-        if (isSuccessRelays2.length <= 0) {
-          $toastSettings = {
-            title: "Failed",
-            description: "failed to publish",
-            color: "bg-red-500",
-          };
-        }
-      } else {
-        //成功したときだけ閉じる
-        $open = false;
-      }
-
-      $nowProgress = false;
-      isPosting = false;
-    } catch (error) {
-      console.log(error);
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to publish",
-        color: "bg-red-500",
-      };
-      $nowProgress = false;
-      isPosting = false;
-    }
-    newev = undefined;
+  // ----------------------------------------
+  // Utility Functions
+  // ----------------------------------------
+  function showToast(title: string, description: string, color: string) {
+    $toastSettings = { title, description, color };
   }
 
-  const resetState = () => {
+  function resetState() {
     text = options.content ?? "";
     tags = [...options.tags];
     warningText = "";
@@ -268,219 +206,325 @@
     initOptions = { ...options, kind: options.kind ?? 1 };
     viewMetadataList = false;
     inputMetadata = "";
-  };
-  // カスタム絵文字チェックの処理を追加
-  const checkCustomEmojis = (text: string) => {
-    const emojiMatches = text.match(/:[a-zA-Z0-9_]+:/g);
-    if (emojiMatches) {
-      emojiMatches.forEach((emoji) => {
-        const emojiName = emoji.slice(1, -1);
-        const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-        if (customEmoji) {
-          addEmojiTag(customEmoji);
-        }
-      });
-    }
-  };
-  const handleTextareaInput = (event: Event) => {
-    const target = event.target as HTMLTextAreaElement;
-    cursorPosition = target.selectionStart;
+  }
 
-    //checkCustomEmojis(text);
-  };
-  const addEmojiTag = (emoji: string[]) => {
-    // 1. URLが同じ絵文字を探す
+  // ----------------------------------------
+  // Tag Management
+  // ----------------------------------------
+  function addEmojiTag(emoji: string[]) {
+    const emojiCopy = [...emoji];
+
+    // Check for emoji with same URL
     const sameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
+      (tag) => tag[0] === "emoji" && tag[2] === emojiCopy[1]
     );
 
     if (sameEmoji) {
-      // 同じURLの絵文字があれば、その名前を使う
-      emoji[0] = sameEmoji[1];
+      emojiCopy[0] = sameEmoji[1];
     }
 
-    // 2. 同じ名前の絵文字があるか確認
+    // Check for emoji with same name
     const sameNameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+      (tag) => tag[0] === "emoji" && tag[1] === emojiCopy[0]
     );
 
-    // 3. 絵文字の条件に従って追加処理
     if (sameNameEmoji) {
-      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
-      if (sameNameEmoji[2] !== emoji[1]) {
-        emoji[0] = `${emoji[0]}_`;
-        tags.push(["emoji", ...emoji]);
+      // If name exists but URL is different, append underscore and add
+      if (sameNameEmoji[2] !== emojiCopy[1]) {
+        emojiCopy[0] = `${emojiCopy[0]}_`;
+        tags.push(["emoji", ...emojiCopy]);
       }
-      // 完全に同じ名前・URLの絵文字がある場合は何もしない
+      // If name and URL are identical, do nothing
     } else {
-      // 同じ名前もURLもない場合、新しい絵文字として追加
-      tags.push(["emoji", ...emoji]);
+      // New emoji, add to tags
+      tags.push(["emoji", ...emojiCopy]);
     }
-  };
-  const handleClickEmoji = (e: string[]) => {
+  }
+
+  function checkCustomEmojis(input: string) {
+    const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
+
+    if (!emojiMatches) return;
+
+    emojiMatches.forEach((emoji) => {
+      const emojiName = emoji.slice(1, -1);
+      const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
+
+      if (customEmoji) {
+        addEmojiTag(customEmoji);
+      }
+    });
+  }
+
+  // ----------------------------------------
+  // Event Publishing
+  // ----------------------------------------
+  async function postNote() {
+    if (text.trim().length <= 0) return;
+
+    const { text: checkedText, tags: checkedTags } = contentCheck(
+      text.trim(),
+      tags
+    );
+
+    // Add warning tag if needed
+    if (onWarning) {
+      checkedTags.push(["content-warning", warningText]);
+    }
+
+    // Add additional reply users
+    if (additionalReplyUsers.length > 0) {
+      const replyUsersArray = additionalReplyUsers.map((user) => ["p", user]);
+      checkedTags.push(...replyUsersArray);
+    }
+
+    // Add client tag if enabled in settings
+    if (lumiSetting.get().addClientTag) {
+      checkedTags.push(clientTag);
+    }
+
+    // Create event parameters
+    newev = {
+      kind: initOptions.kind,
+      content: checkedText,
+      tags: checkedTags,
+    };
+
+    // Check for bulk replies
+    const pTagCount = checkedTags.filter((tag) => tag[0] === "p").length;
+    if (pTagCount > bulkReplyThreshold) {
+      openHellConfirm(true);
+      return;
+    }
+
+    await sendEvent();
+  }
+
+  async function sendEvent() {
+    if (!newev) return;
+
+    isPosting = true;
+    $nowProgress = true;
+    const signer = nip07Signer();
+
+    try {
+      const event = await signer.signEvent($state.snapshot(newev));
+      const { event: ev, res } = await promisePublishSignedEvent(event);
+
+      const successRelays = res
+        .filter((item) => item.ok)
+        .map((item) => normalizeRelayURL(item.from));
+
+      const failedRelays = res
+        .filter((item) => !item.ok)
+        .map((item) => normalizeRelayURL(item.from));
+
+      // If no successful relays, try once more
+      if (successRelays.length <= 0) {
+        const { event: ev, res: res2 } = await promisePublishSignedEvent(event);
+
+        const successRelays2 = res2
+          .filter((item) => item.ok)
+          .map((item) => normalizeRelayURL(item.from));
+
+        if (successRelays2.length <= 0) {
+          showToast("Failed", "Failed to publish", "bg-red-500");
+        } else {
+          $open = false;
+        }
+      } else {
+        $open = false;
+      }
+    } catch (error) {
+      console.log(error);
+      showToast("Failed", "Failed to publish", "bg-red-500");
+    } finally {
+      $nowProgress = false;
+      isPosting = false;
+      newev = undefined;
+    }
+  }
+
+  // ----------------------------------------
+  // Text Handling
+  // ----------------------------------------
+  function handleTextareaInput(event: Event) {
+    const target = event.target as HTMLTextAreaElement;
+    cursorPosition = target.selectionStart;
+  }
+
+  function insertTextAtCursor(insertText: string) {
+    text =
+      text.slice(0, cursorPosition) + insertText + text.slice(cursorPosition);
+    cursorPosition += insertText.length;
+
+    // Focus and move cursor
+    textarea?.focus();
+    setTimeout(() => {
+      textarea?.setSelectionRange(cursorPosition, cursorPosition);
+    }, 0);
+  }
+
+  function handleClickEmoji(e: string[]) {
     const emoji = [...e];
     addEmojiTag(emoji);
-    // 絵文字をテキストに追加
+
     const emojiText = `:${emoji[0]}:`;
-    text =
-      text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
-    cursorPosition += emojiText.length;
+    insertTextAtCursor(emojiText);
+  }
 
-    // カーソル位置を更新
-    textarea?.focus();
-    () => {
-      textarea?.setSelectionRange(cursorPosition, cursorPosition);
-    };
-  };
+  function handleClickUser(pub: string): Promise<void> {
+    const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
+    insertTextAtCursor(emojiText);
+    viewMetadataList = false;
 
-  const handleFileUpload = async (fileList: FileList) => {
+    return Promise.resolve();
+  }
+
+  function handleClickQuote() {
+    insertTextAtCursor(" nostr:");
+  }
+
+  // ----------------------------------------
+  // File Upload
+  // ----------------------------------------
+  async function handleFileUpload(fileList: FileList) {
     if (!fileList || fileList.length <= 0 || !$uploader) {
       $nowProgress = false;
       return;
     }
+
     $nowProgress = true;
 
-    // 既存のアップロードがある場合はキャンセルする
+    // Cancel existing upload if any
     if (uploadAbortController) {
       uploadAbortController.abort();
     }
 
-    // 新しいアップロード用のAbortControllerを作成
+    // Create new abort controller
     uploadAbortController = new AbortController();
 
     try {
-      const uploadedURPs: FileUploadResponse[] = await filesUpload(
+      const uploadedURPs = await filesUpload(
         fileList,
         $uploader,
-        uploadAbortController.signal // アップロード中断のシグナルを渡す
+        uploadAbortController.signal
       );
 
-      console.log(uploadedURPs);
-
-      // 非同期処理を待つPromise配列
+      // Process each uploaded file
       const promises = uploadedURPs.map(async (data) => {
-        if (data.status === "success") {
-          const url = data.nip94_event?.tags.find(
-            (tag) => tag[0] === "url"
-          )?.[1];
+        if (data.status !== "success") return;
 
-          if (url) {
-            const len = text.length; // ULR入れる前のカーソルの場所にカーソルおく
-            const urln = `\n${url}`;
+        const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+        if (!url) return;
 
-            // imetaをタグに入れる
-            if (data.nip94_event) {
-              tags.push(convertMetaTags(data.nip94_event));
-            }
-
-            text =
-              text.slice(0, cursorPosition) + urln + text.slice(cursorPosition);
-            cursorPosition = len;
-
-            // さらに10ms待機するPromise //確実にテキスト挿入完了してから次の処理をするため
-            await delay(10);
-
-            textarea?.focus();
-            setTimeout(() => {
-              if (textarea) textarea.selectionEnd = cursorPosition;
-            }, 0);
-          }
+        // Add metadata tags if available
+        if (data.nip94_event) {
+          tags.push(convertMetaTags(data.nip94_event));
         }
+
+        // Insert URL at cursor position
+        const urlText = `\n${url}`;
+        insertTextAtCursor(urlText);
+
+        // Wait to ensure text insertion completes
+        await delay(10);
       });
 
-      // すべての非同期処理が完了するのを待つ
       await Promise.all(promises);
     } catch (error) {
       console.log(error);
     } finally {
-      // 非同期処理がすべて完了した後に実行
       $nowProgress = false;
       uploadAbortController = null;
     }
-  };
-  // ドラッグ&ドロップのイベントハンドラ
-  const handleDrop = async (event: DragEvent) => {
-    event.preventDefault();
-    if (event.dataTransfer?.files) {
-      await handleFileUpload(event.dataTransfer.files);
-    }
-  };
-  const handleDragOver = (event: DragEvent) => {
-    event.preventDefault();
-  };
-  const onChangeHandler = async (e: Event): Promise<void> => {
-    console.log(e);
+  }
+
+  async function onChangeHandler(e: Event): Promise<void> {
     const _files = (e.target as HTMLInputElement).files;
     if (_files) {
       await handleFileUpload(_files);
     }
-  };
+  }
 
-  const paste = async (event: ClipboardEvent) => {
-    console.log("[paste]", event.type, event.clipboardData);
+  async function paste(event: ClipboardEvent) {
     if (!event.clipboardData) return;
 
+    // Handle image files in clipboard
     const files = Array.from(event.clipboardData.items)
       .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
       .map((item) => item.getAsFile())
       .filter((file): file is File => file !== null);
 
-    const fileList = new DataTransfer();
-    files.forEach((file) => fileList.items.add(file));
-    await handleFileUpload(fileList.files);
+    if (files.length > 0) {
+      const fileList = new DataTransfer();
+      files.forEach((file) => fileList.items.add(file));
+      await handleFileUpload(fileList.files);
+    }
 
-    // カスタム絵文字チェックの処理を追加
+    // Check for custom emojis in pasted text
     const pastedText = event.clipboardData.getData("text");
     if (pastedText) {
       checkCustomEmojis(pastedText);
     }
-  };
+  }
 
-  // svelte-ignore non_reactive_update
-  let openConfirm: (bool: boolean) => void = () => {};
+  function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer?.files) {
+      handleFileUpload(event.dataTransfer.files);
+    }
+  }
 
-  // オーバーレイクリック時の処理を追加
-  const handleOverlayClick = (event: MouseEvent) => {
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  // ----------------------------------------
+  // UI Interaction
+  // ----------------------------------------
+  function handleOverlayClick(event: MouseEvent) {
     if (text.trim().length > 0) {
-      // テキストエリアに入力がある場合、アラートを表示
       openConfirm?.(true);
     } else {
-      // テキストエリアが空の場合、ダイアログを閉じる
       $open = false;
     }
-  };
+  }
 
-  // キーボードショートカットの処理
-  const handleKeyDown = (event: KeyboardEvent) => {
+  function handleKeyDown(event: KeyboardEvent) {
+    // Submit on Ctrl+Enter
     if (event.ctrlKey && event.key === "Enter") {
       postNote();
+      return;
     }
-    // 矢印キーが押された場合にのみカーソル位置を更新
+
+    // Update cursor position on arrow keys
     if (
       ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)
     ) {
       setTimeout(() => {
-        // setTimeoutしないと古いカーソル位置を取得する可能性があるらしい
-        //setTimeout を使って次のイベントループサイクルにカーソル位置の更新を延期
-        //確実に最新のカーソル位置が cursorPosition に反映されるようになります。
         if (textarea) {
           cursorPosition = textarea.selectionStart;
         }
       }, 0);
     }
-  };
+  }
 
-  const keyboardShortcut = (event: KeyboardEvent) => {
+  function keyboardShortcut(event: KeyboardEvent) {
     event.preventDefault();
     const activeElement = document.activeElement;
+
+    // Handle Escape key
     if ($open === true && event.key === "Escape") {
       clickEscape++;
       if (clickEscape >= 2) {
         clickEscape = 0;
         $open = false;
       }
+      return;
     }
 
+    // Open post window with 'n' key when appropriate
     if (
       event.key === "n" &&
       $open === false &&
@@ -488,218 +532,166 @@
       !(activeElement instanceof HTMLTextAreaElement)
     ) {
       $open = true;
-      return;
     }
-  };
-
-  //--------------userlist
-  let metadataList: MetadataList = $derived.by(() => {
-    if (viewMetadataList) {
-      try {
-        const metadataStr = localStorage.getItem("metadata");
-        let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
-          ? JSON.parse(metadataStr)
-          : [];
-        return getMetadataList(metadataQueryData);
-      } catch (error) {
-        return {};
-      }
-    } else return {};
-  });
-
-  let viewMetadataList: boolean = $state(false);
-  let inputMetadata: string = $state("");
-  function checkUserInput(inputMetadata: string, arg1: UserData) {
-    if (inputMetadata === "") {
-      return true;
-    }
-    if (
-      (arg1.name &&
-        arg1.name.toLowerCase().includes(inputMetadata.toLowerCase())) ||
-      (arg1.display_name &&
-        arg1.display_name
-          .toLowerCase()
-          .includes(inputMetadata.toLowerCase())) ||
-      (arg1.nip05 &&
-        arg1.nip05.toLowerCase().includes(inputMetadata.toLowerCase())) ||
-      (arg1.petname &&
-        arg1.petname.toLowerCase().includes(inputMetadata.toLowerCase()))
-    ) {
-      return true;
-    }
-    return false;
   }
 
-  async function handleClickUser(pub: string): Promise<any> {
-    //tags.push(["p", nip19.decode(pub).data as string]);
-
-    const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
-    text =
-      text.slice(0, cursorPosition) + emojiText + text.slice(cursorPosition);
-    cursorPosition += emojiText.length;
-    viewMetadataList = false;
-
-    textarea?.focus();
-    setTimeout(() => {
-      textarea?.setSelectionRange(cursorPosition, cursorPosition);
-    });
-  }
-
-  let emojiInput: HTMLInputElement | undefined = $state();
-  let metadataInput: HTMLInputElement | undefined = $state();
-
-  const handleClickCustomReaction = () => {
+  function handleClickCustomReaction() {
     viewCustomEmojis = !viewCustomEmojis;
+
     if (viewCustomEmojis) {
       setTimeout(() => {
         emojiInput?.focus();
         emojiInput?.setSelectionRange(0, 0);
       });
     }
+
     if (viewMetadataList && viewCustomEmojis) {
       viewMetadataList = false;
     }
-  };
+  }
 
-  const handleClickMetadata = () => {
+  function handleClickMetadata() {
     viewMetadataList = !viewMetadataList;
+
     if (viewMetadataList) {
       setTimeout(() => {
         metadataInput?.focus();
         metadataInput?.setSelectionRange(0, 0);
       });
     }
+
     if (viewMetadataList && viewCustomEmojis) {
       viewCustomEmojis = false;
     }
-  };
+  }
 
-  postWindowOpen.subscribe((value) => {
-    if (value) {
-      const addOption = $state.snapshot($additionalPostOptions);
-      // console.log(addOption);
+  function checkUserInput(input: string, userData: UserData) {
+    if (input === "") return true;
 
-      if (addOption) {
-        // タグをコピー
+    const searchTerm = input.toLowerCase();
 
-        initOptions = {
-          ...options,
-          kind: addOption.kind ?? options.kind ?? 1,
-          //チャンネルからリプするときに optionsとadditional両方にrootがついてしまうので、ルートタグの重複をチェック
-          tags: (() => {
-            const combinedTags = options.tags.concat(addOption.tags);
-            let hasRoot = false;
+    return (
+      (userData.name && userData.name.toLowerCase().includes(searchTerm)) ||
+      (userData.display_name &&
+        userData.display_name.toLowerCase().includes(searchTerm)) ||
+      (userData.nip05 && userData.nip05.toLowerCase().includes(searchTerm)) ||
+      (userData.petname && userData.petname.toLowerCase().includes(searchTerm))
+    );
+  }
 
-            return combinedTags.filter((tag) => {
-              // "root"タグを含む場合の処理
-              if (tag.includes("root")) {
-                if (!hasRoot) {
-                  hasRoot = true; // 最初の"root"タグは保持
-                  return true;
-                }
-                return false; // 2つ目以降の"root"タグは除外
-              }
-              return true; // root以外のタグはそのまま
-            });
-          })(),
-          content: (options.content ?? "") + addOption.content, // contentをマージ
-          addableUserList: addOption.addableUserList,
-          defaultUsers: addOption.defaultUsers,
-          warningText: addOption.warningText,
-        };
-        tags = initOptions.tags;
-        text = initOptions.content ?? "";
-
-        if (initOptions.addableUserList) {
-          additionalReplyUsers = [...initOptions.addableUserList];
-        }
-        if (initOptions.warningText !== undefined) {
-          warningText = initOptions.warningText;
-          onWarning = true;
-        }
-        setTimeout(() => {
-          $additionalPostOptions = undefined;
-        }, 0);
-      }
-
-      $open = true;
-      $postWindowOpen = false;
-    }
-  });
-
-  open.subscribe((value) => {
-    // console.log(value);
-    if (value) {
-      //毎回ユーザー切り替えてないとも限らないから毎回チェックしようとしてみる
-      // if (!signPubkey) {
-      getSignPubkey();
-      //}
-      clickEscape = 0;
-      // const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-      // metadata = queryClient.getQueryData(["metadata", pubkey]);
-      // console.log(metadata);
-      setTimeout(() => {
-        //これしないとtextareaがundefinedとかnullになる
-        //console.log(textarea);
-        if (textarea) {
-          textarea.selectionEnd = 0;
-          textarea?.scroll({
-            top: 0,
-          });
-
-          textarea?.focus();
-        }
-      }, 0);
-    } else {
-      if (uploadAbortController) {
-        uploadAbortController.abort(); // アップロードを中断
-      }
-      resetState();
-    }
-  });
-
-  let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
-
-  selectedUploader.subscribe((value) => {
-    if (value) {
-      $uploader = value;
-    }
-  });
-
-  const userName = (pubkey: string, profile: UserData) => {
+  function userName(pubkey: string, profile: UserData) {
     if (profile.petname) {
       return `📛${profile.petname}`;
     }
+
     if (
       (!profile.display_name || profile.display_name === "") &&
       (!profile.name || profile.name === "")
     ) {
       return displayShortPub(pubkey);
     }
+
     return `${profile.display_name ?? ""}${profile.name ? `@${profile.name}` : ""}`;
-  };
+  }
 
-  const handleClickQuote = () => {
-    text =
-      text.slice(0, cursorPosition) + " nostr:" + text.slice(cursorPosition);
-    cursorPosition += " nostr:".length;
-    textarea?.focus();
-  };
+  function addUser(user: string | undefined) {
+    if (!user) return;
+    if (initOptions?.addableUserList?.includes(user)) return;
 
-  //でばっぐよう
-  // $open = true;
-
-  const addUsr = (usr: string | undefined) => {
-    if (!usr) return;
-    if (initOptions?.addableUserList?.includes(usr)) return;
     initOptions = {
       ...initOptions,
-      addableUserList: [...(initOptions?.addableUserList ?? []), usr],
+      addableUserList: [...(initOptions?.addableUserList ?? []), user],
     };
-    additionalReplyUsers = [...(additionalReplyUsers ?? []), usr];
 
-    console.log(initOptions.addableUserList);
-  };
+    additionalReplyUsers = [...(additionalReplyUsers ?? []), user];
+  }
+
+  // ----------------------------------------
+  // Subscription Handlers
+  // ----------------------------------------
+  postWindowOpen.subscribe((value) => {
+    if (!value) return;
+
+    const addOption = $state.snapshot($additionalPostOptions);
+
+    if (addOption) {
+      // Handle tags, removing duplicate root tags if needed
+      initOptions = {
+        ...options,
+        kind: addOption.kind ?? options.kind ?? 1,
+        tags: (() => {
+          const combinedTags = options.tags.concat(addOption.tags);
+          let hasRoot = false;
+
+          return combinedTags.filter((tag) => {
+            if (tag.includes("root")) {
+              if (!hasRoot) {
+                hasRoot = true;
+                return true;
+              }
+              return false;
+            }
+            return true;
+          });
+        })(),
+        content: (options.content ?? "") + addOption.content,
+        addableUserList: addOption.addableUserList,
+        defaultUsers: addOption.defaultUsers,
+        warningText: addOption.warningText,
+      };
+
+      tags = initOptions.tags;
+      text = initOptions.content ?? "";
+
+      // Set additional reply users if provided
+      if (initOptions.addableUserList) {
+        additionalReplyUsers = [...initOptions.addableUserList];
+      }
+
+      // Set warning if provided
+      if (initOptions.warningText !== undefined) {
+        warningText = initOptions.warningText;
+        onWarning = true;
+      }
+
+      // Clear additional options after processing
+      setTimeout(() => {
+        $additionalPostOptions = undefined;
+      }, 0);
+    }
+
+    $open = true;
+    $postWindowOpen = false;
+  });
+
+  open.subscribe((value) => {
+    if (value) {
+      // Get sign pubkey on window open
+      getSignPubkey();
+      clickEscape = 0;
+
+      // Focus textarea after rendering
+      setTimeout(() => {
+        if (textarea) {
+          textarea.selectionEnd = 0;
+          textarea.scroll({ top: 0 });
+          textarea.focus();
+        }
+      }, 0);
+    } else {
+      // Cancel uploads and reset state when closing
+      if (uploadAbortController) {
+        uploadAbortController.abort();
+      }
+      resetState();
+    }
+  });
+
+  selectedUploader.subscribe((value) => {
+    if (value) {
+      $uploader = value;
+    }
+  });
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -745,7 +737,7 @@
                 ...(initOptions.defaultUsers || []),
                 ...additionalReplyUsers,
               ]}
-              {addUsr}
+              {addUser}
             />
           </div>
         </div>
