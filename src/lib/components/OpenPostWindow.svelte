@@ -713,27 +713,19 @@
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      <div
-        class="rounded-md bg-neutral-900
-            p-6 pt-3 shadow-lg mb-4"
-      >
-        <div class="font-medium text-magnum-400">preview</div>
-        <div class="border border-magnum-500 rounded-md">
-          <PostPreview
-            {tags}
-            {text}
-            {onWarning}
-            {warningText}
-            {signPubkey}
-            kind={initOptions.kind}
-            replyUsers={[
-              ...(initOptions.defaultUsers || []),
-              ...additionalReplyUsers,
-            ]}
-            {addUser}
-          />
-        </div>
-      </div>
+      <PostPreview
+        {tags}
+        {text}
+        {onWarning}
+        {warningText}
+        {signPubkey}
+        kind={initOptions.kind}
+        replyUsers={[
+          ...(initOptions.defaultUsers || []),
+          ...additionalReplyUsers,
+        ]}
+        {addUser}
+      />
 
       <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">
         <button
