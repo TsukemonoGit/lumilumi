@@ -24,6 +24,7 @@
     tieKey: string | undefined;
     relayhint?: string[] | undefined;
     zIndex?: number;
+    omit?: boolean;
   }
 
   let {
@@ -37,6 +38,7 @@
     tieKey,
     relayhint = undefined,
     zIndex,
+    omit = false,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
 
@@ -77,7 +79,7 @@
         >
       {/snippet}
       {#snippet content({ data: text, status })}
-        {#if page.route.id === "/notifications" && depth === 1 && text.pubkey === $loginUser}
+        {#if omit && text.pubkey === $loginUser}
           <OmittedCard
             {text}
             {depth}

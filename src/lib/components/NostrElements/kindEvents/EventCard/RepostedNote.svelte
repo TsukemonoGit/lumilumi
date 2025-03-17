@@ -3,6 +3,7 @@
 
   import Note from "../Note.svelte";
   import NaddrEvent from "../NaddrEvent.svelte";
+  import { page } from "$app/state";
 
   interface Props {
     displayMenu: boolean;
@@ -38,6 +39,7 @@
     {tieKey}
     {maxHeight}
     {zIndex}
+    omit={page.route.id === "/notifications" && depth === 1}
   />
 {:else if tag[0] === "a"}
   <NaddrEvent
