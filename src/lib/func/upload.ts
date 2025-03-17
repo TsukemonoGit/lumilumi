@@ -3,36 +3,217 @@ import {
   type OptionalFormDataFields,
 } from "nostr-tools/nip96";
 
+// エラーコードを定数として定義
+const ERROR_CODES = {
+  FILE_TOO_LARGE: 413,
+  BAD_REQUEST: 400,
+  FORBIDDEN: 403,
+  PAYMENT_REQUIRED: 402,
+};
+
+// エラーメッセージを定数として定義
+const ERROR_MESSAGES = {
+  [ERROR_CODES.FILE_TOO_LARGE]: "File too large!",
+  [ERROR_CODES.BAD_REQUEST]: "Bad request! Some fields are missing or invalid!",
+  [ERROR_CODES.FORBIDDEN]:
+    "Forbidden! Payload tag does not match the requested file!",
+  [ERROR_CODES.PAYMENT_REQUIRED]: "Payment required!",
+  DEFAULT: "Unknown error in uploading file!",
+};
+
+// アップロード設定のインターフェース
+interface UploadOptions {
+  serverApiUrl: string;
+  nip98AuthorizationHeader: string;
+  optionalFormDataFields?: OptionalFormDataFields;
+  signal?: AbortSignal;
+  imageQuality?: number; // 画質設定（1-100）
+  maxWaitTime?: number; // 最大待機時間（ミリ秒）
+  onProcessed?: (
+    originalSize: number,
+    processedSize: number,
+    quality: number
+  ) => void; // 処理結果のコールバック
+}
+
+// 調整後の画像情報のインターフェース
+interface ProcessedImageInfo {
+  file: File;
+  originalSize: number;
+  processedSize: number;
+  quality: number;
+}
+
 // エラーハンドリングを共通化
 function handleErrorResponse(response: Response): never {
-  switch (response.status) {
-    case 413:
-      throw new Error("File too large!");
-    case 400:
-      throw new Error("Bad request! Some fields are missing or invalid!");
-    case 403:
-      throw new Error(
-        "Forbidden! Payload tag does not match the requested file!"
-      );
-    case 402:
-      throw new Error("Payment required!");
-    default:
-      throw new Error("Unknown error in uploading file!");
+  const errorMessage =
+    ERROR_MESSAGES[response.status] || ERROR_MESSAGES.DEFAULT;
+  throw new Error(errorMessage);
+}
+
+// ファイルサイズをフォーマットする関数
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return bytes + " B";
+  } else if (bytes < 1024 * 1024) {
+    return (bytes / 1024).toFixed(2) + " KB";
+  } else {
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   }
+}
+
+// 画質調整機能
+async function adjustImageQuality(
+  file: File,
+  quality: number
+): Promise<ProcessedImageInfo> {
+  if (quality === 100) {
+    return {
+      file,
+      originalSize: file.size,
+      processedSize: file.size,
+      quality: 100,
+    };
+  }
+  if (file.type === "image/jpeg" || file.type === "image/jpg") {
+    // JPG処理
+    return await processJpg(file, quality);
+    // } else if (file.type === 'image/png') {
+    //   // PNG専用処理
+    //   return await processPng(file);
+  } else {
+    // その他のファイル形式はそのまま
+    return {
+      file,
+      originalSize: file.size,
+      processedSize: file.size,
+      quality: 100,
+    };
+  }
+}
+
+async function processJpg(file: File, quality: number) {
+  const originalSize = file.size;
+
+  // Ensure quality is between 1-100
+  const boundedQuality = Math.max(1, Math.min(100, quality));
+
+  try {
+    // Create a URL for the file
+    const url = URL.createObjectURL(file);
+
+    // Create an image element and load the file
+    const img = new Image();
+
+    // Wait for the image to load
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+
+    // Create a canvas with the image dimensions
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error("Failed to get canvas context");
+    }
+
+    // Draw the image to the canvas
+    ctx.drawImage(img, 0, 0);
+
+    // Clean up the object URL
+    URL.revokeObjectURL(url);
+
+    // Get the blob with the specified quality
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob(
+        (result) => {
+          if (result) {
+            resolve(result);
+          } else {
+            // If toBlob fails, use original
+            resolve(new Blob([file], { type: file.type }));
+          }
+        },
+        file.type,
+        boundedQuality / 100
+      );
+    });
+
+    // Create a new file from the blob
+    const processedFile = new File([blob], file.name, { type: file.type });
+
+    // Add debugging logs
+    console.log(
+      `Original size: ${originalSize}, Processed size: ${processedFile.size}`
+    );
+    console.log(`Quality applied: ${boundedQuality}`);
+
+    return {
+      file: processedFile,
+      originalSize,
+      processedSize: processedFile.size,
+      quality: boundedQuality,
+    };
+  } catch (error) {
+    console.error("Failed to adjust image quality:", error);
+    return {
+      file,
+      originalSize,
+      processedSize: originalSize,
+      quality: 100,
+    };
+  }
+}
+
+// プレビュー用のURLを生成する関数
+export function createPreviewUrl(file: File): string {
+  return URL.createObjectURL(file);
+}
+
+// プレビューをクリーンアップする関数
+export function revokePreviewUrl(url: string): void {
+  URL.revokeObjectURL(url);
 }
 
 export async function uploadFile(
   file: File,
-  serverApiUrl: string,
-  nip98AuthorizationHeader: string,
-  optionalFormDataFields?: OptionalFormDataFields,
-  signal?: AbortSignal // signal を追加
+  options: UploadOptions
 ): Promise<FileUploadResponse> {
-  const checkedfile = await removeExif(file);
+  const {
+    serverApiUrl,
+    nip98AuthorizationHeader,
+    optionalFormDataFields,
+    signal,
+    imageQuality = 100, // デフォルトは100%（最高画質）
+    maxWaitTime = 8000, // デフォルトは8秒
+    onProcessed,
+  } = options;
+
+  // 画質調整を行う
+  const processedImageInfo = await adjustImageQuality(file, imageQuality);
+  let processedFile = processedImageInfo.file;
+
+  // コールバックがあれば実行
+  if (onProcessed) {
+    onProcessed(
+      processedImageInfo.originalSize,
+      processedImageInfo.processedSize,
+      processedImageInfo.quality
+    );
+  }
+
+  // Exif情報を削除
+  processedFile = await removeExif(processedFile);
+
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
 
-  // optionalFormDataFields を処理
+  // オプションフィールドを処理
   if (optionalFormDataFields) {
     Object.entries(optionalFormDataFields).forEach(([key, value]) => {
       if (value) {
@@ -40,32 +221,56 @@ export async function uploadFile(
       }
     });
   }
-  formData.append("file", checkedfile);
+  formData.append("file", processedFile);
 
-  // 進行状況確認ループ（1秒おきにチェック、最大5秒まで）
-  const startTime = Date.now(); // ループ開始時間を記録
+  return pollUploadStatus(
+    serverApiUrl,
+    formData,
+    nip98AuthorizationHeader,
+    signal,
+    maxWaitTime
+  );
+}
+
+// 画質チェック機能 - ファイル処理するが実際にはアップロードしない
+export async function checkImageQuality(
+  file: File,
+  quality: number
+): Promise<ProcessedImageInfo> {
+  const processedImageInfo = await adjustImageQuality(file, quality);
+  return processedImageInfo;
+}
+
+// アップロード状態をポーリングする関数
+async function pollUploadStatus(
+  serverApiUrl: string,
+  formData: FormData,
+  authHeader: string,
+  signal?: AbortSignal,
+  maxWaitTime: number = 8000
+): Promise<FileUploadResponse> {
+  const startTime = Date.now();
   let response: Response;
   let statusResponse: FileUploadResponse;
 
-  // 初回リクエストもこのループ内で処理
   while (true) {
     response = await fetch(serverApiUrl, {
       method: "POST",
       headers: {
-        Authorization: nip98AuthorizationHeader,
+        Authorization: authHeader,
       },
       body: formData,
-      signal, // signal を追加して fetch リクエストに渡す
+      signal,
     });
 
     // レスポンスエラーチェック
     if (!response.ok) {
-      handleErrorResponse(response); // エラー処理を呼び出し
+      handleErrorResponse(response);
     }
 
     try {
       statusResponse = await response.json();
-    } catch (error: any) {
+    } catch (error) {
       throw new Error("Failed to parse status response");
     }
 
@@ -74,8 +279,8 @@ export async function uploadFile(
       return statusResponse;
     }
 
-    // 経過時間が5秒を超えたら強制終了//動画だと5病で足りなかったからもうちょい伸ばしてみる
-    if (Date.now() - startTime > 8000) {
+    // 経過時間が最大待機時間を超えたら終了
+    if (Date.now() - startTime > maxWaitTime) {
       return statusResponse;
     }
 
@@ -85,7 +290,7 @@ export async function uploadFile(
       continue;
     }
 
-    // それ以外の場合は、ループを終了
+    // それ以外の場合は、エラーを投げる
     throw new Error("Unexpected status code during file upload process!");
   }
 }
@@ -158,32 +363,35 @@ function removeExifFromJPEG(data: ArrayBuffer): ArrayBuffer {
 // PNGのメタデータ削除
 export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
   const data = new Uint8Array(arrayBuffer);
-  const pngSignature = data.subarray(0, 8); // PNGシグネチャは最初の8バイト
-  if (pngSignature.toString() !== "\x89PNG\r\n\x1A\n") {
+  const pngSignature = new Uint8Array([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+  ]);
+
+  // PNGシグネチャの検証
+  if (!pngSignature.every((value, index) => data[index] === value)) {
     return arrayBuffer; // PNG形式でなければそのまま返す
   }
 
   const chunks: Uint8Array[] = [];
   let offset = 8; // 最初の8バイトはシグネチャ
 
+  // 除外するチャンクタイプ
+  const metadataChunks = ["tEXt", "iTXt", "zTXt", "gAMA", "pHYs"];
+
   while (offset < data.length) {
     const length = new DataView(data.buffer).getUint32(offset); // チャンク長
-    const type = String.fromCharCode(...data.subarray(offset + 4, offset + 8));
+    const typeBytes = data.subarray(offset + 4, offset + 8);
+    const type = String.fromCharCode(...typeBytes);
 
     // メタデータに関連するチャンクを除外
-    if (
-      type !== "tEXt" &&
-      type !== "iTXt" &&
-      type !== "zTXt" &&
-      type !== "gAMA" &&
-      type !== "pHYs"
-    ) {
+    if (!metadataChunks.includes(type)) {
       chunks.push(data.subarray(offset, offset + 12 + length)); // 長さ + タイプ + データ + CRC
     }
 
     offset += 12 + length; // チャンク長さ+12バイト(ヘッダ+CRC)
   }
 
+  // 新しいバッファを作成
   const cleanedBuffer = new Uint8Array(
     pngSignature.byteLength +
       chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)

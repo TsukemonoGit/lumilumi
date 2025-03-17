@@ -13,6 +13,10 @@
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
   import * as Nostr from "nostr-typedef";
   import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
+  import { type Writable, writable } from "svelte/store";
+  import Dialog from "./Elements/Dialog.svelte";
+  import ContentParts from "./NostrElements/content/ContentParts.svelte";
+  import Truncate from "./NostrElements/content/Truncate.svelte";
 
   interface Props {
     tags: string[][];
@@ -62,6 +66,14 @@
     }
     return undefined;
   });
+
+  // svelte-ignore non_reactive_update
+  let showMore: Writable<boolean> = writable(false);
+
+  const onClickShowMore = () => {
+    console.log("showMore");
+    $showMore = true;
+  };
 </script>
 
 {#if signPubkey}<NoteComponent
@@ -108,16 +120,19 @@
       {/if}
     {/snippet}
     {#snippet content()}<!--ここのしょりによってたぐにpが追加されたりするのか？pがないnostr:noteとかにpをつけるquoteUsers に入れて渡す-->
-      <Content
-        {zIndex}
-        {maxHeight}
-        {text}
-        {tags}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {tieKey}
-      />{#if kind === 42}
+
+      <Truncate {maxHeight} {onClickShowMore} {depth}>
+        <ContentParts
+          {maxHeight}
+          {text}
+          {tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+        />
+      </Truncate>
+      {#if kind === 42}
         {@const heyaId = tags.find(
           (tag) => tag[0] === "e" && tag[3] === "root"
         )?.[1]}
@@ -125,3 +140,20 @@
     {/snippet}
   </NoteComponent>
 {/if}
+
+<Dialog bind:open={showMore} zIndex={zIndex + 10}>
+  {#snippet main()}
+    <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+      <ContentParts
+        {maxHeight}
+        {text}
+        {tags}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {zIndex}
+      />
+    </div>
+  {/snippet}</Dialog
+>

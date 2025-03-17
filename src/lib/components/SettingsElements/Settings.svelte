@@ -46,6 +46,7 @@
   } from "$lib/func/constants";
   import { relayRegex2, npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import PicQuarity from "./PicQuarity.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -587,6 +588,11 @@
           />
           {$_("settings.post.addClientTag")}
         </label>
+      </li>
+      <li>
+        {$_("settings.post.picQuarity")}
+        {settings.picQuarity}%
+        <PicQuarity bind:value={settings.picQuarity} />
       </li>
     </ul>
   </fieldset>

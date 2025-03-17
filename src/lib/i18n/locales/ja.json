@@ -35,7 +35,8 @@
     },
     "post": {
       "addClientTag": "投稿にClientタグ(via)をつける",
-      "defaultReaction": "デフォルト リアクション"
+      "defaultReaction": "デフォルト リアクション",
+      "picQuarity": "投稿写真品質（JPG専用）"
     },
     "douki": {
       "title": "データの同期"
