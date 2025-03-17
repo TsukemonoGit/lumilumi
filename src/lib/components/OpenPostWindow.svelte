@@ -698,6 +698,9 @@
         new Set([...(initOptions?.addableUserList ?? []), usr])
       ),
     };
+    additionalReplyUsers = Array.from(
+      new Set([...(additionalReplyUsers ?? []), usr])
+    );
     console.log(initOptions.addableUserList);
   };
 </script>
