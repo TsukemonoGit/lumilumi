@@ -14,7 +14,6 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
-    getDefaultWriteRelays,
     getMetadataList,
     promisePublishSignedEvent,
     type MetadataList,
@@ -40,13 +39,8 @@
     displayShortPub,
   } from "$lib/func/util";
 
-  import type { FileUploadResponse } from "nostr-tools/nip96";
-  import type {
-    DefaultPostOptions,
-    MargePostOptions,
-    Profile,
-  } from "$lib/types";
-  import EventCard from "./NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
+
   import { nip07Signer, now, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
@@ -54,7 +48,6 @@
   import { nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
-  import Content from "./NostrElements/content/Content.svelte";
   import { convertMetaTags } from "$lib/func/imeta";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserName from "./NostrElements/user/UserName.svelte";
@@ -62,7 +55,6 @@
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
-  import { untrack } from "svelte";
 
   // ----------------------------------------
   // Component Props
@@ -158,7 +150,9 @@
   const selectedUploader: Writable<string> = writable();
 
   // Dialog handlers
+  // svelte-ignore non_reactive_update
   let openConfirm: (bool: boolean) => void = () => {};
+  // svelte-ignore non_reactive_update
   let openHellConfirm: (bool: boolean) => void;
 
   // ----------------------------------------
