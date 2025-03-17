@@ -63,6 +63,7 @@
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -688,7 +689,17 @@
   //でばっぐよう
   // $open = true;
 
-  let quoteUsers: string[] = $state([]);
+  const addUsr = (usr: string | undefined) => {
+    if (!usr) return;
+    console.log(usr);
+    initOptions = {
+      ...initOptions,
+      addableUserList: Array.from(
+        new Set([...(initOptions?.addableUserList ?? []), usr])
+      ),
+    };
+    console.log(initOptions.addableUserList);
+  };
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -734,7 +745,7 @@
                 ...(initOptions.defaultUsers || []),
                 ...additionalReplyUsers,
               ]}
-              bind:quoteUsers
+              {addUsr}
             />
           </div>
         </div>

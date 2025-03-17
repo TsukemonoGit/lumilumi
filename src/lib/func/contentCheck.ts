@@ -41,64 +41,64 @@ export function contentCheck(
 
   // Process NIP-19 matches
 
-  const nip19Matches = text.matchAll(nip19Regex);
-  [...nip19Matches].map((match) => {
-    try {
-      let decoded = nip19.decode(match[1]);
-      switch (decoded.type) {
-        case "nprofile":
-          if (decoded.data.relays) {
-            newTags.push([
-              "p",
-              decoded.data.pubkey,
-              decoded.data.relays[0] ?? "",
-            ]);
-          } else {
-            newTags.push(["p", decoded.data.pubkey]);
-          }
-          break;
-        // case "nrelay":
-        //   newTags.push(["r", decoded.data]);
-        //   break;
-        case "nevent":
-          const neventTag = [
-            "q",
-            decoded.data.id,
-            decoded.data.relays?.[0] ?? "",
-          ];
+  // const nip19Matches = text.matchAll(nip19Regex);
+  // [...nip19Matches].map((match) => {
+  //   try {
+  //     let decoded = nip19.decode(match[1]);
+  //     switch (decoded.type) {
+  //       case "nprofile":
+  //         if (decoded.data.relays) {
+  //           newTags.push([
+  //             "p",
+  //             decoded.data.pubkey,
+  //             decoded.data.relays[0] ?? "",
+  //           ]);
+  //         } else {
+  //           newTags.push(["p", decoded.data.pubkey]);
+  //         }
+  //         break;
+  //       // case "nrelay":
+  //       //   newTags.push(["r", decoded.data]);
+  //       //   break;
+  //       case "nevent":
+  //         const neventTag = [
+  //           "q",
+  //           decoded.data.id,
+  //           decoded.data.relays?.[0] ?? "",
+  //         ];
 
-          if (decoded.data.author) {
-            neventTag.push(decoded.data.author);
-          }
-          newTags.push(neventTag);
-          break;
-        case "naddr":
-          if (decoded.data.relays) {
-            newTags.push([
-              "a",
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-              decoded.data.relays?.[0] ?? "",
-            ]);
-          } else {
-            newTags.push([
-              "a",
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-            ]);
-          }
-          break;
-        case "nsec":
-          break;
-        case "npub":
-          newTags.push(["p", decoded.data]);
-          break;
-        case "note":
-          newTags.push(["q", decoded.data]);
-          break;
-      }
-    } catch (error) {
-      console.log("Failed to decode NIP-19 identifier:", match[1]);
-    }
-  });
+  //         if (decoded.data.author) {
+  //           neventTag.push(decoded.data.author);
+  //         }
+  //         newTags.push(neventTag);
+  //         break;
+  //       case "naddr":
+  //         if (decoded.data.relays) {
+  //           newTags.push([
+  //             "a",
+  //             `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+  //             decoded.data.relays?.[0] ?? "",
+  //           ]);
+  //         } else {
+  //           newTags.push([
+  //             "a",
+  //             `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+  //           ]);
+  //         }
+  //         break;
+  //       case "nsec":
+  //         break;
+  //       case "npub":
+  //         newTags.push(["p", decoded.data]);
+  //         break;
+  //       case "note":
+  //         newTags.push(["q", decoded.data]);
+  //         break;
+  //     }
+  //   } catch (error) {
+  //     console.log("Failed to decode NIP-19 identifier:", match[1]);
+  //   }
+  // });
 
   // Process URL matches
   const urlMatches = text.matchAll(urlRegex);
