@@ -12,6 +12,7 @@
   import UserName from "./NostrElements/user/UserName.svelte";
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
   import * as Nostr from "nostr-typedef";
+  import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
 
   interface Props {
     tags: string[][];
@@ -116,7 +117,11 @@
         {depth}
         {repostable}
         {tieKey}
-      />
+      />{#if kind === 42}
+        {@const heyaId = tags.find(
+          (tag) => tag[0] === "e" && tag[3] === "root"
+        )?.[1]}
+        <ChannelTag {heyaId} {tieKey} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}
