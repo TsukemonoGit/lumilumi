@@ -267,6 +267,8 @@
           {depth}
           {repostable}
           {thread}
+          {replyTag}
+          {replyUsers}
         />
       {:else if note.kind === 6 || note.kind === 16}
         <!--リポスト-->
@@ -290,7 +292,7 @@
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay {note} {metadata} />
+            <ProfileDisplay pubkey={note.pubkey} {metadata} />
           {/snippet}
 
           {#snippet actionButtons()}
@@ -338,7 +340,7 @@
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay {note} {metadata} />
+            <ProfileDisplay pubkey={note.pubkey} {metadata} />
           {/snippet}
 
           {#snippet actionButtons()}

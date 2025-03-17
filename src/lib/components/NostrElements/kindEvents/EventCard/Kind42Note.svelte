@@ -28,6 +28,8 @@
     zIndex?: number;
     mini?: boolean;
     metadata: Nostr.Event | undefined;
+    replyTag: string[] | undefined;
+    replyUsers: string[];
   }
 
   let {
@@ -40,20 +42,14 @@
     zIndex = 0,
     mini,
     metadata,
+    replyTag,
+    replyUsers,
   }: Props = $props();
 
   let deleted = $state(false);
   const heyaId = note.tags.find(
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
-
-  let res = $derived(replyedEvent(note.tags, note.kind));
-  let replyTag = $derived(
-    res.replyTag && res.replyTag.length > 3 && res.replyTag[3] === "root"
-      ? undefined
-      : res.replyTag
-  ); //rootは部屋ID
-  let replyUsers = $derived(res.replyUsers);
 
   let warning = $derived(checkContentWarning(note.tags));
 </script>
@@ -80,7 +76,7 @@
       <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
   {/snippet}
   {#snippet name()}
-    <ProfileDisplay {note} {metadata} />
+    <ProfileDisplay pubkey={note.pubkey} {metadata} />
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} {tieKey} />

@@ -9,13 +9,14 @@
   import * as Nostr from "nostr-typedef";
 
   interface Props {
-    note: Nostr.Event;
+    pubkey: string;
     metadata?: Nostr.Event | undefined;
     kindInfo?: boolean;
+    kind?: number;
   }
-  let { note, metadata, kindInfo = false }: Props = $props();
+  let { pubkey, metadata, kind, kindInfo }: Props = $props();
 
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get().get(pubkey));
   let prof = $derived(profile(metadata));
   let isBirthDay = $derived(checkBirthDay(prof));
 </script>
@@ -43,14 +44,14 @@
   {/if}
 {:else}
   <span class="text-magnum-100 text-sm break-all">
-    @{nip19.npubEncode(note.pubkey)}
+    @{nip19.npubEncode(pubkey)}
   </span>
 {/if}
 {#if isBirthDay}
   <Cake size={16} class="text-magnum-400 w-[16px]" />
 {/if}
-{#if kindInfo}
+{#if kindInfo && kind}
   <span class=" text-neutral-300/50 text-sm whitespace-nowrap ml-1">
-    {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
+    {eventKinds.get(kind)?.en ?? `kind:${kind}`}
   </span>
 {/if}

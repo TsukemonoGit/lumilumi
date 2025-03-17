@@ -62,6 +62,7 @@
 
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
+  import PostPreview from "./PostPreview.svelte";
 
   interface Props {
     //チャンネルの情報をあらかじめ入れておく。とかと別でリプライユーザーとかをいれる必要があるから、リプとかのときのオプションと別にする
@@ -106,7 +107,7 @@
   //$: console.log(initOptions.tags);
   let metadata: Nostr.Event | undefined = $state(undefined);
 
-  const additionalReplyUsers: Writable<string[]> = writable([]);
+  let additionalReplyUsers: string[] = $state([]);
   let clickEscape: number = $state(0);
   let signPubkey: string | undefined = $state();
   let textarea: HTMLTextAreaElement | undefined = $state();
@@ -156,8 +157,8 @@
       tags
     );
     if (onWarning) checkedTags.push(["content-warning", warningText]);
-    if ($additionalReplyUsers.length > 0) {
-      const replyUsersArray: string[][] = $additionalReplyUsers.map((user) => [
+    if (additionalReplyUsers.length > 0) {
+      const replyUsersArray: string[][] = additionalReplyUsers.map((user) => [
         "p",
         user,
       ]);
@@ -262,7 +263,7 @@
     onWarning = false;
     viewCustomEmojis = false;
     customReaction = "";
-    $additionalReplyUsers = [];
+    additionalReplyUsers = [];
     initOptions = { ...options, kind: options.kind ?? 1 };
     viewMetadataList = false;
     inputMetadata = "";
@@ -609,7 +610,7 @@
         text = initOptions.content ?? "";
 
         if (initOptions.addableUserList) {
-          $additionalReplyUsers = [...initOptions.addableUserList];
+          additionalReplyUsers = [...initOptions.addableUserList];
         }
         if (initOptions.warningText !== undefined) {
           warningText = initOptions.warningText;
@@ -686,6 +687,8 @@
 
   //でばっぐよう
   // $open = true;
+
+  let quoteUsers: string[] = $state([]);
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -713,43 +716,26 @@
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      {#if lumiSetting.get().showImg && lumiSetting.get().showPreview}
+      {#if lumiSetting.get().showPreview}
         <div
           class="rounded-md bg-neutral-900
             p-6 pt-3 shadow-lg mb-4"
         >
           <div class="font-medium text-magnum-400">preview</div>
           <div class="border border-magnum-500 rounded-md">
-            {#if signPubkey}<EventCard
-                {zIndex}
-                {metadata}
-                note={{
-                  sig: "",
-                  id: "",
-                  pubkey: signPubkey,
-                  content: text ?? "",
-                  tags: tags,
-                  kind: initOptions.kind,
-                  created_at: now(),
-                }}
-                depth={1}
-                displayMenu={false}
-                repostable={false}
-                maxHeight={160}
-                tieKey={undefined}
-              />
-            {:else}
-              <Content
-                {zIndex}
-                maxHeight={160}
-                {text}
-                {tags}
-                displayMenu={false}
-                repostable={false}
-                depth={1}
-                tieKey={undefined}
-              />
-            {/if}
+            <PostPreview
+              {tags}
+              {text}
+              {onWarning}
+              {warningText}
+              {signPubkey}
+              kind={initOptions.kind}
+              replyUsers={[
+                ...(initOptions.defaultUsers || []),
+                ...additionalReplyUsers,
+              ]}
+              bind:quoteUsers
+            />
           </div>
         </div>
       {/if}
@@ -822,19 +808,19 @@
           {#if initOptions.addableUserList}
             {#each initOptions.addableUserList as replyuser, index}
               <div
-                class=" rounded-md {$additionalReplyUsers.includes(replyuser)
+                class=" rounded-md {additionalReplyUsers.includes(replyuser)
                   ? 'bg-magnum-300'
                   : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
               >
                 <UserName pubhex={replyuser} />
 
-                {#if $additionalReplyUsers.includes(replyuser)}
+                {#if additionalReplyUsers.includes(replyuser)}
                   <button
                     class=" inline-flex h-6 w-6 appearance-none align-middle
                      rounded-full p-1 text-magnum-800 bg-magnum-100
                     hover:bg-magnum-300 focus:shadow-magnum-400"
                     onclick={() => {
-                      $additionalReplyUsers = $additionalReplyUsers.filter(
+                      additionalReplyUsers = additionalReplyUsers.filter(
                         (user) => user !== replyuser
                       );
                     }}
@@ -846,10 +832,7 @@
                  rounded-full p-1 text-magnum-800
                 hover:bg-magnum-100 focus:shadow-magnum-400"
                     onclick={() => {
-                      additionalReplyUsers.update((users) => {
-                        users.push(replyuser);
-                        return users;
-                      });
+                      additionalReplyUsers.push(replyuser);
                     }}
                   >
                     <Plus class="size-4" />

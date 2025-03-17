@@ -94,7 +94,7 @@
         <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
     {/snippet}
     {#snippet name()}
-      <ProfileDisplay {note} {metadata} />
+      <ProfileDisplay pubkey={note.pubkey} {metadata} />
     {/snippet}
     {#snippet time()}
       <DisplayTime {displayMenu} {note} {tieKey} />

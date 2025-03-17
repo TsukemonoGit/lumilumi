@@ -99,7 +99,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        {note}
+        pubkey={note.pubkey}
         {metadata}
         kindInfo={note.kind !== 1 ? true : false}
       />
