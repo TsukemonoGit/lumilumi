@@ -694,9 +694,7 @@
     if (initOptions?.addableUserList?.includes(usr)) return;
     initOptions = {
       ...initOptions,
-      addableUserList: Array.from(
-        new Set([...(initOptions?.addableUserList ?? []), usr])
-      ),
+      addableUserList: [...(initOptions?.addableUserList ?? []), usr],
     };
     additionalReplyUsers = Array.from(
       new Set([...(additionalReplyUsers ?? []), usr])
