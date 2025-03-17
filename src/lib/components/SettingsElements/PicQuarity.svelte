@@ -1,7 +1,7 @@
 <script lang="ts">
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { createSlider, melt } from "@melt-ui/svelte";
-  import { onMount } from "svelte";
+
   interface Props {
     value: number;
   }

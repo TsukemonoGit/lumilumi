@@ -193,10 +193,10 @@ export async function uploadFile(
     maxWaitTime = 8000, // デフォルトは8秒
     onProcessed,
   } = options;
-
+  const removeFile = await removeExif(file);
   // 画質調整を行う
-  const processedImageInfo = await adjustImageQuality(file, imageQuality);
-  let processedFile = processedImageInfo.file;
+  const processedImageInfo = await adjustImageQuality(removeFile, imageQuality);
+  const processedFile = processedImageInfo.file;
 
   // コールバックがあれば実行
   if (onProcessed) {
@@ -207,8 +207,8 @@ export async function uploadFile(
     );
   }
 
-  // Exif情報を削除
-  processedFile = await removeExif(processedFile);
+  // // Exif情報を削除
+  // processedFile = await removeExif(processedFile);
 
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
