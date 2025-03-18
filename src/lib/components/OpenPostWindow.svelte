@@ -206,32 +206,49 @@
   // Tag Management
   // ----------------------------------------
   function addEmojiTag(emoji: string[]) {
-    const emojiCopy = [...emoji];
-
-    // Check for emoji with same URL
+    // 1. URLが同じ絵文字を探す
     const sameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[2] === emojiCopy[1]
+      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
     );
 
     if (sameEmoji) {
-      emojiCopy[0] = sameEmoji[1];
+      // 同じURLの絵文字があれば、その名前を使う
+      emoji[0] = sameEmoji[1];
     }
 
-    // Check for emoji with same name
-    const sameNameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[1] === emojiCopy[0]
+    // 2. 同じ名前の絵文字があるか確認
+    let sameNameEmoji = tags.find(
+      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
     );
 
+    // 3. 絵文字の条件に従って追加処理
     if (sameNameEmoji) {
-      // If name exists but URL is different, append underscore and add
-      if (sameNameEmoji[2] !== emojiCopy[1]) {
-        emojiCopy[0] = `${emojiCopy[0]}_`;
-        tags.push(["emoji", ...emojiCopy]);
+      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
+      if (sameNameEmoji[2] !== emoji[1]) {
+        // 元の名前を保存
+        const baseName = emoji[0];
+        let num = 1;
+
+        // 重複しない名前が見つかるまでnumをインクリメント
+        emoji[0] = `${baseName}_${num}`;
+        sameNameEmoji = tags.find(
+          (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+        );
+
+        while (sameNameEmoji) {
+          num++;
+          emoji[0] = `${baseName}_${num}`;
+          sameNameEmoji = tags.find(
+            (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+          );
+        }
+
+        tags.push(["emoji", ...emoji]);
       }
-      // If name and URL are identical, do nothing
+      // 完全に同じ名前・URLの絵文字がある場合は何もしない
     } else {
-      // New emoji, add to tags
-      tags.push(["emoji", ...emojiCopy]);
+      // 同じ名前もURLもない場合、新しい絵文字として追加
+      tags.push(["emoji", ...emoji]);
     }
   }
 
