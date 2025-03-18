@@ -104,9 +104,6 @@ async function processJpg(file: File, quality: number) {
     img.src = url;
   });
 
-  const arrayBuffer = await file.arrayBuffer();
-  const orientation = readExifOrientation(arrayBuffer);
-
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -114,31 +111,12 @@ async function processJpg(file: File, quality: number) {
     throw new Error("Failed to get canvas context");
   }
 
-  // 回転情報を考慮してキャンバスサイズを設定
-  switch (orientation) {
-    case 3:
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.rotate(Math.PI); // 180度回転
-      ctx.translate(-canvas.width, -canvas.height);
-      break;
-    case 6:
-      canvas.width = img.height;
-      canvas.height = img.width;
-      ctx.rotate(Math.PI / 2); // 90度回転
-      ctx.translate(0, -canvas.width);
-      break;
-    case 8:
-      canvas.width = img.height;
-      canvas.height = img.width;
-      ctx.rotate(-Math.PI / 2); // 270度回転
-      ctx.translate(-canvas.height, 0);
-      break;
-    default:
-      canvas.width = img.width;
-      canvas.height = img.height;
-  }
+  // Set canvas dimensions without considering orientation
+  canvas.width = img.width;
+  canvas.height = img.height;
 
+  // Skip all rotation and transformation logic
+  // Simply draw the image as-is
   ctx.drawImage(img, 0, 0);
   URL.revokeObjectURL(url);
 
@@ -189,11 +167,11 @@ export async function uploadFile(
     maxWaitTime = 8000, // デフォルトは8秒
     onProcessed,
   } = options;
-  const removeFile = await removeExif(file);
-  // 画質調整を行う
-  const processedImageInfo = await adjustImageQuality(removeFile, imageQuality);
-  const processedFile = processedImageInfo.file;
 
+  // 画質調整を行う
+  const processedImageInfo = await adjustImageQuality(file, imageQuality);
+
+  const processedFile = await removeExif(processedImageInfo.file);
   // コールバックがあれば実行
   if (onProcessed) {
     onProcessed(
@@ -401,54 +379,4 @@ export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
   }
 
   return cleanedBuffer.buffer;
-}
-
-function readExifOrientation(data: ArrayBuffer): number {
-  const dataView = new DataView(data);
-  let offset = 2; // JPEGのマーカー開始位置 (最初の2バイトはFFD8)
-  const length = data.byteLength;
-
-  while (offset < length) {
-    if (dataView.getUint8(offset) !== 0xff) break;
-
-    const marker = dataView.getUint8(offset + 1);
-    if (marker === 0xe1) {
-      // Exifセグメント (0xFFE1)
-      const segmentLength = dataView.getUint16(offset + 2);
-      const exifData = new DataView(data, offset + 4, segmentLength - 2);
-
-      if (
-        exifData.getUint32(0, false) === 0x45786966 && // 'Exif' マーカー
-        exifData.getUint16(4, false) === 0x0000
-      ) {
-        let littleEndian = false;
-        const tiffHeaderOffset = 6;
-        if (exifData.getUint16(tiffHeaderOffset) === 0x4949) {
-          littleEndian = true;
-        }
-
-        const ifdOffset = exifData.getUint32(
-          tiffHeaderOffset + 4,
-          littleEndian
-        );
-        const numEntries = exifData.getUint16(
-          tiffHeaderOffset + ifdOffset,
-          littleEndian
-        );
-
-        for (let i = 0; i < numEntries; i++) {
-          const entryOffset = tiffHeaderOffset + ifdOffset + 2 + i * 12;
-          const tag = exifData.getUint16(entryOffset, littleEndian);
-
-          if (tag === 0x0112) {
-            // Orientationタグ
-            return exifData.getUint16(entryOffset + 8, littleEndian);
-          }
-        }
-      }
-    }
-
-    offset += 2 + dataView.getUint16(offset + 2);
-  }
-  return 1; // デフォルト（回転なし）
 }
