@@ -94,80 +94,54 @@ async function adjustImageQuality(
 
 async function processJpg(file: File, quality: number) {
   const originalSize = file.size;
-
-  // Ensure quality is between 1-100
   const boundedQuality = Math.max(1, Math.min(100, quality));
+  const url = URL.createObjectURL(file);
+  const img = new Image();
 
-  try {
-    // Create a URL for the file
-    const url = URL.createObjectURL(file);
+  await new Promise((resolve, reject) => {
+    img.onload = resolve;
+    img.onerror = reject;
+    img.src = url;
+  });
 
-    // Create an image element and load the file
-    const img = new Image();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
-    // Wait for the image to load
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = url;
-    });
-
-    // Create a canvas with the image dimensions
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext("2d");
-
-    if (!ctx) {
-      throw new Error("Failed to get canvas context");
-    }
-
-    // Draw the image to the canvas
-    ctx.drawImage(img, 0, 0);
-
-    // Clean up the object URL
-    URL.revokeObjectURL(url);
-
-    // Get the blob with the specified quality
-    const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob(
-        (result) => {
-          if (result) {
-            resolve(result);
-          } else {
-            // If toBlob fails, use original
-            resolve(new Blob([file], { type: file.type }));
-          }
-        },
-        file.type,
-        boundedQuality / 100
-      );
-    });
-
-    // Create a new file from the blob
-    const processedFile = new File([blob], file.name, { type: file.type });
-
-    // Add debugging logs
-    console.log(
-      `Original size: ${originalSize}, Processed size: ${processedFile.size}`
-    );
-    console.log(`Quality applied: ${boundedQuality}`);
-
-    return {
-      file: processedFile,
-      originalSize,
-      processedSize: processedFile.size,
-      quality: boundedQuality,
-    };
-  } catch (error) {
-    console.error("Failed to adjust image quality:", error);
-    return {
-      file,
-      originalSize,
-      processedSize: originalSize,
-      quality: 100,
-    };
+  if (!ctx) {
+    throw new Error("Failed to get canvas context");
   }
+
+  // Set canvas dimensions without considering orientation
+  canvas.width = img.width;
+  canvas.height = img.height;
+
+  // Skip all rotation and transformation logic
+  // Simply draw the image as-is
+  ctx.drawImage(img, 0, 0);
+  URL.revokeObjectURL(url);
+
+  const blob = await new Promise<Blob>((resolve) => {
+    canvas.toBlob(
+      (result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          resolve(new Blob([file], { type: file.type }));
+        }
+      },
+      file.type,
+      boundedQuality / 100
+    );
+  });
+
+  const processedFile = new File([blob], file.name, { type: file.type });
+
+  return {
+    file: processedFile,
+    originalSize,
+    processedSize: processedFile.size,
+    quality: boundedQuality,
+  };
 }
 
 // プレビュー用のURLを生成する関数
@@ -193,11 +167,11 @@ export async function uploadFile(
     maxWaitTime = 8000, // デフォルトは8秒
     onProcessed,
   } = options;
-  const removeFile = await removeExif(file);
-  // 画質調整を行う
-  const processedImageInfo = await adjustImageQuality(removeFile, imageQuality);
-  const processedFile = processedImageInfo.file;
 
+  // 画質調整を行う
+  const processedImageInfo = await adjustImageQuality(file, imageQuality);
+
+  const processedFile = await removeExif(processedImageInfo.file);
   // コールバックがあれば実行
   if (onProcessed) {
     onProcessed(
