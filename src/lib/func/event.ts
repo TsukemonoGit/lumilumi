@@ -29,39 +29,9 @@ export const replyedEvent = (
   tags: string[][],
   kind: number
 ): { replyTag: string[] | undefined; replyUsers: string[] } => {
-  if (kind !== 1111) {
-    const users = tags.reduce((acc, [tag, value]) => {
-      if (tag === "p" && hexRegex.test(value)) {
-        return [...acc, value];
-      } else {
-        return acc;
-      }
-    }, []);
-
-    const IDs = tags?.filter(
-      (tag) =>
-        (tag[0] === "e" && hexRegex.test(tag[1])) ||
-        (tag[0] === "a" && nip33Regex.test(tag[1]))
-    );
-    const root = IDs?.find((item) => item.length > 3 && item[3] === "root");
-    const reply = IDs?.find((item) => item.length > 3 && item[3] === "reply");
-
-    let replyTag;
-    if (kind === 42 && root) {
-      // For kind 42, use reply if it exists, otherwise find a non-root ID
-      replyTag = reply ?? IDs.findLast((item) => item !== root);
-    } else {
-      // For other kinds, maintain priority order: reply > root > last ID
-      replyTag =
-        reply ?? root ?? (IDs.length > 0 ? IDs[IDs.length - 1] : undefined);
-    }
-
-    return {
-      replyUsers: users,
-      replyTag: replyTag ?? undefined,
-    };
-  } else {
-    //comment NIP-22 https://github.com/nostr-protocol/nips/blob/master/22.md
+  // Handle NIP-22 events (kind 1111)
+  if (kind === 1111) {
+    // Extract unique pubkeys from p or P tags
     const users = Array.from(
       new Set(
         tags.reduce((acc, [tag, value]) => {
@@ -73,18 +43,19 @@ export const replyedEvent = (
       )
     );
 
+    // First try to find a lowercase tag (e/a/i)
     const ID = tags?.find(
       (tag) =>
         (tag[0] === "e" && hexRegex.test(tag[1])) ||
         (tag[0] === "a" && nip33Regex.test(tag[1])) ||
         tag[0] === "i"
     );
+
     if (ID) {
-      return {
-        replyUsers: users,
-        replyTag: ID,
-      };
+      return { replyUsers: users, replyTag: ID };
     }
+
+    // Otherwise check for uppercase tags (E/A/I)
     const parentID = tags?.find(
       (tag) =>
         (tag[0] === "E" && hexRegex.test(tag[1])) ||
@@ -92,11 +63,47 @@ export const replyedEvent = (
         tag[0] === "I"
     );
 
-    return {
-      replyUsers: users,
-      replyTag: parentID ? parentID : undefined,
-    };
+    return { replyUsers: users, replyTag: parentID };
   }
+
+  // Handle non-NIP-22 events
+  // Extract pubkeys from p tags
+  const users = tags.reduce((acc, [tag, value]) => {
+    if (tag === "p" && hexRegex.test(value)) {
+      return [...acc, value];
+    }
+    return acc;
+  }, [] as string[]);
+
+  // Find all e and a tags
+  const IDs = tags.filter(
+    (tag) =>
+      (tag[0] === "e" && hexRegex.test(tag[1])) ||
+      (tag[0] === "a" && nip33Regex.test(tag[1]))
+  );
+
+  // Find special tags
+  const root = IDs.find((item) => item.length > 3 && item[3] === "root");
+  const reply = IDs.find((item) => item.length > 3 && item[3] === "reply");
+
+  // Find simple tags (without root/reply marker)
+  const simpleTags = IDs.filter(
+    (item) => !(item.length > 3 && (item[3] === "reply" || item[3] === "root"))
+  );
+
+  let replyTag;
+
+  // For kind 42 (group chats), use different logic
+  if (kind === 42 && root) {
+    replyTag = reply ?? IDs.findLast((item) => item !== root);
+  } else {
+    // Priority: reply > simple tags > root
+    replyTag =
+      reply ??
+      (simpleTags.length > 0 ? simpleTags[simpleTags.length - 1] : root);
+  }
+
+  return { replyUsers: users, replyTag };
 };
 
 export function extractZappedId(tags: string[][]): {
