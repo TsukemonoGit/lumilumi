@@ -51,9 +51,9 @@ export const replyedEvent = (
       // For kind 42, use reply if it exists, otherwise find a non-root ID
       replyTag = reply ?? IDs.findLast((item) => item !== root);
     } else {
-      // For other kinds, maintain priority order: reply > root > last ID
+      // For other kinds, maintain priority order: reply >  last ID > root
       replyTag =
-        reply ?? root ?? (IDs.length > 0 ? IDs[IDs.length - 1] : undefined);
+        reply ?? (IDs.length > 0 ? IDs[IDs.length - 1] ?? root : undefined);
     }
 
     return {
