@@ -77,9 +77,7 @@ export const replyedEvent = (
 
   // Find all e and a tags
   const IDs = tags.filter(
-    (tag) =>
-      (tag[0] === "e" && hexRegex.test(tag[1])) ||
-      (tag[0] === "a" && nip33Regex.test(tag[1]))
+    (tag) => tag[0] === "e" && hexRegex.test(tag[1]) //||(tag[0] === "a" && nip33Regex.test(tag[1]))
   );
 
   // Find special tags
