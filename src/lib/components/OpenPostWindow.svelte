@@ -271,7 +271,7 @@
   // Event Publishing
   // ----------------------------------------
   async function postNote() {
-    if (text.trim().length <= 0) return;
+    if (text.trim().length <= 0 || isPosting) return;
 
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
@@ -312,7 +312,7 @@
   }
 
   async function sendEvent() {
-    if (!newev) return;
+    if (!newev || isPosting) return;
 
     isPosting = true;
     $nowProgress = true;
