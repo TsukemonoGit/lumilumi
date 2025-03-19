@@ -41,7 +41,7 @@
 
   import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
 
-  import { nip07Signer, now, type EventPacket } from "rx-nostr";
+  import { nip07Signer, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
   import type { QueryKey } from "@tanstack/svelte-query";
@@ -326,9 +326,9 @@
         .filter((item) => item.ok)
         .map((item) => normalizeRelayURL(item.from));
 
-      const failedRelays = res
-        .filter((item) => !item.ok)
-        .map((item) => normalizeRelayURL(item.from));
+      // const failedRelays = res
+      //   .filter((item) => !item.ok)
+      //   .map((item) => normalizeRelayURL(item.from));
 
       // If no successful relays, try once more
       if (successRelays.length <= 0) {
