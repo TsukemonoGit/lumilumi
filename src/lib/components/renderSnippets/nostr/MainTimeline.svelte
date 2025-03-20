@@ -123,12 +123,12 @@
     let operator = pipe(tie, uniq);
 
     // Add user status operator for main timeline if enabled
-    if (tieKey === "timeline" && lumiSetting.get().showUserStatus) {
+    if (lumiSetting.get().showUserStatus) {
       operator = pipe(operator, userStatus());
     }
 
     // Add reaction check operator for main timeline if enabled
-    if (tieKey === "timeline" && lumiSetting.get().showReactioninTL) {
+    if (lumiSetting.get().showReactioninTL) {
       operator = pipe(operator, reactionCheck());
     }
 
@@ -140,6 +140,7 @@
    * Registers the tie in the global store
    */
   function registerTie(key: string) {
+    //console.log($tieMapStore);
     if (!key) return;
 
     if (!$tieMapStore) {
@@ -230,6 +231,7 @@
    * Initialize the timeline
    */
   async function initializeTimeline() {
+    registerTie(tieKey);
     const existingEvents: EventPacket[] | undefined = queryClient?.getQueryData(
       [...queryKey, "olderData"]
     );
@@ -388,11 +390,6 @@
     // Update view when data changes or progress completes
     if ((deriveaData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => updateViewEvent(deriveaData));
-    }
-
-    // Register tie when tieKey changes
-    if (tieKey) {
-      untrack(() => registerTie(tieKey));
     }
 
     // Handle timeline filter changes

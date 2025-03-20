@@ -144,7 +144,7 @@
   };
 
   // Set tie in the tie map store
-  function setTie(_tieKey: string) {
+  function registerTie(_tieKey: string) {
     if (!_tieKey) return;
 
     if (!$tieMapStore) {
@@ -159,13 +159,10 @@
     if ($defaultRelays) {
       untrack(() => updateRelayUrls($defaultRelays));
     }
-
+  });
+  $effect(() => {
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => dataChange($globalData, viewIndex, $nowProgress));
-    }
-
-    if (tieKey) {
-      untrack(() => setTie(tieKey));
     }
   });
 
@@ -192,6 +189,7 @@
   // Initialize the component
   async function init() {
     updating = false;
+    registerTie(tieKey);
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
