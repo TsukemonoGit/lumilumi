@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { queryClient, tieMapStore } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { now, type EventPacket } from "rx-nostr/src";
@@ -53,6 +53,9 @@
       since = ev[0].event.created_at;
     }
   }
+
+  // svelte-ignore non_reactive_update
+  let resetUniq: () => void;
   onDestroy(() => {
     queryClient.removeQueries({
       queryKey: timelineQuery,
@@ -61,11 +64,19 @@
       queryKey: [...timelineQuery, "olderData"],
     });
     console.log("GlobalTimelineDestroy");
+    // Clear tie map data
+    const globalTie = $tieMapStore[tieKey];
+    if (globalTie) {
+      const [, seenOn] = globalTie;
+      seenOn.clear();
+    }
+    resetUniq?.();
   });
 </script>
 
 {#if since && globalRelays.length > 0}
   <TimelineList
+    bind:resetUniq
     queryKey={timelineQuery}
     filters={[
       {

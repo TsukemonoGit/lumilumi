@@ -34,7 +34,7 @@
 
   // Configuration constants
   const SCROLL_AMOUNT = 40; // Amount to slide/scroll
-  const MAX_WAIT_TIME = 10000; // Maximum wait time for relay connections (10 seconds)
+  const MAX_WAIT_TIME = 5000; // Maximum wait time for relay connections (10 seconds)
   const BATCH_SIZE = 50; // Number of events to fetch per batch
   const UPDATE_DELAY = 50; // Delay for update events to prevent continuous execution
 
@@ -55,6 +55,7 @@
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
     updateViewEvent?: (_data?: EventPacket[] | undefined | null) => void;
+    resetUniq?: () => void;
   }
 
   let {
@@ -72,6 +73,7 @@
     nodata,
     content,
     updateViewEvent = $bindable(),
+    resetUniq = $bindable(),
   }: Props = $props();
 
   // State variables
@@ -153,6 +155,10 @@
     registerTie(tieKey);
     return pipe(tie, uniq, scanArray());
   }
+
+  resetUniq = () => {
+    eventIds.clear();
+  };
   /**
    * Registers the tie in the global store
    */
