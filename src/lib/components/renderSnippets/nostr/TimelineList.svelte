@@ -30,6 +30,7 @@
   import { createUniq } from "rx-nostr/src";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
+  import { formatAbsoluteDate } from "$lib/func/util";
 
   // Configuration constants
   const SCROLL_AMOUNT = 40; // Amount to slide/scroll
@@ -74,7 +75,6 @@
   }: Props = $props();
 
   // State variables
-  let untilTime: number;
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
   let isOnMount = false;
@@ -129,16 +129,7 @@
     timeoutId = setTimeout(() => {
       const olderData: EventPacket[] | undefined =
         queryClient.getQueryData(olderQueryKey);
-      const allEvents: EventPacket[] = data ?? [];
-
-      if (olderData) {
-        allEvents.push(...olderData);
-      }
-
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
+      const allEvents: EventPacket[] = [...(data || []), ...(olderData || [])];
 
       allUniqueEvents = allEvents
         .map((event) => event.event)
@@ -146,7 +137,9 @@
         .filter((event) => event.created_at <= now() + 10); // Exclude future events (with small tolerance)
 
       displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+
       updating = false;
+      $nowProgress = false;
     }, UPDATE_DELAY);
   };
 
@@ -266,16 +259,22 @@
 
   // UI action handlers
   const handleNext = async () => {
+    $nowProgress = true;
+    const untilTime = allUniqueEvents[allUniqueEvents.length - 1].created_at;
+    console.log(
+      "allUniqueEvents.length:",
+      allUniqueEvents.length,
+      formatAbsoluteDate(untilTime)
+    );
     if (
       !allUniqueEvents ||
       allUniqueEvents.length < viewIndex + amount + SCROLL_AMOUNT
     ) {
       const requiredAmount =
-        viewIndex + amount - allUniqueEvents?.length + 5 * SCROLL_AMOUNT;
+        viewIndex + amount - (allUniqueEvents?.length || 0) + 5 * SCROLL_AMOUNT;
 
-      $nowProgress = true;
-
-      const olderEvents = await loadOlderEvents(
+      // Using the freshly calculated untilTime
+      const globalolderEvents = await loadOlderEvents(
         requiredAmount,
         olderFilters,
         untilTime,
@@ -283,12 +282,12 @@
         relays
       );
 
-      if (olderEvents.length > 0) {
+      if (globalolderEvents.length > 0) {
         queryClient.setQueryData(
           olderQueryKey,
           (oldData: EventPacket[] | undefined) => {
             const existingEvents = oldData ?? [];
-            const allPackets = [...existingEvents, ...olderEvents];
+            const allPackets = [...existingEvents, ...globalolderEvents];
 
             // Remove duplicates based on event ID
             const uniqueEvents = Array.from(
@@ -311,7 +310,6 @@
     }
 
     updateViewEvent?.($globalData);
-    $nowProgress = false;
   };
 
   const handlePrev = () => {
