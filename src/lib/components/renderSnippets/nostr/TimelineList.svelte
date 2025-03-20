@@ -159,13 +159,10 @@
     if ($defaultRelays) {
       untrack(() => updateRelayUrls($defaultRelays));
     }
-
+  });
+  $effect(() => {
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => dataChange($globalData, viewIndex, $nowProgress));
-    }
-
-    if (tieKey) {
-      untrack(() => setTie(tieKey));
     }
   });
 
@@ -192,6 +189,7 @@
   // Initialize the component
   async function init() {
     updating = false;
+    registerTie(tieKey);
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
