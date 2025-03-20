@@ -7,7 +7,7 @@
     onError: () => void;
   }
   let { url, onError, originalUrl }: Props = $props();
-  $inspect("twitterUrl:", url);
+  //  $inspect("twitterUrl:", url);
 </script>
 
 <blockquote class="twitter-tweet">

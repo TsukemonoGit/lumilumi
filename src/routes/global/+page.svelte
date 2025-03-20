@@ -176,12 +176,20 @@
     }
   };
 
+  let init = false;
   // Lifecycle hooks
-  onMount(initializeRelaySettings);
+  onMount(async () => {
+    if (init) return;
+    init = true;
+    await initializeRelaySettings();
+    init = false;
+  });
 
   afterNavigate(async (navigate) => {
-    if (navigate.type === "form") return;
+    if (navigate.type === "form" || init) return;
+    init = true;
     await initializeRelaySettings();
+    init = false;
   });
 
   beforeNavigate(() => {

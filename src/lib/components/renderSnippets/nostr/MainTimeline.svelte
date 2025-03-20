@@ -82,7 +82,7 @@
 
   // State variables
   let allUniqueEvents: Nostr.Event[] = [];
-  let untilTime: number;
+
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
   let isOnMount: boolean = false;
@@ -150,18 +150,45 @@
   }
 
   /**
-   * Updates the view with current events
+   * 常に最新のイベントでビューを更新する関数
+   * updating状態でも必ず最新データが反映されるようにする
    */
+  let isUpdateScheduled: boolean = false;
   updateViewEvent = (_data: EventPacket[] | undefined | null = get(data)) => {
-    if (updating) return;
+    // 最新のデータを常に保存
 
-    updating = true;
+    // すでに更新スケジュールがあれば追加で予約しない
+    if (isUpdateScheduled) {
+      return;
+    }
+
+    // 実際の更新処理をスケジュール
+    isUpdateScheduled = true;
+
+    // 現在更新中でなければすぐに処理、更新中なら更新完了後に処理
+    if (!updating) {
+      scheduleUpdate();
+    }
+  };
+  /**
+   * 更新処理をスケジュール
+   */
+  function scheduleUpdate() {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
-      // Get older events data from query cache
+      processUpdate();
+    }, UPDATE_DELAY);
+  }
+  /**
+   * Updates the view with current events
+   */
+  function processUpdate(_data: EventPacket[] | undefined | null = get(data)) {
+    try {
+      updating = true;
+
       const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
@@ -171,10 +198,6 @@
       const allEvents = [...(_data || []), ...(olderEvents || [])];
 
       // Update the until timestamp for pagination
-      untilTime =
-        allEvents.length > 0
-          ? allEvents[allEvents.length - 1].event.created_at
-          : now();
 
       // Filter and process events
       allUniqueEvents = allEvents
@@ -184,9 +207,24 @@
 
       // Update the display with the current view window
       displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+
+      // リセットフラグ
+      isUpdateScheduled = false;
+      //  }, UPDATE_DELAY);
+    } catch (error) {
+      console.error("Error during update", error);
+      isUpdateScheduled = false;
+    } finally {
       updating = false;
-    }, UPDATE_DELAY);
-  };
+      $nowProgress = false;
+
+      // 更新処理中に新しいデータが来た場合は再度更新をスケジュール
+      // latestUpdateDataが更新された場合に再度処理を行う
+      if (isUpdateScheduled) {
+        scheduleUpdate();
+      }
+    }
+  }
 
   /**
    * Initialize the timeline
@@ -255,6 +293,7 @@
    * Load older events and move view down
    */
   const loadOlderAndMoveDown = async () => {
+    $nowProgress = true;
     // Check if we need to load more events
     const needToLoadMore =
       !allUniqueEvents ||
@@ -265,7 +304,7 @@
       const fetchAmount =
         viewIndex + amount - (allUniqueEvents?.length || 0) + 5 * SLIDE_AMOUNT;
 
-      $nowProgress = true;
+      const untilTime = allUniqueEvents[allUniqueEvents.length - 1].created_at;
 
       // Fetch older events
       const olderEvents = await loadOlderEvents(
@@ -304,7 +343,6 @@
 
     // Update the view with current events
     updateViewEvent(deriveaData);
-    $nowProgress = false;
   };
 
   /**
