@@ -23,7 +23,7 @@
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
-  const tieKey = "timeline";
+  const tieKey = "main";
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];

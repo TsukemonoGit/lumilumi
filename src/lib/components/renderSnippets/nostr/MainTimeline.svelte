@@ -123,12 +123,12 @@
     let operator = pipe(tie, uniq);
 
     // Add user status operator for main timeline if enabled
-    if (tieKey === "timeline" && lumiSetting.get().showUserStatus) {
+    if (lumiSetting.get().showUserStatus) {
       operator = pipe(operator, userStatus());
     }
 
     // Add reaction check operator for main timeline if enabled
-    if (tieKey === "timeline" && lumiSetting.get().showReactioninTL) {
+    if (lumiSetting.get().showReactioninTL) {
       operator = pipe(operator, reactionCheck());
     }
 
@@ -140,6 +140,7 @@
    * Registers the tie in the global store
    */
   function registerTie(key: string) {
+    //console.log($tieMapStore);
     if (!key) return;
 
     if (!$tieMapStore) {
