@@ -147,6 +147,9 @@
    * Registers the tie in the global store
    */
   function registerTie(key: string) {
+    //すでにあったらそれをつかう
+    // なかったら作る
+
     //console.log($tieMapStore);
     if (!key) return;
 
