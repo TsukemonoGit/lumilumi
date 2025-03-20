@@ -144,7 +144,7 @@
   };
 
   // Set tie in the tie map store
-  function setTie(_tieKey: string) {
+  function registerTie(_tieKey: string) {
     if (!_tieKey) return;
 
     if (!$tieMapStore) {
