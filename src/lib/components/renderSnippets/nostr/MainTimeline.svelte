@@ -2,7 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount, untrack } from "svelte";
   import { get } from "svelte/store";
-  import { pipe } from "rxjs";
+  import { pipe, type OperatorFunction } from "rxjs";
   import { createTie, now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
@@ -25,7 +25,7 @@
   } from "$lib/stores/globalRunes.svelte";
 
   // Utility functions
-  import { sortEventPackets, sortEvents } from "$lib/func/util";
+  import { sortEventPackets } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import {
     firstLoadOlderEvents,
@@ -87,8 +87,14 @@
   let timeoutId: NodeJS.Timeout | null = null;
   let isOnMount: boolean = false;
 
-  // Create rx-nostr tie and uniq operator
-  const [tie, tieMap] = createTie();
+  let tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >;
+  let tieMap: Map<string, Set<string>>;
 
   // Event handlers for the uniq operator
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -120,6 +126,7 @@
    * Configures the rx-nostr operators pipeline based on settings
    */
   function configureOperators() {
+    registerTie(tieKey);
     let operator = pipe(tie, uniq);
 
     // Add user status operator for main timeline if enabled
@@ -140,13 +147,21 @@
    * Registers the tie in the global store
    */
   function registerTie(key: string) {
+    //すでにあったらそれをつかう
+    // なかったら作る
+
     //console.log($tieMapStore);
     if (!key) return;
 
     if (!$tieMapStore) {
+      // Create rx-nostr tie and uniq operator
+      [tie, tieMap] = createTie();
       $tieMapStore = { [key]: [tie, tieMap] };
     } else if (!$tieMapStore?.[key]) {
+      [tie, tieMap] = createTie();
       $tieMapStore = { ...$tieMapStore, [key]: [tie, tieMap] };
+    } else {
+      [tie, tieMap] = $tieMapStore[key];
     }
   }
 
@@ -231,7 +246,6 @@
    * Initialize the timeline
    */
   async function initializeTimeline() {
-    registerTie(tieKey);
     const existingEvents: EventPacket[] | undefined = queryClient?.getQueryData(
       [...queryKey, "olderData"]
     );

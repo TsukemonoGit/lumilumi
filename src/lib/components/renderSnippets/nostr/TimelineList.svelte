@@ -26,7 +26,7 @@
   } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { pipe } from "rxjs";
+  import { pipe, type OperatorFunction } from "rxjs";
   import { createUniq } from "rx-nostr/src";
   import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
@@ -95,7 +95,15 @@
   });
 
   // Create tie and uniq for event handling
-  const [tie, tieMap] = createTie();
+  let tie: OperatorFunction<
+    EventPacket,
+    EventPacket & {
+      seenOn: Set<string>;
+      isNew: boolean;
+    }
+  >;
+  let tieMap: Map<string, Set<string>>;
+
   const keyFn = (packet: EventPacket): string => packet.event.id;
   const onCache = (packet: EventPacket): void => {
     // Event observed for the first time
@@ -106,14 +114,12 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
 
   // Create the timeline event list
-  let result = $derived(
-    useTimelineEventList(
-      queryKey,
-      filters,
-      pipe(tie, uniq, scanArray()),
-      req,
-      relays
-    )
+  let result = useTimelineEventList(
+    queryKey,
+    filters,
+    configureOperators(),
+    req,
+    relays
   );
   let globalData = $derived(result.data);
   let status = $derived(result.status);
@@ -143,14 +149,26 @@
     }, UPDATE_DELAY);
   };
 
-  // Set tie in the tie map store
-  function registerTie(_tieKey: string) {
-    if (!_tieKey) return;
+  function configureOperators() {
+    registerTie(tieKey);
+    return pipe(tie, uniq, scanArray());
+  }
+  /**
+   * Registers the tie in the global store
+   */
+  function registerTie(key: string) {
+    //console.log($tieMapStore);
+    if (!key) return;
 
     if (!$tieMapStore) {
-      $tieMapStore = { [_tieKey]: [tie, tieMap] };
-    } else if (!$tieMapStore[_tieKey]) {
-      $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
+      // Create rx-nostr tie and uniq operator
+      [tie, tieMap] = createTie();
+      $tieMapStore = { [key]: [tie, tieMap] };
+    } else if (!$tieMapStore?.[key]) {
+      [tie, tieMap] = createTie();
+      $tieMapStore = { ...$tieMapStore, [key]: [tie, tieMap] };
+    } else {
+      [tie, tieMap] = $tieMapStore[key];
     }
   }
 
@@ -189,7 +207,6 @@
   // Initialize the component
   async function init() {
     updating = false;
-    registerTie(tieKey);
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
