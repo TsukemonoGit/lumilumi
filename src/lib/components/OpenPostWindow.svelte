@@ -11,6 +11,9 @@
     Plus,
     UserPlus,
     Quote,
+    Reply,
+    Bell,
+    BellOff,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -435,7 +438,7 @@
         }
 
         // Insert URL at cursor position
-        const urlText = `\n${url}`;
+        const urlText = `\n${url}\n`;
         insertTextAtCursor(urlText);
 
         // Wait to ensure text insertion completes
@@ -805,45 +808,54 @@
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             {#each initOptions.defaultUsers as user}
-              <div class=" rounded-md bg-magnum-300 text-magnum-950 w-fit px-1">
+              <div class=" rounded-md bg-magnum-600 text-magnum-100 w-fit px-1">
                 <UserName pubhex={user} />
               </div>
             {/each}
           {/if}
           {#if initOptions.addableUserList}
-            {#each initOptions.addableUserList as replyuser, index}
-              <div
-                class=" rounded-md {additionalReplyUsers.includes(replyuser)
-                  ? 'bg-magnum-300'
-                  : 'bg-magnum-300/50'} text-magnum-950 w-fit px-1"
-              >
-                <UserName pubhex={replyuser} />
-
-                {#if additionalReplyUsers.includes(replyuser)}
+            <div class="reply-users-container flex flex-wrap gap-2 my-1">
+              {#each initOptions.addableUserList as replyUser, index}
+                {#if additionalReplyUsers.includes(replyUser)}
+                  <!-- Active reply user (selected) -->
                   <button
-                    class=" inline-flex h-6 w-6 appearance-none align-middle
-                     rounded-full p-1 text-magnum-800 bg-magnum-100
-                    hover:bg-magnum-300 focus:shadow-magnum-400"
+                    class="bg-magnum-600 rounded-md text-magnum-100 w-fit px-2 py-1 flex items-center gap-1 transition-all duration-200 shadow-sm hover:brightness-125"
                     onclick={() => {
                       additionalReplyUsers = additionalReplyUsers.filter(
-                        (user) => user !== replyuser
+                        (user) => user !== replyUser
                       );
                     }}
+                    aria-label={`Remove ${replyUser} from reply list`}
                   >
-                    <X class="size-4" />
+                    <Bell class="size-4 text-magnum-200 fill-magnum-200" />
+                    <UserName pubhex={replyUser} />
+
+                    <X
+                      strokeWidth={4}
+                      class="size-6 rounded-full  text-magnum-200  p-1 font-bold bg-magnum-600"
+                    />
                   </button>
-                {:else}<button
-                    class=" inline-flex h-6 w-6 appearance-none align-middle
-                 rounded-full p-1 text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
+                {:else}
+                  <!-- Inactive reply user (not selected) -->
+                  <button
+                    class="rounded-md border border-magnum-600 text-magnum-100 w-fit px-2 py-1 flex items-center gap-1 transition-all duration-200 shadow-sm hover:bg-magnum-400/25 opacity-75"
                     onclick={() => {
-                      additionalReplyUsers.push(replyuser);
+                      additionalReplyUsers.push(replyUser);
                     }}
+                    aria-label={`Add ${replyUser} to reply list`}
                   >
-                    <Plus class="size-4" />
-                  </button>{/if}
-              </div>
-            {/each}
+                    <Bell class="size-4 text-magnum-500 " /><UserName
+                      pubhex={replyUser}
+                    />
+
+                    <Plus
+                      strokeWidth={4}
+                      class="bg-magnum-800 size-6 rounded-full  text-magnum-400  p-1 font-bold"
+                    />
+                  </button>
+                {/if}
+              {/each}
+            </div>
           {/if}
         </div>
 
