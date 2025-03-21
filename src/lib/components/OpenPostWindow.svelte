@@ -815,16 +815,17 @@
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             {#each initOptions.defaultUsers as user}
               <div
-                class="border border-magnum-600 text-magnum-100 rounded-md w-fit px-2 py-1 flex items-center gap-1"
+                class="text-magnum-100 rounded-md w-fit py-1 flex items-center gap-1"
               >
-                <!-- <Bell class="size-4 text-magnum-500 fill-magnum-500" />--><UserName
+                <!-- <Bell class="size-4 text-magnum-500 fill-magnum-500" /> --><UserName
                   pubhex={user}
                 />
               </div>
             {/each}
           {/if}
+
           {#if initOptions.addableUserList}
-            <div class="reply-users-container flex flex-wrap gap-1">
+            <div class="flex flex-wrap gap-1">
               {#each initOptions.addableUserList as replyUser, index}
                 {#if additionalReplyUsers.includes(replyUser)}
                   <!-- Active reply user (selected) -->
@@ -868,7 +869,6 @@
             </div>
           {/if}
         </div>
-
         <fieldset class="mb-1 flex items-center gap-5">
           <textarea
             disabled={isPosting}
