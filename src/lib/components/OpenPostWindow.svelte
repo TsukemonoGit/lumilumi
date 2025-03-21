@@ -610,7 +610,13 @@
 
   function addUser(user: string | undefined) {
     if (!user) return;
-    if (initOptions?.addableUserList?.includes(user)) return;
+    if (
+      [
+        ...(initOptions?.defaultUsers || []),
+        ...(initOptions?.addableUserList || []),
+      ]?.includes(user)
+    )
+      return;
 
     initOptions = {
       ...initOptions,
@@ -808,13 +814,17 @@
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             {#each initOptions.defaultUsers as user}
-              <div class=" rounded-md bg-magnum-600 text-magnum-100 w-fit px-1">
-                <UserName pubhex={user} />
+              <div
+                class="border border-magnum-600 text-magnum-100 rounded-md w-fit px-2 py-1 flex items-center gap-1"
+              >
+                <!-- <Bell class="size-4 text-magnum-500 fill-magnum-500" />--><UserName
+                  pubhex={user}
+                />
               </div>
             {/each}
           {/if}
           {#if initOptions.addableUserList}
-            <div class="reply-users-container flex flex-wrap gap-2 my-1">
+            <div class="reply-users-container flex flex-wrap gap-1">
               {#each initOptions.addableUserList as replyUser, index}
                 {#if additionalReplyUsers.includes(replyUser)}
                   <!-- Active reply user (selected) -->
@@ -830,10 +840,10 @@
                     <Bell class="size-4 text-magnum-200 fill-magnum-200" />
                     <UserName pubhex={replyUser} />
 
-                    <X
+                    <!-- <X
                       strokeWidth={4}
                       class="size-6 rounded-full  text-magnum-200  p-1 font-bold bg-magnum-600"
-                    />
+                    /> -->
                   </button>
                 {:else}
                   <!-- Inactive reply user (not selected) -->
@@ -848,10 +858,10 @@
                       pubhex={replyUser}
                     />
 
-                    <Plus
+                    <!-- <Plus
                       strokeWidth={4}
                       class="bg-magnum-800 size-6 rounded-full  text-magnum-400  p-1 font-bold"
-                    />
+                    /> -->
                   </button>
                 {/if}
               {/each}
