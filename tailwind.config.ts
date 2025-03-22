@@ -28,6 +28,9 @@ export default {
       screens: {
         xs: "420px",
       },
+      animation: {
+        "spin-slow": "spin 1.2s linear infinite",
+      },
       colors: {
         magnum: getColorsFromName("magnum"),
         neutral: getColorsFromName("neutral"),
