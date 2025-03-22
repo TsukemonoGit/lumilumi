@@ -509,7 +509,7 @@
 </script>
 
 <div
-  class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden gap-1"
+  class="flex flex-row-reverse justify-between pt-0.5 max-w-full overflow-x-hidden"
 >
   <div class="flex gap-0.5 overflow-hidden">
     {#if lumiSetting.get().showAllReactions}
