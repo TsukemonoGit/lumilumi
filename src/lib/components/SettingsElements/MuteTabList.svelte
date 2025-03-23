@@ -2,7 +2,7 @@
   import { _ } from "svelte-i18n";
 
   import { X } from "lucide-svelte";
-  import { createTabs, melt } from "@melt-ui/svelte";
+  import { Tabs } from "melt/builders";
   import { crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
   import { nip19 } from "nostr-tools";
@@ -21,21 +21,15 @@
   import * as Nostr from "nostr-typedef";
   import { promisePublishEvent } from "$lib/func/nostr";
 
-  // export let muteList: LumiMute;
-  const {
-    elements: { root, list, content, trigger },
-    states: { value },
-  } = createTabs({
-    defaultValue: "tab-1",
-  });
-
-  const triggers = [
+  let triggers = $derived([
     { id: "tab-1", title: `Word (${$mutes?.list.word.length})` },
     { id: "tab-2", title: `Hashtag (${$mutes?.list.t.length})` },
     { id: "tab-3", title: `User (${$mutes?.list.p.length})` },
     { id: "tab-4", title: `Thread (${$mutes?.list.e.length})` },
-  ];
-
+  ]);
+  // svelte-ignore state_referenced_locally
+  const tabIds = triggers.map((trigger) => trigger.id);
+  const tabs = new Tabs({ value: tabIds[0] });
   const [send, receive] = crossfade({
     duration: 250,
     easing: cubicInOut,
@@ -126,18 +120,17 @@
 </script>
 
 <div
-  use:melt={$root}
   class="flex w-full flex-col overflow-hidden xs:max-h-[23rem] max-h-[20rem] rounded-xl shadow-md data-[orientation=vertical]:flex-row mb-2"
 >
   <div
-    use:melt={$list}
+    {...tabs.triggerList}
     class="flex shrink-0 overflow-y-auto
-data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-full overflow-auto"
+data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-full overflow-auto bg-neutral-800 p-2"
   >
     {#each triggers as triggerItem}
-      <button use:melt={$trigger(triggerItem.id)} class="trigger relative">
+      <button {...tabs.getTrigger(triggerItem.id)} class="trigger relative">
         {triggerItem.title}
-        {#if $value === triggerItem.id}
+        {#if tabs.value === triggerItem.id}
           <div
             in:send={{ key: "trigger" }}
             out:receive={{ key: "trigger" }}
@@ -147,64 +140,67 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
       </button>
     {/each}
   </div>
-  <div use:melt={$content("tab-1")} class="grow p-5">
-    <ul
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
-    >
-      {#each $mutes.list.word as word, index}
-        <li>
-          {word}
-          <button
-            class="remove"
-            onclick={() => handleClickRemove(["word", word])}
-            ><X size={20} /></button
-          >
-        </li>
-      {/each}
-    </ul>
-  </div>
-  <div use:melt={$content("tab-2")} class="grow p-5">
-    <ul
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 w-full"
-    >
-      {#each $mutes.list.t as t, index}
-        <li>
-          {t}
-          <button class="remove" onclick={() => handleClickRemove(["t", t])}
-            ><X size={20} /></button
-          >
-        </li>
-      {/each}
-    </ul>
-  </div>
-  <div use:melt={$content("tab-3")} class="grow p-5">
-    <ul
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
-    >
-      {#each $mutes.list.p as p, index}
-        <li>
-          {nip19.npubEncode(p)}
-          <button class="remove" onclick={() => handleClickRemove(["p", p])}
-            ><X size={20} /></button
-          >
-        </li>
-      {/each}
-    </ul>
-  </div>
+  <div class="grow p-5">
+    {#if tabs.value === tabIds[0]}
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
+      >
+        {#each $mutes.list.word as word, index}
+          <li>
+            {word}
+            <button
+              class="remove"
+              onclick={() => handleClickRemove(["word", word])}
+              ><X size={20} /></button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    {#if tabs.value === tabIds[1]}
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 w-full"
+      >
+        {#each $mutes.list.t as t, index}
+          <li>
+            {t}
+            <button class="remove" onclick={() => handleClickRemove(["t", t])}
+              ><X size={20} /></button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
+    {#if tabs.value === tabIds[2]}
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
+      >
+        {#each $mutes.list.p as p, index}
+          <li>
+            {nip19.npubEncode(p)}
+            <button class="remove" onclick={() => handleClickRemove(["p", p])}
+              ><X size={20} /></button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
 
-  <div use:melt={$content("tab-4")} class="grow p-5">
-    <ul
-      class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
-    >
-      {#each $mutes.list.e as e, index}
-        <li>
-          {nip19.noteEncode(e)}<button
-            class="remove"
-            onclick={() => handleClickRemove(["e", e])}><X size={20} /></button
-          >
-        </li>
-      {/each}
-    </ul>
+    {#if tabs.value === tabIds[3]}
+      <ul
+        class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2"
+      >
+        {#each $mutes.list.e as e, index}
+          <li>
+            {nip19.noteEncode(e)}<button
+              class="remove"
+              onclick={() => handleClickRemove(["e", e])}
+              ><X size={20} /></button
+            >
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
 </div>
 
@@ -253,29 +249,6 @@ data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r max-h-
       @apply focus:relative;
       background-color: theme(colors.neutral.800);
       color: theme("colors.magnum.300");
-    }
-  }
-
-  .save {
-    display: inline-flex;
-    height: theme(spacing.8);
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    border-radius: theme(borderRadius.md);
-    background-color: theme(colors.magnum.200);
-    padding-inline: theme(spacing.4);
-    line-height: 1;
-    font-weight: theme(fontWeight.semibold);
-    color: theme(colors.magnum.900);
-    @apply transition;
-
-    &:hover {
-      opacity: 0.75;
-    }
-
-    &:focus {
-      @apply !ring-green-600;
     }
   }
 </style>

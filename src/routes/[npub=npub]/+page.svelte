@@ -18,7 +18,6 @@
     Pin,
     ReceiptText,
     MessageSquareText,
-    Smile,
     Zap,
     Sticker,
     BookMarked,
