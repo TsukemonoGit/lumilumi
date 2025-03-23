@@ -26,7 +26,8 @@ export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
 };
 
 //profileがなかったときとかに画面に表示させるpubの省略文字
-export const displayShortPub = (hex: string) => {
+export const displayShortPub = (hex: string): string => {
+  if (!hex) return "";
   try {
     const pub = nip19.npubEncode(hex);
     return `${pub.slice(0, 13)}...${pub.slice(pub.length - 2)}`;
