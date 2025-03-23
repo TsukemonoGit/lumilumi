@@ -1,7 +1,7 @@
 <script lang="ts">
   import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
-  import { createCollapsible, melt } from "@melt-ui/svelte";
+  import { Collapsible } from "melt/builders";
   import { X, Share, Search, ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { slide } from "svelte/transition";
@@ -43,18 +43,6 @@
     filters,
     handleClickSearch,
   }: Props = $props();
-  // export let searchWord: string | undefined;
-  // export let followee: boolean;
-  // export let createFilter;
-  // export let searchKind: number | undefined = undefined;
-  // export let searchPubkey: string | undefined;
-  // export let searchPubkeyTo: string | undefined;
-  // export let searchHashtag: string | undefined;
-  // export let searchSince: number | undefined;
-  // export let searchUntil: number | undefined;
-  // export let resetValue;
-  // export let filters: Writable<Nostr.Filter[]>;
-  // export let handleClickSearch;
 
   const getKindLabel = (
     kind: number | undefined,
@@ -64,11 +52,7 @@
     const kindData = eventKinds.get(kind);
     return kindData ? (locale === "ja" ? kindData.ja : kindData.en) : "";
   };
-
-  const {
-    elements: { root, content, trigger },
-    states: { open },
-  } = createCollapsible({ forceVisible: true });
+  const collapsible = new Collapsible();
 
   const handleClickUser = (pubkey: string) => {
     console.log(pubkey);
@@ -160,106 +144,102 @@
     ><Share size={16} />{$_("about.share")}
   </button>
 </div>
-<div use:melt={$root} class="relative w-full mt-1">
-  <button
-    use:melt={$trigger}
-    class="flex items-center justify-between border-b border-b-magnum-400"
+
+<button
+  {...collapsible.trigger}
+  class="flex items-center border-b border-b-magnum-400 self-start mt-1"
+>
+  <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span>
+  <div
+    class="relative h-6 w-6 place-items-center rounded-full text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
+    aria-label="Toggle"
   >
-    <span class="font-semibold text-magnum-400 p-1">{$_("search.options")}</span
-    >
-    <div
-      class="relative h-6 w-6 place-items-center rounded-full text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 flex justify-center"
-      aria-label="Toggle"
-    >
-      <div class="w-fit h-fit flex justify-center items-center">
-        {#if $open}
-          <X class="size-5" />
-        {:else}
-          <ChevronDown class="size-5" />
-        {/if}
+    <div class="w-fit h-fit flex justify-center items-center">
+      {#if collapsible.open}
+        <X class="size-5" />
+      {:else}
+        <ChevronDown class="size-5" />
+      {/if}
+    </div>
+  </div>
+</button>
+
+{#if collapsible.open}
+  <div
+    {...collapsible.content}
+    transition:slide
+    class="flex gap-2 w-full flex-wrap px-2"
+  >
+    <div class="flex flex-col items-start justify-center mt-2">
+      <div class="font-medium text-magnum-400">kind</div>
+      <div class="flex align-middle mt-1.5 gap-1 items-center">
+        <input
+          type="number"
+          id="kind"
+          class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-400/60"
+          placeholder="1"
+          min="0"
+          bind:value={searchKind}
+        />
+        <KindSelect bind:selectedKind={searchKind} />
+        {getKindLabel(searchKind, $locale)}
       </div>
     </div>
-  </button>
-
-  <div>
-    {#if $open}
+    <div class="flex flex-col items-start justify-center w-full">
+      <div class="font-medium text-magnum-400">from</div>
       <div
-        use:melt={$content}
-        transition:slide
-        class="flex gap-2 w-full flex-wrap px-2"
+        class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
       >
-        <div class="flex flex-col items-start justify-center mt-2">
-          <div class="font-medium text-magnum-400">kind</div>
-          <div class="flex align-middle mt-1.5 gap-1 items-center">
-            <input
-              type="number"
-              id="kind"
-              class="h-10 w-[120px] rounded-md px-3 py-2 border border-magnum-400/60"
-              placeholder="1"
-              min="0"
-              bind:value={searchKind}
-            />
-            <KindSelect bind:selectedKind={searchKind} />
-            {getKindLabel(searchKind, $locale)}
-          </div>
-        </div>
-        <div class="flex flex-col items-start justify-center w-full">
-          <div class="font-medium text-magnum-400">from</div>
-          <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
-          >
-            <UserDataList {handleClickUser} />
+        <UserDataList {handleClickUser} />
 
-            <input
-              type="text"
-              id="npub"
-              class="h-10 px-3 py-2 rounded-r-md"
-              placeholder="npub"
-              bind:value={searchPubkey}
-            />
-          </div>
-        </div>
-        <div class="flex flex-col items-start justify-center w-full">
-          <div class="font-medium text-magnum-400">to</div>
-          <div
-            class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
-          >
-            <UserDataList handleClickUser={handleClickSearchPubkeyTo} />
-
-            <input
-              type="text"
-              id="npub"
-              class="h-10 px-3 py-2 rounded-r-md"
-              placeholder="npub"
-              bind:value={searchPubkeyTo}
-            />
-          </div>
-        </div>
-        <div class="flex flex-col items-start justify-center w-full">
-          <div class="font-medium text-magnum-400">hashtag</div>
-
-          <input
-            type="text"
-            id="hashtag"
-            class="h-10 w-full px-3 py-2 rounded-md border border-magnum-400/60"
-            placeholder="hashtag"
-            bind:value={searchHashtag}
-          />
-        </div>
-        <div class="flex flex-row items-start justify-center">
-          <DateRangePicker
-            bind:startTimeUnix={searchSince}
-            bind:endTimeUnix={searchUntil}
-            title={"Date"}
-          />
-          <button
-            onclick={resetValue}
-            class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
-          >
-            <X class="size-5" /></button
-          >
-        </div>
+        <input
+          type="text"
+          id="npub"
+          class="h-10 px-3 py-2 rounded-r-md"
+          placeholder="npub"
+          bind:value={searchPubkey}
+        />
       </div>
-    {/if}
+    </div>
+    <div class="flex flex-col items-start justify-center w-full">
+      <div class="font-medium text-magnum-400">to</div>
+      <div
+        class="grid grid-cols-[auto_1fr] mt-1.5 divide-x divide-magnum-400/60 rounded-md border border-magnum-400/60 w-full"
+      >
+        <UserDataList handleClickUser={handleClickSearchPubkeyTo} />
+
+        <input
+          type="text"
+          id="npub"
+          class="h-10 px-3 py-2 rounded-r-md"
+          placeholder="npub"
+          bind:value={searchPubkeyTo}
+        />
+      </div>
+    </div>
+    <div class="flex flex-col items-start justify-center w-full">
+      <div class="font-medium text-magnum-400">hashtag</div>
+
+      <input
+        type="text"
+        id="hashtag"
+        class="h-10 w-full px-3 py-2 rounded-md border border-magnum-400/60"
+        placeholder="hashtag"
+        bind:value={searchHashtag}
+      />
+    </div>
+    <div class="flex flex-row items-start justify-center">
+      <DateRangePicker
+        bind:startTimeUnix={searchSince}
+        bind:endTimeUnix={searchUntil}
+        title={"Date"}
+      />
+      <button
+        onclick={resetValue}
+        class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
+      >
+        <X class="size-5" /></button
+      >
+    </div>
   </div>
-</div>
+{/if}
