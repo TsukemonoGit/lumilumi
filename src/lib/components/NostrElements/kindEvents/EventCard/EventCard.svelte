@@ -44,6 +44,7 @@
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import RepostComponent from "../layout/RepostComponent.svelte";
   import Kind8Note from "./Kind8Note.svelte";
+  import Kind30009Note from "./Kind30009Note.svelte";
 
   // Component props interface
   interface Props {
@@ -526,7 +527,23 @@
           {zIndex}
         />
       {:else if note.kind === 8}
+        <!--badge award-->
         <Kind8Note
+          bind:deleted
+          {tieKey}
+          {mini}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {warning}
+          {repostable}
+          {zIndex}
+        />
+      {:else if note.kind === 30009}
+        <!--badge-->
+        <Kind30009Note
           bind:deleted
           {tieKey}
           {mini}

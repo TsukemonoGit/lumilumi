@@ -367,6 +367,20 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Kind mute sets",
     },
   ],
+  [
+    30008,
+    {
+      ja: "プロフィールバッジ",
+      en: "Profile Badges",
+    },
+  ],
+  [
+    30009,
+    {
+      ja: "バッジ定義",
+      en: "Badge Definition",
+    },
+  ],
   //
   //んあ～～～～～～
   //

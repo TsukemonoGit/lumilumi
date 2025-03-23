@@ -1,11 +1,9 @@
 <script lang="ts">
   import { splitHexColorString } from "$lib/func/util";
   import { followList } from "$lib/stores/globalRunes.svelte";
-  import { createAvatar, melt, type CreateAvatarProps } from "@melt-ui/svelte";
-  import type { MeltElement, WithGet } from "@melt-ui/svelte/internal/helpers";
-  import { untrack } from "svelte";
+
   import Avatar from "svelte-boring-avatars";
-  import type { Writable } from "svelte/store";
+
   interface Props {
     url: string | undefined;
     name: string | undefined;
@@ -45,12 +43,6 @@
       return url;
     }
   });
-
-  // const {
-  //   elements: { image, fallback },
-  //   states: { loadingStatus },
-  //   options: { src },
-  // } =
 
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
 
