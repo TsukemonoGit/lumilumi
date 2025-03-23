@@ -1,6 +1,6 @@
 <script lang="ts">
   import { eventKinds } from "$lib/func/kinds";
-  import { createDropdownMenu, melt } from "@melt-ui/svelte";
+  import { Combobox } from "melt/builders";
   import { ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { fly } from "svelte/transition";
@@ -10,63 +10,85 @@
   }
 
   let { selectedKind = $bindable(undefined) }: Props = $props();
-  const {
-    elements: { trigger, menu, item, separator, arrow },
 
-    states: { open },
-  } = createDropdownMenu({
-    forceVisible: true,
-    loop: true,
+  // 選択肢の値を文字列として扱う
+  const kindOptions = Array.from(eventKinds.entries()).map(
+    ([kind, { ja, en }]) => ({
+      value: kind.toString(), // 文字列に変換
+      label: $locale === "ja" ? ja : en,
+      originalKind: kind, // 元の値を保持
+    })
+  );
+
+  // 文字列の配列として選択肢の値だけを抽出
+  const options = kindOptions.map((option) => option.value);
+  type Option = (typeof options)[number];
+
+  const combobox = new Combobox<Option>({
+    onValueChange: (value) => {
+      if (!value) return;
+      selectedKind = Number(value); // 文字列から数値に変換
+    },
   });
-  // run(() => {
-  //   console.log($item);
-  // });
-  // run(() => {
-  //   console.log($locale);
-  // });
-  // locale;
 
-  const handleClickKind = (kind: number) => {
-    selectedKind = kind;
-  };
+  // 検索フィルタリング
+  const filtered = $derived.by(() => {
+    if (!combobox.touched) return options;
+    return options.filter((o) =>
+      o.toLowerCase().includes(combobox.inputValue.trim().toLowerCase())
+    );
+  });
+
+  // 表示用にラベルを取得する関数
+  function getLabel(value: string) {
+    const option = kindOptions.find((o) => o.value === value);
+    return option ? option.label : value;
+  }
 </script>
 
-<button type="button" class="trigger" use:melt={$trigger}>
-  <ChevronDown />
-</button>
+<div class="border border-magnum-400/60 flex gap-1 items-center rounded-md">
+  <input {...combobox.input} placeholder="1" />
+  <button type="button" {...combobox.trigger}>
+    <ChevronDown />
+  </button>
 
-{#if $open}
-  <div
-    class=" menu"
-    use:melt={$menu}
-    transition:fly={{ duration: 150, y: -10 }}
-  >
-    {#each Array.from(eventKinds.entries()) as [kind, { ja, en }]}
-      <div
-        class="item"
-        use:melt={$item}
-        onm-click={() => handleClickKind(kind)}
-      >
-        {kind}
-        {$locale === "ja" ? ja : en}
+  <div {...combobox.content}>
+    {#if combobox.open}
+      <div transition:fly={{ duration: 150, y: -10 }}>
+        {#each filtered as value (value)}
+          <div {...combobox.getOption(value)}>
+            {Number(value)}
+            {getLabel(value)}
+            {#if combobox.isSelected(value)}
+              ✓
+            {/if}
+          </div>
+        {:else}
+          <span>No results found</span>
+        {/each}
       </div>
-    {/each}
+    {/if}
   </div>
-{/if}
+</div>
 
 <style lang="postcss">
-  .menu {
-    @apply z-40 flex max-h-[min(100vh,400px)] min-w-[240px] flex-col shadow-lg overflow-y-auto cursor-pointer;
-    @apply rounded-md bg-neutral-800 border border-neutral-700 p-1;
-    @apply ring-0 !important;
+  [data-melt-combobox-input] {
+    width: 8em;
+    margin: 0.25em;
+    overflow: hidden;
+    height: 2rem;
+    padding: 0.25em;
+    background-color: rgb(var(--color-neutral-900) / 1);
   }
-  .trigger {
-    @apply inline-flex w-8 h-8 items-center justify-center rounded-md  bg-magnum-600;
-    @apply text-magnum-100  transition-colors hover:bg-magnum-600/80;
-    @apply data-[highlighted]:ring-magnum-400 data-[highlighted]:ring-offset-2 !important;
-    @apply p-0 text-sm font-medium  data-[highlighted]:outline-none;
+  [data-melt-combobox-trigger] {
+    width: 2em;
+    color: theme("colors.magnum.500");
   }
-  .item {
-    @apply hover:bg-neutral-700 p-1;
+  [data-melt-combobox-content] {
+    color: theme("colors.neutral.200");
+    background-color: theme("colors.neutral.800");
+    width: max-content !important;
+    height: 70%;
+    overflow-y: auto;
   }
 </style>

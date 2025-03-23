@@ -9,12 +9,6 @@
 
   let { title, contentEle }: Props = $props();
   const collapsible = new Collapsible();
-  // const {
-  //   elements: { root, content, trigger },
-  //   states: { open },
-  // } = createCollapsible({
-  //   forceVisible: true,
-  // });
 </script>
 
 <button

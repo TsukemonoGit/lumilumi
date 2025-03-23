@@ -172,7 +172,8 @@
   >
     <div class="flex flex-col items-start justify-center mt-2">
       <div class="font-medium text-magnum-400">kind</div>
-      <div class="flex align-middle mt-1.5 gap-1 items-center">
+      <KindSelect bind:selectedKind={searchKind} />
+      <!-- <div class="flex align-middle mt-1.5 gap-1 items-center">
         <input
           type="number"
           id="kind"
@@ -183,7 +184,7 @@
         />
         <KindSelect bind:selectedKind={searchKind} />
         {getKindLabel(searchKind, $locale)}
-      </div>
+      </div> -->
     </div>
     <div class="flex flex-col items-start justify-center w-full">
       <div class="font-medium text-magnum-400">from</div>
