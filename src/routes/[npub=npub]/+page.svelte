@@ -3,11 +3,11 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
-  import { onMount, untrack } from "svelte";
+  import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { generateRandomId, setRelays } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import { createTabs, melt } from "@melt-ui/svelte";
+  import { Tabs } from "melt/builders";
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
@@ -78,14 +78,6 @@
   let since: number | undefined = $state(undefined);
   let timelineQuery = $derived(["user", "post", userPubkey]);
 
-  const {
-    elements: { root, list, content, trigger },
-    states: { value },
-  } = createTabs({
-    // defaultValue: "post",
-    //  onValueChange: handleChange,
-  });
-
   const triggers = [
     { id: "post", title: "Post", Icon: ReceiptText },
     { id: "chat", title: "Chat", Icon: MessageSquareText },
@@ -99,6 +91,25 @@
     // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relay", Icon: RadioTower },
   ];
+
+  const tabIds = triggers.map((t) => t.id);
+  const tabs = new Tabs<string>({
+    value: tabIds[0],
+    onValueChange: (v) => {
+      if (v) {
+        window.location.hash = v;
+        const tabsElement = document?.querySelector("#userTabs");
+        setTimeout(() => {
+          tabsElement?.scrollIntoView({
+            block: "start",
+            inline: "nearest",
+            behavior: "instant",
+          });
+          window.scrollBy(0, -100);
+        }, 0);
+      }
+    },
+  });
 
   const [send, receive] = crossfade({
     duration: 150,
@@ -133,9 +144,11 @@
     console.log(page.url.hash);
     const hash = triggers.find((t) => `#${t.id}` === page.url.hash);
     if (hash) {
-      value.set(hash.id);
+      tabs.value = hash.id;
+      //value.set(hash.id);
     } else {
-      value.set("post");
+      tabs.value = "post";
+      //value.set("post");
     }
     //ログインしてない＝10002リレーないから
     if (!$loginUser && data.relays && data.relays.length > 0) {
@@ -162,20 +175,6 @@
     }
   }
 
-  value.subscribe((v) => {
-    if (v) {
-      window.location.hash = v;
-      const tabsElement = document?.querySelector("#userTabs");
-      setTimeout(() => {
-        tabsElement?.scrollIntoView({
-          block: "start",
-          inline: "nearest",
-          behavior: "instant",
-        });
-        window.scrollBy(0, -100);
-      }, 0);
-    }
-  });
   let isBirthDay: boolean = $state(false);
   let metadata: Nostr.Event | undefined = $state(undefined);
   const metadataChange = (_metadata: Nostr.Event) => {
@@ -196,25 +195,23 @@
     >
       <UserProfile pubkey={userPubkey} depth={0} tieKey={undefined} />
       <div
-        id="userTabs"
-        use:melt={$root}
         class={"flex w-full flex-col overflow-hidden rounded-xl shadow-lg  data-[orientation=vertical]:flex-row mt-4 border border-neutral-500 "}
       >
         <div
-          use:melt={$list}
+          {...tabs.triggerList}
           class="flex shrink-0 flex-wrap overflow-x-auto
                   data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r"
         >
           {#each triggers as triggerItem}
             <button
-              use:melt={$trigger(triggerItem.id)}
+              {...tabs.getTrigger(triggerItem.id)}
               class="trigger relative flex-col gap-1 min-w-20"
             >
               {#if triggerItem.Icon}<triggerItem.Icon
                   size={20}
                   class="min-h-[20px]"
                 />{/if}{triggerItem.title}
-              {#if $value === triggerItem.id}
+              {#if tabs.value === triggerItem.id}
                 <div
                   in:send={{ key: "trigger" }}
                   out:receive={{ key: "trigger" }}
@@ -224,476 +221,480 @@
             </button>
           {/each}
         </div>
-        <div use:melt={$content("post")} class="content">
-          {#if $value === "post"}
-            <LatestEvent
-              queryKey={["pin", userPubkey]}
-              filters={[
-                {
-                  kinds: [10001],
-                  limit: 1,
-                  authors: [userPubkey],
-                },
-              ]}
-            >
-              {#snippet children({ event })}
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
-                >
-                  {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
-                    <div>
-                      <Pin
-                        class="-rotate-45 text-magnum-400"
-                      />{#if e === "e"}<Note
-                          {id}
-                          displayMenu={true}
-                          depth={1}
-                          repostable={true}
-                          tieKey={userPubkey}
-                        />{:else}
-                        <NaddrEvent
-                          data={parseNaddr([e, id])}
-                          displayMenu={true}
-                          depth={1}
-                          repostable={true}
-                          tieKey={userPubkey}
-                          content={id}
-                        />
-                      {/if}
-                    </div>
-                  {/each}
-                </div>
-              {/snippet}
-            </LatestEvent>
-            {#if since}
-              <TimelineList
-                queryKey={timelineQuery}
-                filters={[
-                  {
-                    kinds: [1, 6, 16],
-
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                olderFilters={[
-                  {
-                    kinds: [1, 6, 16],
-
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                {req}
-                {amount}
-                tieKey={userPubkey}
+        <!-- {#each tabIds as id}
+  <div {...tabs.getContent(id)}>
+    {id}
+  </div>
+{/each} 
+        <div use:melt={$content("post")} class="content">-->
+        {#if tabs.value === "post"}
+          <LatestEvent
+            queryKey={["pin", userPubkey]}
+            filters={[
+              {
+                kinds: [10001],
+                limit: 1,
+                authors: [userPubkey],
+              },
+            ]}
+          >
+            {#snippet children({ event })}
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 border-b border-magnum-600/30 w-full"
               >
-                {#snippet content({ events, len })}
-                  <!-- <SetRepoReactions /> -->
-                  <div
-                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                  >
-                    {#if events && events.length > 0}
-                      {#each events as event, index (event.id)}
-                        <Metadata
-                          queryKey={["metadata", event.pubkey]}
-                          pubkey={event.pubkey}
-                        >
-                          {#snippet loading()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet nodata()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet error()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet content({ metadata })}
-                            <EventCard
-                              {metadata}
-                              note={event}
-                              tieKey={userPubkey}
-                            />
-                          {/snippet}
-                        </Metadata>
-                        <!-- </div> -->
-                      {/each}
-                    {/if}
-                  </div>{/snippet}
-                {#snippet loading()}
-                  <EmptyCardList length={10} />
-                {/snippet}
-
-                {#snippet error()}
+                {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
                   <div>
-                    <p>{error}</p>
-                  </div>
-                {/snippet}
-              </TimelineList>{/if}
-          {/if}
-        </div>
-        <div use:melt={$content("chat")} class="content">
-          {#if $value === "chat"}
-            {#if since}
-              <TimelineList
-                queryKey={["publck chat", userPubkey]}
-                filters={[
-                  {
-                    kinds: [42],
-
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                olderFilters={[
-                  {
-                    kinds: [42],
-
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                {req}
-                {amount}
-                tieKey={userPubkey}
-              >
-                {#snippet content({ events })}
-                  <!-- <SetRepoReactions /> -->
-                  <div
-                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                  >
-                    {#if events && events.length > 0}
-                      {#each events as event, index (event.id)}
-                        <Metadata
-                          queryKey={["metadata", event.pubkey]}
-                          pubkey={event.pubkey}
-                        >
-                          {#snippet loading()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet nodata()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet error()}
-                            <div>
-                              <EventCard note={event} tieKey={userPubkey} />
-                            </div>
-                          {/snippet}
-                          {#snippet content({ metadata })}
-                            <EventCard
-                              {metadata}
-                              note={event}
-                              tieKey={userPubkey}
-                            />
-                          {/snippet}
-                        </Metadata>
-                        <!-- </div> -->
-                      {/each}
-                    {/if}
-                  </div>{/snippet}
-                {#snippet loading()}
-                  <EmptyCardList length={10} />
-                {/snippet}
-
-                {#snippet error()}
-                  <div>
-                    <p>{error}</p>
-                  </div>
-                {/snippet}
-              </TimelineList>{/if}
-          {/if}
-        </div>
-        <div use:melt={$content("reactions")} class="content">
-          {#if $value === "reactions"}
-            <TimelineList
-              queryKey={["user", "reactions", userPubkey]}
-              filters={[
-                {
-                  kinds: [7, 17],
-                  limit: 50,
-                  authors: [userPubkey],
-                  since: now(),
-                },
-              ]}
-              olderFilters={[
-                {
-                  kinds: [7, 17],
-                  limit: 50,
-                  authors: [userPubkey],
-                  since: now(),
-                },
-              ]}
-              {req}
-              {amount}
-              tieKey={userPubkey}
-            >
-              {#snippet content({ events })}
-                <!-- <SetRepoReactions /> -->
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                >
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <!-- <div
-                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                      events.length - 1
-                        ? 'last-visible'
-                        : ''} {index === 0 ? 'first-visible' : ''}"
-                    > -->
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                      >
-                        {#snippet loading()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet nodata()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet error()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet content({ metadata })}
-                          <EventCard
-                            {metadata}
-                            note={event}
-                            excludefunc={excludeKind7}
-                            tieKey={userPubkey}
-                          />
-                        {/snippet}
-                      </Metadata>
-                      <!-- </div> -->
-                    {/each}
-                  {/if}
-                </div>{/snippet}
-              {#snippet loading()}
-                <EmptyCardList length={10} />
-              {/snippet}
-
-              {#snippet error()}
-                <div>
-                  <p>{error}</p>
-                </div>
-              {/snippet}
-            </TimelineList>
-          {/if}
-        </div>
-
-        <!--zap-->
-        <div use:melt={$content("zap")} class="content">
-          {#if $value === "zap"}
-            <TimelineList
-              queryKey={["user", "zap", userPubkey]}
-              filters={[
-                {
-                  kinds: [9735],
-                  limit: 50,
-                  "#p": [userPubkey],
-                  since: now(),
-                },
-              ]}
-              olderFilters={[
-                {
-                  kinds: [9735],
-                  limit: 50,
-                  "#p": [userPubkey],
-                  since: now(),
-                },
-              ]}
-              {req}
-              viewIndex={0}
-              {amount}
-              tieKey={userPubkey}
-            >
-              {#snippet content({ events })}
-                <!-- <SetRepoReactions /> -->
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                >
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <!-- <div
-                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                      events.length - 1
-                        ? 'last-visible'
-                        : ''} {index === 0 ? 'first-visible' : ''}"
-                    > -->
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                      >
-                        {#snippet loading()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet nodata()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet error()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                              tieKey={userPubkey}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet content({ metadata })}
-                          <EventCard
-                            {metadata}
-                            note={event}
-                            excludefunc={excludeKind7}
-                            tieKey={userPubkey}
-                          />
-                        {/snippet}
-                      </Metadata>
-                      <!-- </div> -->
-                    {/each}
-                  {/if}
-                </div>{/snippet}
-              {#snippet loading()}
-                <EmptyCardList length={10} />
-              {/snippet}
-
-              {#snippet error()}
-                <div>
-                  <p>{error}</p>
-                </div>
-              {/snippet}
-            </TimelineList>
-          {/if}
-        </div>
-
-        <div use:melt={$content("relays")} class="content">
-          {#if $value === "relays"}
-            <LatestEvent
-              queryKey={["relays", userPubkey]}
-              filters={[
-                {
-                  kinds: [10002],
-                  limit: 1,
-                  authors: [userPubkey],
-                },
-              ]}
-            >
-              {#snippet loading()}
-                <EmptyCardList length={10} />
-              {/snippet}
-
-              {#snippet error()}
-                <div class="p-1">
-                  <p>{error}</p>
-                </div>
-              {/snippet}
-              {#snippet nodata()}
-                <div class="p-1">
-                  <p>relays nodata</p>
-                </div>
-              {/snippet}
-
-              {#snippet children({ event })}
-                <div
-                  class="max-w-[100vw] break-words divide-y divide-magnum-600/30"
-                >
-                  {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
-                    <div class=" overflow-hidden p-1">
-                      <RelayCard
-                        {url}
-                        read={!rw || rw === "read" ? true : false}
-                        write={!rw || rw === "write" ? true : false}
+                    <Pin
+                      class="-rotate-45 text-magnum-400"
+                    />{#if e === "e"}<Note
+                        {id}
+                        displayMenu={true}
+                        depth={1}
+                        repostable={true}
+                        tieKey={userPubkey}
+                      />{:else}
+                      <NaddrEvent
+                        data={parseNaddr([e, id])}
+                        displayMenu={true}
+                        depth={1}
+                        repostable={true}
+                        tieKey={userPubkey}
+                        content={id}
                       />
-                    </div>
-                  {/each}
-                </div>
-              {/snippet}
-            </LatestEvent>
-          {/if}
-        </div>
+                    {/if}
+                  </div>
+                {/each}
+              </div>
+            {/snippet}
+          </LatestEvent>
+          {#if since}
+            <TimelineList
+              queryKey={timelineQuery}
+              filters={[
+                {
+                  kinds: [1, 6, 16],
 
-        <div use:melt={$content("followee")} class="content">
-          {#if $value === "followee"}
-            <Contacts
-              queryKey={["timeline", "contacts", data.pubkey]}
-              pubkey={data.pubkey}
+                  authors: [userPubkey],
+                  since: since,
+                },
+              ]}
+              olderFilters={[
+                {
+                  kinds: [1, 6, 16],
+
+                  authors: [userPubkey],
+                  since: since,
+                },
+              ]}
+              {req}
+              {amount}
+              tieKey={userPubkey}
             >
+              {#snippet content({ events, len })}
+                <!-- <SetRepoReactions /> -->
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                      >
+                        {#snippet loading()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet nodata()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet error()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet content({ metadata })}
+                          <EventCard
+                            {metadata}
+                            note={event}
+                            tieKey={userPubkey}
+                          />
+                        {/snippet}
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}
+                  {/if}
+                </div>{/snippet}
               {#snippet loading()}
                 <EmptyCardList length={10} />
               {/snippet}
 
               {#snippet error()}
-                <div class="p-1">
+                <div>
                   <p>{error}</p>
                 </div>
               {/snippet}
-              {#snippet nodata()}
-                <div class="p-1">
-                  <p>nodata</p>
+            </TimelineList>{/if}
+        {/if}
+        <!--</div>
+        <div use:melt={$content("chat")} class="content"> -->
+        {#if tabs.value === "chat"}
+          {#if since}
+            <TimelineList
+              queryKey={["publck chat", userPubkey]}
+              filters={[
+                {
+                  kinds: [42],
+
+                  authors: [userPubkey],
+                  since: since,
+                },
+              ]}
+              olderFilters={[
+                {
+                  kinds: [42],
+
+                  authors: [userPubkey],
+                  since: since,
+                },
+              ]}
+              {req}
+              {amount}
+              tieKey={userPubkey}
+            >
+              {#snippet content({ events })}
+                <!-- <SetRepoReactions /> -->
+                <div
+                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                >
+                  {#if events && events.length > 0}
+                    {#each events as event, index (event.id)}
+                      <Metadata
+                        queryKey={["metadata", event.pubkey]}
+                        pubkey={event.pubkey}
+                      >
+                        {#snippet loading()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet nodata()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet error()}
+                          <div>
+                            <EventCard note={event} tieKey={userPubkey} />
+                          </div>
+                        {/snippet}
+                        {#snippet content({ metadata })}
+                          <EventCard
+                            {metadata}
+                            note={event}
+                            tieKey={userPubkey}
+                          />
+                        {/snippet}
+                      </Metadata>
+                      <!-- </div> -->
+                    {/each}
+                  {/if}
+                </div>{/snippet}
+              {#snippet loading()}
+                <EmptyCardList length={10} />
+              {/snippet}
+
+              {#snippet error()}
+                <div>
+                  <p>{error}</p>
                 </div>
               {/snippet}
-              {#snippet content({ contacts, status })}
-                {#if contacts}
-                  <PaginationList
-                    list={contacts.tags
-                      .filter((tag) => tag[0] === "p" && tag.length > 1)
-                      .map((tag) => tag[1])}
-                    tieKey={userPubkey}
-                    >{#snippet children({ id })}
-                      <Metadatanoyatu pubkey={id} tieKey={userPubkey} />
-                    {/snippet}
-                  </PaginationList>{/if}
-              {/snippet}
-            </Contacts>
-          {/if}
-        </div>
-        <div use:melt={$content("bookmark")} class="content">
-          {#if $value === "bookmark"}
-            <BookmarkTab pubkey={userPubkey} />
-          {/if}
-        </div>
-        <div use:melt={$content("emojis")} class="content">
-          {#if $value === "emojis"}
-            <CustomEmojiTab pubkey={userPubkey} />
-          {/if}
-        </div>
+            </TimelineList>{/if}
+        {/if}
+        <!-- </div>
+         <div use:melt={$content("reactions")} class="content"> -->
+        {#if tabs.value === "reactions"}
+          <TimelineList
+            queryKey={["user", "reactions", userPubkey]}
+            filters={[
+              {
+                kinds: [7, 17],
+                limit: 50,
+                authors: [userPubkey],
+                since: now(),
+              },
+            ]}
+            olderFilters={[
+              {
+                kinds: [7, 17],
+                limit: 50,
+                authors: [userPubkey],
+                since: now(),
+              },
+            ]}
+            {req}
+            {amount}
+            tieKey={userPubkey}
+          >
+            {#snippet content({ events })}
+              <!-- <SetRepoReactions /> -->
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              >
+                {#if events && events.length > 0}
+                  {#each events as event, index (event.id)}
+                    <!-- <div
+                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
+                      events.length - 1
+                        ? 'last-visible'
+                        : ''} {index === 0 ? 'first-visible' : ''}"
+                    > -->
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                    >
+                      {#snippet loading()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet nodata()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet error()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet content({ metadata })}
+                        <EventCard
+                          {metadata}
+                          note={event}
+                          excludefunc={excludeKind7}
+                          tieKey={userPubkey}
+                        />
+                      {/snippet}
+                    </Metadata>
+                    <!-- </div> -->
+                  {/each}
+                {/if}
+              </div>{/snippet}
+            {#snippet loading()}
+              <EmptyCardList length={10} />
+            {/snippet}
+
+            {#snippet error()}
+              <div>
+                <p>{error}</p>
+              </div>
+            {/snippet}
+          </TimelineList>
+        {/if}
+        <!--  </div>
+
+        zap
+        <div use:melt={$content("zap")} class="content">-->
+        {#if tabs.value === "zap"}
+          <TimelineList
+            queryKey={["user", "zap", userPubkey]}
+            filters={[
+              {
+                kinds: [9735],
+                limit: 50,
+                "#p": [userPubkey],
+                since: now(),
+              },
+            ]}
+            olderFilters={[
+              {
+                kinds: [9735],
+                limit: 50,
+                "#p": [userPubkey],
+                since: now(),
+              },
+            ]}
+            {req}
+            viewIndex={0}
+            {amount}
+            tieKey={userPubkey}
+          >
+            {#snippet content({ events })}
+              <!-- <SetRepoReactions /> -->
+              <div
+                class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+              >
+                {#if events && events.length > 0}
+                  {#each events as event, index (event.id)}
+                    <!-- <div
+                      class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
+                      events.length - 1
+                        ? 'last-visible'
+                        : ''} {index === 0 ? 'first-visible' : ''}"
+                    > -->
+                    <Metadata
+                      queryKey={["metadata", event.pubkey]}
+                      pubkey={event.pubkey}
+                    >
+                      {#snippet loading()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet nodata()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet error()}
+                        <div>
+                          <EventCard
+                            note={event}
+                            excludefunc={excludeKind7}
+                            tieKey={userPubkey}
+                          />
+                        </div>
+                      {/snippet}
+                      {#snippet content({ metadata })}
+                        <EventCard
+                          {metadata}
+                          note={event}
+                          excludefunc={excludeKind7}
+                          tieKey={userPubkey}
+                        />
+                      {/snippet}
+                    </Metadata>
+                    <!-- </div> -->
+                  {/each}
+                {/if}
+              </div>{/snippet}
+            {#snippet loading()}
+              <EmptyCardList length={10} />
+            {/snippet}
+
+            {#snippet error()}
+              <div>
+                <p>{error}</p>
+              </div>
+            {/snippet}
+          </TimelineList>
+        {/if}
+        <!-- </div>
+
+        <div use:melt={$content("relays")} class="content"> -->
+        {#if tabs.value === "relays"}
+          <LatestEvent
+            queryKey={["relays", userPubkey]}
+            filters={[
+              {
+                kinds: [10002],
+                limit: 1,
+                authors: [userPubkey],
+              },
+            ]}
+          >
+            {#snippet loading()}
+              <EmptyCardList length={10} />
+            {/snippet}
+
+            {#snippet error()}
+              <div class="p-1">
+                <p>{error}</p>
+              </div>
+            {/snippet}
+            {#snippet nodata()}
+              <div class="p-1">
+                <p>relays nodata</p>
+              </div>
+            {/snippet}
+
+            {#snippet children({ event })}
+              <div
+                class="max-w-[100vw] break-words divide-y divide-magnum-600/30"
+              >
+                {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
+                  <div class=" overflow-hidden p-1">
+                    <RelayCard
+                      {url}
+                      read={!rw || rw === "read" ? true : false}
+                      write={!rw || rw === "write" ? true : false}
+                    />
+                  </div>
+                {/each}
+              </div>
+            {/snippet}
+          </LatestEvent>
+        {/if}
+        <!--  </div>
+
+        <div use:melt={$content("followee")} class="content"> -->
+        {#if tabs.value === "followee"}
+          <Contacts
+            queryKey={["timeline", "contacts", data.pubkey]}
+            pubkey={data.pubkey}
+          >
+            {#snippet loading()}
+              <EmptyCardList length={10} />
+            {/snippet}
+
+            {#snippet error()}
+              <div class="p-1">
+                <p>{error}</p>
+              </div>
+            {/snippet}
+            {#snippet nodata()}
+              <div class="p-1">
+                <p>nodata</p>
+              </div>
+            {/snippet}
+            {#snippet content({ contacts, status })}
+              {#if contacts}
+                <PaginationList
+                  list={contacts.tags
+                    .filter((tag) => tag[0] === "p" && tag.length > 1)
+                    .map((tag) => tag[1])}
+                  tieKey={userPubkey}
+                  >{#snippet children({ id })}
+                    <Metadatanoyatu pubkey={id} tieKey={userPubkey} />
+                  {/snippet}
+                </PaginationList>{/if}
+            {/snippet}
+          </Contacts>
+        {/if}
+        <!--   </div>
+        <div use:melt={$content("bookmark")} class="content"> -->
+        {#if tabs.value === "bookmark"}
+          <BookmarkTab pubkey={userPubkey} />
+        {/if}
+        <!--     </div>
+        <div use:melt={$content("emojis")} class="content"> -->
+        {#if tabs.value === "emojis"}
+          <CustomEmojiTab pubkey={userPubkey} />
+        {/if}
       </div>
     </div>
   {/if}
@@ -741,42 +742,14 @@
       position: relative;
     }
 
-    &:focus-visible {
-      @apply z-10 ring-2;
-    }
-
-    &[data-state="active"] {
-      @apply focus:relative;
+    &[data-active] {
       background-color: theme(colors.neutral.900);
-
-      color: theme("colors.magnum.500");
-    }
-  }
-
-  .save {
-    display: inline-flex;
-    height: theme(spacing.8);
-    cursor: default;
-    align-items: center;
-    justify-content: center;
-    border-radius: theme(borderRadius.md);
-    background-color: theme(colors.magnum.200);
-    padding-inline: theme(spacing.4);
-    line-height: 1;
-    font-weight: theme(fontWeight.semibold);
-    color: theme(colors.magnum.900);
-    @apply transition;
-
-    &:hover {
-      opacity: 0.75;
+      color: theme(colors.magnum.500);
+      font-weight: bold;
     }
 
-    &:focus {
-      @apply !ring-green-600;
+    &[data-active]:focus {
+      position: relative;
     }
-  }
-
-  .content {
-    @apply min-h-4;
   }
 </style>
