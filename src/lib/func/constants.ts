@@ -6,6 +6,18 @@ import type {
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 
+export const notificationKinds = [
+  1, // Note
+  4, // Direct message (legacy)
+  6, // Repost
+  7, // Reaction
+  8, // badge award event
+  16, // Generic repost
+  42, // Channel message
+  9735, // Zap receipt
+  1111, // Comment (NIP-22)
+  1059, // Direct message (newer format)  三代目DM ,
+];
 export const clientTag = [
   "client",
   "lumilumi",

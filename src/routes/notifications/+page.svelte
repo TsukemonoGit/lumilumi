@@ -16,6 +16,7 @@
   import NotificationList from "./NotificationList.svelte";
   import { extractKind9734 } from "$lib/func/zap";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import { notificationKinds } from "$lib/func/constants";
 
   // Constants
   const TIMELINE_QUERY: QueryKey = ["notifications"];
@@ -23,13 +24,33 @@
   const DISPLAY_AMOUNT = 50;
   const INITIAL_LOAD_LIMIT = 100;
 
-  // Notification types config
-  const NOTIFICATION_TYPES = [
-    { id: "reaction", title: Heart, kind: 7 },
-    { id: "reply", title: Reply, kind: 1 },
+  // Notification types configuration
+  type NotificationType = {
+    id: string;
+    title: any;
+    kinds: number[];
+  };
+
+  // Define base notification types
+  const BASE_NOTIFICATION_TYPES: NotificationType[] = [
+    { id: "reaction", title: Heart, kinds: [7] },
+    { id: "reply", title: Reply, kinds: [1] },
     { id: "repost", title: Repeat2, kinds: [6, 16] },
-    { id: "zap", title: Zap, kind: 9735 },
-    { id: "other", title: "other", kinds: [42, 4, 1059, 1111] },
+    { id: "zap", title: Zap, kinds: [9735] },
+  ];
+
+  // Get all kinds covered by specific notification types
+  const coveredKinds = BASE_NOTIFICATION_TYPES.flatMap((type) => type.kinds);
+
+  // Generate "other" kinds dynamically
+  const otherKinds = notificationKinds.filter(
+    (kind) => !coveredKinds.includes(kind)
+  );
+
+  // Complete notification types including "other" category
+  const NOTIFICATION_TYPES: NotificationType[] = [
+    ...BASE_NOTIFICATION_TYPES,
+    { id: "other", title: "other", kinds: otherKinds },
   ];
 
   // State
@@ -41,17 +62,7 @@
   // Build initial filters
   let filters: Nostr.Filter[] = [
     {
-      kinds: [
-        1, // Note
-        6, // Repost
-        7, // Reaction
-        16, // Generic repost
-        42, // Channel message
-        9735, // Zap receipt
-        1111, // Comment (NIP-22)
-        4, // Direct message (legacy)
-        1059, // Direct message (newer format)
-      ],
+      kinds: notificationKinds,
       "#p": [$loginUser],
       since: undefined,
       until: undefined,
@@ -118,6 +129,7 @@
 
     // Verify p-tag addresses the current user for certain event kinds
     if ([7, 6, 16].includes(event.kind)) {
+      //別のユーザーあての可能性あるからラストが自分か確認
       if (!isEventAddressedToUser(event)) {
         return false;
       }
@@ -155,15 +167,9 @@
       const typeConfig = NOTIFICATION_TYPES.find((t) => t.id === selectedType);
       if (!typeConfig) return false;
 
-      if ("kind" in typeConfig) {
-        return event.kind === typeConfig.kind;
-      } else if ("kinds" in typeConfig) {
-        return typeConfig.kinds?.includes(event.kind);
-      }
-      return false;
+      return typeConfig.kinds.includes(event.kind);
     });
   }
-
   // Toggle button handlers
   function selectAllNotificationTypes() {
     value.set(NOTIFICATION_TYPES.map((type) => type.id));
