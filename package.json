@@ -49,6 +49,7 @@
 		"markdown-it-mark": "^4.0.0",
 		"markdown-it-sub": "^2.0.0",
 		"markdown-it-sup": "^2.0.0",
+		"melt": "^0.19.0",
 		"nostr-login": "^1.7.11",
 		"nostr-tools": "^2.11.0",
 		"nostr-typedef": "^0.12.0",

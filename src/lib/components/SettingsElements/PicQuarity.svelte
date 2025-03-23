@@ -1,43 +1,53 @@
 <script lang="ts">
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { createSlider, melt } from "@melt-ui/svelte";
+  import { Slider } from "melt/builders";
 
   interface Props {
     value: number;
   }
+
   let { value = $bindable() }: Props = $props();
 
-  const {
-    elements: { root, range, thumbs, ticks },
-    states: { value: sliderValue },
-  } = createSlider({
-    defaultValue: [lumiSetting.get().picQuarity || 100],
+  const slider = new Slider({
     min: 10,
-    step: 5,
     max: 100,
+    step: 5,
+    value: () => value || lumiSetting.get().picQuarity || 100,
+    onValueChange: (v) => {
+      value = v;
+    },
   });
-
-  sliderValue.subscribe((v) => {
-    //console.log(v);
-    value = v[0];
-  });
-  // $inspect(value);
 </script>
 
-<span use:melt={$root} class="relative flex h-[20px] w-[200px] items-center">
-  <span class="h-[3px] w-full bg-magnum-600/40">
-    <span use:melt={$range} class="h-[3px] bg-magnum-600"></span>
-  </span>
+<div
+  class="slider-container relative flex h-[20px] w-[200px] items-center"
+  {...slider.root}
+>
+  <div class="slider-track h-[3px] w-full bg-magnum-600/40 relative">
+    <div
+      class="slider-range h-[3px] bg-magnum-600 absolute inset-0 right-[var(--percentage-inv)]"
+    ></div>
+  </div>
 
-  {#each $ticks as tick}
-    <span
-      use:melt={tick}
-      class="h-[3px] w-[3px] rounded-full bg-magnum-600/50 data-[bounded]:bg-magnum-500/75"
-    ></span>
-  {/each}
+  <div
+    {...slider.thumb}
+    class="h-5 w-5 rounded-full bg-magnum-400 focus:ring-4 focus:ring-magnum-400/40 absolute top-1/2 left-[var(--percentage)] -translate-x-1/2 -translate-y-1/2"
+  ></div>
+</div>
 
-  <span
-    use:melt={$thumbs[0]}
-    class="h-5 w-5 rounded-full bg-magnum-300 focus:ring-4 focus:!ring-magnum-300/40"
-  ></span>
-</span>
+<style>
+  .slider-container {
+    position: relative;
+  }
+
+  .slider-track {
+    position: relative;
+    width: 100%;
+  }
+
+  .slider-range {
+    position: absolute;
+    inset: 0;
+    right: var(--percentage-inv);
+  }
+</style>
