@@ -1,7 +1,7 @@
 <script lang="ts">
   import { eventKinds } from "$lib/func/kinds";
   import { Combobox } from "melt/builders";
-  import { ChevronDown } from "lucide-svelte";
+  import { Check, ChevronDown } from "lucide-svelte";
   import { locale } from "svelte-i18n";
   import { fly } from "svelte/transition";
 
@@ -58,9 +58,9 @@
         {#each filtered as value (value)}
           <div {...combobox.getOption(value)}>
             {Number(value)}
-            {getLabel(value)}
+            <span class="text-sm text-neutral-400">{getLabel(value)}</span>
             {#if combobox.isSelected(value)}
-              ✓
+              <Check class="float-end text-magnum-400" />
             {/if}
           </div>
         {:else}
@@ -90,5 +90,16 @@
     width: max-content !important;
     height: 70%;
     overflow-y: auto;
+    cursor: pointer;
+  }
+  [data-melt-combobox-option] {
+    padding: 0.25em;
+    border-radius: 0.25em;
+    &:hover {
+      background-color: theme("colors.neutral.700");
+    }
+    &:active {
+      background-color: theme("colors.neutral.600");
+    }
   }
 </style>
