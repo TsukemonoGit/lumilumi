@@ -1,0 +1,138 @@
+<!--バッジ受賞-->
+<script lang="ts">
+  import * as Nostr from "nostr-typedef";
+
+  import { _ } from "svelte-i18n";
+  import { loginUser } from "$lib/stores/stores";
+
+  import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
+
+  import Content from "../../content/Content.svelte";
+  import UserName from "../../user/UserName.svelte";
+  import Reply from "../Reply.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
+  import ReplyTo from "../layout/ReplyTo.svelte";
+  import { hexRegex, nip33Regex } from "$lib/func/regex";
+  import { parseNaddr } from "$lib/func/util";
+  import type { AddressPointer } from "nostr-tools/nip19";
+  import NaddrEvent from "../NaddrEvent.svelte";
+
+  interface Props {
+    note: Nostr.Event;
+    metadata: Nostr.Event | undefined;
+    displayMenu: boolean;
+    depth: number;
+    maxHeight: number | undefined;
+    tieKey: string | undefined;
+    mini: boolean;
+    warning: string[] | undefined;
+
+    repostable: boolean;
+    deleted: boolean;
+    zIndex?: number;
+  }
+
+  let {
+    note,
+    metadata,
+    displayMenu,
+    depth,
+    maxHeight,
+    tieKey,
+    mini,
+    warning,
+
+    repostable,
+    deleted = $bindable(),
+    zIndex,
+  }: Props = $props();
+
+  let replyUsers: string[] = $derived(
+    note.tags
+      .filter(
+        (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1])
+      )
+      .map((tag) => tag[1])
+  );
+  let badgeAddress: AddressPointer | undefined = $derived.by(() => {
+    const atag = note.tags.find(
+      (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
+    );
+    return atag ? parseNaddr(atag) : undefined;
+  });
+</script>
+
+<NoteComponent
+  warningText={warning !== undefined
+    ? warning.length > 1
+      ? warning[1]
+      : ""
+    : undefined}
+>
+  {#snippet icon()}
+    <UserPopupMenu
+      pubkey={note.pubkey}
+      {metadata}
+      size={mini ? 20 : 40}
+      {displayMenu}
+      {depth}
+      {tieKey}
+    />
+  {/snippet}
+  {#snippet seenOn()}
+    {#if lumiSetting.get().showRelayIcon && displayMenu}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+  {/snippet}
+  {#snippet name()}
+    <ProfileDisplay
+      pubkey={note.pubkey}
+      {metadata}
+      kindInfo={true}
+      kind={note.kind}
+    />
+  {/snippet}
+  {#snippet time()}
+    <DisplayTime {displayMenu} {note} {tieKey} />
+  {/snippet}
+  {#snippet status()}
+    {#if lumiSetting.get().showUserStatus}<ShowStatus
+        pubkey={note.pubkey}
+        {tieKey}
+      />{/if}
+  {/snippet}
+  {#snippet replyUser()}
+    {#if replyUsers.length > 0}
+      <ReplyTo
+        >{#each replyUsers as user}
+          {#if !displayMenu}<UserName pubhex={user} />{:else}
+            <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
+        {/each}</ReplyTo
+      >{/if}
+  {/snippet}
+
+  {#snippet content()}
+    {#if badgeAddress}<div class="border rounded-md border-magnum-600/30">
+        <NaddrEvent
+          data={badgeAddress}
+          {displayMenu}
+          {depth}
+          {tieKey}
+          content={`${badgeAddress.kind}:${badgeAddress.pubkey}:${badgeAddress.identifier}`}
+          {repostable}
+          mini={true}
+          thread={true}
+        />
+      </div>{:else}<span class="italic text-neutral-600">badge load error</span
+      >{/if}{/snippet}
+  {#snippet actionButtons()}
+    {#if displayMenu}
+      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+  {/snippet}
+</NoteComponent>

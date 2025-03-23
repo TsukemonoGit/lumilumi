@@ -40,6 +40,7 @@ import {
 } from "$lib/stores/globalRunes.svelte";
 
 import { validateLoginPubkey } from "./validateLoginPubkey";
+import { notificationKinds } from "./constants";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -254,11 +255,7 @@ export const makeMainFilters = (
 
   if (lumiSetting.get().showReactioninTL) {
     filters.push({
-      kinds: [
-        42 /*チャンネルのリプライ*/, 1 /*リプライ*/, 6 /*kind1のリポスト*/, 16,
-        /*kind1以外のリポスト（ktag）*/ 7 /*リアクション kタグ*/, 1059,
-        9735 /*zap receipt**/, 4 /**旧DM */, 1059 /** 三代目DM */,
-      ],
+      kinds: notificationKinds,
       "#p": [get(loginUser)],
       since: since,
     });
