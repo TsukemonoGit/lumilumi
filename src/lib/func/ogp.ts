@@ -10,7 +10,8 @@ export type Ogp = {
   memo?: string;
 };
 
-export let isvalidURL = (str: string): boolean => {
+export let isvalidURL = (str: string | null): boolean => {
+  if (!str) return false;
   try {
     const url = new URL(str);
     return url.protocol === "https:";
