@@ -1,7 +1,7 @@
 <script lang="ts">
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
 
-  import type { Ogp } from "$lib/func/ogp";
+  import { isvalidURL, type Ogp } from "$lib/func/ogp";
   import { profile } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
@@ -9,6 +9,12 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
+  import NoteComponent from "../layout/NoteComponent.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import SeenonIcons from "../SeenonIcons.svelte";
+  import ProfileDisplay from "./ProfileDisplay.svelte";
+  import DisplayTime from "./DisplayTime.svelte";
+  import ShowStatus from "../Status/ShowStatus.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -26,48 +32,51 @@
   let { note, data, metadata, displayMenu, depth, repostable, tieKey }: Props =
     $props();
 
-  let prof = $derived(profile(metadata));
   let deleted = $state(false);
 </script>
 
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else}
-  <div class=" break-all overflow-x-hidden gap-4 p-1">
-    <div class="flex gap-1 w-fit">
-      {#if metadata}
-        <div>
-          <UserPopupMenu
-            pubkey={note.pubkey}
-            {metadata}
-            size={20}
-            {displayMenu}
-            {depth}
-            {tieKey}
-          />
-        </div>
-        <div class="text-magnum-100 text-sm">
-          {#if prof}
-            <DisplayName
-              height={21}
-              name={`@${prof?.name ?? prof?.display_name ?? ""}`}
-              tags={metadata.tags}
-            />{:else}noname{/if}
-        </div>
-        <div class="text-neutral-300/50 text-sm">
-          {eventKinds.get(note.kind)?.en ?? `kind:${note.kind}`}
-        </div>
-      {/if}
-    </div>
-
-    <OgpCard
-      contents={data.ogp}
-      url={data.url}
-    />{#if displayMenu}<NoteActionButtons
-        {note}
-        {repostable}
+  <NoteComponent warningText={undefined}>
+    {#snippet icon()}
+      <UserPopupMenu
+        pubkey={note.pubkey}
+        {metadata}
+        size={20}
+        {displayMenu}
+        {depth}
         {tieKey}
-        bind:deleted
-      />{/if}
-  </div>
+      />
+    {/snippet}
+    {#snippet seenOn()}
+      {#if lumiSetting.get().showRelayIcon && displayMenu}
+        <SeenonIcons id={note.id} width={20} {tieKey} />{/if}
+    {/snippet}
+    {#snippet name()}
+      <ProfileDisplay
+        pubkey={note.pubkey}
+        kind={note.kind}
+        {metadata}
+        kindInfo={true}
+      />
+    {/snippet}
+    {#snippet time()}
+      <DisplayTime {displayMenu} {note} {tieKey} />
+    {/snippet}
+    {#snippet status()}
+      {#if lumiSetting.get().showUserStatus}<ShowStatus
+          pubkey={note.pubkey}
+          {tieKey}
+        />{/if}
+    {/snippet}
+
+    {#snippet content()}
+      <OgpCard contents={data.ogp} url={data.url} />
+    {/snippet}
+    {#snippet actionButtons()}
+      {#if displayMenu}
+        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+    {/snippet}
+  </NoteComponent>
 {/if}
