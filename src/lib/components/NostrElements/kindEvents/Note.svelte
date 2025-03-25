@@ -49,10 +49,11 @@
       hasLoaded = true;
     }
   };
-
+  let isOmitted = $state(false);
   let dynamicClasses = $state("");
   const onChange = (ev: Nostr.Event) => {
-    if (omit && ev.pubkey === $loginUser) {
+    isOmitted = omit && ev.pubkey === $loginUser;
+    if (isOmitted) {
       dynamicClasses = "ml-5 opacity-90 text-sm";
     }
   };
@@ -72,7 +73,9 @@
       {#snippet nodata()}
         {#if relayhint && relayhint.length > 0}
           <NoteByRelayhint
+            bind:isOmitted
             {id}
+            {omit}
             {mini}
             {displayMenu}
             {depth}
@@ -91,22 +94,12 @@
         >
       {/snippet}
       {#snippet content({ data: text, status })}
-        <!--   {#if omit && text.pubkey === $loginUser}
-          <OmittedCard
-            {text}
-            {depth}
-            {repostable}
-            {maxHeight}
-            {displayMenu}
-            {tieKey}
-            {zIndex}
-          />
-        {:else} -->
         <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
           {#snippet loading()}
             <EventCard
               note={text}
-              mini={(omit && text.pubkey === $loginUser) || mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -118,7 +111,8 @@
           {#snippet nodata()}
             <EventCard
               note={text}
-              mini={(omit && text.pubkey === $loginUser) || mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -130,7 +124,8 @@
           {#snippet error()}
             <EventCard
               note={text}
-              mini={(omit && text.pubkey === $loginUser) || mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -143,7 +138,8 @@
             <EventCard
               note={text}
               {metadata}
-              mini={(omit && text.pubkey === $loginUser) || mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {displayMenu}

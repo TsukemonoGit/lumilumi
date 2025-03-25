@@ -1,13 +1,14 @@
 <script lang="ts">
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import type { nip19 } from "nostr-tools";
-  import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
+
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "./EventCard/EventCard.svelte";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -20,6 +21,8 @@
     thread?: boolean;
     relayhint: string[];
     zIndex?: number;
+    omit: boolean;
+    isOmitted?: boolean;
   }
 
   let {
@@ -33,6 +36,8 @@
     thread = false,
     relayhint,
     zIndex,
+    omit,
+    isOmitted = $bindable(),
   }: Props = $props();
   let queryKey = $derived([
     "naddr",
@@ -45,6 +50,10 @@
     //   }
     return;
   };
+
+  const onChange = (ev: Nostr.Event) => {
+    isOmitted = omit && ev.pubkey === $loginUser;
+  };
 </script>
 
 {#await queryCheck(queryKey)}<EmptyCard
@@ -53,6 +62,7 @@
   >
 {:then}
   <LatestEvent
+    {onChange}
     relays={relayhint}
     {queryKey}
     filters={[
@@ -93,7 +103,8 @@
               {repostable}
               {tieKey}
               {depth}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {thread}
               {zIndex}
             />
@@ -107,7 +118,8 @@
               {repostable}
               {tieKey}
               {depth}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {thread}
               {zIndex}
             />
@@ -121,7 +133,8 @@
               {repostable}
               {tieKey}
               {depth}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {thread}
               {zIndex}
             />
@@ -135,7 +148,8 @@
             {repostable}
             {tieKey}
             {depth}
-            {mini}
+            mini={isOmitted || mini}
+            showStatus={isOmitted}
             {thread}
             {zIndex}
           />

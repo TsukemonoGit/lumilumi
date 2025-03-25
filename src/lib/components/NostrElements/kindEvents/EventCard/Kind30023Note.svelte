@@ -26,6 +26,7 @@
     tieKey: string | undefined;
     zIndex: number | undefined;
     mini: boolean;
+    showStatus?: boolean;
   }
 
   let {
@@ -38,6 +39,7 @@
     tieKey,
     zIndex,
     mini,
+    showStatus = true,
   }: Props = $props();
 
   let deleted = $state(false);
@@ -96,7 +98,7 @@
       <DisplayTime {displayMenu} {note} {tieKey} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
+      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
           {tieKey}
         />{/if}

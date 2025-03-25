@@ -29,6 +29,7 @@
     kindInfo?: boolean;
 
     deleted: boolean;
+    showStatus?: boolean;
   }
 
   let {
@@ -43,6 +44,7 @@
     repostable,
 
     deleted = $bindable(),
+    showStatus = true,
   }: Props = $props();
 </script>
 
@@ -73,7 +75,7 @@
     <DisplayTime {displayMenu} {note} {tieKey} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}
         {tieKey}
       />{/if}

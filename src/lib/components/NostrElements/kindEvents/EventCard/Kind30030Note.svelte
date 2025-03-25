@@ -37,6 +37,7 @@
     mini?: boolean;
     metadata: Nostr.Event | undefined;
     depth: number;
+    showStatus?: boolean;
   }
 
   let deleted = $state(false);
@@ -48,6 +49,7 @@
     displayMenu,
     mini,
     metadata,
+    showStatus = true,
     depth,
   }: Props = $props();
   let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
@@ -319,7 +321,7 @@
       <DisplayTime {displayMenu} {note} {tieKey} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
+      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
           {tieKey}
         />{/if}

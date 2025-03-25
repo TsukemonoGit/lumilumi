@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { nip19 } from "nostr-tools";
   import EventCard from "./EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
-  import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
+
   import { encodetoNote } from "$lib/func/encode";
-  import { queryClient } from "$lib/stores/stores";
+  import { loginUser, queryClient } from "$lib/stores/stores";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     id: string;
@@ -20,6 +20,8 @@
     tieKey: string | undefined;
     relayhint: string[];
     zIndex?: number;
+    omit: boolean;
+    isOmitted?: boolean;
   }
 
   let {
@@ -33,6 +35,8 @@
     tieKey,
     relayhint,
     zIndex,
+    omit,
+    isOmitted = $bindable(),
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
   const queryCheck = async (id: string) => {
@@ -41,13 +45,17 @@
     return;
     //  }
   };
+
+  const onChange = (ev: Nostr.Event) => {
+    isOmitted = omit && ev.pubkey === $loginUser;
+  };
 </script>
 
 {#await queryCheck(id)}<EmptyCard nevent={displayMenu ? loadingText : undefined}
     >Loading {loadingText}</EmptyCard
   >
 {:then}
-  <Text queryKey={["timeline", id]} {id} relays={relayhint}>
+  <Text queryKey={["timeline", id]} {id} relays={relayhint} {onChange}>
     {#snippet loading()}
       <EmptyCard nevent={displayMenu ? loadingText : undefined}
         >Loading {loadingText}</EmptyCard
@@ -69,7 +77,8 @@
           <div>
             <EventCard
               note={text}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -83,7 +92,8 @@
           <div>
             <EventCard
               note={text}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -97,7 +107,8 @@
           <div>
             <EventCard
               note={text}
-              {mini}
+              mini={isOmitted || mini}
+              showStatus={isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -111,7 +122,8 @@
           <EventCard
             note={text}
             {metadata}
-            {mini}
+            mini={isOmitted || mini}
+            showStatus={isOmitted}
             {maxHeight}
             {thread}
             {displayMenu}

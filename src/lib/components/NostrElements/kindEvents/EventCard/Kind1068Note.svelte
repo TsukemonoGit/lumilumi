@@ -31,6 +31,7 @@
     zIndex: number | undefined;
     maxHeight: number | undefined;
     repostable: boolean;
+    showStatus?: boolean;
   }
 
   let {
@@ -45,6 +46,7 @@
     zIndex,
     maxHeight,
     repostable,
+    showStatus = true,
   }: Props = $props();
 
   let deleted = $state(false);
@@ -108,7 +110,7 @@
       <DisplayTime {displayMenu} {note} {tieKey} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
+      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
           {tieKey}
         />{/if}
