@@ -367,12 +367,55 @@
     cursorPosition = target.selectionStart;
   }
 
-  function insertTextAtCursor(insertText: string) {
-    text =
-      text.slice(0, cursorPosition) + insertText + text.slice(cursorPosition);
-    cursorPosition += insertText.length;
+  function insertTextAtCursor(
+    insertText: string,
+    options: {
+      addSpaceBefore?: boolean;
+      addSpaceAfter?: boolean;
+    } = {}
+  ) {
+    const { addSpaceBefore = false, addSpaceAfter = false } = options;
 
-    // Focus and move cursor
+    // 空白文字を判定する正規表現
+    const WHITESPACE_REGEX = /^\s+$/;
+
+    // 文脈に応じたスペース追加
+    const finalInsertText = (() => {
+      let result = insertText;
+
+      // 文頭の特別な処理
+      const isTextStart = cursorPosition === 0;
+
+      // 前のスペース処理
+      if (addSpaceBefore) {
+        // 文頭でない、かつ前の文字が空白でない場合
+        if (!isTextStart && cursorPosition > 0) {
+          const prev = text[cursorPosition - 1];
+          if (!WHITESPACE_REGEX.test(prev)) {
+            result = ` ${result}`;
+          }
+        }
+      }
+
+      // 後ろのスペース処理
+      if (addSpaceAfter) {
+        const next = text[cursorPosition];
+        if (!WHITESPACE_REGEX.test(next)) {
+          result = `${result} `;
+        }
+      }
+
+      return result;
+    })();
+
+    // テキストと カーソル位置の更新
+    text =
+      text.slice(0, cursorPosition) +
+      finalInsertText +
+      text.slice(cursorPosition);
+    cursorPosition += finalInsertText.length;
+
+    // カーソル位置調整
     textarea?.focus();
     setTimeout(() => {
       textarea?.setSelectionRange(cursorPosition, cursorPosition);
@@ -388,15 +431,19 @@
   }
 
   function handleClickUser(pub: string): Promise<void> {
-    const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
-    insertTextAtCursor(emojiText);
+    // const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
+    insertTextAtCursor(`nostr:${pub}`, {
+      addSpaceAfter: true,
+      addSpaceBefore: true,
+    });
     viewMetadataList = false;
 
     return Promise.resolve();
   }
 
   function handleClickQuote() {
-    insertTextAtCursor(" nostr:");
+    // const inputText = cursorPosition === 0 ? "nostr:" : " nostr:";
+    insertTextAtCursor("nostr:", { addSpaceBefore: true });
   }
 
   // ----------------------------------------
@@ -438,8 +485,11 @@
         }
 
         // Insert URL at cursor position
-        const urlText = `\n${url}\n`;
-        insertTextAtCursor(urlText);
+        // const urlText = cursorPosition === 0 ? `${url}\n` : `\n${url}\n`;
+        insertTextAtCursor(url, {
+          addSpaceBefore: true,
+          addSpaceAfter: true,
+        });
 
         // Wait to ensure text insertion completes
         await delay(10);
