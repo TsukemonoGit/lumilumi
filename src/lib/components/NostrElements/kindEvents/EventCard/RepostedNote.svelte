@@ -50,6 +50,7 @@
     {repostable}
     content={tag[1]}
     {zIndex}
+    omit={page.route.id === "/notifications" && depth === 1}
     mini={true}
   />
 {:else}

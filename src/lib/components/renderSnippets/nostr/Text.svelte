@@ -10,6 +10,7 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
+  import { untrack } from "svelte";
 
   interface Props {
     relays?: string[] | undefined;
@@ -30,6 +31,7 @@
     content?: import("svelte").Snippet<
       [{ data: Nostr.Event; status: ReqStatus }]
     >;
+    onChange?: (metadata: Nostr.Event) => void;
   }
 
   let {
@@ -41,6 +43,7 @@
     loading,
     nodata,
     content,
+    onChange,
   }: Props = $props();
 
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
@@ -48,6 +51,12 @@
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
+
+  $effect(() => {
+    if ($data?.event) {
+      untrack(() => onChange?.($data?.event));
+    }
+  });
 </script>
 
 {#if $errorData}
