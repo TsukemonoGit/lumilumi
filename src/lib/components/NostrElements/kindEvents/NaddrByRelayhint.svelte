@@ -104,7 +104,7 @@
               {tieKey}
               {depth}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {thread}
               {zIndex}
             />
@@ -119,7 +119,7 @@
               {tieKey}
               {depth}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {thread}
               {zIndex}
             />
@@ -134,7 +134,7 @@
               {tieKey}
               {depth}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {thread}
               {zIndex}
             />
@@ -149,7 +149,7 @@
             {tieKey}
             {depth}
             mini={isOmitted || mini}
-            showStatus={isOmitted}
+            showStatus={!isOmitted}
             {thread}
             {zIndex}
           />

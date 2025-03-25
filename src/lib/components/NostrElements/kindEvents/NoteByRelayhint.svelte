@@ -78,7 +78,7 @@
             <EventCard
               note={text}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -93,7 +93,7 @@
             <EventCard
               note={text}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -108,7 +108,7 @@
             <EventCard
               note={text}
               mini={isOmitted || mini}
-              showStatus={isOmitted}
+              showStatus={!isOmitted}
               {maxHeight}
               {thread}
               {depth}
@@ -123,7 +123,7 @@
             note={text}
             {metadata}
             mini={isOmitted || mini}
-            showStatus={isOmitted}
+            showStatus={!isOmitted}
             {maxHeight}
             {thread}
             {displayMenu}

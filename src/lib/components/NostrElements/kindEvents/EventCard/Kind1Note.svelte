@@ -54,7 +54,7 @@
     deleted = $bindable(),
     replyTag,
     thread,
-    showStatus = true,
+    showStatus,
   }: Props = $props();
 
   let warning = $derived(checkContentWarning(note?.tags));

@@ -90,7 +90,8 @@
             {#if data.relays && data.relays.length > 0}
               <NaddrByRelayhint
                 {data}
-                showStatus={isOmitted}
+                bind:isOmitted
+                {omit}
                 {content}
                 {mini}
                 {displayMenu}
@@ -120,7 +121,7 @@
             {#snippet loading()}
               <div>
                 <EventCard
-                  showStatus={isOmitted}
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
@@ -135,7 +136,7 @@
             {#snippet nodata()}
               <div>
                 <EventCard
-                  showStatus={isOmitted}
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
@@ -150,7 +151,7 @@
             {#snippet error()}
               <div>
                 <EventCard
-                  showStatus={isOmitted}
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
@@ -164,7 +165,7 @@
             {/snippet}
             {#snippet content({ metadata })}
               <EventCard
-                showStatus={isOmitted}
+                showStatus={!isOmitted}
                 {metadata}
                 {displayMenu}
                 note={event}
