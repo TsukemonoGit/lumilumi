@@ -12,6 +12,7 @@
   import { page } from "$app/state";
   import { loginUser } from "$lib/stores/stores";
   import OmittedCard from "./EventCard/OmittedCard.svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     id: string;
@@ -48,11 +49,22 @@
       hasLoaded = true;
     }
   };
+
+  let dynamicClasses = $state("");
+  const onChange = (ev: Nostr.Event) => {
+    if (omit && ev.pubkey === $loginUser) {
+      dynamicClasses = "ml-5 opacity-90 text-sm";
+    }
+  };
 </script>
 
-<div use:viewport={null} onenterViewport={handleEnterViewport}>
+<div
+  class={dynamicClasses}
+  use:viewport={null}
+  onenterViewport={handleEnterViewport}
+>
   {#if hasLoaded}
-    <Text queryKey={["timeline", id]} {id}>
+    <Text queryKey={["timeline", id]} {id} {onChange}>
       {#snippet loading()}
         <EmptyCard nevent={displayMenu ? loadingText : undefined}
           >Loading {loadingText}</EmptyCard
@@ -79,7 +91,7 @@
         >
       {/snippet}
       {#snippet content({ data: text, status })}
-        {#if omit && text.pubkey === $loginUser}
+        <!--   {#if omit && text.pubkey === $loginUser}
           <OmittedCard
             {text}
             {depth}
@@ -89,59 +101,59 @@
             {tieKey}
             {zIndex}
           />
-        {:else}
-          <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
-            {#snippet loading()}
-              <EventCard
-                note={text}
-                {mini}
-                {maxHeight}
-                {thread}
-                {depth}
-                {repostable}
-                {tieKey}
-                {zIndex}
-              />
-            {/snippet}
-            {#snippet nodata()}
-              <EventCard
-                note={text}
-                {mini}
-                {maxHeight}
-                {thread}
-                {depth}
-                {repostable}
-                {tieKey}
-                {zIndex}
-              />
-            {/snippet}
-            {#snippet error()}
-              <EventCard
-                note={text}
-                {mini}
-                {maxHeight}
-                {thread}
-                {depth}
-                {repostable}
-                {tieKey}
-                {zIndex}
-              />
-            {/snippet}
-            {#snippet content({ metadata })}
-              <EventCard
-                note={text}
-                {metadata}
-                {mini}
-                {maxHeight}
-                {thread}
-                {displayMenu}
-                {depth}
-                {repostable}
-                {tieKey}
-                {zIndex}
-              />
-            {/snippet}
-          </Metadata>{/if}
+        {:else} -->
+        <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
+          {#snippet loading()}
+            <EventCard
+              note={text}
+              mini={(omit && text.pubkey === $loginUser) || mini}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet nodata()}
+            <EventCard
+              note={text}
+              mini={(omit && text.pubkey === $loginUser) || mini}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet error()}
+            <EventCard
+              note={text}
+              mini={(omit && text.pubkey === $loginUser) || mini}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {tieKey}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet content({ metadata })}
+            <EventCard
+              note={text}
+              {metadata}
+              mini={(omit && text.pubkey === $loginUser) || mini}
+              {maxHeight}
+              {thread}
+              {displayMenu}
+              {depth}
+              {repostable}
+              {tieKey}
+              {zIndex}
+            />
+          {/snippet}
+        </Metadata><!-- {/if} -->
       {/snippet}
     </Text>
   {:else}

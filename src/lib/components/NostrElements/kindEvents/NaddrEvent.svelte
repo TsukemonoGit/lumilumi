@@ -9,6 +9,8 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import { viewport } from "$lib/func/useViewportAction";
+  import { loginUser } from "$lib/stores/stores";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -20,6 +22,7 @@
     mini?: boolean;
     thread?: boolean;
     zIndex?: number;
+    omit?: boolean;
   }
 
   let {
@@ -32,6 +35,7 @@
     mini = false,
     thread = false,
     zIndex,
+    omit = false,
   }: Props = $props();
   let queryKey = $derived([
     "naddr",
@@ -44,12 +48,24 @@
       hasLoaded = true;
     }
   };
+
+  let dynamicClasses = $state("");
+  const onChange = (ev: Nostr.Event) => {
+    if (omit && ev.pubkey === $loginUser) {
+      dynamicClasses = "ml-5 opacity-90 text-sm";
+    }
+  };
 </script>
 
 {#if queryKey}
-  <div use:viewport={null} onenterViewport={handleEnterViewport}>
+  <div
+    class={dynamicClasses}
+    use:viewport={null}
+    onenterViewport={handleEnterViewport}
+  >
     {#if hasLoaded}
       <LatestEvent
+        {onChange}
         {queryKey}
         filters={[
           data.identifier !== ""
