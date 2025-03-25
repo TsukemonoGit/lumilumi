@@ -20,6 +20,7 @@
     tieKey: string | undefined;
     mini: any;
     message?: string | undefined; // console.log(message);
+    showStatus?: boolean;
   }
 
   let {
@@ -31,6 +32,7 @@
     tieKey,
     mini,
     message = undefined,
+    showStatus = true,
   }: Props = $props();
 
   let deleted = $state(false);
@@ -70,7 +72,7 @@
           <DisplayTime {displayMenu} {note} {tieKey} />
         {/snippet}
         {#snippet status()}
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
+          {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
               pubkey={note.pubkey}
               {tieKey}
             />{/if}
@@ -116,7 +118,7 @@
           <DisplayTime {displayMenu} {note} {tieKey} />
         {/snippet}
         {#snippet status()}
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
+          {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
               pubkey={note.pubkey}
               {tieKey}
             />{/if}
@@ -162,7 +164,7 @@
           <DisplayTime {displayMenu} {note} {tieKey} />
         {/snippet}
         {#snippet status()}
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
+          {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
               pubkey={note.pubkey}
               {tieKey}
             />{/if}
@@ -209,7 +211,7 @@
           <DisplayTime {displayMenu} {note} {tieKey} />
         {/snippet}
         {#snippet status()}
-          {#if lumiSetting.get().showUserStatus}<ShowStatus
+          {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
               pubkey={note.pubkey}
               {tieKey}
             />{/if}

@@ -27,10 +27,19 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
+    showStatus?: boolean;
   }
 
-  let { note, data, metadata, displayMenu, depth, repostable, tieKey }: Props =
-    $props();
+  let {
+    note,
+    data,
+    metadata,
+    displayMenu,
+    depth,
+    repostable,
+    tieKey,
+    showStatus,
+  }: Props = $props();
 
   let deleted = $state(false);
 </script>
@@ -65,7 +74,7 @@
       <DisplayTime {displayMenu} {note} {tieKey} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
+      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
           {tieKey}
         />{/if}

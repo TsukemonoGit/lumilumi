@@ -38,6 +38,7 @@
     repostable: boolean;
     deleted: boolean;
     zIndex?: number;
+    showStatus?: boolean;
   }
 
   let {
@@ -53,6 +54,7 @@
     repostable,
     deleted = $bindable(),
     zIndex,
+    showStatus = true,
   }: Props = $props();
   let badgeName = $derived(
     note.tags.find((tag) => tag[0] == "name" && tag.length > 1)?.[1]
@@ -99,7 +101,7 @@
     <DisplayTime {displayMenu} {note} {tieKey} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}
         {tieKey}
       />{/if}

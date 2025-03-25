@@ -33,6 +33,7 @@
     tieKey: string | undefined;
     warning: string[] | undefined;
     zIndex?: number;
+    showStatus?: boolean;
   }
 
   let {
@@ -47,6 +48,7 @@
     tieKey,
     warning,
     zIndex,
+    showStatus = true,
   }: Props = $props();
   let deleted = $state(false);
   let imeta: Imeta[] | undefined = $derived(
@@ -100,7 +102,7 @@
       <DisplayTime {displayMenu} {note} {tieKey} />
     {/snippet}
     {#snippet status()}
-      {#if lumiSetting.get().showUserStatus}<ShowStatus
+      {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
           {tieKey}
         />{/if}

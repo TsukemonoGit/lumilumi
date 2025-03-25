@@ -34,6 +34,7 @@
     repostable: boolean;
     deleted: boolean;
     zIndex?: number;
+    showStatus?: boolean;
   }
 
   let {
@@ -51,6 +52,7 @@
     repostable,
     deleted = $bindable(),
     zIndex,
+    showStatus = true,
   }: Props = $props();
 
   let decrypt: string | undefined = $state(undefined);
@@ -111,7 +113,7 @@
     <DisplayTime {displayMenu} {note} {tieKey} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}
         {tieKey}
       />{/if}

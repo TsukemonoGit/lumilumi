@@ -60,6 +60,7 @@
     repostable?: boolean;
     tieKey: string | undefined;
     zIndex?: number | undefined;
+    showStatus?: boolean;
   }
 
   // Props with defaults
@@ -76,6 +77,7 @@
     repostable = true,
     tieKey,
     zIndex,
+    showStatus = true,
   }: Props = $props();
 
   // State variables
@@ -255,6 +257,7 @@
           bind:deleted
           {replyTag}
           {thread}
+          {showStatus}
           kindInfo={note.kind !== 1 ? true : false}
         />
       {:else if note.kind === 42}
@@ -271,6 +274,7 @@
           {thread}
           {replyTag}
           {replyUsers}
+          {showStatus}
         />
       {:else if note.kind === 6 || note.kind === 16}
         <!--リポスト-->
@@ -398,6 +402,7 @@
           {repostable}
           {maxHeight}
           {warning}
+          {showStatus}
         />
       {:else if note.kind === 40}
         <!--kind40 パブ茶部屋-->
@@ -428,6 +433,7 @@
           {warning}
           {zIndex}
           {maxHeight}
+          {showStatus}
         />
       {:else if note.kind === 30000}
         <ListLinkCard event={note} {depth} {tieKey} />
@@ -441,6 +447,7 @@
           {displayMenu}
           {metadata}
           {depth}
+          {showStatus}
         />
       {:else if note.kind === 9735}
         <!--kind9735 zap receipt-->
@@ -472,6 +479,7 @@
           {replyTag}
           {repostable}
           {zIndex}
+          {showStatus}
         />
       {:else if note.kind === 31990}
         {@const data = get31990Ogp(note)}
@@ -486,6 +494,7 @@
             {repostable}
             {maxHeight}
             {zIndex}
+            {showStatus}
           />
         {:else}
           <Kind31990Note
@@ -496,6 +505,7 @@
             {depth}
             {repostable}
             {tieKey}
+            {showStatus}
           />
         {/if}
       {:else if note.kind === 1059}
@@ -513,6 +523,7 @@
           {maxHeight}
           {warning}
           {repostable}
+          {showStatus}
         />
       {:else if note.kind === 30023 || note.kind === 30024}
         <Kind30023Note
@@ -525,6 +536,7 @@
           {maxHeight}
           {repostable}
           {zIndex}
+          {showStatus}
         />
       {:else if note.kind === 8}
         <!--badge award-->
@@ -540,6 +552,7 @@
           {warning}
           {repostable}
           {zIndex}
+          {showStatus}
         />
       {:else if note.kind === 30009}
         <!--badge-->
@@ -555,6 +568,7 @@
           {warning}
           {repostable}
           {zIndex}
+          {showStatus}
         />
       {:else}
         <OtherKindNote
@@ -567,6 +581,7 @@
           {maxHeight}
           {tieKey}
           {zIndex}
+          {showStatus}
         />{/if}
     </article>
   {/if}

@@ -48,10 +48,11 @@
       hasLoaded = true;
     }
   };
-
+  let isOmitted = $state(false);
   let dynamicClasses = $state("");
   const onChange = (ev: Nostr.Event) => {
-    if (omit && ev.pubkey === $loginUser) {
+    isOmitted = omit && ev.pubkey === $loginUser;
+    if (isOmitted) {
       dynamicClasses = "ml-5 opacity-90 text-sm";
     }
   };
@@ -89,6 +90,8 @@
             {#if data.relays && data.relays.length > 0}
               <NaddrByRelayhint
                 {data}
+                bind:isOmitted
+                {omit}
                 {content}
                 {mini}
                 {displayMenu}
@@ -118,12 +121,13 @@
             {#snippet loading()}
               <div>
                 <EventCard
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
                   {tieKey}
                   {depth}
-                  {mini}
+                  mini={isOmitted || mini}
                   {thread}
                   {zIndex}
                 />
@@ -132,12 +136,13 @@
             {#snippet nodata()}
               <div>
                 <EventCard
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
                   {tieKey}
                   {depth}
-                  {mini}
+                  mini={isOmitted || mini}
                   {thread}
                   {zIndex}
                 />
@@ -146,12 +151,13 @@
             {#snippet error()}
               <div>
                 <EventCard
+                  showStatus={!isOmitted}
                   note={event}
                   {displayMenu}
                   {repostable}
                   {tieKey}
                   {depth}
-                  {mini}
+                  mini={isOmitted || mini}
                   {thread}
                   {zIndex}
                 />
@@ -159,13 +165,14 @@
             {/snippet}
             {#snippet content({ metadata })}
               <EventCard
+                showStatus={!isOmitted}
                 {metadata}
                 {displayMenu}
                 note={event}
                 {repostable}
                 {tieKey}
                 {depth}
-                {mini}
+                mini={isOmitted || mini}
                 {thread}
                 {zIndex}
               />

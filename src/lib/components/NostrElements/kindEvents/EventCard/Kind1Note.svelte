@@ -36,6 +36,7 @@
     kindInfo?: boolean;
     replyUsers: string[];
     deleted: boolean;
+    showStatus?: boolean;
   }
 
   let {
@@ -53,6 +54,7 @@
     deleted = $bindable(),
     replyTag,
     thread,
+    showStatus,
   }: Props = $props();
 
   let warning = $derived(checkContentWarning(note?.tags));
@@ -91,7 +93,7 @@
     <DisplayTime {displayMenu} {note} {tieKey} />
   {/snippet}
   {#snippet status()}
-    {#if lumiSetting.get().showUserStatus}<ShowStatus
+    {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}
         {tieKey}
       />{/if}
