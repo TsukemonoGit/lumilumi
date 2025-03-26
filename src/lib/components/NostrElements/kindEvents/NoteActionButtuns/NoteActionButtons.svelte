@@ -94,8 +94,10 @@
   });
 
   let queryId = $derived(atag ?? note?.id);
-
+  let prosessing = false;
   const handleClickReaction = async () => {
+    if (prosessing) return;
+    prosessing = true;
     //console.log("atag:", atag);
     const tags: string[][] = root ? [root] : [];
 
@@ -120,6 +122,7 @@
     //観測失敗することあるから押したやつは押したときに観測しておくことにする
 
     await publishAndSetQuery(ev, ["reactions", queryId, "reaction"]);
+    prosessing = false;
   };
 
   async function publishAndSetQuery(
@@ -176,6 +179,8 @@
   ];
 
   const handleSelectItem = async (index: number) => {
+    if (prosessing) return;
+    prosessing = true;
     console.log(menuTexts[index].num);
     const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
     const eventpointer: nip19.EventPointer = {
@@ -188,7 +193,16 @@
     switch (menuTexts[index].num) {
       case 0:
         //repost
-        let tags: string[][] = [["p", note.pubkey]];
+        let tags: string[][] = [
+          ["p", note.pubkey],
+          [
+            "e", //a tagのやつにもeもいれる
+            note.id,
+            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
+            "" /*marker*/,
+            note.pubkey,
+          ],
+        ];
 
         //リポストはetagのことしか書いてない
         //https://github.com/nostr-protocol/nips/blob/master/18.md
@@ -196,13 +210,6 @@
 
         //replaceable
 
-        tags.push([
-          "e",
-          note.id,
-          relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
-          "" /*marker*/,
-          note.pubkey,
-        ]);
         if (atag) {
           tags.push([
             "a",
@@ -260,6 +267,7 @@
         // }, 60);
         break;
     }
+    prosessing = false;
   };
   function encodeNaddr(atag: string, nevent: string): string {
     const matches = atag.match(nip33Regex);
