@@ -23,6 +23,10 @@
   import { parseNaddr } from "$lib/func/util";
   import type { AddressPointer } from "nostr-tools/nip19";
   import NaddrEvent from "../NaddrEvent.svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
+  import { SquareArrowOutUpRight } from "lucide-svelte";
+  import { nip19 } from "nostr-tools";
+  import { getRelaysById } from "$lib/func/nostr";
 
   interface Props {
     note: Nostr.Event;
@@ -68,6 +72,23 @@
       (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
     );
     return atag ? parseNaddr(atag) : undefined;
+  });
+
+  let nevent: string | undefined = $derived.by(() => {
+    if (!note) {
+      return undefined;
+    }
+    try {
+      const eventpointer: nip19.EventPointer = {
+        id: note.id,
+        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        author: note.pubkey,
+        kind: note.kind,
+      };
+      return nip19.neventEncode(eventpointer);
+    } catch {
+      return undefined;
+    }
   });
 </script>
 
@@ -131,7 +152,13 @@
           mini={true}
           thread={true}
         />
-      </div>{:else}<span class="italic text-neutral-600">badge load error</span
+      </div>
+      <Link
+        className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
+        href={`https://nos-haiku.vercel.app/entry/${nevent}`}
+        >Manage your badge on Nos Haiku<SquareArrowOutUpRight size={12} /></Link
+      >
+    {:else}<span class="italic text-neutral-600">badge load error</span
       >{/if}{/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
