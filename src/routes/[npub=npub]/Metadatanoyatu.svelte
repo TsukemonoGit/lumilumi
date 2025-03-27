@@ -20,43 +20,28 @@
       return undefined;
     }
   });
-
-  let view = $state(true);
-
-  $effect(() => {
-    if (pubkey) {
-      untrack(() => () => {
-        view = false;
-        setTimeout(() => {
-          view = true;
-        }, 0);
-      });
-    }
-  });
 </script>
 
-{#if view}
-  <div class="w-full overflow-hidden">
-    <Metadata queryKey={["metadata", pubkey]} {pubkey}>
-      {#snippet loading()}<EmptyCard nevent={encodedPub}
-          >loading {encodedPub}</EmptyCard
-        >
-      {/snippet}
-      {#snippet nodata()}
-        <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
-      {/snippet}
-      {#snippet error()}
-        <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
-      {/snippet}
-      {#snippet content({ metadata })}
-        <Kind0Note
-          note={metadata}
-          displayMenu={true}
-          depth={0}
-          repostable={true}
-          {tieKey}
-        />
-      {/snippet}
-    </Metadata>
-  </div>
-{/if}
+<div class="w-full overflow-hidden">
+  <Metadata queryKey={["metadata", pubkey]} {pubkey}>
+    {#snippet loading()}<EmptyCard nevent={encodedPub}
+        >loading {encodedPub}</EmptyCard
+      >
+    {/snippet}
+    {#snippet nodata()}
+      <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
+    {/snippet}
+    {#snippet error()}
+      <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
+    {/snippet}
+    {#snippet content({ metadata })}
+      <Kind0Note
+        note={metadata}
+        displayMenu={true}
+        depth={0}
+        repostable={true}
+        {tieKey}
+      />
+    {/snippet}
+  </Metadata>
+</div>
