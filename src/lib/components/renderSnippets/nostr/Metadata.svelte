@@ -54,25 +54,11 @@
   const staleTime: number = Infinity;
   let refetchInterval: number = Infinity;
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
-  const localData = getMetadata(queryKey);
+  let localData = $derived(getMetadata(queryKey));
   //console.log(localData);
-  const initData: EventPacket | undefined = lumiSetting.get().showImg
-    ? undefined
-    : localData; //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
-  //console.log(initData);
-  //if (!lumiSetting.get().showImg) {
-  // staleTime = Infinity;
-  // }
-  //else {
-  //画像表示オンのときはローカルデータ使わないで新しく取得する
-  //if (initData) {
-  //staleTime = Infinity;
-  //refetchInterval = Infinity;
-  //initialDataUpdatedAt = now() * 1000 - 2 * 57 * 60 * 1000; //2hよりちょっと前//最初詠み込まれたときにドバっとなって重くなるのを防ぐ
-  // staleTime = 2 * 60 * 60 * 1000; //2h
-  // refetchInterval = 2 * 60 * 60 * 1000;
-  //}
-  // }
+  let initData: EventPacket | undefined = $derived(
+    lumiSetting.get().showImg ? undefined : localData
+  ); //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
 
   let result = $derived(
     useMetadata(
@@ -86,6 +72,7 @@
       refetchInterval
     )
   );
+
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
