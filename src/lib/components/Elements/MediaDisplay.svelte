@@ -6,7 +6,8 @@
   import type { Writable } from "svelte/store";
   import { queryClient } from "$lib/stores/stores";
   import type { UrlType } from "$lib/func/useUrl";
-  import { pushState } from "$app/navigation";
+  import { goto, pushState } from "$app/navigation";
+  import { page } from "$app/state";
 
   interface Props {
     open: Writable<boolean>;
@@ -44,17 +45,32 @@
       $dialogOpen = true;
       $open = false;
 
-      // pushState("", {
-      //   mediaView: {
-      //     imageUrls: displayImages.map((img) => img.url),
-      //     originalIndices: displayImages.map((img) => img.originalIndex),
-      //     currentIndex,
-      //   },
-      // });
+      // 現在のパスに対してstateを追加
+      const currentPath = page.url.pathname;
+      pushState(currentPath, {
+        state: {
+          mediaView: {
+            imageUrls: displayImages.map((img) => img.url),
+            originalIndices: displayImages.map((img) => img.originalIndex),
+            currentIndex,
+          },
+          replaceState: true,
+        },
+      });
     }
   });
-  const handlePopState = () => {
-    $dialogOpen = false;
+
+  const handlePopState = (event: PopStateEvent) => {
+    // SvelteKitの履歴状態から mediaView を取得
+    const mediaView = event.state?.["sveltekit:states"]?.state?.mediaView;
+
+    if (mediaView) {
+      displayImages = mediaCheck(mediaView.imageUrls.map((url: string) => url));
+      currentIndex = mediaView.currentIndex;
+      $dialogOpen = true;
+    } else {
+      $dialogOpen = false;
+    }
   };
 
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
