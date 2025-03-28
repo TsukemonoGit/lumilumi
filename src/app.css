@@ -193,6 +193,9 @@ body {
 input[type="text"] {
   background-color: rgb(var(--color-neutral-900) / 1);
 }
+input[type="email"] {
+  background-color: rgb(var(--color-neutral-900) / 1);
+}
 input[type="number"] {
   background-color: rgb(var(--color-neutral-900) / 1);
 }

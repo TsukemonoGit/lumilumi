@@ -8,12 +8,9 @@
     SmilePlus,
     Send,
     TriangleAlert,
-    Plus,
     UserPlus,
     Quote,
-    Reply,
     Bell,
-    BellOff,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -971,7 +968,7 @@
             {#if viewCustomEmojis}
               <input
                 bind:this={emojiInput}
-                type="text"
+                type="email"
                 id="emoji"
                 class="h-8 w-full rounded-md text-magnum-100 border-2
             border-magnum-400"
