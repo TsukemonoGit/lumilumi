@@ -9,7 +9,6 @@
     Squirrel,
   } from "lucide-svelte";
 
-  //  import * as Nostr from "nostr-typedef";
   import { nip19 } from "nostr-tools";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
@@ -53,12 +52,9 @@
         icon: Copy,
         num: 3,
       },
-      // { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
+
       { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-      // { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-      // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
-      // text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
-      //{ text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
+
       //replaceable のすとびうあのリンク
 
       {

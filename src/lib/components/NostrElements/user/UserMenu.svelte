@@ -54,23 +54,39 @@
   const baseMenuTexts = [
     { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
     { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
-    // { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 3 },
     { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
+    { text: $_("menu.broadcast"), icon: Radio, num: 5 },
+    { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
+    { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
   ];
 
-  let menuTexts = $derived([
-    ...(page.url.pathname === `/${encodedPubkey}`
-      ? baseMenuTexts.filter((item) => item.num !== 0) // "userPage" を削除
-      : baseMenuTexts),
-    ...(metadata
-      ? [
-          { text: $_("menu.broadcast"), icon: Radio, num: 5 },
-          { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
-        ]
-      : []),
-    /*    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 }, */
-    { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
-  ]);
+  let menuTexts = $derived(
+    baseMenuTexts.filter((item) => {
+      // Remove user page if on user's own page
+      if (item.num === 0 && page.url.pathname === `/${encodedPubkey}`) {
+        return false;
+      }
+
+      // Remove JSON and broadcast if no metadata
+      if (!metadata && (item.num === 2 || item.num === 5)) {
+        return false;
+      }
+
+      // Remove broadcast if specific metadata condition is met
+      if (metadata) {
+        const shouldRemoveBroadcast =
+          item.num === 5 &&
+          metadata.tags.some((tag) => tag[0] === "-") &&
+          metadata.pubkey !== $loginUser;
+
+        if (shouldRemoveBroadcast) {
+          return false;
+        }
+      }
+
+      return true;
+    })
+  );
 
   const handleSelectItem = async (index: number) => {
     switch (index) {

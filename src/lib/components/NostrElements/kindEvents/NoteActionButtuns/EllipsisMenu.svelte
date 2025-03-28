@@ -29,7 +29,7 @@
   import { nostviewstrable } from "$lib/func/constants";
 
   import { generateResultMessage, translateText } from "$lib/func/util";
-  import { writable, type Writable } from "svelte/store";
+  import { get, writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import type { OkPacketAgainstEvent } from "rx-nostr";
@@ -79,9 +79,16 @@
       { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
       { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
       { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
-      { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
+
       { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
     ];
+
+    //NIP-70
+    if (
+      !(note.tags.find((tag) => tag[0] === "-") && note.pubkey !== $loginUser)
+    ) {
+      menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
+    }
 
     //30030 emojitoリンク
     if (note.kind === 30030) {

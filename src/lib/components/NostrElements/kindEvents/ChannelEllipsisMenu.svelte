@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toastSettings } from "$lib/stores/stores";
+  import { loginUser, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -45,9 +45,16 @@
       { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
       //{ text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
       // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
-      { text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 },
+
       { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
     ];
+
+    //NIP-70
+    if (
+      !(note.tags.find((tag) => tag[0] === "-") && note.pubkey !== $loginUser)
+    ) {
+      menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
+    }
 
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));
