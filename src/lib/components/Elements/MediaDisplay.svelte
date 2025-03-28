@@ -6,6 +6,7 @@
   import type { Writable } from "svelte/store";
   import { queryClient } from "$lib/stores/stores";
   import type { UrlType } from "$lib/func/useUrl";
+  import { pushState } from "$app/navigation";
 
   interface Props {
     open: Writable<boolean>;
@@ -42,8 +43,20 @@
       displayImages = mediaCheck(images);
       $dialogOpen = true;
       $open = false;
+
+      // pushState("", {
+      //   mediaView: {
+      //     imageUrls: displayImages.map((img) => img.url),
+      //     originalIndices: displayImages.map((img) => img.originalIndex),
+      //     currentIndex,
+      //   },
+      // });
     }
   });
+  const handlePopState = () => {
+    $dialogOpen = false;
+  };
+
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
   function mediaCheck(images: string[]) {
     return images
@@ -59,6 +72,7 @@
   }
 </script>
 
+<svelte:window onpopstate={handlePopState} />
 {#if $dialogOpen && displayImages.length > 0}
   <div class="" use:melt={$portalled}>
     <div
