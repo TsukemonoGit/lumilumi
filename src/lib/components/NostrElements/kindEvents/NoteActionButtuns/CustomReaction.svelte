@@ -120,7 +120,7 @@
       <div class="flex gap-1 pr-8 max-w-80">
         <input
           id="emoji"
-          type="text"
+          type="email"
           class="h-10 w-full rounded-md px-2 py-2 text-magnum-100 border
                {customReactionError ? 'border-red-500' : 'border-neutral-900'}"
           bind:value={customReaction}
