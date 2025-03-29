@@ -13,8 +13,8 @@
 	"devDependencies": {
 		"@melt-ui/svelte": "^0.86.6",
 		"@neoconfetti/svelte": "^2.2.2",
-		"@sveltejs/adapter-auto": "^4.0.0",
-		"@sveltejs/adapter-cloudflare": "^5.1.0",
+		"@sveltejs/adapter-auto": "^5.0.0",
+		"@sveltejs/adapter-cloudflare": "^6.0.1",
 		"@sveltejs/kit": "^2.20.2",
 		"@sveltejs/vite-plugin-svelte": "^4.0.4",
 		"@tailwindcss/typography": "^0.5.16",

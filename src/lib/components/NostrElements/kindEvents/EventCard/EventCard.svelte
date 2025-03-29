@@ -45,6 +45,7 @@
   import RepostComponent from "../layout/RepostComponent.svelte";
   import Kind8Note from "./Kind8Note.svelte";
   import Kind30009Note from "./Kind30009Note.svelte";
+  import Kind1018Note from "./Kind1018Note.svelte";
 
   // Component props interface
   interface Props {
@@ -421,7 +422,23 @@
           {zIndex}
           {mini}
         />
+      {:else if note.kind === 1018}
+        <Kind1018Note
+          {zIndex}
+          {tieKey}
+          {replyUsers}
+          {mini}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {maxHeight}
+          {warning}
+          {showStatus}
+        />
       {:else if note.kind === 1068}
+        <!--poll-->
         <Kind1068Note
           {tieKey}
           {note}

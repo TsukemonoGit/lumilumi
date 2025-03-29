@@ -30,22 +30,8 @@
       return null;
     }
   };
-  // $: if ($loginUser) {
-  //   const observer1 = new QueryObserver($queryClient, {
-  //     queryKey: ["metadata", $loginUser],
-  //   });
-  //   const unsubscribe1 = observer1.subscribe((result: any) => {
-  //     if ($queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket) {
-  //       metadata = (
-  //         $queryClient?.getQueryData(["metadata", $loginUser]) as EventPacket
-  //       ).event;
-  //       const tmp = picture(metadata);
-  //       if (tmp) {
-  //         url.set(tmp);
-  //       }
-  //     }
-  //   });
-  // }
+
+  let avatarColor = $derived(splitHexColorString($loginUser));
 </script>
 
 {#if $loginUser}
@@ -58,7 +44,7 @@
             {size}
             name={$loginUser}
             variant="beam"
-            colors={splitHexColorString($loginUser)}
+            colors={avatarColor}
           />
         </div>
       {/snippet}
@@ -69,7 +55,7 @@
             {size}
             name={$loginUser}
             variant="beam"
-            colors={splitHexColorString($loginUser)}
+            colors={avatarColor}
           />
         </div>
       {/snippet}
@@ -80,7 +66,7 @@
             {size}
             name={$loginUser}
             variant="beam"
-            colors={splitHexColorString($loginUser)}
+            colors={avatarColor}
           />
         </div>
       {/snippet}
@@ -104,7 +90,7 @@
               {size}
               name={$loginUser}
               variant="beam"
-              colors={splitHexColorString($loginUser)}
+              colors={avatarColor}
             />
           {/if}
         </div>

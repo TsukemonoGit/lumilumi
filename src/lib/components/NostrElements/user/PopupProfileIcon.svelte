@@ -30,6 +30,7 @@
       return undefined;
     }
   };
+  let avatarColor = $derived(splitHexColorString(pubkey));
 </script>
 
 <Popover ariaLabel="user profile">
@@ -37,32 +38,17 @@
     <Metadata queryKey={["metadata", pubkey]} {pubkey}>
       {#snippet loading()}
         <div>
-          <Avatar
-            {size}
-            name={pubkey}
-            variant="beam"
-            colors={splitHexColorString(pubkey)}
-          />
+          <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
         </div>
       {/snippet}
       {#snippet nodata()}
         <div>
-          <Avatar
-            {size}
-            name={pubkey}
-            variant="beam"
-            colors={splitHexColorString(pubkey)}
-          />
+          <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
         </div>
       {/snippet}
       {#snippet error()}
         <div>
-          <Avatar
-            {size}
-            name={pubkey}
-            variant="beam"
-            colors={splitHexColorString(pubkey)}
-          />
+          <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
         </div>
       {/snippet}
 
@@ -72,20 +58,10 @@
           {#if picture !== undefined}
             <UserAvatar {size} name={pubkey} url={picture} {pubkey} />
           {:else}
-            <Avatar
-              {size}
-              name={pubkey}
-              variant="beam"
-              colors={splitHexColorString(pubkey)}
-            />
+            <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
           {/if}
         {:else}
-          <Avatar
-            {size}
-            name={pubkey}
-            variant="beam"
-            colors={splitHexColorString(pubkey)}
-          />
+          <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
         {/if}
       {/snippet}
     </Metadata>
