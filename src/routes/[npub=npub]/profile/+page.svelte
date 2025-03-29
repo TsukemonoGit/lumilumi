@@ -306,11 +306,11 @@
       if (date.getFullYear() !== birth_year) {
         throw Error("birth");
       }
-      return { day: birth_day, month: birth_month, year: birth_year };
+      return { year: birth_year, month: birth_month, day: birth_day };
     }
 
     // 年が指定されていない場合
-    return { day: birth_day, month: birth_month };
+    return { month: birth_month, day: birth_day };
   }
 </script>
 
