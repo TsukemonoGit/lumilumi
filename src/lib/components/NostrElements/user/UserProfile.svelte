@@ -73,26 +73,50 @@
   });
   // $inspect(zapAddress);
 
-  const formatBirth = (birth: number[]): string | undefined => {
-    try {
-      if (birth.length === 3) {
-        const date = new Date(birth[2], birth[1] - 1, birth[0]);
-        return date.toLocaleDateString();
-      } else if (birth.length === 2) {
-        const date = new Date(2025, birth[1] - 1, birth[0]);
-        return date.toLocaleDateString($locale || "en-US", {
-          month: "long",
-          day: "numeric",
-        });
-      } else {
+  const formatBirth = (prof: Profile | undefined): string | undefined => {
+    const birthday = prof?.birthday;
+    const birth = prof?.birth;
+    console.log(birthday, birth);
+    if (birthday) {
+      try {
+        if (birthday.month && birthday.day) {
+          const date = new Date(
+            birthday.year || 2025,
+            birthday.month - 1,
+            birthday.day
+          );
+          return date.toLocaleDateString($locale || "en-US", {
+            month: "long",
+            day: "numeric",
+          });
+        }
+      } catch (e) {
+        console.error(e);
         return undefined;
       }
-    } catch (e) {
-      return undefined;
+    } else if (birth) {
+      try {
+        if (birth.length === 3) {
+          const date = new Date(birth[2], birth[1] - 1, birth[0]);
+          return date.toLocaleDateString();
+        } else if (birth.length === 2) {
+          const date = new Date(2025, birth[1] - 1, birth[0]);
+          return date.toLocaleDateString($locale || "en-US", {
+            month: "long",
+            day: "numeric",
+          });
+        } else {
+          return undefined;
+        }
+      } catch (e) {
+        return undefined;
+      }
     }
   };
 
   let avatarColor = $derived(splitHexColorString(pubkey));
+  let birthDay = $derived(formatBirth(prof));
+  let isBirthday = $derived(checkBirthDay(prof));
 </script>
 
 {#if !pubcheck}
@@ -255,22 +279,11 @@
             {#if prof.website}<Link
                 className="text-sm underline text-magnum-300 break-all  flex gap-1 items-center"
                 href={prof.website}><Globe size={16} />{prof?.website}</Link
-              >{/if}{#if prof.birth}
-              {@const birthDay = formatBirth(prof.birth)}
-              {@const isBirthday = checkBirthDay(prof)}
-              {#if birthDay}
-                <div
-                  class="text-sm flex break-all flex-wrap items-center gap-1"
-                >
-                  <Cake size={16} />{birthDay}
-
-                  {#if isBirthday}🎉
-                    <!-- <PartyPopper
-                      size={16}
-                      class={`${isBirthday ? "text-magnum-400 " : ""}`}
-                    /> -->
-                  {/if}
-                </div>{/if}{/if}
+              >{/if}
+            {#if birthDay}
+              <div class="text-sm flex break-all flex-wrap items-center gap-1">
+                <Cake size={16} />{birthDay}{#if isBirthday}🎉{/if}
+              </div>{/if}
           </div>
           {#if lumiSetting.get().showUserStatus}
             <div class={`text-sm text-zinc-500`}>

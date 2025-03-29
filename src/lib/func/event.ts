@@ -187,7 +187,13 @@ export const get31990Ogp = (
 
 export const checkBirthDay = (prof: Profile | undefined): boolean => {
   if (!prof) return false;
-  if (prof.birth && Array.isArray(prof.birth)) {
+  if (prof.birthday) {
+    const { year, month, day } = prof.birthday;
+    const now = new Date();
+    if (day === now.getDate() && month === now.getMonth() + 1) {
+      return true;
+    }
+  } else if (prof.birth && Array.isArray(prof.birth)) {
     const [day, month] = prof.birth;
     const now = new Date();
     if (day === now.getDate() && month === now.getMonth() + 1) {
