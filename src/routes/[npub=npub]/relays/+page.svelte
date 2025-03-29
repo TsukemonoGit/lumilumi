@@ -92,10 +92,7 @@
           color: "bg-red-500",
         };
         isError = true;
-        //   // 現在のURLの親階層に戻る
-        //   const currentUrl = page.url.pathname; // 現在のURLパスを取得
-        //   const parentUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/")); // 一つ前の階層を取得
-        //  // goto(parentUrl); // 一つ前の階層に移動
+
         return;
       }
     } catch (error) {
@@ -149,17 +146,18 @@
   async function getQueryRelaysData(
     pubkey: string
   ): Promise<EventPacket | undefined> {
-    const defaultRelayData: EventPacket[] | undefined =
-      queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+    const defaultRelayData: EventPacket | undefined = queryClient?.getQueryData(
+      ["defaultRelay", pubkey] as QueryKey
+    );
     if (defaultRelayData) {
       console.log(defaultRelayData);
-      return defaultRelayData[0];
+      return defaultRelayData;
     }
     try {
       const relaydata = await usePromiseReq(
         {
           filters: [{ kinds: [10002], authors: [pubkey], limit: 1 }],
-          operator: pipe(latest()),
+          operator: pipe(),
         },
         undefined
       );
