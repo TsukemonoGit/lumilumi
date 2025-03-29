@@ -91,7 +91,10 @@
               {data}
             </div>
             <div class="ml-2 whitespace-pre-wrap break-all">
-              {profile[data]}
+              {#if typeof profile[data] === "object"}
+                {JSON.stringify(profile[data], null, 2)}
+              {:else}
+                {profile[data]}{/if}
             </div>
           </div>
         {/each}

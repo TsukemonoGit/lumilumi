@@ -112,13 +112,21 @@
     try {
       profile = JSON.parse(metadata.content);
       newProfile = { ...profile };
-      if (newProfile.birth && Array.isArray(newProfile.birth)) {
+      if (newProfile.birthday) {
+        birth_day = newProfile.birthday.day;
+        birth_month = newProfile.birthday.month;
+        birth_year = newProfile.birthday.year;
+      } else if (newProfile.birth && Array.isArray(newProfile.birth)) {
+        //旧仕様のbirthプロパティを使用している場合
         birth_day =
           newProfile.birth.length > 0 ? newProfile.birth[0] : undefined;
         birth_month =
           newProfile.birth.length > 1 ? newProfile.birth[1] : undefined;
         birth_year =
           newProfile.birth.length > 2 ? newProfile.birth[2] : undefined;
+        // newProfileからbirthプロパティを削除
+        const { birth, ...restProfile } = newProfile;
+        newProfile = restProfile;
       }
       let { lud06, lud16 } = profile;
       if (lud16) {
@@ -131,10 +139,6 @@
     }
     $nowProgress = false;
   });
-
-  // afterNavigate((navigate) => {
-  //   console.log("afterNavigate", navigate.type);
-  // });
 
   const handleClickSave = async () => {
     if (lud !== "") {
@@ -191,10 +195,12 @@
     // birthのバリデーション
     if (birth_day && birth_month) {
       try {
-        const birthArray = birthToArray();
+        const birthObj = checkBirth();
+        newProfile = { ...newProfile, birthday: birthObj };
+        /*  const birthArray = birthToArray();
         if (birthArray) {
           newProfile = { ...newProfile, birth: birthArray };
-        }
+        } */
       } catch (error: any) {
         $toastSettings = {
           title: "Error",
@@ -276,40 +282,35 @@
     }
     const emojiText = `:${e[0]}:`;
     newProfile.display_name = newProfile.display_name + emojiText;
-    // newProfile.display_name?.slice(0, cursorPosition) +
-    // emojiText +
-    // newProfile.display_name?.slice(cursorPosition);
-    // cursorPosition += emojiText.length;
   };
 
-  function birthToArray(): number[] | undefined {
-    let birthArray: number[] = [];
-    console.log(birth_day);
+  function checkBirth(): { day: number; month: number; year?: number } {
+    if (!birth_day || !birth_month) {
+      throw Error("birth");
+    }
 
-    if (birth_day && birth_day > 0 && birth_day <= 31) {
-      birthArray.push(birth_day);
-    } else if (birth_day) {
-      throw Error("birth day");
-    } else {
-      return undefined;
+    // 日付検証用に現在か指定された年を使用
+    const yearToCheck = birth_year || new Date().getFullYear();
+    const date = new Date(yearToCheck, birth_month - 1, birth_day);
+
+    // 日付の有効性チェック
+    const isValidMonth = date.getMonth() + 1 === birth_month;
+    const isValidDay = date.getDate() === birth_day;
+
+    if (!isValidMonth || !isValidDay) {
+      throw Error("birth");
     }
-    if (birth_month && birth_month > 0 && birth_month <= 12) {
-      birthArray.push(birth_month);
-    } else if (birth_month) {
-      throw Error("birth month");
-    } else {
-      return undefined;
+
+    // 年が指定されている場合はさらに年の有効性もチェック
+    if (birth_year) {
+      if (date.getFullYear() !== birth_year) {
+        throw Error("birth");
+      }
+      return { year: birth_year, month: birth_month, day: birth_day };
     }
-    if (
-      birth_year &&
-      birth_year > 0 &&
-      birth_year <= new Date().getFullYear()
-    ) {
-      birthArray.push(birth_year);
-    } else if (birth_year) {
-      throw Error("birth year");
-    }
-    return birthArray;
+
+    // 年が指定されていない場合
+    return { month: birth_month, day: birth_day };
   }
 </script>
 
