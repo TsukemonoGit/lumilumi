@@ -9,9 +9,7 @@
   import NoteByRelayhint from "./NoteByRelayhint.svelte";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import { viewport } from "$lib/func/useViewportAction";
-  import { page } from "$app/state";
   import { loginUser } from "$lib/stores/stores";
-  import OmittedCard from "./EventCard/OmittedCard.svelte";
   import * as Nostr from "nostr-typedef";
 
   interface Props {
@@ -26,6 +24,7 @@
     relayhint?: string[] | undefined;
     zIndex?: number;
     omit?: boolean;
+    onChange?: (ev: Nostr.Event) => void;
   }
 
   let {
@@ -40,6 +39,7 @@
     relayhint = undefined,
     zIndex,
     omit = false,
+    onChange,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
 
@@ -51,11 +51,12 @@
   };
   let isOmitted = $state(false);
   let dynamicClasses = $state("");
-  const onChange = (ev: Nostr.Event) => {
+  const handleOnChange = (ev: Nostr.Event) => {
     isOmitted = omit && ev.pubkey === $loginUser;
     if (isOmitted) {
       dynamicClasses = "ml-5 opacity-90 text-sm";
     }
+    onChange?.(ev);
   };
 </script>
 
@@ -65,7 +66,7 @@
   onenterViewport={handleEnterViewport}
 >
   {#if hasLoaded}
-    <Text queryKey={["timeline", id]} {id} {onChange}>
+    <Text queryKey={["timeline", id]} {id} onChange={handleOnChange}>
       {#snippet loading()}
         <EmptyCard nevent={displayMenu ? loadingText : undefined}
           >Loading {loadingText}</EmptyCard

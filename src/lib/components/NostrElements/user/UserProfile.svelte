@@ -91,6 +91,8 @@
       return undefined;
     }
   };
+
+  let avatarColor = $derived(splitHexColorString(pubkey));
 </script>
 
 {#if !pubcheck}
@@ -167,7 +169,7 @@
                     size={iconSize}
                     name={pubkey}
                     variant="beam"
-                    colors={splitHexColorString(pubkey)}
+                    colors={avatarColor}
                   />
                 {/if}
               </div>

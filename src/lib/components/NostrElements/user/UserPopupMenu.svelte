@@ -45,6 +45,8 @@
   });
 
   let pubcheck = $derived(hexRegex.test(pubkey));
+
+  let avatarColor = $derived(splitHexColorString(pubkey));
 </script>
 
 {#if !displayMenu || !pubcheck}
@@ -52,12 +54,7 @@
   {#if lumiSetting.get().showImg && url && url !== ""}
     <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
   {:else}
-    <Avatar
-      {size}
-      name={pubkey}
-      variant="beam"
-      colors={splitHexColorString(pubkey)}
-    />
+    <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
   {/if}
   <!-- </div> -->
 {:else}
@@ -65,12 +62,7 @@
     {#if lumiSetting.get().showImg && url && url !== ""}
       <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
     {:else}
-      <Avatar
-        {size}
-        name={pubkey}
-        variant="beam"
-        colors={splitHexColorString(pubkey)}
-      />
+      <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
     {/if}
     {#snippet popoverContent()}
       <div class="p-1 w-[24rem] max-w-full">
