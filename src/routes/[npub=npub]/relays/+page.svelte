@@ -35,11 +35,8 @@
 
   let { data }: { data: LayoutData } = $props();
 
-  // const data={pubkey:page.params.npub};
-  console.log(data.pubkey);
-
   let deleted = $state(false);
-  //svelte-ignore non_reactive_update
+
   let kind10002: Nostr.Event | undefined = $state();
   let newTags: string[][] = $state([]);
 
@@ -76,6 +73,7 @@
   });
 
   async function init() {
+    console.log("init");
     if (!queryClient) {
       console.log("error");
       return;
@@ -146,12 +144,11 @@
   async function getQueryRelaysData(
     pubkey: string
   ): Promise<EventPacket | undefined> {
-    const defaultRelayData: EventPacket | undefined = queryClient?.getQueryData(
-      ["defaultRelay", pubkey] as QueryKey
-    );
-    if (defaultRelayData) {
-      console.log(defaultRelayData);
-      return defaultRelayData;
+    const defaultRelayData: EventPacket[] | undefined =
+      queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
+    if (defaultRelayData && defaultRelayData.length > 0) {
+      console.log(defaultRelayData[0]);
+      return defaultRelayData[0];
     }
     try {
       const relaydata = await usePromiseReq(
@@ -274,6 +271,15 @@
         relayStates.delete(url);
       }
     });
+    if (newTags.length <= 0) {
+      $toastSettings = {
+        title: "Warning",
+        description: "At least one new relay tag must be added.",
+        color: "bg-orange-500",
+      };
+      $nowProgress = false;
+      return;
+    }
     console.log(newTags);
     const eventParam: Nostr.EventParameters = {
       content: "",

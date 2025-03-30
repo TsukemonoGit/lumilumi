@@ -76,7 +76,7 @@
   const formatBirth = (prof: Profile | undefined): string | undefined => {
     const birthday = prof?.birthday;
     const birth = prof?.birth;
-    console.log(birthday, birth);
+    //console.log(birthday, birth);
     //年もある人は年月日表示で返す。
     //月日だけの人は、月日だけ表示で返す。
     if (birthday) {
