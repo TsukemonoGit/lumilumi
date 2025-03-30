@@ -188,20 +188,31 @@ export const get31990Ogp = (
 export const checkBirthDay = (prof: Profile | undefined): boolean => {
   if (!prof) return false;
   if (prof.birthday) {
-    const { year, month, day } = prof.birthday;
-    const now = new Date();
-    if (day === now.getDate() && month === now.getMonth() + 1) {
-      return true;
-    }
-  } else if (prof.birth && Array.isArray(prof.birth)) {
-    const [day, month] = prof.birth;
-    const now = new Date();
-    if (day === now.getDate() && month === now.getMonth() + 1) {
-      return true;
-    }
+    return isTodayBirthday(prof.birthday.day, prof.birthday.month);
+  } else if (prof.birth && Array.isArray(prof.birth) && prof.birth.length > 1) {
+    return isTodayBirthday(prof.birth[0], prof.birth[1]);
   }
   return false;
 };
+
+const isTodayBirthday = (
+  day: number | undefined,
+  month: number | undefined
+): boolean => {
+  if (!day || !month) return false;
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const birthday = new Date(thisYear, month - 1, day);
+  // 今年がうるう年じゃなかったらここで 2/29 は勝手に 3/1 になる
+  // うるうだったら2/29のまま
+
+  return (
+    //今年の誕生日====//今日
+    birthday.getMonth() === now.getMonth() &&
+    birthday.getDate() === now.getDate()
+  );
+};
+
 export const checkContentWarning = (tags: string[][]): string[] | undefined => {
   return tags.find((item) => item[0] === "content-warning");
 };

@@ -291,6 +291,12 @@
 
     // 日付検証用に現在か指定された年を使用
     const yearToCheck = birth_year || new Date().getFullYear();
+
+    // 2月29日の場合、年が指定されていない場合は有効
+    if (birth_month === 2 && birth_day === 29 && !birth_year) {
+      return { month: birth_month, day: birth_day }; // 年がない場合はそのまま2/29を誕生日として有効
+    }
+
     const date = new Date(yearToCheck, birth_month - 1, birth_day);
 
     // 日付の有効性チェック

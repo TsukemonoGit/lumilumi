@@ -91,7 +91,7 @@
             return date.toLocaleDateString();
           } else {
             const date = new Date(
-              birthday.year || 2025,
+              birthday.year || 2024,
               birthday.month - 1,
               birthday.day
             );
@@ -111,7 +111,7 @@
           const date = new Date(birth[2], birth[1] - 1, birth[0]);
           return date.toLocaleDateString();
         } else if (birth.length === 2) {
-          const date = new Date(2025, birth[1] - 1, birth[0]);
+          const date = new Date(2024, birth[1] - 1, birth[0]);
           return date.toLocaleDateString($locale || "en-US", {
             month: "long",
             day: "numeric",
