@@ -77,18 +77,29 @@
     const birthday = prof?.birthday;
     const birth = prof?.birth;
     console.log(birthday, birth);
+    //年もある人は年月日表示で返す。
+    //月日だけの人は、月日だけ表示で返す。
     if (birthday) {
       try {
         if (birthday.month && birthday.day) {
-          const date = new Date(
-            birthday.year || 2025,
-            birthday.month - 1,
-            birthday.day
-          );
-          return date.toLocaleDateString($locale || "en-US", {
-            month: "long",
-            day: "numeric",
-          });
+          if (birthday.year) {
+            const date = new Date(
+              birthday.year,
+              birthday.month - 1,
+              birthday.day
+            );
+            return date.toLocaleDateString();
+          } else {
+            const date = new Date(
+              birthday.year || 2025,
+              birthday.month - 1,
+              birthday.day
+            );
+            return date.toLocaleDateString($locale || "en-US", {
+              month: "long",
+              day: "numeric",
+            });
+          }
         }
       } catch (e) {
         console.error(e);
