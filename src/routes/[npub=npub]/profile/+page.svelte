@@ -145,8 +145,9 @@
       if (newProfile && LUD06Regex.test(lud.trim())) {
         newProfile.lud06 = lud;
       } else if (newProfile && LUD16Regex.test(lud.trim())) {
+        newProfile.lud16 = lud;
         //16が@の方。testだけだとemailアドレスでも通るので確認する
-        try {
+        /*   try {
           let [name, domain] = lud.split("@");
           const lnurl = new URL(
             `/.well-known/lnurlp/${name}`,
@@ -168,7 +169,7 @@
             color: "bg-orange-500",
           };
           return;
-        }
+        } */
       } else {
         //ludに何かしら入力があるのに06でも16でもないとき
         $toastSettings = {
