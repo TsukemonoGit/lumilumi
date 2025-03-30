@@ -13,6 +13,7 @@
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
   import { app, loginUser } from "$lib/stores/stores";
+  import { get } from "svelte/store";
 
   interface Props {
     pubkey: string;
@@ -46,7 +47,6 @@
     contents,
   }: Props = $props();
 
-  //$inspect(derivedUser);
   let queryKey = ["defaultRelay", pubkey];
   let filters = [
     // { authors: [pubkey], kinds: [3], limit: 1 },
@@ -86,7 +86,10 @@
       //resultがsuccessなのにdataがない（りれーがせっとされてない）ときはデフォリレーをいれる。
       if (value) {
         status = value;
-        if (value === "success" && !result.data) {
+        if (
+          value === "success" &&
+          (!result.data || (get(result.data) || []).length <= 0)
+        ) {
           // console.log(defaultRelays);
           setRelays(defaultRelays);
           data = defaultRelays;
