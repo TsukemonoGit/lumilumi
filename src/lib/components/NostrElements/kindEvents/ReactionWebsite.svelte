@@ -60,7 +60,7 @@
       />
     {/snippet}
     {#snippet name()}
-      <ProfileDisplay {note} {metadata} />
+      <ProfileDisplay pubkey={note.pubkey} {metadata} />
     {/snippet}
 
     {#snippet actionButtons()}
