@@ -227,7 +227,7 @@
           <div class="user-icon-container mb-2">
             <UserPopupMenu
               pubkey={metadata.pubkey}
-              size={42}
+              size={64}
               {metadata}
               displayMenu={false}
               tieKey={undefined}
