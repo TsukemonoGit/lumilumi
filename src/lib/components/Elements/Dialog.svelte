@@ -5,6 +5,8 @@
   import { fade } from "svelte/transition";
   import { X } from "lucide-svelte";
   import type { Writable } from "svelte/store";
+  import { page } from "$app/state";
+  import { pushState } from "$app/navigation";
 
   const {
     elements: {
@@ -40,10 +42,19 @@
     if (value) {
       $dialogOpen = true;
       $open = false;
+      // 現在のパスに対してstateを追加
+      const currentPath = page.url.pathname;
+      pushState(currentPath, {
+        state: { dialogOpen: true, replaceState: true },
+      });
     }
   });
+  const handlePopState = (event: PopStateEvent) => {
+    $dialogOpen = false;
+  };
 </script>
 
+<svelte:window onpopstate={handlePopState} />
 {#if $dialogOpen}
   <div class="" use:melt={$portalled}>
     <div
