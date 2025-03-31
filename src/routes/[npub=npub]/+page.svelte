@@ -43,10 +43,10 @@
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
 
-  import BirthDayFestival from "./BirthDayFestival.svelte";
   import { checkBirthDay } from "$lib/func/event";
 
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
+  import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";
 
   interface Props {
     data: {
@@ -712,9 +712,7 @@
   onChange={metadataChange}
 ></Metadata>
 {#if isBirthDay}
-  <div class="fixed top-0 left-0 w-full h-full z-50 pointer-events-none">
-    <BirthDayFestival {metadata} />
-  </div>
+  <BirthDayFestival {metadata} />
 {/if}
 
 <style lang="postcss">
