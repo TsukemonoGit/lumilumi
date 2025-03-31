@@ -2,6 +2,10 @@
   import { onMount } from "svelte";
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
   import { Zap, Cake, Gift, Music, PartyPopper, Sparkles } from "lucide-svelte";
+  import { profile } from "$lib/func/util";
+  import UserName from "../NostrElements/user/UserName.svelte";
+  import UserAvatar from "../NostrElements/user/UserAvatar.svelte";
+  import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
 
   interface Confetti {
     id: number; // 一意の識別子
@@ -216,6 +220,25 @@
           Happy Birthday!
         </h1>
 
+        <!-- ユーザーアイコンとユーザー名 -->
+        <div
+          class="user-profile-container mt-3 mb-2 flex flex-col items-center"
+        >
+          <div class="user-icon-container mb-2">
+            <UserPopupMenu
+              pubkey={metadata.pubkey}
+              size={42}
+              {metadata}
+              displayMenu={false}
+              tieKey={undefined}
+              depth={0}
+            />
+          </div>
+          <div class="text-2xl font-medium text-center user-name-glow">
+            <UserName pubhex={metadata.pubkey} />
+          </div>
+        </div>
+
         <!-- ミュージック -->
         <div class="music-notes mt-4 flex">
           {#each Array(3) as _, i}
@@ -232,7 +255,7 @@
     <!-- 閉じるボタン -->
     <button
       class="absolute top-4 right-4 bg-white bg-opacity-20 text-white rounded-full p-2 text-sm z-50 hover:bg-opacity-30 transition-all"
-      on:click={endAnimation}
+      onclick={endAnimation}
     >
       ✕
     </button>
@@ -382,6 +405,50 @@
     }
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  .user-name-glow {
+    color: #ffffff;
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.7),
+      0 0 20px rgba(255, 215, 0, 0.5);
+    animation: name-pulse 2s infinite;
+    background: linear-gradient(90deg, #fff6e0, #ffeda0, #fff6e0);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  @keyframes name-pulse {
+    0%,
+    100% {
+      background-position: 0% center;
+    }
+    50% {
+      background-position: 100% center;
+    }
+  }
+
+  .user-icon-container {
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(45deg, #ffd700, #ff007f);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    animation: border-pulse 3s infinite;
+  }
+
+  @keyframes border-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
     }
   }
 </style>
