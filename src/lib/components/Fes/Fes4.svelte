@@ -12,6 +12,8 @@
   let stars: any[] = $state([]);
   let cakeVisible = $state(false);
   let animationActive = $state(true);
+  let zapOpen = $state(false); // zapOpenの状態を追跡
+  let animationTimer: ReturnType<typeof setTimeout> | null; // アニメーションタイマーの参照を保持
 
   const colors = [
     "from-red-500 to-yellow-400",
@@ -30,16 +32,37 @@
     return Math.random() * 100;
   }
 
-  function randomRotation() {
-    return Math.random() * 360;
-  }
-
   function getRandomItem(array: any[]) {
     return array[Math.floor(Math.random() * array.length)];
   }
 
+  // アニメーションタイマーをセットする関数
+  function setAnimationTimer() {
+    // 既存のタイマーがあればクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+    }
+
+    // 新しいタイマーをセット
+    animationTimer = setTimeout(() => {
+      // タイマー終了時にzapOpenがtrueの場合は延長
+      if (zapOpen) {
+        // タイマーを再設定（延長）
+        setAnimationTimer();
+      } else {
+        // zapOpenがfalseならアニメーションを終了
+        endAnimation();
+      }
+    }, 12000); // 元のタイマーと同じ12秒に設定
+  }
+
   function endAnimation() {
     animationActive = false;
+    // タイマーをクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
   }
 
   onMount(() => {
@@ -82,10 +105,8 @@
       cakeVisible = true;
     }, 3000);
 
-    // アニメーションを終了
-    setTimeout(() => {
-      endAnimation();
-    }, 12000);
+    // アニメーションタイマーを設定
+    setAnimationTimer();
   });
 </script>
 
@@ -162,7 +183,7 @@
             <UserName pubhex={metadata.pubkey} />
           </div>
         </div>
-        <UserZap {metadata} comment="Happy Birthday🎉">
+        <UserZap {metadata} bind:zapOpen comment="Happy Birthday🎉">
           <div class="zap-button">
             <Zap class="zap-icon" size="2rem" />
           </div>

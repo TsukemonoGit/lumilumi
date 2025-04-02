@@ -66,6 +66,10 @@
     return array[Math.floor(Math.random() * array.length)];
   }
 
+  let zapOpen: boolean = $state(false);
+  // 初期タイマー設定
+  let animationTimer: NodeJS.Timeout | null;
+
   // アニメーションを終了する
   function endAnimation() {
     // フェードアウト
@@ -74,6 +78,33 @@
     setTimeout(() => {
       animationActive = false;
     }, 1000);
+
+    // タイマーをクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
+  }
+
+  // タイマーをセットする関数
+  function setAnimationTimer() {
+    // 既存のタイマーがあればクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+    }
+
+    // 新しいタイマーをセット
+    animationTimer = setTimeout(() => {
+      // タイマー終了時に zapOpen がまだ true の場合は延長
+
+      if (zapOpen) {
+        // タイマーを再設定
+        setAnimationTimer();
+      } else {
+        // zapOpen が false ならアニメーションを終了
+        endAnimation();
+      }
+    }, 8000);
   }
 
   onMount(() => {
@@ -108,10 +139,8 @@
       cakeIsVisible = true;
     }, 2000);
 
-    // アニメーションを8秒後に自動的に終了
-    setTimeout(() => {
-      endAnimation();
-    }, 8000);
+    // アニメーションを開始する時にタイマーをセット
+    setAnimationTimer();
   });
 </script>
 
@@ -171,7 +200,7 @@
       >
         {#if present.isZap}
           <div class="zap-container relative z-50 cursor-pointer">
-            <UserZap {metadata} comment="Happy Birthday🎉">
+            <UserZap {metadata} bind:zapOpen comment="Happy Birthday🎉">
               <div class="flex flex-col items-center">
                 <Zap
                   class="zap bg-gradient-to-r from-yellow-400 to-amber-500 stroke-purple-800 rounded-full hover:scale-110 active:scale-95 transition-transform"

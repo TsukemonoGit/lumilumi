@@ -13,6 +13,7 @@
     invoice: string | undefined;
     id: string | undefined;
     openZapwindow: (bool: boolean) => void;
+    closeInvoice?: () => void;
   }
 
   const {
@@ -29,7 +30,12 @@
   } = createDialog({
     forceVisible: true,
   });
-  let { invoice, id, openZapwindow = $bindable() }: Props = $props();
+  let {
+    invoice,
+    id,
+    openZapwindow = $bindable(),
+    closeInvoice,
+  }: Props = $props();
 
   openZapwindow = (bool: boolean) => {
     $open = bool;
@@ -66,6 +72,7 @@
         }
       });
     } else {
+      closeInvoice?.();
       unsubscribe?.();
     }
   });

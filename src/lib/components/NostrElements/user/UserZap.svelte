@@ -9,14 +9,21 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import DisplayName from "./DisplayName.svelte";
+  import { type Writable, writable } from "svelte/store";
 
   interface Props {
     metadata: Nostr.Event;
     children?: () => any;
     comment?: string;
+    zapOpen?: boolean;
   }
 
-  let { metadata, children, comment }: Props = $props();
+  let {
+    metadata,
+    children,
+    comment,
+    zapOpen = $bindable(false),
+  }: Props = $props();
   let invoice: string | undefined = $state();
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
@@ -24,12 +31,13 @@
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
   const prof = profile(metadata);
-
+  let invOp = false;
   const onClickOK = async () => {
     invoice = undefined;
     console.log(zapAmount);
     console.log(zapComment);
     if (zapAmount <= 0) {
+      zapOpen = false;
       //toast dasite
       dialogOpen?.(false);
       return;
@@ -51,26 +59,20 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
+      zapOpen = false;
       return;
     }
     $nowProgress = false;
     invoice = zapInvoice;
     dialogOpen?.(false);
     invoiceOpen?.(true);
-
+    invOp = true;
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
 
   let amountEle: HTMLInputElement | undefined = $state();
 
-  // run(() => {
-  //   if ($dialogOpen) {
-  //     setTimeout(() => {
-  //       amountEle?.focus();
-  //     }, 1);
-  //   }
-  // });
   const handleClickZap = async () => {
     console.log("zap");
     const storagezap = localStorage.getItem("zap");
@@ -82,7 +84,20 @@
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
+    zapOpen = true;
   };
+
+  let dialogStatus: Writable<boolean> = $state(writable(false));
+  const closeInvoice = () => {
+    zapOpen = false;
+    invOp = true;
+  };
+  // svelte-ignore state_referenced_locally
+  dialogStatus.subscribe((value) => {
+    if (!value && !invOp) {
+      zapOpen = false;
+    }
+  });
 </script>
 
 <button onclick={handleClickZap} title="zap"
@@ -95,6 +110,7 @@
   {/if}
 </button>
 <AlertDialog
+  bind:dialogStatus
   bind:openDialog={dialogOpen}
   onClickOK={() => onClickOK()}
   title="Zap"
@@ -143,4 +159,9 @@
   {/snippet}</AlertDialog
 >
 
-<ZapInvoiceWindow bind:openZapwindow={invoiceOpen} {invoice} id={undefined} />
+<ZapInvoiceWindow
+  bind:openZapwindow={invoiceOpen}
+  {invoice}
+  id={undefined}
+  {closeInvoice}
+/>

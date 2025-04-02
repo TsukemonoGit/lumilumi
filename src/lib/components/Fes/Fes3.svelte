@@ -1,4 +1,3 @@
-<!--cursor-->
 <script lang="ts">
   import UserName from "$lib/components/NostrElements/user/UserName.svelte";
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
@@ -10,6 +9,9 @@
   let showCelebration = $state(true);
   let isFadingOut = $state(false);
   let characters: any[] = $state([]);
+  let zapOpen = $state(false); // zapOpenの状態を追跡
+  let animationTimer: ReturnType<typeof setTimeout>; // タイマー参照を保持
+  let characterInterval: ReturnType<typeof setInterval>; // キャラクター生成インターバルの参照
 
   function getRandomCharacter() {
     const characters = [
@@ -41,8 +43,39 @@
     return characters[Math.floor(Math.random() * characters.length)];
   }
 
+  // アニメーションタイマーをセットする関数
+  function setAnimationTimer() {
+    // 既存のタイマーがあればクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+    }
+
+    // 新しいタイマーをセット
+    animationTimer = setTimeout(() => {
+      // zapOpenがtrueの場合はタイマーを再設定
+      if (zapOpen) {
+        // タイマーを再設定（延長）
+        setAnimationTimer();
+      } else {
+        // zapOpenがfalseならアニメーションを終了
+        startFadeOut();
+      }
+    }, 8000);
+  }
+
+  // フェードアウトを開始する関数
+  function startFadeOut() {
+    isFadingOut = true;
+    setTimeout(() => {
+      showCelebration = false;
+      if (characterInterval) {
+        clearInterval(characterInterval);
+      }
+    }, 500); // フェードアウトアニメーションが完了するのを待つ
+  }
+
   onMount(() => {
-    // Create initial burst of characters
+    // 初期のキャラクターバーストを作成
     for (let i = 0; i < 50; i++) {
       characters.push({
         id: i,
@@ -56,8 +89,8 @@
       });
     }
 
-    // Add continuous stream of characters
-    const interval = setInterval(() => {
+    // キャラクターの連続ストリームを追加
+    characterInterval = setInterval(() => {
       if (characters.length < 100) {
         characters.push({
           id: Date.now(),
@@ -72,14 +105,8 @@
       }
     }, 200);
 
-    // Hide celebration after 10 seconds with fade out
-    setTimeout(() => {
-      isFadingOut = true;
-      setTimeout(() => {
-        showCelebration = false;
-        clearInterval(interval);
-      }, 500); // Wait for fade out animation to complete
-    }, 8000);
+    // アニメーションタイマーを設定
+    setAnimationTimer();
   });
 </script>
 
@@ -101,7 +128,7 @@
     <div class="message">
       <span class="birthday-text">Happy Birthday!</span>
       <span class="zap-icon">
-        <UserZap {metadata} comment="Happy Birthday! 🎉">
+        <UserZap {metadata} bind:zapOpen comment="Happy Birthday! 🎉">
           <Zap size="2rem" />
         </UserZap></span
       >
