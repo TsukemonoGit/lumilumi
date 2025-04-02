@@ -71,8 +71,9 @@
       stars.push({
         id: i,
         left: randomPosition(),
+        top: Math.random() * 10, // 上部に配置
         delay: Math.random() * 5,
-        size: 1 + Math.random() * 1.5,
+        size: 0.5 + Math.random() * 1.5,
       });
     }
 
@@ -92,6 +93,21 @@
   <div class="animation-container">
     <!-- 背景 -->
     <div class="background-gradient"></div>
+
+    <!-- 星 -->
+    {#each stars as star}
+      <div
+        class="star"
+        style="
+          left: {star.left}%;
+          top: {star.top}%;
+          animation-delay: {star.delay}s;
+          font-size: {star.size}rem;
+        "
+      >
+        <Star />
+      </div>
+    {/each}
 
     <!-- 花火 -->
     {#each fireworks as firework}
@@ -147,11 +163,8 @@
           </div>
         </div>
         <UserZap {metadata} comment="Happy Birthday🎉">
-          <div class="flex flex-col items-center">
-            <Zap
-              class="zap bg-gradient-to-r from-yellow-400 to-amber-500 stroke-purple-800 rounded-full hover:scale-110 active:scale-95 transition-transform"
-              size="4rem"
-            />
+          <div class="zap-button">
+            <Zap class="zap-icon" size="2rem" />
           </div>
         </UserZap>
       </div>
@@ -205,6 +218,7 @@
     position: absolute;
     color: #ffd700;
     animation: twinkle 2s ease-in-out infinite;
+    z-index: 10;
   }
 
   .cake-container {
@@ -217,7 +231,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem; /* 行間を広げる */
+    gap: 1rem; /* 行間を広げる */
     padding: 1.5rem;
   }
 
@@ -342,5 +356,33 @@
     to {
       transform: rotate(360deg);
     }
+  }
+
+  .zap-button {
+    background: radial-gradient(circle, #ff7eb3, #ff758c, #ff6a66);
+    border: 4px solid #fff;
+    border-radius: 50%;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow:
+      0 0 20px rgba(255, 105, 135, 0.8),
+      0 0 40px rgba(255, 105, 135, 0.6);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .zap-button:hover {
+    transform: scale(1.2) rotate(15deg);
+    box-shadow:
+      0 0 30px rgba(255, 105, 135, 1),
+      0 0 60px rgba(255, 105, 135, 0.8);
+  }
+
+  .zap-icon {
+    color: #fff;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
   }
 </style>

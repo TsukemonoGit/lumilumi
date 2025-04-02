@@ -20,8 +20,8 @@
   ];
 
   // ランダムに1つ選択
-  const RandomFestival = // festivals[3];
-    festivals[Math.floor(Math.random() * festivals.length)];
+  const RandomFestival = festivals[3];
+  // festivals[Math.floor(Math.random() * festivals.length)];
 </script>
 
 <div class="fixed top-0 left-0 w-full h-full z-50 pointer-events-none">
