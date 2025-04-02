@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
+  import { writable, type Writable } from "svelte/store";
 
   interface Props {
     onClickOK: () => void;
@@ -10,6 +11,7 @@
     main?: import("svelte").Snippet;
     openDialog?: (bool: boolean) => void;
     closeOnOutsideClick?: boolean;
+    dialogStatus?: Writable<boolean>;
   }
 
   let {
@@ -19,6 +21,7 @@
     okButtonName = undefined,
     main,
     openDialog = $bindable(),
+    dialogStatus = $bindable(writable(false)),
     closeOnOutsideClick = true,
   }: Props = $props();
 
@@ -43,6 +46,9 @@
     $openEle = bool;
   };
   // export { open };
+  openEle.subscribe((value) => {
+    $dialogStatus = value;
+  });
 </script>
 
 {#if $openEle}
