@@ -50,7 +50,7 @@
         packets.length > 0 &&
         (!data || packets[0].event.created_at > data.created_at)
       ) {
-        console.log(result);
+        // console.log(result);
         data = packets[0].event;
         //  const data = queryClient?.getQueryData(queryKey);
         //  console.log(data);
