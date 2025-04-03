@@ -248,7 +248,7 @@
       </div>
     </div>
 
-    <Dialog bind:open={dialogOpen}>
+    <Dialog bind:open={dialogOpen} id={`Json`}>
       {#snippet main()}
         <div>
           <h2 class="m-0 text-lg font-medium">Relay Information</h2>

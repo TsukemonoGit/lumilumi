@@ -813,7 +813,7 @@
   </div>
 </div>
 
-<Dialog bind:open
+<Dialog bind:open id={`Json`}
   >{#snippet main()}
     <div class="flex w-full justify-center">
       <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />

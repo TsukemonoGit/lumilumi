@@ -8,6 +8,16 @@ declare global {
     // interface PageData {}
     // interface PageState {}
     // interface Platform {}
+    interface PageState {
+      dialogOpen?: {
+        id: string;
+        mediaView?: {
+          imageUrls: string[];
+          originalIndices: number[];
+          currentIndex: number;
+        };
+      };
+    }
   }
   /// <reference types="svelte" />
 }

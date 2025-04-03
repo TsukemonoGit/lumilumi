@@ -55,6 +55,7 @@
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
   import { _ } from "svelte-i18n";
+  import PopState from "./PopState.svelte";
 
   let { data, children } = $props<{
     data:
@@ -90,59 +91,6 @@
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
-    // console.log(import.meta.env.MODE);
-    // PWA プラグインによる登録を優先
-
-    // try {
-    //   //@ts-ignore
-    //   const { registerSW } = await import("virtual:pwa-register");
-    //   registerSW({
-    //     immediate: true,
-    //     registrationOptions: {
-    //       type: "module", // ここで type を 'module' または 'classic' に設定
-    //     },
-    //     onRegistered(r: { update: () => void }) {
-    //       console.log("Service Worker registered:", r);
-    //       // 定期的に更新チェックを行う場合
-    //       if (r) {
-    //         setInterval(() => {
-    //           console.log("Checking for SW update");
-    //           r.update();
-    //         }, 20 * 1000); // 20秒ごとに更新チェック
-    //       }
-    //     },
-    //     onRegisterError(error: any) {
-    //       console.error("SW registration error:", error);
-    //     },
-    //   });
-    // } catch (error) {
-    //   console.error("Failed to import virtual:pwa-register:", error);
-    // }
-
-    // // ブラウザがサービスワーカーをサポートしている場合
-    // //  // ホームページにいるときにサービスワーカーを更新
-    // if ("serviceWorker" in navigator && page.url.pathname === "/") {
-    //   try {
-    //     const registration = await navigator.serviceWorker.register(
-    //       "/my-sw.js",
-    //       {
-    //         type: "module", // ここで type を明示
-    //         updateViaCache: "none", // キャッシュ更新を強制
-    //       }
-    //     );
-    //     console.log(
-    //       "Service Worker registered with scope:",
-    //       registration.scope
-    //     );
-
-    //     registration.update();
-    //   } catch (error) {
-    //     console.error("Service Worker registration failed:", error);
-    //   }
-    // }
-
-    // make sure this is called before any
-    // window.nostr calls are made
     if (browser && !nlBanner) {
       const nostrLogin = await import("nostr-login");
       await nostrLogin.init({
@@ -229,6 +177,7 @@
   ); //data.relaysにちょっとしかなかったらデフォリレーから足す
 </script>
 
+<PopState />
 <svelte:document on:visibilitychange={onVisibilityChange} />
 <svelte:head>
   <title>Lumilumi</title

@@ -3,12 +3,11 @@ import {
   type QueryClientConfig,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 import {
   type RxNostr,
   type EventPacket,
   type DefaultRelayConfig,
-  type EventVerifier,
 } from "rx-nostr";
 import {
   // timelineFilterInit,
@@ -20,7 +19,6 @@ import {
 } from "$lib/types";
 //import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
-//import type { Part } from "$lib/func/content";
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -33,6 +31,15 @@ const config: QueryClientConfig = {
     },
   },
 };
+export interface Popstate {
+  id: string;
+  mediaview?: {
+    imageUrls: string[];
+    currentIndex: number;
+    originalIndices: number[];
+  };
+}
+export const popStack: Writable<Popstate[]> = writable([]);
 export const metadataQueue = writable<[QueryKey, EventPacket][]>([]);
 export const queryClient = new QueryClient(config);
 

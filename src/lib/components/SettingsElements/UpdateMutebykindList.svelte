@@ -100,7 +100,7 @@
     onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen}>
+<Dialog bind:open={dialogOpen} id={`Json`}>
   {#snippet main()}
     <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
       {#if $mutebykinds}

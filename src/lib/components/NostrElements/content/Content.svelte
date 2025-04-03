@@ -66,7 +66,7 @@
 {/if}
 <!--Show more no Dialog-->
 
-<Dialog bind:open={showMore} zIndex={zIndex + 10}>
+<Dialog bind:open={showMore} zIndex={zIndex + 10} id={`showmore_${depth}`}>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       <ContentParts

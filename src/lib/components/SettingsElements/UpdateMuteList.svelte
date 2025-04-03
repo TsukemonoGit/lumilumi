@@ -102,7 +102,7 @@
   >{/if}
 <!--JSON no Dialog-->
 
-<Dialog open={dialogOpen}>
+<Dialog open={dialogOpen} id={`Json`}>
   {#snippet main()}
     <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
       {#if $mutes}
