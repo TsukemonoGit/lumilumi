@@ -2,7 +2,7 @@
 <script lang="ts">
   import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { SmilePlus, X } from "lucide-svelte";
+  import { RefreshCw, SmilePlus, X } from "lucide-svelte";
 
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
@@ -16,6 +16,7 @@
   import { nip07Signer } from "rx-nostr";
   import { lumiSetting, userStatusMap } from "$lib/stores/globalRunes.svelte";
   import { _ } from "svelte-i18n";
+  import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -267,6 +268,11 @@
                         </button>
                       {/if}
                     {/each}
+                    <EmojiListUpdate
+                      buttonClass="ml-auto p-1 m-1 rounded-full  bg-magnum-500 hover:opacity-75 active:opacity-50"
+                    >
+                      <RefreshCw />
+                    </EmojiListUpdate>
                   </div>
                 </div>
               {/snippet}

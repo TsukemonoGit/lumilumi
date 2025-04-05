@@ -19,7 +19,7 @@
   import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { generateResultMessage } from "$lib/func/util";
 
-  import { SmilePlus } from "lucide-svelte";
+  import { RefreshCw, SmilePlus } from "lucide-svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
 
   import InputImageFromFile from "./InputImageFromFile.svelte";
@@ -30,6 +30,7 @@
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
   import { getNurlFetch } from "$lib/func/zap";
+  import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -525,7 +526,9 @@
                           />{:else}{e[0]}{/if}
                       </button>
                     {/if}
-                  {/each}
+                  {/each}<EmojiListUpdate>
+                    <RefreshCw />
+                  </EmojiListUpdate>
                 </div>
               </div>
             {/snippet}

@@ -746,10 +746,9 @@
         >
       </div>
     {/if}
-
     <!--emoji-->
     <div class="mt-4">
-      <UpdateEmojiList bind:pubkey={settings.pubkey} />
+      <UpdateEmojiList />
     </div>
     <div
       class="border rounded-md border-magnum-400 p-1 m-2 before:content-['*']"
