@@ -458,6 +458,7 @@
         <!--kind30030-->
         <Kind30030Note
           {note}
+          {mini}
           {repostable}
           {maxHeight}
           {tieKey}
