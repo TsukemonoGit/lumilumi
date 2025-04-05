@@ -160,7 +160,7 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
     try {
       const privateContent = await (
         window?.nostr as Nostr.Nip07.Nostr
-      )?.nip04?.decrypt(get(loginUser), event.content);
+      )?.nip04?.decrypt(event.pubkey, event.content);
       if (privateContent) {
         const parsedContent: string[][] = JSON.parse(privateContent);
         if (parsedContent.length > 0) {

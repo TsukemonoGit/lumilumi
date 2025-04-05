@@ -11,6 +11,7 @@
     UserPlus,
     Quote,
     Bell,
+    RefreshCw,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -55,6 +56,7 @@
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
+  import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
 
   // ----------------------------------------
   // Component Props
@@ -964,30 +966,30 @@
         {/if}
         <div class="mt-2 flex justify-end gap-1 md:gap-2 items-center">
           <!--emojis-->
-          {#if $emojis && $emojis.list.length > 0}
-            {#if viewCustomEmojis}
-              <input
-                bind:this={emojiInput}
-                type="email"
-                id="emoji"
-                class="h-8 w-full rounded-md text-magnum-100 border-2
+
+          {#if viewCustomEmojis}
+            <input
+              bind:this={emojiInput}
+              type="email"
+              id="emoji"
+              class="h-8 w-full rounded-md text-magnum-100 border-2
             border-magnum-400"
-                bind:value={customReaction}
-              />
-            {/if}
-            <button
-              aria-label="open custom emoji list"
-              onclick={handleClickCustomReaction}
-              class="button"
-            >
-              <SmilePlus
-                size="20"
-                class={viewCustomEmojis
-                  ? "stroke-magnum-500"
-                  : "stroke-magnum-300"}
-              />
-            </button>
+              bind:value={customReaction}
+            />
           {/if}
+          <button
+            aria-label="open custom emoji list"
+            onclick={handleClickCustomReaction}
+            class="button"
+          >
+            <SmilePlus
+              size="20"
+              class={viewCustomEmojis
+                ? "stroke-magnum-500"
+                : "stroke-magnum-300"}
+            />
+          </button>
+
           <!--userdata-->
 
           {#if viewMetadataList}
@@ -1044,7 +1046,11 @@
                   />
                 </button>
               {/if}
-            {/each}
+            {/each}<EmojiListUpdate
+              buttonClass="ml-auto p-1 m-1 rounded-full  bg-magnum-500 hover:opacity-75 active:opacity-50"
+            >
+              <RefreshCw />
+            </EmojiListUpdate>
           </div>
         {/if}
         <!--metadataList-->
