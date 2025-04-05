@@ -348,10 +348,7 @@
               square={true}
             />{/if}{/if}
       </div>
-      <div
-        class="flex gap-1 flex-wrap break-all"
-        style="max-height:{maxHeight ?? 'none'}"
-      >
+      <div class="flex gap-1 flex-wrap break-all">
         {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
           <CustomEmoji part={{ type: "emoji", content: shortcode, url: url }} />
         {/each}<ClientTag depth={0} tags={note.tags} />
