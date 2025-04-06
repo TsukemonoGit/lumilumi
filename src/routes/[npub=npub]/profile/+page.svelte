@@ -29,7 +29,6 @@
 
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
-  import { getNurlFetch } from "$lib/func/zap";
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
 
   let { data }: { data: LayoutData } = $props();
@@ -134,6 +133,8 @@
         lud = lud16;
       } else if (lud06) {
         lud = lud06;
+      } else {
+        lud = "";
       }
     } catch (error) {
       console.error("failed to parse metadata");
@@ -142,13 +143,16 @@
   });
 
   const handleClickSave = async () => {
-    if (lud !== "") {
-      if (newProfile && LUD06Regex.test(lud.trim())) {
-        newProfile.lud06 = lud;
-      } else if (newProfile && LUD16Regex.test(lud.trim())) {
-        newProfile.lud16 = lud;
-        //16が@の方。testだけだとemailアドレスでも通るので確認する
-        /*   try {
+    if (newProfile) {
+      if (lud !== "") {
+        if (LUD06Regex.test(lud.trim())) {
+          newProfile.lud06 = lud;
+          delete newProfile.lud16;
+        } else if (newProfile && LUD16Regex.test(lud.trim())) {
+          newProfile.lud16 = lud;
+          delete newProfile.lud06;
+          //16が@の方。testだけだとemailアドレスでも通るので確認する
+          /*   try {
           let [name, domain] = lud.split("@");
           const lnurl = new URL(
             `/.well-known/lnurlp/${name}`,
@@ -171,14 +175,20 @@
           };
           return;
         } */
+        } else {
+          delete newProfile.lud06;
+          delete newProfile.lud16;
+          //ludに何かしら入力があるのに06でも16でもないとき
+          $toastSettings = {
+            title: "Error",
+            description: `Error ${$_("profile.lud")}`,
+            color: "bg-orange-500",
+          };
+          return;
+        }
       } else {
-        //ludに何かしら入力があるのに06でも16でもないとき
-        $toastSettings = {
-          title: "Error",
-          description: `Error ${$_("profile.lud")}`,
-          color: "bg-orange-500",
-        };
-        return;
+        delete newProfile.lud06;
+        delete newProfile.lud16;
       }
     }
 
