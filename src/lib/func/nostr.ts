@@ -23,6 +23,7 @@ import {
   completeOnTimeout,
   type RxReqEmittable,
   createRxForwardReq,
+  type ConnectionState,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
 import { Observable, type OperatorFunction } from "rxjs";
@@ -429,13 +430,18 @@ export async function promisePublishEvent(
   return promisePublishSignedEvent(event, relays);
 }
 
-export function relaysReconnectChallenge() {
+export async function relaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-
+  // // 全体を500ms遅延
+  // await new Promise((resolve) => setTimeout(resolve, 500));
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
-    if (value.read) {
+    if (
+      value.read &&
+      get(app).rxNostr.getRelayStatus(key)?.connection ===
+        ("error" as ConnectionState)
+    ) {
       get(app).rxNostr.reconnect(key);
     }
   });
