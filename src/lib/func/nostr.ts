@@ -431,20 +431,20 @@ export async function promisePublishEvent(
 }
 
 export async function relaysReconnectChallenge() {
-  if (Object.entries(get(defaultRelays)).length == 0) {
-    return;
-  }
-  // // 全体を500ms遅延
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
+  const relays = Object.entries(get(defaultRelays));
+  if (relays.length === 0) return;
+
+  for (const [key, value] of relays) {
     if (
       value.read &&
       get(app).rxNostr.getRelayStatus(key)?.connection ===
         ("error" as ConnectionState)
     ) {
       get(app).rxNostr.reconnect(key);
+      // 1つ接続するたびに300ms待つ
+      await new Promise((resolve) => setTimeout(resolve, 300));
     }
-  });
+  }
 }
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
