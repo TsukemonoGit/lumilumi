@@ -25,8 +25,8 @@
     <div class="w-[24rem] max-w-full">
       <UserProfile
         {pubkey}
-        bannerHeight={80}
-        iconSize={60}
+        bannerHeight={60}
+        iconSize={56}
         depth={0}
         {tieKey}
         zIndex={zIndex || 0 + 10}

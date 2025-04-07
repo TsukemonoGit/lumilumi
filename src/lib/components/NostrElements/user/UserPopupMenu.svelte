@@ -69,8 +69,8 @@
         <UserProfile
           {zIndex}
           {pubkey}
-          bannerHeight={80}
-          iconSize={60}
+          bannerHeight={60}
+          iconSize={56}
           {depth}
           {tieKey}
         />
