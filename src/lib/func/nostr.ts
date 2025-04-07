@@ -435,7 +435,7 @@ export async function relaysReconnectChallenge() {
     return;
   }
   // // 全体を500ms遅延
-  // await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
     if (
       value.read &&
