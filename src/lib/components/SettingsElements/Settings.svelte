@@ -172,7 +172,8 @@
     settings.relays = settings.relays.filter((relay) => relay.url !== url);
   }
 
-  function saveSettings() {
+  function saveSettings(event?: Event) {
+    event?.preventDefault();
     console.log("save");
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
@@ -186,19 +187,6 @@
       color: "bg-green-500",
     });
 
-    // console.log($selectedRelayset);
-    // console.log(settings.useRelaySet);
-    // console.log($loginUser);
-    // console.log(originalSettings?.pubkey);
-
-    //  const original = $state.snapshot($originalSettings);
-    // if (
-    //   (original?.pubkey && settings.pubkey !== original?.pubkey) ||
-    //   settings?.useRelaySet !== original?.useRelaySet ||
-    //   JSON.stringify(original?.relays) !== JSON.stringify(settings.relays)
-    // ) {
-    //   // reloadWithoutWarning();
-    // }
     updateStores(settings);
 
     originalSettings = $state.snapshot(settings);
@@ -405,8 +393,16 @@
 
   beforeNavigate((navigation) => {
     console.log("beforeNavigate", navigation.type);
-    if (navigation.type !== "form" && settingsChanged()) {
-      // && !shouldReload) {
+
+    if (navigation.from?.url.href === navigation.to?.url.href) {
+      navigation.cancel();
+      return;
+    }
+    // ダイアログ関連のナビゲーションを識別するための条件
+    const isDialog =
+      (navigation.to?.url as any).state?.dialogOpen !== undefined;
+    // ダイアログ操作ではなく、フォーム送信でもなく、変更がある場合のみ確認
+    if (isDialog && settingsChanged()) {
       if (
         !confirm(
           "You have unsaved changes. Are you sure you want to leave this page?"
@@ -415,7 +411,6 @@
         navigation.cancel();
       }
     }
-    //  shouldReload = false;
   });
 
   const emojiTag: Writable<string[]> = writable([]);
@@ -439,22 +434,13 @@
 
   // svelte-ignore non_reactive_update
   let open: Writable<boolean> = writable(false);
-
-  let displayimage = writable<string>();
-  const onClickglobalImageOpen = () => {
-    $displayimage = "./relaysetglobal.webp";
-    $open = true;
-  };
-  const onClickkindImageOpen = () => {
-    $displayimage = "./mutebykind.webp";
-    $open = true;
-  };
 </script>
 
 <form class=" flex flex-col gap-3">
   <fieldset class="text-sm break-all">
     <div class="ml-2">
       <button
+        type="button"
         class="h-10 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
         onclick={handleClickLogin}>Get Pubkey</button
       >
@@ -478,6 +464,7 @@
       {#each optionsArrStr as option, index}
         <div class="flex items-center gap-3 w-fix">
           <button
+            type="button"
             use:melt={$radioGroupitem(index.toString())}
             class="grid h-6 w-6 place-items-center rounded-full shadow-sm border border-magnum-500"
             id={index.toString()}
@@ -522,6 +509,7 @@
               write
             </label>
             <button
+              type="button"
               class="hover:opacity-75 active:opacity-50"
               onclick={() => removeRelay(relay.url)}><X /></button
             >
@@ -540,6 +528,7 @@
             />
 
             <button
+              type="button"
               class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
               onclick={addRelay}>Add</button
             >
@@ -741,8 +730,11 @@
           )}/30007"
           >{$_("settings.nostviewstr.kind30007")}
         </a><button
+          type="button"
           class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
-          onclick={onClickkindImageOpen}><Image /></button
+          onclick={() => {
+            $open = true;
+          }}><Image /></button
         >
       </div>
     {/if}
@@ -790,32 +782,38 @@
   </fieldset>
 
   <Kind30078 {settingsChanged} bind:settings saveLumiSettings={saveSettings} />
-</form>
 
-<div class=" fixed md:bottom-5 bottom-16 right-5 z-1">
   <div
-    class="opacity-75 hover:opacity-100 bg-neutral-200 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2"
+    class="sticky bottom-14 md:bottom-2 bg-neutral-200/80 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2 w-fit ml-auto"
   >
     <button
+      type="button"
       class=" rounded-fullmd w-10 h-10 flex justify-center items-center font-bold text-magnum-900 hover:text-magnum-600 active:opacity-50"
       onclick={reloadWithoutWarning}><RotateCw /></button
     >
 
     <button
+      type="submit"
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50"
       onclick={saveSettings}><Save />SAVE</button
     >
     <button
+      type="button"
       class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
       onclick={cancelSettings}>CANCEL</button
     >
   </div>
-</div>
+</form>
 
-<Dialog bind:open
+<Dialog bind:open id={"mutebykind_image"}
   >{#snippet main()}
     <div class="flex w-full justify-center">
-      <img loading="lazy" alt="relaySttGlobal" class="" src={$displayimage} />
+      <img
+        loading="lazy"
+        alt="relaySttGlobal"
+        class=""
+        src="./mutebykind.webp"
+      />
     </div>
   {/snippet}</Dialog
 >

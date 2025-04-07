@@ -3,12 +3,11 @@ import {
   type QueryClientConfig,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 import {
   type RxNostr,
   type EventPacket,
   type DefaultRelayConfig,
-  type EventVerifier,
 } from "rx-nostr";
 import {
   // timelineFilterInit,
@@ -21,6 +20,16 @@ import {
 //import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
 //import type { Part } from "$lib/func/content";
+
+export interface Popstate {
+  id: string;
+  mediaview?: {
+    imageUrls: string[];
+    currentIndex: number;
+    originalIndices: number[];
+  };
+}
+export const popStack: Writable<Popstate[]> = writable([]);
 
 const config: QueryClientConfig = {
   defaultOptions: {
@@ -45,20 +54,6 @@ export const toastSettings = writable<{
 }>();
 
 export const loginUser = writable<string>();
-// export const showImg = writable<boolean>(false);
-// export const showPreview = writable<boolean>(false);
-// export const menuLeft = writable<boolean>(false);
-//export const showKind16 = writable<boolean>(false);
-// export const showRelayIcon = writable<boolean>(false);
-// export const defaultReaction = writable<{ content: string; tag: string[] }>({
-//   content: "+",
-//   tag: [],
-// });
-//export const showReactioninTL = writable<boolean>(true);
-//export const showUserStatus = writable<boolean>();
-//export const addClientTag = writable<boolean>(false);
-// export const kind42inTL = writable<boolean>(false);
-// export const showAllReactions = writable<boolean>(false);
 
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
 
