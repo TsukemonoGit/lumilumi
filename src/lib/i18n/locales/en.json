@@ -85,7 +85,8 @@
     "petname": {
       "petname": "Petname",
       "write": "Can set the display name (petname) of the follow users.",
-      "edit": "Edit Petname"
+      "edit": "Edit Petname",
+      "warning": "Since it's public, avoid names that could be problematic."
     }
   },
   "profile": {

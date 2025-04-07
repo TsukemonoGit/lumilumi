@@ -398,9 +398,12 @@
     <div>
       {#if beforeKind3}
         <div class="flex flex-col items-start justify-center">
-          <div class="font-medium text-magnum-400">
+          <p class="font-medium text-magnum-400">
             {$_("user.petname.write")} (NIP-02)
-          </div>
+          </p>
+          <p class="font-medium text-sm text-magnum-400">
+            {$_("user.petname.warning")}
+          </p>
           <input
             type="text"
             class="h-10 w-full rounded-md px-3 py-2 mt-2 border border-magnum-600 bg-neutral-900"

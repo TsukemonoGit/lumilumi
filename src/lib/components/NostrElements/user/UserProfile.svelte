@@ -128,6 +128,8 @@
   let avatarColor = $derived(splitHexColorString(pubkey));
   let birthDay = $derived(formatBirth(prof));
   let isBirthday = $derived(checkBirthDay(prof));
+
+  let mini = $derived(bannerHeight !== 180);
 </script>
 
 {#if !pubcheck}
@@ -257,7 +259,7 @@
                 {#if zapAddress}
                   <UserZap {metadata}>
                     <div
-                      class="text-sm grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300"
+                      class={`${mini ? "text-xs" : "text-sm"} grid break-all flex-wrap grid-cols-[auto_1fr] items-center text-left gap-1 underline text-magnum-300`}
                     >
                       <Zap class="fill-magnum-300" size={16} />{zapAddress}
                     </div>
@@ -288,7 +290,7 @@
             </div>
 
             {#if prof.website}<Link
-                className="text-sm underline text-magnum-300 break-all  flex gap-1 items-center"
+                className={`${mini ? "text-xs" : "text-sm"} underline text-magnum-300 break-all  flex gap-1 items-center`}
                 href={prof.website}><Globe size={16} />{prof?.website}</Link
               >{/if}
             {#if birthDay}
@@ -302,10 +304,10 @@
             </div>
           {/if}
           {#if prof.about}
-            <div class="mt-2">
+            <div class={`mt-2 ${mini ? "text-sm" : ""}`}>
               <Content
                 {zIndex}
-                maxHeight={bannerHeight * 1.5}
+                maxHeight={mini ? bannerHeight : bannerHeight * 1.5}
                 text={prof.about}
                 tags={metadata.tags}
                 displayMenu={true}
