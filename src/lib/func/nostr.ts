@@ -431,21 +431,59 @@ export async function promisePublishEvent(
 }
 
 export async function relaysReconnectChallenge() {
-  const relays = Object.entries(get(defaultRelays));
-  if (relays.length === 0) return;
-
-  for (const [key, value] of relays) {
-    if (
+  const relays = Object.entries(get(defaultRelays)).filter(
+    ([key, value]) =>
       value.read &&
       get(app).rxNostr.getRelayStatus(key)?.connection ===
         ("error" as ConnectionState)
-    ) {
-      get(app).rxNostr.reconnect(key);
-      // 1つ接続するたびに300ms待つ
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
+  );
+  if (relays.length === 0) return;
+
+  for (const [key, value] of relays) {
+    get(app).rxNostr.reconnect(key);
+    // 接続が完了するまで待機する
+    await waitForConnection(key);
   }
 }
+
+// 接続完了を待機する補助関数
+async function waitForConnection(relayUrl: string, timeout = 5000) {
+  return new Promise<void>((resolve) => {
+    // ここで明示的に Promise<void> と型を指定
+    const checkInterval = 300; // 300msごとにチェック
+    const maxAttempts = timeout / checkInterval;
+    let attempts = 0;
+
+    const checkConnection = () => {
+      attempts++;
+      const status = get(app).rxNostr.getRelayStatus(relayUrl)?.connection;
+
+      // 接続済みまたはエラー終了の場合は完了
+      if (
+        status === "connected" ||
+        status === "error" ||
+        status === "rejected"
+      ) {
+        resolve(); // 値なしで resolve を呼び出す
+        return;
+      }
+
+      // タイムアウトした場合も次に進む
+      if (attempts >= maxAttempts) {
+        console.warn(`Connection timeout for relay: ${relayUrl}`);
+        resolve(); // 値なしで resolve を呼び出す
+        return;
+      }
+
+      // まだ接続中なら再度チェック
+      setTimeout(checkConnection, checkInterval);
+    };
+
+    // 初回チェック開始
+    checkConnection();
+  });
+}
+
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
 }
