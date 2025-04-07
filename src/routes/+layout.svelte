@@ -181,10 +181,10 @@
     showBanner.set(banner);
   });
 
-  function onVisibilityChange() {
+  async function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
-      relaysReconnectChallenge();
-      rxNostr3RelaysReconnectChallenge();
+      await relaysReconnectChallenge();
+      await rxNostr3RelaysReconnectChallenge();
     }
   }
 
