@@ -4,10 +4,11 @@
   import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
-  import { queryClient } from "$lib/stores/stores";
+  import { popStack, queryClient } from "$lib/stores/stores";
   import type { UrlType } from "$lib/func/useUrl";
-  import { goto, pushState } from "$app/navigation";
+  import { pushState, replaceState } from "$app/navigation";
   import { page } from "$app/state";
+  import { untrack } from "svelte";
 
   interface Props {
     open: Writable<boolean>;
@@ -26,6 +27,9 @@
   const { trigger, overlay, content, close, portalled } = elements;
   const { open: dialogOpen } = states;
 
+  const DIALOG_ID = "mediaView";
+  let isInitialized = $state(false);
+
   const goToNext = () => {
     if (displayImages.length > 0) {
       currentIndex = (currentIndex + 1) % displayImages.length;
@@ -39,41 +43,80 @@
     }
   };
 
-  open.subscribe((value: boolean) => {
-    if (value && images) {
-      displayImages = mediaCheck(images);
-      $dialogOpen = true;
-      $open = false;
-
-      // 現在のパスに対してstateを追加
-      const currentPath = page.url.pathname;
-      pushState(currentPath, {
-        state: {
+  // ダイアログの状態を作成
+  function createDialogState(): App.PageState {
+    if (displayImages.length > 0) {
+      return {
+        dialogOpen: {
+          id: DIALOG_ID,
           mediaView: {
             imageUrls: displayImages.map((img) => img.url),
             originalIndices: displayImages.map((img) => img.originalIndex),
             currentIndex,
           },
-          replaceState: true,
         },
-      });
+      };
+    }
+    return {};
+  }
+
+  // ダイアログを開く際に新しい履歴エントリを作成
+  function openDialogWithHistory() {
+    if (displayImages.length > 0) {
+      const dialogState = createDialogState();
+      pushState("", dialogState);
+    }
+  }
+
+  // ダイアログを開く
+  open.subscribe((value: boolean) => {
+    if (value && images) {
+      displayImages = mediaCheck(images);
+      if (displayImages.length > 0) {
+        $dialogOpen = true;
+        $open = false;
+        // 初期化完了後のみ履歴操作を行う
+        if (isInitialized) {
+          openDialogWithHistory();
+        }
+      }
     }
   });
 
-  const handlePopState = (event: PopStateEvent) => {
-    // SvelteKitの履歴状態から mediaView を取得
-    const mediaView = event.state?.["sveltekit:states"]?.state?.mediaView;
+  // コンポーネント初期化時の処理
+  $effect(() => {
+    if (!isInitialized) {
+      isInitialized = true;
 
-    if (mediaView) {
-      displayImages = mediaCheck(mediaView.imageUrls.map((url: string) => url));
-      currentIndex = mediaView.currentIndex;
-      $dialogOpen = true;
-    } else {
-      $dialogOpen = false;
+      // 初期表示時にダイアログを開く必要があるか確認
+      const mediaViewState = page.state?.dialogOpen?.mediaView;
+      if (mediaViewState && mediaViewState.imageUrls?.length > 0) {
+        displayImages = mediaCheck(mediaViewState.imageUrls);
+        // 元のインデックスも復元
+        if (mediaViewState.originalIndices) {
+          displayImages = displayImages.map((item, idx) => ({
+            ...item,
+            originalIndex: mediaViewState.originalIndices[idx] ?? idx,
+          }));
+        }
+        currentIndex = mediaViewState.currentIndex ?? 0;
+        $dialogOpen = true;
+      }
     }
-  };
+  });
+
+  // Handle back navigation from popStack
+  popStack.subscribe((value) => {
+    const log = value.find((v) => v.id === DIALOG_ID);
+    if (log) {
+      $dialogOpen = false;
+      $open = false;
+      popStack.update((stack) => stack.filter((s) => s.id !== DIALOG_ID));
+    }
+  });
 
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
+
   function mediaCheck(images: string[]) {
     return images
       .map((url, index) => ({ url, originalIndex: index }))
@@ -86,9 +129,33 @@
         return data === undefined || data === "image";
       });
   }
+
+  // // ダイアログが閉じられたときの処理
+  // dialogOpen.subscribe((value) => {
+  //   if (value === false && displayImages.length > 0) {
+  //     const currentDialogState = page.state?.dialogOpen?.id === DIALOG_ID;
+  //     if (currentDialogState) {
+  //       // history.back();
+  //     }
+  //   }
+  // });
+
+  // 外部からのページ状態変更を監視
+  $effect(() => {
+    const currentDialogState = page.state?.dialogOpen?.id === DIALOG_ID;
+    if ($dialogOpen && !currentDialogState) {
+      untrack(() => {
+        $dialogOpen = false;
+      });
+    }
+  });
+
+  // 画像読み込み時にステータスをリセット
+  $effect(() => {
+    loadingStatus = "loading";
+  });
 </script>
 
-<svelte:window onpopstate={handlePopState} />
 {#if $dialogOpen && displayImages.length > 0}
   <div class="" use:melt={$portalled}>
     <div
@@ -111,10 +178,9 @@
           )?.url}
           class="max-h-[100vh] max-w-[100vw] object-contain"
         />
-        <!--もしかしたら画像じゃないやつもあるかもしれないし-->
         {#if loadingStatus === "error" || loadingStatus === "loading"}
-          <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span
-          >{/if}
+          <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span>
+        {/if}
       </div>
     </div>
     {#if displayImages.length > 1}

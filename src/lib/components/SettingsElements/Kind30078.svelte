@@ -298,7 +298,7 @@
   onclick={handleClickUpDownload}>{$_("settings.load.title")}</button
 >
 
-<Dialog bind:open={dialogOpen}>
+<Dialog bind:open={dialogOpen} id={"30078"}>
   {#snippet main()}
     <h2 class="text-magnum-300 text-lg font-bold">
       {$_("settings.load.title2")}

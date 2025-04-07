@@ -321,7 +321,7 @@
   </Metadata>
 {/if}
 <!--JSON no Dialog-->
-<Dialog bind:open={dialogOpen} zIndex={zIndex + 10}>
+<Dialog bind:open={dialogOpen} zIndex={zIndex + 10} id={`profile_${pubkey}`}>
   {#snippet main()}
     <div
       class="w-full h-[400px] max-h-[80vh] overflow-hidden flex justify-center items-center p-1"

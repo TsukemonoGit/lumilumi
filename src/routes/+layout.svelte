@@ -55,6 +55,7 @@
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
   import { _ } from "svelte-i18n";
+  import Popstate from "./Popstate.svelte";
 
   let { data, children } = $props<{
     data:
@@ -257,13 +258,9 @@
     type="module"
     src="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/makibishi-component.js"
   ></script>
-
-  <!-- <script
-    type="module"
-    src="https://cdn.jsdelivr.net/npm/nostr-zap@1.1.0"
-  ></script> -->
 </svelte:head>
 
+<Popstate />
 <QueryClientProvider client={queryClient}>
   <NostrMain>
     {#snippet loading()}

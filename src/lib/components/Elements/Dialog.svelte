@@ -1,12 +1,13 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import type { Snippet } from "svelte";
+  import { untrack, type Snippet } from "svelte";
 
   import { fade } from "svelte/transition";
   import { X } from "lucide-svelte";
   import type { Writable } from "svelte/store";
   import { page } from "$app/state";
   import { pushState } from "$app/navigation";
+  import { popStack } from "$lib/stores/stores";
 
   const {
     elements: {
@@ -29,6 +30,7 @@
     main?: Snippet;
     open?: Writable<boolean>;
     zIndex?: number;
+    id: string;
   }
 
   let {
@@ -36,25 +38,48 @@
     dialogTitle = undefined,
     main,
     zIndex = 10,
+    id,
   }: Props = $props();
+
+  // ダイアログを開く際に新しい履歴エントリを作成
+  function openDialogWithHistory() {
+    pushState("", {
+      dialogOpen: {
+        id: id,
+      },
+    });
+  }
+
   open?.subscribe((value: boolean) => {
     // console.log(value);
     if (value) {
       $dialogOpen = true;
       $open = false;
-      // 現在のパスに対してstateを追加
-      const currentPath = page.url.pathname;
-      pushState(currentPath, {
-        state: { dialogOpen: true, replaceState: true },
+      openDialogWithHistory();
+    }
+  });
+
+  // Handle back navigation from popStack
+  popStack.subscribe((value) => {
+    const log = value.find((v) => v.id === id);
+    if (log) {
+      $dialogOpen = false;
+      $open = false;
+      popStack.update((stack) => stack.filter((s) => s.id !== id));
+    }
+  });
+
+  // 外部からのページ状態変更を監視
+  $effect(() => {
+    const currentDialogState = page.state?.dialogOpen?.id === id;
+    if ($dialogOpen && !currentDialogState) {
+      untrack(() => {
+        $dialogOpen = false;
       });
     }
   });
-  const handlePopState = (event: PopStateEvent) => {
-    $dialogOpen = false;
-  };
 </script>
 
-<svelte:window onpopstate={handlePopState} />
 {#if $dialogOpen}
   <div class="" use:melt={$portalled}>
     <div

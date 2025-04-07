@@ -297,7 +297,7 @@
   </div>
 {/if}
 
-<Dialog bind:open={showMore} zIndex={zIndex + 10}>
+<Dialog id={"showMore_preview"} bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       <ContentParts

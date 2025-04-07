@@ -47,7 +47,7 @@
   >{/if}
 
 <!--Show more no Dialog-->
-<Dialog bind:open={showMore}>
+<Dialog bind:open={showMore} id={`3d_${content}`}>
   {#snippet main()}
     <div class="flex items-center justify-center w-full overflow-hidden">
       <model-viewer

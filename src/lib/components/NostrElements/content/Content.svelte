@@ -5,6 +5,7 @@
   import ContentParts from "./ContentParts.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
+  import { noteEncode } from "nostr-tools/nip19";
 
   interface Props {
     text: string;
@@ -66,7 +67,11 @@
 {/if}
 <!--Show more no Dialog-->
 
-<Dialog bind:open={showMore} zIndex={zIndex + 10}>
+<Dialog
+  id={`showMore_${text.slice(10)}_${depth}`}
+  bind:open={showMore}
+  zIndex={zIndex + 10}
+>
   {#snippet main()}
     <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       <ContentParts
