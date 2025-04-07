@@ -1,7 +1,12 @@
 import { app, defaultRelays, queryClient } from "$lib/stores/stores";
 import type { UseReqOpts3, ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
+import {
+  createRxNostr,
+  createRxForwardReq,
+  type EventPacket,
+  type ConnectionState,
+} from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { Observable } from "rxjs";
 import * as Nostr from "nostr-typedef";
@@ -43,19 +48,65 @@ export function set3Relays(relays: any) {
   get(app).rxNostr3.setDefaultRelays(relays);
 }
 
-export function rxNostr3RelaysReconnectChallenge() {
+export async function rxNostr3RelaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-  if (Object.entries(get(app).rxNostr3.getDefaultRelays()).length <= 0) {
+
+  const relays = Object.entries(get(app).rxNostr3.getDefaultRelays())?.filter(
+    ([key, value]) =>
+      value.read &&
+      get(app).rxNostr3.getRelayStatus(key)?.connection ===
+        ("error" as ConnectionState)
+  );
+
+  if (!relays || relays.length <= 0) {
     get(app).rxNostr3.setDefaultRelays(get(defaultRelays));
   } else {
-    Object.entries(get(defaultRelays)).forEach(([key, value], index) => {
-      if (value.read) {
-        get(app).rxNostr3.reconnect(key);
-      }
-    });
+    for (const [key, value] of relays) {
+      get(app).rxNostr.reconnect(key);
+      // 接続が完了するまで待機する
+      await waitForConnection(key);
+    }
   }
+}
+
+// 接続完了を待機する補助関数
+async function waitForConnection(relayUrl: string, timeout = 5000) {
+  return new Promise<void>((resolve) => {
+    // ここで明示的に Promise<void> と型を指定
+    const checkInterval = 300; // 300msごとにチェック
+    const maxAttempts = timeout / checkInterval;
+    let attempts = 0;
+
+    const checkConnection = () => {
+      attempts++;
+      const status = get(app).rxNostr3.getRelayStatus(relayUrl)?.connection;
+
+      // 接続済みまたはエラー終了の場合は完了
+      if (
+        status === "connected" ||
+        status === "error" ||
+        status === "rejected"
+      ) {
+        resolve(); // 値なしで resolve を呼び出す
+        return;
+      }
+
+      // タイムアウトした場合も次に進む
+      if (attempts >= maxAttempts) {
+        console.warn(`Connection timeout for relay: ${relayUrl}`);
+        resolve(); // 値なしで resolve を呼び出す
+        return;
+      }
+
+      // まだ接続中なら再度チェック
+      setTimeout(checkConnection, checkInterval);
+    };
+
+    // 初回チェック開始
+    checkConnection();
+  });
 }
 
 export function rxNostr3Status() {
