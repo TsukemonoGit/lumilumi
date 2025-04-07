@@ -438,7 +438,6 @@ export async function relaysReconnectChallenge() {
         ("error" as ConnectionState)
   );
   if (relays.length === 0) return;
-
   for (const [key, value] of relays) {
     get(app).rxNostr.reconnect(key);
     // 接続が完了するまで待機する
