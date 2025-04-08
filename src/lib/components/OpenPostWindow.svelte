@@ -445,19 +445,40 @@
     insertTextAtCursor("nostr:", { addSpaceBefore: true });
   }
 
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject("Failed to convert file to base64.");
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file); // ← Base64 + Data URI に変換されるポイント
+    });
+  }
   // ----------------------------------------
   // File Upload
   // ----------------------------------------
   async function handleFileUpload(fileList: FileList) {
-    console.log(fileList);
-    const message = `type:${fileList.item(0)?.type || ""}\nsize:${fileList.item(0)?.size || ""}`;
-    showToast(fileList.item(0)?.name || "", message, "bg-green-300");
-
     if (!fileList || fileList.length <= 0 || !$uploader) {
       $nowProgress = false;
       return;
     }
+    const file = fileList.item(0);
+    if (file) {
+      const base64URI = await fileToBase64(file);
+      console.log(fileList);
+      const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
+      showToast(file?.name, message, "bg-green-300");
 
+      insertTextAtCursor(base64URI, {
+        addSpaceBefore: true,
+        addSpaceAfter: true,
+      });
+    }
     $nowProgress = true;
 
     // Cancel existing upload if any
