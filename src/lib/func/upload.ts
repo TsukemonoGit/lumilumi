@@ -67,14 +67,6 @@ async function adjustImageQuality(
   file: File,
   quality: number
 ): Promise<ProcessedImageInfo> {
-  // if (quality === 100) {
-  //   return {
-  //     file,
-  //     originalSize: file.size,
-  //     processedSize: file.size,
-  //     quality: 100,
-  //   };
-  // }
   if (file.type === "image/jpeg" || file.type === "image/jpg") {
     // JPG処理
     return await processJpg(file, quality);
@@ -92,137 +84,131 @@ async function adjustImageQuality(
   }
 }
 
-async function processJpg(file: File, quality: number) {
-  try {
-    const originalSize = file.size;
-    const boundedQuality = Math.max(1, Math.min(100, quality));
+export async function processJpg(file: File, quality: number) {
+  const originalSize = file.size;
+  const boundedQuality = Math.max(1, Math.min(100, quality));
+  let url: string | null = null;
 
-    // 画像の読み込みをより堅牢に
-    const url = URL.createObjectURL(file);
+  try {
+    // 壊れているかチェック
+    const isCorrupted = await checkIfJpegIsCorrupted(file);
+    if (isCorrupted) {
+      console.warn("Corrupted JPEG detected. Returning original file.");
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+        isCorrupted: true,
+      };
+    }
+
+    // 画像読み込み
+    url = URL.createObjectURL(file);
     const img = new Image();
 
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = (e) => {
-        console.error("Image loading failed:", e);
-        reject(new Error("Image loading failed"));
-      };
-      // タイムアウト設定を追加
-      const timeout = setTimeout(() => {
-        reject(new Error("Image loading timed out"));
-      }, 10000); // 10秒のタイムアウト
+    const { success, error } = await new Promise<{
+      success: boolean;
+      error?: any;
+    }>((resolve) => {
+      img.onload = () => resolve({ success: true });
+      img.onerror = (e) => resolve({ success: false, error: e });
 
-      img.addEventListener("load", () => {
-        clearTimeout(timeout);
-        resolve(null);
-      });
+      const timeout = setTimeout(
+        () => resolve({ success: false, error: "timeout" }),
+        10000
+      );
+      img.addEventListener("load", () => clearTimeout(timeout));
 
-      img.src = url;
-    }).catch((error) => {
-      URL.revokeObjectURL(url);
-      console.warn("Failed to load image:", error);
-      // 画像読み込み失敗時は元のファイルを返す
-      throw error;
+      img.src = url!;
     });
 
-    // 画像の幅と高さが有効かチェック
-    if (img.width === 0 || img.height === 0) {
-      URL.revokeObjectURL(url);
-      console.warn("Image has invalid dimensions");
+    if (!success || img.width === 0 || img.height === 0) {
+      console.warn("Failed to load image:", error ?? "invalid dimensions");
       return {
         file,
         originalSize,
         processedSize: originalSize,
         quality: 100,
+        isCorrupted: true,
       };
     }
 
-    let canvas;
-    try {
-      canvas = document.createElement("canvas");
-    } catch (error) {
-      URL.revokeObjectURL(url);
-      console.error("Failed to create canvas element:", error);
-      return {
-        file,
-        originalSize,
-        processedSize: originalSize,
-        quality: 100,
-      };
-    }
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      URL.revokeObjectURL(url);
-      console.error("Failed to get canvas context");
-      return {
-        file,
-        originalSize,
-        processedSize: originalSize,
-        quality: 100,
-      };
-    }
-
-    // Canvas サイズを設定
+    // Canvas描画
+    const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
 
-    // 描画前にキャンバスをクリア
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 描画を試みる
-    try {
-      ctx.drawImage(img, 0, 0);
-    } catch (drawError) {
-      console.error("Error during canvas drawing:", drawError);
-      URL.revokeObjectURL(url);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("Failed to get 2D context from canvas.");
       return {
         file,
         originalSize,
         processedSize: originalSize,
         quality: 100,
+        isCorrupted: true,
       };
     }
 
-    URL.revokeObjectURL(url);
+    try {
+      //ctx.fillStyle = "#fff"; // 白背景
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
 
-    // toBlob処理にタイムアウトを追加
-    const blob = await Promise.race([
-      new Promise<Blob>((resolve) => {
-        canvas.toBlob(
-          (result) => {
-            if (result && result.size > 0) {
-              resolve(result);
-            } else {
-              console.warn("Canvas toBlob returned empty or invalid result");
-              resolve(new Blob([file], { type: file.type }));
-            }
-          },
-          file.type,
-          boundedQuality / 100
-        );
-      }),
-      new Promise<Blob>((resolve) => {
-        setTimeout(() => {
-          console.warn("Canvas toBlob operation timed out");
-          resolve(new Blob([file], { type: file.type }));
-        }, 5000); // 5秒のタイムアウト
-      }),
-    ]);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      const totalPixels = pixels.length / 4;
 
-    // 生成されたBlobのサイズチェック（極端に小さい場合のみ）
-    if (blob.size === 0) {
-      console.warn("Generated blob has zero size");
+      if (checkIfMostlyBlack(pixels, totalPixels)) {
+        console.warn("Random pixel sampling suggests image is fully black.");
+        return {
+          file,
+          originalSize,
+          processedSize: originalSize,
+          quality: 100,
+          isCorrupted: true,
+        };
+      }
+    } catch (drawErr) {
+      console.warn("drawImage failed:", drawErr);
       return {
         file,
         originalSize,
         processedSize: originalSize,
         quality: 100,
+        isCorrupted: true,
+      };
+    }
+
+    // toBlob で画質調整
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob(
+        (result) => {
+          if (result && result.size > 0) {
+            resolve(result);
+          } else {
+            console.warn("Canvas toBlob returned invalid blob");
+            resolve(new Blob([file], { type: file.type }));
+          }
+        },
+        file.type,
+        boundedQuality / 100
+      );
+    });
+
+    if (blob.size === 0) {
+      console.warn("Blob size is zero — fallback to original");
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+        isCorrupted: true,
       };
     }
 
     const processedFile = new File([blob], file.name, { type: file.type });
-
     return {
       file: processedFile,
       originalSize,
@@ -233,11 +219,113 @@ async function processJpg(file: File, quality: number) {
     console.error("Image processing failed completely:", error);
     return {
       file,
-      originalSize: file.size,
-      processedSize: file.size,
+      originalSize,
+      processedSize: originalSize,
       quality: 100,
+      isCorrupted: true,
     };
+  } finally {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
   }
+}
+
+function checkIfMostlyBlack(pixels: Uint8ClampedArray, totalPixels: number) {
+  let suspicious = true;
+  for (let i = 0; i < 10; i++) {
+    const rand = Math.floor(Math.random() * totalPixels);
+    const offset = rand * 4;
+    const r = pixels[offset];
+    const g = pixels[offset + 1];
+    const b = pixels[offset + 2];
+    const a = pixels[offset + 3];
+
+    if (!(r === 0 && g === 0 && b === 0 && a === 255)) {
+      suspicious = false;
+      break;
+    }
+  }
+  return suspicious;
+}
+
+// JPEG画像が破損しているかをチェックする関数
+async function checkIfJpegIsCorrupted(file: File): Promise<boolean> {
+  return new Promise((resolve) => {
+    // JPEGのシグネチャをチェック
+    const reader = new FileReader();
+    reader.onload = () => {
+      const arr = new Uint8Array(reader.result as ArrayBuffer);
+
+      // JPEGのシグネチャ(0xFFD8)がない場合は破損とみなす
+      if (arr.length < 2 || arr[0] !== 0xff || arr[1] !== 0xd8) {
+        resolve(true);
+        return;
+      }
+
+      // 画像のロードテスト
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+
+        // 画像サイズが無効な場合は破損と判断
+        if (img.width <= 0 || img.height <= 0) {
+          resolve(true);
+          return;
+        }
+
+        try {
+          // 描画テスト
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.min(10, img.width);
+          canvas.height = Math.min(10, img.height);
+          const ctx = canvas.getContext("2d");
+
+          if (!ctx) {
+            // キャンバスコンテキストが取得できなくても破損とは判断しない
+            resolve(false);
+            return;
+          }
+
+          // 小さな領域を描画してみる
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          try {
+            // ピクセルデータを取得
+            const imageData = ctx.getImageData(0, 0, 1, 1);
+            resolve(false); // 問題なく取得できた場合は破損していない
+          } catch (e) {
+            // ピクセルデータ取得エラー
+            resolve(true);
+          }
+        } catch (e) {
+          // 描画エラー
+          resolve(true);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(true); // ロードエラーは破損を示す
+      };
+
+      // タイムアウト設定
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        resolve(true); // タイムアウトも破損を示す
+      }, 3000);
+
+      img.src = url;
+    };
+
+    reader.onerror = () => {
+      resolve(true); // ファイル読み込みエラーは破損を示す
+    };
+
+    reader.readAsArrayBuffer(file.slice(0, 2)); // 先頭2バイトだけ読み込む
+  });
 }
 
 // プレビュー用のURLを生成する関数
@@ -267,7 +355,6 @@ export async function uploadFile(
   // 画質調整を行う
   const processedImageInfo = await adjustImageQuality(file, imageQuality);
 
-  const processedFile = await removeExif(processedImageInfo.file);
   // コールバックがあれば実行
   if (onProcessed) {
     onProcessed(
@@ -276,9 +363,6 @@ export async function uploadFile(
       processedImageInfo.quality
     );
   }
-
-  // // Exif情報を削除
-  // processedFile = await removeExif(processedFile);
 
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
@@ -291,6 +375,8 @@ export async function uploadFile(
       }
     });
   }
+  // Exif情報を削除
+  const processedFile = await removeExif(processedImageInfo.file);
   formData.append("file", processedFile);
 
   return pollUploadStatus(

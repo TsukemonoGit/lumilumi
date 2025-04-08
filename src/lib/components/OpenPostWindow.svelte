@@ -445,6 +445,32 @@
     insertTextAtCursor("nostr:", { addSpaceBefore: true });
   }
 
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject("Failed to convert file to base64.");
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file); // ← Base64 + Data URI に変換されるポイント
+    });
+  }
+
+  function downloadTextFile(text: string, filename: string) {
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename; // 例: "image.txt"
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // メモリ解放
+  }
   // ----------------------------------------
   // File Upload
   // ----------------------------------------
@@ -453,7 +479,18 @@
       $nowProgress = false;
       return;
     }
+    // const file = fileList.item(0);
+    // if (file) {
+    //   const base64URI = await fileToBase64(file);
+    //   console.log(fileList);
+    //   const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
+    //   showToast(file?.name, message, "bg-green-300");
 
+    //   // ← ダウンロードさせる処理を追加
+    //   // テキストファイルとしてダウンロード
+    //   const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
+    //   downloadTextFile(base64URI, textFilename);
+    // }
     $nowProgress = true;
 
     // Cancel existing upload if any
@@ -473,8 +510,15 @@
 
       // Process each uploaded file
       const promises = uploadedURPs.map(async (data) => {
-        if (data.status !== "success") return;
+        if (data.status !== "success") {
+          $toastSettings = {
+            title: "error",
+            description: uploadedURPs[0].message,
+            color: "bg-red-400",
+          };
 
+          return;
+        }
         const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
         if (!url) return;
 
