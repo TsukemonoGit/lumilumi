@@ -459,6 +459,18 @@
       reader.readAsDataURL(file); // ← Base64 + Data URI に変換されるポイント
     });
   }
+
+  function downloadTextFile(text: string, filename: string) {
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename; // 例: "image.txt"
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url); // メモリ解放
+  }
   // ----------------------------------------
   // File Upload
   // ----------------------------------------
@@ -474,10 +486,10 @@
       const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
       showToast(file?.name, message, "bg-green-300");
 
-      insertTextAtCursor(base64URI, {
-        addSpaceBefore: true,
-        addSpaceAfter: true,
-      });
+      // ← ダウンロードさせる処理を追加
+      // テキストファイルとしてダウンロード
+      const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
+      downloadTextFile(base64URI, textFilename);
     }
     $nowProgress = true;
 
