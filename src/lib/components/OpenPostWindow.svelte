@@ -449,6 +449,10 @@
   // File Upload
   // ----------------------------------------
   async function handleFileUpload(fileList: FileList) {
+    console.log(fileList);
+    const message = `type:${fileList.item(0)?.type || ""}\nsize:${fileList.item(0)?.size || ""}`;
+    showToast(fileList.item(0)?.name || "", message, "bg-green-300");
+
     if (!fileList || fileList.length <= 0 || !$uploader) {
       $nowProgress = false;
       return;
