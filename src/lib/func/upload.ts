@@ -96,31 +96,85 @@ async function processJpg(file: File, quality: number) {
   try {
     const originalSize = file.size;
     const boundedQuality = Math.max(1, Math.min(100, quality));
+
+    // 画像の読み込みをより堅牢に
     const url = URL.createObjectURL(file);
     const img = new Image();
 
     await new Promise((resolve, reject) => {
       img.onload = resolve;
-      img.onerror = reject;
+      img.onerror = (e) => {
+        console.error("Image loading failed:", e);
+        reject(new Error("Image loading failed"));
+      };
+      // タイムアウト設定を追加
+      const timeout = setTimeout(() => {
+        reject(new Error("Image loading timed out"));
+      }, 10000); // 10秒のタイムアウト
+
+      img.addEventListener("load", () => {
+        clearTimeout(timeout);
+        resolve(null);
+      });
+
       img.src = url;
+    }).catch((error) => {
+      URL.revokeObjectURL(url);
+      console.warn("Failed to load image:", error);
+      // 画像読み込み失敗時は元のファイルを返す
+      throw error;
     });
+
+    // 画像の幅と高さが有効かチェック
+    if (img.width === 0 || img.height === 0) {
+      URL.revokeObjectURL(url);
+      console.warn("Image has invalid dimensions");
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+      };
+    }
 
     let canvas;
     try {
       canvas = document.createElement("canvas");
     } catch (error) {
-      console.error("Failed to create canvas element:", error);
       URL.revokeObjectURL(url);
+      console.error("Failed to create canvas element:", error);
       return {
         file,
         originalSize,
         processedSize: originalSize,
-        quality: 100, // 処理できなかったので元の品質
+        quality: 100,
       };
     }
+
     const ctx = canvas.getContext("2d");
     if (!ctx) {
+      URL.revokeObjectURL(url);
       console.error("Failed to get canvas context");
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+      };
+    }
+
+    // Canvas サイズを設定
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // 描画前にキャンバスをクリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 描画を試みる
+    try {
+      ctx.drawImage(img, 0, 0);
+    } catch (drawError) {
+      console.error("Error during canvas drawing:", drawError);
       URL.revokeObjectURL(url);
       return {
         file,
@@ -130,28 +184,42 @@ async function processJpg(file: File, quality: number) {
       };
     }
 
-    // Set canvas dimensions without considering orientation
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    // Skip all rotation and transformation logic
-    // Simply draw the image as-is
-    ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
 
-    const blob = await new Promise<Blob>((resolve) => {
-      canvas.toBlob(
-        (result) => {
-          if (result) {
-            resolve(result);
-          } else {
-            resolve(new Blob([file], { type: file.type }));
-          }
-        },
-        file.type,
-        boundedQuality / 100
-      );
-    });
+    // toBlob処理にタイムアウトを追加
+    const blob = await Promise.race([
+      new Promise<Blob>((resolve) => {
+        canvas.toBlob(
+          (result) => {
+            if (result && result.size > 0) {
+              resolve(result);
+            } else {
+              console.warn("Canvas toBlob returned empty or invalid result");
+              resolve(new Blob([file], { type: file.type }));
+            }
+          },
+          file.type,
+          boundedQuality / 100
+        );
+      }),
+      new Promise<Blob>((resolve) => {
+        setTimeout(() => {
+          console.warn("Canvas toBlob operation timed out");
+          resolve(new Blob([file], { type: file.type }));
+        }, 5000); // 5秒のタイムアウト
+      }),
+    ]);
+
+    // 生成されたBlobのサイズチェック（極端に小さい場合のみ）
+    if (blob.size === 0) {
+      console.warn("Generated blob has zero size");
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+      };
+    }
 
     const processedFile = new File([blob], file.name, { type: file.type });
 
@@ -162,7 +230,7 @@ async function processJpg(file: File, quality: number) {
       quality: boundedQuality,
     };
   } catch (error) {
-    console.error("Image processing failed:", error);
+    console.error("Image processing failed completely:", error);
     return {
       file,
       originalSize: file.size,
