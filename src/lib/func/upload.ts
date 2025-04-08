@@ -152,9 +152,24 @@ export async function processJpg(file: File, quality: number) {
     }
 
     try {
-      ctx.fillStyle = "#fff"; // 白背景
+      //ctx.fillStyle = "#fff"; // 白背景
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      const totalPixels = pixels.length / 4;
+
+      if (checkIfMostlyBlack(pixels, totalPixels)) {
+        console.warn("Random pixel sampling suggests image is fully black.");
+        return {
+          file,
+          originalSize,
+          processedSize: originalSize,
+          quality: 100,
+          isCorrupted: true,
+        };
+      }
     } catch (drawErr) {
       console.warn("drawImage failed:", drawErr);
       return {
@@ -214,6 +229,24 @@ export async function processJpg(file: File, quality: number) {
       URL.revokeObjectURL(url);
     }
   }
+}
+
+function checkIfMostlyBlack(pixels: Uint8ClampedArray, totalPixels: number) {
+  let suspicious = true;
+  for (let i = 0; i < 10; i++) {
+    const rand = Math.floor(Math.random() * totalPixels);
+    const offset = rand * 4;
+    const r = pixels[offset];
+    const g = pixels[offset + 1];
+    const b = pixels[offset + 2];
+    const a = pixels[offset + 3];
+
+    if (!(r === 0 && g === 0 && b === 0 && a === 255)) {
+      suspicious = false;
+      break;
+    }
+  }
+  return suspicious;
 }
 
 // JPEG画像が破損しているかをチェックする関数

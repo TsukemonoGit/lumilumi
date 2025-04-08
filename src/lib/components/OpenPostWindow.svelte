@@ -510,8 +510,15 @@
 
       // Process each uploaded file
       const promises = uploadedURPs.map(async (data) => {
-        if (data.status !== "success") return;
+        if (data.status !== "success") {
+          $toastSettings = {
+            title: "error",
+            description: uploadedURPs[0].message,
+            color: "bg-red-400",
+          };
 
+          return;
+        }
         const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
         if (!url) return;
 
