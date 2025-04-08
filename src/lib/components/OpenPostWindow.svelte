@@ -479,18 +479,18 @@
       $nowProgress = false;
       return;
     }
-    const file = fileList.item(0);
-    if (file) {
-      const base64URI = await fileToBase64(file);
-      console.log(fileList);
-      const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
-      showToast(file?.name, message, "bg-green-300");
+    // const file = fileList.item(0);
+    // if (file) {
+    //   const base64URI = await fileToBase64(file);
+    //   console.log(fileList);
+    //   const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
+    //   showToast(file?.name, message, "bg-green-300");
 
-      // ← ダウンロードさせる処理を追加
-      // テキストファイルとしてダウンロード
-      const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
-      downloadTextFile(base64URI, textFilename);
-    }
+    //   // ← ダウンロードさせる処理を追加
+    //   // テキストファイルとしてダウンロード
+    //   const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
+    //   downloadTextFile(base64URI, textFilename);
+    // }
     $nowProgress = true;
 
     // Cancel existing upload if any
