@@ -93,55 +93,83 @@ async function adjustImageQuality(
 }
 
 async function processJpg(file: File, quality: number) {
-  const originalSize = file.size;
-  const boundedQuality = Math.max(1, Math.min(100, quality));
-  const url = URL.createObjectURL(file);
-  const img = new Image();
+  try {
+    const originalSize = file.size;
+    const boundedQuality = Math.max(1, Math.min(100, quality));
+    const url = URL.createObjectURL(file);
+    const img = new Image();
 
-  await new Promise((resolve, reject) => {
-    img.onload = resolve;
-    img.onerror = reject;
-    img.src = url;
-  });
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+    let canvas;
+    try {
+      canvas = document.createElement("canvas");
+    } catch (error) {
+      console.error("Failed to create canvas element:", error);
+      URL.revokeObjectURL(url);
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100, // 処理できなかったので元の品質
+      };
+    }
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("Failed to get canvas context");
+      URL.revokeObjectURL(url);
+      return {
+        file,
+        originalSize,
+        processedSize: originalSize,
+        quality: 100,
+      };
+    }
 
-  if (!ctx) {
-    throw new Error("Failed to get canvas context");
+    // Set canvas dimensions without considering orientation
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Skip all rotation and transformation logic
+    // Simply draw the image as-is
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob(
+        (result) => {
+          if (result) {
+            resolve(result);
+          } else {
+            resolve(new Blob([file], { type: file.type }));
+          }
+        },
+        file.type,
+        boundedQuality / 100
+      );
+    });
+
+    const processedFile = new File([blob], file.name, { type: file.type });
+
+    return {
+      file: processedFile,
+      originalSize,
+      processedSize: processedFile.size,
+      quality: boundedQuality,
+    };
+  } catch (error) {
+    console.error("Image processing failed:", error);
+    return {
+      file,
+      originalSize: file.size,
+      processedSize: file.size,
+      quality: 100,
+    };
   }
-
-  // Set canvas dimensions without considering orientation
-  canvas.width = img.width;
-  canvas.height = img.height;
-
-  // Skip all rotation and transformation logic
-  // Simply draw the image as-is
-  ctx.drawImage(img, 0, 0);
-  URL.revokeObjectURL(url);
-
-  const blob = await new Promise<Blob>((resolve) => {
-    canvas.toBlob(
-      (result) => {
-        if (result) {
-          resolve(result);
-        } else {
-          resolve(new Blob([file], { type: file.type }));
-        }
-      },
-      file.type,
-      boundedQuality / 100
-    );
-  });
-
-  const processedFile = new File([blob], file.name, { type: file.type });
-
-  return {
-    file: processedFile,
-    originalSize,
-    processedSize: processedFile.size,
-    quality: boundedQuality,
-  };
 }
 
 // プレビュー用のURLを生成する関数
