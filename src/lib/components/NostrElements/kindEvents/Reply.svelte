@@ -18,7 +18,7 @@
 
   let { replyTag, displayMenu, depth, repostable, tieKey }: Props = $props();
   let loadNote = $state(false);
-  $inspect(replyTag);
+  //$inspect(replyTag);
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
