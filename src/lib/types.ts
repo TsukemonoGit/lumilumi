@@ -23,10 +23,12 @@ export interface TimelineFilter {
   //0 all
   //1 follow only
   //2 all
+  globalExcludeFollowee: boolean; //グローバルタイムラインからフォロイーの投稿を除外
 }
 export const timelineFilterInit: TimelineFilter = {
   adaptMute: true,
   selectCanversation: 0,
+  globalExcludeFollowee: false,
 };
 export interface ReqResult<A> {
   data: Readable<A | undefined | null>;
