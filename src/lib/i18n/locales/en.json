@@ -229,7 +229,8 @@
   "filter": {
     "menu": {
       "muteOn": "Adapt Mute",
-      "canversation": "Conversation Display Levels"
+      "canversation": "Conversation Display Levels",
+      "globalExcludeFollowee": "Exclude posts from followees"
     },
     "canversation": {
       "all": "Show all conversations",

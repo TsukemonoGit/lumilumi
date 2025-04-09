@@ -233,7 +233,8 @@
     },
     "menu": {
       "canversation": "会話の表示",
-      "muteOn": "ミュートを適応する"
+      "muteOn": "ミュートを適応する",
+      "globalExcludeFollowee": "フォロイーの投稿を除外する"
     }
   },
   "timeline": {
