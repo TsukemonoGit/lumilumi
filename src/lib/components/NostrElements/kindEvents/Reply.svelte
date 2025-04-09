@@ -18,7 +18,7 @@
 
   let { replyTag, displayMenu, depth, repostable, tieKey }: Props = $props();
   let loadNote = $state(false);
-
+  //$inspect(replyTag);
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
@@ -48,45 +48,46 @@
         "timeline.hideParentPost"
       )}</button
     >
-    <div class="border rounded-md border-magnum-600/30">
-      {#if replyTag[0] === "e" || replyTag[0] === "E"}
-        {@const relayhint =
-          replyTag && replyTag.length > 2 && relayRegex.test(replyTag[2])
-            ? [replyTag[2]]
-            : undefined}
-        <Note
-          {relayhint}
-          id={replyTag[1]}
-          mini={true}
-          {displayMenu}
-          depth={depth + 1}
-          {repostable}
-          {tieKey}
-        />
-      {:else if replyTag[0] === "a" || replyTag[0] === "A"}
-        <!---->
-        {@const naddr = parseNaddr(replyTag)}
-        <NaddrEvent
-          data={naddr}
-          {displayMenu}
-          depth={depth + 1}
-          {tieKey}
-          {repostable}
-          content={undefined}
-        />
-      {:else if replyTag[0] === "I" || replyTag[0] === "i"}
-        <!---->
-        {#if replyTag[1].startsWith("http")}
-          {@const part = toPart(replyTag)}
-          <UrlDisplay {part} {openModal} />
-        {:else}
-          <!---->
-          {replyTag.toString()}
-        {/if}
+
+    {#if replyTag[0] === "e" || replyTag[0] === "E"}
+      {@const relayhint =
+        replyTag && replyTag.length > 2 && relayRegex.test(replyTag[2])
+          ? [replyTag[2]]
+          : undefined}
+      <Note
+        className={"border rounded-md border-magnum-600/30"}
+        {relayhint}
+        id={replyTag[1]}
+        mini={true}
+        {displayMenu}
+        depth={depth + 1}
+        {repostable}
+        {tieKey}
+      />
+    {:else if replyTag[0] === "a" || replyTag[0] === "A"}
+      <!---->
+      {@const naddr = parseNaddr(replyTag)}
+      <NaddrEvent
+        className={"border rounded-md border-magnum-600/30"}
+        data={naddr}
+        {displayMenu}
+        depth={depth + 1}
+        {tieKey}
+        {repostable}
+        content={undefined}
+      />
+    {:else if replyTag[0] === "I" || replyTag[0] === "i"}
+      <!---->
+      {#if replyTag[1].startsWith("http")}
+        {@const part = toPart(replyTag)}
+        <UrlDisplay {part} {openModal} />
       {:else}
         <!---->
         {replyTag.toString()}
       {/if}
-    </div>
+    {:else}
+      <!---->
+      {replyTag.toString()}
+    {/if}
   {/if}
 {/if}

@@ -25,6 +25,7 @@
     zIndex?: number;
     omit?: boolean;
     onChange?: (ev: Nostr.Event) => void;
+    className?: string;
   }
 
   let {
@@ -40,6 +41,7 @@
     zIndex,
     omit = false,
     onChange,
+    className,
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
 
@@ -50,11 +52,11 @@
     }
   };
   let isOmitted = $state(false);
-  let dynamicClasses = $state("");
+  let dynamicClasses = $state(className);
   const handleOnChange = (ev: Nostr.Event) => {
     isOmitted = omit && ev.pubkey === $loginUser;
     if (isOmitted) {
-      dynamicClasses = "ml-5 opacity-90 text-sm";
+      dynamicClasses = `${className} ml-5 opacity-90 text-sm`;
     }
     onChange?.(ev);
   };
