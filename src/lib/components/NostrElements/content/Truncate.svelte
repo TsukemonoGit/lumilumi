@@ -24,9 +24,9 @@
   // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
   const minHeight = 100; // 最小の高さを設定
   let contentHeight = $derived(
-    Math.max(maxHeight * Math.pow(0.8, depth * 1.8), minHeight)
+    Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
   );
-  //$inspect(contentHeight);
+
   // maxHeight = 380のとき、
   // depth が 4 以上 のときに contentHeight が 100 を下回ります。
 </script>

@@ -71,50 +71,53 @@
     >{:else if decoded.type === "nevent"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      <div class="border rounded-md border-magnum-600/30">
-        <Note
-          id={decoded.data.id}
-          mini={true}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-          {maxHeight}
-          {zIndex}
-        />
-      </div>
+
+      <Note
+        className="border rounded-md border-magnum-600/30"
+        id={decoded.data.id}
+        mini={true}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {maxHeight}
+        {zIndex}
+      />
+
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
     >{:else if decoded.type === "note"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      <div class="border rounded-md border-magnum-600/30">
-        <Note
-          id={decoded.data}
-          mini={true}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-          {maxHeight}
-          {zIndex}
-        />
-      </div>
+
+      <Note
+        className="border rounded-md border-magnum-600/30"
+        id={decoded.data}
+        mini={true}
+        {displayMenu}
+        {depth}
+        {repostable}
+        {tieKey}
+        {maxHeight}
+        {zIndex}
+      />
+
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " /></span
     >{:else if decoded.type === "naddr"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-      <div class="border rounded-md border-magnum-600/30">
-        <NaddrEvent
-          data={decoded.data}
-          {displayMenu}
-          {depth}
-          {tieKey}
-          {repostable}
-          {content}
-          {zIndex}
-          mini={true}
-        />
-      </div>
+
+      <NaddrEvent
+        className="border rounded-md border-magnum-600/30"
+        data={decoded.data}
+        {displayMenu}
+        {depth}
+        {tieKey}
+        {repostable}
+        {content}
+        {zIndex}
+        mini={true}
+      />
+
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
     </span>
   {:else if decoded.type === "nsec"}{content}

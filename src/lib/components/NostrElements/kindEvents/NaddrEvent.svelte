@@ -23,6 +23,7 @@
     thread?: boolean;
     zIndex?: number;
     omit?: boolean;
+    className?: string;
   }
 
   let {
@@ -36,6 +37,7 @@
     thread = false,
     zIndex,
     omit = false,
+    className,
   }: Props = $props();
   let queryKey = $derived([
     "naddr",
@@ -49,11 +51,11 @@
     }
   };
   let isOmitted = $state(false);
-  let dynamicClasses = $state("");
+  let dynamicClasses = $state(className);
   const onChange = (ev: Nostr.Event) => {
     isOmitted = omit && ev.pubkey === $loginUser;
     if (isOmitted) {
-      dynamicClasses = "ml-5 opacity-90 text-sm";
+      dynamicClasses = `${className} ml-5 opacity-90 text-sm`;
     }
   };
 </script>
