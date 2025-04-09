@@ -7,6 +7,10 @@
       console.log(cur);
       return { ...cur, globalExcludeFollowee: !cur.globalExcludeFollowee };
     });
+    localStorage.setItem(
+      "timelineFilter",
+      JSON.stringify(timelineFilter.get())
+    );
   };
 </script>
 

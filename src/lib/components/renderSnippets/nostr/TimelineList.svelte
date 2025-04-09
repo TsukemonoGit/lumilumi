@@ -28,7 +28,11 @@
   import { onDestroy, onMount, untrack } from "svelte";
   import { pipe, type OperatorFunction } from "rxjs";
   import { createUniq } from "rx-nostr/src";
-  import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import {
+    displayEvents,
+    relayStateMap,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
   import { formatAbsoluteDate } from "$lib/func/util";
 
@@ -351,6 +355,13 @@
     viewIndex = 0;
     updateViewEvent?.($globalData);
   };
+
+  $effect(() => {
+    // Handle timeline filter changes
+    if (timelineFilter.get()) {
+      untrack(() => updateViewEvent?.($globalData));
+    }
+  });
 </script>
 
 {#if viewIndex !== 0}
