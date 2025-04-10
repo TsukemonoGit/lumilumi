@@ -10,7 +10,6 @@
   import { now, type EventPacket } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
   import * as Nostr from "nostr-typedef";
-  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   let isOnMount = false;
   let amount = 50;
@@ -19,9 +18,15 @@
     timelineQuery: QueryKey;
     tieKey?: string;
     globalRelays: any;
+    eventFilter?: (event: Nostr.Event) => boolean;
   }
   const req = createRxForwardReq("global");
-  let { timelineQuery, tieKey = "global", globalRelays }: Props = $props();
+  let {
+    timelineQuery,
+    tieKey = "global",
+    globalRelays,
+    eventFilter = () => true,
+  }: Props = $props();
 
   onMount(async () => {
     if (!isOnMount) {
@@ -74,14 +79,6 @@
     }
     resetUniq?.();
   });
-
-  const checkGlobalFolloweePost = (note: Nostr.Event): boolean => {
-    if (timelineFilter.get().globalExcludeFollowee) {
-      return !followList.get().has(note.pubkey);
-    } else {
-      return true;
-    }
-  };
 </script>
 
 {#if since && globalRelays.length > 0}
@@ -107,9 +104,7 @@
     {amount}
     {tieKey}
     relays={globalRelays}
-    eventFilter={(note) => {
-      return checkGlobalFolloweePost(note);
-    }}
+    {eventFilter}
   >
     {#snippet content({ events, len })}
       <!-- <SetRepoReactions /> -->
