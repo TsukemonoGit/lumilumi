@@ -69,12 +69,13 @@
   };
   // エラー状態として扱う状態のリスト
   const errorStates: ConnectionState[] = ["error", "rejected", "terminated"];
-  let errorRelayCount = $derived(
+  let errorRelayCount: number = $state(0);
+  relayStateMap.subscribe((value) => {
     //   stateが "error" 、"rejected"、 "terminated"のリレーの数を数える
-    [...relayStateMap.get().values()].filter((state) =>
+    errorRelayCount = [...value.values()].filter((state) =>
       errorStates.includes(state)
-    ).length
-  );
+    ).length;
+  });
 </script>
 
 <!--reconnect relayは readable default relayだけ-->
