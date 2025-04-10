@@ -453,10 +453,10 @@ export async function promisePublishEvent(
 export function relaysReconnectChallenge() {
   //AUTHチャレンジが必要なリレーは除く
   const relays = Object.entries(get(defaultRelays)).filter(([key, value]) => {
-    const isRead = value.read;
-    const notAuth = !authRelay.get().includes(key);
+    const isRead = value.read; //リードリレーのみ
+    const notAuth = !authRelay.get().includes(key); //アウスに含まれないリレーのみ
     const connectError =
-      get(app).rxNostr.getRelayStatus(key)?.connection === "error";
+      get(app).rxNostr.getRelayStatus(key)?.connection === "error"; //エラーリレーのみ
     /*  console.log(
       "isRead",
       isRead,

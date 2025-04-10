@@ -27,6 +27,7 @@
   import Settei from "./Settei.svelte";
   import GlobalDescription from "./GlobalDescription.svelte";
   import GlobalTimeline from "./GlobalTimeline.svelte";
+  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const TIE_KEY = "global";
@@ -201,6 +202,14 @@
   $effect(() => {
     reinitializeTimeline();
   });
+
+  const checkGlobalFolloweePost = (note: Nostr.Event): boolean => {
+    if (timelineFilter.get().globalExcludeFollowee) {
+      return !followList.get().has(note.pubkey);
+    } else {
+      return true;
+    }
+  };
 </script>
 
 {#if !$loginUser && globalRelays.length <= 0}
@@ -237,6 +246,10 @@
         bind:this={compRef}
         globalRelays={$state.snapshot(globalRelays)}
         {timelineQuery}
+        tieKey={"global"}
+        eventFilter={(note) => {
+          return checkGlobalFolloweePost(note);
+        }}
       />
     {/if}
     <!-- {/snippet} -->
