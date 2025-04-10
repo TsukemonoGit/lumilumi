@@ -5,7 +5,10 @@
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import RelayStatusColor from "./RelayStatusColor.svelte";
-  import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
+  import {
+    rxNostr3ReccoctRelay,
+    rxNostr3RelaysReconnectChallenge,
+  } from "$lib/func/reactions";
 
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
   import type { ConnectionState } from "rx-nostr";
@@ -54,8 +57,8 @@
   let disabledButton: string | undefined = $state();
   const handleClickReconnect = (url: string) => {
     reconnectRelay(url);
-    // rxNostr3ReccoctRelay(url);
-    rxNostr3RelaysReconnectChallenge();
+    rxNostr3ReccoctRelay(url);
+    // rxNostr3RelaysReconnectChallenge();
     //リアクションの方の接続情報がわからないから全体のリコネクトチャレンジする
     disabledButton = url;
     setTimeout(() => {
