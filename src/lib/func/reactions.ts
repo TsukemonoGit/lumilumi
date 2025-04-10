@@ -57,13 +57,12 @@ export async function rxNostr3RelaysReconnectChallenge() {
     ([key, value]) =>
       value.read &&
       !authRelay.get().includes(key) &&
-      get(app).rxNostr3.getRelayStatus(key)?.connection ===
-        ("error" as ConnectionState)
+      get(app).rxNostr3.getRelayStatus(key)?.connection === "error"
   );
   if (relays.length === 0) return;
 
-  Object.entries(relays).forEach(([key, value], index) => {
-    get(app).rxNostr3.reconnect(key);
+  relays.forEach(([key, value]) => {
+    get(app).rxNostr.reconnect(key);
   });
 }
 

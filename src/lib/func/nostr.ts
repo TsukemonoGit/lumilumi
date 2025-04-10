@@ -452,18 +452,28 @@ export async function promisePublishEvent(
 
 export async function relaysReconnectChallenge() {
   //AUTHチャレンジが必要なリレーは除く
-  const relays = Object.entries(get(defaultRelays)).filter(
-    ([key, value]) =>
-      value.read &&
-      !authRelay.get().includes(key) &&
-      get(app).rxNostr.getRelayStatus(key)?.connection ===
-        ("error" as ConnectionState)
-  );
+  const relays = Object.entries(get(defaultRelays)).filter(([key, value]) => {
+    const isRead = value.read;
+    const notAuth = !authRelay.get().includes(key);
+    const connectError =
+      get(app).rxNostr.getRelayStatus(key)?.connection === "error";
+    /*  console.log(
+      "isRead",
+      isRead,
+      "notAuth",
+      notAuth,
+      "connectError",
+      connectError
+    ); */
+    return isRead && notAuth && connectError;
+  });
   if (relays.length === 0) return;
 
-  Object.entries(relays).forEach(([key, value], index) => {
+  relays.forEach(([key, value]) => {
     get(app).rxNostr.reconnect(key);
   });
+
+  // コメントアウトされたコードもこの方が自然
   // for (const [key, value] of relays) {
   //   get(app).rxNostr.reconnect(key);
   //   // 接続が完了するまで待機する
