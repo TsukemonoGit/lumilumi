@@ -14,7 +14,7 @@ import * as Nostr from "nostr-typedef";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
-import { verifier } from "$lib/stores/globalRunes.svelte";
+import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -52,23 +52,19 @@ export async function rxNostr3RelaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-
-  const relays = Object.entries(get(app).rxNostr3.getDefaultRelays())?.filter(
+  //AUTHチャレンジが必要なリレーは除く
+  const relays = Object.entries(get(defaultRelays)).filter(
     ([key, value]) =>
       value.read &&
+      !authRelay.get().includes(key) &&
       get(app).rxNostr3.getRelayStatus(key)?.connection ===
         ("error" as ConnectionState)
   );
+  if (relays.length === 0) return;
 
-  if (!relays || relays.length <= 0) {
-    get(app).rxNostr3.setDefaultRelays(get(defaultRelays));
-  } else {
-    for (const [key, value] of relays) {
-      get(app).rxNostr.reconnect(key);
-      // 接続が完了するまで待機する
-      await waitForConnection(key);
-    }
-  }
+  Object.entries(relays).forEach(([key, value], index) => {
+    get(app).rxNostr3.reconnect(key);
+  });
 }
 
 // 接続完了を待機する補助関数

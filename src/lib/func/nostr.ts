@@ -451,6 +451,7 @@ export async function promisePublishEvent(
 }
 
 export async function relaysReconnectChallenge() {
+  //AUTHチャレンジが必要なリレーは除く
   const relays = Object.entries(get(defaultRelays)).filter(
     ([key, value]) =>
       value.read &&
