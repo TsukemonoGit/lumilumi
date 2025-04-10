@@ -32,11 +32,6 @@ export function setRxNostr3() {
   app.update((be) => {
     return { ...be, rxNostr3: rxNostr3 };
   });
-
-  // rxNostr3.createConnectionStateObservable().subscribe((packet) => {
-  //   //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-  //   relayStateMap3.update((value) => value.set(packet.from, packet.state));
-  // });
 }
 export function set3Relays(relays: any) {
   if (!get(app).rxNostr3) {
@@ -48,7 +43,7 @@ export function set3Relays(relays: any) {
   get(app).rxNostr3.setDefaultRelays(relays);
 }
 
-export async function rxNostr3RelaysReconnectChallenge() {
+export function rxNostr3RelaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }

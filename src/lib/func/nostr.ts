@@ -450,7 +450,7 @@ export async function promisePublishEvent(
   return promisePublishSignedEvent(event, relays);
 }
 
-export async function relaysReconnectChallenge() {
+export function relaysReconnectChallenge() {
   //AUTHチャレンジが必要なリレーは除く
   const relays = Object.entries(get(defaultRelays)).filter(([key, value]) => {
     const isRead = value.read;
