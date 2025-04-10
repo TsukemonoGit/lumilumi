@@ -14,7 +14,7 @@ import * as Nostr from "nostr-typedef";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
-import { verifier } from "$lib/stores/globalRunes.svelte";
+import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -32,11 +32,6 @@ export function setRxNostr3() {
   app.update((be) => {
     return { ...be, rxNostr3: rxNostr3 };
   });
-
-  // rxNostr3.createConnectionStateObservable().subscribe((packet) => {
-  //   //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-  //   relayStateMap3.update((value) => value.set(packet.from, packet.state));
-  // });
 }
 export function set3Relays(relays: any) {
   if (!get(app).rxNostr3) {
@@ -48,27 +43,22 @@ export function set3Relays(relays: any) {
   get(app).rxNostr3.setDefaultRelays(relays);
 }
 
-export async function rxNostr3RelaysReconnectChallenge() {
+export function rxNostr3RelaysReconnectChallenge() {
   if (Object.entries(get(defaultRelays)).length == 0) {
     return;
   }
-
-  const relays = Object.entries(get(app).rxNostr3.getDefaultRelays())?.filter(
+  //AUTHチャレンジが必要なリレーは除く
+  const relays = Object.entries(get(defaultRelays)).filter(
     ([key, value]) =>
       value.read &&
-      get(app).rxNostr3.getRelayStatus(key)?.connection ===
-        ("error" as ConnectionState)
+      !authRelay.get().includes(key) &&
+      get(app).rxNostr3.getRelayStatus(key)?.connection === "error"
   );
+  if (relays.length === 0) return;
 
-  if (!relays || relays.length <= 0) {
-    get(app).rxNostr3.setDefaultRelays(get(defaultRelays));
-  } else {
-    for (const [key, value] of relays) {
-      get(app).rxNostr.reconnect(key);
-      // 接続が完了するまで待機する
-      await waitForConnection(key);
-    }
-  }
+  relays.forEach(([key, value]) => {
+    get(app).rxNostr.reconnect(key);
+  });
 }
 
 // 接続完了を待機する補助関数

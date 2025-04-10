@@ -24,6 +24,8 @@ import {
   type RxReqEmittable,
   createRxForwardReq,
   type ConnectionState,
+  filterByType,
+  type AuthPacket,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
 import { Observable, type OperatorFunction } from "rxjs";
@@ -34,6 +36,7 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
 import {
+  authRelay,
   followList,
   lumiSetting,
   relayStateMap,
@@ -64,6 +67,23 @@ export function setRxNostr() {
       return value.set(packet.from, packet.state);
     });
   });
+
+  rxNostr
+    .createAllMessageObservable()
+    .pipe(filterByType("AUTH"))
+    .subscribe(
+      (
+        e: AuthPacket & {
+          type: "AUTH";
+        }
+      ) => {
+        console.log("AUTH", e);
+        if (!authRelay.get().includes(e.from)) {
+          authRelay.update((v) => [...v, e.from]);
+        }
+        console.log("authRelay", authRelay.get());
+      }
+    );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
@@ -430,19 +450,35 @@ export async function promisePublishEvent(
   return promisePublishSignedEvent(event, relays);
 }
 
-export async function relaysReconnectChallenge() {
-  const relays = Object.entries(get(defaultRelays)).filter(
-    ([key, value]) =>
-      value.read &&
-      get(app).rxNostr.getRelayStatus(key)?.connection ===
-        ("error" as ConnectionState)
-  );
+export function relaysReconnectChallenge() {
+  //AUTHチャレンジが必要なリレーは除く
+  const relays = Object.entries(get(defaultRelays)).filter(([key, value]) => {
+    const isRead = value.read;
+    const notAuth = !authRelay.get().includes(key);
+    const connectError =
+      get(app).rxNostr.getRelayStatus(key)?.connection === "error";
+    /*  console.log(
+      "isRead",
+      isRead,
+      "notAuth",
+      notAuth,
+      "connectError",
+      connectError
+    ); */
+    return isRead && notAuth && connectError;
+  });
   if (relays.length === 0) return;
-  for (const [key, value] of relays) {
+
+  relays.forEach(([key, value]) => {
     get(app).rxNostr.reconnect(key);
-    // 接続が完了するまで待機する
-    await waitForConnection(key);
-  }
+  });
+
+  // コメントアウトされたコードもこの方が自然
+  // for (const [key, value] of relays) {
+  //   get(app).rxNostr.reconnect(key);
+  //   // 接続が完了するまで待機する
+  //   await waitForConnection(key);
+  // }
 }
 
 // 接続完了を待機する補助関数

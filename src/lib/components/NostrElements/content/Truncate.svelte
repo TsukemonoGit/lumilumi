@@ -14,7 +14,7 @@
     onClickShowMore,
     depth = 0,
   }: Props = $props();
-  const threshold = 160; // 例えば20px以上大きい場合にのみ"Show More"ボタンを表示
+  let threshold = $derived(maxHeight * 0.35); // 160例えば20px以上大きい場合にのみ"Show More"ボタンを表示
   let isTruncated = $state(false);
 
   function toggleShowMore() {
@@ -22,7 +22,7 @@
   }
 
   // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
-  const minHeight = 100; // 最小の高さを設定
+  let minHeight = $derived(maxHeight * 0.2); // 100 最小の高さを設定
   let contentHeight = $derived(
     Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
   );

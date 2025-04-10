@@ -181,11 +181,10 @@
     showBanner.set(banner);
   });
 
-  async function onVisibilityChange() {
+  function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await relaysReconnectChallenge();
-      await rxNostr3RelaysReconnectChallenge();
+      relaysReconnectChallenge();
+      rxNostr3RelaysReconnectChallenge();
     }
   }
 
