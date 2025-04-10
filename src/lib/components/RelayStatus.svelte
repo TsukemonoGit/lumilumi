@@ -8,6 +8,7 @@
   import { rxNostr3RelaysReconnectChallenge } from "$lib/func/reactions";
 
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import type { ConnectionState } from "rx-nostr";
 
   let readRelays = $derived(
     $defaultRelays
@@ -63,14 +64,27 @@
       //  rxNostr3Status();
     }, 3000);
   };
+  // エラー状態として扱う状態のリスト
+  const errorStates: ConnectionState[] = ["error", "rejected", "terminated"];
+  let errorRelayCount = $derived(
+    //   stateが "error" 、"rejected"、 "terminated"のリレーの数を数える
+    [...relayStateMap.get().values()].filter((state) =>
+      errorStates.includes(state)
+    ).length
+  );
 </script>
 
 <!--reconnect relayは readable default relayだけ-->
 <Popover ariaLabel={"relays status"}>
-  <RadioTower
-    size="20"
-    class={`${overallStateColor}  hover:opacity-75 active:opacity-50`}
-  />
+  <div class="flex gap-0.5 items-end">
+    <RadioTower
+      size="20"
+      class={`${overallStateColor}  hover:opacity-75 active:opacity-50`}
+    />
+    <div class="font-bold text-xs text-red-500">
+      {errorRelayCount !== 0 ? errorRelayCount : ""}
+    </div>
+  </div>
 
   {#snippet popoverContent()}
     <div class="max-h-80 overflow-x-auto max-w-80">

@@ -24,6 +24,8 @@ import {
   type RxReqEmittable,
   createRxForwardReq,
   type ConnectionState,
+  filterByType,
+  type AuthPacket,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
 import { Observable, type OperatorFunction } from "rxjs";
@@ -34,6 +36,7 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { nip19 } from "nostr-tools";
 import { hexRegex } from "./regex";
 import {
+  authRelay,
   followList,
   lumiSetting,
   relayStateMap,
@@ -64,6 +67,23 @@ export function setRxNostr() {
       return value.set(packet.from, packet.state);
     });
   });
+
+  rxNostr
+    .createAllMessageObservable()
+    .pipe(filterByType("AUTH"))
+    .subscribe(
+      (
+        e: AuthPacket & {
+          type: "AUTH";
+        }
+      ) => {
+        console.log("AUTH", e);
+        if (!authRelay.get().includes(e.from)) {
+          authRelay.update((v) => [...v, e.from]);
+        }
+        console.log("authRelay", authRelay.get());
+      }
+    );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
@@ -434,15 +454,20 @@ export async function relaysReconnectChallenge() {
   const relays = Object.entries(get(defaultRelays)).filter(
     ([key, value]) =>
       value.read &&
+      !authRelay.get().includes(key) &&
       get(app).rxNostr.getRelayStatus(key)?.connection ===
         ("error" as ConnectionState)
   );
   if (relays.length === 0) return;
-  for (const [key, value] of relays) {
+
+  Object.entries(relays).forEach(([key, value], index) => {
     get(app).rxNostr.reconnect(key);
-    // 接続が完了するまで待機する
-    await waitForConnection(key);
-  }
+  });
+  // for (const [key, value] of relays) {
+  //   get(app).rxNostr.reconnect(key);
+  //   // 接続が完了するまで待機する
+  //   await waitForConnection(key);
+  // }
 }
 
 // 接続完了を待機する補助関数

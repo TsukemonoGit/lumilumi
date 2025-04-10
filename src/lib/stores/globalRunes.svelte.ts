@@ -26,6 +26,8 @@ export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
 export const showBanner = createShowBanner();
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
+export const authRelay = createCustomStore<string[]>([]);
+
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数
