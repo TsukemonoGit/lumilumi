@@ -38,7 +38,7 @@
       isTruncated: (value) => (isTruncated = value),
       threshold,
     }}
-    class="mt-0.5 overflow-y-auto overflow-x-hidden max-w-full relative"
+    class="mt-0.5  overflow-hidden max-w-full relative"
     style={!isTruncated
       ? ""
       : `max-height: ${contentHeight}px; overflow: hidden;`}
