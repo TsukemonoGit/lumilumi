@@ -12,7 +12,7 @@
   import UserAvatar from "../user/UserAvatar.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
 
-  let size = 96;
+  const size = 96;
   interface Props {
     id: string; //40
     handleClickToChannel?: (() => void) | undefined;

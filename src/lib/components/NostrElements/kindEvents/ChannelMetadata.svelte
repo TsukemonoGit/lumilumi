@@ -4,6 +4,7 @@
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
   import { encodetoNpub } from "$lib/func/encode";
+  import EmptyListCard from "./layout/EmptyListCard.svelte";
 
   interface Props {
     id: string; //kind40 channel id
@@ -20,25 +21,26 @@
   }: Props = $props();
 
   let loadingText = $derived(encodetoNpub(id));
+  const kind = 41;
   //console.log(id);
 </script>
 
 <!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->
 <Text queryKey={["timeline", id]} {id}>
   {#snippet loading()}
-    <button onclick={handleClickToChannel} class="break-all"
-      >loading {loadingText}
-    </button>
+    <EmptyListCard {handleClickToChannel} {linkButtonTitle} {id}>
+      loading {loadingText}
+    </EmptyListCard>
   {/snippet}
   {#snippet nodata()}
-    <button onclick={handleClickToChannel} class="break-all"
-      >nodata {loadingText}
-    </button>
+    <EmptyListCard {handleClickToChannel} {linkButtonTitle} {id}>
+      nodata {loadingText}
+    </EmptyListCard>
   {/snippet}
   {#snippet error()}
-    <button onclick={handleClickToChannel} class="break-all"
-      >error {loadingText}
-    </button>
+    <EmptyListCard {handleClickToChannel} {linkButtonTitle} {id}>
+      error {loadingText}
+    </EmptyListCard>
   {/snippet}
   {#snippet content({ data: text })}
     <LatestEvent
