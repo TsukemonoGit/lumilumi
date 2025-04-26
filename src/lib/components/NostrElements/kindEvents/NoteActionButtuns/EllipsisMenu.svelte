@@ -144,7 +144,7 @@
         $modalState = {
           isOpen: true,
           component: ModalJson,
-          props: { note: { note }, tieKey: { tieKey } },
+          props: { note: note, tieKey: tieKey },
         };
         break;
 
