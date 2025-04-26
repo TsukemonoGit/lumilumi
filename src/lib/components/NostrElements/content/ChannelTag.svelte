@@ -7,6 +7,9 @@
   import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
+  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
+  import { _ } from "svelte-i18n";
+
   interface Props {
     heyaId: string | undefined;
     tieKey: string | undefined;
@@ -43,53 +46,50 @@
     }
   }
   let channelLink = $derived(getChannelLink(heyaId));
+  const menuTexts: { icon: any; text: string; num: number }[] = [
+    { icon: undefined, text: $_("channel.menu.edit"), num: 0 },
+    { icon: undefined, text: $_("channel.menu.open"), num: 1 },
+  ];
+  const handleSelectItem = (index: number) => {
+    console.log(index);
+    switch (menuTexts[index].num) {
+      case 0:
+        //edit
+        break;
+      case 1:
+        //open
+        goto(channelLink);
+        break;
+      default:
+        break;
+    }
+  };
 </script>
 
 {#if heyaId}
-  <Text queryKey={["timeline", heyaId]} id={heyaId}>
-    {#snippet loading()}
-      <button
-        title={channelLink}
-        onclick={handleClickToChannel}
-        class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        ><MessagesSquare {size} class="mr-1" />kind:42</button
-      >
-    {/snippet}
-    {#snippet nodata()}
-      <button
-        title={channelLink}
-        onclick={handleClickToChannel}
-        class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        ><MessagesSquare {size} class="mr-1" />kind:42</button
-      >
-    {/snippet}
-    {#snippet error()}
-      <button
-        title={channelLink}
-        onclick={handleClickToChannel}
-        class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        ><MessagesSquare {size} class="mr-1" />kind:42</button
-      >
-    {/snippet}
-    {#snippet content({ data: text })}
-      {@const channelData = getContent(text)}
-      {#if channelData}
-        <button
-          title={channelLink}
-          onclick={handleClickToChannel}
-          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        >
+  <DropdownMenu
+    {menuTexts}
+    {handleSelectItem}
+    buttonClass="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
+  >
+    <Text queryKey={["timeline", heyaId]} id={heyaId}>
+      {#snippet loading()}
+        <MessagesSquare {size} class="mr-1" />kind:42
+      {/snippet}
+      {#snippet nodata()}
+        <MessagesSquare {size} class="mr-1" />kind:42
+      {/snippet}
+      {#snippet error()}
+        <MessagesSquare {size} class="mr-1" />kind:42
+      {/snippet}
+      {#snippet content({ data: text })}
+        {@const channelData = getContent(text)}
+        {#if channelData}
           <MessagesSquare {size} class="mr-1" />{channelData.name}
-        </button>
-      {:else}
-        <button
-          title={channelLink}
-          onclick={handleClickToChannel}
-          class="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
-        >
+        {:else}
           <MessagesSquare {size} class="mr-1" />kind:42
-        </button>
-      {/if}
-    {/snippet}
-  </Text>
+        {/if}
+      {/snippet}
+    </Text>
+  </DropdownMenu>
 {/if}

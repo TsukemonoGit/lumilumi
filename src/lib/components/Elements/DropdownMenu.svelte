@@ -47,67 +47,10 @@
         use:melt={$item}
         onm-click={() => handleSelectItem(index)}
       >
-        <Icon class="icon mr-2 size-4 " />{text}
+        {#if Icon}<Icon class="icon mr-2 size-4 " />{/if}{text}
       </div>
     {/each}
-    <!-- <div class="item" use:melt={$item}>About Melt UI</div>
-    <div class="item" use:melt={$item}>Check for Updates...</div>
-    <div class="separator" use:melt={$separator} />
-    <div class="item" use:melt={$checkboxItem}>
-      <div class="check">
-        {#if $settingsSync}
-          <Check class="size-4" />
-        {/if}
-      </div>
-      Settings Sync is On
-    </div>
-    <div class="item !hidden md:!flex" use:melt={$subTrigger}>
-      Profiles
-      <div class="rightSlot">
-        <ChevronRight class="size-4" />
-      </div>
-    </div>
-    {#if $subOpen}
-      <div
-        class="menu subMenu"
-        use:melt={$subMenu}
-        transition:fly={{ x: -50, duration: 150 }}
-      >
-        <div class="text">People</div>
-        <div use:melt={$radioGroup}>
-          {#each personsArr as person}
-            <div class="item" use:melt={$radioItem({ value: person })}>
-              <div class="check">
-                {#if $isChecked(person)}
-                  <div class="dot" />
-                {/if}
-              </div>
-              {person}
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
-    <div use:melt={$separator} class="separator" />
 
-    <div class="item" use:melt={$checkboxItemA}>
-      <div class="check">
-        {#if $hideMeltUI}
-          <Check class="size-4" />
-        {/if}
-      </div>
-      Hide Melt UI
-      <div class="rightSlot">⌘H</div>
-    </div>
-    <div class="item" use:melt={$item} data-disabled>
-      Show All Components
-      <div class="rightSlot">⇧⌘N</div>
-    </div>
-    <div use:melt={$separator} class="separator" />
-    <div class="item" use:melt={$item}>
-      Quit Melt UI
-      <div class="rightSlot">⌘Q</div>
-    </div> -->
     <div use:melt={$arrow}></div>
   </div>
 {/if}

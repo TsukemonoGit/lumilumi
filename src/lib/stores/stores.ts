@@ -107,3 +107,14 @@ export const reactionToast = writable<{
 export const ogTitle = writable<string>("Lumilumi");
 
 export const ogDescription = writable<string>("the nostr client");
+export interface ModalState {
+  
+  isOpen: boolean;
+  component: any;
+  props?: Record<string, any>;
+}
+export const modalState = writable<ModalState>({
+  isOpen: false,
+  component: null,
+  props: {},
+});
