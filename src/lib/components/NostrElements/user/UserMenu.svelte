@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     loginUser,
+    modalState,
     nowProgress,
     queryClient,
     toastSettings,
@@ -27,7 +28,7 @@
   import { nip19 } from "nostr-tools";
   import { page } from "$app/state";
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
-  import { writable, type Writable } from "svelte/store";
+  //import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
@@ -40,7 +41,7 @@
   let { tieKey, metadata, pubkey, profile }: Props = $props();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  //let dialogOpen: Writable<boolean> = writable(false);
   let encodedPubkey = $derived.by(() => {
     if (pubkey) {
       try {
@@ -117,7 +118,16 @@
         }
         break;
       case 2:
-        $dialogOpen = true;
+        //   $dialogOpen = true;
+        $modalState = {
+          isOpen: true,
+          component: ModalJson,
+          props: {
+            note: metadata,
+            tieKey: tieKey,
+            profile: profile,
+          },
+        };
         break;
       case 3:
         if (encodedPubkey) {
@@ -219,7 +229,7 @@
       <ChevronRight class="ml-auto" />
     </div></UserMuteMenu
   >{/if}
-
+<!-- 
 {#if metadata}
   <ModalJson
     bind:dialogOpen
@@ -228,3 +238,4 @@
     {tieKey}
     zIndex={50}
   />{/if}
+ -->

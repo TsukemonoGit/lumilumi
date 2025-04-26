@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { loginUser, toastSettings } from "$lib/stores/stores";
+  import { loginUser, modalState, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -33,7 +33,7 @@
   let { note, indexes = undefined, listData, tieKey }: Props = $props();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  //let dialogOpen: Writable<boolean> = writable(false);
 
   // svelte-ignore non_reactive_update
   let menuTexts = [
@@ -65,7 +65,12 @@
     switch (menuTexts[index].num) {
       case 0:
         //view json
-        $dialogOpen = true;
+        //$dialogOpen = true;
+        $modalState = {
+          isOpen: true,
+          component: ModalJson,
+          props: { note: { note }, tieKey: { tieKey } },
+        };
         break;
 
       case 1:
@@ -143,5 +148,5 @@
   <Ellipsis size="20" />
 </DropdownMenu>
 
-<!--JSON no Dialog-->
-<ModalJson bind:dialogOpen {note} {tieKey} />
+<!--JSON no Dialog
+<ModalJson bind:dialogOpen {note} {tieKey} />-->

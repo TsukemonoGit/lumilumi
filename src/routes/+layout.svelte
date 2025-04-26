@@ -56,6 +56,7 @@
   import { page } from "$app/state";
   import { _ } from "svelte-i18n";
   import Popstate from "./Popstate.svelte";
+  import Modal from "./Modal.svelte";
 
   let { data, children } = $props<{
     data:
@@ -314,3 +315,4 @@
 {#if page.url.origin === "https://lumilumi.vercel.app" || page.url.origin === "http://localhost:5173"}
   <DomainMigrationNotice />
 {/if}
+<Modal />

@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
+  import {
+    loginUser,
+    modalState,
+    queryClient,
+    toastSettings,
+  } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -57,7 +62,7 @@
   }: Props = $props();
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  // let dialogOpen: Writable<boolean> = writable(false);
 
   let replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
@@ -135,7 +140,12 @@
     switch (menuTexts[index].num) {
       case 0:
         //view json
-        $dialogOpen = true;
+        //$dialogOpen = true;
+        $modalState = {
+          isOpen: true,
+          component: ModalJson,
+          props: { note: { note }, tieKey: { tieKey } },
+        };
         break;
 
       case 1:
@@ -343,8 +353,8 @@
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
 
-<!--JSON no Dialog-->
-<ModalJson bind:dialogOpen {note} {tieKey} />
+<!--JSON no Dialog
+<ModalJson bind:dialogOpen {note} {tieKey} />-->
 <AlertDialog
   bind:openDialog={deleteDialogOpen}
   onClickOK={() => onClickOK()}
