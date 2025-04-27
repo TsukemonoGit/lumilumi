@@ -177,7 +177,7 @@
       {:else}
         <div class="mt-2 mb-4">
           {#if includeHeyaId}
-            <div class="p-3 bg-red-900/30 rounded-lg border border-red-500">
+            <div class="p-3 bg-red-900/20 rounded-lg border border-red-500">
               <!-- 追加または削除しようとしている部屋ID -->
               <ChannelMetadata
                 id={heyaId}
@@ -185,9 +185,9 @@
                 clickAction={false}
                 linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
               />
-              <p class="text-red-200">{$_("channel.menu.removeConfirm")}</p>
+              <p class="mt-4">{$_("channel.menu.removeConfirm")}</p>
               <button
-                class="mt-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md"
+                class="mt-2 bg-red-600/90 hover:bg-red-700/90 text-white font-medium py-2 px-4 rounded-md"
                 onclick={updateChannelList}
               >
                 {$_("channel.menu.remove")}
@@ -202,9 +202,9 @@
                 clickAction={false}
                 linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
               />
-              <p class="text-green-200">{$_("channel.menu.addConfirm")}</p>
+              <p class="mt-4">{$_("channel.menu.addConfirm")}</p>
               <button
-                class="mt-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md"
+                class="mt-2 bg-green-600/90 hover:bg-green-700/90 text-white font-medium py-2 px-4 rounded-md"
                 onclick={updateChannelList}
               >
                 {$_("channel.menu.add")}
