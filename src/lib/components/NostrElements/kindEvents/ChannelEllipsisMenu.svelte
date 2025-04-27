@@ -20,7 +20,6 @@
   import { page } from "$app/state";
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
-  import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
