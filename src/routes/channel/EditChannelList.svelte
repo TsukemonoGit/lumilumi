@@ -62,7 +62,7 @@
           operator: pipe(latest()),
         },
         undefined,
-        2000
+        3000
       );
 
       if (

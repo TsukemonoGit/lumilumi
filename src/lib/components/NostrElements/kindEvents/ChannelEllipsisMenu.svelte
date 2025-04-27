@@ -7,6 +7,7 @@
     SquareArrowOutUpRight,
     Radio,
     Share,
+    Edit,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -55,6 +56,11 @@
     ) {
       menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
     }
+
+    //
+    /*  if (note.pubkey === $loginUser) {
+      menu.push({ text: `${$_("menu.editChannelInfo")}`, icon: Edit, num: 8 });
+    } */
 
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));

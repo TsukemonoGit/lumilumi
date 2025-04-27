@@ -132,7 +132,8 @@
     "nostrapp": "App Manager で開く",
     "mention": "メンションを送る",
     "userSearch": "ユーザー検索",
-    "delete": "削除"
+    "delete": "削除",
+    "editChannelInfo": "チャンネル情報の修正"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
@@ -145,6 +146,22 @@
       "addConfirm": "このチャンネルをリストに追加しますか？",
       "add": "チャンネルを追加",
       "currentList": "現在のチャンネルリスト"
+    },
+    "create": {
+      "title": "新規チャンネル作成",
+      "name": "チャンネル名",
+      "namePlaceholder": "チャンネル名を入力",
+      "about": "説明",
+      "aboutPlaceholder": "このチャンネルについて記述...",
+      "picture": "画像URL",
+      "categories": "カテゴリー",
+      "categoryPlaceholder": "カテゴリーを入力（例：nostr、開発、雑談）",
+      "addCategory": "カテゴリーを追加",
+      "addToList": "このチャンネルを自分のリストに追加する",
+      "submit": "チャンネルを作成",
+      "success": "チャンネルが正常に作成されました！",
+      "error": "チャンネルの作成に失敗しました。もう一度お試しください。",
+      "errorNameRequired": "チャンネル名は必須です。"
     }
   },
   "list": {
@@ -304,6 +321,7 @@
     "edit": "ステータスの編集"
   },
   "common": {
-    "close": "閉じる"
+    "close": "閉じる",
+    "cancel": "キャンセル"
   }
 }

@@ -72,7 +72,7 @@
   };
 </script>
 
-<div class="flex w-fit gap-1">
+<div class="flex w-60 max-w-full gap-1">
   <UploaderSelect bind:selectedUploader={$selectedUploader} /><MediaPicker
     bind:files
     bind:fileInput
