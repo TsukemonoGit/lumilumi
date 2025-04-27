@@ -1,4 +1,5 @@
 <script lang="ts">
+  let { tieKey } = $props();
   const handleClickCreate = () => {
     console.log("create channel");
   };

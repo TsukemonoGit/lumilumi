@@ -11,6 +11,7 @@
     handleClickToChannel?: (() => void) | undefined;
     linkButtonTitle: string;
     tieKey: string | undefined;
+    clickAction?: boolean;
   }
 
   let {
@@ -18,6 +19,7 @@
     handleClickToChannel = undefined,
     linkButtonTitle,
     tieKey,
+    clickAction = true,
   }: Props = $props();
 
   let loadingText = $derived(encodetoNpub(id));
@@ -53,6 +55,7 @@
             {handleClickToChannel}
             {id}
             {linkButtonTitle}
+            {clickAction}
             event={text}
             {tieKey}
           />
@@ -64,6 +67,7 @@
             {handleClickToChannel}
             {id}
             {linkButtonTitle}
+            {clickAction}
             event={text}
             {tieKey}
           />
@@ -75,6 +79,7 @@
             {handleClickToChannel}
             {id}
             {linkButtonTitle}
+            {clickAction}
             event={text}
             {tieKey}
           />
@@ -85,6 +90,7 @@
           {handleClickToChannel}
           {id}
           {linkButtonTitle}
+          {clickAction}
           {event}
           {tieKey}
         />
