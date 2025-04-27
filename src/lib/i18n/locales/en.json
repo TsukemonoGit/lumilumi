@@ -163,6 +163,10 @@
       "success": "Channel created successfully!",
       "error": "Failed to create channel. Please try again.",
       "errorNameRequired": "Channel name is required."
+    },
+    "edit": {
+      "title": "Edit Channel Information",
+      "submit": "Update Channel"
     }
   },
   "list": {

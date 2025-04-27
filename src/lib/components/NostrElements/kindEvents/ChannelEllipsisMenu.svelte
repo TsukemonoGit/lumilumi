@@ -21,16 +21,25 @@
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import { writable } from "svelte/store";
+  import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
 
   interface Props {
-    note: Nostr.Event;
+    note: Nostr.Event; //kind40か41
     indexes?: number[] | undefined;
     channelData: ChannelData;
     tieKey: string | undefined;
+    heyaId: string;
   }
 
-  let { note, indexes = undefined, channelData, tieKey }: Props = $props();
-
+  let {
+    note,
+    indexes = undefined,
+    channelData,
+    tieKey,
+    heyaId,
+  }: Props = $props();
+  let editChannelListOpen = $state(writable(false));
   // svelte-ignore non_reactive_update
   // let dialogOpen: Writable<boolean> = writable(false);
 
@@ -57,9 +66,13 @@
     }
 
     //
-    /*  if (note.pubkey === $loginUser) {
-      menu.push({ text: `${$_("menu.editChannelInfo")}`, icon: Edit, num: 8 });
-    } */
+    if (note.pubkey === $loginUser) {
+      menu.unshift({
+        text: `${$_("menu.editChannelInfo")}`,
+        icon: Edit,
+        num: 8,
+      }); //配列の先頭に挿入
+    }
 
     if (indexes !== undefined) {
       menu = menu.filter((item) => indexes.includes(item.num));
@@ -150,6 +163,10 @@
           };
         }
         break;
+      case 8:
+        //Edit Channel Info
+        $editChannelListOpen = true;
+        break;
     }
   };
 
@@ -177,3 +194,4 @@
 
 <!--JSON no Dialog
 <ModalJson bind:dialogOpen {note} {tieKey} />-->
+<EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} {tieKey} />

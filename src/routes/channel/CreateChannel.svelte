@@ -211,7 +211,7 @@
 
 <button
   onclick={handleClickCreate}
-  class="border border-magnum-500 rounded-md p-2 font-bold self-start text-magnum-500 hover:bg-magnum-500/10 active:bg-magnum-500/20 flex items-center"
+  class="border border-magnum-500 rounded-md p-2 font-bold self-start text-magnum-400 hover:bg-magnum-500/10 active:bg-magnum-500/20 flex items-center"
 >
   <MessagesSquare class="mr-1" />Create New Channel
 </button>
