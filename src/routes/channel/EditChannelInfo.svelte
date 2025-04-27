@@ -183,8 +183,13 @@
 
     // ダイアログを閉じる
     $dialogOpen = false;
-    $editChannelListOpen = false;
   };
+
+  dialogOpen.subscribe((value) => {
+    if (!value) {
+      $editChannelListOpen = false;
+    }
+  });
 </script>
 
 {#if $dialogOpen}

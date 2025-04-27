@@ -137,7 +137,6 @@
 
         // ダイアログを閉じる
         $dialogOpen = false;
-        $editChannelListOpen = false;
       }
     } catch (error) {
       console.error("イベント送信エラー:", error);
@@ -146,6 +145,11 @@
       $nowProgress = false;
     }
   }
+  dialogOpen.subscribe((value) => {
+    if (!value) {
+      $editChannelListOpen = false;
+    }
+  });
 </script>
 
 {#if $dialogOpen}
@@ -168,7 +172,7 @@
       </h2>
 
       {#if $nowProgress}
-        loading...
+        <span class="text-neutral-500">loading...</span>
       {:else}
         <div class="mt-2 mb-4">
           {#if includeHeyaId}
