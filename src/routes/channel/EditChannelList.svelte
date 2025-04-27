@@ -137,7 +137,7 @@
 
         // ダイアログを閉じる
         $dialogOpen = false;
-        editChannelListOpen.set(false);
+        $editChannelListOpen = false;
       }
     } catch (error) {
       console.error("イベント送信エラー:", error);
@@ -149,7 +149,7 @@
 
   function closeDialog() {
     $dialogOpen = false;
-    editChannelListOpen.set(false);
+    $editChannelListOpen = false;
   }
 </script>
 
