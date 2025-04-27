@@ -133,7 +133,8 @@
     "nostrapp": "Open in App Manager",
     "mention": "Send Mention",
     "userSearch": "Search User",
-    "delete": "Delete"
+    "delete": "Delete",
+    "editChannelInfo": "Edit Channel Information"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",
@@ -146,6 +147,26 @@
       "addConfirm": "Do you want to add this channel to your list?",
       "add": "Add Channel",
       "currentList": "Current Channel List"
+    },
+    "create": {
+      "title": "Create New Channel",
+      "name": "Channel Name",
+      "namePlaceholder": "Enter channel name",
+      "about": "Description",
+      "aboutPlaceholder": "Write about this channel...",
+      "picture": "Picture URL",
+      "categories": "Categories",
+      "categoryPlaceholder": "Enter category (e.g. nostr, dev, chat)",
+      "addCategory": "Add Category",
+      "addToList": "Add this channel to my personal list",
+      "submit": "Create Channel",
+      "success": "Channel created successfully!",
+      "error": "Failed to create channel. Please try again.",
+      "errorNameRequired": "Channel name is required."
+    },
+    "edit": {
+      "title": "Edit Channel Information",
+      "submit": "Update Channel"
     }
   },
   "list": {
@@ -305,6 +326,7 @@
     "edit": "Edit status"
   },
   "common": {
-    "close": "Close"
+    "close": "Close",
+    "cancel": "CANCEL"
   }
 }

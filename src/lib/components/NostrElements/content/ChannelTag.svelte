@@ -97,5 +97,5 @@
     </Text>
   </DropdownMenu>
 
-  <EditChannelList bind:editChannelListOpen {heyaId} />
+  <EditChannelList bind:editChannelListOpen {heyaId} {tieKey} />
 {/if}

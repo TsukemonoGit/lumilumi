@@ -10,26 +10,54 @@
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { nip19 } from "nostr-tools";
   import { clientTag } from "$lib/func/constants";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { promisePublishEvent } from "$lib/func/nostr";
+  import { getRelaysById, promisePublishEvent } from "$lib/func/nostr";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
-  import type { EventPacket } from "rx-nostr";
+
   import type { QueryKey } from "@tanstack/svelte-query";
+  import type { Writable } from "svelte/store";
+  import type { ChannelData } from "$lib/types";
 
   let querykey: QueryKey = $derived(["kind10005", $loginUser]);
-  let { tieKey } = $props();
+
+  interface Props {
+    editChannelListOpen: Writable<boolean>;
+    heyaId: string;
+    note: Nostr.Event; //kind40か41
+    channelData: ChannelData;
+    tieKey: string | undefined;
+  }
+  let {
+    editChannelListOpen = $bindable(),
+    heyaId,
+    note,
+    channelData,
+    tieKey,
+  }: Props = $props();
 
   // フォームの状態を管理
-  let channelName = $state("");
-  let channelAbout = $state("");
-  let channelPicture = $state("");
-  let categories = $state([{ value: "" }]);
+  let channelName = $state(channelData.name);
+  let channelAbout = $state(channelData.about || "");
+  let channelPicture = $state(channelData.picture || "");
+  let categories = $state(
+    note.tags.reduce<{ value: string }[]>((a, b) => {
+      if (b[0] === "t") {
+        return [...a, { value: b[1] }];
+      } else {
+        return a;
+      }
+    }, [])
+  );
   let addToList = $state(true);
   let error = $state("");
 
+  editChannelListOpen.subscribe((value) => {
+    if (value) {
+      $dialogOpen = true;
+    }
+  });
   // カテゴリー追加
   const addCategory = () => {
     categories = [...categories, { value: "" }];
@@ -66,9 +94,17 @@
         about: channelAbout.trim(),
         picture: channelPicture.trim(),
       };
-
+      const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
       // tags の作成
-      const tags: string[][] = [];
+      const tags: string[][] = [
+        [
+          "e",
+          heyaId,
+          relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "",
+          "root",
+          note.pubkey,
+        ],
+      ];
 
       // カテゴリータグを追加
       categories.forEach((cat) => {
@@ -84,7 +120,7 @@
 
       // 新しいイベントを作成（実際のアプリに合わせて調整）
       const newChannelEvent: Nostr.EventParameters = {
-        kind: 40,
+        kind: 41,
         content: JSON.stringify(channelMetadata),
         tags: tags,
         created_at: Math.floor(Date.now() / 1000),
@@ -100,12 +136,10 @@
         description: message,
         color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
       };
-
-      if (addToList) {
-        // チャンネルリスト(kind 10005)に追加する処理
-        await addChannelToList(ev.id);
-      }
-
+      queryClient.setQueryData(
+        ["channel", "kind41", heyaId],
+        formatToEventPacket(ev)
+      );
       // 完了メッセージと画面遷移
       //alert($_("channel.create.success"));
 
@@ -119,61 +153,6 @@
       error = $_("channel.create.error");
     } finally {
       $nowProgress = false;
-    }
-  };
-
-  // チャンネルをリストに追加する処理
-  const addChannelToList = async (channelId: string) => {
-    try {
-      // 現在のKind 10005を取得
-      const kind10005data: EventPacket | undefined =
-        queryClient.getQueryData(querykey);
-      if (kind10005data) {
-        // 新しいタグリストを作成
-        const newTags = [...kind10005data.event.tags, ["e", channelId]];
-
-        // 新しいイベントを作成して送信
-        // 新しいイベントを作成
-        const newEvent: Nostr.EventParameters = {
-          kind: 10005,
-          content: "",
-          tags: newTags,
-          created_at: Math.floor(Date.now() / 1000),
-        };
-
-        // イベントを送信する処理（実際のアプリケーションに合わせて実装）
-        const { event: signedkind10005, res } =
-          await promisePublishEvent(newEvent);
-        console.log("イベントを送信:", signedkind10005);
-
-        const isSuccess = res
-          .filter((item) => item.ok)
-          .map((item) => item.from);
-        const isFailed = res
-          .filter((item) => !item.ok)
-          .map((item) => item.from);
-        const message = generateResultMessage(isSuccess, isFailed);
-        $toastSettings = {
-          title: isSuccess.length > 0 ? "Success" : "Failed",
-          description: message,
-          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-        };
-
-        if (isSuccess.length > 0) {
-          // 成功したら状態を更新
-
-          queryClient.setQueryData(
-            querykey,
-            formatToEventPacket(signedkind10005)
-          );
-        }
-
-        console.log("Added channel to list:", channelId);
-      } else {
-        throw new Error("Failed to fetch kind 10005 data");
-      }
-    } catch (err) {
-      console.error("リスト追加エラー:", err);
     }
   };
 
@@ -204,17 +183,9 @@
 
     // ダイアログを閉じる
     $dialogOpen = false;
+    $editChannelListOpen = false;
   };
 </script>
-
-<!--作ったら自動で10005にも入るようにしよう-->
-
-<button
-  onclick={handleClickCreate}
-  class="border border-magnum-500 rounded-md p-2 font-bold self-start text-magnum-400 hover:bg-magnum-500/10 active:bg-magnum-500/20 flex items-center"
->
-  <MessagesSquare class="mr-1" />Create New Channel
-</button>
 
 {#if $dialogOpen}
   <div class="" use:melt={$portalled}>
@@ -226,13 +197,13 @@
     ></div>
     <div
       class={`fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))]
-               -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-               p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
+                 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
+                 p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
       style={`z-index:10`}
       use:melt={$content}
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium mb-4">
-        {$_("channel.create.title")}
+        {$_("channel.edit.title")}
       </h2>
 
       <div class="overflow-y-auto px-1">
@@ -326,17 +297,6 @@
             {$_("channel.create.addCategory")}
           </button>
         </label>
-
-        <!-- Add to personal list option -->
-
-        <label class="flex items-center gap-2 cursor-pointer mb-4">
-          <input
-            type="checkbox"
-            bind:checked={addToList}
-            class="h-4 w-4 rounded bg-neutral-700"
-          />
-          <span>{$_("channel.create.addToList")}</span>
-        </label>
       </div>
 
       <div class="mt-6 flex justify-end gap-4">
@@ -344,7 +304,7 @@
         <button
           onclick={closeDialog}
           class="inline-flex h-10 items-center justify-center rounded-md
-                  bg-neutral-800 border border-neutral-700 px-4 font-medium leading-none text-white"
+                    bg-neutral-800 border border-neutral-700 px-4 font-medium leading-none text-white"
         >
           {$_("common.cancel")}
         </button>
@@ -354,10 +314,10 @@
           onclick={createChannel}
           disabled={$nowProgress}
           class="inline-flex h-10 items-center justify-center rounded-md
-                  bg-magnum-600 hover:bg-magnum-700 px-6 font-medium leading-none text-white
-                  disabled:bg-magnum-800 disabled:opacity-70"
+                    bg-magnum-600 hover:bg-magnum-700 px-6 font-medium leading-none text-white
+                    disabled:bg-magnum-800 disabled:opacity-70"
         >
-          {$_("channel.create.submit")}
+          {$_("channel.edit.submit")}
         </button>
       </div>
 
@@ -366,8 +326,8 @@
         aria-label="close"
         onclick={closeDialog}
         class="absolute right-4 top-4 inline-flex appearance-none
-        items-center justify-center rounded-full p-1 text-magnum-800
-        hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
+          items-center justify-center rounded-full p-1 text-magnum-800
+          hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
       >
         <X class="size-6" />
       </button>

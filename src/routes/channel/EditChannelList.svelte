@@ -55,16 +55,16 @@
 
       const kind10005data: EventPacket | undefined =
         queryClient.getQueryData(querykey);
-
+      console.log(kind10005data);
       const newKind10005: EventPacket[] = await usePromiseReq(
         {
           filters: [{ kinds: [10005], authors: [$loginUser], limit: 1 }],
           operator: pipe(latest()),
         },
         undefined,
-        2000
+        3000
       );
-
+      console.log(newKind10005);
       if (
         newKind10005 &&
         newKind10005.length > 0 &&
@@ -72,7 +72,7 @@
           newKind10005[0].event.created_at > kind10005data.event.created_at)
       ) {
         kind10005 = newKind10005[0].event;
-        queryClient.setQueryData(querykey, kind10005);
+        queryClient.setQueryData(querykey, newKind10005[0].event);
       } else if (kind10005data) {
         kind10005 = kind10005data.event;
       }
@@ -137,7 +137,7 @@
 
         // ダイアログを閉じる
         $dialogOpen = false;
-        editChannelListOpen.set(false);
+        $editChannelListOpen = false;
       }
     } catch (error) {
       console.error("イベント送信エラー:", error);
@@ -145,11 +145,6 @@
     } finally {
       $nowProgress = false;
     }
-  }
-
-  function closeDialog() {
-    $dialogOpen = false;
-    editChannelListOpen.set(false);
   }
 </script>
 
@@ -238,7 +233,7 @@
 
       <div class="mt-4 flex justify-end gap-4">
         <button
-          onclick={closeDialog}
+          use:melt={$close}
           class="inline-flex h-8 items-center justify-center rounded-sm
                       bg-zinc-100 px-4 font-medium leading-none text-zinc-600 hover:bg-zinc-200"
         >
@@ -252,7 +247,6 @@
         class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
                   items-center justify-center rounded-full p-1 text-magnum-800
                   hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
-        onclick={closeDialog}
       >
         <X class="size-4" />
       </button>

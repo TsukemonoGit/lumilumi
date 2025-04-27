@@ -7,6 +7,7 @@
     SquareArrowOutUpRight,
     Radio,
     Share,
+    Edit,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -19,18 +20,26 @@
   import { page } from "$app/state";
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";
-  import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import { writable } from "svelte/store";
+  import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
 
   interface Props {
-    note: Nostr.Event;
+    note: Nostr.Event; //kind40か41
     indexes?: number[] | undefined;
     channelData: ChannelData;
     tieKey: string | undefined;
+    heyaId: string;
   }
 
-  let { note, indexes = undefined, channelData, tieKey }: Props = $props();
-
+  let {
+    note,
+    indexes = undefined,
+    channelData,
+    tieKey,
+    heyaId,
+  }: Props = $props();
+  let editChannelListOpen = $state(writable(false));
   // svelte-ignore non_reactive_update
   // let dialogOpen: Writable<boolean> = writable(false);
 
@@ -54,6 +63,15 @@
       !(note.tags.find((tag) => tag[0] === "-") && note.pubkey !== $loginUser)
     ) {
       menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
+    }
+
+    //
+    if (note.pubkey === $loginUser) {
+      menu.unshift({
+        text: `${$_("menu.editChannelInfo")}`,
+        icon: Edit,
+        num: 8,
+      }); //配列の先頭に挿入
     }
 
     if (indexes !== undefined) {
@@ -145,6 +163,10 @@
           };
         }
         break;
+      case 8:
+        //Edit Channel Info
+        $editChannelListOpen = true;
+        break;
     }
   };
 
@@ -172,3 +194,4 @@
 
 <!--JSON no Dialog
 <ModalJson bind:dialogOpen {note} {tieKey} />-->
+<EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} {tieKey} />
