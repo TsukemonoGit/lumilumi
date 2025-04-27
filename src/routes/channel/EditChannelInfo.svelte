@@ -122,7 +122,7 @@
       const newChannelEvent: Nostr.EventParameters = {
         kind: 41,
         content: JSON.stringify(channelMetadata),
-        tags: tags,
+        tags: $state.snapshot(tags),
         created_at: Math.floor(Date.now() / 1000),
       };
 

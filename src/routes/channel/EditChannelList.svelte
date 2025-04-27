@@ -111,7 +111,7 @@
     const newEvent: Nostr.EventParameters = {
       kind: 10005,
       content: "",
-      tags: newTags,
+      tags: $state.snapshot(newTags),
       created_at: Math.floor(Date.now() / 1000),
     };
 
