@@ -9,6 +9,8 @@
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
+  import { writable } from "svelte/store";
+  import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
 
   interface Props {
     heyaId: string | undefined;
@@ -50,11 +52,13 @@
     { icon: undefined, text: $_("channel.menu.edit"), num: 0 },
     { icon: undefined, text: $_("channel.menu.open"), num: 1 },
   ];
+  let editChannelListOpen = $state(writable(false));
   const handleSelectItem = (index: number) => {
     console.log(index);
     switch (menuTexts[index].num) {
       case 0:
         //edit
+        $editChannelListOpen = true;
         break;
       case 1:
         //open
@@ -92,4 +96,6 @@
       {/snippet}
     </Text>
   </DropdownMenu>
+
+  <EditChannelList bind:editChannelListOpen {heyaId} />
 {/if}

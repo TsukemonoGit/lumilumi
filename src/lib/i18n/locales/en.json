@@ -140,7 +140,12 @@
     "global": "goto Global Channel Feed",
     "menu": {
       "edit": "Edit Channel List",
-      "open": "Open Channel"
+      "open": "Open Channel",
+      "removeConfirm": "Do you want to remove this channel from your list?",
+      "remove": "Remove Channel",
+      "addConfirm": "Do you want to add this channel to your list?",
+      "add": "Add Channel",
+      "currentList": "Current Channel List"
     }
   },
   "list": {
@@ -298,5 +303,8 @@
   },
   "status": {
     "edit": "Edit status"
+  },
+  "common": {
+    "close": "Close"
   }
 }
