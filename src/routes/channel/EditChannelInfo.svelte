@@ -1,12 +1,12 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { MessagesSquare, X, Image, Plus, Minus } from "lucide-svelte";
+  import { X, Plus, Minus } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import { _ } from "svelte-i18n";
   import * as Nostr from "nostr-typedef";
   import {
-    loginUser,
     nowProgress,
+    popStack,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
@@ -16,11 +16,11 @@
   import { getRelaysById, promisePublishEvent } from "$lib/func/nostr";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
 
-  import type { QueryKey } from "@tanstack/svelte-query";
   import type { Writable } from "svelte/store";
   import type { ChannelData } from "$lib/types";
-
-  let querykey: QueryKey = $derived(["kind10005", $loginUser]);
+  import { pushState } from "$app/navigation";
+  import { page } from "$app/state";
+  import { untrack } from "svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -52,10 +52,32 @@
   );
   let addToList = $state(true);
   let error = $state("");
-
+  const id = "editChannelInformation";
   editChannelListOpen.subscribe((value) => {
     if (value) {
       $dialogOpen = true;
+      pushState("", {
+        dialogOpen: {
+          id: id,
+        },
+      });
+    }
+  });
+  // Handle back navigation from popStack
+  popStack.subscribe((value) => {
+    const log = value.find((v) => v.id === id);
+    if (log) {
+      $dialogOpen = false;
+      popStack.update((stack) => stack.filter((s) => s.id !== id));
+    }
+  });
+  // 外部からのページ状態変更を監視
+  $effect(() => {
+    const currentDialogState = page.state?.dialogOpen?.id === id;
+    if ($dialogOpen && !currentDialogState) {
+      untrack(() => {
+        $dialogOpen = false;
+      });
     }
   });
   // カテゴリー追加
@@ -71,10 +93,6 @@
   // カテゴリー更新
   const updateCategory = (index: number, value: string) => {
     categories = categories.map((cat, i) => (i === index ? { value } : cat));
-  };
-
-  const handleClickCreate = () => {
-    $dialogOpen = true;
   };
 
   // チャンネル作成処理
