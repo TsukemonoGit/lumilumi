@@ -245,7 +245,7 @@
 
           <InputImageFromFile bind:inputText={channelPicture} />
         </label>
-        <div class="flex gap-2 sm:flex-row flex-col">
+        <div class="flex gap-2 sm:flex-row flex-col mb-2">
           <input
             type="text"
             bind:value={channelPicture}
