@@ -86,7 +86,7 @@
       const newChannelEvent: Nostr.EventParameters = {
         kind: 40,
         content: JSON.stringify(channelMetadata),
-        tags: tags,
+        tags: $state.snapshot(tags),
         created_at: Math.floor(Date.now() / 1000),
       };
 
@@ -137,7 +137,7 @@
         const newEvent: Nostr.EventParameters = {
           kind: 10005,
           content: "",
-          tags: newTags,
+          tags: $state.snapshot(newTags),
           created_at: Math.floor(Date.now() / 1000),
         };
 
