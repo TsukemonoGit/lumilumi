@@ -10,6 +10,7 @@
   import {
     loginUser,
     nowProgress,
+    popStack,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
@@ -18,6 +19,9 @@
   import { nip19 } from "nostr-tools";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
+  import { pushState } from "$app/navigation";
+  import { page } from "$app/state";
+  import { untrack } from "svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -44,12 +48,34 @@
     closeOnOutsideClick: false,
   });
   let includeHeyaId = $state(false);
+  const id = "editChannelList";
+  // Handle back navigation from popStack
+  popStack.subscribe((value) => {
+    const log = value.find((v) => v.id === id);
+    if (log) {
+      $dialogOpen = false;
+      popStack.update((stack) => stack.filter((s) => s.id !== id));
+    }
+  });
+  // 外部からのページ状態変更を監視
+  $effect(() => {
+    const currentDialogState = page.state?.dialogOpen?.id === id;
+    if ($dialogOpen && !currentDialogState) {
+      untrack(() => {
+        $dialogOpen = false;
+      });
+    }
+  });
 
   editChannelListOpen.subscribe(async (value) => {
     if (value) {
       $dialogOpen = true;
       console.log("open", value);
-
+      pushState("", {
+        dialogOpen: {
+          id: id,
+        },
+      });
       // 最新の10005を取得する
       $nowProgress = true;
 

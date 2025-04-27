@@ -7,6 +7,7 @@
   import {
     loginUser,
     nowProgress,
+    popStack,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
@@ -18,6 +19,9 @@
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { pushState } from "$app/navigation";
+  import { page } from "$app/state";
+  import { untrack } from "svelte";
 
   let querykey: QueryKey = $derived(["kind10005", $loginUser]);
   let { tieKey } = $props();
@@ -44,10 +48,32 @@
   const updateCategory = (index: number, value: string) => {
     categories = categories.map((cat, i) => (i === index ? { value } : cat));
   };
-
+  const id = "createChannel";
   const handleClickCreate = () => {
     $dialogOpen = true;
+    pushState("", {
+      dialogOpen: {
+        id: id,
+      },
+    });
   };
+  // Handle back navigation from popStack
+  popStack.subscribe((value) => {
+    const log = value.find((v) => v.id === id);
+    if (log) {
+      $dialogOpen = false;
+      popStack.update((stack) => stack.filter((s) => s.id !== id));
+    }
+  });
+  // 外部からのページ状態変更を監視
+  $effect(() => {
+    const currentDialogState = page.state?.dialogOpen?.id === id;
+    if ($dialogOpen && !currentDialogState) {
+      untrack(() => {
+        $dialogOpen = false;
+      });
+    }
+  });
 
   // チャンネル作成処理
   const createChannel = async () => {
