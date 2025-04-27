@@ -172,7 +172,7 @@
       </h2>
 
       {#if $nowProgress}
-        loading...
+        <span class="text-neutral-500">loading...</span>
       {:else}
         <div class="mt-2 mb-4">
           {#if includeHeyaId}
