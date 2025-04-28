@@ -33,7 +33,16 @@
   let size = clickAction ? 96 : 66;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
-      return JSON.parse(text.content) as ChannelData;
+      const kategories = text.tags.reduce((result, tag) => {
+        if (tag[0] === "t" && tag.length > 1) {
+          result.push(tag[1]);
+        }
+        return result;
+      }, []);
+      return {
+        ...JSON.parse(text.content),
+        kategories: kategories,
+      } as ChannelData;
     } catch (error) {
       return undefined;
     }
@@ -50,6 +59,7 @@
       kind: event.kind,
       name: channelData.name,
       about: channelData.about || "",
+      kategories: channelData.kategories || [],
     }}
   >
     {#snippet listAvatar()}

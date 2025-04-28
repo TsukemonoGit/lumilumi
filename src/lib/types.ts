@@ -168,6 +168,7 @@ export interface ChannelData {
   about?: string;
   picture?: string;
   relays?: string;
+  kategories?:string[];
 }
 
 export interface DefaultPostOptions {
