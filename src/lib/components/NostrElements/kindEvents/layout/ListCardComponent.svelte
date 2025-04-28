@@ -6,7 +6,12 @@
     linkButtonTitle?: string;
     handleClickToChannel?: () => void | undefined;
     listAvatar: Snippet;
-    listProps: { kind: number; name: string; about: string };
+    listProps: {
+      kind: number;
+      name: string;
+      about: string;
+      kategories: string[];
+    };
     userAvatar: Snippet;
     menu: Snippet;
   }
@@ -20,6 +25,11 @@
     listProps,
     menu,
   }: Props = $props();
+
+  const handleClickKategory = (kategory: string) => {
+    //かてごりーくりっくしたときのどうさ
+    console.log(kategory);
+  };
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">
@@ -46,8 +56,18 @@
         </div>
 
         <div class="text-magnum-100">{listProps.about}</div>
+        <div
+          class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+        >
+          {#each listProps.kategories as kategory}
+            <div>
+              {kategory}
+            </div>
+          {/each}
+        </div>
       </div></button
-    >{:else}
+    >
+  {:else}
     <div class="grid grid-cols-[auto_1fr]">
       <!--がぞう-->
 
@@ -66,6 +86,15 @@
         </div>
 
         <div class="text-magnum-100">{listProps.about}</div>
+        <div
+          class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+        >
+          {#each listProps.kategories as kategory}
+            <div>
+              {kategory}
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
   {/if}
@@ -74,4 +103,15 @@
     {@render userAvatar?.()}
     {@render menu?.()}
   </div>
+  <!--  <div class="float-end flex gap-1 justify-end">
+    {#each listProps.kategories as kategory}
+      <button
+        class="rounded-md text-magnum-200 font-bold px-1"
+        onclick={(event) => {
+          event.stopPropagation();
+          handleClickKategory(kategory);
+        }}>#{kategory}</button
+      >
+    {/each}
+  </div> -->
 </div>
