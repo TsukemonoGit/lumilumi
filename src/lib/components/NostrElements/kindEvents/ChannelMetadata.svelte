@@ -3,7 +3,7 @@
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
-  import { encodetoNpub } from "$lib/func/encode";
+  import { encodetoNote, encodetoNpub } from "$lib/func/encode";
   import EmptyListCard from "./layout/EmptyListCard.svelte";
 
   interface Props {
@@ -22,7 +22,7 @@
     clickAction = true,
   }: Props = $props();
 
-  let loadingText = $derived(encodetoNpub(id));
+  let loadingText = $derived(encodetoNote(id));
   const kind = 41;
   //console.log(id);
 </script>
