@@ -9,7 +9,6 @@
   import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { loginUser } from "$lib/stores/stores";
-  import { latestList } from "$lib/func/event";
 
   const tieKey = undefined;
 
@@ -24,11 +23,7 @@
   };
 
   const filtered = (events: Nostr.Event[]) => {
-    const list = events.filter((event) =>
-      event.tags.find((item) => item[0] === "p")
-    );
-    //同じaタグのイベントは最新のだけにする
-    return latestList(list);
+    return events.filter((event) => event.tags.find((item) => item[0] === "p"));
   };
 </script>
 
