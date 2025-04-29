@@ -269,7 +269,7 @@
                       {/if}
                     {/each}
                     <EmojiListUpdate
-                      buttonClass="ml-auto p-1 m-1 rounded-full  bg-magnum-500 hover:opacity-75 active:opacity-50"
+                      buttonClass="ml-auto p-1 m-1 rounded-full   hover:opacity-75 active:opacity-50 bg-magnum-600/70 text-magnum-300"
                     >
                       <RefreshCw />
                     </EmojiListUpdate>
