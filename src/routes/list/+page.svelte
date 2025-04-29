@@ -8,7 +8,7 @@
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
-  import { loginUser, toastSettings } from "$lib/stores/stores";
+  import { loginUser } from "$lib/stores/stores";
   import { latestList } from "$lib/func/event";
 
   const tieKey = undefined;
@@ -30,23 +30,8 @@
     //同じaタグのイベントは最新のだけにする
     return latestList(list);
   };
-  // afterNavigate(() => {
-  //   if (!$loginUser) {
-  //     $toastSettings = {
-  //       title: "Warning",
-  //       description: $_("list.settingswarning"),
-  //       color: "bg-orange-500",
-  //     };
-
-  //     goto("/settings");
-  //   }
-  // });
 </script>
 
-<!-- <svelte:head>
-  <title>Lumilumi-List</title><meta property="og:description" content="List" />
-  <meta name="description" content="List" />
-</svelte:head> -->
 {#if !$loginUser}
   <a
     href="/settings"
@@ -56,7 +41,11 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
-      <ListMain queryKey={["kind30000", $loginUser]} pubkey={$loginUser}>
+      <ListMain
+        queryKey={["kind30000", $loginUser]}
+        pubkey={$loginUser}
+        kind={30000}
+      >
         {#snippet children({ events })}
           {@const peopleList = filtered(events)}
           {#if peopleList.length === 0}

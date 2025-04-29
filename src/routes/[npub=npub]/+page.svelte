@@ -25,6 +25,8 @@
     Users,
     RadioTower,
     SmilePlus,
+    Newspaper,
+    Library,
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -47,6 +49,8 @@
 
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
   import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";
+
+  import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
 
   interface Props {
     data: {
@@ -93,6 +97,8 @@
 
     { id: "followee", title: "Follow", Icon: Users },
     { id: "emojis", title: "Emojis", Icon: SmilePlus },
+    { id: "articles", title: "Articles", Icon: Library },
+
     { id: "bookmark", title: "Bookmark", Icon: BookMarked },
 
     { id: "zap", title: "Zapped", Icon: Zap },
@@ -692,6 +698,26 @@
         <div use:melt={$content("emojis")} class="content">
           {#if $value === "emojis"}
             <CustomEmojiTab pubkey={userPubkey} />
+          {/if}
+        </div>
+        <div use:melt={$content("articles")} class="content">
+          {#if $value === "articles"}
+            <ListMain
+              queryKey={["kind30023", userPubkey]}
+              pubkey={userPubkey}
+              kind={30023}
+              >{#snippet loading()}
+                loading
+              {/snippet}
+              {#snippet nodata()}
+                No articles found
+              {/snippet}
+              {#snippet children({ events })}
+                {#each events as event}
+                  <EventCard note={event} tieKey={undefined} />
+                {/each}
+              {/snippet}
+            </ListMain>
           {/if}
         </div>
       </div>

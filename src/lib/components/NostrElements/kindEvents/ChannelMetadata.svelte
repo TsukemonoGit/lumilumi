@@ -3,7 +3,7 @@
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import ChannelMetadataLayout from "./ChannelMetadataLayout.svelte";
-  import { encodetoNote, encodetoNpub } from "$lib/func/encode";
+  import { encodetoNote } from "$lib/func/encode";
   import EmptyListCard from "./layout/EmptyListCard.svelte";
 
   interface Props {
