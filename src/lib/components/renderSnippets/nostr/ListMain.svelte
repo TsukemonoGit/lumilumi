@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { useReplaceableEventList } from "$lib/stores/useReplaceableEventList";
   import type { ReqStatus } from "$lib/types";
@@ -15,6 +14,7 @@
   interface Props {
     queryKey: QueryKey;
     pubkey: string;
+    kind: number;
     req?:
       | (RxReq<"backward"> &
           RxReqEmittable<{
@@ -41,9 +41,10 @@
     loading,
     nodata,
     children,
+    kind,
   }: Props = $props();
 
-  let result = $derived(useReplaceableEventList(queryKey, pubkey, 30000, req));
+  let result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
@@ -56,7 +57,6 @@
     events: $data.map(({ event }) => event),
     status: $status,
   })}
-  <!-- <slot events={$data.map(({ event }) => event)} status={$status} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}
