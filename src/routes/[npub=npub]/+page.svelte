@@ -45,7 +45,7 @@
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
 
-  import { checkBirthDay } from "$lib/func/event";
+  import { checkBirthDay, latestList } from "$lib/func/event";
 
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
   import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";

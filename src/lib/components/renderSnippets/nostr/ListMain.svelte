@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { latestList } from "$lib/func/event";
   import { useReplaceableEventList } from "$lib/stores/useReplaceableEventList";
   import type { ReqStatus } from "$lib/types";
 
@@ -43,6 +44,13 @@
     children,
     kind,
   }: Props = $props();
+  //これできてないっぽい
+  /*  
+      latestEach((eventpacket) => {
+      const tag = eventpacket.event.tags.find((tag) => tag[0] === "d");
+      return tag ? tag[1] : null;
+      //  import { latestList } from "$lib/func/event";でやってる
+    }), */
 
   let result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
   let data = $derived(result.data);
@@ -54,7 +62,7 @@
   {@render error?.($errorData)}
 {:else if $data && $data.length > 0}
   {@render children?.({
-    events: $data.map(({ event }) => event),
+    events: latestList($data.map(({ event }) => event)), //dごとの最新だけ残す
     status: $status,
   })}
 {:else if $status === "loading"}

@@ -29,10 +29,12 @@ export function useReplaceableEventList(
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey] }];
   const operator = pipe(
-    latestEach((eventpacket) => {
+     //これできてないっぽいからListMainのほうでlatestListしてる
+  /*  
+      latestEach((eventpacket) => {
       const tag = eventpacket.event.tags.find((tag) => tag[0] === "d");
       return tag ? tag[1] : null;
-    }),
+    }), */
 
     scanArray()
   );
