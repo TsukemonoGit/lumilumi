@@ -308,16 +308,23 @@
   const onClickOK = async () => {
     deleteDialogOpen(false);
     try {
+      const deletetags = [
+        ["e", note.id],
+        ["k", note.kind.toString()],
+      ];
+      if (isAddressableKind(note.kind) || isReplaceableKind(note.kind)) {
+        deletetags.push([
+          "a",
+          `${note.kind}:${note.pubkey}:${note.tags.find((item) => item[0] === "d")?.[1] || ""}`,
+        ]);
+      }
       const {
         event,
         res,
       }: {
         event: Nostr.Event;
         res: OkPacketAgainstEvent[];
-      } = await deleteEvent([
-        ["e", note.id],
-        ["k", note.kind.toString()],
-      ]);
+      } = await deleteEvent(deletetags);
       // console.log(res);
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
