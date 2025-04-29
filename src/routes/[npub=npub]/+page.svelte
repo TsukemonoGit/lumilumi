@@ -714,7 +714,7 @@
               {/snippet}
               {#snippet children({ events })}
                 {#each events as event}
-                  <EventCard note={event} tieKey={undefined} />
+                  <EventCard note={event} tieKey={undefined} {metadata} />
                 {/each}
               {/snippet}
             </ListMain>
