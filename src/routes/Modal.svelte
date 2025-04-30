@@ -35,16 +35,20 @@
     });
   }
 
-  // Handle back navigation from popStack
-  popStack.subscribe((value) => {
-    const log = value.find((v) => v.id === id);
-    if (log) {
-      $dialogOpen = false;
-      popStack.update((stack) => stack.filter((s) => s.id !== id));
+  // ブラウザバックなどでpopStackからナビゲーション変更があった場合
+  $effect(() => {
+    const logEntry = $popStack?.[0]?.id === id;
+
+    if (logEntry) {
+      untrack(() => {
+        $dialogOpen = false;
+
+        popStack.update((stack) => stack.filter((entry) => entry.id !== id));
+      });
     }
   });
 
-  // 外部からのページ状態変更を監視
+  /*  // 外部からのページ状態変更を監視
   $effect(() => {
     const currentDialogState = page.state?.dialogOpen?.id === id;
     if ($dialogOpen && !currentDialogState) {
@@ -52,7 +56,7 @@
         $dialogOpen = false;
       });
     }
-  });
+  }); */
 
   let modal: ModalState | null = $state(null);
   let unsubscribe = modalState.subscribe((state) => {

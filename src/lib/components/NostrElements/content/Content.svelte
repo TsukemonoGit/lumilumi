@@ -68,7 +68,7 @@
 <!--Show more no Dialog-->
 
 <Dialog
-  id={`showMore_${text.slice(10)}_${depth}`}
+  id={`showMore_${text.slice(5)}_${depth}`}
   bind:open={showMore}
   zIndex={zIndex + 10}
 >
