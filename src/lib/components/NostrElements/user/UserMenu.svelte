@@ -36,9 +36,10 @@
     metadata: Nostr.Event | undefined;
     pubkey: string;
     profile: Profile | undefined;
+    tab?: string | undefined;
   }
 
-  let { tieKey, metadata, pubkey, profile }: Props = $props();
+  let { tieKey, metadata, pubkey, profile, tab }: Props = $props();
 
   // svelte-ignore non_reactive_update
   //let dialogOpen: Writable<boolean> = writable(false);
@@ -59,6 +60,7 @@
     { text: $_("menu.broadcast"), icon: Radio, num: 5 },
     { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
     { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
+    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
   ];
 
   let menuTexts = $derived(
@@ -84,7 +86,9 @@
           return false;
         }
       }
-
+      if (!tab && item.num === 7) {
+        return false;
+      }
       return true;
     })
   );
@@ -185,7 +189,7 @@
         const shareData = {
           //title: "",
           text: "",
-          url: `${page.url.origin}/${urlData}`,
+          url: `${page.url.origin}/${urlData}${tab ? `#${tab}` : ""}`,
         };
 
         try {
