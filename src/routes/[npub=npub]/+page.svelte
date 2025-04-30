@@ -3,9 +3,9 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
-  import { onMount, untrack } from "svelte";
+  import { onMount } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import { generateRandomId, setRelays } from "$lib/func/nostr";
+  import { setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
   import { cubicInOut } from "svelte/easing";
@@ -18,14 +18,12 @@
     Pin,
     ReceiptText,
     MessageSquareText,
-    Smile,
     Zap,
     Sticker,
     BookMarked,
     Users,
     RadioTower,
     SmilePlus,
-    Newspaper,
     Library,
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -45,7 +43,7 @@
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
 
-  import { checkBirthDay, latestList } from "$lib/func/event";
+  import { checkBirthDay } from "$lib/func/event";
 
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
   import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";
@@ -69,9 +67,9 @@
 
   // svelte-ignore non_reactive_update
   let req = createRxForwardReq();
-  const excludeKind1 = (event: Nostr.Event) => {
+  /*  const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
-  };
+  }; */
   const excludeKind7 = (event: Nostr.Event) => {
     return event.kind === 7 && event.pubkey === data.pubkey;
   };
@@ -219,7 +217,7 @@
           {#each triggers as triggerItem}
             <button
               use:melt={$trigger(triggerItem.id)}
-              class="trigger relative flex-col gap-1 min-w-20"
+              class="trigger relative flex-col gap-1 min-w-16 text-sm"
             >
               {#if triggerItem.Icon}<triggerItem.Icon
                   size={20}
