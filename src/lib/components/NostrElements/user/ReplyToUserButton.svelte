@@ -54,6 +54,6 @@
 
 <button
   onclick={handleClickRelayToUser}
-  class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
+  class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
   title={"reply"}><Reply /></button
 >
