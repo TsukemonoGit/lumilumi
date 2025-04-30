@@ -37,6 +37,7 @@
     depth: number;
     tieKey: string | undefined;
     zIndex?: number | undefined;
+    tab?: string | undefined;
   }
 
   let {
@@ -46,6 +47,7 @@
     depth,
     tieKey,
     zIndex = 0,
+    tab,
   }: Props = $props();
   let petname = $derived(followList.get().get(pubkey));
 
@@ -278,6 +280,7 @@
                     {metadata}
                     {prof}
                     {tieKey}
+                    {tab}
                   />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">

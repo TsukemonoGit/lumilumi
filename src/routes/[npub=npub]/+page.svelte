@@ -200,7 +200,12 @@
       class="w-full break-words overflow-hidden"
       id={componentKey.toString()}
     >
-      <UserProfile pubkey={userPubkey} depth={0} tieKey={undefined} />
+      <UserProfile
+        pubkey={userPubkey}
+        depth={0}
+        tieKey={undefined}
+        tab={$value}
+      />
       <div
         id="userTabs"
         use:melt={$root}
