@@ -48,15 +48,15 @@
     }
   });
 
-  /*  // 外部からのページ状態変更を監視
   $effect(() => {
     const currentDialogState = page.state?.dialogOpen?.id === id;
     if ($dialogOpen && !currentDialogState) {
       untrack(() => {
         $dialogOpen = false;
+        popStack.update((stack) => stack.filter((entry) => entry.id !== id));
       });
     }
-  }); */
+  });
 
   let modal: ModalState | null = $state(null);
   let unsubscribe = modalState.subscribe((state) => {
