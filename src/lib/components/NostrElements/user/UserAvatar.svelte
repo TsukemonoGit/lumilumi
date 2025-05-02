@@ -56,7 +56,7 @@
 {#if avatarUrl && avatarUrl !== ""}
   <div
     {title}
-    class="relative flex items-center justify-center {!square
+    class="relative flex justify-center items-center {!square
       ? 'rounded-full'
       : ''} bg-neutral-800 overflow-hidden"
     style="height: {size}px; width: {size}px;"
@@ -66,7 +66,7 @@
       onload={() => (loadingStatus = "loaded")}
       onerror={() => (loadingStatus = "error")}
       alt={name}
-      class=" object-cover {!square ? 'rounded-full' : ''}"
+      class="absolute t-0 l-0 object-cover {!square ? 'rounded-full' : ''}"
       style="height: 100%; width: 100%; object-fit: cover; object-position: center;"
       loading="lazy"
     />
