@@ -18,6 +18,8 @@
   import NostrContent from "./Simple/NostrContent.svelte";
   import Dl from "./Simple/Dl.svelte";
   import NotabPart from "./Simple/NotabPart.svelte";
+  import CheckboxInput from "./Simple/CheckboxInput.svelte";
+  import Label from "./Simple/Label.svelte";
   interface Props {
     part: Token;
     displayMenu: any;
@@ -266,6 +268,20 @@
   <br />
 {:else if part.type === "dl"}
   <Dl
+    {part}
+    {repostable}
+    {depth}
+    {displayMenu}
+    {tags}
+    {openModal}
+    {nolist}
+    {tieKey}
+    {zIndex}
+  />
+{:else if part.type === "checkbox_input"}
+  <CheckboxInput {part} />
+{:else if part.type === "label"}
+  <Label
     {part}
     {repostable}
     {depth}
