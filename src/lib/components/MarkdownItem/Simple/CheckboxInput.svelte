@@ -15,7 +15,6 @@
 
 <input
   type="checkbox"
-  class="rounded-checkbox"
   checked={isChecked}
   disabled
   id={part.attrs?.find(([key]) => key === "id")?.[1] ?? ""}
@@ -23,14 +22,9 @@
 
 <style lang="postcss">
   input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
     vertical-align: middle;
-  }
-
-  .rounded-checkbox {
-    width: 24px !important;
-    height: 24px !important;
+    width: 24px;
+    height: 24px;
 
     border: 1px solid theme("colors.magnum.600");
     border-radius: 4px;
@@ -44,7 +38,7 @@
   }
 
   /* チェックされている状態 */
-  .rounded-checkbox:checked {
+  input[type="checkbox"]:checked {
     background-color: theme("colors.magnum.600") !important;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='3' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8l3 3 5-5'/%3E%3C/svg%3E") !important;
     background-repeat: no-repeat !important;
@@ -52,12 +46,12 @@
   }
 
   /* 無効かつチェックされている状態 */
-  .rounded-checkbox:disabled:checked {
+  input[type="checkbox"]:disabled:checked {
     cursor: not-allowed;
   }
 
   /* 無効だが未チェックの状態 */
-  .rounded-checkbox:disabled:not(:checked) {
+  input[type="checkbox"]:disabled:not(:checked) {
     cursor: not-allowed;
   }
 </style>
