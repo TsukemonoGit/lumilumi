@@ -264,6 +264,7 @@ input:-webkit-autofill:focus {
 
 .contentBlock li {
   /* margin-bottom: 0.5em;  各リストアイテムの下にスペースを追加 */
+  margin-top: 0.5em;
 }
 
 /* ネストされたリストのスタイル */

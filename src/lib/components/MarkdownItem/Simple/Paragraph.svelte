@@ -31,7 +31,7 @@
   let children: Token[] = $derived(transformTokens(part.children ?? []));
 </script>
 
-<p class="my-2">
+<p>
   {#if part.children && children}
     {#each children as child}
       <SimpleContentBlock
