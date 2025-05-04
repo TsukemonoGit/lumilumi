@@ -47,7 +47,7 @@
   //プレビューにも使ってるからconstだとだめ
   let tokens = $derived(
     md
-.use(markdownCheckBoxPlugin)
+      .use(markdownCheckBoxPlugin)
       .use(markdownImgPlugin)
 
       .use(markdownItFootnote)
@@ -124,7 +124,9 @@
   id={`showMore_${text.slice(10)}_${depth}}`}
 >
   {#snippet main()}
-    <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+    <div
+      class="contentBlock rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden"
+    >
       {#each parts as token}
         <SimpleContentBlock
           part={token}
