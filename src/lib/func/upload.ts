@@ -2,7 +2,8 @@ import {
   type FileUploadResponse,
   type OptionalFormDataFields,
 } from "nostr-tools/nip96";
-
+import { getToken } from "nostr-tools/nip98";
+import * as Nostr from "nostr-typedef";
 // エラーコードを定数として定義
 const ERROR_CODES = {
   FILE_TOO_LARGE: 413,
@@ -409,45 +410,77 @@ async function pollUploadStatus(
   let response: Response;
   let statusResponse: FileUploadResponse;
 
+  // 初回アップロードリクエスト
+  response = await fetch(serverApiUrl, {
+    method: "POST",
+    headers: {
+      Authorization: authHeader,
+    },
+    body: formData,
+    signal,
+  });
+
+  if (!response.ok) {
+    handleErrorResponse(response);
+  }
+
+  try {
+    statusResponse = await response.json();
+  } catch (error) {
+    throw new Error("Failed to parse upload response");
+  }
+  console.log(statusResponse.processing_url);
+  // 即時完了している場合は返す
+  if (response.status === 201 || !statusResponse.processing_url) {
+    return statusResponse;
+  }
+  // 初回アップロード後、ポーリング前に1秒待機
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const processingAuthToken = await getToken(
+    statusResponse.processing_url,
+    "GET",
+    async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+    true
+  );
+  console.log("Auth header:", processingAuthToken);
+  // 処理待ちの場合は processing_url をポーリング
   while (true) {
-    response = await fetch(serverApiUrl, {
-      method: "POST",
-      headers: {
-        Authorization: authHeader,
-      },
-      body: formData,
-      signal,
-    });
-
-    // レスポンスエラーチェック
-    if (!response.ok) {
-      handleErrorResponse(response);
-    }
-
-    try {
-      statusResponse = await response.json();
-    } catch (error) {
-      throw new Error("Failed to parse status response");
-    }
-
-    // 初期レスポンスが201ならすぐに返す
-    if (response.status === 201) {
-      return statusResponse;
-    }
-
-    // 経過時間が最大待機時間を超えたら終了
     if (Date.now() - startTime > maxWaitTime) {
       return statusResponse;
     }
 
-    // 進行状況が200または202の場合、1秒待機して再チェック
-    if (response.status === 200 || response.status === 202) {
+    const processingResponse = await fetch(statusResponse.processing_url, {
+      method: "GET",
+      headers: {
+        Authorization: processingAuthToken,
+      },
+      signal,
+    });
+
+    if (!processingResponse.ok) {
+      throw new Error(
+        `Unexpected status code ${processingResponse.status} while polling processing_url`
+      );
+    }
+
+    if (processingResponse.status === 201) {
+      // 処理完了時の最終レスポンスを返す
+      return await processingResponse.json();
+    }
+
+    const processingStatus = await processingResponse.json();
+
+    if (processingStatus.status === "processing") {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       continue;
     }
 
-    // それ以外の場合は、エラーを投げる
-    throw new Error("Unexpected status code during file upload process!");
+    if (processingStatus.status === "error") {
+      throw new Error("File processing failed");
+    }
+
+    throw new Error("Unexpected processing status");
   }
 }
 
