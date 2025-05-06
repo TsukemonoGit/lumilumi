@@ -6,7 +6,6 @@
   import type { Writable } from "svelte/store";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
-  import { page } from "$app/state";
 
   interface Props {
     dialogTitle?: string;

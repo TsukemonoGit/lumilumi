@@ -57,6 +57,8 @@
   import CustomEmoji from "./NostrElements/content/CustomEmoji.svelte";
   import PostPreview from "./PostPreview.svelte";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
+  import GeohashMap from "./GeohashMap.svelte";
+  import { untrack } from "svelte";
 
   // ----------------------------------------
   // Component Props
@@ -98,6 +100,7 @@
   // ----------------------------------------
   // State Management
   // ----------------------------------------
+  let geohash: string = $state("");
   let text: string = $state(options.content ?? "");
   let tags: string[][] = $state([...options.tags]);
   let cursorPosition: number = 0;
@@ -157,6 +160,21 @@
   // svelte-ignore non_reactive_update
   let openHellConfirm: (bool: boolean) => void;
 
+  $effect(() => {
+    if (geohash) {
+      untrack(() => {
+        // まず現在の g タグをフィルタリングで除去
+        const filteredTags = tags.filter((tag) => tag[0] !== "g");
+        // 新しい g タグを追加
+        tags = [...filteredTags, ["g", geohash]];
+      });
+    } else {
+      untrack(() => {
+        // geohash がない場合は g タグを除去
+        tags = tags.filter((tag) => tag[0] !== "g");
+      });
+    }
+  });
   // ----------------------------------------
   // User Authentication
   // ----------------------------------------
@@ -202,6 +220,7 @@
     initOptions = { ...options, kind: options.kind ?? 1 };
     viewMetadataList = false;
     inputMetadata = "";
+    geohash = "";
   }
 
   // ----------------------------------------
@@ -1021,6 +1040,7 @@
               bind:value={customReaction}
             />
           {/if}
+          <GeohashMap bind:geohash />
           <button
             aria-label="open custom emoji list"
             onclick={handleClickCustomReaction}
