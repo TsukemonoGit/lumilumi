@@ -434,16 +434,50 @@ async function pollUploadStatus(
   if (response.status === 201 || !statusResponse.processing_url) {
     return statusResponse;
   }
-  // 初回アップロード後、ポーリング前に1秒待機
+  // 初回アップロード後、ポーリング前に2秒待機
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  const processingAuthToken = await getToken(
-    statusResponse.processing_url,
-    "GET",
-    async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-    true
-  );
-  console.log("Auth header:", processingAuthToken);
+  let processingAuthToken;
+  let signatureFailed = false;
+
+  try {
+    processingAuthToken = await getToken(
+      statusResponse.processing_url,
+      "GET",
+      async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+      true
+    );
+  } catch (error) {
+    // 署名失敗した場合
+    console.log("Initial signature failed:", error);
+    signatureFailed = true;
+
+    // 署名を一度失敗した場合、少し待機してから署名チャレンジ
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // 待機後に再度署名を試みる
+    try {
+      console.log("Retrying signature after wait...");
+      processingAuthToken = await getToken(
+        statusResponse.processing_url,
+        "GET",
+        async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+        true
+      );
+      signatureFailed = false;
+      console.log("Retry signature succeeded");
+    } catch (retryError) {
+      console.log("Retry signature also failed:", retryError);
+      throw new Error(
+        "Cannot verify if the image was uploaded because signature authorization was denied"
+      );
+    }
+  }
+
+  if (!signatureFailed) {
+    console.log("Auth header:", processingAuthToken);
+  }
+
   // 処理待ちの場合は processing_url をポーリング
   while (true) {
     if (Date.now() - startTime > maxWaitTime) {
