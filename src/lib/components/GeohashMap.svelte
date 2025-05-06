@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPin, MapPinCheck, MapPinPlus } from "lucide-svelte";
+  import { MapPinCheck, MapPinPlus } from "lucide-svelte";
   import Dialog from "./Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
   import { browser } from "$app/environment";
@@ -20,38 +20,41 @@
   };
 </script>
 
-{#if browser}
-  {#await import("$lib/components/Sveaflet.svelte") then module}
-    {@const Sveaflet = module.default}
-
-    <button aria-label="open map" onclick={handleClickOpenMap} class="button">
-      {#if geohash}
-        <MapPinCheck size="20" class={"stroke-magnum-500"} />
-      {:else}
-        <MapPinPlus size="20" class={"stroke-magnum-300"} />
-      {/if}
-    </button>
-    <Dialog bind:open={dialogOpen} zIndex={9999} id="setGiohash"
-      >{#snippet main()}
-        <div class="p-2 w-full overflow-x-hidden flex-col justify-center gap-2">
-          <div class="flex justify-center items-center gap-1 mb-1">
-            <p class="text-sm font-medium">GEOHASH:</p>
-            {#if geohash}
-              <p
-                class="inline font-mono bg-neutral-50 px-1 text-magnum-700 rounded"
-              >
-                {geohash}
-              </p>
-            {:else}
-              <p class="inline text-sm italic">No location set</p>
-            {/if}
+<button aria-label="open map" onclick={handleClickOpenMap} class="button">
+  {#if geohash}
+    <MapPinCheck size="20" class={"stroke-magnum-500"} />
+  {:else}
+    <MapPinPlus size="20" class={"stroke-magnum-300"} />
+  {/if}
+</button>
+<Dialog bind:open={dialogOpen} zIndex={9999} id="setGiohash"
+  >{#snippet main()}
+    <div class="p-2 w-full overflow-x-hidden flex-col justify-center gap-2">
+      <div class="flex justify-center items-center gap-1 mb-1">
+        <p class="text-sm font-medium">GEOHASH:</p>
+        {#if geohash}
+          <p
+            class="inline font-mono bg-neutral-50 px-1 text-magnum-700 rounded"
+          >
+            {geohash}
+          </p>
+        {:else}
+          <p class="inline text-sm italic">No location set</p>
+        {/if}
+      </div>
+      {#if browser}
+        {#await import("$lib/components/Sveaflet.svelte")}
+          <div class="italic text-center pt-4 text-neutral-500">
+            Loading map...
           </div>
+        {:then module}
+          {@const Sveaflet = module.default}
           <Sveaflet {onClickSubmit} {onClickDelete} initGeo={geohash} />
-        </div>
-      {/snippet}</Dialog
-    >
-  {/await}
-{/if}
+        {/await}
+      {/if}
+    </div>
+  {/snippet}</Dialog
+>
 
 <style lang="postcss">
   .button {
