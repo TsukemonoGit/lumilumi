@@ -328,5 +328,10 @@
   "common": {
     "close": "Close",
     "cancel": "CANCEL"
+  },
+  "geo": {
+    "location": "Get My Location",
+    "submit": "Confirm Location",
+    "delete": "Delete Location"
   }
 }

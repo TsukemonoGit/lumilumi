@@ -328,5 +328,10 @@
   "common": {
     "close": "閉じる",
     "cancel": "キャンセル"
+  },
+  "geo": {
+    "location": "現在地を取得",
+    "submit": "位置を決定",
+    "delete": "位置情報を削除"
   }
 }
