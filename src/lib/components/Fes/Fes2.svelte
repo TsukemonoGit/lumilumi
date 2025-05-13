@@ -155,7 +155,7 @@
     >
       {#each Array(20) as _, i}
         <div
-          class="absolute rounded-full bg-white opacity-70 pointer-events-none"
+          class="absolute rounded-full bg-neutral-950 dark:bg-neutral-50 opacity-70 pointer-events-none"
           style="
             width: {0.2 + Math.random() * 0.3}rem; 
             height: {0.2 + Math.random() * 0.3}rem;
