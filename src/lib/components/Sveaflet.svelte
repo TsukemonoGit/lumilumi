@@ -3,14 +3,16 @@
     decodeGeohash,
     encodeGeohash,
     getCurrentLocation,
+    searchPlace,
   } from "$lib/func/geohash";
+  import { toastSettings } from "$lib/stores/stores";
 
   import {
     latLng,
     type LatLngExpression,
     type Map as LeafletMap,
   } from "leaflet";
-  import { Check, LocateFixed, X } from "lucide-svelte";
+  import { Check, LocateFixed, Search, X } from "lucide-svelte";
   import { Map, TileLayer, Marker, Popup } from "sveaflet";
   import { onMount } from "svelte";
   import { _ } from "svelte-i18n";
@@ -76,6 +78,21 @@
   let geohash = $derived(
     encodeGeohash(latLng(position).lat, latLng(position).lng)
   );
+  let searchWord = $state("");
+  const handleClickSearch = async () => {
+    const res = await searchPlace(searchWord);
+    if (res) {
+      position = res;
+      setPopupContent("You clicked the map at " + position.toString());
+      leafletMap?.flyTo(position);
+    } else {
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to find the specified location.",
+        color: "bg-orange-500",
+      };
+    }
+  };
 </script>
 
 <div class="map">
@@ -95,6 +112,16 @@
       <Popup options={{ content: popupContent }} bind:instance={popup} />
     </Marker>
   </Map>
+  <!-- 検索入力とボタン -->
+  <div class="search-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="search word"
+      bind:value={searchWord}
+    />
+    <button class="search-btn" onclick={handleClickSearch}><Search /></button>
+  </div>
 </div>
 <div class="button-container">
   <button class="btn locate-btn" onclick={getLocation}
@@ -110,10 +137,19 @@
 
 <style lang="postcss">
   .map {
-    @apply h-[480px] w-[640px] max-w-full rounded-md border border-blue-400 p-1;
+    @apply relative h-[480px] w-[640px] max-w-full rounded-md border border-blue-400 p-1;
   }
-  .map {
-    @apply h-[480px] w-[640px] max-w-full rounded-md border border-blue-400 p-1;
+  .search-bar {
+    @apply absolute bottom-2 left-2 flex items-center;
+    z-index: 1000;
+  }
+
+  .search-input {
+    @apply h-8 md:w-52 w-36 border rounded-l-md border-solid px-2 leading-none text-neutral-100 bg-neutral-900;
+  }
+
+  .search-btn {
+    @apply h-8 px-3 rounded-r-md bg-blue-600 text-neutral-900 hover:bg-blue-700 active:bg-blue-800;
   }
   .button-container {
     @apply flex flex-wrap justify-center gap-2 mt-3;
