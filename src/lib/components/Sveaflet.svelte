@@ -83,6 +83,8 @@
     const res = await searchPlace(searchWord);
     if (res) {
       position = res;
+      setPopupContent("You clicked the map at " + position.toString());
+      leafletMap?.flyTo(position);
     } else {
       $toastSettings = {
         title: "Error",
