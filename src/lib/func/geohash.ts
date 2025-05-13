@@ -1,6 +1,5 @@
 import type { DecodedGeohash } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import { latLng, type LatLngExpression } from "leaflet";
 import { derived } from "svelte/store";
 
 // Constants
@@ -220,46 +219,4 @@ export function encodeGeohash(
   }
 
   return geohash;
-}
-//https://github.com/penpenpng/imhere-nostr/blob/main/src/lib/nominatim.ts
-export interface Place {
-  place_id: string;
-  latLng: [number, number];
-  geohash: string;
-  name?: string;
-  display_name?: string;
-}
-
-interface RawPlace {
-  place_id: string;
-  lat: string;
-  lon: string;
-  name: string;
-  display_name: string;
-}
-
-/** https://nominatim.org/release-docs/latest/api/Search/ */
-export async function searchPlace(q: string): Promise<LatLngExpression | null> {
-  const xs = await get<RawPlace[]>(
-    "https://nominatim.openstreetmap.org/search",
-    {
-      q,
-      format: "jsonv2",
-    }
-  );
-  console.log(xs);
-  if (xs.length > 0) {
-    const first = xs[0];
-    return latLng(parseFloat(first.lat), parseFloat(first.lon));
-  } else {
-    return null;
-  }
-}
-
-async function get<T = unknown>(
-  url: string,
-  query: Record<string, string>
-): Promise<T> {
-  const res = await fetch(`${url}?${new URLSearchParams(query)}`);
-  return res.json();
 }
