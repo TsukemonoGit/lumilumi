@@ -1,5 +1,6 @@
 <script lang="ts">
   import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
+  import WarningHide3 from "$lib/components/Elements/WarningHide3.svelte";
   interface Props {
     warningText?: string;
     icon?: () => any;
@@ -58,7 +59,7 @@
       {@render content?.()}
 
       {#if warningText !== undefined}
-        <WarningHide2 text={warningText} />
+        <WarningHide3 text={warningText} />
       {/if}
     </div>
     {@render actionButtons?.()}
