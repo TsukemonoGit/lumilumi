@@ -21,7 +21,7 @@
 
 <div
   class="rounded-md border border-magnum-500/40 absolute top-0 left-0 w-full h-full {$value[0] >=
-  70
+  50
     ? 'pointer-events-none'
     : ''}"
   style="backdrop-filter: blur({(1 - $value[0] / 100) ** 2 * 50}px);"
