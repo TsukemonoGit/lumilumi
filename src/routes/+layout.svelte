@@ -312,7 +312,7 @@
   <ReloadPrompt />
 {/await}
 
-{#if page.url.origin === "https://lumilumi.vercel.app" || page.url.origin === "http://localhost:5173"}
+{#if new URL(page.url.origin).hostname !== import.meta.env.APP_ORIGIN && import.meta.env.PROD}
   <DomainMigrationNotice />
 {/if}
 <Modal />
