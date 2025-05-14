@@ -24,8 +24,7 @@
   70
     ? 'pointer-events-none'
     : ''}"
-  style=" backdrop-filter: blur({(1 - $value[0] / 100) ** 2 * 50}px);
-  "
+  style="backdrop-filter: blur({(1 - $value[0] / 100) ** 2 * 50}px);"
 >
   <!-- スクロール可能なテキスト領域 -->
   <div
