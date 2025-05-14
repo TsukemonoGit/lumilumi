@@ -312,7 +312,8 @@
   <ReloadPrompt />
 {/await}
 
-{#if new URL(page.url.origin).hostname !== import.meta.env.APP_ORIGIN && import.meta.env.PROD}
+{#if new URL(page.url.origin).hostname !== "lumilumi.app" && // import.meta.env.APP_ORIGIN
+  import.meta.env.PROD}
   <DomainMigrationNotice />
 {/if}
 <Modal />
