@@ -116,7 +116,8 @@
         aria-label="close"
         class="absolute right-4 top-4 inline-flex appearance-none
                items-center justify-center rounded-full p-1 text-magnum-800
-               hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100 z-10"
+               hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
+        style:z-index={zIndex + 1}
       >
         <X class="size-6" />
       </button>

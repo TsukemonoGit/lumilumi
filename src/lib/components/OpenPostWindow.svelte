@@ -1023,74 +1023,76 @@
         </div> -->
 
         {#if nsecCheck}
-          <div class="text-sm text-red-500　">
+          <div class="text-sm text-red-500">
             {$_("post.nsecAlart")}
           </div>
         {/if}
-        <div class="mt-2 flex justify-end gap-1 md:gap-2 items-center">
-          <!--emojis-->
-
-          {#if viewCustomEmojis}
-            <input
-              bind:this={emojiInput}
-              type="email"
-              id="emoji"
-              class="h-8 w-full rounded-md text-magnum-100 border-2
-            border-magnum-400"
-              bind:value={customReaction}
-            />
-          {/if}
+        <div class="mt-2 grid grid-cols-[auto_1fr] gap-1 md:gap-2 items-center">
           <GeohashMap bind:geohash />
-          <button
-            aria-label="open custom emoji list"
-            onclick={handleClickCustomReaction}
-            class="button"
-          >
-            <SmilePlus
-              size="20"
-              class={viewCustomEmojis
-                ? "stroke-magnum-500"
-                : "stroke-magnum-300"}
-            />
-          </button>
+          <div class=" flex justify-end gap-1 md:gap-2 items-center">
+            <!--emojis-->
 
-          <!--userdata-->
+            {#if viewCustomEmojis}
+              <input
+                bind:this={emojiInput}
+                type="email"
+                id="emoji"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
+            border-magnum-400"
+                bind:value={customReaction}
+              />
+            {/if}
 
-          {#if viewMetadataList}
-            <input
-              bind:this={metadataInput}
-              type="text"
-              id="npub"
-              class="h-8 w-full rounded-md text-magnum-100 border-2
+            <button
+              aria-label="open custom emoji list"
+              onclick={handleClickCustomReaction}
+              class="button"
+            >
+              <SmilePlus
+                size="20"
+                class={viewCustomEmojis
+                  ? "stroke-magnum-500"
+                  : "stroke-magnum-300"}
+              />
+            </button>
+
+            <!--userdata-->
+
+            {#if viewMetadataList}
+              <input
+                bind:this={metadataInput}
+                type="text"
+                id="npub"
+                class="h-8 w-full rounded-md text-magnum-100 border-2
          border-magnum-400"
-              bind:value={inputMetadata}
-            />
-          {/if}
-          <button
-            aria-label="open name list"
-            onclick={handleClickMetadata}
-            class="button"
-          >
-            <UserPlus
-              size="20"
-              class={viewMetadataList
-                ? "stroke-magnum-500"
-                : "stroke-magnum-300"}
-            />
-          </button>
+                bind:value={inputMetadata}
+              />
+            {/if}
+            <button
+              aria-label="open name list"
+              onclick={handleClickMetadata}
+              class="button"
+            >
+              <UserPlus
+                size="20"
+                class={viewMetadataList
+                  ? "stroke-magnum-500"
+                  : "stroke-magnum-300"}
+              />
+            </button>
 
-          <!---->
-          <button
-            disabled={isPosting || text.trim() === ""}
-            aria-label="post"
-            title="Post (Ctrl+Enter)"
-            class="sendButton"
-            onclick={postNote}
-          >
-            <Send size="20" class="stroke-zinc-100" />
-          </button>
+            <!---->
+            <button
+              disabled={isPosting || text.trim() === ""}
+              aria-label="post"
+              title="Post (Ctrl+Enter)"
+              class="sendButton"
+              onclick={postNote}
+            >
+              <Send size="20" class="stroke-zinc-100" />
+            </button>
+          </div>
         </div>
-
         <!--emojis-->
         {#if viewCustomEmojis}
           <div
