@@ -317,10 +317,11 @@
   hr::after {
     background: theme(colors.neutral.900);
     color: rgb(var(--color-magnum-100) / 0.5);
+    border-radius: 1em;
     content: " ･ᴗ･ " !important;
     position: relative;
-    padding: 0 4px;
-    top: -13px;
+    padding: 0 8px 2px 8px;
+    top: -0.7em;
   }
 
   blockquote {
