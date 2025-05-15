@@ -29,14 +29,16 @@
   <!-- スクロール可能なテキスト領域 -->
   <div
     class="absolute w-full top-0 text-magnum-500 font-bold text-xs flex justify-center items-center gap-1"
-    style=" opacity:{1 - $value[0] / 100}"
+    style=" opacity:{1 - $value[0] / 100};
+     text-shadow: 0.5px 0.5px 1px rgb(0 0 0 )"
   >
     <!-- TriangleAlertアイコン -->
     <TriangleAlert size="16" />WARNING<TriangleAlert size="16" />
   </div>
   <div
     class="absolute w-full max-h-[calc(100%-24px)] overflow-y-auto text-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-magnum-100 text-sm p-1"
-    style=" opacity:{1 - $value[0] / 100}"
+    style="opacity:{1 - $value[0] / 100}; 
+text-shadow: 0.5px 0.5px 1px rgb(0 0 0 )"
   >
     {text ?? ""}
   </div>
