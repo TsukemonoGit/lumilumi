@@ -50,7 +50,7 @@
           filters: [{ kinds: [1018], "#e": [note.id] }],
           operator: pipe(uniq(), latestEachPubkey()),
         },
-        voteRelays
+        voteRelays.length > 0 ? voteRelays : undefined
       )
     )?.map((evs) => evs.event);
     userVoteEvent = voteEvents.find((ev) => ev.pubkey === $loginUser);
