@@ -14,6 +14,10 @@ export const relaySearchRelays = [
   "wss://nos.lol",
   //kind:3
   // "wss://relayable.org",
+
+  //https://lumilumi.app/nevent1qvzqqqqqqypzp978pfzrv6n9xhq5tvenl9e74pklmskh4xw6vxxyp3j8qkke3cezqqsgfmmcxyknak5frh0jpmp55w2k32l9e9h05qxjvj09hkcf0uh27nclstphx
+  //https://github.com/coracle-social/compass
+  "wss://indexer.coracle.social",
 ];
 
 export const defaultRelays = [
