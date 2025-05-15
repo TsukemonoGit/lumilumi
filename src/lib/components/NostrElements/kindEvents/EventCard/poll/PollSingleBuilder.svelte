@@ -10,6 +10,8 @@
   import { latestEachPubkey } from "$lib/stores/operators";
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { clientTag } from "$lib/func/constants";
 
   let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
   let group: RadioGroup | undefined = $state();
@@ -94,7 +96,9 @@
         ],
         content: "",
       };
-
+      if (lumiSetting.get().addClientTag) {
+        voteEvent.tags?.push(clientTag);
+      }
       console.log(voteEvent);
 
       const signer = nip07Signer();

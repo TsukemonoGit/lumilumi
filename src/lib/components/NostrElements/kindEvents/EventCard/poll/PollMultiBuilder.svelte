@@ -10,6 +10,8 @@
   import { latestEachPubkey } from "$lib/stores/operators";
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { clientTag } from "$lib/func/constants";
 
   let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
 
@@ -88,7 +90,7 @@
     } else {
       selectedIds = [...selectedIds, id];
     }
-    console.log("選択された選択肢:", selectedIds);
+    //console.log("選択された選択肢:", selectedIds);
   }
 
   const handleClickVote = async () => {
@@ -108,6 +110,9 @@
       selectedIds.forEach((id) => {
         voteEvent.tags?.push(["response", id]);
       });
+      if (lumiSetting.get().addClientTag) {
+        voteEvent.tags?.push(clientTag);
+      }
       console.log(voteEvent);
 
       const signer = nip07Signer();
