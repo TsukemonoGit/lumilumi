@@ -332,7 +332,7 @@
   }
 </script>
 
-<section class="w-full mb-20">
+<section class="w-full">
   <div class="w-full border border-magnum-400 rounded-md p-1">
     {#if kind10002}
       <Metadata pubkey={data.pubkey} queryKey={["metadata", data.pubkey]}>
@@ -443,7 +443,7 @@
       </button>
     </div>
   </div>
-  <div class="w-full flex gap-2 mt-8">
+  <div class="w-full flex gap-2 my-8">
     <button
       class=" rounded-md bg-magnum-600 w-24 h-10 flex justify-center items-center gap-1 font-bold text-magnum-100 hover:bg-magnum-900 active:opacity-50 disabled:opacity-25"
       disabled={$nowProgress || isError}
