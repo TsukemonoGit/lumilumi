@@ -338,6 +338,8 @@
     "vote": "投票",
     "submitting": "投票中...",
     "change": "投票を変更",
-    "voted": "投票済み"
+    "voted": "投票済み",
+    "goto_poll": "投票する",
+    "view_results": "結果を見る"
   }
 }
