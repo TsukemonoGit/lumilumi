@@ -18,6 +18,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import Content from "../../content/Content.svelte";
+  import { page } from "$app/state";
 
   interface Props {
     note: Nostr.Event;

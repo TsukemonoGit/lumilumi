@@ -1,7 +1,4 @@
-import {
-  type FileUploadResponse,
-  type OptionalFormDataFields,
-} from "nostr-tools/nip96";
+import { type FileUploadResponse, type OptionalFormDataFields } from "./nip96";
 import { getToken } from "nostr-tools/nip98";
 import * as Nostr from "nostr-typedef";
 // エラーコードを定数として定義

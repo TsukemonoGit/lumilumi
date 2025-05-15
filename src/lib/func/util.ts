@@ -1,6 +1,6 @@
 import type { Profile, UserMuteStatus } from "$lib/types";
 import * as Nostr from "nostr-typedef";
-import { readServerConfig, type FileUploadResponse } from "nostr-tools/nip96";
+import { readServerConfig, type FileUploadResponse } from "./nip96";
 import { getToken } from "nostr-tools/nip98";
 import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
@@ -377,7 +377,7 @@ export const nip19Decode = (
   }
   // console.log(content);
   try {
-    const decoded: nip19.DecodeResult = nip19.decode(content);
+    const decoded = nip19.decode(content);
     if (decoded.type === "naddr") {
       return {
         type: decoded.type,
