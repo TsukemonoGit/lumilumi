@@ -333,5 +333,11 @@
     "location": "現在地を取得",
     "submit": "位置を決定",
     "delete": "位置情報を削除"
+  },
+  "poll": {
+    "vote": "投票",
+    "submitting": "投票中...",
+    "change": "投票を変更",
+    "voted": "投票済み"
   }
 }

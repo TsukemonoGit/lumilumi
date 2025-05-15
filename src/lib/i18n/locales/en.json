@@ -333,5 +333,11 @@
     "location": "Get My Location",
     "submit": "Confirm Location",
     "delete": "Delete Location"
+  },
+  "poll": {
+    "vote": "Vote",
+    "submitting": "Submitting...",
+    "change": "Change Vote",
+    "voted": "Voted"
   }
 }

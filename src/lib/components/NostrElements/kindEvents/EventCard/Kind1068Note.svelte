@@ -20,6 +20,9 @@
   import Content from "../../content/Content.svelte";
   import { page } from "$app/state";
 
+  import PollSingleBuilder from "./poll/PollSingleBuilder.svelte";
+  import PollMultiBuilder from "./poll/PollMultiBuilder.svelte";
+
   interface Props {
     note: Nostr.Event;
     metadata: Nostr.Event | undefined;
@@ -74,6 +77,7 @@
       return undefined;
     }
   });
+  let hasEnded = $derived(Math.floor(Date.now() / 1000) > endsAt);
 </script>
 
 {#if deleted}
@@ -129,16 +133,26 @@
           {repostable}
           {tieKey}
         />
-        {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
-          <label>
-            <input type="radio" disabled={true} /><span class="ml-2 break-all"
-              >{itemTag[2]}</span
-            ></label
-          >
-        {/each}
+        {#if page.params.note || page.params.naddr}
+          {#if polltype === "singlechoice"}
+            <PollSingleBuilder {note} {hasEnded} />
+          {:else}
+            <PollMultiBuilder {note} {hasEnded} />
+          {/if}
+          <!--NOTEとかページの投稿は展開する-->
+          <!--投票もできるようにする-->
+        {:else}
+          {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
+            <label>
+              <input type="radio" disabled={true} /><span class="ml-2 break-all"
+                >{itemTag[2]}</span
+              ></label
+            >
+          {/each}
+        {/if}
       </div>
       <div class="mt-2">
-        {#if Math.floor(Date.now() / 1000) > endsAt}
+        {#if hasEnded}
           <p class="text-neutral-500 font-sm">Voting period has ended</p>
         {:else}
           <p class="text-neutral-500 font-sm">
@@ -147,12 +161,12 @@
         {/if}
 
         <p class="text-neutral-500 font-sm">Type: {polltype}</p>
-
-        <Link
-          className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
-          href={`https://nos-haiku.vercel.app/entry/${nevent}`}
-          >go to poll<SquareArrowOutUpRight size={12} /></Link
-        >
+        {#if !(page.params.note || page.params.naddr)}
+          <Link
+            className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
+            href={`https://nos-haiku.vercel.app/entry/${nevent}`}
+            >go to poll<SquareArrowOutUpRight size={12} /></Link
+          >{/if}
       </div>
     {/snippet}
     {#snippet actionButtons()}
