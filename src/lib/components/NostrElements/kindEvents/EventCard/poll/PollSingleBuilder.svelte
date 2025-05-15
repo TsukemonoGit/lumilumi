@@ -96,6 +96,7 @@
       };
 
       console.log(voteEvent);
+
       const signer = nip07Signer();
       const event = await signer.signEvent(voteEvent);
 
@@ -116,15 +117,7 @@
           color: "bg-red-500",
         };
       }
-      /*    // リレーリスト追加
-      voteRelays.forEach((relay) => {
-        voteEvent.tags?.push(["relay", relay]);
-      });
 
-      // イベント発行
-      const published = await publishEvent(voteEvent, voteRelays);
-      console.log("投票を送信しました:", published);
- */
       // 投票リストを更新
       await getVotedEvents();
     } catch (error) {
@@ -151,15 +144,16 @@
               <div
                 class={[
                   "grid h-6 w-6 min-w-6 place-items-center rounded-full border shadow-sm ",
-                  " data-[disabled=true]:bg-gray-400",
                   "bg-neutral-900 border-magnum-500 ",
+                  `${hasEnded ? "border-neutral-500" : "border-magnum-500"}`,
                 ]}
               >
                 {#if item.checked}
                   <div
                     class={[
                       "h-3 w-3 rounded-full",
-                      item.checked && " bg-magnum-500",
+                      item.checked &&
+                        `${hasEnded ? "bg-neutral-500" : "bg-magnum-500"}`,
                     ]}
                     aria-hidden="true"
                   ></div>
@@ -283,6 +277,5 @@
 
   .radio-button[data-disabled="true"] {
     cursor: not-allowed;
-    opacity: 0.8;
   }
 </style>
