@@ -12,6 +12,10 @@ EN / [JA](./README-ja.md)
 
   - You can't use extensions on the Android version of Chrome, but you can easily use NIP-46 by installing [Amber](https://github.com/greenart7c3/Amber).
 
+- Warning Content Blur Slider
+![blur2](https://github.com/user-attachments/assets/c2daab6e-ae18-458c-a3de-3b478ff3c9fb)
+
+ 
 - Birthday
 
   A special birthday animation plays, and a cake 🎂 appears next to the name. (The animation may be subject to change.)
