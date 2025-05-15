@@ -7,10 +7,9 @@
   import ShowStatus from "../Status/ShowStatus.svelte";
   import { formatAbsoluteDate } from "$lib/func/util";
 
-  import Link from "$lib/components/Elements/Link.svelte";
   import { nip19 } from "nostr-tools";
   import { getRelaysById } from "$lib/func/nostr";
-  import { SquareArrowOutUpRight } from "lucide-svelte";
+
   import NoteComponent from "../layout/NoteComponent.svelte";
 
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
@@ -22,6 +21,8 @@
 
   import PollSingleBuilder from "./poll/PollSingleBuilder.svelte";
   import PollMultiBuilder from "./poll/PollMultiBuilder.svelte";
+  import { goto } from "$app/navigation";
+  import { _ } from "svelte-i18n";
 
   interface Props {
     note: Nostr.Event;
@@ -78,6 +79,10 @@
     }
   });
   let hasEnded = $derived(Math.floor(Date.now() / 1000) > endsAt);
+
+  const handleclickGotoPoll = () => {
+    goto(`./${nevent}`);
+  };
 </script>
 
 {#if deleted}
@@ -162,11 +167,20 @@
 
         <p class="text-neutral-500 font-sm">Type: {polltype}</p>
         {#if !(page.params.note || page.params.naddr)}
-          <Link
+          <button
+            type="button"
+            onclick={handleclickGotoPoll}
+            class=" border border-neutral-400 text-magnum-300 break-all hover:opacity-80 flex items-center gap-1 rounded-md px-2 mt-2"
+          >
+            {hasEnded
+              ? `${$_("poll.view_results")}`
+              : `${$_("poll.goto_poll")}`}</button
+          >
+          <!--   <Link
             className="underline text-magnum-300 break-all hover:opacity-80 flex items-center gap-1"
             href={`https://nos-haiku.vercel.app/entry/${nevent}`}
             >go to poll<SquareArrowOutUpRight size={12} /></Link
-          >{/if}
+          > -->{/if}
       </div>
     {/snippet}
     {#snippet actionButtons()}

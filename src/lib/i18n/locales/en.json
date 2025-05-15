@@ -338,6 +338,8 @@
     "vote": "Vote",
     "submitting": "Submitting...",
     "change": "Change Vote",
-    "voted": "Voted"
+    "voted": "Voted",
+    "goto_poll": "Vote Now",
+    "view_results": "View Results"
   }
 }
