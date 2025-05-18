@@ -44,8 +44,10 @@
   open?.subscribe((value) => {
     if (value) {
       $dialogOpen = true;
-      $open = false;
       openDialogWithHistory();
+    } else {
+      $dialogOpen = false;
+      popStack.update((stack) => stack.filter((entry) => entry.id !== id));
     }
   });
 
@@ -57,7 +59,6 @@
       untrack(() => {
         $dialogOpen = false;
         $open = false;
-        popStack.update((stack) => stack.filter((entry) => entry.id !== id));
       });
     }
   });

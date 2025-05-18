@@ -340,6 +340,28 @@
     "change": "Change Vote",
     "voted": "Voted",
     "goto_poll": "Vote Now",
-    "view_results": "View Results"
+    "view_results": "View Results",
+    "warning": {
+      "title": "Error",
+      "description": "Please enter text for all options",
+      "pollTitle": "Please enter a poll title."
+    },
+    "title": "Poll",
+    "select": {
+      "title": "Options",
+      "add": "Add Option",
+      "multi": "Multiple Selection Allowed"
+    },
+    "limit": "Poll Expiration",
+    "publish": "Submit Poll",
+    "lim": {
+      "300": "5 minutes",
+      "1800": "30 minutes",
+      "3600": "1 hour",
+      "21600": "6 hours",
+      "86400": "1 day",
+      "259200": "3 days",
+      "604800": "7 days"
+    }
   }
 }
