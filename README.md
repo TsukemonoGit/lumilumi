@@ -81,14 +81,14 @@ Implemented voting functionality supporting [NIP-56](https://github.com/nostr-pr
 
 ## Screenshots
 
-<img src="./image/10.png" width="300" alt="Screenshot 1">
-<img src="./image/11.png" width="300" alt="Screenshot 2">
-<img src="./image/2.png" width="300" alt="Screenshot 3">
-<img src="./image/3.png" width="300" alt="Screenshot 4">
-<img src="./image/4.png" width="300" alt="Screenshot 5">
-<img src="./image/5.png" width="300" alt="Screenshot 6">
-<img src="./image/6.png" width="300" alt="Screenshot 7">
-<img src="./image/7.png" width="300" alt="Screenshot 8">
-<img src="./image/8.png" width="300" alt="Screenshot 9">
-<img src="./image/9.png" width="300" alt="Screenshot 10">
-<img src="./image/12.png" width="300" alt="Screenshot 11">
+<img src="./image/10.png" width="500" alt="Screenshot 1">
+<img src="./image/11.png" width="500" alt="Screenshot 2">
+<img src="./image/2.png" width="500" alt="Screenshot 3">
+<img src="./image/3.png" width="500" alt="Screenshot 4">
+<img src="./image/4.png" width="500" alt="Screenshot 5">
+<img src="./image/5.png" width="500" alt="Screenshot 6">
+<img src="./image/6.png" width="500" alt="Screenshot 7">
+<img src="./image/7.png" width="500" alt="Screenshot 8">
+<img src="./image/8.png" width="500" alt="Screenshot 9">
+<img src="./image/9.png" width="500" alt="Screenshot 10">
+<img src="./image/12.png" width="500" alt="Screenshot 11">
