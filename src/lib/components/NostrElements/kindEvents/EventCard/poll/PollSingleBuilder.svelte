@@ -16,7 +16,7 @@
   let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
   let group: RadioGroup | undefined = $state();
   let optionTags: string[][] = $derived(
-    note.tags.filter((tag) => tag[0] === "option" && tag.length > 2)
+    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2)
   );
   let isSubmitting: boolean = $state(false); // 投票送信中かどうかのフラグ
   const tieKey = undefined;
@@ -167,7 +167,7 @@
                 {label}
               </div>
 
-              {#if userVoteEvent || hasEnded}
+              {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}
                 {@const evs = voteEvents.filter((ev) => getVoted(ev) === id)}
 
                 <div

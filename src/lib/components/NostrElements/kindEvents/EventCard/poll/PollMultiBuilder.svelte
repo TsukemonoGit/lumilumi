@@ -21,7 +21,7 @@
   let isSubmitting: boolean = $state(false); // 投票送信中かどうかのフラグ
 
   let optionTags: string[][] = $derived(
-    note.tags.filter((tag) => tag[0] === "option" && tag.length > 2)
+    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2)
   );
   let selectedIds: string[] = $state([]);
   const tieKey = undefined;
@@ -162,7 +162,7 @@
     />
     <span class="ml-2 break-all">{label}</span>
 
-    {#if userVoteEvent || hasEnded}
+    {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}
       {@const evs = voteEvents.filter((ev) =>
         getVotes(ev).find((v) => v === id)
       )}

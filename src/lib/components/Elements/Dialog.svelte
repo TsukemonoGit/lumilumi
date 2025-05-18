@@ -13,6 +13,7 @@
     open?: Writable<boolean>;
     zIndex?: number;
     id: string;
+    closeOnOutsideClick?: boolean;
   }
 
   let {
@@ -21,6 +22,7 @@
     main,
     zIndex = 10,
     id,
+    closeOnOutsideClick = true,
   }: Props = $props();
 
   const {
@@ -28,6 +30,7 @@
     states: { open: dialogOpen },
   } = createDialog({
     forceVisible: true,
+    closeOnOutsideClick: closeOnOutsideClick,
   });
 
   // ダイアログを開く際に新しい履歴エントリを作成
@@ -58,11 +61,12 @@
     if (logEntry) {
       untrack(() => {
         $dialogOpen = false;
-        $open = false;
       });
     }
   });
-
+  dialogOpen.subscribe((value) => {
+    if (!value) $open = false;
+  });
   /*   // 外部からのページ状態変更を監視
   $effect(() => {
     const currentDialogState = page.state?.dialogOpen?.id === id;
