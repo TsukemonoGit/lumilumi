@@ -12,6 +12,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
+  import Content from "$lib/components/NostrElements/content/Content.svelte";
 
   let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
 
@@ -160,7 +161,17 @@
       checked={isSelected(id)}
       onchange={() => selectChange(id)}
     />
-    <span class="ml-2 break-all">{label}</span>
+    <span class="ml-2 break-all">
+      <Content
+        text={label}
+        tags={note.tags}
+        displayTags={false}
+        displayMenu={false}
+        {depth}
+        {tieKey}
+        repostable={false}
+      /></span
+    >
 
     {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}
       {@const evs = voteEvents.filter((ev) =>

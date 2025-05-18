@@ -226,6 +226,11 @@ input[type="checkbox"] {
 
   accent-color: theme("colors.magnum.400");
 }
+.rounded-checkbox:disabled {
+  appearance: auto;
+
+  accent-color: theme("colors.neutral.400");
+}
 section {
   display: flex;
   flex-direction: column;

@@ -17,6 +17,7 @@
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
+    displayTags?: boolean;
   }
 
   let {
@@ -29,6 +30,7 @@
     isShowClientTag,
     maxHeight,
     zIndex = 0,
+    displayTags,
   }: Props = $props();
 
   // svelte-ignore non_reactive_update
@@ -51,6 +53,7 @@
       {depth}
       {repostable}
       {tieKey}
+      {displayTags}
     />
   </Truncate>
 {:else}
@@ -63,6 +66,7 @@
     {depth}
     {repostable}
     {tieKey}
+    {displayTags}
   />
 {/if}
 <!--Show more no Dialog-->
@@ -84,6 +88,7 @@
         {repostable}
         {tieKey}
         {zIndex}
+        {displayTags}
       />
     </div>
   {/snippet}</Dialog

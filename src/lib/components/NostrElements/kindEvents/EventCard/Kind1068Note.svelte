@@ -128,29 +128,39 @@
 
     {#snippet content()}
       <div class="flex flex-col p-0.5 mt-1">
-        <Content
-          {zIndex}
-          {maxHeight}
-          text={note.content}
-          tags={note.tags}
-          {displayMenu}
-          {depth}
-          {repostable}
-          {tieKey}
-        />
+        <div>
+          <Content
+            {zIndex}
+            {maxHeight}
+            text={note.content}
+            tags={note.tags}
+            {displayMenu}
+            {depth}
+            {repostable}
+            {tieKey}
+          />
+        </div>
         {#if page.params.note || page.params.naddr}
-          {#if polltype === "singlechoice"}
-            <PollSingleBuilder {note} {hasEnded} />
-          {:else}
+          {#if polltype === "multiplechoice"}
             <PollMultiBuilder {note} {hasEnded} />
+          {:else}
+            <PollSingleBuilder {note} {hasEnded} />
           {/if}
           <!--NOTEとかページの投稿は展開する-->
           <!--投票もできるようにする-->
         {:else}
           {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
-            <label>
+            <label class="flex flex-wrap">
               <input type="radio" disabled={true} /><span class="ml-2 break-all"
-                >{itemTag[2]}</span
+                ><Content
+                  text={itemTag[2]}
+                  tags={note.tags}
+                  displayTags={false}
+                  displayMenu={false}
+                  {depth}
+                  {tieKey}
+                  repostable={false}
+                /></span
               ></label
             >
           {/each}
