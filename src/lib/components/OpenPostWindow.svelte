@@ -59,7 +59,7 @@
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import GeohashMap from "./GeohashMap.svelte";
   import { untrack } from "svelte";
-
+  import MakePollUI from "./MakePollUI.svelte";
   // ----------------------------------------
   // Component Props
   // ----------------------------------------
@@ -824,6 +824,13 @@
       $uploader = value;
     }
   });
+
+  const onPolled = (id: string) => {
+    insertTextAtCursor(`nostr:${id}`, {
+      addSpaceBefore: true,
+      addSpaceAfter: true,
+    });
+  };
 </script>
 
 <svelte:window onkeyup={keyboardShortcut} onkeydown={handleKeyDown} />
@@ -1028,7 +1035,10 @@
           </div>
         {/if}
         <div class="mt-2 grid grid-cols-[auto_1fr] gap-1 md:gap-2 items-center">
-          <GeohashMap bind:geohash />
+          <div class="flex items-center gap-1">
+            <GeohashMap bind:geohash />
+            <MakePollUI {onPolled} />
+          </div>
           <div class=" flex justify-end gap-1 md:gap-2 items-center">
             <!--emojis-->
 
