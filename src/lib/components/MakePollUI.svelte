@@ -10,6 +10,8 @@
   import { nip07Signer } from "rx-nostr";
   import { promisePublishSignedEvent } from "$lib/func/nostr";
   import { nip19 } from "nostr-tools";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { clientTag } from "$lib/func/constants";
   interface Props {
     onPolled: (id: string) => void;
   }
@@ -134,6 +136,9 @@
         ],
       ],
     };
+    if (lumiSetting.get().addClientTag) {
+      eventParam.tags?.push(clientTag);
+    }
     console.log("eventParam", eventParam);
 
     try {
@@ -205,7 +210,7 @@
               <input
                 type="text"
                 placeholder={`${$_("poll.select.title")} ${index + 1}`}
-                class="flex-1 border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="flex-1 border rounded-md px-3 py-2 m-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 bind:value={pollOptions[index]}
               />
               {#if pollOptions.length > 2}
