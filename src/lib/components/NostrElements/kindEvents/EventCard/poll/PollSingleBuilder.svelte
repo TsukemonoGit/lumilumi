@@ -12,6 +12,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
+  import Content from "$lib/components/NostrElements/content/Content.svelte";
 
   let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
   let group: RadioGroup | undefined = $state();
@@ -164,7 +165,15 @@
                 {/if}
               </div>
               <div class="leading-none text-gray-600 dark:text-gray-100 ml-1">
-                {label}
+                <Content
+                  text={label}
+                  tags={note.tags}
+                  displayTags={false}
+                  displayMenu={false}
+                  {depth}
+                  {tieKey}
+                  repostable={false}
+                />
               </div>
 
               {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}

@@ -26,6 +26,7 @@
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
+    displayTags?: boolean;
   }
 
   let {
@@ -38,6 +39,7 @@
     isShowClientTag = true,
     maxHeight,
     zIndex,
+    displayTags = true,
   }: Props = $props();
 
   let parts: Part[] = $state([]);
@@ -76,7 +78,7 @@
     }
     // console.log(content);
     try {
-      const decoded: nip19.DecodeResult = nip19.decode(content);
+      const decoded = nip19.decode(content);
       if (decoded.type === "naddr") {
         return {
           type: decoded.type,
@@ -143,10 +145,11 @@
       class="whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
     >{/if}{/each}
-
-{#if geohash}
-  <Geohash {geohash} />{/if}
-{#if proxy}
-  <ProxyTag proxyTag={proxy} />
+{#if displayTags}
+  {#if geohash}
+    <Geohash {geohash} />{/if}
+  {#if proxy}
+    <ProxyTag proxyTag={proxy} />
+  {/if}
+  <ClientTag {tags} {isShowClientTag} {depth} />
 {/if}
-<ClientTag {tags} {isShowClientTag} {depth} />
