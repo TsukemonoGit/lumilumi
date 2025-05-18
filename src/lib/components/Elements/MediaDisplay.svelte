@@ -166,31 +166,30 @@
       class="fixed inset-0 z-[999] bg-black/50"
       transition:fade={{ duration: 150 }}
     ></div>
-
-    <!-- 画像表示エリア -->
-    <div
-      use:melt={$content}
-      class="fixed left-1/2 top-1/2 z-[999] max-h-[100vh] max-w-[100vw] -translate-x-1/2 -translate-y-1/2"
-    >
-      <div class="relative w-full h-full">
-        <img
-          onload={() => (loadingStatus = "loaded")}
-          onerror={() => (loadingStatus = "error")}
-          alt=""
-          src={$state.snapshot(
-            displayImages.find((img) => img.originalIndex === currentIndex)
-          )?.url}
-          class="max-h-[100vh] max-w-[100vw] object-contain"
-        />
-        {#if loadingStatus === "error" || loadingStatus === "loading"}
-          <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span>
-        {/if}
+    <div use:melt={$content}>
+      <!-- 画像表示エリア -->
+      <div
+        class="fixed left-1/2 top-1/2 z-[999] max-h-[100vh] max-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+      >
+        <div class="relative w-full h-full">
+          <img
+            onload={() => (loadingStatus = "loaded")}
+            onerror={() => (loadingStatus = "error")}
+            alt=""
+            src={$state.snapshot(
+              displayImages.find((img) => img.originalIndex === currentIndex)
+            )?.url}
+            class="max-h-[100vh] max-w-[100vw] object-contain"
+          />
+          {#if loadingStatus === "error" || loadingStatus === "loading"}
+            <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span
+            >
+          {/if}
+        </div>
       </div>
-    </div>
 
-    <!-- ナビゲーションボタン（複数画像の場合のみ表示） -->
-    {#if displayImages.length > 1}
-      <div use:melt={$content}>
+      <!-- ナビゲーションボタン（複数画像の場合のみ表示） -->
+      {#if displayImages.length > 1}
         <button
           class="fixed left-1 top-1/2 z-[999] bg-neutral-100/75 -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
           onclick={goToPrev}
@@ -203,9 +202,8 @@
         >
           <ChevronRight />
         </button>
-      </div>
-    {/if}
-
+      {/if}
+    </div>
     <!-- 閉じるボタン -->
     <button
       use:melt={$close}
