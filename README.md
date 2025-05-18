@@ -1,83 +1,94 @@
 EN / [JA](./README-ja.md)
 
-# Lumilumi the nostr web client
-<img src="./image/1.png" width=500>
+# Lumilumi - Nostr Web Client
 
-## Features
-- Supports sharing images and URLs
+<img src="./image/1.png" width="400" alt="Lumilumi main screen">
 
-  <img src="./image/13.png" width=300>
+## Key Features
 
-  - If you're using Windows, you'll need to install Edge, and if you're using Android, you'll need to install Chrome, otherwise it might not appear in the share menu.
+### Voting Feature
 
-  - You can't use extensions on the Android version of Chrome, but you can easily use NIP-46 by installing [Amber](https://github.com/greenart7c3/Amber).
+Implemented voting functionality supporting [NIP-56](https://github.com/nostr-protocol/nips/blob/master/56.md). Users can vote from multiple options and check results in real-time.
 
-- Warning Content Blur Slider
-![blur2](https://github.com/user-attachments/assets/c2daab6e-ae18-458c-a3de-3b478ff3c9fb)
+<img src="./image/poll2.png" width="300" alt="Voting feature">
+<img src="./image/poll1.png" width="300" alt="Voting feature">
 
- 
-- Birthday
+### Image & URL Sharing
 
-  A special birthday animation plays, and a cake 🎂 appears next to the name. (The animation may be subject to change.)
+<img src="./image/13.png" width="300" alt="Sharing feature">
 
-  ![birthday festival](./image/birthdayfes.gif)
+- You'll need to install Edge for Windows or Chrome for Android, otherwise it might not appear in the share menu
+- While you can't use extensions on Android Chrome, you can easily use NIP-46 by installing [Amber](https://github.com/greenart7c3/Amber)
 
-- 3D view
+### Warning Content Blur Slider
 
-  ![3DView](./image/test.gif)
-  [Actual page](https://lumilumi.app/nevent1qvzqqqqqqypzq4jsz7zew5j7jr4pdfxh483nwq9vyw9ph6wm706sjwrzj2we58nqqyxhwumn8ghj77tpvf6jumt9qywhwumn8ghj7un9d3shjtnwdaehgu3wwa5hyetydejhgtn2wqqjqamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6nsqyxhwumn8ghj7mn0wvhxcmmvqqsgn5eef652pzj07a2c0adfcazr23exkuhl09nldms9qv9cr4xvr3qk57wkh)
+<img src="https://github.com/user-attachments/assets/c2daab6e-ae18-458c-a3de-3b478ff3c9fb" width="300" alt="Blur slider">
 
-- A mode that hides images for those who are concerned about data usage
+### Birthday Feature
 
-  In image-off mode, we display a [boring avatar](https://github.com/boringdesigners/boring-avatars) generated based on npub as the icon.
+A special birthday animation plays, and a cake 🎂 appears next to the name (animation may be subject to change)
 
-- Articles [NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md) (kind:30023) can also be viewed
+<img src="./image/birthdayfes.gif" width="300" alt="Birthday festival">
 
-- Petname📛 ([NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)) can be added.
+### 3D View
 
-- geohash ![](https://nostpic.com/media/5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60/39dcb327b3a207b47ded4dc461660b4ccb539efcac591ba8dd27704bc54e7a6f.webp)![image](https://github.com/user-attachments/assets/375e1545-95b8-4855-a9de-eab23c2727a9)
+<img src="./image/test.gif" width="300" alt="3D View">
 
-## Various settings
-- Relay settings
-  - A mode that uses the standard kind:10002 for each client, and a mode that sets an app-specific relay (for example, set it for outside use and switch to it when going outside)
+[Actual page](https://lumilumi.app/nevent1qvzqqqqqqypzq4jsz7zew5j7jr4pdfxh483nwq9vyw9ph6wm706sjwrzj2we58nqqyxhwumn8ghj77tpvf6jumt9qywhwumn8ghj7un9d3shjtnwdaehgu3wwa5hyetydejhgtn2wqqjqamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6nsqyxhwumn8ghj7mn0wvhxcmmvqqsgn5eef652pzj07a2c0adfcazr23exkuhl09nldms9qv9cr4xvr3qk57wkh)
 
-- Post Settings
+### Image-Off Mode for Data Saving
 
-- Display Settings
+In image-off mode, we display a [boring avatar](https://github.com/boringdesigners/boring-avatars) generated based on npub as the icon to reduce data usage
 
-- Settings that affect data consumption
+### Article Viewing
 
-- Sync Settings
-  - mute (kind:10000)
+[NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md) (kind:30023) articles can also be viewed
 
-  - mute by kind (kind:30007)
+### Petname Support 📛
 
-  - emoji (kind:10030)
+Add petnames based on [NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)
 
+### Geohash Location
 
-## Keyboard shortcuts
+<img src="https://nostpic.com/media/5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60/39dcb327b3a207b47ded4dc461660b4ccb539efcac591ba8dd27704bc54e7a6f.webp" width="300" alt="Geohash 1">
+<img src="https://github.com/user-attachments/assets/375e1545-95b8-4855-a9de-eab23c2727a9" width="300" alt="Geohash 2">
+
+## Configuration Options
+
+### Relay Settings
+
+- Mode using standard kind:10002 for each client
+- Mode for setting app-specific relays (for example, configure for outdoor use and switch when going out)
+
+### Post Settings
+
+### Display Settings
+
+### Data Consumption Settings
+
+### Sync Settings
+
+- Mute (kind:10000)
+- Mute by kind (kind:30007)
+- Emoji (kind:10030)
+
+## Keyboard Shortcuts
 
 - Press [n] to open the note entry screen
-
-- On the note entry screen
+- On the note entry screen:
   - Press [Ctrl+Enter] to post
-  - Press [Esc Esc] (twice) to close the entry screen
+  - Press [Esc] twice to close the entry screen
 
+## Screenshots
 
-
-
-------
-## screenshots
-
-<img src="./image/10.png" width=500>
-<img src="./image/11.png" width=500>
-
-<img src="./image/2.png" width=500>
-<img src="./image/3.png" width=500>
-<img src="./image/4.png" width=500>
-<img src="./image/5.png" width=500>
-<img src="./image/6.png" width=500>
-<img src="./image/7.png" width=500>
-<img src="./image/8.png" width=500>
-<img src="./image/9.png" width=500>
-<img src="./image/12.png" width=500>
+<img src="./image/10.png" width="300" alt="Screenshot 1">
+<img src="./image/11.png" width="300" alt="Screenshot 2">
+<img src="./image/2.png" width="300" alt="Screenshot 3">
+<img src="./image/3.png" width="300" alt="Screenshot 4">
+<img src="./image/4.png" width="300" alt="Screenshot 5">
+<img src="./image/5.png" width="300" alt="Screenshot 6">
+<img src="./image/6.png" width="300" alt="Screenshot 7">
+<img src="./image/7.png" width="300" alt="Screenshot 8">
+<img src="./image/8.png" width="300" alt="Screenshot 9">
+<img src="./image/9.png" width="300" alt="Screenshot 10">
+<img src="./image/12.png" width="300" alt="Screenshot 11">
