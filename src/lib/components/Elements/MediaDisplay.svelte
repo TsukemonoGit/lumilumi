@@ -159,11 +159,11 @@
 </script>
 
 {#if $dialogOpen && displayImages.length > 0}
-  <div use:melt={$portalled}>
+  <div use:melt={$portalled} class="fixed top-0 left-0 z-[999]">
     <!-- オーバーレイ -->
     <div
       use:melt={$overlay}
-      class="fixed inset-0 z-[999] bg-black/50"
+      class="fixed inset-0 bg-black/50"
       transition:fade={{ duration: 150 }}
     ></div>
     <div use:melt={$content}>
