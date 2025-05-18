@@ -67,7 +67,7 @@
     }
     // console.log(content);
     try {
-      const decoded: nip19.DecodeResult = nip19.decode(content);
+      const decoded = nip19.decode(content);
       if (decoded.type === "naddr") {
         return {
           type: decoded.type,
@@ -92,12 +92,6 @@
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
 </script>
-
-<!-- <MediaDisplay
-  bind:open={showModal}
-  images={mediaList}
-  bind:currentIndex={modalIndex}
-/> -->
 
 {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
       part.url

@@ -845,7 +845,7 @@
   </button>
 {/if}
 {#if $open}
-  <div use:melt={$portalled}>
+  <div use:melt={$portalled} class="fixed top-0 left-0">
     <button
       aria-label="overlay"
       use:melt={$overlay}

@@ -78,11 +78,6 @@
   };
 </script>
 
-<!-- <MediaDisplay
-  bind:open={showModal}
-  images={mediaList}
-  bind:currentIndex={modalIndex}
-/> -->
 <article class="contentBlock overflow-hidden">
   {#if parts}
     {#if maxHeight !== 0}
