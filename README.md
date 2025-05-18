@@ -12,6 +12,10 @@ EN / [JA](./README-ja.md)
 
   - You can't use extensions on the Android version of Chrome, but you can easily use NIP-46 by installing [Amber](https://github.com/greenart7c3/Amber).
 
+- Warning Content Blur Slider
+![blur2](https://github.com/user-attachments/assets/c2daab6e-ae18-458c-a3de-3b478ff3c9fb)
+
+ 
 - Birthday
 
   A special birthday animation plays, and a cake 🎂 appears next to the name. (The animation may be subject to change.)
@@ -30,6 +34,8 @@ EN / [JA](./README-ja.md)
 - Articles [NIP-23](https://github.com/nostr-protocol/nips/blob/master/23.md) (kind:30023) can also be viewed
 
 - Petname📛 ([NIP-02](https://github.com/nostr-protocol/nips/blob/master/02.md)) can be added.
+
+- geohash ![](https://nostpic.com/media/5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60/39dcb327b3a207b47ded4dc461660b4ccb539efcac591ba8dd27704bc54e7a6f.webp)![image](https://github.com/user-attachments/assets/375e1545-95b8-4855-a9de-eab23c2727a9)
 
 ## Various settings
 - Relay settings
