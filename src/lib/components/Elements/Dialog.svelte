@@ -59,7 +59,6 @@
       untrack(() => {
         $dialogOpen = false;
         $open = false;
-        popStack.update((stack) => stack.filter((entry) => entry.id !== id));
       });
     }
   });
