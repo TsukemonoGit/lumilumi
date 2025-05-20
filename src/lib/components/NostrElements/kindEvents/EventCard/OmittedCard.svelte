@@ -56,6 +56,7 @@
     {/if}
     {#if text.kind === 30023 || text.kind === 30024}<SimpleMarkdown
         {maxHeight}
+        note={text}
         text={text.content ?? ""}
         tags={text.tags}
         {displayMenu}

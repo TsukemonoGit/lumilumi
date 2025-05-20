@@ -164,7 +164,7 @@
                   ></div>
                 {/if}
               </div>
-              <div class="leading-none text-gray-600 dark:text-gray-100 ml-1">
+              <div class=" text-gray-600 dark:text-gray-100 ml-1">
                 <Content
                   text={label}
                   tags={note.tags}

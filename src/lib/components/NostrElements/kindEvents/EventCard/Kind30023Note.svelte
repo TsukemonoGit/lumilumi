@@ -130,6 +130,7 @@
           </div>
         </div>{/if}
       <SimpleMarkdown
+        {note}
         {maxHeight}
         text={note.content}
         tags={note.tags}
