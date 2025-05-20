@@ -13,7 +13,9 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
 
-  import UserAvatar from "../../user/UserAvatar.svelte";
+  import Link from "$lib/components/Elements/Link.svelte";
+  import { datetime, formatAbsoluteDate } from "$lib/func/util";
+  import ClientTag from "../../content/ClientTag.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -46,16 +48,28 @@
     zIndex,
     showStatus = true,
   }: Props = $props();
-  let badgeName = $derived(
-    note.tags.find((tag) => tag[0] == "name" && tag.length > 1)?.[1]
+  let siteUrl = $derived.by(() => {
+    const urlTag = note.tags.find(
+      (tag) => tag[0] == "d" && tag.length > 1
+    )?.[1];
+    if (!urlTag) return;
+    if (!urlTag?.startsWith("http")) {
+      return `https://${urlTag}`;
+    } else {
+      return urlTag;
+    }
+  });
+  let title = $derived(
+    note.tags.find((tag) => tag[0] == "title" && tag.length > 1)?.[1]
   );
-  let description = $derived(
-    note.tags.find((tag) => tag[0] == "description" && tag.length > 1)?.[1]
+  let published_at = $derived(
+    note.tags.find((tag) => tag[0] == "published_at" && tag.length > 1)?.[1]
   );
-  let image = $derived(
-    note.tags.find((tag) => tag[0] == "image" && tag.length > 1)?.[1]
+  let hashTags = $derived(
+    note.tags
+      .filter((tag) => tag[0] == "t" && tag.length > 1)
+      .map((tag) => tag[1])
   );
-  const size = 80;
 </script>
 
 <NoteComponent
@@ -98,18 +112,27 @@
   {/snippet}
 
   {#snippet content()}
-    <div class="mt-1 grid grid-cols-[auto_1fr] gap-1">
-      <UserAvatar
-        url={image}
-        name={badgeName}
-        pubkey={undefined}
-        {size}
-        square={true}
-      />
-      <div>
-        <p class="font-bold">{badgeName}</p>
-        <p>{description}</p>
+    <div>
+      <div class="text-lg font-bold">{title}</div>
+      <Link
+        className="underline  text-magnum-300 break-all"
+        href={siteUrl || ""}>{siteUrl}</Link
+      >
+      <p class="mt-2">{note.content}</p>
+      <div class="mt-2">
+        {#each hashTags as hash}
+          <a
+            aria-label={"Search for events containing the hashtag"}
+            href={`/search?t=${hash}`}
+            class="underline text-magnum-300 break-all mr-1">#{hash}</a
+          >
+        {/each}
       </div>
+      <ClientTag tags={note.tags} {depth} />
+      {#if published_at}
+        <time class="float-end" datetime={datetime(Number(published_at))}
+          >at {formatAbsoluteDate(Number(published_at))}</time
+        >{/if}
     </div>
   {/snippet}
   {#snippet actionButtons()}

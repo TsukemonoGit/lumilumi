@@ -444,7 +444,18 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
       en: "Handler information",
     },
   ],
+
+  //
+
+  [
+    39701,
+    {
+      ja: "Webブックマーク",
+      en: "Web bookmarks",
+    },
+  ],
 ]);
+
 /*
 
 [
