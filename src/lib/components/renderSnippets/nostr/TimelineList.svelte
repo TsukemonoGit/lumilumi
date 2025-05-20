@@ -87,7 +87,12 @@
   let allUniqueEvents: Nostr.Event[];
   let readUrls: string[] = [];
   let olderQueryKey = $derived([...queryKey, "olderData"]);
-
+  let destroyed = false;
+  onDestroy(() => {
+    console.log("timeline destroy");
+    destroyed = true;
+    // 他のクリーンアップ処理
+  });
   // Create query for older data
   $effect(() => {
     createQuery({
@@ -139,6 +144,11 @@
     if (timeoutId) clearTimeout(timeoutId);
 
     timeoutId = setTimeout(() => {
+      if (destroyed) {
+        updating = false;
+        $nowProgress = false;
+        return;
+      }
       const olderData: EventPacket[] | undefined =
         queryClient.getQueryData(olderQueryKey);
       const allEvents: EventPacket[] = [...(data || []), ...(olderData || [])];
@@ -276,10 +286,6 @@
       isOnMount = false;
       $nowProgress = false;
     }
-  });
-
-  onDestroy(() => {
-    // Cleanup if needed
   });
 
   // UI action handlers
