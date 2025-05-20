@@ -81,11 +81,6 @@
     console.log("showMore");
     $showMore = true;
   };
-  const onClickShowPage = () => {
-    if (note) {
-      goto(`/${noteLink(note, tieKey)}`);
-    }
-  };
 </script>
 
 <article class="contentBlock overflow-hidden">
@@ -98,14 +93,13 @@
               onclick={onClickShowMore}
               class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
             >
-              Show More
+              {$_("truncate.expand")}
             </button>{:else}
-            <button
-              onclick={onClickShowPage}
-              class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
-            >
-              Read more
-            </button>{/if}
+            <a
+              href={`/${noteLink(note, tieKey)}`}
+              class="h-8 flex items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+              >{$_("truncate.openpage")}
+            </a>{/if}
         {/snippet}
         {#each parts as token}
           <SimpleContentBlock

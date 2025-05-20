@@ -2,6 +2,7 @@
 <script lang="ts">
   import { useTruncate } from "$lib/func/useTruncate";
   import type { Snippet } from "svelte";
+  import { _ } from "svelte-i18n";
 
   interface Props {
     maxHeight?: number;
@@ -59,7 +60,7 @@
         onclick={toggleShowMore}
         class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
       >
-        Show More
+        {$_("truncate.expand")}
       </button>
     {/if}
   {/if}

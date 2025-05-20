@@ -363,5 +363,9 @@
       "259200": "3 days",
       "604800": "7 days"
     }
+  },
+  "truncate": {
+    "expand": "Read More",
+    "openpage": "Open Article"
   }
 }
