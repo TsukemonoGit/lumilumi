@@ -35,7 +35,7 @@
 </script>
 
 <a
-  class="inline-block underline text-magnum-300 break-all hover:opacity-80"
+  class="inline underline text-magnum-300 break-all hover:opacity-80"
   {href}
   target="_blank"
   rel="noopener noreferrer"
