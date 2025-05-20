@@ -19,10 +19,11 @@
   <UrlType url={part.url}>
     {#snippet loading()}
       <Link
-        props={{ "inline aria-label": `External Links: ${part.url}` }}
-        className="inline underline text-magnum-300 break-all hover:opacity-80"
+        props={{ "aria-label": `External Links: ${part.url}` }}
+        className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
-      >{/snippet}
+      >
+    {/snippet}
     {#snippet content(type)}
       {#if type === "image"}
         <!-- <ContentOneImage url={part.url ?? ""} /> -->
