@@ -288,10 +288,6 @@
     }
   });
 
-  onDestroy(() => {
-    // Cleanup if needed
-  });
-
   // UI action handlers
   const handleNext = async () => {
     $nowProgress = true;
