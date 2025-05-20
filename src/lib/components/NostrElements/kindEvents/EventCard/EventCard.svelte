@@ -46,6 +46,7 @@
   import Kind8Note from "./Kind8Note.svelte";
   import Kind30009Note from "./Kind30009Note.svelte";
   import Kind1018Note from "./Kind1018Note.svelte";
+  import Kind39701Note from "./Kind39701Note.svelte";
 
   // Component props interface
   interface Props {
@@ -575,6 +576,22 @@
       {:else if note.kind === 30009}
         <!--badge-->
         <Kind30009Note
+          bind:deleted
+          {tieKey}
+          {mini}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {maxHeight}
+          {warning}
+          {repostable}
+          {zIndex}
+          {showStatus}
+        />
+      {:else if note.kind === 39701}
+        <!--web bookmark-->
+        <Kind39701Note
           bind:deleted
           {tieKey}
           {mini}

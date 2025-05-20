@@ -28,7 +28,6 @@
   import { type Part, parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import { untrack } from "svelte";
-  import type { DecodeResult } from "nostr-tools/nip19";
 
   // Props definition
   interface Props {
@@ -112,13 +111,11 @@
   });
 
   // Helper functions
-  const nip19Decode = (
-    content: string | undefined
-  ): DecodeResult | undefined => {
+  const nip19Decode = (content: string | undefined) => {
     if (!content) return undefined;
 
     try {
-      const decoded: nip19.DecodeResult = nip19.decode(content);
+      const decoded = nip19.decode(content);
 
       switch (decoded.type) {
         case "naddr":
@@ -153,7 +150,15 @@
     }
   };
 
-  const addUserTag = (decode: DecodeResult | undefined) => {
+  const addUserTag = (
+    decode:
+      | { type: "naddr"; data: nip19.AddressPointer }
+      | { type: "nevent"; data: nip19.EventPointer }
+      | { type: "nprofile"; data: nip19.ProfilePointer }
+      | { type: "nsec"; data: Uint8Array }
+      | { type: "npub" | "note"; data: string }
+      | undefined
+  ) => {
     if (!decode) return;
 
     switch (decode.type) {
