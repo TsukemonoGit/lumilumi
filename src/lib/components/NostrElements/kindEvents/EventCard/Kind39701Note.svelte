@@ -13,9 +13,9 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
 
-  import Link from "$lib/components/Elements/Link.svelte";
   import { datetime, formatAbsoluteDate } from "$lib/func/util";
   import ClientTag from "../../content/ClientTag.svelte";
+  import MediaEmbedSwitcher from "../../content/MediaEmbedSwitcher.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -114,10 +114,7 @@
   {#snippet content()}
     <div>
       <div class="text-lg font-bold">{title}</div>
-      <Link
-        className="underline  text-magnum-300 break-all"
-        href={siteUrl || ""}>{siteUrl}</Link
-      >
+      <MediaEmbedSwitcher url={siteUrl || ""} />
       <p class="mt-2">{note.content}</p>
       <div class="mt-2">
         {#each hashTags as hash}

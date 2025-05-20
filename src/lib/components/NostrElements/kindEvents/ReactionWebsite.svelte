@@ -2,15 +2,10 @@
   import * as Nostr from "nostr-typedef";
   import Reaction from "./Reaction.svelte";
 
-  import { profile } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
-
   import NoteActionButtons from "./NoteActionButtuns/NoteActionButtons.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
 
   import { isvalidURL } from "$lib/func/ogp";
-  import OGP from "$lib/components/renderSnippets/OGP.svelte";
-  import OgpCard from "$lib/components/Elements/OgpCard.svelte";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
