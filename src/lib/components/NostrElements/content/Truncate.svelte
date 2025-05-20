@@ -1,18 +1,21 @@
 <!--Truncate.svelte-->
 <script lang="ts">
   import { useTruncate } from "$lib/func/useTruncate";
+  import type { Snippet } from "svelte";
 
   interface Props {
     maxHeight?: number;
     children: any;
     depth: number;
     onClickShowMore: () => void;
+    truncate?: Snippet;
   }
   let {
     maxHeight = 460,
     children,
     onClickShowMore,
     depth = 0,
+    truncate,
   }: Props = $props();
   let threshold = $derived(maxHeight * 0.35); // 160例えば20px以上大きい場合にのみ"Show More"ボタンを表示
   let isTruncated = $state(false);
@@ -49,12 +52,16 @@
     {/if}
   </div>
   {#if isTruncated}
-    <button
-      onclick={toggleShowMore}
-      class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
-    >
-      Show More
-    </button>
+    {#if truncate}
+      {@render truncate?.()}
+    {:else}
+      <button
+        onclick={toggleShowMore}
+        class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+      >
+        Show More
+      </button>
+    {/if}
   {/if}
 {/if}
 

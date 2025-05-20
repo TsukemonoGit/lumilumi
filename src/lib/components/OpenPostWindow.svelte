@@ -845,7 +845,7 @@
   </button>
 {/if}
 {#if $open}
-  <div use:melt={$portalled} class="fixed top-0 left-0">
+  <div use:melt={$portalled} class="fixed top-0 left-0 z-50">
     <button
       aria-label="overlay"
       use:melt={$overlay}
@@ -929,7 +929,7 @@
               bind:value={warningText}
             />
           </div>
-          <!--{:else}<div class="h-4" />-->{/if}
+        {/if}
         <div class="flex gap-1 mb-0.5 flex-wrap">
           {#if initOptions.defaultUsers && initOptions.defaultUsers.length > 0}
             {#each initOptions.defaultUsers as user}
@@ -959,11 +959,6 @@
                   >
                     <Bell class="size-4 text-magnum-200 fill-magnum-200" />
                     <UserName pubhex={replyUser} />
-
-                    <!-- <X
-                      strokeWidth={4}
-                      class="size-6 rounded-full  text-magnum-200  p-1 font-bold bg-magnum-600"
-                    /> -->
                   </button>
                 {:else}
                   <!-- Inactive reply user (not selected) -->
@@ -977,11 +972,6 @@
                     <Bell class="size-4 text-magnum-500 " /><UserName
                       pubhex={replyUser}
                     />
-
-                    <!-- <Plus
-                      strokeWidth={4}
-                      class="bg-magnum-800 size-6 rounded-full  text-magnum-400  p-1 font-bold"
-                    /> -->
                   </button>
                 {/if}
               {/each}

@@ -17,6 +17,9 @@
   import Truncate from "../NostrElements/content/Truncate.svelte";
   import Dialog from "../Elements/Dialog.svelte";
   import { type Writable, writable } from "svelte/store";
+  import * as Nostr from "nostr-typedef";
+  import { goto } from "$app/navigation";
+  import { noteLink } from "$lib/func/event";
 
   interface Props {
     text: string;
@@ -28,10 +31,12 @@
     tieKey: string | undefined;
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
+    note?: Nostr.Event;
   }
 
   let {
     text,
+    note,
     tags,
     displayMenu,
     depth,
@@ -76,12 +81,32 @@
     console.log("showMore");
     $showMore = true;
   };
+  const onClickShowPage = () => {
+    if (note) {
+      goto(`/${noteLink(note, tieKey)}`);
+    }
+  };
 </script>
 
 <article class="contentBlock overflow-hidden">
   {#if parts}
     {#if maxHeight !== 0}
       <Truncate {maxHeight} {depth} {onClickShowMore}>
+        {#snippet truncate()}
+          {#if !note}
+            <button
+              onclick={onClickShowMore}
+              class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+            >
+              Show More
+            </button>{:else}
+            <button
+              onclick={onClickShowPage}
+              class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+            >
+              Read more
+            </button>{/if}
+        {/snippet}
         {#each parts as token}
           <SimpleContentBlock
             part={token}
