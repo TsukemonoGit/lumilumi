@@ -48,6 +48,12 @@
   }: Props = $props();
 
   const md = markdownit();
+  md.core.ruler.before("normalize", "preserve_trailing_space", (state) => {
+    if (!state.src) return;
+
+    // 行末のスペース1個をNBSPに変換（Markdown構文に影響しないよう注意）
+    state.src = state.src.replace(/(?<=\S)( )(?=\n|$)/g, "\u00A0");
+  });
 
   //プレビューにも使ってるからconstだとだめ
   let tokens = $derived(
@@ -64,6 +70,7 @@
       .use(markdownDlPlugin)
       .use(markdownDdPlugin)
       .use(markdownDtPlugin)
+
       .parse(text, {})
   );
   let parts = $derived(transformTokens(tokens));
