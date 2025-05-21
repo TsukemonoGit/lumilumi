@@ -26,6 +26,7 @@
   import ReplyTo from "../layout/ReplyTo.svelte";
   import UserName from "../../user/UserName.svelte";
   import PopupUserName from "../../user/PopupUserName.svelte";
+  import ClientTag from "../../content/ClientTag.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -60,8 +61,8 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let referenceTag = note.tags.find(
-    (tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e"
+  let referenceTag = $derived(
+    note.tags.find((tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e")
   ); //https://github.com/nostr-protocol/nips/blob/master/84.md#references
 
   // 引用元へのリンクパスを取得する関数
@@ -146,6 +147,7 @@
             {depth}
             {repostable}
             {tieKey}
+            displayTags={false}
           />
 
           {#if referenceTag}
@@ -164,6 +166,7 @@
           {/if}
         </blockquote>
       </div>
+      <ClientTag tags={note.tags} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
@@ -175,7 +178,7 @@
 <style>
   blockquote {
     padding: 0.5em 1.5em;
-    margin: 1em 0;
+
     border-left: 5px solid rgb(var(--color-magnum-500) / 1); /* 引用の左側にカラーテーマに基づくライン */
     background-color: rgb(
       var(--color-neutral-800) / 1
