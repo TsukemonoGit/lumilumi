@@ -222,6 +222,14 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
   ],
   //
   //～～～～～～
+  [
+    9802,
+    {
+      ja: "ハイライト",
+      en: "Highlights",
+    },
+  ],
+
   //
 
   [

@@ -47,6 +47,7 @@
   import Kind30009Note from "./Kind30009Note.svelte";
   import Kind1018Note from "./Kind1018Note.svelte";
   import Kind39701Note from "./Kind39701Note.svelte";
+  import Kind9802Note from "./Kind9802Note.svelte";
 
   // Component props interface
   interface Props {
@@ -480,6 +481,22 @@
           {tieKey}
           {mini}
           {zIndex}
+        />
+      {:else if note.kind === 9802}
+        <!--kind9735 zap receipt-->
+        <Kind9802Note
+          {replyUsers}
+          {tieKey}
+          {note}
+          {metadata}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {mini}
+          {warning}
+          {zIndex}
+          {maxHeight}
+          {showStatus}
         />
       {:else if note.kind === 4}
         <!--旧仕様のDMだよ-->
