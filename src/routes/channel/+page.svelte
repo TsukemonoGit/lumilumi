@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
   import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
   import ChannelMain from "$lib/components/renderSnippets/nostr/ChannelMain.svelte";
@@ -16,26 +16,7 @@
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
-
-  // afterNavigate((navigate) => {
-  //   console.log("afterNavigate", navigate.type);
-  //   if (!$loginUser) {
-  //     $toastSettings = {
-  //       title: "Warning",
-  //       description: $_("channel.settingswarning"),
-  //       color: "bg-orange-500",
-  //     };
-
-  //     goto("/settings");
-  //   }
-  // });
 </script>
-
-<!-- <svelte:head>
-  <title>Lumilumi-Channel</title>
-  <meta property="og:description" content="Channel" />
-  <meta name="description" content="Channel" />
-</svelte:head> -->
 
 <section class=" flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
   {#if !$loginUser}

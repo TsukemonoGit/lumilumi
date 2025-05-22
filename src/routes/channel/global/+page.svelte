@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterNavigate, goto } from "$app/navigation";
+  import { afterNavigate } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
 
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
@@ -55,19 +55,6 @@
       since = ev[0].event.created_at;
     }
   }
-
-  // afterNavigate((navigate) => {
-  //   console.log("afterNavigate", navigate.type);
-  //   if (!$loginUser) {
-  //     $toastSettings = {
-  //       title: "Warning",
-  //       description: $_("channel.settingswarning"),
-  //       color: "bg-orange-500",
-  //     };
-
-  //     goto("/settings");
-  //   }
-  // });
 </script>
 
 <section class=" flex flex-col gap-2 max-w-full overflow-x-hidden w-full">
@@ -85,14 +72,6 @@
 
           since: since,
         },
-        // {
-        //   kinds: [7],
-        //   "#k": ["42"],
-        //   "#p": [$loginUser],
-        //   limit: 20,
-
-        //   since: since,
-        // },
       ]}
       olderFilters={[
         {
@@ -136,16 +115,6 @@
                 <EventCard {metadata} note={event} {tieKey} />
               {/snippet}
             </Metadata>
-
-            <!-- <div
-                class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
-              >
-                <ChannelMetadata
-                  handleClickToChannel={() => handleClickToChannel(event.id)}
-                  id={event.id}
-                  linkButtonTitle={`/channel/${nip19.noteEncode(event.id)}`}
-                />
-              </div> -->
           {/each}{/if}
       {/snippet}
     </TimelineList>

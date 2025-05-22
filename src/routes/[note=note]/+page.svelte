@@ -26,35 +26,6 @@
 
   let tieKey = undefined;
 
-  //デフォリレーの設定はrootのSetDefaultRelayのとこでやってるはず
-  // let isMount = false;
-  // onMount(() => {
-  //   init();
-  // });
-  // afterNavigate((navigate) => {
-  //   console.log("afterNavigate", navigate.type);
-  //   if (navigate.type !== "form") {
-  //     init();
-  //   }
-  // });
-
-  // function init() {
-  //   if (isMount) {
-  //     return;
-  //   }
-  //   isMount = true;
-  //   // const nrelays = data?.relays?.filter((relay) => relay.startsWith("ws"));
-  //   // if (!$defaultRelays && data.relays && nrelays && nrelays.length > 0) {
-  //   //   //setRelays(nrelays);
-  //   // } else if (!$defaultRelays) {
-  //   //   setRelays(defoRelay);
-  //   // }
-
-  //   isMount = false;
-  // }
-  // onDestroy(() => {
-  //   console.log("destroy");
-  // });
   const repostable = true;
 
   const maxHeight = 0;

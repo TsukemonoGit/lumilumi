@@ -26,14 +26,12 @@
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
-  //console.log(filters);
-  //let amount = 50;
-  //let viewIndex = 0;
+
   const tieKey = "naddr";
   let loading = $state(true);
 
   let isOnMount = false;
-  //let since: number | undefined = undefined;
+
   const maxHeight = 0;
   onMount(() => {
     if (!isOnMount) {
@@ -57,13 +55,6 @@
     if (data.kind === 30000) {
       goto(`list/${page.params.naddr}`);
     }
-    // since = undefined;
-
-    // if ($defaultRelays) {
-    //   setRelays($defaultRelays);
-    // } else if (!$defaultRelays && data.relays) {
-    //   setRelays(data.relays);
-    // }
 
     loading = false;
   }

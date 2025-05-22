@@ -151,30 +151,6 @@
         } else if (newProfile && LUD16Regex.test(lud.trim())) {
           newProfile.lud16 = lud;
           delete newProfile.lud06;
-          //16が@の方。testだけだとemailアドレスでも通るので確認する
-          /*   try {
-          let [name, domain] = lud.split("@");
-          const lnurl = new URL(
-            `/.well-known/lnurlp/${name}`,
-            `https://${domain}`
-          ).toString();
-
-          let body = await getNurlFetch(lnurl);
-
-          if (body && body.allowsNostr && body.nostrPubkey) {
-            newProfile.lud16 = lud;
-          } else {
-            throw Error();
-          }
-        } catch (error) {
-          console.log(error);
-          $toastSettings = {
-            title: "Error",
-            description: `Error ${$_("profile.lud")}`,
-            color: "bg-orange-500",
-          };
-          return;
-        } */
         } else {
           delete newProfile.lud06;
           delete newProfile.lud16;

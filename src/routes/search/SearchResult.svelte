@@ -24,12 +24,6 @@
   $inspect(filters);
   const tieKey = "search";
 
-  // onMount(() => {
-  //   console.log("relays", relays);
-  // });
-  // afterNavigate(() => {
-  //   console.log("relays", relays);
-  // });
   onDestroy(() => {
     console.log("onDestroy");
     unsucscribeSearch();
