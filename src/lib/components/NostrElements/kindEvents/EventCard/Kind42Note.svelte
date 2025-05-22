@@ -6,7 +6,7 @@
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import UserName from "../../user/UserName.svelte";
   import Reply from "../Reply.svelte";
-  import { checkContentWarning, replyedEvent } from "$lib/func/event";
+  import { checkContentWarning } from "$lib/func/event";
   import ChannelTag from "../../content/ChannelTag.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";

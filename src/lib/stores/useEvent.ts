@@ -1,8 +1,6 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import {
-  latest,
   type EventPacket,
-  type RxNostr,
   type RxReq,
   type RxReqEmittable,
   type RxReqOverable,

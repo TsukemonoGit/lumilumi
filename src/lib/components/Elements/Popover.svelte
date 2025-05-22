@@ -1,6 +1,6 @@
 <script lang="ts">
   //Popover.svelte
-  import { createPopover, createSync, melt } from "@melt-ui/svelte";
+  import { createPopover, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
   const {

@@ -126,7 +126,6 @@
 {#if errorData}
   {@render error?.(errorData)}
 {:else if data && data.length > 0}
-  <!-- {@const relays = setRelays(data)} -->
   {@render contents?.({
     relays: data,
     status: status ?? "success",
@@ -134,15 +133,11 @@
 {:else if status === "loading"}
   {@render loading?.()}
 {:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
-  <!-- {@const relaysset = setRelays($state.snapshot(relays))} -->
-  <!-- {#await setRelays(localRelays || paramRelays) then} -->
   {@render contents?.({
     relays: _relays,
     status: "success",
   })}
-  <!-- {/await} -->
 {:else}
-  <!-- {@const relays = setRelays(defaultRelays)} -->
   {@render contents?.({
     relays: defaultRelays,
     status: status ?? "success",

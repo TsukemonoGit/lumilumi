@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { RadioGroup } from "melt/builders";
+
   import { promisePublishSignedEvent, usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { nip07Signer, uniq } from "rx-nostr";

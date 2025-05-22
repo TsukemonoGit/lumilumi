@@ -10,7 +10,6 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
-    DefaultRelayConfig,
     RxReq,
     RxReqEmittable,
     RxReqOverable,
@@ -114,7 +113,6 @@
   {@render error?.($errorData)}
 {:else if kind3Data}
   {@render content?.({ contacts: kind3Data, status: $status ?? "error" })}
-  <!-- <slot contacts={kind3Data} status={$status ?? "error"} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  //import { page } from "$app/stores";
   import { nowProgress } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
@@ -12,8 +11,6 @@
   let { metadata }: Props = $props();
 
   const handleClickEdit = () => {
-    // console.log(page.params);
-    // console.log(page.url?.pathname);
     goto(`${nip19.npubEncode(metadata.pubkey)}/profile`);
   };
 </script>

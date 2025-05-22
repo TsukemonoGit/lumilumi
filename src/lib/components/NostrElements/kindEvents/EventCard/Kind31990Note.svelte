@@ -2,12 +2,9 @@
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
 
   import { isvalidURL, type Ogp } from "$lib/func/ogp";
-  import { profile } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
-  import { eventKinds } from "$lib/func/kinds";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
-  import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";

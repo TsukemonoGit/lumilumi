@@ -5,10 +5,9 @@
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
-  import { formatAbsoluteDate, parseNaddr } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
 
   import { nip19 } from "nostr-tools";
-  import { getRelaysById } from "$lib/func/nostr";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
 
@@ -17,11 +16,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import Content from "../../content/Content.svelte";
-  import { page } from "$app/state";
 
-  import PollSingleBuilder from "./poll/PollSingleBuilder.svelte";
-  import PollMultiBuilder from "./poll/PollMultiBuilder.svelte";
-  import { goto } from "$app/navigation";
   import { _ } from "svelte-i18n";
   import ReplyTo from "../layout/ReplyTo.svelte";
   import UserName from "../../user/UserName.svelte";

@@ -5,7 +5,7 @@
   import { ClipboardCopy, X } from "lucide-svelte";
 
   import QRCode from "qrcode";
-  import { onDestroy, untrack } from "svelte";
+  import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
 

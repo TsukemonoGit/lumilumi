@@ -18,7 +18,7 @@
   import Dialog from "../Elements/Dialog.svelte";
   import { type Writable, writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
-  import { goto } from "$app/navigation";
+
   import { noteLink } from "$lib/func/event";
 
   interface Props {

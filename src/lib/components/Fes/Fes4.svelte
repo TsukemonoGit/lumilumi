@@ -3,7 +3,7 @@
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
 
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
-  import { Zap, Cake, Gift, Sparkles, Star, PartyPopper } from "lucide-svelte";
+  import { Zap, Cake, Sparkles, Star } from "lucide-svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
 
   let { metadata } = $props();

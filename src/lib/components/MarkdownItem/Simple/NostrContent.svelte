@@ -5,7 +5,7 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import { _ } from "svelte-i18n";
   import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
-  import ContentImage from "$lib/components/NostrElements/content/ContentImage.svelte";
+
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
   import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";

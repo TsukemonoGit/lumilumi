@@ -27,7 +27,7 @@
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
   import { lnurlToZapAddress } from "$lib/func/zap";
-  import { Cake, Globe, PartyPopper, Zap } from "lucide-svelte";
+  import { Cake, Globe, Zap } from "lucide-svelte";
   import { checkBirthDay } from "$lib/func/event";
 
   interface Props {

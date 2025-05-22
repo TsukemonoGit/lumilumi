@@ -23,7 +23,6 @@ import {
   completeOnTimeout,
   type RxReqEmittable,
   createRxForwardReq,
-  type ConnectionState,
   filterByType,
   type AuthPacket,
 } from "rx-nostr";

@@ -23,8 +23,6 @@
   }: Props = $props();
 
   let loadingText = $derived(encodetoNote(id));
-  const kind = 41;
-  //console.log(id);
 </script>
 
 <!--querykeyをTLとおなじにしとかないとTLでこのIDのイベント出てきたあとこれ取得しようとしたときに取得できなくなる的な-->

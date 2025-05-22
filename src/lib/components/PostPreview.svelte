@@ -11,7 +11,7 @@
   import ShowStatus from "./NostrElements/kindEvents/Status/ShowStatus.svelte";
   import UserName from "./NostrElements/user/UserName.svelte";
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
-  import * as Nostr from "nostr-typedef";
+
   import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
   import { type Writable, writable } from "svelte/store";
   import Dialog from "./Elements/Dialog.svelte";
