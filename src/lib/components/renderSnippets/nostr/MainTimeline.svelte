@@ -112,6 +112,7 @@
   let deriveaData = $derived($data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
+  let destroyed = false;
 
   // Get read URLs from default relays
   let readUrls = $derived.by(() => {
@@ -195,6 +196,11 @@
     }
 
     timeoutId = setTimeout(() => {
+      if (destroyed) {
+        updating = false;
+        $nowProgress = false;
+        return;
+      }
       processUpdate();
     }, UPDATE_DELAY);
   }
@@ -439,6 +445,8 @@
 
   onDestroy(() => {
     // Clean up resources if needed
+    console.log("timeline destroy");
+    destroyed = true;
   });
 </script>
 
