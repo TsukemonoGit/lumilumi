@@ -445,7 +445,7 @@
 
   onDestroy(() => {
     // Clean up resources if needed
-    console.log("timeline destroy");
+    console.log("main timeline destroy");
     destroyed = true;
   });
 </script>

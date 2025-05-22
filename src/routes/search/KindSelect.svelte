@@ -18,13 +18,6 @@
     forceVisible: true,
     loop: true,
   });
-  // run(() => {
-  //   console.log($item);
-  // });
-  // run(() => {
-  //   console.log($locale);
-  // });
-  // locale;
 
   const handleClickKind = (kind: number) => {
     selectedKind = kind;

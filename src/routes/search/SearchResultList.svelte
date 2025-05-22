@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import {
@@ -69,29 +68,6 @@
     nodata,
     children,
   }: Props = $props();
-  // export let queryKey: QueryKey;
-  // export let filters: Nostr.Filter[];
-  // export let req:
-  //   | (RxReq<"backward"> &
-  //       RxReqEmittable<{
-  //         relays: string[];
-  //       }> &
-  //       RxReqOverable &
-  //       RxReqPipeable)
-  //   | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable)
-  //   | undefined = undefined;
-  // export let viewIndex: number;
-  // export let amount: number; //1ページに表示する量
-  // export let eventFilter: (event: Nostr.Event) => boolean = () => true; // デフォルトフィルタ
-  // export let relays: string[] | undefined = undefined; //emitにしていするいちじりれー
-  // export let tieKey: string;
-  // export let tie: OperatorFunction<
-  //   EventPacket,
-  //   EventPacket & {
-  //     seenOn: Set<string>;
-  //     isNew: boolean;
-  //   }
-  // >;
 
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
@@ -151,24 +127,6 @@
       updateViewEvent?.(data);
     }
   }
-  // data?.subscribe((value) => {
-  //   updateViewEvent(value);
-  // });
-
-  // $effect(() => {
-  //   console.log("test");
-  //   updateViewEvent($data);
-  // });
-  // if (($data && viewIndex >= 0) || !$nowProgress) {
-  //   updateViewEvent($data);
-  // }
-  //});
-  //$: console.log($data);
-
-  // beforeNavigate((navigate) => {
-  //   console.log("beforeNavigate", navigate.type);
-  //   $slicedEvent = [];
-  // });
 
   let isOnMount = false;
 
@@ -284,18 +242,6 @@
     }
     updateViewEvent($data);
     $nowProgress = false;
-    // console.log(viewIndex);
-    //スマホではスクロールちゃんとなってたからでかいときだけやる
-    // if (window.innerWidth > 640) {
-    //   //px
-    //   const lastVisibleElement = document?.querySelector(".last-visible");
-    //   setTimeout(() => {
-    //     //データが更新終わるのを待ってからスライドしてみる
-    //     if (lastVisibleElement) {
-    //       lastVisibleElement.scrollIntoView({ block: "end" });
-    //     }
-    //   }, 10);
-    // }
   };
 
   const handlePrev = () => {
@@ -387,7 +333,6 @@
     status: $status,
     len: $data?.length ?? 0,
   })}
-  <!-- <slot events={$slicedEvent} status={$status} len={$data?.length ?? 0} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

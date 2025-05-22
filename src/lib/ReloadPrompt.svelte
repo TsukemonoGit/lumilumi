@@ -51,14 +51,7 @@
   </div>
 {/if}
 
-<!-- <div class="pwa-date">
-  {buildDate}
-</div> -->
-
 <style>
-  /* .pwa-date {
-    visibility: hidden;
-  } */
   .pwa-toast {
     position: fixed;
     right: 0;

@@ -43,18 +43,6 @@
     filters,
     handleClickSearch,
   }: Props = $props();
-  // export let searchWord: string | undefined;
-  // export let followee: boolean;
-  // export let createFilter;
-  // export let searchKind: number | undefined = undefined;
-  // export let searchPubkey: string | undefined;
-  // export let searchPubkeyTo: string | undefined;
-  // export let searchHashtag: string | undefined;
-  // export let searchSince: number | undefined;
-  // export let searchUntil: number | undefined;
-  // export let resetValue;
-  // export let filters: Writable<Nostr.Filter[]>;
-  // export let handleClickSearch;
 
   const getKindLabel = (
     kind: number | undefined,
@@ -85,14 +73,6 @@
     console.log(page.url);
     try {
       await navigator.share(shareData);
-      // await navigator.clipboard.writeText(
-      //   `${page.url.origin}/channel/${nevent}`
-      // );
-      // $toastSettings = {
-      //   title: "Success",
-      //   description: `shared successfully`,
-      //   color: "bg-green-500",
-      // };
     } catch (error: any) {
       console.error(error.message);
       $toastSettings = {

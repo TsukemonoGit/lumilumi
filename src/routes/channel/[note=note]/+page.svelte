@@ -19,15 +19,6 @@
   import type { PageData } from "./$types";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
-  // interface Props {
-  //   data: {
-  //     id: string;
-  //     relays?: string[] | undefined;
-  //     kind?: number | undefined;
-  //     author?: string | undefined;
-  //   };
-  // }
-
   let { data }: { data: PageData } = $props();
 
   //チャンネルでのリポストって誰に向けて見せたくてリポストしてるのかわからんくて扱いにくいから
@@ -111,21 +102,6 @@
             kinds: [42],
             since: since,
           },
-          // {
-          //   kinds: [16],
-          //   "#k": ["42"],
-          //   limit: 20,
-
-          //   since: since,
-          // },
-          // {
-          //   kinds: [7], //   "#k": ["42"],
-          //   "#p": [$loginUser],
-          //   "#e": [data.id],
-          //   limit: 20,
-
-          //   since: since,
-          // },
         ]}
         olderFilters={[
           {
@@ -152,12 +128,6 @@
           >
             {#if events && events.length > 0}
               {#each events as event, index (event.id)}
-                <!-- <div
-                class="max-w-full break-words whitespace-pre-line box-border overflow-hidden event-card {index ===
-                events.length - 1
-                  ? 'last-visible'
-                  : ''} {index === 0 ? 'first-visible' : ''}"
-              > -->
                 <Metadata
                   queryKey={["metadata", event.pubkey]}
                   pubkey={event.pubkey}
@@ -186,7 +156,6 @@
                     />
                   {/snippet}
                 </Metadata>
-                <!-- </div> -->
               {/each}
             {/if}
           </div>{/snippet}

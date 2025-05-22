@@ -32,14 +32,6 @@
     };
     try {
       await navigator.share(shareData);
-      // await navigator.clipboard.writeText(
-      //   `${page.url.origin}/channel/${nevent}`
-      // );
-      // $toastSettings = {
-      //   title: "Success",
-      //   description: `shared successfully`,
-      //   color: "bg-green-500",
-      // };
     } catch (error: any) {
       console.error(error.message);
       $toastSettings = {
