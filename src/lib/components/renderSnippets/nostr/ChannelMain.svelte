@@ -44,18 +44,6 @@
     children,
   }: Props = $props();
 
-  // export let queryKey: QueryKey;
-  // export let pubkey: string;
-  // export let req:
-  //   | (RxReq<"backward"> &
-  //       RxReqEmittable<{
-  //         relays: string[];
-  //       }> &
-  //       RxReqOverable &
-  //       RxReqPipeable)
-
-  //   | undefined = undefined;
-
   let result = $derived(
     useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req)
   );
@@ -68,7 +56,6 @@
   {@render error?.($errorData)}
 {:else if $data}
   {@render children?.({ event: $data.event, status: $status })}
-  <!-- <slot event={$data?.event} status={$status} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

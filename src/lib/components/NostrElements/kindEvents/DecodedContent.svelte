@@ -7,7 +7,6 @@
   import UserName from "../user/UserName.svelte";
 
   import NaddrEvent from "./NaddrEvent.svelte";
-  import { viewport } from "$lib/func/useViewportAction";
 
   interface Props {
     displayMenu: boolean;

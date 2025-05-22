@@ -1,7 +1,7 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
 
-  import { MapPinned, ExternalLink, MapPin } from "lucide-svelte";
+  import { MapPinned, MapPin } from "lucide-svelte";
   import UseGeohash from "./UseGeohash.svelte";
   import { decodeGeohash } from "$lib/func/geohash";
 

@@ -16,7 +16,6 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { _ } from "svelte-i18n";
   import { page } from "$app/state";
-  import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {

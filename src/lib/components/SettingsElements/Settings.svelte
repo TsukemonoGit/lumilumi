@@ -23,7 +23,6 @@
   } from "$lib/types";
   import { _ } from "svelte-i18n";
   import { beforeNavigate } from "$app/navigation";
-  import { browser } from "$app/environment";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";

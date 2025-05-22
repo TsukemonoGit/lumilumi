@@ -1,6 +1,6 @@
 import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
-import { app, loginUser, queryClient } from "$lib/stores/stores";
+import { app, queryClient } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
 import type { LumiMuteByKindList, MuteList, Theme } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";

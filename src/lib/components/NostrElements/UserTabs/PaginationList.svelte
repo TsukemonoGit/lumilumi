@@ -16,14 +16,6 @@
   onMount(() => {
     paginationElement = document?.querySelector("#pagination");
   });
-  // const handleChange: CreatePaginationProps["onPageChange"] = ({
-  //   curr,
-  //   next,
-  // }) => {
-  //   console.log(curr, next);
-
-  //   return next;
-  // };
 
   const {
     elements: { root, pageTrigger, prevButton, nextButton },

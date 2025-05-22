@@ -6,7 +6,7 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { latestEach } from "rx-nostr";
+//import { latestEach } from "rx-nostr";
 import { pipe } from "rxjs";
 
 import { scanArray } from "./operators.js";
@@ -29,8 +29,8 @@ export function useReplaceableEventList(
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey] }];
   const operator = pipe(
-     //これできてないっぽいからListMainのほうでlatestListしてる
-  /*  
+    //これできてないっぽいからListMainのほうでlatestListしてる
+    /*  
       latestEach((eventpacket) => {
       const tag = eventpacket.event.tags.find((tag) => tag[0] === "d");
       return tag ? tag[1] : null;

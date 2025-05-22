@@ -6,7 +6,7 @@
 
   interface Props {
     events: Nostr.Event<number>[];
-    tieKey: string; // const followFilteredEvents = writable<Nostr.Event[]>();
+    tieKey: string;
   }
 
   let { events, tieKey }: Props = $props();

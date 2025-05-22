@@ -3,13 +3,11 @@
   import * as Nostr from "nostr-typedef";
 
   import { _ } from "svelte-i18n";
-  import { loginUser } from "$lib/stores/stores";
 
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
-  import Content from "../../content/Content.svelte";
   import UserName from "../../user/UserName.svelte";
-  import Reply from "../Reply.svelte";
+
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";

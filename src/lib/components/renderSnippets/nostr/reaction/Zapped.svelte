@@ -67,7 +67,6 @@
 
 {#if data}
   {@render content?.({ event: data })}
-  <!-- <slot event={data?.event} {status} /> -->
 {:else}
   {@render loading?.()}
 {/if}

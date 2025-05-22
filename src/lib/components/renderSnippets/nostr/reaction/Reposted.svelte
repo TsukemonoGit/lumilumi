@@ -12,7 +12,7 @@
     loading: Snippet;
   }
   let { id, content, loading }: Props = $props();
-  //export let req: RxReqBase | undefined = undefined;
+
   let data: Nostr.Event | undefined = $state();
 
   let unsubscribe: () => void;
@@ -54,13 +54,10 @@
     // queryClient.removeQueries({ queryKey: ["reactions", "repost", id] });//まだこのIDがTLにいるかもしれないからけさない
     //けさなくてもstaletime gctime設定されてるから無限に残ることはない
   });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 </script>
 
 {#if data}
   {@render content?.({ event: data })}
-  <!-- <slot event={data?.event} {status} /> -->
 {:else}
   {@render loading?.()}
 {/if}

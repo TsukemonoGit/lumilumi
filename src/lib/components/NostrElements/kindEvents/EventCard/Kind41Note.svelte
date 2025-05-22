@@ -48,6 +48,7 @@
 <!--kind40 パブ茶部屋-->
 {#if root}
   <ChannelMetadataLayout
+    clickAction={true}
     linkButtonTitle={`/channel/${nip19.noteEncode(root)}`}
     handleClickToChannel={() => handleClickToChannel(root)}
     id={root}

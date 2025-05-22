@@ -4,7 +4,6 @@
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { nip19 } from "nostr-tools";
-  import { untrack } from "svelte";
 
   interface Props {
     pubkey: string;

@@ -37,13 +37,6 @@
       setMetadataList();
     }
   };
-  // $effect(() => {
-  //   if (viewMetadataList) {
-  //     untrack(() => {
-  //       setMetadataList();
-  //     });
-  //   }
-  // });
 
   function checkUserInput(inputMetadata: string, arg1: UserData) {
     if (inputMetadata === "") {

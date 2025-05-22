@@ -5,7 +5,6 @@
   import ContentParts from "./ContentParts.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
-  import { noteEncode } from "nostr-tools/nip19";
 
   interface Props {
     text: string;

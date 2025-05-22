@@ -16,10 +16,6 @@
   }
   let { error, nodata, content, loading }: Props = $props();
 
-  // export let rxNostr: RxNostr | undefined = undefined;
-
-  //export let events: Nostr.Event<number>[];
-
   let filters: Nostr.Filter[] = [];
   let result: { data: any; status: any; error: any };
 
@@ -27,7 +23,7 @@
   const updateInterval = 2000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
-  // $: console.log(viewEventIds.get);
+
   let etagList: string[] = $state([]);
   let atagList: string[] = $state([]);
 
@@ -47,27 +43,6 @@
 
     debounceUpdate();
   });
-  //  $derived(
-  //   Array.from(
-  //     new Set(
-  //       viewEventIds
-  //         .get()
-  //         .filter((tag) => tag[0] === "e")
-  //         .map((tag) => tag[1])
-  //     )
-  //   )
-  // );
-
-  //  $derived(
-  //   Array.from(
-  //     new Set(
-  //       viewEventIds
-  //         .get()
-  //         .filter((tag) => tag[0] === "a")
-  //         .map((tag) => tag[1])
-  //     )
-  //   )
-  // );
 
   $effect(() => {
     if (etagList || atagList) {
@@ -149,7 +124,6 @@
   {@render error?.()}
 {:else if $data}
   {@render content?.({ events: $data.event, status: status })}
-  <!-- <slot events={$data.event} {status} /> -->
 {:else if $status === "loading"}
   {@render loading?.()}
 {:else}

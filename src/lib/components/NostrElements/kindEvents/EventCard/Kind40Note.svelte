@@ -36,6 +36,7 @@
   {#snippet loading()}
     <div>
       <ChannelMetadataLayout
+        clickAction={true}
         linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
@@ -47,6 +48,7 @@
   {#snippet nodata()}
     <div>
       <ChannelMetadataLayout
+        clickAction={true}
         linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
@@ -58,6 +60,7 @@
   {#snippet error()}
     <div>
       <ChannelMetadataLayout
+        clickAction={true}
         linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
@@ -68,6 +71,7 @@
   {/snippet}
   {#snippet children({ event })}
     <ChannelMetadataLayout
+      clickAction={true}
       linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}
       handleClickToChannel={() => handleClickToChannel(note.id)}
       id={note.id}
