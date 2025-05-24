@@ -100,7 +100,14 @@
   {/snippet}
   {#snippet reply()}
     {#if !thread && (replyTag || replyUsers.length > 0)}
-      <Reply {replyTag} {displayMenu} depth={depth + 1} {repostable} {tieKey} />
+      <Reply
+        {replyTag}
+        {displayMenu}
+        depth={depth + 1}
+        {repostable}
+        {tieKey}
+        {zIndex}
+      />
     {/if}
   {/snippet}
 
