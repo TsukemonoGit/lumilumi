@@ -60,6 +60,7 @@
   import GeohashMap from "./GeohashMap.svelte";
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
+
   // ----------------------------------------
   // Component Props
   // ----------------------------------------
@@ -495,7 +496,7 @@
   // ----------------------------------------
   async function handleFileUpload(fileList: FileList) {
     if (!fileList || fileList.length <= 0 || !$uploader) {
-      $nowProgress = false;
+      //$nowProgress = false;
       return;
     }
     // const file = fileList.item(0);
@@ -510,7 +511,7 @@
     //   const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
     //   downloadTextFile(base64URI, textFilename);
     // }
-    $nowProgress = true;
+    // $nowProgress = true;
 
     // Cancel existing upload if any
     if (uploadAbortController) {
@@ -561,7 +562,7 @@
     } catch (error) {
       console.log(error);
     } finally {
-      $nowProgress = false;
+      //  $nowProgress = false;
       uploadAbortController = null;
     }
   }
@@ -569,7 +570,9 @@
   async function onChangeHandler(e: Event): Promise<void> {
     const _files = (e.target as HTMLInputElement).files;
     if (_files) {
+      $nowProgress = true;
       await handleFileUpload(_files);
+      $nowProgress = false;
     }
   }
 
@@ -583,9 +586,11 @@
       .filter((file): file is File => file !== null);
 
     if (files.length > 0) {
+      $nowProgress = true;
       const fileList = new DataTransfer();
       files.forEach((file) => fileList.items.add(file));
       await handleFileUpload(fileList.files);
+      $nowProgress = false;
     }
 
     // Check for custom emojis in pasted text
@@ -595,10 +600,12 @@
     }
   }
 
-  function handleDrop(event: DragEvent) {
+  async function handleDrop(event: DragEvent) {
     event.preventDefault();
     if (event.dataTransfer?.files) {
-      handleFileUpload(event.dataTransfer.files);
+      $nowProgress = true;
+      await handleFileUpload(event.dataTransfer.files);
+      $nowProgress = false;
     }
   }
 
