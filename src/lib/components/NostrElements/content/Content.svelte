@@ -52,6 +52,7 @@
       {depth}
       {repostable}
       {tieKey}
+      {zIndex}
       {displayTags}
     />
   </Truncate>
@@ -65,6 +66,7 @@
     {depth}
     {repostable}
     {tieKey}
+    {zIndex}
     {displayTags}
   />
 {/if}

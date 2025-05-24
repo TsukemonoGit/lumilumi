@@ -87,7 +87,6 @@
     >{:else if decoded.type === "note"}<span
       class="grid grid-cols-[auto_1fr_auto]"
       ><Quote size="14" class="text-magnum-500 fill-magnum-500/75 " />
-
       <Note
         className="border rounded-md border-magnum-600/30"
         id={decoded.data}

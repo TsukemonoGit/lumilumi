@@ -65,7 +65,7 @@
         depth={depth + 1}
         {repostable}
         {tieKey}
-        {zIndex}
+        zIndex={zIndex || 10 + 10}
       />
     {:else if replyTag[0] === "a" || replyTag[0] === "A"}
       <!---->
@@ -78,7 +78,7 @@
         {tieKey}
         {repostable}
         content={undefined}
-        {zIndex}
+        zIndex={zIndex || 10 + 10}
       />
     {:else if replyTag[0] === "I" || replyTag[0] === "i"}
       <!---->
