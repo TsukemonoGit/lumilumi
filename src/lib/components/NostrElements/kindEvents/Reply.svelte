@@ -14,9 +14,11 @@
     depth: number;
     repostable: boolean;
     tieKey: string | undefined;
+    zIndex?: number;
   }
 
-  let { replyTag, displayMenu, depth, repostable, tieKey }: Props = $props();
+  let { replyTag, displayMenu, depth, repostable, tieKey, zIndex }: Props =
+    $props();
   let loadNote = $state(false);
   //$inspect(replyTag);
   const openModal = (index: number) => {
@@ -63,6 +65,7 @@
         depth={depth + 1}
         {repostable}
         {tieKey}
+        {zIndex}
       />
     {:else if replyTag[0] === "a" || replyTag[0] === "A"}
       <!---->
@@ -75,6 +78,7 @@
         {tieKey}
         {repostable}
         content={undefined}
+        {zIndex}
       />
     {:else if replyTag[0] === "I" || replyTag[0] === "i"}
       <!---->

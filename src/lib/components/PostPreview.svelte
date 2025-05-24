@@ -238,6 +238,7 @@
               depth={depth + 1}
               {repostable}
               {tieKey}
+              {zIndex}
             />
           {/if}
         {/snippet}
