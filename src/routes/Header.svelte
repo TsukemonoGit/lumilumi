@@ -128,6 +128,9 @@
   }
   .label {
     list-style-type: disc;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5em;
   }
 
   .option {
