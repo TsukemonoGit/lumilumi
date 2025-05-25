@@ -17,7 +17,7 @@
 
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { nip50relays } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";

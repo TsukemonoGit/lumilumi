@@ -6,7 +6,7 @@
   import { userMuteStatus } from "$lib/func/util";
   import type { UserMuteStatus } from "$lib/types";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createTooltip } from "@melt-ui/svelte";
   import { melt } from "@melt-ui/svelte/internal/actions";
@@ -68,26 +68,26 @@
   const muteMenu = [
     {
       id: "user" as keyof UserMuteStatus,
-      addText: $_("mute.user.add"),
-      removeText: $_("mute.user.remove"),
+      addText: `${$_("mute.user.add")}`,
+      removeText: `${$_("mute.user.remove")}`,
       Icon: User,
     },
     {
       id: "repost" as keyof UserMuteStatus,
-      addText: $_("mute.repost.add"),
-      removeText: $_("mute.repost.remove"),
+      addText: `${$_("mute.repost.add")}`,
+      removeText: `${$_("mute.repost.remove")}`,
       Icon: Repeat2,
     },
     {
       id: "reaction" as keyof UserMuteStatus,
-      addText: $_("mute.reaction.add"),
-      removeText: $_("mute.reaction.remove"),
+      addText: `${$_("mute.reaction.add")}`,
+      removeText: `${$_("mute.reaction.remove")}`,
       Icon: SmilePlus,
     },
     {
       id: "zap" as keyof UserMuteStatus,
-      addText: $_("mute.zap.add"),
-      removeText: $_("mute.zap.remove"),
+      addText: `${$_("mute.zap.add")}`,
+      removeText: `${$_("mute.zap.remove")}`,
       Icon: Zap,
     },
   ];
@@ -123,8 +123,8 @@
         //データないけど新しく作っていいですか
         kind = 10000;
         dtag = undefined;
-        title = $_("create.kind10000.title");
-        text = $_("create.kind10000.text");
+        title = `${$_("create.kind10000.title")}`;
+        text = `${$_("create.kind10000.text")}`;
         $nowProgress = false;
 
         dialogOpen?.(true);
@@ -184,8 +184,8 @@
       if (!kind30007) {
         //データないけど新しく作っていいですか
 
-        title = $_("create.kind30007.6.title");
-        text = $_("create.kind30007.6.text");
+        title = `${$_("create.kind30007.6.title")}`;
+        text = `${$_("create.kind30007.6.text")}`;
         $nowProgress = false;
 
         dialogOpen?.(true);
@@ -249,8 +249,8 @@
       if (!kind30007) {
         //データないけど新しく作っていいですか
 
-        title = $_("create.kind30007.7.title");
-        text = $_("create.kind30007.7.text");
+        title = `${$_("create.kind30007.7.title")}`;
+        text = `${$_("create.kind30007.7.text")}`;
 
         $nowProgress = false;
 
@@ -316,8 +316,8 @@
       console.log(kind30007);
       if (!kind30007) {
         //データないけど新しく作っていいですか
-        title = $_("create.kind30007.3974.title");
-        text = $_("create.kind30007.3974.text");
+        title = `${$_("create.kind30007.3974.title")}`;
+        text = `${$_("create.kind30007.3974.text")}`;
 
         $nowProgress = false;
 

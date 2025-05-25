@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { getStatusLink } from "$lib/func/status";

@@ -21,7 +21,7 @@
   import Content from "../content/Content.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import ReplyToUserButton from "$lib/components/NostrElements/user/ReplyToUserButton.svelte";
-  import { _, locale } from "svelte-i18n";
+  import { t as _, locale } from "@konemono/svelte5-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { type Writable, writable } from "svelte/store";
   import type { Profile } from "$lib/types";

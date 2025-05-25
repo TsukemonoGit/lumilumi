@@ -12,7 +12,7 @@
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import { createEmojiListFrom10030 } from "$lib/func/settings";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";

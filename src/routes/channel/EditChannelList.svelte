@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import type { Writable } from "svelte/store";
   import { fade } from "svelte/transition";

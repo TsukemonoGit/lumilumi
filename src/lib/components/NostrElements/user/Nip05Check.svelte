@@ -2,7 +2,7 @@
   import { queryClient } from "$lib/stores/stores";
   import { BadgeAlert, ShieldCheck, Loader, AtSign } from "lucide-svelte";
   import UseNip05Check from "../../renderSnippets/UseNip05Check.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { untrack } from "svelte";
 
   interface Props {

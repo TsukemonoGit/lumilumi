@@ -3,7 +3,7 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";

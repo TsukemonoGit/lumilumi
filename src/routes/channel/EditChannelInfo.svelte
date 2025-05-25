@@ -2,7 +2,7 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X, Plus, Minus } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
   import {
     nowProgress,
@@ -104,7 +104,7 @@
   // チャンネル作成処理
   const createChannel = async () => {
     if (!channelName.trim()) {
-      error = $_("channel.create.errorNameRequired");
+      error = `${$_("channel.create.errorNameRequired")}`;
       return;
     }
 
@@ -174,7 +174,7 @@
       // window.location.href = `/channel/${nip19.noteEncode(mockEventId)}`;
     } catch (err) {
       console.error("チャンネル作成エラー:", err);
-      error = $_("channel.create.error");
+      error = `${$_("channel.create.error")}`;
     } finally {
       $nowProgress = false;
     }

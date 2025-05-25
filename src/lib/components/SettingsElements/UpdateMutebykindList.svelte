@@ -14,10 +14,10 @@
     toastSettings,
   } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { eventKinds } from "$lib/func/kinds";
-  import { locale } from "svelte-i18n";
+  import { locale } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
 

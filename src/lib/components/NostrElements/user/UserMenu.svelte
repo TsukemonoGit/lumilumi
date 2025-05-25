@@ -19,7 +19,7 @@
   } from "lucide-svelte";
   import UserMuteMenu from "./UserMuteMenu.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import * as Nostr from "nostr-typedef";
@@ -57,7 +57,7 @@
     { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
     { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
     { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
-    { text: $_("menu.broadcast"), icon: Radio, num: 5 },
+    { text: `${$_("menu.broadcast")}`, icon: Radio, num: 5 },
     { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
     { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
     { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },

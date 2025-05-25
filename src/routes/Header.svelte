@@ -4,7 +4,7 @@
 
   import Popover from "$lib/components/Elements/Popover.svelte";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { page } from "$app/state";
   import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";

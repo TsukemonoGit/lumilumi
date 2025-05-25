@@ -11,7 +11,7 @@
   import { nip19 } from "nostr-tools";
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";

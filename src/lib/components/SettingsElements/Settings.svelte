@@ -21,7 +21,7 @@
     LumiMuteByKind,
     LumiSetting,
   } from "$lib/types";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { beforeNavigate } from "$app/navigation";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
@@ -56,10 +56,10 @@
   let originalSettings: LumiSetting | undefined = undefined;
 
   //const optionsArr = ["0", "1"];
-  const optionsArrStr = [
-    $_("settings.relayMenuText0"),
-    $_("settings.relayMenuText1"),
-  ];
+  let optionsArrStr = $derived([
+    `${$_("settings.relayMenuText0")}`,
+    `${$_("settings.relayMenuText1")}`,
+  ]);
   //inputurl
   const {
     elements: { root: relayInputroot },
@@ -182,7 +182,7 @@
     $nowProgress = true;
     toastSettings.set({
       title: "Success",
-      description: $_("settings.refreshPage"),
+      description: `${$_("settings.refreshPage")}`,
       color: "bg-green-500",
     });
 

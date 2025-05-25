@@ -3,14 +3,14 @@
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, Share, Search, ChevronDown } from "lucide-svelte";
-  import { locale } from "svelte-i18n";
+  import { locale } from "@konemono/svelte5-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
 
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
   import { eventKinds } from "$lib/func/kinds";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import { followList } from "$lib/stores/globalRunes.svelte";
 

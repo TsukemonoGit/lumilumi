@@ -4,7 +4,7 @@
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   interface Props {
     encodedId: string;
     indexes?: number[] | undefined;
@@ -24,7 +24,7 @@
   let menuTexts = $derived.by(() => {
     let menu = [
       {
-        text: $_("menu.copy.nevent"),
+        text: `${$_("menu.copy.nevent")}`,
         icon: Copy,
         num: 3,
       },

@@ -4,7 +4,7 @@
   import { Select } from "melt/builders";
   import Dialog from "./Elements/Dialog.svelte";
   import { ChartBar, Check, Plus, X } from "lucide-svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { defaultRelays, toastSettings } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
   import { nip07Signer } from "rx-nostr";

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, untrack, type SvelteComponent } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import * as Nostr from "nostr-typedef";

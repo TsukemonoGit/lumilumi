@@ -43,7 +43,7 @@
   import { untrack } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { type QueryKey } from "@tanstack/svelte-query";
   import { type EventPacket } from "rx-nostr";
 

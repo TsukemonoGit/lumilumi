@@ -1,6 +1,6 @@
 <script>
   import { X } from "lucide-svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   const newDomain = "https://lumilumi.app"; // 新ドメインのURL
   let view = $state(true);

@@ -3,7 +3,7 @@
   import { nowProgress } from "$lib/stores/stores";
   import { nip19 } from "nostr-tools";
   import * as Nostr from "nostr-typedef";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   interface Props {
     metadata: Nostr.Event;
   }

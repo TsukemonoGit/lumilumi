@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { UserCog, Pin, RadioTower, User } from "lucide-svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { nip19 } from "nostr-tools";
 

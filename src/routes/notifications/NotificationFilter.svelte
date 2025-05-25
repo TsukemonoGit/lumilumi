@@ -3,7 +3,7 @@
 
   import { onlyFollowee } from "$lib/stores/stores";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   const handleChangeChecked = () => {
     console.log($onlyFollowee);

@@ -16,7 +16,7 @@
   } from "lucide-svelte";
 
   import Avatar from "svelte-boring-avatars";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import UserAvatar from "../../user/UserAvatar.svelte";
   import { untrack } from "svelte";
   import { type Nip11 } from "nostr-typedef";

@@ -2,7 +2,7 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);

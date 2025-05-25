@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import Truncate from "./Truncate.svelte";
   import ContentParts from "./ContentParts.svelte";

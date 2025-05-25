@@ -19,7 +19,7 @@
     type OkPacketAgainstEvent,
     now,
   } from "rx-nostr";
-  import { _, locale } from "svelte-i18n";
+  import { t as _, locale } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
 
   import {

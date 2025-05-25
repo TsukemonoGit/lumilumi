@@ -7,7 +7,7 @@
     getQueryRelays,
   } from "$lib/func/settings";
   import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { createRxNostr } from "rx-nostr/src";
 

@@ -1,13 +1,14 @@
 // src/lib/i18n/index.ts
-import { browser } from "$app/environment";
-import { init, register } from "svelte-i18n";
+
+import { initI18n, registerLocale } from "@konemono/svelte5-i18n";
 
 const defaultLocale = "en";
 
-register("en", () => import("./locales/en.json"));
-register("ja", () => import("./locales/ja.json"));
+// 動的インポート方式で言語ファイルを登録
+registerLocale("ja", () => import("./locales/ja.json"));
+registerLocale("en", () => import("./locales/en.json"));
 
-init({
-  fallbackLocale: defaultLocale,
-  initialLocale: browser ? window.navigator.language : defaultLocale,
+initI18n({
+  defaultLocale: defaultLocale,
+  supportedLocales: ["ja", "en"],
 });

@@ -14,7 +14,7 @@
   import { nip19 } from "nostr-tools";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import ModalJson from "$lib/components/ModalJson.svelte";
 
@@ -37,7 +37,7 @@
   // svelte-ignore non_reactive_update
   let menuTexts = [
     {
-      text: $_("menu.copy.naddr"),
+      text: `${$_("menu.copy.naddr")}`,
       icon: Copy,
       num: 3,
     },

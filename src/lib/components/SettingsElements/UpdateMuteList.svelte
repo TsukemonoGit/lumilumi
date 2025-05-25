@@ -11,7 +11,7 @@
     toastSettings,
   } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import AddMute from "./AddMute.svelte";
 
   import MuteTabList from "./MuteTabList.svelte";

@@ -13,7 +13,7 @@
   import { extractKind9734 } from "$lib/func/zap";
   import FolloweeFilteredEventList from "../lib/components/NostrElements/FolloweeFilteredEventList.svelte";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "../lib/components/NostrElements/kindEvents/MakeNewKind3.svelte";
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
