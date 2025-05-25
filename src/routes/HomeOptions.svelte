@@ -1,13 +1,13 @@
 <script lang="ts">
   import { createRadioGroup, melt } from "@melt-ui/svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { writable } from "svelte/store";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const optionsArr = [
-    ["0", $_("filter.canversation.all")],
-    ["1", $_("filter.canversation.onlyFollowee")],
-    ["2", $_("filter.canversation.none")],
+    ["0", `${$_("filter.canversation.all")}`],
+    ["1", `${$_("filter.canversation.onlyFollowee")}`],
+    ["2", `${$_("filter.canversation.none")}`],
   ];
 
   const selected = writable<string>(

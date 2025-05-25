@@ -71,12 +71,12 @@
   let menuTexts = $derived.by(() => {
     let menu = [
       {
-        text: $_("menu.copy.text"),
+        text: `${$_("menu.copy.text")}`,
         icon: NotepadText,
         num: 8,
       },
       {
-        text: `${replaceable ? $_("menu.copy.naddr") : $_("menu.copy.nevent")}`,
+        text: `${replaceable ? `${$_("menu.copy.naddr")}` : `${$_("menu.copy.nevent")}`}`,
         icon: Copy,
         num: 3,
       },

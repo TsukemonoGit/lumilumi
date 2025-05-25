@@ -8,7 +8,7 @@
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { writable } from "svelte/store";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
 
@@ -49,8 +49,8 @@
   }
   let channelLink = $derived(getChannelLink(heyaId));
   const menuTexts: { icon: any; text: string; num: number }[] = [
-    { icon: undefined, text: $_("channel.menu.edit"), num: 0 },
-    { icon: undefined, text: $_("channel.menu.open"), num: 1 },
+    { icon: undefined, text: `${$_("channel.menu.edit")}`, num: 0 },
+    { icon: undefined, text: `${$_("channel.menu.open")}`, num: 1 },
   ];
   let editChannelListOpen = $state(writable(false));
   const handleSelectItem = (index: number) => {

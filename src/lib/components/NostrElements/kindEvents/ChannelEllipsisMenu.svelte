@@ -46,7 +46,7 @@
   let menuTexts = $derived.by(() => {
     let menu = [
       {
-        text: $_("menu.copy.nevent"),
+        text: `${$_("menu.copy.nevent")}`,
         icon: Copy,
         num: 3,
       },

@@ -3,7 +3,7 @@
   import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { nip19 } from "nostr-tools";
   import {
     loginUser,
@@ -217,7 +217,7 @@
     use:melt={$trigger}
     aria-label="mute"
   >
-    {$selectedLabel || $_("mute.type.select")}
+    {$selectedLabel || `${$_("mute.type.select")}`}
     <ChevronDown class="size-5" />
   </button>
   {#if $open}

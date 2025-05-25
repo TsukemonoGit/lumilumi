@@ -11,7 +11,7 @@
 
   import { nip19 } from "nostr-tools";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
   interface Props {
     naddr: string | undefined;
@@ -48,7 +48,7 @@
     let naddrpointer = decodeNaddr(naddr);
     let menu = [
       {
-        text: $_("menu.copy.naddr"),
+        text: `${$_("menu.copy.naddr")}`,
         icon: Copy,
         num: 3,
       },

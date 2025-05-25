@@ -101,7 +101,7 @@
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
 
-        description: $_("nostrlogin.description"),
+        description: `${$_("nostrlogin.description")}`,
       });
 
       //await nostrLogin.launch();

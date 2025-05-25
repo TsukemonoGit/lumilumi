@@ -104,7 +104,7 @@
   // チャンネル作成処理
   const createChannel = async () => {
     if (!channelName.trim()) {
-      error = $_("channel.create.errorNameRequired");
+      error = `${$_("channel.create.errorNameRequired")}`;
       return;
     }
 
@@ -174,7 +174,7 @@
       // window.location.href = `/channel/${nip19.noteEncode(mockEventId)}`;
     } catch (err) {
       console.error("チャンネル作成エラー:", err);
-      error = $_("channel.create.error");
+      error = `${$_("channel.create.error")}`;
     } finally {
       $nowProgress = false;
     }
