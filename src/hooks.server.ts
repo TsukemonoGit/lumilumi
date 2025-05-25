@@ -1,6 +1,5 @@
 // hooks.server.ts
 import type { Handle } from "@sveltejs/kit";
-import { locale } from "svelte-i18n";
 
 // 許可するオリジンを設定（必要に応じて）
 const allowedOrigins = [
@@ -9,12 +8,6 @@ const allowedOrigins = [
 ]; //, "https://another-example.com"];
 
 export const handle: Handle = async ({ event, resolve }) => {
-  // Accept-Language ヘッダーを使用して言語設定
-  const lang = event.request.headers.get("accept-language")?.split(",")[0];
-  if (lang) {
-    locale.set(lang);
-  }
-
   // CORSのプリフライトリクエストに対応
   if (event.url.pathname.startsWith("/api")) {
     const origin = event.request.headers.get("Origin");

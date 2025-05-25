@@ -2,7 +2,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";

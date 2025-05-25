@@ -15,7 +15,7 @@
   import { nip19 } from "nostr-tools";
   import { nip07Signer } from "rx-nostr";
   import { lumiSetting, userStatusMap } from "$lib/stores/globalRunes.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
 
   let { dialogOpen = $bindable() } = $props();

@@ -4,7 +4,7 @@
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   interface Props {
     encodedId: string;
     indexes?: number[] | undefined;

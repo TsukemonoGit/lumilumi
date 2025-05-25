@@ -54,9 +54,10 @@
   import { defaultRelays } from "$lib/stores/relays";
   import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
+  import "$lib/i18n/index.ts";
 
   let { data, children } = $props<{
     data:

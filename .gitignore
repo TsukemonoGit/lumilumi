@@ -17,3 +17,5 @@ src/routes/api/getOtp
 test*.jpg
 test*.jpeg
 test*.png
+
+replace-imports.js

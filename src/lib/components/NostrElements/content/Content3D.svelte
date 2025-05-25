@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Box, ZoomIn } from "lucide-svelte";
   import loaderIcon from "$lib/assets/loader.svg";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import Dialog from "$lib/components/Elements/Dialog.svelte";
 
   import { type Writable, writable } from "svelte/store";

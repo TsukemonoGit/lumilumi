@@ -13,7 +13,7 @@
   import { latest, uniq, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   //import { samplemetadata, sample2 } from "./data";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import Link from "$lib/components/Elements/Link.svelte";
   import Content from "$lib/components/NostrElements/content/Content.svelte";

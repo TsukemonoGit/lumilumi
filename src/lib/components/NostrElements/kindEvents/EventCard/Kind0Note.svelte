@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { profile } from "$lib/func/util";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import FollowButton from "../../user/FollowButton.svelte";
   import Content from "../../content/Content.svelte";

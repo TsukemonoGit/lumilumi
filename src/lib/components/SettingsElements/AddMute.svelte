@@ -3,7 +3,7 @@
   import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { nip19 } from "nostr-tools";
   import {
     loginUser,

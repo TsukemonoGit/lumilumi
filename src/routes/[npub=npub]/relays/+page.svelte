@@ -18,7 +18,7 @@
   import { latest, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   //import { samplemetadata, sample2 } from "./data";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { X, Save } from "lucide-svelte";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";

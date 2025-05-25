@@ -2,7 +2,7 @@
   import { eventKinds } from "$lib/func/kinds";
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
   import { ChevronDown } from "lucide-svelte";
-  import { locale } from "svelte-i18n";
+  import { locale } from "@konemono/svelte5-i18n";
   import { fly } from "svelte/transition";
 
   interface Props {

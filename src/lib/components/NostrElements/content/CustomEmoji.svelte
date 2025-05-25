@@ -2,7 +2,7 @@
   import { type Part } from "$lib/func/content";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   interface Props {
     part: Part;

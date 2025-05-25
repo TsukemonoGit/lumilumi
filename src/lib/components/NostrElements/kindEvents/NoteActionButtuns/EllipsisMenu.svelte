@@ -28,13 +28,13 @@
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
-  import { locale } from "svelte-i18n";
+  import { t as _, locale } from "@konemono/svelte5-i18n";
+
   import { page } from "$app/state";
   import { nostviewstrable } from "$lib/func/constants";
 
   import { generateResultMessage, translateText } from "$lib/func/util";
-  import { get, writable, type Writable } from "svelte/store";
+
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import type { OkPacketAgainstEvent } from "rx-nostr";

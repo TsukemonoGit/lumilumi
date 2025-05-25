@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createRadioGroup, melt } from "@melt-ui/svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { writable } from "svelte/store";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 

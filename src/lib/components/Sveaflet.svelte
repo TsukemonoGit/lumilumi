@@ -14,7 +14,7 @@
   import { Check, LocateFixed, Search, X } from "lucide-svelte";
   import { Map, TileLayer, Marker, Popup } from "sveaflet";
   import { onMount } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   interface Props {
     initGeo?: string;

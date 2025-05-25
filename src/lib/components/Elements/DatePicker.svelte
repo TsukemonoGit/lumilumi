@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition";
   import { CalendarDateTime } from "@internationalized/date";
   import { Calendar, ChevronLeft, ChevronRight } from "lucide-svelte";
-  import { locale } from "svelte-i18n";
+  import { locale } from "@konemono/svelte5-i18n";
   import type { DateValue } from "@internationalized/date";
 
   interface Props {
@@ -12,7 +12,11 @@
     maxValue?: DateValue | undefined;
   }
 
-  let { title = "Date", minValue = undefined, maxValue = undefined }: Props = $props();
+  let {
+    title = "Date",
+    minValue = undefined,
+    maxValue = undefined,
+  }: Props = $props();
 
   let {
     elements: {

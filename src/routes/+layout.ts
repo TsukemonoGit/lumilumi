@@ -1,7 +1,6 @@
 // +layout.ts
-import { browser } from "$app/environment";
-import "$lib/i18n"; // Import to initialize. Important :)
-import { locale, waitLocale } from "svelte-i18n";
+
+//import { locale, waitLocale } from "@konemono/svelte5-i18n";
 import type { LayoutLoad } from "./$types";
 import { nip19 } from "nostr-tools";
 import { relayRegex2 } from "$lib/func/regex";
@@ -12,10 +11,7 @@ import { error } from "@sveltejs/kit";
 export const load: LayoutLoad = async (
   params
 ): Promise<{ relays?: string[] | undefined } | undefined> => {
-  if (browser) {
-    locale.set(window.navigator.language);
-  }
-  await waitLocale();
+  //await waitLocale();
   const p = params; // キャストして kind を取得
 
   //pram

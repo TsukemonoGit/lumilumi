@@ -5,7 +5,7 @@
   import type { ZonedDateTime } from "@internationalized/date";
   import { now, getLocalTimeZone } from "@internationalized/date";
 
-  import { locale } from "svelte-i18n";
+  import { locale } from "@konemono/svelte5-i18n";
   import { untrack } from "svelte";
 
   const {

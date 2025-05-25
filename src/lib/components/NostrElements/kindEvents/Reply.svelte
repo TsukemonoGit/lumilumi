@@ -3,7 +3,7 @@
   import Note from "./Note.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { relayRegex } from "$lib/func/regex";
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import type { Part } from "$lib/func/content";

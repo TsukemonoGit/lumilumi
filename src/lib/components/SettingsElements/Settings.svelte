@@ -21,7 +21,7 @@
     LumiMuteByKind,
     LumiSetting,
   } from "$lib/types";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { beforeNavigate } from "$app/navigation";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";

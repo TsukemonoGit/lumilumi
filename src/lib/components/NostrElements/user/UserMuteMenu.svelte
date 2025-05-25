@@ -6,7 +6,7 @@
   import { userMuteStatus } from "$lib/func/util";
   import type { UserMuteStatus } from "$lib/types";
 
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import { createTooltip } from "@melt-ui/svelte";
   import { melt } from "@melt-ui/svelte/internal/actions";

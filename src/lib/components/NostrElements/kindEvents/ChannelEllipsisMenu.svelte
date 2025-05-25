@@ -15,8 +15,8 @@
   import { nip19 } from "nostr-tools";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { _ } from "svelte-i18n";
-  import { locale } from "svelte-i18n";
+  import { t as _, locale } from "@konemono/svelte5-i18n";
+
   import { page } from "$app/state";
   import type { ChannelData } from "$lib/types";
   import { translateText } from "$lib/func/util";

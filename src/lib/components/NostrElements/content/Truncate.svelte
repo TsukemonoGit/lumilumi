@@ -2,7 +2,7 @@
 <script lang="ts">
   import { useTruncate } from "$lib/func/useTruncate";
   import type { Snippet } from "svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   interface Props {
     maxHeight?: number;

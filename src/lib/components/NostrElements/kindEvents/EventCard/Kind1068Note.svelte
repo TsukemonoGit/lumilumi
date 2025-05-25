@@ -22,7 +22,7 @@
   import PollSingleBuilder from "./poll/PollSingleBuilder.svelte";
   import PollMultiBuilder from "./poll/PollMultiBuilder.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   interface Props {
     note: Nostr.Event;

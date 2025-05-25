@@ -9,7 +9,7 @@
   import { hexRegex } from "$lib/func/regex";
 
   import UserProfile from "./UserProfile.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";

@@ -11,7 +11,7 @@
 
   import { nip19 } from "nostr-tools";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { writable, type Writable } from "svelte/store";
   interface Props {
     naddr: string | undefined;

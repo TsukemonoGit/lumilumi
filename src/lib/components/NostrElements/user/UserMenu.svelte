@@ -19,7 +19,7 @@
   } from "lucide-svelte";
   import UserMuteMenu from "./UserMuteMenu.svelte";
   import { goto } from "$app/navigation";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import * as Nostr from "nostr-typedef";

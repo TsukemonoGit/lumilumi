@@ -15,7 +15,7 @@
   import { nip19 } from "nostr-tools";
 
   import { mutes } from "$lib/stores/stores";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import type { PageData } from "./$types";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 

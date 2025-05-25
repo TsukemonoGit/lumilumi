@@ -10,7 +10,7 @@
   } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
   import type { EventTemplate } from "nostr-tools";

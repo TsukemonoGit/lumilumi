@@ -8,7 +8,7 @@
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import { writable } from "svelte/store";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
 

@@ -4,7 +4,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
-  import { _ } from "svelte-i18n";
+  import { t as _ } from '@konemono/svelte5-i18n';
   import type { QueryKey } from "@tanstack/svelte-query";
   import type * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
