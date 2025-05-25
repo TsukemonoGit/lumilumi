@@ -56,10 +56,10 @@
   let originalSettings: LumiSetting | undefined = undefined;
 
   //const optionsArr = ["0", "1"];
-  const optionsArrStr = [
+  let optionsArrStr = $derived([
     `${$_("settings.relayMenuText0")}`,
     `${$_("settings.relayMenuText1")}`,
-  ];
+  ]);
   //inputurl
   const {
     elements: { root: relayInputroot },
