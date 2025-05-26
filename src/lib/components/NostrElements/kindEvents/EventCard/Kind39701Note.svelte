@@ -2,7 +2,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
@@ -16,6 +16,7 @@
   import { datetime, formatAbsoluteDate } from "$lib/func/util";
   import ClientTag from "../../content/ClientTag.svelte";
   import MediaEmbedSwitcher from "../../content/MediaEmbedSwitcher.svelte";
+  import Content from "../../content/Content.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -115,7 +116,18 @@
     <div>
       <div class="text-lg font-bold">{title}</div>
       <MediaEmbedSwitcher url={siteUrl || ""} />
-      <p class="mt-2">{note.content}</p>
+      <div class="mt-2">
+        <Content
+          {zIndex}
+          {maxHeight}
+          text={note.content}
+          tags={note.tags}
+          {displayMenu}
+          {depth}
+          {repostable}
+          {tieKey}
+        />
+      </div>
       <div class="mt-2">
         {#each hashTags as hash}
           <a
@@ -125,7 +137,7 @@
           >
         {/each}
       </div>
-      <ClientTag tags={note.tags} {depth} />
+      <!--  <ClientTag tags={note.tags} {depth} /> -->
       {#if published_at}
         <time class="float-end" datetime={datetime(Number(published_at))}
           >at {formatAbsoluteDate(Number(published_at))}</time
