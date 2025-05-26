@@ -3,7 +3,7 @@
   import Fes2 from "./Fes2.svelte"; //Claude
   import Fes3 from "./Fes3.svelte"; //cursor
   import Fes4 from "./Fes4.svelte"; //Copilot (1~3を参考にしてやいやい)
-  // import Fes5 from "./Fes5.svelte";
+  import Fes5 from "./Fes5.svelte"; //ChatGPT canvas
   // import Fes6 from "./Fes6.svelte";
   // import Fes7 from "./Fes7.svelte";
   // import Fes8 from "./Fes8.svelte";
@@ -16,7 +16,8 @@
     Fes1,
     Fes2,
     Fes3,
-    Fes4, // Fes5, Fes6, Fes7, Fes8, Fes9, Fes10
+    Fes4,
+    Fes5, // Fes6, Fes7, Fes8, Fes9, Fes10
   ];
 
   // ランダムに1つ選択
