@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import SimpleContentBlock from "./SimpleContentBlock.svelte";
   import markdownit from "markdown-it";
   import { transformTokens } from "$lib/func/markdown";
@@ -15,8 +15,8 @@
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
   import markdownCheckBoxPlugin from "markdown-it-task-checkbox";
   import Truncate from "../NostrElements/content/Truncate.svelte";
-  import Dialog from "../Elements/Dialog.svelte";
-  import { type Writable, writable } from "svelte/store";
+  //import Dialog from "../Elements/Dialog.svelte";
+  //import { type Writable, writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
 
   import { noteLink } from "$lib/func/event";
@@ -83,30 +83,23 @@
   };
 
   // svelte-ignore non_reactive_update
-  let showMore: Writable<boolean> = writable(false);
+  /*  let showMore: Writable<boolean> = writable(false);
   const onClickShowMore = () => {
     console.log("showMore");
     $showMore = true;
-  };
+  }; */
 </script>
 
 <article class="contentBlock overflow-hidden">
-  {#if parts}
+  {#if parts && note}
     {#if maxHeight !== 0}
-      <Truncate {maxHeight} {depth} {onClickShowMore}>
+      <Truncate {maxHeight} {depth}>
         {#snippet truncate()}
-          {#if !note}
-            <button
-              onclick={onClickShowMore}
-              class="h-8 items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
-            >
-              {$_("truncate.expand")}
-            </button>{:else}
-            <a
-              href={`/${noteLink(note, tieKey)}`}
-              class="h-8 flex items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
-              >{$_("truncate.openpage")}
-            </a>{/if}
+          <a
+            href={`/${noteLink(note, tieKey)}`}
+            class="h-8 flex items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
+            >{$_("truncate.openpage")}
+          </a>
         {/snippet}
         {#each parts as token}
           <SimpleContentBlock
@@ -139,7 +132,7 @@
   {/if}
 </article>
 <!--Show more no Dialog-->
-<Dialog
+<!-- <Dialog
   bind:open={showMore}
   zIndex={zIndex + 10}
   id={`showMore_${text.slice(10)}_${depth}}`}
@@ -164,3 +157,4 @@
     </div>
   {/snippet}</Dialog
 >
+ -->

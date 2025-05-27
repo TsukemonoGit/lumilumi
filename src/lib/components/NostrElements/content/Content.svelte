@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import Truncate from "./Truncate.svelte";
   import ContentParts from "./ContentParts.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
+  import { untrack } from "svelte";
 
   interface Props {
     text: string;
@@ -34,11 +35,22 @@
 
   // svelte-ignore non_reactive_update
   let showMore: Writable<boolean> = writable(false);
-
+  let dialogContentRef: HTMLDivElement | undefined = $state();
   const onClickShowMore = () => {
     console.log("showMore");
+
     $showMore = true;
   };
+  $effect(() => {
+    if (dialogContentRef) {
+      console.log("dialogContentRef", dialogContentRef);
+      untrack(() => {
+        setTimeout(() => {
+          (dialogContentRef as HTMLDivElement).scrollTop = 0;
+        }, 0);
+      });
+    }
+  });
 </script>
 
 {#if maxHeight !== 0}
@@ -78,7 +90,10 @@
   zIndex={zIndex + 10}
 >
   {#snippet main()}
-    <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+    <div
+      class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden"
+      bind:this={dialogContentRef}
+    >
       <ContentParts
         {maxHeight}
         {text}
