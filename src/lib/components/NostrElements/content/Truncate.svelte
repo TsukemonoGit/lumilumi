@@ -2,13 +2,13 @@
 <script lang="ts">
   import { useTruncate } from "$lib/func/useTruncate";
   import type { Snippet } from "svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   interface Props {
     maxHeight?: number;
     children: any;
     depth: number;
-    onClickShowMore: () => void;
+    onClickShowMore?: () => void;
     truncate?: Snippet;
   }
   let {
