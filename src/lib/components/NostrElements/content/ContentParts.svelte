@@ -27,6 +27,7 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     displayTags?: boolean;
+    kind?: number;
   }
 
   let {
@@ -40,6 +41,7 @@
     maxHeight,
     zIndex,
     displayTags = true,
+    kind = 1,
   }: Props = $props();
 
   let parts: Part[] = $state([]);
@@ -127,7 +129,7 @@
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.url}`}
+      href={`/search?t=${part.url}&k=${kind}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
     >
   {:else if part.type === "relay"}

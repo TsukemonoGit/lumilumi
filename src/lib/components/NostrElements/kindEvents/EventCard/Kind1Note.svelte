@@ -129,6 +129,7 @@
       {depth}
       {repostable}
       {tieKey}
+      kind={note.kind}
     />
   {/snippet}
   {#snippet actionButtons()}

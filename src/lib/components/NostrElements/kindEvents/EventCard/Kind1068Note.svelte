@@ -22,7 +22,7 @@
   import PollSingleBuilder from "./poll/PollSingleBuilder.svelte";
   import PollMultiBuilder from "./poll/PollMultiBuilder.svelte";
   import { goto } from "$app/navigation";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   interface Props {
     note: Nostr.Event;
@@ -138,6 +138,7 @@
             {depth}
             {repostable}
             {tieKey}
+            kind={note.kind}
           />
         </div>
         {#if page.params.note || page.params.naddr}

@@ -6,7 +6,7 @@
   import { nip07Signer, uniq } from "rx-nostr";
   import { loginUser, toastSettings } from "$lib/stores/stores";
   import { untrack } from "svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { latestEachPubkey } from "$lib/stores/operators";
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
@@ -173,6 +173,7 @@
                   {depth}
                   {tieKey}
                   repostable={false}
+                  kind={note.kind}
                 />
               </div>
 

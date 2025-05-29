@@ -135,6 +135,7 @@
         {repostable}
         {tieKey}
         {zIndex}
+        kind={note.kind}
       />
       <span
         class={"float-end text-neutral-400    text-sm font-semibold px-1"}

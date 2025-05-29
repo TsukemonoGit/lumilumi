@@ -126,6 +126,7 @@
           {depth}
           {repostable}
           {tieKey}
+          kind={note.kind}
         />
       </div>
       <div class="mt-2">

@@ -120,6 +120,7 @@
       {depth}
       {repostable}
       {tieKey}
+      kind={note.kind}
     /><ChannelTag {heyaId} {tieKey} />
   {/snippet}
   {#snippet actionButtons()}
