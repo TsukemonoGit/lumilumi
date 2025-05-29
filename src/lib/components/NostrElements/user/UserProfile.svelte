@@ -317,6 +317,7 @@
                 {depth}
                 repostable={false}
                 {tieKey}
+                kind={metadata.kind}
               />
             </div>
           {/if}

@@ -68,6 +68,7 @@
         depth={0}
         repostable={false}
         tieKey={undefined}
+        kind={event.kind}
       />
     </div>
   {/if}

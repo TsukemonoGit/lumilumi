@@ -148,6 +148,7 @@
           {repostable}
           {tieKey}
           {zIndex}
+          kind={note.kind}
         />
       {/if}
     {/snippet}

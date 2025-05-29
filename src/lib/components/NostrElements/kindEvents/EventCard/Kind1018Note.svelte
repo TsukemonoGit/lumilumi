@@ -170,6 +170,7 @@
         {repostable}
         {tieKey}
         {zIndex}
+        kind={note.kind}
       />
     {/snippet}
     {#snippet actionButtons()}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { loginUser } from "$lib/stores/stores";
 
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
@@ -156,6 +156,7 @@
           {depth}
           repostable={false}
           {tieKey}
+          kind={note.kind}
         />
       {/if}
     {/if}

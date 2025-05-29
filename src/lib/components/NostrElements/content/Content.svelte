@@ -18,6 +18,7 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     displayTags?: boolean;
+    kind?: number;
   }
 
   let {
@@ -31,6 +32,7 @@
     maxHeight,
     zIndex = 0,
     displayTags,
+    kind,
   }: Props = $props();
 
   // svelte-ignore non_reactive_update
@@ -66,6 +68,7 @@
       {tieKey}
       {zIndex}
       {displayTags}
+      {kind}
     />
   </Truncate>
 {:else}
@@ -80,6 +83,7 @@
     {tieKey}
     {zIndex}
     {displayTags}
+    {kind}
   />
 {/if}
 <!--Show more no Dialog-->
@@ -105,6 +109,7 @@
         {tieKey}
         {zIndex}
         {displayTags}
+        {kind}
       />
     </div>
   {/snippet}</Dialog

@@ -77,6 +77,7 @@
           {depth}
           {repostable}
           {tieKey}
+          kind={text.kind}
         />
       {/if}
     {:else}
@@ -87,6 +88,7 @@
         {depth}
         {repostable}
         {tieKey}
+        kind={text.kind}
       />{#if text.kind !== 1}{#if text.kind === 42}{@const heyaId =
             text.tags.find(
               (tag) => tag[0] === "e" && tag[3] === "root"

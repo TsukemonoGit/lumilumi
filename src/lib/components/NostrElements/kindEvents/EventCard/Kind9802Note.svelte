@@ -17,7 +17,7 @@
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import Content from "../../content/Content.svelte";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import ReplyTo from "../layout/ReplyTo.svelte";
   import UserName from "../../user/UserName.svelte";
   import PopupUserName from "../../user/PopupUserName.svelte";
@@ -143,6 +143,7 @@
             {repostable}
             {tieKey}
             displayTags={false}
+            kind={note.kind}
           />
 
           {#if referenceTag}
