@@ -36,7 +36,7 @@
 <div class="sidebar fixed top-28 bottom-12">
   <nav class="h-full overflow-hidden">
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
-      {#each mainMenuItems as { Icon, link, alt, noPubkey }}
+      {#each mainMenuItems.filter((item) => item.alt !== "global") as { Icon, link, alt, noPubkey }}
         {#if alt === "profile"}
           {#if $loginUser && encodedPub}
             <li

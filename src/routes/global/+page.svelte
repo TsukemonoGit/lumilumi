@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount, untrack, type SvelteComponent } from "svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/state";
+  import TLSwitch from "../TLSwitch.svelte";
 
   // Store imports
   import {
@@ -263,6 +264,7 @@
     }}
   />
 </div>
+<TLSwitch />
 
 <style>
   section {
