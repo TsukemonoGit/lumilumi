@@ -139,7 +139,7 @@
         {/each}
       </div>
       <!--  <ClientTag tags={note.tags} {depth} /> -->
-      {#if published_at}
+      {#if !isNaN(Number(published_at))}
         <time class="float-end" datetime={datetime(Number(published_at))}
           >at {formatAbsoluteDate(Number(published_at))}</time
         >{/if}
