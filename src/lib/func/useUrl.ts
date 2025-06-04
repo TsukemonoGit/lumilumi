@@ -1,9 +1,13 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { derived } from "svelte/store";
+import { derived, type Readable } from "svelte/store";
 
 export type UrlType = "text" | "image" | "audio" | "movie" | "3D" | "url";
 
-export const useUrl = (url: string) => {
+export const useUrl = (
+  url: string
+): {
+  data: Readable<UrlType | null | undefined>;
+} => {
   const genQueryKey = () => ["useUrl", url] as const;
 
   const query = createQuery({

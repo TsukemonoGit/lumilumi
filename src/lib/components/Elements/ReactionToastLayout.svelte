@@ -36,7 +36,9 @@
 {#if handledTag}
   {#if event.kind === 6 || event.kind === 16}
     <div class="flex w-full">
-      <Repeat class="text-magnum-400" /><UserName pubhex={event.pubkey} />
+      <Repeat class="text-magnum-400 min-w-4" /><UserName
+        pubhex={event.pubkey}
+      />
     </div>
     <div class="px-2 w-full"><ReactionToastContent tag={handledTag} /></div>
   {:else if event.kind === 7}
@@ -48,14 +50,18 @@
     {@const zapRequest = extractKind9734(event)}
     {@const zapAmount = extractAmount(event, zapRequest)}
     <div class="flex w-full">
-      <Zap class="text-magnum-400" />{zapAmount}{#if zapRequest}<UserName
+      <Zap
+        class="text-magnum-400 min-w-4"
+      />{zapAmount}{#if zapRequest}<UserName
           pubhex={zapRequest.pubkey}
         />{zapRequest.content}{/if}
     </div>
     <div class="px-2 w-full"><ReactionToastContent tag={handledTag} /></div>
   {:else}
     <div class="flex w-full">
-      <Reply class="text-magnum-400" /><ReactionToastContent tag={handledTag} />
+      <Reply class="text-magnum-400 min-w-4" /><ReactionToastContent
+        tag={handledTag}
+      />
     </div>
     <UserName pubhex={event.pubkey} />
     <div class="px-2 w-full">
@@ -76,5 +82,5 @@
 
 {#if event.kind === 4}
   <div class="flex w-full">
-    <Mail class="text-magnum-400" /><UserName pubhex={event.pubkey} />
+    <Mail class="text-magnum-400 min-w-4" /><UserName pubhex={event.pubkey} />
   </div>{/if}
