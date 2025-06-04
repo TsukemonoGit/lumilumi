@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import {
@@ -964,7 +964,7 @@
                     }}
                     aria-label={`Remove ${replyUser} from reply list`}
                   >
-                    <Bell class="size-4 text-magnum-200 fill-magnum-200" />
+                    <Bell class="min-w-4 text-magnum-200 fill-magnum-200" />
                     <UserName pubhex={replyUser} />
                   </button>
                 {:else}
@@ -976,7 +976,7 @@
                     }}
                     aria-label={`Add ${replyUser} to reply list`}
                   >
-                    <Bell class="size-4 text-magnum-500 " /><UserName
+                    <Bell class="min-w-4 text-magnum-500 " /><UserName
                       pubhex={replyUser}
                     />
                   </button>
