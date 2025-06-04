@@ -20,9 +20,17 @@
   );
 </script>
 
-{#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
-        {part}
-        {height}
-      />{:else}<span class="inline align-middle">{part.content}</span>{/if}
-  {/each}
-{/if}
+<span
+  class=" line-clamp-1 truncate max-w-full overflow-hidden"
+  style="white-space: normal; word-break: break-word; overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;"
+>
+  {#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
+          {part}
+          {height}
+        />{:else}{part.content}{/if}
+    {/each}
+  {/if}
+</span>

@@ -45,26 +45,26 @@
 <span
   use:viewport={null}
   onenterViewport={handleEnterViewport}
-  class="inline-flex flex-wrap"
-  >{#if hasLoaded}{#if petname}📛{petname}{:else}@<Metadata
+  class="inline-block flex-wrap"
+  >{#if hasLoaded}{#if petname}📛{petname}{:else}<Metadata
         queryKey={["metadata", pubhex]}
         pubkey={pubhex}
       >
         {#snippet loading()}
-          <span class="text-sm inline-flex break-all">{pubString}</span
+          <span class="text-sm inline-flex break-all">@{pubString}</span
           >{/snippet}
         {#snippet nodata()}
-          <span class="text-sm inline-flex break-all">{pubString}</span>
+          <span class="text-sm inline-flex break-all">@{pubString}</span>
         {/snippet}
         {#snippet error()}
-          <span class="text-sm inline-flex break-all">{pubString}</span>
+          <span class="text-sm inline-flex break-all">@{pubString}</span>
         {/snippet}
         {#snippet content({ metadata })}
           <DisplayName
             height={21}
-            name={userName(metadata)}
+            name={`@${userName(metadata)}`}
             tags={metadata.tags}
           />
         {/snippet}
-      </Metadata>{/if}{:else}{pubString}{/if}</span
+      </Metadata>{/if}{:else}@{pubString}{/if}</span
 >
