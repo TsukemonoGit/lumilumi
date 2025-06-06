@@ -8,12 +8,14 @@
     handleSelectItem: (arg0: number) => any;
     children?: import("svelte").Snippet;
     buttonClass?: string;
+    zIndex?: number;
   }
 
   let {
     menuTexts = [],
     handleSelectItem,
     children,
+    zIndex = 40,
     buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden",
   }: Props = $props();
   const {
@@ -35,15 +37,21 @@
 >
 
 {#if $open}
-  <div use:melt={$overlay} class="fixed inset-0 z-40"></div>
+  <div
+    use:melt={$overlay}
+    class="fixed inset-0"
+    style={`z-index:${zIndex}`}
+  ></div>
   <div
     class=" menu"
+    style={`z-index:${zIndex}`}
     use:melt={$menu}
     transition:fly={{ duration: 150, y: -10 }}
   >
     {#each menuTexts as { icon: Icon, text }, index}
       <div
         class="item"
+        style={`z-index:${zIndex}`}
         use:melt={$item}
         onm-click={() => handleSelectItem(index)}
       >
@@ -57,7 +65,7 @@
 
 <style lang="postcss">
   .menu {
-    @apply z-40 flex max-h-[300px] min-w-[220px] flex-col shadow-lg;
+    @apply flex max-h-[300px] min-w-[220px] flex-col shadow-lg;
     @apply rounded-md bg-magnum-950 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
@@ -66,7 +74,7 @@
   }
   .item {
     @apply relative h-10 min-h-[24px] select-none rounded-sm pl-6 pr-1;
-    @apply z-40 text-magnum-50 outline-none;
+    @apply text-magnum-50 outline-none;
     @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
     @apply data-[disabled]:text-neutral-600;
     @apply flex items-center text-sm leading-none;
