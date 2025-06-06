@@ -20,7 +20,7 @@
     repostable: boolean;
     maxHeight: number | undefined;
     displayMenu: boolean;
-    tieKey: string | undefined;
+
     mini: any;
     zapRequestEvent: Nostr.Event;
     amount: number;
@@ -35,7 +35,7 @@
     repostable,
     maxHeight,
     displayMenu,
-    tieKey,
+
     mini,
     zapRequestEvent,
     amount,
@@ -107,40 +107,38 @@
               {metadata}
               size={20}
               {depth}
-              {tieKey}
             />
           </div>
-          <div class="inline-block break-all break-words whitespace-pre-line">
-            {#if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />{#if prof && prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    />
-                  </span>{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{encodetoNpub(zapRequestEvent.pubkey)}</span
-              >
-            {/if}
-          </div>
+
+          {#if metadata}
+            {@const prof = profile(metadata)}
+            {#if prof}
+              <DisplayName
+                height={21}
+                name={prof.display_name ?? ""}
+                tags={metadata.tags}
+              />{#if prof && prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  />
+                </span>{/if}{/if}
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{encodetoNpub(zapRequestEvent.pubkey)}</span
+            >
+          {/if}
+
           <UserPopupMenu
             pubkey={note.pubkey}
             metadata={undefined}
             size={20}
             {depth}
-            {tieKey}
           />
           <div class="ml-auto">
-            <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
+            <NoteActionButtons {note} {repostable} bind:deleted />
           </div>
         </div>
         <div class="break-all text-sm px-2">
@@ -154,7 +152,6 @@
             {repostable}
             {displayMenu}
             {maxHeight}
-            {tieKey}
             {zIndex}
             {mini}
           />

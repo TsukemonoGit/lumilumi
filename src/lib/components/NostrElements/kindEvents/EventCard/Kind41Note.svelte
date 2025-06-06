@@ -14,7 +14,7 @@
     depth: number;
     maxHeight: number | undefined;
     repostable: boolean;
-    tieKey: string | undefined;
+
     mini: boolean;
     zIndex?: number;
   }
@@ -26,7 +26,7 @@
     depth,
     maxHeight,
     repostable,
-    tieKey,
+
     mini,
     zIndex,
   }: Props = $props();
@@ -39,7 +39,7 @@
     }
     const neventPointer: nip19.EventPointer = {
       id: id,
-      relays: tieKey ? getRelaysById(id, tieKey) : [],
+      relays: getRelaysById(id),
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
@@ -53,11 +53,9 @@
     handleClickToChannel={() => handleClickToChannel(root)}
     id={root}
     event={note}
-    {tieKey}
   />
 {:else}
   <OtherKindNote
-    {tieKey}
     {note}
     {metadata}
     {displayMenu}

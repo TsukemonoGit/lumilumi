@@ -13,6 +13,7 @@ import { pipe } from "rxjs";
 import { scanArray } from "./operators.js";
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq.js";
+import { tie } from "./stores.js";
 
 export function useUniqueEventList(
   queryKey: QueryKey,
@@ -26,7 +27,7 @@ export function useUniqueEventList(
         RxReqPipeable)
     | undefined
 ): ReqResult<EventPacket[]> {
-  const operator = pipe(uniq(), scanArray());
+  const operator = pipe(tie, uniq(), scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<
     EventPacket[]
   >;

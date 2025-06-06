@@ -12,6 +12,7 @@ import { pipe } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq";
+import { tie } from "./stores";
 
 export function useReplaceableEvent(
   rxNostr: RxNostr,
@@ -32,7 +33,7 @@ export function useReplaceableEvent(
   refetchInterval: number = Infinity
 ): ReqResult<EventPacket> {
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
-  const operator = pipe(latest());
+  const operator = pipe(tie, latest());
   return useReq(
     {
       queryKey,

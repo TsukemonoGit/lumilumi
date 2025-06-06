@@ -27,7 +27,6 @@
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
 
-  const tieKey = "naddr";
   let loading = $state(true);
 
   let isOnMount = false;
@@ -86,7 +85,6 @@
                 depth={0}
                 repostable={true}
                 {maxHeight}
-                {tieKey}
               /><NoteInfo note={event} />
             </div>
           {/snippet}
@@ -99,7 +97,6 @@
                 depth={0}
                 repostable={true}
                 {maxHeight}
-                {tieKey}
               /><NoteInfo note={event} />
             </div>
           {/snippet}
@@ -112,7 +109,6 @@
                 depth={0}
                 repostable={true}
                 {maxHeight}
-                {tieKey}
               /><NoteInfo note={event} />
             </div>
           {/snippet}
@@ -126,7 +122,6 @@
                 depth={0}
                 repostable={true}
                 {maxHeight}
-                {tieKey}
               /><NoteInfo note={event} />
             </div>
           {/snippet}
@@ -145,13 +140,13 @@
 
           {#snippet children({ kind1, kind6, kind7, kind9735 })}
             <!--kind6-->
-            <NoteRepostList events={kind6} {tieKey} />
+            <NoteRepostList events={kind6} />
 
             <!--kind7-->
-            <NoteReactionList events={kind7} {tieKey} />
+            <NoteReactionList events={kind7} />
 
             <!--zap レシート-->
-            <ZapReactionList events={kind9735} {tieKey} />
+            <ZapReactionList events={kind9735} />
 
             <!--kind1,42-->
             <CollapsibleList title="Comments" amount={kind1.length}>
@@ -168,22 +163,12 @@
                   >
                     {#snippet loading()}
                       <div>
-                        <EventCard
-                          note={event}
-                          depth={0}
-                          repostable={true}
-                          {tieKey}
-                        />
+                        <EventCard note={event} depth={0} repostable={true} />
                       </div>
                     {/snippet}
                     {#snippet nodata()}
                       <div>
-                        <EventCard
-                          note={event}
-                          depth={0}
-                          repostable={true}
-                          {tieKey}
-                        />
+                        <EventCard note={event} depth={0} repostable={true} />
                       </div>
                     {/snippet}
                     {#snippet error()}
@@ -193,7 +178,6 @@
                           depth={0}
                           repostable={true}
                           {maxHeight}
-                          {tieKey}
                         />
                       </div>
                     {/snippet}
@@ -203,7 +187,6 @@
                         note={event}
                         depth={0}
                         repostable={true}
-                        {tieKey}
                       />
                     {/snippet}
                   </Metadata>

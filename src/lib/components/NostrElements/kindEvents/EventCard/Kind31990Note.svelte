@@ -23,7 +23,7 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     showStatus?: boolean;
   }
 
@@ -34,7 +34,7 @@
     displayMenu,
     depth,
     repostable,
-    tieKey,
+
     showStatus,
   }: Props = $props();
 
@@ -52,12 +52,11 @@
         size={20}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet seenOn()}
       {#if lumiSetting.get().showRelayIcon && displayMenu}
-        <SeenonIcons id={note.id} width={20} {tieKey} />{/if}
+        <SeenonIcons id={note.id} width={20} />{/if}
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
@@ -68,12 +67,11 @@
       />
     {/snippet}
     {#snippet time()}
-      <DisplayTime {displayMenu} {note} {tieKey} />
+      <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
-          {tieKey}
         />{/if}
     {/snippet}
 
@@ -82,7 +80,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

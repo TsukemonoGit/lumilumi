@@ -37,7 +37,6 @@
       size={80}
       {metadata}
       displayMenu={false}
-      tieKey={undefined}
       depth={0}
     />
 

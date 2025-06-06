@@ -18,7 +18,7 @@
     handleClickToChannel?: (() => void) | undefined;
     linkButtonTitle: string;
     event: Nostr.Event; //40か41
-    tieKey: string | undefined;
+
     clickAction: boolean;
   }
 
@@ -27,7 +27,7 @@
     handleClickToChannel = undefined,
     linkButtonTitle,
     event,
-    tieKey,
+
     clickAction,
   }: Props = $props();
   let size = clickAction ? 96 : 66;
@@ -90,7 +90,6 @@
             metadata={undefined}
             size={24}
             depth={0}
-            {tieKey}
           />
         {/snippet}
 
@@ -100,7 +99,6 @@
             metadata={undefined}
             size={24}
             depth={0}
-            {tieKey}
           />
         {/snippet}
 
@@ -110,28 +108,16 @@
             metadata={undefined}
             size={24}
             depth={0}
-            {tieKey}
           />
         {/snippet}
 
         {#snippet content({ metadata })}
-          <UserPopupMenu
-            pubkey={event.pubkey}
-            {metadata}
-            size={40}
-            depth={0}
-            {tieKey}
-          />
+          <UserPopupMenu pubkey={event.pubkey} {metadata} size={40} depth={0} />
         {/snippet}
       </Metadata>{/snippet}
     {#snippet menu()}
       <button class="text-magnum-400"
-        ><ChannelEllipsisMenu
-          note={event}
-          {channelData}
-          {tieKey}
-          heyaId={id}
-        /></button
+        ><ChannelEllipsisMenu note={event} {channelData} heyaId={id} /></button
       >{/snippet}
   </ListCardComponent>
 {/if}

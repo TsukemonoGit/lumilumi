@@ -13,10 +13,9 @@
   const size = 20;
   interface Props {
     pubkey: string;
-    tieKey: string | undefined;
   }
 
-  let { pubkey, tieKey }: Props = $props();
+  let { pubkey }: Props = $props();
 
   const getPicture = (content: string): string | undefined => {
     try {
@@ -68,13 +67,7 @@
   </div>
   {#snippet popoverContent()}
     <div>
-      <UserProfile
-        {pubkey}
-        bannerHeight={60}
-        iconSize={56}
-        depth={0}
-        {tieKey}
-      />
+      <UserProfile {pubkey} bannerHeight={60} iconSize={56} depth={0} />
     </div>
   {/snippet}
 </Popover>

@@ -20,7 +20,7 @@
     note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2)
   );
   let isSubmitting: boolean = $state(false); // 投票送信中かどうかのフラグ
-  const tieKey = undefined;
+
   const depth = 0;
   let userVoteEvent: Nostr.Event | undefined = $state();
   $inspect(optionTags);
@@ -171,7 +171,6 @@
                   displayTags={false}
                   displayMenu={false}
                   {depth}
-                  {tieKey}
                   repostable={false}
                   kind={note.kind}
                 />
@@ -195,7 +194,6 @@
                             metadata={undefined}
                             size={24}
                             {depth}
-                            {tieKey}
                           />
                         {/snippet}
 
@@ -205,7 +203,6 @@
                             metadata={undefined}
                             size={24}
                             {depth}
-                            {tieKey}
                           />
                         {/snippet}
 
@@ -215,7 +212,6 @@
                             metadata={undefined}
                             size={24}
                             {depth}
-                            {tieKey}
                           />
                         {/snippet}
 
@@ -225,7 +221,6 @@
                             {metadata}
                             size={24}
                             {depth}
-                            {tieKey}
                           />
                         {/snippet}
                       </Metadata>

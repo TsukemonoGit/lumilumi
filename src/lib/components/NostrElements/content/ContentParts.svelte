@@ -22,7 +22,7 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
@@ -36,7 +36,7 @@
     displayMenu,
     depth,
     repostable,
-    tieKey,
+
     isShowClientTag = true,
     maxHeight,
     zIndex,
@@ -119,7 +119,6 @@
         {displayMenu}
         depth={depth + 1}
         {repostable}
-        {tieKey}
         {zIndex}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}

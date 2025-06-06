@@ -6,7 +6,7 @@
     loginUser,
     nowProgress,
     queryClient,
-    tieMapStore,
+    tie,
   } from "$lib/stores/stores";
   import { useTimelineEventList } from "$lib/stores/useTimelineEventList";
   import type { ReqStatus } from "$lib/types";
@@ -18,12 +18,7 @@
     loadOlderEvents,
     waitForConnections,
   } from "./timelineList";
-  import {
-    createTie,
-    now,
-    type DefaultRelayConfig,
-    type EventPacket,
-  } from "rx-nostr";
+  import { now, type DefaultRelayConfig, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
   import { pipe, type OperatorFunction } from "rxjs";
@@ -50,7 +45,7 @@
     viewIndex?: number;
     amount: number;
     relays?: string[] | undefined;
-    tieKey: string;
+
     eventFilter?: (event: Nostr.Event) => boolean;
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
@@ -70,7 +65,7 @@
     viewIndex = 0,
     amount,
     relays = undefined,
-    tieKey,
+
     eventFilter = () => true,
     error,
     loading,
@@ -104,16 +99,6 @@
       refetchOnMount: false,
     });
   });
-
-  // Create tie and uniq for event handling
-  let tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >;
-  let tieMap: Map<string, Set<string>>;
 
   const keyFn = (packet: EventPacket): string => packet.event.id;
   const onCache = (packet: EventPacket): void => {
@@ -166,7 +151,6 @@
   };
 
   function configureOperators() {
-    registerTie(tieKey);
     return pipe(tie, uniq, scanArray());
   }
 
@@ -176,7 +160,7 @@
   /**
    * Registers the tie in the global store
    */
-  function registerTie(key: string) {
+  /* function registerTie(key: string) {
     //console.log($tieMapStore);
     if (!key) return;
 
@@ -190,7 +174,7 @@
     } else {
       [tie, tieMap] = $tieMapStore[key];
     }
-  }
+  } */
 
   // Effect to handle reactive state changes
   $effect(() => {

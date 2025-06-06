@@ -198,12 +198,7 @@
       class="w-full break-words overflow-hidden"
       id={componentKey.toString()}
     >
-      <UserProfile
-        pubkey={userPubkey}
-        depth={0}
-        tieKey={undefined}
-        tab={$value}
-      />
+      <UserProfile pubkey={userPubkey} depth={0} tab={$value} />
       <div
         id="userTabs"
         use:melt={$root}
@@ -258,14 +253,12 @@
                         displayMenu={true}
                         depth={1}
                         repostable={true}
-                        tieKey={userPubkey}
                       />{:else}
                       <NaddrEvent
                         data={parseNaddr([e, id])}
                         displayMenu={true}
                         depth={1}
                         repostable={true}
-                        tieKey={userPubkey}
                         content={id}
                       />
                     {/if}
@@ -294,7 +287,6 @@
                 ]}
                 {req}
                 {amount}
-                tieKey={userPubkey}
               >
                 {#snippet content({ events, len })}
                   <!-- <SetRepoReactions /> -->
@@ -307,25 +299,21 @@
                       >
                         {#snippet loading()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet nodata()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet error()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet content({ metadata })}
-                          <EventCard
-                            {metadata}
-                            note={event}
-                            tieKey={userPubkey}
-                          />
+                          <EventCard {metadata} note={event} />
                         {/snippet}
                       </Metadata>
                       <!-- </div> -->
@@ -370,7 +358,6 @@
                 ]}
                 {req}
                 {amount}
-                tieKey={userPubkey}
               >
                 {#snippet content({ events })}
                   <!-- <SetRepoReactions /> -->
@@ -383,25 +370,21 @@
                       >
                         {#snippet loading()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet nodata()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet error()}
                           <div>
-                            <EventCard note={event} tieKey={userPubkey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet content({ metadata })}
-                          <EventCard
-                            {metadata}
-                            note={event}
-                            tieKey={userPubkey}
-                          />
+                          <EventCard {metadata} note={event} />
                         {/snippet}
                       </Metadata>
                       <!-- </div> -->
@@ -445,7 +428,6 @@
               ]}
               {req}
               {amount}
-              tieKey={userPubkey}
             >
               {#snippet content({ events })}
                 {#if events && events.length > 0}
@@ -456,29 +438,17 @@
                     >
                       {#snippet loading()}
                         <div>
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind7}
-                            tieKey={userPubkey}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind7} />
                         </div>
                       {/snippet}
                       {#snippet nodata()}
                         <div>
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind7}
-                            tieKey={userPubkey}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind7} />
                         </div>
                       {/snippet}
                       {#snippet error()}
                         <div>
-                          <EventCard
-                            note={event}
-                            excludefunc={excludeKind7}
-                            tieKey={userPubkey}
-                          />
+                          <EventCard note={event} excludefunc={excludeKind7} />
                         </div>
                       {/snippet}
                       {#snippet content({ metadata })}
@@ -486,7 +456,6 @@
                           {metadata}
                           note={event}
                           excludefunc={excludeKind7}
-                          tieKey={userPubkey}
                         />
                       {/snippet}
                     </Metadata>
@@ -530,7 +499,6 @@
               {req}
               viewIndex={0}
               {amount}
-              tieKey={userPubkey}
             >
               {#snippet content({ events })}
                 <div
@@ -547,7 +515,6 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -556,7 +523,6 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -565,7 +531,6 @@
                             <EventCard
                               note={event}
                               excludefunc={excludeKind7}
-                              tieKey={userPubkey}
                             />
                           </div>
                         {/snippet}
@@ -574,7 +539,6 @@
                             {metadata}
                             note={event}
                             excludefunc={excludeKind7}
-                            tieKey={userPubkey}
                           />
                         {/snippet}
                       </Metadata>
@@ -665,9 +629,8 @@
                     list={contacts.tags
                       .filter((tag) => tag[0] === "p" && tag.length > 1)
                       .map((tag) => tag[1])}
-                    tieKey={userPubkey}
                     >{#snippet children({ id })}
-                      <Metadatanoyatu pubkey={id} tieKey={userPubkey} />
+                      <Metadatanoyatu pubkey={id} />
                     {/snippet}
                   </PaginationList>{/if}
               {/snippet}
@@ -701,7 +664,7 @@
               {/snippet}
               {#snippet children({ events })}
                 {#each events as event}
-                  <EventCard note={event} tieKey={undefined} {metadata} />
+                  <EventCard note={event} {metadata} />
                 {/each}
               {/snippet}
             </ListMain>

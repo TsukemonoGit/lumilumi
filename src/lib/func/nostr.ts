@@ -4,7 +4,7 @@ import {
   loginUser,
   metadataQueue,
   queryClient,
-  tieMapStore,
+  tieMap,
 } from "$lib/stores/stores";
 import type { ReqStatus, Profile, UsePromiseReqOpts } from "$lib/types";
 import { createQuery, type QueryKey } from "@tanstack/svelte-query";
@@ -521,17 +521,8 @@ async function waitForConnection(relayUrl: string, timeout = 5000) {
 export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
 }
-// let tieKey: string;
-// export function setTieKey(key: string) {
-//   tieKey = key;
-//   // console.log(tieKey);
-// }
 
-export function getRelaysById(id: string, key: string): string[] {
-  //console.log(tieMapStore);
-  const tieMap: Map<string, Set<string>> | undefined =
-    get(tieMapStore)?.[key]?.[1];
-
+export function getRelaysById(id: string): string[] {
   return Array.from(tieMap?.get(id) || []);
 }
 
@@ -569,20 +560,10 @@ export function usePromiseReq(
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]
     : [initData];
-  //console.log(accumulatedData);
-  // const tie =
-  //   tieKey !== "undefined" ? get(tieMapStore)?.[tieKey]?.[0] : undefined;
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req, { relays: relays })
     .pipe(metadata(), operator, completeOnTimeout(timeout));
-  // tie
-  //   ? _rxNostr
-  //       .use(_req, { relays: relays })
-  //       .pipe(tie, metadata(), operator, completeOnTimeout(timeout)) // muteCheck(),
-  //   : _rxNostr
-  //       .use(_req, { relays: relays })
-  //       .pipe(metadata(), operator, completeOnTimeout(timeout)); //muteCheck(),
 
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {

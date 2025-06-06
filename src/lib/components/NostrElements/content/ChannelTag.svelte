@@ -14,10 +14,9 @@
 
   interface Props {
     heyaId: string | undefined;
-    tieKey: string | undefined;
   }
 
-  let { heyaId, tieKey }: Props = $props();
+  let { heyaId }: Props = $props();
 
   const size = 18;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
@@ -34,7 +33,7 @@
     }
     const neventPointer: nip19.EventPointer = {
       id: heyaId,
-      relays: tieKey ? getRelaysById(heyaId, tieKey) : [],
+      relays: getRelaysById(heyaId),
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
@@ -97,5 +96,5 @@
     </Text>
   </DropdownMenu>
 
-  <EditChannelList bind:editChannelListOpen {heyaId} {tieKey} />
+  <EditChannelList bind:editChannelListOpen {heyaId} />
 {/if}

@@ -4,7 +4,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import type { QueryKey } from "@tanstack/svelte-query";
   import type * as Nostr from "nostr-typedef";
   import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
@@ -246,7 +246,6 @@
           {viewIndex}
           amount={DISPLAY_AMOUNT}
           eventFilter={getNotificationFilterPredicate}
-          tieKey={TIE_KEY}
           bind:updateViewNotifi
         >
           {#snippet children({ events })}
@@ -261,24 +260,24 @@
                   >
                     {#snippet loading()}
                       <div class="w-full">
-                        <EventCard note={event} tieKey={TIE_KEY} />
+                        <EventCard note={event} />
                       </div>
                     {/snippet}
 
                     {#snippet nodata()}
                       <div class="w-full">
-                        <EventCard note={event} tieKey={TIE_KEY} />
+                        <EventCard note={event} />
                       </div>
                     {/snippet}
 
                     {#snippet error()}
                       <div class="w-full">
-                        <EventCard note={event} tieKey={TIE_KEY} />
+                        <EventCard note={event} />
                       </div>
                     {/snippet}
 
                     {#snippet content({ metadata })}
-                      <EventCard {metadata} note={event} tieKey={TIE_KEY} />
+                      <EventCard {metadata} note={event} />
                     {/snippet}
                   </Metadata>
                 {/each}

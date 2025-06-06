@@ -16,7 +16,7 @@
     depth: number;
     displayMenu: boolean;
     repostable: boolean;
-    tieKey: string | undefined;
+
     mini?: boolean;
     thread?: boolean;
     relayhint: string[];
@@ -31,7 +31,7 @@
     depth,
     displayMenu,
     repostable,
-    tieKey,
+
     mini = false,
     thread = false,
     relayhint,
@@ -101,7 +101,6 @@
               note={event}
               {displayMenu}
               {repostable}
-              {tieKey}
               {depth}
               mini={isOmitted || mini}
               showStatus={!isOmitted}
@@ -116,7 +115,6 @@
               note={event}
               {displayMenu}
               {repostable}
-              {tieKey}
               {depth}
               mini={isOmitted || mini}
               showStatus={!isOmitted}
@@ -131,7 +129,6 @@
               note={event}
               {displayMenu}
               {repostable}
-              {tieKey}
               {depth}
               mini={isOmitted || mini}
               showStatus={!isOmitted}
@@ -146,7 +143,6 @@
             {displayMenu}
             note={event}
             {repostable}
-            {tieKey}
             {depth}
             mini={isOmitted || mini}
             showStatus={!isOmitted}

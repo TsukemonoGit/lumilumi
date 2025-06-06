@@ -8,22 +8,16 @@
 
   interface Props {
     note: Nostr.Event;
-
-    tieKey: string | undefined;
   }
 
-  let {
-    note,
-
-    tieKey,
-  }: Props = $props();
+  let { note }: Props = $props();
   const handleClickToChannel = (id: string) => {
     if (!id) {
       return;
     }
     const neventPointer: nip19.EventPointer = {
       id: id,
-      relays: tieKey ? getRelaysById(id, tieKey) : [],
+      relays: getRelaysById(id),
     };
     goto(`/channel/${nip19.neventEncode(neventPointer)}`);
   };
@@ -41,7 +35,6 @@
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
         event={note}
-        {tieKey}
       />
     </div>
   {/snippet}
@@ -53,7 +46,6 @@
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
         event={note}
-        {tieKey}
       />
     </div>
   {/snippet}
@@ -65,7 +57,6 @@
         handleClickToChannel={() => handleClickToChannel(note.id)}
         id={note.id}
         event={note}
-        {tieKey}
       />
     </div>
   {/snippet}
@@ -76,7 +67,6 @@
       handleClickToChannel={() => handleClickToChannel(note.id)}
       id={note.id}
       {event}
-      {tieKey}
     />
   {/snippet}
 </LatestEvent>

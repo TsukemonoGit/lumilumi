@@ -9,10 +9,9 @@
 
   import { nip19 } from "nostr-tools";
   //import * as Nostr from "nostr-typedef";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import CreateChannel from "./CreateChannel.svelte";
 
-  const tieKey = undefined;
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
   };
@@ -26,7 +25,7 @@
       style="word-break: break-word;">{$_("setting.pubkey")}</a
     >
   {:else}
-    <CreateChannel {tieKey} />
+    <CreateChannel />
     <ChannelMain queryKey={["kind10005", $loginUser]} pubkey={$loginUser}>
       {#snippet children({ event })}
         {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
@@ -37,7 +36,6 @@
               handleClickToChannel={() => handleClickToChannel(id)}
               {id}
               linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-              {tieKey}
             />
           </div>
         {/each}

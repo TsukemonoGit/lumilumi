@@ -7,10 +7,9 @@
 
   interface Props {
     pubkey: string;
-    tieKey: string;
   }
 
-  let { pubkey, tieKey }: Props = $props();
+  let { pubkey }: Props = $props();
   let encodedPub: string | undefined = $derived.by(() => {
     if (!pubkey) return undefined;
     try {
@@ -39,7 +38,6 @@
         displayMenu={true}
         depth={0}
         repostable={true}
-        {tieKey}
       />
     {/snippet}
   </Metadata>

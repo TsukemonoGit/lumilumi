@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import BulletList from "./Simple/BulletList.svelte";
   import CodeBlock from "./Simple/CodeBlock.svelte";
@@ -28,7 +28,7 @@
     tags: any;
     openModal: any;
     nolist: boolean;
-    tieKey: string | undefined;
+
     zIndex?: number | undefined;
   }
 
@@ -40,7 +40,7 @@
     tags,
     openModal,
     nolist,
-    tieKey,
+
     zIndex,
   }: Props = $props();
 
@@ -57,7 +57,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "hr"}
@@ -71,7 +70,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
   <!---->
@@ -90,7 +88,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
   />
 {:else if part.type === "blockquote"}
   <blockquote>
@@ -102,7 +99,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     />
   </blockquote>
@@ -115,7 +111,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "bullet_list"}
@@ -127,7 +122,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "list_item"}
@@ -139,7 +133,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "inline"}
@@ -152,7 +145,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     /></span
   >
@@ -165,7 +157,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "image"}
@@ -180,7 +171,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     /></strong
   >
@@ -194,7 +184,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     /></s
   >
@@ -205,7 +194,6 @@
     {depth}
     {displayMenu}
     {tags}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "em"}
@@ -218,7 +206,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     /></em
   >
@@ -235,7 +222,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "footnote"}
@@ -260,7 +246,6 @@
       {tags}
       {openModal}
       {nolist}
-      {tieKey}
       {zIndex}
     /></mark
   >
@@ -275,7 +260,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else if part.type === "checkbox_input"}
@@ -289,7 +273,6 @@
     {tags}
     {openModal}
     {nolist}
-    {tieKey}
     {zIndex}
   />
 {:else}<b>{part.type}</b>
@@ -299,7 +282,6 @@
     {depth}
     {displayMenu}
     {tags}
-    {tieKey}
     {zIndex}
   />
 {/if}

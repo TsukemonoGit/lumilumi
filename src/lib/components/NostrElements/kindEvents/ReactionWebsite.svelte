@@ -18,11 +18,10 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-    tieKey: string | undefined;
+
     repostable: boolean;
   }
-  let { note, metadata, displayMenu, tieKey, depth, repostable }: Props =
-    $props();
+  let { note, metadata, displayMenu, depth, repostable }: Props = $props();
   let deleted = $state(false);
   let website = $derived(reactionWebsite(note));
   function reactionWebsite(note: Nostr.Event): string | undefined {
@@ -51,7 +50,6 @@
         size={20}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet name()}
@@ -60,7 +58,7 @@
 
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </RepostComponent>
   <!--リアクションしたノートの情報（リポストのを使いまわし）-->

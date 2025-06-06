@@ -176,7 +176,6 @@
             size={64}
             {metadata}
             displayMenu={false}
-            tieKey={undefined}
             depth={0}
           />
           <div class="username">

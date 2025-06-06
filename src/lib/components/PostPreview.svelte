@@ -57,7 +57,7 @@
   const displayMenu = false;
   const mini = false;
   const depth = 0;
-  const tieKey = undefined;
+
   const repostable = false;
   const zIndex = 50;
   const maxHeight = undefined;
@@ -207,7 +207,6 @@
               size={40}
               displayMenu={false}
               depth={0}
-              tieKey={undefined}
             />{/if}
         {/snippet}
 
@@ -219,7 +218,6 @@
         {#snippet status()}
           {#if lumiSetting.get().showUserStatus}<ShowStatus
               pubkey={signPubkey}
-              tieKey={undefined}
             />{/if}
         {/snippet}
         {#snippet replyUser()}
@@ -237,7 +235,6 @@
               {displayMenu}
               depth={depth + 1}
               {repostable}
-              {tieKey}
               {zIndex}
             />
           {/if}
@@ -256,7 +253,6 @@
                     {displayMenu}
                     depth={depth + 1}
                     {repostable}
-                    {tieKey}
                     {zIndex}
                   />{:else}<span class="break-all">{part.content}</span>{/if}
               {:else if part.type === "url"}
@@ -296,7 +292,7 @@
             {@const heyaId = tags.find(
               (tag) => tag[0] === "e" && tag[3] === "root"
             )?.[1]}
-            <ChannelTag {heyaId} {tieKey} />{/if}
+            <ChannelTag {heyaId} />{/if}
         {/snippet}
       </NoteComponent>
     </div>
@@ -313,7 +309,6 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         {zIndex}
       />
     </div>

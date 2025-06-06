@@ -5,14 +5,13 @@
   import RepostList from "./RepostList.svelte";
   interface Props {
     events: Nostr.Event[];
-    tieKey: string | undefined;
   }
 
-  let { events, tieKey }: Props = $props();
+  let { events }: Props = $props();
 </script>
 
 <CollapsibleList title="Repost" amount={events.length}>
   <div class="mx-2">
-    <RepostList {events} {tieKey} />
+    <RepostList {events} />
   </div>
 </CollapsibleList>

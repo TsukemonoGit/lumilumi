@@ -27,14 +27,12 @@
     heyaId: string;
     note: Nostr.Event; //kind40か41
     channelData: ChannelData;
-    tieKey: string | undefined;
   }
   let {
     editChannelListOpen = $bindable(),
     heyaId,
     note,
     channelData,
-    tieKey,
   }: Props = $props();
 
   // フォームの状態を管理
@@ -118,7 +116,7 @@
         about: channelAbout.trim(),
         picture: channelPicture.trim(),
       };
-      const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
+      const relayhints = getRelaysById(note.id);
       // tags の作成
       const tags: string[][] = [
         [

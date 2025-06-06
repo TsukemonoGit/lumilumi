@@ -12,6 +12,7 @@ import { pipe } from "rxjs";
 import { scanArray } from "./operators.js";
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq.js";
+import { tie } from "./stores.js";
 
 export function useReplaceableEventList(
   queryKey: QueryKey,
@@ -29,6 +30,7 @@ export function useReplaceableEventList(
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey] }];
   const operator = pipe(
+    tie,
     //これできてないっぽいからListMainのほうでlatestListしてる
     /*  
       latestEach((eventpacket) => {

@@ -26,10 +26,9 @@
       title: string | undefined;
       description: string | undefined;
     };
-    tieKey: string | undefined;
   }
 
-  let { note, indexes = undefined, listData, tieKey }: Props = $props();
+  let { note, indexes = undefined, listData }: Props = $props();
 
   // svelte-ignore non_reactive_update
   //let dialogOpen: Writable<boolean> = writable(false);
@@ -68,7 +67,7 @@
         $modalState = {
           isOpen: true,
           component: ModalJson,
-          props: { note: note, tieKey: tieKey },
+          props: { note: note },
         };
         break;
 
@@ -134,7 +133,7 @@
         kind: note.kind,
         identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
         pubkey: note.pubkey,
-        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        relays: getRelaysById(note.id),
       };
       return nip19.naddrEncode(naddrpointer);
     } catch (error) {
@@ -148,4 +147,4 @@
 </DropdownMenu>
 
 <!--JSON no Dialog
-<ModalJson bind:dialogOpen {note} {tieKey} />-->
+<ModalJson bind:dialogOpen {note}  />-->

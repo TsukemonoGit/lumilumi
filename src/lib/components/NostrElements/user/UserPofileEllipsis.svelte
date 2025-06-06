@@ -10,11 +10,11 @@
     pubkey: string;
     metadata?: Nostr.Event;
     prof?: Profile;
-    tieKey: string | undefined;
+
     tab?: string | undefined;
   }
 
-  let { pubkey, metadata, prof, tieKey, tab }: Props = $props();
+  let { pubkey, metadata, prof, tab }: Props = $props();
 </script>
 
 <Popover ariaLabel="user menu" showCloseButton={false}>
@@ -28,7 +28,7 @@
     <div
       class="menu flex flex-col flex-wrap divide-y divide-zinc-500 bg-neutral-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
     >
-      <UserMenu {pubkey} {metadata} profile={prof} {tieKey} {tab} />
+      <UserMenu {pubkey} {metadata} profile={prof} {tab} />
     </div>
   {/snippet}
 </Popover>

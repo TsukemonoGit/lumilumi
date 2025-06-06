@@ -3,7 +3,7 @@
   import Popover from "../../Elements/Popover.svelte";
   import UserProfile from "./UserProfile.svelte";
   import UserName from "./UserName.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";
 
@@ -11,11 +11,11 @@
 
   interface Props {
     pubkey: string;
-    tieKey: string | undefined;
+
     zIndex?: number;
   }
 
-  let { pubkey, tieKey, zIndex }: Props = $props();
+  let { pubkey, zIndex }: Props = $props();
 </script>
 
 <Popover ariaLabel="user profile"
@@ -28,7 +28,6 @@
         bannerHeight={60}
         iconSize={56}
         depth={0}
-        {tieKey}
         zIndex={zIndex || 0 + 10}
       />
       <!--ユーザーポップアップのとこのUserMenu消してみる-->
@@ -39,37 +38,22 @@
         <Metadata queryKey={["metadata", pubkey]} {pubkey}>
           {#snippet loading()}
             <div>
-              <UserMenu
-                {pubkey}
-                metadata={undefined}
-                profile={undefined}
-                {tieKey}
-              />
+              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
             </div>
           {/snippet}
           {#snippet nodata()}
             <div>
-              <UserMenu
-                {pubkey}
-                metadata={undefined}
-                profile={undefined}
-                {tieKey}
-              />
+              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
             </div>
           {/snippet}
           {#snippet error()}
             <div>
-              <UserMenu
-                {pubkey}
-                metadata={undefined}
-                profile={undefined}
-                {tieKey}
-              />
+              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
             </div>
           {/snippet}
           {#snippet content({ metadata })}
             {@const profile = getProfile(metadata)}
-            <UserMenu {pubkey} {metadata} {profile} {tieKey} />
+            <UserMenu {pubkey} {metadata} {profile} />
           {/snippet}
         </Metadata>
       </div>

@@ -27,7 +27,7 @@
   console.log(filters);
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "naddr";
+
   let loading = $state(true);
 
   let isOnMount = false;
@@ -121,13 +121,13 @@
       {/snippet}
       {#snippet children({ event })}
         <div class="w-full flex justify-between">
-          <ListLinkCard {event} depth={0} {tieKey} />
+          <ListLinkCard {event} depth={0} />
         </div>
 
         {#await pubkeyList(event)}
           waiting decrypt list
         {:then pubkeys}
-          <ListUsersCard {pubkeys} {tieKey} />
+          <ListUsersCard {pubkeys} />
 
           {#if since}
             <TimelineList
@@ -149,7 +149,6 @@
               req={createRxForwardReq()}
               {viewIndex}
               {amount}
-              {tieKey}
             >
               {#snippet content({ events, len })}
                 <!-- <SetRepoReactions /> -->
@@ -170,21 +169,21 @@
                       >
                         {#snippet loading()}
                           <div class="w-full">
-                            <EventCard note={event} {tieKey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet nodata()}
                           <div class="w-full">
-                            <EventCard note={event} {tieKey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet error()}
                           <div class="w-full">
-                            <EventCard note={event} {tieKey} />
+                            <EventCard note={event} />
                           </div>
                         {/snippet}
                         {#snippet content({ metadata })}
-                          <EventCard {metadata} note={event} {tieKey} />
+                          <EventCard {metadata} note={event} />
                         {/snippet}
                       </Metadata>
                       <!-- </div> -->

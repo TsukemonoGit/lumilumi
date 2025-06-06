@@ -61,7 +61,7 @@
     viewMuteEvent?: boolean;
     excludefunc?: (event: Nostr.Event) => boolean;
     repostable?: boolean;
-    tieKey: string | undefined;
+
     zIndex?: number | undefined;
     showStatus?: boolean;
   }
@@ -78,7 +78,7 @@
     viewMuteEvent = $bindable(false),
     excludefunc = (event: Nostr.Event) => false,
     repostable = true,
-    tieKey,
+
     zIndex,
     showStatus = true,
   }: Props = $props();
@@ -240,7 +240,7 @@
           Show more
         </button>
       {:else}
-        <ReplyThread {replyTag} {displayMenu} {depth} {repostable} {tieKey} />
+        <ReplyThread {replyTag} {displayMenu} {depth} {repostable} />
       {/if}
     {/if}
 
@@ -256,7 +256,6 @@
           {mini}
           {displayMenu}
           {depth}
-          {tieKey}
           bind:deleted
           {replyTag}
           {thread}
@@ -269,7 +268,6 @@
           {zIndex}
           {metadata}
           {mini}
-          {tieKey}
           {note}
           {displayMenu}
           {depth}
@@ -297,7 +295,6 @@
               size={20}
               {displayMenu}
               {depth}
-              {tieKey}
             />
           {/snippet}
           {#snippet name()}
@@ -306,12 +303,7 @@
 
           {#snippet actionButtons()}
             {#if displayMenu}
-              <NoteActionButtons
-                {note}
-                {repostable}
-                {tieKey}
-                bind:deleted
-              />{/if}
+              <NoteActionButtons {note} {repostable} bind:deleted />{/if}
           {/snippet}
         </RepostComponent>
 
@@ -324,7 +316,6 @@
             {repostable}
             {displayMenu}
             {maxHeight}
-            {tieKey}
             {zIndex}
             {mini}
           />
@@ -345,7 +336,6 @@
               size={20}
               {displayMenu}
               {depth}
-              {tieKey}
             />
           {/snippet}
           {#snippet name()}
@@ -354,12 +344,7 @@
 
           {#snippet actionButtons()}
             {#if displayMenu}
-              <NoteActionButtons
-                {note}
-                {repostable}
-                {tieKey}
-                bind:deleted
-              />{/if}
+              <NoteActionButtons {note} {repostable} bind:deleted />{/if}
           {/snippet}
         </RepostComponent>
 
@@ -373,7 +358,6 @@
             {repostable}
             {displayMenu}
             {maxHeight}
-            {tieKey}
             {zIndex}
             {mini}
           />
@@ -381,21 +365,13 @@
         {/if}
       {:else if note.kind === 17}
         <!--https://github.com/nostr-protocol/nips/pull/1381 reactions to a website-->
-        <ReactionWebsite
-          {note}
-          {metadata}
-          {displayMenu}
-          {depth}
-          {tieKey}
-          {repostable}
-        />
+        <ReactionWebsite {note} {metadata} {displayMenu} {depth} {repostable} />
       {:else if note.kind === 0}
         <!--kind0-->
-        <Kind0Note {note} {displayMenu} {depth} {repostable} {tieKey} />
+        <Kind0Note {note} {displayMenu} {depth} {repostable} />
       {:else if note.kind === 20}
         <Kind20Note
           {zIndex}
-          {tieKey}
           {replyUsers}
           {mini}
           {note}
@@ -409,11 +385,10 @@
         />
       {:else if note.kind === 40}
         <!--kind40 パブ茶部屋-->
-        <Kind40Note {tieKey} {note} />
+        <Kind40Note {note} />
       {:else if note.kind === 41}
         <!--kind:40チャンネルroot-->
         <Kind41Note
-          {tieKey}
           {note}
           {metadata}
           {displayMenu}
@@ -427,7 +402,6 @@
       {:else if note.kind === 1018}
         <Kind1018Note
           {zIndex}
-          {tieKey}
           {replyUsers}
           {mini}
           {note}
@@ -442,7 +416,6 @@
       {:else if note.kind === 1068}
         <!--poll-->
         <Kind1068Note
-          {tieKey}
           {note}
           {metadata}
           {displayMenu}
@@ -455,7 +428,7 @@
           {showStatus}
         />
       {:else if note.kind === 30000}
-        <ListLinkCard event={note} {depth} {tieKey} />
+        <ListLinkCard event={note} {depth} />
       {:else if note.kind === 30030}
         <!--kind30030-->
         <Kind30030Note
@@ -463,7 +436,6 @@
           {mini}
           {repostable}
           {maxHeight}
-          {tieKey}
           {displayMenu}
           {metadata}
           {depth}
@@ -478,7 +450,6 @@
           {repostable}
           {maxHeight}
           {displayMenu}
-          {tieKey}
           {mini}
           {zIndex}
         />
@@ -486,7 +457,6 @@
         <!--kind9735 zap receipt-->
         <Kind9802Note
           {replyUsers}
-          {tieKey}
           {note}
           {metadata}
           {displayMenu}
@@ -502,7 +472,6 @@
         <!--旧仕様のDMだよ-->
         <Kind4Note
           bind:deleted
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -521,7 +490,6 @@
         {@const data = get31990Ogp(note)}
         {#if !data}
           <OtherKindNote
-            {tieKey}
             {mini}
             {note}
             {metadata}
@@ -540,7 +508,6 @@
             {displayMenu}
             {depth}
             {repostable}
-            {tieKey}
             {showStatus}
           />
         {/if}
@@ -550,7 +517,6 @@
       {:else if note.kind === 30315}
         <!---->
         <Kind30315Note
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -563,7 +529,6 @@
         />
       {:else if note.kind === 30023 || note.kind === 30024}
         <Kind30023Note
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -578,7 +543,6 @@
         <!--badge award-->
         <Kind8Note
           bind:deleted
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -594,7 +558,6 @@
         <!--badge-->
         <Kind30009Note
           bind:deleted
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -610,7 +573,6 @@
         <!--web bookmark-->
         <Kind39701Note
           bind:deleted
-          {tieKey}
           {mini}
           {note}
           {metadata}
@@ -631,7 +593,6 @@
           {depth}
           {repostable}
           {maxHeight}
-          {tieKey}
           {zIndex}
           {showStatus}
         />{/if}

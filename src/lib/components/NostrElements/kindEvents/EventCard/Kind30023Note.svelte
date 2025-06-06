@@ -23,7 +23,7 @@
     depth: number;
     maxHeight: number | undefined;
     repostable: boolean;
-    tieKey: string | undefined;
+
     zIndex: number | undefined;
     mini: boolean;
     showStatus?: boolean;
@@ -36,7 +36,7 @@
     depth,
     maxHeight,
     repostable,
-    tieKey,
+
     zIndex,
     mini,
     showStatus = true,
@@ -79,12 +79,11 @@
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet seenOn()}
       {#if lumiSetting.get().showRelayIcon && displayMenu}
-        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
@@ -95,12 +94,11 @@
       />
     {/snippet}
     {#snippet time()}
-      <DisplayTime {displayMenu} {note} {tieKey} />
+      <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
-          {tieKey}
         />{/if}
     {/snippet}
 
@@ -137,13 +135,12 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         {zIndex}
       /><ClientTag tags={note.tags} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

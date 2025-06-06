@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
-  import { queryClient, tieMapStore } from "$lib/stores/stores";
+  import { queryClient, tie } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { now, type EventPacket } from "rx-nostr/src";
@@ -16,14 +16,14 @@
   let viewIndex = 0;
   interface Props {
     timelineQuery: QueryKey;
-    tieKey?: string;
+
     globalRelays: any;
     eventFilter?: (event: Nostr.Event) => boolean;
   }
   const req = createRxForwardReq("global");
   let {
     timelineQuery,
-    tieKey = "global",
+
     globalRelays,
     eventFilter = () => true,
   }: Props = $props();
@@ -71,12 +71,7 @@
       queryKey: [...timelineQuery, "olderData"],
     });
     console.log("GlobalTimelineDestroy");
-    // Clear tie map data
-    const globalTie = $tieMapStore[tieKey];
-    if (globalTie) {
-      const [, seenOn] = globalTie;
-      seenOn.clear();
-    }
+
     resetUniq?.();
   });
 </script>
@@ -102,7 +97,6 @@
     {req}
     {viewIndex}
     {amount}
-    {tieKey}
     relays={globalRelays}
     {eventFilter}
   >
@@ -119,21 +113,21 @@
             >
               {#snippet loading()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet nodata()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet error()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} {tieKey} />
+                <EventCard {metadata} note={event} />
               {/snippet}
             </Metadata>
             <!-- </div> -->

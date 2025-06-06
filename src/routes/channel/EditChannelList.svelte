@@ -26,9 +26,8 @@
   interface Props {
     editChannelListOpen: Writable<boolean>;
     heyaId: string;
-    tieKey: string | undefined;
   }
-  let { editChannelListOpen = $bindable(), heyaId, tieKey }: Props = $props();
+  let { editChannelListOpen = $bindable(), heyaId }: Props = $props();
   let querykey: QueryKey = $derived(["kind10005", $loginUser]);
   let kind10005: Nostr.Event | undefined = $state();
 
@@ -212,7 +211,6 @@
               <!-- 追加または削除しようとしている部屋ID -->
               <ChannelMetadata
                 id={heyaId}
-                {tieKey}
                 clickAction={false}
                 linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
               />
@@ -229,7 +227,6 @@
               <!-- 追加または削除しようとしている部屋ID -->
               <ChannelMetadata
                 id={heyaId}
-                {tieKey}
                 clickAction={false}
                 linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
               />
@@ -260,7 +257,6 @@
                   clickAction={false}
                   {id}
                   linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-                  {tieKey}
                 />
               {/each}{/if}
           </div>

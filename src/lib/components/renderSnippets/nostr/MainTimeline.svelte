@@ -3,7 +3,7 @@
   import { onDestroy, onMount, untrack } from "svelte";
   import { get } from "svelte/store";
   import { pipe, type OperatorFunction } from "rxjs";
-  import { createTie, now, type EventPacket } from "rx-nostr";
+  import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
@@ -15,7 +15,7 @@
     loginUser,
     nowProgress,
     queryClient,
-    tieMapStore,
+    tie,
   } from "$lib/stores/stores";
   import {
     displayEvents,
@@ -53,7 +53,7 @@
     viewIndex: number;
     amount: number;
     relays?: string[] | undefined;
-    tieKey: string;
+
     eventFilter: (event: Nostr.Event) => boolean;
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
@@ -71,7 +71,7 @@
     viewIndex,
     amount,
     relays = undefined,
-    tieKey,
+
     eventFilter = () => true,
     error,
     loading,
@@ -86,15 +86,6 @@
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
   let isOnMount: boolean = false;
-
-  let tie: OperatorFunction<
-    EventPacket,
-    EventPacket & {
-      seenOn: Set<string>;
-      isNew: boolean;
-    }
-  >;
-  let tieMap: Map<string, Set<string>>;
 
   // Event handlers for the uniq operator
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -127,7 +118,6 @@
    * Configures the rx-nostr operators pipeline based on settings
    */
   function configureOperators() {
-    registerTie(tieKey);
     let operator = pipe(tie, uniq);
 
     // Add user status operator for main timeline if enabled
@@ -147,7 +137,7 @@
   /**
    * Registers the tie in the global store
    */
-  function registerTie(key: string) {
+  /*   function registerTie(key: string) {
     //すでにあったらそれをつかう
     // なかったら作る
 
@@ -165,7 +155,7 @@
       [tie, tieMap] = $tieMapStore[key];
     }
   }
-
+ */
   /**
    * 常に最新のイベントでビューを更新する関数
    * updating状態でも必ず最新データが反映されるようにする

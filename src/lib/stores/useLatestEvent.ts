@@ -11,6 +11,7 @@ import type {
 } from "rx-nostr";
 import { latest } from "rx-nostr";
 import { pipe } from "rxjs";
+import { tie } from "./stores";
 
 export function useLatestEvent(
   queryKey: QueryKey,
@@ -25,7 +26,7 @@ export function useLatestEvent(
     | undefined,
   relays?: string[] | undefined
 ): ReqResult<EventPacket> {
-  const operator = pipe(latest());
+  const operator = pipe(tie, latest());
   return useReq(
     { queryKey, filters, operator, req },
     relays

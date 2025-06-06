@@ -44,11 +44,7 @@
     <RelayCard url={relayUrl} write={false} read={false} />
   </div>
 
-  <GlobalTimeline
-    tieKey={relayUrl}
-    globalRelays={[relayUrl]}
-    timelineQuery={[relayUrl]}
-  />
+  <GlobalTimeline globalRelays={[relayUrl]} timelineQuery={[relayUrl]} />
 
   <div class="postWindow">
     <OpenPostWindow

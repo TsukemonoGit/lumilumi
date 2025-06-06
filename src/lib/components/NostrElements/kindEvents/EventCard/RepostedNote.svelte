@@ -13,7 +13,7 @@
     tag: string[];
     zIndex?: number;
     depth: number;
-    tieKey: string | undefined;
+
     mini: boolean;
   }
 
@@ -23,7 +23,7 @@
     maxHeight,
     tag,
     depth,
-    tieKey,
+
     zIndex,
     mini,
   }: Props = $props();
@@ -36,7 +36,6 @@
     {displayMenu}
     {depth}
     {repostable}
-    {tieKey}
     {maxHeight}
     {zIndex}
     omit={page.route.id === "/notifications" && depth === 1}
@@ -46,7 +45,6 @@
     data={parseNaddr(tag)}
     {displayMenu}
     {depth}
-    {tieKey}
     {repostable}
     content={tag[1]}
     {zIndex}

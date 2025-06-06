@@ -13,7 +13,7 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     isShowClientTag?: boolean;
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
@@ -27,7 +27,7 @@
     displayMenu,
     depth,
     repostable,
-    tieKey,
+
     isShowClientTag,
     maxHeight,
     zIndex = 0,
@@ -65,7 +65,6 @@
       {displayMenu}
       {depth}
       {repostable}
-      {tieKey}
       {zIndex}
       {displayTags}
       {kind}
@@ -80,7 +79,6 @@
     {displayMenu}
     {depth}
     {repostable}
-    {tieKey}
     {zIndex}
     {displayTags}
     {kind}
@@ -106,7 +104,6 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         {zIndex}
         {displayTags}
         {kind}

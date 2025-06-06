@@ -32,14 +32,13 @@
   import ModalJson from "$lib/components/ModalJson.svelte";
 
   interface Props {
-    tieKey: string | undefined;
     metadata: Nostr.Event | undefined;
     pubkey: string;
     profile: Profile | undefined;
     tab?: string | undefined;
   }
 
-  let { tieKey, metadata, pubkey, profile, tab }: Props = $props();
+  let { metadata, pubkey, profile, tab }: Props = $props();
 
   // svelte-ignore non_reactive_update
   //let dialogOpen: Writable<boolean> = writable(false);
@@ -128,7 +127,7 @@
           component: ModalJson,
           props: {
             note: metadata,
-            tieKey: tieKey,
+
             profile: profile,
           },
         };
@@ -239,7 +238,7 @@
     bind:dialogOpen
     note={metadata}
     {profile}
-    {tieKey}
+    
     zIndex={50}
   />{/if}
  -->
