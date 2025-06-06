@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { formatUrl, getRelayInfo } from "$lib/func/util";
-  import { relayIconErrorStore } from "$lib/stores/stores";
   import { Triangle } from "lucide-svelte";
-  import Avatar from "svelte-boring-avatars";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import RelayCard from "$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
+
   import { getRelaysById } from "$lib/func/nostr";
 
-  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import UserAvatar from "../user/UserAvatar.svelte";
+  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+
+  import SeenonIcon from "./SeenonIcon.svelte";
 
   interface Props {
     id: string;
@@ -24,12 +21,6 @@
       return getRelaysById(id);
     } else return [];
   });
-
-  const handleStateError = (url: string) => {
-    if (!$relayIconErrorStore.includes(url)) {
-      $relayIconErrorStore.push(url);
-    }
-  };
 </script>
 
 {#if relays.length > 0}
@@ -38,41 +29,7 @@
     style="width:{width}px "
   >
     {#each viewAll ? relays : relays.slice(0, 2) as url}
-      <Popover ariaLabel="relay Info">
-        <div title={url}>
-          {#await getRelayInfo(url)}
-            <Avatar {size} name={url} variant="beam" />
-          {:then relayInfo}
-            {#if !relayInfo}
-              <Avatar {size} name={url} variant="beam" />
-            {:else if lumiSetting.get().showImg && relayInfo.icon}
-              <UserAvatar
-                url={relayInfo.icon}
-                name={url ?? ""}
-                pubkey={undefined}
-                title={url}
-                {size}
-              />
-            {:else if lumiSetting.get().showImg && !$relayIconErrorStore.includes(url)}
-              <UserAvatar
-                url={formatUrl(url) + "favicon.ico"}
-                name={url ?? ""}
-                pubkey={undefined}
-                {size}
-                handleStateError={() => handleStateError(url)}
-                title={url}
-              />
-            {:else}
-              <Avatar {size} name={url} variant="beam" />
-            {/if}
-          {/await}
-        </div>
-        {#snippet popoverContent()}
-          <div class="max-w-[90%]">
-            <RelayCard {url} write={false} read={false} />
-          </div>
-        {/snippet}
-      </Popover>
+      <SeenonIcon {url} {size} zIndex={20} />
     {/each}
     {#if !viewAll && relays.length > 2}
       <button

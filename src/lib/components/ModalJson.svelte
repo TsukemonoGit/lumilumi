@@ -5,6 +5,8 @@
   import type { Profile } from "$lib/types";
   import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
+  import SeenonIcon from "./NostrElements/kindEvents/SeenonIcon.svelte";
+
   interface Props {
     dialogOpen: any;
     note: Nostr.Event;
@@ -99,6 +101,9 @@
   </div>
 {/if}
 <h2 class="m-0 text-lg font-medium">Seen on</h2>
-<div class="break-words whitespace-pre-wrap">
-  {getRelaysById(note.id).join(", ")}
+<div class="break-words whitespace-pre-wrap gap-2 flex flex-wrap">
+  {#each getRelaysById(note.id) as relay}
+    <!-- <div> --><SeenonIcon url={relay} size={24} zIndex={110} />
+    <!-- {relay}</div> -->
+  {/each}
 </div>

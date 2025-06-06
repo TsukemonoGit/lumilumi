@@ -16,7 +16,7 @@
   } from "lucide-svelte";
 
   import Avatar from "svelte-boring-avatars";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import UserAvatar from "../../user/UserAvatar.svelte";
   import { untrack } from "svelte";
   import { type Nip11 } from "nostr-typedef";
@@ -26,9 +26,10 @@
     url: string;
     write: boolean;
     read: boolean;
+    zIndex: number;
   }
 
-  let { url, write, read }: Props = $props();
+  let { url, write, read, zIndex }: Props = $props();
 
   let imageLoaded = true;
 
@@ -210,7 +211,7 @@
           </div>
         {/if}
         <div class="ml-auto">
-          <DropdownMenu {menuTexts} {handleSelectItem}>
+          <DropdownMenu {menuTexts} {zIndex} {handleSelectItem}>
             <div
               class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
             >
@@ -258,17 +259,4 @@
       {/if}
     </div>
   </div>
-
-  <!--  <Dialog bind:open={dialogOpen} id={`Relay_${url}`}>
-      {#snippet main()}
-        <div>
-          <h2 class="m-0 text-lg font-medium">Relay Information</h2>
-          <div
-            class="break-all whitespace-pre-wrap break-words overflow-auto border rounded-md border-magnum-500/50 p-2 max-h-[30vh]"
-          >
-            {JSON.stringify(relayInfo, null, 2)}
-          </div>
-        </div>
-      {/snippet}</Dialog
-    > -->
 {/if}
