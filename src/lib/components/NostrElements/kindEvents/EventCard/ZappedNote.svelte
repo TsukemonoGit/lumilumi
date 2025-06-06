@@ -109,28 +109,28 @@
               {depth}
             />
           </div>
-          <div class="inline-block break-all break-words whitespace-pre-line">
-            {#if metadata}
-              {@const prof = profile(metadata)}
-              {#if prof}
-                <DisplayName
-                  height={21}
-                  name={prof.display_name ?? ""}
-                  tags={metadata.tags}
-                />{#if prof && prof.name && prof.name !== ""}<span
-                    class="text-magnum-100 text-sm"
-                    ><DisplayName
-                      height={21}
-                      name={`@${prof.name}`}
-                      tags={metadata.tags}
-                    />
-                  </span>{/if}{/if}
-            {:else}
-              <span class="text-magnum-100 text-sm"
-                >@{encodetoNpub(zapRequestEvent.pubkey)}</span
-              >
-            {/if}
-          </div>
+
+          {#if metadata}
+            {@const prof = profile(metadata)}
+            {#if prof}
+              <DisplayName
+                height={21}
+                name={prof.display_name ?? ""}
+                tags={metadata.tags}
+              />{#if prof && prof.name && prof.name !== ""}<span
+                  class="text-magnum-100 text-sm"
+                  ><DisplayName
+                    height={21}
+                    name={`@${prof.name}`}
+                    tags={metadata.tags}
+                  />
+                </span>{/if}{/if}
+          {:else}
+            <span class="text-magnum-100 text-sm"
+              >@{encodetoNpub(zapRequestEvent.pubkey)}</span
+            >
+          {/if}
+
           <UserPopupMenu
             pubkey={note.pubkey}
             metadata={undefined}
