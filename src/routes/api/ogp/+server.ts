@@ -11,9 +11,29 @@ export const GET: RequestHandler = async ({ url: request }) => {
     });
   }
 
-  const result = await unfurl(url).catch((err) => {
+  const parsedUrl = new URL(url);
+  const host = parsedUrl.host.toLowerCase();
+
+  let userAgent = "LumilumiOGPFetcher/1.0 (+https://lumilumi.app)";
+
+  // AmazonかTwitterドメインならfacebookexternalhitに切り替え
+  if (
+    host.includes("amazon.") ||
+    host.includes("twitter.com") ||
+    host.includes("x.com") ||
+    host.includes("t.co")
+  ) {
+    userAgent = "facebookexternalhit";
+  }
+
+  const result = await unfurl(url, {
+    headers: {
+      Accept: "text/html, application/xhtml+xml",
+      "User-Agent": userAgent,
+    },
+  }).catch((err) => {
     throw error(404, {
-      message: err,
+      message: err.message ?? String(err),
     });
   });
 
