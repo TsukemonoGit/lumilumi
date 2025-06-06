@@ -217,17 +217,14 @@ export const checkContentWarning = (tags: string[][]): string[] | undefined => {
   return tags.find((item) => item[0] === "content-warning");
 };
 
-export const noteLink = (
-  note: Nostr.Event,
-  tieKey: string | undefined = undefined
-): string /**nevent or naddr */ => {
+export const noteLink = (note: Nostr.Event): string /**nevent or naddr */ => {
   let replaceable =
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind));
 
   if (!replaceable) {
     let eventpointer: nip19.EventPointer = {
       id: note.id,
-      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      relays: getRelaysById(note.id),
       author: note.pubkey,
       kind: note.kind,
     };
@@ -237,7 +234,7 @@ export const noteLink = (
       kind: note.kind,
       identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
       pubkey: note.pubkey,
-      relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+      relays: getRelaysById(note.id),
     };
     return nip19.naddrEncode(naddrpointer);
   }

@@ -10,7 +10,7 @@
     id: string; //kind40 channel id
     handleClickToChannel?: (() => void) | undefined;
     linkButtonTitle: string;
-    tieKey: string | undefined;
+
     clickAction?: boolean;
   }
 
@@ -18,7 +18,7 @@
     id,
     handleClickToChannel = undefined,
     linkButtonTitle,
-    tieKey,
+
     clickAction = true,
   }: Props = $props();
 
@@ -55,7 +55,6 @@
             {linkButtonTitle}
             {clickAction}
             event={text}
-            {tieKey}
           />
         </div>
       {/snippet}
@@ -67,7 +66,6 @@
             {linkButtonTitle}
             {clickAction}
             event={text}
-            {tieKey}
           />
         </div>
       {/snippet}
@@ -79,7 +77,6 @@
             {linkButtonTitle}
             {clickAction}
             event={text}
-            {tieKey}
           />
         </div>
       {/snippet}
@@ -90,7 +87,6 @@
           {linkButtonTitle}
           {clickAction}
           {event}
-          {tieKey}
         />
       {/snippet}
     </LatestEvent>

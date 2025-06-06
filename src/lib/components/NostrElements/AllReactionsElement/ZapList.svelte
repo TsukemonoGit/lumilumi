@@ -8,10 +8,9 @@
 
   interface Props {
     events: Nostr.Event[];
-    tieKey: string | undefined;
   }
 
-  let { events, tieKey }: Props = $props();
+  let { events }: Props = $props();
 
   //とりあえずデコード失敗したら0になるようになってるけどちゃんと取り除いて
 
@@ -81,7 +80,6 @@
                   metadata={undefined}
                   size={24}
                   depth={0}
-                  {tieKey}
                 />
               {/snippet}
 
@@ -91,7 +89,6 @@
                   metadata={undefined}
                   size={24}
                   depth={0}
-                  {tieKey}
                 />
               {/snippet}
 
@@ -101,7 +98,6 @@
                   metadata={undefined}
                   size={24}
                   depth={0}
-                  {tieKey}
                 />
               {/snippet}
 
@@ -111,7 +107,6 @@
                   {metadata}
                   size={24}
                   depth={0}
-                  {tieKey}
                 />
               {/snippet}
             </Metadata>

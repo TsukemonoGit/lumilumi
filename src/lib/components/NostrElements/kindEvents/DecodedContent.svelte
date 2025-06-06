@@ -13,7 +13,7 @@
     content: string | undefined;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     maxHeight: number | undefined;
     decoded:
       | {
@@ -44,7 +44,7 @@
     content,
     depth,
     repostable,
-    tieKey,
+
     decoded,
     maxHeight,
     zIndex,
@@ -55,7 +55,6 @@
   {#if decoded.type === "npub"}<span class="text-magnum-300 align-middle"
       >{#if !displayMenu}<UserName pubhex={decoded.data} />{:else}<PopupUserName
           pubkey={decoded.data}
-          {tieKey}
           {zIndex}
         />{/if}</span
     >{:else if decoded.type === "nprofile"}<span
@@ -65,7 +64,6 @@
         />{:else}<PopupUserName
           {zIndex}
           pubkey={decoded.data.pubkey}
-          {tieKey}
         />{/if}</span
     >{:else if decoded.type === "nevent"}<span
       class="grid grid-cols-[auto_1fr_auto]"
@@ -78,7 +76,6 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         {maxHeight}
         {zIndex}
       />
@@ -94,7 +91,6 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         {maxHeight}
         {zIndex}
       />
@@ -109,7 +105,6 @@
         data={decoded.data}
         {displayMenu}
         {depth}
-        {tieKey}
         {repostable}
         {content}
         {zIndex}

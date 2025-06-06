@@ -12,7 +12,7 @@
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import { createEmojiListFrom10030 } from "$lib/func/settings";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
@@ -32,7 +32,7 @@
     note: Nostr.Event;
     repostable: boolean;
     maxHeight: number | undefined;
-    tieKey: string | undefined;
+
     displayMenu: boolean;
     mini?: boolean;
     metadata: Nostr.Event | undefined;
@@ -45,7 +45,7 @@
     note,
     repostable,
     maxHeight,
-    tieKey,
+
     displayMenu,
     mini,
     metadata,
@@ -302,12 +302,11 @@
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet seenOn()}
       {#if lumiSetting.get().showRelayIcon && displayMenu}
-        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
@@ -318,12 +317,11 @@
       />
     {/snippet}
     {#snippet time()}
-      <DisplayTime {displayMenu} {note} {tieKey} />
+      <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
-          {tieKey}
         />{/if}
     {/snippet}
 
@@ -372,7 +370,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

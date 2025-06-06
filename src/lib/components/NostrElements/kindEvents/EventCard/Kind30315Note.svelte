@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
   import { getStatusLink } from "$lib/func/status";
@@ -24,7 +24,7 @@
     displayMenu: boolean;
     depth: number;
     maxHeight: number | undefined;
-    tieKey: string | undefined;
+
     mini: boolean;
     warning: string[] | undefined;
 
@@ -38,7 +38,7 @@
     displayMenu,
     depth,
     maxHeight,
-    tieKey,
+
     mini,
     warning,
 
@@ -69,12 +69,11 @@
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet seenOn()}
       {#if lumiSetting.get().showRelayIcon && displayMenu}
-        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
@@ -85,31 +84,29 @@
       />
     {/snippet}
     {#snippet time()}
-      <DisplayTime {displayMenu} {note} {tieKey} />
+      <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
-          {tieKey}
         />{/if}
     {/snippet}
 
     {#snippet content()}
       <div class="grid grid-cols-[auto_1fr] flex-wrap gap-1 items-center">
         {#if statusTag === "general"}
-          <GeneralStatusDisplay link={statusLink} event={note} {tieKey} />
+          <GeneralStatusDisplay link={statusLink} event={note} />
         {:else if statusTag === "music"}<MusicStatusDisplay
             link={statusLink}
             event={note}
-            {tieKey}
           />{:else}
-          <OtherStatusDisplay link={statusLink} event={note} {tieKey} />
+          <OtherStatusDisplay link={statusLink} event={note} />
         {/if}
       </div>
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

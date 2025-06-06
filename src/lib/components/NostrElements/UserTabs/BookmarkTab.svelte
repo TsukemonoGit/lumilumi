@@ -38,7 +38,7 @@
         (tag) =>
           (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") && tag.length > 1
       )}
-      <PaginationList list={filteredList.map((tag) => tag[1])} tieKey={pubkey}>
+      <PaginationList list={filteredList.map((tag) => tag[1])}>
         {#snippet children({ id, index })}
           {#if filteredList[index][0] === "e"}
             <Note
@@ -47,7 +47,6 @@
               displayMenu={true}
               depth={0}
               repostable={true}
-              tieKey={pubkey}
             />
             <!---->
           {:else if filteredList[index][0] === "a"}
@@ -108,7 +107,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -118,7 +116,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -128,7 +125,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -138,7 +134,6 @@
                       displayMenu={true}
                       repostable={true}
                       note={event}
-                      tieKey={pubkey}
                     />
                   {/snippet}
                 </Metadata>

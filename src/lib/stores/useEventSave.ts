@@ -11,6 +11,7 @@ import { pipe } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq";
+import { tie } from "./stores";
 
 export function useEventSave(
   queryKey: QueryKey,
@@ -26,6 +27,6 @@ export function useEventSave(
     | undefined
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
-  const operator = pipe(uniq());
+  const operator = pipe(tie, uniq());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<EventPacket>;
 }

@@ -15,16 +15,9 @@
     note: Nostr.Event;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
   }
 
-  let {
-    displayMenu,
-    note = $bindable(),
-    depth,
-    repostable,
-    tieKey,
-  }: Props = $props();
+  let { displayMenu, note = $bindable(), depth, repostable }: Props = $props();
 
   let prof = $derived(profile(note));
   let petname = $derived(followList.get().get(note.pubkey));
@@ -33,13 +26,7 @@
 
 <div class="grid grid-cols-[auto_1fr] py-1">
   <div class="p-1">
-    <UserPopupMenu
-      pubkey={note.pubkey}
-      metadata={note}
-      size={40}
-      {depth}
-      {tieKey}
-    />
+    <UserPopupMenu pubkey={note.pubkey} metadata={note} size={40} {depth} />
   </div>
   <div class="p-1 overflow-x-hidden">
     <div
@@ -78,7 +65,6 @@
       {displayMenu}
       {depth}
       {repostable}
-      {tieKey}
       kind={note.kind}
     />
   </div>

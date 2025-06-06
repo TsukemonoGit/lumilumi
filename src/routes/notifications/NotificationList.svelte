@@ -7,7 +7,7 @@
     nowProgress,
     onlyFollowee,
     queryClient,
-    tieMapStore,
+    tie,
   } from "$lib/stores/stores";
   import {
     type QueryKey,
@@ -17,10 +17,10 @@
   } from "@tanstack/svelte-query";
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
-  import { createTie, now, type EventPacket } from "rx-nostr";
+  import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
-  import { writable, type Writable } from "svelte/store";
+  import { get, writable, type Writable } from "svelte/store";
   import { pipe } from "rxjs";
 
   import { debounce, sortEvents } from "$lib/func/util";
@@ -45,7 +45,7 @@
     amount: number; // Number of items to display per page
     eventFilter?: (event: Nostr.Event) => boolean;
     relays?: string[];
-    tieKey: string;
+
     updateViewNotifi?: () => void;
     children?: import("svelte").Snippet<[any]>;
   }
@@ -57,7 +57,7 @@
     amount,
     eventFilter = () => true,
     relays = undefined,
-    tieKey,
+
     updateViewNotifi = $bindable<() => void>(),
     children,
   }: Props = $props();
@@ -76,9 +76,6 @@
     }
     return [];
   });
-
-  // Setup Nostr tie and data handling
-  const [tie, tieMap] = createTie();
 
   // Create unique events filter
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -169,17 +166,6 @@
 
   onDestroy(() => {
     // Cleanup code if needed
-  });
-
-  // Store tie in global map
-  $effect(() => {
-    if (tieKey) {
-      if (!$tieMapStore) {
-        $tieMapStore = { [tieKey]: [tie, tieMap] };
-      } else if (!$tieMapStore?.[tieKey]) {
-        $tieMapStore = { ...$tieMapStore, [tieKey]: [tie, tieMap] };
-      }
-    }
   });
 
   // Update view when data changes

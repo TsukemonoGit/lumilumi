@@ -36,7 +36,7 @@
       {@const filteredList = event.tags.filter(
         (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1
       )}
-      <PaginationList list={filteredList.map((tag) => tag[1])} tieKey={pubkey}>
+      <PaginationList list={filteredList.map((tag) => tag[1])}>
         {#snippet children({ id, index })}
           {#if filteredList[index][0] === "emoji"}
             <div
@@ -93,7 +93,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -103,7 +102,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -113,7 +111,6 @@
                         note={event}
                         displayMenu={true}
                         repostable={true}
-                        tieKey={pubkey}
                       />
                     </div>
                   {/snippet}
@@ -123,7 +120,6 @@
                       displayMenu={true}
                       repostable={true}
                       note={event}
-                      tieKey={pubkey}
                     />
                   {/snippet}
                 </Metadata>

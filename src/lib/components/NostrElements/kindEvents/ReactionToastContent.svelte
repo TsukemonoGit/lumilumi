@@ -96,7 +96,6 @@
           displayMenu={false}
           depth={0}
           repostable={false}
-          tieKey={undefined}
           isShowClientTag={false}
         />
       </div>
@@ -132,7 +131,6 @@
           displayMenu={false}
           depth={0}
           repostable={false}
-          tieKey={undefined}
         />
       {/snippet}
     </LatestEvent>

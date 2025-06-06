@@ -3,7 +3,7 @@
   import Note from "./Note.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { relayRegex } from "$lib/func/regex";
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import type { Part } from "$lib/func/content";
@@ -13,12 +13,11 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     zIndex?: number;
   }
 
-  let { replyTag, displayMenu, depth, repostable, tieKey, zIndex }: Props =
-    $props();
+  let { replyTag, displayMenu, depth, repostable, zIndex }: Props = $props();
   let loadNote = $state(false);
   //$inspect(replyTag);
   const openModal = (index: number) => {
@@ -64,7 +63,6 @@
         {displayMenu}
         depth={depth + 1}
         {repostable}
-        {tieKey}
         zIndex={zIndex || 10 + 10}
       />
     {:else if replyTag[0] === "a" || replyTag[0] === "A"}
@@ -75,7 +73,6 @@
         data={naddr}
         {displayMenu}
         depth={depth + 1}
-        {tieKey}
         {repostable}
         content={undefined}
         zIndex={zIndex || 10 + 10}

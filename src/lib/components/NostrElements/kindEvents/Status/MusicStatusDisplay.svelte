@@ -6,17 +6,16 @@
   interface Props {
     link: string | undefined;
     event: Nostr.Event;
-    tieKey: string | undefined;
+
     color?: string | undefined;
   }
-  let { link, event, tieKey, color }: Props = $props();
+  let { link, event, color }: Props = $props();
   let deleted = $state(false);
 </script>
 
 {#if (link !== "" || event.content.trim() !== "") && !deleted}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
-      {tieKey}
       TriggerIcon={Music}
       note={event}
       iconSize={16}

@@ -5,7 +5,7 @@
     loginUser,
     nowProgress,
     queryClient,
-    tieMapStore,
+    tie,
   } from "$lib/stores/stores";
 
   import type { ReqStatus } from "$lib/types";
@@ -19,7 +19,6 @@
     type RxReq,
     type RxReqEmittable,
     type RxReqPipeable,
-    createTie,
   } from "rx-nostr";
   import { onDestroy, onMount, untrack } from "svelte";
   import {
@@ -27,7 +26,7 @@
     loadOlderEvents,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { readable } from "svelte/store";
+  import { get, readable } from "svelte/store";
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
@@ -44,7 +43,7 @@
     amount: number;
     req: RxReq<"forward"> & RxReqEmittable & RxReqPipeable;
     relays?: string[];
-    tieKey: string;
+
     eventFilter?: (event: Nostr.Event) => boolean;
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
@@ -61,7 +60,7 @@
     amount,
     req,
     relays = undefined,
-    tieKey,
+
     eventFilter = () => true,
     error,
     loading,
@@ -129,26 +128,6 @@
   }
 
   let isOnMount = false;
-
-  const [tie, tieMap] = createTie();
-  // $effect.pre(() => {
-  $effect(() => {
-    if (tieKey) {
-      untrack(() => setTie(tieKey));
-    }
-  });
-
-  function setTie(_tieKey: string) {
-    if (_tieKey) {
-      //$tieMapStore = { undefined: undefined };
-      if (!$tieMapStore) {
-        $tieMapStore = { [_tieKey]: [tie, tieMap] };
-      } else if (!$tieMapStore?.[_tieKey]) {
-        $tieMapStore = { ...$tieMapStore, [_tieKey]: [tie, tieMap] };
-      }
-    }
-  }
-  //});
 
   onMount(async () => {
     if (!isOnMount) {

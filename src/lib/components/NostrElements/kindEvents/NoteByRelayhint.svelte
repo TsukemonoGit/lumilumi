@@ -17,7 +17,7 @@
     thread?: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     relayhint: string[];
     zIndex?: number;
     omit: boolean;
@@ -32,7 +32,7 @@
     thread = false,
     depth,
     repostable,
-    tieKey,
+
     relayhint,
     zIndex,
     omit,
@@ -83,7 +83,6 @@
               {thread}
               {depth}
               {repostable}
-              {tieKey}
               {zIndex}
             />
           </div>
@@ -98,7 +97,6 @@
               {thread}
               {depth}
               {repostable}
-              {tieKey}
               {zIndex}
             />
           </div>
@@ -113,7 +111,6 @@
               {thread}
               {depth}
               {repostable}
-              {tieKey}
               {zIndex}
             />
           </div>
@@ -129,7 +126,6 @@
             {displayMenu}
             {depth}
             {repostable}
-            {tieKey}
             {zIndex}
           />
         {/snippet}

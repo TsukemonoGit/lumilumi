@@ -6,10 +6,9 @@
 
   interface Props {
     events: Nostr.Event<number>[];
-    tieKey: string;
   }
 
-  let { events, tieKey }: Props = $props();
+  let { events }: Props = $props();
 </script>
 
 {#if events && events.length > 0}
@@ -17,21 +16,21 @@
     <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
       {#snippet loading()}
         <div class="w-full">
-          <EventCard note={event} repostable={true} {tieKey} />
+          <EventCard note={event} repostable={true} />
         </div>
       {/snippet}
       {#snippet nodata()}
         <div class="w-full">
-          <EventCard note={event} repostable={true} {tieKey} />
+          <EventCard note={event} repostable={true} />
         </div>
       {/snippet}
       {#snippet error()}
         <div class="w-full">
-          <EventCard note={event} repostable={true} {tieKey} />
+          <EventCard note={event} repostable={true} />
         </div>
       {/snippet}
       {#snippet content({ metadata })}
-        <EventCard {metadata} note={event} repostable={true} {tieKey} />
+        <EventCard {metadata} note={event} repostable={true} />
       {/snippet}
     </Metadata>
   {/each}

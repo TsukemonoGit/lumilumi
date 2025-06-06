@@ -8,14 +8,14 @@
   interface Props {
     dialogOpen: any;
     note: Nostr.Event;
-    tieKey: string | undefined;
+
     profile?: Profile | undefined;
     zIndex?: number;
   }
   let {
     dialogOpen = $bindable(),
     note,
-    tieKey,
+
     profile = undefined,
     zIndex = 0,
   }: Props = $props();
@@ -35,14 +35,14 @@
             kind: note.kind,
             identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
             pubkey: note.pubkey,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            relays: getRelaysById(note.id),
           };
           naddr = nip19.naddrEncode(naddrpointer);
           nevent = undefined;
         } else {
           const eventpointer: nip19.EventPointer = {
             id: note.id,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            relays: getRelaysById(note.id),
             author: note.pubkey,
             kind: note.kind,
           };
@@ -100,5 +100,5 @@
 {/if}
 <h2 class="m-0 text-lg font-medium">Seen on</h2>
 <div class="break-words whitespace-pre-wrap">
-  {tieKey ? getRelaysById(note.id, tieKey).join(", ") : ""}
+  {getRelaysById(note.id).join(", ")}
 </div>

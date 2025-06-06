@@ -35,7 +35,7 @@
     bannerHeight?: number;
     iconSize?: number;
     depth: number;
-    tieKey: string | undefined;
+
     zIndex?: number | undefined;
     tab?: string | undefined;
   }
@@ -45,7 +45,7 @@
     bannerHeight = 180,
     iconSize = 80,
     depth,
-    tieKey,
+
     zIndex = 0,
     tab,
   }: Props = $props();
@@ -147,7 +147,7 @@
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
-          <UserPofileEllipsis {pubkey} {tieKey} />
+          <UserPofileEllipsis {pubkey} />
 
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
@@ -163,7 +163,7 @@
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
-          <UserPofileEllipsis {pubkey} {tieKey} />
+          <UserPofileEllipsis {pubkey} />
 
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
@@ -179,7 +179,7 @@
           {#if $loginUser !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
-          <UserPofileEllipsis {pubkey} {tieKey} />
+          <UserPofileEllipsis {pubkey} />
 
           {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
             <FollowButton {pubkey} />{/if}
@@ -275,13 +275,7 @@
                     /><ReplyToUserButton {pubkey} />{/if}
                   {#if prof.lud16 || prof.lud06}
                     <UserZap {metadata} />
-                  {/if}<UserPofileEllipsis
-                    {pubkey}
-                    {metadata}
-                    {prof}
-                    {tieKey}
-                    {tab}
-                  />
+                  {/if}<UserPofileEllipsis {pubkey} {metadata} {prof} {tab} />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">
                   {#if $loginUser === pubkey}<UserEditEllipsis
@@ -303,7 +297,7 @@
           </div>
           {#if lumiSetting.get().showUserStatus}
             <div class={`text-sm text-zinc-500`}>
-              <ShowStatus {pubkey} {tieKey} />
+              <ShowStatus {pubkey} />
             </div>
           {/if}
           {#if prof.about}
@@ -316,7 +310,6 @@
                 displayMenu={true}
                 {depth}
                 repostable={false}
-                {tieKey}
                 kind={metadata.kind}
               />
             </div>

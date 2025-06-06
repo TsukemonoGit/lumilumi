@@ -5,10 +5,9 @@
 
   interface Props {
     events: Nostr.Event[];
-    tieKey: string | undefined;
   }
 
-  let { events, tieKey }: Props = $props();
+  let { events }: Props = $props();
 </script>
 
 {#each events as event (event.id)}
@@ -19,7 +18,6 @@
         metadata={undefined}
         size={24}
         depth={0}
-        {tieKey}
       />
     {/snippet}
 
@@ -29,7 +27,6 @@
         metadata={undefined}
         size={24}
         depth={0}
-        {tieKey}
       />
     {/snippet}
 
@@ -39,18 +36,11 @@
         metadata={undefined}
         size={24}
         depth={0}
-        {tieKey}
       />
     {/snippet}
 
     {#snippet content({ metadata })}
-      <UserPopupMenu
-        pubkey={event.pubkey}
-        {metadata}
-        size={24}
-        depth={0}
-        {tieKey}
-      />
+      <UserPopupMenu pubkey={event.pubkey} {metadata} size={24} depth={0} />
     {/snippet}
   </Metadata>
 {/each}

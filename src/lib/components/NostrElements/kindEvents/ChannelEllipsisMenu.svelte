@@ -28,7 +28,7 @@
     note: Nostr.Event; //kind40か41
     indexes?: number[] | undefined;
     channelData: ChannelData;
-    tieKey: string | undefined;
+
     heyaId: string;
   }
 
@@ -36,7 +36,7 @@
     note,
     indexes = undefined,
     channelData,
-    tieKey,
+
     heyaId,
   }: Props = $props();
   let editChannelListOpen = $state(writable(false));
@@ -88,7 +88,7 @@
         $modalState = {
           isOpen: true,
           component: ModalJson,
-          props: { note: note, tieKey: tieKey },
+          props: { note: note },
         };
         break;
 
@@ -177,7 +177,7 @@
     try {
       const eventpointer: nip19.EventPointer = {
         id: note.id,
-        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        relays: getRelaysById(note.id),
         author: note.pubkey,
         kind: note.kind,
       };
@@ -193,5 +193,5 @@
 </DropdownMenu>
 
 <!--JSON no Dialog
-<ModalJson bind:dialogOpen {note} {tieKey} />-->
-<EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} {tieKey} />
+<ModalJson bind:dialogOpen {note}  />-->
+<EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} />

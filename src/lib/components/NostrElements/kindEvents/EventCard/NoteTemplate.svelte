@@ -28,7 +28,7 @@
     depth: number;
 
     displayMenu?: boolean;
-    tieKey: string | undefined;
+
     children?: any;
     kindInfo?: boolean;
     content: any;
@@ -43,7 +43,7 @@
     mini = false,
     depth,
     displayMenu = true,
-    tieKey,
+
     content,
     replyUsers,
     actionButtons,
@@ -75,12 +75,11 @@
       size={mini ? 20 : 40}
       {displayMenu}
       {depth}
-      {tieKey}
     />
   {/snippet}
   {#snippet seenOn()}
     {#if lumiSetting.get().showRelayIcon && displayMenu}
-      <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
 
   {#snippet name()}{#if petname}<span class="text-magnum-100">📛{petname}</span>
@@ -116,7 +115,7 @@
   {#snippet time()}
     {#if displayMenu}
       <a
-        href={`/${noteLink(note, tieKey)}`}
+        href={`/${noteLink(note)}`}
         class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
       >
         <time datetime={datetime(note.created_at)}

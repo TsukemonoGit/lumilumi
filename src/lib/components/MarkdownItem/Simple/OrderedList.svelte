@@ -12,7 +12,7 @@
     tags: any;
     openModal: any;
     nolist: boolean;
-    tieKey: string | undefined;
+
     zIndex?: number | undefined;
   }
 
@@ -24,7 +24,7 @@
     tags,
     openModal,
     nolist,
-    tieKey,
+
     zIndex,
   }: Props = $props();
 
@@ -49,7 +49,6 @@
                 {tags}
                 {openModal}
                 {nolist}
-                {tieKey}
                 {zIndex}
               />
             {/each}
@@ -60,7 +59,6 @@
               {depth}
               {displayMenu}
               {tags}
-              {tieKey}
               {zIndex}
             />
           {/if}
@@ -75,7 +73,6 @@
           {tags}
           {openModal}
           {nolist}
-          {tieKey}
         />
       {/if}
     {/each}

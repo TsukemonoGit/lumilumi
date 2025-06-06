@@ -11,7 +11,7 @@
   import { nip19 } from "nostr-tools";
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
@@ -19,7 +19,7 @@
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
   let viewIndex = 0;
-  const tieKey = "globalchannel";
+
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
 
@@ -88,7 +88,6 @@
       req={createRxForwardReq()}
       {viewIndex}
       {amount}
-      {tieKey}
       >{#snippet content({ events, len })}
         {#if events && events.length > 0}
           {#each events as event (event.id)}
@@ -98,21 +97,21 @@
             >
               {#snippet loading()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet nodata()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet error()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} {tieKey} />
+                <EventCard {metadata} note={event} />
               {/snippet}
             </Metadata>
           {/each}{/if}

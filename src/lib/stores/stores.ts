@@ -19,6 +19,7 @@ import {
 } from "$lib/types";
 //import * as Nostr from "nostr-typedef";
 import { type OperatorFunction } from "rxjs";
+import { createTie } from "./operators";
 //import type { Part } from "$lib/func/content";
 
 export interface Popstate {
@@ -65,19 +66,7 @@ export const mutebykinds = writable<LumiMuteByKind>();
 export const nowProgress = writable<boolean>(false);
 
 //export const tieMapStore = writable<Map<string, Set<string>>>();
-export const tieMapStore = writable<{
-  [key: string]:
-    | [
-        OperatorFunction<
-          EventPacket,
-          EventPacket & {
-            seenOn: Set<string>;
-            isNew: boolean;
-          }
-        >,
-        Map<string, Set<string>>
-      ];
-}>();
+export const [tie, tieMap] = createTie();
 
 export const uploader = writable<string>();
 
@@ -108,7 +97,6 @@ export const ogTitle = writable<string>("Lumilumi");
 
 export const ogDescription = writable<string>("the nostr client");
 export interface ModalState {
-  
   isOpen: boolean;
   component: any;
   props?: Record<string, any>;

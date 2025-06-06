@@ -13,16 +13,15 @@
   interface Props {
     id: string;
     width: number;
-    tieKey: string | undefined;
   }
 
-  let { id, width, tieKey }: Props = $props();
+  let { id, width }: Props = $props();
 
   let size = 16;
   let viewAll = $state(false);
   let relays: string[] = $derived.by(() => {
-    if (displayEvents.get() && tieKey) {
-      return getRelaysById(id, tieKey);
+    if (displayEvents.get()) {
+      return getRelaysById(id);
     } else return [];
   });
 

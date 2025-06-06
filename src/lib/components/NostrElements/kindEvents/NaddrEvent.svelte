@@ -18,7 +18,7 @@
     depth: number;
     displayMenu: boolean;
     repostable: boolean;
-    tieKey: string | undefined;
+
     mini?: boolean;
     thread?: boolean;
     zIndex?: number;
@@ -32,7 +32,7 @@
     depth,
     displayMenu,
     repostable,
-    tieKey,
+
     mini = false,
     thread = false,
     zIndex,
@@ -99,7 +99,6 @@
                 {displayMenu}
                 {depth}
                 {repostable}
-                {tieKey}
                 relayhint={data.relays}
                 {zIndex}
               />
@@ -127,7 +126,6 @@
                   note={event}
                   {displayMenu}
                   {repostable}
-                  {tieKey}
                   {depth}
                   mini={isOmitted || mini}
                   {thread}
@@ -142,7 +140,6 @@
                   note={event}
                   {displayMenu}
                   {repostable}
-                  {tieKey}
                   {depth}
                   mini={isOmitted || mini}
                   {thread}
@@ -157,7 +154,6 @@
                   note={event}
                   {displayMenu}
                   {repostable}
-                  {tieKey}
                   {depth}
                   mini={isOmitted || mini}
                   {thread}
@@ -172,7 +168,6 @@
                 {displayMenu}
                 note={event}
                 {repostable}
-                {tieKey}
                 {depth}
                 mini={isOmitted || mini}
                 {thread}

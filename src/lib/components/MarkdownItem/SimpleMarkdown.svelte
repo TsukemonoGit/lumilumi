@@ -28,7 +28,7 @@
     depth: number;
     repostable: boolean;
     nolist?: boolean;
-    tieKey: string | undefined;
+
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     note?: Nostr.Event;
@@ -42,7 +42,7 @@
     depth,
     repostable,
     nolist = false,
-    tieKey,
+
     maxHeight,
     zIndex = 0,
   }: Props = $props();
@@ -96,7 +96,7 @@
       <Truncate {maxHeight} {depth}>
         {#snippet truncate()}
           <a
-            href={`/${noteLink(note, tieKey)}`}
+            href={`/${noteLink(note)}`}
             class="h-8 flex items-center justify-center rounded-full border border-zinc-600 bg-zinc-800 px-4 font-medium leading-none text-zinc-200 w-full"
             >{$_("truncate.openpage")}
           </a>
@@ -110,7 +110,6 @@
             {tags}
             {openModal}
             {nolist}
-            {tieKey}
             {zIndex}
           />
         {/each}</Truncate
@@ -124,7 +123,6 @@
           {tags}
           {openModal}
           {nolist}
-          {tieKey}
           {zIndex}
         />
       {/each}
@@ -150,7 +148,7 @@
           {tags}
           {openModal}
           {nolist}
-          {tieKey}
+          
           {zIndex}
         />
       {/each}

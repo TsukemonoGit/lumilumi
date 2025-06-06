@@ -30,7 +30,6 @@
     displayMenu: boolean;
     depth: number;
 
-    tieKey: string | undefined;
     mini: boolean;
     warning: string[] | undefined;
     zIndex: number | undefined;
@@ -45,7 +44,6 @@
     displayMenu,
     depth,
 
-    tieKey,
     mini,
     warning,
     zIndex,
@@ -69,7 +67,7 @@
     try {
       const eventpointer: nip19.EventPointer = {
         id: note.id,
-        relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+        relays: getRelaysById(note.id),
         author: note.pubkey,
         kind: note.kind,
       };
@@ -102,12 +100,11 @@
         size={mini ? 20 : 40}
         {displayMenu}
         {depth}
-        {tieKey}
       />
     {/snippet}
     {#snippet seenOn()}
       {#if lumiSetting.get().showRelayIcon && displayMenu}
-        <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+        <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
@@ -117,12 +114,11 @@
       />
     {/snippet}
     {#snippet time()}
-      <DisplayTime {displayMenu} {note} {tieKey} />
+      <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
           pubkey={note.pubkey}
-          {tieKey}
         />{/if}
     {/snippet}
 
@@ -137,7 +133,6 @@
             {displayMenu}
             {depth}
             {repostable}
-            {tieKey}
             kind={note.kind}
           />
         </div>
@@ -159,7 +154,6 @@
                   displayTags={false}
                   displayMenu={false}
                   {depth}
-                  {tieKey}
                   repostable={false}
                 /></span
               ></label
@@ -196,7 +190,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

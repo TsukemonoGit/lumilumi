@@ -16,7 +16,7 @@
     displayMenu: boolean;
 
     depth: number;
-    tieKey: string | undefined;
+
     maxHeight: number | undefined;
     text: Nostr.Event;
     zIndex?: number;
@@ -26,7 +26,7 @@
     repostable,
     displayMenu,
     depth,
-    tieKey,
+
     maxHeight,
     text,
     zIndex,
@@ -48,7 +48,7 @@
           <ReplyTo
             >{#each replyUsers as user}
               {#if !displayMenu}<UserName pubhex={user} />{:else}
-                <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
+                <PopupUserName pubkey={user} {zIndex} />{/if}
             {/each}</ReplyTo
           >
         </div>
@@ -62,7 +62,6 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
       />
     {:else if text.kind === 31990}
       {@const data = get31990Ogp(text)}
@@ -76,7 +75,6 @@
           {displayMenu}
           {depth}
           {repostable}
-          {tieKey}
           kind={text.kind}
         />
       {/if}
@@ -87,17 +85,16 @@
         {displayMenu}
         {depth}
         {repostable}
-        {tieKey}
         kind={text.kind}
       />{#if text.kind !== 1}{#if text.kind === 42}{@const heyaId =
             text.tags.find(
               (tag) => tag[0] === "e" && tag[3] === "root"
-            )?.[1]}<ChannelTag {heyaId} {tieKey} />{:else}<span
+            )?.[1]}<ChannelTag {heyaId} />{:else}<span
             class="flex ml-auto hover:opacity-75 focus:opacity-50 text-neutral-300 text-sm"
             style="word-break: break-word;">kind:{text.kind}</span
           >{/if}{/if}
     {/if}
     {#if displayMenu}
-      <NoteActionButtons note={text} {repostable} {tieKey} bind:deleted />{/if}
+      <NoteActionButtons note={text} {repostable} bind:deleted />{/if}
   </div>
 {/if}

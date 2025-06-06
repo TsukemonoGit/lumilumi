@@ -9,7 +9,7 @@
   import { hexRegex } from "$lib/func/regex";
 
   import UserProfile from "./UserProfile.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import UserMenu from "./UserMenu.svelte";
   import { getProfile } from "$lib/func/event";
@@ -22,17 +22,9 @@
     metadata: Nostr.Event | undefined;
     displayMenu?: boolean;
     depth: number;
-    tieKey: string | undefined;
   }
 
-  let {
-    pubkey,
-    size,
-    metadata,
-    displayMenu = true,
-    depth,
-    tieKey,
-  }: Props = $props();
+  let { pubkey, size, metadata, displayMenu = true, depth }: Props = $props();
   const zIndex = 30;
   let profile = $derived(getProfile(metadata));
   let url = $derived(profile?.picture);
@@ -72,7 +64,6 @@
           bannerHeight={60}
           iconSize={56}
           {depth}
-          {tieKey}
         />
 
         <!--ユーザーポップアップのとこのUserMenu消してみる-->
@@ -81,7 +72,7 @@
         >
           <div class="text-zinc-300 font-bold pl-2 text-md py-2">User Menu</div>
 
-          <UserMenu {pubkey} {metadata} {profile} {tieKey} />
+          <UserMenu {pubkey} {metadata} {profile} />
         </div>
       </div>
     {/snippet}</Popover

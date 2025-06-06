@@ -43,7 +43,7 @@
   import { untrack } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { type EventPacket } from "rx-nostr";
 
@@ -59,12 +59,12 @@
   let {
     note,
     repostable,
-    tieKey,
+
     deleted = $bindable(),
   }: {
     note: Nostr.Event;
     repostable: boolean;
-    tieKey?: string | undefined;
+
     deleted: boolean;
   } = $props();
 
@@ -182,7 +182,7 @@
     if (prosessing) return;
     prosessing = true;
     console.log(menuTexts[index].num);
-    const relayhints = tieKey ? getRelaysById(note.id, tieKey) : [];
+    const relayhints = getRelaysById(note.id);
     const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: relayhints,
@@ -386,7 +386,7 @@
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
     tags.push(["p", note.pubkey]);
-    const relaylist = tieKey ? getRelaysById(note.id, tieKey) : [];
+    const relaylist = getRelaysById(note.id);
     const root = note.tags.find(
       (item) =>
         (item[0] === "e" || item[0] === "a") &&
@@ -537,7 +537,7 @@
     {/if}
     <!--メニュー-->
 
-    <EllipsisMenu iconSize={20} {note} {tieKey} bind:deleted />
+    <EllipsisMenu iconSize={20} {note} bind:deleted />
   </div>
   <!---->
 
@@ -601,7 +601,6 @@
                   {metadata}
                   displayMenu={false}
                   repostable={false}
-                  {tieKey}
                 />
               </div>
               <div class="mt-4 rounded-md">
@@ -723,19 +722,19 @@
     <div class="flex gap-1 p-1 items-center">
       <Repeat2 size="20" class="text-magnum-500/75  min-w-5 mx-0.5" />
       <div class="flex flex-wrap">
-        <RepostList events={repost} {tieKey} />
+        <RepostList events={repost} />
       </div>
     </div>
   {/if}
 
   {#if reaction_length > 0}
     <!--kind7-->
-    <ReactionList events={reaction} {tieKey} />
+    <ReactionList events={reaction} />
   {/if}
 
   {#if zap_length > 0}
     <!--zap レシート-->
-    <ZapList events={zap} {tieKey} />
+    <ZapList events={zap} />
   {/if}
 {/if}
 

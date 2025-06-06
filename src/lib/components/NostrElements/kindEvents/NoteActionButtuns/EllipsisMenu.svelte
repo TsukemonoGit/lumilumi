@@ -47,7 +47,7 @@
     TriggerIcon?: any;
     iconSize?: number;
     iconClass?: string;
-    tieKey: string | undefined;
+
     deleted: boolean;
   }
 
@@ -57,7 +57,7 @@
     TriggerIcon = Ellipsis,
     iconSize = 20,
     iconClass = "",
-    tieKey,
+
     deleted = $bindable(false),
   }: Props = $props();
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
@@ -144,7 +144,7 @@
         $modalState = {
           isOpen: true,
           component: ModalJson,
-          props: { note: note, tieKey: tieKey },
+          props: { note: note },
         };
         break;
 
@@ -277,14 +277,14 @@
             kind: note.kind,
             identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
             pubkey: note.pubkey,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            relays: getRelaysById(note.id),
           };
           naddr = nip19.naddrEncode(naddrpointer);
           nevent = undefined;
         } else {
           const eventpointer: nip19.EventPointer = {
             id: note.id,
-            relays: tieKey ? getRelaysById(note.id, tieKey) : [],
+            relays: getRelaysById(note.id),
             author: note.pubkey,
             kind: note.kind,
           };
@@ -361,7 +361,7 @@
 </DropdownMenu>
 
 <!--JSON no Dialog
-<ModalJson bind:dialogOpen {note} {tieKey} />-->
+<ModalJson bind:dialogOpen {note}  />-->
 <AlertDialog
   bind:openDialog={deleteDialogOpen}
   onClickOK={() => onClickOK()}
@@ -369,13 +369,7 @@
 >
   {#snippet main()}<p>{$_("post.delete")}</p>
     <div class="rounded-md border-magnum-600/30 border">
-      <Note
-        id={note.id}
-        displayMenu={false}
-        depth={0}
-        repostable={false}
-        {tieKey}
-      />
+      <Note id={note.id} displayMenu={false} depth={0} repostable={false} />
     </div>
   {/snippet}
 </AlertDialog>

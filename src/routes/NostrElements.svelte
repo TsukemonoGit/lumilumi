@@ -13,7 +13,7 @@
   import { extractKind9734 } from "$lib/func/zap";
   import FolloweeFilteredEventList from "../lib/components/NostrElements/FolloweeFilteredEventList.svelte";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { awaitInterval } from "$lib/func/util";
   import MakeNewKind3 from "../lib/components/NostrElements/kindEvents/MakeNewKind3.svelte";
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
@@ -23,7 +23,7 @@
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
-  const tieKey = "main";
+
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];
@@ -176,7 +176,6 @@
           queryKey={timelineQuery}
           filters={makeMainFilters(contacts, since).mainFilters}
           olderFilters={makeMainFilters(contacts, since).olderFilters}
-          {tieKey}
           {viewIndex}
           {amount}
           eventFilter={(note) => {
@@ -193,7 +192,7 @@
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >
-              <FolloweeFilteredEventList {events} {tieKey} />
+              <FolloweeFilteredEventList {events} />
             </div>{/snippet}
           {#snippet loading()}
             <div>

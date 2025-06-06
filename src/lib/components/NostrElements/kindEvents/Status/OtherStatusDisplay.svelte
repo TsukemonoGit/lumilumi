@@ -7,9 +7,8 @@
   interface Props {
     link: string | undefined;
     event: Nostr.Event;
-    tieKey: string | undefined;
   }
-  let { link, event, tieKey }: Props = $props();
+  let { link, event }: Props = $props();
   let deleted = $state(false);
 </script>
 
@@ -20,7 +19,6 @@
       note={event}
       iconSize={16}
       iconClass="text-zinc-500"
-      {tieKey}
       bind:deleted
     />
   </div>
@@ -40,7 +38,6 @@
 {:else if event.content.trim() !== ""}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
-      {tieKey}
       TriggerIcon={CircleHelp}
       note={event}
       iconSize={16}

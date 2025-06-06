@@ -11,10 +11,9 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
   }
 
-  let { replyTag, displayMenu, depth, repostable, tieKey }: Props = $props();
+  let { replyTag, displayMenu, depth, repostable }: Props = $props();
 
   const openModal = (index: number) => {
     // modalIndex = index;
@@ -44,7 +43,6 @@
       thread={true}
       depth={depth + 1}
       {repostable}
-      {tieKey}
     />
   {:else if replyTag[0] === "a" || replyTag[0] === "A"}
     <!---->
@@ -53,7 +51,6 @@
       data={naddr}
       {displayMenu}
       {depth}
-      {tieKey}
       {repostable}
       content={replyTag[1]}
       mini={true}

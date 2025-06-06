@@ -3,7 +3,7 @@
   import { nip19 } from "nostr-tools";
   import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -16,7 +16,7 @@
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
   }
@@ -27,7 +27,7 @@
     displayMenu,
     depth,
     repostable,
-    tieKey,
+
     maxHeight,
     zIndex,
   }: Props = $props();
@@ -104,7 +104,6 @@
         {displayMenu}
         depth={depth + 1}
         {repostable}
-        {tieKey}
         {zIndex}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}

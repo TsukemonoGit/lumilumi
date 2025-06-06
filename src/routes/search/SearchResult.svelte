@@ -22,7 +22,6 @@
   let { filters, relays }: Props = $props();
   const req = createRxForwardReq();
   $inspect(filters);
-  const tieKey = "search";
 
   onDestroy(() => {
     console.log("onDestroy");
@@ -45,7 +44,6 @@
     {req}
     {viewIndex}
     {amount}
-    {tieKey}
     relays={relays.length > 0 ? relays : nip50relays}
   >
     {#snippet children({ events, len })}
@@ -59,21 +57,21 @@
             >
               {#snippet loading()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet nodata()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet error()}
                 <div class="w-full">
-                  <EventCard note={event} {tieKey} />
+                  <EventCard note={event} />
                 </div>
               {/snippet}
               {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} {tieKey} />
+                <EventCard {metadata} note={event} />
               {/snippet}
             </Metadata>
           {/each}

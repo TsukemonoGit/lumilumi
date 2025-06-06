@@ -24,7 +24,6 @@
   import { untrack } from "svelte";
 
   let querykey: QueryKey = $derived(["kind10005", $loginUser]);
-  let { tieKey } = $props();
 
   // フォームの状態を管理
   let channelName = $state("");

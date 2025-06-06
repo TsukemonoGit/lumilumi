@@ -2,12 +2,12 @@
   import { noteLink } from "$lib/func/event";
   import { datetime, formatAbsoluteDate } from "$lib/func/util";
 
-  let { note, displayMenu, tieKey } = $props();
+  let { note, displayMenu } = $props();
 </script>
 
 {#if displayMenu}
   <a
-    href={`/${noteLink(note, tieKey)}`}
+    href={`/${noteLink(note)}`}
     class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
   >
     <time datetime={datetime(note.created_at)}

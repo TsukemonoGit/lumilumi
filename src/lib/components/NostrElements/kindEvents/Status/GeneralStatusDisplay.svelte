@@ -7,10 +7,10 @@
   interface Props {
     link: string | undefined;
     event: Nostr.Event;
-    tieKey: string | undefined;
+
     color?: string | undefined;
   }
-  let { link, event, tieKey, color }: Props = $props();
+  let { link, event, color }: Props = $props();
   let deleted = $state(false);
 </script>
 
@@ -21,7 +21,6 @@
       note={event}
       iconSize={16}
       iconClass={color ?? "text-zinc-500"}
-      {tieKey}
       bind:deleted
     />
   </div>

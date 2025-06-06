@@ -24,7 +24,7 @@
     note: Nostr.Event;
     depth: number;
     repostable: boolean;
-    tieKey: string | undefined;
+
     zIndex?: number;
     mini?: boolean;
     metadata: Nostr.Event | undefined;
@@ -39,7 +39,7 @@
     note,
     depth,
     repostable,
-    tieKey,
+
     zIndex = 0,
     mini,
     metadata,
@@ -70,23 +70,21 @@
       size={mini ? 20 : 40}
       {displayMenu}
       {depth}
-      {tieKey}
     />
   {/snippet}
   {#snippet seenOn()}
     {#if lumiSetting.get().showRelayIcon && displayMenu}
-      <SeenonIcons id={note.id} width={mini ? 20 : 40} {tieKey} />{/if}
+      <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
     <ProfileDisplay pubkey={note.pubkey} {metadata} />
   {/snippet}
   {#snippet time()}
-    <DisplayTime {displayMenu} {note} {tieKey} />
+    <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}
-        {tieKey}
       />{/if}
   {/snippet}
   {#snippet replyUser()}
@@ -94,20 +92,13 @@
       <ReplyTo
         >{#each replyUsers as user}
           {#if !displayMenu}<UserName pubhex={user} />{:else}
-            <PopupUserName pubkey={user} {tieKey} {zIndex} />{/if}
+            <PopupUserName pubkey={user} {zIndex} />{/if}
         {/each}</ReplyTo
       >{/if}
   {/snippet}
   {#snippet reply()}
     {#if !thread && (replyTag || replyUsers.length > 0)}
-      <Reply
-        {replyTag}
-        {displayMenu}
-        depth={depth + 1}
-        {repostable}
-        {tieKey}
-        {zIndex}
-      />
+      <Reply {replyTag} {displayMenu} depth={depth + 1} {repostable} {zIndex} />
     {/if}
   {/snippet}
 
@@ -119,12 +110,11 @@
       {displayMenu}
       {depth}
       {repostable}
-      {tieKey}
       kind={note.kind}
-    /><ChannelTag {heyaId} {tieKey} />
+    /><ChannelTag {heyaId} />
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />{/if}
+      <NoteActionButtons {note} {repostable} bind:deleted />{/if}
   {/snippet}
 </NoteComponent>

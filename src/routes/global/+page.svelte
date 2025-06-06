@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, untrack, type SvelteComponent } from "svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
@@ -12,7 +12,7 @@
     loginUser,
     nowProgress,
     queryClient,
-    tieMapStore,
+    tie,
     toastSettings,
   } from "$lib/stores/stores";
 
@@ -88,11 +88,11 @@
       });
 
       // Clear tie map data
-      const globalTie = $tieMapStore[TIE_KEY];
-      if (globalTie) {
-        const [, seenOn] = globalTie;
-        seenOn.clear();
-      }
+      // const globalTie = $tieMapStore[TIE_KEY];
+      // if (globalTie) {
+      //   const [, seenOn] = globalTie;
+      //   seenOn.clear();
+      // }
 
       globalRelays = relays;
     }
@@ -246,7 +246,6 @@
         bind:this={compRef}
         globalRelays={$state.snapshot(globalRelays)}
         {timelineQuery}
-        tieKey={"global"}
         eventFilter={(note) => {
           return checkGlobalFolloweePost(note);
         }}

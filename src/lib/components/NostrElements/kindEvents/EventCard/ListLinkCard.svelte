@@ -12,10 +12,9 @@
   interface Props {
     event: Nostr.Event;
     depth: number;
-    tieKey: string | undefined;
   }
 
-  let { event, depth, tieKey }: Props = $props();
+  let { event, depth }: Props = $props();
 
   const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
   const title = event.tags.find((tag) => tag[0] === "title")?.[1];
@@ -81,7 +80,6 @@
           metadata={undefined}
           size={40}
           {depth}
-          {tieKey}
         />
       {/snippet}
       {#snippet nodata()}
@@ -90,7 +88,6 @@
           metadata={undefined}
           size={40}
           {depth}
-          {tieKey}
         />
       {/snippet}
       {#snippet error()}
@@ -99,24 +96,16 @@
           metadata={undefined}
           size={40}
           {depth}
-          {tieKey}
         />
       {/snippet}
       {#snippet content({ metadata })}
-        <UserPopupMenu
-          pubkey={event.pubkey}
-          {metadata}
-          size={40}
-          {depth}
-          {tieKey}
-        />
+        <UserPopupMenu pubkey={event.pubkey} {metadata} size={40} {depth} />
       {/snippet}
     </Metadata>
     <button class="text-magnum-400"
       ><ListEllipsisMenu
         note={event}
         listData={{ dtag: dtag, title: title, description: description }}
-        {tieKey}
       />
     </button>
   </div>

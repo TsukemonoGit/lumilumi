@@ -10,6 +10,7 @@ import { pipe } from "rxjs";
 
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq";
+import { tie } from "./stores";
 
 export function useEvent(
   queryKey: QueryKey,
@@ -25,7 +26,7 @@ export function useEvent(
   relays?: string[] | undefined
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
-  const operator = pipe();
+  const operator = pipe(tie);
   return useReq(
     { queryKey, filters, operator, req },
     relays

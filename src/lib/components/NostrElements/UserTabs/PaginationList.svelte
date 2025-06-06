@@ -6,11 +6,11 @@
 
   interface Props {
     list: string[];
-    tieKey: string;
+
     children?: import("svelte").Snippet<[any]>;
   }
 
-  let { list, tieKey, children }: Props = $props();
+  let { list, children }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
 
   onMount(() => {

@@ -20,7 +20,7 @@
     repostable: boolean;
     maxHeight: number | undefined;
     displayMenu: boolean;
-    tieKey: string | undefined;
+
     mini: any;
     zapRequestEvent: Nostr.Event;
     amount: number;
@@ -35,7 +35,7 @@
     repostable,
     maxHeight,
     displayMenu,
-    tieKey,
+
     mini,
     zapRequestEvent,
     amount,
@@ -107,7 +107,6 @@
               {metadata}
               size={20}
               {depth}
-              {tieKey}
             />
           </div>
           <div class="inline-block break-all break-words whitespace-pre-line">
@@ -137,10 +136,9 @@
             metadata={undefined}
             size={20}
             {depth}
-            {tieKey}
           />
           <div class="ml-auto">
-            <NoteActionButtons {note} {repostable} {tieKey} bind:deleted />
+            <NoteActionButtons {note} {repostable} bind:deleted />
           </div>
         </div>
         <div class="break-all text-sm px-2">
@@ -154,7 +152,6 @@
             {repostable}
             {displayMenu}
             {maxHeight}
-            {tieKey}
             {zIndex}
             {mini}
           />

@@ -15,7 +15,7 @@
   import { nip19 } from "nostr-tools";
 
   import { mutes } from "$lib/stores/stores";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import type { PageData } from "./$types";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
@@ -27,7 +27,6 @@
   //repostable={false}チャンネル部屋ではリポストできないようにしてみる（kindで判断じゃなくてチャンネル部屋にいるときだけだけどダイジョブ？？？）
   let amount = 50;
   let viewIndex = 0;
-  let tieKey = $derived(`channel+${data.id}`);
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
@@ -88,7 +87,6 @@
     <ChannelMetadata
       id={data.id}
       linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
-      {tieKey}
     />
     {#if isMute}
       <!---->
@@ -113,7 +111,6 @@
         req={createRxForwardReq()}
         {viewIndex}
         {amount}
-        {tieKey}
         eventFilter={(event) =>
           (event.kind === 42 &&
             event.tags.find(
@@ -134,26 +131,21 @@
                 >
                   {#snippet loading()}
                     <div class="w-full">
-                      <EventCard note={event} repostable={false} {tieKey} />
+                      <EventCard note={event} repostable={false} />
                     </div>
                   {/snippet}
                   {#snippet nodata()}
                     <div class="w-full">
-                      <EventCard note={event} repostable={false} {tieKey} />
+                      <EventCard note={event} repostable={false} />
                     </div>
                   {/snippet}
                   {#snippet error()}
                     <div class="w-full">
-                      <EventCard note={event} repostable={false} {tieKey} />
+                      <EventCard note={event} repostable={false} />
                     </div>
                   {/snippet}
                   {#snippet content({ metadata })}
-                    <EventCard
-                      {metadata}
-                      note={event}
-                      repostable={false}
-                      {tieKey}
-                    />
+                    <EventCard {metadata} note={event} repostable={false} />
                   {/snippet}
                 </Metadata>
               {/each}

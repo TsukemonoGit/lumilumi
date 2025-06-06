@@ -392,7 +392,6 @@
           displayMenu={true}
           depth={0}
           repostable={true}
-          tieKey={undefined}
           kind={0}
         />
       {/if}

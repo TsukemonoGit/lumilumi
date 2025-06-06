@@ -19,7 +19,7 @@
     repostable: boolean;
     maxHeight: number | undefined;
     displayMenu: boolean;
-    tieKey: string | undefined;
+
     mini: any;
     zIndex?: number;
   }
@@ -31,7 +31,7 @@
     repostable,
     maxHeight,
     displayMenu,
-    tieKey,
+
     mini,
     zIndex,
   }: Props = $props();
@@ -48,7 +48,6 @@
     {repostable}
     {displayMenu}
     {depth}
-    {tieKey}
     {mini}
     message={!zapRequestEvent
       ? "failed to get zap request event"
@@ -67,7 +66,6 @@
       {repostable}
       {maxHeight}
       {displayMenu}
-      {tieKey}
       {mini}
       {zIndex}
       message={"failed to get zapped user"}
@@ -78,7 +76,7 @@
       {repostable}
       {displayMenu}
       {depth}
-      {tieKey}
+      
       {mini}
       message={"failed to get zapped user"}
     /> -->
@@ -94,7 +92,6 @@
           {repostable}
           {maxHeight}
           {displayMenu}
-          {tieKey}
           {mini}
           {zIndex}
           message={"loading zap recipient's data..."}
@@ -105,7 +102,7 @@
             {repostable}
             {displayMenu}
             {depth}
-            {tieKey}
+            
             {mini}
             message={"loading zap recipient's data..."}
           /> -->
@@ -120,7 +117,6 @@
           {repostable}
           {maxHeight}
           {displayMenu}
-          {tieKey}
           {mini}
           {zIndex}
           message={"failed to get zap recipient's data."}
@@ -131,7 +127,7 @@
             {repostable}
             {displayMenu}
             {depth}
-            {tieKey}
+            
             {mini}
             message={"failed to get zap recipient's data."}
           /> -->
@@ -146,7 +142,6 @@
           {repostable}
           {maxHeight}
           {displayMenu}
-          {tieKey}
           {mini}
           {zIndex}
           message={"error to get zap recipient's data."}
@@ -157,7 +152,7 @@
             {repostable}
             {displayMenu}
             {depth}
-            {tieKey}
+            
             {mini}
             message={"error to get zap recipient's data."}
           /> -->
@@ -173,7 +168,6 @@
             {repostable}
             {maxHeight}
             {displayMenu}
-            {tieKey}
             {mini}
             {zIndex}
             message={"Checking the LNURL Server's pubkey..."}
@@ -184,7 +178,7 @@
             {repostable}
             {displayMenu}
             {depth}
-            {tieKey}
+            
             {mini}
             message={"Checking the LNURL Server's pubkey..."}
           /> -->
@@ -199,7 +193,6 @@
               {repostable}
               {maxHeight}
               {displayMenu}
-              {tieKey}
               {mini}
               {zIndex}
               message={isValidEvent9735.error}
@@ -210,7 +203,7 @@
               {repostable}
               {displayMenu}
               {depth}
-              {tieKey}
+              
               {mini}
               message={isValidEvent9735.error}
             /> -->
@@ -224,7 +217,6 @@
               {repostable}
               {maxHeight}
               {displayMenu}
-              {tieKey}
               {mini}
               {zIndex}
             />

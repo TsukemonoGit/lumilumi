@@ -17,7 +17,7 @@ import { pipe } from "rxjs";
 import { derived, get } from "svelte/store";
 import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app } from "./stores";
+import { app, tie } from "./stores";
 import { scanArray } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
@@ -36,7 +36,7 @@ export function useRelaySet(
   console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
 
-  const operator = pipe(uniq(), scanArray(), completeOnTimeout(5000));
+  const operator = pipe(tie, uniq(), scanArray(), completeOnTimeout(5000));
   //console.log(queryKey, filters, operator, req);
   const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
     staleTime: Infinity,

@@ -24,8 +24,6 @@
 
   let { data }: { data: PageData } = $props();
 
-  let tieKey = undefined;
-
   const repostable = true;
 
   const maxHeight = 0;
@@ -76,7 +74,6 @@
                     {thread}
                     {depth}
                     {repostable}
-                    {tieKey}
                   /><NoteInfo note={text} />
                 </div>
               {/snippet}
@@ -90,7 +87,6 @@
                     {thread}
                     {depth}
                     {repostable}
-                    {tieKey}
                   /><NoteInfo note={text} />
                 </div>
               {/snippet}
@@ -104,7 +100,6 @@
                     {thread}
                     {depth}
                     {repostable}
-                    {tieKey}
                   /><NoteInfo note={text} />
                 </div>
               {/snippet}
@@ -120,7 +115,6 @@
                     {displayMenu}
                     {depth}
                     {repostable}
-                    {tieKey}
                   /><NoteInfo note={text} />
                 </div>
               {/snippet}
@@ -141,13 +135,13 @@
 
                 {#snippet children({ kind1, kind6, kind7, kind9735 })}
                   <!--kind6-->
-                  <NoteRepostList events={kind6} {tieKey} />
+                  <NoteRepostList events={kind6} />
 
                   <!--kind7-->
-                  <NoteReactionList events={kind7} {tieKey} />
+                  <NoteReactionList events={kind7} />
 
                   <!--zap レシート-->
-                  <ZapReactionList events={kind9735} {tieKey} />
+                  <ZapReactionList events={kind9735} />
 
                   <!--kind1,42-->
                   <CollapsibleList title="Comments" amount={kind1.length}>
@@ -164,32 +158,17 @@
                         >
                           {#snippet loading()}
                             <div>
-                              <EventCard
-                                note={event}
-                                depth={0}
-                                {repostable}
-                                {tieKey}
-                              />
+                              <EventCard note={event} depth={0} {repostable} />
                             </div>
                           {/snippet}
                           {#snippet nodata()}
                             <div>
-                              <EventCard
-                                note={event}
-                                depth={0}
-                                {repostable}
-                                {tieKey}
-                              />
+                              <EventCard note={event} depth={0} {repostable} />
                             </div>
                           {/snippet}
                           {#snippet error()}
                             <div>
-                              <EventCard
-                                note={event}
-                                depth={0}
-                                {repostable}
-                                {tieKey}
-                              />
+                              <EventCard note={event} depth={0} {repostable} />
                             </div>
                           {/snippet}
                           {#snippet content({ metadata })}
@@ -198,7 +177,6 @@
                               note={event}
                               depth={0}
                               {repostable}
-                              {tieKey}
                             />
                           {/snippet}
                         </Metadata>

@@ -7,12 +7,11 @@
 
   interface Props {
     events: Nostr.Event[];
-    tieKey: string | undefined;
   }
 
-  let { events = $bindable(), tieKey }: Props = $props();
+  let { events = $bindable() }: Props = $props();
 </script>
 
 <CollapsibleList title="Zap" amount={events.length}>
-  <ZapList {events} {tieKey} />
+  <ZapList {events} />
 </CollapsibleList>
