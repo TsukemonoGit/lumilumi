@@ -8,7 +8,6 @@
   import * as Nostr from "nostr-typedef";
   import {
     defaultRelays,
-    loginUser,
     nowProgress,
     queryClient,
     toastSettings,
@@ -17,7 +16,7 @@
 
   import Settei from "../global/Settei.svelte";
   import SearchOption from "./SearchOption.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { nip50relays } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";
@@ -26,7 +25,7 @@
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { page } from "$app/state";
 
   let { data }: { data: PageData } = $props();
@@ -118,7 +117,7 @@
     //すでにあるならデータをセットする
     const data: string[] | undefined = queryClient.getQueryData([
       "searchRelay",
-      $loginUser,
+      lumiSetting.get().pubkey,
     ]);
 
     if (data) {
@@ -128,7 +127,7 @@
       const fetchRelays = await usePromiseReq(
         {
           filters: [
-            { authors: [$loginUser], kinds: [10007], limit: 1 },
+            { authors: [lumiSetting.get().pubkey], kinds: [10007], limit: 1 },
           ] as Nostr.Filter[],
           operator: pipe(latest()),
         },
@@ -139,7 +138,10 @@
       if (fetchRelays.length > 0) {
         const relaylist = toGlobalRelaySet(fetchRelays[0].event);
         if (relaylist.length > 0) {
-          queryClient.setQueryData(["searchRelay", $loginUser], relaylist);
+          queryClient.setQueryData(
+            ["searchRelay", lumiSetting.get().pubkey],
+            relaylist
+          );
           searchRelays = relaylist;
         }
       }
@@ -246,7 +248,10 @@
     if (isSuccess.length > 0) {
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
-        queryClient.setQueryData(["searchRelay", $loginUser], relaylist);
+        queryClient.setQueryData(
+          ["searchRelay", lumiSetting.get().pubkey],
+          relaylist
+        );
         searchRelays = relaylist;
       }
     }
@@ -260,7 +265,7 @@
 </script>
 
 <section>
-  {#if $loginUser}
+  {#if lumiSetting.get().pubkey}
     <Settei
       title={$_("settei.search")}
       relays={searchRelays}

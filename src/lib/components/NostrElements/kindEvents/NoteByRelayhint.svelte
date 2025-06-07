@@ -5,9 +5,10 @@
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
   import { encodetoNote } from "$lib/func/encode";
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import * as Nostr from "nostr-typedef";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     id: string;
@@ -47,7 +48,7 @@
   };
 
   const onChange = (ev: Nostr.Event) => {
-    isOmitted = omit && ev.pubkey === $loginUser;
+    isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
   };
 </script>
 

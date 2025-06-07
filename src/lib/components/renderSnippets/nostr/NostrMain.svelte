@@ -6,7 +6,6 @@
     mutes,
     defaultRelays,
     onlyFollowee,
-    loginUser,
   } from "$lib/stores/stores";
 
   import { goto } from "$app/navigation";
@@ -116,7 +115,7 @@
       localRelays = [];
       // setRelays(relaySearchRelays);
     }
-    pubkey = $loginUser = lumiSetting.get().pubkey;
+    pubkey = lumiSetting.get().pubkey;
   }
 
   function loadMutetokanoSettei() {

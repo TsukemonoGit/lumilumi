@@ -49,7 +49,12 @@
   let invoice: string | undefined = $state(undefined);
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver(queryClient, {
-    queryKey: ["reactions", monoZap.eventTag[1], "zapped", $loginUser],
+    queryKey: [
+      "reactions",
+      monoZap.eventTag[1],
+      "zapped",
+      lumiSetting.get().pubkey,
+    ],
   });
   let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {

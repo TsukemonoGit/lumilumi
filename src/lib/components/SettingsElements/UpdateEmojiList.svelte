@@ -1,8 +1,8 @@
 <script lang="ts">
   import { formatAbsoluteDate } from "$lib/func/util";
-  import { emojis, loginUser, nowProgress } from "$lib/stores/stores";
+  import { emojis } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
   import { nip19 } from "nostr-tools";
@@ -10,9 +10,6 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus } from "lucide-svelte";
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
-  interface Props {
-    pubkey: string;
-  }
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
@@ -58,12 +55,12 @@
           {/each}
         </div>
       {/if}
-      {#if $loginUser}<a
+      {#if lumiSetting.get().pubkey}<a
           class="underline text-magnum-300 break-all ml-4 text-sm"
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            $loginUser
+            lumiSetting.get().pubkey
           )}/10030"
           >{$_("settings.nostviewstr.kind10030")}
         </a>{/if}

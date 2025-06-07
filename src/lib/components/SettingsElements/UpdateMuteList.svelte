@@ -4,18 +4,14 @@
 
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import {
-    loginUser,
-    mutes,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import AddMute from "./AddMute.svelte";
 
   import MuteTabList from "./MuteTabList.svelte";
   import { writable } from "svelte/store";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -109,12 +105,12 @@
         <AddMute />
         <MuteTabList />
       {/if}
-      {#if $loginUser}<a
+      {#if lumiSetting.get().pubkey}<a
           class="underline text-magnum-300 break-all ml-4 text-sm"
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            $loginUser
+            lumiSetting.get().pubkey
           )}/10000"
         >
           {$_("settings.nostviewstr.kind10000")}

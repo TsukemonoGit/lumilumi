@@ -5,12 +5,7 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import { nip19 } from "nostr-tools";
-  import {
-    loginUser,
-    mutes,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "../Elements/AlertDialog.svelte";
 
@@ -21,6 +16,7 @@
     toMuteList,
   } from "$lib/func/settings";
   import { promisePublishEvent } from "$lib/func/nostr";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   let muteInput: string = $state("");
 
@@ -131,7 +127,7 @@
       newTags.push(addTag);
       const newEvPara: Nostr.EventParameters = {
         kind: kind10000.kind,
-        pubkey: $loginUser,
+        pubkey: lumiSetting.get().pubkey,
         tags: kind10000.tags,
         content: (await encryptPrvTags(kind10000.pubkey, newTags)) ?? "",
       };
@@ -178,9 +174,9 @@
     }
     const newEvPara: Nostr.EventParameters = {
       kind: 10000,
-      pubkey: $loginUser,
+      pubkey: lumiSetting.get().pubkey,
       tags: [],
-      content: (await encryptPrvTags($loginUser, [addTag])) ?? "",
+      content: (await encryptPrvTags(lumiSetting.get().pubkey, [addTag])) ?? "",
     };
     const { event: ev, res: res } = await promisePublishEvent(newEvPara);
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);

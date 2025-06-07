@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { loginUser } from "$lib/stores/stores";
-
   import Avatar from "svelte-boring-avatars";
   import * as Nostr from "nostr-typedef";
   import type { Profile } from "$lib/types";
@@ -31,18 +29,21 @@
     }
   };
 
-  let avatarColor = $derived(splitHexColorString($loginUser));
+  let avatarColor = $derived(splitHexColorString(lumiSetting.get().pubkey));
 </script>
 
-{#if $loginUser}
+{#if lumiSetting.get().pubkey}
   <div class="my-auto">
-    <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser}>
+    <Metadata
+      queryKey={["metadata", lumiSetting.get().pubkey]}
+      pubkey={lumiSetting.get().pubkey}
+    >
       {#snippet loading()}
         <div>
           <Avatar
             {square}
             {size}
-            name={$loginUser}
+            name={lumiSetting.get().pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -53,7 +54,7 @@
           <Avatar
             {square}
             {size}
-            name={$loginUser}
+            name={lumiSetting.get().pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -64,7 +65,7 @@
           <Avatar
             {square}
             {size}
-            name={$loginUser}
+            name={lumiSetting.get().pubkey}
             variant="beam"
             colors={avatarColor}
           />
@@ -88,7 +89,7 @@
             <Avatar
               {square}
               {size}
-              name={$loginUser}
+              name={lumiSetting.get().pubkey}
               variant="beam"
               colors={avatarColor}
             />

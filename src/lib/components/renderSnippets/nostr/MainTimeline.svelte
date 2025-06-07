@@ -2,7 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount, untrack } from "svelte";
   import { get } from "svelte/store";
-  import { pipe, type OperatorFunction } from "rxjs";
+  import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
   import { type QueryKey, createQuery } from "@tanstack/svelte-query";
@@ -12,7 +12,6 @@
   // Store imports
   import {
     defaultRelays,
-    loginUser,
     nowProgress,
     queryClient,
     tie,
@@ -462,8 +461,11 @@
     >
   </div>
 {/if}
-{#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
-  <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
+{#if lumiSetting.get().pubkey}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+  <Metadata
+    queryKey={["metadata", lumiSetting.get().pubkey]}
+    pubkey={lumiSetting.get().pubkey}
+  />
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}

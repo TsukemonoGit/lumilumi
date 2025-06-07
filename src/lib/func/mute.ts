@@ -2,13 +2,16 @@ import { latest } from "rx-nostr";
 import { usePromiseReq } from "./nostr";
 import { pipe } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { loginUser, mutes } from "$lib/stores/stores";
+import { mutes } from "$lib/stores/stores";
 import { get } from "svelte/store";
+import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
 export async function refetchKind10000(): Promise<Nostr.Event | undefined> {
   const kind10000 = await usePromiseReq(
     {
-      filters: [{ kinds: [10000], authors: [get(loginUser)], limit: 1 }],
+      filters: [
+        { kinds: [10000], authors: [lumiSetting.get().pubkey], limit: 1 },
+      ],
       operator: pipe(latest()),
     },
     undefined,

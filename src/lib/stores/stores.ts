@@ -18,7 +18,7 @@ import {
   //type TimelineFilter,
 } from "$lib/types";
 //import * as Nostr from "nostr-typedef";
-import { type OperatorFunction } from "rxjs";
+
 import { createTie } from "./operators";
 //import type { Part } from "$lib/func/content";
 
@@ -53,8 +53,6 @@ export const toastSettings = writable<{
   description: string;
   color: string;
 }>();
-
-export const loginUser = writable<string>();
 
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
 

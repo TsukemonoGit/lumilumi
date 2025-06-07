@@ -9,7 +9,6 @@
   import UserAvatar from "./UserAvatar.svelte";
 
   import Nip05Check from "./Nip05Check.svelte";
-  import { loginUser } from "$lib/stores/stores";
   import MuteStatusIcons from "$lib/components/Elements/MuteStatusIcons.svelte";
 
   import UserZap from "./UserZap.svelte";
@@ -144,12 +143,14 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if $loginUser !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} />
 
-          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+              {pubkey}
+            />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
       </div>
@@ -160,12 +161,14 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if $loginUser !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} />
 
-          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+              {pubkey}
+            />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
       </div>
@@ -176,12 +179,14 @@
       >
         {loadingText}
         <div class="flex flex-row ml-auto gap-2">
-          {#if $loginUser !== pubkey}<MuteStatusIcons
+          {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}
           <UserPofileEllipsis {pubkey} />
 
-          {#if $loginUser === pubkey}<UserEditEllipsis {pubkey} />{:else}
+          {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
+              {pubkey}
+            />{:else}
             <FollowButton {pubkey} />{/if}
         </div>
       </div>
@@ -270,7 +275,7 @@
               </div>
               <div class="flex flex-col gap-2">
                 <div class="flex flex-row ml-auto gap-2">
-                  {#if $loginUser !== pubkey}<MuteStatusIcons
+                  {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}
                   {#if prof.lud16 || prof.lud06}
@@ -278,7 +283,7 @@
                   {/if}<UserPofileEllipsis {pubkey} {metadata} {prof} {tab} />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">
-                  {#if $loginUser === pubkey}<UserEditEllipsis
+                  {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
                       {pubkey}
                     />{:else}
                     <FollowButton {pubkey} />{/if}

@@ -7,12 +7,7 @@
   } from "$lib/func/settings";
   import { formatAbsoluteDate } from "$lib/func/util";
   import { nip19 } from "nostr-tools";
-  import {
-    loginUser,
-    mutebykinds,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { mutebykinds, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
@@ -20,6 +15,7 @@
   import { locale } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -33,11 +29,16 @@
   async function handleClickMuteByKind() {
     const beforeList = $mutebykinds?.list;
     try {
-      const gotPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      ).getPublicKey();
-      if (gotPubkey) {
-        pubkey = gotPubkey;
+      if (!loginUser.get()) {
+        const gpubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (gpubkey) {
+          loginUser.set(gpubkey);
+        }
+      }
+      if (loginUser.get()) {
+        pubkey = loginUser.get();
       }
     } catch (error) {
       console.log(error);
@@ -123,12 +124,12 @@
         {/each}
       {/if}
 
-      {#if $loginUser}<a
+      {#if lumiSetting.get().pubkey}<a
           class="underline text-magnum-300 break-all ml-4 text-sm"
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            $loginUser
+            lumiSetting.get().pubkey
           )}/30007"
           >{$_("settings.nostviewstr.kind30007")}
         </a>{/if}

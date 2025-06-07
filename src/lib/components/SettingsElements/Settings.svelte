@@ -6,7 +6,6 @@
   import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
     emojis,
-    loginUser,
     mutes,
     mutebykinds,
     toastSettings,
@@ -197,11 +196,11 @@
     if (settings.useRelaySet === "1" && settings.relays.length > 0) {
       setRelays(settings.relays as DefaultRelayConfig[]);
     } else {
-      // queryKey: ["defaultRelay", $loginUser] のデータがあるか確認
+      // queryKey: ["defaultRelay", lumiSetting.get().pubkey] のデータがあるか確認
 
       const data: EventPacket[] | undefined = queryClient.getQueryData([
         "defaultRelay",
-        $loginUser,
+        lumiSetting.get().pubkey,
       ]);
       console.log(data);
       if (data) {
@@ -211,7 +210,9 @@
       } else {
         const relays = await usePromiseReq(
           {
-            filters: [{ authors: [$loginUser], kinds: [10002], limit: 1 }],
+            filters: [
+              { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
+            ],
             operator: pipe(latest()),
           },
           undefined,
@@ -226,9 +227,9 @@
       // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
       //コンポーネント外やでerrorがでる
       // useRelaySet(
-      //   ["defaultRelay", $loginUser],
+      //   ["defaultRelay", lumiSetting.get().pubkey],
       //   [
-      //     { authors: [$loginUser], kinds: [10002], limit: 1 },
+      //     { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
       //   ] as Nostr.Filter[],
       //   undefined
       // );
@@ -237,7 +238,7 @@
   }
 
   function updateStores(settings: LumiSetting) {
-    $loginUser = settings.pubkey;
+    lumiSetting.get().pubkey = settings.pubkey;
 
     //relayset情報を更新する前に確認
     console.log($selectedRelayset, settings.useRelaySet);
@@ -478,7 +479,7 @@
             for={index.toString()}
             id="{index.toString()}-label"
           >
-            {option}{#if index === 0 && $loginUser}
+            {option}{#if index === 0 && lumiSetting.get().pubkey}
               <a
                 class="underline text-magnum-300 break-all flex-wrap inline-flex"
                 href={`/${inputPubkey}/relays`}
@@ -702,13 +703,13 @@
     <div class="mt-2">
       <UpdateMuteList bind:pubkey={settings.pubkey} />
     </div>
-    {#if $loginUser}
+    {#if lumiSetting.get().pubkey}
       <a
         class="underline text-magnum-300 break-all ml-4 text-sm"
         target="_blank"
         rel="noopener noreferrer"
         href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
+          lumiSetting.get().pubkey
         )}/10000"
       >
         {$_("settings.nostviewstr.kind10000")}
@@ -718,14 +719,14 @@
     <div class="mt-2">
       <UpdateMutebykindList bind:pubkey={settings.pubkey} />
     </div>
-    {#if $loginUser}
+    {#if lumiSetting.get().pubkey}
       <div class="flex gap-2 items-center">
         <a
           class="underline text-magnum-300 break-all ml-4 text-sm"
           target="_blank"
           rel="noopener noreferrer"
           href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-            $loginUser
+            lumiSetting.get().pubkey
           )}/30007"
           >{$_("settings.nostviewstr.kind30007")}
         </a><button
@@ -751,13 +752,13 @@
         >(NIP-30)</Link
       >
     </div>
-    {#if $loginUser}
+    {#if lumiSetting.get().pubkey}
       <a
         class="underline text-magnum-300 break-all ml-4 text-sm"
         target="_blank"
         rel="noopener noreferrer"
         href="https://nostviewstr.vercel.app/{nip19.npubEncode(
-          $loginUser
+          lumiSetting.get().pubkey
         )}/10030"
         >{$_("settings.nostviewstr.kind10030")}
       </a>

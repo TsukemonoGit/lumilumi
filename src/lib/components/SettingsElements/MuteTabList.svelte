@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { X } from "lucide-svelte";
   import { createTabs, melt } from "@melt-ui/svelte";
@@ -7,12 +7,7 @@
   import { cubicInOut } from "svelte/easing";
   import { nip19 } from "nostr-tools";
   import { refetchKind10000 } from "$lib/func/mute";
-  import {
-    loginUser,
-    mutes,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import {
     toMuteList,
     decryptContent,
@@ -20,6 +15,7 @@
   } from "$lib/func/settings";
   import * as Nostr from "nostr-typedef";
   import { promisePublishEvent } from "$lib/func/nostr";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   // export let muteList: LumiMute;
   const {
@@ -88,7 +84,7 @@
       );
       const newEvPara: Nostr.EventParameters = {
         kind: kind10000.kind,
-        pubkey: $loginUser,
+        pubkey: lumiSetting.get().pubkey,
         tags: newpubTags,
         content:
           (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",

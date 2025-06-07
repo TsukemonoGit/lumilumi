@@ -1,17 +1,16 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { MessagesSquare, X, Image, Plus, Minus } from "lucide-svelte";
+  import { MessagesSquare, X, Plus, Minus } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
   import {
-    loginUser,
     nowProgress,
     popStack,
     queryClient,
     toastSettings,
   } from "$lib/stores/stores";
-  import { nip19 } from "nostr-tools";
+
   import { clientTag } from "$lib/func/constants";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -23,7 +22,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
 
-  let querykey: QueryKey = $derived(["kind10005", $loginUser]);
+  let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
 
   // フォームの状態を管理
   let channelName = $state("");

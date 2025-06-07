@@ -48,11 +48,12 @@
   import { writable, type Writable } from "svelte/store";
   import {
     displayEvents,
+    loginUser,
     showBanner,
     verifier,
   } from "$lib/stores/globalRunes.svelte";
   import { defaultRelays } from "$lib/stores/relays";
-  import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
+  //import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
   import { page } from "$app/state";
   import { t as _ } from "@konemono/svelte5-i18n";
   import Popstate from "./Popstate.svelte";
@@ -93,6 +94,11 @@
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
+    document.addEventListener("nlAuth", (e: Event) => {
+      const customEvent = e as CustomEvent;
+      loginUser.set(customEvent.detail.pubkey || "");
+      console.log(customEvent);
+    });
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {

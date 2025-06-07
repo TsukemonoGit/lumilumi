@@ -8,7 +8,6 @@
   import { latest, type EventPacket } from "rx-nostr";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import {
-    loginUser,
     nowProgress,
     popStack,
     queryClient,
@@ -22,13 +21,14 @@
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
     heyaId: string;
   }
   let { editChannelListOpen = $bindable(), heyaId }: Props = $props();
-  let querykey: QueryKey = $derived(["kind10005", $loginUser]);
+  let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
   let kind10005: Nostr.Event | undefined = $state();
 
   const {
@@ -89,7 +89,9 @@
       console.log(kind10005data);
       const newKind10005: EventPacket[] = await usePromiseReq(
         {
-          filters: [{ kinds: [10005], authors: [$loginUser], limit: 1 }],
+          filters: [
+            { kinds: [10005], authors: [lumiSetting.get().pubkey], limit: 1 },
+          ],
           operator: pipe(latest()),
         },
         undefined,

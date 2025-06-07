@@ -2,7 +2,6 @@
   import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
-    loginUser,
     nowProgress,
     queryClient,
     tie,
@@ -30,7 +29,7 @@
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
-  import { displayEvents } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { useSearchEventList } from "$lib/stores/useSearchEventList";
 
   const sift = 40; //スライドする量
@@ -301,8 +300,11 @@
     /></button
   >
 {/if}
-{#if $loginUser}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
-  <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
+{#if lumiSetting.get().pubkey}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+  <Metadata
+    queryKey={["metadata", lumiSetting.get().pubkey]}
+    pubkey={lumiSetting.get().pubkey}
+  />
 {/if}
 {#if $errorData}
   {@render error?.($errorData)}

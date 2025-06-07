@@ -28,7 +28,7 @@
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
@@ -49,6 +49,7 @@
   import BirthDayFestival from "$lib/components/Fes/BirthDayFestival.svelte";
 
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     data: {
@@ -142,7 +143,7 @@
       value.set("post");
     }
     //ログインしてない＝10002リレーないから
-    if (!$loginUser && data.relays && data.relays.length > 0) {
+    if (!lumiSetting.get().pubkey && data.relays && data.relays.length > 0) {
       setRelays(data.relays);
     }
     since = undefined;

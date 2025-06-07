@@ -9,6 +9,7 @@ import type { ConnectionState } from "rx-nostr";
 import type { EventVerifier } from "rx-nostr-crypto";
 import { SvelteMap } from "svelte/reactivity";
 
+export const loginUser = createCustomStore<string>("");
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
 export const timelineFilter =
   createCustomStore<TimelineFilter>(timelineFilterInit);

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
-  import { loginUser } from "$lib/stores/stores";
+
   import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
@@ -65,7 +65,11 @@
   }
 
   function performUpdate() {
-    if ((etagList.length <= 0 && atagList.length <= 0) || !$loginUser) return;
+    if (
+      (etagList.length <= 0 && atagList.length <= 0) ||
+      !lumiSetting.get().pubkey
+    )
+      return;
 
     filters =
       etagList.length > 0
@@ -74,7 +78,7 @@
               "#e": $state.snapshot(etagList),
               authors: lumiSetting.get().showAllReactions
                 ? undefined
-                : [$loginUser],
+                : [lumiSetting.get().pubkey],
               kinds: [7, 6, 16],
             },
             {
@@ -89,7 +93,7 @@
           "#a": $state.snapshot(atagList),
           authors: lumiSetting.get().showAllReactions
             ? undefined
-            : [$loginUser],
+            : [lumiSetting.get().pubkey],
           kinds: [7, 6, 16],
         },
         {

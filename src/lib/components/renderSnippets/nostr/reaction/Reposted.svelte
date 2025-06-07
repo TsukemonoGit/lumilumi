@@ -1,10 +1,11 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import { QueryObserver } from "@tanstack/svelte-query";
 
   import { onDestroy, onMount, type Snippet } from "svelte";
   import type { EventPacket } from "rx-nostr";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     id: string;
@@ -23,13 +24,13 @@
       "reactions",
       id,
       "repost",
-      $loginUser,
+      lumiSetting.get().pubkey,
     ]);
     if (queryData) {
       data = queryData[0].event;
     }
     const observer1 = new QueryObserver(queryClient, {
-      queryKey: ["reactions", id, "repost", $loginUser],
+      queryKey: ["reactions", id, "repost", lumiSetting.get().pubkey],
     });
     unsubscribe = observer1.subscribe((result: any) => {
       const packets = result?.data as EventPacket[] | undefined;

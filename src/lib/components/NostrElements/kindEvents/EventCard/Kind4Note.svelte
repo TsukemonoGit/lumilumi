@@ -2,7 +2,6 @@
   import * as Nostr from "nostr-typedef";
 
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { loginUser } from "$lib/stores/stores";
 
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
 
@@ -59,16 +58,20 @@
 
   //自分宛て？もしくは自分が書いた？
   let forme = $derived(
-    note.pubkey === $loginUser ||
+    note.pubkey === lumiSetting.get().pubkey ||
       note.tags.find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === $loginUser
+        (tag) =>
+          tag[0] === "p" &&
+          tag.length > 1 &&
+          tag[1] === lumiSetting.get().pubkey
       )
   );
 
   //どっちがどっち
   async function decryptMessage() {
     const user = note.tags.find(
-      (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== $loginUser
+      (tag) =>
+        tag[0] === "p" && tag.length > 1 && tag[1] !== lumiSetting.get().pubkey
     )?.[1];
     try {
       decrypt = await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(

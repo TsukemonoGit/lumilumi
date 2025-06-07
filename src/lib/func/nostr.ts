@@ -1,7 +1,6 @@
 import {
   app,
   defaultRelays,
-  loginUser,
   metadataQueue,
   queryClient,
   tieMap,
@@ -243,7 +242,7 @@ export const makeMainFilters = (
 ): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
 
-  const pubkeyList = pubkeysIn(contacts, get(loginUser));
+  const pubkeyList = pubkeysIn(contacts, lumiSetting.get().pubkey);
 
   const kinds = [1, 6];
   if (lumiSetting.get().showKind16) {
@@ -276,7 +275,7 @@ export const makeMainFilters = (
   if (lumiSetting.get().showReactioninTL) {
     filters.push({
       kinds: notificationKinds,
-      "#p": [get(loginUser)],
+      "#p": [lumiSetting.get().pubkey],
       since: since,
     });
   } //とりあえず通知をTLに流したくないときは フィルターから外してみる
