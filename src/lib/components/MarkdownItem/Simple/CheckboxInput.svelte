@@ -8,7 +8,8 @@
   let { part }: Props = $props();
 
   // checked属性があるかどうかで判定
-  const isChecked = part.attrs?.some(([key, value]) => key === "checked");
+  const isChecked = part.meta.checked;
+  console.log(part);
 </script>
 
 <input

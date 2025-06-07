@@ -13,13 +13,14 @@
   import markdownLinkPlugin from "$lib/func/markdown-it/markdown-it-link";
   import markdownDdPlugin from "$lib/func/markdown-it/markdonw-it-dd";
   import markdownDtPlugin from "$lib/func/markdown-it/markdown-it-dt";
-  import markdownCheckBoxPlugin from "markdown-it-task-checkbox";
+
   import Truncate from "../NostrElements/content/Truncate.svelte";
   //import Dialog from "../Elements/Dialog.svelte";
   //import { type Writable, writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
 
   import { noteLink } from "$lib/func/event";
+  import markdownTaskListPlugin from "$lib/func/markdown-it/markdown-it-tasklist";
 
   interface Props {
     text: string;
@@ -58,7 +59,7 @@
   //プレビューにも使ってるからconstだとだめ
   let tokens = $derived(
     md
-      .use(markdownCheckBoxPlugin)
+      .use(markdownTaskListPlugin)
       .use(markdownImgPlugin)
 
       .use(markdownItFootnote)

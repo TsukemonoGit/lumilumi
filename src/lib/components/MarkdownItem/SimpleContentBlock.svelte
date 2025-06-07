@@ -262,7 +262,7 @@
     {nolist}
     {zIndex}
   />
-{:else if part.type === "checkbox_input"}
+{:else if part.type === "task_checkbox"}
   <CheckboxInput {part} />
 {:else if part.type === "label"}
   <Label
