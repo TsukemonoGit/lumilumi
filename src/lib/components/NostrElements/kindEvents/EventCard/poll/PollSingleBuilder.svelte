@@ -4,7 +4,7 @@
   import { promisePublishSignedEvent, usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { nip07Signer, uniq } from "rx-nostr";
-  import { loginUser, toastSettings } from "$lib/stores/stores";
+  import { toastSettings } from "$lib/stores/stores";
   import { untrack } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { latestEachPubkey } from "$lib/stores/operators";
@@ -56,7 +56,9 @@
         voteRelays.length > 0 ? voteRelays : undefined
       )
     )?.map((evs) => evs.event);
-    userVoteEvent = voteEvents.find((ev) => ev.pubkey === $loginUser);
+    userVoteEvent = voteEvents.find(
+      (ev) => ev.pubkey === lumiSetting.get().pubkey
+    );
     const value = getVoted(userVoteEvent);
 
     group = new RadioGroup({ disabled: hasEnded, value: value });
@@ -82,7 +84,7 @@
   //--------
   const handleClickVote = async () => {
     console.log(group?.value);
-    if (!group?.value || !$loginUser || isSubmitting) return;
+    if (!group?.value || !lumiSetting.get().pubkey || isSubmitting) return;
 
     try {
       isSubmitting = true;
@@ -176,7 +178,7 @@
                 />
               </div>
 
-              {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}
+              {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === note.pubkey}
                 {@const evs = voteEvents.filter((ev) => getVoted(ev) === id)}
 
                 <div

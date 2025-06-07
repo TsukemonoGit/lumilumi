@@ -4,7 +4,7 @@
   import { promisePublishSignedEvent, usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { nip07Signer, uniq } from "rx-nostr";
-  import { loginUser, toastSettings } from "$lib/stores/stores";
+  import { toastSettings } from "$lib/stores/stores";
   import { untrack } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { latestEachPubkey } from "$lib/stores/operators";
@@ -58,7 +58,9 @@
         )
       )?.map((evs) => evs.event) || [];
 
-    userVoteEvent = voteEvents.find((ev) => ev.pubkey === $loginUser);
+    userVoteEvent = voteEvents.find(
+      (ev) => ev.pubkey === lumiSetting.get().pubkey
+    );
 
     // ユーザーが過去に投票していた選択肢を取得して選択状態を復元
     if (userVoteEvent) {
@@ -95,7 +97,8 @@
   }
 
   const handleClickVote = async () => {
-    if (selectedIds.length === 0 || !$loginUser || isSubmitting) return;
+    if (selectedIds.length === 0 || !lumiSetting.get().pubkey || isSubmitting)
+      return;
 
     try {
       isSubmitting = true;
@@ -173,7 +176,7 @@
       /></span
     >
 
-    {#if userVoteEvent || hasEnded || $loginUser === note.pubkey}
+    {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === note.pubkey}
       {@const evs = voteEvents.filter((ev) =>
         getVotes(ev).find((v) => v === id)
       )}

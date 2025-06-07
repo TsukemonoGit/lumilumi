@@ -9,7 +9,7 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { setRelays } from "$lib/func/nostr";
-  import { defaultRelays, loginUser, queryClient } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import * as Nostr from "nostr-typedef";
@@ -18,6 +18,7 @@
   import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   let { data }: { data: PageData } = $props();
 
   const atag = `${data.kind}:${data.pubkey}${data.identifier}`;
@@ -82,7 +83,8 @@
       const prvListStr = await (
         window.nostr as Nostr.Nip07.Nostr
       ).nip04?.decrypt(
-        $loginUser ??
+        lumiSetting.get().pubkey ??
+          loginUser.get() ??
           (await (window.nostr as Nostr.Nip07.Nostr).getPublicKey()),
         event.content
       );

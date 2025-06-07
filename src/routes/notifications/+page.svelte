@@ -1,6 +1,6 @@
 <script lang="ts">
   import { now, type EventPacket } from "rx-nostr";
-  import { loginUser, onlyFollowee, queryClient } from "$lib/stores/stores";
+  import { onlyFollowee, queryClient } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
@@ -15,7 +15,7 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   import { extractKind9734 } from "$lib/func/zap";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { notificationKinds } from "$lib/func/constants";
 
   // Constants
@@ -63,7 +63,7 @@
   let filters: Nostr.Filter[] = [
     {
       kinds: notificationKinds,
-      "#p": [$loginUser],
+      "#p": [lumiSetting.get().pubkey],
       since: undefined,
       until: undefined,
       limit: undefined,
@@ -116,7 +116,7 @@
   // Filter helpers
   function getNotificationFilterPredicate(event: Nostr.Event): boolean {
     // Skip self-notifications
-    if (event.pubkey === $loginUser) {
+    if (event.pubkey === lumiSetting.get().pubkey) {
       return false;
     }
 
@@ -157,7 +157,7 @@
       (tag) => tag[0] === "p" && tag.length > 1
     )?.[1];
 
-    return targetPubkey === $loginUser;
+    return targetPubkey === lumiSetting.get().pubkey;
   }
 
   function isSelectedNotificationType(event: Nostr.Event): boolean {
@@ -197,7 +197,7 @@
   }
 </script>
 
-{#if !$loginUser}
+{#if !lumiSetting.get().pubkey}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"

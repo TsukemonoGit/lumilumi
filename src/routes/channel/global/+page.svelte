@@ -4,7 +4,7 @@
 
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
-  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
@@ -15,6 +15,7 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   const timelineQuery: QueryKey = ["globalchannel"];
   let amount = 50;
@@ -117,10 +118,10 @@
           {/each}{/if}
       {/snippet}
     </TimelineList>
-  {/if}{#if $loginUser}
+  {/if}{#if lumiSetting.get().pubkey}
     <Link
       className="w-full border border-magnum-500 rounded-lg p-2 hover:opacity-75 active:opacity-50 flex justify-center font-semibold text-magnum-300 break-all "
-      href={`https://nostviewstr.vercel.app/${nip19.npubEncode($loginUser)}/${10005}`}
+      href={`https://nostviewstr.vercel.app/${nip19.npubEncode(lumiSetting.get().pubkey)}/${10005}`}
       >{$_("nostviewstr.kind10005")}<SquareArrowOutUpRight size={16} /></Link
     >{/if}
 </section>

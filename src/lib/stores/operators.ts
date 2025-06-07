@@ -3,7 +3,6 @@ import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
-  loginUser,
   metadataQueue,
   mutebykinds,
   mutes,
@@ -19,6 +18,7 @@ import { type QueryKey } from "@tanstack/svelte-query";
 import { muteCheck, muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
 import {
   followList,
+  lumiSetting,
   timelineFilter,
   userStatusMap,
 } from "$lib/stores/globalRunes.svelte";
@@ -363,8 +363,8 @@ export function zapCheck() {
     }
 
     const pub = zappedPubkey(event.event);
-    if (pub === get(loginUser)) {
-      return true; // kindが9735で、かつpubがget(loginUser)と一致する場合はtrueを返す（イベントを通過させる）
+    if (pub === lumiSetting.get().pubkey) {
+      return true; // kindが9735で、かつpubがlumiSetting.get().pubkeyと一致する場合はtrueを返す（イベントを通過させる）
     } else {
       return false; // 上記以外の場合はfalseを返す（イベントを通過させない）
     }
@@ -383,7 +383,7 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
 
 export function reactionCheck() {
   return filter((packet: EventPacket) => {
-    const loginUserPubkey = get(loginUser);
+    const loginUserPubkey = lumiSetting.get().pubkey;
     const isFollowingUser = (pubkey: string) =>
       followList.get() && followList.get().has(pubkey);
 

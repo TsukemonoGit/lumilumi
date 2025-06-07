@@ -12,8 +12,9 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
-  import { app, loginUser } from "$lib/stores/stores";
+  import { app } from "$lib/stores/stores";
   import { get } from "svelte/store";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -58,7 +59,7 @@
   let zyouken =
     localRelays.length > 0 ||
     (paramRelays && paramRelays.length > 0) ||
-    !$loginUser;
+    !lumiSetting.get().pubkey;
   console.log(zyouken);
   let _relays: DefaultRelayConfig[] | string[] =
     paramRelays && paramRelays.length > 0 //neventとかのやつ
@@ -103,7 +104,7 @@
     });
   } else if (_relays.length > 0) {
     setRelays(_relays);
-  } else if (!$loginUser) {
+  } else if (!lumiSetting.get().pubkey) {
     //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
     setRelays(defaultRelays);
   }

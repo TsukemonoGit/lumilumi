@@ -50,7 +50,7 @@
   import { clientTag } from "$lib/func/constants";
 
   import { convertMetaTags } from "$lib/func/imeta";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserName from "./NostrElements/user/UserName.svelte";
 
   import AlertDialog from "./Elements/AlertDialog.svelte";
@@ -188,10 +188,17 @@
     $nowProgress = true;
 
     try {
-      const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      if (!loginUser.get()) {
+        const pubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (pubkey) {
+          loginUser.set(pubkey);
+        }
+      }
 
-      if (pub) {
-        signPubkey = pub;
+      if (loginUser.get()) {
+        signPubkey = loginUser.get();
         metadata = (
           queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
         )?.event;

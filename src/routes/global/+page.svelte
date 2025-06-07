@@ -8,13 +8,7 @@
   import { page } from "$app/state";
 
   // Store imports
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    tie,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   // Utility function imports
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
@@ -27,7 +21,11 @@
   import Settei from "./Settei.svelte";
   import GlobalDescription from "./GlobalDescription.svelte";
   import GlobalTimeline from "./GlobalTimeline.svelte";
-  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    followList,
+    lumiSetting,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const TIE_KEY = "global";
@@ -75,7 +73,10 @@
       // Update relay list and clear queries
       const relaylist = toGlobalRelaySet(event);
       if (relaylist.length > 0) {
-        queryClient.setQueryData(["globalRelay", $loginUser], relaylist);
+        queryClient.setQueryData(
+          ["globalRelay", lumiSetting.get().pubkey],
+          relaylist
+        );
         globalRelays = relaylist;
       }
 
@@ -107,7 +108,7 @@
     // Check if we already have the data in cache
     const cachedData: string[] | undefined = queryClient.getQueryData([
       "globalRelay",
-      $loginUser,
+      lumiSetting.get().pubkey,
     ]);
 
     if (cachedData) {
@@ -122,7 +123,7 @@
       {
         filters: [
           {
-            authors: [$loginUser],
+            authors: [lumiSetting.get().pubkey],
             kinds: [30002],
             "#d": ["global"],
             limit: 1,
@@ -139,7 +140,10 @@
     if (fetchRelays.length > 0) {
       const relayList = toGlobalRelaySet(fetchRelays[0].event);
       if (relayList.length > 0) {
-        queryClient.setQueryData(["globalRelay", $loginUser], relayList);
+        queryClient.setQueryData(
+          ["globalRelay", lumiSetting.get().pubkey],
+          relayList
+        );
         globalRelays = relayList;
       }
     }
@@ -212,7 +216,7 @@
   };
 </script>
 
-{#if !$loginUser && globalRelays.length <= 0}
+{#if !lumiSetting.get().pubkey && globalRelays.length <= 0}
   <p class="whitespace-pre-wrap break-words p-2">
     {$_("global.explain")}
 

@@ -3,7 +3,6 @@
   import { page } from "$app/state";
   import {
     defaultRelays,
-    loginUser,
     nowProgress,
     onlyFollowee,
     queryClient,
@@ -20,7 +19,7 @@
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
-  import { get, writable, type Writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import { pipe } from "rxjs";
 
   import { debounce, sortEvents } from "$lib/func/util";
@@ -31,7 +30,11 @@
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
-  import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
+  import {
+    displayEvents,
+    lumiSetting,
+    relayStateMap,
+  } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const SLIDE_AMOUNT = 40; // Amount to slide when navigating
@@ -308,8 +311,11 @@
   </div>
 {/if}
 
-{#if $loginUser}
-  <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
+{#if lumiSetting.get().pubkey}
+  <Metadata
+    queryKey={["metadata", lumiSetting.get().pubkey]}
+    pubkey={lumiSetting.get().pubkey}
+  />
 {/if}
 
 {#if displayEvents.get() && displayEvents.get()?.length > 0}

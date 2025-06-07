@@ -3,7 +3,6 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { AlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
-  import { loginUser } from "$lib/stores/stores";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import { nip19 } from "nostr-tools";
@@ -29,7 +28,9 @@
     forceVisible: true,
   });
 
-  let encodedPub: string | undefined = $derived(pubCheck($loginUser));
+  let encodedPub: string | undefined = $derived(
+    pubCheck(lumiSetting.get().pubkey)
+  );
 
   function pubCheck(hex: string | undefined): string | undefined {
     if (hex) {
@@ -130,11 +131,13 @@
             {:else}
               <li
                 aria-current={page.url?.pathname ===
-                (link === undefined && $loginUser ? `/${encodedPub}` : link)
+                (link === undefined && lumiSetting.get().pubkey
+                  ? `/${encodedPub}`
+                  : link)
                   ? "page"
                   : undefined}
               >
-                {#if noPubkey || $loginUser}
+                {#if noPubkey || lumiSetting.get().pubkey}
                   <a
                     href={link ?? `/${encodedPub}`}
                     use:melt={$close}

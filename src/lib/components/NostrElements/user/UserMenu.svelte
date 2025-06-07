@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    loginUser,
     modalState,
     nowProgress,
     queryClient,
@@ -30,6 +29,7 @@
   import { useNip05PromiseCheck } from "$lib/func/nip05check";
   //import { writable, type Writable } from "svelte/store";
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     metadata: Nostr.Event | undefined;
@@ -79,7 +79,7 @@
         const shouldRemoveBroadcast =
           item.num === 5 &&
           metadata.tags.some((tag) => tag[0] === "-") &&
-          metadata.pubkey !== $loginUser;
+          metadata.pubkey !== lumiSetting.get().pubkey;
 
         if (shouldRemoveBroadcast) {
           return false;
@@ -219,7 +219,7 @@
     <Icon class="mx-2 my-auto" />{text}
   </button>
 {/each}
-{#if $loginUser && pubkey !== $loginUser}
+{#if lumiSetting.get().pubkey && pubkey !== lumiSetting.get().pubkey}
   <UserMuteMenu {pubkey}>
     <div
       class="

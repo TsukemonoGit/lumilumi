@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { loginUser, modalState, toastSettings } from "$lib/stores/stores";
+  import { modalState, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -17,6 +17,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import ModalJson from "$lib/components/ModalJson.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -50,7 +51,10 @@
 
   //NIP-70
   if (
-    !(note.tags.find((tag) => tag[0] === "-") && note.pubkey !== $loginUser)
+    !(
+      note.tags.find((tag) => tag[0] === "-") &&
+      note.pubkey !== lumiSetting.get().pubkey
+    )
   ) {
     menuTexts.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
   }

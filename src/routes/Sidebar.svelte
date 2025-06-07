@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
   import logo from "$lib/assets/favicon.svg";
-  import { loginUser } from "$lib/stores/stores";
 
   import { TrendingUp, User } from "lucide-svelte";
 
@@ -14,7 +13,9 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import LumiIcon from "$lib/assets/lumi-chan.webp";
 
-  let encodedPub: string | undefined = $derived(pubCheck($loginUser));
+  let encodedPub: string | undefined = $derived(
+    pubCheck(lumiSetting.get().pubkey)
+  );
 
   function pubCheck(hex: string | undefined): string | undefined {
     if (hex) {
@@ -38,7 +39,7 @@
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
       {#each mainMenuItems as { Icon, link, alt, noPubkey }}
         {#if alt === "profile"}
-          {#if $loginUser && encodedPub}
+          {#if lumiSetting.get().pubkey && encodedPub}
             <li
               aria-current={page.url.pathname === `/${encodedPub}`
                 ? "page"
@@ -65,7 +66,7 @@
           </li>
         {:else}
           <li aria-current={page.url.pathname === link ? "page" : undefined}>
-            {#if noPubkey || $loginUser}
+            {#if noPubkey || lumiSetting.get().pubkey}
               <a href={link} title={alt}>
                 <Icon /><span class="ml-2">{alt}</span>
               </a>

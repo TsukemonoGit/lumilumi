@@ -15,7 +15,6 @@
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import {
-    loginUser,
     mutebykinds,
     mutes,
     nowProgress,
@@ -30,6 +29,7 @@
   } from "$lib/func/settings";
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   interface Props {
     pubkey: string;
     children?: import("svelte").Snippet;
@@ -143,7 +143,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind10000.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: kind10000.tags,
           content: (await encryptPrvTags(kind10000.pubkey, newTags)) ?? "",
         };
@@ -204,7 +204,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -271,7 +271,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -338,7 +338,7 @@
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
@@ -413,7 +413,7 @@
         );
         const newEvPara: Nostr.EventParameters = {
           kind: kind10000.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",
@@ -478,7 +478,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -545,7 +545,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -614,7 +614,7 @@
       if (check) {
         const newEvPara: Nostr.EventParameters = {
           kind: kind30007.kind,
-          pubkey: $loginUser,
+          pubkey: lumiSetting.get().pubkey,
           tags: newpubTags,
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
@@ -660,7 +660,12 @@
     const kind30007 = await usePromiseReq(
       {
         filters: [
-          { kinds: [30007], authors: [$loginUser], "#d": [dtag], limit: 1 },
+          {
+            kinds: [30007],
+            authors: [lumiSetting.get().pubkey],
+            "#d": [dtag],
+            limit: 1,
+          },
         ],
         operator: pipe(latest()),
       },
@@ -702,9 +707,10 @@
 
     const newEvPara: Nostr.EventParameters = {
       kind: kind,
-      pubkey: $loginUser,
+      pubkey: lumiSetting.get().pubkey,
       tags: newPubTag,
-      content: (await encryptPrvTags($loginUser, newPrvTag)) ?? "",
+      content:
+        (await encryptPrvTags(lumiSetting.get().pubkey, newPrvTag)) ?? "",
     };
 
     const { event: ev, res: res } = await promisePublishEvent(newEvPara);

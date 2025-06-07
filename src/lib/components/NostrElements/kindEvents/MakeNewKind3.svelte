@@ -1,19 +1,14 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
 
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { promisePublishSignedEvent, pubkeysIn } from "$lib/func/nostr";
   import { nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import SampleGlobalLink from "./SampleGlobalLink.svelte";
   import { formatToEventPacket } from "$lib/func/util";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   let dialogOpen: (bool: boolean) => void = $state(() => {});
 
@@ -29,11 +24,11 @@
     const ev: Nostr.EventParameters = {
       kind: 3,
       content: "",
-      tags: [["p", $loginUser]],
+      tags: [["p", lumiSetting.get().pubkey]],
     };
     const signer = nip07Signer();
     const event = await signer.signEvent(ev);
-    if (event.pubkey !== $loginUser) {
+    if (event.pubkey !== lumiSetting.get().pubkey) {
       $toastSettings = {
         title: "Error",
         description: "login pubkey ≠ sign pubkey",
@@ -56,7 +51,7 @@
       } else {
         //location.reload();
         queryClient.setQueryData(
-          ["timeline", "contacts", $loginUser],
+          ["timeline", "contacts", lumiSetting.get().pubkey],
           (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from)
         );
 
@@ -68,7 +63,7 @@
   };
 </script>
 
-{#if $loginUser}
+{#if lumiSetting.get().pubkey}
   <div class="break-all whitespace-pre-wrap">
     {$_("create_kind3.message")}
 

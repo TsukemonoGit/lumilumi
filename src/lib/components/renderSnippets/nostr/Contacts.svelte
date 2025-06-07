@@ -2,8 +2,8 @@
 <script lang="ts">
   import { browser } from "$app/environment";
   import { pubkeysIn } from "$lib/func/nostr";
-  import { followList } from "$lib/stores/globalRunes.svelte";
-  import { app, loginUser } from "$lib/stores/stores";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
   import type { ReqStatus } from "$lib/types";
 
@@ -99,10 +99,10 @@
   });
 
   $effect(() => {
-    if (kind3Data && pubkey === $loginUser) {
+    if (kind3Data && pubkey === lumiSetting.get().pubkey) {
       untrack(() => {
         localStorage.setItem(kind3key, JSON.stringify(kind3Data));
-        const pubkeyList = pubkeysIn(kind3Data, get(loginUser));
+        const pubkeyList = pubkeysIn(kind3Data, lumiSetting.get().pubkey);
         followList.set(pubkeyList);
       });
     }

@@ -25,7 +25,7 @@
   import InputImageFromFile from "./InputImageFromFile.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
@@ -57,10 +57,15 @@
       return;
     }
     try {
-      const signPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      )?.getPublicKey();
-      if (data.pubkey !== signPubkey) {
+      if (!loginUser.get()) {
+        const pubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (pubkey) {
+          loginUser.set(pubkey);
+        }
+      }
+      if (data.pubkey !== loginUser.get()) {
         $toastSettings = {
           title: "Error",
           description: "login pubkey ≠ sign pubkey",

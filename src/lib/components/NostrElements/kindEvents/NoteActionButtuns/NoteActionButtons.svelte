@@ -296,13 +296,6 @@
   let invoiceOpen: (bool: boolean) => void = () => {};
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
-  // const observer = $derived(
-  //   new QueryObserver(queryClient, {
-  //     queryKey: ["reactions", "zapped", queryId, $loginUser],
-  //   })
-  // );
-  // let unsubscribe: () => void;
-
   const handleClickZap = () => {
     const storagezap = localStorage.getItem("zap");
     if (storagezap) {

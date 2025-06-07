@@ -5,10 +5,11 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "./EventCard/EventCard.svelte";
 
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import * as Nostr from "nostr-typedef";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -52,7 +53,7 @@
   };
 
   const onChange = (ev: Nostr.Event) => {
-    isOmitted = omit && ev.pubkey === $loginUser;
+    isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
   };
 </script>
 

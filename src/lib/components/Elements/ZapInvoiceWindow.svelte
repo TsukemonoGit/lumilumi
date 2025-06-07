@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { loginUser, queryClient, toastSettings } from "$lib/stores/stores";
+  import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { ClipboardCopy, X } from "lucide-svelte";
@@ -8,6 +8,7 @@
   import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     invoice: string | undefined;
@@ -57,7 +58,7 @@
         | QueryObserver<unknown, Error, unknown, unknown, string[]>
         | undefined = id
         ? new QueryObserver(queryClient, {
-            queryKey: ["reactions", id, "zapped", $loginUser],
+            queryKey: ["reactions", id, "zapped", lumiSetting.get().pubkey],
           })
         : undefined;
       //ザップ一回したら押せなくなるけど

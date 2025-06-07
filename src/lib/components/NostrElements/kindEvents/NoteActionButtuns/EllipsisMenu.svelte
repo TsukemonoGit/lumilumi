@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    loginUser,
-    modalState,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { modalState, queryClient, toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -41,6 +36,7 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
   import Note from "../Note.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -90,7 +86,10 @@
 
     //NIP-70
     if (
-      !(note.tags.find((tag) => tag[0] === "-") && note.pubkey !== $loginUser)
+      !(
+        note.tags.find((tag) => tag[0] === "-") &&
+        note.pubkey !== lumiSetting.get().pubkey
+      )
     ) {
       menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
     }
@@ -120,7 +119,7 @@
       menu = menu.filter((item) => indexes.includes(item.num));
     }
     if (
-      note.pubkey === $loginUser &&
+      note.pubkey === lumiSetting.get().pubkey &&
       note.kind !== 5 &&
       note.kind !==
         62 /*消滅イベントhttps://github.com/nostr-protocol/nips/blob/master/62.md**/

@@ -7,12 +7,7 @@
     makeMainFilters,
     changeMainEmit,
   } from "$lib/func/nostr";
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
   import {
     nip07Signer,
     type EventPacket,
@@ -35,7 +30,7 @@
   import { latest } from "rx-nostr/src";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
-  import { followList } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     pubkey: string;
@@ -52,7 +47,7 @@
   let contactsQueryKey: QueryKey = $derived([
     "timeline",
     "contacts",
-    $loginUser,
+    lumiSetting.get().pubkey,
   ]);
   let isfollowee: boolean = $derived(followList.get().has(pubkey));
 
@@ -103,14 +98,16 @@
 
   const refreshContactsData = async (kind3Event: EventPacket | undefined) => {
     $nowProgress = true;
-    console.log($loginUser);
+    console.log(lumiSetting.get().pubkey);
     // await queryClient.refetchQueries({ queryKey: contactsQueryKey });
     // await delay(1000);
     // const newKind3: EventPacket | undefined =
     //   queryClient.getQueryData(contactsQueryKey);
     const newKind3: EventPacket[] = await usePromiseReq(
       {
-        filters: [{ kinds: [3], authors: [$loginUser], limit: 1 }],
+        filters: [
+          { kinds: [3], authors: [lumiSetting.get().pubkey], limit: 1 },
+        ],
         operator: pipe(latest()),
       },
       undefined,
@@ -258,13 +255,13 @@
       kind: 3,
       content: "",
       tags: [
-        ["p", $loginUser],
+        ["p", lumiSetting.get().pubkey],
         ["p", pubkey],
       ],
     };
     const signer = nip07Signer();
     const event = await signer.signEvent(ev);
-    if (event.pubkey !== $loginUser) {
+    if (event.pubkey !== lumiSetting.get().pubkey) {
       $toastSettings = {
         title: "Error",
         description: "login pubkey ≠ sign pubkey",
@@ -290,7 +287,7 @@
   };
 </script>
 
-{#if $loginUser && isfollowee !== undefined}
+{#if lumiSetting.get().pubkey && isfollowee !== undefined}
   {#if isfollowee}
     <button
       disabled={$nowProgress}

@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    emojis,
-    loginUser,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import Avatar from "svelte-boring-avatars";
@@ -102,7 +97,7 @@
 
     const newEvPara: Nostr.EventParameters = {
       kind: 10030,
-      pubkey: $loginUser,
+      pubkey: lumiSetting.get().pubkey,
       tags: [["a", atag]],
       content: "",
     };
@@ -161,7 +156,7 @@
       newTags.push(["a", atag]);
       const newEvPara: Nostr.EventParameters = {
         kind: 10030,
-        pubkey: $loginUser,
+        pubkey: lumiSetting.get().pubkey,
         tags: newTags,
         content: newestKind10030.content,
       };
@@ -229,7 +224,7 @@
       );
       const newEvPara: Nostr.EventParameters = {
         kind: 10030,
-        pubkey: $loginUser,
+        pubkey: lumiSetting.get().pubkey,
         tags: newTags,
         content: newestKind10030.content,
       };
@@ -264,7 +259,9 @@
   async function refetchKind10030(): Promise<Nostr.Event | undefined> {
     const kind10030 = await usePromiseReq(
       {
-        filters: [{ kinds: [10030], authors: [$loginUser], limit: 1 }],
+        filters: [
+          { kinds: [10030], authors: [lumiSetting.get().pubkey], limit: 1 },
+        ],
         operator: pipe(latest()),
       },
       undefined,
@@ -351,7 +348,7 @@
           <CustomEmoji part={{ type: "emoji", content: shortcode, url: url }} />
         {/each}<ClientTag depth={0} tags={note.tags} />
       </div>
-      {#if $loginUser}
+      {#if lumiSetting.get().pubkey}
         {#if inMyCustomEmoji}
           <button
             disabled={$nowProgress || disabled}

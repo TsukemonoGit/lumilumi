@@ -9,8 +9,9 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import EmptyCard from "./EventCard/EmptyCard.svelte";
   import { viewport } from "$lib/func/useViewportAction";
-  import { loginUser } from "$lib/stores/stores";
+
   import * as Nostr from "nostr-typedef";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     data: nip19.AddressPointer;
@@ -53,7 +54,7 @@
   let isOmitted = $state(false);
   let dynamicClasses = $state(className);
   const onChange = (ev: Nostr.Event) => {
-    isOmitted = omit && ev.pubkey === $loginUser;
+    isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
     if (isOmitted) {
       dynamicClasses = `${className} ml-5 opacity-90 text-sm`;
     }

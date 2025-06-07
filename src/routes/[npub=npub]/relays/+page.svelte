@@ -5,12 +5,7 @@
     setRelays,
     usePromiseReq,
   } from "$lib/func/nostr";
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
@@ -28,7 +23,7 @@
   import { relayRegex2 } from "$lib/func/regex";
 
   import { SvelteMap } from "svelte/reactivity";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { LayoutData } from "../$types";
   import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
@@ -80,10 +75,15 @@
     }
 
     try {
-      const signPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      )?.getPublicKey();
-      if (data.pubkey !== signPubkey) {
+      if (!loginUser.get()) {
+        const pubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (pubkey) {
+          loginUser.set(pubkey);
+        }
+      }
+      if (data.pubkey !== loginUser.get()) {
         $toastSettings = {
           title: "Error",
           description: "login pubkey ≠ sign pubkey",
@@ -285,7 +285,7 @@
       content: "",
       tags: $state.snapshot(newTags),
       kind: 10002,
-      pubkey: $loginUser,
+      pubkey: lumiSetting.get().pubkey,
     };
     const { event, res } = await promisePublishEvent(eventParam);
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);

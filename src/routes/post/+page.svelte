@@ -13,7 +13,7 @@
   import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { beforeNavigate } from "$app/navigation";
 
   let tags: string[][] = [];
@@ -41,11 +41,16 @@
     } else {
       $uploader = savedUploader;
     }
+    if (!loginUser.get()) {
+      const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+      if (pubkey) {
+        loginUser.set(pubkey);
+      }
+    }
 
-    const pub = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-    if (pub) {
-      console.log(pub);
-      signPubkey = pub;
+    if (loginUser.get()) {
+      console.log(loginUser.get());
+      signPubkey = loginUser.get();
     }
     $nowProgress = false;
   };

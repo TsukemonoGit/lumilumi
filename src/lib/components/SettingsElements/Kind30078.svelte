@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    loginUser,
-    nowProgress,
-    toastSettings,
-    uploader,
-  } from "$lib/stores/stores";
+  import { nowProgress, toastSettings, uploader } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
@@ -23,9 +18,13 @@
   import * as Nostr from "nostr-typedef";
   import { datetime } from "$lib/func/util";
   import AlertDialog from "../Elements/AlertDialog.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
-  import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    lumiSetting,
+    showBanner,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -76,15 +75,11 @@
     $nowProgress = false;
     $dialogOpen = true;
   }
-  // onMount(() => {});
-  // function handleClickDownload(
-  //   event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-  // ) {}
 
   let saveName: string = $state("");
 
   async function get30078() {
-    const relays = await getQueryRelays($loginUser);
+    const relays = await getQueryRelays(lumiSetting.get().pubkey);
     console.log(relays);
     if (!relays) {
       $toastSettings = {
@@ -99,7 +94,7 @@
         filters: [
           {
             kinds: [30078],
-            authors: [$loginUser],
+            authors: [lumiSetting.get().pubkey],
             limit: 1,
             "#d": ["lumi-settings"],
           },
@@ -247,9 +242,9 @@
         content: str,
         tags: [["d", "lumi-settings"]],
         kind: 30078,
-        pubkey: $loginUser,
+        pubkey: lumiSetting.get().pubkey,
       };
-      const relays = await getQueryRelays($loginUser);
+      const relays = await getQueryRelays(lumiSetting.get().pubkey);
       const writeRelays = configToWrite(relays);
       const { event: ev, res: res } = await promisePublishEvent(
         evePara,

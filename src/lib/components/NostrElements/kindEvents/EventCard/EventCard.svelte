@@ -7,8 +7,12 @@
   import { page } from "$app/state";
 
   // Store imports
-  import { loginUser, mutebykinds, mutes } from "$lib/stores/stores";
-  import { timelineFilter, viewEventIds } from "$lib/stores/globalRunes.svelte";
+  import { mutebykinds, mutes } from "$lib/stores/stores";
+  import {
+    lumiSetting,
+    timelineFilter,
+    viewEventIds,
+  } from "$lib/stores/globalRunes.svelte";
 
   // Utility function imports
   import { muteCheck } from "$lib/func/muteCheck";
@@ -198,7 +202,8 @@
   const noteClass = () => {
     const ptag = note.tags.filter((tag) => tag[0] === "p");
     const user =
-      note.pubkey !== $loginUser && ptag.find((tag) => tag[1] === $loginUser);
+      note.pubkey !== lumiSetting.get().pubkey &&
+      ptag.find((tag) => tag[1] === lumiSetting.get().pubkey);
 
     return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`;
   };

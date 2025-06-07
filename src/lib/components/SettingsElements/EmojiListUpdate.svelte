@@ -7,13 +7,13 @@
     getQueryRelays,
   } from "$lib/func/settings";
   import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createRxNostr } from "rx-nostr/src";
 
   import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 
-  import { verifier } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, verifier } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     buttonClass?: string;
@@ -27,11 +27,16 @@
     const beforeEvent = $emojis?.event;
 
     try {
-      const gotPubkey = await (
-        window.nostr as Nostr.Nip07.Nostr
-      ).getPublicKey();
-      if (gotPubkey) {
-        pubkey = gotPubkey;
+      if (!loginUser.get()) {
+        const pubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (pubkey) {
+          loginUser.set(pubkey);
+        }
+      }
+      if (loginUser.get()) {
+        pubkey = loginUser.get();
       }
     } catch (error) {
       console.log(error);

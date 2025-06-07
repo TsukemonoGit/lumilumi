@@ -3,7 +3,6 @@
   import { afterNavigate } from "$app/navigation";
   import {
     defaultRelays,
-    loginUser,
     nowProgress,
     queryClient,
     tie,
@@ -25,6 +24,7 @@
   import { createUniq } from "rx-nostr/src";
   import {
     displayEvents,
+    lumiSetting,
     relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
@@ -376,8 +376,11 @@
   </div>
 {/if}
 
-{#if $loginUser}
-  <Metadata queryKey={["metadata", $loginUser]} pubkey={$loginUser} />
+{#if lumiSetting.get().pubkey}
+  <Metadata
+    queryKey={["metadata", lumiSetting.get().pubkey]}
+    pubkey={lumiSetting.get().pubkey}
+  />
 {/if}
 
 {#if $errorData}

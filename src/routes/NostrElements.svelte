@@ -5,7 +5,7 @@
 
   import { makeMainFilters } from "$lib/func/nostr";
 
-  import { loginUser, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import OpenPostWindow from "../lib/components/OpenPostWindow.svelte";
@@ -19,14 +19,22 @@
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
   import MainTimeline from "../lib/components/renderSnippets/nostr/MainTimeline.svelte";
   import { page } from "$app/state";
-  import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    followList,
+    lumiSetting,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
 
   let amount = 50; //1ページに表示する量
   let viewIndex = 0;
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
-  const timelineQuery: QueryKey = ["timeline", "feed", $loginUser];
+  const timelineQuery: QueryKey = [
+    "timeline",
+    "feed",
+    lumiSetting.get().pubkey,
+  ];
 
   onMount(async () => {
     if (!isOnMount) {
@@ -106,7 +114,10 @@
       .map((tag) => tag[1]);
 
     //ログインユーザーの会話はどれでも表示
-    if (note.pubkey === $loginUser || pTags.includes($loginUser)) {
+    if (
+      note.pubkey === lumiSetting.get().pubkey ||
+      pTags.includes(lumiSetting.get().pubkey)
+    ) {
       return true;
     }
     //自分以外のpTags
@@ -149,7 +160,7 @@
   };
 </script>
 
-{#if !$loginUser}
+{#if !lumiSetting.get().pubkey}
   <a
     href="/settings"
     class=" whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -157,7 +168,10 @@
   >
   <SampleGlobalLink />
 {:else}
-  <Contacts queryKey={["timeline", "contacts", $loginUser]} pubkey={$loginUser}>
+  <Contacts
+    queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
+    pubkey={lumiSetting.get().pubkey}
+  >
     {#snippet loading()}
       <div>
         {#await awaitInterval(3000) then}
