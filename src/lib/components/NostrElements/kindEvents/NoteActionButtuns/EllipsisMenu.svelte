@@ -15,6 +15,7 @@
     Layers,
     Notebook,
     Trash,
+    FilePenLine,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -37,13 +38,13 @@
 
   import Note from "../Note.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
     TriggerIcon?: any;
     iconSize?: number;
     iconClass?: string;
-
     deleted: boolean;
   }
 
@@ -53,93 +54,174 @@
     TriggerIcon = Ellipsis,
     iconSize = 20,
     iconClass = "",
-
     deleted = $bindable(false),
   }: Props = $props();
+
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
-  // svelte-ignore non_reactive_update
-  // let dialogOpen: Writable<boolean> = writable(false);
 
   let replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
+  // メニュー項目の定義を論理的な順序で整理
   let menuTexts = $derived.by(() => {
-    let menu = [
+    const baseMenuItems = [
+      // 基本操作グループ
       {
         text: `${$_("menu.copy.text")}`,
         icon: NotepadText,
-        num: 8,
+        action: "copy_text",
       },
       {
         text: `${replaceable ? `${$_("menu.copy.naddr")}` : `${$_("menu.copy.nevent")}`}`,
         icon: Copy,
-        num: 3,
+        action: "copy_id",
       },
-      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-      { text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-      { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+      {
+        text: `${$_("menu.note")}`,
+        icon: Notebook,
+        action: "goto_note",
+      },
+      // 共有・外部リンクグループ
+      {
+        text: `${$_("menu.sharelink")}`,
+        icon: Share,
+        action: "share_link",
+      },
+      {
+        text: `${$_("menu.njump")}`,
+        icon: SquareArrowOutUpRight,
+        action: "open_njump",
+      },
 
-      { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
+      // ツール・ユーティリティグループ
+      {
+        text: `${$_("menu.translate")}`,
+        icon: Earth,
+        action: "translate",
+      },
+      {
+        text: `${$_("menu.json")}`,
+        icon: FileJson2,
+        action: "view_json",
+      },
     ];
 
-    //NIP-70
+    let menuItems = [...baseMenuItems];
+
+    // 条件付きメニュー項目を適切な位置に挿入
+
+    // Broadcast（NIP-70チェック後、ツールセクションに追加）
     if (
       !(
         note.tags.find((tag) => tag[0] === "-") &&
         note.pubkey !== lumiSetting.get().pubkey
       )
     ) {
-      menu.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
-    }
-
-    //30030 emojitoリンク
-    if (note.kind === 30030) {
-      menu.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
-    }
-
-    //30311 zap.streamリンク
-    if (note.kind === 30311) {
-      menu.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
-    }
-    //31990 App Managerリンク
-    if (note.kind === 31990) {
-      menu.push({ text: `${$_("menu.nostrapp")}`, icon: Layers, num: 11 });
-    }
-    //replaceable のすとびうあのリンク
-    if (nostviewstrable.includes(note.kind)) {
-      menu.push({
-        text: `${$_("menu.nostviewstr")}`,
-        icon: Squirrel,
-        num: 10,
+      menuItems.splice(7, 0, {
+        text: `${$_("menu.broadcast")}`,
+        icon: Radio,
+        action: "broadcast",
       });
     }
-    if (indexes !== undefined) {
-      menu = menu.filter((item) => indexes.includes(item.num));
+
+    // 種類別の外部サービスリンク（外部リンクグループの後に追加）
+    const externalServices = [];
+
+    if (note.kind === 30030) {
+      externalServices.push({
+        text: `${$_("menu.emoji")}`,
+        icon: Smile,
+        action: "open_emojito",
+      });
     }
+
+    if (note.kind === 30311) {
+      externalServices.push({
+        text: `${$_("menu.stream")}`,
+        icon: Tv,
+        action: "open_zapstream",
+      });
+    }
+
+    if (note.kind === 31990) {
+      externalServices.push({
+        text: `${$_("menu.nostrapp")}`,
+        icon: Layers,
+        action: "open_nostrapp",
+      });
+    }
+
+    if (nostviewstrable.includes(note.kind)) {
+      externalServices.push({
+        text: `${$_("menu.nostviewstr")}`,
+        icon: Squirrel,
+        action: "open_nostviewstr",
+      });
+    }
+
+    if (note.pubkey === lumiSetting.get().pubkey && note.kind === 30023) {
+      externalServices.push({
+        text: `${$_("menu.MAKIMONO")}`,
+        icon: FilePenLine,
+        action: "open_makimono",
+      });
+    }
+
+    // 外部サービスリンクを適切な位置に挿入
+    if (externalServices.length > 0) {
+      const njumpIndex = menuItems.findIndex(
+        (item) => item.action === "open_njump"
+      );
+      menuItems.splice(njumpIndex + 1, 0, ...externalServices);
+    }
+
+    // 削除ボタンは最後に追加
     if (
       note.pubkey === lumiSetting.get().pubkey &&
       note.kind !== 5 &&
-      note.kind !==
-        62 /*消滅イベントhttps://github.com/nostr-protocol/nips/blob/master/62.md**/
+      note.kind !== 62
     ) {
-      menu.push({
+      menuItems.push({
         text: `${$_("menu.delete")}`,
         icon: Trash,
-        num: 12,
+        action: "delete",
       });
     }
-    return menu;
+
+    // indexesが指定されている場合は、従来の番号システムをマッピング
+    if (indexes !== undefined) {
+      const actionToNumMap = {
+        view_json: 0,
+        open_njump: 1,
+        translate: 2,
+        copy_id: 3,
+        goto_note: 4,
+        open_emojito: 5,
+        broadcast: 6,
+        share_link: 7,
+        copy_text: 8,
+        open_zapstream: 9,
+        open_nostviewstr: 10,
+        open_nostrapp: 11,
+        delete: 12,
+        open_makimono: 13,
+      };
+
+      menuItems = menuItems.filter((item) => {
+        const num = actionToNumMap[item.action as keyof typeof actionToNumMap];
+        return num !== undefined && indexes.includes(num);
+      });
+    }
+
+    return menuItems;
   });
 
   const handleSelectItem = async (index: number) => {
-    //  console.log(menuTexts[index]);
+    const selectedItem = menuTexts[index];
 
-    switch (menuTexts[index].num) {
-      case 0:
-        //view json
-        //$dialogOpen = true;
+    switch (selectedItem.action) {
+      case "view_json":
         $modalState = {
           isOpen: true,
           component: ModalJson,
@@ -147,24 +229,17 @@
         };
         break;
 
-      case 1:
-        //open in njump
-
-        const url = `https://njump.me/${replaceable ? naddr : nevent}`;
-
-        window.open(url, "_blank", "noreferrer");
+      case "open_njump":
+        const njumpUrl = `https://njump.me/${replaceable ? naddr : nevent}`;
+        window.open(njumpUrl, "_blank", "noreferrer");
         break;
 
-      case 2:
-        //Translate
-
+      case "translate":
         const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${translateText(note.content)}`;
-
         window.open(translateUrl, "_blank", "noreferrer");
         break;
 
-      case 3:
-        //Copy EventID
+      case "copy_id":
         try {
           await navigator.clipboard.writeText(
             replaceable ? (naddr ?? "") : (nevent ?? "")
@@ -183,33 +258,25 @@
           };
         }
         break;
-      case 4:
-        //Goto Note page
+
+      case "goto_note":
         goto(`/${replaceable ? naddr : nevent}`);
         break;
-      case 5:
-        //open in emojito
-        const emojito = `https://emojito.meme/a/${naddr}`;
 
+      case "open_emojito":
+        const emojito = `https://emojito.meme/a/${naddr}`;
         window.open(emojito, "_blank", "noreferrer");
         break;
 
-      case 6:
-        //broadcast
+      case "broadcast":
         publishEvent(note);
-        // setTimeout(() => {
-        //   slicedEvent.update((value) => value);
-        //   console.log("こうしんしたよ");
-        // }, 1000);
         break;
-      case 7:
-        //Share link
+
+      case "share_link":
         const shareData = {
           title: "",
-          //text: "lumilumi",
           url: `${page.url.origin}/${replaceable ? naddr : nevent}`,
         };
-        //console.log(shareData);
         try {
           await navigator.share(shareData);
         } catch (error: any) {
@@ -222,8 +289,7 @@
         }
         break;
 
-      case 8:
-        //Copy text
+      case "copy_text":
         try {
           await navigator.clipboard.writeText(note.content);
           $toastSettings = {
@@ -240,27 +306,29 @@
           };
         }
         break;
-      case 9:
-        //open in zap.stream
-        const zapStream = `https://zap.stream/${naddr}`;
 
+      case "open_zapstream":
+        const zapStream = `https://zap.stream/${naddr}`;
         window.open(zapStream, "_blank", "noreferrer");
         break;
-      case 10:
-        //open in nostviewer
-        const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
 
+      case "open_nostviewstr":
+        const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
         window.open(nostviewer, "_blank", "noreferrer");
         break;
-      case 11:
-        //open in nostviewer
-        const nostrapp = `https://nostrapp.link/a/${naddr}`;
 
+      case "open_nostrapp":
+        const nostrapp = `https://nostrapp.link/a/${naddr}`;
         window.open(nostrapp, "_blank", "noreferrer");
         break;
-      case 12:
-        //delete
+
+      case "delete":
         deleteDialogOpen(true);
+        break;
+
+      case "open_makimono":
+        const makimono = `https://makimono.lumilumi.app//${naddr}`;
+        window.open(makimono, "_blank", "noreferrer");
         break;
     }
   };
@@ -324,11 +392,10 @@
         event: Nostr.Event;
         res: OkPacketAgainstEvent[];
       } = await deleteEvent(deletetags);
-      // console.log(res);
+
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       let str = generateResultMessage(isSuccess, isFailed);
-      // console.log(str);
 
       $toastSettings = {
         title: isSuccess.length > 0 ? "Success" : "Failed",
@@ -359,8 +426,6 @@
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
 
-<!--JSON no Dialog
-<ModalJson bind:dialogOpen {note}  />-->
 <AlertDialog
   bind:openDialog={deleteDialogOpen}
   onClickOK={() => onClickOK()}
@@ -368,7 +433,13 @@
 >
   {#snippet main()}<p>{$_("post.delete")}</p>
     <div class="rounded-md border-magnum-600/30 border">
-      <Note id={note.id} displayMenu={false} depth={0} repostable={false} />
+      <Note
+        id={note.id}
+        displayMenu={false}
+        depth={0}
+        repostable={false}
+        maxHeight={192}
+      />
     </div>
   {/snippet}
 </AlertDialog>
