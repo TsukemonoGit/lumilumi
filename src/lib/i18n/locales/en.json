@@ -134,7 +134,8 @@
     "mention": "Send Mention",
     "userSearch": "Search User",
     "delete": "Delete",
-    "editChannelInfo": "Edit Channel Information"
+    "editChannelInfo": "Edit Channel Information",
+    "MAKIMONO": "Edit with MAKIMONO"
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",
