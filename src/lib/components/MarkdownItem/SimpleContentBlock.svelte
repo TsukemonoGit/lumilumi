@@ -189,11 +189,10 @@
   >
 {:else if part.type === "text"}
   <NostrContent
-    text={part.content}
+    event={{ content: part.content, tags }}
     {repostable}
     {depth}
     {displayMenu}
-    {tags}
     {zIndex}
   />
 {:else if part.type === "em"}
@@ -277,11 +276,10 @@
   />
 {:else}<b>{part.type}</b>
   <NostrContent
-    text={part.content}
+    event={{ content: part.content, tags }}
     {repostable}
     {depth}
     {displayMenu}
-    {tags}
     {zIndex}
   />
 {/if}
