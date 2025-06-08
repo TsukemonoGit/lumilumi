@@ -61,6 +61,7 @@
         <Content3D content={part.content} url={part.url} />
       {:else if type === "url"}
         {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<MediaEmbedSwitcher
+            {author}
             url={part.url || ""}
           />{:else}<Link
             props={{ "aria-label": `External Links: ${part.url}` }}
