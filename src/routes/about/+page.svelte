@@ -2,12 +2,7 @@
   import UniqueEventList from "$lib/components/renderSnippets/nostr/UniqueEventList.svelte";
   import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
-  import {
-    loginUser,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
   import { Share, BriefcaseMedical } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";

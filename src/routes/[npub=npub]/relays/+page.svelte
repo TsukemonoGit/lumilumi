@@ -217,9 +217,8 @@
       return;
     }
 
-    // Duplicate check
-    console.log(newTags);
-    if (newTags.find((tag) => tag[1] === newRelay)) {
+    // 重複チェックはsortedTagsで行う方が安全
+    if (sortedTags.find((tag) => tag[1] === newRelay)) {
       $toastSettings = {
         title: "Warning",
         description: "The entered relay is already included",
@@ -234,6 +233,9 @@
     relayStates.set(newRelay, { read: true, write: true });
     updateRelayCounts();
     newRelay = "";
+
+    // ソートをクリアして新しいアイテムが最後に表示されるようにする
+    sortConfig = { key: null, direction: "asc" };
   }
 
   function removeRelay(url: string) {
@@ -247,30 +249,37 @@
     newTags = kind10002 ? getTags(kind10002) : [];
     setAllStates();
     updateRelayCounts();
+    // ソート状態もリセット
+    sortConfig = { key: null, direction: "asc" };
   }
 
   async function save() {
     // console.log(newTags);
     $nowProgress = true;
-    // 新しいタグを生成
-    newTags = relayStates.entries().reduce((before, [url, state]) => {
-      if (state.read && state.write) {
-        before.push(["r", url]);
-      } else if (state.read) {
-        before.push(["r", url, "read"]);
-      } else if (state.write) {
-        before.push(["r", url, "write"]);
-      }
-      return before;
-    }, [] as string[][]);
+    // 現在の並び順（sortedTags）を維持しつつ、relayStatesの状態を反映
+    const updatedTags = sortedTags
+      .map(([r, url, rw]) => {
+        const state = relayStates.get(url);
+        if (!state) return null; // relayStatesにない場合は除外
 
-    //relayStates　readもwriteもfalseのurlを削除）
-    // relayStates から read も write も false の URL を削除
+        if (state.read && state.write) {
+          return ["r", url];
+        } else if (state.read) {
+          return ["r", url, "read"];
+        } else if (state.write) {
+          return ["r", url, "write"];
+        }
+        return null; // readもwriteもfalseの場合は除外
+      })
+      .filter((tag) => tag !== null) as string[][];
+
+    // relayStatesからreadもwriteもfalseのURLを削除
     relayStates.forEach((state, url) => {
       if (!state.read && !state.write) {
         relayStates.delete(url);
       }
     });
+
     if (newTags.length <= 0) {
       $toastSettings = {
         title: "Warning",
@@ -280,29 +289,40 @@
       $nowProgress = false;
       return;
     }
-    console.log(newTags);
+    // 並び順を維持してnewTagsを更新
+    newTags = updatedTags;
     const eventParam: Nostr.EventParameters = {
       content: "",
       tags: $state.snapshot(newTags),
       kind: 10002,
       pubkey: lumiSetting.get().pubkey,
     };
-    const { event, res } = await promisePublishEvent(eventParam);
-    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-    const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+    try {
+      const { event, res } = await promisePublishEvent(eventParam);
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+      const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
-    let str = generateResultMessage(isSuccess, isFailed);
-    console.log(str);
+      let str = generateResultMessage(isSuccess, isFailed);
+      console.log(str);
 
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
-    checkDefaultRelay(event, isSuccess[0]);
-    //reset押したときに戻るデータを更新
-    updateRelayCounts();
-    kind10002 = event;
+      $toastSettings = {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: str,
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      };
+      checkDefaultRelay(event, isSuccess[0]);
+      //reset押したときに戻るデータを更新
+      updateRelayCounts();
+      kind10002 = event;
+    } catch (error) {
+      $toastSettings = {
+        title: "Failed",
+        description: "failed to publish",
+        color: "bg-red-500",
+      };
+    }
+    // 保存後はソート状態をクリアして手動並び順を維持
+    sortConfig = { key: null, direction: "asc" };
     $nowProgress = false;
   }
 
@@ -329,6 +349,107 @@
     // イベントの形を整えてセット
     const relays = setRelaysByKind10002(ev);
     setRelays(relays);
+  }
+
+  // 既存の変数に加えて以下を追加
+  let sortConfig: { key: null | string; direction: string } = $state({
+    key: null,
+    direction: "asc",
+  });
+  let draggedIndex: number | null = $state(null);
+  let dragOverIndex: number | null = $state(null);
+
+  // 並べ替えロジック
+  let sortedTags = $derived(
+    sortConfig.key
+      ? [...newTags].sort((a, b) => {
+          let aVal, bVal;
+
+          switch (sortConfig.key) {
+            case "url":
+              aVal = a[1]; // url
+              bVal = b[1];
+              break;
+            case "read":
+              aVal = relayStates.get(a[1])?.read ? 1 : 0;
+              bVal = relayStates.get(b[1])?.read ? 1 : 0;
+              break;
+            case "write":
+              aVal = relayStates.get(a[1])?.write ? 1 : 0;
+              bVal = relayStates.get(b[1])?.write ? 1 : 0;
+              break;
+            default:
+              return 0;
+          }
+
+          if (sortConfig.direction === "asc") {
+            return aVal > bVal ? 1 : -1;
+          } else {
+            return aVal < bVal ? 1 : -1;
+          }
+        })
+      : newTags
+  );
+
+  // ドラッグ&ドロップ関数
+  function handleDragStart(e: DragEvent, index: number) {
+    draggedIndex = index;
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move";
+    }
+    if (e.target) {
+      (e.target as HTMLElement).classList.add("opacity-50");
+    }
+  }
+
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    const row = (e.target as HTMLElement).closest("tr");
+    if (row) {
+      const tbody = row.parentElement;
+      if (tbody) {
+        const rows = Array.from(tbody.children);
+        dragOverIndex = rows.indexOf(row);
+      }
+    }
+  }
+
+  function handleDrop(
+    e: DragEvent & { currentTarget: EventTarget & HTMLTableRowElement },
+    dropIndex: number
+  ) {
+    e.preventDefault();
+
+    if (draggedIndex !== null && draggedIndex !== dropIndex) {
+      // sortedTagsから実際の並び順を取得
+      const newArray = [...sortedTags];
+      const draggedItem = newArray[draggedIndex];
+
+      // アイテムを削除
+      newArray.splice(draggedIndex, 1);
+
+      // 新しい位置に挿入
+      const insertIndex = draggedIndex < dropIndex ? dropIndex - 1 : dropIndex;
+      newArray.splice(insertIndex, 0, draggedItem);
+
+      // 元のnewTagsを更新（これが実際のデータソース）
+      newTags = newArray;
+
+      // ソート設定をクリアして手動並び順を維持
+      sortConfig = { key: null, direction: "asc" };
+    }
+
+    dragOverIndex = null;
+  }
+
+  function handleDragEnd(e: DragEvent) {
+    (e.target as HTMLElement).classList.remove("opacity-50");
+    draggedIndex = null;
+    dragOverIndex = null;
   }
 </script>
 
@@ -376,50 +497,69 @@
     <table>
       <thead>
         <tr>
-          <th class="text-center"
-            >relay
-            <div class=" text-xs font-normal">{newTags.length}</div></th
-          ><th class="text-center"
-            >read
-            <div class=" text-xs font-normal">
-              {readLen}
-            </div></th
-          ><th class="text-center"
-            >write
-            <div class=" text-xs font-normal">
-              {writeLen}
-            </div></th
-          ><th class="text-center"></th>
-        </tr></thead
-      ><tbody>
-        {#each newTags as [r, url, rw], index}
-          <tr>
-            <td class="text-left break-all">{url} </td>
-            <td class="text-center"
-              ><input
+          <th class="text-center">
+            relay
+            <div class="text-xs font-normal">{newTags.length}</div>
+          </th>
+          <th class="text-center">
+            read
+            <div class="text-xs font-normal">{readLen}</div>
+          </th>
+          <th class="text-center">
+            write
+            <div class="text-xs font-normal">{writeLen}</div>
+          </th>
+          <th class="text-center"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {#each newTags as [r, url, rw], index (url)}
+          <tr
+            class="drag-row hover:bg-magnum-50 transition-colors"
+            draggable="true"
+            ondragstart={(e) => handleDragStart(e, index)}
+            ondragover={(e) => handleDragOver(e)}
+            ondrop={(e) => handleDrop(e, index)}
+            ondragend={handleDragEnd}
+            class:drag-over={dragOverIndex === index}
+          >
+            <td class="text-left break-all">
+              <div class="flex items-center gap-2">
+                <span
+                  class="drag-handle cursor-grab text-gray-400 hover:text-gray-600"
+                  >⋮⋮</span
+                >
+                {url}
+              </div>
+            </td>
+            <td class="text-center">
+              <input
                 type="checkbox"
                 checked={relayStates.get(url)?.read}
                 onchange={(e) => handleClickRead(e, url)}
-              /></td
-            >
-            <td class="text-center"
-              ><input
+              />
+            </td>
+            <td class="text-center">
+              <input
                 type="checkbox"
                 checked={relayStates.get(url)?.write}
                 onchange={(e) => handleClickWrite(e, url)}
-              /></td
-            ><td
-              ><button
+              />
+            </td>
+            <td>
+              <button
                 class="m-auto h-6 w-6 flex justify-center items-center
-            rounded-full text-magnum-800 bg-magnum-100
-            hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300 disabled:opacity-25"
+                rounded-full text-magnum-800 bg-magnum-100
+                hover:opacity-75 hover:bg-magnum-200 active:bg-magnum-300 disabled:opacity-25"
                 disabled={isError}
-                onclick={() => removeRelay(url)}><X size={20} /></button
-              ></td
-            >
+                onclick={() => removeRelay(url)}
+              >
+                <X size={20} />
+              </button>
+            </td>
           </tr>
-        {/each}</tbody
-      >
+        {/each}
+      </tbody>
     </table>
     <div class="mt-2 flex items-center w-full">
       <input
@@ -473,5 +613,22 @@
   }
   tr:hover {
     background-color: theme("colors.neutral.800");
+  }
+  .drag-row {
+    transition: all 0.2s ease;
+  }
+
+  .drag-over {
+    border-top: 2px solid #6366f1;
+  }
+
+  .drag-handle {
+    writing-mode: vertical-lr;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .drag-handle:active {
+    cursor: grabbing;
   }
 </style>
