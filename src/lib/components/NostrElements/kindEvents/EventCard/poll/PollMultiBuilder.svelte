@@ -166,12 +166,13 @@
     />
     <span class="ml-2 break-all">
       <Content
-        text={label}
-        tags={note.tags}
+        event={{
+          ...note,
+          content: label,
+        }}
         displayTags={false}
         displayMenu={false}
         {depth}
-        kind={note.kind}
         repostable={false}
       /></span
     >

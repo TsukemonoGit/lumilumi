@@ -15,10 +15,10 @@
   import { untrack } from "svelte";
 
   import UrlDisplay from "./UrlDisplay.svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
-    text: string;
-    tags: string[][];
+    event: Partial<Nostr.Event>;
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
@@ -27,12 +27,10 @@
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
     displayTags?: boolean;
-    kind?: number;
   }
 
   let {
-    text,
-    tags,
+    event,
     displayMenu,
     depth,
     repostable,
@@ -41,10 +39,13 @@
     maxHeight,
     zIndex,
     displayTags = true,
-    kind = 1,
   }: Props = $props();
 
   let parts: Part[] = $state([]);
+
+  let text = $derived(event.content || "");
+  let tags = $derived(event.tags || []);
+
   //プレビューにも使ってるからconstだとだめ
   $effect(() => {
     if (text || tags) {
@@ -122,13 +123,13 @@
         {zIndex}
       />{:else}{part.content}{/if}
   {:else if part.type === "url"}
-    <UrlDisplay {part} {openModal} />
+    <UrlDisplay {part} {openModal} author={event.pubkey || ""} />
   {:else if part.type === "emoji"}
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.url}&k=${kind}`}
+      href={`/search?t=${part.url}&k=${event.kind || 1}`}
       class="underline text-magnum-300 break-all">#{part.content}</a
     >
   {:else if part.type === "relay"}

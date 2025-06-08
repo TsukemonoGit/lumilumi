@@ -130,15 +130,13 @@
       <div class="flex flex-col p-0.5 mt-1">
         <blockquote>
           <Content
+            event={note}
             {zIndex}
             {maxHeight}
-            text={note.content}
-            tags={note.tags}
             {displayMenu}
             {depth}
             {repostable}
             displayTags={false}
-            kind={note.kind}
           />
 
           {#if referenceTag}

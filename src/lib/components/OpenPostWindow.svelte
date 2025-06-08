@@ -873,12 +873,15 @@
       use:melt={$content}
     >
       <PostPreview
-        {tags}
-        {text}
+        event={{
+          tags,
+          content: text,
+          kind: initOptions.kind,
+          pubkey: signPubkey,
+        }}
         {onWarning}
         {warningText}
         {signPubkey}
-        kind={initOptions.kind}
         replyUsers={[
           ...(initOptions.defaultUsers || []),
           ...additionalReplyUsers,

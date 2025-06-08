@@ -66,14 +66,16 @@
     <UserName pubhex={event.pubkey} />
     <div class="px-2 w-full">
       <Content
-        text={event.content.length < 40
-          ? (event.content ?? "")
-          : `${event.content.slice(0, 40)}...`}
-        tags={event.tags}
+        event={{
+          ...event,
+          content:
+            event.content && event.content.length > 40
+              ? `${event.content.slice(0, 40)}...`
+              : (event.content ?? ""),
+        }}
         displayMenu={false}
         depth={0}
         repostable={false}
-        kind={event.kind}
       />
     </div>
   {/if}

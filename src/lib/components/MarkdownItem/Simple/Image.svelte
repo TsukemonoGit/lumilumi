@@ -17,7 +17,7 @@
   let alt = $derived(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]);
   let title = $derived(part?.attrs?.find((attr) => attr[0] === "title")?.[1]);
   let button = $derived(
-    `View Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`
+    `Expand Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`
   );
   //$: console.log(part);
 
@@ -29,7 +29,7 @@
   );
 </script>
 
-{#if (lumiSetting.get().showImg && lumiSetting.get().autoExpandImages) || view}
+{#if lumiSetting.get().showImg || view}
   <img
     loading="lazy"
     {width}

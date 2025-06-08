@@ -3,7 +3,6 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { queryClient, viewMediaModal } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
-  import Content from "./NostrElements/content/Content.svelte";
   import ProfileDisplay from "./NostrElements/kindEvents/EventCard/ProfileDisplay.svelte";
   import NoteComponent from "./NostrElements/kindEvents/layout/NoteComponent.svelte";
   import ReplyTo from "./NostrElements/kindEvents/layout/ReplyTo.svelte";
@@ -28,31 +27,31 @@
   import { type Part, parseText } from "$lib/func/content";
   import { nip19 } from "nostr-tools";
   import { untrack } from "svelte";
+  import * as Nostr from "nostr-typedef";
 
   // Props definition
   interface Props {
-    tags: string[][];
-    text: string;
+    event: Partial<Nostr.Event>;
     onWarning: boolean;
     warningText: string;
     signPubkey: string | undefined;
-    kind: number;
+
     addUser: (usr: string | undefined) => void;
     replyUsers: string[];
   }
 
   // Initialize props
   let {
-    tags,
-    text,
+    event,
     onWarning,
     warningText,
     signPubkey,
-    kind,
+
     replyUsers,
     addUser,
   }: Props = $props();
-
+  let text = $derived(event.content || "");
+  let tags = $derived(event.tags || []);
   // Constants
   const displayMenu = false;
   const mini = false;
@@ -79,8 +78,8 @@
   );
 
   let replyTag = $derived.by(() => {
-    if ([1, 42, 4, 1111].includes(kind) && tags.length > 0) {
-      return replyedEvent(tags, kind).replyTag;
+    if ([1, 42, 4, 1111].includes(event.kind || 1) && tags.length > 0) {
+      return replyedEvent(tags, event.kind || 1).replyTag;
     }
     return undefined;
   });
@@ -256,7 +255,7 @@
                     {zIndex}
                   />{:else}<span class="break-all">{part.content}</span>{/if}
               {:else if part.type === "url"}
-                <UrlDisplay {part} {openModal} />
+                <UrlDisplay {part} {openModal} author={signPubkey || ""} />
               {:else if part.type === "emoji"}
                 <CustomEmoji {part} />
               {:else if part.type === "hashtag"}
@@ -288,7 +287,7 @@
               <ProxyTag proxyTag={proxy} />
             {/if}
           </Truncate>
-          {#if kind === 42}
+          {#if event.kind === 42}
             {@const heyaId = tags.find(
               (tag) => tag[0] === "e" && tag[3] === "root"
             )?.[1]}
@@ -304,8 +303,7 @@
     <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
       <ContentParts
         {maxHeight}
-        {text}
-        {tags}
+        {event}
         {displayMenu}
         {depth}
         {repostable}

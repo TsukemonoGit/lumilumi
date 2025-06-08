@@ -57,22 +57,20 @@
               >{/if}{/each}
         {:else}
           <NostrContent
-            text={part.content}
+            event={{ content: part.content, tags: tags }}
             {repostable}
             {depth}
             {displayMenu}
-            {tags}
             {zIndex}
           />
         {/if}
       </li>{/each}
   </ul>{:else}
   <NostrContent
-    text={part.content}
+    event={{ content: part.content, tags: tags }}
     {repostable}
     {depth}
     {displayMenu}
-    {tags}
     {zIndex}
   />{/if}
 

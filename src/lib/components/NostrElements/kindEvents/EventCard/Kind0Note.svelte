@@ -60,12 +60,13 @@
 
     <Content
       maxHeight={192}
-      text={prof?.about?.trim() ?? ""}
-      tags={note.tags}
+      event={{
+        ...note,
+        content: prof?.about?.trim() ?? "",
+      }}
       {displayMenu}
       {depth}
       {repostable}
-      kind={note.kind}
     />
   </div>
 </div>

@@ -1,7 +1,7 @@
 <!--ContentImage.svelte-->
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   let imgError: boolean = $state(false);
@@ -11,6 +11,7 @@
     url?: string | undefined;
     number?: number | undefined;
     openModal: (index: number) => void;
+    author: string;
   }
 
   let {
@@ -18,11 +19,18 @@
     url = undefined,
     number = undefined,
     openModal,
+    author,
   }: Props = $props();
   let view = $state(false);
+  let showDirectly = $derived(
+    lumiSetting.get().imageAutoExpand === "all" ||
+      (lumiSetting.get().imageAutoExpand === "following" &&
+        author &&
+        followList.get().has(author))
+  );
 </script>
 
-{#if (lumiSetting.get().showImg && lumiSetting.get().autoExpandImages && !imgError) || view}
+{#if (lumiSetting.get().showImg && showDirectly && !imgError) || view}
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all "
@@ -52,5 +60,5 @@
   >{:else}
   <button
     class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50"
-    onclick={() => (view = true)}>View Image</button
+    onclick={() => (view = true)}>Expand Image</button
   >{/if}

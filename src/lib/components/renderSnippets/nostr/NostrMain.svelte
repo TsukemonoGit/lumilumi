@@ -104,6 +104,11 @@
 
   function applySavedSettings(settings: LumiSetting) {
     lumiSetting.set(settings);
+    if (!lumiSetting.get().imageAutoExpand) {
+      lumiSetting.update((value) => {
+        return { ...value, imageAutoExpand: "all" };
+      });
+    }
     //  console.log(savedRelays);
     if (
       lumiSetting.get().useRelaySet === "1" &&

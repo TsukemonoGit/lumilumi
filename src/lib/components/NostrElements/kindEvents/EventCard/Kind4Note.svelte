@@ -143,13 +143,14 @@
         >{:else}
         <!--複合できたら内容を表示-->
         <Content
+          event={{
+            ...note,
+            content: decrypt,
+          }}
           {maxHeight}
-          text={decrypt}
-          tags={note.tags}
           {displayMenu}
           {depth}
           repostable={false}
-          kind={note.kind}
         />
       {/if}
     {/if}

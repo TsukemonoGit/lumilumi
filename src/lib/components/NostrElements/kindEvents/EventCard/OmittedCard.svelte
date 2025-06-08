@@ -68,24 +68,14 @@
       {#if data}
         <OgpCard contents={data.ogp} url={data.url} />
       {:else}
-        <Content
-          {maxHeight}
-          text={text.content ?? ""}
-          tags={text.tags}
-          {displayMenu}
-          {depth}
-          {repostable}
-          kind={text.kind}
-        />
+        <Content {maxHeight} event={text} {displayMenu} {depth} {repostable} />
       {/if}
     {:else}
       <Content
-        text={text.content ?? ""}
-        tags={text.tags}
+        event={text}
         {displayMenu}
         {depth}
         {repostable}
-        kind={text.kind}
       />{#if text.kind !== 1}{#if text.kind === 42}{@const heyaId =
             text.tags.find(
               (tag) => tag[0] === "e" && tag[3] === "root"

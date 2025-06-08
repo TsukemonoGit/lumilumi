@@ -115,6 +115,7 @@ declare global {
     nostr?: Nostr.Nip07.Nostr;
   }
 }
+export type ImageAutoExpand = "all" | "following" | "manual";
 
 export interface LumiSetting {
   relays: DefaultRelayConfig[];
@@ -132,7 +133,7 @@ export interface LumiSetting {
   showAllReactions: boolean;
   kind42inTL: boolean;
   addClientTag: boolean;
-  autoExpandImages: boolean; //画像表示のワンクッションあり
+  imageAutoExpand: ImageAutoExpand; //画像表示のワンクッションあり
   defaultReaction: { content: string; tag: string[] };
 }
 export interface LumiEmoji {

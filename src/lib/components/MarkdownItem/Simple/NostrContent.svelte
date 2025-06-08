@@ -9,10 +9,9 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
   import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";
-
+  import * as Nostr from "nostr-typedef";
   interface Props {
-    text: string;
-    tags: string[][];
+    event: Partial<Nostr.Event>;
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
@@ -22,8 +21,7 @@
   }
 
   let {
-    text,
-    tags,
+    event,
     displayMenu,
     depth,
     repostable,
@@ -32,6 +30,9 @@
     zIndex,
   }: Props = $props();
   let parts: Part[] = $state([]);
+
+  let text = $derived(event.content || "");
+  let tags = $derived(event.tags || []);
   //プレビューにも使ってるからconstだとだめ
   $effect(() => {
     if (text || tags) {
@@ -110,6 +111,7 @@
     <UrlDisplay
       {part}
       {openModal}
+      author={event.pubkey || ""}
     />{:else if part.type === "emoji"}{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
         height="24"
         loading="lazy"

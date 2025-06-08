@@ -32,7 +32,12 @@
       "showAllReaction": "Show everyone's reactions",
       "kind42inTL": "Display public chats on HomeTL",
       "embed": "Embed supported content?",
-      "autoExpandImages": "Auto-expand images"
+      "imageAutoExpand": {
+        "label": "Auto-expand images",
+        "all": "Auto-expand all images",
+        "following": "Auto-expand images from following users only",
+        "manual": "Manual expand (click to view)"
+      }
     },
     "post": {
       "addClientTag": "Add client tag (via) to post",

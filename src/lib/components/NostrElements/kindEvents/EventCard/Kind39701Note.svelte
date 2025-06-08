@@ -118,12 +118,10 @@
         <Content
           {zIndex}
           {maxHeight}
-          text={note.content}
-          tags={note.tags}
+          event={note}
           {displayMenu}
           {depth}
           {repostable}
-          kind={note.kind}
         />
       </div>
       <div class="mt-2">
