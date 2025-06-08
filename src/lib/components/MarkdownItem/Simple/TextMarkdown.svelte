@@ -45,11 +45,10 @@
     />{/each}
 {:else}
   <NostrContent
-    text={part.content}
+    event={{ content: part.content, tags }}
     {repostable}
     {depth}
     {displayMenu}
-    {tags}
     {zIndex}
   />
 {/if}
