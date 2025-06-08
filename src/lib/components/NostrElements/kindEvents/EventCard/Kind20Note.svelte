@@ -122,17 +122,21 @@
         </div>{/if}
       {#if imageList.length > 0}
         {#each imageList as url, number}
-          <ContentImage src={url} {url} {number} {openModal} />
+          <ContentImage
+            src={url}
+            {url}
+            {number}
+            {openModal}
+            author={note.pubkey}
+          />
         {/each}{/if}
       <Content
         {maxHeight}
-        text={note.content}
-        tags={note.tags}
+        event={note}
         {displayMenu}
         {depth}
         {repostable}
         {zIndex}
-        kind={note.kind}
       />
       <span
         class={"float-end text-neutral-400    text-sm font-semibold px-1"}

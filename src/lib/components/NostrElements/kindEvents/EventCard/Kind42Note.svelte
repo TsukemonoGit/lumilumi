@@ -105,12 +105,10 @@
   {#snippet content()}
     <Content
       {zIndex}
-      text={note.content}
-      tags={note.tags}
+      event={note}
       {displayMenu}
       {depth}
       {repostable}
-      kind={note.kind}
     /><ChannelTag {heyaId} />
   {/snippet}
   {#snippet actionButtons()}

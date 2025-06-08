@@ -32,7 +32,13 @@
       "showAllReaction": "みんなのリアクションを表示する",
       "kind42inTL": "パブリックチャットをHomeTLに表示する",
       "embed": "埋め込み対応したコンテンツを埋め込み表示する",
-      "autoExpandImages": "画像を自動展開する"
+
+      "imageAutoExpand": {
+        "label": "画像の自動展開",
+        "all": "すべて自動展開",
+        "following": "フォローユーザーのみ自動展開",
+        "manual": "手動展開（すべてクリック）"
+      }
     },
     "post": {
       "addClientTag": "投稿にClientタグ(via)をつける",

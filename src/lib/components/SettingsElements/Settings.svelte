@@ -45,6 +45,7 @@
   import { relayRegex2, npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import PicQuarity from "./PicQuarity.svelte";
+  import ImageAutoExpand from "./ImageAutoExpand.svelte";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -600,24 +601,17 @@
         />
         {$_("settings.display.loadImage")}
       </label>
-      <label class={`ml-8 ${!settings.showImg ? "opacity-25" : ""}`}>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          bind:checked={settings.embed}
-          disabled={!settings.showImg}
-        />
-        {$_("settings.display.embed")}(youtube, twitter,bluesky)
-      </label>
-      <label class={`ml-8 ${!settings.showImg ? "opacity-25" : ""}`}>
-        <input
-          type="checkbox"
-          class="rounded-checkbox"
-          disabled={!settings.showImg}
-          bind:checked={settings.autoExpandImages}
-        />
-        {$_("settings.display.autoExpandImages")}
-      </label>
+      {#if settings.showImg}
+        <label class={`ml-8`}>
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={settings.embed}
+          />
+          {$_("settings.display.embed")}(youtube, twitter,bluesky)
+        </label>
+        <ImageAutoExpand bind:imageAutoExpand={settings.imageAutoExpand} />
+      {/if}
       <label>
         <input
           type="checkbox"

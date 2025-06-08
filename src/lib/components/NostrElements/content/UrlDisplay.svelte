@@ -7,12 +7,14 @@
   import ContentImage from "./ContentImage.svelte";
   import { isvalidURL } from "$lib/func/ogp";
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
+  import ContentVideo from "./ContentVideo.svelte";
 
   interface Props {
     part: Part;
     openModal: (index: number) => void;
+    author: string;
   }
-  let { part, openModal }: Props = $props();
+  let { part, openModal, author }: Props = $props();
 </script>
 
 {#if part.url}
@@ -32,21 +34,15 @@
           url={part.url}
           number={part.number}
           {openModal}
+          {author}
         />
       {:else if type === "movie"}
-        {#if lumiSetting.get().showImg}
-          <video
-            aria-label="video contents"
-            controls
-            src={part.content}
-            class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-            ><track default kind="captions" /></video
-          >
-        {:else}<Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
-            className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}>{part.content}</Link
-          >{/if}
+        <ContentVideo
+          src={part.content}
+          url={part.url}
+          number={part.number}
+          {author}
+        />
       {:else if type === "audio"}
         {#if lumiSetting.get().showImg}
           <audio

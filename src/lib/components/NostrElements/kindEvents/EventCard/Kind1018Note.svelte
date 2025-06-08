@@ -160,13 +160,11 @@
       {/if}
       <Content
         {maxHeight}
-        text={note.content}
-        tags={note.tags}
+        event={note}
         {displayMenu}
         {depth}
         {repostable}
         {zIndex}
-        kind={note.kind}
       />
     {/snippet}
     {#snippet actionButtons()}

@@ -128,12 +128,10 @@
           <Content
             {zIndex}
             {maxHeight}
-            text={note.content}
-            tags={note.tags}
+            event={note}
             {displayMenu}
             {depth}
             {repostable}
-            kind={note.kind}
           />
         </div>
         {#if page.params.note || page.params.naddr}
@@ -149,8 +147,10 @@
             <label class="flex flex-wrap">
               <input type="radio" disabled={true} /><span class="ml-2 break-all"
                 ><Content
-                  text={itemTag[2]}
-                  tags={note.tags}
+                  event={{
+                    ...note,
+                    content: itemTag[2],
+                  }}
                   displayTags={false}
                   displayMenu={false}
                   {depth}

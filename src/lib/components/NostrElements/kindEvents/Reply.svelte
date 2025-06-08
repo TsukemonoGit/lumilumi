@@ -81,7 +81,7 @@
       <!---->
       {#if replyTag[1].startsWith("http")}
         {@const part = toPart(replyTag)}
-        <UrlDisplay {part} {openModal} />
+        <UrlDisplay {part} {openModal} author={""} />
       {:else}
         <!---->
         {replyTag.toString()}

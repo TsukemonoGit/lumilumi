@@ -168,13 +168,14 @@
               </div>
               <div class=" text-gray-600 dark:text-gray-100 ml-1">
                 <Content
-                  text={label}
-                  tags={note.tags}
+                  event={{
+                    ...note,
+                    content: label,
+                  }}
                   displayTags={false}
                   displayMenu={false}
                   {depth}
                   repostable={false}
-                  kind={note.kind}
                 />
               </div>
 

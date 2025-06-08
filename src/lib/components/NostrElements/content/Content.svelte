@@ -6,10 +6,9 @@
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
   import { untrack } from "svelte";
-
+  import * as Nostr from "nostr-typedef";
   interface Props {
-    text: string;
-    tags: string[][];
+    event: Partial<Nostr.Event>;
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
@@ -22,8 +21,7 @@
   }
 
   let {
-    text,
-    tags,
+    event,
     displayMenu,
     depth,
     repostable,
@@ -32,9 +30,9 @@
     maxHeight,
     zIndex = 0,
     displayTags,
-    kind,
   }: Props = $props();
-
+  let text = $derived(event.content || "");
+  let tags = $derived(event.tags || []);
   // svelte-ignore non_reactive_update
   let showMore: Writable<boolean> = writable(false);
   let dialogContentRef: HTMLDivElement | undefined = $state();
@@ -59,29 +57,25 @@
   <Truncate {maxHeight} {onClickShowMore} {depth}>
     <ContentParts
       {maxHeight}
-      {text}
-      {tags}
+      {event}
       {isShowClientTag}
       {displayMenu}
       {depth}
       {repostable}
       {zIndex}
       {displayTags}
-      {kind}
     />
   </Truncate>
 {:else}
   <ContentParts
     {maxHeight}
-    {text}
-    {tags}
+    {event}
     {isShowClientTag}
     {displayMenu}
     {depth}
     {repostable}
     {zIndex}
     {displayTags}
-    {kind}
   />
 {/if}
 <!--Show more no Dialog-->
@@ -98,15 +92,13 @@
     >
       <ContentParts
         {maxHeight}
-        {text}
-        {tags}
+        {event}
         {isShowClientTag}
         {displayMenu}
         {depth}
         {repostable}
         {zIndex}
         {displayTags}
-        {kind}
       />
     </div>
   {/snippet}</Dialog

@@ -74,11 +74,10 @@
       {/if}{/each}
   {:else}
     <NostrContent
-      text={part.content}
+      event={{ content: part.content, tags: tags }}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
       {zIndex}
     />
   {/if}

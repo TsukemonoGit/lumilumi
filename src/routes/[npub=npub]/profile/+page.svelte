@@ -391,13 +391,15 @@
 
       {#if newProfile.about}
         <Content
+          event={{
+            content: newProfile.about,
+            tags: newTags,
+            kind: 0,
+          }}
           maxHeight={bannerHeight}
-          text={newProfile.about}
-          tags={newTags}
           displayMenu={true}
           depth={0}
           repostable={true}
-          kind={0}
         />
       {/if}
     </div>

@@ -308,14 +308,15 @@
           {#if prof.about}
             <div class={`mt-2 ${mini ? "text-sm" : ""}`}>
               <Content
+                event={{
+                  ...metadata,
+                  content: prof.about,
+                }}
                 {zIndex}
                 maxHeight={mini ? bannerHeight : bannerHeight * 1.5}
-                text={prof.about}
-                tags={metadata.tags}
                 displayMenu={true}
                 {depth}
                 repostable={false}
-                kind={metadata.kind}
               />
             </div>
           {/if}

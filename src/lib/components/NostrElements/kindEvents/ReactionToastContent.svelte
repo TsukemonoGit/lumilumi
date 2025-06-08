@@ -89,10 +89,13 @@
     {#snippet content({ data: text })}
       <div class="mx-2 text-sm">
         <Content
-          text={text.content.length < contentLen
-            ? (text.content ?? "")
-            : `${text.content.slice(0, contentLen)}...`}
-          tags={text.tags}
+          event={{
+            ...event,
+            content:
+              text.content.length < contentLen
+                ? (text.content ?? "")
+                : `${text.content.slice(0, contentLen)}...`,
+          }}
           displayMenu={false}
           depth={0}
           repostable={false}
@@ -124,10 +127,13 @@
 
       {#snippet children({ event })}
         <Content
-          text={event.content.length < contentLen
-            ? (event.content ?? "")
-            : `${event.content.slice(0, contentLen)}...`}
-          tags={event.tags}
+          event={{
+            ...event,
+            content:
+              event.content.length < contentLen
+                ? (event.content ?? "")
+                : `${event.content.slice(0, contentLen)}...`,
+          }}
           displayMenu={false}
           depth={0}
           repostable={false}
