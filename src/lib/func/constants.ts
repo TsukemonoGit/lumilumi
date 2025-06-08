@@ -82,6 +82,7 @@ export const initSettings: LumiSetting = {
   addClientTag: false,
   showAllReactions: false,
   kind42inTL: false,
+  autoExpandImages: true, //画像自動展開ありなし
 };
 export const initLumiEmoji: LumiEmoji = {
   list: [],

@@ -20,7 +20,7 @@
     },
     "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
     "display": {
-      "loadImage": "画像を読み込み表示する (プロフィールのリアルタイム更新ON/OFF)",
+      "loadImage": "すべての画像を読み込み表示する (プロフィールのリアルタイム更新ON/OFF)",
       "preview": "ノート作成時にプレビューを表示する",
       "menu": "menuボタンを左側に表示する",
       "showRelayIcon": "アイコンの下にリレー情報を表示する",
@@ -31,7 +31,8 @@
       "showClientTag": "TLにもクライアントタグ(via)を表示",
       "showAllReaction": "みんなのリアクションを表示する",
       "kind42inTL": "パブリックチャットをHomeTLに表示する",
-      "embed": "埋め込み対応したコンテンツを埋め込み表示する"
+      "embed": "埋め込み対応したコンテンツを埋め込み表示する",
+      "autoExpandImages": "画像を自動展開する"
     },
     "post": {
       "addClientTag": "投稿にClientタグ(via)をつける",

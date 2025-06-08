@@ -2,7 +2,7 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
@@ -22,7 +22,7 @@
   let view = $state(false);
 </script>
 
-{#if (lumiSetting.get().showImg && !imgError) || view}
+{#if (lumiSetting.get().showImg && lumiSetting.get().autoExpandImages && !imgError) || view}
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all "

@@ -29,7 +29,7 @@
   );
 </script>
 
-{#if lumiSetting.get().showImg || view}
+{#if (lumiSetting.get().showImg && lumiSetting.get().autoExpandImages) || view}
   <img
     loading="lazy"
     {width}
