@@ -139,6 +139,7 @@
         }
         break;
       case 4:
+        //update profile
         $nowProgress = true;
         const key: QueryKey = ["metadata", pubkey];
         queryClient.invalidateQueries({ queryKey: key });

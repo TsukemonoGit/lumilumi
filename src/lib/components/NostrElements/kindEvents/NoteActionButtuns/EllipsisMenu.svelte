@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { modalState, queryClient, toastSettings } from "$lib/stores/stores";
+  import {
+    modalState,
+    nowProgress,
+    queryClient,
+    toastSettings,
+  } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -16,6 +21,7 @@
     Notebook,
     Trash,
     FilePenLine,
+    RefreshCw,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -38,6 +44,7 @@
 
   import Note from "../Note.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import type { QueryKey } from "@tanstack/svelte-query";
 
   interface Props {
     note: Nostr.Event;
@@ -110,6 +117,15 @@
     let menuItems = [...baseMenuItems];
 
     // 条件付きメニュー項目を適切な位置に挿入
+
+    // データ更新ボタン（条件付きで基本操作グループに追加）
+    if (replaceable) {
+      menuItems.splice(3, 0, {
+        text: `${$_("menu.refresh")}`,
+        icon: RefreshCw,
+        action: "refresh_data",
+      });
+    }
 
     // Broadcast（NIP-70チェック後、ツールセクションに追加）
     if (
@@ -206,6 +222,7 @@
         open_nostrapp: 11,
         delete: 12,
         open_makimono: 13,
+        refresh_data: 14,
       };
 
       menuItems = menuItems.filter((item) => {
@@ -329,6 +346,17 @@
       case "open_makimono":
         const makimono = `https://makimono.lumilumi.app//${naddr}`;
         window.open(makimono, "_blank", "noreferrer");
+        break;
+      case "refresh_data":
+        $nowProgress = true;
+        const key: QueryKey = [
+          "naddr",
+          `${note.kind}:${note.pubkey}:${note.tags.find((tag) => tag[0] === "d")?.[1] || ""}`,
+        ] as QueryKey;
+        queryClient.invalidateQueries({ queryKey: key });
+        setTimeout(() => {
+          $nowProgress = false;
+        }, 1000);
         break;
     }
   };
