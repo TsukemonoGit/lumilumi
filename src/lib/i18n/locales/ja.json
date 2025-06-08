@@ -135,7 +135,8 @@
     "delete": "削除",
     "editChannelInfo": "チャンネル情報の修正",
     "copylink": "リンクをコピー",
-    "MAKIMONO": "MAKIMONOで編集する"
+    "MAKIMONO": "MAKIMONOで編集する",
+    "refresh": "最新データを取得"
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
