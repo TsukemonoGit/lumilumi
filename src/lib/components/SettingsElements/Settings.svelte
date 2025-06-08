@@ -609,6 +609,15 @@
         />
         {$_("settings.display.embed")}(youtube, twitter,bluesky)
       </label>
+      <label class={`ml-8 ${!settings.showImg ? "opacity-25" : ""}`}>
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          disabled={!settings.showImg}
+          bind:checked={settings.autoExpandImages}
+        />
+        {$_("settings.display.autoExpandImages")}
+      </label>
       <label>
         <input
           type="checkbox"

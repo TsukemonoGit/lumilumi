@@ -132,7 +132,7 @@ export interface LumiSetting {
   showAllReactions: boolean;
   kind42inTL: boolean;
   addClientTag: boolean;
-
+  autoExpandImages: boolean; //画像表示のワンクッションあり
   defaultReaction: { content: string; tag: string[] };
 }
 export interface LumiEmoji {
@@ -168,7 +168,7 @@ export interface ChannelData {
   about?: string;
   picture?: string;
   relays?: string;
-  kategories?:string[];
+  kategories?: string[];
 }
 
 export interface DefaultPostOptions {

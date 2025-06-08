@@ -82,6 +82,7 @@ export const initSettings: LumiSetting = {
   addClientTag: false,
   showAllReactions: false,
   kind42inTL: false,
+  autoExpandImages: false, //像表示のワンクッションあり
 };
 export const initLumiEmoji: LumiEmoji = {
   list: [],
