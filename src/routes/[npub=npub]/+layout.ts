@@ -1,4 +1,4 @@
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 //import { pubkey } from '$lib/stores/settings';
 import { error } from "@sveltejs/kit";
 import type { LayoutLoad, RouteParams } from "./$types";

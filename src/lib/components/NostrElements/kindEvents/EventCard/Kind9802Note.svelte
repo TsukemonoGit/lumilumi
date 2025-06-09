@@ -7,7 +7,7 @@
   import ShowStatus from "../Status/ShowStatus.svelte";
   import { parseNaddr } from "$lib/func/util";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
 

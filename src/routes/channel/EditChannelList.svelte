@@ -15,7 +15,7 @@
   } from "$lib/stores/stores";
   import { pipe } from "rxjs";
   import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import { pushState } from "$app/navigation";

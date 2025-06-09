@@ -4,12 +4,12 @@
   import { Select } from "melt/builders";
   import Dialog from "./Elements/Dialog.svelte";
   import { ChartBar, Check, Plus, X } from "lucide-svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { defaultRelays, toastSettings } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
   import { nip07Signer } from "rx-nostr";
   import { promisePublishSignedEvent } from "$lib/func/nostr";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
   interface Props {

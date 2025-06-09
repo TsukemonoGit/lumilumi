@@ -1,6 +1,6 @@
 import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./regex";
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 import { parseNaddr } from "./util";
 
 export function getStatusLink(

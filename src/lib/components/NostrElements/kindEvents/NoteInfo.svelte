@@ -1,7 +1,7 @@
 <script lang="ts">
   import { datetime, parseNaddr } from "$lib/func/util";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
   interface Props {
     note: Nostr.Event;

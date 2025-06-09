@@ -19,11 +19,11 @@
   import ReplyTo from "../layout/ReplyTo.svelte";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import { parseNaddr } from "$lib/func/util";
-  import type { AddressPointer } from "nostr-tools/nip19";
+
   import NaddrEvent from "../NaddrEvent.svelte";
   import Link from "$lib/components/Elements/Link.svelte";
   import { SquareArrowOutUpRight } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { getRelaysById } from "$lib/func/nostr";
 
   interface Props {
@@ -65,7 +65,7 @@
       )
       .map((tag) => tag[1])
   );
-  let badgeAddress: AddressPointer | undefined = $derived.by(() => {
+  let badgeAddress: nip19.AddressPointer | undefined = $derived.by(() => {
     const atag = note.tags.find(
       (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
     );

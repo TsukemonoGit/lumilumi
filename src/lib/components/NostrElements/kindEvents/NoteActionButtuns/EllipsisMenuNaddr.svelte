@@ -9,7 +9,7 @@
     Squirrel,
   } from "lucide-svelte";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";

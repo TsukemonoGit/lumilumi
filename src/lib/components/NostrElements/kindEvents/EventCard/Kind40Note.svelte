@@ -1,6 +1,6 @@
 <script lang="ts">
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import ChannelMetadataLayout from "../ChannelMetadataLayout.svelte";
   import { getRelaysById } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";

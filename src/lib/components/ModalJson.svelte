@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { getRelaysById } from "$lib/func/nostr";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import type { Profile } from "$lib/types";
   import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 

@@ -12,7 +12,7 @@
   import { contentEmojiCheck } from "$lib/func/contentCheck";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { nip07Signer } from "rx-nostr";
   import {
     loginUser,

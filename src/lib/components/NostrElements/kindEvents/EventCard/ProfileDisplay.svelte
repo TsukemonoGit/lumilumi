@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Cake } from "lucide-svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { checkBirthDay } from "$lib/func/event";
   import { followList } from "$lib/stores/globalRunes.svelte";
   import { profile } from "$lib/func/util";

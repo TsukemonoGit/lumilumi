@@ -4,7 +4,7 @@
 
   import { TrendingUp, User } from "lucide-svelte";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import UserAvatar2 from "./UserAvatar2.svelte";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
   //  import { melt } from "@melt-ui/svelte";

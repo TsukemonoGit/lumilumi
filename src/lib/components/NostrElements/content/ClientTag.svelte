@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { parseNaddr } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   interface Props {
     tags: string[][];

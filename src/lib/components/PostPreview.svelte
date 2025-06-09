@@ -25,7 +25,7 @@
   import Geohash from "./NostrElements/content/geohash/Geohash.svelte";
   import ProxyTag from "./NostrElements/content/ProxyTag.svelte";
   import { type Part, parseText } from "$lib/func/content";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { untrack } from "svelte";
   import * as Nostr from "nostr-typedef";
 

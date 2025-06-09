@@ -99,6 +99,7 @@
       loginUser.set(customEvent.detail.pubkey || "");
       console.log(customEvent);
     });
+    localStorage?.removeItem("preferred-locale");
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {

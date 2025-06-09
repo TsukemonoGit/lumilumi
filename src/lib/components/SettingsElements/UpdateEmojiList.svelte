@@ -5,7 +5,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { writable, type Writable } from "svelte/store";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus } from "lucide-svelte";
