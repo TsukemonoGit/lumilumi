@@ -104,7 +104,7 @@
   let geohash: string = $state("");
   let text: string = $state(options.content ?? "");
   let tags: string[][] = $state([...options.tags]);
-  let cursorPosition: number = 0;
+  // let cursorPosition: number = 0;
   let onWarning: boolean = $state<boolean>(false);
   let warningText = $state("");
   let customReaction: string = $state("");
@@ -388,10 +388,10 @@
   // ----------------------------------------
   // Text Handling
   // ----------------------------------------
-  function handleTextareaInput(event: Event) {
-    const target = event.target as HTMLTextAreaElement;
-    cursorPosition = target.selectionStart;
-  }
+  // function handleTextareaInput(event: Event) {
+  //   const target = event.target as HTMLTextAreaElement;
+  //   cursorPosition = target.selectionStart;
+  // }
 
   function insertTextAtCursor(
     insertText: string,
@@ -410,13 +410,13 @@
       let result = insertText;
 
       // 文頭の特別な処理
-      const isTextStart = cursorPosition === 0;
+      const isTextStart = textarea?.selectionStart === 0;
 
       // 前のスペース処理
       if (addSpaceBefore) {
         // 文頭でない、かつ前の文字が空白でない場合
-        if (!isTextStart && cursorPosition > 0) {
-          const prev = text[cursorPosition - 1];
+        if ((!isTextStart && textarea?.selectionStart) || 0 > 0) {
+          const prev = text[textarea?.selectionStart || 0 - 1];
           if (!WHITESPACE_REGEX.test(prev)) {
             result = ` ${result}`;
           }
@@ -425,7 +425,7 @@
 
       // 後ろのスペース処理
       if (addSpaceAfter) {
-        const next = text[cursorPosition];
+        const next = text[textarea?.selectionStart || 0];
         if (!WHITESPACE_REGEX.test(next)) {
           result = `${result} `;
         }
@@ -435,16 +435,16 @@
     })();
 
     // テキストと カーソル位置の更新
+    const insertStart = textarea?.selectionStart || 0;
+    const insertEnd = insertStart + finalInsertText.length;
     text =
-      text.slice(0, cursorPosition) +
-      finalInsertText +
-      text.slice(cursorPosition);
-    cursorPosition += finalInsertText.length;
+      text.slice(0, insertStart) + finalInsertText + text.slice(insertStart);
 
-    // カーソル位置調整
-    textarea?.focus();
+    // カーソル位置を挿入テキストの最後に調整
+
     setTimeout(() => {
-      textarea?.setSelectionRange(cursorPosition, cursorPosition);
+      textarea?.focus();
+      textarea?.setSelectionRange(insertEnd, insertEnd);
     }, 0);
   }
 
@@ -457,7 +457,6 @@
   }
 
   function handleClickUser(pub: string): Promise<void> {
-    // const emojiText = cursorPosition === 0 ? `nostr:${pub} ` : ` nostr:${pub} `;
     insertTextAtCursor(`nostr:${pub}`, {
       addSpaceAfter: true,
       addSpaceBefore: true,
@@ -468,36 +467,9 @@
   }
 
   function handleClickQuote() {
-    // const inputText = cursorPosition === 0 ? "nostr:" : " nostr:";
     insertTextAtCursor("nostr:", { addSpaceBefore: true });
   }
 
-  function fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result);
-        } else {
-          reject("Failed to convert file to base64.");
-        }
-      };
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file); // ← Base64 + Data URI に変換されるポイント
-    });
-  }
-
-  function downloadTextFile(text: string, filename: string) {
-    const blob = new Blob([text], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename; // 例: "image.txt"
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url); // メモリ解放
-  }
   // ----------------------------------------
   // File Upload
   // ----------------------------------------
@@ -506,19 +478,6 @@
       //$nowProgress = false;
       return;
     }
-    // const file = fileList.item(0);
-    // if (file) {
-    //   const base64URI = await fileToBase64(file);
-    //   console.log(fileList);
-    //   const message = `type: ${file?.type || ""}\nsize: ${file?.size || ""}`;
-    //   showToast(file?.name, message, "bg-green-300");
-
-    //   // ← ダウンロードさせる処理を追加
-    //   // テキストファイルとしてダウンロード
-    //   const textFilename = file.name.replace(/\.[^/.]+$/, "") + ".txt";
-    //   downloadTextFile(base64URI, textFilename);
-    // }
-    // $nowProgress = true;
 
     // Cancel existing upload if any
     if (uploadAbortController) {
@@ -555,7 +514,6 @@
         }
 
         // Insert URL at cursor position
-        // const urlText = cursorPosition === 0 ? `${url}\n` : `\n${url}\n`;
         insertTextAtCursor(url, {
           addSpaceBefore: true,
           addSpaceAfter: true,
@@ -642,11 +600,11 @@
     if (
       ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)
     ) {
-      setTimeout(() => {
-        if (textarea) {
-          cursorPosition = textarea.selectionStart;
-        }
-      }, 0);
+      // setTimeout(() => {
+      //   if (textarea) {
+      //     cursorPosition = textarea.selectionStart;
+      //   }
+      // }, 0);
     }
   }
 
@@ -1003,18 +961,18 @@
             bind:this={textarea}
             bind:value={text}
             oninput={(e) => {
-              handleTextareaInput(e);
+              //  handleTextareaInput(e);
               clickEscape = 0;
             }}
             onchange={(e) => {
               checkCustomEmojis(text);
             }}
             onclick={(e) => {
-              handleTextareaInput(e);
+              //  handleTextareaInput(e);
               clickEscape = 0;
             }}
             ontouchend={(e) => {
-              handleTextareaInput(e);
+              //   handleTextareaInput(e);
               clickEscape = 0;
             }}
             onpaste={(e) => {
