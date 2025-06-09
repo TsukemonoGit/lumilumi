@@ -1,7 +1,7 @@
 <script lang="ts">
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   import PaginationList from "./PaginationList.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";

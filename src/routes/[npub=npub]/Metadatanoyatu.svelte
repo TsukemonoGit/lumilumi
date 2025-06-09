@@ -3,7 +3,7 @@
   import Kind0Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
 
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   interface Props {
     pubkey: string;

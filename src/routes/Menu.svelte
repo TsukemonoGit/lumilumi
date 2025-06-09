@@ -5,7 +5,7 @@
   import { fade, fly } from "svelte/transition";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
   import LumiIcon from "$lib/assets/lumi-chan.webp";
   import logo from "$lib/assets/favicon.svg";

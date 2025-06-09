@@ -4,7 +4,7 @@
   import { fade } from "svelte/transition";
 
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "../Elements/AlertDialog.svelte";

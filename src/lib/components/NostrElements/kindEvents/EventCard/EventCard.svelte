@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import { Repeat2 } from "lucide-svelte";
   import { onDestroy, untrack } from "svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { page } from "$app/state";
 

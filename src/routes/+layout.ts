@@ -2,7 +2,7 @@
 
 //import { locale, waitLocale } from "@konemono/svelte5-i18n";
 import type { LayoutLoad } from "./$types";
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 import { relayRegex2 } from "$lib/func/regex";
 import { error } from "@sveltejs/kit";
 

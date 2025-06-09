@@ -3,7 +3,7 @@
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
 
   import { formatAbsoluteDate } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";

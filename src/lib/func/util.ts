@@ -6,7 +6,7 @@ import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch } from "nostr-tools/utils";
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
 import { urlRegex } from "./regex";

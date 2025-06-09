@@ -31,7 +31,7 @@ import * as Nostr from "nostr-typedef";
 import { metadata } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 import { hexRegex } from "./regex";
 import {
   authRelay,

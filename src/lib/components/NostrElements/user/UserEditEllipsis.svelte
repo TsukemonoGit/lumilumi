@@ -1,9 +1,9 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { UserCog, Pin, RadioTower, User } from "lucide-svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   import { goto } from "$app/navigation";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";

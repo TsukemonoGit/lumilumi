@@ -6,7 +6,7 @@
 
   import { SquareArrowOutUpRight } from "lucide-svelte";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   //import * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";
   import CreateChannel from "./CreateChannel.svelte";

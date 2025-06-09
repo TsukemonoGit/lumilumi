@@ -1,7 +1,7 @@
 <script lang="ts">
   import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";

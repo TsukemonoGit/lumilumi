@@ -8,7 +8,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { onMount } from "svelte";
   //import * as Nostr from "nostr-typedef";
   import { t as _ } from "@konemono/svelte5-i18n";

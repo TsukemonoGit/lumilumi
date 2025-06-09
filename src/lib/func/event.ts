@@ -4,7 +4,7 @@ import * as Nostr from "nostr-typedef";
 import { hexRegex, nip33Regex } from "./regex";
 import type { Ogp } from "./ogp";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
-import { nip19 } from "nostr-tools";
+import * as nip19 from "nostr-tools/nip19";
 import { getRelaysById } from "./nostr";
 
 export const repostedId = (

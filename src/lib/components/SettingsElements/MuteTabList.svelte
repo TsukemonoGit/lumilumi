@@ -5,7 +5,7 @@
   import { createTabs, melt } from "@melt-ui/svelte";
   import { crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import { refetchKind10000 } from "$lib/func/mute";
   import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import {

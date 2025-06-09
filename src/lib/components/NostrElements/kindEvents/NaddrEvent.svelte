@@ -1,6 +1,6 @@
 <script lang="ts">
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import type { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import EventCard from "./EventCard/EventCard.svelte";

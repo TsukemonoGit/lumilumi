@@ -3,7 +3,7 @@
   import { getRelaysById } from "$lib/func/nostr";
   import type { ChannelData } from "$lib/types";
   import { MessagesSquare } from "lucide-svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 

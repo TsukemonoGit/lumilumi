@@ -17,7 +17,7 @@
   import { sortEvents } from "$lib/func/util";
 
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
   import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { type PageData } from "./$types";

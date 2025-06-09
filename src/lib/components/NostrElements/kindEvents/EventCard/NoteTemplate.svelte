@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { nip19 } from "nostr-tools";
+  import * as nip19 from "nostr-tools/nip19";
 
   import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
 
