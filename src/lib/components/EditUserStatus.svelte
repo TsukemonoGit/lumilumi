@@ -9,7 +9,7 @@
 
   import { publishEvent } from "$lib/func/nostr";
   import Popover from "./Elements/Popover.svelte";
-  import { contentEmojiCheck } from "$lib/func/contentCheck";
+  import { checkCustomEmojis, contentEmojiCheck } from "$lib/func/contentCheck";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import * as nip19 from "nostr-tools/nip19";
@@ -91,9 +91,9 @@
             } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
               userURL = nip19.naddrEncode(parseNaddr(raeTags));
             }
-            emojiTags = statusEvent.tags.filter(
+            /*    emojiTags = statusEvent.tags.filter(
               (tag) => tag[0] === "emoji" && tag.length >= 3
-            );
+            ); */
           }
         }
         $nowProgress = false;
@@ -112,6 +112,9 @@
         };
         $nowProgress = false;
       }
+      setTimeout(() => {
+        statusInput?.setSelectionRange(userStatus.length, userStatus.length);
+      }, 1);
     }
   });
 
@@ -125,8 +128,10 @@
         tags.push(addTag);
       }
     }
-    if (emojiTags.length > 0) {
-      tags = [...tags, ...emojiTags];
+
+    const emojitag: string[][] | undefined = checkCustomEmojis(userStatus);
+    if (emojitag) {
+      tags = [...tags, ...emojitag];
     }
     const newtags = contentEmojiCheck(userStatus, tags);
     const newStatus: Nostr.EventParameters = {
@@ -144,7 +149,7 @@
         description: "",
         color: "bg-green-500",
       };
-      emojiTags = [];
+
       $nowProgress = false;
       $open = false;
     } catch (error) {
@@ -153,27 +158,37 @@
         description: "failed to publish",
         color: "bg-red-500",
       };
-      emojiTags = [];
+
       $nowProgress = false;
       $open = false;
     }
   };
 
-  let emojiTags: string[][] = [];
+  let statusInput = $state<HTMLInputElement>();
+
   const handleClickEmojiDisplayName = (e: string[]) => {
     openPopover?.(false);
 
-    const emojiTag = ["emoji", ...e];
+    /*    const emojiTag = ["emoji", ...e];
     if (!emojiTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
       emojiTags.push(emojiTag);
-    }
+    } */
     const emojiText = `:${e[0]}:`;
-    userStatus = userStatus + emojiText;
-    // newProfile.display_name?.slice(0, cursorPosition) +
-    // emojiText +
-    // newProfile.display_name?.slice(cursorPosition);
-    // cursorPosition += emojiText.length;
+    // userStatus = userStatus + emojiText;
+    const insertStart = statusInput?.selectionStart || 0;
+    const insertEnd = insertStart + emojiText.length;
+
+    userStatus =
+      userStatus.slice(0, insertStart) +
+      emojiText +
+      userStatus.slice(insertStart);
+
+    setTimeout(() => {
+      statusInput?.focus();
+      statusInput?.setSelectionRange(insertEnd, insertEnd);
+    }, 0);
   };
+
   let customReaction: string = "";
 
   function createNewAddTag(str: string): string[] {
@@ -239,6 +254,7 @@
       <fieldset class="mb-4 mt-4 flex flex-col gap-2">
         <label class=" text-zinc-100" for="status"> Status </label>
         <input
+          bind:this={statusInput}
           class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
           id="status"
