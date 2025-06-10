@@ -32,9 +32,9 @@
       <label
         {...item.attrs}
         class="flex items-center gap-3 p-2 rounded-lg border border-neutral-200 dark:border-neutral-600
-               hover:bg-neutral-50 dark:hover:bg-neutral-700 cursor-pointer transition-colors
+               hover:bg-neutral-700/50 cursor-pointer transition-colors
                {item.checked
-          ? 'bg-magnum-50 dark:bg-magnum-900/20 border-magnum-300 dark:border-magnum-600'
+          ? 'bg-magnum-600/20 border-magnum-300 dark:border-magnum-600'
           : ''}"
       >
         <div class="relative flex items-center justify-center">
