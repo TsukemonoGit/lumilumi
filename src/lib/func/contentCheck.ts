@@ -78,13 +78,13 @@ export function contentCheck(
         case "naddr":
           if (decoded.data.relays) {
             newTags.push([
-              "a",
+              "q", //   "a",//https://github.com/nostr-protocol/nips/blob/master/18.md#quote-reposts
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
               decoded.data.relays?.[0] ?? "",
             ]);
           } else {
             newTags.push([
-              "a",
+              "q", //   "a",
               `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
             ]);
           }

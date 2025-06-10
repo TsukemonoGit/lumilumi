@@ -182,7 +182,9 @@
     if (prosessing) return;
     prosessing = true;
     console.log(menuTexts[index].num);
-    const relayhints = getRelaysById(note.id);
+    const relayhints = getRelaysById(note.id).filter((relay) =>
+      relay.startsWith("wss://")
+    );
     const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: relayhints,
@@ -198,7 +200,7 @@
           [
             "e", //a tagのやつにもeもいれる
             note.id,
-            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "", //ws://は除く
+            relayhints?.[0] ?? "", //ws://は除く
             "" /*marker*/,
             note.pubkey,
           ],
@@ -211,11 +213,7 @@
         //replaceable
 
         if (atag) {
-          tags.push([
-            "a",
-            atag,
-            relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "",
-          ]);
+          tags.push(["a", atag, relayhints?.[0] ?? ""]);
         }
         if (note.kind !== 1) {
           tags.push(["k", note.kind.toString()]);
@@ -244,7 +242,7 @@
         const options: AdditionalPostOptions = {
           tags: [],
           content: atag
-            ? ` nostr:${encodeNaddr(atag, nevent)} \n`
+            ? ` nostr:${encodeNaddr(atag, relayhints)} \n`
             : ` nostr:${nevent} \n`,
           defaultUsers: [],
           addableUserList: [note.pubkey],
@@ -269,20 +267,21 @@
     }
     prosessing = false;
   };
-  function encodeNaddr(atag: string, nevent: string): string {
+  function encodeNaddr(atag: string, relayhints: string[]): string | null {
     const matches = atag.match(nip33Regex);
     if (!matches) {
-      return nevent;
+      return null;
     }
     const naddrAddress: nip19.AddressPointer = {
       kind: Number(matches[1]),
       pubkey: matches[2],
       identifier: matches[3],
+      relays: relayhints,
     };
     try {
       return nip19.naddrEncode(naddrAddress);
     } catch (error) {
-      return nevent;
+      return null;
     }
   }
 
