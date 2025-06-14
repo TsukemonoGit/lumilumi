@@ -308,7 +308,7 @@
         return;
       }
       // 成功時の処理
-      const { event: ev, res } = result;
+      const { event, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
