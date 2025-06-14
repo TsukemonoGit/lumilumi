@@ -11,7 +11,7 @@
   import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   // Utility function imports
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import { generateResultMessage } from "$lib/func/util";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { unsucscribeGlobal } from "$lib/func/useReq";
@@ -26,6 +26,7 @@
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   // Constants
   const TIE_KEY = "global";
@@ -51,12 +52,25 @@
     relays.forEach((relay) => newTags.push(["relay", relay]));
 
     // Publish the event
-    const { event, res } = await promisePublishEvent({
+
+    const result = await safePublishEvent({
       content: "",
       tags: newTags,
       kind: 30002,
     });
-
+    if ("errorCode" in result) {
+      if (result.isCanceled) {
+        return; // キャンセル時は何もしない
+      }
+      $toastSettings = {
+        title: "Error",
+        description: $_(result.errorCode),
+        color: "bg-red-500",
+      };
+      return;
+    }
+    // 成功時の処理
+    const { event: event, res } = result;
     // Process results
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);

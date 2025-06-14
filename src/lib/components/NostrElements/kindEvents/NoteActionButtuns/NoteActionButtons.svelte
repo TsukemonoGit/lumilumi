@@ -11,7 +11,7 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelaysById, promisePublishEvent } from "$lib/func/nostr";
+  import { getRelaysById } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
 
   import type { AdditionalPostOptions } from "$lib/types";
@@ -55,6 +55,7 @@
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import Reposted from "$lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
   import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   let {
     note,
@@ -129,8 +130,20 @@
     eventParam: Nostr.EventParameters,
     queryKey: QueryKey
   ) {
-    const { event: ev, res } = await promisePublishEvent(eventParam);
-
+    const result = await safePublishEvent(eventParam);
+    if ("errorCode" in result) {
+      if (result.isCanceled) {
+        return; // キャンセル時は何もしない
+      }
+      $toastSettings = {
+        title: "Error",
+        description: $_(result.errorCode),
+        color: "bg-red-500",
+      };
+      return;
+    }
+    // 成功時の処理
+    const { event: ev, res } = result;
     const isSuccessRelays: string[] = res
       .filter((item) => item.ok)
       .map((item) => normalizeRelayURL(item.from));

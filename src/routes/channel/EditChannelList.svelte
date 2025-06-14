@@ -6,7 +6,7 @@
   import { X } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { latest, type EventPacket } from "rx-nostr";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import {
     nowProgress,
     popStack,
@@ -22,6 +22,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -150,7 +151,20 @@
 
     try {
       // イベントを送信する処理（実際のアプリケーションに合わせて実装）
-      const { event: ev, res } = await promisePublishEvent(newEvent);
+      const result = await safePublishEvent(newEvent);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
       console.log("イベントを送信:", ev);
 
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);

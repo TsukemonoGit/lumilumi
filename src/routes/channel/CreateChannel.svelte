@@ -14,13 +14,14 @@
   import { clientTag } from "$lib/func/constants";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { promisePublishEvent } from "$lib/func/nostr";
+
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
 
@@ -121,7 +122,21 @@
       };
 
       console.log("Creating channel:", newChannelEvent);
-      const { event: ev, res } = await promisePublishEvent(newChannelEvent);
+
+      const result = await safePublishEvent(newChannelEvent);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       const message = generateResultMessage(isSuccess, isFailed);
@@ -172,8 +187,20 @@
         };
 
         // イベントを送信する処理（実際のアプリケーションに合わせて実装）
-        const { event: signedkind10005, res } =
-          await promisePublishEvent(newEvent);
+        const result = await safePublishEvent(newEvent);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: signedkind10005, res } = result;
         console.log("イベントを送信:", signedkind10005);
 
         const isSuccess = res

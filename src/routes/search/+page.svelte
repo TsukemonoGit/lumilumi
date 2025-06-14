@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
   import SearchResult from "./SearchResult.svelte";
@@ -27,6 +27,7 @@
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { page } from "$app/state";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   let { data }: { data: PageData } = $props();
 
@@ -228,11 +229,25 @@
     const newTags: string[][] = [];
     relays.map((relay) => newTags.push(["relay", relay]));
     console.log(newTags);
-    const { event, res } = await promisePublishEvent({
+
+    const result = await safePublishEvent({
       content: "",
       tags: newTags,
       kind: 10007,
     });
+    if ("errorCode" in result) {
+      if (result.isCanceled) {
+        return; // キャンセル時は何もしない
+      }
+      $toastSettings = {
+        title: "Error",
+        description: $_(result.errorCode),
+        color: "bg-red-500",
+      };
+      return;
+    }
+    // 成功時の処理
+    const { event: event, res } = result;
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 

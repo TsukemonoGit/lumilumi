@@ -43,6 +43,7 @@ import {
 
 import { validateLoginPubkey } from "./validateLoginPubkey";
 import { notificationKinds } from "./constants";
+import { SigningError } from "./publishError";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -442,10 +443,19 @@ export async function promisePublishEvent(
   ev: Nostr.EventParameters,
   relays?: string[] | undefined
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
-  const signer = nip07Signer();
-  const event = await signer.signEvent(ev);
-
-  return promisePublishSignedEvent(event, relays);
+  try {
+    const signer = nip07Signer();
+    const event = await signer.signEvent(ev);
+    return promisePublishSignedEvent(event, relays);
+  } catch (error: any) {
+    if (error.message.includes("invalid plaintext size")) {
+      throw new SigningError("イベントデータのサイズが無効", "INVALID_SIZE");
+    }
+    if (error.message.includes("User rejected")) {
+      throw new SigningError("署名がキャンセルされました", "USER_REJECTED");
+    }
+    throw new SigningError(`署名エラー: ${error.message}`, "SIGNING_FAILED");
+  }
 }
 
 export function relaysReconnectChallenge() {

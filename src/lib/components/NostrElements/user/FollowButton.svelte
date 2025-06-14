@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     pubkeysIn,
-    promisePublishEvent,
     usePromiseReq,
     promisePublishSignedEvent,
     makeMainFilters,
@@ -31,6 +30,7 @@
   import { type QueryKey } from "@tanstack/svelte-query";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   interface Props {
     pubkey: string;
@@ -158,10 +158,25 @@
     dialogOpen?.(false);
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
-    const { event: ev, res } = await promisePublishEvent(
-      $state.snapshot(afterEventParameters) as Nostr.Event
-    );
-    handlePublishResult(res, ev);
+
+    try {
+      const result = await safePublishEvent(
+        $state.snapshot(afterEventParameters) as Nostr.Event
+      );
+
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        showToast("Failed", $_(result.errorCode), "bg-red-500");
+        return;
+      }
+
+      // 成功時の処理
+      handlePublishResult(result.res, result.event);
+    } finally {
+      $nowProgress = false;
+    }
   };
 
   const handlePublishResult = (

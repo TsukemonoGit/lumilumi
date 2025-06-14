@@ -14,8 +14,9 @@
     encryptPrvTags,
   } from "$lib/func/settings";
   import * as Nostr from "nostr-typedef";
-  import { promisePublishEvent } from "$lib/func/nostr";
+
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   // export let muteList: LumiMute;
   const {
@@ -90,7 +91,20 @@
           (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",
       };
 
-      const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+      const result = await safePublishEvent(newEvPara);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
 
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       console.log(isSuccess);
