@@ -45,7 +45,7 @@
 <span
   use:viewport={null}
   onenterViewport={handleEnterViewport}
-  class="inline-block flex-wrap"
+  class="inline-block flex-wrap align-middle"
   >{#if hasLoaded}{#if petname}📛{petname}{:else}<Metadata
         queryKey={["metadata", pubhex]}
         pubkey={pubhex}

@@ -26,8 +26,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;"
->
-  {#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
+  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
           {part}
           {height}
         />{:else}{part.content}{/if}
