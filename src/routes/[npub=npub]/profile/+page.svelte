@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import {
     emojis,
     nowProgress,
@@ -30,6 +30,7 @@
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -215,7 +216,20 @@
         tags: newTags,
         pubkey: data.pubkey,
       };
-      const { event, res } = await promisePublishEvent(ev);
+      const result = await safePublishEvent(ev);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 

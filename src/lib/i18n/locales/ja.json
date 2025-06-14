@@ -32,7 +32,6 @@
       "showAllReaction": "みんなのリアクションを表示する",
       "kind42inTL": "パブリックチャットをHomeTLに表示する",
       "embed": "埋め込み対応したコンテンツを埋め込み表示する",
-
       "imageAutoExpand": {
         "label": "画像の自動展開",
         "all": "すべて自動展開",
@@ -376,5 +375,11 @@
   "truncate": {
     "expand": "続きを読む",
     "openpage": "記事を開く"
+  },
+  "signError": {
+    "eventSize": "イベントデータのサイズが無効です（1-65535バイトである必要があります）",
+    "cancel": "署名がキャンセルされました",
+    "signFailed": "イベントの署名に失敗しました",
+    "publishFailed": "イベントの公開に失敗しました"
   }
 }

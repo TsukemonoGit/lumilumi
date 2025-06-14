@@ -11,7 +11,7 @@
   import { createTooltip } from "@melt-ui/svelte";
   import { melt } from "@melt-ui/svelte/internal/actions";
   import { fade } from "svelte/transition";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import {
@@ -30,6 +30,7 @@
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
   interface Props {
     pubkey: string;
     children?: import("svelte").Snippet;
@@ -147,7 +148,22 @@
           tags: kind10000.tags,
           content: (await encryptPrvTags(kind10000.pubkey, newTags)) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -208,7 +224,20 @@
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -275,7 +304,20 @@
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -342,7 +384,20 @@
           tags: kind30007.tags,
           content: (await encryptPrvTags(kind30007.pubkey, newTags)) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -418,7 +473,20 @@
           content:
             (await encryptPrvTags(kind10000.pubkey, newPrvTags ?? [])) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -483,7 +551,20 @@
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -550,7 +631,20 @@
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -619,7 +713,20 @@
           content:
             (await encryptPrvTags(kind30007.pubkey, newPrvTags ?? [])) ?? "",
         };
-        const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+        const result = await safePublishEvent(newEvPara);
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+        // 成功時の処理
+        const { event: ev, res } = result;
         const isSuccess = res
           .filter((item) => item.ok)
           .map((item) => item.from);
@@ -713,7 +820,20 @@
         (await encryptPrvTags(lumiSetting.get().pubkey, newPrvTag)) ?? "",
     };
 
-    const { event: ev, res: res } = await promisePublishEvent(newEvPara);
+    const result = await safePublishEvent(newEvPara);
+    if ("errorCode" in result) {
+      if (result.isCanceled) {
+        return; // キャンセル時は何もしない
+      }
+      $toastSettings = {
+        title: "Error",
+        description: $_(result.errorCode),
+        color: "bg-red-500",
+      };
+      return;
+    }
+    // 成功時の処理
+    const { event: ev, res } = result;
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     console.log(isSuccess);
     if (isSuccess.length <= 0) {

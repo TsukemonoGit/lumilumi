@@ -1,7 +1,7 @@
 <script lang="ts">
   import { nowProgress, toastSettings, uploader } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
 
@@ -25,6 +25,7 @@
     showBanner,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -246,10 +247,21 @@
       };
       const relays = await getQueryRelays(lumiSetting.get().pubkey);
       const writeRelays = configToWrite(relays);
-      const { event: ev, res: res } = await promisePublishEvent(
-        evePara,
-        writeRelays
-      );
+
+      const result = await safePublishEvent(evePara, writeRelays);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return false; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return false;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       console.log(isSuccess);
       if (isSuccess.length <= 0) {

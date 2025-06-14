@@ -1,16 +1,12 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import {
-    promisePublishEvent,
-    setRelays,
-    usePromiseReq,
-  } from "$lib/func/nostr";
+  import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import { pipe } from "rxjs";
-  import { latest, type EventPacket } from "rx-nostr";
+  import { type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   //import { samplemetadata, sample2 } from "./data";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -27,6 +23,7 @@
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { LayoutData } from "../$types";
   import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   let { data }: { data: LayoutData } = $props();
 
@@ -298,7 +295,20 @@
       pubkey: lumiSetting.get().pubkey,
     };
     try {
-      const { event, res } = await promisePublishEvent(eventParam);
+      const result = await safePublishEvent(eventParam);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 

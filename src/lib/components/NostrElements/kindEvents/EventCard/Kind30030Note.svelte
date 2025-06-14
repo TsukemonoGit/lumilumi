@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
 
   import Avatar from "svelte-boring-avatars";
-  import { promisePublishEvent, usePromiseReq } from "$lib/func/nostr";
+  import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
   import { createEmojiListFrom10030 } from "$lib/func/settings";
@@ -22,6 +22,7 @@
   import ProfileDisplay from "./ProfileDisplay.svelte";
   import { checkContentWarning } from "$lib/func/event";
   import CustomEmoji from "../../content/CustomEmoji.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
 
   interface Props {
     note: Nostr.Event;
@@ -102,31 +103,48 @@
       content: "",
     };
 
-    const { event: ev, res: res } = await promisePublishEvent(newEvPara);
-    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    try {
+      const result = await safePublishEvent(newEvPara);
 
-    if (isSuccess.length <= 0) {
-      //失敗
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to add emoji",
-        color: "bg-red-500",
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+
+      // 成功時の処理
+      const { event: ev, res } = result;
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+
+      if (isSuccess.length <= 0) {
+        //失敗
+        $toastSettings = {
+          title: "Error",
+          description: "Failed to add emoji",
+          color: "bg-red-500",
+        };
+        return;
+      }
+
+      // 成功時の処理
+      const list = await createEmojiListFrom10030(ev);
+      $emojis = {
+        list: list,
+        updated: Math.floor(Date.now() / 1000),
+        event: ev,
       };
+      $emojis = $emojis;
+      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+    } finally {
       $nowProgress = false;
       disabled = false;
-
-      return;
     }
-    $nowProgress = false;
-    const list = await createEmojiListFrom10030(ev);
-    $emojis = {
-      list: list,
-      updated: Math.floor(Date.now() / 1000),
-      event: ev,
-    };
-    $emojis = $emojis;
-    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
-    disabled = false;
   }
 
   async function handleClickAdd() {
@@ -137,58 +155,69 @@
     console.log("myEmojiListに", atag, "を追加");
     $nowProgress = true;
     disabled = true;
-    //最新の10030を取得
-    let newestKind10030 = await refetchKind10030();
-    if (!newestKind10030) {
-      //データないけど新しく作っていいですかnoyatu
-      $nowProgress = false;
-      dialogOpen?.(true);
-      return;
-    }
-    //新しいリストにほんとに含まれてないか確認
-    const check = newestKind10030.tags.find(
-      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
-    );
 
-    if (!check) {
-      //含まれていなかったらデータを更新してpublishして
-      const newTags = [...newestKind10030.tags];
-      newTags.push(["a", atag]);
-      const newEvPara: Nostr.EventParameters = {
-        kind: 10030,
-        pubkey: lumiSetting.get().pubkey,
-        tags: newTags,
-        content: newestKind10030.content,
-      };
-
-      const { event: ev, res: res } = await promisePublishEvent(newEvPara);
-      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-
-      if (isSuccess.length <= 0) {
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to add emoji",
-          color: "bg-red-500",
-        };
-        $nowProgress = false;
-        disabled = false;
+    try {
+      //最新の10030を取得
+      let newestKind10030 = await refetchKind10030();
+      if (!newestKind10030) {
+        //データないけど新しく作っていいですかnoyatu
+        dialogOpen?.(true);
         return;
       }
-      //最新を更新
-      newestKind10030 = ev;
-    }
-    //localStorageのデータを新しいのにする。
 
-    $nowProgress = false;
-    const list = await createEmojiListFrom10030(newestKind10030);
-    $emojis = {
-      list: list,
-      updated: Math.floor(Date.now() / 1000),
-      event: newestKind10030,
-    };
-    $emojis = $emojis;
-    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
-    disabled = false;
+      //新しいリストにほんとに含まれてないか確認
+      const check = newestKind10030.tags.find(
+        (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
+      );
+
+      if (!check) {
+        //含まれていなかったらデータを更新してpublishして
+        const newTags = [...newestKind10030.tags];
+        newTags.push(["a", atag]);
+        const newEvPara: Nostr.EventParameters = {
+          kind: 10030,
+          pubkey: lumiSetting.get().pubkey,
+          tags: newTags,
+          content: newestKind10030.content,
+        };
+
+        const result = await safePublishEvent(newEvPara);
+
+        if ("errorCode" in result) {
+          if (result.isCanceled) {
+            return; // キャンセル時は何もしない
+          }
+          $toastSettings = {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          };
+          return;
+        }
+
+        // 成功時の処理
+        const { event: ev, res } = result;
+        const isSuccess = res
+          .filter((item) => item.ok)
+          .map((item) => item.from);
+
+        if (isSuccess.length <= 0) {
+          $toastSettings = {
+            title: "Error",
+            description: "Failed to add emoji",
+            color: "bg-red-500",
+          };
+          return;
+        }
+        //最新を更新
+        newestKind10030 = ev;
+      }
+
+      // 以下の処理があるなら続ける...
+    } finally {
+      $nowProgress = false;
+      disabled = false;
+    }
   }
 
   let disabled = $state(false);
@@ -228,8 +257,21 @@
         tags: newTags,
         content: newestKind10030.content,
       };
-      const { event: ev, res: res } = await promisePublishEvent(newEvPara);
 
+      const result = await safePublishEvent(newEvPara);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
+        }
+        $toastSettings = {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        };
+        return;
+      }
+      // 成功時の処理
+      const { event: ev, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       if (isSuccess.length <= 0) {
         $toastSettings = {
