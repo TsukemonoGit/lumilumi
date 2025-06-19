@@ -47,29 +47,9 @@
     displayTags = true,
   }: Props = $props();
 
-  let parts: Token[] = $state([]);
-
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
-
-  //プレビューにも使ってるからconstだとだめ
-  $effect(() => {
-    if (text || tags) {
-      untrack(async () => {
-        parts = await parseContent(text, tags);
-        // image URL の出現順に number を追加
-        let imageIndex = 0;
-        for (const token of parts) {
-          if (
-            token.type === TokenType.URL &&
-            token.metadata?.type === "image"
-          ) {
-            token.metadata.number = imageIndex++;
-          }
-        }
-      });
-    }
-  });
+  let parts: Token[] = $derived(parseContent(text, tags));
 
   let mediaList = $derived(
     parts

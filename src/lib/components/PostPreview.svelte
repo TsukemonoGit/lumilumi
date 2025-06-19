@@ -67,7 +67,7 @@
   const maxHeight = undefined;
 
   // State
-  let parts: Token[] = $state([]);
+  let parts: Token[] = $derived(parseContent(text, tags));
   let showMore: Writable<boolean> = $state(writable(false));
 
   // Computed values
@@ -104,9 +104,8 @@
 
   // Effects
   $effect(() => {
-    if (text || tags) {
-      untrack(async () => {
-        parts = await parseContent(text, tags);
+    if (parts) {
+      untrack(() => {
         parts
           .filter((part) => part.type === "nip19")
           .forEach((part) => {
