@@ -36,18 +36,13 @@
     maxHeight,
     zIndex,
   }: Props = $props();
-  let parts: Token[] = $state([]);
 
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
+
+  let parts = $derived(parseContent(text, tags));
   //プレビューにも使ってるからconstだとだめ
-  $effect(() => {
-    if (text || tags) {
-      untrack(async () => {
-        parts = await parseContent(text, tags);
-      });
-    }
-  });
+
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
 
   let mediaList = $derived(

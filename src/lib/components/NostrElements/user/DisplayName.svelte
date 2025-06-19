@@ -21,14 +21,9 @@
     tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
   );
 
-  let parts: Token[] | undefined = $state(undefined);
-  $effect(() => {
-    if (emojiTags.length >= 0) {
-      untrack(async () => {
-        parts = await parseContent(name, emojiTags);
-      });
-    }
-  });
+  let parts: Token[] | undefined = $derived(
+    emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined
+  );
 </script>
 
 <span
