@@ -56,7 +56,7 @@
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
-        parts = await parseContent(text, tags, { detectUrlType: true });
+        parts = await parseContent(text, tags);
         // image URL の出現順に number を追加
         let imageIndex = 0;
         for (const token of parts) {
@@ -73,10 +73,7 @@
 
   let mediaList = $derived(
     parts
-      .filter(
-        (part) =>
-          part.type === "url" && part.metadata && part.metadata.type === "image"
-      )
+      .filter((part) => part.type === "url")
       .map((p) => p.content)
       .filter((t) => t !== undefined)
   );

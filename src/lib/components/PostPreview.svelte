@@ -91,10 +91,7 @@
 
   let mediaList = $derived(
     parts
-      .filter(
-        (part) =>
-          part.type === "url" && part.metadata && part.metadata.type === "image"
-      )
+      .filter((part) => part.type === "url")
       .map((p) => p.content)
       .filter((t) => t !== undefined)
   );
@@ -109,7 +106,7 @@
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
-        parts = await parseContent(text, tags, { detectUrlType: true });
+        parts = await parseContent(text, tags);
         parts
           .filter((part) => part.type === "nip19")
           .forEach((part) => {
