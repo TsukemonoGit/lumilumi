@@ -2,14 +2,15 @@
   import type { Token } from "markdown-it/index.js";
   import SimpleContentBlock from "../SimpleContentBlock.svelte";
   import { transformTokens } from "$lib/func/markdown";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     part: Token;
-    displayMenu: any;
-    depth: any;
-    repostable: any;
-    tags: any;
-    openModal: any;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    note: Nostr.Event;
+
     nolist: boolean;
 
     zIndex?: number | undefined;
@@ -20,8 +21,8 @@
     displayMenu,
     depth,
     repostable,
-    tags,
-    openModal,
+    note,
+
     nolist,
 
     zIndex,
@@ -39,8 +40,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />
@@ -54,8 +54,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />
@@ -69,8 +68,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />
@@ -84,8 +82,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />
@@ -99,8 +96,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />
@@ -114,8 +110,7 @@
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
+          {note}
           {nolist}
           {zIndex}
         />

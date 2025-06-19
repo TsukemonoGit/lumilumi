@@ -14,7 +14,7 @@
   import ProfileDisplay from "./ProfileDisplay.svelte";
 
   import { datetime, formatAbsoluteDate } from "$lib/func/util";
-  import ClientTag from "../../content/ClientTag.svelte";
+  // import ClientTag from "../../content/ClientTag.svelte";
   import MediaEmbedSwitcher from "../../content/MediaEmbedSwitcher.svelte";
   import Content from "../../content/Content.svelte";
 
@@ -113,7 +113,7 @@
   {#snippet content()}
     <div>
       <div class="text-lg font-bold">{title}</div>
-      <MediaEmbedSwitcher url={siteUrl || ""} />
+      <MediaEmbedSwitcher url={siteUrl || ""} author={note.pubkey} />
       <div class="mt-2">
         <Content
           {zIndex}

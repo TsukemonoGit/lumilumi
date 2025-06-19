@@ -66,7 +66,7 @@
   {#if website}
     <div class="p-2">
       {#if lumiSetting.get().showImg && isvalidURL(website)}
-        <MediaEmbedSwitcher url={website || ""} />
+        <MediaEmbedSwitcher url={website || ""} author={note.pubkey} />
       {:else}
         <Link className="underline text-magnum-300 break-all " href={website}
           >{website}</Link

@@ -524,3 +524,7 @@ export function debounce<T extends (...args: any[]) => Promise<void> | void>(
     }, delay);
   };
 }
+
+export function nipLink(str: string): string {
+  return `https://github.com/nostr-protocol/nips/blob/master/${str}.md`;
+}

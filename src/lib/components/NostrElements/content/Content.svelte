@@ -32,7 +32,7 @@
     displayTags,
   }: Props = $props();
   let text = $derived(event.content || "");
-  let tags = $derived(event.tags || []);
+
   // svelte-ignore non_reactive_update
   let showMore: Writable<boolean> = writable(false);
   let dialogContentRef: HTMLDivElement | undefined = $state();

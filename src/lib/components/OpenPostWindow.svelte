@@ -60,6 +60,7 @@
   import GeohashMap from "./GeohashMap.svelte";
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
+  import { TokenType, type Token } from "@konemono/nostr-content-parser";
 
   // ----------------------------------------
   // Component Props
@@ -1083,7 +1084,13 @@
                   class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
                 >
                   <CustomEmoji
-                    part={{ type: "emoji", content: e[0], url: e[1] }}
+                    part={{
+                      type: TokenType.CUSTOM_EMOJI,
+                      content: e[0],
+                      metadata: { name: e[0], url: e[1] },
+                      start: 0,
+                      end: 0,
+                    } as Token}
                   />
                 </button>
               {/if}

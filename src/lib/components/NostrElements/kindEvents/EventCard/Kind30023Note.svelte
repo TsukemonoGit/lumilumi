@@ -130,8 +130,6 @@
       <SimpleMarkdown
         {note}
         {maxHeight}
-        text={note.content}
-        tags={note.tags}
         {displayMenu}
         {depth}
         {repostable}

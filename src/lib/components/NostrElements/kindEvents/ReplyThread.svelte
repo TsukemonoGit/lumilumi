@@ -1,7 +1,8 @@
 <script lang="ts">
-  import type { Part } from "$lib/func/content";
+  //import type { Part } from "$lib/func/content";
   import { relayRegex } from "$lib/func/regex";
   import { parseNaddr } from "$lib/func/util";
+  import type { Token } from "@konemono/nostr-content-parser";
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import Note from "./Note.svelte";
@@ -20,11 +21,13 @@
     // if (showModal) $showModal = true;
     // $viewMediaModal = { index: index, mediaList: mediaList };
   };
-  const toPart = (tag: string[]): Part => {
+  const toPart = (tag: string[]): Token => {
     return {
       type: "url",
-      url: tag[1],
+
       content: tag[1],
+      start: 0,
+      end: 0,
     };
   };
 </script>
