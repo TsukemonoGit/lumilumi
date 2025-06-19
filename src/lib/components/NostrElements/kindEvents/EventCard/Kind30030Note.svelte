@@ -23,6 +23,7 @@
   import { checkContentWarning } from "$lib/func/event";
   import CustomEmoji from "../../content/CustomEmoji.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { TokenType, type Token } from "@konemono/nostr-content-parser";
 
   interface Props {
     note: Nostr.Event;
@@ -387,7 +388,15 @@
       </div>
       <div class="flex gap-1 flex-wrap break-all">
         {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
-          <CustomEmoji part={{ type: "emoji", content: shortcode, url: url }} />
+          <CustomEmoji
+            part={{
+              type: TokenType.CUSTOM_EMOJI,
+              content: shortcode,
+              metadata: { name: shortcode, url: url },
+              start: 0,
+              end: 0,
+            } as Token}
+          />
         {/each}<ClientTag depth={0} tags={note.tags} />
       </div>
       {#if lumiSetting.get().pubkey}
