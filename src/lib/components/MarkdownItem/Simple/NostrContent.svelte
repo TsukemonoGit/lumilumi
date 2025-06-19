@@ -1,15 +1,22 @@
 <script lang="ts">
-  import { parseText, type Part } from "$lib/func/content";
+  //import { parseText, type Part } from "$lib/func/content";
   import * as nip19 from "nostr-tools/nip19";
   import { viewMediaModal } from "$lib/stores/stores";
   import Link from "$lib/components/Elements/Link.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  //import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
   import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
+  import {
+    parseContent,
+    TokenType,
+    type Token,
+  } from "@konemono/nostr-content-parser";
+  import CustomEmoji from "$lib/components/NostrElements/content/CustomEmoji.svelte";
+  import { nipLink, parseNaddr } from "$lib/func/util";
   interface Props {
     event: Partial<Nostr.Event>;
     displayMenu: boolean;
@@ -29,7 +36,7 @@
     maxHeight,
     zIndex,
   }: Props = $props();
-  let parts: Part[] = $state([]);
+  let parts: Token[] = $state([]);
 
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
@@ -37,15 +44,16 @@
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
-        parts = await parseText(text, tags);
+        parts = await parseContent(text, tags);
       });
     }
   });
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
+
   let mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
-      .map((p) => p.url)
+      .map((p) => p.content)
       .filter((t) => t !== undefined)
   );
 
@@ -90,12 +98,29 @@
       return undefined;
     }
   };
-  let imgError: boolean = $state(false);
-  let imgLoad: boolean = $state(false);
+
+  const arekore = (
+    type: string,
+    id: string
+  ): nip19.DecodedResult | undefined => {
+    try {
+      switch (type) {
+        case "a":
+          return { type: "naddr", data: parseNaddr(["a", id]) };
+
+        case "p":
+          return { type: "npub", data: id };
+        case "e":
+          return { type: "note", data: id };
+      }
+    } catch (error) {
+      return undefined;
+    }
+  };
 </script>
 
 {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
-      part.url
+      part.metadata!.plainNip19 as string
     )}
     {#if decoded}
       <DecodedContent
@@ -107,37 +132,37 @@
         {repostable}
         {zIndex}
       />{:else}{part.content}{/if}
+  {:else if part.type === TokenType.LEGACY_REFERENCE && part.metadata && part.metadata.tagType && part.metadata.referenceId}
+    {@const decoded = arekore(
+      part.metadata.tagType as string,
+      part.metadata.referenceId as string
+    )}
+    {#if decoded}
+      <DecodedContent
+        {maxHeight}
+        {decoded}
+        content={part.content}
+        {displayMenu}
+        depth={depth + 1}
+        {repostable}
+        {zIndex}
+      />{:else}{part}{part.content}{/if}
   {:else if part.type === "url"}
     <UrlDisplay
       {part}
       {openModal}
       author={event.pubkey || ""}
-    />{:else if part.type === "emoji"}{#if lumiSetting.get().showImg && !imgError}{#if !imgLoad}:{part.content}:{/if}<img
-        height="24"
-        loading="lazy"
-        alt={`:${part.content}:`}
-        src={part.url}
-        title={`:${part.content}:`}
-        class="inline h-[24px] object-contain m-0 overflow-hidden"
-        onload={() => (imgLoad = true)}
-        onerror={() => (imgError = true)}
-      />{:else}:{part.content}:{/if}{:else if part.type === "hashtag"}
-    <a
-      aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.url}`}
-      class="underline text-magnum-300 break-all hover:opacity-80"
-      >#{part.content}</a
-    >
+    />{:else if part.type === TokenType.CUSTOM_EMOJI}<CustomEmoji {part} />
   {:else if part.type === "relay"}
     <a
       class="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</a
+      href={part.content ?? ""}>{part.content}</a
     >
-  {:else if part.type === "nip"}
+  {:else if part.type === TokenType.NIP_IDENTIFIER}
     <Link
-      props={{ "aria-label": `External Links: ${part.url}` }}
+      props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</Link
+      href={nipLink(part.content ?? "")}>{part.content}</Link
     >{:else}<span
       class="inline whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span

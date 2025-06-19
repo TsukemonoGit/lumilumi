@@ -4,13 +4,15 @@
   import { transformTokens } from "$lib/func/markdown";
   import NostrContent from "./NostrContent.svelte";
 
+  import * as Nostr from "nostr-typedef";
+
   interface Props {
     part: Token;
-    displayMenu: any;
-    depth: any;
-    repostable: any;
-    tags: any;
-    openModal: any;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    note: Nostr.Event;
+
     nolist: boolean;
 
     zIndex?: number | undefined;
@@ -21,8 +23,8 @@
     displayMenu,
     depth,
     repostable,
-    tags,
-    openModal,
+    note,
+
     nolist,
 
     zIndex,
@@ -49,15 +51,14 @@
             {repostable}
             {depth}
             {displayMenu}
-            {tags}
-            {openModal}
+            {note}
             {nolist}
             {zIndex}
           />{/if}
       {/each}
     {:else}
       <NostrContent
-        event={{ content: child.content, tags: tags }}
+        event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
         {repostable}
         {depth}
         {displayMenu}
@@ -66,7 +67,7 @@
     {/if}{/each}
 {:else}
   <NostrContent
-    event={{ content: part.content, tags: tags }}
+    event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
     {repostable}
     {depth}
     {displayMenu}

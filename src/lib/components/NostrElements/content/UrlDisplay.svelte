@@ -1,48 +1,43 @@
 <script lang="ts">
   import Link from "$lib/components/Elements/Link.svelte";
   import UrlType from "$lib/components/renderSnippets/UrlType.svelte";
-  import type { Part } from "$lib/func/content";
+  //import type { Part } from "$lib/func/content";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import Content3D from "./Content3D.svelte";
   import ContentImage from "./ContentImage.svelte";
   import { isvalidURL } from "$lib/func/ogp";
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
   import ContentVideo from "./ContentVideo.svelte";
+  import type { Token } from "@konemono/nostr-content-parser";
 
   interface Props {
-    part: Part;
+    part: Token;
     openModal: (index: number) => void;
     author: string;
   }
   let { part, openModal, author }: Props = $props();
 </script>
 
-{#if part.url}
-  <UrlType url={part.url}>
+{#if part.content}
+  <UrlType url={part.content}>
     {#snippet loading()}
       <Link
-        props={{ "aria-label": `External Links: ${part.url}` }}
+        props={{ "aria-label": `External Links: ${part.content}` }}
         className="underline text-magnum-300 break-all hover:opacity-80"
         href={part.content ?? ""}>{part.content}</Link
       >
     {/snippet}
     {#snippet content(type)}
       {#if type === "image"}
-        <!-- <ContentOneImage url={part.url ?? ""} /> -->
+        <!-- <ContentOneImage url={part.content ?? ""} /> -->
         <ContentImage
-          src={part.url}
-          url={part.url}
-          number={part.number}
+          url={part.content}
+          number={part.metadata!.number as number}
           {openModal}
           {author}
         />
       {:else if type === "movie"}
-        <ContentVideo
-          src={part.content}
-          url={part.url}
-          number={part.number}
-          {author}
-        />
+        <ContentVideo src={part.content} url={part.content} {author} />
       {:else if type === "audio"}
         {#if lumiSetting.get().showImg}
           <audio
@@ -53,18 +48,16 @@
             ><track default kind="captions" /></audio
           >
         {:else}<Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
+            props={{ "aria-label": `External Links: ${part.content}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
             href={part.content ?? ""}>{part.content}</Link
           >{/if}
       {:else if type === "3D"}
-        <Content3D content={part.content} url={part.url} />
+        <Content3D content={part.content} url={part.content} />
       {:else if type === "url"}
-        {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}<MediaEmbedSwitcher
-            {author}
-            url={part.url || ""}
-          />{:else}<Link
-            props={{ "aria-label": `External Links: ${part.url}` }}
+        {#if lumiSetting.get().showImg && isvalidURL(part.content || "")}
+          <MediaEmbedSwitcher {author} url={part.content || ""} />{:else}<Link
+            props={{ "aria-label": `External Links: ${part.content}` }}
             className="underline text-magnum-300 break-all hover:opacity-80"
             href={part.content ?? ""}>{part.content}</Link
           >{/if}

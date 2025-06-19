@@ -7,7 +7,6 @@
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
   interface Props {
-    src?: string | undefined;
     url?: string | undefined;
     number?: number | undefined;
     openModal: (index: number) => void;
@@ -15,7 +14,6 @@
   }
 
   let {
-    src = undefined,
     url = undefined,
     number = undefined,
     openModal,
@@ -34,7 +32,7 @@
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all "
-      href={url ?? ""}>{src}</Link
+      href={url ?? ""}>{url}</Link
     >{/if}
   <div>
     <button
@@ -46,7 +44,7 @@
         width="288"
         height="200"
         alt="img"
-        {src}
+        src={url}
         class=" max-w-[min(18rem,100%)] max-h-[18rem] object-contain overflow-hidden"
         onload={() => (imgLoad = true)}
         onerror={() => (imgError = true)}
@@ -56,7 +54,7 @@
   <Link
     props={{ "aria-label": `External Links: ${url}` }}
     className="underline text-magnum-300 break-all "
-    href={url ?? ""}>{src}</Link
+    href={url ?? ""}>{url}</Link
   >{:else}
   <button
     class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50"

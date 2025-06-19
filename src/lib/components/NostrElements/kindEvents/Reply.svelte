@@ -6,7 +6,8 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { relayRegex } from "$lib/func/regex";
   import UrlDisplay from "../content/UrlDisplay.svelte";
-  import type { Part } from "$lib/func/content";
+  //import type { Part } from "$lib/func/content";
+  import type { Token } from "@konemono/nostr-content-parser";
 
   interface Props {
     replyTag: string[] | undefined;
@@ -25,11 +26,13 @@
     // if (showModal) $showModal = true;
     // $viewMediaModal = { index: index, mediaList: mediaList };
   };
-  const toPart = (tag: string[]): Part => {
+  const toPart = (tag: string[]): Token => {
     return {
       type: "url",
-      url: tag[1],
+
       content: tag[1],
+      start: 0,
+      end: 0,
     };
   };
 </script>

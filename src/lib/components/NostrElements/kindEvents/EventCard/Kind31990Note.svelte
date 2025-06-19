@@ -1,7 +1,7 @@
 <script lang="ts">
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
 
-  import { isvalidURL, type Ogp } from "$lib/func/ogp";
+  import { type Ogp } from "$lib/func/ogp";
   import * as Nostr from "nostr-typedef";
 
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";

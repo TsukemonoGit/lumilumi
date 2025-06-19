@@ -122,13 +122,7 @@
         </div>{/if}
       {#if imageList.length > 0}
         {#each imageList as url, number}
-          <ContentImage
-            src={url}
-            {url}
-            {number}
-            {openModal}
-            author={note.pubkey}
-          />
+          <ContentImage {url} {number} {openModal} author={note.pubkey} />
         {/each}{/if}
       <Content
         {maxHeight}

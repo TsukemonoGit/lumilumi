@@ -8,7 +8,7 @@
     displayMenu: any;
     depth: any;
     repostable: any;
-    tags: any;
+    note: any;
     openModal: any;
     nolist: boolean;
     //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
@@ -21,8 +21,8 @@
     displayMenu,
     depth,
     repostable,
-    tags,
-    openModal,
+    note,
+
     nolist,
 
     zIndex,
@@ -34,8 +34,7 @@
   {repostable}
   {depth}
   {displayMenu}
-  {tags}
-  {openModal}
+  {note}
   {nolist}
   {zIndex}
 />

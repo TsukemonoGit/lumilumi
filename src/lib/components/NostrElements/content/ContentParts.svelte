@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { parseText, type Part } from "$lib/func/content";
+  //import { parseText, type Part } from "$lib/func/content";
+  import {
+    parseContent,
+    TokenType,
+    type Token,
+  } from "@konemono/nostr-content-parser";
   import * as nip19 from "nostr-tools/nip19";
   import DecodedContent from "../kindEvents/DecodedContent.svelte";
   import { viewMediaModal } from "$lib/stores/stores";
@@ -16,6 +21,7 @@
 
   import UrlDisplay from "./UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
+  import { nipLink, parseNaddr } from "$lib/func/util";
 
   interface Props {
     event: Partial<Nostr.Event>;
@@ -41,7 +47,7 @@
     displayTags = true,
   }: Props = $props();
 
-  let parts: Part[] = $state([]);
+  let parts: Token[] = $state([]);
 
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
@@ -50,7 +56,17 @@
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
-        parts = await parseText(text, tags);
+        parts = await parseContent(text, tags);
+        // image URL の出現順に number を追加
+        let imageIndex = 0;
+        for (const token of parts) {
+          if (
+            token.type === TokenType.URL &&
+            token.metadata?.type === "image"
+          ) {
+            token.metadata.number = imageIndex++;
+          }
+        }
       });
     }
   });
@@ -58,7 +74,7 @@
   let mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
-      .map((p) => p.url)
+      .map((p) => p.content)
       .filter((t) => t !== undefined)
   );
 
@@ -69,13 +85,7 @@
 
   const nip19Decode = (
     content: string | undefined
-  ):
-    | { type: "naddr"; data: nip19.AddressPointer }
-    | { type: "nevent"; data: nip19.EventPointer }
-    | { type: "nprofile"; data: nip19.ProfilePointer }
-    | { type: "nsec"; data: Uint8Array }
-    | { type: "npub" | "note"; data: string }
-    | undefined => {
+  ): nip19.DecodedResult | undefined => {
     if (content === undefined) {
       return undefined;
     }
@@ -107,10 +117,29 @@
     tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
   ); // string | undefined
   let proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
+
+  const arekore = (
+    type: string,
+    id: string
+  ): nip19.DecodedResult | undefined => {
+    try {
+      switch (type) {
+        case "a":
+          return { type: "naddr", data: parseNaddr(["a", id]) };
+
+        case "p":
+          return { type: "npub", data: id };
+        case "e":
+          return { type: "note", data: id };
+      }
+    } catch (error) {
+      return undefined;
+    }
+  };
 </script>
 
 {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
-      part.url
+      part.metadata!.plainNip19 as string
     )}
     {#if decoded}
       <DecodedContent
@@ -122,26 +151,41 @@
         {repostable}
         {zIndex}
       />{:else}{part.content}{/if}
+  {:else if part.type === TokenType.LEGACY_REFERENCE && part.metadata && part.metadata.tagType && part.metadata.referenceId}
+    {@const decoded = arekore(
+      part.metadata.tagType as string,
+      part.metadata.referenceId as string
+    )}
+    {#if decoded}
+      <DecodedContent
+        {maxHeight}
+        {decoded}
+        content={part.content}
+        {displayMenu}
+        depth={depth + 1}
+        {repostable}
+        {zIndex}
+      />{:else}{part}{part.content}{/if}
   {:else if part.type === "url"}
     <UrlDisplay {part} {openModal} author={event.pubkey || ""} />
-  {:else if part.type === "emoji"}
+  {:else if part.type === TokenType.CUSTOM_EMOJI}
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.url}&k=${event.kind || 1}`}
-      class="underline text-magnum-300 break-all">#{part.content}</a
+      href={`/search?t=${part.metadata!.tag}&k=${event.kind || 1}`}
+      class="underline text-magnum-300 break-all">{part.content}</a
     >
   {:else if part.type === "relay"}
-    <a class="underline text-magnum-300 break-all" href={part.url ?? ""}
+    <a class="underline text-magnum-300 break-all" href={part.content ?? ""}
       >{part.content}</a
     >
-  {:else if part.type === "nip"}
+  {:else if part.type === TokenType.NIP_IDENTIFIER}
     <Link
-      props={{ "aria-label": `External Links: ${part.url}` }}
+      props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={part.url ?? ""}>{part.content}</Link
-    >{:else if part.type === "invoice" && part.content}
+      href={nipLink(part.content ?? "")}>{part.content}</Link
+    >{:else if part.type === TokenType.LNBC && part.content}
     <InvoiceCard invoice={part.content} />
   {:else}<span
       class="whitespace-pre-wrap break-words"

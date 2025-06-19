@@ -9,7 +9,7 @@
 
   // checked属性があるかどうかで判定
   const isChecked = part.meta.checked;
-  console.log(part);
+  // console.log(part);
 </script>
 
 <input

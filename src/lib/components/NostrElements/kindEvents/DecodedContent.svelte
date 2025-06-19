@@ -15,27 +15,7 @@
     repostable: boolean;
 
     maxHeight: number | undefined;
-    decoded:
-      | {
-          type: "naddr";
-          data: nip19.AddressPointer;
-        }
-      | {
-          type: "nevent";
-          data: nip19.EventPointer;
-        }
-      | {
-          type: "nprofile";
-          data: nip19.ProfilePointer;
-        }
-      | {
-          type: "nsec";
-          data: Uint8Array;
-        }
-      | {
-          type: "npub" | "note";
-          data: string;
-        };
+    decoded: nip19.DecodedResult;
     zIndex: number | undefined;
   }
 

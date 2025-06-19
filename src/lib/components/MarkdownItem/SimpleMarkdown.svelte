@@ -23,8 +23,6 @@
   import markdownTaskListPlugin from "$lib/func/markdown-it/markdown-it-tasklist";
 
   interface Props {
-    text: string;
-    tags: string[][];
     displayMenu: boolean;
     depth: number;
     repostable: boolean;
@@ -32,13 +30,12 @@
 
     maxHeight?: number | undefined;
     zIndex?: number | undefined;
-    note?: Nostr.Event;
+    note: Nostr.Event;
   }
 
   let {
-    text,
     note,
-    tags,
+
     displayMenu,
     depth,
     repostable,
@@ -72,7 +69,7 @@
       .use(markdownDdPlugin)
       .use(markdownDtPlugin)
 
-      .parse(text, {})
+      .parse(note.content, {})
   );
   let parts = $derived(transformTokens(tokens));
 
@@ -108,8 +105,7 @@
             {repostable}
             {depth}
             {displayMenu}
-            {tags}
-            {openModal}
+            {note}
             {nolist}
             {zIndex}
           />
@@ -117,12 +113,11 @@
       >{:else}
       {#each parts as token}
         <SimpleContentBlock
+          {note}
           part={token}
           {repostable}
           {depth}
           {displayMenu}
-          {tags}
-          {openModal}
           {nolist}
           {zIndex}
         />

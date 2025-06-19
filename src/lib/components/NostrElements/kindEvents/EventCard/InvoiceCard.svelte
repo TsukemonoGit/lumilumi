@@ -8,7 +8,7 @@
     invoice: string;
   }
 
-  let { invoice = $bindable() }: Props = $props();
+  let { invoice }: Props = $props();
   // svelte-ignore non_reactive_update
   let invoiceOpen: (bool: boolean) => void = () => {};
 
@@ -19,7 +19,7 @@
       return undefined;
     }
     try {
-      console.log(decode(str));
+      // console.log(decode(str));
       return decode(str);
     } catch (error) {
       return undefined;
@@ -29,8 +29,42 @@
     console.log("pay");
     invoiceOpen?.(true);
   };
+
   let decoded = $derived(invoiceDecode(invoice));
-  let amount = $derived(1);
+
+  // 金額（satoshi単位）を取得
+  let amount: number | undefined = $derived(
+    decoded ? getAmountSats(decoded) : undefined
+  );
+
+  function getAmountSats(decoded: DecodedInvoice): number | undefined {
+    const section = decoded.sections.find((s) => s.name === "amount");
+    if (!section) return undefined;
+
+    const letters = section.letters; // e.g. '20u'
+    const match = letters.match(/^(\d+)([munp])$/);
+    if (!match) return undefined;
+
+    const [_, numStr, unit] = match;
+    const num = parseInt(numStr);
+    if (isNaN(num)) return undefined;
+
+    // 単位倍率（BTC → sats）
+    const unitToSats: Record<string, number> = {
+      m: 1e5, // millibtc = 0.001 BTC = 100,000 sats
+      u: 1e2, // microbtc = 0.000001 BTC = 100 sats
+      n: 0.1, // nanobtc  = 0.000000001 BTC = 0.1 sats
+      p: 0.0001, // picobtc  = 0.000000000001 BTC = 0.0001 sats
+    };
+
+    const multiplier = unitToSats[unit];
+    if (multiplier === undefined) return undefined;
+
+    const sats = num * multiplier;
+
+    // 最終的に整数satsに丸める（切り捨て）
+    return Math.floor(sats);
+  }
 </script>
 
 {#if !decoded || !amount}

@@ -20,13 +20,15 @@
   import NotabPart from "./Simple/NotabPart.svelte";
   import CheckboxInput from "./Simple/CheckboxInput.svelte";
   import Label from "./Simple/Label.svelte";
+  import * as Nostr from "nostr-typedef";
+
   interface Props {
     part: Token;
-    displayMenu: any;
-    depth: any;
-    repostable: any;
-    tags: any;
-    openModal: any;
+    displayMenu: boolean;
+    depth: number;
+    repostable: boolean;
+    note: Nostr.Event;
+
     nolist: boolean;
 
     zIndex?: number | undefined;
@@ -37,8 +39,8 @@
     displayMenu,
     depth,
     repostable,
-    tags,
-    openModal,
+    note,
+
     nolist,
 
     zIndex,
@@ -48,240 +50,195 @@
   // }
 </script>
 
-{#if part.type === "heading"}
-  <Heading
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "hr"}
-  <hr class="my-6" />
-{:else if part.type === "paragraph"}
-  <Paragraph
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-  <!---->
-{:else if part.type === "code_block"}
-  <CodeBlock {part} />
-{:else if part.type === "code_inline"}
-  <CodeInline {part} />
-{:else if part.type === "fence"}
-  <Fence {part} />
-{:else if part.type === "table"}
-  <Table
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-  />
-{:else if part.type === "blockquote"}
-  <blockquote>
-    <NotabPart
+{#if part}
+  {#if part.type === "heading"}
+    <Heading
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
     />
-  </blockquote>
-{:else if part.type === "ordered_list"}
-  <OrderedList
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "bullet_list"}
-  <BulletList
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "list_item"}
-  <ListItem
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "inline"}
-  <span>
-    <NotabPart
+  {:else if part.type === "hr"}
+    <hr class="my-6" />
+  {:else if part.type === "paragraph"}
+    <Paragraph
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
-    /></span
-  >
-{:else if part.type === "link"}
-  <Link
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "image"}
-  <Image {part} />
-{:else if part.type === "strong"}
-  <strong>
-    <NotabPart
+    />
+    <!---->
+  {:else if part.type === "code_block"}
+    <CodeBlock {part} />
+  {:else if part.type === "code_inline"}
+    <CodeInline {part} />
+  {:else if part.type === "fence"}
+    <Fence {part} />
+  {:else if part.type === "table"}
+    <Table {part} {repostable} {depth} {displayMenu} {note} {nolist} />
+  {:else if part.type === "blockquote"}
+    <blockquote>
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      />
+    </blockquote>
+  {:else if part.type === "ordered_list"}
+    <OrderedList
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
-    /></strong
-  >
-{:else if part.type === "s"}
-  <s>
-    <NotabPart
+    />
+  {:else if part.type === "bullet_list"}
+    <BulletList
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
-    /></s
-  >
-{:else if part.type === "text"}
-  <NostrContent
-    event={{ content: part.content, tags }}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {zIndex}
-  />
-{:else if part.type === "em"}
-  <em class="italic">
-    <NotabPart
+    />
+  {:else if part.type === "list_item"}
+    <ListItem
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
-    /></em
-  >
-{:else if part.type === "softbreak"}
-  <!---->
-{:else if part.type === "footnote_ref"}
-  <FootnoteRef {part} />
-{:else if part.type === "footnote_block"}
-  <FootnoteBlock
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "footnote"}
-  {part.content}
-{:else if part.type === "footnote_anchor"}
-  <a
-    href="#footnote-ref-{part.meta.id}"
-    id="footnote-def-{part.meta.id}"
-    class="footnote-def mx-1">[{part.meta.id}]</a
-  >
-{:else if part.type === "sub"}
-  <sub>{part.content}</sub>
-{:else if part.type === "sup"}
-  <sup>{part.content}</sup>
-{:else if part.type === "mark"}
-  <mark>
-    <NotabPart
+    />
+  {:else if part.type === "inline"}
+    <span>
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      /></span
+    >
+  {:else if part.type === "link"}
+    <Link {part} {repostable} {depth} {displayMenu} {note} {nolist} {zIndex} />
+  {:else if part.type === "image"}
+    <Image {part} />
+  {:else if part.type === "strong"}
+    <strong>
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      /></strong
+    >
+  {:else if part.type === "s"}
+    <s>
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      /></s
+    >
+  {:else if part.type === "text"}
+    <NostrContent
+      event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {zIndex}
+    />
+  {:else if part.type === "em"}
+    <em class="italic">
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      /></em
+    >
+  {:else if part.type === "softbreak"}
+    <!---->
+  {:else if part.type === "footnote_ref"}
+    <FootnoteRef {part} />
+  {:else if part.type === "footnote_block"}
+    <FootnoteBlock
       {part}
       {repostable}
       {depth}
       {displayMenu}
-      {tags}
-      {openModal}
+      {note}
       {nolist}
       {zIndex}
-    /></mark
-  >
-{:else if part.type === "hardbreak"}
-  <br />
-{:else if part.type === "dl"}
-  <Dl
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else if part.type === "task_checkbox"}
-  <CheckboxInput {part} />
-{:else if part.type === "label"}
-  <Label
-    {part}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {tags}
-    {openModal}
-    {nolist}
-    {zIndex}
-  />
-{:else}<b>{part.type}</b>
-  <NostrContent
-    event={{ content: part.content, tags }}
-    {repostable}
-    {depth}
-    {displayMenu}
-    {zIndex}
-  />
+    />
+  {:else if part.type === "footnote"}
+    {part.content}
+  {:else if part.type === "footnote_anchor"}
+    <a
+      href="#footnote-ref-{part.meta.id}"
+      id="footnote-def-{part.meta.id}"
+      class="footnote-def mx-1">[{part.meta.id}]</a
+    >
+  {:else if part.type === "sub"}
+    <sub>{part.content}</sub>
+  {:else if part.type === "sup"}
+    <sup>{part.content}</sup>
+  {:else if part.type === "mark"}
+    <mark>
+      <NotabPart
+        {part}
+        {repostable}
+        {depth}
+        {displayMenu}
+        {note}
+        {nolist}
+        {zIndex}
+      /></mark
+    >
+  {:else if part.type === "hardbreak"}
+    <br />
+  {:else if part.type === "dl"}
+    <Dl {part} {repostable} {depth} {displayMenu} {note} {nolist} {zIndex} />
+  {:else if part.type === "task_checkbox"}
+    <CheckboxInput {part} />
+  {:else if part.type === "label"}
+    <Label {part} {repostable} {depth} {displayMenu} {note} {nolist} {zIndex} />
+  {:else}<b>{part.type}</b>
+    <NostrContent
+      event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+      {repostable}
+      {depth}
+      {displayMenu}
+      {zIndex}
+    />
+  {/if}
 {/if}
 
 <style lang="postcss">

@@ -1,7 +1,13 @@
 <!--カスタム絵文字展開付きのName-->
 <script lang="ts">
   import { parseEmojiText } from "$lib/func/displayname";
+  import {
+    parseContent,
+    TokenType,
+    type Token,
+  } from "@konemono/nostr-content-parser";
   import CustomEmoji from "../content/CustomEmoji.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     tags: string[][];
@@ -15,9 +21,14 @@
     tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
   );
 
-  let parts = $derived(
-    emojiTags.length >= 0 ? parseEmojiText(name, emojiTags) : undefined
-  );
+  let parts: Token[] | undefined = $state(undefined);
+  $effect(() => {
+    if (emojiTags.length >= 0) {
+      untrack(async () => {
+        parts = await parseContent(name, emojiTags);
+      });
+    }
+  });
 </script>
 
 <span
@@ -26,7 +37,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;"
-  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === "emoji"}<CustomEmoji
+  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === TokenType.CUSTOM_EMOJI}<CustomEmoji
           {part}
           {height}
         />{:else}{part.content}{/if}

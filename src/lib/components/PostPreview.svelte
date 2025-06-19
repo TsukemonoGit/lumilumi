@@ -24,10 +24,15 @@
   import ClientTag from "./NostrElements/content/ClientTag.svelte";
   import Geohash from "./NostrElements/content/geohash/Geohash.svelte";
   import ProxyTag from "./NostrElements/content/ProxyTag.svelte";
-  import { type Part, parseText } from "$lib/func/content";
+  //import { type Part, parseText } from "$lib/func/content";
   import * as nip19 from "nostr-tools/nip19";
   import { untrack } from "svelte";
   import * as Nostr from "nostr-typedef";
+  import {
+    parseContent,
+    TokenType,
+    type Token,
+  } from "@konemono/nostr-content-parser";
 
   // Props definition
   interface Props {
@@ -62,7 +67,7 @@
   const maxHeight = undefined;
 
   // State
-  let parts: Part[] = $state([]);
+  let parts: Token[] = $state([]);
   let showMore: Writable<boolean> = $state(writable(false));
 
   // Computed values
@@ -87,8 +92,8 @@
   let mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
-      .map((p) => p.url)
-      .filter((url) => url !== undefined)
+      .map((p) => p.content)
+      .filter((t) => t !== undefined)
   );
 
   let geohash = $derived(
@@ -101,10 +106,14 @@
   $effect(() => {
     if (text || tags) {
       untrack(async () => {
-        parts = await parseText(text, tags);
+        parts = await parseContent(text, tags);
         parts
           .filter((part) => part.type === "nip19")
-          .forEach((part) => addUserTag(nip19Decode(part.url)));
+          .forEach((part) => {
+            if (part.metadata?.plainNip19) {
+              addUserTag(nip19Decode(part.metadata.plainNip19 as string));
+            }
+          });
       });
     }
   });
@@ -242,7 +251,7 @@
 
           <Truncate {maxHeight} {onClickShowMore} {depth}>
             {#each parts as part}{#if part.type === "nip19"}{@const decoded =
-                  nip19Decode(part.url)}
+                  nip19Decode(part.metadata!.plainNip19 as string)}
 
                 {#if decoded}
                   <DecodedContent
@@ -256,25 +265,25 @@
                   />{:else}<span class="break-all">{part.content}</span>{/if}
               {:else if part.type === "url"}
                 <UrlDisplay {part} {openModal} author={signPubkey || ""} />
-              {:else if part.type === "emoji"}
+              {:else if part.type === TokenType.CUSTOM_EMOJI}
                 <CustomEmoji {part} />
               {:else if part.type === "hashtag"}
                 <a
                   aria-label={"Search for events containing the hashtag"}
-                  href={`/search?t=${part.url}`}
-                  class="underline text-magnum-300 break-all">#{part.content}</a
+                  href={`/search?t=${part.metadata!.tag}`}
+                  class="underline text-magnum-300 break-all">{part.content}</a
                 >
               {:else if part.type === "relay"}
                 <a
                   class="underline text-magnum-300 break-all"
-                  href={part.url ?? ""}>{part.content}</a
+                  href={part.content ?? ""}>{part.content}</a
                 >
-              {:else if part.type === "nip"}
+              {:else if part.type === TokenType.NIP_IDENTIFIER}
                 <Link
-                  props={{ "aria-label": `External Links: ${part.url}` }}
+                  props={{ "aria-label": `External Links: ${part.content}` }}
                   className="underline text-magnum-300 break-all hover:opacity-80"
-                  href={part.url ?? ""}>{part.content}</Link
-                >{:else if part.type === "invoice" && part.content}
+                  href={part.content ?? ""}>{part.content}</Link
+                >{:else if part.type === TokenType.LNBC && part.content}
                 <InvoiceCard invoice={part.content} />
               {:else}<span
                   class="whitespace-pre-wrap break-words"
