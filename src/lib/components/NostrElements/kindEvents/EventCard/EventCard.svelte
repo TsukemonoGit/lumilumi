@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { Repeat2 } from "lucide-svelte";
+  import { EyeOff, Repeat2 } from "lucide-svelte";
   import { onDestroy, untrack } from "svelte";
   import * as nip19 from "nostr-tools/nip19";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
@@ -123,9 +123,9 @@
       return "null";
     }
 
-    if (!timelineFilter.get().adaptMute) {
-      return "null";
-    }
+    // if (!timelineFilter.get().adaptMute) {
+    //   return "null";
+    // }
 
     if (paramNoteId === note.id || excludefunc(note)) {
       return "null";
@@ -235,7 +235,7 @@
       {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
     </button>
   {/if}
-  {#if muteType === "null" || viewMuteEvent}
+  {#if !timelineFilter.get().adaptMute || muteType === "null" || viewMuteEvent}
     {#if thread && replyTag}
       {#if depth >= 1 && depth % 6 === 0 && !loadThread}
         <button
@@ -250,6 +250,15 @@
     {/if}
 
     <article class="{noteClass()} w-full">
+      <!-- ミュート投稿のアイコン表示 -->
+      {#if muteType !== "null"}
+        <div
+          class="absolute top-0 left-0 bg-neutral-500/80 rounded-full p-1 text-magnum-700 dark:text-magnum-300"
+          style={`z-index:${zIndex || 10 + 1}`}
+        >
+          <EyeOff size={14} />
+        </div>
+      {/if}
       {#if note.kind === 1 || note.kind === 1111}
         <Kind1Note
           {replyUsers}
