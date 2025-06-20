@@ -40,7 +40,7 @@
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
 
-  let parts = $derived(parseContent(text, tags));
+  let parts: Token[] = $derived(parseContent(text, tags));
   //プレビューにも使ってるからconstだとだめ
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
