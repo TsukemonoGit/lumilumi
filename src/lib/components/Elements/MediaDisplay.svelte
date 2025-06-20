@@ -215,7 +215,7 @@
 
     <!-- 画像カウンター -->
     <div
-      class="fixed bottom-0 right-0 z-50 text-neutral-800 px-1 bg-neutral-100/50 z-[999]"
+      class="fixed bottom-0 right-0 text-neutral-800 px-1 bg-neutral-100/50 z-[999]"
     >
       {#if displayImages.length > 0}
         {displayImages.findIndex((img) => img.originalIndex === currentIndex) +

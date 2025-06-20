@@ -204,7 +204,7 @@
     p-6 pt-3 shadow-lg mb-4"
   >
     <div class="font-medium text-magnum-400">preview</div>
-    <div class="border border-magnum-500 rounded-md">
+    <div class="border border-magnum-500 rounded-md min-h-[6.6rem]">
       <NoteComponent warningText={onWarning ? warningText : undefined}>
         {#snippet icon()}
           {#if signPubkey}
