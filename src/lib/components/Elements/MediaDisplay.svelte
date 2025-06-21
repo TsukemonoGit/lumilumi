@@ -16,6 +16,17 @@
     currentIndex?: number;
   }
 
+  interface MediaItem {
+    url: string;
+    originalIndex: number;
+  }
+
+  interface MediaViewState {
+    imageUrls: string[];
+    originalIndices: number[];
+    currentIndex: number;
+  }
+
   const DIALOG_ID = "mediaView";
 
   let {
@@ -24,17 +35,20 @@
     currentIndex = $bindable(0),
   }: Props = $props();
 
-  let displayImages: { url: string; originalIndex: number }[] = $state([]);
+  // 状態管理
+  let displayImages: MediaItem[] = $state([]);
+  let displayIndex = $state(0); // displayImages配列内でのインデックス
   let isInitialized = $state(false);
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
 
+  // ダイアログ作成
   const { elements, states } = createDialog({ forceVisible: true });
   const { overlay, content, close, portalled } = elements;
   const { open: dialogOpen } = states;
 
-  // 画像配列をチェックして表示可能なものだけをフィルタ
-  function mediaCheck(images: string[]) {
-    return images
+  // 画像フィルタリング：表示可能な画像のみを抽出
+  function filterValidImages(imageUrls: string[]): MediaItem[] {
+    return imageUrls
       .map((url, index) => ({ url, originalIndex: index }))
       .filter((item) => {
         const data: UrlType | undefined = queryClient.getQueryData([
@@ -45,38 +59,52 @@
       });
   }
 
-  // ナビゲーション関数
+  // 表示インデックスから元のインデックスへの変換
+  function getOriginalIndex(): number {
+    return displayImages[displayIndex]?.originalIndex ?? 0;
+  }
+
+  // 元のインデックスから表示インデックスへの変換
+  function findDisplayIndex(originalIdx: number): number {
+    const found = displayImages.findIndex(
+      (img) => img.originalIndex === originalIdx
+    );
+    return found >= 0 ? found : 0;
+  }
+
+  // ナビゲーション
   function goToNext() {
     if (displayImages.length > 0) {
-      currentIndex = (currentIndex + 1) % displayImages.length;
+      displayIndex = (displayIndex + 1) % displayImages.length;
+      currentIndex = getOriginalIndex();
     }
   }
 
   function goToPrev() {
     if (displayImages.length > 0) {
-      currentIndex =
-        (currentIndex - 1 + displayImages.length) % displayImages.length;
+      displayIndex =
+        (displayIndex - 1 + displayImages.length) % displayImages.length;
+      currentIndex = getOriginalIndex();
     }
   }
 
-  // ダイアログの状態を作成
+  // 履歴状態作成
   function createDialogState(): App.PageState {
-    if (displayImages.length > 0) {
-      return {
-        dialogOpen: {
-          id: DIALOG_ID,
-          mediaView: {
-            imageUrls: displayImages.map((img) => img.url),
-            originalIndices: displayImages.map((img) => img.originalIndex),
-            currentIndex,
-          },
+    if (displayImages.length === 0) return {};
+
+    return {
+      dialogOpen: {
+        id: DIALOG_ID,
+        mediaView: {
+          imageUrls: displayImages.map((img) => img.url),
+          originalIndices: displayImages.map((img) => img.originalIndex),
+          currentIndex: getOriginalIndex(),
         },
-      };
-    }
-    return {};
+      },
+    };
   }
 
-  // ダイアログを開く際に新しい履歴エントリを作成
+  // 履歴付きでダイアログを開く
   function openDialogWithHistory() {
     if (displayImages.length > 0) {
       const dialogState = createDialogState();
@@ -84,57 +112,61 @@
     }
   }
 
-  // 外部からのダイアログを開く要求の処理
+  // ダイアログを開く処理
+  function openDialog(imageUrls: string[], targetIndex: number = 0) {
+    displayImages = filterValidImages(imageUrls);
+
+    if (displayImages.length === 0) return;
+
+    displayIndex = findDisplayIndex(targetIndex);
+    currentIndex = getOriginalIndex();
+    $dialogOpen = true;
+
+    // 初期化完了後のみ履歴操作
+    if (isInitialized) {
+      openDialogWithHistory();
+    }
+  }
+
+  // ダイアログを閉じる処理
+  function closeDialog() {
+    $dialogOpen = false;
+    $open = false;
+    loadingStatus = "loading";
+  }
+
+  // 外部からの開く要求の処理
   $effect(() => {
     if ($open && images.length > 0) {
       untrack(() => {
-        displayImages = mediaCheck(images);
-        if (displayImages.length > 0) {
-          $dialogOpen = true;
-          $open = false;
-          // 初期化完了後のみ履歴操作を行う
-          if (isInitialized) {
-            openDialogWithHistory();
-          }
-        }
+        openDialog(images, currentIndex);
+        $open = false;
       });
     }
   });
 
-  // コンポーネント初期化時の処理
+  // 初期化処理
   $effect(() => {
-    if (!isInitialized) {
-      isInitialized = true;
+    if (isInitialized) return;
 
-      // 初期表示時にダイアログを開く必要があるか確認
-      const mediaViewState = page.state?.dialogOpen?.mediaView;
-      if (mediaViewState && mediaViewState.imageUrls?.length > 0) {
-        untrack(() => {
-          displayImages = mediaCheck(mediaViewState.imageUrls);
+    isInitialized = true;
 
-          // 元のインデックスも復元
-          if (mediaViewState.originalIndices) {
-            displayImages = displayImages.map((item, idx) => ({
-              ...item,
-              originalIndex: mediaViewState.originalIndices[idx] ?? idx,
-            }));
-          }
-
-          currentIndex = mediaViewState.currentIndex ?? 0;
-          $dialogOpen = true;
-        });
-      }
+    // ページ状態からの復元
+    const mediaViewState = page.state?.dialogOpen?.mediaView as MediaViewState;
+    if (mediaViewState?.imageUrls?.length > 0) {
+      untrack(() => {
+        openDialog(mediaViewState.imageUrls, mediaViewState.currentIndex ?? 0);
+      });
     }
   });
 
-  // ブラウザバックなどでpopStackからナビゲーション変更があった場合
+  // ブラウザバック処理
   $effect(() => {
-    const logEntry = $popStack?.[0]?.id === DIALOG_ID;
+    const shouldClose = $popStack?.[0]?.id === DIALOG_ID;
 
-    if (logEntry) {
+    if (shouldClose) {
       untrack(() => {
-        $dialogOpen = false;
-        $open = false;
+        closeDialog();
         popStack.update((stack) =>
           stack.filter((entry) => entry.id !== DIALOG_ID)
         );
@@ -142,30 +174,34 @@
     }
   });
 
-  // 外部からのページ状態変更を監視
+  // ページ状態変更監視
   $effect(() => {
     const currentDialogState = page.state?.dialogOpen?.id === DIALOG_ID;
     if ($dialogOpen && !currentDialogState) {
-      untrack(() => {
-        $dialogOpen = false;
-      });
+      untrack(() => closeDialog());
     }
   });
 
-  // 画像変更時にロード状態をリセット
+  // 画像変更時のロード状態リセット
   $effect(() => {
-    loadingStatus = "loading";
+    if (displayImages.length > 0) {
+      loadingStatus = "loading";
+    }
   });
+
+  // 現在の画像URL取得
+  let currentImageUrl = $derived(displayImages[displayIndex]?.url ?? "");
 </script>
 
 {#if $dialogOpen && displayImages.length > 0}
-  <div use:melt={$portalled} class="fixed top-0 left-0 z-[999]">
+  <div use:melt={$portalled} class="fixed inset-0 z-[999]">
     <!-- オーバーレイ -->
     <div
       use:melt={$overlay}
       class="fixed inset-0 bg-black/50"
       transition:fade={{ duration: 150 }}
     ></div>
+
     <div use:melt={$content}>
       <!-- 画像表示エリア -->
       <div
@@ -173,54 +209,61 @@
       >
         <div class="relative w-full h-full">
           <img
+            src={currentImageUrl}
+            alt=""
+            class="max-h-[100vh] max-w-[100vw] object-contain"
             onload={() => (loadingStatus = "loaded")}
             onerror={() => (loadingStatus = "error")}
-            alt=""
-            src={$state.snapshot(
-              displayImages.find((img) => img.originalIndex === currentIndex)
-            )?.url}
-            class="max-h-[100vh] max-w-[100vw] object-contain"
           />
-          {#if loadingStatus === "error" || loadingStatus === "loading"}
-            <span class="absolute t-0 l-0 overflow-hidden">{loadingStatus}</span
+
+          <!-- ローディング・エラー表示 -->
+          {#if loadingStatus !== "loaded"}
+            <div
+              class="absolute inset-0 flex items-center justify-center bg-black/20"
             >
+              <span class="text-neutral-200 bg-black/50 px-2 py-1 rounded">
+                {loadingStatus === "error" ? "error" : "loading..."}
+              </span>
+            </div>
           {/if}
         </div>
       </div>
 
-      <!-- ナビゲーションボタン（複数画像の場合のみ表示） -->
+      <!-- ナビゲーションボタン -->
       {#if displayImages.length > 1}
         <button
-          class="fixed left-1 top-1/2 z-[999] bg-neutral-100/75 -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
+          class="fixed sm:left-4 left-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onclick={goToPrev}
+          aria-label="prev image"
         >
-          <ChevronLeft />
+          <ChevronLeft size={24} />
         </button>
+
         <button
-          class="fixed right-1 top-1/2 z-[999] bg-neutral-100/75 -translate-y-1/2 p-1 hover:bg-neutral-100 text-neutral-800 focus:shadow-neutral-400 w-fit"
+          class="fixed sm:right-4 right-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
           onclick={goToNext}
+          aria-label="next image"
         >
-          <ChevronRight />
+          <ChevronRight size={24} />
         </button>
       {/if}
     </div>
+
     <!-- 閉じるボタン -->
     <button
       use:melt={$close}
+      class="fixed sm:right-4 sm:top-4 right-2 top-2 z-[999] rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
       aria-label="close"
-      class="fixed z-[999] right-4 top-4 inline-flex appearance-none items-center justify-center rounded-full p-1 text-magnum-800 bg-magnum-100/70 hover:bg-magnum-100 focus:shadow-magnum-400"
     >
-      <X />
+      <X size={24} />
     </button>
 
     <!-- 画像カウンター -->
+
     <div
-      class="fixed bottom-0 right-0 text-neutral-800 px-1 bg-neutral-100/50 z-[999]"
+      class="fixed bottom-1 right-1 z-[999] rounded bg-neutral-800/50 px-3 py-1 text-sm text-neutral-300"
     >
-      {#if displayImages.length > 0}
-        {displayImages.findIndex((img) => img.originalIndex === currentIndex) +
-          1}/{displayImages.length}
-      {/if}
+      {displayIndex + 1} / {displayImages.length}
     </div>
   </div>
 {/if}
