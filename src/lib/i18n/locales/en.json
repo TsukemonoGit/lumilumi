@@ -63,7 +63,7 @@
     },
     "load": {
       "title": "Load/Save Settings",
-      "description": "Stored in the relay with kind: 300078 ID: lumi-settings (NIP-78)",
+      "description": "Stored in the relay with kind: 30078 ID: lumi-settings (NIP-78)",
       "title2": "Load Settings / Save Current Settings to Relay",
       "description2": "If a data entry with the same name exists, it will be overwritten."
     }
