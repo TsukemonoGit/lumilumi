@@ -125,30 +125,3 @@
     {/if}
   {/if}
 </article>
-<!--Show more no Dialog-->
-<!-- <Dialog
-  bind:open={showMore}
-  zIndex={zIndex + 10}
-  id={`showMore_${text.slice(10)}_${depth}}`}
->
-  {#snippet main()}
-    <div
-      class="contentBlock rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden"
-    >
-      {#each parts as token}
-        <SimpleContentBlock
-          part={token}
-          {repostable}
-          {depth}
-          {displayMenu}
-          {tags}
-          {openModal}
-          {nolist}
-          
-          {zIndex}
-        />
-      {/each}
-    </div>
-  {/snippet}</Dialog
->
- -->
