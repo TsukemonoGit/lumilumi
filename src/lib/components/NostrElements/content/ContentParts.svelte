@@ -164,7 +164,8 @@
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={nipLink(part.content ?? "")}>{part.content}</Link
+      href={nipLink((part.metadata!.number as string) ?? "")}
+      >{part.content}</Link
     >{:else if part.type === TokenType.LNBC && part.content}
     <InvoiceCard invoice={part.content} />
   {:else}<span
