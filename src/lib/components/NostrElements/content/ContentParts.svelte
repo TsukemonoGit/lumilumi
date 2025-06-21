@@ -161,7 +161,6 @@
       >{part.content}</a
     >
   {:else if part.type === TokenType.NIP_IDENTIFIER}
-    {JSON.stringify(part)}
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
