@@ -157,7 +157,8 @@
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
-      href={nipLink(part.content ?? "")}>{part.content}</Link
+      href={nipLink((part.metadata!.number as string) ?? "")}
+      >{part.content}</Link
     >{:else}<span
       class="inline whitespace-pre-wrap break-words"
       style="word-break: break-word;">{part.content}</span
