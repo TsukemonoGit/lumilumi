@@ -7,18 +7,13 @@
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
   interface Props {
-    url?: string | undefined;
+    url: string;
     number?: number | undefined;
     openModal: (index: number) => void;
     author: string;
   }
 
-  let {
-    url = undefined,
-    number = undefined,
-    openModal,
-    author,
-  }: Props = $props();
+  let { url, number = undefined, openModal, author }: Props = $props();
   let view = $state(false);
   let showDirectly = $derived(
     lumiSetting.get().imageAutoExpand === "all" ||
@@ -32,7 +27,7 @@
   {#if !imgLoad}<Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all "
-      href={url ?? ""}>{url}</Link
+      href={url}>{url}</Link
     >{/if}
   <div>
     <button

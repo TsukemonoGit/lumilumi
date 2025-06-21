@@ -32,7 +32,7 @@
         <!-- <ContentOneImage url={part.content ?? ""} /> -->
         <ContentImage
           url={part.content}
-          number={part.metadata!.number as number}
+          number={(part.metadata!.number as number) || 0}
           {openModal}
           {author}
         />
