@@ -67,7 +67,9 @@
   const maxHeight = undefined;
 
   // State
-  let parts: Token[] = $derived(parseContent(text, tags));
+  let parts: Token[] = $derived(
+    parseContent(text, tags, { hashtagsFromTagsOnly: false })
+  );
   let showMore: Writable<boolean> = $state(writable(false));
 
   // Computed values
