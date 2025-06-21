@@ -227,7 +227,7 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  {#if muteType !== "null" && depth >= 1}
+  {#if timelineFilter.get().adaptMute && muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
       onclick={() => (viewMuteEvent = !viewMuteEvent)}
