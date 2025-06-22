@@ -60,7 +60,7 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
+    updateViewEvent: (partialdata?: EventPacket[] | null | undefined) => void;
   }
 
   let {
@@ -103,6 +103,9 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
   let destroyed = false;
+
+  //過去イベントロードが完了してるかどうか
+  let isLoadingOlderEvents: boolean = $state(false);
 
   // Get read URLs from default relays
   let readUrls = $derived.by(() => {
@@ -160,7 +163,7 @@
    * updating状態でも必ず最新データが反映されるようにする
    */
   let isUpdateScheduled: boolean = false;
-  updateViewEvent = (_data: EventPacket[] | undefined | null = get(data)) => {
+  updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
     // 最新のデータを常に保存
 
     // すでに更新スケジュールがあれば追加で予約しない
@@ -173,13 +176,33 @@
 
     // 現在更新中でなければすぐに処理、更新中なら更新完了後に処理
     if (!updating) {
-      scheduleUpdate();
+      scheduleUpdate(partialdata || []);
+    }
+  };
+
+  const setAllEvents = (
+    data: EventPacket[] | null | undefined,
+    older: EventPacket[] | undefined,
+    part: EventPacket[] | undefined
+  ): EventPacket[] => {
+    // Combine current and older events
+    if (part && part.length > 0) {
+      const seen = new Set();
+      return [...(data || []), ...(older || []), ...(part || [])].filter(
+        (pk) => {
+          if (seen.has(pk.event.id)) return false;
+          seen.add(pk.event.id);
+          return true;
+        }
+      );
+    } else {
+      return [...(data || []), ...(older || [])];
     }
   };
   /**
    * 更新処理をスケジュール
    */
-  function scheduleUpdate() {
+  function scheduleUpdate(partialdata?: EventPacket[]) {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -190,13 +213,13 @@
         $nowProgress = false;
         return;
       }
-      processUpdate();
+      processUpdate(partialdata);
     }, UPDATE_DELAY);
   }
   /**
    * Updates the view with current events
    */
-  function processUpdate(_data: EventPacket[] | undefined | null = get(data)) {
+  function processUpdate(partialdata?: EventPacket[]) {
     try {
       updating = true;
 
@@ -204,9 +227,11 @@
         ...queryKey,
         "olderData",
       ]);
-
-      // Combine current and older events
-      const allEvents = [...(_data || []), ...(olderEvents || [])];
+      const allEvents: EventPacket[] = setAllEvents(
+        $data,
+        olderEvents,
+        partialdata
+      );
 
       // Update the until timestamp for pagination
 
@@ -228,7 +253,7 @@
     } finally {
       updating = false;
       $nowProgress = false;
-
+      currentEventCount = allUniqueEvents?.length || 0;
       // 更新処理中に新しいデータが来た場合は再度更新をスケジュール
       // latestUpdateDataが更新された場合に再度処理を行う
       if (isUpdateScheduled) {
@@ -241,25 +266,20 @@
    * Initialize the timeline
    */
   async function initializeTimeline() {
-    const existingEvents: EventPacket[] | undefined = queryClient?.getQueryData(
-      [...queryKey, "olderData"]
-    );
+    try {
+      const existingEvents: EventPacket[] | undefined =
+        queryClient?.getQueryData([...queryKey, "olderData"]);
 
-    // Only fetch older events if we don't already have them
-    if (!existingEvents || existingEvents.length <= 0) {
-      // Prepare filters for initial load
-      const initialFilters: Nostr.Filter[] = olderFilters.map((filter) => ({
-        ...filter,
-        since: undefined,
-        until:
-          filters[0].until === undefined
-            ? (filter.since ?? now())
-            : filter.until,
-        limit: LOAD_LIMIT,
-      }));
+      // 既存データがある場合は早期リターン
+      if (existingEvents && existingEvents.length > 0) {
+        console.log(`既存データ${existingEvents.length}件を使用`);
+        updateViewEvent();
+        return;
+      }
 
-      // Wait for relay connections if we have read URLs
-      if (readUrls) {
+      // リレー接続を先に確立
+      if (readUrls && readUrls.length > 0) {
+        console.log("リレー接続を確立中...");
         await waitForConnections(
           readUrls,
           relayStateMap.get(),
@@ -267,21 +287,45 @@
         );
       }
 
-      // Fetch initial batch of events
+      // フィルター準備を関数化
+      const createInitialFilters = (): Nostr.Filter[] => {
+        return olderFilters.map((filter) => ({
+          ...filter,
+          since: undefined,
+          until: filters[0]?.until ?? filter.since ?? now(),
+          limit: LOAD_LIMIT,
+        }));
+      };
+
+      const initialFilters = createInitialFilters();
+
+      // インクリメンタル更新ハンドラー（途中データはqueryに入れない）
+      const handleIncrementalData = (partialData: EventPacket[]) => {
+        if (partialData.length === 0) return;
+
+        // console.log(`${partialData.length}件受信`);
+
+        // 途中データをupdateViewEventに渡す
+        updateViewEvent(partialData);
+      };
+
+      console.log("初期データを取得中...");
+
+      // 初期データを取得
       const olderEvents = await firstLoadOlderEvents(
         LOAD_LIMIT,
         initialFilters,
         tie,
-        relays
+        relays,
+        handleIncrementalData
       );
 
-      // Store fetched events in query cache if we got any
+      // 最終データをqueryに保存
       if (olderEvents.length > 0) {
         queryClient.setQueryData(
           [...queryKey, "olderData"],
           (oldData: EventPacket[] | undefined) => {
-            // Deduplicate events using a Map
-            return sortEventPackets(
+            const deduplicatedData = sortEventPackets(
               Array.from(
                 new Map(
                   [...(oldData ?? []), ...olderEvents].map((packet) => [
@@ -291,47 +335,101 @@
                 ).values()
               )
             );
+
+            return LOAD_LIMIT > 0
+              ? deduplicatedData.slice(0, LOAD_LIMIT)
+              : deduplicatedData;
           }
         );
       }
-    }
 
-    // Update the view with all current events
-    updateViewEvent();
+      console.log(`初期化完了: ${olderEvents.length}件のイベントを取得`);
+    } catch (error) {
+      console.error("Timeline初期化エラー:", error);
+
+      // エラー時でも既存データがあれば表示
+      const fallbackData = queryClient?.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]) as EventPacket[];
+      if (fallbackData && fallbackData.length > 0) {
+        console.log("フォールバックデータを使用");
+      }
+    } finally {
+      // 最終的なビュー更新（途中データなし）
+      updateViewEvent();
+    }
   }
+  let currentEventCount: number = $state(0);
+  let requiredEventCount: number = $state(viewIndex + amount + SLIDE_AMOUNT);
+
+  let loadMoreDisabled = $derived(
+    $nowProgress ||
+      (isLoadingOlderEvents && currentEventCount < requiredEventCount)
+  );
 
   /**
    * Load older events and move view down
    */
   const loadOlderAndMoveDown = async () => {
+    if ($nowProgress) return;
+
     $nowProgress = true;
-    // Check if we need to load more events
-    const needToLoadMore =
-      !allUniqueEvents ||
-      allUniqueEvents.length < viewIndex + amount + SLIDE_AMOUNT;
+    let viewMoved = false;
 
-    if (needToLoadMore) {
-      // Calculate how many events we need to fetch
+    try {
+      // 十分なイベントがある場合は即座にビュー移動
+      if (currentEventCount >= requiredEventCount + SLIDE_AMOUNT) {
+        viewIndex += SLIDE_AMOUNT;
+        updateViewEvent();
+        return;
+      }
+      if (isLoadingOlderEvents) {
+        console.log("前回のデータ取得が完了していません");
+        return;
+      }
+      isLoadingOlderEvents = true;
       const fetchAmount =
-        viewIndex + amount - (allUniqueEvents?.length || 0) + 5 * SLIDE_AMOUNT;
+        requiredEventCount - currentEventCount + 6 * SLIDE_AMOUNT;
+      const untilTime =
+        allUniqueEvents?.[allUniqueEvents.length - 1]?.created_at;
 
-      const untilTime = allUniqueEvents[allUniqueEvents.length - 1].created_at;
+      if (!untilTime) {
+        console.warn("No existing events to determine untilTime");
+        return;
+      }
 
-      // Fetch older events
+      // インクリメンタル更新のハンドラー（途中データはqueryに入れない）
+      const handleIncrementalData = (partialData: EventPacket[]) => {
+        if (partialData.length === 0) return;
+
+        // console.log(`${partialData.length}件受信`);
+
+        // 途中データも含めて十分かチェック（queryデータ + 途中データ）
+        // この判定はupdateViewEvent内で計算された結果を使う必要があるかも
+        const totalCount = currentEventCount + partialData.length;
+        if (!viewMoved && totalCount >= viewIndex + amount + SLIDE_AMOUNT) {
+          viewIndex += SLIDE_AMOUNT;
+          viewMoved = true;
+        }
+        updateViewEvent(partialData); // ビュー移動後に再更新
+      };
+
+      // 古いイベントを取得
       const olderEvents = await loadOlderEvents(
         fetchAmount,
         olderFilters,
         untilTime,
         tie,
-        relays
+        relays,
+        handleIncrementalData
       );
 
-      // Store fetched events in query cache if we got any
+      // 最終データをqueryに保存
       if (olderEvents.length > 0) {
         queryClient.setQueryData(
           [...queryKey, "olderData"],
           (oldData: EventPacket[] | undefined) => {
-            // Deduplicate events using a Map
             return sortEventPackets(
               Array.from(
                 new Map(
@@ -345,15 +443,25 @@
           }
         );
       }
-    }
 
-    // Only move the view if we have enough events
-    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
-      viewIndex += SLIDE_AMOUNT;
-    }
+      // // 最終チェック：まだ移動していない場合
+      if (
+        !viewMoved &&
+        allUniqueEvents?.length >= viewIndex + amount - 10 + SLIDE_AMOUNT
+      ) {
+        viewIndex += SLIDE_AMOUNT;
+      }
 
-    // Update the view with current events
-    updateViewEvent(deriveaData);
+      // console.log(`${olderEvents.length}件の追加イベントを取得完了`);
+    } catch (error) {
+      console.error("loadOlderAndMoveDown error:", error);
+    } finally {
+      // 最終更新（途中データなし）
+      updateViewEvent();
+      $nowProgress = false;
+      isLoadingOlderEvents = false;
+      requiredEventCount = viewIndex + amount + SLIDE_AMOUNT;
+    }
   };
 
   /**
@@ -482,7 +590,7 @@
 {/if}
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
-    disabled={$nowProgress}
+    disabled={loadMoreDisabled}
     class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
     onclick={() => loadOlderAndMoveDown()}
     ><Triangle

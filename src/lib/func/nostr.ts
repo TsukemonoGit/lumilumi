@@ -45,6 +45,8 @@ import { validateLoginPubkey } from "./validateLoginPubkey";
 import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
+import { throttle } from "$lib/func/throttle";
+
 let rxNostr: RxNostr;
 export function setRxNostr() {
   if (get(app)?.rxNostr) {
@@ -543,7 +545,9 @@ export function usePromiseReq(
     initData = [],
   }: UsePromiseReqOpts<EventPacket[] | EventPacket>,
   relays: string[] | undefined,
-  timeout: number | undefined = 3000
+  timeout: number | undefined = 3000,
+  onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
+  sift?: number
 ): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
@@ -565,6 +569,7 @@ export function usePromiseReq(
   } else {
     _req = createRxBackwardReq();
   }
+
   // 初期データが配列でない場合は、配列に変換
   let accumulatedData: EventPacket[] = Array.isArray(initData)
     ? [...initData]
@@ -574,32 +579,39 @@ export function usePromiseReq(
     .use(_req, { relays: relays })
     .pipe(metadata(), operator, completeOnTimeout(timeout));
 
+  const throttledOnData = onData ? throttle(onData, 200) : undefined;
+
   return new Promise<EventPacket[]>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
       subscription.unsubscribe();
-      resolve(accumulatedData);
-    }, timeout + 10000); // Timeout after 3 seconds if not completed
+      resolve(accumulatedData.slice(0, sift === 0 ? undefined : sift));
+    }, timeout + 10000);
 
     const subscription = obs.subscribe({
       next: (v: EventPacket[] | EventPacket) => {
-        //  console.log(v);
         // 受け取ったデータが配列でない場合、配列に変換して追加
         if (Array.isArray(v)) {
           accumulatedData = v;
         } else {
           accumulatedData.push(v);
         }
+
+        // 処理途中のデータを都度コールバックで返す
+        if (throttledOnData) {
+          throttledOnData(
+            [...accumulatedData].slice(0, sift === 0 ? undefined : sift)
+          );
+        }
       },
       complete: () => {
-        clearTimeout(timeoutId); // Cancel the timeout
-        resolve(accumulatedData);
+        clearTimeout(timeoutId);
+        resolve(accumulatedData.slice(0, sift === 0 ? undefined : sift));
       },
       error: (e) => {
         console.log(e);
         console.error("[rx-nostr]", e);
-
-        clearTimeout(timeoutId); // Cancel the timeout
-        resolve(accumulatedData);
+        clearTimeout(timeoutId);
+        resolve(accumulatedData.slice(0, sift === 0 ? undefined : sift));
       },
     });
 

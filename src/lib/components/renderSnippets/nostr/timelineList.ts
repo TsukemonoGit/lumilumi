@@ -34,7 +34,8 @@ export async function loadOlderEvents(
   filters: Filter[],
   until: number,
   tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
-  relays?: string[]
+  relays?: string[],
+  onData?: (data: EventPacket[]) => void // 処理途中のデータを受け取るコールバック
 ): Promise<EventPacket[]> {
   // Check if display events exist
   if (!displayEvents.get() || displayEvents.get().length < 0) {
@@ -63,7 +64,10 @@ export async function loadOlderEvents(
       filters: newFilters,
       req: newReq,
     },
-    relays
+    relays,
+    undefined,
+    onData,
+    sift
   );
 
   // Filter events by timestamp
@@ -75,7 +79,7 @@ export async function loadOlderEvents(
   console.log("Retrieved events count:", filteredOlderEvents.length);
 
   // Return requested number of events
-  return filteredOlderEvents.slice(0, sift);
+  return filteredOlderEvents;
 }
 
 /**
@@ -90,7 +94,8 @@ export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
   tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
-  relays?: string[]
+  relays?: string[],
+  onData?: (data: EventPacket[]) => void // 処理途中のデータを受け取るコールバック
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
   const operator = createOperatorPipeline(tie);
@@ -103,14 +108,17 @@ export async function firstLoadOlderEvents(
       req: newReq,
     },
     relays,
-    4000
+    4000,
+    onData,
+    sift
   );
 
   console.log("sift:", sift);
   console.log("olderEvents.length:", olderEvents.length);
 
   // Return either all events or limited by sift
-  return olderEvents.slice(0, sift === 0 ? undefined : sift);
+  //return olderEvents.slice(0, sift === 0 ? undefined : sift);
+  return olderEvents;
 }
 
 /**
