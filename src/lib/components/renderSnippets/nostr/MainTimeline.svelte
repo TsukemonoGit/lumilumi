@@ -491,7 +491,7 @@
 
   // Effects
   $effect(() => {
-    if (data && viewIndex >= 0 && !$nowProgress) {
+    if ($data && viewIndex >= 0 && !$nowProgress) {
       untrack(() => updateViewEvent());
     }
   });
