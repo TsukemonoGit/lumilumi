@@ -12,7 +12,7 @@
 <div class="suno-embed-container">
   <iframe
     src={url}
-    class="w-full h-96 overflow-hidden rounded-lg"
+    class="w-full h-36 overflow-hidden rounded-lg"
     frameborder="0"
     allow="encrypted-media; fullscreen; autoplay"
     allowfullscreen
