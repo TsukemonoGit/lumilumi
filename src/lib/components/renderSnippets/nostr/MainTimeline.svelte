@@ -350,7 +350,9 @@
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-        updateViewEvent();
+        setTimeout(() => {
+          updateViewEvent();
+        }, 0);
         return;
       }
 
@@ -387,7 +389,9 @@
           viewIndex += CONFIG.SLIDE_AMOUNT;
           viewMoved = true;
         }
-        updateViewEvent(partialData);
+        setTimeout(() => {
+          updateViewEvent();
+        }, 0);
       };
 
       const olderEvents = await loadOlderEvents(
@@ -409,11 +413,13 @@
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
+        setTimeout(() => {
+          updateViewEvent();
+        }, 0);
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
-      updateViewEvent();
       $nowProgress = false;
       timelineManager.isLoadingOlderEvents = false;
       timelineManager.requiredEventCount =
