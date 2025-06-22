@@ -346,7 +346,7 @@
     try {
       if (
         timelineManager.currentEventCount >=
-        timelineManager.requiredEventCount + CONFIG.SLIDE_AMOUNT
+        timelineManager.requiredEventCount + CONFIG.SLIDE_AMOUNT + 10
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         updateViewEvent();
@@ -381,7 +381,7 @@
           timelineManager.currentEventCount + partialData.length;
         if (
           !viewMoved &&
-          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT
+          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10
         ) {
           viewIndex += CONFIG.SLIDE_AMOUNT;
           viewMoved = true;
@@ -405,7 +405,7 @@
       if (
         !viewMoved &&
         timelineManager.allUniqueEvents?.length >=
-          viewIndex + amount + CONFIG.SLIDE_AMOUNT
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
       }
