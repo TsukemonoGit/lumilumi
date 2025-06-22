@@ -3,6 +3,7 @@
   import Link from "$lib/components/Elements/Link.svelte";
   import OgpCard from "$lib/components/Elements/OgpCard.svelte";
   import OGP from "$lib/components/renderSnippets/OGP.svelte";
+  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import EmbedSuno from "./Embed/EmbedSuno.svelte";
 
   let { url } = $props();
@@ -24,9 +25,9 @@
       contents.playerStream &&
       sunoDomains.some((domain) => contents.playerStream?.includes(domain))}
 
-    {#if !error && contents.player && isSuno}
+    {#if lumiSetting.get().embed && !error && contents.player && isSuno}
       <EmbedSuno url={contents.player} {onError} />
-    {:else if !error && contents.playerStream && isSunoStream}
+    {:else if lumiSetting.get().embed && !error && contents.playerStream && isSunoStream}
       <EmbedSuno url={contents.playerStream} {onError} />
     {:else if contents.title !== "" || contents.image !== "" || contents.description !== ""}
       <OgpCard {contents} url={url ?? ""} />
