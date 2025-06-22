@@ -249,7 +249,7 @@
         updateViewEvent();
         return;
       }
-
+      timelineManager.isLoadingOlderEvents = true;
       if (readUrls && readUrls.length > 0) {
         console.log("リレー接続を確立中...");
         await waitForConnections(
@@ -282,6 +282,7 @@
       handleFallbackData();
     } finally {
       updateViewEvent();
+      timelineManager.isLoadingOlderEvents = false;
     }
   }
 
@@ -346,7 +347,7 @@
     try {
       if (
         timelineManager.currentEventCount >=
-        timelineManager.requiredEventCount + CONFIG.SLIDE_AMOUNT + 10
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         updateViewEvent();
@@ -381,7 +382,7 @@
           timelineManager.currentEventCount + partialData.length;
         if (
           !viewMoved &&
-          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10
+          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT
         ) {
           viewIndex += CONFIG.SLIDE_AMOUNT;
           viewMoved = true;
@@ -405,7 +406,7 @@
       if (
         !viewMoved &&
         timelineManager.allUniqueEvents?.length >=
-          viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
       }
