@@ -70,7 +70,7 @@
     queryKey,
     filters,
     olderFilters,
-    viewIndex,
+    viewIndex = $bindable(),
     amount,
     relays = undefined,
     eventFilter = () => true,
@@ -83,22 +83,29 @@
 
   // State management
   class TimelineManager {
-    allUniqueEvents: Nostr.Event[] = [];
-    updating = false;
+    allUniqueEvents: Nostr.Event[] = $state([]);
+    updating = $state(false);
     timeoutId: NodeJS.Timeout | null = null;
-    isOnMount = false;
-    isLoadingOlderEvents = false;
-    isUpdateScheduled = false;
-    destroyed = false;
+    isOnMount = $state(false);
+    isLoadingOlderEvents = $state(false);
+    isUpdateScheduled = $state(false);
+    destroyed = $state(false);
     currentEventCount = $state(0);
-    requiredEventCount = $state(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
+    requiredEventCount = $state(0);
 
     get loadMoreDisabled() {
-      return (
-        $nowProgress ||
-        (this.isLoadingOlderEvents &&
-          this.currentEventCount < this.requiredEventCount)
-      );
+      // nowProgressまたは初期化中の場合は常に無効
+      if ($nowProgress || this.isOnMount) return true;
+
+      // 前回のデータ取得中の場合
+      if (this.isLoadingOlderEvents) {
+        // ストックが十分にある場合のみ有効
+        const hasEnoughStock =
+          this.currentEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+        return !hasEnoughStock;
+      }
+
+      return false;
     }
 
     reset() {
@@ -124,7 +131,6 @@
   // Query setup
   const result = useMainTimeline(queryKey, configureOperators(), filters);
   const data = $derived(result.data);
-  const deriveaData = $derived($data);
   const status = $derived(result.status);
   const errorData = $derived(result.error);
 
@@ -161,15 +167,18 @@
     older: EventPacket[] | undefined,
     partial: EventPacket[] | undefined
   ): EventPacket[] {
-    if (partial && partial.length > 0) {
-      const seen = new Set<string>();
-      return [...(current || []), ...(older || []), ...partial].filter((pk) => {
-        if (seen.has(pk.event.id)) return false;
-        seen.add(pk.event.id);
-        return true;
-      });
-    }
-    return [...(current || []), ...(older || [])];
+    const allEvents = [
+      ...(current || []),
+      ...(older || []),
+      ...(partial || []),
+    ];
+    const seen = new Set<string>();
+
+    return allEvents.filter((pk) => {
+      if (seen.has(pk.event.id)) return false;
+      seen.add(pk.event.id);
+      return true;
+    });
   }
 
   /**
@@ -217,8 +226,11 @@
           (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
         );
 
+      const startIndex = Math.max(0, viewIndex);
+      const endIndex = startIndex + amount;
+
       displayEvents.set(
-        timelineManager.allUniqueEvents.slice(viewIndex, viewIndex + amount)
+        timelineManager.allUniqueEvents.slice(startIndex, endIndex)
       );
 
       timelineManager.isUpdateScheduled = false;
@@ -249,7 +261,9 @@
         updateViewEvent();
         return;
       }
+
       timelineManager.isLoadingOlderEvents = true;
+
       if (readUrls && readUrls.length > 0) {
         console.log("リレー接続を確立中...");
         await waitForConnections(
@@ -345,28 +359,25 @@
     let viewMoved = false;
 
     try {
-      if (
+      const hasEnoughStock =
         timelineManager.currentEventCount >=
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT + CONFIG.SLIDE_AMOUNT
-      ) {
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+
+      if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-        setTimeout(() => {
-          updateViewEvent();
-        }, 0);
+
+        updateViewEvent();
+
         return;
       }
 
+      // 👇 ストック不足でリクエスト中なら return
       if (timelineManager.isLoadingOlderEvents) {
         console.log("前回のデータ取得が完了していません");
         return;
       }
 
-      timelineManager.isLoadingOlderEvents = true;
-
-      const fetchAmount =
-        timelineManager.requiredEventCount -
-        timelineManager.currentEventCount +
-        5 * CONFIG.LOAD_LIMIT; //
+      // 👇 ストック不足でloadしても上限に満たなかったら中断
       const untilTime =
         timelineManager.allUniqueEvents?.[
           timelineManager.allUniqueEvents.length - 1
@@ -377,22 +388,9 @@
         return;
       }
 
-      const handleIncrementalData = (partialData: EventPacket[]) => {
-        if (partialData.length === 0) return;
+      timelineManager.isLoadingOlderEvents = true;
 
-        const totalCount =
-          timelineManager.currentEventCount + partialData.length;
-        if (
-          !viewMoved &&
-          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT
-        ) {
-          viewIndex += CONFIG.SLIDE_AMOUNT;
-          viewMoved = true;
-        }
-        setTimeout(() => {
-          updateViewEvent();
-        }, 0);
-      };
+      const fetchAmount = CONFIG.LOAD_LIMIT * 5;
 
       const olderEvents = await loadOlderEvents(
         fetchAmount,
@@ -400,30 +398,45 @@
         untilTime,
         tie,
         relays,
-        handleIncrementalData
+        (partialData) => {
+          if (partialData.length === 0) return;
+
+          timelineManager.updateCounts();
+          const stillNotEnough =
+            timelineManager.currentEventCount <
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+
+          if (!viewMoved && !stillNotEnough) {
+            viewIndex += CONFIG.SLIDE_AMOUNT;
+            viewMoved = true;
+          }
+
+          updateViewEvent(partialData);
+        }
       );
 
       if (olderEvents.length > 0) {
         updateQueryDataForOlder(olderEvents);
       }
 
+      timelineManager.updateCounts();
+
+      // 👇 最後のチェック: ストック足りないなら移動しない
       if (
         !viewMoved &&
-        timelineManager.allUniqueEvents?.length >=
+        timelineManager.currentEventCount >=
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-        setTimeout(() => {
-          updateViewEvent();
-        }, 0);
+
+        updateViewEvent();
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
       $nowProgress = false;
       timelineManager.isLoadingOlderEvents = false;
-      timelineManager.requiredEventCount =
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+      timelineManager.updateCounts();
     }
   }
 
@@ -448,17 +461,19 @@
   function moveUp() {
     if (viewIndex <= 0) return;
 
-    scroll({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
+    }
     viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
 
     setTimeout(() => {
-      updateViewEvent(deriveaData);
+      updateViewEvent();
     }, CONFIG.SCROLL_DELAY);
   }
 
   function moveToTop() {
     viewIndex = 0;
-    updateViewEvent(deriveaData);
+    updateViewEvent();
   }
 
   // Query for older data
@@ -473,16 +488,20 @@
 
   // Effects
   $effect(() => {
-    if ((deriveaData && viewIndex >= 0) || !$nowProgress) {
-      untrack(() => updateViewEvent(deriveaData));
+    if (data && viewIndex >= 0 && !$nowProgress) {
+      untrack(() => updateViewEvent());
     }
+  });
 
+  $effect(() => {
     if (timelineFilter.get()) {
-      untrack(() => updateViewEvent(deriveaData));
-      localStorage.setItem(
-        "timelineFilter",
-        JSON.stringify(timelineFilter.get())
-      );
+      untrack(() => updateViewEvent());
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(
+          "timelineFilter",
+          JSON.stringify(timelineFilter.get())
+        );
+      }
     }
   });
 
@@ -510,6 +529,9 @@
   onDestroy(() => {
     console.log("main timeline destroy");
     timelineManager.destroyed = true;
+    if (timelineManager.timeoutId) {
+      clearTimeout(timelineManager.timeoutId);
+    }
   });
 </script>
 
@@ -548,7 +570,7 @@
   {@render content?.({
     events: displayEvents.get(),
     status: $status,
-    len: deriveaData?.length ?? 0,
+    len: $data?.length ?? 0,
   })}
 {:else if $status === "loading"}
   {@render loading?.()}
