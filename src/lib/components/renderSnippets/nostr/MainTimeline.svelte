@@ -363,7 +363,7 @@
       const fetchAmount =
         timelineManager.requiredEventCount -
         timelineManager.currentEventCount +
-        6 * CONFIG.SLIDE_AMOUNT;
+        5 * CONFIG.LOAD_LIMIT; //
       const untilTime =
         timelineManager.allUniqueEvents?.[
           timelineManager.allUniqueEvents.length - 1
