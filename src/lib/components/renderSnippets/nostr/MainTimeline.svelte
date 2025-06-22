@@ -405,7 +405,7 @@
       if (
         !viewMoved &&
         timelineManager.allUniqueEvents?.length >=
-          viewIndex + amount - 10 + CONFIG.SLIDE_AMOUNT
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
       }
