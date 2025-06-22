@@ -1,7 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { get } from "svelte/store";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
@@ -40,10 +39,15 @@
   import type { ReqStatus } from "$lib/types";
 
   // Constants
-  const SLIDE_AMOUNT = 40; // Number of events to slide in pagination
-  const UPDATE_DELAY = 20; // Delay for debouncing view updates (ms)
-  const LOAD_LIMIT = 50; // Number of events to fetch in initial load
-  const CONNECTION_TIMEOUT = 5000; // Maximum time to wait for relay connections (ms)
+  const CONFIG = {
+    SLIDE_AMOUNT: 40,
+    UPDATE_DELAY: 20,
+    LOAD_LIMIT: 50,
+    CONNECTION_TIMEOUT: 5000,
+    FUTURE_EVENT_TOLERANCE: 10,
+    SCROLL_ADJUSTMENT: 120,
+    SCROLL_DELAY: 100,
+  };
 
   interface Props {
     queryKey: QueryKey;
@@ -52,7 +56,6 @@
     viewIndex: number;
     amount: number;
     relays?: string[] | undefined;
-
     eventFilter: (event: Nostr.Event) => boolean;
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
@@ -70,7 +73,6 @@
     viewIndex,
     amount,
     relays = undefined,
-
     eventFilter = () => true,
     error,
     loading,
@@ -79,343 +81,314 @@
     updateViewEvent = $bindable(),
   }: Props = $props();
 
-  // State variables
-  let allUniqueEvents: Nostr.Event[] = [];
+  // State management
+  class TimelineManager {
+    allUniqueEvents: Nostr.Event[] = [];
+    updating = false;
+    timeoutId: NodeJS.Timeout | null = null;
+    isOnMount = false;
+    isLoadingOlderEvents = false;
+    isUpdateScheduled = false;
+    destroyed = false;
+    currentEventCount = $state(0);
+    requiredEventCount = $state(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
 
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
-  let isOnMount: boolean = false;
+    get loadMoreDisabled() {
+      return (
+        $nowProgress ||
+        (this.isLoadingOlderEvents &&
+          this.currentEventCount < this.requiredEventCount)
+      );
+    }
 
-  // Event handlers for the uniq operator
+    reset() {
+      this.updating = false;
+      this.isUpdateScheduled = false;
+      $nowProgress = false;
+    }
+
+    updateCounts() {
+      this.currentEventCount = this.allUniqueEvents?.length || 0;
+      this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+    }
+  }
+
+  const timelineManager = new TimelineManager();
+
+  // Rx-Nostr setup
   const keyFn = (packet: EventPacket): string => packet.event.id;
-  const onCache = (packet: EventPacket): void => {
-    // Called when a new unique event is received
-  };
-  const onHit = (packet: EventPacket): void => {
-    // Called when a duplicate event is received
-  };
+  const onCache = (packet: EventPacket): void => {};
+  const onHit = (packet: EventPacket): void => {};
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
 
   // Query setup
-  let result = useMainTimeline(queryKey, configureOperators(), filters);
-  let data = $derived(result.data);
-  let deriveaData = $derived($data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
-  let destroyed = false;
+  const result = useMainTimeline(queryKey, configureOperators(), filters);
+  const data = $derived(result.data);
+  const deriveaData = $derived($data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 
-  //過去イベントロードが完了してるかどうか
-  let isLoadingOlderEvents: boolean = $state(false);
-
-  // Get read URLs from default relays
-  let readUrls = $derived.by(() => {
-    if ($defaultRelays) {
-      return Object.values($defaultRelays)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
+  // Computed values
+  const readUrls = $derived.by(() => {
+    if (!$defaultRelays) return [];
+    return Object.values($defaultRelays)
+      .filter((config) => config.read)
+      .map((config) => config.url);
   });
 
   /**
-   * Configures the rx-nostr operators pipeline based on settings
+   * Configures the rx-nostr operators pipeline
    */
   function configureOperators() {
     let operator = pipe(tie, uniq);
 
-    // Add user status operator for main timeline if enabled
     if (lumiSetting.get().showUserStatus) {
       operator = pipe(operator, userStatus());
     }
 
-    // Add reaction check operator for main timeline if enabled
     if (lumiSetting.get().showReactioninTL) {
       operator = pipe(operator, reactionCheck());
     }
 
-    // Final operator to convert to array
     return pipe(operator, scanArray());
   }
 
   /**
-   * Registers the tie in the global store
+   * Event deduplication and merging utility
    */
-  /*   function registerTie(key: string) {
-    //すでにあったらそれをつかう
-    // なかったら作る
-
-    //console.log($tieMapStore);
-    if (!key) return;
-
-    if (!$tieMapStore) {
-      // Create rx-nostr tie and uniq operator
-      [tie, tieMap] = createTie();
-      $tieMapStore = { [key]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[key]) {
-      [tie, tieMap] = createTie();
-      $tieMapStore = { ...$tieMapStore, [key]: [tie, tieMap] };
-    } else {
-      [tie, tieMap] = $tieMapStore[key];
+  function mergeEvents(
+    current: EventPacket[] | null | undefined,
+    older: EventPacket[] | undefined,
+    partial: EventPacket[] | undefined
+  ): EventPacket[] {
+    if (partial && partial.length > 0) {
+      const seen = new Set<string>();
+      return [...(current || []), ...(older || []), ...partial].filter((pk) => {
+        if (seen.has(pk.event.id)) return false;
+        seen.add(pk.event.id);
+        return true;
+      });
     }
+    return [...(current || []), ...(older || [])];
   }
- */
+
   /**
-   * 常に最新のイベントでビューを更新する関数
-   * updating状態でも必ず最新データが反映されるようにする
+   * Update scheduling and execution
    */
-  let isUpdateScheduled: boolean = false;
   updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
-    // 最新のデータを常に保存
+    if (timelineManager.isUpdateScheduled) return;
 
-    // すでに更新スケジュールがあれば追加で予約しない
-    if (isUpdateScheduled) {
-      return;
-    }
+    timelineManager.isUpdateScheduled = true;
 
-    // 実際の更新処理をスケジュール
-    isUpdateScheduled = true;
-
-    // 現在更新中でなければすぐに処理、更新中なら更新完了後に処理
-    if (!updating) {
+    if (!timelineManager.updating) {
       scheduleUpdate(partialdata || []);
     }
   };
 
-  const setAllEvents = (
-    data: EventPacket[] | null | undefined,
-    older: EventPacket[] | undefined,
-    part: EventPacket[] | undefined
-  ): EventPacket[] => {
-    // Combine current and older events
-    if (part && part.length > 0) {
-      const seen = new Set();
-      return [...(data || []), ...(older || []), ...(part || [])].filter(
-        (pk) => {
-          if (seen.has(pk.event.id)) return false;
-          seen.add(pk.event.id);
-          return true;
-        }
-      );
-    } else {
-      return [...(data || []), ...(older || [])];
-    }
-  };
-  /**
-   * 更新処理をスケジュール
-   */
   function scheduleUpdate(partialdata?: EventPacket[]) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    if (timelineManager.timeoutId) {
+      clearTimeout(timelineManager.timeoutId);
     }
 
-    timeoutId = setTimeout(() => {
-      if (destroyed) {
-        updating = false;
-        $nowProgress = false;
+    timelineManager.timeoutId = setTimeout(() => {
+      if (timelineManager.destroyed) {
+        timelineManager.reset();
         return;
       }
       processUpdate(partialdata);
-    }, UPDATE_DELAY);
+    }, CONFIG.UPDATE_DELAY);
   }
-  /**
-   * Updates the view with current events
-   */
+
   function processUpdate(partialdata?: EventPacket[]) {
     try {
-      updating = true;
+      timelineManager.updating = true;
 
       const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]);
-      const allEvents: EventPacket[] = setAllEvents(
-        $data,
-        olderEvents,
-        partialdata
-      );
 
-      // Update the until timestamp for pagination
+      const allEvents = mergeEvents($data, olderEvents, partialdata);
 
-      // Filter and process events
-      allUniqueEvents = allEvents
+      timelineManager.allUniqueEvents = allEvents
         .map((event) => event.event)
         .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // Exclude future events with small tolerance
+        .filter(
+          (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+        );
 
-      // Update the display with the current view window
-      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+      displayEvents.set(
+        timelineManager.allUniqueEvents.slice(viewIndex, viewIndex + amount)
+      );
 
-      // リセットフラグ
-      isUpdateScheduled = false;
-      //  }, UPDATE_DELAY);
+      timelineManager.isUpdateScheduled = false;
     } catch (error) {
       console.error("Error during update", error);
-      isUpdateScheduled = false;
+      timelineManager.isUpdateScheduled = false;
     } finally {
-      updating = false;
+      timelineManager.updating = false;
       $nowProgress = false;
-      currentEventCount = allUniqueEvents?.length || 0;
-      // 更新処理中に新しいデータが来た場合は再度更新をスケジュール
-      // latestUpdateDataが更新された場合に再度処理を行う
-      if (isUpdateScheduled) {
+      timelineManager.updateCounts();
+
+      if (timelineManager.isUpdateScheduled) {
         scheduleUpdate();
       }
     }
   }
 
   /**
-   * Initialize the timeline
+   * Timeline initialization
    */
   async function initializeTimeline() {
     try {
       const existingEvents: EventPacket[] | undefined =
         queryClient?.getQueryData([...queryKey, "olderData"]);
 
-      // 既存データがある場合は早期リターン
       if (existingEvents && existingEvents.length > 0) {
         console.log(`既存データ${existingEvents.length}件を使用`);
         updateViewEvent();
         return;
       }
 
-      // リレー接続を先に確立
       if (readUrls && readUrls.length > 0) {
         console.log("リレー接続を確立中...");
         await waitForConnections(
           readUrls,
           relayStateMap.get(),
-          CONNECTION_TIMEOUT
+          CONFIG.CONNECTION_TIMEOUT
         );
       }
 
-      // フィルター準備を関数化
-      const createInitialFilters = (): Nostr.Filter[] => {
-        return olderFilters.map((filter) => ({
-          ...filter,
-          since: undefined,
-          until: filters[0]?.until ?? filter.since ?? now(),
-          limit: LOAD_LIMIT,
-        }));
-      };
-
       const initialFilters = createInitialFilters();
-
-      // インクリメンタル更新ハンドラー（途中データはqueryに入れない）
-      const handleIncrementalData = (partialData: EventPacket[]) => {
-        if (partialData.length === 0) return;
-
-        // console.log(`${partialData.length}件受信`);
-
-        // 途中データをupdateViewEventに渡す
-        updateViewEvent(partialData);
-      };
+      const handleIncrementalData = createIncrementalHandler();
 
       console.log("初期データを取得中...");
 
-      // 初期データを取得
       const olderEvents = await firstLoadOlderEvents(
-        LOAD_LIMIT,
+        CONFIG.LOAD_LIMIT,
         initialFilters,
         tie,
         relays,
         handleIncrementalData
       );
 
-      // 最終データをqueryに保存
       if (olderEvents.length > 0) {
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (oldData: EventPacket[] | undefined) => {
-            const deduplicatedData = sortEventPackets(
-              Array.from(
-                new Map(
-                  [...(oldData ?? []), ...olderEvents].map((packet) => [
-                    packet.event.id,
-                    packet,
-                  ])
-                ).values()
-              )
-            );
-
-            return LOAD_LIMIT > 0
-              ? deduplicatedData.slice(0, LOAD_LIMIT)
-              : deduplicatedData;
-          }
-        );
+        updateQueryData(olderEvents);
       }
 
       console.log(`初期化完了: ${olderEvents.length}件のイベントを取得`);
     } catch (error) {
       console.error("Timeline初期化エラー:", error);
-
-      // エラー時でも既存データがあれば表示
-      const fallbackData = queryClient?.getQueryData([
-        ...queryKey,
-        "olderData",
-      ]) as EventPacket[];
-      if (fallbackData && fallbackData.length > 0) {
-        console.log("フォールバックデータを使用");
-      }
+      handleFallbackData();
     } finally {
-      // 最終的なビュー更新（途中データなし）
       updateViewEvent();
     }
   }
-  let currentEventCount: number = $state(0);
-  let requiredEventCount: number = $state(viewIndex + amount + SLIDE_AMOUNT);
 
-  let loadMoreDisabled = $derived(
-    $nowProgress ||
-      (isLoadingOlderEvents && currentEventCount < requiredEventCount)
-  );
+  function createInitialFilters(): Nostr.Filter[] {
+    return olderFilters.map((filter) => ({
+      ...filter,
+      since: undefined,
+      until: filters[0]?.until ?? filter.since ?? now(),
+      limit: CONFIG.LOAD_LIMIT,
+    }));
+  }
+
+  function createIncrementalHandler() {
+    return (partialData: EventPacket[]) => {
+      if (partialData.length === 0) return;
+      updateViewEvent(partialData);
+    };
+  }
+
+  function updateQueryData(events: EventPacket[]) {
+    queryClient.setQueryData(
+      [...queryKey, "olderData"],
+      (oldData: EventPacket[] | undefined) => {
+        const deduplicatedData = sortEventPackets(
+          Array.from(
+            new Map(
+              [...(oldData ?? []), ...events].map((packet) => [
+                packet.event.id,
+                packet,
+              ])
+            ).values()
+          )
+        );
+
+        return CONFIG.LOAD_LIMIT > 0
+          ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
+          : deduplicatedData;
+      }
+    );
+  }
+
+  function handleFallbackData() {
+    const fallbackData = queryClient?.getQueryData([
+      ...queryKey,
+      "olderData",
+    ]) as EventPacket[];
+
+    if (fallbackData && fallbackData.length > 0) {
+      console.log("フォールバックデータを使用");
+    }
+  }
 
   /**
-   * Load older events and move view down
+   * Navigation functions
    */
-  const loadOlderAndMoveDown = async () => {
+  async function loadOlderAndMoveDown() {
     if ($nowProgress) return;
 
     $nowProgress = true;
     let viewMoved = false;
 
     try {
-      // 十分なイベントがある場合は即座にビュー移動
-      if (currentEventCount >= requiredEventCount + SLIDE_AMOUNT) {
-        viewIndex += SLIDE_AMOUNT;
+      if (
+        timelineManager.currentEventCount >=
+        timelineManager.requiredEventCount + CONFIG.SLIDE_AMOUNT
+      ) {
+        viewIndex += CONFIG.SLIDE_AMOUNT;
         updateViewEvent();
         return;
       }
-      if (isLoadingOlderEvents) {
+
+      if (timelineManager.isLoadingOlderEvents) {
         console.log("前回のデータ取得が完了していません");
         return;
       }
-      isLoadingOlderEvents = true;
+
+      timelineManager.isLoadingOlderEvents = true;
+
       const fetchAmount =
-        requiredEventCount - currentEventCount + 6 * SLIDE_AMOUNT;
+        timelineManager.requiredEventCount -
+        timelineManager.currentEventCount +
+        6 * CONFIG.SLIDE_AMOUNT;
       const untilTime =
-        allUniqueEvents?.[allUniqueEvents.length - 1]?.created_at;
+        timelineManager.allUniqueEvents?.[
+          timelineManager.allUniqueEvents.length - 1
+        ]?.created_at;
 
       if (!untilTime) {
         console.warn("No existing events to determine untilTime");
         return;
       }
 
-      // インクリメンタル更新のハンドラー（途中データはqueryに入れない）
       const handleIncrementalData = (partialData: EventPacket[]) => {
         if (partialData.length === 0) return;
 
-        // console.log(`${partialData.length}件受信`);
-
-        // 途中データも含めて十分かチェック（queryデータ + 途中データ）
-        // この判定はupdateViewEvent内で計算された結果を使う必要があるかも
-        const totalCount = currentEventCount + partialData.length;
-        if (!viewMoved && totalCount >= viewIndex + amount + SLIDE_AMOUNT) {
-          viewIndex += SLIDE_AMOUNT;
+        const totalCount =
+          timelineManager.currentEventCount + partialData.length;
+        if (
+          !viewMoved &&
+          totalCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT
+        ) {
+          viewIndex += CONFIG.SLIDE_AMOUNT;
           viewMoved = true;
         }
-        updateViewEvent(partialData); // ビュー移動後に再更新
+        updateViewEvent(partialData);
       };
 
-      // 古いイベントを取得
       const olderEvents = await loadOlderEvents(
         fetchAmount,
         olderFilters,
@@ -425,74 +398,63 @@
         handleIncrementalData
       );
 
-      // 最終データをqueryに保存
       if (olderEvents.length > 0) {
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (oldData: EventPacket[] | undefined) => {
-            return sortEventPackets(
-              Array.from(
-                new Map(
-                  [...(oldData ?? []), ...olderEvents].map((packet) => [
-                    packet.event.id,
-                    packet,
-                  ])
-                ).values()
-              )
-            );
-          }
-        );
+        updateQueryDataForOlder(olderEvents);
       }
 
-      // // 最終チェック：まだ移動していない場合
       if (
         !viewMoved &&
-        allUniqueEvents?.length >= viewIndex + amount - 10 + SLIDE_AMOUNT
+        timelineManager.allUniqueEvents?.length >=
+          viewIndex + amount - 10 + CONFIG.SLIDE_AMOUNT
       ) {
-        viewIndex += SLIDE_AMOUNT;
+        viewIndex += CONFIG.SLIDE_AMOUNT;
       }
-
-      // console.log(`${olderEvents.length}件の追加イベントを取得完了`);
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
-      // 最終更新（途中データなし）
       updateViewEvent();
       $nowProgress = false;
-      isLoadingOlderEvents = false;
-      requiredEventCount = viewIndex + amount + SLIDE_AMOUNT;
+      timelineManager.isLoadingOlderEvents = false;
+      timelineManager.requiredEventCount =
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT;
     }
-  };
+  }
 
-  /**
-   * Move view up to more recent events
-   */
-  const moveUp = () => {
-    if (viewIndex > 0) {
-      // Slight scroll adjustment for better UX
-      scroll({
-        top: window.scrollY + 120,
-      });
+  function updateQueryDataForOlder(events: EventPacket[]) {
+    queryClient.setQueryData(
+      [...queryKey, "olderData"],
+      (oldData: EventPacket[] | undefined) => {
+        return sortEventPackets(
+          Array.from(
+            new Map(
+              [...(oldData ?? []), ...events].map((packet) => [
+                packet.event.id,
+                packet,
+              ])
+            ).values()
+          )
+        );
+      }
+    );
+  }
 
-      // Update view index with minimum of 0
-      viewIndex = Math.max(viewIndex - SLIDE_AMOUNT, 0);
+  function moveUp() {
+    if (viewIndex <= 0) return;
 
-      // Short delay to allow scroll to complete
-      setTimeout(() => {
-        updateViewEvent(deriveaData);
-      }, 100);
-    }
-  };
+    scroll({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
+    viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
 
-  /**
-   * Move view to the top (most recent events)
-   */
-  const moveToTop = () => {
+    setTimeout(() => {
+      updateViewEvent(deriveaData);
+    }, CONFIG.SCROLL_DELAY);
+  }
+
+  function moveToTop() {
     viewIndex = 0;
     updateViewEvent(deriveaData);
-  };
+  }
 
-  // Create query for older data
+  // Query for older data
   createQuery({
     queryKey: [...queryKey, "olderData"],
     queryFn: undefined,
@@ -502,14 +464,12 @@
     refetchOnMount: false,
   });
 
-  // Effects to handle data and state changes
+  // Effects
   $effect(() => {
-    // Update view when data changes or progress completes
     if ((deriveaData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => updateViewEvent(deriveaData));
     }
 
-    // Handle timeline filter changes
     if (timelineFilter.get()) {
       untrack(() => updateViewEvent(deriveaData));
       localStorage.setItem(
@@ -519,62 +479,62 @@
     }
   });
 
-  // Lifecycle hooks
+  // Lifecycle
   onMount(async () => {
-    if (!isOnMount) {
-      isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      isOnMount = false;
-      $nowProgress = false;
-    }
+    if (timelineManager.isOnMount) return;
+
+    timelineManager.isOnMount = true;
+    $nowProgress = true;
+    await initializeTimeline();
+    timelineManager.isOnMount = false;
+    $nowProgress = false;
   });
 
   afterNavigate(async (navigate) => {
-    if (navigate.type !== "form" && !isOnMount) {
-      isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      isOnMount = false;
-      $nowProgress = false;
-    }
+    if (navigate.type === "form" || timelineManager.isOnMount) return;
+
+    timelineManager.isOnMount = true;
+    $nowProgress = true;
+    await initializeTimeline();
+    timelineManager.isOnMount = false;
+    $nowProgress = false;
   });
 
   onDestroy(() => {
-    // Clean up resources if needed
     console.log("main timeline destroy");
-    destroyed = true;
+    timelineManager.destroyed = true;
   });
 </script>
 
 {#if viewIndex !== 0}
-  <div class=" w-full">
+  <div class="w-full">
     <button
-      class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => moveToTop()}
+      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      onclick={moveToTop}
       disabled={$nowProgress}
-      ><SkipForward
+    >
+      <SkipForward
         size={20}
         class="mx-auto -rotate-90 stroke-magnum-100 fill-magnum-100"
-      /></button
-    >
+      />
+    </button>
     <button
       disabled={$nowProgress}
       class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-      onclick={() => moveUp()}
-      ><Triangle
-        size={20}
-        class="mx-auto stroke-magnum-100 fill-magnum-100"
-      /></button
+      onclick={moveUp}
     >
+      <Triangle size={20} class="mx-auto stroke-magnum-100 fill-magnum-100" />
+    </button>
   </div>
 {/if}
-{#if lumiSetting.get().pubkey}<!--メニューのアイコンのとこがTLに自分が出てこないと取得されないけどMenuのとこにかいたらいつの時点から取得可能なのかわからなくてうまく取得できないからここにかいてみる…-->
+
+{#if lumiSetting.get().pubkey}
   <Metadata
     queryKey={["metadata", lumiSetting.get().pubkey]}
     pubkey={lumiSetting.get().pubkey}
   />
 {/if}
+
 {#if $errorData}
   {@render error?.($errorData)}
 {:else if displayEvents.get() && displayEvents.get().length > 0}
@@ -588,17 +548,15 @@
 {:else}
   {@render nodata?.()}
 {/if}
+
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
-    disabled={loadMoreDisabled}
-    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
-    onclick={() => loadOlderAndMoveDown()}
-    ><Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    />Load more<Triangle
-      size={20}
-      class="rotate-180 stroke-magnum-100 fill-magnum-100"
-    /></button
+    disabled={timelineManager.loadMoreDisabled}
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+    onclick={loadOlderAndMoveDown}
   >
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+    Load more
+    <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
+  </button>
 {/if}
