@@ -16,12 +16,14 @@ export const GET: RequestHandler = async ({ url: request }) => {
 
   let userAgent = "LumilumiOGPFetcher/1.0 (+https://lumilumi.app)";
 
-  // AmazonかTwitterドメインならfacebookexternalhitに切り替え
+  // AmazonかTwitterかSUNOドメインならfacebookexternalhitに切り替え
   if (
     host.includes("amazon.") ||
     host.includes("twitter.com") ||
     host.includes("x.com") ||
-    host.includes("t.co")
+    host.includes("t.co") ||
+    host.includes("suno.com") ||
+    host.includes("suno.ai")
   ) {
     userAgent = "facebookexternalhit";
   }
