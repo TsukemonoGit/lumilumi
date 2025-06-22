@@ -404,7 +404,7 @@
           timelineManager.updateCounts();
           const stillNotEnough =
             timelineManager.currentEventCount <
-            viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮
 
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
