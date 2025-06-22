@@ -14,16 +14,24 @@
   };
 
   const sunoDomains = ["suno.ai", "suno.com"];
+  const isSunoUrl = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      return sunoDomains.some(
+        (domain) =>
+          urlObj.hostname === domain || urlObj.hostname.endsWith(`.${domain}`)
+      );
+    } catch {
+      return false;
+    }
+  };
 </script>
 
 <OGP url={url ?? ""}
   >{#snippet renderContent(contents)}
-    {@const isSuno =
-      contents.player &&
-      sunoDomains.some((domain) => contents.player?.includes(domain))}
+    {@const isSuno = contents.player && isSunoUrl(contents.player)}
     {@const isSunoStream =
-      contents.playerStream &&
-      sunoDomains.some((domain) => contents.playerStream?.includes(domain))}
+      contents.playerStream && isSunoUrl(contents.playerStream)}
 
     {#if lumiSetting.get().embed && !error && contents.player && isSuno}
       <EmbedSuno url={contents.player} {onError} />
