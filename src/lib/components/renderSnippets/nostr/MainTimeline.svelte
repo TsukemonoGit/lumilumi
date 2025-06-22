@@ -362,10 +362,10 @@
       const hasEnoughStock =
         timelineManager.currentEventCount >=
         viewIndex + amount + CONFIG.SLIDE_AMOUNT;
-      console.log(
-        timelineManager.currentEventCount,
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT
-      );
+      // console.log(
+      //   timelineManager.currentEventCount,
+      //   viewIndex + amount + CONFIG.SLIDE_AMOUNT
+      // );
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
 
