@@ -1,6 +1,6 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
-import type { OperatorFunction } from "rxjs";
+import type { Observable, OperatorFunction } from "rxjs";
 import { filter, map, pipe, scan, tap } from "rxjs";
 import {
   metadataQueue,
@@ -101,7 +101,9 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   );
 }
 
-export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
+export function scanArray<A extends EventPacket>(
+  sift?: number
+): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
     const queryKey: QueryKey = ["timeline", a.event.id];
     // クエリデータの設定
@@ -127,7 +129,10 @@ export function scanArray<A extends EventPacket>(): OperatorFunction<A, A[]> {
 
     //insertEventPacketIntoDescendingList(acc, a)にしてみてたけどなんかめっちゃ遅くなったからソートに戻す
     const sorted = sortEventPackets([...acc, a]); //.sort((a, b) => b.event.created_at - a.event.created_at);
-
+    // siftが設定されている場合は指定された件数でちぎる
+    if (sift !== undefined) {
+      return sorted.slice(0, sift === 0 ? undefined : sift);
+    }
     return sorted;
   }, []);
 }
