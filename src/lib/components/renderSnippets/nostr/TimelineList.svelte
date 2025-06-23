@@ -29,13 +29,7 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
-  import { formatAbsoluteDate } from "$lib/func/util";
-
-  // Configuration constants
-  const SCROLL_AMOUNT = 40; // Amount to slide/scroll
-  const MAX_WAIT_TIME = 5000; // Maximum wait time for relay connections (10 seconds)
-  const BATCH_SIZE = 50; // Number of events to fetch per batch
-  const UPDATE_DELAY = 50; // Delay for update events to prevent continuous execution
+  import { formatAbsoluteDate, sortEventPackets } from "$lib/func/util";
 
   interface Props {
     queryKey: QueryKey;
@@ -53,9 +47,19 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    updateViewEvent?: (_data?: EventPacket[] | undefined | null) => void;
+    updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
     resetUniq?: () => void;
   }
+  // Constants
+  const CONFIG = {
+    SLIDE_AMOUNT: 40,
+    UPDATE_DELAY: 20,
+    LOAD_LIMIT: 50,
+    CONNECTION_TIMEOUT: 5000,
+    FUTURE_EVENT_TOLERANCE: 10,
+    SCROLL_ADJUSTMENT: 120,
+    SCROLL_DELAY: 100,
+  };
 
   let {
     queryKey,
@@ -75,6 +79,46 @@
     resetUniq = $bindable(),
   }: Props = $props();
 
+  // State management
+  class TimelineManager {
+    allUniqueEvents: Nostr.Event[] = $state([]);
+    updating = $state(false);
+    timeoutId: NodeJS.Timeout | null = null;
+    isOnMount = $state(false);
+    isLoadingOlderEvents = $state(false);
+    isUpdateScheduled = $state(false);
+    destroyed = $state(false);
+    currentEventCount = $state(0);
+    requiredEventCount = $state(0);
+
+    get loadMoreDisabled() {
+      // nowProgressまたは初期化中の場合は常に無効
+      if ($nowProgress || this.isOnMount) return true;
+
+      // 前回のデータ取得中の場合
+      if (this.isLoadingOlderEvents) {
+        // ストックが十分にある場合のみ有効
+        const hasEnoughStock =
+          this.currentEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+        return !hasEnoughStock;
+      }
+
+      return false;
+    }
+
+    reset() {
+      this.updating = false;
+      this.isUpdateScheduled = false;
+      $nowProgress = false;
+    }
+
+    updateCounts() {
+      this.currentEventCount = this.allUniqueEvents?.length || 0;
+      this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+    }
+  }
+
+  const timelineManager = new TimelineManager();
   // State variables
   let updating: boolean = false;
   let timeoutId: NodeJS.Timeout | null = null;
@@ -122,33 +166,96 @@
   let errorData = $derived(result.error);
 
   // Update the view with current events
-  updateViewEvent = (data: EventPacket[] | undefined | null = $globalData) => {
-    if (updating) return;
 
-    updating = true;
-    if (timeoutId) clearTimeout(timeoutId);
+  /**
+   * Update scheduling and execution
+   */
+  updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
+    if (timelineManager.isUpdateScheduled) return;
 
-    timeoutId = setTimeout(() => {
-      if (destroyed) {
-        updating = false;
-        $nowProgress = false;
+    timelineManager.isUpdateScheduled = true;
+
+    if (!timelineManager.updating) {
+      scheduleUpdate(partialdata || []);
+    }
+  };
+
+  function scheduleUpdate(partialdata?: EventPacket[]) {
+    if (timelineManager.timeoutId) {
+      clearTimeout(timelineManager.timeoutId);
+    }
+
+    timelineManager.timeoutId = setTimeout(() => {
+      if (timelineManager.destroyed) {
+        timelineManager.reset();
         return;
       }
-      const olderData: EventPacket[] | undefined =
-        queryClient.getQueryData(olderQueryKey);
-      const allEvents: EventPacket[] = [...(data || []), ...(olderData || [])];
+      processUpdate(partialdata);
+    }, CONFIG.UPDATE_DELAY);
+  }
+  /**
+   * Event deduplication and merging utility
+   */
+  function mergeEvents(
+    current: EventPacket[] | null | undefined,
+    older: EventPacket[] | undefined,
+    partial: EventPacket[] | undefined
+  ): EventPacket[] {
+    const allEvents = [
+      ...(current || []),
+      ...(older || []),
+      ...(partial || []),
+    ];
+    if (!partial || partial.length === 0) {
+      return allEvents;
+    }
+    const seen = new Set<string>();
 
-      allUniqueEvents = allEvents
+    return allEvents.filter((pk) => {
+      if (seen.has(pk.event.id)) return false;
+      seen.add(pk.event.id);
+      return true;
+    });
+  }
+  function processUpdate(partialdata?: EventPacket[]) {
+    try {
+      timelineManager.updating = true;
+
+      const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]);
+
+      const allEvents = mergeEvents($globalData, olderEvents, partialdata);
+
+      timelineManager.allUniqueEvents = allEvents
         .map((event) => event.event)
         .filter(eventFilter)
-        .filter((event) => event.created_at <= now() + 10); // Exclude future events (with small tolerance)
+        .filter(
+          (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+        );
 
-      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+      const startIndex = Math.max(0, viewIndex);
+      const endIndex = startIndex + amount;
 
-      updating = false;
+      displayEvents.set(
+        timelineManager.allUniqueEvents.slice(startIndex, endIndex)
+      );
+
+      timelineManager.isUpdateScheduled = false;
+    } catch (error) {
+      console.error("Error during update", error);
+      timelineManager.isUpdateScheduled = false;
+    } finally {
+      timelineManager.updating = false;
       $nowProgress = false;
-    }, UPDATE_DELAY);
-  };
+      timelineManager.updateCounts();
+
+      if (timelineManager.isUpdateScheduled) {
+        scheduleUpdate();
+      }
+    }
+  }
 
   function configureOperators() {
     return pipe(tie, uniq, scanArray());
@@ -184,7 +291,7 @@
   });
   $effect(() => {
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
-      untrack(() => dataChange($globalData, viewIndex, $nowProgress));
+      untrack(() => updateViewEvent());
     }
   });
 
@@ -197,17 +304,12 @@
     }
   }
 
-  // Handle data changes
-  function dataChange(
-    data: EventPacket[] | null | undefined,
-    index: number,
-    progress: boolean
-  ) {
-    if ((data && index >= 0) || !progress) {
-      updateViewEvent?.(data);
-    }
+  function createIncrementalHandler() {
+    return (partialData: EventPacket[]) => {
+      if (partialData.length === 0) return;
+      updateViewEvent(partialData);
+    };
   }
-
   // Initialize the component
   async function init() {
     updating = false;
@@ -222,17 +324,23 @@
           filters[0].until === undefined
             ? (filter.since ?? now())
             : filter.until,
-        limit: BATCH_SIZE,
+        limit: CONFIG.LOAD_LIMIT,
       }));
-
+      timelineManager.isLoadingOlderEvents = true;
       // Wait for relay connections before proceeding
-      await waitForConnections(readUrls, relayStateMap.get(), MAX_WAIT_TIME);
+      await waitForConnections(
+        readUrls,
+        relayStateMap.get(),
+        CONFIG.CONNECTION_TIMEOUT
+      );
+      const handleIncrementalData = createIncrementalHandler();
 
       const olderEvents = await firstLoadOlderEvents(
-        BATCH_SIZE,
+        CONFIG.LOAD_LIMIT,
         newFilters,
         tie,
-        relays
+        relays,
+        handleIncrementalData
       );
 
       if (olderEvents.length > 0) {
@@ -246,6 +354,7 @@
 
         setTimeout(() => {
           updateViewEvent?.($globalData);
+          timelineManager.isLoadingOlderEvents = false;
         }, 10);
       }
     }
@@ -274,66 +383,119 @@
 
   // UI action handlers
   const handleNext = async () => {
-    $nowProgress = true;
-    const untilTime = allUniqueEvents[allUniqueEvents.length - 1].created_at;
-    console.log(
-      "allUniqueEvents.length:",
-      allUniqueEvents.length,
-      formatAbsoluteDate(untilTime)
-    );
-    if (
-      !allUniqueEvents ||
-      allUniqueEvents.length < viewIndex + amount + SCROLL_AMOUNT
-    ) {
-      const requiredAmount =
-        viewIndex + amount - (allUniqueEvents?.length || 0) + 5 * SCROLL_AMOUNT;
+    if ($nowProgress) return;
 
-      // Using the freshly calculated untilTime
-      const globalolderEvents = await loadOlderEvents(
-        requiredAmount,
+    $nowProgress = true;
+    let viewMoved = false;
+
+    try {
+      const hasEnoughStock =
+        timelineManager.currentEventCount >=
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+      // console.log(
+      //   timelineManager.currentEventCount,
+      //   viewIndex + amount + CONFIG.SLIDE_AMOUNT
+      // );
+      if (hasEnoughStock) {
+        viewIndex += CONFIG.SLIDE_AMOUNT;
+
+        updateViewEvent();
+
+        return;
+      }
+
+      // 👇 ストック不足でリクエスト中なら return
+      if (timelineManager.isLoadingOlderEvents) {
+        console.log("前回のデータ取得が完了していません");
+        return;
+      }
+
+      // 👇 ストック不足でloadしても上限に満たなかったら中断
+      const untilTime =
+        timelineManager.allUniqueEvents?.[
+          timelineManager.allUniqueEvents.length - 1
+        ]?.created_at;
+
+      if (!untilTime) {
+        console.warn("No existing events to determine untilTime");
+        return;
+      }
+
+      timelineManager.isLoadingOlderEvents = true;
+
+      const fetchAmount = CONFIG.LOAD_LIMIT * 5;
+
+      const olderEvents = await loadOlderEvents(
+        fetchAmount,
         olderFilters,
         untilTime,
         tie,
-        relays
+        relays,
+        (partialData) => {
+          if (partialData.length === 0) return;
+
+          timelineManager.updateCounts();
+          const stillNotEnough =
+            timelineManager.currentEventCount <
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮
+
+          if (!viewMoved && !stillNotEnough) {
+            viewIndex += CONFIG.SLIDE_AMOUNT;
+            viewMoved = true;
+          }
+
+          updateViewEvent(partialData);
+        }
       );
 
-      if (globalolderEvents.length > 0) {
-        queryClient.setQueryData(
-          olderQueryKey,
-          (oldData: EventPacket[] | undefined) => {
-            const existingEvents = oldData ?? [];
-            const allPackets = [...existingEvents, ...globalolderEvents];
+      if (olderEvents.length > 0) {
+        updateQueryDataForOlder(olderEvents);
+      }
 
-            // Remove duplicates based on event ID
-            const uniqueEvents = Array.from(
-              new Map(
-                allPackets.map((packet) => [packet.event.id, packet])
-              ).values()
-            );
+      timelineManager.updateCounts();
 
-            // Sort events by timestamp
-            return uniqueEvents.sort(
-              (a, b) => b.event.created_at - a.event.created_at
-            );
-          }
+      // 👇 最後のチェック: ストック足りないなら移動しない
+      if (
+        !viewMoved &&
+        timelineManager.currentEventCount >=
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT
+      ) {
+        viewIndex += CONFIG.SLIDE_AMOUNT;
+
+        updateViewEvent();
+      }
+    } catch (error) {
+      console.error("loadOlderAndMoveDown error:", error);
+    } finally {
+      $nowProgress = false;
+      timelineManager.isLoadingOlderEvents = false;
+      timelineManager.updateCounts();
+    }
+  };
+  function updateQueryDataForOlder(events: EventPacket[]) {
+    queryClient.setQueryData(
+      [...queryKey, "olderData"],
+      (oldData: EventPacket[] | undefined) => {
+        return sortEventPackets(
+          Array.from(
+            new Map(
+              [...(oldData ?? []), ...events].map((packet) => [
+                packet.event.id,
+                packet,
+              ])
+            ).values()
+          )
         );
       }
-    }
-
-    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
-      viewIndex += SCROLL_AMOUNT;
-    }
-
-    updateViewEvent?.($globalData);
-  };
-
+    );
+  }
   const handlePrev = () => {
     if (viewIndex > 0) {
       scroll({
         top: window.scrollY + 120,
       });
 
-      viewIndex = Math.max(viewIndex - SCROLL_AMOUNT, 0);
+      viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
 
       setTimeout(() => {
         updateViewEvent?.($globalData);
