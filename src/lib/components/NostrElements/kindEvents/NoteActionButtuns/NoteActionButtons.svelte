@@ -130,7 +130,7 @@
     eventParam: Nostr.EventParameters,
     queryKey: QueryKey
   ) {
-    const result = await safePublishEvent(eventParam);
+    const result = await safePublishEvent($state.snapshot(eventParam));
     if ("errorCode" in result) {
       if (result.isCanceled) {
         return; // キャンセル時は何もしない
