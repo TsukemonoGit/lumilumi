@@ -30,6 +30,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
   import { formatAbsoluteDate, sortEventPackets } from "$lib/func/util";
+  import { page } from "$app/state";
 
   interface Props {
     queryKey: QueryKey;
@@ -111,14 +112,31 @@
       this.isUpdateScheduled = false;
       $nowProgress = false;
     }
-
+    fullReset() {
+      console.log("timelineManager full reset");
+      this.allUniqueEvents = [];
+      this.timeoutId = null;
+      this.isOnMount = false;
+      this.isLoadingOlderEvents = false;
+      this.destroyed = false;
+      this.currentEventCount = 0;
+      this.requiredEventCount = 0;
+      this.reset(); // 既存のresetメソッドを呼び出し
+    }
     updateCounts() {
       this.currentEventCount = this.allUniqueEvents?.length || 0;
       this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
     }
   }
 
-  const timelineManager = new TimelineManager();
+  $effect(() => {
+    // ユーザーIDが変更された時にリセット
+    if (page.params.userId) {
+      timelineManager.fullReset();
+    }
+  });
+
+  const timelineManager: TimelineManager = new TimelineManager();
 
   let isOnMount = false;
 
@@ -265,24 +283,6 @@
   resetUniq = () => {
     eventIds.clear();
   };
-  /**
-   * Registers the tie in the global store
-   */
-  /* function registerTie(key: string) {
-    //console.log($tieMapStore);
-    if (!key) return;
-
-    if (!$tieMapStore) {
-      // Create rx-nostr tie and uniq operator
-      [tie, tieMap] = createTie();
-      $tieMapStore = { [key]: [tie, tieMap] };
-    } else if (!$tieMapStore?.[key]) {
-      [tie, tieMap] = createTie();
-      $tieMapStore = { ...$tieMapStore, [key]: [tie, tieMap] };
-    } else {
-      [tie, tieMap] = $tieMapStore[key];
-    }
-  } */
 
   // Effect to handle reactive state changes
   $effect(() => {
@@ -311,6 +311,7 @@
       updateViewEvent(partialData);
     };
   }
+
   // Initialize the component
   async function init() {
     timelineManager.updating = false;
