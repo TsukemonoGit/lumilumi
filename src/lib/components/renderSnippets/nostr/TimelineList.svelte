@@ -119,17 +119,18 @@
   }
 
   const timelineManager = new TimelineManager();
-  // State variables
-  let updating: boolean = false;
-  let timeoutId: NodeJS.Timeout | null = null;
+
   let isOnMount = false;
-  let allUniqueEvents: Nostr.Event[];
+
   let readUrls: string[] = [];
   let olderQueryKey = $derived([...queryKey, "olderData"]);
-  let destroyed = false;
+
   onDestroy(() => {
     console.log("timeline destroy");
-    destroyed = true;
+    timelineManager.destroyed = true;
+    if (timelineManager.timeoutId) {
+      clearTimeout(timelineManager.timeoutId);
+    }
     // 他のクリーンアップ処理
   });
   // Create query for older data
@@ -312,7 +313,7 @@
   }
   // Initialize the component
   async function init() {
-    updating = false;
+    timelineManager.updating = false;
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
