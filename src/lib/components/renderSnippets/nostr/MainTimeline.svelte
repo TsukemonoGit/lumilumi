@@ -172,6 +172,9 @@
       ...(older || []),
       ...(partial || []),
     ];
+    if (!partial || partial.length === 0) {
+      return allEvents;
+    }
     const seen = new Set<string>();
 
     return allEvents.filter((pk) => {
