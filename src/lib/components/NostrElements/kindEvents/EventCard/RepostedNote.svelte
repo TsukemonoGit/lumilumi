@@ -31,6 +31,7 @@
 
 {#if tag[0] === "e"}
   <Note
+    relayhint={tag[2] ? [tag[2]] : undefined}
     id={tag[1]}
     {mini}
     {displayMenu}
