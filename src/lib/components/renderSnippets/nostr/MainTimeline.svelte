@@ -497,13 +497,11 @@
     if (typeof window !== "undefined") {
       window.scrollTo({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
     }
-    const previousViewIndex = viewIndex;
+
     viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
 
     // 履歴を更新
-    if (viewIndex !== previousViewIndex) {
-      updateHistoryState();
-    }
+    updateHistoryState();
 
     setTimeout(() => {
       updateViewEvent();
@@ -511,13 +509,12 @@
   }
 
   function moveToTop() {
-    const previousViewIndex = viewIndex;
     viewIndex = 0;
 
     // 履歴を更新
-    if (previousViewIndex !== 0) {
-      updateHistoryState();
-    }
+
+    updateHistoryState();
+
     updateViewEvent();
   }
 
