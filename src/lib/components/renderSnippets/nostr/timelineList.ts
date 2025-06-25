@@ -1,11 +1,13 @@
 // timelineList.ts
 
 import { usePromiseReq } from "$lib/func/nostr";
-import { displayEvents } from "$lib/stores/globalRunes.svelte";
+import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
 import { scanArray } from "$lib/stores/operators";
+import { defaultRelays } from "$lib/stores/stores";
 import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
 import { pipe, type OperatorFunction } from "rxjs";
+import { get } from "svelte/store";
 
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
@@ -121,17 +123,24 @@ export async function firstLoadOlderEvents(
   return olderEvents;
 }
 
+const getRelayUrls = () => {
+  const defo = get(defaultRelays);
+  if (!defo) return [];
+  return Object.values(defo)
+    .filter((config) => config.read)
+    .map((config) => config.url);
+};
+
 /**
  * Wait for sufficient relay connections before proceeding
- * @param readUrls - Array of relay URLs to connect to
- * @param relayStateMap - Map tracking the connection state of each relay
+
  * @param maxWaitTime - Maximum time to wait for connections in milliseconds
  */
 export async function waitForConnections(
-  readUrls: string[],
-  relayStateMap: Map<string, string>,
-  maxWaitTime: number
+  maxWaitTime: number = 5000
 ): Promise<void> {
+  const readUrls = getRelayUrls();
+  const stateMap = relayStateMap.get() as Map<string, string>;
   const normalizeUrl = (url: string) => url.replace(/\/$/, "");
   const normalizedReadUrls = readUrls.map(normalizeUrl);
   const startTime = Date.now();
@@ -141,7 +150,7 @@ export async function waitForConnections(
   // Function to check how many relays have reached a final connection state
   const getFinalStateRelayCount = (): number => {
     return normalizedReadUrls.filter((url) => {
-      const state = relayStateMap.get(normalizeUrl(url));
+      const state = stateMap.get(normalizeUrl(url));
       return state !== "initialize" && state !== "connecting";
     }).length;
   };

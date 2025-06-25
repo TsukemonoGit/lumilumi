@@ -8,7 +8,12 @@
   import { page } from "$app/state";
 
   // Store imports
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import {
+    defaultRelays,
+    nowProgress,
+    queryClient,
+    toastSettings,
+  } from "$lib/stores/stores";
 
   // Utility function imports
   import { usePromiseReq } from "$lib/func/nostr";
@@ -24,12 +29,14 @@
   import {
     followList,
     lumiSetting,
+    relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
 
   // Constants
-  const TIE_KEY = "global";
+  //const TIE_KEY = "global";
 
   // State variables
   let compRef: SvelteComponent | undefined = $state();
@@ -119,13 +126,15 @@
    * Fetches the global relay configuration from the user's data
    */
   const fetchGlobalRelayConfig = async () => {
+    if (!lumiSetting.get().pubkey) return;
+    await waitForConnections();
     // Check if we already have the data in cache
     const cachedData: string[] | undefined = queryClient.getQueryData([
       "globalRelay",
       lumiSetting.get().pubkey,
     ]);
 
-    if (cachedData) {
+    if (cachedData && cachedData.length > 0) {
       globalRelays = cachedData;
       return;
     }
