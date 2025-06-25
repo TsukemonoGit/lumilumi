@@ -15,7 +15,13 @@
     ogDescription,
     ogTitle,
   } from "$lib/stores/stores";
-  import { relaysReconnectChallenge, setRxNostr } from "$lib/func/nostr";
+  import {
+    relaysReconnectChallenge,
+    setRelays,
+    setRxNostr,
+    usePromiseReq,
+  } from "$lib/func/nostr";
+  import { pipe } from "rxjs";
   import { browser } from "$app/environment";
   import "../app.css";
 
@@ -36,7 +42,7 @@
     createNoopClient,
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
-  import { mediaUploader } from "$lib/func/constants";
+  import { LUMI_STORAGE_KEY, mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
 
   import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
@@ -49,6 +55,7 @@
   import {
     displayEvents,
     loginUser,
+    lumiSetting,
     showBanner,
     verifier,
   } from "$lib/stores/globalRunes.svelte";
@@ -59,6 +66,8 @@
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
   import "$lib/i18n/index.ts";
+  import { latest, type EventPacket } from "rx-nostr";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
 
   let { data, children } = $props<{
     data:
@@ -96,10 +105,29 @@
   onMount(async () => {
     document.addEventListener("nlAuth", (e: Event) => {
       const customEvent = e as CustomEvent;
-      loginUser.set(customEvent.detail.pubkey || "");
+      const pub = customEvent.detail.pubkey;
+
+      if (pub) {
+        loginUser.set(pub);
+        if (!lumiSetting.get().pubkey) {
+          lumiSetting.update((val) => {
+            return {
+              ...val,
+              pubkey: pub,
+            };
+          });
+          //設定ない人で公開鍵ログインされたらそれで設定保存する
+          localStorage.setItem(
+            LUMI_STORAGE_KEY,
+            JSON.stringify(lumiSetting.get())
+          );
+          setUserRelay();
+        }
+      }
       console.log(customEvent);
     });
     localStorage?.removeItem("preferred-locale");
+
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {
@@ -186,6 +214,35 @@
         )
       : undefined
   ); //data.relaysにちょっとしかなかったらデフォリレーから足す
+
+  //設定データない人で、nostr-loginに公開鍵セットされたら、デフォリレーを更新する
+  async function setUserRelay() {
+    const data: EventPacket[] | undefined = queryClient.getQueryData([
+      "defaultRelay",
+      lumiSetting.get().pubkey,
+    ]);
+    console.log(data);
+    if (data) {
+      // データがある場合はイベントの形を整えてセット
+      const relays = setRelaysByKind10002(data[0].event);
+      setRelays(relays);
+    } else {
+      const relays = await usePromiseReq(
+        {
+          filters: [
+            { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
+          ],
+          operator: pipe(latest()),
+        },
+        undefined,
+        undefined
+      );
+      console.log(relays);
+      if (relays) {
+        setRelays(setRelaysByKind10002(relays[0].event));
+      }
+    }
+  }
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
@@ -224,15 +281,15 @@
     {#snippet loading()}
       <!---->
     {/snippet}
-    {#snippet contents({ pubkey, localRelays })}
-      <SetDefaultRelays paramRelays={dataRelays} {pubkey} {localRelays}>
+    {#snippet contents({ localRelays })}
+      <SetDefaultRelays paramRelays={dataRelays} {localRelays}>
         {#snippet loading()}
           loading
         {/snippet}
 
         {#snippet error()}error
         {/snippet}
-        {#snippet contents({ relays, status })}
+        {#snippet contents()}
           <Header />
           <SetRepoReactions />
           <Menu />

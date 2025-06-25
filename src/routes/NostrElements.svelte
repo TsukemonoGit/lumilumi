@@ -7,7 +7,7 @@
 
   import { queryClient } from "$lib/stores/stores";
   import { afterNavigate } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import OpenPostWindow from "../lib/components/OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/zap";
@@ -30,11 +30,7 @@
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
-  const timelineQuery: QueryKey = [
-    "timeline",
-    "feed",
-    lumiSetting.get().pubkey,
-  ];
+  let timelineQuery: QueryKey = ["timeline", "feed", lumiSetting.get().pubkey];
 
   onMount(async () => {
     if (!isOnMount) {
@@ -53,10 +49,20 @@
       isOnMount = false;
     }
   });
-
+  $effect(() => {
+    if (lumiSetting.get().pubkey) {
+      untrack(async () => {
+        if (!isOnMount) {
+          isOnMount = true;
+          await init();
+          isOnMount = false;
+        }
+      });
+    }
+  });
   async function init() {
     since = undefined;
-
+    if (!lumiSetting.get().pubkey) return;
     const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
@@ -143,13 +149,6 @@
   // svelte-ignore non_reactive_update
   let updateViewEvent: () => void = () => {};
 
-  // timelineFilter.subscribe((value) => {
-  //   //設定が変わったら更新
-  //   if (value) {
-  //     updateViewEvent?.();
-  //   }
-  // });
-
   //kind0がTLに流れるのをあれするやつ
   const excludeKind0 = (note: Nostr.Event): boolean => {
     if (note.kind === 0) {
@@ -185,7 +184,7 @@
       <div><MakeNewKind3 /></div>
     {/snippet}
     {#snippet content({ contacts, status })}
-      {#if since}
+      {#if since && lumiSetting.get().pubkey}
         <MainTimeline
           queryKey={timelineQuery}
           filters={makeMainFilters(contacts, since).mainFilters}
@@ -202,7 +201,6 @@
         >
           {#snippet content({ events, len })}
             <!-- <SetRepoReactions /> -->
-
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >

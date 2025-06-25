@@ -32,7 +32,7 @@ export const monoZap = {
 
   relays: [
     "wss://nostr.mutinywallet.com",
-    "wss://bostr.nokotaro.com",
+    "wss://nos.lol",
     "wss://relay.nostr.band/",
     "wss://relay.nostr.wirednet.jp",
   ],
@@ -58,7 +58,7 @@ export const mediaUploader = [
   "https://nostpic.com",
   "https://yabu.me",
 ];
-
+export const LUMI_STORAGE_KEY = "lumiSetting";
 export const initSettings: LumiSetting = {
   relays: [],
   useRelaySet: "0",
@@ -69,17 +69,17 @@ export const initSettings: LumiSetting = {
     tag: [],
   },
   picQuarity: 100,
-  showImg: false,
+  showImg: true,
   embed: true,
   menuleft: false,
   showRelayIcon: false,
 
   showReactioninTL: true,
 
-  showUserStatus: false,
+  showUserStatus: true,
 
   showKind16: false,
-  addClientTag: false,
+  addClientTag: true,
   showAllReactions: false,
   kind42inTL: false,
   imageAutoExpand: "all", //画像自動展開ありなし
