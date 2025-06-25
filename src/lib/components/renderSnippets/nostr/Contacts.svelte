@@ -16,7 +16,6 @@
     RxReqPipeable,
   } from "rx-nostr";
   import { onMount, untrack } from "svelte";
-  import { get } from "svelte/store";
 
   interface Props {
     relays?: string[] | undefined;

@@ -17,7 +17,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
-    pubkey: string;
+    // pubkey: string;
     localRelays: DefaultRelayConfig[];
     paramRelays: string[] | undefined;
     req?:
@@ -39,7 +39,7 @@
   }
   let {
     req = undefined,
-    pubkey,
+    // pubkey,
     localRelays,
     paramRelays = undefined,
     // relayChange,
@@ -47,7 +47,7 @@
     loading,
     contents,
   }: Props = $props();
-
+  let pubkey = lumiSetting.get().pubkey;
   let queryKey = ["defaultRelay", pubkey];
   let filters = [
     // { authors: [pubkey], kinds: [3], limit: 1 },

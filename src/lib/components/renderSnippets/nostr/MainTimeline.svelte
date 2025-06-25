@@ -129,7 +129,9 @@
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
 
   // Query setup
-  const result = useMainTimeline(queryKey, configureOperators(), filters);
+  let result = $derived(
+    useMainTimeline(queryKey, configureOperators(), filters)
+  );
   const data = $derived(result.data);
   const status = $derived(result.status);
   const errorData = $derived(result.error);
@@ -513,7 +515,7 @@
 
   // Lifecycle
   onMount(async () => {
-    if (timelineManager.isOnMount) return;
+    if (timelineManager.isOnMount || !lumiSetting.get().pubkey) return;
 
     timelineManager.isOnMount = true;
     $nowProgress = true;
@@ -523,7 +525,12 @@
   });
 
   afterNavigate(async (navigate) => {
-    if (navigate.type === "form" || timelineManager.isOnMount) return;
+    if (
+      navigate.type === "form" ||
+      timelineManager.isOnMount ||
+      !lumiSetting.get().pubkey
+    )
+      return;
 
     timelineManager.isOnMount = true;
     $nowProgress = true;
@@ -537,6 +544,18 @@
     timelineManager.destroyed = true;
     if (timelineManager.timeoutId) {
       clearTimeout(timelineManager.timeoutId);
+    }
+  });
+  $effect(() => {
+    if (lumiSetting.get().pubkey) {
+      untrack(async () => {
+        console.log(filters);
+        timelineManager.isOnMount = true;
+        $nowProgress = true;
+        await initializeTimeline();
+        timelineManager.isOnMount = false;
+        $nowProgress = false;
+      });
     }
   });
 </script>

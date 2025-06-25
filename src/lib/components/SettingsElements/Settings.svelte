@@ -41,13 +41,13 @@
     initLumiMute,
     initLumiEmoji,
     initLumiMuteByKind,
+    LUMI_STORAGE_KEY,
   } from "$lib/func/constants";
   import { relayRegex2, npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
 
-  const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
@@ -116,7 +116,7 @@
   });
 
   function loadSettings() {
-    let savedSettings = localStorage.getItem(STORAGE_KEY);
+    let savedSettings = localStorage.getItem(LUMI_STORAGE_KEY);
     if (savedSettings) {
       try {
         const loadSet = JSON.parse(savedSettings);
@@ -177,7 +177,7 @@
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
     $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(LUMI_STORAGE_KEY, JSON.stringify(settings));
 
     $nowProgress = true;
     toastSettings.set({

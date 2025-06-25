@@ -8,17 +8,16 @@
     onlyFollowee,
   } from "$lib/stores/stores";
 
-  import { goto } from "$app/navigation";
+  //import { goto } from "$app/navigation";
   import { setRxNostr, setRelays } from "$lib/func/nostr";
   import type { DefaultRelayConfig } from "rx-nostr";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import type {
     LumiEmoji,
     LumiMute,
     LumiMuteByKind,
     LumiSetting,
   } from "$lib/types";
-  import { page } from "$app/state";
 
   import {
     initLumiEmoji,
@@ -39,14 +38,22 @@
   }: {
     loading: import("svelte").Snippet;
     contents: import("svelte").Snippet<
-      [{ pubkey: string; localRelays: DefaultRelayConfig[] }]
+      [{ /*  pubkey: string;  */ localRelays: DefaultRelayConfig[] }]
     >;
   } = $props();
 
   let localRelays: DefaultRelayConfig[] = $state.raw([]);
 
-  let pubkey: string = $state("");
+  /*  let pubkey: string = $state("");
+  $effect(() => {
+    const pub = lumiSetting.get().pubkey;
 
+    if (pub) {
+      untrack(() => {
+        pubkey = pub;
+      });
+    }
+  }); */
   let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
   onMount(async () => {
@@ -72,15 +79,15 @@
     if (savedSettings) {
       applySavedSettings(savedSettings);
     } else {
-      if (page.url.pathname === "/") {
-        //ホームに居るときだけ設定ないときは設定に飛ばす
-        goto("/settings");
-      } else {
-        //設定なし。閲覧モードのときは画像表示してみる
-        lumiSetting.update((cur) => {
+      // if (page.url.pathname === "/") {
+      //   //ホームに居るときだけ設定ないときは設定に飛ばす
+      //   goto("/settings");
+      // } else {
+      //設定なし。閲覧モードのときは画像表示してみる
+      /*    lumiSetting.update((cur) => {
           return { ...cur, showImg: true };
-        });
-      }
+        }); */
+      // }
     }
 
     nowLoading = false; // 初期化処理が完了したらローディングを終了
@@ -120,7 +127,6 @@
       localRelays = [];
       // setRelays(relaySearchRelays);
     }
-    pubkey = lumiSetting.get().pubkey;
   }
 
   function loadMutetokanoSettei() {
@@ -154,5 +160,5 @@
 {#if nowLoading}
   {@render loading()}
 {:else}
-  {@render contents({ pubkey, localRelays })}
+  {@render contents({ localRelays })}
 {/if}

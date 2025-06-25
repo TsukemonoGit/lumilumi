@@ -285,7 +285,7 @@
     "gotoSetting": "Go to Settings Page"
   },
   "setting": {
-    "pubkey": "Please set up pubkey on the Settings page"
+    "pubkey": "Please enter your public key on the settings page or log in via the Nostr banner in the top right."
   },
   "nip05": {
     "verify": "Verify",
