@@ -56,7 +56,7 @@
     SLIDE_AMOUNT: 40,
     UPDATE_DELAY: 20,
     LOAD_LIMIT: 50,
-    CONNECTION_TIMEOUT: 5000,
+
     FUTURE_EVENT_TOLERANCE: 10,
     SCROLL_ADJUSTMENT: 120,
     SCROLL_DELAY: 100,
@@ -330,11 +330,7 @@
       }));
       timelineManager.isLoadingOlderEvents = true;
       // Wait for relay connections before proceeding
-      await waitForConnections(
-        readUrls,
-        relayStateMap.get(),
-        CONFIG.CONNECTION_TIMEOUT
-      );
+      await waitForConnections();
       const handleIncrementalData = createIncrementalHandler();
 
       const olderEvents = await firstLoadOlderEvents(

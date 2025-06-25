@@ -30,11 +30,7 @@
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
-  import {
-    displayEvents,
-    lumiSetting,
-    relayStateMap,
-  } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const SLIDE_AMOUNT = 40; // Amount to slide when navigating
@@ -69,16 +65,6 @@
   let untilTime: number;
   let allUniqueNotifi: Nostr.Event[] = [];
   let isOnMount = false;
-
-  // Reactive declarations
-  let readUrls: string[] = $derived.by(() => {
-    if ($defaultRelays) {
-      return Object.values($defaultRelays)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
-    return [];
-  });
 
   // Create unique events filter
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -189,7 +175,7 @@
 
     try {
       // Wait for relay connections
-      await waitForConnections(readUrls, relayStateMap.get(), 5000);
+      await waitForConnections();
 
       // Load initial events
       const olderEvents = await usePromiseReq(
