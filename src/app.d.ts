@@ -18,6 +18,7 @@ declare global {
           currentIndex: number;
         };
       };
+      viewIndex?: number;
     }
   }
   /// <reference types="svelte" />

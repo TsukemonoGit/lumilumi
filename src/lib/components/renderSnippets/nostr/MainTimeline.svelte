@@ -37,6 +37,7 @@
 
   // Types
   import type { ReqStatus } from "$lib/types";
+  import { replaceState } from "$app/navigation";
 
   // Constants
   const CONFIG = {
@@ -52,8 +53,7 @@
     queryKey: QueryKey;
     filters: Nostr.Filter[];
     olderFilters: Nostr.Filter[];
-    viewIndex: number;
-    amount: number;
+
     relays?: string[] | undefined;
     eventFilter: (event: Nostr.Event) => boolean;
     error?: import("svelte").Snippet<[Error]>;
@@ -69,8 +69,7 @@
     queryKey,
     filters,
     olderFilters,
-    viewIndex = $bindable(),
-    amount,
+
     relays = undefined,
     eventFilter = () => true,
     error,
@@ -79,7 +78,8 @@
     content,
     updateViewEvent = $bindable(),
   }: Props = $props();
-
+  let viewIndex = $state(0);
+  const amount = 50;
   // State management
   class TimelineManager {
     allUniqueEvents: Nostr.Event[] = $state([]);
@@ -256,15 +256,35 @@
    * Timeline initialization
    */
   async function initializeTimeline() {
+    const urlParams =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const savedViewIndex = urlParams?.get("idx");
     try {
       const existingEvents: EventPacket[] | undefined =
         queryClient?.getQueryData([...queryKey, "olderData"]);
 
       if (existingEvents && existingEvents.length > 0) {
         console.log(`既存データ${existingEvents.length}件を使用`);
+        //  updateViewEvent();
+
+        //ページ復元
+        const allLen = [...($data || []), ...existingEvents].length;
+
+        if (savedViewIndex && allLen > parseInt(savedViewIndex, 10) + amount) {
+          viewIndex = parseInt(savedViewIndex, 10);
+          console.log(viewIndex);
+        } else {
+          updateHistoryState();
+        }
+
         updateViewEvent();
         return;
       }
+      //ページ復元
+
+      updateHistoryState();
 
       timelineManager.isLoadingOlderEvents = true;
 
@@ -357,7 +377,7 @@
 
     $nowProgress = true;
     let viewMoved = false;
-
+    //const previousViewIndex = viewIndex; // 元の位置を保存
     try {
       const hasEnoughStock =
         timelineManager.currentEventCount >=
@@ -368,6 +388,9 @@
       // );
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
+        // viewIndexが変更された場合のみ履歴を更新
+
+        updateHistoryState();
 
         updateViewEvent();
 
@@ -411,6 +434,10 @@
 
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
+            // viewIndexが変更された場合のみ履歴を更新
+
+            updateHistoryState();
+
             viewMoved = true;
           }
 
@@ -431,6 +458,9 @@
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
+        // viewIndexが変更された場合のみ履歴を更新
+
+        updateHistoryState();
 
         updateViewEvent();
       }
@@ -467,7 +497,13 @@
     if (typeof window !== "undefined") {
       window.scrollTo({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
     }
+    const previousViewIndex = viewIndex;
     viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
+
+    // 履歴を更新
+    if (viewIndex !== previousViewIndex) {
+      updateHistoryState();
+    }
 
     setTimeout(() => {
       updateViewEvent();
@@ -475,7 +511,13 @@
   }
 
   function moveToTop() {
+    const previousViewIndex = viewIndex;
     viewIndex = 0;
+
+    // 履歴を更新
+    if (previousViewIndex !== 0) {
+      updateHistoryState();
+    }
     updateViewEvent();
   }
 
@@ -553,6 +595,19 @@
       });
     }
   });
+
+  // 履歴管理用の関数（replaceStateのみ使用）
+  function updateHistoryState() {
+    if (typeof window !== "undefined") {
+      const currentUrl = new URL(window.location.href);
+      if (viewIndex === 0) {
+        currentUrl.searchParams.delete("idx");
+      } else {
+        currentUrl.searchParams.set("idx", viewIndex.toString());
+      }
+      replaceState(currentUrl.toString(), { viewIndex });
+    }
+  }
 </script>
 
 {#if viewIndex !== 0}

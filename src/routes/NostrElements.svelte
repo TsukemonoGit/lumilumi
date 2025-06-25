@@ -25,9 +25,6 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
 
-  let amount = 50; //1ページに表示する量
-  let viewIndex = 0;
-
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   let timelineQuery: QueryKey = ["timeline", "feed", lumiSetting.get().pubkey];
@@ -189,8 +186,6 @@
           queryKey={timelineQuery}
           filters={makeMainFilters(contacts, since).mainFilters}
           olderFilters={makeMainFilters(contacts, since).olderFilters}
-          {viewIndex}
-          {amount}
           eventFilter={(note) => {
             return (
               checkCanvasation(note, timelineFilter.get().selectCanversation) &&
