@@ -381,5 +381,10 @@
     "cancel": "署名がキャンセルされました",
     "signFailed": "イベントの署名に失敗しました",
     "publishFailed": "イベントの公開に失敗しました"
+  },
+  "process": {
+    "chunk": "チャンク",
+    "merging": "統合中",
+    "processing": "処理中"
   }
 }

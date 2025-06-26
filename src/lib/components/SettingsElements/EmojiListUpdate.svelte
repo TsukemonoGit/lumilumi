@@ -200,13 +200,13 @@
     </div>
     <div class="mt-2 text-sm text-center text-gray-700 dark:text-gray-300">
       {#if progressState.details.chunkCount || 0 > 0}
-        チャンク {progressState.details.currentChunk}/{progressState.details
-          .chunkCount}
+        {$_("process.chunk")}
+        {progressState.details.currentChunk}/{progressState.details.chunkCount}
       {:else if progressState.details.totalEmojis || 0 > 0}
-        統合中... ({progressState.details.processedCount}/{progressState.details
-          .totalEmojis})
+        {$_("process.merging")}... ({progressState.details
+          .processedCount}/{progressState.details.totalEmojis})
       {:else}
-        処理中...
+        {$_("process.processing")}...
       {/if}
     </div>
   </div>
