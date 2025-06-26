@@ -356,50 +356,37 @@ export async function encryptPrvTags(
   }
 }
 
-// export async function migrateSettings() {
-//   const STORAGE_KEY = "lumiSetting";
-//   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
-//   const lumiMute_STORAGE_KEY = "lumiMute";
-//   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
-//   let savedSettings = localStorage.getItem(STORAGE_KEY);
+export interface ProgressDetails {
+  chunkCount?: number;
+  directEmojiCount?: number;
+  filterCount?: number;
+  processedCount?: number;
+  currentChunk?: number;
+  chunkResultCount?: number;
+  totalEmojis?: number;
+}
 
-//   if (!savedSettings) return;
+export type ProgressCallback = (
+  current: number,
+  total: number,
 
-//   const settings: LumiSetting = JSON.parse(savedSettings);
-
-//   // LumiEmojiを別のキーに移動
-//   if (settings.emoji) {
-//     localStorage.setItem(lumiEmoji_STORAGE_KEY, JSON.stringify(settings.emoji));
-//     delete settings.emoji; // lumisettingから削除
-//   }
-
-//   // LumiMuteを別のキーに移動
-//   if (settings.mute) {
-//     localStorage.setItem(lumiMute_STORAGE_KEY, JSON.stringify(settings.mute));
-//     delete settings.mute; // lumisettingから削除
-//   }
-
-//   // LumiMuteByKindを別のキーに移動
-//   if (settings.mutebykinds) {
-//     localStorage.setItem(
-//       lumiMuteByKind_STORAGE_KEY,
-//       JSON.stringify(settings.mutebykinds)
-//     );
-//     delete settings.mutebykinds; // lumisettingから削除
-//   }
-
-//   // 変更後の設定を再保存
-//   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-
-//   console.log("Settings migration completed.");
-// }
+  details?: ProgressDetails
+) => void;
 
 export async function createEmojiListFrom10030(
   event: Nostr.Event,
   rxNostr: RxNostr | undefined = undefined,
-  relays: DefaultRelayConfig[] | undefined = undefined
+  relays: DefaultRelayConfig[] | undefined = undefined,
+  onProgress?: ProgressCallback
 ): Promise<string[][]> {
-  //10030に直emojiになってるやつをまずlistに追加
+  // 進捗報告用の総ステップ数を計算
+  let currentStep = 1;
+  const baseSteps = 6; // 基本ステップ数
+
+  // ステップ1: 直接の絵文字を抽出
+  onProgress?.(++currentStep, baseSteps, {
+    directEmojiCount: 0,
+  });
   let list: string[][] = event.tags.reduce(
     (acc: string[][], [tag, shortcode, url]) => {
       if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
@@ -411,7 +398,11 @@ export async function createEmojiListFrom10030(
     []
   );
 
-  //10030のatagたちをフィルターにする
+  onProgress?.(currentStep, baseSteps, {
+    directEmojiCount: list.length,
+  });
+
+  // ステップ2: 10030のatagたちをフィルターにする
   const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
     event.tags as string[][]
   ).reduce((acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
@@ -440,21 +431,74 @@ export async function createEmojiListFrom10030(
     20
   );
 
-  // 全てのチャンクを並列で処理する
-  const pkListArray = await Promise.all(
-    chunkedFilters.map((chunk) => getNaddrEmojiList(rxNostr, chunk, relays))
-  );
-  if (pkListArray.length > 0) {
-    //重複しないように整える
+  // 総ステップ数を再計算（チャンク数を含む）
+  const totalSteps = baseSteps + chunkedFilters.length;
 
+  onProgress?.(++currentStep, totalSteps, {
+    filterCount: naddrFilters.length,
+    chunkCount: chunkedFilters.length,
+  });
+
+  // ステップ3: 全てのチャンクを個別に処理する
+  onProgress?.(++currentStep, totalSteps, {
+    chunkCount: chunkedFilters.length,
+    processedCount: 0,
+  });
+
+  const pkListArray: any[][] = [];
+
+  // 各チャンクを順次処理して進捗を詳細に表示
+  for (let i = 0; i < chunkedFilters.length; i++) {
+    const chunk = chunkedFilters[i];
+
+    // チャンク処理開始の進捗報告
+    onProgress?.(currentStep + i, totalSteps, {
+      chunkCount: chunkedFilters.length,
+      processedCount: i,
+      currentChunk: i + 1,
+    });
+
+    try {
+      const chunkResult = await getNaddrEmojiList(rxNostr, chunk, relays);
+      pkListArray.push(chunkResult);
+
+      // チャンク完了の進捗報告
+      onProgress?.(
+        currentStep + i + 1,
+        totalSteps,
+
+        {
+          chunkCount: chunkedFilters.length,
+          processedCount: i + 1,
+          currentChunk: i + 1,
+          chunkResultCount: chunkResult.length,
+        }
+      );
+    } catch (error) {
+      console.error(`チャンク ${i + 1} の処理でエラー:`, error);
+      pkListArray.push([]); // エラーの場合は空配列を追加
+    }
+  }
+
+  // currentStepを更新
+  currentStep += chunkedFilters.length;
+
+  // ステップ4: 結果を統合
+  onProgress?.(++currentStep, totalSteps, {
+    processedCount: pkListArray.flat().length,
+  });
+
+  if (pkListArray.length > 0) {
     // フラット化して一つの配列にする
     const flattenedList = pkListArray.flat();
 
     // dtag をキーとして最新のイベントをマップに格納
-    const latestEventsMap = new Map<string, EventPacket>();
+    const latestEventsMap = new Map<string, any>();
 
     flattenedList.forEach((packet) => {
-      const dTag = packet.event.tags.find((tag) => tag[0] === "d")?.[1];
+      const dTag = packet.event.tags.find(
+        (tag: string[]) => tag[0] === "d"
+      )?.[1];
       if (dTag) {
         const existingEvent = latestEventsMap.get(dTag);
         if (
@@ -472,7 +516,7 @@ export async function createEmojiListFrom10030(
       const event = Array.from(latestEventsMap.values()).find((pk) => {
         const kind = pk.event.kind;
         const pubkey = pk.event.pubkey;
-        const dTag = pk.event.tags.find((tag) => tag[0] === "d")?.[1];
+        const dTag = pk.event.tags.find((tag: string[]) => tag[0] === "d")?.[1];
         return `${kind}:${pubkey}:${dTag}` === id;
       });
       return event;
@@ -483,17 +527,36 @@ export async function createEmojiListFrom10030(
       if (pk && pk.event) {
         list = [
           ...list,
-          ...pk.event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
-            if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-              return [...acc, [shortcode, url]];
-            } else {
-              return acc;
-            }
-          }, []),
+          ...pk.event.tags.reduce(
+            (acc: string[][], [tag, shortcode, url]: string[]) => {
+              if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+                return [...acc, [shortcode, url]];
+              } else {
+                return acc;
+              }
+            },
+            []
+          ),
         ];
       }
     });
   }
+  // console.log(totalSteps, totalSteps, {
+  //   directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
+  //   filterCount: naddrFilters.length,
+  //   chunkCount: chunkedFilters.length,
+  //   processedCount: pkListArray.flat().length,
+  //   totalEmojis: list.length,
+  // });
+  // 最終ステップ: 完了
+  onProgress?.(totalSteps, totalSteps, {
+    directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
+    filterCount: naddrFilters.length,
+    chunkCount: chunkedFilters.length,
+    processedCount: pkListArray.flat().length,
+    totalEmojis: list.length,
+  });
+
   return list;
 }
 

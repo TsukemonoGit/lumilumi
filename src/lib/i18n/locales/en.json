@@ -381,5 +381,10 @@
     "signFailed": "Failed to sign event",
     "cancel": "Signature was canceled by user",
     "publishFailed": "Failed to publish event"
+  },
+  "process": {
+    "chunk": "Chunk",
+    "merging": "Merging",
+    "processing": "Processing"
   }
 }
