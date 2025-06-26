@@ -355,7 +355,6 @@ export async function encryptPrvTags(
     return undefined;
   }
 }
-
 export interface ProgressDetails {
   chunkCount?: number;
   directEmojiCount?: number;
@@ -372,77 +371,60 @@ export type ProgressCallback = (
   details?: ProgressDetails
 ) => void;
 
-export async function createEmojiListFrom10030(
-  event: Nostr.Event,
-  rxNostr: RxNostr | undefined = undefined,
-  relays: DefaultRelayConfig[] | undefined = undefined,
-  onProgress?: ProgressCallback
-): Promise<string[][]> {
-  // ステップ1: 直接の絵文字を抽出
-  onProgress?.(1, 4, {
-    directEmojiCount: 0,
-  });
+interface FilterWithId {
+  id: string;
+  filter: Nostr.Filter;
+}
 
-  let list: string[][] = event.tags.reduce(
-    (acc: string[][], [tag, shortcode, url]) => {
-      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-        return [...acc, [shortcode, url]];
-      } else {
-        return acc;
+// 直接の絵文字を抽出
+function extractDirectEmojis(event: Nostr.Event): string[][] {
+  return event.tags.reduce((acc: string[][], [tag, shortcode, url]) => {
+    if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+      return [...acc, [shortcode, url]];
+    }
+    return acc;
+  }, []);
+}
+
+// aタグからフィルターを作成
+function createNaddrFilters(event: Nostr.Event): FilterWithId[] {
+  return (event.tags as string[][]).reduce(
+    (acc: FilterWithId[], [tag, value]) => {
+      console.log(tag, value);
+      if (tag === "a") {
+        const matches = value.match(nip33Regex);
+        console.log(matches);
+        if (matches) {
+          const filter: Nostr.Filter = {
+            kinds: [Number(matches[1])],
+            authors: [matches[2]],
+            "#d": [matches[3]],
+            limit: 1,
+          };
+          acc.push({ id: value, filter });
+        }
       }
+      return acc;
     },
     []
   );
+}
 
-  onProgress?.(1, 4, {
-    directEmojiCount: list.length,
-  });
-
-  // ステップ2: 10030のatagたちをフィルターにする
-  const naddrFilters: { id: string; filter: Nostr.Filter }[] = (
-    event.tags as string[][]
-  ).reduce((acc: { id: string; filter: Nostr.Filter }[], [tag, value]) => {
-    console.log(tag, value);
-    if (tag === "a") {
-      const matches = value.match(nip33Regex);
-      console.log(matches);
-      if (matches) {
-        const filter: Nostr.Filter = {
-          kinds: [Number(matches[1])],
-          authors: [matches[2]],
-          "#d": [matches[3]],
-          limit: 1,
-        };
-
-        // フィルタを結果に追加
-        acc.push({ id: value, filter: filter });
-      }
-    }
-    return acc;
-  }, [] as { id: string; filter: Nostr.Filter }[]);
-
-  console.log(naddrFilters);
-  const chunkedFilters = chunkArray(
-    naddrFilters.map((fil) => fil.filter),
-    20
-  );
-
-  onProgress?.(2, 4, {
-    filterCount: naddrFilters.length,
-    chunkCount: chunkedFilters.length,
-  });
-
-  // ステップ3: 全てのチャンクを並列処理する
+// チャンクを並列処理
+async function processChunksInParallel(
+  chunkedFilters: Nostr.Filter[][],
+  rxNostr: RxNostr | undefined,
+  relays: DefaultRelayConfig[] | undefined,
+  onProgress?: ProgressCallback
+): Promise<any[][]> {
   let completedChunks = 0;
 
-  // 並列処理で全チャンクを処理
-  const pkListArray: any[][] = await Promise.all(
+  return Promise.all(
     chunkedFilters.map(async (chunk, i) => {
       try {
         const chunkResult = await getNaddrEmojiList(rxNostr, chunk, relays);
-
-        // 完了したチャンクをカウント
         completedChunks++;
+
         onProgress?.(3, 4, {
           chunkCount: chunkedFilters.length,
           processedCount: completedChunks,
@@ -454,77 +436,133 @@ export async function createEmojiListFrom10030(
       } catch (error) {
         console.error(`チャンク ${i + 1} の処理でエラー:`, error);
         completedChunks++;
+
         onProgress?.(3, 4, {
           chunkCount: chunkedFilters.length,
           processedCount: completedChunks,
           currentChunk: completedChunks,
           chunkResultCount: 0,
         });
-        return []; // エラーの場合は空配列を返す
+
+        return [];
       }
     })
   );
+}
 
-  // ステップ4: 結果を統合
-  onProgress?.(4, 4, {
-    processedCount: pkListArray.flat().length,
+// イベントから絵文字を抽出
+function extractEmojisFromEvent(event: any): string[][] {
+  return event.tags.reduce(
+    (acc: string[][], [tag, shortcode, url]: string[]) => {
+      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
+        return [...acc, [shortcode, url]];
+      }
+      return acc;
+    },
+    []
+  );
+}
+
+// 最新のイベントのマップを作成
+function createLatestEventsMap(flattenedList: any[]): Map<string, any> {
+  const latestEventsMap = new Map<string, any>();
+
+  flattenedList.forEach((packet) => {
+    const dTag = packet.event.tags.find((tag: string[]) => tag[0] === "d")?.[1];
+    if (dTag) {
+      const existingEvent = latestEventsMap.get(dTag);
+      if (
+        !existingEvent ||
+        packet.event.created_at > existingEvent.event.created_at
+      ) {
+        latestEventsMap.set(dTag, packet);
+      }
+    }
   });
 
-  if (pkListArray.length > 0) {
-    // フラット化して一つの配列にする
-    const flattenedList = pkListArray.flat();
+  return latestEventsMap;
+}
 
-    // dtag をキーとして最新のイベントをマップに格納
-    const latestEventsMap = new Map<string, any>();
-
-    flattenedList.forEach((packet) => {
-      const dTag = packet.event.tags.find(
-        (tag: string[]) => tag[0] === "d"
-      )?.[1];
-      if (dTag) {
-        const existingEvent = latestEventsMap.get(dTag);
-        if (
-          !existingEvent ||
-          packet.event.created_at > existingEvent.event.created_at
-        ) {
-          latestEventsMap.set(dTag, packet);
-        }
-      }
+// フィルターに対応するイベントを取得
+function getSortedEvents(
+  naddrFilters: FilterWithId[],
+  latestEventsMap: Map<string, any>
+): any[] {
+  return naddrFilters.map((filter) => {
+    const id = filter.id;
+    return Array.from(latestEventsMap.values()).find((pk) => {
+      const kind = pk.event.kind;
+      const pubkey = pk.event.pubkey;
+      const dTag = pk.event.tags.find((tag: string[]) => tag[0] === "d")?.[1];
+      return `${kind}:${pubkey}:${dTag}` === id;
     });
+  });
+}
 
-    // 各チャンクの結果を結合する
-    const sortedLatestEvents = naddrFilters.map((filter) => {
-      const id = filter.id;
-      const event = Array.from(latestEventsMap.values()).find((pk) => {
-        const kind = pk.event.kind;
-        const pubkey = pk.event.pubkey;
-        const dTag = pk.event.tags.find((tag: string[]) => tag[0] === "d")?.[1];
-        return `${kind}:${pubkey}:${dTag}` === id;
-      });
-      return event;
-    });
-
-    // 各チャンクの結果を結合する
-    sortedLatestEvents.forEach((pk) => {
-      if (pk && pk.event) {
-        list = [
-          ...list,
-          ...pk.event.tags.reduce(
-            (acc: string[][], [tag, shortcode, url]: string[]) => {
-              if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-                return [...acc, [shortcode, url]];
-              } else {
-                return acc;
-              }
-            },
-            []
-          ),
-        ];
-      }
-    });
+// 結果を統合
+function mergeResults(
+  pkListArray: any[][],
+  naddrFilters: FilterWithId[]
+): string[][] {
+  if (pkListArray.length === 0) {
+    return [];
   }
 
-  // 最終ステップ: 完了
+  const flattenedList = pkListArray.flat();
+  const latestEventsMap = createLatestEventsMap(flattenedList);
+  const sortedLatestEvents = getSortedEvents(naddrFilters, latestEventsMap);
+
+  return sortedLatestEvents.reduce((acc: string[][], pk) => {
+    if (pk?.event) {
+      const emojis = extractEmojisFromEvent(pk.event);
+      return [...acc, ...emojis];
+    }
+    return acc;
+  }, []);
+}
+
+export async function createEmojiListFrom10030(
+  event: Nostr.Event,
+  rxNostr: RxNostr | undefined = undefined,
+  relays: DefaultRelayConfig[] | undefined = undefined,
+  onProgress?: ProgressCallback
+): Promise<string[][]> {
+  // ステップ1: 直接の絵文字を抽出
+  onProgress?.(1, 4, { directEmojiCount: 0 });
+
+  let list = extractDirectEmojis(event);
+
+  onProgress?.(1, 4, { directEmojiCount: list.length });
+
+  // ステップ2: aタグからフィルターを作成
+  const naddrFilters = createNaddrFilters(event);
+  console.log(naddrFilters);
+
+  const chunkedFilters = chunkArray(
+    naddrFilters.map((fil) => fil.filter),
+    20
+  );
+
+  onProgress?.(2, 4, {
+    filterCount: naddrFilters.length,
+    chunkCount: chunkedFilters.length,
+  });
+
+  // ステップ3: 全てのチャンクを並列処理
+  const pkListArray = await processChunksInParallel(
+    chunkedFilters,
+    rxNostr,
+    relays,
+    onProgress
+  );
+
+  // ステップ4: 結果を統合
+  onProgress?.(4, 4, { processedCount: pkListArray.flat().length });
+
+  const mergedEmojis = mergeResults(pkListArray, naddrFilters);
+  list = [...list, ...mergedEmojis];
+
+  // 最終レポート
   onProgress?.(4, 4, {
     directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
     filterCount: naddrFilters.length,
