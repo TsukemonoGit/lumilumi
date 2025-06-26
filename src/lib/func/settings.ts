@@ -369,7 +369,6 @@ export interface ProgressDetails {
 export type ProgressCallback = (
   current: number,
   total: number,
-
   details?: ProgressDetails
 ) => void;
 
@@ -379,14 +378,11 @@ export async function createEmojiListFrom10030(
   relays: DefaultRelayConfig[] | undefined = undefined,
   onProgress?: ProgressCallback
 ): Promise<string[][]> {
-  // 進捗報告用の総ステップ数を計算
-  let currentStep = 1;
-  const baseSteps = 6; // 基本ステップ数
-
   // ステップ1: 直接の絵文字を抽出
-  onProgress?.(++currentStep, baseSteps, {
+  onProgress?.(1, 4, {
     directEmojiCount: 0,
   });
+
   let list: string[][] = event.tags.reduce(
     (acc: string[][], [tag, shortcode, url]) => {
       if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
@@ -398,7 +394,7 @@ export async function createEmojiListFrom10030(
     []
   );
 
-  onProgress?.(currentStep, baseSteps, {
+  onProgress?.(1, 4, {
     directEmojiCount: list.length,
   });
 
@@ -431,60 +427,46 @@ export async function createEmojiListFrom10030(
     20
   );
 
-  // 総ステップ数を再計算（チャンク数を含む）
-  const totalSteps = baseSteps + chunkedFilters.length;
-
-  onProgress?.(++currentStep, totalSteps, {
+  onProgress?.(2, 4, {
     filterCount: naddrFilters.length,
     chunkCount: chunkedFilters.length,
   });
 
-  // ステップ3: 全てのチャンクを個別に処理する
-  onProgress?.(++currentStep, totalSteps, {
-    chunkCount: chunkedFilters.length,
-    processedCount: 0,
-  });
+  // ステップ3: 全てのチャンクを並列処理する
+  let completedChunks = 0;
 
-  const pkListArray: any[][] = [];
+  // 並列処理で全チャンクを処理
+  const pkListArray: any[][] = await Promise.all(
+    chunkedFilters.map(async (chunk, i) => {
+      try {
+        const chunkResult = await getNaddrEmojiList(rxNostr, chunk, relays);
 
-  // 各チャンクを順次処理して進捗を詳細に表示
-  for (let i = 0; i < chunkedFilters.length; i++) {
-    const chunk = chunkedFilters[i];
-
-    // チャンク処理開始の進捗報告
-    onProgress?.(currentStep + i, totalSteps, {
-      chunkCount: chunkedFilters.length,
-      processedCount: i,
-      currentChunk: i + 1,
-    });
-
-    try {
-      const chunkResult = await getNaddrEmojiList(rxNostr, chunk, relays);
-      pkListArray.push(chunkResult);
-
-      // チャンク完了の進捗報告
-      onProgress?.(
-        currentStep + i + 1,
-        totalSteps,
-
-        {
+        // 完了したチャンクをカウント
+        completedChunks++;
+        onProgress?.(3, 4, {
           chunkCount: chunkedFilters.length,
-          processedCount: i + 1,
-          currentChunk: i + 1,
+          processedCount: completedChunks,
+          currentChunk: completedChunks,
           chunkResultCount: chunkResult.length,
-        }
-      );
-    } catch (error) {
-      console.error(`チャンク ${i + 1} の処理でエラー:`, error);
-      pkListArray.push([]); // エラーの場合は空配列を追加
-    }
-  }
+        });
 
-  // currentStepを更新
-  currentStep += chunkedFilters.length;
+        return chunkResult;
+      } catch (error) {
+        console.error(`チャンク ${i + 1} の処理でエラー:`, error);
+        completedChunks++;
+        onProgress?.(3, 4, {
+          chunkCount: chunkedFilters.length,
+          processedCount: completedChunks,
+          currentChunk: completedChunks,
+          chunkResultCount: 0,
+        });
+        return []; // エラーの場合は空配列を返す
+      }
+    })
+  );
 
   // ステップ4: 結果を統合
-  onProgress?.(++currentStep, totalSteps, {
+  onProgress?.(4, 4, {
     processedCount: pkListArray.flat().length,
   });
 
@@ -541,15 +523,9 @@ export async function createEmojiListFrom10030(
       }
     });
   }
-  // console.log(totalSteps, totalSteps, {
-  //   directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
-  //   filterCount: naddrFilters.length,
-  //   chunkCount: chunkedFilters.length,
-  //   processedCount: pkListArray.flat().length,
-  //   totalEmojis: list.length,
-  // });
+
   // 最終ステップ: 完了
-  onProgress?.(totalSteps, totalSteps, {
+  onProgress?.(4, 4, {
     directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
     filterCount: naddrFilters.length,
     chunkCount: chunkedFilters.length,

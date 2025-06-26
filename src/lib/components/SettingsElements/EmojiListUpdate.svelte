@@ -34,32 +34,45 @@
       chunkResultCount: 0,
       totalEmojis: 0,
     } as ProgressDetails,
+    completedChunks: new Set<number>(),
+    maxPercent: 0, // 最大進捗を記録
   });
 
   const progressCallback: ProgressCallback = (current, total, details) => {
     let percent = 0;
 
-    // chunk進捗（最大80%）
-    if (details?.chunkCount && details?.currentChunk) {
-      const chunkRatio = details.currentChunk / details.chunkCount;
-      percent = Math.floor(chunkRatio * 80);
+    // ステップ1: 直接絵文字抽出（0-5%）
+    if (current === 1 && total === 4) {
+      percent = 5;
+    }
+    // ステップ2: フィルター作成（5-15%）
+    else if (current === 2 && total === 4) {
+      percent = 15;
+    }
+    // ステップ3: 並列処理（15-85%）
+    else if (current === 3 && total === 4) {
+      if (details?.chunkCount && details.processedCount !== undefined) {
+        const chunkProgress = details.processedCount / details.chunkCount;
+        percent = 15 + Math.floor(chunkProgress * 70); // 15% + (0-70%)
+      } else {
+        percent = 15;
+      }
+    }
+    // ステップ4: 統合処理（85-100%）
+    else if (current === 4 && total === 4) {
+      if (details?.totalEmojis !== undefined) {
+        percent = 100;
+      } else {
+        percent = 85;
+      }
     }
 
-    // chunk完了後、後処理進捗（最大20%）
-    if (
-      details?.chunkCount === details?.currentChunk &&
-      details?.processedCount !== undefined &&
-      details?.totalEmojis
-    ) {
-      const postRatio = details.totalEmojis
-        ? details.processedCount / details.totalEmojis
-        : 0;
-      percent = 80 + Math.floor(postRatio * 20);
-    }
-
-    progress.value = Math.min(percent, 100);
+    // 進捗の後退を防ぐ
+    progressState.maxPercent = Math.max(progressState.maxPercent, percent);
+    progress.value = progressState.maxPercent;
 
     progressState = {
+      ...progressState,
       details: {
         chunkCount: details?.chunkCount ?? progressState.details.chunkCount,
         currentChunk:
@@ -89,6 +102,8 @@
         chunkResultCount: 0,
         totalEmojis: 0,
       },
+      completedChunks: new Set<number>(),
+      maxPercent: 0,
     };
   };
 
@@ -199,12 +214,12 @@
       <div {...progress.progress}></div>
     </div>
     <div class="mt-2 text-sm text-center text-gray-700 dark:text-gray-300">
-      {#if progressState.details.chunkCount || 0 > 0}
-        {$_("process.chunk")}
-        {progressState.details.currentChunk}/{progressState.details.chunkCount}
-      {:else if progressState.details.totalEmojis || 0 > 0}
-        {$_("process.merging")}... ({progressState.details
-          .processedCount}/{progressState.details.totalEmojis})
+      {#if progressState.details.chunkCount && progressState.details.chunkCount > 0}
+        {#if progressState.details.totalEmojis && progressState.details.totalEmojis > 0}
+          {$_("process.merging")}... ({progressState.details.totalEmojis} emojis)
+        {:else if progressState.details.filterCount}
+          (filters: {progressState.details.filterCount})
+        {/if}
       {:else}
         {$_("process.processing")}...
       {/if}
