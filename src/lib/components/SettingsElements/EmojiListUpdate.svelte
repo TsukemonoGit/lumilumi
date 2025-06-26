@@ -20,15 +20,11 @@
     buttonClass?: string;
     children?: () => any;
   }
-  let { buttonClass, children }: Props = $props();
 
+  let { buttonClass, children }: Props = $props();
   const progress = new Progress();
 
-  // 進捗状態
   let progressState = $state({
-    current: 0,
-    total: 0,
-
     details: {
       chunkCount: 0,
       directEmojiCount: 0,
@@ -40,42 +36,50 @@
     } as ProgressDetails,
   });
 
-  const progressCallback: ProgressCallback = (
-    current,
-    total,
+  const progressCallback: ProgressCallback = (current, total, details) => {
+    let percent = 0;
 
-    details
-  ) => {
+    // chunk 進捗（最大70%）
+    if (details?.chunkCount && details?.currentChunk) {
+      const chunkRatio = details.currentChunk / details.chunkCount;
+      percent = Math.floor(chunkRatio * 70);
+    }
+
+    // chunk 完了後、後処理を進捗として反映（最大30%）
+    if (
+      details?.chunkCount === details?.currentChunk &&
+      details?.processedCount !== undefined &&
+      details?.totalEmojis
+    ) {
+      const postRatio = details.totalEmojis
+        ? details.processedCount / details.totalEmojis
+        : 0;
+      percent = 70 + Math.floor(postRatio * 30);
+    }
+
+    progress.value = Math.min(percent, 100);
+
     progressState = {
-      current,
-      total,
-
       details: {
         chunkCount: details?.chunkCount ?? progressState.details.chunkCount,
+        currentChunk:
+          details?.currentChunk ?? progressState.details.currentChunk,
+        processedCount:
+          details?.processedCount ?? progressState.details.processedCount,
+        totalEmojis: details?.totalEmojis ?? progressState.details.totalEmojis,
         directEmojiCount:
           details?.directEmojiCount ?? progressState.details.directEmojiCount,
         filterCount: details?.filterCount ?? progressState.details.filterCount,
-        processedCount:
-          details?.processedCount ?? progressState.details.processedCount,
-        currentChunk:
-          details?.currentChunk ?? progressState.details.currentChunk,
         chunkResultCount:
           details?.chunkResultCount ?? progressState.details.chunkResultCount,
-        totalEmojis: details?.totalEmojis ?? progressState.details.totalEmojis,
-      } as ProgressDetails,
+      },
     };
-
-    // melt-uiのprogressの値を更新
-    progress.value = current;
-    progress.max = total;
   };
 
-  async function handleClickEmoji() {
-    $nowProgress = true;
-    progressState = {
-      current: 0,
-      total: 0,
+  const resetProgress = () => {
+    progress.value = 0;
 
+    progressState = {
       details: {
         chunkCount: 0,
         directEmojiCount: 0,
@@ -86,41 +90,36 @@
         totalEmojis: 0,
       },
     };
+  };
 
-    // melt-uiのprogressを初期化
-    progress.value = 0;
-    progress.max = 0;
+  async function handleClickEmoji() {
+    $nowProgress = true;
+    resetProgress();
 
     let pubkey: string = "";
     const beforeEvent = $emojis?.event;
 
     try {
       if (!loginUser.get()) {
-        const pubkey = await (
-          window.nostr as Nostr.Nip07.Nostr
-        )?.getPublicKey();
-        if (pubkey) {
-          loginUser.set(pubkey);
-        }
+        const got = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
+        if (got) loginUser.set(got);
       }
-      if (loginUser.get()) {
-        pubkey = loginUser.get();
-      }
+      pubkey = loginUser.get() ?? "";
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
-    if (pubkey === "") {
+
+    if (!pubkey) {
       $toastSettings = {
         title: "Error",
-        description: "pubkey not found ",
+        description: "pubkey not found",
         color: "bg-red-500",
       };
       $nowProgress = false;
       return;
     }
-
+    progress.value++;
     const relays = await getQueryRelays(pubkey);
-    console.log(relays);
     if (!relays) {
       $toastSettings = {
         title: "Error",
@@ -128,13 +127,16 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
+      resetProgress();
       return;
     }
-
+    progress.value++;
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10030], authors: [pubkey] },
     ];
+
     const pk = await getDoukiList(filters, relays);
+
     if (!pk && !beforeEvent) {
       $toastSettings = {
         title: "Warning",
@@ -142,8 +144,10 @@
         color: "bg-red-500",
       };
       $nowProgress = false;
+      resetProgress();
       return;
     }
+    progress.value++;
     const kind10030event =
       !beforeEvent ||
       beforeEvent.pubkey !== pk.event.pubkey ||
@@ -163,7 +167,7 @@
     );
 
     $emojis = {
-      list: list,
+      list,
       updated: Math.floor(Date.now() / 1000),
       event: kind10030event,
     };
@@ -172,47 +176,43 @@
     rxNostr.dispose();
     $nowProgress = false;
 
-    // 完了後に進捗をリセット
-    setTimeout(() => {
-      progressState = {
-        current: 0,
-        total: 0,
-
-        details: {
-          chunkCount: 0,
-          directEmojiCount: 0,
-          filterCount: 0,
-          processedCount: 0,
-          currentChunk: 0,
-          chunkResultCount: 0,
-          totalEmojis: 0,
-        } as ProgressDetails,
-      };
-      progress.value = 0;
-      progress.max = 0;
-    }, 2000);
+    setTimeout(() => resetProgress(), 2000);
   }
 </script>
 
+<!-- ✅ UI部分 -->
 <button
   class={buttonClass ||
     "hover:opacity-75 active:opacity-50 disabled:opacity-25"}
   disabled={$nowProgress}
   onclick={handleClickEmoji}
   title="update emoji list"
-  >{@render children?.()}
+>
+  {@render children?.()}
 </button>
 
-{#if progressState.total > 0}
+{#if progress.value > 0}
   <div
     class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm px-4 py-3 rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 min-w-80 max-w-md"
   >
     <div {...progress.root}>
       <div {...progress.progress}></div>
     </div>
+    <div class="mt-2 text-sm text-center text-gray-700 dark:text-gray-300">
+      {#if progressState.details.chunkCount || 0 > 0}
+        チャンク {progressState.details.currentChunk}/{progressState.details
+          .chunkCount}
+      {:else if progressState.details.totalEmojis || 0 > 0}
+        統合中... ({progressState.details.processedCount}/{progressState.details
+          .totalEmojis})
+      {:else}
+        処理中...
+      {/if}
+    </div>
   </div>
 {/if}
 
+<!-- ✅ スタイル -->
 <style>
   [data-melt-progress-root] {
     height: 1.5rem;

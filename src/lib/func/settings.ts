@@ -380,8 +380,8 @@ export async function createEmojiListFrom10030(
   onProgress?: ProgressCallback
 ): Promise<string[][]> {
   // 進捗報告用の総ステップ数を計算
-  let currentStep = 0;
-  const baseSteps = 5; // 基本ステップ数
+  let currentStep = 1;
+  const baseSteps = 6; // 基本ステップ数
 
   // ステップ1: 直接の絵文字を抽出
   onProgress?.(++currentStep, baseSteps, {
@@ -541,7 +541,7 @@ export async function createEmojiListFrom10030(
       }
     });
   }
-
+  console.log(list.length);
   // 最終ステップ: 完了
   onProgress?.(totalSteps, totalSteps, {
     directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
