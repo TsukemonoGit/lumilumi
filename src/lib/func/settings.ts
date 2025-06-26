@@ -541,7 +541,13 @@ export async function createEmojiListFrom10030(
       }
     });
   }
-  console.log(list.length);
+  // console.log(totalSteps, totalSteps, {
+  //   directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,
+  //   filterCount: naddrFilters.length,
+  //   chunkCount: chunkedFilters.length,
+  //   processedCount: pkListArray.flat().length,
+  //   totalEmojis: list.length,
+  // });
   // 最終ステップ: 完了
   onProgress?.(totalSteps, totalSteps, {
     directEmojiCount: event.tags.filter(([tag]) => tag === "emoji").length,

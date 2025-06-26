@@ -39,13 +39,13 @@
   const progressCallback: ProgressCallback = (current, total, details) => {
     let percent = 0;
 
-    // chunk 進捗（最大70%）
+    // chunk進捗（最大80%）
     if (details?.chunkCount && details?.currentChunk) {
       const chunkRatio = details.currentChunk / details.chunkCount;
-      percent = Math.floor(chunkRatio * 70);
+      percent = Math.floor(chunkRatio * 80);
     }
 
-    // chunk 完了後、後処理を進捗として反映（最大30%）
+    // chunk完了後、後処理進捗（最大20%）
     if (
       details?.chunkCount === details?.currentChunk &&
       details?.processedCount !== undefined &&
@@ -54,7 +54,7 @@
       const postRatio = details.totalEmojis
         ? details.processedCount / details.totalEmojis
         : 0;
-      percent = 70 + Math.floor(postRatio * 30);
+      percent = 80 + Math.floor(postRatio * 20);
     }
 
     progress.value = Math.min(percent, 100);
