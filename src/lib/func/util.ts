@@ -528,3 +528,16 @@ export function debounce<T extends (...args: any[]) => Promise<void> | void>(
 export function nipLink(str: string): string {
   return `https://github.com/nostr-protocol/nips/blob/master/${str}.md`;
 }
+
+// Helper functions
+export function getIDbyParam(str: string) {
+  const { type, data } = nip19.decode(str);
+
+  if (type === "note") {
+    return data as string;
+  } else if (type === "nevent") {
+    return data.id;
+  } else {
+    console.log(data);
+  }
+}

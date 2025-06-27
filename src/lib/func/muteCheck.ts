@@ -8,7 +8,13 @@ export type MuteCheck =
   | "thread"
   | "kind"
   | "null";
-export function muteCheck(event: Nostr.Event): MuteCheck {
+
+type EventWithContentPubkeyTags = Pick<
+  Nostr.Event,
+  "content" | "tags" | "pubkey"
+> &
+  Partial<Omit<Nostr.Event, "content" | "tags" | "pubkey">>;
+export function muteCheck(event: EventWithContentPubkeyTags): MuteCheck {
   if (get(mutes)) {
     // Check if the event should be muted based on mutes.p
     if (shouldMuteByP(event)) {
@@ -40,8 +46,8 @@ export function muteCheck(event: Nostr.Event): MuteCheck {
   return "null";
 }
 
-function shouldMuteByP(event: Nostr.Event): boolean {
-  if (!event) {
+function shouldMuteByP(event: EventWithContentPubkeyTags): boolean {
+  if (!event || !event.pubkey) {
     return false;
   }
 
@@ -50,7 +56,7 @@ function shouldMuteByP(event: Nostr.Event): boolean {
   return pMutes.includes(event.pubkey); // Replace with actual property check
 }
 
-function shouldMuteByWord(event: Nostr.Event): boolean {
+function shouldMuteByWord(event: EventWithContentPubkeyTags): boolean {
   if (!event) {
     return false;
   }
@@ -61,7 +67,7 @@ function shouldMuteByWord(event: Nostr.Event): boolean {
   return wordMutes.some((muteWord) => event.content.includes(muteWord));
 }
 
-function shouldMuteByT(event: Nostr.Event): boolean {
+function shouldMuteByT(event: EventWithContentPubkeyTags): boolean {
   if (!event) {
     return false;
   }
@@ -74,8 +80,8 @@ function shouldMuteByT(event: Nostr.Event): boolean {
   return tagsWithT.some((tag) => tMutes.includes(tag[1]));
 }
 
-function shouldMuteByE(event: Nostr.Event): boolean {
-  if (!event) {
+function shouldMuteByE(event: EventWithContentPubkeyTags): boolean {
+  if (!event || !event.id) {
     return false;
   }
   const eMutes = get(mutes)?.list.e || [];
@@ -88,7 +94,7 @@ function shouldMuteByE(event: Nostr.Event): boolean {
   ); // Replace with actual property check
 }
 
-function shouldMuteByKinds(event: Nostr.Event): boolean {
+function shouldMuteByKinds(event: EventWithContentPubkeyTags): boolean {
   if (!event) {
     return false;
   }

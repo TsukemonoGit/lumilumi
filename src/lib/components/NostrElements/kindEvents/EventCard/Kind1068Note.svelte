@@ -144,7 +144,7 @@
           <!--投票もできるようにする-->
         {:else}
           {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
-            <label class="flex flex-wrap">
+            <label class="inline-flex">
               <input type="radio" disabled={true} /><span class="ml-2 break-all"
                 ><Content
                   event={{
