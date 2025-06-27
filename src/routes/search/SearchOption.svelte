@@ -1,11 +1,11 @@
 <script lang="ts">
-  import DateRangePicker from "$lib/components/Elements/DateRangePicker.svelte";
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { X, Share, Search, ChevronDown } from "lucide-svelte";
   import { locale } from "@konemono/svelte5-i18n";
   import { slide } from "svelte/transition";
   import KindSelect from "./KindSelect.svelte";
+  import DateTimeInput from "./DateTimeInput.svelte";
   import * as Nostr from "nostr-typedef";
 
   import UserDataList from "$lib/components/NostrElements/UserDataList.svelte";
@@ -22,7 +22,6 @@
     searchPubkey: string | undefined;
     searchPubkeyTo: string | undefined;
     searchHashtag: string | undefined;
-    searchSince: number | undefined;
     searchUntil: number | undefined;
     resetValue: () => void;
     filters: Nostr.Filter[];
@@ -37,12 +36,33 @@
     searchPubkey = $bindable(),
     searchPubkeyTo = $bindable(),
     searchHashtag = $bindable(),
-    searchSince = $bindable(),
     searchUntil = $bindable(),
     resetValue,
     filters,
     handleClickSearch,
   }: Props = $props();
+
+  let searchUntilDate = $state("");
+  let searchUntilTime = $state("");
+
+  // 日付と時刻を組み合わせてUnixタイムスタンプに変換
+  $effect(() => {
+    if (searchUntilDate && searchUntilTime) {
+      const dateTime = new Date(`${searchUntilDate}T${searchUntilTime}`);
+      searchUntil = Math.floor(dateTime.getTime() / 1000);
+    } else if (!searchUntilDate && !searchUntilTime) {
+      searchUntil = undefined;
+    }
+  });
+
+  // searchUntilからUIの値を復元
+  $effect(() => {
+    if (searchUntil) {
+      const date = new Date(searchUntil * 1000);
+      searchUntilDate = date.toISOString().split("T")[0];
+      searchUntilTime = date.toTimeString().split(" ")[0].substring(0, 5);
+    }
+  });
 
   const getKindLabel = (
     kind: number | undefined,
@@ -94,12 +114,17 @@
       : params.delete("k");
     searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
     searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
-    searchSince ? params.set("s", String(searchSince)) : params.delete("s");
     searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
     followee ? params.set("f", String(followee)) : params.delete("f");
 
     console.log(url.toString());
     return url.toString();
+  }
+
+  function handleResetValue() {
+    searchUntilDate = "";
+    searchUntilTime = "";
+    resetValue();
   }
 </script>
 
@@ -226,14 +251,13 @@
             bind:value={searchHashtag}
           />
         </div>
-        <div class="flex flex-row items-start justify-center">
-          <DateRangePicker
-            bind:startTimeUnix={searchSince}
-            bind:endTimeUnix={searchUntil}
-            title={"Date"}
+        <div class="flex flex-row items-start justify-center gap-2">
+          <DateTimeInput
+            bind:dateValue={searchUntilDate}
+            bind:timeValue={searchUntilTime}
           />
           <button
-            onclick={resetValue}
+            onclick={handleResetValue}
             class="h-8 w-8 place-items-center rounded-md text-sm shadow hover:opacity-75 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75 bg-magnum-600 justify-center inline-flex mt-auto mb-1 ml-1"
           >
             <X class="size-5" /></button

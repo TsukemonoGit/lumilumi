@@ -190,18 +190,10 @@ body {
 .container {
   @apply max-w-[960px];
 }
-input[type="text"] {
+input {
   background-color: rgb(var(--color-neutral-900) / 1);
 }
-input[type="email"] {
-  background-color: rgb(var(--color-neutral-900) / 1);
-}
-input[type="number"] {
-  background-color: rgb(var(--color-neutral-900) / 1);
-}
-input[type="url"] {
-  background-color: rgb(var(--color-neutral-900) / 1);
-}
+
 hr {
   border-top: 1px solid rgb(var(--color-magnum-100) / 0.2);
 }
@@ -246,7 +238,17 @@ input:-webkit-autofill {
 input:-webkit-autofill:focus {
   caret-color: theme("colors.neutral.100") !important;
 }
+/* 日付入力用 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
+    hue-rotate(216deg) brightness(103%) contrast(103%);
+}
 
+/* 時刻入力用 */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(94%) sepia(8%) saturate(275%)
+    hue-rotate(216deg) brightness(103%) contrast(103%);
+}
 @media screen and (max-width: 768px) {
   .postWindow {
     /* display: block !important; */
