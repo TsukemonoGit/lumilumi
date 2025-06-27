@@ -14,7 +14,12 @@
   import { clientTag } from "$lib/func/constants";
   import Content from "$lib/components/NostrElements/content/Content.svelte";
 
-  let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
+  let {
+    note,
+    hasEnded,
+    endsAt,
+  }: { note: Nostr.Event; hasEnded: boolean; endsAt: number | undefined } =
+    $props();
   let group: RadioGroup | undefined = $state();
   let optionTags: string[][] = $derived(
     note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2)
@@ -47,10 +52,14 @@
       return pre; // Return the accumulator unchanged if condition not met
     }, []); // Initial value should be an empty array
 
+    let filter: Nostr.Filter = { kinds: [1018], "#e": [note.id] };
+    if (endsAt) {
+      filter = { ...filter, until: endsAt };
+    }
     voteEvents = (
       await usePromiseReq(
         {
-          filters: [{ kinds: [1018], "#e": [note.id] }],
+          filters: [filter],
           operator: pipe(uniq(), latestEachPubkey()),
         },
         voteRelays.length > 0 ? voteRelays : undefined

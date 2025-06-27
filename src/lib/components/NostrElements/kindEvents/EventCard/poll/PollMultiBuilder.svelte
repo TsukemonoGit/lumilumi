@@ -14,7 +14,12 @@
   import { clientTag } from "$lib/func/constants";
   import Content from "$lib/components/NostrElements/content/Content.svelte";
 
-  let { note, hasEnded }: { note: Nostr.Event; hasEnded: boolean } = $props();
+  let {
+    note,
+    hasEnded,
+    endsAt,
+  }: { note: Nostr.Event; hasEnded: boolean; endsAt: number | undefined } =
+    $props();
 
   let userVoteEvent: Nostr.Event | undefined = $state(); //このユーザーの投票
   let voteEvents: Nostr.Event[] = $state([]);
@@ -46,12 +51,15 @@
       }
       return pre; // Return the accumulator unchanged if condition not met
     }, [] as string[]); // Initial value should be an empty array
-
+    let filter: Nostr.Filter = { kinds: [1018], "#e": [note.id] };
+    if (endsAt) {
+      filter = { ...filter, until: endsAt };
+    }
     voteEvents =
       (
         await usePromiseReq(
           {
-            filters: [{ kinds: [1018], "#e": [note.id] }],
+            filters: [filter],
             operator: pipe(uniq(), latestEachPubkey()),
           },
           voteRelays.length > 0 ? voteRelays : undefined
