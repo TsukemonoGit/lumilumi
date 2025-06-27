@@ -1,7 +1,12 @@
 <script lang="ts">
   import { replyedEvent } from "$lib/func/event";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { queryClient, viewMediaModal } from "$lib/stores/stores";
+  import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    mutebykinds,
+    mutes,
+    queryClient,
+    viewMediaModal,
+  } from "$lib/stores/stores";
   import type { EventPacket } from "rx-nostr";
   import ProfileDisplay from "./NostrElements/kindEvents/EventCard/ProfileDisplay.svelte";
   import NoteComponent from "./NostrElements/kindEvents/layout/NoteComponent.svelte";
@@ -34,6 +39,8 @@
     type Token,
   } from "@konemono/nostr-content-parser";
   import { nipLink } from "$lib/func/util";
+  import { muteCheck } from "$lib/func/muteCheck";
+  import { EyeOff } from "lucide-svelte";
 
   // Props definition
   interface Props {
@@ -199,6 +206,15 @@
     };
     console.log(index, $state.snapshot(mediaList));
   };
+
+  //ミュートメニューの設定は考慮しない
+  let muteType = $derived.by(() => {
+    if (!$mutes || (!$mutebykinds && !timelineFilter.get())) {
+      return "null";
+    }
+
+    return muteCheck({ content: text, tags: tags, pubkey: signPubkey || "" });
+  });
 </script>
 
 {#if lumiSetting.get().showPreview}
@@ -207,9 +223,18 @@
     p-6 pt-3 shadow-lg mb-4"
   >
     <div class="font-medium text-magnum-400">preview</div>
-    <div class="border border-magnum-500 rounded-md min-h-[6.6rem]">
+    <div class="relative border border-magnum-500 rounded-md min-h-[6.6rem]">
       <NoteComponent warningText={onWarning ? warningText : undefined}>
         {#snippet icon()}
+          <!-- ミュート投稿のアイコン表示 -->
+          {#if muteType !== "null"}
+            <div
+              class="absolute top-0 left-0 bg-neutral-500/80 rounded-full p-1 text-magnum-700 dark:text-magnum-300"
+              style={`z-index:${zIndex || 10 + 1}`}
+            >
+              <EyeOff size={14} />
+            </div>
+          {/if}
           {#if signPubkey}
             <UserPopupMenu
               pubkey={signPubkey}

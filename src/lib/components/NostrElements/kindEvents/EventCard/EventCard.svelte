@@ -9,6 +9,7 @@
   // Store imports
   import { mutebykinds, mutes } from "$lib/stores/stores";
   import {
+    loginUser,
     lumiSetting,
     timelineFilter,
     viewEventIds,
@@ -52,6 +53,7 @@
   import Kind1018Note from "./Kind1018Note.svelte";
   import Kind39701Note from "./Kind39701Note.svelte";
   import Kind9802Note from "./Kind9802Note.svelte";
+  import { getIDbyParam } from "$lib/func/util";
 
   // Component props interface
   interface Props {
@@ -118,36 +120,19 @@
     page.params.note ? getIDbyParam(page.params.note) : undefined
   );
 
+  //ミュートメニューの設定は考慮しない
   let muteType = $derived.by(() => {
     if (!$mutes && !$mutebykinds && !timelineFilter.get()) {
       return "null";
     }
-
-    // if (!timelineFilter.get().adaptMute) {
-    //   return "null";
-    // }
-
     if (paramNoteId === note.id || excludefunc(note)) {
       return "null";
     }
 
-    return $mutes || $mutebykinds ? muteCheck(note) : "null";
+    return muteCheck(note);
   });
 
   let warning = $derived(checkContentWarning(note?.tags));
-
-  // Helper functions
-  function getIDbyParam(str: string) {
-    const { type, data } = nip19.decode(str);
-
-    if (type === "note") {
-      return data as string;
-    } else if (type === "nevent") {
-      return data.id;
-    } else {
-      console.log(data);
-    }
-  }
 
   function checkContentWarning(tags: string[][]): string[] | undefined {
     return tags.find((item) => item[0] === "content-warning");
@@ -227,7 +212,7 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  {#if timelineFilter.get().adaptMute && muteType !== "null" && depth >= 1}
+  {#if note.pubkey !== loginUser.get() && timelineFilter.get().adaptMute && muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
       onclick={() => (viewMuteEvent = !viewMuteEvent)}
@@ -235,7 +220,7 @@
       {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
     </button>
   {/if}
-  {#if !timelineFilter.get().adaptMute || muteType === "null" || viewMuteEvent}
+  {#if !timelineFilter.get().adaptMute || note.pubkey === loginUser.get() || muteType === "null" || viewMuteEvent}
     {#if thread && replyTag}
       {#if depth >= 1 && depth % 6 === 0 && !loadThread}
         <button
