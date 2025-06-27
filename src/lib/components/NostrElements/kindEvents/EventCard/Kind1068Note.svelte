@@ -136,9 +136,9 @@
         </div>
         {#if page.params.note || page.params.naddr}
           {#if polltype === "multiplechoice"}
-            <PollMultiBuilder {note} {hasEnded} />
+            <PollMultiBuilder {note} {hasEnded} {endsAt} />
           {:else}
-            <PollSingleBuilder {note} {hasEnded} />
+            <PollSingleBuilder {note} {hasEnded} {endsAt} />
           {/if}
           <!--NOTEとかページの投稿は展開する-->
           <!--投票もできるようにする-->
