@@ -166,7 +166,7 @@
 {#each optionTags as [_, id, label]}
   <label class="flex my-1 items-center">
     <input
-      class="rounded-checkbox disabled:cursor-not-allowed"
+      class="rounded-checkbox disabled:cursor-not-allowed min-w-6"
       type="checkbox"
       disabled={hasEnded}
       checked={isSelected(id)}
