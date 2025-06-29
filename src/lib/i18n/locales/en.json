@@ -390,5 +390,9 @@
     "chunk": "Chunk",
     "merging": "Merging",
     "processing": "Processing"
+  },
+  "features": {
+    "title": "Features",
+    "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported."
   }
 }

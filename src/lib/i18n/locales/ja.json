@@ -390,5 +390,9 @@
     "chunk": "チャンク",
     "merging": "統合中",
     "processing": "処理中"
+  },
+  "features": {
+    "title": "機能",
+    "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。"
   }
 }
