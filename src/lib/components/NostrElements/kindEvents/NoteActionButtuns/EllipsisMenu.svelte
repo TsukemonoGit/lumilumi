@@ -228,31 +228,31 @@
         : []),
     ];
 
-    // indexesが指定されている場合は、従来の番号システムをマッピング
+    // indexes指定時の処理を変更
     if (indexes !== undefined) {
-      const actionToNumMap = {
-        view_json: 0,
-        open_njump: 1,
-        translate: 2,
-        copy_id: 3,
-        goto_note: 4,
-        open_emojito: 5,
-        broadcast: 6,
-        share_link: 7,
-        copy_text: 8,
-        open_zapstream: 9,
-        open_nostviewstr: 10,
-        open_nostrapp: 11,
-        delete: 12,
-        open_makimono: 13,
-        refresh_data: 14,
-        toggle_bookmark: 15, // 新しく追加
+      const numToActionMap: Record<number, string> = {
+        0: "view_json",
+        1: "open_njump",
+        2: "translate",
+        3: "copy_id",
+        4: "goto_note",
+        5: "open_emojito",
+        6: "broadcast",
+        7: "share_link",
+        8: "copy_text",
+        9: "open_zapstream",
+        10: "open_nostviewstr",
+        11: "open_nostrapp",
+        12: "delete",
+        13: "open_makimono",
+        14: "refresh_data",
+        15: "toggle_bookmark",
       };
 
-      return menuItems.filter((item) => {
-        const num = actionToNumMap[item.action as keyof typeof actionToNumMap];
-        return num !== undefined && indexes.includes(num);
-      });
+      const allowedActions = indexes
+        .map((i) => numToActionMap[i])
+        .filter(Boolean);
+      return menuItems.filter((item) => allowedActions.includes(item.action));
     }
 
     return menuItems;
@@ -382,66 +382,91 @@
           $nowProgress = false;
         }, 1000);
         break;
+
       case "toggle_bookmark":
-        let pre: Nostr.Event<number> | null = bookmark10003.get();
-        const pub = loginUser.get();
-        if (!pre || pre.pubkey !== pub) {
-          //なかったらほんとにないのか確認する
-          const bookmarkEvent = await usePromiseReq(
-            {
-              filters: [{ kinds: [10003], authors: [pub], limit: 1 }],
-              operator: pipe(latest()),
-            },
-            undefined,
-            2000
-          );
-          if (bookmarkEvent) {
-            pre = bookmarkEvent[0].event;
-          } else {
-            pre = null;
-          }
-        }
-        const tags = (): string[][] => {
-          const [tagType, tagValue] = replaceable
-            ? [
-                "a",
-                `${note.kind}:${note.pubkey}:${note.tags.find((t) => t[0] === "d")?.[1] || ""}`,
-              ]
-            : ["e", note.id];
-
-          const existing = pre?.tags || [];
-
-          return isBookmarked
-            ? existing.filter((t) => !(t[0] === tagType && t[1] === tagValue))
-            : [...existing, [tagType, tagValue]];
-        };
-        const eventParam: Nostr.EventParameters = {
-          kind: 10003,
-          pubkey: pub,
-          content: pre ? pre.content : "",
-          tags: tags(),
-        };
-        const signer = nip07Signer();
         try {
-          const event = await signer.signEvent(eventParam);
+          // isBookmarked の状態を確認
+          if (typeof isBookmarked === "undefined") {
+            console.error("isBookmarked is undefined");
+            break;
+          }
 
-          publishEvent(event);
-          $toastSettings = {
-            title: "Published",
-            description: "",
-            color: "bg-green-500",
+          let pre: Nostr.Event<number> | null = bookmark10003.get();
+          const pub = loginUser.get();
+
+          if (!pub) {
+            console.error("User not logged in");
+            break;
+          }
+
+          if (!pre || pre.pubkey !== pub) {
+            //なかったらほんとにないのか確認する
+            const bookmarkEvent = await usePromiseReq(
+              {
+                filters: [{ kinds: [10003], authors: [pub], limit: 1 }],
+                operator: pipe(latest()),
+              },
+              undefined,
+              2000
+            );
+
+            if (bookmarkEvent.length > 0) {
+              pre = bookmarkEvent[0].event;
+            } else {
+              pre = null;
+            }
+          }
+          const tags = (): string[][] => {
+            const [tagType, tagValue] = replaceable
+              ? [
+                  "a",
+                  `${note.kind}:${note.pubkey}:${note.tags.find((t) => t[0] === "d")?.[1] || ""}`,
+                ]
+              : ["e", note.id];
+
+            const existing = pre?.tags || [];
+
+            return isBookmarked
+              ? existing.filter((t) => !(t[0] === tagType && t[1] === tagValue))
+              : [...existing, [tagType, tagValue]];
           };
+          const eventParam: Nostr.EventParameters = {
+            kind: 10003,
+            pubkey: pub,
+            content: pre ? pre.content : "",
+            tags: tags(),
+          };
+          const signer = nip07Signer();
+          try {
+            const event = await signer.signEvent(eventParam);
 
-          $nowProgress = false;
+            publishEvent(event);
+            $toastSettings = {
+              title: "Published",
+              description: "",
+              color: "bg-green-500",
+            };
+
+            $nowProgress = false;
+          } catch (error) {
+            $toastSettings = {
+              title: "Failed",
+              description: "failed to publish",
+              color: "bg-red-500",
+            };
+
+            $nowProgress = false;
+          }
         } catch (error) {
+          console.error("Bookmark toggle error:", error);
           $toastSettings = {
             title: "Failed",
-            description: "failed to publish",
+            description: "failed to toggle bookmark",
             color: "bg-red-500",
           };
-
           $nowProgress = false;
         }
+        break;
     }
   };
 
