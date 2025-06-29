@@ -593,6 +593,7 @@
                 {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
                   <div class=" overflow-hidden p-1">
                     <RelayCard
+                      zIndex={0}
                       {url}
                       read={!rw || rw === "read" ? true : false}
                       write={!rw || rw === "write" ? true : false}

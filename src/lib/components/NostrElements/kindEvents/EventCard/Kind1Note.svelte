@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { bookmark10003, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
   import { checkContentWarning } from "$lib/func/event";
@@ -58,6 +58,12 @@
   }: Props = $props();
 
   let warning = $derived(checkContentWarning(note?.tags));
+
+  let isBookmarked: boolean = $derived(
+    bookmark10003
+      .get()
+      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) || false
+  );
 </script>
 
 <NoteComponent
@@ -90,7 +96,24 @@
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} />
+    {#if isBookmarked}
+      <svg
+        class="absolute right-0 top-6 rotate-90 fill-magnum-500/75"
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="18"
+        viewBox="0 0 16 18"
+        fill="none"
+      >
+        <path
+          d="M1 1V17L8 13L15 17V1"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>{/if}
   {/snippet}
+
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
         pubkey={note.pubkey}

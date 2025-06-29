@@ -28,7 +28,7 @@ import {
 import { writable, derived, get, type Readable } from "svelte/store";
 import { Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { metadata } from "$lib/stores/operators";
+import { bookmark, metadata } from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import * as nip19 from "nostr-tools/nip19";
@@ -289,6 +289,12 @@ export const makeMainFilters = (
       authors: Array.from(pubkeyList.keys()),
     });
   }
+
+  //bookmarkイベントの更新もリアルタイムでチェック
+  filters.push({
+    kinds: [10003],
+    authors: [lumiSetting.get().pubkey],
+  });
   console.log(filters);
 
   return { mainFilters: filters, olderFilters: olderFilters };
@@ -318,7 +324,7 @@ export function useMainTimelineReq(
 
   const obs: Observable<EventPacket | EventPacket[]> = get(app)
     .rxNostr.use(req)
-    .pipe(metadata(), operator);
+    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
@@ -577,7 +583,7 @@ export function usePromiseReq(
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(metadata(), operator, completeOnTimeout(timeout));
+    .pipe(metadata(), bookmark(), operator, completeOnTimeout(timeout));
 
   const throttledOnData = onData ? throttle(onData, 200) : undefined;
 
