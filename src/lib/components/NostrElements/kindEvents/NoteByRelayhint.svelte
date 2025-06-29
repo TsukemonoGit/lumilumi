@@ -41,8 +41,8 @@
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
   const queryCheck = async (id: string) => {
-    //if (!queryClient.getQueryData(["timeline", id])) {//見つかんないときにリレーヒントから探すからない
-    queryClient.removeQueries({ queryKey: ["timeline", id] });
+    //if (!queryClient.getQueryData(["note", id])) {//見つかんないときにリレーヒントから探すからない
+    queryClient.removeQueries({ queryKey: ["note", id] });
     return;
     //  }
   };
@@ -56,7 +56,7 @@
     >Loading {loadingText}</EmptyCard
   >
 {:then}
-  <Text queryKey={["timeline", id]} {id} relays={relayhint} {onChange}>
+  <Text queryKey={["note", id]} {id} relays={relayhint} {onChange}>
     {#snippet loading()}
       <EmptyCard nevent={displayMenu ? loadingText : undefined}
         >Loading {loadingText}</EmptyCard

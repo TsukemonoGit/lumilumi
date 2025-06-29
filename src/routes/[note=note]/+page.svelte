@@ -44,7 +44,7 @@
   <section class="mb-20">
     <!-- <SetRepoReactions /> -->
     <div class="max-w-[100vw] break-words box-border w-full">
-      <Text queryKey={["timeline", data.id]} id={data.id}>
+      <Text queryKey={["note", data.id]} id={data.id}>
         {#snippet loading()}
           <div class=" w-full text-sm text-neutral-500 flex-inline break-all">
             Loading {nip19.noteEncode(data.id)}
