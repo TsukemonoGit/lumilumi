@@ -8,12 +8,7 @@
   import { page } from "$app/state";
 
   // Store imports
-  import {
-    defaultRelays,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
 
   // Utility function imports
   import { usePromiseReq } from "$lib/func/nostr";
@@ -29,7 +24,6 @@
   import {
     followList,
     lumiSetting,
-    relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
@@ -221,6 +215,7 @@
   });
 
   beforeNavigate(() => {
+    init = false;
     // Unsubscribe from global events when navigating away
     unsucscribeGlobal();
   });

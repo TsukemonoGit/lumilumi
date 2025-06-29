@@ -4,7 +4,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
 
-  import { queryClient, tie } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
   import { now, type EventPacket } from "rx-nostr/src";
@@ -17,7 +17,7 @@
   interface Props {
     timelineQuery: QueryKey;
 
-    globalRelays: any;
+    globalRelays: string[] | undefined;
     eventFilter?: (event: Nostr.Event) => boolean;
   }
   const req = createRxForwardReq("global");
@@ -76,7 +76,7 @@
   });
 </script>
 
-{#if since && globalRelays.length > 0}
+{#if since && globalRelays && globalRelays.length > 0}
   <TimelineList
     bind:resetUniq
     queryKey={timelineQuery}

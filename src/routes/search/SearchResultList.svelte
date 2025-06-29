@@ -25,7 +25,7 @@
     loadOlderEvents,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import { get, readable } from "svelte/store";
+  import { readable } from "svelte/store";
   import { sortEvents } from "$lib/func/util";
   import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";

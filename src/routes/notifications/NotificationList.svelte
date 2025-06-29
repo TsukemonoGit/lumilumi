@@ -2,7 +2,6 @@
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import {
-    defaultRelays,
     nowProgress,
     onlyFollowee,
     queryClient,

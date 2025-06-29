@@ -60,12 +60,12 @@
   let {
     note,
     repostable,
-
+    isBookmarked,
     deleted = $bindable(),
   }: {
     note: Nostr.Event;
     repostable: boolean;
-
+    isBookmarked?: boolean;
     deleted: boolean;
   } = $props();
 
@@ -542,7 +542,7 @@
     {/if}
     <!--メニュー-->
 
-    <EllipsisMenu iconSize={20} {note} bind:deleted />
+    <EllipsisMenu iconSize={20} {note} bind:deleted {isBookmarked} />
   </div>
   <!---->
 

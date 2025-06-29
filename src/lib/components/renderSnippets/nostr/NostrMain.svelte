@@ -6,12 +6,13 @@
     mutes,
     defaultRelays,
     onlyFollowee,
+    queryClient,
   } from "$lib/stores/stores";
 
   //import { goto } from "$app/navigation";
   import { setRxNostr, setRelays } from "$lib/func/nostr";
-  import type { DefaultRelayConfig } from "rx-nostr";
-  import { onMount, untrack } from "svelte";
+  import type { DefaultRelayConfig, EventPacket } from "rx-nostr";
+  import { onMount } from "svelte";
   import type {
     LumiEmoji,
     LumiMute,
@@ -20,12 +21,18 @@
   } from "$lib/types";
 
   import {
+    BOOKMARK_STORAGE_KEY,
     initLumiEmoji,
     initLumiMute,
     initLumiMuteByKind,
   } from "$lib/func/constants";
   import { setRxNostr3 } from "$lib/func/reactions";
-  import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import {
+    bookmark10003,
+    lumiSetting,
+    timelineFilter,
+  } from "$lib/stores/globalRunes.svelte";
+  import type { QueryKey } from "@tanstack/svelte-query";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -153,6 +160,21 @@
       } catch (error) {
         console.log(error);
       }
+    }
+    //bookmark
+    const bookmark = localStorage.getItem(BOOKMARK_STORAGE_KEY);
+    if (bookmark) {
+      try {
+        const parsedData: EventPacket = JSON.parse(bookmark);
+        if (parsedData) {
+          const queryKey: QueryKey = [
+            "naddr",
+            `${10003}:${parsedData.event.pubkey}:`,
+          ];
+          queryClient.setQueryData(queryKey, parsedData);
+          bookmark10003.set(parsedData.event);
+        }
+      } catch (error) {}
     }
   }
 </script>

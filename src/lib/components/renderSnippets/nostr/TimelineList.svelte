@@ -20,16 +20,15 @@
   import { now, type DefaultRelayConfig, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { pipe, type OperatorFunction } from "rxjs";
+  import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
   import {
     displayEvents,
     lumiSetting,
-    relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
-  import { formatAbsoluteDate, sortEventPackets } from "$lib/func/util";
+  import { sortEventPackets } from "$lib/func/util";
   import { page } from "$app/state";
 
   interface Props {
@@ -48,7 +47,7 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
+    //  updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
     resetUniq?: () => void;
   }
   // Constants
@@ -75,7 +74,7 @@
     loading,
     nodata,
     content,
-    updateViewEvent = $bindable(),
+    //  updateViewEvent = $bindable(),
     resetUniq = $bindable(),
   }: Props = $props();
 
@@ -188,7 +187,7 @@
   /**
    * Update scheduling and execution
    */
-  updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
+  const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
     if (timelineManager.isUpdateScheduled) return;
 
     timelineManager.isUpdateScheduled = true;

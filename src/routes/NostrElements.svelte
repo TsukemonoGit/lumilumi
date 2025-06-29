@@ -143,9 +143,6 @@
     }
   }
 
-  // svelte-ignore non_reactive_update
-  let updateViewEvent: () => void = () => {};
-
   //kind0がTLに流れるのをあれするやつ
   const excludeKind0 = (note: Nostr.Event): boolean => {
     if (note.kind === 0) {
@@ -192,7 +189,6 @@
               excludeKind0(note)
             );
           }}
-          bind:updateViewEvent
         >
           {#snippet content({ events, len })}
             <!-- <SetRepoReactions /> -->

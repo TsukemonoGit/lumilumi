@@ -1,17 +1,19 @@
 <script lang="ts">
   //import WarningHide2 from "$lib/components/Elements/WarningHide2.svelte";
   import WarningHide3 from "$lib/components/Elements/WarningHide3.svelte";
+  import type { Snippet } from "svelte";
   interface Props {
     warningText?: string;
-    icon?: () => any;
-    seenOn?: () => any;
-    name?: () => any;
-    time?: () => any;
-    status?: () => any;
-    replyUser?: () => any;
-    reply?: () => any;
-    content?: () => any;
-    actionButtons?: () => any;
+    icon?: Snippet;
+    seenOn?: Snippet;
+    name?: Snippet;
+    time?: Snippet;
+    status?: Snippet;
+    replyUser?: Snippet;
+    reply?: Snippet;
+    content?: Snippet;
+    actionButtons?: Snippet;
+    bookmark?: Snippet;
   }
   let {
     warningText,
@@ -24,6 +26,7 @@
     reply,
     content,
     actionButtons,
+    bookmark,
   }: Props = $props();
 </script>
 
@@ -41,6 +44,7 @@
         {@render name?.()}
       </div>
       {@render time?.()}
+      {@render bookmark?.()}
     </div>
     {#if status}
       <div class={`text-sm text-zinc-500`}>

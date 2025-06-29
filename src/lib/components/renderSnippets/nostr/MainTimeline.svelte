@@ -18,7 +18,6 @@
   import {
     displayEvents,
     lumiSetting,
-    relayStateMap,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
 
@@ -62,7 +61,7 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    updateViewEvent: (partialdata?: EventPacket[] | null | undefined) => void;
+    // updateViewEvent: (partialdata?: EventPacket[] | null | undefined) => void;
   }
 
   let {
@@ -76,7 +75,7 @@
     loading,
     nodata,
     content,
-    updateViewEvent = $bindable(),
+    // updateViewEvent = $bindable(),
   }: Props = $props();
   let viewIndex = $state(0);
   const amount = 50;
@@ -188,7 +187,7 @@
   /**
    * Update scheduling and execution
    */
-  updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
+  const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
     if (timelineManager.isUpdateScheduled) return;
 
     timelineManager.isUpdateScheduled = true;

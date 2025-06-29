@@ -17,12 +17,14 @@ import { type QueryKey } from "@tanstack/svelte-query";
 
 import { muteCheck, muteCheck as muteCheckEvent } from "$lib/func/muteCheck";
 import {
+  bookmark10003,
   followList,
   lumiSetting,
   timelineFilter,
   userStatusMap,
 } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
+import { BOOKMARK_STORAGE_KEY } from "$lib/func/constants";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,
@@ -177,6 +179,25 @@ export function metadata(): OperatorFunction<EventPacket, EventPacket> {
         ...queue,
         [["metadata", event.event.pubkey], event],
       ]);
+    }
+  });
+}
+export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
+  return tap((pk: EventPacket) => {
+    //最新のブックマークイベントをクエリーに入れてローカルストレージに保存
+    if (
+      pk.event.kind === 10003 &&
+      pk.event.pubkey === lumiSetting.get().pubkey
+    ) {
+      const queryKey: QueryKey = ["naddr", `${10003}:${pk.event.pubkey}:`];
+
+      const preMeta: EventPacket | undefined =
+        queryClient.getQueryData(queryKey);
+      if (!preMeta || pk.event.created_at > preMeta.event.created_at) {
+        queryClient.setQueryData(queryKey, pk);
+        localStorage?.setItem(BOOKMARK_STORAGE_KEY, JSON.stringify(pk));
+        bookmark10003.set(pk.event);
+      }
     }
   });
 }

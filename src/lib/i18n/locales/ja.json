@@ -142,7 +142,11 @@
     "editChannelInfo": "チャンネル情報の修正",
     "copylink": "リンクをコピー",
     "MAKIMONO": "MAKIMONOで編集する",
-    "refresh": "最新データを取得"
+    "refresh": "最新データを取得",
+    "bookmark": {
+      "add": "ブックマークに追加",
+      "remove": "ブックマークを削除"
+    }
   },
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
@@ -386,5 +390,9 @@
     "chunk": "チャンク",
     "merging": "統合中",
     "processing": "処理中"
+  },
+  "features": {
+    "title": "機能",
+    "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。"
   }
 }

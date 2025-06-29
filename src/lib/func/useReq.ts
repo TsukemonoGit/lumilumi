@@ -1,4 +1,4 @@
-import { metadata } from "$lib/stores/operators";
+import { bookmark, metadata } from "$lib/stores/operators";
 import { app } from "$lib/stores/stores";
 import type {
   UseReqOpts,
@@ -74,7 +74,7 @@ export function useReq(
   //一定時間立って削除したデータの再取得できるように
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(metadata(), operator);
+    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
@@ -86,27 +86,6 @@ export function useReq(
     queryFn: (): Promise<EventPacket | EventPacket[] | null> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
-
-        // let timeout: NodeJS.Timeout | null = null;
-
-        // const clearTimeoutIfExists = () => {
-        //   if (timeout !== null) {
-        //     clearTimeout(timeout);
-        //     timeout = null;
-        //   }
-        // };
-
-        // // データが来なかった場合にタイムアウト処理を行う
-        // timeout = setTimeout(() => {
-        //   if (!fulfilled) {
-        //     console.log(
-        //       "No data received for 15 seconds. Marking as success.",
-        //       queryKey
-        //     );
-        //     status.set("success");
-        //     resolve(null); // タイムアウト時に undefined を返す
-        //   }
-        // }, 15000);
 
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
@@ -204,7 +183,7 @@ export function useForwardReq(
   //一定時間立って削除したデータの再取得できるように
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(req, { relays: relays })
-    .pipe(metadata(), operator);
+    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
@@ -312,7 +291,7 @@ export function useSearchReq(
   //一定時間立って削除したデータの再取得できるように
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(req, { relays: relays })
-    .pipe(metadata(), operator);
+    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
@@ -419,7 +398,7 @@ export function useGlobalReq(
   //一定時間立って削除したデータの再取得できるように
   const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
     .use(req, { relays: relays })
-    .pipe(metadata(), operator);
+    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,

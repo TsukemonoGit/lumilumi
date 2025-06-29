@@ -212,6 +212,14 @@
       </div>
     </li>
     <li>
+      <div class="list">{$_("features.title")}</div>
+      <div class="item">
+        <ul class="list-disc ml-4 space-y-1">
+          <li>{$_("features.bookmark")}</li>
+        </ul>
+      </div>
+    </li>
+    <li>
       <div class="list">{$_("shortcut.title")}</div>
       <div class="item">
         <table>

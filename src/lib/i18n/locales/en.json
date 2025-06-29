@@ -142,7 +142,11 @@
     "delete": "Delete",
     "editChannelInfo": "Edit Channel Information",
     "MAKIMONO": "Edit with MAKIMONO",
-    "refresh": "Get Latest Data"
+    "refresh": "Get Latest Data",
+    "bookmark": {
+      "add": "Add Bookmark",
+      "remove": "Remove Bookmark"
+    }
   },
   "channel": {
     "settingswarning": "To view the channel page, you need to set up a pubkey.",
@@ -386,5 +390,9 @@
     "chunk": "Chunk",
     "merging": "Merging",
     "processing": "Processing"
+  },
+  "features": {
+    "title": "Features",
+    "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported."
   }
 }
