@@ -22,12 +22,19 @@
     Trash,
     FilePenLine,
     RefreshCw,
+    BookmarkMinus,
+    BookmarkPlus,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
-  import { deleteEvent, getRelaysById, publishEvent } from "$lib/func/nostr";
+  import {
+    deleteEvent,
+    getRelaysById,
+    publishEvent,
+    usePromiseReq,
+  } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
-
+  import { pipe } from "rxjs";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { t as _, locale } from "@konemono/svelte5-i18n";
@@ -39,11 +46,15 @@
 
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
-  import type { OkPacketAgainstEvent } from "rx-nostr";
+  import { latest, nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
   import Note from "../Note.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    bookmark10003,
+    loginUser,
+    lumiSetting,
+  } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
 
   interface Props {
@@ -53,6 +64,7 @@
     iconSize?: number;
     iconClass?: string;
     deleted: boolean;
+    isBookmarked?: boolean;
   }
 
   let {
@@ -62,6 +74,7 @@
     iconSize = 20,
     iconClass = "",
     deleted = $bindable(false),
+    isBookmarked,
   }: Props = $props();
 
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
@@ -72,7 +85,7 @@
 
   // メニュー項目の定義を論理的な順序で整理
   let menuTexts = $derived.by(() => {
-    const baseMenuItems = [
+    const menuItems = [
       // 基本操作グループ
       {
         text: `${$_("menu.copy.text")}`,
@@ -89,6 +102,29 @@
         icon: Notebook,
         action: "goto_note",
       },
+
+      // ブックマーク（条件付き）
+      ...(note.kind === 1 || note.kind === 30023
+        ? [
+            {
+              text: `${isBookmarked ? `${$_("menu.bookmark.remove")}` : `${$_("menu.bookmark.add")}`}`,
+              icon: isBookmarked ? BookmarkMinus : BookmarkPlus,
+              action: "toggle_bookmark",
+            },
+          ]
+        : []),
+
+      // データ更新ボタン（条件付き）
+      ...(replaceable
+        ? [
+            {
+              text: `${$_("menu.refresh")}`,
+              icon: RefreshCw,
+              action: "refresh_data",
+            },
+          ]
+        : []),
+
       // 共有・外部リンクグループ
       {
         text: `${$_("menu.sharelink")}`,
@@ -101,6 +137,71 @@
         action: "open_njump",
       },
 
+      // 外部サービス（条件付き）
+      ...(note.kind === 30030
+        ? [
+            {
+              text: `${$_("menu.emoji")}`,
+              icon: Smile,
+              action: "open_emojito",
+            },
+          ]
+        : []),
+
+      ...(note.kind === 30311
+        ? [
+            {
+              text: `${$_("menu.stream")}`,
+              icon: Tv,
+              action: "open_zapstream",
+            },
+          ]
+        : []),
+
+      ...(note.kind === 31990
+        ? [
+            {
+              text: `${$_("menu.nostrapp")}`,
+              icon: Layers,
+              action: "open_nostrapp",
+            },
+          ]
+        : []),
+
+      ...(nostviewstrable.includes(note.kind)
+        ? [
+            {
+              text: `${$_("menu.nostviewstr")}`,
+              icon: Squirrel,
+              action: "open_nostviewstr",
+            },
+          ]
+        : []),
+
+      ...(note.pubkey === lumiSetting.get().pubkey && note.kind === 30023
+        ? [
+            {
+              text: `${$_("menu.MAKIMONO")}`,
+              icon: FilePenLine,
+              action: "open_makimono",
+            },
+          ]
+        : []),
+
+      // Broadcast（条件付き）
+      ...(!(
+        note.tags.find((tag) => tag[0] === "-") &&
+        note.pubkey !== lumiSetting.get().pubkey
+      )
+        ? [
+            {
+              text: `${$_("menu.broadcast")}`,
+              icon: Radio,
+              action: "broadcast",
+            },
+          ]
+        : []),
+
       // ツール・ユーティリティグループ
       {
         text: `${$_("menu.translate")}`,
@@ -112,98 +213,20 @@
         icon: FileJson2,
         action: "view_json",
       },
-    ];
 
-    let menuItems = [...baseMenuItems];
-
-    // 条件付きメニュー項目を適切な位置に挿入
-
-    // データ更新ボタン（条件付きで基本操作グループに追加）
-    if (replaceable) {
-      menuItems.splice(3, 0, {
-        text: `${$_("menu.refresh")}`,
-        icon: RefreshCw,
-        action: "refresh_data",
-      });
-    }
-
-    // Broadcast（NIP-70チェック後、ツールセクションに追加）
-    if (
-      !(
-        note.tags.find((tag) => tag[0] === "-") &&
-        note.pubkey !== lumiSetting.get().pubkey
-      )
-    ) {
-      menuItems.splice(7, 0, {
-        text: `${$_("menu.broadcast")}`,
-        icon: Radio,
-        action: "broadcast",
-      });
-    }
-
-    // 種類別の外部サービスリンク（外部リンクグループの後に追加）
-    const externalServices = [];
-
-    if (note.kind === 30030) {
-      externalServices.push({
-        text: `${$_("menu.emoji")}`,
-        icon: Smile,
-        action: "open_emojito",
-      });
-    }
-
-    if (note.kind === 30311) {
-      externalServices.push({
-        text: `${$_("menu.stream")}`,
-        icon: Tv,
-        action: "open_zapstream",
-      });
-    }
-
-    if (note.kind === 31990) {
-      externalServices.push({
-        text: `${$_("menu.nostrapp")}`,
-        icon: Layers,
-        action: "open_nostrapp",
-      });
-    }
-
-    if (nostviewstrable.includes(note.kind)) {
-      externalServices.push({
-        text: `${$_("menu.nostviewstr")}`,
-        icon: Squirrel,
-        action: "open_nostviewstr",
-      });
-    }
-
-    if (note.pubkey === lumiSetting.get().pubkey && note.kind === 30023) {
-      externalServices.push({
-        text: `${$_("menu.MAKIMONO")}`,
-        icon: FilePenLine,
-        action: "open_makimono",
-      });
-    }
-
-    // 外部サービスリンクを適切な位置に挿入
-    if (externalServices.length > 0) {
-      const njumpIndex = menuItems.findIndex(
-        (item) => item.action === "open_njump"
-      );
-      menuItems.splice(njumpIndex + 1, 0, ...externalServices);
-    }
-
-    // 削除ボタンは最後に追加
-    if (
-      note.pubkey === lumiSetting.get().pubkey &&
+      // 削除ボタン（条件付き、最後に配置）
+      ...(note.pubkey === lumiSetting.get().pubkey &&
       note.kind !== 5 &&
       note.kind !== 62
-    ) {
-      menuItems.push({
-        text: `${$_("menu.delete")}`,
-        icon: Trash,
-        action: "delete",
-      });
-    }
+        ? [
+            {
+              text: `${$_("menu.delete")}`,
+              icon: Trash,
+              action: "delete",
+            },
+          ]
+        : []),
+    ];
 
     // indexesが指定されている場合は、従来の番号システムをマッピング
     if (indexes !== undefined) {
@@ -223,9 +246,10 @@
         delete: 12,
         open_makimono: 13,
         refresh_data: 14,
+        toggle_bookmark: 15, // 新しく追加
       };
 
-      menuItems = menuItems.filter((item) => {
+      return menuItems.filter((item) => {
         const num = actionToNumMap[item.action as keyof typeof actionToNumMap];
         return num !== undefined && indexes.includes(num);
       });
@@ -358,6 +382,66 @@
           $nowProgress = false;
         }, 1000);
         break;
+      case "toggle_bookmark":
+        let pre: Nostr.Event<number> | null = bookmark10003.get();
+        const pub = loginUser.get();
+        if (!pre || pre.pubkey !== pub) {
+          //なかったらほんとにないのか確認する
+          const bookmarkEvent = await usePromiseReq(
+            {
+              filters: [{ kinds: [10003], authors: [pub], limit: 1 }],
+              operator: pipe(latest()),
+            },
+            undefined,
+            2000
+          );
+          if (bookmarkEvent) {
+            pre = bookmarkEvent[0].event;
+          } else {
+            pre = null;
+          }
+        }
+        const tags = (): string[][] => {
+          const [tagType, tagValue] = replaceable
+            ? [
+                "a",
+                `${note.kind}:${note.pubkey}:${note.tags.find((t) => t[0] === "d")?.[1] || ""}`,
+              ]
+            : ["e", note.id];
+
+          const existing = pre?.tags || [];
+
+          return isBookmarked
+            ? existing.filter((t) => !(t[0] === tagType && t[1] === tagValue))
+            : [...existing, [tagType, tagValue]];
+        };
+        const eventParam: Nostr.EventParameters = {
+          kind: 10003,
+          pubkey: pub,
+          content: pre ? pre.content : "",
+          tags: tags(),
+        };
+        const signer = nip07Signer();
+        try {
+          const event = await signer.signEvent(eventParam);
+
+          publishEvent(event);
+          $toastSettings = {
+            title: "Published",
+            description: "",
+            color: "bg-green-500",
+          };
+
+          $nowProgress = false;
+        } catch (error) {
+          $toastSettings = {
+            title: "Failed",
+            description: "failed to publish",
+            color: "bg-red-500",
+          };
+
+          $nowProgress = false;
+        }
     }
   };
 

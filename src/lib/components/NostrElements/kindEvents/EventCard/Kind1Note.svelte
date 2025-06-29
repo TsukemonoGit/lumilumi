@@ -66,6 +66,35 @@
   );
 </script>
 
+{#if isBookmarked}<svg
+    class="absolute right-0 -top-0.5 fill-magnum-500/75"
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="12"
+    viewBox="0 0 16 12"
+    fill="none"
+  >
+    <path
+      d="M1 1V11L8 5L15 11V1"
+      stroke-width="1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg><!-- <svg
+    class="absolute right-0 fill-magnum-500/75"
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="18"
+    viewBox="0 0 16 18"
+    fill="none"
+  >
+    <path
+      d="M1 1V17L8 13L15 17V1"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg> -->{/if}
 <NoteComponent
   warningText={warning !== undefined
     ? warning.length > 1
@@ -96,22 +125,6 @@
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} />
-    {#if isBookmarked}
-      <svg
-        class="absolute right-0 top-6 rotate-90 fill-magnum-500/75"
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="18"
-        viewBox="0 0 16 18"
-        fill="none"
-      >
-        <path
-          d="M1 1V17L8 13L15 17V1"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>{/if}
   {/snippet}
 
   {#snippet status()}
@@ -145,6 +158,6 @@
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+      <NoteActionButtons {note} {repostable} bind:deleted {isBookmarked} />{/if}
   {/snippet}
 </NoteComponent>
