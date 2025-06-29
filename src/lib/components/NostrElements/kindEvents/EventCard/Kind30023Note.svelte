@@ -6,7 +6,7 @@
   import ClientTag from "../../content/ClientTag.svelte";
   import NoteActionButtons from "../NoteActionButtuns/NoteActionButtons.svelte";
 
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { bookmark10003, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
 
   import NoteComponent from "../layout/NoteComponent.svelte";
@@ -60,11 +60,36 @@
   );
 
   let warning = $derived(checkContentWarning(note?.tags));
+  let isBookmarked: boolean = $derived(
+    bookmark10003
+      .get()
+      ?.tags.some(
+        (tag) =>
+          tag[0] === "a" &&
+          tag[1] ===
+            `${note.kind}:${note.pubkey}:${note.tags.find((tag) => tag[0] === "d")?.[1] || ""}`
+      ) || false
+  );
 </script>
 
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else}
+  {#if isBookmarked}<svg
+      class="absolute right-0 -top-0.5 fill-magnum-500/75"
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="12"
+      viewBox="0 0 16 12"
+      fill="none"
+    >
+      <path
+        d="M1 1V11L8 5L15 11V1"
+        stroke-width="1"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>{/if}
   <NoteComponent
     warningText={warning !== undefined
       ? warning.length > 1

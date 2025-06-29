@@ -36,7 +36,11 @@
     {#if event}
       {@const filteredList = event.tags.filter(
         (tag) =>
-          (tag[0] === "e" || tag[0] === "t" || tag[0] === "r") && tag.length > 1
+          (tag[0] === "e" ||
+            tag[0] === "t" ||
+            tag[0] === "r" ||
+            tag[0] === "a") &&
+          tag.length > 1
       )}
       <PaginationList list={filteredList.map((tag) => tag[1])}>
         {#snippet children({ id, index })}
