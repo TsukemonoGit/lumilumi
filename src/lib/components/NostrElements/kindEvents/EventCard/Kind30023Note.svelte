@@ -163,7 +163,12 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons
+          {note}
+          {repostable}
+          bind:deleted
+          {isBookmarked}
+        />{/if}
     {/snippet}
   </NoteComponent>
 {/if}
