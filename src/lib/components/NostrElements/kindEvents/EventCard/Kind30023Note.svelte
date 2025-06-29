@@ -68,7 +68,7 @@
           tag[0] === "a" &&
           tag[1] ===
             `${note.kind}:${note.pubkey}:${note.tags.find((tag) => tag[0] === "d")?.[1] || ""}`
-      ) || false
+      ) ?? false
   );
 </script>
 
