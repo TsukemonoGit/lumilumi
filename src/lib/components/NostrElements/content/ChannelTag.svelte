@@ -75,7 +75,7 @@
     {handleSelectItem}
     buttonClass="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
   >
-    <Text queryKey={["timeline", heyaId]} id={heyaId}>
+    <Text queryKey={["note", heyaId]} id={heyaId}>
       {#snippet loading()}
         <MessagesSquare {size} class="mr-1" />kind:42
       {/snippet}
