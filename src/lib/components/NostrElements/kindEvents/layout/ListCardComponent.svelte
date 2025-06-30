@@ -26,106 +26,74 @@
     listProps,
     menu,
   }: Props = $props();
-
-  /*   const handleClickKategory = (kategory: string) => {
-    //かてごりーくりっくしたときのどうさ
-    console.log(kategory);
-  }; */
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">
+  <!-- コンテンツ部分を共通化 -->
+  {#snippet content()}
+    <div class="grid grid-cols-[auto_1fr]">
+      <!-- 画像 -->
+      <div class="relative">
+        {@render listAvatar?.()}
+        <div
+          class="absolute text-xs bottom-0 left-1 align-bottom text-magnum-900 dark:text-magnum-100 font-semibold bg-black/40 px-0.5"
+        >
+          kind:{listProps.kind}
+        </div>
+      </div>
+
+      <!-- テキスト -->
+      <div class="ml-2 text-start flex flex-col">
+        <div class="text-lg font-bold text-magnum-400">
+          {listProps.name}
+        </div>
+
+        <div class="text-sm text-magnum-100 max-w-full">
+          {#if clickAction}
+            <div
+              class="line-clamp-4"
+              style="white-space: pre-wrap; word-break: break-word;"
+            >
+              {listProps.about}
+            </div>
+          {:else}
+            <ContentParts
+              event={{ content: listProps.about, kind: listProps.kind }}
+              displayMenu={false}
+              depth={0}
+              repostable={false}
+            />
+          {/if}
+        </div>
+
+        {#if listProps.kategories}
+          <div
+            class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+          >
+            {#each listProps.kategories as kategory}
+              <div>{kategory}</div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/snippet}
+
+  <!-- クリック可能かどうかで分岐 -->
   {#if clickAction}
     <button
       title={linkButtonTitle || ""}
-      class="grid grid-cols-[auto_1fr] hover:opacity-75 active:opacity-50"
+      class="hover:opacity-75 active:opacity-50"
       onclick={handleClickToChannel}
     >
-      <!--がぞう-->
-
-      <div class="relative">
-        {@render listAvatar?.()}
-        <div
-          class="absolute text-xs bottom-0 left-1 align-bottom text-magnum-900 dark:text-magnum-100 font-semibold bg-black/40 px-0.5"
-        >
-          kind:{listProps.kind}
-        </div>
-      </div>
-      <!--てきすとたち-->
-      <div class="ml-2 text-start flex flex-col">
-        <div class="text-lg font-bold text-magnum-400">
-          {listProps.name}
-        </div>
-
-        <div
-          class="text-sm line-clamp-4 text-magnum-100 max-w-full"
-          style="	white-space: pre-wrap; word-break: break-word;"
-        >
-          {listProps.about}
-        </div>
-        {#if listProps.kategories}
-          <div
-            class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
-          >
-            {#each listProps.kategories as kategory}
-              <div>
-                {kategory}
-              </div>
-            {/each}
-          </div>{/if}
-      </div></button
-    >
+      {@render content()}
+    </button>
   {:else}
-    <div class="grid grid-cols-[auto_1fr]">
-      <!--がぞう-->
-
-      <div class="relative">
-        {@render listAvatar?.()}
-        <div
-          class="absolute text-xs bottom-0 left-1 align-bottom text-magnum-900 dark:text-magnum-100 font-semibold bg-black/40 px-0.5"
-        >
-          kind:{listProps.kind}
-        </div>
-      </div>
-      <!--てきすとたち-->
-      <div class="ml-2 text-start flex flex-col">
-        <div class="text-lg font-bold text-magnum-400">
-          {listProps.name}
-        </div>
-        <div class={`text-sm text-magnum-100 max-w-full `}>
-          <ContentParts
-            event={{ content: listProps.about, kind: listProps.kind }}
-            displayMenu={false}
-            depth={0}
-            repostable={false}
-          />
-        </div>
-        {#if listProps.kategories}
-          <div
-            class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
-          >
-            {#each listProps.kategories as kategory}
-              <div>
-                {kategory}
-              </div>
-            {/each}
-          </div>{/if}
-      </div>
-    </div>
+    {@render content()}
   {/if}
 
   <div class="flex flex-col justify-between items-center">
     {@render userAvatar?.()}
     {@render menu?.()}
   </div>
-  <!--  <div class="float-end flex gap-1 justify-end">
-    {#each listProps.kategories as kategory}
-      <button
-        class="rounded-md text-magnum-200 font-bold px-1"
-        onclick={(event) => {
-          event.stopPropagation();
-          handleClickKategory(kategory);
-        }}>#{kategory}</button
-      >
-    {/each}
-  </div> -->
 </div>
