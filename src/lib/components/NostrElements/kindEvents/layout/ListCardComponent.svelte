@@ -91,10 +91,7 @@
         <div class="text-lg font-bold text-magnum-400">
           {listProps.name}
         </div>
-        <div
-          class={`text-sm text-magnum-100 max-w-full`}
-          style="	white-space: pre-wrap; word-break: break-word;"
-        >
+        <div class={`text-sm text-magnum-100 max-w-full `}>
           <ContentParts
             event={{ content: listProps.about, kind: listProps.kind }}
             displayMenu={false}
