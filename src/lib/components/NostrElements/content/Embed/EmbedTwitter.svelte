@@ -20,3 +20,13 @@
     charset="utf-8"
   ></script>
 </blockquote>
+
+<style>
+  :global(.twitter-tweet iframe) {
+    pointer-events: none !important;
+  }
+
+  :global(.twitter-tweet:hover iframe) {
+    pointer-events: auto !important;
+  }
+</style>
