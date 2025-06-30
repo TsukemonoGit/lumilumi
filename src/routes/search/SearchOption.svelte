@@ -13,6 +13,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import { followList } from "$lib/stores/globalRunes.svelte";
+  import { onMount, untrack } from "svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -44,23 +45,24 @@
 
   let searchUntilDate = $state("");
   let searchUntilTime = $state("");
-
-  // 日付と時刻を組み合わせてUnixタイムスタンプに変換
-  $effect(() => {
-    if (searchUntilDate && searchUntilTime) {
-      const dateTime = new Date(`${searchUntilDate}T${searchUntilTime}`);
-      searchUntil = Math.floor(dateTime.getTime() / 1000);
-    } else if (!searchUntilDate && !searchUntilTime) {
-      searchUntil = undefined;
-    }
-  });
-
-  // searchUntilからUIの値を復元
-  $effect(() => {
+  onMount(() => {
     if (searchUntil) {
       const date = new Date(searchUntil * 1000);
       searchUntilDate = date.toISOString().split("T")[0];
       searchUntilTime = date.toTimeString().split(" ")[0].substring(0, 5);
+    }
+  });
+  // 日付と時刻を組み合わせてUnixタイムスタンプに変換
+  $effect(() => {
+    if (searchUntilDate && searchUntilTime) {
+      untrack(() => {
+        const dateTime = new Date(`${searchUntilDate}T${searchUntilTime}`);
+        searchUntil = Math.floor(dateTime.getTime() / 1000);
+      });
+    } else if (!searchUntilDate && !searchUntilTime) {
+      untrack(() => {
+        searchUntil = undefined;
+      });
     }
   });
 
