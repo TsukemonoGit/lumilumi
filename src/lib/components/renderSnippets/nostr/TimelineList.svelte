@@ -352,10 +352,7 @@
       if (olderEvents.length > 0) {
         queryClient.setQueryData(
           olderQueryKey,
-          (oldData: EventPacket[] | undefined) => [
-            ...(oldData ?? []),
-            ...olderEvents,
-          ]
+          (oldData: EventPacket[] | undefined) => [...olderEvents]
         );
 
         setTimeout(() => {
