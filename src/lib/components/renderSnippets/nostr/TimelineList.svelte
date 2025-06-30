@@ -218,22 +218,32 @@
     older: EventPacket[] | undefined,
     partial: EventPacket[] | undefined
   ): EventPacket[] {
-    const allEvents = [
-      ...(current || []),
-      ...(older || []),
-      ...(partial || []),
-    ];
+    // partialがない場合は単純結合（重複チェック不要）
     if (!partial || partial.length === 0) {
-      return allEvents;
+      return [...(current || []), ...(older || [])];
     }
-    const seen = new Set<string>();
 
-    return allEvents.filter((pk) => {
-      if (seen.has(pk.event.id)) return false;
-      seen.add(pk.event.id);
-      return true;
+    // partialがある場合のみ重複チェック
+    // current, olderは重複なし、partialとの重複のみチェック
+    const existingIds = new Set<string>();
+    const result: EventPacket[] = [];
+
+    // current, olderを先に追加（重複なし前提）
+    [...(current || []), ...(older || [])].forEach((pk) => {
+      existingIds.add(pk.event.id);
+      result.push(pk);
     });
+
+    // partialから重複していないもののみ追加
+    partial.forEach((pk) => {
+      if (!existingIds.has(pk.event.id)) {
+        result.push(pk);
+      }
+    });
+
+    return result;
   }
+
   function processUpdate(partialdata?: EventPacket[]) {
     try {
       timelineManager.updating = true;
