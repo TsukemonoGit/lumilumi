@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import ContentParts from "../../content/ContentParts.svelte";
 
   interface Props {
     clickAction: boolean;
@@ -10,7 +11,7 @@
       kind: number;
       name: string;
       about: string;
-      kategories: string[];
+      kategories?: string[];
     };
     userAvatar: Snippet;
     menu: Snippet;
@@ -26,10 +27,10 @@
     menu,
   }: Props = $props();
 
-  const handleClickKategory = (kategory: string) => {
+  /*   const handleClickKategory = (kategory: string) => {
     //かてごりーくりっくしたときのどうさ
     console.log(kategory);
-  };
+  }; */
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">
@@ -51,20 +52,26 @@
       </div>
       <!--てきすとたち-->
       <div class="ml-2 text-start flex flex-col">
-        <div class="text-xl font-bold text-magnum-400">
+        <div class="text-lg font-bold text-magnum-400">
           {listProps.name}
         </div>
 
-        <div class="text-magnum-100">{listProps.about}</div>
         <div
-          class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+          class="text-sm line-clamp-4 text-magnum-100 max-w-full"
+          style="	white-space: pre-wrap; word-break: break-word;"
         >
-          {#each listProps.kategories as kategory}
-            <div>
-              {kategory}
-            </div>
-          {/each}
+          {listProps.about}
         </div>
+        {#if listProps.kategories}
+          <div
+            class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+          >
+            {#each listProps.kategories as kategory}
+              <div>
+                {kategory}
+              </div>
+            {/each}
+          </div>{/if}
       </div></button
     >
   {:else}
@@ -81,20 +88,30 @@
       </div>
       <!--てきすとたち-->
       <div class="ml-2 text-start flex flex-col">
-        <div class="text-xl font-bold text-magnum-400">
+        <div class="text-lg font-bold text-magnum-400">
           {listProps.name}
         </div>
-
-        <div class="text-magnum-100">{listProps.about}</div>
         <div
-          class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+          class={`text-sm text-magnum-100 max-w-full`}
+          style="	white-space: pre-wrap; word-break: break-word;"
         >
-          {#each listProps.kategories as kategory}
-            <div>
-              {kategory}
-            </div>
-          {/each}
+          <ContentParts
+            event={{ content: listProps.about, kind: listProps.kind }}
+            displayMenu={false}
+            depth={0}
+            repostable={false}
+          />
         </div>
+        {#if listProps.kategories}
+          <div
+            class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
+          >
+            {#each listProps.kategories as kategory}
+              <div>
+                {kategory}
+              </div>
+            {/each}
+          </div>{/if}
       </div>
     </div>
   {/if}
