@@ -83,10 +83,13 @@
 
 {#if view}
   <section class="w-full break-words overflow-hidden">
-    <ChannelMetadata
-      id={data.id}
-      linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
-    />
+    <div class="text-left w-full bg-neutral-800 rounded-lg overflow-hidden p-2">
+      <ChannelMetadata
+        id={data.id}
+        linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+        clickAction={false}
+      />
+    </div>
     {#if isMute}
       <!---->
       {$_("mute.channel")}
