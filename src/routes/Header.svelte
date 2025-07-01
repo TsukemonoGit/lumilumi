@@ -83,7 +83,7 @@
                 {:else if currentPage?.alt === "global"}
                   <GlobalOptions />
                 {/if}
-                <li>
+                <li class="checkbox-item">
                   <label class="label">
                     <input
                       type="checkbox"
@@ -94,7 +94,7 @@
                     {$_("filter.menu.muteOn")}
                   </label>
                 </li>
-                <li>
+                <li class="checkbox-item">
                   <label class="label">
                     <input
                       type="checkbox"
@@ -121,18 +121,18 @@
     flex: 0.6;
   }
   ul {
-    list-style-type: disc; /* デフォルトのリストアイコン */
-
-    padding-left: 1.5em; /* パディングを追加してアイコンとテキストの距離を調整 */
+    list-style-type: none; /* 全体的にリストの点を削除 */
+    padding-left: 0; /* パディングも削除 */
   }
+
   li {
     padding-top: 4px;
   }
-  .label {
-    list-style-type: disc;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5em;
+
+  /* チェックボックス用のli要素はリストスタイルを無効化 */
+  li.checkbox-item {
+    list-style-type: none;
+    padding-left: 0;
   }
 
   .option {
