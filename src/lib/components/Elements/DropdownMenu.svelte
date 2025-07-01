@@ -16,7 +16,7 @@
     handleSelectItem,
     children,
     zIndex = 40,
-    buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden",
+    buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden w-fit",
   }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow, overlay },
@@ -32,11 +32,8 @@
   type="button"
   class={buttonClass}
   use:melt={$trigger}
-  aria-label="Update dimensions"
-  >{@render children?.()}<span class="sr-only">Open Popover</span></button
->
-
-{#if $open}
+  aria-label="Update dimensions">{@render children?.()}</button
+>{#if $open}
   <div
     use:melt={$overlay}
     class="fixed inset-0"
