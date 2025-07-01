@@ -1,3 +1,4 @@
+<!--HomeOption.svelte-->
 <script lang="ts">
   import { createRadioGroup, melt } from "@melt-ui/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -32,29 +33,24 @@
   });
 </script>
 
-<li class="mb-2">
-  <div class="label">
+<li class="option-section">
+  <div class="section-title">
     {$_("filter.menu.canversation")}
   </div>
-  <div
-    use:melt={$root}
-    class="text-sm my-1 gap-1 flex flex-col data-[orientation=horizontal]:flex-row"
-    aria-label="View density"
-  >
+  <div use:melt={$root} class="radio-group" aria-label="View density">
     {#each optionsArr as [index, option]}
-      <div class="flex items-center gap-3">
+      <div class="radio-item">
         <button
           use:melt={$item(index)}
-          class="grid h-6 w-6 cursor-default place-items-center rounded-full border border-magnum-400 shadow-sm
-hover:bg-magnum-800"
+          class="radio-button"
           id={option}
           aria-labelledby="{option}-label"
         >
           {#if $isChecked(index)}
-            <div class="h-3 w-3 rounded-full bg-magnum-400"></div>
+            <div class="radio-indicator"></div>
           {/if}
         </button>
-        <label for={option} id="{option}-label">
+        <label for={option} id="{option}-label" class="option-label">
           {option}
         </label>
       </div>
@@ -62,3 +58,119 @@ hover:bg-magnum-800"
     <input name="line-height" use:melt={$hiddenInput} />
   </div>
 </li>
+
+<style lang="postcss">
+  header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 0.6;
+  }
+  /* 全体のリストスタイル */
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  /* オプションセクション共通スタイル */
+  .option-section {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background-color: theme("colors.neutral.800");
+    border: 1px solid theme("colors.neutral.700");
+    list-style-type: none;
+  }
+
+  .option-section:last-child {
+    margin-bottom: 0;
+  }
+
+  /* セクションタイトル */
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: theme("colors.magnum.200");
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid theme("colors.neutral.700");
+  }
+
+  /* ラジオボタングループ */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+
+  .radio-button {
+    display: grid;
+    height: 18px;
+    width: 18px;
+    cursor: pointer;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid theme("colors.magnum.400");
+    background-color: transparent;
+    transition: background-color 0.2s;
+  }
+
+  .radio-button:hover {
+    background-color: theme("colors.magnum.800");
+  }
+
+  .radio-indicator {
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: theme("colors.magnum.400");
+  }
+
+  /* チェックボックスグループ */
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .checkbox-item {
+    padding: 4px 0;
+  }
+
+  /* 共通のラベルスタイル */
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: theme("colors.neutral.200");
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* チェックボックスのスタイル調整 */
+  .rounded-checkbox {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .option {
+    @apply absolute top-0 h-8 flex  right-8;
+  }
+
+  @media (max-width: 768px) {
+    .option {
+      @apply absolute top-0 h-8 flex right-0;
+    }
+  }
+</style>
