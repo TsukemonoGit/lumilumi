@@ -204,7 +204,7 @@
           class="flex gap-1 items-center rounded-full border-magnum-300 border m-2 px-2 py-1 text-magnum-300 hover:opacity-75 active:opacity-50"
           data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
-          data-relays="wss://nostr.mutinywallet.com,wss://bostr.nokotaro.com,wss://relay.nostr.band/"
+          data-relays="wss://nostr.mutinywallet.com,wss://relay.nostr.wirednet.jp,wss://relay.nostr.band/"
           onclick={() => dialogOpen?.(true)}
         >
           Zap⚡️Lumilumi
