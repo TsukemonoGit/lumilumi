@@ -34,7 +34,6 @@
   let searchWord: string | undefined = $state();
   let searchKind: number | undefined = $state();
   let searchPubkey = $state("");
-  let searchSince: number | undefined = $state();
   let searchUntil: number | undefined = $state();
   let searchHashtag: string | undefined = $state();
   let searchPubkeyTo: string = $state("");
@@ -85,7 +84,6 @@
     searchKind = data.searchKind;
     searchPubkey = data.searchPubkey;
     searchPubkeyTo = data.searchPubkeyTo;
-    searchSince = data.searchSince;
     searchUntil = data.searchUntil;
     followee = data.followee;
     //kindはデフォ値があるから含めない
@@ -94,7 +92,6 @@
       searchWord ||
       searchPubkey ||
       searchPubkeyTo ||
-      searchSince ||
       searchUntil ||
       searchKind ||
       searchKind === 0
@@ -176,7 +173,7 @@
         : followee && followList.get()
           ? Array.from(followList.get().keys())
           : undefined,
-      since: !Number.isNaN(searchSince) ? searchSince : undefined,
+
       until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
       // "#t": searchHashtag ? [searchHashtag] : [],
       // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
@@ -218,7 +215,6 @@
   }
 
   function resetValue() {
-    searchSince = undefined;
     searchUntil = undefined;
   }
 
@@ -292,7 +288,6 @@
     bind:searchWord
     bind:searchPubkey
     bind:searchPubkeyTo
-    bind:searchSince
     bind:searchUntil
     bind:followee
     {handleClickSearch}
