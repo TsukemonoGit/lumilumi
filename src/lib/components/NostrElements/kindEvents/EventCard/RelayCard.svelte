@@ -1,26 +1,16 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { page } from "$app/state";
-  import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-
   import { formatUrl, getRelayInfo } from "$lib/func/util";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { modalState, toastSettings } from "$lib/stores/stores";
-  import {
-    Copy,
-    Ellipsis,
-    FileJson2,
-    SquareArrowOutUpRight,
-    RadioTower,
-    Share,
-  } from "lucide-svelte";
+
+  import { Ellipsis } from "lucide-svelte";
 
   import Avatar from "svelte-boring-avatars";
   import { t as _ } from "@konemono/svelte5-i18n";
   import UserAvatar from "../../user/UserAvatar.svelte";
   import { untrack } from "svelte";
   import { type Nip11 } from "nostr-typedef";
-  import ModalRelayInfo from "./ModalRelayInfo.svelte";
+
+  import RelayMenu from "../../RelayMenu.svelte";
 
   interface Props {
     url: string;
@@ -34,124 +24,6 @@
   let imageLoaded = true;
 
   let size = 48;
-
-  let encodedUrl = $derived(encodeURIComponent(url));
-
-  // svelte-ignore non_reactive_update
-  const menuTexts =
-    //page.params.relay !== encodedUrl
-    //?
-    [
-      { text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 },
-
-      { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
-      { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-      {
-        text: `${$_("menu.open.relayHtml")}`,
-        icon: SquareArrowOutUpRight,
-        num: 4,
-      },
-
-      {
-        text: `${$_("menu.nostr-watch")}`,
-        icon: SquareArrowOutUpRight,
-        num: 1,
-      },
-
-      { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
-    ];
-
-  const handleSelectItem = async (index: number) => {
-    try {
-      //const encodedrelay = nip19.nrelayEncode(url);
-      const hostname = new URL(url).hostname;
-
-      switch (menuTexts[index].num) {
-        case 0:
-          //view json
-          //$dialogOpen = true;
-          $modalState = {
-            isOpen: true,
-            component: ModalRelayInfo,
-            props: { relayInfo: relayInfo },
-          };
-
-          break;
-
-        case 1:
-          //nostrWatch
-          //https://legacy.nostr.watch/
-
-          window.open(
-            `https://legacy.nostr.watch/relay/${hostname}`,
-            "_blank",
-            "noreferrer"
-          );
-
-          // `https://nostr.watch/relay/${html.hostname}`,
-          //const njumpURL = `https://njump.me/${encodedrelay}`;
-
-          //  window.open(njumpURL, "_blank", "noreferrer");
-          break;
-
-        case 3:
-          //Copy relayURL
-          try {
-            await navigator.clipboard.writeText(url);
-            $toastSettings = {
-              title: "Success",
-              description: `Copied to clipboard`,
-              color: "bg-green-500",
-            };
-          } catch (error: any) {
-            console.error(error.message);
-            $toastSettings = {
-              title: "Error",
-              description: "Failed to copy",
-              color: "bg-orange-500",
-            };
-          }
-          break;
-        case 4:
-          //open relay site
-
-          window.open(formatUrl(url), "_blank", "noreferrer");
-
-          break;
-        case 5:
-          //goto relay page
-
-          goto(`/relay/${encodedUrl}`);
-          break;
-        case 6:
-          //share relay page
-          const shareData = {
-            title: "",
-            //text: "lumilumi",
-            url: `${page.url.origin}/relay/${encodedUrl}`,
-          };
-
-          try {
-            await navigator.share(shareData);
-          } catch (error: any) {
-            console.error(error.message);
-            $toastSettings = {
-              title: "Error",
-              description: "Failed to share",
-              color: "bg-orange-500",
-            };
-          }
-          break;
-      }
-    } catch (error) {
-      console.log("relay encode error");
-      $toastSettings = {
-        title: "Error",
-        description: "relay encode error",
-        color: "bg-orange-500",
-      };
-    }
-  };
 
   let relayInfo: Nip11.RelayInfo | undefined = $state();
   $effect(() => {
@@ -211,13 +83,13 @@
           </div>
         {/if}
         <div class="ml-auto">
-          <DropdownMenu {menuTexts} {zIndex} {handleSelectItem}>
-            <div
+          <RelayMenu {url} {zIndex} {relayInfo}
+            ><div
               class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
             >
               <Ellipsis size={20} />
-            </div>
-          </DropdownMenu>
+            </div></RelayMenu
+          >
         </div>
       </div>
       {#if relayInfo.description}
