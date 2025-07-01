@@ -6,7 +6,6 @@
   import EmbedBluesky from "./Embed/EmbedBluesky.svelte";
   import OgpLoad from "./OgpLoad.svelte";
 
-  // Types
   type PlatformType = "youtube" | "twitter" | "bluesky" | "other";
 
   interface URLPattern {
@@ -19,9 +18,16 @@
   // Props
   let { url, author }: { url: string; author: string } = $props();
 
-  // State
-  let forceExpand = $state(false);
-  let loadFailed = $state(false);
+  // State - loadFailedをembedStateに統合
+  let embedState = $state<{
+    forceExpand: boolean;
+    loadFailed: boolean;
+    hasAttemptedLoad: boolean;
+  }>({
+    forceExpand: false,
+    loadFailed: false,
+    hasAttemptedLoad: false,
+  });
 
   // Constants
   const URL_PATTERNS: Record<Exclude<PlatformType, "other">, URLPattern> = {
@@ -74,7 +80,7 @@
     bluesky: "Bluesky",
   } as const;
 
-  // Utility functions
+  // Platform detection (既存のロジックを維持)
   const parseURL = (url: string): URL | null => {
     try {
       return isvalidURL(url) ? new URL(url) : null;
@@ -93,7 +99,6 @@
     patterns: readonly RegExp[]
   ): boolean => patterns.some((pattern) => pattern.test(target));
 
-  // Platform validation functions
   const isYouTubeValid = (parsedUrl: URL): boolean => {
     const { hostname, pathname, searchParams } = parsedUrl;
     const pattern = URL_PATTERNS.youtube;
@@ -150,22 +155,40 @@
     return "other";
   };
 
-  const normalizeTwitterUrl = (url: string): string | null => {
-    if (platform !== "twitter") return null;
-    if (url.includes("t.co")) return url;
-
-    return url.replace(
-      /^(?:https?:\/\/)?(?:x\.com|twitter\.com)\/([^\/]+)\/status\/(\d+)/i,
-      "https://twitter.com/$1/status/$2"
-    );
-  };
-
   // Derived values
   const platform = $derived(detectPlatform(url));
-  const youtubeVideoId = $derived(
-    platform === "youtube" ? getYoutubeVideoId(url) : null
-  );
-  const twitterUrl = $derived(normalizeTwitterUrl(url));
+
+  // プラットフォーム固有データを統合
+  const platformData = $derived.by(() => {
+    switch (platform) {
+      case "youtube":
+        return {
+          id: getYoutubeVideoId(url),
+          url: null,
+          originalUrl: null,
+        };
+      case "twitter":
+        const twitterUrl = url.includes("t.co")
+          ? url
+          : url.replace(
+              /^(?:https?:\/\/)?(?:x\.com|twitter\.com)\/([^\/]+)\/status\/(\d+)/i,
+              "https://twitter.com/$1/status/$2"
+            );
+        return {
+          id: null,
+          url: twitterUrl,
+          originalUrl: url,
+        };
+      case "bluesky":
+        return {
+          id: null,
+          url: url,
+          originalUrl: null,
+        };
+      default:
+        return { id: null, url: null, originalUrl: null };
+    }
+  });
 
   const shouldAutoExpand = $derived.by(() => {
     const setting = lumiSetting.get().imageAutoExpand;
@@ -175,19 +198,35 @@
     );
   });
 
-  const shouldShowEmbed = $derived(
-    (shouldAutoExpand || forceExpand) && lumiSetting.get().embed && !loadFailed
-  );
+  // 表示ロジックを統合・簡素化
+  const displayMode = $derived.by((): "embed" | "button" | "ogp" => {
+    const canEmbed = platform !== "other";
+    const shouldExpand = shouldAutoExpand || embedState.forceExpand;
+    const embedEnabled = lumiSetting.get().embed;
 
-  const shouldFallbackToOgp = $derived(loadFailed && platform !== "other");
-  const shouldShowOgp = $derived(shouldFallbackToOgp || platform === "other");
+    if (!canEmbed) {
+      return "ogp";
+    }
+
+    if (!shouldExpand) {
+      return "button";
+    }
+
+    if (!embedEnabled || embedState.loadFailed) {
+      return "ogp";
+    }
+
+    return "embed";
+  });
 
   // Event handlers
   const handleOnError = () => {
-    loadFailed = true;
+    embedState.loadFailed = true;
+    embedState.hasAttemptedLoad = true;
   };
+
   const handleExpand = () => {
-    forceExpand = true;
+    embedState.forceExpand = true;
   };
 
   // Styles
@@ -195,32 +234,24 @@
     "rounded-md border font-semibold border-magnum-600 text-magnum-200 p-1 m-1 hover:opacity-75 active:opacity-50";
 </script>
 
-{#if platform === "youtube" && youtubeVideoId}
-  {#if shouldShowEmbed}
-    <EmbedYoutube id={youtubeVideoId} onError={handleOnError} />
-  {:else}
-    <button class={expandButtonClass} onclick={handleExpand}>
-      Expand {PLATFORM_LABELS.youtube}
-    </button>
+<!-- 表示ロジックをswitch文で整理 -->
+{#if displayMode === "embed"}
+  {#if platform === "youtube" && platformData.id}
+    <EmbedYoutube id={platformData.id} onError={handleOnError} />
+  {:else if platform === "twitter" && platformData.url}
+    <EmbedTwitter
+      url={platformData.url}
+      originalUrl={platformData.originalUrl || url}
+      onError={handleOnError}
+    />
+  {:else if platform === "bluesky" && platformData.url}
+    <EmbedBluesky url={platformData.url} onError={handleOnError} />
   {/if}
-{:else if platform === "twitter" && twitterUrl}
-  {#if shouldShowEmbed}
-    <EmbedTwitter url={twitterUrl} originalUrl={url} onError={handleOnError} />
-  {:else}
-    <button class={expandButtonClass} onclick={handleExpand}>
-      Expand {PLATFORM_LABELS.twitter}
-    </button>
-  {/if}
-{:else if platform === "bluesky"}
-  {#if shouldShowEmbed}
-    <EmbedBluesky {url} onError={handleOnError} />
-  {:else}
-    <button class={expandButtonClass} onclick={handleExpand}>
-      Expand {PLATFORM_LABELS.bluesky}
-    </button>
-  {/if}
-{/if}
-
-{#if shouldShowOgp}
+{:else if displayMode === "button"}
+  <button class={expandButtonClass} onclick={handleExpand}>
+    Expand {PLATFORM_LABELS[platform as keyof typeof PLATFORM_LABELS]}
+  </button>
+{:else}
+  <!-- displayMode === "ogp" または予期しない状態 -->
   <OgpLoad {url} />
 {/if}
