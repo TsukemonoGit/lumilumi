@@ -143,6 +143,6 @@
   };
 </script>
 
-<DropdownMenu {menuTexts} {zIndex} {handleSelectItem}>
-  {@render children?.()}
-</DropdownMenu>
+<DropdownMenu {menuTexts} {zIndex} {handleSelectItem}
+  >{@render children?.()}</DropdownMenu
+>

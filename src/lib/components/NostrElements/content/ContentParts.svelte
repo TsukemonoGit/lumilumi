@@ -162,17 +162,8 @@
     >
   {:else if part.type === "relay"}
     <RelayMenu url={part.content} zIndex={zIndex || 0}>
-      <span class="text-magnum-300 break-all">{part.content}</span>
-    </RelayMenu>
-    <!-- <span class="underline break-all">{part.content}</span><RelayMenu
-      url={part.content}
-      zIndex={zIndex || 0}
-    >
-      <RadioTower
-        class="inline-block rounded-full border border-magnum-300 text-magnum-300 p-0.5 w-5 h-5 "
-      />
-    </RelayMenu> -->
-  {:else if part.type === TokenType.NIP_IDENTIFIER}
+      <span class="text-magnum-300 break-all">{part.content}</span></RelayMenu
+    >{:else if part.type === TokenType.NIP_IDENTIFIER}
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}
       className="underline text-magnum-300 break-all hover:opacity-80"
