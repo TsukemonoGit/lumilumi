@@ -39,7 +39,7 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
-
+    // console.log(path);
     if (imageRegex.test(path)) {
       return "image";
     } else if (movieRegex.test(path)) {
@@ -53,7 +53,7 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
         // HEADリクエストを送信してContent-Typeを取得
         const response = await fetch(url, { method: "HEAD" });
         const contentType = response.headers.get("Content-Type");
-
+        // console.log(contentType);
         if (contentType?.startsWith("image/")) {
           return "image";
         } else if (contentType?.startsWith("video/")) {
