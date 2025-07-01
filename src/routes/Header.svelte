@@ -4,7 +4,7 @@
 
   import Popover from "$lib/components/Elements/Popover.svelte";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { page } from "$app/state";
   import { showBanner, timelineFilter } from "$lib/stores/globalRunes.svelte";
@@ -46,7 +46,9 @@
   const onMuteChange = () => {
     timelineFilter.update((cur) => {
       console.log(cur);
-      return { ...cur, adaptMute: !cur.adaptMute };
+      const tlFilter = { ...cur, adaptMute: !cur.adaptMute };
+      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      return tlFilter;
     });
   };
 </script>

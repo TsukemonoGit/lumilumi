@@ -1,16 +1,17 @@
 <script lang="ts">
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
 
   const onChangeExcludeFollowee = () => {
     timelineFilter.update((cur) => {
       console.log(cur);
-      return { ...cur, globalExcludeFollowee: !cur.globalExcludeFollowee };
+      const tlFilter = {
+        ...cur,
+        globalExcludeFollowee: !cur.globalExcludeFollowee,
+      };
+      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      return tlFilter;
     });
-    localStorage.setItem(
-      "timelineFilter",
-      JSON.stringify(timelineFilter.get())
-    );
   };
 </script>
 
