@@ -22,8 +22,17 @@
       hostname === "t.co"
   );
   let isBluesky: boolean = $derived.by(() => {
-    const atProtoPostPattern = /\/profile\/[^\/]+\/post\/[^\/]+$/;
-    return atProtoPostPattern.test(url);
+    const bskyPostPattern = /bsky\.app\/profile\/[^\/]+\/post\/[^\/]+/;
+    const excludePatterns = [
+      "/img/",
+      "/feed_fullsize/",
+      "/avatar/",
+      "/banner/",
+    ];
+    return (
+      bskyPostPattern.test(url) &&
+      !excludePatterns.some((pattern) => url.includes(pattern))
+    );
   });
 
   let showImageOrVideo: boolean = $derived.by(() => {
