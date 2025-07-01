@@ -546,12 +546,6 @@
   $effect(() => {
     if (timelineFilter.get()) {
       untrack(() => updateViewEvent());
-      if (typeof localStorage !== "undefined") {
-        localStorage.setItem(
-          "timelineFilter",
-          JSON.stringify(timelineFilter.get())
-        );
-      }
     }
   });
 
