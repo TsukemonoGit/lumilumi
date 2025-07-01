@@ -27,7 +27,10 @@
     if (value !== undefined && value !== null) {
       timelineFilter.update((cur) => {
         console.log(cur);
-        return { ...cur, selectCanversation: Number(value) };
+        const tlFilter = { ...cur, selectCanversation: Number(value) };
+        localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+
+        return tlFilter;
       });
     }
   });
