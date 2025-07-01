@@ -22,6 +22,10 @@
   import UrlDisplay from "./UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
   import { nipLink, parseNaddr } from "$lib/func/util";
+  import Popover from "$lib/components/Elements/Popover.svelte";
+  import RelayCard from "../kindEvents/EventCard/RelayCard.svelte";
+  import RelayMenu from "../RelayMenu.svelte";
+  import { RadioTower } from "lucide-svelte";
 
   interface Props {
     event: Partial<Nostr.Event>;
@@ -157,9 +161,17 @@
       class="underline text-magnum-300 break-all">{part.content}</a
     >
   {:else if part.type === "relay"}
-    <a class="underline text-magnum-300 break-all" href={part.content ?? ""}
-      >{part.content}</a
+    <RelayMenu url={part.content} zIndex={zIndex || 0}>
+      <span class="text-magnum-300 break-all">{part.content}</span>
+    </RelayMenu>
+    <!-- <span class="underline break-all">{part.content}</span><RelayMenu
+      url={part.content}
+      zIndex={zIndex || 0}
     >
+      <RadioTower
+        class="inline-block rounded-full border border-magnum-300 text-magnum-300 p-0.5 w-5 h-5 "
+      />
+    </RelayMenu> -->
   {:else if part.type === TokenType.NIP_IDENTIFIER}
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}
