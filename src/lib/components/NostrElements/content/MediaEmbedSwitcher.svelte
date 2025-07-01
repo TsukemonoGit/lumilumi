@@ -21,9 +21,10 @@
       hostname.includes("x.com") ||
       hostname === "t.co"
   );
-  let isBluesky: boolean = $derived(
-    hostname.includes("bsky.app") || url.startsWith("at://")
-  );
+  let isBluesky: boolean = $derived.by(() => {
+    const atProtoPostPattern = /\/profile\/[^\/]+\/post\/[^\/]+$/;
+    return atProtoPostPattern.test(url);
+  });
 
   let showImageOrVideo: boolean = $derived.by(() => {
     switch (lumiSetting.get().imageAutoExpand) {

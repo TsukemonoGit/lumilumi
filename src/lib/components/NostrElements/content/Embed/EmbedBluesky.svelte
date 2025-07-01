@@ -21,11 +21,9 @@
     }
   }
 
-  async function extractBlueskyInfo(url: string): Promise<string> {
-    // Match profile post URLs like https://bsky.app/profile/username.bsky.social/post/postid
-    const profileMatch = url.match(
-      /bsky\.app\/profile\/([^\/]+)\/post\/([^\/]+)/
-    );
+  async function extractAtProtoInfo(url: string): Promise<string> {
+    // Match profile post URLs like https://*/profile/username.bsky.social/post/postid
+    const profileMatch = url.match(/\/profile\/([^\/]+)\/post\/([^\/]+)$/);
     if (profileMatch) {
       try {
         const handle = profileMatch[1];
@@ -40,16 +38,16 @@
 
         return uri;
       } catch (error) {
-        console.error("Error processing Bluesky URL:", error);
+        console.error("Error processing AT Protocol URL:", error);
         throw error;
       }
     }
 
-    throw new Error("Invalid Bluesky URL format");
+    throw new Error("Invalid AT Protocol URL format");
   }
 </script>
 
-{#await extractBlueskyInfo(url)}
+{#await extractAtProtoInfo(url)}
   <OgpLoad {url} />
 {:then uri}
   <blockquote
@@ -64,4 +62,6 @@
       charset="utf-8"
     ></script>
   </blockquote>
+{:catch}
+  <OgpLoad {url} />
 {/await}
