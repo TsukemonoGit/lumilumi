@@ -18,7 +18,10 @@
 
   async function extractBskyUri(url: string): Promise<string> {
     const match = url.match(/bsky\.app\/profile\/([^\/]+)\/post\/([^\/]+)/);
-    if (!match) throw new Error("Invalid bsky.app URL format");
+    if (!match) {
+      onError();
+      throw new Error("Invalid bsky.app URL format");
+    }
 
     const [, handle, postId] = match;
     const did = await resolveHandleToDid(handle);

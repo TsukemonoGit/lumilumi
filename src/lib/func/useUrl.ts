@@ -39,7 +39,8 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
-    // console.log(path);
+
+    // 拡張子チェック
     if (imageRegex.test(path)) {
       return "image";
     } else if (movieRegex.test(path)) {
@@ -50,10 +51,13 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
       return "3D";
     } else {
       try {
-        // HEADリクエストを送信してContent-Typeを取得
-        const response = await fetch(url, { method: "HEAD" });
-        const contentType = response.headers.get("Content-Type");
-        // console.log(contentType);
+        // プロキシAPI経由でContent-Typeを取得
+        const response = await fetch(
+          `/api/url-check?url=${encodeURIComponent(url)}`
+        );
+        const data = await response.json();
+        const contentType = data.contentType;
+
         if (contentType?.startsWith("image/")) {
           return "image";
         } else if (contentType?.startsWith("video/")) {
@@ -66,6 +70,7 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
           return "url";
         }
       } catch (error) {
+        console.log(error);
         return "url";
       }
     }
