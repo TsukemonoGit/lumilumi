@@ -724,12 +724,7 @@
 {#if viewAllReactions}
   <!--kind6-->
   {#if repost_length > 0}
-    <div class="flex gap-1 p-1 items-center">
-      <Repeat2 size="20" class="text-magnum-500/75  min-w-5 mx-0.5" />
-      <div class="flex flex-wrap">
-        <RepostList events={repost} />
-      </div>
-    </div>
+    <RepostList events={repost} />
   {/if}
 
   {#if reaction_length > 0}
