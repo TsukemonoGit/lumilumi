@@ -34,13 +34,11 @@
 </script>
 
 {#each uniqueContents as content}
-  <div
-    class="flex max-w-full break-words whitespace-pre-line p-1 box-border overflow-hidden"
-  >
+  <div class="flex max-w-full p-0.5 overflow-hidden">
     <div class="min-w-6 flex justify-center">
       <Reaction event={findEvent(content)} />
     </div>
-    <div class="flex-wrap px-2 gap-1">
+    <div class="flex-wrap px-2 gap-1 h-fit">
       {#each filterEventsByContent(validEvents, content) as event (event.id)}
         <!-- 修正: validEvents を使用 -->
         {#if event.pubkey}

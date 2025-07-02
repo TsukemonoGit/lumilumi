@@ -63,20 +63,6 @@
 </li>
 
 <style lang="postcss">
-  header {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 0.6;
-  }
-  /* 全体のリストスタイル */
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-    margin: 0;
-  }
-
   /* オプションセクション共通スタイル */
   .option-section {
     padding: 12px;
