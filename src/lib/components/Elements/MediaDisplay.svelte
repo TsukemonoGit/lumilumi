@@ -211,8 +211,7 @@
           <img
             src={currentImageUrl}
             alt=""
-            class="object-contain"
-            style="width: 100%; height: auto; max-width: 100vw; max-height: 100vh;"
+            class="max-h-[100vh] max-w-[100vw] object-contain"
             onload={() => (loadingStatus = "loaded")}
             onerror={() => (loadingStatus = "error")}
           />
