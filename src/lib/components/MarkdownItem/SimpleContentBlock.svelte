@@ -138,7 +138,7 @@
     >
   {:else if part.type === "link"}
     <Link {part} {repostable} {depth} {displayMenu} {note} {nolist} {zIndex} />
-  {:else if part.type === "image"}
+  {:else if part.type === "image" || part.type === "svg"}
     <Image {part} />
   {:else if part.type === "strong"}
     <strong>
