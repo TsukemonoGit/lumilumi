@@ -17,15 +17,11 @@
 
   import InvoiceCard from "../kindEvents/EventCard/InvoiceCard.svelte";
 
-  import { untrack } from "svelte";
-
   import UrlDisplay from "./UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
   import { nipLink, parseNaddr } from "$lib/func/util";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-  import RelayCard from "../kindEvents/EventCard/RelayCard.svelte";
+
   import RelayMenu from "../RelayMenu.svelte";
-  import { RadioTower } from "lucide-svelte";
 
   interface Props {
     event: Partial<Nostr.Event>;

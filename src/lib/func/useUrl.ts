@@ -1,7 +1,14 @@
 import { createQuery } from "@tanstack/svelte-query";
 import { derived, type Readable } from "svelte/store";
 
-export type UrlType = "text" | "image" | "audio" | "movie" | "3D" | "url";
+export type UrlType =
+  | "text"
+  | "image"
+  | "svg"
+  | "audio"
+  | "movie"
+  | "3D"
+  | "url";
 
 export const useUrl = (
   url: string
@@ -26,6 +33,8 @@ export const useUrl = (
 
 /** ImageFile_Check_正規表現_パターン */
 const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
+// SVGを別で定義
+const svgRegex = /\.svg$/i;
 //movie
 const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
 
@@ -40,8 +49,10 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
 
-    // 拡張子チェック
-    if (imageRegex.test(path)) {
+    // 拡張子チェック - SVGを最初にチェック
+    if (svgRegex.test(path)) {
+      return "svg";
+    } else if (imageRegex.test(path)) {
       return "image";
     } else if (movieRegex.test(path)) {
       return "movie";
@@ -58,7 +69,9 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
         const data = await response.json();
         const contentType = data.contentType;
 
-        if (contentType?.startsWith("image/")) {
+        if (contentType?.includes("svg")) {
+          return "svg";
+        } else if (contentType?.startsWith("image/")) {
           return "image";
         } else if (contentType?.startsWith("video/")) {
           return "movie";

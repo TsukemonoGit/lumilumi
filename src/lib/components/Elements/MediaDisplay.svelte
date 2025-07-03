@@ -19,6 +19,7 @@
   interface MediaItem {
     url: string;
     originalIndex: number;
+    type: UrlType;
   }
 
   interface MediaViewState {
@@ -50,12 +51,16 @@
   function filterValidImages(imageUrls: string[]): MediaItem[] {
     return imageUrls
       .map((url, index) => ({ url, originalIndex: index }))
-      .filter((item) => {
+      .map((item) => {
         const data: UrlType | undefined = queryClient.getQueryData([
           "useUrl",
           item.url,
         ]);
-        return data === undefined || data === "image";
+        return { ...item, type: data || "url" };
+      })
+      .filter((item) => {
+        // image または svg のみを表示対象とする
+        return item.type === "image" || item.type === "svg";
       });
   }
 
@@ -191,6 +196,7 @@
 
   // 現在の画像URL取得
   let currentImageUrl = $derived(displayImages[displayIndex]?.url ?? "");
+  let currentImageType = $derived(displayImages[displayIndex]?.type ?? "image");
 </script>
 
 {#if $dialogOpen && displayImages.length > 0}
@@ -208,13 +214,29 @@
         class="fixed left-1/2 top-1/2 z-[999] max-h-[100vh] max-w-[100vw] -translate-x-1/2 -translate-y-1/2"
       >
         <div class="relative w-full h-full">
-          <img
-            src={currentImageUrl}
-            alt=""
-            class="max-h-[100vh] max-w-[100vw] object-contain"
-            onload={() => (loadingStatus = "loaded")}
-            onerror={() => (loadingStatus = "error")}
-          />
+          {#if currentImageType === "svg"}
+            <!-- SVG専用の表示 -->
+            <div
+              class="flex items-center justify-center max-h-[100vh] max-w-[100vw]"
+            >
+              <img
+                src={currentImageUrl}
+                alt=""
+                class="h-[100vh] w-[100vh] object-contain"
+                onload={() => (loadingStatus = "loaded")}
+                onerror={() => (loadingStatus = "error")}
+              />
+            </div>
+          {:else}
+            <!-- 通常の画像表示 -->
+            <img
+              src={currentImageUrl}
+              alt=""
+              class="max-h-[100vh] max-w-[100vw] object-contain"
+              onload={() => (loadingStatus = "loaded")}
+              onerror={() => (loadingStatus = "error")}
+            />
+          {/if}
 
           <!-- ローディング・エラー表示 -->
           {#if loadingStatus !== "loaded"}
@@ -259,11 +281,13 @@
     </button>
 
     <!-- 画像カウンター -->
-
     <div
       class="fixed bottom-1 right-1 z-[999] rounded bg-neutral-800/50 px-3 py-1 text-sm text-neutral-300"
     >
       {displayIndex + 1} / {displayImages.length}
+      {#if currentImageType === "svg"}
+        <span class="ml-1 text-xs opacity-75">SVG</span>
+      {/if}
     </div>
   </div>
 {/if}

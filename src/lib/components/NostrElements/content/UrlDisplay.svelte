@@ -28,7 +28,7 @@
       >
     {/snippet}
     {#snippet content(type)}
-      {#if type === "image"}
+      {#if type === "image" || type === "svg"}
         <!-- <ContentOneImage url={part.content ?? ""} /> -->
         <ContentImage
           url={part.content}
