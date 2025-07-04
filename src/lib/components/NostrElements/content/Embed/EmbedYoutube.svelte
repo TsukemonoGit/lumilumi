@@ -6,7 +6,7 @@
   let { id, onError }: Props = $props();
 </script>
 
-<div class="aspect-video w-full max-h-64">
+<div class="youtube-embed aspect-video w-full max-h-64">
   <iframe
     width="100%"
     height="100%"
@@ -20,3 +20,13 @@
     onerror={onError}
   ></iframe>
 </div>
+
+<style>
+  :global(.youtube-embed iframe) {
+    pointer-events: none !important;
+  }
+
+  :global(.youtube-embed:hover iframe) {
+    pointer-events: auto !important;
+  }
+</style>
