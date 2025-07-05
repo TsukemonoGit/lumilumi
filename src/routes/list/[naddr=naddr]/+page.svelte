@@ -145,7 +145,6 @@
                 {
                   kinds: [1, 6, 16],
                   authors: pubkeys,
-                  since: since,
                 },
               ]}
               req={createRxForwardReq()}

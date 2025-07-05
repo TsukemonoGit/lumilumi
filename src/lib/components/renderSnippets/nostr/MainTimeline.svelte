@@ -428,9 +428,7 @@
 
       const olderEvents = await loadOlderEvents(
         fetchAmount,
-        olderFilters.map((fil) => {
-          return { ...fil, since: undefined };
-        }),
+        olderFilters,
         untilTime,
         tie,
         relays,
