@@ -450,8 +450,9 @@
 
             viewMoved = true;
           }
-
-          updateViewEvent(partialData);
+          setTimeout(() => {
+            updateViewEvent(partialData);
+          });
         }
       );
 
@@ -471,8 +472,9 @@
         // viewIndexが変更された場合のみ履歴を更新
 
         updateHistoryState();
-
-        updateViewEvent();
+        setTimeout(() => {
+          updateViewEvent();
+        });
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
