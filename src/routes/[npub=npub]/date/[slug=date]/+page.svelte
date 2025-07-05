@@ -14,6 +14,8 @@
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import { t } from "@konemono/svelte5-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { toastSettings } from "$lib/stores/stores";
+  import { Share } from "lucide-svelte";
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
@@ -82,6 +84,25 @@
       day: "2-digit",
     }).format(date);
   }
+
+  // 共有機能
+  async function handleShare() {
+    const shareData = {
+      title: "",
+      url: window.location.href,
+    };
+
+    try {
+      await navigator.share(shareData);
+    } catch (error: any) {
+      console.error(error.message);
+      $toastSettings = {
+        title: "Error",
+        description: "Failed to share",
+        color: "bg-orange-500",
+      };
+    }
+  }
 </script>
 
 {#if !localDate}
@@ -132,53 +153,65 @@
                   <!-- 統計情報 -->
                   {@const stats = getEventStats(events)}
                   <div class="bg-neutral-900 p-4 rounded-lg mb-2">
-                    <h3 class="text-lg font-semibold mb-2">
-                      <div class="inline-flex align-bottom">
-                        <Metadata
-                          queryKey={["metadata", data.pubkey]}
-                          pubkey={data.pubkey}
-                        >
-                          {#snippet loading()}
-                            <UserPopupMenu
-                              pubkey={data.pubkey}
-                              metadata={undefined}
-                              size={24}
-                              depth={0}
-                            />
-                          {/snippet}
+                    <!-- ヘッダー部分 -->
+                    <div class="flex justify-between items-start mb-3">
+                      <h3 class="text-lg font-semibold">
+                        <div class="inline-flex align-bottom">
+                          <Metadata
+                            queryKey={["metadata", data.pubkey]}
+                            pubkey={data.pubkey}
+                          >
+                            {#snippet loading()}
+                              <UserPopupMenu
+                                pubkey={data.pubkey}
+                                metadata={undefined}
+                                size={24}
+                                depth={0}
+                              />
+                            {/snippet}
 
-                          {#snippet error()}
-                            <UserPopupMenu
-                              pubkey={data.pubkey}
-                              metadata={undefined}
-                              size={24}
-                              depth={0}
-                            />
-                          {/snippet}
+                            {#snippet error()}
+                              <UserPopupMenu
+                                pubkey={data.pubkey}
+                                metadata={undefined}
+                                size={24}
+                                depth={0}
+                              />
+                            {/snippet}
 
-                          {#snippet nodata()}
-                            <UserPopupMenu
-                              pubkey={data.pubkey}
-                              metadata={undefined}
-                              size={24}
-                              depth={0}
-                            />
-                          {/snippet}
+                            {#snippet nodata()}
+                              <UserPopupMenu
+                                pubkey={data.pubkey}
+                                metadata={undefined}
+                                size={24}
+                                depth={0}
+                              />
+                            {/snippet}
 
-                          {#snippet content({ metadata })}
-                            <UserPopupMenu
-                              pubkey={data.pubkey}
-                              {metadata}
-                              size={24}
-                              depth={0}
-                            />
-                          {/snippet}
-                        </Metadata>
-                      </div>
-                      {$t("date.activity_on", {
-                        date: formatDateOnly(localDate),
-                      })}
-                    </h3>
+                            {#snippet content({ metadata })}
+                              <UserPopupMenu
+                                pubkey={data.pubkey}
+                                {metadata}
+                                size={24}
+                                depth={0}
+                              />
+                            {/snippet}
+                          </Metadata>
+                        </div>
+                        {$t("date.activity_on", {
+                          date: formatDateOnly(localDate),
+                        })}
+                      </h3>
+
+                      <!-- 共有ボタン - 右上 -->
+                      <button
+                        class="flex items-center gap-1 px-2 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs rounded transition-colors duration-200 shrink-0"
+                        onclick={handleShare}
+                      >
+                        <Share class="w-4 h-4" />
+                        <span>{$t("menu.sharelink")}</span>
+                      </button>
+                    </div>
                     <div class="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <div class="text-2xl font-bold text-blue-600">
