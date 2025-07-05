@@ -449,7 +449,9 @@
             viewMoved = true;
           }
 
-          updateViewEvent(partialData);
+          setTimeout(() => {
+            updateViewEvent(partialData);
+          });
         }
       );
 
@@ -467,7 +469,9 @@
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
 
-        updateViewEvent();
+        setTimeout(() => {
+          updateViewEvent();
+        });
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
