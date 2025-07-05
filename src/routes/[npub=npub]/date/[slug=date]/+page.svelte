@@ -53,13 +53,13 @@
     console.log(ev);
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
-      // .filter(
-      //   (tag) =>
-      //     tag[0] === "r" &&
-      //     relayRegex.test(tag[1]) &&
-      //     (tag.length === 2 || tag[2] === "write")
-      // )
-      .map((r) => r[1]);
+      .filter(
+        (tag) => tag[0] === "r" && relayRegex.test(tag[1])
+        //    && relayRegex.test(tag[1]) &&
+        //     (tag.length === 2 || tag[2] === "write")
+      )
+      .map((r) => r[1])
+      .slice(0, 20);
   };
 
   // イベントの統計を計算
