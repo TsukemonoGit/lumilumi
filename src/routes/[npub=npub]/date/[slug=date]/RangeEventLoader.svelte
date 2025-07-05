@@ -106,7 +106,7 @@
               .map((packet) => packet.event)
               .filter((event) => {
                 if (seenEventIds.has(event.id)) {
-                  console.log(`重複イベントをスキップ: ${event.id}`);
+                  //  console.log(`重複イベントをスキップ: ${event.id}`);
                   return false;
                 }
                 seenEventIds.add(event.id);
