@@ -631,7 +631,8 @@
                     list={contacts.tags
                       .filter((tag) => tag[0] === "p" && tag.length > 1)
                       .map((tag) => tag[1])}
-                    >{#snippet children({ id })}
+                    >{#snippet children(event, index)}
+                      {@const id = event as string}
                       <Metadatanoyatu pubkey={id} />
                     {/snippet}
                   </PaginationList>{/if}

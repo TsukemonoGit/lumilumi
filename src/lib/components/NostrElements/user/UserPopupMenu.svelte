@@ -19,7 +19,7 @@
   interface Props {
     pubkey: string;
     size: number;
-    metadata: Nostr.Event | undefined;
+    metadata?: Nostr.Event | undefined;
     displayMenu?: boolean;
     depth: number;
   }

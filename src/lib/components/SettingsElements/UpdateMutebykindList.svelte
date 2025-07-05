@@ -5,7 +5,7 @@
     getMutebykindList,
     getQueryRelays,
   } from "$lib/func/settings";
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
   import { mutebykinds, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
@@ -94,7 +94,7 @@
   onclick={handleClickMuteByKind}>MuteByKind</button
 ><time class="ml-2"
   >{$_("settings.lastUpdated")}: {$mutebykinds
-    ? formatAbsoluteDate($mutebykinds?.updated)
+    ? formatAbsoluteDateFromUnix($mutebykinds?.updated)
     : ""}</time
 >{#if $mutebykinds}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"

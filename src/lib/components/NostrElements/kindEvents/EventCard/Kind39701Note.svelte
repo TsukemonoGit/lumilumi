@@ -13,7 +13,7 @@
   import DisplayTime from "./DisplayTime.svelte";
   import ProfileDisplay from "./ProfileDisplay.svelte";
 
-  import { datetime, formatAbsoluteDate } from "$lib/func/util";
+  import { datetime, formatAbsoluteDateFromUnix } from "$lib/func/util";
   // import ClientTag from "../../content/ClientTag.svelte";
   import MediaEmbedSwitcher from "../../content/MediaEmbedSwitcher.svelte";
   import Content from "../../content/Content.svelte";
@@ -136,7 +136,7 @@
       <!--  <ClientTag tags={note.tags} {depth} /> -->
       {#if !isNaN(Number(published_at))}
         <time class="float-end" datetime={datetime(Number(published_at))}
-          >at {formatAbsoluteDate(Number(published_at))}</time
+          >at {formatAbsoluteDateFromUnix(Number(published_at))}</time
         >{/if}
     </div>
   {/snippet}

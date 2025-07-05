@@ -394,5 +394,14 @@
   "features": {
     "title": "機能",
     "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。"
+  },
+  "date": {
+    "activity_on": "{date}の活動",
+    "relay_fetch_failed": "リレー情報の取得に失敗しました: {error}",
+    "relay_not_found": "リレー情報が見つかりません",
+    "post": "投稿",
+    "repost": "リポスト",
+    "total": "合計",
+    "no_posts_today": "この日の投稿はありません"
   }
 }
