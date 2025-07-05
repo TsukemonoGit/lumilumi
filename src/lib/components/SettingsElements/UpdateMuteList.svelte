@@ -2,7 +2,7 @@
   import * as Nostr from "nostr-typedef";
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
 
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
   import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
@@ -90,7 +90,7 @@
   onclick={handleClickMute}>Mute</button
 ><time class="ml-2"
   >{$_("settings.lastUpdated")}: {$mutes
-    ? formatAbsoluteDate($mutes?.updated)
+    ? formatAbsoluteDateFromUnix($mutes?.updated)
     : ""}</time
 >{#if $mutes}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"

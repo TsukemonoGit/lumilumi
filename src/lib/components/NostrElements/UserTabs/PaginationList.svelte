@@ -1,16 +1,16 @@
 <script lang="ts">
   import { createPagination, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
-
-  import { onMount } from "svelte";
+  import * as Nostr from "nostr-typedef";
+  import { onMount, type Snippet } from "svelte";
 
   interface Props {
-    list: string[];
-
-    children?: import("svelte").Snippet<[any]>;
+    list: string[] | Nostr.Event[];
+    perPage?: number;
+    children?: Snippet<[string | Nostr.Event, number]>;
   }
 
-  let { list, children }: Props = $props();
+  let { list, children, perPage = 20 }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
 
   onMount(() => {
@@ -20,14 +20,18 @@
   const {
     elements: { root, pageTrigger, prevButton, nextButton },
     states: { pages, range },
+    options: { count },
   } = createPagination({
     count: list.length,
-    perPage: 20,
+    perPage: perPage,
     defaultPage: 1,
     siblingCount: 1,
     //onPageChange: handleChange,
   });
-
+  // listが変更されたときにcountを更新
+  $effect(() => {
+    count.set(list.length);
+  });
   let viewList = $derived(list.slice($range.start, $range.end));
 
   range.subscribe((value) => {
@@ -84,10 +88,10 @@
       {$range.start} - {$range.end}
     </p>
   </nav>
-  {#each viewList as pubhex, index}{@render children?.({
-      id: pubhex,
-      index: index + $range.start,
-    })}{/each}
+
+  {#each viewList as li, index}
+    {@render children?.(li, index + $range.start)}
+  {/each}
   <nav
     class="flex flex-col items-center"
     aria-label="pagination"

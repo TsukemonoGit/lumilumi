@@ -18,7 +18,7 @@
 
   import {
     datetime,
-    formatAbsoluteDate,
+    formatAbsoluteDateFromUnix,
     formatRelativeDate,
     formatToEventPacket,
     generateResultMessage,
@@ -346,7 +346,10 @@
               Updated at <time
                 class="font-semibold text-magnum-300"
                 datetime={datetime(beforeKind3?.created_at)}
-                >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
+                >{formatAbsoluteDateFromUnix(
+                  beforeKind3?.created_at,
+                  true
+                )}</time
               ><span class="ml-2"
                 >({formatRelativeDate(beforeKind3?.created_at, $locale)})</span
               >
@@ -426,7 +429,7 @@
           Follow List Updated at<time
             class="font-semibold text-magnum-300 ml-2"
             datetime={datetime(beforeKind3?.created_at)}
-            >{formatAbsoluteDate(beforeKind3?.created_at, true)}</time
+            >{formatAbsoluteDateFromUnix(beforeKind3?.created_at, true)}</time
           >
           ({formatRelativeDate(beforeKind3?.created_at, $locale)})
         </div>

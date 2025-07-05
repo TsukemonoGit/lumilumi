@@ -61,7 +61,7 @@
   };
 </script>
 
-{#if queryKey}
+{#if queryKey && data}
   <div
     class={dynamicClasses}
     use:viewport={null}

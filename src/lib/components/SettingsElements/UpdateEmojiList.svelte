@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import { emojis } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -22,7 +22,7 @@
 </EmojiListUpdate>
 <time class="ml-2"
   >{$_("settings.lastUpdated")}: {$emojis
-    ? formatAbsoluteDate($emojis?.updated)
+    ? formatAbsoluteDateFromUnix($emojis?.updated)
     : ""}</time
 >{#if $emojis}<button
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"

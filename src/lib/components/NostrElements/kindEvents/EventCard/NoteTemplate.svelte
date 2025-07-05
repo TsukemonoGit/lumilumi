@@ -3,7 +3,11 @@
 
   import * as nip19 from "nostr-tools/nip19";
 
-  import { datetime, formatAbsoluteDate, profile } from "$lib/func/util";
+  import {
+    datetime,
+    formatAbsoluteDateFromUnix,
+    profile,
+  } from "$lib/func/util";
 
   import SeenonIcons from "../SeenonIcons.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
@@ -119,12 +123,12 @@
         class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
       >
         <time datetime={datetime(note.created_at)}
-          >{formatAbsoluteDate(note.created_at)}</time
+          >{formatAbsoluteDateFromUnix(note.created_at)}</time
         >
       </a>
     {:else}
       <time datetime={datetime(note.created_at)}
-        >{formatAbsoluteDate(note.created_at)}</time
+        >{formatAbsoluteDateFromUnix(note.created_at)}</time
       >
     {/if}
   {/snippet}

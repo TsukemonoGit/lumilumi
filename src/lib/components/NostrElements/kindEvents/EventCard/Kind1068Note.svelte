@@ -5,7 +5,7 @@
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
-  import { formatAbsoluteDate } from "$lib/func/util";
+  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
 
   import * as nip19 from "nostr-tools/nip19";
   import { getRelaysById } from "$lib/func/nostr";
@@ -166,7 +166,7 @@
           <p class="text-neutral-500 font-sm">Voting period has ended</p>
         {:else}
           <p class="text-neutral-500 font-sm">
-            Ends at: {formatAbsoluteDate(endsAt)}
+            Ends at: {formatAbsoluteDateFromUnix(endsAt)}
           </p>
         {/if}
 

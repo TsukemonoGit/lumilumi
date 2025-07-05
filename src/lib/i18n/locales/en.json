@@ -394,5 +394,14 @@
   "features": {
     "title": "Features",
     "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported."
+  },
+  "date": {
+    "activity_on": "Activity on {date}",
+    "relay_fetch_failed": "Failed to fetch relay information: {error}",
+    "relay_not_found": "No relay information found",
+    "post": "Post",
+    "repost": "Repost",
+    "total": "Total",
+    "no_posts_today": "No posts on this day"
   }
 }
