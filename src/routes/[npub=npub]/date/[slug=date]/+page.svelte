@@ -51,14 +51,14 @@
     /wss:\/\/[a-zA-Z0-9.-]+(:[0-9]{1,5})?(\/[a-zA-Z0-9._~%+-]*)*/g;
   const onChange = (ev: Nostr.Event) => {
     console.log(ev);
-    //writeリレーリストをuserRelayListにいれる。
+    //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
-      .filter(
-        (tag) =>
-          tag[0] === "r" &&
-          relayRegex.test(tag[1]) &&
-          (tag.length === 2 || tag[2] === "write")
-      )
+      // .filter(
+      //   (tag) =>
+      //     tag[0] === "r" &&
+      //     relayRegex.test(tag[1]) &&
+      //     (tag.length === 2 || tag[2] === "write")
+      // )
       .map((r) => r[1]);
   };
 
@@ -76,7 +76,7 @@
     };
   };
 
-  $inspect(userRelayList);
+  $inspect("userRelayList", userRelayList);
   export function formatDateOnly(date: Date): string {
     return new Intl.DateTimeFormat(undefined, {
       year: "numeric",
