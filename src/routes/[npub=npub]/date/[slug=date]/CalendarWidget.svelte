@@ -48,27 +48,26 @@
 
       // 現在のパスを処理
       const currentPath = page.url.pathname;
-      const pathParts = currentPath.split("/");
+      const pathParts = currentPath.split("/").filter((part) => part !== ""); // 空文字を除去
 
-      if (pathParts.length > 0) {
-        const lastPart = pathParts[pathParts.length - 1];
+      // 最後の部分が date/日付 の形式かチェック
+      const lastPart = pathParts[pathParts.length - 1];
 
-        // "date" の場合は "date/日付" に変更
-        if (lastPart === "date") {
-          pathParts[pathParts.length - 1] = `date/${dateString}`;
-        }
-        // "date/日付" の場合は日付部分のみ変更
-        else if (lastPart.startsWith("date/")) {
-          pathParts[pathParts.length - 1] = `date/${dateString}`;
-        }
-        // その他の場合は最後に /date/日付 を付け加える
-        else {
-          pathParts.push(`date/${dateString}`);
-        }
-
-        goto(pathParts.join("/"));
+      if (lastPart === "date") {
+        // "date" の場合は日付を追加
+        pathParts.push(dateString);
+      } else if (
+        pathParts.length >= 2 &&
+        pathParts[pathParts.length - 2] === "date"
+      ) {
+        // 既に "date/日付" の形式の場合は日付部分のみ変更
+        pathParts[pathParts.length - 1] = dateString;
+      } else {
+        // その他の場合は date/日付 を追加
+        pathParts.push("date", dateString);
       }
 
+      goto("/" + pathParts.join("/"));
       return next;
     },
   });
