@@ -23,6 +23,34 @@
       date.getDate()
     );
   }
+
+  function updateDateInPath(currentPath: string, newDateString: string) {
+    const segments = currentPath.split("/").filter(Boolean);
+
+    const dateSegmentIndex = segments.findIndex(
+      (segment: string, index: number) => {
+        return (
+          segment === "date" &&
+          index < segments.length - 1 &&
+          /^\d{4}-\d{2}-\d{2}$/.test(segments[index + 1])
+        );
+      }
+    );
+
+    if (dateSegmentIndex !== -1) {
+      segments[dateSegmentIndex + 1] = newDateString;
+    } else {
+      const lastSegment = segments[segments.length - 1];
+      if (lastSegment === "date") {
+        segments.push(newDateString);
+      } else {
+        segments.push("date", newDateString);
+      }
+    }
+
+    return "/" + segments.join("/");
+  }
+
   // Melt UIのカレンダーを作成
   let {
     elements: { calendar, heading, grid, cell, prevButton, nextButton },
@@ -43,31 +71,10 @@
     onValueChange: ({ curr, next }) => {
       if (!next) return curr;
 
-      // 選択された日付を yyyy-mm-dd に変換（タイムゾーン考慮）
       const dateString = formatDate(next.toDate(localTimezone));
+      const newPath = updateDateInPath(page.url.pathname, dateString);
 
-      // 現在のパスを処理
-      const currentPath = page.url.pathname;
-      const pathParts = currentPath.split("/").filter((part) => part !== ""); // 空文字を除去
-
-      // 最後の部分が date/日付 の形式かチェック
-      const lastPart = pathParts[pathParts.length - 1];
-
-      if (lastPart === "date") {
-        // "date" の場合は日付を追加
-        pathParts.push(dateString);
-      } else if (
-        pathParts.length >= 2 &&
-        pathParts[pathParts.length - 2] === "date"
-      ) {
-        // 既に "date/日付" の形式の場合は日付部分のみ変更
-        pathParts[pathParts.length - 1] = dateString;
-      } else {
-        // その他の場合は date/日付 を追加
-        pathParts.push("date", dateString);
-      }
-
-      goto("/" + pathParts.join("/"));
+      goto(newPath);
       return next;
     },
   });
