@@ -1,5 +1,6 @@
 <script lang="ts">
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import type { LayoutData } from "../$types";
   import CalendarWidget from "./[slug=date]/CalendarWidget.svelte";
@@ -53,6 +54,14 @@
     <p class="subtitle">カレンダーから日付を選択してください</p>
   </div>
   <CalendarWidget currentDate={localDate} />
+</div>
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
 </div>
 
 <style>

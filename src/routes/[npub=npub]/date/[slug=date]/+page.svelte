@@ -13,6 +13,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import { t } from "@konemono/svelte5-i18n";
+  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
@@ -301,3 +302,11 @@
     </details>
   </div>
 {/if}
+<div class="postWindow">
+  <OpenPostWindow
+    options={{
+      tags: [],
+      kind: 1,
+    }}
+  />
+</div>
