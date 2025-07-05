@@ -332,7 +332,7 @@
 <AlertDialog
   bind:openDialog={dialogOpen}
   onClickOK={publishEvent}
-  title={$_("user.followList.get().update")}
+  title={$_("user.followList.update")}
 >
   {#snippet main()}
     <div>
