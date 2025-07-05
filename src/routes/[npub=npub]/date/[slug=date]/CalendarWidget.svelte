@@ -46,13 +46,26 @@
       // 選択された日付を yyyy-mm-dd に変換（タイムゾーン考慮）
       const dateString = formatDate(next.toDate(localTimezone));
 
-      // 現在のパスを処理して slug を置き換える
+      // 現在のパスを処理
       const currentPath = page.url.pathname;
       const pathParts = currentPath.split("/");
 
       if (pathParts.length > 0) {
-        pathParts[pathParts.length - 1] = dateString;
-        // ページ遷移は非同期だが、ここではawaitしない
+        const lastPart = pathParts[pathParts.length - 1];
+
+        // "date" の場合は "date/日付" に変更
+        if (lastPart === "date") {
+          pathParts[pathParts.length - 1] = `date/${dateString}`;
+        }
+        // "date/日付" の場合は日付部分のみ変更
+        else if (lastPart.startsWith("date/")) {
+          pathParts[pathParts.length - 1] = `date/${dateString}`;
+        }
+        // その他の場合は最後に /date/日付 を付け加える
+        else {
+          pathParts.push(`date/${dateString}`);
+        }
+
         goto(pathParts.join("/"));
       }
 
