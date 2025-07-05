@@ -332,7 +332,7 @@
         since: undefined,
         until:
           filters[0].until === undefined
-            ? (filter.since ?? now())
+            ? (filters[0].since ?? now())
             : filter.until,
         limit: CONFIG.LOAD_LIMIT,
       }));
@@ -430,9 +430,7 @@
 
       const olderEvents = await loadOlderEvents(
         fetchAmount,
-        olderFilters.map((fil) => {
-          return { ...fil, since: undefined };
-        }),
+        olderFilters,
         untilTime,
         tie,
         relays,

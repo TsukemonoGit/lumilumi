@@ -107,7 +107,6 @@
           {
             "#e": [data.id],
             kinds: [42],
-            since: since,
           },
         ]}
         req={createRxForwardReq()}
