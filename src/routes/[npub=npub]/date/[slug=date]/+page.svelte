@@ -16,6 +16,7 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { toastSettings } from "$lib/stores/stores";
   import { Share } from "lucide-svelte";
+  import { relayRegex } from "$lib/func/regex";
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
@@ -46,20 +47,18 @@
   );
 
   let userRelayList: string[] | undefined = $state(undefined);
-  //ws://なし
-  const relayRegex =
-    /wss:\/\/[a-zA-Z0-9.-]+(:[0-9]{1,5})?(\/[a-zA-Z0-9._~%+-]*)*/g;
+
   const onChange = (ev: Nostr.Event) => {
     console.log(ev);
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
-      // .filter(
-      //   (tag) =>
-      //     tag[0] === "r" &&
-      //     relayRegex.test(tag[1]) &&
-      //     (tag.length === 2 || tag[2] === "write")
-      // )
-      .map((r) => r[1]);
+      .filter(
+        (tag) => tag[0] === "r" && relayRegex.test(tag[1])
+        //    && relayRegex.test(tag[1]) &&
+        //     (tag.length === 2 || tag[2] === "write")
+      )
+      .map((r) => r[1])
+      .slice(0, 20);
   };
 
   // イベントの統計を計算
