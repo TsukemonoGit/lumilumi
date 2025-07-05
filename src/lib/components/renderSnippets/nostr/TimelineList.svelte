@@ -430,7 +430,9 @@
 
       const olderEvents = await loadOlderEvents(
         fetchAmount,
-        olderFilters,
+        olderFilters.map((fil) => {
+          return { ...fil, since: undefined };
+        }),
         untilTime,
         tie,
         relays,
@@ -438,6 +440,7 @@
           if (partialData.length === 0) return;
 
           timelineManager.updateCounts();
+          console.log(timelineManager.currentEventCount);
           const stillNotEnough =
             timelineManager.currentEventCount <
             viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮
@@ -445,11 +448,10 @@
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
             viewMoved = true;
+            updateViewEvent(partialData);
           }
 
-          setTimeout(() => {
-            updateViewEvent(partialData);
-          });
+          updateViewEvent(partialData);
         }
       );
 
@@ -469,7 +471,7 @@
 
         setTimeout(() => {
           updateViewEvent();
-        });
+        }, 0);
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
