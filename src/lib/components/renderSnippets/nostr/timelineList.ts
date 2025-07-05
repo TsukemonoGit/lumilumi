@@ -50,6 +50,7 @@ export async function loadOlderEvents(
     ...filter,
     limit: sift + 4,
     until: until,
+    //since: undefined,
   }));
 
   console.log(newFilters);
