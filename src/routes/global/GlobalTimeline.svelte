@@ -90,6 +90,8 @@
     olderFilters={[
       {
         kinds: [1, 6, 16],
+
+        since: since,
       },
     ]}
     {req}

@@ -283,6 +283,7 @@
                     kinds: [1, 6, 16],
 
                     authors: [userPubkey],
+                    since: since,
                   },
                 ]}
                 {req}
@@ -353,6 +354,7 @@
                     kinds: [42],
 
                     authors: [userPubkey],
+                    since: since,
                   },
                 ]}
                 {req}
@@ -422,6 +424,7 @@
                   kinds: [7, 17],
                   limit: 50,
                   authors: [userPubkey],
+                  since: now(),
                 },
               ]}
               {req}
@@ -491,6 +494,7 @@
                   kinds: [9735],
                   limit: 50,
                   "#p": [userPubkey],
+                  since: now(),
                 },
               ]}
               {req}

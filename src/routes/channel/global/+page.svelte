@@ -77,10 +77,13 @@
       olderFilters={[
         {
           kinds: [42],
+          since: since,
         },
         {
           kinds: [16],
           "#k": ["42"],
+
+          since: since,
         },
       ]}
       req={createRxForwardReq()}

@@ -260,6 +260,7 @@ export const makeMainFilters = (
     {
       authors: Array.from(pubkeyList.keys()),
       kinds: [...kinds],
+      since: since,
     },
   ];
   if (lumiSetting.get().showImg) {
