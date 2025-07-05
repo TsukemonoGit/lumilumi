@@ -120,7 +120,7 @@
           }
         );
 
-        if (abortController.signal.aborted) break;
+        if (abortController?.signal.aborted) break;
 
         console.log(`取得件数: ${olderEvents.length}`);
 
@@ -149,7 +149,7 @@
         }
       }
     } catch (err) {
-      if (abortController.signal.aborted) {
+      if (abortController?.signal.aborted) {
         console.log("データ取得がキャンセルされました");
         return [];
       }

@@ -53,7 +53,7 @@
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
       .filter(
-        (tag) => tag[0] === "r" && relayRegex.test(tag[1])
+        (tag) => tag[0] === "r" && tag.length > 1 //&& relayRegex.test(tag[1])
         //    && relayRegex.test(tag[1]) &&
         //     (tag.length === 2 || tag[2] === "write")
       )
@@ -118,7 +118,7 @@
           {onChange}
         >
           {#snippet loading()}
-            <EmptyCardList length={10} />
+            <EmptyCardList length={1} />
           {/snippet}
 
           {#snippet error()}
