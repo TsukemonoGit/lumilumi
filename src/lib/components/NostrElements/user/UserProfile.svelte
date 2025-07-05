@@ -26,8 +26,9 @@
   import type { Profile } from "$lib/types";
   import * as Nostr from "nostr-typedef";
   import { lnurlToZapAddress } from "$lib/func/zap";
-  import { Cake, Globe, Zap } from "lucide-svelte";
+  import { Cake, CalendarSearch, Globe, Zap } from "lucide-svelte";
   import { checkBirthDay } from "$lib/func/event";
+  import { goto } from "$app/navigation";
 
   interface Props {
     pubkey: string;
@@ -145,7 +146,12 @@
         <div class="flex flex-row ml-auto gap-2">
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
-            /><ReplyToUserButton {pubkey} />{/if}
+            /><ReplyToUserButton {pubkey} />{/if}<button
+            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            title={"Daity User Activity"}
+            onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
+            ><CalendarSearch /></button
+          >
           <UserPofileEllipsis {pubkey} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
@@ -163,7 +169,12 @@
         <div class="flex flex-row ml-auto gap-2">
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
-            /><ReplyToUserButton {pubkey} />{/if}
+            /><ReplyToUserButton {pubkey} />{/if}<button
+            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            title={"Daity User Activity"}
+            onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
+            ><CalendarSearch /></button
+          >
           <UserPofileEllipsis {pubkey} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
@@ -181,7 +192,12 @@
         <div class="flex flex-row ml-auto gap-2">
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
-            /><ReplyToUserButton {pubkey} />{/if}
+            /><ReplyToUserButton {pubkey} />{/if}<button
+            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            title={"Daity User Activity"}
+            onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
+            ><CalendarSearch /></button
+          >
           <UserPofileEllipsis {pubkey} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
@@ -277,7 +293,12 @@
                 <div class="flex flex-row ml-auto gap-2">
                   {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
                       {pubkey}
-                    /><ReplyToUserButton {pubkey} />{/if}
+                    /><ReplyToUserButton {pubkey} />{/if}<button
+                    class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+                    title={"Daity User Activity"}
+                    onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
+                    ><CalendarSearch /></button
+                  >
                   {#if prof.lud16 || prof.lud06}
                     <UserZap {metadata} />
                   {/if}<UserPofileEllipsis {pubkey} {metadata} {prof} {tab} />
