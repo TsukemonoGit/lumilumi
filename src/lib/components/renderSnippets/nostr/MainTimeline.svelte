@@ -399,9 +399,9 @@
         // viewIndexが変更された場合のみ履歴を更新
 
         updateHistoryState();
-
-        updateViewEvent();
-
+        setTimeout(() => {
+          updateViewEvent();
+        });
         return;
       }
 
@@ -449,10 +449,10 @@
             updateHistoryState();
 
             viewMoved = true;
-          }
-          setTimeout(() => {
             updateViewEvent(partialData);
-          });
+          }
+
+          updateViewEvent(partialData);
         }
       );
 
