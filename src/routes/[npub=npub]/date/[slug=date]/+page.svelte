@@ -19,6 +19,7 @@
   import { getNip05FromMetadata } from "$lib/func/nip05";
   import { error } from "@sveltejs/kit";
   import type { EventPacket } from "rx-nostr";
+  import UserActivityLoader from "./UserActivityLoader.svelte";
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
@@ -63,28 +64,7 @@
       .slice(0, 20);
   };
 
-  // イベントの統計を計算
-  const getEventStats = (events: Nostr.Event[]) => {
-    const posts = events.filter((event) => event.kind === 1);
-    const reposts = events.filter(
-      (event) => event.kind === 6 || event.kind === 16
-    );
-
-    return {
-      posts: posts.length,
-      reposts: reposts.length,
-      total: events.length,
-    };
-  };
-
   $inspect("userRelayList", userRelayList);
-  export function formatDateOnly(date: Date): string {
-    return new Intl.DateTimeFormat(undefined, {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(date);
-  }
 
   // 共有機能
   async function handleShare() {
@@ -158,185 +138,49 @@
           {/snippet}
 
           {#snippet error()}
-            <div
-              class="p-4 bg-red-100 border border-red-400 text-red-700 rounded"
-            >
-              <p>
-                {$t("date.relay_fetch_failed", {
-                  error: error?.toString() || "",
-                })}
-              </p>
-            </div>
+            <UserActivityLoader
+              pubkey={data.pubkey}
+              relays={undefined}
+              range={getLocalDayRange}
+              {localDate}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {zIndex}
+              {displayMenu}
+              {handleShare}
+            />
           {/snippet}
 
           {#snippet nodata()}
-            <div
-              class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded"
-            >
-              <p>{$t("date.relay_not_found")}</p>
-            </div>
-          {/snippet}
-
-          {#if getLocalDayRange}
-            <RangeEventLoader
-              relays={userRelayList}
+            <UserActivityLoader
+              pubkey={data.pubkey}
+              relays={undefined}
               range={getLocalDayRange}
-              filter={{ kinds: [1, 6, 16], authors: [data.pubkey] }}
-            >
-              {#snippet children(events)}
-                {#if events.length > 0}
-                  <!-- 統計情報 -->
-                  {@const stats = getEventStats(events)}
-                  <div class="bg-neutral-900 p-4 rounded-lg mb-2">
-                    <!-- ヘッダー部分 -->
-                    <div class="flex justify-between items-start mb-3">
-                      <h3 class="text-lg font-semibold">
-                        <div class="inline-flex align-bottom">
-                          <Metadata
-                            queryKey={["metadata", data.pubkey]}
-                            pubkey={data.pubkey}
-                          >
-                            {#snippet loading()}
-                              <UserPopupMenu
-                                pubkey={data.pubkey}
-                                metadata={undefined}
-                                size={24}
-                                depth={0}
-                              />
-                            {/snippet}
-
-                            {#snippet error()}
-                              <UserPopupMenu
-                                pubkey={data.pubkey}
-                                metadata={undefined}
-                                size={24}
-                                depth={0}
-                              />
-                            {/snippet}
-
-                            {#snippet nodata()}
-                              <UserPopupMenu
-                                pubkey={data.pubkey}
-                                metadata={undefined}
-                                size={24}
-                                depth={0}
-                              />
-                            {/snippet}
-
-                            {#snippet content({ metadata })}
-                              <UserPopupMenu
-                                pubkey={data.pubkey}
-                                {metadata}
-                                size={24}
-                                depth={0}
-                              />
-                            {/snippet}
-                          </Metadata>
-                        </div>
-                        {$t("date.activity_on", {
-                          date: formatDateOnly(localDate),
-                        })}
-                      </h3>
-
-                      <!-- 共有ボタン - 右上 -->
-                      <button
-                        class="flex items-center gap-1 px-2 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs rounded transition-colors duration-200 shrink-0"
-                        onclick={handleShare}
-                      >
-                        <Share class="w-4 h-4" />
-                        <span>{$t("menu.sharelink")}</span>
-                      </button>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div class="text-2xl font-bold text-blue-600">
-                          {stats.posts}
-                        </div>
-                        <div class="text-sm text-neutral-400">
-                          {$t("date.post")}
-                        </div>
-                      </div>
-                      <div>
-                        <div class="text-2xl font-bold text-green-600">
-                          {stats.reposts}
-                        </div>
-                        <div class="text-sm text-neutral-400">
-                          {$t("date.repost")}
-                        </div>
-                      </div>
-                      <div>
-                        <div class="text-2xl font-bold text-purple-600">
-                          {stats.total}
-                        </div>
-                        <div class="text-sm text-neutral-400">
-                          {$t("date.total")}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <PaginationList list={events}>
-                    {#snippet children(event, index)}
-                      {#if event}
-                        {@const note = event as Nostr.Event}
-                        <Metadata
-                          queryKey={["metadata", note.pubkey]}
-                          pubkey={note.pubkey}
-                        >
-                          {#snippet loading()}
-                            <EventCard
-                              {note}
-                              {maxHeight}
-                              {thread}
-                              {depth}
-                              {repostable}
-                              {zIndex}
-                            />
-                          {/snippet}
-                          {#snippet nodata()}
-                            <EventCard
-                              {note}
-                              {maxHeight}
-                              {thread}
-                              {depth}
-                              {repostable}
-                              {zIndex}
-                            />
-                          {/snippet}
-                          {#snippet error()}
-                            <EventCard
-                              {note}
-                              {maxHeight}
-                              {thread}
-                              {depth}
-                              {repostable}
-                              {zIndex}
-                            />
-                          {/snippet}
-                          {#snippet content({ metadata })}
-                            <EventCard
-                              {note}
-                              {metadata}
-                              {maxHeight}
-                              {thread}
-                              {displayMenu}
-                              {depth}
-                              {repostable}
-                              {zIndex}
-                            />
-                          {/snippet}
-                        </Metadata>{/if}
-                    {/snippet}
-                  </PaginationList>
-                {:else}
-                  <div class="text-center py-12">
-                    <div class="text-gray-500 text-lg">
-                      {$t("date.no_posts_today")}
-                    </div>
-                  </div>
-                {/if}
-              {/snippet}
-            </RangeEventLoader>
-          {/if}
+              {localDate}
+              {maxHeight}
+              {thread}
+              {depth}
+              {repostable}
+              {zIndex}
+              {displayMenu}
+              {handleShare}
+            />
+          {/snippet}
+          <UserActivityLoader
+            pubkey={data.pubkey}
+            relays={userRelayList}
+            range={getLocalDayRange}
+            {localDate}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {zIndex}
+            {displayMenu}
+            {handleShare}
+          />
         </LatestEvent>
       </div>
     </div>
