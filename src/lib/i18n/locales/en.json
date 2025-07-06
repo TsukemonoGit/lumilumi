@@ -403,5 +403,9 @@
     "repost": "Repost",
     "total": "Total",
     "no_posts_today": "No posts on this day"
+  },
+  "error": "Error: {error}",
+  "data": {
+    "loading": "Loading data..."
   }
 }

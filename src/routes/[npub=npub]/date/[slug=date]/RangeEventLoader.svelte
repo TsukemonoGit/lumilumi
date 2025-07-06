@@ -6,6 +6,8 @@
   import { loadOlderEvents } from "$lib/components/renderSnippets/nostr/timelineList";
   import { tie } from "$lib/stores/stores";
 
+  import { t } from "@konemono/svelte5-i18n";
+
   interface Props {
     relays: string[] | undefined;
     range: { since: number; until: number };
@@ -15,7 +17,7 @@
 
   let { relays, range, filter, children }: Props = $props();
 
-  const SIFT_SIZE = 100; // 1回で取得する件数
+  const SIFT_SIZE = 200; // 1回で取得する件数
   const events = writable<Nostr.Event[]>([]);
 
   let error: string | null = $state(null);
@@ -170,11 +172,11 @@
 </script>
 
 {#if error}
-  <div>エラー: {error}</div>
+  <div>{$t("error", { error: error })}</div>
 {:else if isLoading && currentEvents.length === 0}
-  <div>データを読み込み中...</div>
+  <div>{$t("data.loading")}</div>
 {:else if currentEvents.length > 0}
   {@render children(currentEvents)}
 {:else}
-  <div>データがありません</div>
+  <div>{$t("data.nodata")}</div>
 {/if}

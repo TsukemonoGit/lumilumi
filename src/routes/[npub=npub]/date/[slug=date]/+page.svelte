@@ -14,9 +14,11 @@
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import { t } from "@konemono/svelte5-i18n";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { toastSettings } from "$lib/stores/stores";
+  import { queryClient, toastSettings } from "$lib/stores/stores";
   import { Share } from "lucide-svelte";
-  import { relayRegex } from "$lib/func/regex";
+  import { getNip05FromMetadata } from "$lib/func/nip05";
+  import { error } from "@sveltejs/kit";
+  import type { EventPacket } from "rx-nostr";
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
@@ -86,20 +88,54 @@
 
   // 共有機能
   async function handleShare() {
-    const shareData = {
-      title: "",
-      url: window.location.href,
-    };
+    let shareUrl = window.location.href;
 
+    // URLにnpubまたはnprofileが含まれている場合のみnip05置換を検討
+    const npubPattern = /npub\w{59}/;
+    const nprofilePattern = /nprofile\w{59,}/;
+
+    if (npubPattern.test(shareUrl) || nprofilePattern.test(shareUrl)) {
+      try {
+        // メタデータからNIP-05アドレスを取得
+        const metadataPk: EventPacket | null | undefined =
+          queryClient.getQueryData(["metadata", data.pubkey]);
+        if (!metadataPk) throw error;
+        const nip05Address = await getNip05FromMetadata(
+          metadataPk.event,
+          queryClient
+        );
+
+        // nip05アドレスが取得できた場合のみ置換
+        if (nip05Address) {
+          if (npubPattern.test(shareUrl)) {
+            shareUrl = shareUrl.replace(npubPattern, nip05Address);
+          } else if (nprofilePattern.test(shareUrl)) {
+            shareUrl = shareUrl.replace(nprofilePattern, nip05Address);
+          }
+        }
+      } catch (error) {
+        console.error("NIP-05 verification failed:", error);
+        // エラーが発生した場合は元のURLを使用
+      }
+    }
+
+    // 共有処理
     try {
+      const shareData = {
+        text: "",
+        url: shareUrl,
+      };
+
       await navigator.share(shareData);
     } catch (error: any) {
-      console.error(error.message);
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to share",
-        color: "bg-orange-500",
-      };
+      console.error("Share failed:", error.message);
+      // フォールバック処理（クリップボードにコピーなど）
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        console.log("URL copied to clipboard");
+      } catch (clipboardError) {
+        console.error("Failed to copy to clipboard:", clipboardError);
+      }
     }
   }
 </script>

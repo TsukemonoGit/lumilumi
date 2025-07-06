@@ -2,12 +2,11 @@
   import { goto } from "$app/navigation";
   import { CalendarDate } from "@internationalized/date";
   import { createCalendar, melt } from "@melt-ui/svelte";
-  import type { DateValue } from "@internationalized/date";
 
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
   import { locale as l } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { formatDate } from "$lib/func/util";
   interface Props {
     currentDate?: Date | null;
