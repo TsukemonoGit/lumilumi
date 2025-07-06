@@ -1,3 +1,4 @@
+<!--UserMenu.svelte-->
 <script lang="ts">
   import {
     modalState,
@@ -26,10 +27,10 @@
   import { publishEvent } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
   import { page } from "$app/state";
-  import { useNip05PromiseCheck } from "$lib/func/nip05check";
-  //import { writable, type Writable } from "svelte/store";
+
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { getNip05FromProfile } from "$lib/func/nip05";
 
   interface Props {
     metadata: Nostr.Event | undefined;
@@ -40,8 +41,6 @@
 
   let { metadata, pubkey, profile, tab }: Props = $props();
 
-  // svelte-ignore non_reactive_update
-  //let dialogOpen: Writable<boolean> = writable(false);
   let encodedPubkey = $derived.by(() => {
     if (pubkey) {
       try {
@@ -52,54 +51,90 @@
     }
   });
 
-  const baseMenuTexts = [
-    { text: `${$_("menu.userPage")}`, icon: User, num: 0 },
-    { text: `${$_("menu.copy.pubkey")}`, icon: Copy, num: 1 },
-    { text: `${$_("menu.updateProfile")}`, icon: RefreshCcw, num: 4 },
-    { text: `${$_("menu.broadcast")}`, icon: Radio, num: 5 },
-    { text: `${$_("menu.json")}`, icon: FileJson2, num: 2 },
-    { text: `${$_("menu.userSearch")}`, icon: Search, num: 8 },
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
-  ];
+  // メニュー項目の定義を論理的な順序で整理
+  let menuTexts = $derived.by(() => {
+    const menuItems = [
+      // 基本操作グループ
+      {
+        text: `${$_("menu.copy.pubkey")}`,
+        icon: Copy,
+        action: "copy_pubkey",
+      },
+      {
+        text: `${$_("menu.userPage")}`,
+        icon: User,
+        action: "goto_user",
+      },
 
-  let menuTexts = $derived(
-    baseMenuTexts.filter((item) => {
-      // Remove user page if on user's own page
-      if (item.num === 0 && page.url.pathname === `/${encodedPubkey}`) {
-        return false;
-      }
+      // 検索・発見グループ
+      {
+        text: `${$_("menu.userSearch")}`,
+        icon: Search,
+        action: "search_user",
+      },
 
-      // Remove JSON and broadcast if no metadata
-      if (!metadata && (item.num === 2 || item.num === 5)) {
-        return false;
-      }
+      // データ更新・管理グループ
+      {
+        text: `${$_("menu.updateProfile")}`,
+        icon: RefreshCcw,
+        action: "update_profile",
+      },
 
-      // Remove broadcast if specific metadata condition is met
-      if (metadata) {
-        const shouldRemoveBroadcast =
-          item.num === 5 &&
-          metadata.tags.some((tag) => tag[0] === "-") &&
-          metadata.pubkey !== lumiSetting.get().pubkey;
+      // ブロードキャスト（条件付き）
+      ...(metadata &&
+      !(
+        metadata.tags.some((tag) => tag[0] === "-") &&
+        metadata.pubkey !== lumiSetting.get().pubkey
+      )
+        ? [
+            {
+              text: `${$_("menu.broadcast")}`,
+              icon: Radio,
+              action: "broadcast",
+            },
+          ]
+        : []),
 
-        if (shouldRemoveBroadcast) {
-          return false;
-        }
-      }
-      if (!tab && item.num === 7) {
+      // 共有・外部リンクグループ
+      ...(tab
+        ? [
+            {
+              text: `${$_("menu.sharelink")}`,
+              icon: Share,
+              action: "share_link",
+            },
+          ]
+        : []),
+
+      // ツール・ユーティリティグループ
+      ...(metadata
+        ? [
+            {
+              text: `${$_("menu.json")}`,
+              icon: FileJson2,
+              action: "view_json",
+            },
+          ]
+        : []),
+    ];
+
+    // 現在のページがユーザー自身のページの場合はユーザーページへのリンクを除外
+    return menuItems.filter((item) => {
+      if (
+        item.action === "goto_user" &&
+        page.url.pathname === `/${encodedPubkey}`
+      ) {
         return false;
       }
       return true;
-    })
-  );
+    });
+  });
 
   const handleSelectItem = async (index: number) => {
-    switch (index) {
-      case 0:
-        if (encodedPubkey) {
-          goto(`/${encodedPubkey}`);
-        }
-        break;
-      case 1:
+    const selectedItem = menuTexts[index];
+
+    switch (selectedItem.action) {
+      case "copy_pubkey":
         try {
           if (encodedPubkey) {
             await navigator.clipboard.writeText(encodedPubkey);
@@ -120,26 +155,18 @@
           };
         }
         break;
-      case 2:
-        //   $dialogOpen = true;
-        $modalState = {
-          isOpen: true,
-          component: ModalJson,
-          props: {
-            note: metadata,
 
-            profile: profile,
-          },
-        };
-        break;
-      case 3:
+      case "goto_user":
         if (encodedPubkey) {
-          const url = `https://njump.me/${encodedPubkey}`;
-          window.open(url, "_blank", "noreferrer");
+          goto(`/${encodedPubkey}`);
         }
         break;
-      case 4:
-        //update profile
+
+      case "search_user":
+        goto(`search?author=${encodedPubkey}&load=false`);
+        break;
+
+      case "update_profile":
         $nowProgress = true;
         const key: QueryKey = ["metadata", pubkey];
         queryClient.invalidateQueries({ queryKey: key });
@@ -147,52 +174,38 @@
           $nowProgress = false;
         }, 1000);
         break;
-      case 5:
-        //bloadcast metadata
+
+      case "broadcast":
         if (metadata) {
           publishEvent(metadata);
           $nowProgress = true;
+          setTimeout(() => {
+            $nowProgress = false;
+          }, 1000);
         }
-        setTimeout(() => {
-          //処理してるよのためだけの
-          $nowProgress = false;
-        }, 1000);
         break;
-      case 7:
-        //リンクの共有
-        //Share link
+
+      case "share_link":
         if (!encodedPubkey) {
           return;
         }
+
         $nowProgress = true;
-        let urlData: string = encodedPubkey;
-        const nip05 = profile?.nip05;
-        if (nip05) {
-          const data: { result: boolean; error?: string } | undefined =
-            queryClient.getQueryData(["nip05", pubkey, nip05.toLowerCase()]);
-          if (data && data.result) {
-            urlData = nip05;
-          } else {
-            const data = await useNip05PromiseCheck(nip05, pubkey);
-            if (data) {
-              queryClient.setQueryData(
-                ["nip05", pubkey, nip05.toLowerCase()],
-                data
-              );
-              if (data.result) {
-                urlData = nip05;
-              }
-            }
-          }
-        }
-        $nowProgress = false;
-        const shareData = {
-          //title: "",
-          text: "",
-          url: `${page.url.origin}/${urlData}${tab ? `#${tab}` : ""}`,
-        };
 
         try {
+          // getNip05FromProfileを使用してNIP-05アドレスを取得
+          const verifiedNip05 = await getNip05FromProfile(
+            profile,
+            pubkey,
+            queryClient
+          );
+          const urlData = verifiedNip05 || encodedPubkey;
+
+          const shareData = {
+            text: "",
+            url: `${page.url.origin}/${urlData}${tab ? `#${tab}` : ""}`,
+          };
+
           await navigator.share(shareData);
         } catch (error: any) {
           console.error(error.message);
@@ -201,18 +214,28 @@
             description: "Failed to share",
             color: "bg-orange-500",
           };
+        } finally {
+          $nowProgress = false;
         }
         break;
-      case 8:
-        goto(`search?author=${encodedPubkey}&load=false`);
+
+      case "view_json":
+        $modalState = {
+          isOpen: true,
+          component: ModalJson,
+          props: {
+            note: metadata,
+            profile: profile,
+          },
+        };
         break;
     }
   };
 </script>
 
-{#each menuTexts as { icon: Icon, text, num }}
+{#each menuTexts as { icon: Icon, text }, index}
   <button
-    onclick={() => handleSelectItem(num)}
+    onclick={() => handleSelectItem(index)}
     class="
      flex
      font-medium leading-none bg-neutral-800 text-magnum-300 hover:bg-magnum-500/25 active:opacity-50 disabled:opacity-15 py-1 items-center"
@@ -233,13 +256,3 @@
       <ChevronRight class="ml-auto" />
     </div></UserMuteMenu
   >{/if}
-<!-- 
-{#if metadata}
-  <ModalJson
-    bind:dialogOpen
-    note={metadata}
-    {profile}
-    
-    zIndex={50}
-  />{/if}
- -->
