@@ -543,6 +543,7 @@
 
         updateHistoryState();
       }
+      updateViewEvent();
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
@@ -550,7 +551,6 @@
 
       timelineManager.isLoadingOlderEvents = false;
       timelineManager.updateCounts();
-      updateViewEvent();
     }
   }
 
