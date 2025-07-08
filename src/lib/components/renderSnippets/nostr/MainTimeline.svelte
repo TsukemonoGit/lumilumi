@@ -81,15 +81,14 @@
   const amount = 50;
   // State management
   class TimelineManager {
-    allUniqueEvents: Nostr.Event[] = $state([]);
     updating = $state(false);
     timeoutId: NodeJS.Timeout | null = null;
     isOnMount = $state(false);
     isLoadingOlderEvents = $state(false);
     isUpdateScheduled = $state(false);
     destroyed = $state(false);
-    currentEventCount = $state(0);
-    requiredEventCount = $state(0);
+    olderEventCount = $state(0); // currentEventCount から olderEventCount に変更
+    requiredEventCount = $derived(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
 
     get loadMoreDisabled() {
       // nowProgressまたは初期化中の場合は常に無効
@@ -99,7 +98,7 @@
       if (this.isLoadingOlderEvents) {
         // ストックが十分にある場合のみ有効
         const hasEnoughStock =
-          this.currentEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+          this.olderEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT; // olderEventCountを使用
         return !hasEnoughStock;
       }
 
@@ -110,11 +109,6 @@
       this.updating = false;
       this.isUpdateScheduled = false;
       $nowProgress = false;
-    }
-
-    updateCounts() {
-      this.currentEventCount = this.allUniqueEvents?.length || 0;
-      this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
     }
   }
 
@@ -224,27 +218,35 @@
     try {
       timelineManager.updating = true;
 
-      const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
-        ...queryKey,
-        "olderData",
-      ]);
+      // 表示範囲を計算
+      const { startIndex, endIndex } = calculateDisplayRange();
 
-      const allEvents = mergeEvents($data, olderEvents, partialdata);
+      // 現在のデータをフィルタリング
+      const currentEvents = filterEvents($data || []);
+      // 現在のデータだけで表示範囲をカバーできるかチェック
+      if (currentEvents.length >= endIndex) {
+        // 十分な場合：現在のデータのみ使用
+        displayEvents.set(currentEvents.slice(startIndex, endIndex));
+      } else {
+        // 不十分な場合：古いデータも個別にフィルタリングして結合
+        const olderEvents: EventPacket[] | null | undefined =
+          queryClient?.getQueryData([...queryKey, "olderData"]);
+        const filteredOlderEvents = olderEvents
+          ? filterEvents(olderEvents)
+          : [];
+        const filteredPartialEvents = partialdata
+          ? filterEvents(partialdata)
+          : [];
 
-      timelineManager.allUniqueEvents = allEvents
-        .map((event) => event.event)
-        .filter(eventFilter)
-        .filter(
-          (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+        // フィルタリング済みのイベントを結合
+        const allFilteredEvents = combineFilteredEvents(
+          currentEvents,
+          filteredOlderEvents,
+          filteredPartialEvents
         );
 
-      const startIndex = Math.max(0, viewIndex);
-      const endIndex = startIndex + amount;
-
-      displayEvents.set(
-        timelineManager.allUniqueEvents.slice(startIndex, endIndex)
-      );
-
+        displayEvents.set(allFilteredEvents.slice(startIndex, endIndex));
+      }
       timelineManager.isUpdateScheduled = false;
     } catch (error) {
       console.error("Error during update", error);
@@ -252,14 +254,56 @@
     } finally {
       timelineManager.updating = false;
       $nowProgress = false;
-      timelineManager.updateCounts();
 
       if (timelineManager.isUpdateScheduled) {
         scheduleUpdate();
       }
     }
   }
+  /**
+   * フィルタリング済みのイベント配列を結合
+   * 重複除去と時系列ソートを行う
+   * @param currentEvents - 現在のイベント
+   * @param olderEvents - 古いイベント
+   * @param partialEvents - 部分的なイベント
+   * @returns 結合済みのイベント配列
+   */
+  function combineFilteredEvents(
+    currentEvents: Nostr.Event[],
+    olderEvents: Nostr.Event[],
+    partialEvents: Nostr.Event[]
+  ) {
+    // 全イベントを結合
+    const allEvents = [...currentEvents, ...olderEvents, ...partialEvents];
 
+    // 重複除去（IDベース）
+    return Array.from(
+      new Map(allEvents.map((event) => [event.id, event])).values()
+    );
+  }
+  /**
+   * 表示範囲のインデックスを計算
+   * @returns 開始と終了インデックス
+   */
+  function calculateDisplayRange() {
+    const startIndex = Math.max(0, viewIndex);
+    const endIndex = startIndex + amount;
+    return { startIndex, endIndex };
+  }
+
+  /**
+   * イベントデータをフィルタリング
+   * @param events - フィルタリング対象のイベント配列
+   * @returns フィルタリング済みのイベント配列
+   */
+  function filterEvents(events: EventPacket[]) {
+    return events
+      .map((event) => event.event)
+      .filter(eventFilter)
+      .filter(
+        (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+      );
+  }
   /**
    * Timeline initialization
    */
@@ -358,7 +402,7 @@
             ).values()
           )
         );
-
+        timelineManager.olderEventCount = deduplicatedData.length;
         return CONFIG.LOAD_LIMIT > 0
           ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
           : deduplicatedData;
@@ -388,12 +432,12 @@
     //const previousViewIndex = viewIndex; // 元の位置を保存
     try {
       const hasEnoughStock =
-        timelineManager.currentEventCount >=
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT;
-      // console.log(
-      //   timelineManager.currentEventCount,
-      //   viewIndex + amount + CONFIG.SLIDE_AMOUNT
-      // );
+        ($data || []).length + timelineManager.olderEventCount >=
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
+      console.log(
+        ($data || []).length + timelineManager.olderEventCount,
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
+      );
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         // viewIndexが変更された場合のみ履歴を更新
@@ -410,12 +454,12 @@
         console.log("前回のデータ取得が完了していません");
         return;
       }
-
+      const older = queryClient?.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]) as EventPacket[];
       // 👇 ストック不足でloadしても上限に満たなかったら中断
-      const untilTime =
-        timelineManager.allUniqueEvents?.[
-          timelineManager.allUniqueEvents.length - 1
-        ]?.created_at;
+      const untilTime = older?.[older.length - 1]?.event.created_at;
 
       if (!untilTime) {
         console.warn("No existing events to determine untilTime");
@@ -437,10 +481,11 @@
         (partialData) => {
           if (partialData.length === 0) return;
 
-          timelineManager.updateCounts();
           const stillNotEnough =
-            timelineManager.currentEventCount <
-            viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮
+            ($data || []).length +
+              timelineManager.olderEventCount +
+              partialData.length <
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
 
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
@@ -449,6 +494,7 @@
             updateHistoryState();
 
             viewMoved = true;
+
             updateViewEvent(partialData);
           }
 
@@ -460,28 +506,23 @@
         updateQueryDataForOlder(olderEvents);
       }
 
-      timelineManager.updateCounts();
-
       // 👇 最後のチェック: ストック足りないなら移動しない
       if (
         !viewMoved &&
-        timelineManager.currentEventCount >=
-          viewIndex + amount + CONFIG.SLIDE_AMOUNT
+        ($data || []).length + timelineManager.olderEventCount >=
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT * 0.1 //フィルター考慮
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         // viewIndexが変更された場合のみ履歴を更新
 
         updateHistoryState();
-        setTimeout(() => {
-          updateViewEvent();
-        });
       }
+      updateViewEvent();
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
       $nowProgress = false;
       timelineManager.isLoadingOlderEvents = false;
-      timelineManager.updateCounts();
     }
   }
 
@@ -489,7 +530,7 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
-        return sortEventPackets(
+        const older = sortEventPackets(
           Array.from(
             new Map(
               [...(oldData ?? []), ...events].map((packet) => [
@@ -499,6 +540,9 @@
             ).values()
           )
         );
+
+        timelineManager.olderEventCount = older.length;
+        return older;
       }
     );
   }
