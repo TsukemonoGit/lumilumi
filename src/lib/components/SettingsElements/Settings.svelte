@@ -47,6 +47,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
+  import { normalizeURL } from "nostr-tools/utils";
 
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -154,10 +155,8 @@
 
   function addRelay() {
     if (!relayInput) return;
-    let input = relayInput.trim();
-    if (!input.endsWith("/")) {
-      input += "/";
-    }
+    let input = normalizeURL(relayInput.trim());
+
     if (relayRegex2.test(input)) {
       settings.relays = [
         ...settings.relays,

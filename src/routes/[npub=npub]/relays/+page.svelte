@@ -24,6 +24,7 @@
   import type { LayoutData } from "../$types";
   import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { normalizeURL } from "nostr-tools/utils";
 
   let { data }: { data: LayoutData } = $props();
 
@@ -130,7 +131,7 @@
     //タグの末尾を揃える
     return ev.tags.reduce((before, tag) => {
       if (tag[0] === "r" && tag.length > 1) {
-        const relayURL = tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`;
+        const relayURL = normalizeURL(tag[1]);
         tag[1] = relayURL;
         return [...before, tag];
       } else {
@@ -203,7 +204,7 @@
     }
 
     // ここでスラッシュを追加
-    newRelay = !newRelay.endsWith("/") ? `${newRelay}/` : newRelay;
+    newRelay = normalizeURL(newRelay);
 
     if (!relayRegex2.test(newRelay)) {
       $toastSettings = {
