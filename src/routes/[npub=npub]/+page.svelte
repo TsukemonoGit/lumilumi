@@ -25,6 +25,7 @@
     RadioTower,
     SmilePlus,
     Library,
+    Images,
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -50,6 +51,7 @@
 
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import UserMediaDisplay from "./UserMediaDisplay.svelte";
 
   interface Props {
     data: {
@@ -91,6 +93,16 @@
 
   const triggers = [
     { id: "post", title: "Post", Icon: ReceiptText },
+    //画像オンの時だけメディア欄を出す
+    ...(lumiSetting.get().showImg
+      ? [
+          {
+            id: "media",
+            title: "Media",
+            Icon: Images,
+          },
+        ]
+      : []),
     { id: "chat", title: "Chat", Icon: MessageSquareText },
     { id: "reactions", title: "Reaction", Icon: Sticker },
 
@@ -671,6 +683,15 @@
                 {/each}
               {/snippet}
             </ListMain>
+          {/if}
+        </div>
+
+        <div
+          use:melt={$content("media")}
+          class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        >
+          {#if $value === "media"}
+            <UserMediaDisplay pubkey={data.pubkey} />
           {/if}
         </div>
       </div>
