@@ -33,7 +33,6 @@
   import {
     formatToEventPacket,
     noReactionKind,
-    normalizeRelayURL,
     profile,
     sortEventPackets,
   } from "$lib/func/util";
@@ -146,7 +145,7 @@
     const { event: ev, res } = result;
     const isSuccessRelays: string[] = res
       .filter((item) => item.ok)
-      .map((item) => normalizeRelayURL(item.from));
+      .map((item) => item.from);
 
     queryKey = [...queryKey, ev.pubkey];
 

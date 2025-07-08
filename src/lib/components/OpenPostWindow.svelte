@@ -33,12 +33,7 @@
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import {
-    filesUpload,
-    delay,
-    normalizeRelayURL,
-    displayShortPub,
-  } from "$lib/func/util";
+  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
 
   import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
 
@@ -354,11 +349,7 @@
 
       const successRelays = res
         .filter((item) => item.ok)
-        .map((item) => normalizeRelayURL(item.from));
-
-      // const failedRelays = res
-      //   .filter((item) => !item.ok)
-      //   .map((item) => normalizeRelayURL(item.from));
+        .map((item) => item.from);
 
       // If no successful relays, try once more
       if (successRelays.length <= 0) {
@@ -366,7 +357,7 @@
 
         const successRelays2 = res2
           .filter((item) => item.ok)
-          .map((item) => normalizeRelayURL(item.from));
+          .map((item) => item.from);
 
         if (successRelays2.length <= 0) {
           showToast("Failed", "Failed to publish", "bg-red-500");

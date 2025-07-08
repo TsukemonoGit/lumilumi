@@ -8,7 +8,7 @@ import { queryClient } from "$lib/stores/stores";
 import { latest, uniq, type EventPacket } from "rx-nostr";
 import { pipe } from "rxjs";
 import { decode } from "light-bolt11-decoder";
-import { utf8Decoder } from "nostr-tools/utils";
+import { normalizeURL, utf8Decoder } from "nostr-tools/utils";
 
 export interface InvoiceProp {
   metadata: Nostr.Event;
@@ -208,11 +208,15 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
 
   const readRelay: string[] | undefined = queryRelay?.event?.tags?.reduce(
     (acc: string[], tag: string[]) => {
-      if (tag[0] === "r" && tag.length === 2) {
-        return [...acc, tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`];
-      } else if (tag.length > 2 && tag[2] === "read") {
-        return [...acc, tag[1].endsWith("/") ? tag[1] : `${tag[1]}/`];
-      } else {
+      try {
+        if (tag[0] === "r" && tag.length === 2) {
+          return [...acc, normalizeURL(tag[1])];
+        } else if (tag.length > 2 && tag[2] === "read") {
+          return [...acc, normalizeURL(tag[1])];
+        } else {
+          return acc;
+        }
+      } catch (error) {
         return acc;
       }
     },
@@ -309,7 +313,7 @@ export function makeZapRequest({
 
 export function lnurlToZapAddress(lud06: string): string | undefined {
   try {
-    const { words } = bech32.decode(lud06, 1000);
+    const { words } = bech32.decode(lud06 as `${string}1${string}`, 1000);
     const data = bech32.fromWords(words);
     const lnurl = new TextDecoder().decode(data);
 

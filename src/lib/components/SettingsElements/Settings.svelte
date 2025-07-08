@@ -47,6 +47,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
+  import { normalizeURL } from "nostr-tools/utils";
 
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -154,16 +155,22 @@
 
   function addRelay() {
     if (!relayInput) return;
-    let input = relayInput.trim();
-    if (!input.endsWith("/")) {
-      input += "/";
-    }
-    if (relayRegex2.test(input)) {
-      settings.relays = [
-        ...settings.relays,
-        { url: input, read: true, write: true },
-      ];
-      relayInput = "";
+    try {
+      let input = normalizeURL(relayInput.trim());
+
+      if (relayRegex2.test(input)) {
+        settings.relays = [
+          ...settings.relays,
+          { url: input, read: true, write: true },
+        ];
+        relayInput = "";
+      }
+    } catch (error) {
+      toastSettings.set({
+        title: "Error",
+        description: `Invalid URL`,
+        color: "bg-red-500",
+      });
     }
   }
 
