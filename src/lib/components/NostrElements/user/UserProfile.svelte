@@ -254,7 +254,9 @@
             <!--nameとか | アイコン-->
             <div class="flex flex-row items-center gap-2 mt-1 justify-between">
               <div class="flex flex-col mt-1">
-                <div class=" sm:text-xl text-md font-bold break-all text-left">
+                <div
+                  class="flex flex-wrap sm:text-xl text-md font-bold break-all text-left"
+                >
                   {#if prof.display_name}
                     <DisplayName
                       height={21}
@@ -274,7 +276,7 @@
 
                 {#if prof.nip05}
                   <div class="text-sm flex break-all flex-wrap items-center">
-                    {prof.nip05}<Nip05Check
+                    {prof.nip05.replace(/^_@/, "")}<Nip05Check
                       {pubkey}
                       nip05Address={prof.nip05}
                     />
