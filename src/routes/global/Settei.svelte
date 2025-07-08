@@ -39,20 +39,29 @@
     if (!newRelayURL.trim()) {
       return;
     }
-    const url = normalizeURL(newRelayURL.trim());
+    try {
+      const url = normalizeURL(newRelayURL.trim());
 
-    console.log(url);
-    if (!relayRegex2.test(url) || $newRelays.includes(url)) {
+      console.log(url);
+      if (!relayRegex2.test(url) || $newRelays.includes(url)) {
+        $toastSettings = {
+          title: "Error",
+          description: "failed to add relay",
+          color: "bg-orange-500",
+        };
+        return;
+      } else {
+        $newRelays.push(url);
+        $newRelays = $newRelays;
+        newRelayURL = "";
+      }
+    } catch (error) {
       $toastSettings = {
         title: "Error",
-        description: "failed to add relay",
+        description: "Invalid URL",
         color: "bg-orange-500",
       };
       return;
-    } else {
-      $newRelays.push(url);
-      $newRelays = $newRelays;
-      newRelayURL = "";
     }
   };
   function arraysEqual(a: string[], b: string[]): boolean {

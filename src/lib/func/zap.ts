@@ -208,11 +208,15 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
 
   const readRelay: string[] | undefined = queryRelay?.event?.tags?.reduce(
     (acc: string[], tag: string[]) => {
-      if (tag[0] === "r" && tag.length === 2) {
-        return [...acc, normalizeURL(tag[1])];
-      } else if (tag.length > 2 && tag[2] === "read") {
-        return [...acc, normalizeURL(tag[1])];
-      } else {
+      try {
+        if (tag[0] === "r" && tag.length === 2) {
+          return [...acc, normalizeURL(tag[1])];
+        } else if (tag.length > 2 && tag[2] === "read") {
+          return [...acc, normalizeURL(tag[1])];
+        } else {
+          return acc;
+        }
+      } catch (error) {
         return acc;
       }
     },
