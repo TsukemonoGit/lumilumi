@@ -329,8 +329,11 @@ export function formatUrl(url: string) {
   let httpsUrl = url.startsWith("wss://")
     ? url.replace(/^wss:/, "https:")
     : url.replace(/^ws:/, "http:");
-
-  return normalizeURL(httpsUrl);
+  try {
+    return normalizeURL(httpsUrl);
+  } catch (error) {
+    return url;
+  }
 }
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");

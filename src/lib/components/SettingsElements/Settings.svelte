@@ -155,14 +155,22 @@
 
   function addRelay() {
     if (!relayInput) return;
-    let input = normalizeURL(relayInput.trim());
+    try {
+      let input = normalizeURL(relayInput.trim());
 
-    if (relayRegex2.test(input)) {
-      settings.relays = [
-        ...settings.relays,
-        { url: input, read: true, write: true },
-      ];
-      relayInput = "";
+      if (relayRegex2.test(input)) {
+        settings.relays = [
+          ...settings.relays,
+          { url: input, read: true, write: true },
+        ];
+        relayInput = "";
+      }
+    } catch (error) {
+      toastSettings.set({
+        title: "Error",
+        description: `Invalid URL`,
+        color: "bg-red-500",
+      });
     }
   }
 

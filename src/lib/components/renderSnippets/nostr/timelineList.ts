@@ -9,6 +9,8 @@ import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
 import { pipe, type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
+import { normalizeURL } from "nostr-tools/utils";
+
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
   seenOn: Set<string>;
@@ -141,8 +143,7 @@ export async function waitForConnections(
 ): Promise<void> {
   const readUrls = getRelayUrls();
   const stateMap = relayStateMap.get() as Map<string, string>;
-  const normalizeUrl = (url: string) => url.replace(/\/$/, "");
-  const normalizedReadUrls = readUrls.map(normalizeUrl);
+  const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
   const startTime = Date.now();
   const RELAY_CHECK_INTERVAL = 500; // milliseconds
   const REQUIRED_CONNECTION_RATIO = 0.8; // 80% of relays must be connected
@@ -150,7 +151,7 @@ export async function waitForConnections(
   // Function to check how many relays have reached a final connection state
   const getFinalStateRelayCount = (): number => {
     return normalizedReadUrls.filter((url) => {
-      const state = stateMap.get(normalizeUrl(url));
+      const state = stateMap.get(normalizeURL(url));
       return state !== "initialize" && state !== "connecting";
     }).length;
   };
