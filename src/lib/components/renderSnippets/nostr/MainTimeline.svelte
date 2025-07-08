@@ -154,6 +154,40 @@
   }
 
   /**
+   * Event deduplication and merging utility
+   */
+  function mergeEvents(
+    current: EventPacket[] | null | undefined,
+    older: EventPacket[] | undefined,
+    partial: EventPacket[] | undefined
+  ): EventPacket[] {
+    // partialがない場合は単純結合（重複チェック不要）
+    if (!partial || partial.length === 0) {
+      return [...(current || []), ...(older || [])];
+    }
+
+    // partialがある場合のみ重複チェック
+    // current, olderは重複なし、partialとの重複のみチェック
+    const existingIds = new Set<string>();
+    const result: EventPacket[] = [];
+
+    // current, olderを先に追加（重複なし前提）
+    [...(current || []), ...(older || [])].forEach((pk) => {
+      existingIds.add(pk.event.id);
+      result.push(pk);
+    });
+
+    // partialから重複していないもののみ追加
+    partial.forEach((pk) => {
+      if (!existingIds.has(pk.event.id)) {
+        result.push(pk);
+      }
+    });
+
+    return result;
+  }
+
+  /**
    * Update scheduling and execution
    */
   const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
@@ -180,14 +214,6 @@
     }, CONFIG.UPDATE_DELAY);
   }
 
-  //------
-
-  /**
-   * タイムラインの表示を更新する
-   * $dataだけで十分な場合は古いデータの読み込みを回避
-   * マージ処理を回避して個別フィルタリング後に結合
-   * @param partialdata - 部分的なイベントデータ
-   */
   function processUpdate(partialdata?: EventPacket[]) {
     try {
       timelineManager.updating = true;
@@ -195,14 +221,12 @@
       // 表示範囲を計算
       const { startIndex, endIndex } = calculateDisplayRange();
 
-
       // 現在のデータをフィルタリング
       const currentEvents = filterEvents($data || []);
       // 現在のデータだけで表示範囲をカバーできるかチェック
       if (currentEvents.length >= endIndex) {
         // 十分な場合：現在のデータのみ使用
         displayEvents.set(currentEvents.slice(startIndex, endIndex));
-
       } else {
         // 不十分な場合：古いデータも個別にフィルタリングして結合
         const olderEvents: EventPacket[] | null | undefined =
@@ -220,14 +244,6 @@
           filteredOlderEvents,
           filteredPartialEvents
         );
-        // 全データでも表示範囲をカバーできない場合はhistory.back()
-        if (viewIndex !== 0 && allFilteredEvents.length < endIndex) {
-          // history.back();
-          //return;
-        } else {
-          updateDisplay(allFilteredEvents, startIndex, endIndex);
-        }
-      }
 
         displayEvents.set(allFilteredEvents.slice(startIndex, endIndex));
       }
@@ -239,48 +255,9 @@
       timelineManager.updating = false;
       $nowProgress = false;
 
-
-    /*  // 時系列でソート
-    return uniqueEvents.sort((a, b) => b.created_at - a.created_at); */
-  }
-
-  /**
-   * 表示用のイベントを更新
-   * @param events - 全イベント配列
-   * @param startIndex - 表示開始インデックス
-   * @param endIndex - 表示終了インデックス
-   */
-  function updateDisplay(events: any[], startIndex: number, endIndex: number) {
-    // 全イベントを保存
-    timelineManager.allUniqueEvents = events;
-
-    // 表示範囲のイベントのみを設定
-    displayEvents.set(events.slice(startIndex, endIndex));
-  }
-
-  /**
-   * 更新エラーを処理
-   * @param error - 発生したエラー
-   */
-  function handleUpdateError(error: Error) {
-    console.error("Error during update", error);
-    timelineManager.isUpdateScheduled = false;
-  }
-
-  /**
-   * 更新処理の後処理
-   * 状態のリセットと必要に応じた再スケジュール
-   */
-  function finalizeUpdate() {
-    timelineManager.updating = false;
-
-    $nowProgress = false;
-
-    timelineManager.updateCounts();
-
-    // 追加の更新がスケジュールされている場合は実行
-    if (timelineManager.isUpdateScheduled) {
-      scheduleUpdate();
+      if (timelineManager.isUpdateScheduled) {
+        scheduleUpdate();
+      }
     }
   }
   /**
@@ -313,8 +290,6 @@
     const endIndex = startIndex + amount;
     return { startIndex, endIndex };
   }
-
-  //------------------
 
   /**
    * イベントデータをフィルタリング
@@ -457,14 +432,12 @@
     //const previousViewIndex = viewIndex; // 元の位置を保存
     try {
       const hasEnoughStock =
-
         ($data || []).length + timelineManager.olderEventCount >=
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
       console.log(
         ($data || []).length + timelineManager.olderEventCount,
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
       );
-
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         // viewIndexが変更された場合のみ履歴を更新
@@ -549,7 +522,6 @@
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
       $nowProgress = false;
-
       timelineManager.isLoadingOlderEvents = false;
     }
   }
