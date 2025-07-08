@@ -5,7 +5,7 @@ import { getToken } from "nostr-tools/nip98";
 import { uploadFile } from "./upload";
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
-import { binarySearch } from "nostr-tools/utils";
+import { binarySearch, normalizeURL } from "nostr-tools/utils";
 import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
@@ -330,12 +330,8 @@ export function formatUrl(url: string) {
     ? url.replace(/^wss:/, "https:")
     : url.replace(/^ws:/, "http:");
 
-  return httpsUrl.endsWith("/") ? httpsUrl : httpsUrl + "/";
+  return normalizeURL(httpsUrl);
 }
-//末尾に"/"をつける
-export const normalizeRelayURL = (str: string) => {
-  return !str.trim().endsWith("/") ? `${str.trim()}/` : str.trim();
-};
 
 export const cleanRelayUrl = (url: string) => url.replace(/\/$/, "");
 

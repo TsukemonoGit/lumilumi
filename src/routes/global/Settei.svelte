@@ -8,6 +8,7 @@
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
   import { untrack } from "svelte";
+  import { normalizeURL } from "nostr-tools/utils";
   interface Props {
     relays?: string[];
     title: string;
@@ -38,9 +39,7 @@
     if (!newRelayURL.trim()) {
       return;
     }
-    const url = !newRelayURL.trim().endsWith("/")
-      ? `${newRelayURL.trim()}/`
-      : newRelayURL.trim();
+    const url = normalizeURL(newRelayURL.trim());
 
     console.log(url);
     if (!relayRegex2.test(url) || $newRelays.includes(url)) {

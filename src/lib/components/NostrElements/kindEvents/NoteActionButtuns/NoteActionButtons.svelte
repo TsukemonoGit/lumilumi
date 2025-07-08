@@ -33,7 +33,6 @@
   import {
     formatToEventPacket,
     noReactionKind,
-    normalizeRelayURL,
     profile,
     sortEventPackets,
   } from "$lib/func/util";
@@ -56,6 +55,7 @@
   import Reposted from "$lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
   import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { normalizeURL } from "nostr-tools/utils";
 
   let {
     note,
@@ -146,7 +146,7 @@
     const { event: ev, res } = result;
     const isSuccessRelays: string[] = res
       .filter((item) => item.ok)
-      .map((item) => normalizeRelayURL(item.from));
+      .map((item) => normalizeURL(item.from));
 
     queryKey = [...queryKey, ev.pubkey];
 
