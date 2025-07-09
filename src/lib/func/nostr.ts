@@ -211,16 +211,7 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
   }
 
   const metadata: [QueryKey, EventPacket][] = JSON.parse(metadataStr);
-  // console.log(
-  //   metadata.find(
-  //     ([key, _]) =>
-  //       JSON.stringify(key) ===
-  //       JSON.stringify([
-  //         "metadata",
-  //         "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
-  //       ])
-  //   )
-  // );
+
   // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
   const result = metadata.find(
     ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
@@ -583,7 +574,13 @@ export function usePromiseReq(
 
   const obs: Observable<EventPacket[] | EventPacket> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(metadata(), bookmark(), operator, completeOnTimeout(timeout));
+    .pipe(
+      metadata(),
+      bookmark(),
+
+      operator,
+      completeOnTimeout(timeout)
+    );
 
   const throttledOnData = onData ? throttle(onData, 200) : undefined;
 

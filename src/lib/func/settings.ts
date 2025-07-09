@@ -1,4 +1,9 @@
-import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
+import {
+  latestEachNaddr,
+  latestbyId,
+  saveEachNote,
+  scanArray,
+} from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { app, queryClient } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
@@ -33,15 +38,17 @@ export function setTheme(theme: Theme) {
   }
 }
 
-export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
+export async function getRelayList(
+  pubkey: string
+): Promise<EventPacket | null> {
   const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relaySearchRelays);
-  let res: EventPacket[] = [];
+  let res: EventPacket | null = null;
   await new Promise<void>((resolve) => {
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(uniq(), scanArray(), completeOnTimeout(3000))
+      .pipe(uniq(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -117,7 +124,7 @@ export async function getQueryRelays(
     // console.log("t");
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
-    if (relayList.length > 0) {
+    if (relayList) {
       queryClient.setQueryData(["defaultRelay", pubkey], relayList);
     } else {
       console.log("failed to get relay data");

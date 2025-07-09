@@ -1,7 +1,7 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
-import { filter, map, pipe, scan, tap } from "rxjs";
+import { filter, map, of, pipe, scan, tap } from "rxjs";
 import {
   metadataQueue,
   mutebykinds,
@@ -25,6 +25,7 @@ import {
 } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 import { BOOKMARK_STORAGE_KEY } from "$lib/func/constants";
+import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,
@@ -103,16 +104,39 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   );
 }
 
+const createEventQueryKey = (ev: Nostr.Event): QueryKey | null => {
+  if (ev.kind === 0) {
+    return null;
+    //
+  } else if (isAddressableKind(ev.kind) && isReplaceableKind(ev.kind)) {
+    return [
+      "naddr",
+      `${ev.kind}:${ev.pubkey}:${
+        ev.tags.find((tag) => tag[0] === "d")?.[1] || ""
+      }`,
+    ] as QueryKey;
+  } else if (ev.id) {
+    return ["note", ev.id] as QueryKey;
+  }
+  return null;
+};
+
+export function saveEachNote(): OperatorFunction<EventPacket, EventPacket> {
+  return tap((pk: EventPacket) => {
+    if (pk.event && pk.event.id) {
+      const queryKey: QueryKey | null = createEventQueryKey(pk.event);
+      // クエリデータの設定
+      if (queryKey && !queryClient.getQueryData(queryKey)) {
+        queryClient.setQueryData(queryKey, pk);
+      }
+    }
+  });
+}
+
 export function scanArray<A extends EventPacket>(
   sift?: number
 ): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
-    const queryKey: QueryKey = ["note", a.event.id];
-    // クエリデータの設定
-    if (a.event && a.event.id && !queryClient.getQueryData(queryKey)) {
-      queryClient.setQueryData(queryKey, a);
-    }
-
     // 新しい順にソート
 
     //insertEventPacketIntoDescendingList(acc, a)にしてみてたけどなんかめっちゃ遅くなったからソートに戻す

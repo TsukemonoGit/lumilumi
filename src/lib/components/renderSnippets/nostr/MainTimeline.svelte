@@ -23,7 +23,12 @@
 
   // Utility functions
   import { sortEventPackets } from "$lib/func/util";
-  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import {
+    userStatus,
+    reactionCheck,
+    scanArray,
+    saveEachNote,
+  } from "$lib/stores/operators";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
@@ -150,7 +155,7 @@
       operator = pipe(operator, reactionCheck());
     }
 
-    return pipe(operator, scanArray());
+    return pipe(operator, saveEachNote(), scanArray());
   }
 
   /**

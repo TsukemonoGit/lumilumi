@@ -27,7 +27,7 @@
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
-  import { scanArray } from "$lib/stores/operators";
+  import { saveEachNote, scanArray } from "$lib/stores/operators";
   import { sortEventPackets } from "$lib/func/util";
   import { page } from "$app/state";
 
