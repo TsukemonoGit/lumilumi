@@ -350,7 +350,7 @@ type MediaType = (typeof mediaTypes)[number];
 
 // 結果の型定義
 export interface MediaResult {
-  event: EventPacket;
+  eventPacket: EventPacket;
   mediaUrl: string;
   mediaType: MediaType;
 }
@@ -368,7 +368,7 @@ export interface MediaOperatorOutput {
 }
 
 export interface MediaEvent {
-  event: EventPacket;
+  eventPacket: EventPacket;
   mediaUrl: string;
   mediaType: MediaType;
 }
@@ -382,25 +382,25 @@ export const mediaOperator = (sift: number) => {
   let eventBuffer: EventPacket[] = [];
 
   return pipe(
-    mergeMap((event: EventPacket) => {
-      eventBuffer.push(event);
+    mergeMap((eventPacket: EventPacket) => {
+      eventBuffer.push(eventPacket);
 
       // sift制限（古いものを先に切る）
       if (sift !== 0 && eventBuffer.length > sift) {
         eventBuffer = eventBuffer.slice(0, sift);
       }
 
-      const urls = extractMediaUrls(event.event.content);
+      const urls = extractMediaUrls(eventPacket.event.content);
 
       return from(urls).pipe(
         mergeMap(async (url) => {
           const mediaType = await userPromiseUrl(url);
           if (mediaType && mediaTypes.includes(mediaType as MediaType)) {
             return {
-              event,
+              eventPacket,
               mediaUrl: url,
               mediaType: mediaType as MediaType,
-              createdAt: event.event.created_at,
+              createdAt: eventPacket.event.created_at,
             };
           }
           return null;

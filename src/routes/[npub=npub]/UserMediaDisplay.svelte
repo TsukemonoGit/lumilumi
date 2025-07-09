@@ -20,7 +20,6 @@
   let loadingProgress = $state<string>("");
   const LOAD_LIMIT = 500;
   const MAX_RETRIES = 30;
-  const displayMenu = false;
   const mini = false;
   const depth = 0;
 
@@ -115,7 +114,11 @@
               );
 
               // mediaEvents に追加
-              mediaEvents = [...mediaEvents, ...newMedia];
+              mediaEvents = [...mediaEvents, ...newMedia].sort(
+                (a, b) =>
+                  a.eventPacket.event.created_at -
+                  b.eventPacket.event.created_at
+              );
 
               oldestCreatedAt = results.oldestCreatedAt;
               currentUntil = results.oldestCreatedAt;
@@ -204,7 +207,7 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 
   <div class="media-grid">
-    {#each viewList as media, index (media.event.event.id + "-" + media.mediaUrl)}
+    {#each viewList as media, index (media.eventPacket.event.id + "-" + media.mediaUrl)}
       {#if media}
         <button class="media-item" onclick={() => openModal(media)}>
           {#if media.mediaType === "image" || media.mediaType === "svg"}
@@ -232,15 +235,15 @@
 
 <Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
   {#snippet main()}
-    {#if selectedEvent?.event}
+    {#if selectedEvent?.eventPacket}
       <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
         <Metadata
-          queryKey={["metadata", selectedEvent?.event.event.pubkey]}
-          pubkey={selectedEvent?.event.event.pubkey}
+          queryKey={["metadata", selectedEvent?.eventPacket.event.pubkey]}
+          pubkey={selectedEvent?.eventPacket.event.pubkey}
         >
           {#snippet loading()}
             <EventCard
-              note={selectedEvent!.event.event}
+              note={selectedEvent!.eventPacket.event}
               {mini}
               showStatus={true}
               {maxHeight}
@@ -252,7 +255,7 @@
           {/snippet}
           {#snippet nodata()}
             <EventCard
-              note={selectedEvent!.event.event}
+              note={selectedEvent!.eventPacket.event}
               {mini}
               showStatus={true}
               {maxHeight}
@@ -264,7 +267,7 @@
           {/snippet}
           {#snippet error()}
             <EventCard
-              note={selectedEvent!.event.event}
+              note={selectedEvent!.eventPacket.event}
               {mini}
               showStatus={true}
               {maxHeight}
@@ -277,7 +280,7 @@
           {#snippet content({ metadata })}
             <EventCard
               {metadata}
-              note={selectedEvent!.event.event}
+              note={selectedEvent!.eventPacket.event}
               {mini}
               showStatus={true}
               {maxHeight}
