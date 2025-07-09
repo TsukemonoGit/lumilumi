@@ -1,7 +1,7 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
-import { filter, map, of, pipe, scan, tap } from "rxjs";
+import { filter, from, map, mergeMap, of, pipe, scan, tap } from "rxjs";
 import {
   metadataQueue,
   mutebykinds,
@@ -26,6 +26,8 @@ import {
 import { SvelteMap } from "svelte/reactivity";
 import { BOOKMARK_STORAGE_KEY } from "$lib/func/constants";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
+import { urlRegex } from "$lib/func/regex";
+import { userPromiseUrl } from "$lib/func/useUrl";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,
@@ -340,3 +342,83 @@ function setReactionEvent(packet: EventPacket) {
     });
   }
 }
+
+//media用
+
+const mediaTypes = ["image", "svg", "movie", "audio", "3D"] as const;
+type MediaType = (typeof mediaTypes)[number];
+
+// 結果の型定義
+export interface MediaResult {
+  event: EventPacket;
+  mediaUrl: string;
+  mediaType: MediaType;
+}
+
+// オペレーターの状態管理用の型
+export interface MediaOperatorState {
+  result: MediaResult;
+  oldestCreatedAt: number;
+  totalPacketsProcessed: number;
+}
+export interface MediaOperatorOutput {
+  result: MediaResult[];
+  oldestCreatedAt: number;
+  totalPacketsProcessed: number;
+}
+
+export interface MediaEvent {
+  event: EventPacket;
+  mediaUrl: string;
+  mediaType: MediaType;
+}
+const extractMediaUrls = (content: string): string[] => {
+  const urls = content.match(urlRegex) || [];
+  return urls.filter((url) => url.length > 0);
+};
+
+// 個別の結果を返すmediaOperator
+export const mediaOperator = (sift: number) => {
+  let eventBuffer: EventPacket[] = [];
+
+  return pipe(
+    mergeMap((event: EventPacket) => {
+      eventBuffer.push(event);
+
+      // sift制限（古いものを先に切る）
+      if (sift !== 0 && eventBuffer.length > sift) {
+        eventBuffer = eventBuffer.slice(0, sift);
+      }
+
+      const urls = extractMediaUrls(event.event.content);
+
+      return from(urls).pipe(
+        mergeMap(async (url) => {
+          const mediaType = await userPromiseUrl(url);
+          if (mediaType && mediaTypes.includes(mediaType as MediaType)) {
+            return {
+              event,
+              mediaUrl: url,
+              mediaType: mediaType as MediaType,
+              createdAt: event.event.created_at,
+            };
+          }
+          return null;
+        }),
+        filter(
+          (result): result is MediaResult & { createdAt: number } =>
+            result !== null
+        ),
+        // 🟢 最後に createdAt を eventBuffer から求めて添付
+        map((result) => ({
+          result,
+          oldestCreatedAt:
+            eventBuffer.length > 0
+              ? eventBuffer[eventBuffer.length - 1].event.created_at
+              : 0,
+          totalPacketsProcessed: eventBuffer.length,
+        }))
+      );
+    })
+  );
+};

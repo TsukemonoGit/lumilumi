@@ -24,11 +24,19 @@ import {
   createRxForwardReq,
   filterByType,
   type AuthPacket,
+  uniq,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
 import { Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
-import { bookmark, metadata } from "$lib/stores/operators";
+import {
+  bookmark,
+  mediaOperator,
+  metadata,
+  type MediaOperatorOutput,
+  type MediaOperatorState,
+  type MediaResult,
+} from "$lib/stores/operators";
 import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import * as nip19 from "nostr-tools/nip19";
@@ -674,4 +682,98 @@ export async function deleteEvent(tags: string[][]): Promise<{
   }
   const keys = Object.keys(relays);
   return await promisePublishEvent(eventParam, keys);
+}
+
+//media用
+
+// useMediaPromiseReq関数
+interface UseMediaPromiseReqOpts<T> {
+  filters: any;
+  req?: any;
+}
+
+export function useMediaPromiseReq(
+  {
+    filters,
+
+    req,
+  }: UseMediaPromiseReqOpts<MediaOperatorOutput>,
+  relays: string[] | undefined,
+  timeout: number | undefined = 3000,
+
+  sift: number,
+  onData?: (result: MediaResult) => void
+): Promise<MediaOperatorOutput> {
+  const _rxNostr = get(app).rxNostr;
+  if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
+    console.log("error");
+    throw Error("No default relays available");
+  }
+
+  let _req:
+    | (RxReq<"backward"> &
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
+    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
+
+  if (req) {
+    _req = req;
+  } else {
+    _req = createRxBackwardReq();
+  }
+
+  let accumulatedData: MediaResult[] = [];
+  let oldestCreatedAt = 0;
+  let totalPacketsProcessed = 0;
+
+  const obs: Observable<MediaOperatorState> = _rxNostr
+    .use(_req, { relays: relays })
+    .pipe(uniq(), mediaOperator(sift), completeOnTimeout(timeout));
+
+  return new Promise<MediaOperatorOutput>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      subscription.unsubscribe();
+      resolve({
+        result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
+        oldestCreatedAt,
+        totalPacketsProcessed,
+      });
+    }, timeout + 10000);
+
+    const subscription = obs.subscribe({
+      next: (v) => {
+        //console.log(v.result);
+        accumulatedData = [...accumulatedData, v.result];
+        oldestCreatedAt = v.oldestCreatedAt;
+        totalPacketsProcessed = v.totalPacketsProcessed;
+
+        if (onData) {
+          onData(v.result);
+        }
+      },
+      complete: () => {
+        clearTimeout(timeoutId);
+        resolve({
+          result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
+          oldestCreatedAt,
+          totalPacketsProcessed,
+        });
+      },
+      error: (e) => {
+        console.log(e);
+        console.error("[rx-nostr]", e);
+        clearTimeout(timeoutId);
+        resolve({
+          result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
+          oldestCreatedAt,
+          totalPacketsProcessed,
+        });
+      },
+    });
+
+    _req.emit(filters);
+  });
 }

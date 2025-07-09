@@ -1,27 +1,24 @@
 <script lang="ts">
-  import { usePromiseReq } from "$lib/func/nostr";
+  import { useMediaPromiseReq } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
   import { uniq, type EventPacket } from "rx-nostr";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { pipe } from "rxjs";
-  import { userPromiseUrl } from "$lib/func/useUrl";
   import { urlRegex } from "$lib/func/regex";
-  import { scanArray } from "$lib/stores/operators";
+  import {
+    mediaOperator,
+    type MediaEvent,
+    type MediaResult,
+  } from "$lib/stores/operators";
 
   let { pubkey }: { pubkey: string } = $props();
 
-  const mediaTypes = ["image", "svg", "movie", "audio", "3D"] as const;
-  type MediaType = (typeof mediaTypes)[number];
-
-  interface MediaEvent {
-    event: EventPacket;
-    mediaUrl: string;
-    mediaType: MediaType;
-  }
-
   let mediaEvents = $state<MediaEvent[]>([]);
   let isLoading = $state(false);
-  let hasMore = $state(true);
+  let maxPage = $state<number | null>(null); // 最終ページ番号
+  let loadingProgress = $state<string>("");
+  const LOAD_LIMIT = 300;
+  const MAX_RETRIES = 30;
 
   // ページ番号（0始まり）
   let page = $state(0);
@@ -35,11 +32,15 @@
   // 初期取得の最古日時
   let oldestCreatedAt: number | null = null;
 
+  let viewList = $derived(
+    mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
+  );
+  $inspect(viewList);
   const createFilter = (until?: number): Nostr.Filter => {
     const filter: Nostr.Filter = {
       kinds: [1],
       authors: [pubkey],
-      limit: 200,
+      limit: LOAD_LIMIT,
     };
     if (until) {
       filter.until = until;
@@ -47,108 +48,136 @@
     return filter;
   };
 
-  const extractMediaUrls = (content: string): string[] => {
-    const urls = content.match(urlRegex) || [];
-    return urls.filter((url) => url.length > 0);
-  };
-
-  const processEvents = async (
-    events: EventPacket[]
-  ): Promise<MediaEvent[]> => {
-    const results: MediaEvent[] = [];
-
-    for (const event of events) {
-      const urls = extractMediaUrls(event.event.content);
-      for (const url of urls) {
-        const mediaType = await userPromiseUrl(url);
-        if (mediaType && mediaTypes.includes(mediaType as MediaType)) {
-          results.push({
-            event,
-            mediaUrl: url,
-            mediaType: mediaType as MediaType,
-          });
-        }
-      }
-    }
-    return results;
-  };
-
   // 指定ページのデータを読み込み・切り替え
-  const loadPage = async (targetPage: number) => {
-    if (targetPage < 0) return;
-    if (isLoading) return;
+  $effect(() => {
+    if (page >= 0) {
+      untrack(async () => {
+        if (isLoading) return;
 
-    // すでに表示可能な範囲にデータがあるか
-    const startIndex = targetPage * MEDIA_PER_PAGE;
-    if (mediaEvents.length >= startIndex + MEDIA_PER_PAGE) {
-      // 表示だけ切り替え
-      page = targetPage;
-      return;
+        // すでに表示可能な範囲にデータがあるか
+        const startIndex = page * MEDIA_PER_PAGE;
+        console.log(
+          startIndex,
+          mediaEvents.length >= startIndex + MEDIA_PER_PAGE
+        );
+        if (mediaEvents.length >= startIndex + MEDIA_PER_PAGE) {
+          // 表示だけ切り替え
+          console.log(page);
+          return;
+        }
+
+        isLoading = true;
+
+        try {
+          let retryCount = 0;
+          let currentUntil: number | undefined;
+
+          // 取得用untilを決める
+          if (page === 0) {
+            currentUntil = undefined;
+          } else {
+            currentUntil = oldestCreatedAt || undefined;
+          }
+          console.log(currentUntil);
+          // 必要な件数に達するまで繰り返し取得
+          while (retryCount < MAX_RETRIES) {
+            const filter = createFilter(currentUntil);
+            console.log(filter);
+            const onData = (media: MediaResult) => {
+              // id が既に存在するかチェック
+              if (!mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)) {
+                mediaEvents = [...mediaEvents, media];
+              }
+            };
+
+            const results = await useMediaPromiseReq(
+              { filters: [filter] },
+              undefined,
+              2000,
+
+              LOAD_LIMIT,
+              onData
+            );
+            console.log(results);
+            // 取得したイベントを処理
+            if (results.result.length > 0) {
+              // mediaUrl が重複していないものだけ追加
+              const newMedia = results.result.filter(
+                (media) =>
+                  !mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)
+              );
+
+              // mediaEvents に追加
+              mediaEvents = [...mediaEvents, ...newMedia];
+
+              oldestCreatedAt = results.oldestCreatedAt;
+              currentUntil = results.oldestCreatedAt;
+
+              // 進捗メッセージを更新
+              loadingProgress = `${mediaEvents.length}件のメディアを取得済み（試行回数: ${retryCount + 1}/${MAX_RETRIES}）`;
+            }
+
+            // 必要な件数に達した場合は終了
+            if (mediaEvents.length >= page * MEDIA_PER_PAGE + MEDIA_PER_PAGE) {
+              break;
+            }
+
+            // totalPacketsProcessedがLOAD_LIMITに達していない場合は最後のページ
+            if (results.totalPacketsProcessed < LOAD_LIMIT) {
+              maxPage = page;
+              break;
+            }
+
+            retryCount++;
+          }
+
+          // ページ境界のcreated_atを保存
+          if (oldestCreatedAt) {
+            oldestCreatedAtByPage.set(page, oldestCreatedAt);
+          }
+
+          // 最大試行回数に達した場合
+          if (retryCount >= MAX_RETRIES) {
+            maxPage = page;
+          }
+
+          // 最終的にデータが取得できなかった場合
+          if (mediaEvents.length === 0) {
+            maxPage = page;
+            loadingProgress = "データがありません";
+            // メッセージを表示してから消す
+            setTimeout(() => {
+              loadingProgress = "";
+            }, 2000);
+            return;
+          }
+
+          loadingProgress = `${mediaEvents.length}件のメディアを読み込み完了`;
+
+          // 完了メッセージを少し表示してから消す
+          setTimeout(() => {
+            loadingProgress = "";
+          }, 1000);
+        } catch (e) {
+          console.error("Failed to load page:", e);
+          maxPage = page;
+          loadingProgress = "読み込みエラーが発生しました";
+          // エラー時も少し表示してから消す
+          setTimeout(() => {
+            loadingProgress = "";
+          }, 2000);
+        } finally {
+          isLoading = false;
+        }
+      });
     }
-
-    isLoading = true;
-    try {
-      // 取得用untilを決める
-      let until: number | undefined;
-      if (targetPage === 0) {
-        until = undefined;
-      } else {
-        until =
-          oldestCreatedAtByPage.get(targetPage - 1) ??
-          oldestCreatedAt ??
-          undefined;
-      }
-
-      const filter = createFilter(until);
-      const events = await usePromiseReq(
-        { filters: [filter], operator: pipe(uniq(), scanArray()) },
-        undefined,
-        2000
-      );
-
-      if (events.length === 0) {
-        hasMore = false;
-        return;
-      }
-
-      const newMedia = await processEvents(events);
-      const existingUrls = new Set(mediaEvents.map((m) => m.mediaUrl));
-      const uniqueNewMedia = newMedia.filter(
-        (m) => !existingUrls.has(m.mediaUrl)
-      );
-
-      if (uniqueNewMedia.length > 0) {
-        mediaEvents = [...mediaEvents, ...uniqueNewMedia];
-      }
-
-      // ページ境界のcreated_atを保存
-      const sortedEvents = events.sort(
-        (a, b) => a.event.created_at - b.event.created_at
-      );
-      const oldest = sortedEvents[0].event.created_at - 1;
-      oldestCreatedAtByPage.set(targetPage, oldest);
-      oldestCreatedAt = oldest;
-
-      if (events.length < 200) {
-        hasMore = false;
-      }
-
-      page = targetPage;
-    } catch (e) {
-      console.error("Failed to load page:", e);
-      hasMore = false;
-    } finally {
-      isLoading = false;
-    }
-  };
-
+  });
   // 最初の読み込み
   const loadInitialMedia = async () => {
     mediaEvents = [];
     oldestCreatedAtByPage.clear();
     oldestCreatedAt = null;
-    hasMore = true;
-    await loadPage(0);
+    maxPage = null;
   };
 
   const openModal = (media: MediaEvent) => {
@@ -173,41 +202,57 @@
   <div class="controls">
     <button
       class="btn"
-      onclick={() => loadPage(0)}
+      onclick={() => {
+        page = 0;
+      }}
       disabled={isLoading || page === 0}>TOP</button
     >
     <button
       class="btn"
-      onclick={() => loadPage(page - 1)}
+      onclick={() => {
+        page = Math.max(0, page - 1);
+      }}
       disabled={isLoading || page === 0}>前のページ</button
     >
     <button
       class="btn"
-      onclick={() => loadPage(page + 1)}
-      disabled={isLoading || !hasMore}>次のページ</button
+      onclick={() => {
+        page = page + 1;
+      }}
+      disabled={isLoading || (maxPage !== null && page >= maxPage)}
     >
-  </div>
+      次のページ</button
+    >
 
-  <div class="media-grid">
-    {#each mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE) as media (media.event.event.id + "-" + media.mediaUrl)}
-      <div class="media-item" onclick={() => openModal(media)}>
-        {#if media.mediaType === "image" || media.mediaType === "svg"}
-          <img src={media.mediaUrl} alt="" loading="lazy" />
-        {:else if media.mediaType === "movie"}
-          <video src={media.mediaUrl} muted preload="metadata">
-            <track kind="captions" />
-          </video>
-          <div class="media-type-indicator">🎬</div>
-        {:else if media.mediaType === "audio"}
-          <div class="audio-placeholder">
-            <span>🎵</span>
-          </div>
-        {:else if media.mediaType === "3D"}
-          <div class="media-3d-placeholder">
-            <span>🎲</span>
-          </div>
-        {/if}
+    {#if isLoading || loadingProgress}
+      <div class="loading-indicator">
+        <span class="spinner"></span>
+        <span>{loadingProgress}</span>
       </div>
+    {/if}
+  </div>
+  <div class="media-grid">
+    {#each viewList as media, index (media.event.event.id + "-" + media.mediaUrl)}
+      {#if media}
+        <div class="media-item" onclick={() => openModal(media)}>
+          {#if media.mediaType === "image" || media.mediaType === "svg"}
+            <img src={media.mediaUrl} alt="" loading="lazy" />
+          {:else if media.mediaType === "movie"}
+            <video src={media.mediaUrl} muted preload="metadata">
+              <track kind="captions" />
+            </video>
+            <div class="media-type-indicator">🎬</div>
+          {:else if media.mediaType === "audio"}
+            <div class="audio-placeholder">
+              <span>🎵</span>
+            </div>
+          {:else if media.mediaType === "3D"}
+            <div class="media-3d-placeholder">
+              <span>🎲</span>
+            </div>
+          {/if}
+        </div>
+      {/if}
     {/each}
   </div>
 
@@ -244,7 +289,6 @@
 </div>
 
 <style>
-  /* （省略）元のスタイルはそのまま使えます */
   .media-gallery {
     max-width: 1200px;
     margin: 0 auto;
@@ -253,20 +297,35 @@
 
   .controls {
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    background: white;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-right: 0.5rem;
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
   }
 
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .media-grid {
@@ -315,6 +374,27 @@
     height: 100%;
     font-size: 3rem;
     color: #666;
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
 
   .modal-overlay {
