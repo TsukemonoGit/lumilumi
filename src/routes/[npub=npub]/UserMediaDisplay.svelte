@@ -12,6 +12,7 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
+  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
 
   let { pubkey }: { pubkey: string } = $props();
 
@@ -51,10 +52,10 @@
     }
     return filter;
   };
-
+  let isInitialized = $state(false);
   // 指定ページのデータを読み込み・切り替え
   $effect(() => {
-    if (page >= 0) {
+    if (page >= 0 && isInitialized) {
       untrack(async () => {
         if (isLoading) return;
 
@@ -187,8 +188,10 @@
     $showModal = true;
   };
 
-  onMount(() => {
+  onMount(async () => {
     loadInitialMedia();
+    await waitForConnections();
+    isInitialized = true;
   });
 </script>
 
