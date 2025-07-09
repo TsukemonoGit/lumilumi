@@ -1,15 +1,16 @@
 <script lang="ts">
   import { useMediaPromiseReq } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
-  import { uniq, type EventPacket } from "rx-nostr";
   import { onMount, untrack } from "svelte";
-  import { pipe } from "rxjs";
-  import { urlRegex } from "$lib/func/regex";
-  import {
-    mediaOperator,
-    type MediaEvent,
-    type MediaResult,
-  } from "$lib/stores/operators";
+
+  import { type MediaEvent, type MediaResult } from "$lib/stores/operators";
+
+  import Controls from "./Controls.svelte";
+  import Dialog from "$lib/components/Elements/Dialog.svelte";
+
+  import { writable, type Writable } from "svelte/store";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   let { pubkey }: { pubkey: string } = $props();
 
@@ -19,7 +20,13 @@
   let loadingProgress = $state<string>("");
   const LOAD_LIMIT = 500;
   const MAX_RETRIES = 30;
+  const displayMenu = false;
+  const mini = false;
+  const depth = 0;
 
+  const repostable = true;
+  const zIndex = 50;
+  const maxHeight = undefined;
   // ページ番号（0始まり）
   let page = $state(0);
 
@@ -35,7 +42,7 @@
   let viewList = $derived(
     mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
   );
-  $inspect(viewList);
+  //$inspect(viewList);
   const createFilter = (until?: number): Nostr.Filter => {
     const filter: Nostr.Filter = {
       kinds: [1],
@@ -179,19 +186,14 @@
     oldestCreatedAt = null;
     maxPage = null;
   };
+  let selectedEvent = $state<MediaEvent | null>(null);
+  let showModal: Writable<boolean> = writable(false);
 
   const openModal = (media: MediaEvent) => {
-    selectedEvent = media;
-    showModal = true;
-  };
-
-  const closeModal = () => {
-    showModal = false;
     selectedEvent = null;
+    selectedEvent = media;
+    $showModal = true;
   };
-
-  let selectedEvent = $state<MediaEvent | null>(null);
-  let showModal = $state(false);
 
   onMount(() => {
     loadInitialMedia();
@@ -199,42 +201,12 @@
 </script>
 
 <div class="media-gallery">
-  <div class="controls">
-    <button
-      class="btn"
-      onclick={() => {
-        page = 0;
-      }}
-      disabled={isLoading || page === 0}>TOP</button
-    >
-    <button
-      class="btn"
-      onclick={() => {
-        page = Math.max(0, page - 1);
-      }}
-      disabled={isLoading || page === 0}>前のページ</button
-    >
-    <button
-      class="btn"
-      onclick={() => {
-        page = page + 1;
-      }}
-      disabled={isLoading || (maxPage !== null && page >= maxPage)}
-    >
-      次のページ</button
-    >
+  <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 
-    {#if isLoading || loadingProgress}
-      <div class="loading-indicator">
-        <span class="spinner"></span>
-        <span>{loadingProgress}</span>
-      </div>
-    {/if}
-  </div>
   <div class="media-grid">
     {#each viewList as media, index (media.event.event.id + "-" + media.mediaUrl)}
       {#if media}
-        <div class="media-item" onclick={() => openModal(media)}>
+        <button class="media-item" onclick={() => openModal(media)}>
           {#if media.mediaType === "image" || media.mediaType === "svg"}
             <img src={media.mediaUrl} alt="" loading="lazy" />
           {:else if media.mediaType === "movie"}
@@ -251,81 +223,81 @@
               <span>🎲</span>
             </div>
           {/if}
-        </div>
+        </button>
       {/if}
     {/each}
   </div>
-
-  {#if showModal && selectedEvent}
-    <div class="modal-overlay" onclick={closeModal}>
-      <div class="modal-content" onclick={(e) => e.stopPropagation()}>
-        <button class="modal-close" onclick={closeModal}>×</button>
-
-        <div class="modal-media">
-          {#if selectedEvent.mediaType === "image" || selectedEvent.mediaType === "svg"}
-            <img src={selectedEvent.mediaUrl} alt="" />
-          {:else if selectedEvent.mediaType === "movie"}
-            <video src={selectedEvent.mediaUrl} controls>
-              <track kind="captions" />
-            </video>
-          {:else if selectedEvent.mediaType === "audio"}
-            <audio src={selectedEvent.mediaUrl} controls></audio>
-          {/if}
-        </div>
-
-        <div class="modal-info">
-          <div class="event-content">{selectedEvent.event.event.content}</div>
-          <div class="event-meta">
-            <small>
-              投稿日時: {new Date(
-                selectedEvent.event.event.created_at * 1000
-              ).toLocaleString()}
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-  {/if}
+  <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 </div>
+
+<Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
+  {#snippet main()}
+    {#if selectedEvent?.event}
+      <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+        <Metadata
+          queryKey={["metadata", selectedEvent?.event.event.pubkey]}
+          pubkey={selectedEvent?.event.event.pubkey}
+        >
+          {#snippet loading()}
+            <EventCard
+              note={selectedEvent!.event.event}
+              {mini}
+              showStatus={true}
+              {maxHeight}
+              thread={false}
+              {depth}
+              {repostable}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet nodata()}
+            <EventCard
+              note={selectedEvent!.event.event}
+              {mini}
+              showStatus={true}
+              {maxHeight}
+              thread={false}
+              {depth}
+              {repostable}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet error()}
+            <EventCard
+              note={selectedEvent!.event.event}
+              {mini}
+              showStatus={true}
+              {maxHeight}
+              thread={false}
+              {depth}
+              {repostable}
+              {zIndex}
+            />
+          {/snippet}
+          {#snippet content({ metadata })}
+            <EventCard
+              {metadata}
+              note={selectedEvent!.event.event}
+              {mini}
+              showStatus={true}
+              {maxHeight}
+              thread={false}
+              {depth}
+              {repostable}
+              {zIndex}
+            />
+          {/snippet}
+        </Metadata>
+      </div>
+    {/if}
+  {/snippet}</Dialog
+>
 
 <style>
   .media-gallery {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
-  }
-
-  .controls {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .loading-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #666;
-    font-size: 0.9rem;
-  }
-
-  .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
   }
 
   .media-grid {
@@ -374,27 +346,6 @@
     height: 100%;
     font-size: 3rem;
     color: #666;
-  }
-
-  .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
   }
 
   .modal-overlay {
