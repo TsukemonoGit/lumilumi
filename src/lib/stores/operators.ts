@@ -386,8 +386,9 @@ export const mediaOperator = (sift: number) => {
       eventBuffer.push(eventPacket);
 
       // sift制限（古いものを先に切る）
-      if (sift !== 0 && eventBuffer.length > sift) {
-        eventBuffer = eventBuffer.slice(0, sift);
+      if (sift !== 0 && eventBuffer.length >= sift) {
+        eventBuffer = sortEventPackets(eventBuffer).slice(0, sift);
+        // console.log(eventBuffer[sift - 1].event.created_at);
       }
 
       const urls = extractMediaUrls(eventPacket.event.content);
@@ -413,9 +414,9 @@ export const mediaOperator = (sift: number) => {
         map((result) => ({
           result,
           oldestCreatedAt:
-            eventBuffer.length > 0
-              ? eventBuffer[eventBuffer.length - 1].event.created_at
-              : 0,
+            eventBuffer.length >= sift
+              ? eventBuffer[sift - 1].event.created_at
+              : eventBuffer[eventBuffer.length - 1].event.created_at,
           totalPacketsProcessed: eventBuffer.length,
         }))
       );

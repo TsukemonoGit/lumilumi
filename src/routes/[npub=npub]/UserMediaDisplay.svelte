@@ -11,6 +11,7 @@
   import { writable, type Writable } from "svelte/store";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { formatAbsoluteDateFromUnix } from "$lib/func/util";
 
   let { pubkey }: { pubkey: string } = $props();
 
@@ -31,9 +32,6 @@
 
   // 1ページあたりのメディア数
   const MEDIA_PER_PAGE = 24;
-
-  // ページごとの取得境界（until値）を保存
-  let oldestCreatedAtByPage = new Map<number, number | null>();
 
   // 初期取得の最古日時
   let oldestCreatedAt: number | null = null;
@@ -62,37 +60,36 @@
 
         // すでに表示可能な範囲にデータがあるか
         const startIndex = page * MEDIA_PER_PAGE;
-        console.log(
-          startIndex,
-          mediaEvents.length >= startIndex + MEDIA_PER_PAGE
-        );
+
         if (mediaEvents.length >= startIndex + MEDIA_PER_PAGE) {
           // 表示だけ切り替え
-          console.log(page);
+          //  console.log(page);
           return;
         }
 
         isLoading = true;
 
         try {
-          let retryCount = 0;
-          let currentUntil: number | undefined;
+          // ループ前に元のデータをバックアップ
+          const originalMediaEvents: MediaResult[] = [...mediaEvents];
+          let finalNewMedia: MediaResult[] = [];
 
-          // 取得用untilを決める
-          if (page === 0) {
-            currentUntil = undefined;
-          } else {
-            currentUntil = oldestCreatedAt || undefined;
-          }
-          console.log(currentUntil);
-          // 必要な件数に達するまで繰り返し取得
+          let retryCount = 0;
+          let currentUntil: number | undefined =
+            page === 0 ? undefined : oldestCreatedAt || undefined;
+
           while (retryCount < MAX_RETRIES) {
             const filter = createFilter(currentUntil);
-            console.log(filter);
+            //console.log(filter);
+
             const onData = (media: MediaResult) => {
-              // id が既に存在するかチェック
+              // 重複チェックしつつ一時的にUI用に追加
               if (!mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)) {
-                mediaEvents = [...mediaEvents, media];
+                mediaEvents = [...mediaEvents, media].sort(
+                  (a, b) =>
+                    b.eventPacket.event.created_at -
+                    a.eventPacket.event.created_at
+                );
               }
             };
 
@@ -100,39 +97,33 @@
               { filters: [filter] },
               undefined,
               2000,
-
               LOAD_LIMIT,
               onData
             );
             console.log(results);
-            // 取得したイベントを処理
+
             if (results.result.length > 0) {
-              // mediaUrl が重複していないものだけ追加
+              // 最終確定用に重複なく追加
               const newMedia = results.result.filter(
                 (media) =>
-                  !mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)
+                  !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl)
               );
-
-              // mediaEvents に追加
-              mediaEvents = [...mediaEvents, ...newMedia].sort(
-                (a, b) =>
-                  b.eventPacket.event.created_at -
-                  a.eventPacket.event.created_at
+              finalNewMedia = [...finalNewMedia, ...newMedia].filter(
+                (v) => v.eventPacket.event.created_at >= results.oldestCreatedAt
               );
 
               oldestCreatedAt = results.oldestCreatedAt;
               currentUntil = results.oldestCreatedAt;
 
-              // 進捗メッセージを更新
               loadingProgress = `${mediaEvents.length}件のメディアを取得済み（試行回数: ${retryCount + 1}/${MAX_RETRIES}）`;
             }
 
-            // 必要な件数に達した場合は終了
+            // 必要な件数に達したら終了
             if (mediaEvents.length >= page * MEDIA_PER_PAGE + MEDIA_PER_PAGE) {
               break;
             }
 
-            // totalPacketsProcessedがLOAD_LIMITに達していない場合は最後のページ
+            // 最後のページ判定
             if (results.totalPacketsProcessed < LOAD_LIMIT) {
               maxPage = page;
               break;
@@ -141,21 +132,23 @@
             retryCount++;
           }
 
-          // ページ境界のcreated_atを保存
-          if (oldestCreatedAt) {
-            oldestCreatedAtByPage.set(page, oldestCreatedAt);
-          }
+          // ループ終了後、元のデータ + 確定データで上書き（ソート済み）
+          mediaEvents = [...originalMediaEvents, ...finalNewMedia].sort(
+            (a, b) =>
+              b.eventPacket.event.created_at - a.eventPacket.event.created_at
+          );
 
-          // 最大試行回数に達した場合
+          // ページ境界の oldestCreatedAt を保存
+
+          // 最大試行回数に達したらページ末尾とみなす
           if (retryCount >= MAX_RETRIES) {
             maxPage = page;
           }
 
-          // 最終的にデータが取得できなかった場合
+          // 取得データなしの場合の処理
           if (mediaEvents.length === 0) {
             maxPage = page;
             loadingProgress = "データがありません";
-            // メッセージを表示してから消す
             setTimeout(() => {
               loadingProgress = "";
             }, 2000);
@@ -163,8 +156,6 @@
           }
 
           loadingProgress = `${mediaEvents.length}件のメディアを読み込み完了`;
-
-          // 完了メッセージを少し表示してから消す
           setTimeout(() => {
             loadingProgress = "";
           }, 1000);
@@ -172,7 +163,6 @@
           console.error("Failed to load page:", e);
           maxPage = page;
           loadingProgress = "読み込みエラーが発生しました";
-          // エラー時も少し表示してから消す
           setTimeout(() => {
             loadingProgress = "";
           }, 2000);
@@ -182,10 +172,10 @@
       });
     }
   });
+
   // 最初の読み込み
   const loadInitialMedia = async () => {
     mediaEvents = [];
-    oldestCreatedAtByPage.clear();
     oldestCreatedAt = null;
     maxPage = null;
   };
@@ -209,7 +199,12 @@
   <div class="media-grid">
     {#each viewList as media, index (media.eventPacket.event.id + "-" + media.mediaUrl)}
       {#if media}
-        <button class="media-item" onclick={() => openModal(media)}>
+        <button class="media-item" onclick={() => openModal(media)}
+          ><div
+            class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm"
+          >
+            {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
+          </div>
           {#if media.mediaType === "image" || media.mediaType === "svg"}
             <img src={media.mediaUrl} alt="" loading="lazy" />
           {:else if media.mediaType === "movie"}
