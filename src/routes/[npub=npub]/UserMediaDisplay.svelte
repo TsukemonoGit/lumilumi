@@ -17,14 +17,14 @@
   let isLoading = $state(false);
   let maxPage = $state<number | null>(null); // 最終ページ番号
   let loadingProgress = $state<string>("");
-  const LOAD_LIMIT = 300;
+  const LOAD_LIMIT = 500;
   const MAX_RETRIES = 30;
 
   // ページ番号（0始まり）
   let page = $state(0);
 
   // 1ページあたりのメディア数
-  const MEDIA_PER_PAGE = 20;
+  const MEDIA_PER_PAGE = 24;
 
   // ページごとの取得境界（until値）を保存
   let oldestCreatedAtByPage = new Map<number, number | null>();
@@ -330,7 +330,7 @@
 
   .media-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
   }
