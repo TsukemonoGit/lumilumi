@@ -75,12 +75,10 @@
           let finalNewMedia: MediaResult[] = [];
 
           let retryCount = 0;
-          let currentUntil: number | undefined =
-            page === 0 ? undefined : oldestCreatedAt || undefined;
+          let currentUntil: number | undefined = oldestCreatedAt || undefined;
 
           while (retryCount < MAX_RETRIES) {
             const filter = createFilter(currentUntil);
-            //console.log(filter);
 
             const onData = (media: MediaResult) => {
               // 重複チェックしつつ一時的にUI用に追加
@@ -100,17 +98,15 @@
               LOAD_LIMIT,
               onData
             );
-            console.log(results);
 
             if (results.result.length > 0) {
               // 最終確定用に重複なく追加
               const newMedia = results.result.filter(
                 (media) =>
-                  !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl)
+                  !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl) &&
+                  media.eventPacket.event.created_at >= results.oldestCreatedAt
               );
-              finalNewMedia = [...finalNewMedia, ...newMedia].filter(
-                (v) => v.eventPacket.event.created_at >= results.oldestCreatedAt
-              );
+              finalNewMedia = [...finalNewMedia, ...newMedia];
 
               oldestCreatedAt = results.oldestCreatedAt;
               currentUntil = results.oldestCreatedAt;
@@ -119,7 +115,10 @@
             }
 
             // 必要な件数に達したら終了
-            if (mediaEvents.length >= page * MEDIA_PER_PAGE + MEDIA_PER_PAGE) {
+            if (
+              finalNewMedia.length >=
+              page * MEDIA_PER_PAGE + MEDIA_PER_PAGE
+            ) {
               break;
             }
 
