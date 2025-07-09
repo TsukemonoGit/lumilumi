@@ -1,4 +1,9 @@
-import { latestEachNaddr, latestbyId, scanArray } from "$lib/stores/operators";
+import {
+  latestEachNaddr,
+  latestbyId,
+  saveEachNote,
+  scanArray,
+} from "$lib/stores/operators";
 import { relaySearchRelays } from "$lib/stores/relays";
 import { app, queryClient } from "$lib/stores/stores";
 import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
@@ -33,15 +38,17 @@ export function setTheme(theme: Theme) {
   }
 }
 
-export async function getRelayList(pubkey: string): Promise<EventPacket[]> {
+export async function getRelayList(
+  pubkey: string
+): Promise<EventPacket | null> {
   const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
   rxNostr.setDefaultRelays(relaySearchRelays);
-  let res: EventPacket[] = [];
+  let res: EventPacket | null = null;
   await new Promise<void>((resolve) => {
     const subscription = rxNostr
       .use(rxReq)
-      .pipe(uniq(), scanArray(), completeOnTimeout(3000))
+      .pipe(uniq(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
           console.log("Received:", packet);
@@ -107,17 +114,15 @@ export async function getDoukiList(
 export async function getQueryRelays(
   pubkey: string
 ): Promise<DefaultRelayConfig[] | undefined> {
-  let defaultRelayData = queryClient?.getQueryData([
-    "defaultRelay",
-    pubkey,
-  ] as QueryKey);
+  let defaultRelayData: EventPacket | null | undefined =
+    queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
   console.log(defaultRelayData);
 
   if (!defaultRelayData) {
     // console.log("t");
     const relayList = await getRelayList(pubkey);
     console.log(relayList);
-    if (relayList.length > 0) {
+    if (relayList) {
       queryClient.setQueryData(["defaultRelay", pubkey], relayList);
     } else {
       console.log("failed to get relay data");
@@ -133,9 +138,8 @@ export async function getQueryRelays(
   if (!defaultRelayData) {
     return;
   }
-  const data: EventPacket[] = defaultRelayData as EventPacket[];
-
-  const kind10002 = data.find((packet) => packet.event.kind === 10002);
+  //けっきょく10002しか見てないから
+  const kind10002 = defaultRelayData;
   // const kind3 = data.find((packet) => packet.event.kind === 3);
 
   const relays =

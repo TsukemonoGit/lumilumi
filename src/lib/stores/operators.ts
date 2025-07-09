@@ -1,7 +1,7 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
-import { filter, map, pipe, scan, tap } from "rxjs";
+import { filter, from, map, mergeMap, of, pipe, scan, tap } from "rxjs";
 import {
   metadataQueue,
   mutebykinds,
@@ -25,6 +25,9 @@ import {
 } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
 import { BOOKMARK_STORAGE_KEY } from "$lib/func/constants";
+import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
+import { urlRegex } from "$lib/func/regex";
+import { userPromiseUrl } from "$lib/func/useUrl";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,
@@ -103,16 +106,39 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   );
 }
 
+const createEventQueryKey = (ev: Nostr.Event): QueryKey | null => {
+  if (ev.kind === 0) {
+    return null;
+    //
+  } else if (isAddressableKind(ev.kind) && isReplaceableKind(ev.kind)) {
+    return [
+      "naddr",
+      `${ev.kind}:${ev.pubkey}:${
+        ev.tags.find((tag) => tag[0] === "d")?.[1] || ""
+      }`,
+    ] as QueryKey;
+  } else if (ev.id) {
+    return ["note", ev.id] as QueryKey;
+  }
+  return null;
+};
+
+export function saveEachNote(): OperatorFunction<EventPacket, EventPacket> {
+  return tap((pk: EventPacket) => {
+    if (pk.event && pk.event.id) {
+      const queryKey: QueryKey | null = createEventQueryKey(pk.event);
+      // クエリデータの設定
+      if (queryKey && !queryClient.getQueryData(queryKey)) {
+        queryClient.setQueryData(queryKey, pk);
+      }
+    }
+  });
+}
+
 export function scanArray<A extends EventPacket>(
   sift?: number
 ): OperatorFunction<A, A[]> {
   return scan((acc: A[], a: A) => {
-    const queryKey: QueryKey = ["note", a.event.id];
-    // クエリデータの設定
-    if (a.event && a.event.id && !queryClient.getQueryData(queryKey)) {
-      queryClient.setQueryData(queryKey, a);
-    }
-
     // 新しい順にソート
 
     //insertEventPacketIntoDescendingList(acc, a)にしてみてたけどなんかめっちゃ遅くなったからソートに戻す
@@ -316,3 +342,84 @@ function setReactionEvent(packet: EventPacket) {
     });
   }
 }
+
+//media用
+
+const mediaTypes = ["image", "svg", "movie", "audio", "3D"] as const;
+type MediaType = (typeof mediaTypes)[number];
+
+// 結果の型定義
+export interface MediaResult {
+  eventPacket: EventPacket;
+  mediaUrl: string;
+  mediaType: MediaType;
+}
+
+// オペレーターの状態管理用の型
+export interface MediaOperatorState {
+  result: MediaResult;
+  oldestCreatedAt: number;
+  totalPacketsProcessed: number;
+}
+export interface MediaOperatorOutput {
+  result: MediaResult[];
+  oldestCreatedAt: number;
+  totalPacketsProcessed: number;
+}
+
+export interface MediaEvent {
+  eventPacket: EventPacket;
+  mediaUrl: string;
+  mediaType: MediaType;
+}
+const extractMediaUrls = (content: string): string[] => {
+  const urls = content.match(urlRegex) || [];
+  return urls.filter((url) => url.length > 0);
+};
+
+// 個別の結果を返すmediaOperator
+export const mediaOperator = (sift: number) => {
+  let eventBuffer: EventPacket[] = [];
+
+  return pipe(
+    mergeMap((eventPacket: EventPacket) => {
+      eventBuffer.push(eventPacket);
+
+      // sift制限（古いものを先に切る）
+      if (sift !== 0 && eventBuffer.length >= sift) {
+        eventBuffer = sortEventPackets(eventBuffer).slice(0, sift);
+        // console.log(eventBuffer[sift - 1].event.created_at);
+      }
+
+      const urls = extractMediaUrls(eventPacket.event.content);
+
+      return from(urls).pipe(
+        mergeMap(async (url) => {
+          const mediaType = await userPromiseUrl(url);
+          if (mediaType && mediaTypes.includes(mediaType as MediaType)) {
+            return {
+              eventPacket,
+              mediaUrl: url,
+              mediaType: mediaType as MediaType,
+              createdAt: eventPacket.event.created_at,
+            };
+          }
+          return null;
+        }),
+        filter(
+          (result): result is MediaResult & { createdAt: number } =>
+            result !== null
+        ),
+        // 🟢 最後に createdAt を eventBuffer から求めて添付
+        map((result) => ({
+          result,
+          oldestCreatedAt:
+            eventBuffer.length >= sift
+              ? eventBuffer[sift - 1].event.created_at
+              : eventBuffer[eventBuffer.length - 1].event.created_at,
+          totalPacketsProcessed: eventBuffer.length,
+        }))
+      );
+    })
+  );
+};

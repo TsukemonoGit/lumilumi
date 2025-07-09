@@ -1,3 +1,4 @@
+import { queryClient } from "$lib/stores/stores";
 import { createQuery } from "@tanstack/svelte-query";
 import { derived, type Readable } from "svelte/store";
 
@@ -9,16 +10,15 @@ export type UrlType =
   | "movie"
   | "3D"
   | "url";
+const genUrlQueryKey = (url: string) => ["useUrl", url] as const;
 
 export const useUrl = (
   url: string
 ): {
   data: Readable<UrlType | null | undefined>;
 } => {
-  const genQueryKey = () => ["useUrl", url] as const;
-
   const query = createQuery({
-    queryKey: genQueryKey(),
+    queryKey: genUrlQueryKey(url),
     queryFn: ({ queryKey: [, url] }) => checkFileExtension(url),
     staleTime: 1 * 60 * 60 * 1000, // 1 hour
     gcTime: 1 * 60 * 60 * 1000, // 1 hour
@@ -89,5 +89,30 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
     }
   } catch (error) {
     return "text";
+  }
+};
+
+export const userPromiseUrl = async (url: string): Promise<UrlType | null> => {
+  if (!url) return null;
+
+  const queryKey = genUrlQueryKey(url);
+
+  // キャッシュにあるかチェック
+  const cached = queryClient.getQueryData<UrlType>(queryKey);
+  if (cached) {
+    return cached;
+  }
+
+  try {
+    // なければ取得
+    const type = await checkFileExtension(url);
+
+    // キャッシュにセット
+    queryClient.setQueryData(queryKey, type);
+
+    return type;
+  } catch (err) {
+    console.error("userPromiseUrl error:", err);
+    return null;
   }
 };
