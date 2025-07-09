@@ -114,10 +114,8 @@ export async function getDoukiList(
 export async function getQueryRelays(
   pubkey: string
 ): Promise<DefaultRelayConfig[] | undefined> {
-  let defaultRelayData = queryClient?.getQueryData([
-    "defaultRelay",
-    pubkey,
-  ] as QueryKey);
+  let defaultRelayData: EventPacket | null | undefined =
+    queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
   console.log(defaultRelayData);
 
   if (!defaultRelayData) {
@@ -140,9 +138,8 @@ export async function getQueryRelays(
   if (!defaultRelayData) {
     return;
   }
-  const data: EventPacket[] = defaultRelayData as EventPacket[];
-
-  const kind10002 = data.find((packet) => packet.event.kind === 10002);
+  //けっきょく10002しか見てないから
+  const kind10002 = defaultRelayData;
   // const kind3 = data.find((packet) => packet.event.kind === 3);
 
   const relays =

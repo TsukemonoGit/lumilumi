@@ -135,6 +135,7 @@
     }
     progress.value++;
     const relays = await getQueryRelays(pubkey);
+    console.log(relays);
     if (!relays) {
       $toastSettings = {
         title: "Error",
@@ -145,11 +146,12 @@
       resetProgress();
       return;
     }
+
     progress.value++;
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10030], authors: [pubkey] },
     ];
-
+    console.log(filters);
     const pk = await getDoukiList(filters, relays);
 
     if (!pk && !beforeEvent) {
