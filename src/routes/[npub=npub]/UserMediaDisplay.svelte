@@ -116,8 +116,8 @@
               // mediaEvents に追加
               mediaEvents = [...mediaEvents, ...newMedia].sort(
                 (a, b) =>
-                  a.eventPacket.event.created_at -
-                  b.eventPacket.event.created_at
+                  b.eventPacket.event.created_at -
+                  a.eventPacket.event.created_at
               );
 
               oldestCreatedAt = results.oldestCreatedAt;
@@ -316,12 +316,14 @@
     overflow: hidden;
     border-radius: 8px;
     cursor: pointer;
-    background: #f5f5f5;
+    background: theme("colors.neutral.200");
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
+  :global(.dark) .media-item {
+    background: theme("colors.neutral.800");
+  }
   .media-item img,
   .media-item video {
     width: 100%;
