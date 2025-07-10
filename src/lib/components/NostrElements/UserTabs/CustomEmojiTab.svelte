@@ -37,16 +37,21 @@
         (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1
       )}
       <PaginationList list={filteredList.map((tag) => tag[1])}>
-        {#snippet children({ id, index })}
+        {#snippet children(li, index)}
+          {@const id = li as string}
           {#if filteredList[index][0] === "emoji"}
             <div
               class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
             >
               <CustomEmoji
                 part={{
-                  type: "emoji",
+                  type: "custom_emoji",
                   content: filteredList[index][1],
-                  url: filteredList[index][2],
+                  metadata: {
+                    url: filteredList[index][2],
+                  },
+                  start: 0,
+                  end: 0,
                 }}
               />
             </div>

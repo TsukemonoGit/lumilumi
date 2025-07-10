@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { parseNaddr } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
@@ -43,7 +43,8 @@
           tag.length > 1
       )}
       <PaginationList list={filteredList.map((tag) => tag[1])}>
-        {#snippet children({ id, index })}
+        {#snippet children(li, index)}
+          {@const id = li as string}
           {#if filteredList[index][0] === "e"}
             <Note
               {id}
