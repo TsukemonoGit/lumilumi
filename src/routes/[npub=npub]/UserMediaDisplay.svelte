@@ -123,6 +123,7 @@
     imageLoadStatus = {};
     selectedEvent = null;
     showModal.set(false);
+    isCancelled = false;
   };
 
   onMount(async () => {
@@ -131,6 +132,7 @@
     isInitialized = true;
   });
   onDestroy(() => {
+    //処理中断
     isCancelled = true;
   });
 
