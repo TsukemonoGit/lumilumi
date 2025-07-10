@@ -102,42 +102,33 @@
   onDestroy(() => {
     isCancelled = true;
   });
+
   // 指定ページのデータを読み込み・切り替え
   $effect(() => {
     if (page >= 0 && isInitialized) {
       untrack(async () => {
         if (isLoading) return;
 
-        // すでに表示可能な範囲にデータがあるか
         const startIndex = page * MEDIA_PER_PAGE;
 
         if (mediaEvents.length >= startIndex + MEDIA_PER_PAGE) {
           // 表示だけ切り替え
-          //  console.log(page);
           return;
         }
 
         isLoading = true;
 
         try {
-          // ループ前に元のデータをバックアップ
-          const originalMediaEvents: MediaResult[] = [...mediaEvents];
-          let finalNewMedia: MediaResult[] = [];
-
           let retryCount = 0;
           let currentUntil: number | undefined = oldestCreatedAt || undefined;
 
           while (retryCount < MAX_RETRIES && !isCancelled) {
+            const originalMediaEvents: MediaResult[] = [...mediaEvents];
             const filter = createFilter(currentUntil);
 
             const onData = (media: MediaResult) => {
-              // 重複チェックしつつ一時的にUI用に追加
               if (!mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)) {
-                mediaEvents = [...mediaEvents, media].sort(
-                  (a, b) =>
-                    b.eventPacket.event.created_at -
-                    a.eventPacket.event.created_at
-                );
+                mediaEvents = [...mediaEvents, media];
               }
             };
 
@@ -148,31 +139,42 @@
               LOAD_LIMIT,
               onData
             );
-            console.log(results);
-            if (results.result.length > 0) {
-              // 最終確定用に重複なく追加
-              const newMedia = results.result.filter(
-                (media) =>
-                  !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl) &&
-                  media.eventPacket.event.created_at >= results.oldestCreatedAt
+
+            // 重複排除して結合（mediaUrl ベースでユニークに）
+            const merged = [...originalMediaEvents, ...results.result];
+            const seen = new Set<string>();
+            mediaEvents = merged
+              .filter((m) => {
+                if (seen.has(m.mediaUrl)) return false;
+                seen.add(m.mediaUrl);
+                return (
+                  m.eventPacket.event.created_at >= results.oldestCreatedAt
+                );
+              })
+              .sort(
+                (a, b) =>
+                  b.eventPacket.event.created_at -
+                  a.eventPacket.event.created_at
               );
-              finalNewMedia = [...finalNewMedia, ...newMedia];
 
-              oldestCreatedAt = results.oldestCreatedAt;
-              currentUntil = results.oldestCreatedAt;
+            oldestCreatedAt = results.oldestCreatedAt;
+            currentUntil = results.oldestCreatedAt;
 
-              loadingProgress = `${mediaEvents.length}件のメディアを取得済み（試行回数: ${retryCount + 1}/${MAX_RETRIES}）`;
-            }
+            loadingProgress = `${mediaEvents.length}件のメディアを取得済み（試行回数: ${retryCount + 1}/${MAX_RETRIES}）`;
 
-            // 必要な件数に達したら終了
-            if (
-              finalNewMedia.length >=
-              page * MEDIA_PER_PAGE + MEDIA_PER_PAGE
-            ) {
+            console.log(
+              "page:",
+              page,
+              "required:",
+              page * MEDIA_PER_PAGE + MEDIA_PER_PAGE,
+              "mediaLen:",
+              mediaEvents.length
+            );
+
+            if (mediaEvents.length >= page * MEDIA_PER_PAGE + MEDIA_PER_PAGE) {
               break;
             }
 
-            // 最後のページ判定
             if (results.totalPacketsProcessed < LOAD_LIMIT) {
               maxPage = page;
               break;
@@ -180,24 +182,13 @@
 
             retryCount++;
           }
-          if (isCancelled) {
-            loadInitialMedia();
-            return;
-          }
-          // ループ終了後、元のデータ + 確定データで上書き（ソート済み）
-          mediaEvents = [...originalMediaEvents, ...finalNewMedia].sort(
-            (a, b) =>
-              b.eventPacket.event.created_at - a.eventPacket.event.created_at
-          );
 
-          // ページ境界の oldestCreatedAt を保存
+          if (isCancelled) return;
 
-          // 最大試行回数に達したらページ末尾とみなす
           if (retryCount >= MAX_RETRIES) {
             maxPage = page;
           }
 
-          // 取得データなしの場合の処理
           if (mediaEvents.length === 0) {
             maxPage = page;
             loadingProgress = "データがありません";
