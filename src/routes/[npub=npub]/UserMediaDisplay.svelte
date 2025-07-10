@@ -13,11 +13,9 @@
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
 
   // 定数
-  const LOAD_LIMIT = 500;
+  const LOAD_LIMIT = 300;
   const MAX_RETRIES = 30;
   const MEDIA_PER_PAGE = 24;
-  const LOADING_TIMEOUT = 2000;
-  const SUCCESS_TIMEOUT = 1000;
 
   // EventCard用固定値
   const EVENT_CARD_CONFIG = {
@@ -30,12 +28,6 @@
 
   // 型定義
   type ImageLoadStatus = "loading" | "success" | "error";
-  type LoadResult = {
-    success: boolean;
-    mediaEvents: MediaEvent[];
-    oldestCreatedAt?: number;
-    isLastPage: boolean;
-  };
 
   // Props
   let { pubkey }: { pubkey: string } = $props();
@@ -64,31 +56,6 @@
     limit: LOAD_LIMIT,
     ...(until && { until }),
   });
-
-  const updateLoadingProgress = (count: number, retryCount: number) => {
-    loadingProgress = `${count}件のメディアを取得済み（試行回数: ${retryCount}/${MAX_RETRIES}）`;
-  };
-
-  const showMessage = (message: string, timeout: number) => {
-    loadingProgress = message;
-    setTimeout(() => {
-      loadingProgress = "";
-    }, timeout);
-  };
-
-  const showSuccessMessage = (count: number) => {
-    if (count === 0) {
-      showMessage("データがありません", LOADING_TIMEOUT);
-    } else {
-      showMessage(`${count}件のメディアを読み込み完了`, SUCCESS_TIMEOUT);
-    }
-  };
-
-  const handleLoadError = (error: unknown) => {
-    console.error("Failed to load page:", error);
-    maxPage = page;
-    showMessage("読み込みエラーが発生しました", LOADING_TIMEOUT);
-  };
 
   // 画像読み込み処理
   const handleImageLoad = (mediaUrl: string) => {
@@ -131,120 +98,126 @@
     await waitForConnections();
     isInitialized = true;
   });
+
   onDestroy(() => {
-    //処理中断
     isCancelled = true;
   });
-
-  // メディアデータ読み込み
-  const loadMediaData = async (
-    requiredEndIndex: number
-  ): Promise<LoadResult | null> => {
-    const originalMediaEvents = [...mediaEvents];
-    let finalNewMedia: MediaEvent[] = [];
-    let retryCount = 0;
-    let currentUntil = oldestCreatedAt || undefined;
-
-    while (retryCount < MAX_RETRIES && !isCancelled) {
-      const filter = createFilter(currentUntil);
-
-      const onData = (media: MediaEvent) => {
-        if (!mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)) {
-          mediaEvents = [...mediaEvents, media].sort(
-            (a, b) =>
-              b.eventPacket.event.created_at - a.eventPacket.event.created_at
-          );
-        }
-      };
-
-      const results = await useMediaPromiseReq(
-        { filters: [filter] },
-        undefined,
-        2000,
-        LOAD_LIMIT,
-        onData
-      );
-
-      if (results.result.length > 0) {
-        const newMedia = results.result.filter(
-          (media) =>
-            !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl) &&
-            media.eventPacket.event.created_at >= results.oldestCreatedAt
-        );
-
-        finalNewMedia = [...finalNewMedia, ...newMedia];
-        currentUntil = results.oldestCreatedAt;
-        updateLoadingProgress(mediaEvents.length, retryCount + 1);
-      }
-
-      if (finalNewMedia.length >= requiredEndIndex) {
-        break;
-      }
-
-      if (results.totalPacketsProcessed < LOAD_LIMIT) {
-        return {
-          success: true,
-          mediaEvents: [...originalMediaEvents, ...finalNewMedia].sort(
-            (a, b) =>
-              b.eventPacket.event.created_at - a.eventPacket.event.created_at
-          ),
-          oldestCreatedAt: results.oldestCreatedAt,
-          isLastPage: true,
-        };
-      }
-
-      retryCount++;
-    }
-
-    if (isCancelled) {
-      // 中断されたら何も返さず即終了、または null や失敗を示す値を返す
-      return null;
-    }
-
-    const sortedMediaEvents = [...originalMediaEvents, ...finalNewMedia].sort(
-      (a, b) => b.eventPacket.event.created_at - a.eventPacket.event.created_at
-    );
-
-    return {
-      success: true,
-      mediaEvents: sortedMediaEvents,
-      oldestCreatedAt: currentUntil,
-      isLastPage: retryCount >= MAX_RETRIES || sortedMediaEvents.length === 0,
-    };
-  };
-
-  // ページ変更時の処理
+  // 指定ページのデータを読み込み・切り替え
   $effect(() => {
     if (page >= 0 && isInitialized) {
       untrack(async () => {
         if (isLoading) return;
 
+        // すでに表示可能な範囲にデータがあるか
         const startIndex = page * MEDIA_PER_PAGE;
-        const requiredEndIndex = startIndex + MEDIA_PER_PAGE;
 
-        if (mediaEvents.length >= requiredEndIndex) {
+        if (mediaEvents.length >= startIndex + MEDIA_PER_PAGE) {
+          // 表示だけ切り替え
+          //  console.log(page);
           return;
         }
 
         isLoading = true;
 
         try {
-          const result = await loadMediaData(requiredEndIndex);
-          if (!result) {
-            throw Error;
-          }
-          if (result.success) {
-            mediaEvents = result.mediaEvents;
-            oldestCreatedAt = result.oldestCreatedAt || null;
-            if (result.isLastPage) {
-              maxPage = page;
+          // ループ前に元のデータをバックアップ
+          const originalMediaEvents: MediaResult[] = [...mediaEvents];
+          let finalNewMedia: MediaResult[] = [];
+
+          let retryCount = 0;
+          let currentUntil: number | undefined = oldestCreatedAt || undefined;
+
+          while (retryCount < MAX_RETRIES && !isCancelled) {
+            const filter = createFilter(currentUntil);
+
+            const onData = (media: MediaResult) => {
+              // 重複チェックしつつ一時的にUI用に追加
+              if (!mediaEvents.some((m) => m.mediaUrl === media.mediaUrl)) {
+                mediaEvents = [...mediaEvents, media].sort(
+                  (a, b) =>
+                    b.eventPacket.event.created_at -
+                    a.eventPacket.event.created_at
+                );
+              }
+            };
+
+            const results = await useMediaPromiseReq(
+              { filters: [filter] },
+              undefined,
+              2000,
+              LOAD_LIMIT,
+              onData
+            );
+            console.log(results);
+            if (results.result.length > 0) {
+              // 最終確定用に重複なく追加
+              const newMedia = results.result.filter(
+                (media) =>
+                  !finalNewMedia.some((m) => m.mediaUrl === media.mediaUrl) &&
+                  media.eventPacket.event.created_at >= results.oldestCreatedAt
+              );
+              finalNewMedia = [...finalNewMedia, ...newMedia];
+
+              oldestCreatedAt = results.oldestCreatedAt;
+              currentUntil = results.oldestCreatedAt;
+
+              loadingProgress = `${mediaEvents.length}件のメディアを取得済み（試行回数: ${retryCount + 1}/${MAX_RETRIES}）`;
             }
-            showSuccessMessage(result.mediaEvents.length);
-          } else {
-            handleLoadError("データの読み込みに失敗しました");
+
+            // 必要な件数に達したら終了
+            if (
+              finalNewMedia.length >=
+              page * MEDIA_PER_PAGE + MEDIA_PER_PAGE
+            ) {
+              break;
+            }
+
+            // 最後のページ判定
+            if (results.totalPacketsProcessed < LOAD_LIMIT) {
+              maxPage = page;
+              break;
+            }
+
+            retryCount++;
           }
+          if (isCancelled) {
+            loadInitialMedia();
+            return;
+          }
+          // ループ終了後、元のデータ + 確定データで上書き（ソート済み）
+          mediaEvents = [...originalMediaEvents, ...finalNewMedia].sort(
+            (a, b) =>
+              b.eventPacket.event.created_at - a.eventPacket.event.created_at
+          );
+
+          // ページ境界の oldestCreatedAt を保存
+
+          // 最大試行回数に達したらページ末尾とみなす
+          if (retryCount >= MAX_RETRIES) {
+            maxPage = page;
+          }
+
+          // 取得データなしの場合の処理
+          if (mediaEvents.length === 0) {
+            maxPage = page;
+            loadingProgress = "データがありません";
+            setTimeout(() => {
+              loadingProgress = "";
+            }, 2000);
+            return;
+          }
+
+          loadingProgress = `${mediaEvents.length}件のメディアを読み込み完了`;
+          setTimeout(() => {
+            loadingProgress = "";
+          }, 1000);
         } catch (e) {
-          handleLoadError(e);
+          console.error("Failed to load page:", e);
+          maxPage = page;
+          loadingProgress = "読み込みエラーが発生しました";
+          setTimeout(() => {
+            loadingProgress = "";
+          }, 2000);
         } finally {
           isLoading = false;
         }
