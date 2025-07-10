@@ -26,7 +26,7 @@
   const depth = 0;
 
   const repostable = true;
-  const zIndex = 50;
+  const zIndex = 10;
   const maxHeight = undefined;
   // ページ番号（0始まり）
   let page = $state(0);
@@ -37,10 +37,28 @@
   // 初期取得の最古日時
   let oldestCreatedAt: number | null = null;
 
+  // 画像読み込み状態を管理
+  let imageLoadStatus = $state<{
+    [key: string]: "loading" | "success" | "error";
+  }>({});
+
   let viewList = $derived(
     mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
   );
-  //$inspect(viewList);
+
+  // プレースホルダーを含む表示リスト
+  let displayList: (MediaEvent | null)[] = $derived.by(() => {
+    const items: (MediaEvent | null)[] = [...viewList];
+    const needed = MEDIA_PER_PAGE - items.length;
+
+    // 不足分をプレースホルダーで埋める
+    for (let i = 0; i < needed; i++) {
+      items.push(null);
+    }
+
+    return items;
+  });
+
   const createFilter = (until?: number): Nostr.Filter => {
     const filter: Nostr.Filter = {
       kinds: [1],
@@ -53,6 +71,21 @@
     return filter;
   };
   let isInitialized = $state(false);
+
+  // 画像読み込み処理
+  const handleImageLoad = (mediaUrl: string) => {
+    imageLoadStatus[mediaUrl] = "success";
+  };
+
+  const handleImageError = (mediaUrl: string) => {
+    imageLoadStatus[mediaUrl] = "error";
+  };
+
+  const initImageLoad = (mediaUrl: string) => {
+    if (!imageLoadStatus[mediaUrl]) {
+      imageLoadStatus[mediaUrl] = "loading";
+    }
+  };
 
   // 指定ページのデータを読み込み・切り替え
   $effect(() => {
@@ -218,16 +251,31 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 
   <div class="media-grid">
-    {#each viewList as media, index (media.eventPacket.event.id + "-" + media.mediaUrl)}
+    {#each displayList as media, index}
       {#if media}
-        <button class="media-item" onclick={() => openModal(media)}
-          ><div
+        <button class="media-item" onclick={() => openModal(media)}>
+          <div
             class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm"
           >
             {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
           </div>
           {#if media.mediaType === "image" || media.mediaType === "svg"}
-            <img src={media.mediaUrl} alt="" loading="lazy" />
+            {#if imageLoadStatus[media.mediaUrl] === "error"}
+              <div class="image-error-placeholder"></div>
+            {:else}
+              <img
+                src={media.mediaUrl}
+                alt=""
+                loading="lazy"
+                onload={() => handleImageLoad(media.mediaUrl)}
+                onerror={() => handleImageError(media.mediaUrl)}
+                onloadstart={() => initImageLoad(media.mediaUrl)}
+                class:loading={imageLoadStatus[media.mediaUrl] === "loading"}
+              />
+              {#if imageLoadStatus[media.mediaUrl] === "loading"}
+                <div class="image-loading-placeholder"></div>
+              {/if}
+            {/if}
           {:else if media.mediaType === "movie"}
             <video src={media.mediaUrl} muted preload="metadata">
               <track kind="captions" />
@@ -243,6 +291,9 @@
             </div>
           {/if}
         </button>
+      {:else}
+        <!-- データなしプレースホルダー -->
+        <div class="media-item placeholder"></div>
       {/if}
     {/each}
   </div>
@@ -332,19 +383,34 @@
     overflow: hidden;
     border-radius: 8px;
     cursor: pointer;
-    background: theme("colors.neutral.200");
+    background: theme("colors.neutral.800");
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
+  .media-item.placeholder {
+    cursor: default;
+    background: theme("colors.neutral.800");
+  }
+
   :global(.dark) .media-item {
     background: theme("colors.neutral.800");
   }
+
+  :global(.dark) .media-item.placeholder {
+    background: theme("colors.neutral.800");
+  }
+
   .media-item img,
   .media-item video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .media-item img.loading {
+    opacity: 0;
   }
 
   .media-type-indicator {
@@ -367,5 +433,30 @@
     height: 100%;
     font-size: 3rem;
     color: #666;
+  }
+
+  .image-error-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #999;
+    background: theme("colors.neutral.800");
+  }
+
+  :global(.dark) .image-error-placeholder {
+    background: theme("colors.neutral.800");
+  }
+
+  .image-error-placeholder span {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+
+  .error-text {
+    font-size: 0.75rem;
+    text-align: center;
   }
 </style>
