@@ -2,75 +2,93 @@
   import { useMediaPromiseReq } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
   import { onMount, untrack } from "svelte";
+  import { writable, type Writable } from "svelte/store";
 
   import { type MediaEvent, type MediaResult } from "$lib/stores/operators";
-
   import Controls from "./Controls.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
-
-  import { writable, type Writable } from "svelte/store";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
 
-  let { pubkey }: { pubkey: string } = $props();
-
-  let mediaEvents = $state<MediaEvent[]>([]);
-  let isLoading = $state(false);
-  let maxPage = $state<number | null>(null); // 最終ページ番号
-  let loadingProgress = $state<string>("");
+  // 定数
   const LOAD_LIMIT = 500;
   const MAX_RETRIES = 30;
-  const mini = false;
-  const depth = 0;
-
-  const repostable = true;
-  const zIndex = 10;
-  const maxHeight = undefined;
-  // ページ番号（0始まり）
-  let page = $state(0);
-
-  // 1ページあたりのメディア数
   const MEDIA_PER_PAGE = 24;
+  const LOADING_TIMEOUT = 2000;
+  const SUCCESS_TIMEOUT = 1000;
 
-  // 初期取得の最古日時
+  // EventCard用固定値
+  const EVENT_CARD_CONFIG = {
+    mini: false,
+    depth: 0,
+    repostable: true,
+    zIndex: 50,
+    maxHeight: undefined,
+  };
+
+  // 型定義
+  type ImageLoadStatus = "loading" | "success" | "error";
+  type LoadResult = {
+    success: boolean;
+    mediaEvents: MediaEvent[];
+    oldestCreatedAt?: number;
+    isLastPage: boolean;
+  };
+
+  // Props
+  let { pubkey }: { pubkey: string } = $props();
+
+  // 状態管理
+  let mediaEvents = $state<MediaEvent[]>([]);
+  let isLoading = $state(false);
+  let maxPage = $state<number | null>(null);
+  let loadingProgress = $state<string>("");
+  let page = $state(0);
   let oldestCreatedAt: number | null = null;
+  let imageLoadStatus = $state<Record<string, ImageLoadStatus>>({});
+  let isInitialized = $state(false);
+  let selectedEvent = $state<MediaEvent | null>(null);
+  let showModal: Writable<boolean> = $state(writable(false));
 
-  // 画像読み込み状態を管理
-  let imageLoadStatus = $state<{
-    [key: string]: "loading" | "success" | "error";
-  }>({});
-
+  // 派生状態
   let viewList = $derived(
     mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
   );
 
-  // プレースホルダーを含む表示リスト
-  let displayList: (MediaEvent | null)[] = $derived.by(() => {
-    const items: (MediaEvent | null)[] = [...viewList];
-    const needed = MEDIA_PER_PAGE - items.length;
-
-    // 不足分をプレースホルダーで埋める
-    for (let i = 0; i < needed; i++) {
-      items.push(null);
-    }
-
-    return items;
+  // ユーティリティ関数
+  const createFilter = (until?: number): Nostr.Filter => ({
+    kinds: [1],
+    authors: [pubkey],
+    limit: LOAD_LIMIT,
+    ...(until && { until }),
   });
 
-  const createFilter = (until?: number): Nostr.Filter => {
-    const filter: Nostr.Filter = {
-      kinds: [1],
-      authors: [pubkey],
-      limit: LOAD_LIMIT,
-    };
-    if (until) {
-      filter.until = until;
-    }
-    return filter;
+  const updateLoadingProgress = (count: number, retryCount: number) => {
+    loadingProgress = `${count}件のメディアを取得済み（試行回数: ${retryCount}/${MAX_RETRIES}）`;
   };
-  let isInitialized = $state(false);
+
+  const showMessage = (message: string, timeout: number) => {
+    loadingProgress = message;
+    setTimeout(() => {
+      loadingProgress = "";
+    }, timeout);
+  };
+
+  const showSuccessMessage = (count: number) => {
+    if (count === 0) {
+      showMessage("データがありません", LOADING_TIMEOUT);
+    } else {
+      showMessage(`${count}件のメディアを読み込み完了`, SUCCESS_TIMEOUT);
+    }
+  };
+
+  const handleLoadError = (error: unknown) => {
+    console.error("Failed to load page:", error);
+    maxPage = page;
+    showMessage("読み込みエラーが発生しました", LOADING_TIMEOUT);
+  };
 
   // 画像読み込み処理
   const handleImageLoad = (mediaUrl: string) => {
@@ -87,47 +105,18 @@
     }
   };
 
-  // 指定ページのデータを読み込み・切り替え
-  $effect(() => {
-    if (page >= 0 && isInitialized) {
-      untrack(async () => {
-        if (isLoading) return;
+  // モーダル処理
+  const openModal = (media: MediaEvent) => {
+    selectedEvent = media;
+    $showModal = true;
+  };
 
-        const startIndex = page * MEDIA_PER_PAGE;
-        const requiredEndIndex = startIndex + MEDIA_PER_PAGE;
-
-        // 既存データで表示可能な場合は処理終了
-        if (mediaEvents.length >= requiredEndIndex) {
-          return;
-        }
-
-        isLoading = true;
-
-        try {
-          const result = await loadMediaData(requiredEndIndex);
-
-          if (result.success) {
-            mediaEvents = result.mediaEvents;
-            oldestCreatedAt = result.oldestCreatedAt || null;
-            if (result.isLastPage) {
-              maxPage = page;
-            }
-            showSuccessMessage(result.mediaEvents.length);
-          } else {
-            handleLoadError("データの読み込みに失敗しました");
-          }
-        } catch (e) {
-          handleLoadError(e);
-        } finally {
-          isLoading = false;
-        }
-      });
-    }
-  });
-
-  async function loadMediaData(requiredEndIndex: number) {
+  // メディアデータ読み込み
+  const loadMediaData = async (
+    requiredEndIndex: number
+  ): Promise<LoadResult> => {
     const originalMediaEvents = [...mediaEvents];
-    let finalNewMedia: any[] = [];
+    let finalNewMedia: MediaEvent[] = [];
     let retryCount = 0;
     let currentUntil = oldestCreatedAt || undefined;
 
@@ -160,16 +149,13 @@
 
         finalNewMedia = [...finalNewMedia, ...newMedia];
         currentUntil = results.oldestCreatedAt;
-
         updateLoadingProgress(mediaEvents.length, retryCount + 1);
       }
 
-      // 必要件数に達した場合は終了
       if (finalNewMedia.length >= requiredEndIndex) {
         break;
       }
 
-      // 最後のページ判定
       if (results.totalPacketsProcessed < LOAD_LIMIT) {
         return {
           success: true,
@@ -195,50 +181,51 @@
       oldestCreatedAt: currentUntil,
       isLastPage: retryCount >= MAX_RETRIES || sortedMediaEvents.length === 0,
     };
-  }
+  };
 
-  function updateLoadingProgress(count: number, retryCount: number) {
-    loadingProgress = `${count}件のメディアを取得済み（試行回数: ${retryCount}/${MAX_RETRIES}）`;
-  }
-
-  function showSuccessMessage(count: number) {
-    if (count === 0) {
-      loadingProgress = "データがありません";
-    } else {
-      loadingProgress = `${count}件のメディアを読み込み完了`;
-    }
-
-    setTimeout(
-      () => {
-        loadingProgress = "";
-      },
-      count === 0 ? 2000 : 1000
-    );
-  }
-
-  function handleLoadError(error: unknown) {
-    console.error("Failed to load page:", error);
-    maxPage = page;
-    loadingProgress = "読み込みエラーが発生しました";
-    setTimeout(() => {
-      loadingProgress = "";
-    }, 2000);
-  }
-
-  // 最初の読み込み
+  // 初期化処理
   const loadInitialMedia = async () => {
     mediaEvents = [];
     oldestCreatedAt = null;
     maxPage = null;
   };
-  let selectedEvent = $state<MediaEvent | null>(null);
-  let showModal: Writable<boolean> = $state(writable(false));
 
-  const openModal = (media: MediaEvent) => {
-    selectedEvent = null;
-    selectedEvent = media;
-    $showModal = true;
-  };
+  // ページ変更時の処理
+  $effect(() => {
+    if (page >= 0 && isInitialized) {
+      untrack(async () => {
+        if (isLoading) return;
+
+        const startIndex = page * MEDIA_PER_PAGE;
+        const requiredEndIndex = startIndex + MEDIA_PER_PAGE;
+
+        if (mediaEvents.length >= requiredEndIndex) {
+          return;
+        }
+
+        isLoading = true;
+
+        try {
+          const result = await loadMediaData(requiredEndIndex);
+
+          if (result.success) {
+            mediaEvents = result.mediaEvents;
+            oldestCreatedAt = result.oldestCreatedAt || null;
+            if (result.isLastPage) {
+              maxPage = page;
+            }
+            showSuccessMessage(result.mediaEvents.length);
+          } else {
+            handleLoadError("データの読み込みに失敗しました");
+          }
+        } catch (e) {
+          handleLoadError(e);
+        } finally {
+          isLoading = false;
+        }
+      });
+    }
+  });
 
   onMount(async () => {
     loadInitialMedia();
@@ -251,7 +238,8 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 
   <div class="media-grid">
-    {#each displayList as media, index}
+    {#each Array(MEDIA_PER_PAGE) as _, index}
+      {@const media = viewList[index]}
       {#if media}
         <button class="media-item" onclick={() => openModal(media)}>
           <div
@@ -259,6 +247,7 @@
           >
             {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
           </div>
+
           {#if media.mediaType === "image" || media.mediaType === "svg"}
             {#if imageLoadStatus[media.mediaUrl] === "error"}
               <div class="image-error-placeholder"></div>
@@ -292,76 +281,60 @@
           {/if}
         </button>
       {:else}
-        <!-- データなしプレースホルダー -->
         <div class="media-item placeholder"></div>
       {/if}
     {/each}
   </div>
+
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 </div>
 
 <Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
   {#snippet main()}
     {#if selectedEvent?.eventPacket}
-      <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+      <div class="rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
         <Metadata
-          queryKey={["metadata", selectedEvent?.eventPacket.event.pubkey]}
-          pubkey={selectedEvent?.eventPacket.event.pubkey}
+          queryKey={["metadata", selectedEvent.eventPacket.event.pubkey]}
+          pubkey={selectedEvent.eventPacket.event.pubkey}
         >
           {#snippet loading()}
             <EventCard
               note={selectedEvent!.eventPacket.event}
-              {mini}
+              {...EVENT_CARD_CONFIG}
               showStatus={true}
-              {maxHeight}
               thread={false}
-              {depth}
-              {repostable}
-              {zIndex}
             />
           {/snippet}
           {#snippet nodata()}
             <EventCard
               note={selectedEvent!.eventPacket.event}
-              {mini}
+              {...EVENT_CARD_CONFIG}
               showStatus={true}
-              {maxHeight}
               thread={false}
-              {depth}
-              {repostable}
-              {zIndex}
             />
           {/snippet}
           {#snippet error()}
             <EventCard
               note={selectedEvent!.eventPacket.event}
-              {mini}
+              {...EVENT_CARD_CONFIG}
               showStatus={true}
-              {maxHeight}
               thread={false}
-              {depth}
-              {repostable}
-              {zIndex}
             />
           {/snippet}
           {#snippet content({ metadata })}
             <EventCard
               {metadata}
               note={selectedEvent!.eventPacket.event}
-              {mini}
+              {...EVENT_CARD_CONFIG}
               showStatus={true}
-              {maxHeight}
               thread={false}
-              {depth}
-              {repostable}
-              {zIndex}
             />
           {/snippet}
         </Metadata>
       </div>
     {/if}
-  {/snippet}</Dialog
->
+  {/snippet}
+</Dialog>
 
 <style>
   .media-gallery {
@@ -383,7 +356,7 @@
     overflow: hidden;
     border-radius: 8px;
     cursor: pointer;
-    background: theme("colors.neutral.800");
+    background: theme("colors.neutral.200");
     display: flex;
     align-items: center;
     justify-content: center;
@@ -391,7 +364,7 @@
 
   .media-item.placeholder {
     cursor: default;
-    background: theme("colors.neutral.800");
+    background: theme("colors.neutral.200");
   }
 
   :global(.dark) .media-item {
@@ -433,30 +406,5 @@
     height: 100%;
     font-size: 3rem;
     color: #666;
-  }
-
-  .image-error-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: #999;
-    background: theme("colors.neutral.800");
-  }
-
-  :global(.dark) .image-error-placeholder {
-    background: theme("colors.neutral.800");
-  }
-
-  .image-error-placeholder span {
-    font-size: 2rem;
-    margin-bottom: 4px;
-  }
-
-  .error-text {
-    font-size: 0.75rem;
-    text-align: center;
   }
 </style>
