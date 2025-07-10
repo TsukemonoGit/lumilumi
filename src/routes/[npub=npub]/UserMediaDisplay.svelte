@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useMediaPromiseReq } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
-  import { onMount, untrack } from "svelte";
+  import { onDestroy, onMount, untrack } from "svelte";
   import { writable, type Writable } from "svelte/store";
 
   import { type MediaEvent, type MediaResult } from "$lib/stores/operators";
@@ -51,7 +51,7 @@
   let isInitialized = $state(false);
   let selectedEvent = $state<MediaEvent | null>(null);
   let showModal: Writable<boolean> = $state(writable(false));
-
+  let isCancelled = false;
   // 派生状態
   let viewList = $derived(
     mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
@@ -111,16 +111,39 @@
     $showModal = true;
   };
 
+  // 初期化処理
+  const loadInitialMedia = async () => {
+    isInitialized = false;
+    mediaEvents = [];
+    oldestCreatedAt = null;
+    maxPage = null;
+    page = 0;
+    isLoading = false;
+    loadingProgress = "";
+    imageLoadStatus = {};
+    selectedEvent = null;
+    showModal.set(false);
+  };
+
+  onMount(async () => {
+    loadInitialMedia();
+    await waitForConnections();
+    isInitialized = true;
+  });
+  onDestroy(() => {
+    isCancelled = true;
+  });
+
   // メディアデータ読み込み
   const loadMediaData = async (
     requiredEndIndex: number
-  ): Promise<LoadResult> => {
+  ): Promise<LoadResult | null> => {
     const originalMediaEvents = [...mediaEvents];
     let finalNewMedia: MediaEvent[] = [];
     let retryCount = 0;
     let currentUntil = oldestCreatedAt || undefined;
 
-    while (retryCount < MAX_RETRIES) {
+    while (retryCount < MAX_RETRIES && !isCancelled) {
       const filter = createFilter(currentUntil);
 
       const onData = (media: MediaEvent) => {
@@ -171,6 +194,11 @@
       retryCount++;
     }
 
+    if (isCancelled) {
+      // 中断されたら何も返さず即終了、または null や失敗を示す値を返す
+      return null;
+    }
+
     const sortedMediaEvents = [...originalMediaEvents, ...finalNewMedia].sort(
       (a, b) => b.eventPacket.event.created_at - a.eventPacket.event.created_at
     );
@@ -181,13 +209,6 @@
       oldestCreatedAt: currentUntil,
       isLastPage: retryCount >= MAX_RETRIES || sortedMediaEvents.length === 0,
     };
-  };
-
-  // 初期化処理
-  const loadInitialMedia = async () => {
-    mediaEvents = [];
-    oldestCreatedAt = null;
-    maxPage = null;
   };
 
   // ページ変更時の処理
@@ -207,7 +228,9 @@
 
         try {
           const result = await loadMediaData(requiredEndIndex);
-
+          if (!result) {
+            throw Error;
+          }
           if (result.success) {
             mediaEvents = result.mediaEvents;
             oldestCreatedAt = result.oldestCreatedAt || null;
@@ -225,12 +248,6 @@
         }
       });
     }
-  });
-
-  onMount(async () => {
-    loadInitialMedia();
-    await waitForConnections();
-    isInitialized = true;
   });
 </script>
 
@@ -356,7 +373,7 @@
     overflow: hidden;
     border-radius: 8px;
     cursor: pointer;
-    background: theme("colors.neutral.200");
+    background: theme("colors.neutral.800");
     display: flex;
     align-items: center;
     justify-content: center;
@@ -364,7 +381,7 @@
 
   .media-item.placeholder {
     cursor: default;
-    background: theme("colors.neutral.200");
+    background: theme("colors.neutral.800");
   }
 
   :global(.dark) .media-item {
