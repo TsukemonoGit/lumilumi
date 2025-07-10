@@ -2,20 +2,15 @@
   import { page } from "$app/state";
   import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
   import type { LayoutData } from "../../$types";
   import * as Nostr from "nostr-typedef";
-  import RangeEventLoader from "./RangeEventLoader.svelte";
 
   import CalendarWidget from "./CalendarWidget.svelte";
-  import PaginationList from "$lib/components/NostrElements/UserTabs/PaginationList.svelte";
-  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
-  import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
-  import { t } from "@konemono/svelte5-i18n";
+
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import { queryClient, toastSettings } from "$lib/stores/stores";
-  import { Share } from "lucide-svelte";
+
   import { getNip05FromMetadata } from "$lib/func/nip05";
   import { error } from "@sveltejs/kit";
   import type { EventPacket } from "rx-nostr";
