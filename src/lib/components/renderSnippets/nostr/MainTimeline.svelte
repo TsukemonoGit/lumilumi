@@ -242,6 +242,8 @@
         const filteredOlderEvents = olderEvents
           ? filterEvents(olderEvents)
           : [];
+        //フィルターは変わるからこっちでカウント数える
+        timelineManager.filteredOlderEventCount = filteredOlderEvents.length;
         const filteredPartialEvents = partialdata
           ? filterEvents(partialdata)
           : [];
@@ -553,7 +555,6 @@
           )
         );
 
-        timelineManager.filteredOlderEventCount = older.length;
         return older;
       }
     );
