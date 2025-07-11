@@ -92,7 +92,8 @@
     isLoadingOlderEvents = $state(false);
     isUpdateScheduled = $state(false);
     destroyed = $state(false);
-    olderEventCount = $state(0); // currentEventCount から olderEventCount に変更
+    filteredOlderEventCount = $state(0); // currentEventCount から filteredOlderEventCount に変更
+    filteredNewerEventCount = $state(0);
     requiredEventCount = $derived(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
 
     get loadMoreDisabled() {
@@ -103,7 +104,8 @@
       if (this.isLoadingOlderEvents) {
         // ストックが十分にある場合のみ有効
         const hasEnoughStock =
-          this.olderEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT; // olderEventCountを使用
+          this.filteredOlderEventCount >=
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT; // filteredOlderEventCountを使用
         return !hasEnoughStock;
       }
 
@@ -228,6 +230,7 @@
 
       // 現在のデータをフィルタリング
       const currentEvents = filterEvents($data || []);
+      timelineManager.filteredNewerEventCount = currentEvents.length;
       // 現在のデータだけで表示範囲をカバーできるかチェック
       if (currentEvents.length >= endIndex) {
         // 十分な場合：現在のデータのみ使用
@@ -407,7 +410,8 @@
             ).values()
           )
         );
-        timelineManager.olderEventCount = deduplicatedData.length;
+        timelineManager.filteredOlderEventCount =
+          filterEvents(deduplicatedData).length;
         return CONFIG.LOAD_LIMIT > 0
           ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
           : deduplicatedData;
@@ -437,10 +441,12 @@
     //const previousViewIndex = viewIndex; // 元の位置を保存
     try {
       const hasEnoughStock =
-        ($data || []).length + timelineManager.olderEventCount >=
+        timelineManager.filteredNewerEventCount +
+          timelineManager.filteredOlderEventCount >=
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
       console.log(
-        ($data || []).length + timelineManager.olderEventCount,
+        timelineManager.filteredNewerEventCount +
+          timelineManager.filteredOlderEventCount,
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
       );
       if (hasEnoughStock) {
@@ -487,8 +493,8 @@
           if (partialData.length === 0) return;
 
           const stillNotEnough =
-            ($data || []).length +
-              timelineManager.olderEventCount +
+            timelineManager.filteredNewerEventCount +
+              timelineManager.filteredOlderEventCount +
               partialData.length <
             viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
 
@@ -514,7 +520,8 @@
       // 👇 最後のチェック: ストック足りないなら移動しない
       if (
         !viewMoved &&
-        ($data || []).length + timelineManager.olderEventCount >=
+        timelineManager.filteredNewerEventCount +
+          timelineManager.filteredOlderEventCount >=
           viewIndex + amount + CONFIG.SLIDE_AMOUNT * 0.1 //フィルター考慮
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
@@ -546,7 +553,7 @@
           )
         );
 
-        timelineManager.olderEventCount = older.length;
+        timelineManager.filteredOlderEventCount = older.length;
         return older;
       }
     );
