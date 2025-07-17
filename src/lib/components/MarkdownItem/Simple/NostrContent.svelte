@@ -7,7 +7,7 @@
   import DecodedContent from "$lib/components/NostrElements/kindEvents/DecodedContent.svelte";
 
   //import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { untrack } from "svelte";
+
   import UrlDisplay from "$lib/components/NostrElements/content/UrlDisplay.svelte";
   import * as Nostr from "nostr-typedef";
   import {
@@ -122,6 +122,7 @@
         {maxHeight}
         {decoded}
         content={part.content}
+        tags={event.tags}
         {displayMenu}
         depth={depth + 1}
         {repostable}
@@ -137,6 +138,7 @@
         {maxHeight}
         {decoded}
         content={part.content}
+        tags={event.tags}
         {displayMenu}
         depth={depth + 1}
         {repostable}
