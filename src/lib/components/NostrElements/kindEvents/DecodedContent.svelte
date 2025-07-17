@@ -54,6 +54,15 @@
     mini: true,
   };
 
+  // 複数のタグからリレーヒントを検索
+  const findRelayHint = (searchTags: string[][]) => {
+    for (const tag of searchTags) {
+      const hint = getRelayHint(tag);
+      if (hint) return hint;
+    }
+    return undefined;
+  };
+
   // relayhintの構築
   const buildRelayHint = (
     relayHint: string | undefined,
@@ -83,7 +92,10 @@
       {/if}
     </span>
   {:else if decoded.type === "nevent"}
-    {@const relayHint = getRelayHint(["e", decoded.data.id])}
+    {@const relayHint = findRelayHint([
+      ["e", decoded.data.id],
+      ["q", decoded.data.id],
+    ])}
     <span class="grid grid-cols-[auto_1fr_auto]">
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
       <Note
@@ -94,7 +106,10 @@
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
     </span>
   {:else if decoded.type === "note"}
-    {@const relayHint = getRelayHint(["e", decoded.data])}
+    {@const relayHint = findRelayHint([
+      ["e", decoded.data],
+      ["q", decoded.data],
+    ])}
     <span class="grid grid-cols-[auto_1fr_auto]">
       <Quote size="14" class="text-magnum-500 fill-magnum-500/75" />
       <Note

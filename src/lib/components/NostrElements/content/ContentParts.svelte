@@ -126,6 +126,7 @@
         {maxHeight}
         {decoded}
         content={part.content}
+        tags={event.tags}
         {displayMenu}
         depth={depth + 1}
         {repostable}
@@ -141,6 +142,7 @@
         {maxHeight}
         {decoded}
         content={part.content}
+        tags={event.tags}
         {displayMenu}
         depth={depth + 1}
         {repostable}
