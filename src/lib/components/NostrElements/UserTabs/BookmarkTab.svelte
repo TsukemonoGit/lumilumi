@@ -42,7 +42,12 @@
             tag[0] === "a") &&
           tag.length > 1
       )}
-      <PaginationList list={filteredList.map((tag) => tag[1])}>
+      <PaginationList
+        list={filteredList
+          .map((tag) => tag[1])
+          .slice()
+          .reverse()}
+      >
         {#snippet children(li, index)}
           {@const id = li as string}
           {#if filteredList[index][0] === "e"}

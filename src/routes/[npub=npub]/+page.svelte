@@ -642,7 +642,9 @@
                   <PaginationList
                     list={contacts.tags
                       .filter((tag) => tag[0] === "p" && tag.length > 1)
-                      .map((tag) => tag[1])}
+                      .map((tag) => tag[1])
+                      .slice()
+                      .reverse()}
                     >{#snippet children(event, index)}
                       {@const id = event as string}
                       <Metadatanoyatu pubkey={id} />
