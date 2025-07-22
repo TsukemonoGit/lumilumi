@@ -54,8 +54,8 @@
   let imeta: Imeta[] | undefined = $derived(
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
-      ?.map((imeta) => reverseConvertMetaTags(imeta))
-      .filter((tag) => tag !== undefined)
+      ?.map((i) => reverseConvertMetaTags(i))
+      .filter((url) => url !== undefined)
   );
   //console.log(imeta);
   let imageList = $derived(

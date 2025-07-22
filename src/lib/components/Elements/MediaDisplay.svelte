@@ -5,7 +5,7 @@
   import { fade } from "svelte/transition";
   import type { Writable } from "svelte/store";
   import { popStack, queryClient } from "$lib/stores/stores";
-  import type { UrlType } from "$lib/func/useUrl";
+  import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
@@ -48,20 +48,23 @@
   const { open: dialogOpen } = states;
 
   // 画像フィルタリング：表示可能な画像のみを抽出
-  function filterValidImages(imageUrls: string[]): MediaItem[] {
-    return imageUrls
-      .map((url, index) => ({ url, originalIndex: index }))
-      .map((item) => {
-        const data: UrlType | undefined = queryClient.getQueryData([
-          "useUrl",
-          item.url,
-        ]);
-        return { ...item, type: data || "url" };
+  async function filterValidImages(imageUrls: string[]): Promise<MediaItem[]> {
+    // 1. map でPromise配列を作る
+    const itemsWithType = await Promise.all(
+      imageUrls.map(async (url, index) => {
+        console.log(url);
+        const data: UrlType | null = await userPromiseUrl(url);
+        return { url, originalIndex: index, type: data || "url" };
       })
-      .filter((item) => {
-        // image または svg のみを表示対象とする
-        return item.type === "image" || item.type === "svg";
-      });
+    );
+
+    // 2. フィルター
+    const filtered = itemsWithType.filter((item) => {
+      console.log(item);
+      return item.type === "image" || item.type === "svg";
+    });
+
+    return filtered;
   }
 
   // 表示インデックスから元のインデックスへの変換
@@ -118,8 +121,8 @@
   }
 
   // ダイアログを開く処理
-  function openDialog(imageUrls: string[], targetIndex: number = 0) {
-    displayImages = filterValidImages(imageUrls);
+  async function openDialog(imageUrls: string[], targetIndex: number = 0) {
+    displayImages = await filterValidImages(imageUrls);
 
     if (displayImages.length === 0) return;
 
