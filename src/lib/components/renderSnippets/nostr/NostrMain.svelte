@@ -88,45 +88,36 @@
         if ("globalExcludeFollowee" in migrated && !migrated.global) {
           migrated.global = {
             excludeFollowee: migrated.globalExcludeFollowee,
-            excludeConversation: false,
+            excludeConversation: timelineFilterInit.global.excludeConversation,
           };
           delete migrated.globalExcludeFollowee;
           needsSave = true;
         }
 
         // 各プロパティのデフォルト値設定
-        const defaults = {
-          adaptMute: true,
-          selectCanversation: 0,
-          global: {
-            excludeFollowee: false,
-            excludeConversation: false,
-          },
-        };
-
-        // 不足しているプロパティを補完
         if (migrated.adaptMute === undefined) {
-          migrated.adaptMute = defaults.adaptMute;
+          migrated.adaptMute = timelineFilterInit.adaptMute;
           needsSave = true;
         }
 
         if (migrated.selectCanversation === undefined) {
-          migrated.selectCanversation = defaults.selectCanversation;
+          migrated.selectCanversation = timelineFilterInit.selectCanversation;
           needsSave = true;
         }
 
         if (!migrated.global) {
-          migrated.global = defaults.global;
+          migrated.global = { ...timelineFilterInit.global };
           needsSave = true;
         } else {
           // globalオブジェクト内の不足プロパティを補完
           if (migrated.global.excludeFollowee === undefined) {
-            migrated.global.excludeFollowee = defaults.global.excludeFollowee;
+            migrated.global.excludeFollowee =
+              timelineFilterInit.global.excludeFollowee;
             needsSave = true;
           }
           if (migrated.global.excludeConversation === undefined) {
             migrated.global.excludeConversation =
-              defaults.global.excludeConversation;
+              timelineFilterInit.global.excludeConversation;
             needsSave = true;
           }
         }
@@ -139,22 +130,16 @@
         }
       } catch (error) {
         console.log("timelineFilter parse error");
-        // エラー時はデフォルト値で初期化
-        const defaultFilter = {
-          adaptMute: true,
-          selectCanversation: 0,
-          global: {
-            excludeFollowee: false,
-            excludeConversation: false,
-          },
-        };
-        timelineFilter.set(defaultFilter);
-        localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
+        // エラー時は初期値で初期化
+        timelineFilter.set({ ...timelineFilterInit });
+        localStorage.setItem(
+          "timelineFilter",
+          JSON.stringify(timelineFilterInit)
+        );
       }
     } else {
-      // timelineFilterが存在しない場合のデフォルト値
-
-      timelineFilter.set(timelineFilterInit);
+      // timelineFilterが存在しない場合は初期値を使用
+      timelineFilter.set({ ...timelineFilterInit });
       localStorage.setItem(
         "timelineFilter",
         JSON.stringify(timelineFilterInit)
