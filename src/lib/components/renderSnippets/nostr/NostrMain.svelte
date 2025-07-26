@@ -13,11 +13,12 @@
   import { setRxNostr, setRelays } from "$lib/func/nostr";
   import type { DefaultRelayConfig, EventPacket } from "rx-nostr";
   import { onMount } from "svelte";
-  import type {
-    LumiEmoji,
-    LumiMute,
-    LumiMuteByKind,
-    LumiSetting,
+  import {
+    timelineFilterInit,
+    type LumiEmoji,
+    type LumiMute,
+    type LumiMuteByKind,
+    type LumiSetting,
   } from "$lib/types";
 
   import {
@@ -72,13 +73,77 @@
     if (followee === "true") {
       $onlyFollowee = true;
     }
+    // onMount内のtimelineFilter初期化部分を以下に置き換え
+
     const timeline = localStorage.getItem("timelineFilter");
     if (timeline) {
       try {
-        timelineFilter.set(JSON.parse(timeline));
+        const parsed = JSON.parse(timeline);
+
+        // マイグレーション処理
+        let migrated = { ...parsed };
+        let needsSave = false;
+
+        // 旧バージョンのglobalExcludeFolloweeが存在する場合
+        if ("globalExcludeFollowee" in migrated && !migrated.global) {
+          migrated.global = {
+            excludeFollowee: migrated.globalExcludeFollowee,
+            excludeConversation: timelineFilterInit.global.excludeConversation,
+          };
+          delete migrated.globalExcludeFollowee;
+          needsSave = true;
+        }
+
+        // 各プロパティのデフォルト値設定
+        if (migrated.adaptMute === undefined) {
+          migrated.adaptMute = timelineFilterInit.adaptMute;
+          needsSave = true;
+        }
+
+        if (migrated.selectCanversation === undefined) {
+          migrated.selectCanversation = timelineFilterInit.selectCanversation;
+          needsSave = true;
+        }
+
+        if (!migrated.global) {
+          migrated.global = { ...timelineFilterInit.global };
+          needsSave = true;
+        } else {
+          // globalオブジェクト内の不足プロパティを補完
+          if (migrated.global.excludeFollowee === undefined) {
+            migrated.global.excludeFollowee =
+              timelineFilterInit.global.excludeFollowee;
+            needsSave = true;
+          }
+          if (migrated.global.excludeConversation === undefined) {
+            migrated.global.excludeConversation =
+              timelineFilterInit.global.excludeConversation;
+            needsSave = true;
+          }
+        }
+
+        timelineFilter.set(migrated);
+
+        // マイグレーション後の設定をローカルストレージに保存
+        if (needsSave) {
+          localStorage.setItem("timelineFilter", JSON.stringify(migrated));
+        }
       } catch (error) {
         console.log("timelineFilter parse error");
+        // エラー時は初期値で初期化
+        timelineFilter.set({ ...timelineFilterInit });
+        localStorage.setItem(
+          "timelineFilter",
+          JSON.stringify(timelineFilterInit)
+        );
       }
+    } else {
+      // timelineFilterが存在しない場合は初期値を使用
+      timelineFilter.set({ ...timelineFilterInit });
+      localStorage.setItem(
+        "timelineFilter",
+        JSON.stringify(timelineFilterInit)
+      );
     }
 
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
