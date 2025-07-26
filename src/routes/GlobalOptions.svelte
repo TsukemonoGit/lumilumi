@@ -36,8 +36,8 @@
     <input
       type="checkbox"
       class="rounded-checkbox"
-      checked={timelineFilter.get().global?.excludeFollowee || false}
-      onchange={onChangeExcludeFollowee}
+      checked={timelineFilter.get().global?.excludeConversation || false}
+      onchange={onChangeExcludeConversation}
     />
     {$_("filter.canversation.none")}
   </label>
@@ -48,8 +48,8 @@
       <input
         type="checkbox"
         class="rounded-checkbox"
-        checked={timelineFilter.get().global?.excludeConversation || false}
-        onchange={onChangeExcludeConversation}
+        checked={timelineFilter.get().global?.excludeFollowee || false}
+        onchange={onChangeExcludeFollowee}
       />
       {$_("filter.menu.globalExcludeFollowee")}
     </label>
