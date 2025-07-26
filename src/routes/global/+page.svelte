@@ -225,12 +225,26 @@
     reinitializeTimeline();
   });
 
-  const checkGlobalFolloweePost = (note: Nostr.Event): boolean => {
-    if (timelineFilter.get().globalExcludeFollowee) {
-      return !followList.get().has(note.pubkey);
-    } else {
-      return true;
+  const checkGlobalFilter = (note: Nostr.Event): boolean => {
+    let check = true;
+
+    if (timelineFilter.get().global.excludeFollowee) {
+      check = !followList.get().has(note.pubkey);
     }
+    if (
+      timelineFilter.get().global.excludeConversation &&
+      (note.kind === 1 || note.kind === 42)
+    ) {
+      const pTags: string[] = note.tags
+        .filter(
+          (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
+        )
+        .map((tag) => tag[1]);
+      if (pTags.length > 0) {
+        check = false;
+      }
+    }
+    return check;
   };
 </script>
 
@@ -269,7 +283,7 @@
         globalRelays={$state.snapshot(globalRelays)}
         {timelineQuery}
         eventFilter={(note) => {
-          return checkGlobalFolloweePost(note);
+          return checkGlobalFilter(note);
         }}
       />
     {/if}
