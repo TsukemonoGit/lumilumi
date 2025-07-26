@@ -22,13 +22,20 @@ export interface TimelineFilter {
   selectCanversation: number; //Radio Group
   //0 all
   //1 follow only
-  //2 all
-  globalExcludeFollowee: boolean; //グローバルタイムラインからフォロイーの投稿を除外
+  //2 none ptagがあるものは除外
+  global: {
+    excludeFollowee: boolean; //グローバルタイムラインからフォロイーの投稿を除外
+
+    excludeConversation: boolean;
+  };
 }
 export const timelineFilterInit: TimelineFilter = {
   adaptMute: true,
   selectCanversation: 0,
-  globalExcludeFollowee: false,
+  global: {
+    excludeFollowee: false,
+    excludeConversation: false,
+  },
 };
 export interface ReqResult<A> {
   data: Readable<A | undefined | null>;

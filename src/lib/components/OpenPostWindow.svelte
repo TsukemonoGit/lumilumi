@@ -1056,7 +1056,7 @@
               class="sendButton"
               onclick={postNote}
             >
-              <Send size="20" class="stroke-zinc-100 min-w-4" />
+              <Send size="20" class="stroke-zinc-100 " />
             </button>
           </div>
         </div>
