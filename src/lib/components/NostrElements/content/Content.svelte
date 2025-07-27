@@ -41,16 +41,16 @@
 
     $showMore = true;
   };
-  $effect(() => {
-    if (dialogContentRef) {
-      console.log("dialogContentRef", dialogContentRef);
-      untrack(() => {
-        setTimeout(() => {
-          (dialogContentRef as HTMLDivElement).scrollTop = 0;
-        }, 0);
-      });
-    }
-  });
+  // $effect(() => {
+  //   if (dialogContentRef) {
+  //     console.log("dialogContentRef", dialogContentRef);
+  //     untrack(() => {
+  //       setTimeout(() => {
+  //         (dialogContentRef as HTMLDivElement).scrollTop = 0;
+  //       }, 0);
+  //     });
+  //   }
+  // });
 </script>
 
 {#if maxHeight !== 0}
