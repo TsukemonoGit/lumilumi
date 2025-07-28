@@ -219,11 +219,8 @@
         ];
 
         //markerについて
-        //NIP-10 には
-        //["q", "<event-id> or <event-address>", "<relay-url>", "<pubkey-if-a-regular-event>"]
-        //で
-        //["e", <event-id>, <relay-url>, <marker>, <pubkey>]
-        //   だけど NIP-22 および NIP-25 のeタグの例は詰めてる
+        //NIP-10 にはマーカー部分あるけど
+        //   NIP-22 および NIP-25 のeタグの例は詰めてる
 
         //リポストはetagのことしか書いてない
         //https://github.com/nostr-protocol/nips/blob/master/18.md
@@ -271,17 +268,7 @@
         setTimeout(() => {
           $postWindowOpen = true;
         }, 2);
-        // replyText = atag
-        //   ? ` nostr:${encodeNaddr(atag, nevent)} \n`
-        //   : ` nostr:${nevent} \n`;
 
-        // openReplyWindow = false;
-        // openQuoteWindow = true;
-        // setTimeout(() => {
-        //   textareaQuote.selectionEnd = 0;
-        //   cursorPosition = 0;
-        //   textareaQuote.focus();
-        // }, 60);
         break;
     }
     prosessing = false;
@@ -325,11 +312,6 @@
       amountEle?.focus();
     }, 1);
   };
-  // onMount(() => {
-  //   const storagezap = localStorage.getItem("zap");
-
-  //   zapAmount = Number(storagezap);
-  // });
 
   const onClickOK = async (metadata: Nostr.Event) => {
     invoice = undefined;
@@ -368,31 +350,9 @@
     dialogOpen?.(false);
     invoiceOpen?.(true);
 
-    //ザップウィンドウ閉じる処理ZapInvoiceOpenの方にかいてあったよ
-    //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
-    // const date = now();
-    // unsubscribe = observer.subscribe((result: any) => {
-    //   console.log(result);
-    //   if (result?.data?.event && result.data.event.created_at >= date) {
-    //     invoiceOpen?.(false);
-    //     unsubscribe?.();
-    //   }
-    // });
     //サップの量保存
     localStorage.setItem("zap", zapAmount.toString());
   };
-
-  // $: if (!$invoiceOpen) {
-  //   invoice = undefined;
-  //   unsubscribe?.();
-  // }
-
-  // invoiceOpen.subscribe((value: boolean) => {
-  //   if (!value) {
-  //     invoice = undefined;
-  //     unsubscribe?.();
-  //   }
-  // });
 
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
@@ -446,32 +406,26 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 2000; // 1秒（ミリ秒）
+  const updateInterval = 300; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
-  let updating = false;
 
   function debounceUpdate() {
-    if (updating) {
-      clearTimeout(timeoutId); // 前のタイマーをクリアして最後の1回だけ実行
+    if (timeoutId) {
+      return; // clearTimeout(timeoutId);
     }
+
     timeoutId = setTimeout(() => {
       updateReactionsData();
-      updating = false;
-    }, updateInterval); // 連続で実行されるのを防ぐ
-
-    updating = true;
+      timeoutId = undefined;
+    }, updateInterval);
   }
+
   viewEventIds.subscribe((value) => {
     debounceUpdate();
   });
+
   $effect(() => {
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
-      //   console.log($state.snapshot(viewEventIds.get.length));
-      // console.log(
-      //   queryClient.getQueriesData({
-      //     queryKey: ["reactions", queryId],
-      //   })
-      // );//これで立ったら複数クエリーの結果が出るけどqueryObserverでは複数のやつ同時にサブスクライブできない
       untrack(() => {
         debounceUpdate();
       });
@@ -516,7 +470,6 @@
       .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
 
     hasReactions = hasAnyReaction();
-    updating = false;
     timeoutId = undefined;
   }
 
