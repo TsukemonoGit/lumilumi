@@ -271,10 +271,9 @@
       <input {...group.hiddenInput} />
     </div>
   </div>
-
-  {#if !hasEnded}
-    {#if userVoteEvent}
-      <div class="flex items-center my-2 justify-between">
+  <div class="flex justify-between items-center">
+    {#if !hasEnded}
+      {#if userVoteEvent}
         <button
           class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
           type="button"
@@ -283,23 +282,29 @@
         >
           {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.change")}`}
         </button>
-        <button onclick={handleRefresh} title="Refresh poll results">
-          <RefreshCw
-            class="rounded-full hover:bg-magnum-600/50 p-1 active:bg-magnum-600 text-magnum-200"
-          />
+      {:else if group && group.value !== ""}
+        <button
+          class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          type="button"
+          disabled={isSubmitting}
+          onclick={submitVote}
+        >
+          {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
         </button>
-      </div>
-    {:else if group && group.value !== ""}
+      {/if}
+    {/if}
+    {#if userVoteEvent || lumiSetting.get().pubkey === note.pubkey}
       <button
-        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        type="button"
-        disabled={isSubmitting}
-        onclick={submitVote}
+        onclick={handleRefresh}
+        title="Refresh poll results"
+        class=" ml-auto"
       >
-        {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
+        <RefreshCw
+          class=" rounded-full hover:bg-magnum-600/50 p-1  active:bg-magnum-600 text-magnum-200"
+        />
       </button>
     {/if}
-  {/if}
+  </div>
 {:else}
   <span class="italic text-neutral-500">loading...</span>
 {/if}
