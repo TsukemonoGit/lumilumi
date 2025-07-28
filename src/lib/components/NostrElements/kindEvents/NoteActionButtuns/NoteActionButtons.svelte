@@ -213,10 +213,17 @@
             "e", //a tagのやつにもeもいれる
             note.id,
             relayhints?.[0] ?? "", //ws://は除く
-            "" /*marker*/,
+            /*  "" marker,*/
             note.pubkey,
           ],
         ];
+
+        //markerについて
+        //NIP-10 には
+        //["q", "<event-id> or <event-address>", "<relay-url>", "<pubkey-if-a-regular-event>"]
+        //で
+        //["e", <event-id>, <relay-url>, <marker>, <pubkey>]
+        //   だけど NIP-22 および NIP-25 のeタグの例は詰めてる
 
         //リポストはetagのことしか書いてない
         //https://github.com/nostr-protocol/nips/blob/master/18.md
