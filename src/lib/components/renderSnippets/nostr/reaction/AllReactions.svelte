@@ -1,15 +1,18 @@
 <script lang="ts">
   import { useAllReactions } from "$lib/stores/useAllReactions";
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqResult, ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
+    EventPacket,
     RxReq,
     RxReqEmittable,
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
+  import { untrack } from "svelte";
+  import { readable } from "svelte/store";
 
   interface Props {
     queryKey: QueryKey;
@@ -53,9 +56,34 @@
   }: Props = $props();
 
   let result = $derived(useAllReactions(queryKey, id, atag, req));
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+
+  // debounce用の状態
+  let debounceTimeoutId: NodeJS.Timeout | undefined = undefined;
+  let debouncedResult: ReqResult<EventPacket[]> = $state({
+    data: readable([] as EventPacket[]),
+    status: readable("loading"),
+    error: readable(),
+  });
+  const debounceInterval = 300;
+
+  // resultの変更をdebounceして反映
+  $effect(() => {
+    // タイマーをクリアして最新の結果で再設定
+    if (debounceTimeoutId) {
+      clearTimeout(debounceTimeoutId);
+    }
+
+    debounceTimeoutId = setTimeout(() => {
+      untrack(() => {
+        debouncedResult = { ...result }; // オブジェクトのコピーを作成
+      });
+      debounceTimeoutId = undefined;
+    }, debounceInterval);
+  });
+
+  let data = $derived(debouncedResult.data);
+  let status = $derived(debouncedResult.status);
+  let errorData = $derived(debouncedResult.error);
 
   interface $$Slots {
     default: {
