@@ -41,8 +41,10 @@
 
     $showMore = true;
   };
+
   // $effect(() => {
   //   if (dialogContentRef) {
+  //これでやるとふぁぼとかおしたときもかわるからはっかしちゃう
   //     console.log("dialogContentRef", dialogContentRef);
   //     untrack(() => {
   //       setTimeout(() => {

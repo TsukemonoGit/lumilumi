@@ -13,6 +13,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
   import Content from "$lib/components/NostrElements/content/Content.svelte";
+  import { RefreshCw } from "lucide-svelte";
 
   let {
     note,
@@ -20,87 +21,94 @@
     endsAt,
   }: { note: Nostr.Event; hasEnded: boolean; endsAt: number | undefined } =
     $props();
-  let group: RadioGroup | undefined = $state();
-  let optionTags: string[][] = $derived(
-    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2)
-  );
-  let isSubmitting: boolean = $state(false); // 投票送信中かどうかのフラグ
 
   const depth = 0;
+
+  let group: RadioGroup | undefined = $state();
   let userVoteEvent: Nostr.Event | undefined = $state();
-  $inspect(optionTags);
-
   let voteEvents: Nostr.Event[] = $state([]);
-
-  //過去投票済みの場合は結果を表示
-  //投票してなかったら結果を出しつつ投票メニュー（投票を変更）
-  $effect(() => {
-    if (note) {
-      //のてがかわるたびにちぇっく
-      untrack(() => {
-        getVotedEvents();
-      });
-    }
-  });
-
   let voteRelays: string[] = $state([]);
-  async function getVotedEvents() {
-    voteRelays = note.tags.reduce((pre, cur) => {
-      if (cur[0] === "relay" && cur.length > 1) {
-        return Array.from(new Set([...pre, cur[1]]));
-      }
-      return pre; // Return the accumulator unchanged if condition not met
-    }, []); // Initial value should be an empty array
+  let isSubmitting: boolean = $state(false);
 
-    let filter: Nostr.Filter = { kinds: [1018], "#e": [note.id] };
-    if (endsAt) {
-      filter = { ...filter, until: endsAt };
+  let optionTags: string[][] = $derived(
+    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || []
+  );
+
+  // リセット処理
+  function reset(): void {
+    group = undefined;
+    userVoteEvent = undefined;
+    voteEvents = [];
+    voteRelays = [];
+    isSubmitting = false;
+  }
+
+  // リレーの抽出
+  function extractVoteRelays(noteEvent: Nostr.Event): string[] {
+    return noteEvent.tags.reduce((relays: string[], tag) => {
+      if (tag[0] === "relay" && tag.length > 1) {
+        return Array.from(new Set([...relays, tag[1]]));
+      }
+      return relays;
+    }, []);
+  }
+
+  // 投票フィルターの作成
+  function createVoteFilter(noteId: string, endTime?: number): Nostr.Filter {
+    const filter: Nostr.Filter = { kinds: [1018], "#e": [noteId] };
+    if (endTime) {
+      filter.until = endTime;
     }
-    voteEvents = (
-      await usePromiseReq(
-        {
-          filters: [filter],
-          operator: pipe(uniq(), latestEachPubkey()),
-        },
-        voteRelays.length > 0 ? voteRelays : undefined
-      )
-    )?.map((evs) => evs.event);
+    return filter;
+  }
+
+  // ユーザーの投票値を取得
+  function getUserVoteValue(voteEvent: Nostr.Event | undefined): string {
+    if (!voteEvent) return "";
+
+    const responseTag = voteEvent.tags.find(
+      (tag) => tag[0] === "response" && tag.length > 1
+    );
+    if (!responseTag) return "";
+
+    const matchingOption = optionTags.find(
+      (option) => option[1] === responseTag[1]
+    );
+    return matchingOption ? matchingOption[1] : "";
+  }
+
+  // 投票イベントを取得
+  async function fetchVoteEvents(): Promise<void> {
+    voteRelays = extractVoteRelays(note);
+
+    const filter = createVoteFilter(note.id, endsAt);
+    const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
+
+    const events = await usePromiseReq(
+      {
+        filters: [filter],
+        operator: pipe(uniq(), latestEachPubkey()),
+      },
+      targetRelays
+    );
+
+    voteEvents = events?.map((ev) => ev.event) || [];
     userVoteEvent = voteEvents.find(
       (ev) => ev.pubkey === lumiSetting.get().pubkey
     );
-    const value = getVoted(userVoteEvent);
 
-    group = new RadioGroup({ disabled: hasEnded, value: value });
+    const userVoteValue = getUserVoteValue(userVoteEvent);
+    group = new RadioGroup({ disabled: hasEnded, value: userVoteValue });
   }
-  function getVoted(ev: Nostr.Event | undefined): string {
-    if (!ev) {
-      return "";
-    }
 
-    const res = ev.tags.find((tag) => tag[0] === "response" && tag.length > 1);
-    if (!res) {
-      return "";
-    }
-
-    const op = optionTags.find((op) => op[1] === res[1]);
-    if (!op) {
-      return "";
-    }
-    return op[1];
-  }
-  $inspect(voteEvents);
-
-  //--------
-  const handleClickVote = async () => {
-    console.log(group?.value);
+  // 投票送信処理
+  async function submitVote(): Promise<void> {
     if (!group?.value || !lumiSetting.get().pubkey || isSubmitting) return;
 
     try {
       isSubmitting = true;
 
-      // 投票イベントの作成
-      // 選択した選択肢をタグに追加
-      const voteEvent: Nostr.EventParameters = {
+      const voteEventParams: Nostr.EventParameters = {
         kind: 1018,
         tags: [
           ["e", note.id],
@@ -108,45 +116,62 @@
         ],
         content: "",
       };
+
       if (lumiSetting.get().addClientTag) {
-        voteEvent.tags?.push(clientTag);
+        voteEventParams.tags?.push(clientTag);
       }
-      console.log(voteEvent);
 
       const signer = nip07Signer();
-      const event = await signer.signEvent(voteEvent);
+      const signedEvent = await signer.signEvent(voteEventParams);
+      const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
 
-      const res = await promisePublishSignedEvent(
-        event,
-        voteRelays.length > 0 ? voteRelays : undefined
+      const publishResult = await promisePublishSignedEvent(
+        signedEvent,
+        targetRelays
       );
-      if (res.res.length > 0) {
+
+      if (publishResult.res.length > 0) {
         $toastSettings = {
           title: "Voted",
           description: "",
           color: "bg-green-500",
         };
+        await fetchVoteEvents();
       } else {
-        $toastSettings = {
-          title: "Failed",
-          description: "failed to vote",
-          color: "bg-red-500",
-        };
+        throw new Error("Publish failed");
       }
-
-      // 投票リストを更新
-      await getVotedEvents();
     } catch (error) {
+      console.error("投票の送信に失敗しました:", error);
       $toastSettings = {
         title: "Failed",
         description: "failed to vote",
         color: "bg-red-500",
       };
-      console.error("投票の送信に失敗しました:", error);
     } finally {
       isSubmitting = false;
     }
-  };
+  }
+
+  // リフレッシュ処理
+  function handleRefresh(): void {
+    reset();
+    fetchVoteEvents();
+  }
+
+  // 特定の選択肢に投票したイベントをフィルタリング
+  function getVotesForOption(optionId: string): Nostr.Event[] {
+    return voteEvents.filter((ev) => getUserVoteValue(ev) === optionId);
+  }
+
+  // エフェクト: noteが変更されたときの処理
+  $effect(() => {
+    if (note) {
+      untrack(() => {
+        reset();
+        fetchVoteEvents();
+      });
+    }
+  });
 </script>
 
 {#if group}
@@ -155,6 +180,8 @@
       {#if optionTags.length > 0}
         {#each optionTags as [_, id, label]}
           {@const item = group.getItem(id)}
+          {@const votesForOption = getVotesForOption(id)}
+
           <div class="radio-item">
             <div {...item.attrs} class="radio-button">
               <div
@@ -175,12 +202,10 @@
                   ></div>
                 {/if}
               </div>
-              <div class=" text-gray-600 dark:text-gray-100 ml-1">
+
+              <div class="text-gray-600 dark:text-gray-100 ml-1">
                 <Content
-                  event={{
-                    ...note,
-                    content: label,
-                  }}
+                  event={{ ...note, content: label }}
                   displayTags={false}
                   displayMenu={false}
                   {depth}
@@ -189,20 +214,18 @@
               </div>
 
               {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === note.pubkey}
-                {@const evs = voteEvents.filter((ev) => getVoted(ev) === id)}
-
                 <div
                   class="ml-auto flex overflow-hidden items-center flex-row-reverse pr-4"
                 >
-                  {#each evs as ev}
+                  {#each votesForOption as voteEvent}
                     <div class="w-2 overflow-visible">
                       <Metadata
-                        queryKey={["metadata", ev.pubkey]}
-                        pubkey={ev.pubkey}
+                        queryKey={["metadata", voteEvent.pubkey]}
+                        pubkey={voteEvent.pubkey}
                       >
                         {#snippet loading()}
                           <UserPopupMenu
-                            pubkey={ev.pubkey}
+                            pubkey={voteEvent.pubkey}
                             metadata={undefined}
                             size={24}
                             {depth}
@@ -211,7 +234,7 @@
 
                         {#snippet error()}
                           <UserPopupMenu
-                            pubkey={ev.pubkey}
+                            pubkey={voteEvent.pubkey}
                             metadata={undefined}
                             size={24}
                             {depth}
@@ -220,7 +243,7 @@
 
                         {#snippet nodata()}
                           <UserPopupMenu
-                            pubkey={ev.pubkey}
+                            pubkey={voteEvent.pubkey}
                             metadata={undefined}
                             size={24}
                             {depth}
@@ -229,7 +252,7 @@
 
                         {#snippet content({ metadata })}
                           <UserPopupMenu
-                            pubkey={ev.pubkey}
+                            pubkey={voteEvent.pubkey}
                             {metadata}
                             size={24}
                             {depth}
@@ -239,7 +262,7 @@
                     </div>
                   {/each}
                 </div>
-                <div class="ml-2">{evs.length}</div>
+                <div class="ml-2">{votesForOption.length}</div>
               {/if}
             </div>
           </div>
@@ -248,16 +271,22 @@
       <input {...group.hiddenInput} />
     </div>
   </div>
+
   {#if !hasEnded}
     {#if userVoteEvent}
-      <div class="flex items-center my-2">
+      <div class="flex items-center my-2 justify-between">
         <button
           class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
           type="button"
           disabled={isSubmitting}
-          onclick={handleClickVote}
+          onclick={submitVote}
         >
           {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.change")}`}
+        </button>
+        <button onclick={handleRefresh} title="Refresh poll results">
+          <RefreshCw
+            class="rounded-full hover:bg-magnum-600/50 p-1 active:bg-magnum-600 text-magnum-200"
+          />
         </button>
       </div>
     {:else if group && group.value !== ""}
@@ -265,14 +294,14 @@
         class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         disabled={isSubmitting}
-        onclick={handleClickVote}
+        onclick={submitVote}
       >
         {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
       </button>
     {/if}
   {/if}
 {:else}
-  <span class="italic text-neutral-500"> loaging...</span>
+  <span class="italic text-neutral-500">loading...</span>
 {/if}
 
 <style>
@@ -280,7 +309,6 @@
     margin: 6px 4px;
     display: flex;
     flex-direction: column;
-
     gap: 0.5rem;
   }
 

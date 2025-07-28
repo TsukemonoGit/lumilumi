@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { type Part } from "$lib/func/content";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import type { Token } from "@konemono/nostr-content-parser";
 
