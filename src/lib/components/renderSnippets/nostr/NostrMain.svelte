@@ -75,7 +75,7 @@
     }
 
     const timeline = localStorage.getItem("timelineFilter");
-    if (timeline) {
+    if (timeline && timeline !== "undefined" && timeline !== "null") {
       try {
         const parsed = JSON.parse(timeline);
 
@@ -91,15 +91,19 @@
         // 現行の形式に合致するかチェック
         const filter = parsed;
         const isValidFormat =
+          filter &&
           typeof filter === "object" &&
-          filter !== null &&
-          !Array.isArray(filter) &&
           filter.global &&
           typeof filter.global === "object" &&
           filter.global !== null &&
+          filter.global !== undefined &&
           !Array.isArray(filter.global) &&
+          "excludeFollowee" in filter.global &&
+          "excludeConversation" in filter.global &&
           typeof filter.global.excludeFollowee === "boolean" &&
           typeof filter.global.excludeConversation === "boolean" &&
+          "adaptMute" in filter &&
+          "selectCanversation" in filter &&
           typeof filter.adaptMute === "boolean" &&
           typeof filter.selectCanversation === "boolean";
 
