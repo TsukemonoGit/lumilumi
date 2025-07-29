@@ -229,13 +229,13 @@
 {#if userPubkey === loginUser.get()}
   <div class="flex flex-row-reverse gap-2 mx-1 items-center">
     <button
-      class="rounded-md p-1 m-1 border border-magnum-200 text-magnum-200 font-bold hover:bg-magnum-800/50"
+      class="rounded-md p-1 m-1 border border-magnum-300 text-magnum-300 font-bold hover:bg-magnum-800/50"
       onclick={openDialog}
     >
       Add Pin
     </button>
     <button
-      class="text-magnum-200 p-1 rounded-full hover:bg-magnum-800/50"
+      class="text-magnum-300 p-1 rounded-full hover:bg-magnum-800/50"
       onclick={refreshData}><RefreshCw size={20} /></button
     >
   </div>
