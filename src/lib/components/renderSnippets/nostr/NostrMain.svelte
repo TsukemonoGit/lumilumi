@@ -69,7 +69,7 @@
 
     initializeRxNostr();
 
-    const followee = localStorage.getItem("onlyFollowee");
+    const followee = localStorage.getItem("onlyFollowee"); //通知欄の奴
     if (followee === "true") {
       $onlyFollowee = true;
     }
