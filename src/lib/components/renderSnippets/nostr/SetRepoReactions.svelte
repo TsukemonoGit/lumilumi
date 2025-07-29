@@ -20,7 +20,7 @@
   let result: { data: any; status: any; error: any };
 
   // let lastUpdateTimestamp = Date.now() + 3000; // 初回は余裕を持たせる
-  const updateInterval = 1000; // 1秒（ミリ秒）
+  const updateInterval = 500; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
   let updating = false;
 
@@ -44,11 +44,11 @@
     debounceUpdate();
   });
 
-  $effect(() => {
-    if (etagList || atagList) {
-      untrack(() => debounceUpdate());
-    }
-  });
+  // $effect(() => {
+  //   if (etagList || atagList) {
+  //     untrack(() => debounceUpdate());
+  //   }
+  // });
 
   function debounceUpdate() {
     if (updating) {
