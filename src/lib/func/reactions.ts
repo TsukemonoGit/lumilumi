@@ -3,7 +3,7 @@ import type { ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
 import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import * as Nostr from "nostr-typedef";
 
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
@@ -73,8 +73,6 @@ export function useReq3(): {
   status: Readable<ReqStatus>;
   error: Readable<Error>;
 } {
-  //console.log(filters);
-
   const _queryClient = queryClient;
 
   if (!_queryClient) {
@@ -87,15 +85,24 @@ export function useReq3(): {
   const obs: Observable<EventPacket> = get(app).rxNostr3.use(req3);
 
   const query = createQuery({
-    queryKey: ["reactions"], //TLに表示されているノートたちへのリアクションの監視だからinfinity?
+    queryKey: ["reactions"],
     gcTime: Infinity,
     staleTime: Infinity,
     queryFn: (): Promise<EventPacket> => {
       return new Promise((resolve, reject) => {
         let fulfilled = false;
+        let subscription: Subscription | null = null;
 
-        obs.subscribe({
+        const cleanup = () => {
+          if (subscription) {
+            subscription.unsubscribe();
+            subscription = null;
+          }
+        };
+
+        subscription = obs.subscribe({
           next: (v: EventPacket) => {
+            //console.log(v);
             if (fulfilled) {
               handleEvent(v);
             } else {
@@ -103,11 +110,15 @@ export function useReq3(): {
               fulfilled = true;
             }
           },
-          complete: () => status.set("success"),
+          complete: () => {
+            status.set("success");
+            cleanup();
+          },
           error: (e) => {
             console.error("[rx-nostr]", e);
             status.set("error");
             error.set(e);
+            cleanup();
 
             if (!fulfilled) {
               reject(e);
@@ -115,6 +126,9 @@ export function useReq3(): {
             }
           },
         });
+
+        // クリーンアップ関数を返す
+        return cleanup;
       });
     },
   });

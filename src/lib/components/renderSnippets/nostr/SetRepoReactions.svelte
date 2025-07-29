@@ -5,7 +5,7 @@
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
-  import { type Snippet } from "svelte";
+  import { untrack, type Snippet } from "svelte";
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
@@ -22,6 +22,7 @@
   // let lastUpdateTimestamp = Date.now() + 3000; // 初回は余裕を持たせる
   const updateInterval = 1000; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
+  let updating = false;
 
   let etagList: string[] = $state([]);
   let atagList: string[] = $state([]);
@@ -43,16 +44,24 @@
     debounceUpdate();
   });
 
+  $effect(() => {
+    if (etagList || atagList) {
+      untrack(() => debounceUpdate());
+    }
+  });
+
   function debounceUpdate() {
-    if (timeoutId) {
-      return; // clearTimeout(timeoutId);
+    if (updating) {
+      clearTimeout(timeoutId); // 前のタイマーをクリアして最後の1回だけ実行
     }
 
     timeoutId = setTimeout(() => {
       performUpdate();
       console.log(etagList.length, atagList.length);
-      timeoutId = undefined;
+      updating = false;
     }, updateInterval);
+
+    updating = true;
   }
 
   function performUpdate() {
