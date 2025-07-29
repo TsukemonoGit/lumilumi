@@ -11,11 +11,9 @@
   import { cubicInOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import Note from "$lib/components/NostrElements/kindEvents/Note.svelte";
   import RelayCard from "$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
 
   import {
-    Pin,
     ReceiptText,
     MessageSquareText,
     Zap,
@@ -36,10 +34,8 @@
   import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
 
-  import { parseNaddr, profile } from "$lib/func/util";
-  import { hexRegex, nip33Regex } from "$lib/func/regex";
+  import { profile } from "$lib/func/util";
 
-  import NaddrEvent from "$lib/components/NostrElements/kindEvents/NaddrEvent.svelte";
   import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
   import { page } from "$app/state";
@@ -52,6 +48,7 @@
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserMediaDisplay from "./UserMediaDisplay.svelte";
+  import PinList from "./PinList.svelte";
 
   interface Props {
     data: {
@@ -246,39 +243,8 @@
           class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >
           {#if $value === "post"}
-            <LatestEvent
-              queryKey={["pin", userPubkey]}
-              filters={[
-                {
-                  kinds: [10001],
-                  limit: 1,
-                  authors: [userPubkey],
-                },
-              ]}
-            >
-              {#snippet children({ event })}
-                {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
-                  <div>
-                    <Pin
-                      class="-rotate-45 text-magnum-400"
-                    />{#if e === "e"}<Note
-                        {id}
-                        displayMenu={true}
-                        depth={1}
-                        repostable={true}
-                      />{:else}
-                      <NaddrEvent
-                        data={parseNaddr([e, id])}
-                        displayMenu={true}
-                        depth={1}
-                        repostable={true}
-                        content={id}
-                      />
-                    {/if}
-                  </div>
-                {/each}
-              {/snippet}
-            </LatestEvent>
+            <PinList {userPubkey} />
+
             {#if since}
               <TimelineList
                 queryKey={timelineQuery}

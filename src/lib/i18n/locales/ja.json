@@ -408,5 +408,12 @@
   "data": {
     "nodata": "データがありません",
     "loading": "データを読み込み中..."
+  },
+  "pin": {
+    "delete": "このPINを削除してもよろしいですか？",
+    "invalid": "無効なIDです",
+    "label": "ピンするIDを入力",
+    "addTitle": "PIN追加",
+    "deleteTitle": "PIN削除"
   }
 }
