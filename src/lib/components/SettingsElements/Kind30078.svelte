@@ -215,15 +215,19 @@
       // timelineFilterの形式チェック
       const filter = loadData.timelineFilter;
       const isValidTimelineFilter =
+        filter &&
         typeof filter === "object" &&
-        filter !== null &&
-        !Array.isArray(filter) &&
         filter.global &&
         typeof filter.global === "object" &&
         filter.global !== null &&
+        filter.global !== undefined &&
         !Array.isArray(filter.global) &&
+        "excludeFollowee" in filter.global &&
+        "excludeConversation" in filter.global &&
         typeof filter.global.excludeFollowee === "boolean" &&
         typeof filter.global.excludeConversation === "boolean" &&
+        "adaptMute" in filter &&
+        "selectCanversation" in filter &&
         typeof filter.adaptMute === "boolean" &&
         typeof filter.selectCanversation === "boolean";
 
