@@ -83,7 +83,7 @@ export const viewMediaModal = writable<{
   mediaList: string[];
 }>();
 
-export const onlyFollowee = writable<boolean>(false);
+export const onlyFollowee = writable<boolean>(false); //通知欄
 //export const reactionList = writable<Nostr.Event[]>([]);
 export const reactionToast = writable<{
   title: string;

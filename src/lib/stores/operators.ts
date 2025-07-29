@@ -4,8 +4,6 @@ import type { OperatorFunction } from "rxjs";
 import { filter, from, map, mergeMap, of, pipe, scan, tap } from "rxjs";
 import {
   metadataQueue,
-  mutebykinds,
-  mutes,
   onlyFollowee,
   queryClient,
   reactionToast,
