@@ -166,9 +166,8 @@
 
       // console.log(queryClient.getQueryData(queryKey));
     }
-    setTimeout(() => {
-      debounceUpdate();
-    }, 100);
+
+    scheduleUpdate();
   }
   //リアクションしてないやつだけリアクションしたかどうか監視する感じで
   //リアクションボタン押したあとTLが読み込まれるまで判定できない（？）
@@ -406,12 +405,12 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 300; // 1秒（ミリ秒）
+  const updateInterval = 1000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
   let timeoutId: NodeJS.Timeout | undefined = undefined;
 
-  function debounceUpdate() {
+  function scheduleUpdate() {
     if (timeoutId) {
-      return; // clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
@@ -420,10 +419,14 @@
     }, updateInterval);
   }
 
+  viewEventIds.subscribe((value) => {
+    scheduleUpdate(); // viewEventIdsが変わったら500ms後に実行をスケジュール
+  });
+
   $effect(() => {
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
       untrack(() => {
-        debounceUpdate();
+        scheduleUpdate();
       });
     }
   });
@@ -464,7 +467,10 @@
       ) // EventPacket[]をチェック
       .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
       .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
-
+    /*    console.log("Updated:", {
+      repost: repost.length,
+      reaction: reaction.length,
+    }); */
     hasReactions = hasAnyReaction();
     timeoutId = undefined;
   }
