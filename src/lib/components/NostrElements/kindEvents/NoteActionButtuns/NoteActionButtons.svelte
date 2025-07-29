@@ -406,7 +406,7 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 300; // 1秒（ミリ秒）
+  const updateInterval = 500; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
 
   function debounceUpdate() {
