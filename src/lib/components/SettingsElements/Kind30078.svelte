@@ -212,35 +212,51 @@
     }
 
     if (loadData.timelineFilter) {
-      // timelineFilterの形式チェック
-      const filter = loadData.timelineFilter;
-      const isValidTimelineFilter =
-        filter &&
-        typeof filter === "object" &&
-        filter.global &&
-        typeof filter.global === "object" &&
-        filter.global !== null &&
-        filter.global !== undefined &&
-        !Array.isArray(filter.global) &&
-        "excludeFollowee" in filter.global &&
-        "excludeConversation" in filter.global &&
-        typeof filter.global.excludeFollowee === "boolean" &&
-        typeof filter.global.excludeConversation === "boolean" &&
-        "adaptMute" in filter &&
-        "selectCanversation" in filter &&
-        typeof filter.adaptMute === "boolean" &&
-        typeof filter.selectCanversation === "boolean";
+      // timelineFilterの安全な処理
+      try {
+        const filter = loadData.timelineFilter;
 
-      if (isValidTimelineFilter) {
+        // 基本的な存在チェック
+        if (!filter || typeof filter !== "object" || Array.isArray(filter)) {
+          throw new Error("Invalid filter object");
+        }
+
+        // 現行形式の厳密チェック
+        if (
+          !filter.global ||
+          typeof filter.global !== "object" ||
+          typeof filter.global.excludeFollowee !== "boolean" ||
+          typeof filter.global.excludeConversation !== "boolean" ||
+          typeof filter.adaptMute !== "boolean" ||
+          typeof filter.selectCanversation !== "boolean"
+        ) {
+          throw new Error("Invalid filter structure");
+        }
+
+        // 全チェック通過時のみ設定
         timelineFilter.set(filter);
-        localStorage?.setItem("timelineFilter", JSON.stringify(filter));
-      } else {
-        console.warn("Loaded timelineFilter format is invalid, using default");
-        timelineFilter.set({ ...timelineFilterInit });
-        localStorage?.setItem(
-          "timelineFilter",
-          JSON.stringify(timelineFilterInit)
+        try {
+          localStorage?.setItem("timelineFilter", JSON.stringify(filter));
+        } catch (e) {
+          console.warn("Failed to save loaded timelineFilter:", e);
+        }
+      } catch (error: any) {
+        console.warn(
+          "Loaded timelineFilter is invalid, using default:",
+          error.message
         );
+
+        // エラー時はデフォルト値を使用
+        const defaultFilter = { ...timelineFilterInit };
+        timelineFilter.set(defaultFilter);
+        try {
+          localStorage?.setItem(
+            "timelineFilter",
+            JSON.stringify(defaultFilter)
+          );
+        } catch (e) {
+          console.warn("Failed to save default timelineFilter:", e);
+        }
       }
     }
 

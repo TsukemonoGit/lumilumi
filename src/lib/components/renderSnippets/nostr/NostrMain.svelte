@@ -74,64 +74,67 @@
       $onlyFollowee = true;
     }
 
-    const timeline = localStorage.getItem("timelineFilter");
-    if (timeline && timeline !== "undefined" && timeline !== "null") {
-      try {
-        const parsed = JSON.parse(timeline);
+    // timelineFilterの処理を完全に独立させる
+    let timelineData = null;
+    try {
+      const timeline = localStorage.getItem("timelineFilter");
 
-        // 🛡️ 安全確認：オブジェクトでなければ即初期化
-        if (
-          typeof parsed !== "object" ||
-          parsed === null ||
-          Array.isArray(parsed)
-        ) {
-          throw new Error("timelineFilter is not a plain object");
-        }
-
-        // 現行の形式に合致するかチェック
-        const filter = parsed;
-        const isValidFormat =
-          filter &&
-          typeof filter === "object" &&
-          filter.global &&
-          typeof filter.global === "object" &&
-          filter.global !== null &&
-          filter.global !== undefined &&
-          !Array.isArray(filter.global) &&
-          "excludeFollowee" in filter.global &&
-          "excludeConversation" in filter.global &&
-          typeof filter.global.excludeFollowee === "boolean" &&
-          typeof filter.global.excludeConversation === "boolean" &&
-          "adaptMute" in filter &&
-          "selectCanversation" in filter &&
-          typeof filter.adaptMute === "boolean" &&
-          typeof filter.selectCanversation === "boolean";
-
-        if (isValidFormat) {
-          timelineFilter.set(filter);
-        } else {
-          // 現行形式でない場合は初期化
-          throw new Error("timelineFilter format is outdated");
-        }
-      } catch (error) {
-        console.warn(
-          "timelineFilter is corrupted or outdated, resetting",
-          error
-        );
-        localStorage.removeItem("timelineFilter");
-        timelineFilter.set({ ...timelineFilterInit });
-        localStorage.setItem(
-          "timelineFilter",
-          JSON.stringify(timelineFilterInit)
-        );
+      // 値の存在と妥当性を厳密にチェック
+      if (
+        !timeline ||
+        timeline === "undefined" ||
+        timeline === "null" ||
+        timeline === "" ||
+        timeline.length < 2
+      ) {
+        throw new Error("Invalid timeline data");
       }
-    } else {
-      // timelineFilterが存在しない場合は初期値を使用
-      timelineFilter.set({ ...timelineFilterInit });
-      localStorage.setItem(
-        "timelineFilter",
-        JSON.stringify(timelineFilterInit)
-      );
+
+      // JSON.parseを試行
+      timelineData = JSON.parse(timeline);
+
+      // パース結果の基本チェック
+      if (
+        !timelineData ||
+        typeof timelineData !== "object" ||
+        Array.isArray(timelineData)
+      ) {
+        throw new Error("Parsed data is not a valid object");
+      }
+
+      // 現行形式の厳密チェック
+      if (
+        !timelineData.global ||
+        typeof timelineData.global !== "object" ||
+        typeof timelineData.global.excludeFollowee !== "boolean" ||
+        typeof timelineData.global.excludeConversation !== "boolean" ||
+        typeof timelineData.adaptMute !== "boolean" ||
+        typeof timelineData.selectCanversation !== "boolean"
+      ) {
+        throw new Error("Data structure is invalid");
+      }
+
+      // 全てのチェックを通過した場合のみ設定
+      timelineFilter.set(timelineData);
+    } catch (error: any) {
+      console.warn("timelineFilter reset due to:", error.message);
+
+      // エラー時は確実にクリーンアップ
+      try {
+        localStorage.removeItem("timelineFilter");
+      } catch (e) {
+        console.warn("Failed to remove corrupted timelineFilter:", e);
+      }
+
+      // デフォルト値で初期化
+      const defaultFilter = { ...timelineFilterInit };
+      timelineFilter.set(defaultFilter);
+
+      try {
+        localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
+      } catch (e) {
+        console.warn("Failed to save default timelineFilter:", e);
+      }
     }
 
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
