@@ -89,16 +89,22 @@
         }
 
         // 現行の形式に合致するかチェック
+        const filter = parsed;
         const isValidFormat =
-          parsed.global &&
-          typeof parsed.global === "object" &&
-          typeof parsed.global.excludeFollowee === "boolean" &&
-          typeof parsed.global.excludeConversation === "boolean" &&
-          typeof parsed.adaptMute === "boolean" &&
-          typeof parsed.selectCanversation === "boolean";
+          typeof filter === "object" &&
+          filter !== null &&
+          !Array.isArray(filter) &&
+          filter.global &&
+          typeof filter.global === "object" &&
+          filter.global !== null &&
+          !Array.isArray(filter.global) &&
+          typeof filter.global.excludeFollowee === "boolean" &&
+          typeof filter.global.excludeConversation === "boolean" &&
+          typeof filter.adaptMute === "boolean" &&
+          typeof filter.selectCanversation === "boolean";
 
         if (isValidFormat) {
-          timelineFilter.set(parsed);
+          timelineFilter.set(filter);
         } else {
           // 現行形式でない場合は初期化
           throw new Error("timelineFilter format is outdated");

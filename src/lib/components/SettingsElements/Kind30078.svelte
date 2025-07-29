@@ -213,24 +213,23 @@
 
     if (loadData.timelineFilter) {
       // timelineFilterの形式チェック
+      const filter = loadData.timelineFilter;
       const isValidTimelineFilter =
-        typeof loadData.timelineFilter === "object" &&
-        loadData.timelineFilter !== null &&
-        !Array.isArray(loadData.timelineFilter) &&
-        loadData.timelineFilter.global &&
-        typeof loadData.timelineFilter.global === "object" &&
-        typeof loadData.timelineFilter.global.excludeFollowee === "boolean" &&
-        typeof loadData.timelineFilter.global.excludeConversation ===
-          "boolean" &&
-        typeof loadData.timelineFilter.adaptMute === "boolean" &&
-        typeof loadData.timelineFilter.selectCanversation === "boolean";
+        typeof filter === "object" &&
+        filter !== null &&
+        !Array.isArray(filter) &&
+        filter.global &&
+        typeof filter.global === "object" &&
+        filter.global !== null &&
+        !Array.isArray(filter.global) &&
+        typeof filter.global.excludeFollowee === "boolean" &&
+        typeof filter.global.excludeConversation === "boolean" &&
+        typeof filter.adaptMute === "boolean" &&
+        typeof filter.selectCanversation === "boolean";
 
       if (isValidTimelineFilter) {
-        timelineFilter.set(loadData.timelineFilter);
-        localStorage?.setItem(
-          "timelineFilter",
-          JSON.stringify(loadData.timelineFilter)
-        );
+        timelineFilter.set(filter);
+        localStorage?.setItem("timelineFilter", JSON.stringify(filter));
       } else {
         console.warn("Loaded timelineFilter format is invalid, using default");
         timelineFilter.set({ ...timelineFilterInit });
