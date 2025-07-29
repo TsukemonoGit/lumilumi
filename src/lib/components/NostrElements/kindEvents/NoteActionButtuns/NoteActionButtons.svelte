@@ -406,7 +406,7 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 500; // 1秒（ミリ秒）
+  const updateInterval = 300; // 1秒（ミリ秒）
   let timeoutId: NodeJS.Timeout | undefined = undefined;
 
   function debounceUpdate() {
@@ -419,10 +419,6 @@
       timeoutId = undefined;
     }, updateInterval);
   }
-
-  viewEventIds.subscribe((value) => {
-    debounceUpdate();
-  });
 
   $effect(() => {
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
