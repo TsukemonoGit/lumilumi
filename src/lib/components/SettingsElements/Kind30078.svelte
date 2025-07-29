@@ -7,11 +7,12 @@
 
   import { getQueryRelays, setTheme } from "$lib/func/settings";
   import type { EventPacket, DefaultRelayConfig } from "rx-nostr";
-  import type {
-    Kind30078LumiSetting,
-    Kind30078LumiSettingObj,
-    LumiSetting,
-    Theme,
+  import {
+    timelineFilterInit,
+    type Kind30078LumiSetting,
+    type Kind30078LumiSettingObj,
+    type LumiSetting,
+    type Theme,
   } from "$lib/types";
   import { now } from "rx-nostr/src";
   import type { EventParameters } from "nostr-typedef";
@@ -207,16 +208,37 @@
 
     if (loadData.theme) {
       setTheme(loadData.theme as Theme);
-
       localStorage?.setItem("theme", loadData.theme);
     }
 
     if (loadData.timelineFilter) {
-      timelineFilter.set(loadData.timelineFilter);
-      localStorage?.setItem(
-        "timelineFilter",
-        JSON.stringify(loadData.timelineFilter)
-      );
+      // timelineFilterの形式チェック
+      const isValidTimelineFilter =
+        typeof loadData.timelineFilter === "object" &&
+        loadData.timelineFilter !== null &&
+        !Array.isArray(loadData.timelineFilter) &&
+        loadData.timelineFilter.global &&
+        typeof loadData.timelineFilter.global === "object" &&
+        typeof loadData.timelineFilter.global.excludeFollowee === "boolean" &&
+        typeof loadData.timelineFilter.global.excludeConversation ===
+          "boolean" &&
+        typeof loadData.timelineFilter.adaptMute === "boolean" &&
+        typeof loadData.timelineFilter.selectCanversation === "boolean";
+
+      if (isValidTimelineFilter) {
+        timelineFilter.set(loadData.timelineFilter);
+        localStorage?.setItem(
+          "timelineFilter",
+          JSON.stringify(loadData.timelineFilter)
+        );
+      } else {
+        console.warn("Loaded timelineFilter format is invalid, using default");
+        timelineFilter.set({ ...timelineFilterInit });
+        localStorage?.setItem(
+          "timelineFilter",
+          JSON.stringify(timelineFilterInit)
+        );
+      }
     }
 
     if (loadData.uploader) {
