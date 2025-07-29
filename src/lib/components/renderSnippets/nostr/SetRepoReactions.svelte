@@ -1,11 +1,20 @@
 <script lang="ts">
   import { useRepReactionList } from "$lib/stores/useRepReactionList";
 
+  import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
 
   import { changeEmit } from "$lib/func/reactions";
-  import { untrack } from "svelte";
+  import { untrack, type Snippet } from "svelte";
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
+
+  interface Props {
+    error?: Snippet;
+    nodata?: Snippet;
+    content?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
+    loading?: Snippet;
+  }
+  let { error, nodata, content, loading }: Props = $props();
 
   let filters: Nostr.Filter[] = [];
   let result: { data: any; status: any; error: any };
@@ -101,6 +110,10 @@
 
   result = useRepReactionList();
 
+  let data = $derived(result?.data);
+  let status = $derived(result?.status);
+  let errorData = $derived(result?.error);
+
   //なんかたまにリアクション取得されないときの対策でビジブル変わったときにフィルター再設置してみる
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
@@ -110,3 +123,13 @@
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
+
+{#if $errorData}
+  {@render error?.()}
+{:else if $data}
+  {@render content?.({ events: $data.event, status: status })}
+{:else if $status === "loading"}
+  {@render loading?.()}
+{:else}
+  {@render nodata?.()}
+{/if}
