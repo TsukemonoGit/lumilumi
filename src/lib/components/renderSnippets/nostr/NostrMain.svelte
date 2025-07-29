@@ -79,15 +79,26 @@
       try {
         const parsed = JSON.parse(timeline);
 
-        // ← ここが抜けていると Safari だけ死ぬ
+        // 🛡️ 安全確認：オブジェクトでなければ即初期化
         if (
           typeof parsed !== "object" ||
           parsed === null ||
           Array.isArray(parsed)
         ) {
-          throw new Error(
-            "Invalid format: timelineFilter is not a plain object"
-          );
+          throw new Error("timelineFilter is not a plain object");
+        }
+
+        // 🛡️ 不正な値パターンも弾く（必要に応じて強化）
+        if (
+          "excludeFollowee" in parsed &&
+          typeof parsed.excludeFollowee === "string"
+        ) {
+          if (
+            parsed.excludeFollowee !== "true" &&
+            parsed.excludeFollowee !== "false"
+          ) {
+            throw new Error("excludeFollowee has invalid string value");
+          }
         }
 
         let migrated = { ...parsed };
@@ -141,14 +152,12 @@
         }
 
         timelineFilter.set(migrated);
-
-        // マイグレーション後の設定をローカルストレージに保存
         if (needsSave) {
           localStorage.setItem("timelineFilter", JSON.stringify(migrated));
         }
       } catch (error) {
-        console.log("timelineFilter parse error");
-        // エラー時は初期値で初期化
+        console.warn("timelineFilter is corrupted, resetting", error);
+        localStorage.removeItem("timelineFilter");
         timelineFilter.set({ ...timelineFilterInit });
         localStorage.setItem(
           "timelineFilter",
