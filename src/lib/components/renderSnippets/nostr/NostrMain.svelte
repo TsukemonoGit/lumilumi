@@ -73,24 +73,25 @@
     if (followee === "true") {
       $onlyFollowee = true;
     }
-    // onMount内のtimelineFilter初期化部分を以下に置き換え
 
     const timeline = localStorage.getItem("timelineFilter");
     if (timeline) {
       try {
         const parsed = JSON.parse(timeline);
-
-        // マイグレーション処理
         let migrated = { ...parsed };
         let needsSave = false;
 
-        // 旧バージョンのglobalExcludeFolloweeが存在する場合
-        if ("globalExcludeFollowee" in migrated && !migrated.global) {
+        // 旧形式の検出とマイグレーション
+        // 旧形式：excludeFolloweeがトップレベルにある
+        // 新形式：globalオブジェクト内にある
+        if ("excludeFollowee" in migrated && !migrated.global) {
+          // 旧形式から新形式への移行
           migrated.global = {
-            excludeFollowee: migrated.globalExcludeFollowee,
-            excludeConversation: timelineFilterInit.global.excludeConversation,
+            excludeFollowee: migrated.excludeFollowee || false,
+            excludeConversation:
+              timelineFilterInit.global.excludeConversation || false,
           };
-          delete migrated.globalExcludeFollowee;
+          delete migrated.excludeFollowee;
           needsSave = true;
         }
 
@@ -105,7 +106,8 @@
           needsSave = true;
         }
 
-        if (!migrated.global) {
+        // globalオブジェクトの確認と補完
+        if (!migrated.global || typeof migrated.global !== "object") {
           migrated.global = { ...timelineFilterInit.global };
           needsSave = true;
         } else {
@@ -151,18 +153,10 @@
     if (savedSettings) {
       applySavedSettings(savedSettings);
     } else {
-      // if (page.url.pathname === "/") {
-      //   //ホームに居るときだけ設定ないときは設定に飛ばす
-      //   goto("/settings");
-      // } else {
-      //設定なし。閲覧モードのときは画像表示してみる
-      /*    lumiSetting.update((cur) => {
-          return { ...cur, showImg: true };
-        }); */
-      // }
+      // 省略...
     }
 
-    nowLoading = false; // 初期化処理が完了したらローディングを終了
+    nowLoading = false;
     console.log($defaultRelays);
   });
 

@@ -228,20 +228,34 @@
   const checkGlobalFilter = (note: Nostr.Event): boolean => {
     let check = true;
 
-    if (timelineFilter.get().global.excludeFollowee) {
-      check = !followList.get().has(note.pubkey);
+    const filter = timelineFilter.get();
+    const global = filter?.global;
+
+    if (!global) {
+      return check;
     }
-    if (
-      timelineFilter.get().global.excludeConversation &&
-      (note.kind === 1 || note.kind === 42)
-    ) {
-      const pTags: string[] = note.tags
-        .filter(
-          (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
-        )
-        .map((tag) => tag[1]);
-      if (pTags.length > 0) {
-        check = false;
+
+    if (global.excludeFollowee) {
+      const followListData = followList.get();
+      if (followListData && followListData.has) {
+        check = !followListData.has(note.pubkey);
+      }
+    }
+
+    if (global.excludeConversation && (note.kind === 1 || note.kind === 42)) {
+      if (Array.isArray(note.tags)) {
+        const pTags: string[] = note.tags
+          .filter(
+            (tag) =>
+              Array.isArray(tag) &&
+              tag[0] === "p" &&
+              tag.length > 1 &&
+              tag[1] !== note.pubkey
+          )
+          .map((tag) => tag[1]);
+        if (pTags.length > 0) {
+          check = false;
+        }
       }
     }
     return check;
