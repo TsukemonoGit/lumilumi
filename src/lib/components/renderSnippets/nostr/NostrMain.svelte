@@ -88,75 +88,32 @@
           throw new Error("timelineFilter is not a plain object");
         }
 
-        // 🛡️ 不正な値パターンも弾く（必要に応じて強化）
-        if (
-          "excludeFollowee" in parsed &&
-          typeof parsed.excludeFollowee === "string"
-        ) {
-          if (
-            parsed.excludeFollowee !== "true" &&
-            parsed.excludeFollowee !== "false"
-          ) {
-            throw new Error("excludeFollowee has invalid string value");
-          }
-        }
+        // 現行の形式に合致するかチェック
+        const filter = parsed;
+        const isValidFormat =
+          typeof filter === "object" &&
+          filter !== null &&
+          !Array.isArray(filter) &&
+          filter.global &&
+          typeof filter.global === "object" &&
+          filter.global !== null &&
+          !Array.isArray(filter.global) &&
+          typeof filter.global.excludeFollowee === "boolean" &&
+          typeof filter.global.excludeConversation === "boolean" &&
+          typeof filter.adaptMute === "boolean" &&
+          typeof filter.selectCanversation === "boolean";
 
-        let migrated = { ...parsed };
-        let needsSave = false;
-
-        // excludeFolloweeマイグレーション
-        if (
-          Object.prototype.hasOwnProperty.call(migrated, "excludeFollowee") &&
-          !migrated.global
-        ) {
-          migrated.global = {
-            excludeFollowee: !!migrated.excludeFollowee,
-            excludeConversation:
-              timelineFilterInit.global.excludeConversation || false,
-          };
-          try {
-            delete migrated.excludeFollowee;
-          } catch (e) {
-            console.warn("Failed to delete excludeFollowee", e);
-          }
-          needsSave = true;
-        }
-
-        // 各プロパティのデフォルト値設定
-        if (migrated.adaptMute === undefined) {
-          migrated.adaptMute = timelineFilterInit.adaptMute;
-          needsSave = true;
-        }
-
-        if (migrated.selectCanversation === undefined) {
-          migrated.selectCanversation = timelineFilterInit.selectCanversation;
-          needsSave = true;
-        }
-
-        // globalオブジェクトの確認と補完
-        if (!migrated.global || typeof migrated.global !== "object") {
-          migrated.global = { ...timelineFilterInit.global };
-          needsSave = true;
+        if (isValidFormat) {
+          timelineFilter.set(filter);
         } else {
-          // globalオブジェクト内の不足プロパティを補完
-          if (migrated.global.excludeFollowee === undefined) {
-            migrated.global.excludeFollowee =
-              timelineFilterInit.global.excludeFollowee;
-            needsSave = true;
-          }
-          if (migrated.global.excludeConversation === undefined) {
-            migrated.global.excludeConversation =
-              timelineFilterInit.global.excludeConversation;
-            needsSave = true;
-          }
-        }
-
-        timelineFilter.set(migrated);
-        if (needsSave) {
-          localStorage.setItem("timelineFilter", JSON.stringify(migrated));
+          // 現行形式でない場合は初期化
+          throw new Error("timelineFilter format is outdated");
         }
       } catch (error) {
-        console.warn("timelineFilter is corrupted, resetting", error);
+        console.warn(
+          "timelineFilter is corrupted or outdated, resetting",
+          error
+        );
         localStorage.removeItem("timelineFilter");
         timelineFilter.set({ ...timelineFilterInit });
         localStorage.setItem(
