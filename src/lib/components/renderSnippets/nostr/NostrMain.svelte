@@ -85,7 +85,10 @@
         let needsSave = false;
 
         // 旧バージョンのglobalExcludeFolloweeが存在する場合
-        if ("globalExcludeFollowee" in migrated && !migrated.global) {
+        if (
+          "globalExcludeFollowee" in migrated &&
+          (!migrated.global || typeof migrated.global !== "object")
+        ) {
           migrated.global = {
             excludeFollowee: migrated.globalExcludeFollowee,
             excludeConversation: timelineFilterInit.global.excludeConversation,
@@ -105,7 +108,7 @@
           needsSave = true;
         }
 
-        if (!migrated.global) {
+        if (!migrated.global || typeof migrated.global !== "object") {
           migrated.global = { ...timelineFilterInit.global };
           needsSave = true;
         } else {
@@ -157,8 +160,8 @@
       // } else {
       //設定なし。閲覧モードのときは画像表示してみる
       /*    lumiSetting.update((cur) => {
-          return { ...cur, showImg: true };
-        }); */
+         return { ...cur, showImg: true };
+       }); */
       // }
     }
 

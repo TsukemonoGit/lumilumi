@@ -4,11 +4,12 @@
 
   const onChangeExcludeFollowee = () => {
     timelineFilter.update((cur) => {
+      const currentGlobal = cur?.global || {};
       const tlFilter = {
         ...cur,
         global: {
-          ...cur.global,
-          excludeFollowee: !cur.global.excludeFollowee,
+          ...currentGlobal,
+          excludeFollowee: !currentGlobal.excludeFollowee,
         },
       };
       localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
@@ -18,11 +19,12 @@
 
   const onChangeExcludeConversation = () => {
     timelineFilter.update((cur) => {
+      const currentGlobal = cur?.global || {};
       const tlFilter = {
         ...cur,
         global: {
-          ...cur.global,
-          excludeConversation: !cur.global.excludeConversation,
+          ...currentGlobal,
+          excludeConversation: !currentGlobal.excludeConversation,
         },
       };
       localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
@@ -36,19 +38,19 @@
     <input
       type="checkbox"
       class="rounded-checkbox"
-      checked={timelineFilter.get().global?.excludeConversation || false}
+      checked={timelineFilter.get()?.global?.excludeConversation || false}
       onchange={onChangeExcludeConversation}
     />
     {$_("filter.canversation.none")}
   </label>
 </li>
-{#if followList.get() !== undefined && followList.get().size > 0}
+{#if followList.get()?.size > 0}
   <li class="mb-2">
     <label class="label">
       <input
         type="checkbox"
         class="rounded-checkbox"
-        checked={timelineFilter.get().global?.excludeFollowee || false}
+        checked={timelineFilter.get()?.global?.excludeFollowee || false}
         onchange={onChangeExcludeFollowee}
       />
       {$_("filter.menu.globalExcludeFollowee")}
