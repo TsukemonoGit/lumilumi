@@ -224,41 +224,57 @@
   $effect(() => {
     reinitializeTimeline();
   });
-
   const checkGlobalFilter = (note: Nostr.Event): boolean => {
-    let check = true;
+    try {
+      let check = true;
 
-    const filter = timelineFilter.get();
-    const global = filter?.global;
+      const filter = timelineFilter.get();
+      const global = filter?.global;
 
-    if (!global) {
-      return check;
-    }
-
-    if (global.excludeFollowee) {
-      const followListData = followList.get();
-      if (followListData && followListData.has) {
-        check = !followListData.has(note.pubkey);
+      if (!global) {
+        return check;
       }
-    }
 
-    if (global.excludeConversation && (note.kind === 1 || note.kind === 42)) {
-      if (Array.isArray(note.tags)) {
-        const pTags: string[] = note.tags
-          .filter(
-            (tag) =>
-              Array.isArray(tag) &&
-              tag[0] === "p" &&
-              tag.length > 1 &&
-              tag[1] !== note.pubkey
-          )
-          .map((tag) => tag[1]);
-        if (pTags.length > 0) {
-          check = false;
+      if (global.excludeFollowee) {
+        try {
+          const followListData = followList.get();
+          if (followListData && typeof followListData.has === "function") {
+            check = !followListData.has(note.pubkey);
+          }
+        } catch (e) {
+          console.warn("Error checking followee filter:", e);
+          // フォローリストチェックでエラーが出ても処理を続行
         }
       }
+
+      if (global.excludeConversation && (note.kind === 1 || note.kind === 42)) {
+        try {
+          if (Array.isArray(note.tags)) {
+            const pTags: string[] = note.tags
+              .filter(
+                (tag) =>
+                  Array.isArray(tag) &&
+                  tag[0] === "p" &&
+                  tag.length > 1 &&
+                  tag[1] !== note.pubkey
+              )
+              .map((tag) => tag[1]);
+            if (pTags.length > 0) {
+              check = false;
+            }
+          }
+        } catch (e) {
+          console.warn("Error checking conversation filter:", e);
+          // 会話フィルターでエラーが出ても処理を続行
+        }
+      }
+
+      return check;
+    } catch (error) {
+      console.warn("Error in checkGlobalFilter:", error);
+      // エラー時はフィルタリングしない（投稿を表示）
+      return true;
     }
-    return check;
   };
 </script>
 

@@ -78,20 +78,36 @@
     if (timeline) {
       try {
         const parsed = JSON.parse(timeline);
+
+        // ← ここが抜けていると Safari だけ死ぬ
+        if (
+          typeof parsed !== "object" ||
+          parsed === null ||
+          Array.isArray(parsed)
+        ) {
+          throw new Error(
+            "Invalid format: timelineFilter is not a plain object"
+          );
+        }
+
         let migrated = { ...parsed };
         let needsSave = false;
 
-        // 旧形式の検出とマイグレーション
-        // 旧形式：excludeFolloweeがトップレベルにある
-        // 新形式：globalオブジェクト内にある
-        if ("excludeFollowee" in migrated && !migrated.global) {
-          // 旧形式から新形式への移行
+        // excludeFolloweeマイグレーション
+        if (
+          Object.prototype.hasOwnProperty.call(migrated, "excludeFollowee") &&
+          !migrated.global
+        ) {
           migrated.global = {
-            excludeFollowee: migrated.excludeFollowee || false,
+            excludeFollowee: !!migrated.excludeFollowee,
             excludeConversation:
               timelineFilterInit.global.excludeConversation || false,
           };
-          delete migrated.excludeFollowee;
+          try {
+            delete migrated.excludeFollowee;
+          } catch (e) {
+            console.warn("Failed to delete excludeFollowee", e);
+          }
           needsSave = true;
         }
 
