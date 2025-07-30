@@ -101,35 +101,42 @@
     } else {
       initializeSettings(); //nostr-loginよぶだけ
     }
-
-    const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
-    const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
-    const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
-    //console.log(mute);
-    $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-    //console.log($mutes);
-    $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
-    $mutebykinds = mutebykind
-      ? (JSON.parse(mutebykind) as LumiMuteByKind)
-      : initLumiMuteByKind;
+    try {
+      const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
+      const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
+      const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
+      //console.log(mute);
+      $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
+      //console.log($mutes);
+      $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
+      $mutebykinds = mutebykind
+        ? (JSON.parse(mutebykind) as LumiMuteByKind)
+        : initLumiMuteByKind;
+    } catch (error) {
+      console.log("failed to load");
+    }
 
     originalSettings = $state.snapshot(settings);
   });
 
   function loadSettings() {
-    let savedSettings = localStorage.getItem(LUMI_STORAGE_KEY);
-    if (savedSettings) {
-      try {
-        const loadSet = JSON.parse(savedSettings);
+    try {
+      let savedSettings = localStorage.getItem(LUMI_STORAGE_KEY);
+      if (savedSettings) {
+        try {
+          const loadSet = JSON.parse(savedSettings);
 
-        $relaySetValue = loadSet.useRelaySet; //ラジオボタンの状態更新
+          $relaySetValue = loadSet.useRelaySet; //ラジオボタンの状態更新
 
-        // originalSettings.set({ ...loadSet });
-        return loadSet;
-      } catch (error) {
+          // originalSettings.set({ ...loadSet });
+          return loadSet;
+        } catch (error) {
+          return null;
+        }
+      } else {
         return null;
       }
-    } else {
+    } catch (error) {
       return null;
     }
   }

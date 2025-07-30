@@ -76,14 +76,18 @@
 
     const data: Record<string, any> = {};
     keys.forEach((key) => {
-      const value = localStorage.getItem(key);
-      if (value) {
-        try {
-          data[key] = JSON.parse(value);
-        } catch {
-          data[key] = value; // JSONパースできない場合は文字列として保存
+      try {
+        const value = localStorage.getItem(key);
+        if (value) {
+          try {
+            data[key] = JSON.parse(value);
+          } catch {
+            data[key] = value; // JSONパースできない場合は文字列として保存
+          }
+        } else {
+          data[key] = null;
         }
-      } else {
+      } catch (error) {
         data[key] = null;
       }
     });
@@ -185,10 +189,12 @@
 
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
     addDebugLog(`Saved settings loaded: ${savedSettings ? "exists" : "null"}`);
-
-    loadMutetokanoSettei();
-    addDebugLog("Mute settings loaded");
-
+    try {
+      loadMutetokanoSettei();
+      addDebugLog("Mute settings loaded");
+    } catch (error) {
+      addDebugLog("Error: Failed to load Mute settings");
+    }
     if (savedSettings) {
       applySavedSettings(savedSettings);
       addDebugLog("Saved settings applied");
@@ -241,12 +247,16 @@
   }
 
   function loadSettingsFromLocalStorage(): LumiSetting | null {
-    const savedSettings = localStorage.getItem(STORAGE_KEY);
-    addDebugLog(
-      `Loading settings from localStorage: ${savedSettings ? "exists" : "null"}`
-    );
-    //console.log(savedSettings);
-    return savedSettings ? (JSON.parse(savedSettings) as LumiSetting) : null;
+    try {
+      const savedSettings = localStorage.getItem(STORAGE_KEY);
+      addDebugLog(
+        `Loading settings from localStorage: ${savedSettings ? "exists" : "null"}`
+      );
+      //console.log(savedSettings);
+      return savedSettings ? (JSON.parse(savedSettings) as LumiSetting) : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function applySavedSettings(settings: LumiSetting) {
@@ -309,26 +319,29 @@
         console.log(error);
       }
     }
+    try {
+      //bookmark
+      const bookmark = localStorage.getItem(BOOKMARK_STORAGE_KEY);
+      addDebugLog(`Bookmark data: ${bookmark ? "exists" : "null"}`);
 
-    //bookmark
-    const bookmark = localStorage.getItem(BOOKMARK_STORAGE_KEY);
-    addDebugLog(`Bookmark data: ${bookmark ? "exists" : "null"}`);
-
-    if (bookmark) {
-      try {
-        const parsedData: EventPacket = JSON.parse(bookmark);
-        if (parsedData) {
-          const queryKey: QueryKey = [
-            "naddr",
-            `${10003}:${parsedData.event.pubkey}:`,
-          ];
-          queryClient.setQueryData(queryKey, parsedData);
-          bookmark10003.set(parsedData.event);
-          addDebugLog("Bookmark data loaded and set");
+      if (bookmark) {
+        try {
+          const parsedData: EventPacket = JSON.parse(bookmark);
+          if (parsedData) {
+            const queryKey: QueryKey = [
+              "naddr",
+              `${10003}:${parsedData.event.pubkey}:`,
+            ];
+            queryClient.setQueryData(queryKey, parsedData);
+            bookmark10003.set(parsedData.event);
+            addDebugLog("Bookmark data loaded and set");
+          }
+        } catch (error) {
+          addDebugLog(`Error loading bookmark: ${error}`);
         }
-      } catch (error) {
-        addDebugLog(`Error loading bookmark: ${error}`);
       }
+    } catch (error) {
+      addDebugLog(`Error loading bookmark: ${error}`);
     }
   }
 

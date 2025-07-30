@@ -113,28 +113,30 @@ export function getDefaultWriteRelays(): string[] {
 //metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
   if (followList.get().size > 0) {
-    // まず、現在のローカルストレージのデータを取得
-    const metadataStr = localStorage.getItem("metadata");
-    let currentMetadata: [QueryKey, EventPacket][] = metadataStr
-      ? JSON.parse(metadataStr)
-      : [];
-    let metadataChanged = false;
-    while (queue.length > 0) {
-      const [key, data] = queue.shift()!;
-      const [changed, savedMetadata] = saveMetadataToLocalStorage(
-        currentMetadata,
-        key,
-        data
-      );
-      if (changed) {
-        metadataChanged = true;
+    try {
+      // まず、現在のローカルストレージのデータを取得
+      const metadataStr = localStorage.getItem("metadata");
+      let currentMetadata: [QueryKey, EventPacket][] = metadataStr
+        ? JSON.parse(metadataStr)
+        : [];
+      let metadataChanged = false;
+      while (queue.length > 0) {
+        const [key, data] = queue.shift()!;
+        const [changed, savedMetadata] = saveMetadataToLocalStorage(
+          currentMetadata,
+          key,
+          data
+        );
+        if (changed) {
+          metadataChanged = true;
+        }
+        currentMetadata = savedMetadata;
       }
-      currentMetadata = savedMetadata;
-    }
-    if (metadataChanged) {
-      localStorage?.setItem("metadata", JSON.stringify(currentMetadata));
-      metadataChanged = false;
-    }
+      if (metadataChanged) {
+        localStorage?.setItem("metadata", JSON.stringify(currentMetadata));
+        metadataChanged = false;
+      }
+    } catch (error) {}
   }
 });
 
@@ -213,19 +215,23 @@ const saveMetadataToLocalStorage = (
 };
 
 export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
-  const metadataStr = localStorage.getItem("metadata");
-  if (!metadataStr) {
-    return;
+  try {
+    const metadataStr = localStorage.getItem("metadata");
+    if (!metadataStr) {
+      return;
+    }
+
+    const metadata: [QueryKey, EventPacket][] = JSON.parse(metadataStr);
+
+    // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
+    const result = metadata.find(
+      ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
+    );
+    //console.log(result);
+    return result ? result[1] : undefined;
+  } catch (error) {
+    return undefined;
   }
-
-  const metadata: [QueryKey, EventPacket][] = JSON.parse(metadataStr);
-
-  // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
-  const result = metadata.find(
-    ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
-  );
-  //console.log(result);
-  return result ? result[1] : undefined;
 };
 
 export function generateRandomId(length: number = 6): string {
