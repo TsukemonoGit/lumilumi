@@ -57,7 +57,6 @@
 
   onMount(() => {
     try {
-      console.log($defaultRelays);
       initializeRxNostr();
 
       const followee = localStorage.getItem("onlyFollowee");
@@ -125,9 +124,17 @@
       }
     } catch (e) {
       console.error("Unexpected error in onMount:", e);
-    } finally {
-      nowLoading = false;
     }
+
+    const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
+    loadMutetokanoSettei();
+
+    if (savedSettings) {
+      applySavedSettings(savedSettings);
+    }
+
+    nowLoading = false;
+    console.log($defaultRelays);
   });
 
   function initializeRxNostr() {
