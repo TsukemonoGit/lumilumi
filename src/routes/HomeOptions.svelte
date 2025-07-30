@@ -27,10 +27,15 @@
     if (value !== undefined && value !== null) {
       timelineFilter.update((cur) => {
         console.log(cur);
-        const tlFilter = { ...cur, selectCanversation: Number(value) };
-        localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+        try {
+          const tlFilter = { ...cur, selectCanversation: Number(value) };
+          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
 
-        return tlFilter;
+          return tlFilter;
+        } catch (error) {
+          console.log("Failed to save");
+          return cur;
+        }
       });
     }
   });

@@ -184,18 +184,27 @@
     if (isRelaySelectionInvalid()) return;
     if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
     $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
-    localStorage.setItem(LUMI_STORAGE_KEY, JSON.stringify(settings));
+    try {
+      localStorage.setItem(LUMI_STORAGE_KEY, JSON.stringify(settings));
 
-    $nowProgress = true;
-    toastSettings.set({
-      title: "Success",
-      description: `${$_("settings.refreshPage")}`,
-      color: "bg-green-500",
-    });
+      $nowProgress = true;
+      toastSettings.set({
+        title: "Success",
+        description: `${$_("settings.refreshPage")}`,
+        color: "bg-green-500",
+      });
 
-    updateStores(settings);
+      updateStores(settings);
 
-    originalSettings = $state.snapshot(settings);
+      originalSettings = $state.snapshot(settings);
+    } catch (error) {
+      toastSettings.set({
+        title: "Error",
+        description: `Failed to save`,
+        color: "bg-red-500",
+      });
+    }
+
     //  location.reload();
     $nowProgress = false;
   }

@@ -350,7 +350,11 @@
     invoiceOpen?.(true);
 
     //サップの量保存
-    localStorage.setItem("zap", zapAmount.toString());
+    try {
+      localStorage.setItem("zap", zapAmount.toString());
+    } catch (error) {
+      console.log("Failed to save zap amount to localStorage.");
+    }
   };
 
   const onClickReplyIcon = () => {

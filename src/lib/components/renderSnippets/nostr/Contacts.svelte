@@ -100,7 +100,11 @@
   $effect(() => {
     if (kind3Data && pubkey === lumiSetting.get().pubkey) {
       untrack(() => {
-        localStorage.setItem(kind3key, JSON.stringify(kind3Data));
+        try {
+          localStorage.setItem(kind3key, JSON.stringify(kind3Data));
+        } catch (error) {
+          console.log("failed to save localStorage");
+        }
         const pubkeyList = pubkeysIn(kind3Data, lumiSetting.get().pubkey);
         followList.set(pubkeyList);
       });

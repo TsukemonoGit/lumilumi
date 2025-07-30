@@ -116,11 +116,15 @@
               pubkey: pub,
             };
           });
-          //設定ない人で公開鍵ログインされたらそれで設定保存する
-          localStorage.setItem(
-            LUMI_STORAGE_KEY,
-            JSON.stringify(lumiSetting.get())
-          );
+          try {
+            //設定ない人で公開鍵ログインされたらそれで設定保存する
+            localStorage.setItem(
+              LUMI_STORAGE_KEY,
+              JSON.stringify(lumiSetting.get())
+            );
+          } catch (error) {
+            console.log("Failed to save");
+          }
           setUserRelay();
         }
       }

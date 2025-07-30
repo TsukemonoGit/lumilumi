@@ -75,8 +75,11 @@
         ),
         updated: Math.floor(Date.now() / 1000),
       };
-
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("Failed to save");
+      }
     } else {
       $toastSettings = {
         title: "Warning",

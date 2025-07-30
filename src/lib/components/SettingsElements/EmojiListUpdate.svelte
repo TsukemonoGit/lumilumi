@@ -188,8 +188,11 @@
       updated: Math.floor(Date.now() / 1000),
       event: kind10030event,
     };
-
-    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+    try {
+      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+    } catch (error) {
+      console.log("failed to save localStorage");
+    }
     rxNostr.dispose();
     $nowProgress = false;
 

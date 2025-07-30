@@ -130,7 +130,11 @@
       event: kind10000,
     };
     // $mutes = $mutes;
-    localStorage.setItem("lumiMute", JSON.stringify($mutes));
+    try {
+      localStorage.setItem("lumiMute", JSON.stringify($mutes));
+    } catch (error) {
+      console.log("failed to save localStorage");
+    }
     $nowProgress = false;
   }
 </script>
