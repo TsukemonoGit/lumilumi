@@ -41,7 +41,7 @@
 
 {#if relayUrl}
   <div class="rounded-md border border-magnum-500">
-    <RelayCard url={relayUrl} write={false} read={false} />
+    <RelayCard url={relayUrl} write={false} read={false} zIndex={10} />
   </div>
 
   <GlobalTimeline globalRelays={[relayUrl]} timelineQuery={[relayUrl]} />
