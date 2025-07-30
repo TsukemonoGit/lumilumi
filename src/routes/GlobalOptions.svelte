@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t as _ } from "@konemono/svelte5-i18n";
   import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { browser } from "$app/environment";
 
   const onChangeExcludeFollowee = () => {
     timelineFilter.update((cur) => {
@@ -12,7 +13,13 @@
           excludeFollowee: !currentGlobal.excludeFollowee,
         },
       };
-      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      try {
+        if (browser) {
+          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+        }
+      } catch (error: any) {
+        console.warn("Failed to save timelineFilter:", error);
+      }
       return tlFilter;
     });
   };
@@ -27,7 +34,13 @@
           excludeConversation: !currentGlobal.excludeConversation,
         },
       };
-      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      try {
+        if (browser) {
+          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+        }
+      } catch (error: any) {
+        console.warn("Failed to save timelineFilter:", error);
+      }
       return tlFilter;
     });
   };
@@ -38,7 +51,7 @@
     <input
       type="checkbox"
       class="rounded-checkbox"
-      checked={timelineFilter.get()?.global?.excludeConversation || false}
+      checked={timelineFilter.get()?.global?.excludeConversation ?? false}
       onchange={onChangeExcludeConversation}
     />
     {$_("filter.canversation.none")}
@@ -50,7 +63,7 @@
       <input
         type="checkbox"
         class="rounded-checkbox"
-        checked={timelineFilter.get()?.global?.excludeFollowee || false}
+        checked={timelineFilter.get()?.global?.excludeFollowee ?? false}
         onchange={onChangeExcludeFollowee}
       />
       {$_("filter.menu.globalExcludeFollowee")}
