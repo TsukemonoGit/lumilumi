@@ -65,76 +65,80 @@
   let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
   onMount(async () => {
-    console.log($defaultRelays);
-
-    initializeRxNostr();
-
-    const followee = localStorage.getItem("onlyFollowee"); //通知欄の奴
-    if (followee === "true") {
-      $onlyFollowee = true;
-    }
-
-    // timelineFilterの処理
     try {
-      const raw = localStorage.getItem("timelineFilter");
-      if (!raw || raw.trim() === "" || raw === "undefined" || raw === "null") {
-        throw new Error("Invalid timeline data");
-      }
+      console.log($defaultRelays);
+      initializeRxNostr();
 
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-        throw new Error("Parsed data is not a valid object");
-      }
-
-      const mergedFilter = {
-        ...timelineFilterInit,
-        ...(typeof parsed.adaptMute === "boolean" && {
-          adaptMute: parsed.adaptMute,
-        }),
-        ...(typeof parsed.selectCanversation === "number" &&
-          [0, 1, 2].includes(parsed.selectCanversation) && {
-            selectCanversation: parsed.selectCanversation,
-          }),
-        global: {
-          ...timelineFilterInit.global,
-          ...(parsed.global || {}),
-        },
-      };
-      timelineFilter.set(mergedFilter);
-      localStorage.setItem("timelineFilter", JSON.stringify(mergedFilter));
-    } catch (error: any) {
-      console.warn("timelineFilter reset due to:", error.message);
-
-      // エラー時は確実にクリーンアップ
+      // localStorage可用性チェック
+      let storageAvailable = false;
       try {
-        localStorage.removeItem("timelineFilter");
+        localStorage.setItem("test", "test");
+        localStorage.removeItem("test");
+        storageAvailable = true;
       } catch (e) {
-        console.warn("Failed to remove corrupted timelineFilter:", e);
+        console.warn("localStorage not available");
       }
 
-      // デフォルト値で初期化
-      const defaultFilter = { ...timelineFilterInit };
-      timelineFilter.set(defaultFilter);
+      if (storageAvailable) {
+        const followee = localStorage.getItem("onlyFollowee");
+        if (followee === "true") {
+          $onlyFollowee = true;
+        }
 
-      try {
-        localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
-      } catch (e) {
-        console.warn("Failed to save default timelineFilter:", e);
+        // timelineFilter処理を安全に
+        let savedFilter = null;
+        try {
+          const raw = localStorage.getItem("timelineFilter");
+          if (raw && raw !== "undefined" && raw !== "null") {
+            savedFilter = JSON.parse(raw);
+          }
+        } catch (e) {
+          console.warn("Failed to parse timelineFilter");
+        }
+
+        // マージを安全に実行
+        const defaultFilter = JSON.parse(JSON.stringify(timelineFilterInit));
+        if (savedFilter && typeof savedFilter === "object") {
+          if (typeof savedFilter.adaptMute === "boolean") {
+            defaultFilter.adaptMute = savedFilter.adaptMute;
+          }
+          if (typeof savedFilter.selectCanversation === "number") {
+            defaultFilter.selectCanversation = savedFilter.selectCanversation;
+          }
+          if (savedFilter.global && typeof savedFilter.global === "object") {
+            if (typeof savedFilter.global.excludeFollowee === "boolean") {
+              defaultFilter.global.excludeFollowee =
+                savedFilter.global.excludeFollowee;
+            }
+            if (typeof savedFilter.global.excludeConversation === "boolean") {
+              defaultFilter.global.excludeConversation =
+                savedFilter.global.excludeConversation;
+            }
+          }
+        }
+
+        timelineFilter.set(defaultFilter);
+        try {
+          localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
+        } catch (e) {
+          console.warn("Failed to save timelineFilter");
+        }
+      } else {
+        // localStorage使用不可の場合はデフォルト値のみ
+        timelineFilter.set(timelineFilterInit);
       }
-    }
 
-    const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
-    loadMutetokanoSettei();
-    if (savedSettings) {
-      applySavedSettings(savedSettings);
-    } else {
-      // 省略...
+      const savedSettings = loadSettingsFromLocalStorage();
+      loadMutetokanoSettei();
+      if (savedSettings) {
+        applySavedSettings(savedSettings);
+      }
+    } catch (error) {
+      console.error("onMount error:", error);
+    } finally {
+      nowLoading = false;
     }
-
-    nowLoading = false;
-    console.log($defaultRelays);
   });
-
   function initializeRxNostr() {
     if (!$app?.rxNostr) {
       setRxNostr();
