@@ -212,34 +212,40 @@
     }
 
     if (loadData.timelineFilter) {
-      // timelineFilterの安全な処理
       try {
         const filter = loadData.timelineFilter;
+        console.log("Loading timelineFilter:", JSON.stringify(filter, null, 2));
 
         // 基本的な存在チェック
         if (!filter || typeof filter !== "object" || Array.isArray(filter)) {
           throw new Error("Invalid filter object");
         }
 
-        // 現行形式の厳密チェック
-        if (
-          !filter.global ||
-          typeof filter.global !== "object" ||
-          typeof filter.global.excludeFollowee !== "boolean" ||
-          typeof filter.global.excludeConversation !== "boolean" ||
-          typeof filter.adaptMute !== "boolean" ||
-          typeof filter.selectCanversation !== "boolean"
-        ) {
-          throw new Error("Invalid filter structure");
-        }
+        // スプレッド演算子でマージ（必要なプロパティのみ明示的に指定）
+        const mergedFilter = {
+          ...timelineFilterInit,
+          // 現行形式のプロパティのみを明示的にマージ
+          ...(typeof filter.adaptMute === "boolean" && {
+            adaptMute: filter.adaptMute,
+          }),
+          ...(typeof filter.selectCanversation === "number" &&
+            [0, 1, 2].includes(filter.selectCanversation) && {
+              selectCanversation: filter.selectCanversation,
+            }),
+          global: {
+            ...timelineFilterInit.global,
+            ...(filter.global || {}),
+          },
+        };
 
-        // 全チェック通過時のみ設定
-        timelineFilter.set(filter);
+        timelineFilter.set(mergedFilter);
         try {
-          localStorage?.setItem("timelineFilter", JSON.stringify(filter));
+          localStorage?.setItem("timelineFilter", JSON.stringify(mergedFilter));
         } catch (e) {
           console.warn("Failed to save loaded timelineFilter:", e);
         }
+
+        console.log("Successfully loaded and merged timelineFilter");
       } catch (error: any) {
         console.warn(
           "Loaded timelineFilter is invalid, using default:",

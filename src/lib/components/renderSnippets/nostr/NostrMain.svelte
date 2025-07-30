@@ -74,12 +74,11 @@
       $onlyFollowee = true;
     }
 
-    // timelineFilterの処理を完全に独立させる
-    let timelineData = null;
+    // timelineFilterの処理
     try {
       const timeline = localStorage.getItem("timelineFilter");
 
-      // 値の存在と妥当性を厳密にチェック
+      // 値の存在と妥当性をチェック
       if (
         !timeline ||
         timeline === "undefined" ||
@@ -91,7 +90,7 @@
       }
 
       // JSON.parseを試行
-      timelineData = JSON.parse(timeline);
+      const timelineData = JSON.parse(timeline);
 
       // パース結果の基本チェック
       if (
@@ -102,20 +101,25 @@
         throw new Error("Parsed data is not a valid object");
       }
 
-      // 現行形式の厳密チェック
-      if (
-        !timelineData.global ||
-        typeof timelineData.global !== "object" ||
-        typeof timelineData.global.excludeFollowee !== "boolean" ||
-        typeof timelineData.global.excludeConversation !== "boolean" ||
-        typeof timelineData.adaptMute !== "boolean" ||
-        typeof timelineData.selectCanversation !== "boolean"
-      ) {
-        throw new Error("Data structure is invalid");
-      }
+      // スプレッド演算子でマージ（必要なプロパティのみ明示的に指定）
+      const mergedFilter = {
+        ...timelineFilterInit,
+        // 現行形式のプロパティのみを明示的にマージ
+        ...(typeof timelineData.adaptMute === "boolean" && {
+          adaptMute: timelineData.adaptMute,
+        }),
+        ...(typeof timelineData.selectCanversation === "number" &&
+          [0, 1, 2].includes(timelineData.selectCanversation) && {
+            selectCanversation: timelineData.selectCanversation,
+          }),
+        global: {
+          ...timelineFilterInit.global,
+          ...(timelineData.global || {}),
+        },
+      };
 
-      // 全てのチェックを通過した場合のみ設定
-      timelineFilter.set(timelineData);
+      timelineFilter.set(mergedFilter);
+      localStorage.setItem("timelineFilter", JSON.stringify(mergedFilter));
     } catch (error: any) {
       console.warn("timelineFilter reset due to:", error.message);
 
