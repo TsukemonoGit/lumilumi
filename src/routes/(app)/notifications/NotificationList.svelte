@@ -100,7 +100,7 @@
   // Define update view function with debounce
   updateViewNotifi = debounce(async () => {
     // Return early if not on notifications page
-    if (page.route.id !== "/notifications") {
+    if (page.route.id !== "/(app)/notifications") {
       return;
     }
 

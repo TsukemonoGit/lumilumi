@@ -2,7 +2,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import { svelteTesting } from "@testing-library/svelte/vite";
-
+import path from "path";
 export default defineConfig({
   server: {
     host: true,
@@ -16,8 +16,8 @@ export default defineConfig({
     SvelteKitPWA({
       // サービスワーカーの戦略を指定
       strategies: "injectManifest", // ここでサービスワーカーを生成する設定
-      srcDir: "./src",
-      filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
+      srcDir: path.resolve(__dirname, "src"),
+      //filename: "my-sw.ts",  自作のサービスワーカーのファイル名を指定
       scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
@@ -63,6 +63,7 @@ export default defineConfig({
       },
       //https://vite-pwa-org.netlify.app/frameworks/sveltekit.html#globpatterns
       injectManifest: {
+        swSrc: "src/my-sw.ts",
         globPatterns: [
           "client/**/*.{js,css,ico,png,svg,webp,webmanifest}",
           "prerendered/**/*.{html,json}",

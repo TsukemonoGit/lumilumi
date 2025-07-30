@@ -415,5 +415,30 @@
     "label": "ピンするIDを入力",
     "addTitle": "PIN追加",
     "deleteTitle": "PIN削除"
+  },
+  "reset": {
+    "title": "リセット設定",
+    "notice": {
+      "title": "重要な注意事項",
+      "description": "この操作はブラウザ内のローカルストレージデータのみを削除します。\nリレーサーバーに投稿されたデータ（投稿、プロフィール等）は削除されません。\nリレーのデータを削除するには別途kind:5（削除イベント）を送信する必要があります。"
+    },
+    "description": "以下のローカルストレージデータを削除できます。必要に応じて選択してください。",
+    "options": {
+      "timelineFilter": "タイムラインフィルター設定（設定が壊れた場合のリセットに有効）",
+      "lumiSetting": "るみるみの基本設定（設定が壊れた場合のリセットに有効）",
+      "kind3": "フォローリスト (kind:3)",
+      "metadata": "フォロー中ユーザーのプロフィール (kind:0)リスト",
+      "lumiEmoji": "カスタム絵文字リスト",
+      "lumiMute": "ミュートリスト",
+      "lumiMuteByKind": "イベント種別ごとのミュートリスト",
+      "kind10003": "ブックマークリスト (kind:10003)",
+      "nostrLoginAll": "nostr-login 関連データ"
+    },
+    "buttons": {
+      "deleteSelected": "選択した項目を削除",
+      "selectAll": "全選択",
+      "deselectAll": "全解除"
+    },
+    "deleteSuccess": "選択された設定を削除しました。"
   }
 }

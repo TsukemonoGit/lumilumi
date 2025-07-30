@@ -12,6 +12,7 @@
   import { mainMenuItems } from "./menu";
   import HomeOptions from "./HomeOptions.svelte";
   import GlobalOptions from "./GlobalOptions.svelte";
+  import { type RouteId } from "$app/types";
 
   let _showBanner: boolean = $state(showBanner.get());
 
@@ -61,7 +62,8 @@
       </div>
     {/if}
     <div class="uppercase font-bold">
-      {currentPage?.alt ?? (page.route.id === "/post" ? "share" : "lumilumi")}
+      {currentPage?.alt ??
+        (page.route.id === ("/(app)/post" as RouteId) ? "share" : "lumilumi")}
     </div>
     <RelayStatus />
   </div>

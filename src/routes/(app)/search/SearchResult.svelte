@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createRxForwardReq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
-  import Metadata from "../../lib/components/renderSnippets/nostr/Metadata.svelte";
+  import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import { nip50relays } from "$lib/func/constants";
-  import EventCard from "../../lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
+  import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
 
   import { onDestroy } from "svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
