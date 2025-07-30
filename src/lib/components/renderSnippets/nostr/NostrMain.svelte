@@ -197,9 +197,36 @@
     // 初期化完了時にストレージデータを取得
     getStorageData();
 
+    // ローカルストレージの変更を監視
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "timelineFilter" || e.key === STORAGE_KEY) {
+        addDebugLog(`Storage changed: ${e.key}`);
+        getStorageData(); // ストレージデータを更新
+      }
+    };
+
+    // 他のタブでの変更を監視
+    window.addEventListener("storage", handleStorageChange);
+
+    // 同一タブでの変更を監視（storageイベントは同一タブでは発火しないため）
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function (key: string, value: string) {
+      originalSetItem.call(this, key, value);
+      if (key === "timelineFilter" || key === STORAGE_KEY) {
+        addDebugLog(`Storage updated: ${key}`);
+        getStorageData();
+      }
+    };
+
     nowLoading = false;
     addDebugLog("Loading completed");
     console.log($defaultRelays);
+
+    // クリーンアップ関数
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      localStorage.setItem = originalSetItem; // 元の関数を復元
+    };
   });
 
   function initializeRxNostr() {
