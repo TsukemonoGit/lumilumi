@@ -19,6 +19,7 @@
     type LumiMute,
     type LumiMuteByKind,
     type LumiSetting,
+    type TimelineFilter,
   } from "$lib/types";
 
   import {
@@ -52,93 +53,83 @@
 
   let localRelays: DefaultRelayConfig[] = $state.raw([]);
 
-  /*  let pubkey: string = $state("");
-  $effect(() => {
-    const pub = lumiSetting.get().pubkey;
-
-    if (pub) {
-      untrack(() => {
-        pubkey = pub;
-      });
-    }
-  }); */
   let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
-  onMount(async () => {
+  onMount(() => {
     try {
       console.log($defaultRelays);
       initializeRxNostr();
 
-      // localStorage可用性チェック
-      let storageAvailable = false;
-      try {
-        localStorage.setItem("test", "test");
-        localStorage.removeItem("test");
-        storageAvailable = true;
-      } catch (e) {
-        console.warn("localStorage not available");
+      const followee = localStorage.getItem("onlyFollowee");
+      if (followee === "true") {
+        $onlyFollowee = true;
       }
 
-      if (storageAvailable) {
-        const followee = localStorage.getItem("onlyFollowee");
-        if (followee === "true") {
-          $onlyFollowee = true;
-        }
+      const raw = localStorage.getItem("timelineFilter");
+      let saved: unknown = null;
 
-        // timelineFilter処理を安全に
-        let savedFilter = null;
+      if (raw && raw !== "undefined" && raw !== "null") {
         try {
-          const raw = localStorage.getItem("timelineFilter");
-          if (raw && raw !== "undefined" && raw !== "null") {
-            savedFilter = JSON.parse(raw);
-          }
+          saved = JSON.parse(raw);
         } catch (e) {
-          console.warn("Failed to parse timelineFilter");
+          console.warn("Failed to parse timelineFilter:", e);
         }
+      }
 
-        // マージを安全に実行
-        const defaultFilter = JSON.parse(JSON.stringify(timelineFilterInit));
-        if (savedFilter && typeof savedFilter === "object") {
-          if (typeof savedFilter.adaptMute === "boolean") {
-            defaultFilter.adaptMute = savedFilter.adaptMute;
+      let defaultFilter: TimelineFilter = {
+        ...timelineFilterInit,
+        global: { ...timelineFilterInit.global },
+      };
+
+      if (saved && typeof saved === "object" && saved !== null) {
+        const sf = saved as any;
+
+        // ▼ version判定とマイグレーション
+        if (sf.version === 2) {
+          // ✅ 新形式
+          if (typeof sf.adaptMute === "boolean") {
+            defaultFilter.adaptMute = sf.adaptMute;
           }
-          if (typeof savedFilter.selectCanversation === "number") {
-            defaultFilter.selectCanversation = savedFilter.selectCanversation;
+          if (typeof sf.selectCanversation === "number") {
+            defaultFilter.selectCanversation = sf.selectCanversation;
           }
-          if (savedFilter.global && typeof savedFilter.global === "object") {
-            if (typeof savedFilter.global.excludeFollowee === "boolean") {
-              defaultFilter.global.excludeFollowee =
-                savedFilter.global.excludeFollowee;
+          if (sf.global && typeof sf.global === "object") {
+            if (typeof sf.global.excludeFollowee === "boolean") {
+              defaultFilter.global.excludeFollowee = sf.global.excludeFollowee;
             }
-            if (typeof savedFilter.global.excludeConversation === "boolean") {
+            if (typeof sf.global.excludeConversation === "boolean") {
               defaultFilter.global.excludeConversation =
-                savedFilter.global.excludeConversation;
+                sf.global.excludeConversation;
             }
           }
+        } else {
+          // 🧪 旧形式（versionなし or version: 1）
+          if (typeof sf.adaptMute === "boolean") {
+            defaultFilter.adaptMute = sf.adaptMute;
+          }
+          if (typeof sf.selectCanversation === "number") {
+            defaultFilter.selectCanversation = sf.selectCanversation;
+          }
+          if (typeof sf.excludeFollowee === "boolean") {
+            defaultFilter.global.excludeFollowee = sf.excludeFollowee;
+          }
+          // excludeConversation は旧形式には存在しないのでそのまま
         }
-
-        timelineFilter.set(defaultFilter);
-        try {
-          localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
-        } catch (e) {
-          console.warn("Failed to save timelineFilter");
-        }
-      } else {
-        // localStorage使用不可の場合はデフォルト値のみ
-        timelineFilter.set(timelineFilterInit);
       }
 
-      const savedSettings = loadSettingsFromLocalStorage();
-      loadMutetokanoSettei();
-      if (savedSettings) {
-        applySavedSettings(savedSettings);
+      timelineFilter.set(defaultFilter);
+      try {
+        localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
+      } catch (e) {
+        console.warn("Failed to save timelineFilter");
       }
-    } catch (error) {
-      console.error("onMount error:", error);
+    } catch (e) {
+      console.error("Unexpected error in onMount:", e);
     } finally {
       nowLoading = false;
     }
   });
+
   function initializeRxNostr() {
     if (!$app?.rxNostr) {
       setRxNostr();
