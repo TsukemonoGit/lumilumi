@@ -17,7 +17,7 @@ export default defineConfig({
       // サービスワーカーの戦略を指定
       strategies: "injectManifest", // ここでサービスワーカーを生成する設定
       srcDir: path.resolve(__dirname, "src"),
-      filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
+      //filename: "my-sw.ts",  自作のサービスワーカーのファイル名を指定
       scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト
