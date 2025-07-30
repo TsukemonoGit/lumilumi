@@ -2,7 +2,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { SvelteKitPWA } from "@vite-pwa/sveltekit";
 import { defineConfig } from "vite";
 import { svelteTesting } from "@testing-library/svelte/vite";
-
+import path from "path";
 export default defineConfig({
   server: {
     host: true,
@@ -16,7 +16,7 @@ export default defineConfig({
     SvelteKitPWA({
       // サービスワーカーの戦略を指定
       strategies: "injectManifest", // ここでサービスワーカーを生成する設定
-      srcDir: "./src",
+      srcDir: path.resolve(__dirname, "src"),
       filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
       scope: "/",
       // サービスワーカーの登録に関連する設定
