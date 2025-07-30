@@ -12,7 +12,11 @@
           excludeFollowee: !currentGlobal.excludeFollowee,
         },
       };
-      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      try {
+        localStorage?.setItem("timelineFilter", JSON.stringify(tlFilter));
+      } catch (error: any) {
+        console.warn("Failed to save timelineFilter:", error);
+      }
       return tlFilter;
     });
   };
@@ -27,7 +31,11 @@
           excludeConversation: !currentGlobal.excludeConversation,
         },
       };
-      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+      try {
+        localStorage?.setItem("timelineFilter", JSON.stringify(tlFilter));
+      } catch (error: any) {
+        console.warn("Failed to save timelineFilter:", error);
+      }
       return tlFilter;
     });
   };
