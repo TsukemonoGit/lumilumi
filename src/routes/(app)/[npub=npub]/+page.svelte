@@ -31,7 +31,7 @@
   import * as Nostr from "nostr-typedef";
 
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
-  import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
+  import PaginationList from "$lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
 
   import { profile } from "$lib/func/util";

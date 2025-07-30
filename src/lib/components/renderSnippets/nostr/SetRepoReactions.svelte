@@ -44,11 +44,11 @@
     debounceUpdate();
   });
 
-  $effect(() => {
+  /*  $effect(() => {
     if (etagList || atagList) {
       untrack(() => debounceUpdate());
     }
-  });
+  }); */
 
   function debounceUpdate() {
     if (updating) {

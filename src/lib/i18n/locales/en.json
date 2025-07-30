@@ -414,5 +414,30 @@
     "delete": "Are you sure you want to delete this pin?",
     "addTitle": "Add Pin",
     "deleteTitle": "Delete Pin"
+  },
+  "reset": {
+    "title": "Reset Settings",
+    "notice": {
+      "title": "Important Notice",
+      "description": "This operation only deletes local storage data in your browser.\nData posted to relay servers (posts, profiles, etc.) will not be deleted.\nTo delete relay data, you need to send a kind:5 (deletion event) separately."
+    },
+    "description": "You can delete the following local storage data. Please select as needed.",
+    "options": {
+      "timelineFilter": "Timeline Filter Settings (recommended reset if broken)",
+      "lumiSetting": "Lumi Basic Settings (recommended reset if broken)",
+      "kind3": "Follow List (kind:3)",
+      "metadata": "Profiles of Followed Users (kind:0) list",
+      "lumiEmoji": "Custom Emoji List",
+      "lumiMute": "Mute List",
+      "lumiMuteByKind": "Mute List by Event Kind",
+      "kind10003": "Bookmark List (kind:10003)",
+      "nostrLoginAll": "nostr-login Related Data"
+    },
+    "buttons": {
+      "deleteSelected": "Delete Selected Items",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All"
+    },
+    "deleteSuccess": "Selected settings have been deleted."
   }
 }

@@ -23,7 +23,7 @@
   } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { browser } from "$app/environment";
-  import "../app.css";
+  import "../../app.css";
 
   import { setTheme } from "$lib/func/settings";
   import type { Theme } from "$lib/types";

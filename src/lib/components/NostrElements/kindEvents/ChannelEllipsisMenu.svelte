@@ -22,8 +22,8 @@
   import { translateText } from "$lib/func/util";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { writable } from "svelte/store";
-  import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import EditChannelInfo from "../../../../routes/(app)/channel/EditChannelInfo.svelte";
 
   interface Props {
     note: Nostr.Event; //kind40か41
