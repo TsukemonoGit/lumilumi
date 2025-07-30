@@ -17,19 +17,25 @@ export type RxReqBase = RxReq;
 
 export type ReqStatus = "loading" | "success" | "error";
 
-export interface TimelineFilter {
-  adaptMute: boolean; //top level mute is hidden default
-  selectCanversation: number; //Radio Group
-  //0 all
-  //1 follow only
-  //2 none ptagがあるものは除外
-  global: {
-    excludeFollowee: boolean; //グローバルタイムラインからフォロイーの投稿を除外
+export type OldTimelineFilter = {
+  version?: 1;
+  adaptMute: boolean;
+  selectCanversation: number;
+  excludeFollowee: boolean; // ← globalがない
+};
 
+export interface TimelineFilter {
+  version: 2;
+  adaptMute: boolean;
+  selectCanversation: number;
+  global: {
+    excludeFollowee: boolean;
     excludeConversation: boolean;
   };
 }
+
 export const timelineFilterInit: TimelineFilter = {
+  version: 2,
   adaptMute: true,
   selectCanversation: 0,
   global: {
@@ -37,6 +43,7 @@ export const timelineFilterInit: TimelineFilter = {
     excludeConversation: false,
   },
 };
+
 export interface ReqResult<A> {
   data: Readable<A | undefined | null>;
   status: Readable<ReqStatus>;

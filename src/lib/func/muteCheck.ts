@@ -98,7 +98,7 @@ function shouldMuteByKinds(event: EventWithContentPubkeyTags): boolean {
   if (!event) {
     return false;
   }
-  const kindsMutes = get(mutebykinds).list || [];
+  const kindsMutes = get(mutebykinds)?.list || [];
 
   // Implement logic to check if event.kind and other properties match mutebykinds criteria
   // Example logic:
