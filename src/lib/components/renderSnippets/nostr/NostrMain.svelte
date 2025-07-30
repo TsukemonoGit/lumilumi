@@ -76,48 +76,30 @@
 
     // timelineFilterの処理
     try {
-      const timeline = localStorage.getItem("timelineFilter");
-
-      // 値の存在と妥当性をチェック
-      if (
-        !timeline ||
-        timeline === "undefined" ||
-        timeline === "null" ||
-        timeline === "" ||
-        timeline.length < 2
-      ) {
+      const raw = localStorage.getItem("timelineFilter");
+      if (!raw || raw.trim() === "" || raw === "undefined" || raw === "null") {
         throw new Error("Invalid timeline data");
       }
 
-      // JSON.parseを試行
-      const timelineData = JSON.parse(timeline);
-
-      // パース結果の基本チェック
-      if (
-        !timelineData ||
-        typeof timelineData !== "object" ||
-        Array.isArray(timelineData)
-      ) {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
         throw new Error("Parsed data is not a valid object");
       }
 
-      // スプレッド演算子でマージ（必要なプロパティのみ明示的に指定）
       const mergedFilter = {
         ...timelineFilterInit,
-        // 現行形式のプロパティのみを明示的にマージ
-        ...(typeof timelineData.adaptMute === "boolean" && {
-          adaptMute: timelineData.adaptMute,
+        ...(typeof parsed.adaptMute === "boolean" && {
+          adaptMute: parsed.adaptMute,
         }),
-        ...(typeof timelineData.selectCanversation === "number" &&
-          [0, 1, 2].includes(timelineData.selectCanversation) && {
-            selectCanversation: timelineData.selectCanversation,
+        ...(typeof parsed.selectCanversation === "number" &&
+          [0, 1, 2].includes(parsed.selectCanversation) && {
+            selectCanversation: parsed.selectCanversation,
           }),
         global: {
           ...timelineFilterInit.global,
-          ...(timelineData.global || {}),
+          ...(parsed.global || {}),
         },
       };
-
       timelineFilter.set(mergedFilter);
       localStorage.setItem("timelineFilter", JSON.stringify(mergedFilter));
     } catch (error: any) {
