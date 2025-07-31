@@ -95,12 +95,14 @@
     //await migrateSettings();
     const savedSettings = loadSettings();
     console.log(savedSettings);
-    if (savedSettings) {
-      settings = { ...settings, ...savedSettings };
-      inputPubkey = nip19.npubEncode(settings.pubkey);
-    } else {
-      initializeSettings(); //nostr-loginよぶだけ
-    }
+    try {
+      if (savedSettings) {
+        settings = { ...settings, ...savedSettings };
+        inputPubkey = nip19.npubEncode(settings.pubkey);
+      } else {
+        initializeSettings(); //nostr-loginよぶだけ
+      }
+    } catch (error) {}
     try {
       const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
       const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
