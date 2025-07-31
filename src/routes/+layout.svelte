@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "$lib/i18n/index.ts";
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
