@@ -65,7 +65,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
-  import "$lib/i18n/index.ts";
+
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";

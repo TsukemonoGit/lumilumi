@@ -1,5 +1,5 @@
 // +layout.ts
-
+import "$lib/i18n/index.ts";
 //import { locale, waitLocale } from "@konemono/svelte5-i18n";
 import type { LayoutLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
