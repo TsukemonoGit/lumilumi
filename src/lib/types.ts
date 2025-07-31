@@ -234,6 +234,7 @@ export interface Kind30078LumiSetting {
   lumiSetting: LumiSetting;
   showBanner: boolean;
   theme: string;
+  colorScheme: string;
   timelineFilter: TimelineFilter;
   uploader: string;
   created_at: number;
@@ -250,6 +251,7 @@ export interface Kind30078LumiSettingObj {
   lumiSetting: LumiSetting;
   showBanner: boolean;
   theme: string;
+  colorScheme: string;
   timelineFilter: TimelineFilter;
   uploader: string;
 }

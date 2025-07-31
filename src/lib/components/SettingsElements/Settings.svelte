@@ -14,12 +14,7 @@
   } from "$lib/stores/stores";
   import * as nip19 from "nostr-tools/nip19";
 
-  import type {
-    LumiEmoji,
-    LumiMute,
-    LumiMuteByKind,
-    LumiSetting,
-  } from "$lib/types";
+  import type { LumiSetting } from "$lib/types";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { beforeNavigate } from "$app/navigation";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
@@ -49,6 +44,7 @@
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
   import { normalizeURL } from "nostr-tools/utils";
   import { addDebugLog, debugError, debugInfo } from "../Debug/debug";
+  import ColorThemeSelect from "./ColorThemeSelect.svelte";
 
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -847,7 +843,10 @@
   <!-- Theme 設定 -->
   <fieldset class="border border-magnum-500 rounded-md p-2">
     <legend class="text-magnum-200 font-bold text-lg">theme</legend>
-    <ThemeSwitch />
+    <div class="flex gap-2 flex-row">
+      <ThemeSwitch />
+      <ColorThemeSelect />
+    </div>
   </fieldset>
 
   <Kind30078 {settingsChanged} bind:settings saveLumiSettings={saveSettings} />
