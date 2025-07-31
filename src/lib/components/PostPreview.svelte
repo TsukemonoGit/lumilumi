@@ -41,6 +41,7 @@
   import { nipLink } from "$lib/func/util";
   import { muteCheck } from "$lib/func/muteCheck";
   import { EyeOff } from "lucide-svelte";
+  import { addDebugLog } from "./Debug/debug";
 
   // Props definition
   interface Props {
@@ -195,7 +196,6 @@
   };
 
   const onClickShowMore = () => {
-    console.log("showMore");
     $showMore = true;
   };
 
@@ -204,7 +204,6 @@
       index: index,
       mediaList: $state.snapshot(mediaList),
     };
-    console.log(index, $state.snapshot(mediaList));
   };
 
   //ミュートメニューの設定は考慮しない

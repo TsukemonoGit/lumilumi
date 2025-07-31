@@ -14,6 +14,7 @@ import { saveEachNote, scanArray } from "./operators.js";
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq.js";
 import { tie } from "./stores.js";
+import { addDebugLog } from "$lib/components/Debug/debug.js";
 
 export function useAllReactions(
   queryKey: QueryKey,
@@ -47,7 +48,7 @@ export function useAllReactions(
           { kinds: [1, 42, 6, 7, 9735, 1111], "#q": [id] },
         ]
       : [];
-  console.log(filters);
+  addDebugLog("notirication filter:", filters);
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
   const operator = pipe(tie, uniq, scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<

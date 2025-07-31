@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "$lib/i18n/index.ts";
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
@@ -228,7 +229,6 @@
     addDebugLog(
       `Navigation occurred: type=${navigate.type}, route=${navigate.to?.route.id}`
     );
-    console.log("afterNavigate", navigate.type);
 
     //ページが変わったらリセット
     if (navigate.type !== "form") {

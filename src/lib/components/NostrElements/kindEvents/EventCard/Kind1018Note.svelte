@@ -67,14 +67,14 @@
   let selectedOptionTags: string[][] | undefined = $state(undefined);
 
   const handleNoteChange = (ev: Nostr.Event) => {
-    console.log(response);
+    //console.log(response);
     if (response) {
       selectedOptionTags = ev.tags.filter(
         (tag) =>
           tag[0] === "option" && tag.length > 2 && response.includes(tag[1])
       );
     }
-    console.log(selectedOptionTags);
+    //console.log(selectedOptionTags);
   };
 </script>
 

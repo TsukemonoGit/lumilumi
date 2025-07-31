@@ -151,7 +151,7 @@
     const filters: Nostr.Filter[] = [
       { limit: 1, kinds: [10030], authors: [pubkey] },
     ];
-    console.log(filters);
+    //console.log(filters);
     const pk = await getDoukiList(filters, relays);
 
     if (!pk && !beforeEvent) {

@@ -25,7 +25,7 @@
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
-  console.log(filters);
+  //console.log(filters);
   let amount = 50;
   let viewIndex = 0;
 

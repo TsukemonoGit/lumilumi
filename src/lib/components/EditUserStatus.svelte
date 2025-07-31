@@ -75,7 +75,7 @@
           .get()
           .get(loginUser.get())
           ?.get("general");
-        console.log(statusEvent);
+        //console.log(statusEvent);
 
         if (statusEvent) {
           userStatus = statusEvent.content;

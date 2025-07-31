@@ -130,7 +130,6 @@
   });
 
   afterNavigate(async (navigate) => {
-    // console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form") {
       view = false;
       if (!isOnMount) {
