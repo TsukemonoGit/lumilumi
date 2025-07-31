@@ -48,6 +48,7 @@
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
   import { normalizeURL } from "nostr-tools/utils";
+  import { addDebugLog } from "../Debug/debug";
 
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -92,38 +93,45 @@
   });
 
   onMount(async () => {
-    //await migrateSettings();
+    addDebugLog("Component mounted - starting initialization");
+
     const savedSettings = loadSettings();
-    console.log(savedSettings);
+    addDebugLog("Loaded settings from localStorage", savedSettings);
 
     if (savedSettings) {
-      try {
-        settings = { ...settings, ...savedSettings };
-      } catch (error) {}
+      settings = { ...settings, ...savedSettings };
+      addDebugLog("Merged saved settings into current state");
       try {
         inputPubkey = nip19.npubEncode(settings.pubkey);
-      } catch (error) {}
+        addDebugLog("Encoded pubkey to npub", inputPubkey);
+      } catch (error) {
+        addDebugLog("Failed to encode pubkey", error);
+      }
     } else {
-      initializeSettings(); //nostr-loginよぶだけ
+      addDebugLog(
+        "No valid saved settings found - calling initializeSettings()"
+      );
+      initializeSettings();
     }
 
     try {
       const mute = localStorage.getItem(lumiMute_STORAGE_KEY);
       const emoji = localStorage.getItem(lumiEmoji_STORAGE_KEY);
       const mutebykind = localStorage.getItem(lumiMuteByKind_STORAGE_KEY);
-      //console.log(mute);
-      $mutes = mute ? (JSON.parse(mute) as LumiMute) : initLumiMute;
-      //console.log($mutes);
-      $emojis = emoji ? (JSON.parse(emoji) as LumiEmoji) : initLumiEmoji;
-      $mutebykinds = mutebykind
-        ? (JSON.parse(mutebykind) as LumiMuteByKind)
-        : initLumiMuteByKind;
+
+      $mutes = mute ? JSON.parse(mute) : initLumiMute;
+      $emojis = emoji ? JSON.parse(emoji) : initLumiEmoji;
+      $mutebykinds = mutebykind ? JSON.parse(mutebykind) : initLumiMuteByKind;
+
+      addDebugLog("Loaded mutes/emojis/mutebykind from localStorage");
     } catch (error) {
-      console.log("failed to load");
+      addDebugLog("Error while loading mute/emoji/mutebykind", error);
     }
 
     originalSettings = $state.snapshot(settings);
+    addDebugLog("Captured originalSettings snapshot", originalSettings);
   });
+
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
     if (
       typeof obj !== "object" ||
@@ -147,29 +155,27 @@
   function loadSettings(): LumiSetting | null {
     try {
       const saved = localStorage.getItem(LUMI_STORAGE_KEY);
-      if (!saved) return null;
+      if (!saved) {
+        addDebugLog("No lumiSetting found in localStorage");
+        return null;
+      }
 
       const parsed = JSON.parse(saved);
       if (isValidLumiSetting(parsed)) {
-        $relaySetValue = parsed.useRelaySet; // ラジオボタン状態更新
+        addDebugLog("Parsed valid lumiSetting from localStorage", parsed);
+        $relaySetValue = parsed.useRelaySet;
         return parsed;
       } else {
-        console.warn("無効な設定構造", parsed);
+        addDebugLog("Invalid lumiSetting structure", parsed);
         return null;
       }
     } catch (e) {
-      console.warn("設定の読み込みエラー", e);
+      addDebugLog("Error loading lumiSetting", e);
       return null;
     }
   }
 
   async function initializeSettings() {
-    // //設定がまだないとき
-    // if (browser) {
-    //   const nostrLogin = await import("nostr-login");
-    //   await nostrLogin.init({});
-    // }
-
     try {
       const gotPubkey = await (
         window?.nostr as Nostr.Nip07.Nostr
