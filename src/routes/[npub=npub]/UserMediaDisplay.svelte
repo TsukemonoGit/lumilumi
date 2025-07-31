@@ -135,7 +135,7 @@
             const results = await useMediaPromiseReq(
               { filters: [filter] },
               undefined,
-              2000,
+              3000,
               LOAD_LIMIT,
               onData
             );
