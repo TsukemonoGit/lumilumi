@@ -124,25 +124,41 @@
 
     originalSettings = $state.snapshot(settings);
   });
+  function isValidLumiSetting(obj: unknown): obj is LumiSetting {
+    if (
+      typeof obj !== "object" ||
+      obj === null ||
+      typeof (obj as any).pubkey !== "string" ||
+      typeof (obj as any).useRelaySet !== "string"
+    ) {
+      return false;
+    }
 
-  function loadSettings() {
+    // useRelaySet が "1" の場合は relays が配列かつ non-empty であることを確認
+    if (
+      (obj as any).useRelaySet === "1" &&
+      (!Array.isArray((obj as any).relays) || (obj as any).relays.length === 0)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+  function loadSettings(): LumiSetting | null {
     try {
-      let savedSettings = localStorage.getItem(LUMI_STORAGE_KEY);
-      if (savedSettings) {
-        try {
-          const loadSet = JSON.parse(savedSettings);
+      const saved = localStorage.getItem(LUMI_STORAGE_KEY);
+      if (!saved) return null;
 
-          $relaySetValue = loadSet.useRelaySet; //ラジオボタンの状態更新
-
-          // originalSettings.set({ ...loadSet });
-          return loadSet;
-        } catch (error) {
-          return null;
-        }
+      const parsed = JSON.parse(saved);
+      if (isValidLumiSetting(parsed)) {
+        $relaySetValue = parsed.useRelaySet; // ラジオボタン状態更新
+        return parsed;
       } else {
+        console.warn("無効な設定構造", parsed);
         return null;
       }
-    } catch (error) {
+    } catch (e) {
+      console.warn("設定の読み込みエラー", e);
       return null;
     }
   }
@@ -223,7 +239,11 @@
   }
 
   async function resetDefaultRelay(settings: LumiSetting) {
-    if (settings.useRelaySet === "1" && settings.relays.length > 0) {
+    if (
+      settings.useRelaySet === "1" &&
+      Array.isArray(settings.relays) &&
+      settings.relays.length > 0
+    ) {
       setRelays(settings.relays as DefaultRelayConfig[]);
     } else {
       // queryKey: ["defaultRelay", lumiSetting.get().pubkey] のデータがあるか確認
@@ -268,7 +288,7 @@
   }
 
   function updateStores(settings: LumiSetting) {
-    lumiSetting.get().pubkey = settings.pubkey;
+    lumiSetting.get().pubkey = settings.pubkey || "";
 
     //relayset情報を更新する前に確認
     console.log($selectedRelayset, settings.useRelaySet);
