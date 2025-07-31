@@ -15,9 +15,9 @@ export const load: LayoutLoad = async (
   const p = params; // キャストして kind を取得
 
   //pram
-  const noteParam = p.params.note;
-  const naddrParam = p.params.naddr;
-  const npubParam = p.params.npub;
+  const noteParam: string | undefined = p.params.note;
+  const naddrParam: string | undefined = p.params.naddr;
+  const npubParam: string | undefined = p.params.npub;
   if (noteParam) {
     try {
       const { type, data } = nip19.decode(noteParam);

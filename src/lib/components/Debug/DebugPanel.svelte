@@ -62,8 +62,7 @@
             style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; max-height: 100px; overflow-y: auto;   white-space: pre-wrap;
             word-break: break-word;
             overflow-wrap: break-word;">
-{value === null ? "null" : JSON.stringify(value, null, 2)}
-        </pre>
+{value === null ? "null" : JSON.stringify(value, null, 2)}</pre>
         </div>
       {/each}
 
