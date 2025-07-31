@@ -4,31 +4,37 @@ import { writable } from "svelte/store";
 export const DEBUG_MODE =
   import.meta.env.DEV || import.meta.env.VITE_DEBUG === "true";
 
-export const debugLogs = writable<string[]>([]);
+export type LogLevel = "info" | "warn" | "error" | "success" | "debug";
+
+export interface DebugLog {
+  message: string;
+  level: LogLevel;
+  timestamp: string;
+  details?: any;
+}
+
+export const debugLogs = writable<DebugLog[]>([]);
 export const storageData = writable<Record<string, any>>({});
 export const showDebug = writable(false);
 
-export function addDebugLog(message: string, details?: any) {
+export function addDebugLog(
+  message: string,
+  details?: any,
+  level: LogLevel = "info"
+) {
   if (!DEBUG_MODE) return;
   const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
 
-  let logMessage = `[${timestamp}] ${message}`;
-  if (details !== undefined) {
-    // オブジェクトならJSON文字列化、文字列ならそのまま付加
-    if (typeof details === "object") {
-      try {
-        logMessage += `: ${JSON.stringify(details, null, 2)}`;
-      } catch {
-        logMessage += `: [object]`;
-      }
-    } else {
-      logMessage += `: ${details}`;
-    }
-  }
+  const log: DebugLog = {
+    message,
+    level,
+    timestamp,
+    details,
+  };
 
-  debugLogs.update((logs) => [logMessage, ...logs].slice(0, 50));
+  debugLogs.update((logs) => [log, ...logs].slice(0, 50));
 
-  // console.log(logMessage);
+  // console.log(`[${level.toUpperCase()}] ${message}`, details);
 }
 
 export function getStorageData(keys = ["timelineFilter", "lumiSetting"]) {
@@ -45,7 +51,7 @@ export function getStorageData(keys = ["timelineFilter", "lumiSetting"]) {
   });
 
   storageData.set(data);
-  addDebugLog(`Storage data updated: ${Object.keys(data).length} keys`);
+  debugSuccess(`Storage data updated: ${Object.keys(data).length} keys`, data);
 }
 
 export function toggleDebug() {
@@ -60,7 +66,19 @@ export function toggleDebug() {
 export function clearStorage() {
   if (confirm("本当にすべてのローカルストレージをクリアしますか？")) {
     localStorage.clear();
-    addDebugLog("LocalStorage cleared");
+    debugWarn("LocalStorage cleared");
     getStorageData();
   }
 }
+
+// 便利な関数を追加
+export const debugInfo = (message: string, details?: any) =>
+  addDebugLog(message, details, "info");
+export const debugWarn = (message: string, details?: any) =>
+  addDebugLog(message, details, "warn");
+export const debugError = (message: string, details?: any) =>
+  addDebugLog(message, details, "error");
+export const debugSuccess = (message: string, details?: any) =>
+  addDebugLog(message, details, "success");
+export const debugLog = (message: string, details?: any) =>
+  addDebugLog(message, details, "debug");

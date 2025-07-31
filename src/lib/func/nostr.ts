@@ -54,7 +54,7 @@ import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
-import { addDebugLog } from "$lib/components/Debug/debug";
+import { addDebugLog, debugInfo } from "$lib/components/Debug/debug";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -87,17 +87,17 @@ export function setRxNostr() {
           type: "AUTH";
         }
       ) => {
-        console.log("AUTH", e);
+        addDebugLog("AUTH", e);
         if (!authRelay.get().includes(e.from)) {
           authRelay.update((v) => [...v, e.from]);
         }
-        console.log("authRelay", authRelay.get());
+        addDebugLog("authRelay", authRelay.get());
       }
     );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  console.log(relays);
+  addDebugLog("setRelays", relays);
   if (rxNostr && defaultRelays) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());
@@ -241,7 +241,7 @@ export function generateRandomId(length: number = 6): string {
 const req = createRxForwardReq();
 
 export function changeMainEmit(filters: Nostr.Filter[]) {
-  console.log("changeMainEmit", filters);
+  debugInfo("changeMainEmit", filters);
 
   req.emit(filters);
 }

@@ -21,6 +21,7 @@ import { app, tie } from "./stores";
 import { saveEachNote } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
+import { debugError, debugInfo } from "$lib/components/Debug/debug";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
@@ -80,7 +81,7 @@ export function toRelaySet(
       }
     });
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）
-    console.log(get(app).rxNostr.getDefaultRelays());
+    debugInfo("rxNostr.getDefaultRelays:", get(app).rxNostr.getDefaultRelays());
     return relay;
   } else {
     const relay =
@@ -89,13 +90,13 @@ export function toRelaySet(
         : setRelaysByKind10002(value.event);
 
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）
-    console.log(get(app).rxNostr.getDefaultRelays());
+    debugInfo("rxNostr.getDefaultRelays:", get(app).rxNostr.getDefaultRelays());
     return relay;
   }
 }
 
 export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
-  console.log(event);
+  debugInfo("setRelaysByKind3", event);
   try {
     const relayList: { [key: string]: { read: boolean; write: boolean } } =
       JSON.parse(event.content);
@@ -105,13 +106,13 @@ export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
       write: config.write,
     }));
   } catch (error) {
-    console.error("Error parsing relays by kind 3", error);
+    debugError("Error parsing relays by kind 3", error);
     return [];
   }
 }
 
 export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
-  console.log(event);
+  debugInfo("setRelaysByKind10002", event);
   try {
     const relayList: string[][] = event.tags;
     return relayList.map(([, url, ...config]) => {
@@ -125,7 +126,7 @@ export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
       return conf;
     });
   } catch (error) {
-    console.error("Error parsing relays by kind 10002", error);
+    debugError("Error parsing relays by kind 10002", error);
     return [];
   }
 }

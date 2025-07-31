@@ -10,6 +10,7 @@ import { pipe, type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
+import { debugInfo, debugWarn } from "$lib/components/Debug/debug";
 
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
@@ -117,8 +118,13 @@ export async function firstLoadOlderEvents(
     sift
   );
 
-  console.log("sift:", sift);
-  console.log("olderEvents.length:", olderEvents.length);
+  debugInfo(`📡 Older events fetch completed`, {
+    requested: sift || "unlimited",
+    received: olderEvents.length,
+    relays: relays?.length || "default",
+    filtersCount: filters.length,
+    hasCallback: !!onData,
+  });
 
   // Return either all events or limited by sift
   //return olderEvents.slice(0, sift === 0 ? undefined : sift);
@@ -162,10 +168,10 @@ export async function waitForConnections(
     const totalRelays = normalizedReadUrls.length;
     const connectionRatio = finalStateCount / totalRelays;
 
-    console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
+    debugInfo(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
 
     if (connectionRatio >= REQUIRED_CONNECTION_RATIO) {
-      console.log(
+      debugInfo(
         `${Math.round(
           connectionRatio * 100
         )}% relays are in a final state. Proceeding...`
@@ -175,7 +181,7 @@ export async function waitForConnections(
 
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= maxWaitTime) {
-      console.log("Maximum wait time exceeded. Proceeding...");
+      debugWarn("Maximum wait time exceeded. Proceeding...");
       break;
     }
 

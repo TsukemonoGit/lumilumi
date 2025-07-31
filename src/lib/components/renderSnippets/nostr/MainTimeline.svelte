@@ -42,6 +42,12 @@
   // Types
   import type { ReqStatus } from "$lib/types";
   import { replaceState } from "$app/navigation";
+  import {
+    addDebugLog,
+    debugError,
+    debugInfo,
+    debugWarn,
+  } from "$lib/components/Debug/debug";
 
   // Constants
   const CONFIG = {
@@ -328,7 +334,7 @@
         queryClient?.getQueryData([...queryKey, "olderData"]);
 
       if (existingEvents && existingEvents.length > 0) {
-        console.log(`既存データ${existingEvents.length}件を使用`);
+        addDebugLog(`既存データ${existingEvents.length}件を使用`);
         //  updateViewEvent();
 
         //ページ復元
@@ -351,14 +357,14 @@
       timelineManager.isLoadingOlderEvents = true;
 
       if (readUrls && readUrls.length > 0) {
-        console.log("リレー接続を確立中...");
+        addDebugLog("リレー接続を確立中...");
         await waitForConnections();
       }
 
       const initialFilters = createInitialFilters();
       const handleIncrementalData = createIncrementalHandler();
 
-      console.log("初期データを取得中...");
+      addDebugLog("初期データを取得中...");
 
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
@@ -372,9 +378,9 @@
         updateQueryData(olderEvents);
       }
 
-      console.log(`初期化完了: ${olderEvents.length}件のイベントを取得`);
+      addDebugLog(`初期化完了: ${olderEvents.length}件のイベントを取得`);
     } catch (error) {
-      console.error("Timeline初期化エラー:", error);
+      addDebugLog("Timeline初期化エラー:", error);
       handleFallbackData();
     } finally {
       updateViewEvent();
@@ -428,7 +434,7 @@
     ]) as EventPacket[];
 
     if (fallbackData && fallbackData.length > 0) {
-      console.log("フォールバックデータを使用");
+      addDebugLog("フォールバックデータを使用");
     }
   }
 
@@ -464,7 +470,7 @@
 
       // 👇 ストック不足でリクエスト中なら return
       if (timelineManager.isLoadingOlderEvents) {
-        console.log("前回のデータ取得が完了していません");
+        addDebugLog("前回のデータ取得が完了していません");
         return;
       }
       const older = queryClient?.getQueryData([
@@ -475,7 +481,7 @@
       const untilTime = older?.[older.length - 1]?.event.created_at;
 
       if (!untilTime) {
-        console.warn("No existing events to determine untilTime");
+        debugWarn("No existing events to determine untilTime");
         return;
       }
 
@@ -533,7 +539,7 @@
       }
       updateViewEvent();
     } catch (error) {
-      console.error("loadOlderAndMoveDown error:", error);
+      debugError("loadOlderAndMoveDown error:", error);
     } finally {
       $nowProgress = false;
       timelineManager.isLoadingOlderEvents = false;
@@ -642,7 +648,7 @@
   }); */
 
   onDestroy(() => {
-    console.log("main timeline destroy");
+    debugInfo("main timeline destroy");
     timelineManager.destroyed = true;
     if (timelineManager.timeoutId) {
       clearTimeout(timelineManager.timeoutId);
