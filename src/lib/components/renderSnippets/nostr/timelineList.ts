@@ -10,6 +10,7 @@ import { pipe, type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
+import { debugInfo } from "$lib/components/Debug/debug";
 
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
@@ -117,8 +118,13 @@ export async function firstLoadOlderEvents(
     sift
   );
 
-  console.log("sift:", sift);
-  console.log("olderEvents.length:", olderEvents.length);
+  debugInfo(`📡 Older events fetch completed`, {
+    requested: sift || "unlimited",
+    received: olderEvents.length,
+    relays: relays?.length || "default",
+    filtersCount: filters.length,
+    hasCallback: !!onData,
+  });
 
   // Return either all events or limited by sift
   //return olderEvents.slice(0, sift === 0 ? undefined : sift);

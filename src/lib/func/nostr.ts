@@ -87,17 +87,17 @@ export function setRxNostr() {
           type: "AUTH";
         }
       ) => {
-        console.log("AUTH", e);
+        addDebugLog("AUTH", e);
         if (!authRelay.get().includes(e.from)) {
           authRelay.update((v) => [...v, e.from]);
         }
-        console.log("authRelay", authRelay.get());
+        addDebugLog("authRelay", authRelay.get());
       }
     );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  console.log(relays);
+  addDebugLog("setRelays", relays);
   if (rxNostr && defaultRelays) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());
