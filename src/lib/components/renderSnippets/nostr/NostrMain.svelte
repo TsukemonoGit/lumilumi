@@ -55,13 +55,16 @@
 
   let nowLoading = $state(true); // ローディング状態を追跡する変数を追加
 
-  // デバッグ用の状態
+  const DEBUG_MODE =
+    import.meta.env.DEV || import.meta.env.VITE_DEBUG === "true";
+
   let showDebug = $state(false);
   let debugLogs: string[] = $state([]);
   let storageData = $state<Record<string, any>>({});
 
   // デバッグログを追加する関数
   function addDebugLog(message: string) {
+    if (!DEBUG_MODE) return;
     const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
     debugLogs = [`[${timestamp}] ${message}`, ...debugLogs].slice(0, 50); // 最新50件まで保持
     console.log(message);
@@ -69,6 +72,7 @@
 
   // ローカルストレージの内容を取得する関数
   function getStorageData() {
+    if (!DEBUG_MODE) return;
     const keys = [
       "timelineFilter",
       STORAGE_KEY, // lumiSetting
@@ -347,6 +351,7 @@
 
   // デバッグパネルの表示/非表示を切り替え
   function toggleDebug() {
+    if (!DEBUG_MODE) return;
     showDebug = !showDebug;
     if (showDebug) {
       getStorageData(); // デバッグパネルを開く時にストレージデータを更新
@@ -363,82 +368,83 @@
   }
 </script>
 
-<!-- デバッグボタン（固定位置） -->
-<div style="position: fixed; top: 10px; right: 10px; z-index: 9999;">
-  <button
-    onclick={toggleDebug}
-    style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;"
-  >
-    {showDebug ? "Hide Debug" : "Show Debug"}
-  </button>
-</div>
-
-<!-- デバッグパネル -->
-{#if showDebug}
-  <div
-    style="position: fixed; top: 50px; right: 10px; width: 350px; max-height: 80vh; background: rgba(0,0,0,0.9); color: white; padding: 10px; border-radius: 8px; z-index: 9998; overflow-y: auto; font-family: monospace; font-size: 11px;"
-  >
-    <div
-      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"
+{#if DEBUG_MODE}
+  <!-- デバッグボタン（固定位置） -->
+  <div style="position: fixed; top: 10px; right: 10px; z-index: 9999;">
+    <button
+      onclick={toggleDebug}
+      style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;"
     >
-      <h3 style="margin: 0; font-size: 14px;">Debug Panel</h3>
-      <div>
-        <button
-          onclick={getStorageData}
-          style="background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; margin-right: 5px; cursor: pointer;"
-        >
-          Refresh
-        </button>
-        <button
-          onclick={clearStorage}
-          style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
-        >
-          Clear Storage
-        </button>
-      </div>
-    </div>
-
-    <!-- ローカルストレージの内容 -->
-    <div style="margin-bottom: 15px;">
-      <h4 style="margin: 0 0 5px 0; font-size: 12px; color: #ffc107;">
-        LocalStorage Contents:
-      </h4>
-      <div
-        style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; max-height: 200px; overflow-y: auto;"
-      >
-        {#each Object.entries(storageData) as [key, value]}
-          <div
-            style="margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px;"
-          >
-            <strong style="color: #17a2b8;">{key}:</strong>
-            <pre
-              style="margin: 2px 0; white-space: pre-wrap; word-break: break-all; font-size: 10px;">{value ===
-              null
-                ? "null"
-                : JSON.stringify(value, null, 2)}</pre>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    <!-- デバッグログ -->
-    <div>
-      <h4 style="margin: 0 0 5px 0; font-size: 12px; color: #ffc107;">
-        Debug Logs:
-      </h4>
-      <div
-        style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; max-height: 300px; overflow-y: auto;"
-      >
-        {#each debugLogs as log}
-          <div style="margin-bottom: 2px; font-size: 10px; line-height: 1.3;">
-            {log}
-          </div>
-        {/each}
-      </div>
-    </div>
+      {showDebug ? "Hide Debug" : "Show Debug"}
+    </button>
   </div>
-{/if}
 
+  <!-- デバッグパネル -->
+  {#if showDebug}
+    <div
+      style="position: fixed; top: 50px; right: 10px; width: 350px; max-height: 80vh; background: rgba(0,0,0,0.9); color: white; padding: 10px; border-radius: 8px; z-index: 9998; overflow-y: auto; font-family: monospace; font-size: 11px;"
+    >
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"
+      >
+        <h3 style="margin: 0; font-size: 14px;">Debug Panel</h3>
+        <div>
+          <button
+            onclick={getStorageData}
+            style="background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; margin-right: 5px; cursor: pointer;"
+          >
+            Refresh
+          </button>
+          <button
+            onclick={clearStorage}
+            style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          >
+            Clear Storage
+          </button>
+        </div>
+      </div>
+
+      <!-- ローカルストレージの内容 -->
+      <div style="margin-bottom: 15px;">
+        <h4 style="margin: 0 0 5px 0; font-size: 12px; color: #ffc107;">
+          LocalStorage Contents:
+        </h4>
+        <div
+          style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; max-height: 200px; overflow-y: auto;"
+        >
+          {#each Object.entries(storageData) as [key, value]}
+            <div
+              style="margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 4px;"
+            >
+              <strong style="color: #17a2b8;">{key}:</strong>
+              <pre
+                style="margin: 2px 0; white-space: pre-wrap; word-break: break-all; font-size: 10px;">{value ===
+                null
+                  ? "null"
+                  : JSON.stringify(value, null, 2)}</pre>
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <!-- デバッグログ -->
+      <div>
+        <h4 style="margin: 0 0 5px 0; font-size: 12px; color: #ffc107;">
+          Debug Logs:
+        </h4>
+        <div
+          style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; max-height: 300px; overflow-y: auto;"
+        >
+          {#each debugLogs as log}
+            <div style="margin-bottom: 2px; font-size: 10px; line-height: 1.3;">
+              {log}
+            </div>
+          {/each}
+        </div>
+      </div>
+    </div>
+  {/if}
+{/if}
 {#if nowLoading}
   {@render loading()}
 {:else}
