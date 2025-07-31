@@ -34,10 +34,10 @@
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   const timelineQuery: QueryKey = ["list", "feed", atag];
-  onMount(() => {
+  onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
-      init();
+      await init();
 
       isOnMount = false;
     }
@@ -159,12 +159,6 @@
                 >
                   {#if events && events.length > 0}
                     {#each events as event, index (event.id)}
-                      <!-- <div
-                        class="max-w-full break-words whitespace-pre-line box-border overflow-hidden {index ===
-                        events.length - 1
-                          ? 'last-visible'
-                          : ''} {index === 0 ? 'first-visible' : ''}"
-                      > -->
                       <Metadata
                         queryKey={["metadata", event.pubkey]}
                         pubkey={event.pubkey}
@@ -188,7 +182,6 @@
                           <EventCard {metadata} note={event} />
                         {/snippet}
                       </Metadata>
-                      <!-- </div> -->
                     {/each}{/if}
                 </div>{/snippet}
               {#snippet loading()}

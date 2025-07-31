@@ -9,6 +9,7 @@
   import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { encodetoNpub } from "$lib/func/encode";
 
   const handleClickToList = (event: Nostr.Event) => {
     const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
@@ -23,9 +24,10 @@
   const filtered = (events: Nostr.Event[]) => {
     return events.filter((event) => event.tags.find((item) => item[0] === "p"));
   };
+  let encodePub = $derived(encodetoNpub(lumiSetting.get().pubkey));
 </script>
 
-{#if !lumiSetting.get().pubkey}
+{#if !lumiSetting.get()?.pubkey}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -44,7 +46,7 @@
           {#if peopleList.length === 0}
             <Link
               className="underline text-magnum-300 break-all "
-              href={`https://nostviewstr.vercel.app/${nip19.npubEncode(lumiSetting.get().pubkey)}/${30000}`}
+              href={`https://nostviewstr.vercel.app/${encodePub}/${30000}`}
               >{$_("nostviewstr.kind30000")}</Link
             >
           {:else}
@@ -64,7 +66,7 @@
       >
         <Link
           className=" font-semibold text-magnum-300 break-all inline-flex"
-          href={`https://nostviewstr.vercel.app/${nip19.npubEncode(lumiSetting.get().pubkey)}/${30000}`}
+          href={`https://nostviewstr.vercel.app/${encodePub}/${30000}`}
           >{$_("nostviewstr.kind30000")}<SquareArrowOutUpRight
             size={16}
           /></Link
