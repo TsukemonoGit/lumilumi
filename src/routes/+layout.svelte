@@ -5,7 +5,7 @@
 
   import Header from "./Header.svelte";
   import { onMount } from "svelte";
-
+  import { waitNostr } from "nip07-awaiter";
   import {
     app,
     nowProgress,
@@ -130,12 +130,32 @@
       }
       console.log(customEvent);
     });
-    localStorage?.removeItem("preferred-locale");
 
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {
+      try {
+        const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
+        // console.log(theme);
+        setTheme(theme);
+        const tmp = localStorage.getItem("uploader");
+        // console.log(tmp);
+        $uploader = tmp ?? mediaUploader[0];
+
+        const banner: boolean = localStorage.getItem("showBanner") == "true";
+
+        // console.log(banner);
+        showBanner.set(banner);
+      } catch (error) {}
+      if (!$app?.rxNostr) {
+        setRxNostr();
+      }
+      if (!$app?.rxNostr3) {
+        setRxNostr3();
+      }
+
       const nostrLogin = await import("nostr-login");
+      await waitNostr(1000);
       await nostrLogin.init({
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
@@ -143,20 +163,6 @@
         description: `${$_("nostrlogin.description")}`,
       });
 
-      //await nostrLogin.launch();
-      const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
-      // console.log(theme);
-      setTheme(theme);
-
-      const tmp = localStorage.getItem("uploader");
-      console.log(tmp);
-      $uploader = tmp ?? mediaUploader[0];
-      if (!$app?.rxNostr) {
-        setRxNostr();
-      }
-      if (!$app?.rxNostr3) {
-        setRxNostr3();
-      }
       nlBanner = document.getElementsByTagName(
         "nl-banner"
       )?.[0] as HTMLElement | null;
@@ -165,10 +171,6 @@
         console.log(nlBanner);
       }
     }
-    const banner: boolean = localStorage.getItem("showBanner") == "true";
-
-    // console.log(banner);
-    showBanner.set(banner);
   });
 
   function onVisibilityChange() {
