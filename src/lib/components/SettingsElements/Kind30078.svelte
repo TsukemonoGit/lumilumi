@@ -27,6 +27,8 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { debugInfo } from "../Debug/debug";
+  import { changeTheme, type ColorScheme } from "$lib/func/theme";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -65,6 +67,7 @@
         lumiSetting: settings,
         showBanner: showBanner.get(),
         theme: localStorage.getItem("theme") ?? "system",
+        colorScheme: localStorage.getItem("colorScheme") ?? "orange",
         timelineFilter: timelineFilter.get(),
         uploader: $uploader,
       };
@@ -149,6 +152,7 @@
 
     const result = await publishSettings(newLumiSettings);
     if (result) {
+      debugInfo("publish kidn30078", newLumiSettings);
       saveName = "";
       $toastSettings = {
         title: "Success",
@@ -200,7 +204,7 @@
       return;
     }
     $nowProgress = true;
-
+    debugInfo("loadData", loadData);
     if (loadData.showBanner) {
       showBanner.set(loadData.showBanner);
       localStorage?.setItem("showBanner", loadData.showBanner.toString());
@@ -210,6 +214,9 @@
       setTheme(loadData.theme as Theme);
       localStorage?.setItem("theme", loadData.theme);
     }
+
+    changeTheme((loadData.colorScheme || "orange") as ColorScheme);
+    localStorage?.setItem("colorScheme", loadData.colorScheme);
 
     if (loadData.timelineFilter) {
       try {

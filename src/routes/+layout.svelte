@@ -72,6 +72,8 @@
   import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";
   import { addDebugLog } from "$lib/components/Debug/debug";
 
+  import { changeTheme } from "$lib/func/theme";
+
   let { data, children } = $props<{
     data:
       | {
@@ -153,6 +155,7 @@
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {
+      changeTheme("grayscale");
       addDebugLog(
         "Browser environment detected, initializing browser-specific features"
       );
@@ -160,6 +163,10 @@
         const theme = (localStorage?.getItem("theme") as Theme) ?? "system";
         addDebugLog(`Loaded theme from localStorage: ${theme}`);
         setTheme(theme);
+        const scheme =
+          (localStorage.getItem("colorScheme") as "orange" | "grayscale") ??
+          "orange";
+        changeTheme(scheme);
         const tmp = localStorage.getItem("uploader");
         addDebugLog(
           `Loaded uploader setting from localStorage: ${tmp ?? "not set"}`
