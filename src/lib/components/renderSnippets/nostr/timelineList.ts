@@ -10,7 +10,7 @@ import { pipe, type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
-import { debugInfo } from "$lib/components/Debug/debug";
+import { debugInfo, debugWarn } from "$lib/components/Debug/debug";
 
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
@@ -168,10 +168,10 @@ export async function waitForConnections(
     const totalRelays = normalizedReadUrls.length;
     const connectionRatio = finalStateCount / totalRelays;
 
-    console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
+    debugInfo(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
 
     if (connectionRatio >= REQUIRED_CONNECTION_RATIO) {
-      console.log(
+      debugInfo(
         `${Math.round(
           connectionRatio * 100
         )}% relays are in a final state. Proceeding...`
@@ -181,7 +181,7 @@ export async function waitForConnections(
 
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= maxWaitTime) {
-      console.log("Maximum wait time exceeded. Proceeding...");
+      debugWarn("Maximum wait time exceeded. Proceeding...");
       break;
     }
 

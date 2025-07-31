@@ -54,7 +54,7 @@ import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
-import { addDebugLog } from "$lib/components/Debug/debug";
+import { addDebugLog, debugInfo } from "$lib/components/Debug/debug";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -241,7 +241,7 @@ export function generateRandomId(length: number = 6): string {
 const req = createRxForwardReq();
 
 export function changeMainEmit(filters: Nostr.Filter[]) {
-  console.log("changeMainEmit", filters);
+  debugInfo("changeMainEmit", filters);
 
   req.emit(filters);
 }
