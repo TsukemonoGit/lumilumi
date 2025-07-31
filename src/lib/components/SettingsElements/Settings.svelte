@@ -48,7 +48,7 @@
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
   import { normalizeURL } from "nostr-tools/utils";
-  import { addDebugLog } from "../Debug/debug";
+  import { addDebugLog, debugError, debugInfo } from "../Debug/debug";
 
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -430,7 +430,18 @@
   // リロード前にフラグを設定してイベントリスナーを無効にする関数
   function reloadWithoutWarning() {
     shouldReload = true;
-    location.reload();
+
+    try {
+      debugInfo("リロード実行", { shouldReload });
+      location.reload();
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "SecurityError") {
+        debugError("リロード失敗: セキュリティエラー", e);
+      } else {
+        debugError("リロード失敗: その他のエラー", e);
+        // throw e; // 不明な例外は再スロー（必要に応じて）
+      }
+    }
   }
 
   // function handleBeforeUnload(e: BeforeUnloadEvent) {
