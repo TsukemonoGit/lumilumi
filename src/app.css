@@ -18,30 +18,6 @@
     --initial-color-magnum-900: 121 58 21;
     --initial-color-magnum-950: 65 28 9;
 
-    --initial-color-teal-50: 240 253 254;
-    --initial-color-teal-100: 203 241 245;
-    --initial-color-teal-200: 177 227 235;
-    --initial-color-teal-300: 134 208 221;
-    --initial-color-teal-400: 102 186 202;
-    --initial-color-teal-500: 71 160 178;
-    --initial-color-teal-600: 56 131 147;
-    --initial-color-teal-700: 44 104 117;
-    --initial-color-teal-800: 35 82 92;
-    --initial-color-teal-900: 28 66 74;
-    --initial-color-teal-950: 15 38 42;
-
-    --initial-color-violet-50: 248 240 254;
-    --initial-color-violet-100: 232 203 245;
-    --initial-color-violet-200: 214 177 235;
-    --initial-color-violet-300: 191 134 221;
-    --initial-color-violet-400: 168 102 202;
-    --initial-color-violet-500: 141 71 178;
-    --initial-color-violet-600: 115 56 147;
-    --initial-color-violet-700: 91 44 117;
-    --initial-color-violet-800: 72 35 92;
-    --initial-color-violet-900: 58 28 74;
-    --initial-color-violet-950: 32 15 42;
-
     --initial-color-neutral-50: 250 250 250;
     --initial-color-neutral-100: 245 245 245;
     --initial-color-neutral-200: 229 229 229;
@@ -82,30 +58,6 @@
     --color-magnum-800: var(--initial-color-magnum-800);
     --color-magnum-900: var(--initial-color-magnum-900);
     --color-magnum-950: var(--initial-color-magnum-950);
-
-    --color-teal-50: var(--initial-color-teal-50);
-    --color-teal-100: var(--initial-color-teal-100);
-    --color-teal-200: var(--initial-color-teal-200);
-    --color-teal-300: var(--initial-color-teal-300);
-    --color-teal-400: var(--initial-color-teal-400);
-    --color-teal-500: var(--initial-color-teal-500);
-    --color-teal-600: var(--initial-color-teal-600);
-    --color-teal-700: var(--initial-color-teal-700);
-    --color-teal-800: var(--initial-color-teal-800);
-    --color-teal-900: var(--initial-color-teal-900);
-    --color-teal-950: var(--initial-color-teal-950);
-
-    --color-violet-50: var(--initial-color-violet-50);
-    --color-violet-100: var(--initial-color-violet-100);
-    --color-violet-200: var(--initial-color-violet-200);
-    --color-violet-300: var(--initial-color-violet-300);
-    --color-violet-400: var(--initial-color-violet-400);
-    --color-violet-500: var(--initial-color-violet-500);
-    --color-violet-600: var(--initial-color-violet-600);
-    --color-violet-700: var(--initial-color-violet-700);
-    --color-violet-800: var(--initial-color-violet-800);
-    --color-violet-900: var(--initial-color-violet-900);
-    --color-violet-950: var(--initial-color-violet-950);
 
     --color-neutral-50: var(--initial-color-neutral-50);
     --color-neutral-100: var(--initial-color-neutral-100);
@@ -149,30 +101,6 @@
       --color-magnum-900: 252 225 172;
       --color-magnum-950: 255 249 237;
 
-      --color-teal-50: 15 38 42;
-      --color-teal-100: 28 66 74;
-      --color-teal-200: 35 82 92;
-      --color-teal-300: 44 104 117;
-      --color-teal-400: 56 131 147;
-      --color-teal-500: 71 160 178;
-      --color-teal-600: 102 186 202;
-      --color-teal-700: 134 208 221;
-      --color-teal-800: 177 227 235;
-      --color-teal-900: 203 241 245;
-      --color-teal-950: 240 253 254;
-
-      --color-violet-50: 32 15 42;
-      --color-violet-100: 58 28 74;
-      --color-violet-200: 72 35 92;
-      --color-violet-300: 91 44 117;
-      --color-violet-400: 115 56 147;
-      --color-violet-500: 141 71 178;
-      --color-violet-600: 168 102 202;
-      --color-violet-700: 191 134 221;
-      --color-violet-800: 214 177 235;
-      --color-violet-900: 232 203 245;
-      --color-violet-950: 248 240 254;
-
       --color-neutral-50: 10 10 10;
       --color-neutral-100: 23 23 23;
       --color-neutral-200: 38 38 38;
@@ -215,30 +143,6 @@
         --color-magnum-900: var(--initial-color-magnum-900);
         --color-magnum-950: var(--initial-color-magnum-950);
 
-        --color-teal-50: var(--initial-color-teal-50);
-        --color-teal-100: var(--initial-color-teal-100);
-        --color-teal-200: var(--initial-color-teal-200);
-        --color-teal-300: var(--initial-color-teal-300);
-        --color-teal-400: var(--initial-color-teal-400);
-        --color-teal-500: var(--initial-color-teal-500);
-        --color-teal-600: var(--initial-color-teal-600);
-        --color-teal-700: var(--initial-color-teal-700);
-        --color-teal-800: var(--initial-color-teal-800);
-        --color-teal-900: var(--initial-color-teal-900);
-        --color-teal-950: var(--initial-color-teal-950);
-
-        --color-violet-50: var(--initial-color-violet-50);
-        --color-violet-100: var(--initial-color-violet-100);
-        --color-violet-200: var(--initial-color-violet-200);
-        --color-violet-300: var(--initial-color-violet-300);
-        --color-violet-400: var(--initial-color-violet-400);
-        --color-violet-500: var(--initial-color-violet-500);
-        --color-violet-600: var(--initial-color-violet-600);
-        --color-violet-700: var(--initial-color-violet-700);
-        --color-violet-800: var(--initial-color-violet-800);
-        --color-violet-900: var(--initial-color-violet-900);
-        --color-violet-950: var(--initial-color-violet-950);
-
         --color-neutral-50: var(--initial-color-neutral-50);
         --color-neutral-100: var(--initial-color-neutral-100);
         --color-neutral-200: var(--initial-color-neutral-200);
@@ -268,6 +172,33 @@
         --color-white: var(--initial-color-white);
       }
     }
+  }
+  html.gray:not(.dark) {
+    --color-magnum-50: 10 10 10;
+    --color-magnum-100: 23 23 23;
+    --color-magnum-200: 38 38 38;
+    --color-magnum-300: 64 64 64;
+    --color-magnum-400: 82 82 82;
+    --color-magnum-500: 115 115 115;
+    --color-magnum-600: 163 163 163;
+    --color-magnum-700: 212 212 212;
+    --color-magnum-800: 229 229 229;
+    --color-magnum-900: 245 245 245;
+    --color-magnum-950: 250 250 250;
+  }
+
+  html.gray {
+    --color-magnum-50: 250 250 250;
+    --color-magnum-100: 245 245 245;
+    --color-magnum-200: 229 229 229;
+    --color-magnum-300: 212 212 212;
+    --color-magnum-400: 163 163 163;
+    --color-magnum-500: 115 115 115;
+    --color-magnum-600: 82 82 82;
+    --color-magnum-700: 64 64 64;
+    --color-magnum-800: 38 38 38;
+    --color-magnum-900: 23 23 23;
+    --color-magnum-950: 10 10 10;
   }
 }
 

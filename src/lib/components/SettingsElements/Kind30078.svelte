@@ -28,7 +28,11 @@
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { debugInfo } from "../Debug/debug";
-  import { changeTheme, type ColorScheme } from "$lib/func/theme";
+  import {
+    setColorScheme,
+    setThemeMode,
+    type ColorScheme,
+  } from "$lib/func/theme";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -211,11 +215,11 @@
     }
 
     if (loadData.theme) {
-      setTheme(loadData.theme as Theme);
+      setThemeMode(loadData.theme as Theme);
       localStorage?.setItem("theme", loadData.theme);
     }
 
-    changeTheme((loadData.colorScheme || "orange") as ColorScheme);
+    setColorScheme((loadData.colorScheme || "orange") as ColorScheme);
     localStorage?.setItem("colorScheme", loadData.colorScheme);
 
     if (loadData.timelineFilter) {
