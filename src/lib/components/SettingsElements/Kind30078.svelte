@@ -27,7 +27,7 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
-  import { debugInfo } from "../Debug/debug";
+  import { debugError, debugInfo } from "../Debug/debug";
   import {
     setColorScheme,
     setThemeMode,
@@ -211,16 +211,28 @@
     debugInfo("loadData", loadData);
     if (loadData.showBanner) {
       showBanner.set(loadData.showBanner);
-      localStorage?.setItem("showBanner", loadData.showBanner.toString());
+      try {
+        localStorage?.setItem("showBanner", loadData.showBanner.toString());
+      } catch (error) {
+        debugError("failed to save", error);
+      }
     }
 
     if (loadData.theme) {
       setThemeMode(loadData.theme as Theme);
-      localStorage?.setItem("theme", loadData.theme);
+      try {
+        localStorage?.setItem("theme", loadData.theme);
+      } catch (error) {
+        debugError("failed to save", error);
+      }
     }
     if (loadData.colorScheme) {
       setColorScheme((loadData.colorScheme || "default") as ColorScheme);
-      localStorage?.setItem("colorScheme", loadData.colorScheme);
+      try {
+        localStorage?.setItem("colorScheme", loadData.colorScheme);
+      } catch (error) {
+        debugError("failed to save", error);
+      }
     } else {
       setColorScheme("default");
     }

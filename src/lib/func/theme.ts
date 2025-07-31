@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import { debugError } from "$lib/components/Debug/debug";
 import { tick } from "svelte";
 
 export type ColorScheme = "default" | "gray";
@@ -6,12 +7,15 @@ export type ThemeMode = "light" | "dark" | "system";
 
 export function initThemeSettings() {
   if (!browser) return;
+  try {
+    const theme = (localStorage.getItem("theme") as ThemeMode) ?? "system";
+    const scheme = getCurrentColorScheme();
 
-  const theme = (localStorage.getItem("theme") as ThemeMode) ?? "system";
-  const scheme = getCurrentColorScheme();
-
-  applyThemeMode(theme);
-  applyColorScheme(scheme);
+    applyThemeMode(theme);
+    applyColorScheme(scheme);
+  } catch (error: any) {
+    debugError(error);
+  }
 }
 
 export async function setThemeMode(mode: ThemeMode) {
@@ -25,11 +29,16 @@ export async function setThemeMode(mode: ThemeMode) {
 
 export function setColorScheme(scheme: ColorScheme) {
   if (!browser) return;
-  localStorage.setItem("colorScheme", scheme);
-  applyColorScheme(scheme);
+  try {
+    localStorage.setItem("colorScheme", scheme);
+    applyColorScheme(scheme);
+  } catch (error: any) {
+    debugError(error);
+  }
 }
 
 function applyThemeMode(mode: ThemeMode) {
+  if (!browser) return;
   const root = document.documentElement;
 
   if (mode === "dark") {
@@ -48,6 +57,7 @@ function applyThemeMode(mode: ThemeMode) {
 let currentColorSchemeClass: string | null = null;
 
 function applyColorScheme(scheme: ColorScheme) {
+  if (!browser) return;
   const root = document.documentElement;
 
   if (currentColorSchemeClass) {
@@ -76,5 +86,10 @@ export async function toggleDarkMode() {
 
 function getCurrentColorScheme(): ColorScheme {
   if (!browser) return "default";
-  return (localStorage.getItem("colorScheme") as ColorScheme) ?? "default";
+  try {
+    return (localStorage.getItem("colorScheme") as ColorScheme) ?? "default";
+  } catch (error: any) {
+    debugError(error);
+    return "default";
+  }
 }
