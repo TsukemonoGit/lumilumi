@@ -20,7 +20,7 @@
 
   // Constants
   const TIMELINE_QUERY: QueryKey = ["notifications"];
-  const TIE_KEY = "notifications";
+
   const DISPLAY_AMOUNT = 50;
   const INITIAL_LOAD_LIMIT = 100;
 
@@ -60,15 +60,19 @@
   let updateViewNotifi: () => void = $state(() => {});
 
   // Build initial filters
-  let filters: Nostr.Filter[] = [
-    {
-      kinds: notificationKinds,
-      "#p": [lumiSetting.get().pubkey],
-      since: undefined,
-      until: undefined,
-      limit: undefined,
-    },
-  ];
+  let filters: Nostr.Filter[] | null = $derived(
+    lumiSetting.get()?.pubkey
+      ? [
+          {
+            kinds: notificationKinds,
+            "#p": [lumiSetting.get().pubkey],
+            since: undefined,
+            until: undefined,
+            limit: undefined,
+          },
+        ]
+      : null
+  );
 
   // Initialize toggle group for notification filtering
   const {
@@ -116,7 +120,7 @@
   // Filter helpers
   function getNotificationFilterPredicate(event: Nostr.Event): boolean {
     // Skip self-notifications
-    if (event.pubkey === lumiSetting.get().pubkey) {
+    if (event.pubkey === lumiSetting.get()?.pubkey) {
       return false;
     }
 
@@ -183,7 +187,7 @@
   async function initializeNotifications() {
     const existingEvents: EventPacket[] | undefined =
       queryClient?.getQueryData(TIMELINE_QUERY);
-
+    if (!filters) return;
     if (!existingEvents || existingEvents.length <= 0) {
       // First load - get historical events
       filters[0].since = undefined;
@@ -197,7 +201,7 @@
   }
 </script>
 
-{#if !lumiSetting.get().pubkey}
+{#if !lumiSetting.get().pubkey && filters}
   <a
     href="/settings"
     class="whitespace-pre-wrap break-words p-2 underline text-magnum-400 hover:opacity-75"
@@ -239,7 +243,7 @@
         </button>
       </div>
 
-      {#if view}
+      {#if view && filters}
         <NotificationList
           queryKey={TIMELINE_QUERY}
           {filters}
