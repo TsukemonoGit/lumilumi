@@ -3,6 +3,7 @@
   import Dialog from "./Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
   import { browser } from "$app/environment";
+  import { addDebugLog } from "./Debug/debug";
 
   let { geohash = $bindable() } = $props();
   let dialogOpen: Writable<boolean> = $state(writable(false));
@@ -13,7 +14,7 @@
 
   const onClickSubmit = (geo: string) => {
     geohash = geo;
-    console.log(geo);
+    addDebugLog(geo);
   };
   const onClickDelete = () => {
     geohash = "";

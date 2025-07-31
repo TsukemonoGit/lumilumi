@@ -34,7 +34,6 @@
   });
 
   afterNavigate(async (navigate) => {
-    console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       await init();

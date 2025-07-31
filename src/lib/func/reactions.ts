@@ -10,6 +10,7 @@ import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
 import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";
+//import { addDebugLog } from "$lib/components/Debug/debug";
 
 // const rxNostr3 = createRxNostr({
 //   verifier: get(verifier) ?? cryptoVerifier,
@@ -64,7 +65,7 @@ export function rxNostr3ReccoctRelay(url: string) {
 }
 
 export function changeEmit(filters: Nostr.Filter[]) {
-  console.log(filters);
+  // addDebugLog("rxNostr3 changeEmit", filters);
   req3.emit(filters);
 }
 

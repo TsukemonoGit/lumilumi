@@ -246,7 +246,7 @@
       ...queryKey,
       "olderData",
     ]);
-    console.log("test");
+    // console.log("test");
     const allEvents =
       data && olderdatas ? [...data, ...olderdatas] : (olderdatas ?? []);
 
@@ -275,7 +275,7 @@
   }
 
   onDestroy(() => {
-    console.log("test");
+    console.log("onDestroy");
   });
 </script>
 

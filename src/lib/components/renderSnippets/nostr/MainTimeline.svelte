@@ -610,15 +610,18 @@
     }
   });
 
-  // Lifecycle
+  /*  // Lifecycle
+ //effectでやってるからいらん
   onMount(async () => {
     if (timelineManager.isOnMount || !lumiSetting.get().pubkey) return;
 
-    timelineManager.isOnMount = true;
-    $nowProgress = true;
-    await initializeTimeline();
-    timelineManager.isOnMount = false;
-    $nowProgress = false;
+    if (!timelineManager.isOnMount) {
+      timelineManager.isOnMount = true;
+      $nowProgress = true;
+      await initializeTimeline();
+      timelineManager.isOnMount = false;
+      $nowProgress = false;
+    }
   });
 
   afterNavigate(async (navigate) => {
@@ -629,12 +632,14 @@
     )
       return;
 
-    timelineManager.isOnMount = true;
-    $nowProgress = true;
-    await initializeTimeline();
-    timelineManager.isOnMount = false;
-    $nowProgress = false;
-  });
+    if (!timelineManager.isOnMount) {
+      timelineManager.isOnMount = true;
+      $nowProgress = true;
+      await initializeTimeline();
+      timelineManager.isOnMount = false;
+      $nowProgress = false;
+    }
+  }); */
 
   onDestroy(() => {
     console.log("main timeline destroy");
@@ -646,7 +651,8 @@
   $effect(() => {
     if (lumiSetting.get().pubkey) {
       untrack(async () => {
-        console.log(filters);
+        // console.log(filters);
+
         timelineManager.isOnMount = true;
         $nowProgress = true;
         await initializeTimeline();

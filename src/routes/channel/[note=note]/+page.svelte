@@ -36,7 +36,6 @@
     }
   });
   afterNavigate((navigate) => {
-    console.log("afterNavigate", navigate.type);
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();

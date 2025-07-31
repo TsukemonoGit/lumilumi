@@ -54,6 +54,7 @@ import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
+import { addDebugLog } from "$lib/components/Debug/debug";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -257,7 +258,7 @@ export const makeMainFilters = (
     kinds.push(16);
   }
 
-  console.log("kind42inTL", lumiSetting.get().kind42inTL);
+  //console.log("kind42inTL", lumiSetting.get().kind42inTL);
   if (lumiSetting.get().kind42inTL) {
     kinds.push(42);
   }
@@ -300,7 +301,7 @@ export const makeMainFilters = (
     kinds: [10003],
     authors: [lumiSetting.get().pubkey],
   });
-  console.log(filters);
+  // addDebugLog("mineFilters", filters);
 
   return { mainFilters: filters, olderFilters: olderFilters };
 };
@@ -388,7 +389,7 @@ export function publishEvent(ev: Nostr.EventParameters) {
     throw Error();
   }
   _rxNostr.send(ev).subscribe((packet) => {
-    console.log(
+    addDebugLog(
       `リレー ${packet.from} への送信が ${
         packet.ok ? "成功" : "失敗"
       } しました。`
@@ -440,7 +441,7 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
-        console.log(
+        addDebugLog(
           `リレー ${packet.from} への送信が ${
             packet.ok ? "成功" : "失敗"
           } しました。`
