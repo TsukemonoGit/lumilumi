@@ -28,7 +28,11 @@
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { debugInfo } from "../Debug/debug";
-  import { changeTheme, type ColorScheme } from "$lib/func/theme";
+  import {
+    setColorScheme,
+    setThemeMode,
+    type ColorScheme,
+  } from "$lib/func/theme";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -67,7 +71,7 @@
         lumiSetting: settings,
         showBanner: showBanner.get(),
         theme: localStorage.getItem("theme") ?? "system",
-        colorScheme: localStorage.getItem("colorScheme") ?? "orange",
+        colorScheme: localStorage.getItem("colorScheme") ?? "default",
         timelineFilter: timelineFilter.get(),
         uploader: $uploader,
       };
@@ -211,13 +215,15 @@
     }
 
     if (loadData.theme) {
-      setTheme(loadData.theme as Theme);
+      setThemeMode(loadData.theme as Theme);
       localStorage?.setItem("theme", loadData.theme);
     }
-
-    changeTheme((loadData.colorScheme || "orange") as ColorScheme);
-    localStorage?.setItem("colorScheme", loadData.colorScheme);
-
+    if (loadData.colorScheme) {
+      setColorScheme((loadData.colorScheme || "default") as ColorScheme);
+      localStorage?.setItem("colorScheme", loadData.colorScheme);
+    } else {
+      setColorScheme("default");
+    }
     if (loadData.timelineFilter) {
       try {
         const filter = loadData.timelineFilter;

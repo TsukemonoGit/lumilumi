@@ -1,7 +1,7 @@
 <!--ColorThemeSe.EthiopicCalendar.svelte-->
 
 <script lang="ts">
-  import { changeTheme, type ColorScheme } from "$lib/func/theme";
+  import { setColorScheme, type ColorScheme } from "$lib/func/theme";
   import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
   import { onMount } from "svelte";
 
@@ -9,16 +9,16 @@
 
   // 選択候補
   const colorSchemes: SelectOption<ColorScheme>[] = [
-    { value: "orange", label: "Orange" },
-    { value: "grayscale", label: "Grayscale" },
+    { value: "default", label: "Orange" },
+    { value: "gray", label: "Gray" },
   ];
 
   // 保存されたスキームを取得
-  let currentScheme: ColorScheme = "orange";
+  let currentScheme: ColorScheme = "default";
 
   onMount(() => {
     const stored = localStorage?.getItem("colorScheme");
-    if (stored === "orange" || stored === "grayscale") {
+    if (stored === "default" || stored === "gray") {
       currentScheme = stored;
     }
   });
@@ -41,7 +41,7 @@
     onSelectedChange: ({ curr, next }) => {
       const selected = optionToScheme(next ?? curr ?? colorSchemes[0]);
       currentScheme = selected;
-      changeTheme(selected);
+      setColorScheme(selected);
       localStorage?.setItem("colorScheme", selected);
       return schemeToOption(selected);
     },
@@ -82,7 +82,7 @@
       >
         <div
           class="w-3 h-3 rounded-full"
-          style="background-color: {value === 'orange' ? '#f38d1c' : '#999'}"
+          style="background-color: {value === 'default' ? '#f38d1c' : '#999'}"
         ></div>
         <span class="text-sm font-semibold">{label}</span>
       </button>

@@ -1,36 +1,80 @@
 import { browser } from "$app/environment";
-export type ColorScheme = "orange" | "grayscale";
-export function changeTheme(colorScheme: string = "orange") {
+import { tick } from "svelte";
+
+export type ColorScheme = "default" | "gray";
+export type ThemeMode = "light" | "dark" | "system";
+
+export function initThemeSettings() {
   if (!browser) return;
+
+  const theme = (localStorage.getItem("theme") as ThemeMode) ?? "system";
+  const scheme = getCurrentColorScheme();
+
+  applyThemeMode(theme);
+  applyColorScheme(scheme);
+}
+
+export async function setThemeMode(mode: ThemeMode) {
+  if (!browser) return;
+  localStorage.setItem("theme", mode);
+  applyThemeMode(mode);
+  await tick();
+  // 再描画のため現在のカラースキーム再適用
+  applyColorScheme(getCurrentColorScheme());
+}
+
+export function setColorScheme(scheme: ColorScheme) {
+  if (!browser) return;
+  localStorage.setItem("colorScheme", scheme);
+  applyColorScheme(scheme);
+}
+
+function applyThemeMode(mode: ThemeMode) {
   const root = document.documentElement;
 
-  switch (colorScheme) {
-    case "orange":
-    default:
-      root.style.setProperty("--color-magnum-50", "255 249 237");
-      root.style.setProperty("--color-magnum-100", "254 242 214");
-      root.style.setProperty("--color-magnum-200", "252 224 172");
-      root.style.setProperty("--color-magnum-300", "249 201 120");
-      root.style.setProperty("--color-magnum-400", "247 177 85");
-      root.style.setProperty("--color-magnum-500", "243 141 28");
-      root.style.setProperty("--color-magnum-600", "228 115 18");
-      root.style.setProperty("--color-magnum-700", "189 87 17");
-      root.style.setProperty("--color-magnum-800", "150 69 22");
-      root.style.setProperty("--color-magnum-900", "121 58 21");
-      root.style.setProperty("--color-magnum-950", "65 28 9");
-      break;
-    case "grayscale":
-      root.style.setProperty("--color-magnum-50", "252 252 252");
-      root.style.setProperty("--color-magnum-100", "245 245 245");
-      root.style.setProperty("--color-magnum-200", "229 229 229");
-      root.style.setProperty("--color-magnum-300", "212 212 212");
-      root.style.setProperty("--color-magnum-400", "163 163 163");
-      root.style.setProperty("--color-magnum-500", "115 115 115");
-      root.style.setProperty("--color-magnum-600", "82 82 82");
-      root.style.setProperty("--color-magnum-700", "64 64 64");
-      root.style.setProperty("--color-magnum-800", "64 64 64");
-      root.style.setProperty("--color-magnum-900", "58 58 58");
-      root.style.setProperty("--color-magnum-950", "23 23 23");
-      break;
+  if (mode === "dark") {
+    root.classList.add("dark");
+  } else if (mode === "light") {
+    root.classList.remove("dark");
+  } else {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    root.classList.toggle("dark", prefersDark);
   }
+}
+
+// どこかで現在のカラースキームを追跡する変数を用意
+let currentColorSchemeClass: string | null = null;
+
+function applyColorScheme(scheme: ColorScheme) {
+  const root = document.documentElement;
+
+  if (currentColorSchemeClass) {
+    root.classList.remove(currentColorSchemeClass); // 以前のクラスを削除
+  }
+
+  if (scheme !== "default") {
+    root.classList.add(scheme);
+    currentColorSchemeClass = scheme; // 新しいクラスを設定
+  } else {
+    currentColorSchemeClass = null; // デフォルトの場合はクラスがない
+  }
+}
+
+export async function toggleDarkMode() {
+  if (!browser) return;
+
+  const root = document.documentElement;
+  const newIsDark = !root.classList.contains("dark");
+  root.classList.toggle("dark", newIsDark);
+  localStorage.setItem("theme", newIsDark ? "dark" : "light");
+  await tick();
+  // カラースキーム再適用
+  applyColorScheme(getCurrentColorScheme());
+}
+
+function getCurrentColorScheme(): ColorScheme {
+  if (!browser) return "default";
+  return (localStorage.getItem("colorScheme") as ColorScheme) ?? "default";
 }
