@@ -129,7 +129,7 @@
 
   $effect(() => {
     // ユーザーIDが変更された時にリセット
-    if (page.params.userId) {
+    if (page.params.npub) {
       timelineManager.fullReset();
     }
   });
@@ -440,7 +440,7 @@
           if (partialData.length === 0) return;
 
           timelineManager.updateCounts();
-          console.log(timelineManager.currentEventCount);
+          //console.log(timelineManager.currentEventCount);
           const stillNotEnough =
             timelineManager.currentEventCount <
             viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮

@@ -189,7 +189,11 @@
         event: kind10000,
       };
       // $mutes = $mutes;
-      localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      try {
+        localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "repost") {
       kind = 30007;
@@ -267,7 +271,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "reaction") {
       kind = 30007;
@@ -347,8 +355,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "zap") {
       kind = 30007;
@@ -427,7 +438,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     }
     console.log($mutebykinds);
@@ -512,7 +527,11 @@
         event: kind10000,
       };
       // $mutes = $mutes;
-      localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      try {
+        localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "repost") {
       dtag = "6";
@@ -594,7 +613,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "reaction") {
       ///kind:30007 の dtag 7 の最新を取得
@@ -674,7 +697,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else if (id === "zap") {
       dtag = "9734";
@@ -756,7 +783,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     }
   }
@@ -856,7 +887,11 @@
         event: ev,
       };
       // $mutes = $mutes;
-      localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      try {
+        localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     } else {
       //localStorageのデータを新しいのにする。
@@ -866,7 +901,11 @@
         updated: Math.floor(Date.now() / 1000),
       };
       // $mutebykinds = $mutebykinds;
-      localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      try {
+        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+      } catch (error) {
+        console.log("failed to save localStorage");
+      }
       $nowProgress = false;
     }
   }

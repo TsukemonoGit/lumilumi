@@ -69,8 +69,11 @@
           updated: Math.floor(Date.now() / 1000),
           event: pk.event,
         };
-
-        localStorage.setItem("lumiMute", JSON.stringify($mutes));
+        try {
+          localStorage.setItem("lumiMute", JSON.stringify($mutes));
+        } catch (error) {
+          console.log("Failed to save");
+        }
       }
     } else {
       $toastSettings = {

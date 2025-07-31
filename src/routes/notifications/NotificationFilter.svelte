@@ -3,11 +3,15 @@
 
   import { onlyFollowee } from "$lib/stores/stores";
 
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   const handleChangeChecked = () => {
     console.log($onlyFollowee);
-    localStorage.setItem("onlyFollowee", $onlyFollowee.toString());
+    try {
+      localStorage.setItem("onlyFollowee", $onlyFollowee.toString());
+    } catch (error) {
+      console.log("Failed to save");
+    }
   };
 </script>
 

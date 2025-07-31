@@ -60,15 +60,15 @@
     }
 
     //localのデータを整形 nameは未定？
-
-    localLumisetting = {
-      lumiSetting: settings,
-      showBanner: showBanner.get(),
-      theme: localStorage.getItem("theme") ?? "system",
-      timelineFilter: timelineFilter.get(),
-      uploader: $uploader,
-    };
-
+    try {
+      localLumisetting = {
+        lumiSetting: settings,
+        showBanner: showBanner.get(),
+        theme: localStorage.getItem("theme") ?? "system",
+        timelineFilter: timelineFilter.get(),
+        uploader: $uploader,
+      };
+    } catch (error) {}
     //オープンするときに最新の30078確認する
     $nowProgress = true;
     await get30078();

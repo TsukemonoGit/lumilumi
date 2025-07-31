@@ -23,8 +23,9 @@
   //   .join("\n");
   const setSettings = async () => {
     $nowProgress = true;
-    const lumi = localStorage.getItem("lumiSetting");
     try {
+      const lumi = localStorage.getItem("lumiSetting");
+
       if (lumi) {
         const savedSettings: LumiSetting = JSON.parse(lumi);
 

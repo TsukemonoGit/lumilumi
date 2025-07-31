@@ -67,8 +67,12 @@
     dialogOpen?.(false);
     invoiceOpen?.(true);
     invOp = true;
-    //サップの量保存
-    localStorage.setItem("zap", zapAmount.toString());
+    try {
+      //サップの量保存
+      localStorage.setItem("zap", zapAmount.toString());
+    } catch (error) {
+      console.log("failed to save localStorage");
+    }
   };
 
   let amountEle: HTMLInputElement | undefined = $state();

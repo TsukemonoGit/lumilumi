@@ -12,6 +12,7 @@
   import { mainMenuItems } from "./menu";
   import HomeOptions from "./HomeOptions.svelte";
   import GlobalOptions from "./GlobalOptions.svelte";
+  import { browser } from "$app/environment";
 
   let _showBanner: boolean = $state(showBanner.get());
 
@@ -37,7 +38,13 @@
       //console.log(_showBanner);
       untrack(() => {
         showBanner.set(_showBanner);
-        localStorage.setItem("showBanner", showBanner.get().toString());
+        try {
+          if (browser) {
+            localStorage.setItem("showBanner", showBanner.get().toString());
+          }
+        } catch (error: any) {
+          console.warn("Failed to save timelineFilter:", error);
+        }
       });
     }
   });
@@ -46,9 +53,16 @@
   const onMuteChange = () => {
     timelineFilter.update((cur) => {
       console.log(cur);
-      const tlFilter = { ...cur, adaptMute: !cur.adaptMute };
-      localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
-      return tlFilter;
+      try {
+        const tlFilter = { ...cur, adaptMute: !cur.adaptMute };
+        if (browser) {
+          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+        }
+        return tlFilter;
+      } catch (error: any) {
+        console.warn("Failed to save timelineFilter:", error);
+        return cur;
+      }
     });
   };
 </script>
