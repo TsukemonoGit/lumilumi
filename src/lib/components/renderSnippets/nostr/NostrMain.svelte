@@ -109,6 +109,7 @@
     }
 
     const savedSettings: LumiSetting | null = loadSettingsFromLocalStorage();
+    addDebugLog(`savedSettings`, savedSettings);
     try {
       loadMutetokanoSettei();
     } catch (error) {
@@ -149,7 +150,7 @@
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
     if (typeof obj !== "object" || obj === null) return false;
-    const o = obj as any;
+    /*  const o = obj as any;
     if (typeof o.pubkey !== "string" || typeof o.useRelaySet !== "string")
       return false;
     if (!Array.isArray(o.relays)) return false;
@@ -188,7 +189,7 @@
       !Array.isArray(o.defaultReaction.tag) ||
       !o.defaultReaction.tag.every((t: unknown) => typeof t === "string")
     )
-      return false;
+      return false; */
     return true;
   }
 
@@ -206,6 +207,7 @@
 
   function applySavedSettings(settings: LumiSetting) {
     lumiSetting.set(settings);
+    addDebugLog("Settings applied to lumiSetting store");
     if (!lumiSetting.get().imageAutoExpand) {
       lumiSetting.update((v) => ({ ...v, imageAutoExpand: "all" }));
     }
