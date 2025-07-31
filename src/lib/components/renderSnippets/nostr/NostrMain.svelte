@@ -150,19 +150,18 @@
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
     if (typeof obj !== "object" || obj === null) return false;
-    /*  const o = obj as any;
-    if (typeof o.pubkey !== "string" || typeof o.useRelaySet !== "string")
+
+    const o = obj as any;
+
+    // 必須の文字列プロパティ
+    if (typeof o.pubkey !== "string" || typeof o.useRelaySet !== "string") {
       return false;
-    if (!Array.isArray(o.relays)) return false;
-    for (const r of o.relays) {
-      if (
-        typeof r !== "object" ||
-        typeof r.url !== "string" ||
-        typeof r.read !== "boolean" ||
-        typeof r.write !== "boolean"
-      )
-        return false;
     }
+
+    // relays配列のチェック
+    if (!Array.isArray(o.relays)) return false;
+
+    // booleanプロパティのチェック
     const boolKeys = [
       "showImg",
       "embed",
@@ -179,17 +178,29 @@
     for (const key of boolKeys) {
       if (typeof o[key] !== "boolean") return false;
     }
+
+    // numberプロパティのチェック
     if (typeof o.picQuarity !== "number") return false;
-    if (typeof o.imageAutoExpand !== "object" || o.imageAutoExpand === null)
+
+    // imageAutoExpandのチェック（"all" | "following" | "manual"）
+    if (
+      typeof o.imageAutoExpand !== "string" ||
+      !["all", "following", "manual"].includes(o.imageAutoExpand)
+    ) {
       return false;
+    }
+
+    // defaultReactionオブジェクトのチェック
     if (
       typeof o.defaultReaction !== "object" ||
       o.defaultReaction === null ||
       typeof o.defaultReaction.content !== "string" ||
       !Array.isArray(o.defaultReaction.tag) ||
       !o.defaultReaction.tag.every((t: unknown) => typeof t === "string")
-    )
-      return false; */
+    ) {
+      return false;
+    }
+
     return true;
   }
 
