@@ -71,7 +71,7 @@
         lumiSetting: settings,
         showBanner: showBanner.get(),
         theme: localStorage.getItem("theme") ?? "system",
-        colorScheme: localStorage.getItem("colorScheme") ?? "orange",
+        colorScheme: localStorage.getItem("colorScheme") ?? "default",
         timelineFilter: timelineFilter.get(),
         uploader: $uploader,
       };
@@ -218,10 +218,12 @@
       setThemeMode(loadData.theme as Theme);
       localStorage?.setItem("theme", loadData.theme);
     }
-
-    setColorScheme((loadData.colorScheme || "orange") as ColorScheme);
-    localStorage?.setItem("colorScheme", loadData.colorScheme);
-
+    if (loadData.colorScheme) {
+      setColorScheme((loadData.colorScheme || "default") as ColorScheme);
+      localStorage?.setItem("colorScheme", loadData.colorScheme);
+    } else {
+      setColorScheme("default");
+    }
     if (loadData.timelineFilter) {
       try {
         const filter = loadData.timelineFilter;
