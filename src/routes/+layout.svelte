@@ -68,6 +68,7 @@
   import "$lib/i18n/index.ts";
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";
 
   let { data, children } = $props<{
     data:
@@ -336,3 +337,4 @@
   <DomainMigrationNotice />
 {/if} -->
 <Modal />
+<DebugPanel />
