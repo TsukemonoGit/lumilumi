@@ -160,17 +160,6 @@
 
     // relays配列のチェック
     if (!Array.isArray(o.relays)) return false;
-    for (const r of o.relays) {
-      if (
-        typeof r !== "object" ||
-        r === null ||
-        typeof r.url !== "string" ||
-        typeof r.read !== "boolean" ||
-        typeof r.write !== "boolean"
-      ) {
-        return false;
-      }
-    }
 
     // booleanプロパティのチェック
     const boolKeys = [
