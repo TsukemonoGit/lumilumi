@@ -26,8 +26,6 @@
   import { browser } from "$app/environment";
   import "../app.css";
 
-  import { setTheme } from "$lib/func/settings";
-  import type { Theme } from "$lib/types";
   import Toast from "$lib/components/Elements/Toast.svelte";
 
   import { QueryClientProvider } from "@tanstack/svelte-query";
@@ -70,9 +68,9 @@
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";
-  import { addDebugLog, debug, DEBUG_MODE } from "$lib/components/Debug/debug";
+  import { addDebugLog } from "$lib/components/Debug/debug";
 
-  import { initThemeSettings, setColorScheme } from "$lib/func/theme";
+  import { initThemeSettings } from "$lib/func/theme";
 
   let { data, children } = $props<{
     data:

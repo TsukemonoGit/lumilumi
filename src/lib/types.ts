@@ -18,14 +18,12 @@ export type RxReqBase = RxReq;
 export type ReqStatus = "loading" | "success" | "error";
 
 export type OldTimelineFilter = {
-  version?: 1;
   adaptMute: boolean;
   selectCanversation: number;
   excludeFollowee: boolean; // ← globalがない
 };
 
 export interface TimelineFilter {
-  version: 2;
   adaptMute: boolean;
   selectCanversation: number;
   global: {
@@ -35,7 +33,6 @@ export interface TimelineFilter {
 }
 
 export const timelineFilterInit: TimelineFilter = {
-  version: 2,
   adaptMute: true,
   selectCanversation: 0,
   global: {
