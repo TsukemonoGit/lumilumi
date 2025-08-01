@@ -70,7 +70,7 @@
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";
-  import { addDebugLog } from "$lib/components/Debug/debug";
+  import { addDebugLog, debug, DEBUG_MODE } from "$lib/components/Debug/debug";
 
   import { initThemeSettings, setColorScheme } from "$lib/func/theme";
 
@@ -408,4 +408,6 @@
   <DomainMigrationNotice />
 {/if} -->
 <Modal />
-<DebugPanel />
+{#if $debug}
+  <DebugPanel />
+{/if}

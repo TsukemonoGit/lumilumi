@@ -30,6 +30,7 @@ export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 export const authRelay = createCustomStore<string[]>([]);
 
 export const bookmark10003 = createCustomStore<Nostr.Event | null>(null);
+
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数

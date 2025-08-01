@@ -13,6 +13,7 @@
   import HomeOptions from "./HomeOptions.svelte";
   import GlobalOptions from "./GlobalOptions.svelte";
   import { browser } from "$app/environment";
+  import { debug, DEBUG_MODE } from "$lib/components/Debug/debug";
 
   let _showBanner: boolean = $state(showBanner.get());
 
@@ -116,6 +117,17 @@
                       bind:checked={_showBanner}
                     />
                     {$_("settings.display.banner")}
+                  </label>
+                </li>
+
+                <li class="checkbox-item">
+                  <label class="label">
+                    <input
+                      type="checkbox"
+                      class="rounded-checkbox"
+                      bind:checked={$debug}
+                    />
+                    Debug Mode
                   </label>
                 </li>
               </ul>
