@@ -7,51 +7,61 @@
     toggleDebug,
     clearStorage,
     getStorageData,
-    debug, // これを使用
+    debug,
     debugInfo,
     debugWarn,
     debugError,
     debugSuccess,
     type LogLevel,
+    initErrorHandlers,
   } from "./debug";
 
-  // 新しく追加する関数（debug.tsに実装）
-  function initErrorHandlers() {
-    // グローバルエラーハンドラを追加
-    window.addEventListener("error", (event) => {
-      debugError("Uncaught Error", {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        stack: event.error?.stack,
-      });
+  // Clipboard APIのフォールバック付きコピー関数
+  function copyToClipboard(text: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // モダンブラウザのClipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(text)
+          .then(resolve)
+          .catch(() => {
+            // フォールバック実行
+            fallbackCopyToClipboard(text, resolve, reject);
+          });
+      } else {
+        // 古いブラウザ用のフォールバック
+        fallbackCopyToClipboard(text, resolve, reject);
+      }
     });
+  }
 
-    // Promiseの未処理の拒否をキャッチ
-    window.addEventListener("unhandledrejection", (event) => {
-      debugError("Unhandled Promise Rejection", {
-        reason: event.reason,
-        stack: event.reason?.stack,
-      });
-    });
+  // フォールバック用コピー関数
+  function fallbackCopyToClipboard(
+    text: string,
+    resolve: () => void,
+    reject: () => void
+  ) {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
 
-    // console.error等をオーバーライド
-    const originalConsole = {
-      error: console.error,
-      warn: console.warn,
-      log: console.log,
-    };
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
 
-    console.error = (...args) => {
-      originalConsole.error(...args);
-      debugError("Console Error", args);
-    };
-
-    console.warn = (...args) => {
-      originalConsole.warn(...args);
-      debugWarn("Console Warning", args);
-    };
+      if (successful) {
+        resolve();
+      } else {
+        reject();
+      }
+    } catch (err) {
+      reject();
+    }
   }
 
   // ログをクリップボードにコピーする関数
@@ -71,8 +81,7 @@
       })
       .join("\n\n");
 
-    navigator.clipboard
-      .writeText(logText)
+    copyToClipboard(logText)
       .then(() => {
         debugSuccess("ログをクリップボードにコピーしました");
       })
@@ -92,8 +101,7 @@
           : log.details);
     }
 
-    navigator.clipboard
-      .writeText(text)
+    copyToClipboard(text)
       .then(() => {
         debugSuccess("ログをコピーしました");
       })
@@ -157,8 +165,10 @@
       throw new Error("テスト用の未処理エラー");
     }, 100);
 
-    // Promise rejection
-    Promise.reject(new Error("テスト用のPromise拒否"));
+    // Promise rejection（対応ブラウザのみ）
+    if (typeof Promise !== "undefined") {
+      Promise.reject(new Error("テスト用のPromise拒否"));
+    }
   }
 
   onMount(() => {
@@ -200,35 +210,35 @@
       <h3 style="margin-top: 0; color: #17a2b8;">Debug Panel</h3>
 
       <div
-        style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 5px;"
+        style="margin-bottom: 15px; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap;"
       >
         <button
           onclick={() => getStorageData()}
-          style="background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          style="background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           Refresh
         </button>
         <button
           onclick={clearStorage}
-          style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           Clear Storage
         </button>
         <button
           onclick={testLogs}
-          style="background: #6f42c1; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          style="background: #6f42c1; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           Test Logs
         </button>
         <button
           onclick={testConsoleError}
-          style="background: #fd7e14; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          style="background: #fd7e14; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           Test Errors
         </button>
         <button
           onclick={copyLogsToClipboard}
-          style="background: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;"
+          style="background: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           📋 Copy All
         </button>
@@ -284,7 +294,7 @@
             >
 
             <div
-              style="display: flex; align-items: center; margin-bottom: 2px; padding-right: 25px;"
+              style="display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin-bottom: 2px; padding-right: 25px;"
             >
               <span style="margin-right: 6px;">{getLevelIcon(log.level)}</span>
               <span

@@ -97,3 +97,47 @@ export const debugSuccess = (message: string, details?: any) =>
   addDebugLog(message, details, "success");
 export const debugLog = (message: string, details?: any) =>
   addDebugLog(message, details, "debug");
+
+// 新しく追加する関数（debug.tsに実装）
+export function initErrorHandlers() {
+  // グローバルエラーハンドラを追加
+  window.addEventListener("error", (event) => {
+    debugError("Uncaught Error", {
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+      stack: event.error && event.error.stack ? event.error.stack : null,
+    });
+  });
+
+  // Promiseの未処理の拒否をキャッチ（対応ブラウザのみ）
+  if (
+    typeof window.addEventListener === "function" &&
+    "onunhandledrejection" in window
+  ) {
+    window.addEventListener("unhandledrejection", (event) => {
+      debugError("Unhandled Promise Rejection", {
+        reason: event.reason,
+        stack: event.reason && event.reason.stack ? event.reason.stack : null,
+      });
+    });
+  }
+
+  // console.error等をオーバーライド
+  const originalConsole = {
+    error: console.error,
+    warn: console.warn,
+    log: console.log,
+  };
+
+  console.error = (...args) => {
+    originalConsole.error(...args);
+    debugError("Console Error", args);
+  };
+
+  console.warn = (...args) => {
+    originalConsole.warn(...args);
+    debugWarn("Console Warning", args);
+  };
+}
