@@ -1,12 +1,12 @@
 // src/lib/utils/debug.ts
 
 import { writable } from "svelte/store";
-export const debug = writable(false);
+
 export const DEBUG_MODE =
   import.meta.env.DEV || import.meta.env.VITE_DEBUG === "true";
 
 export type LogLevel = "info" | "warn" | "error" | "success" | "debug";
-
+export const debug = writable(DEBUG_MODE);
 export interface DebugLog {
   message: string;
   level: LogLevel;
@@ -16,7 +16,7 @@ export interface DebugLog {
 
 export const debugLogs = writable<DebugLog[]>([]);
 export const storageData = writable<Record<string, any>>({});
-export const showDebug = writable(DEBUG_MODE);
+export const showDebug = writable(false);
 
 export function addDebugLog(
   message: string,
