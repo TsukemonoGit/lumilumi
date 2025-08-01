@@ -171,6 +171,19 @@
     }
   }
 
+  // キャッシュクリア関数を追加
+  async function clearCaches() {
+    try {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      debugSuccess(`${cacheNames.length}個のキャッシュを削除しました`, {
+        cacheNames,
+      });
+    } catch (error) {
+      debugError("キャッシュ削除に失敗しました", error);
+    }
+  }
+
   onMount(() => {
     // エラーハンドラを初期化
     initErrorHandlers();
@@ -223,6 +236,12 @@
           style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
         >
           Clear Storage
+        </button>
+        <button
+          onclick={clearCaches}
+          style="background: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; margin-right: 5px; margin-bottom: 5px;"
+        >
+          🗑️ Clear Cache
         </button>
         <button
           onclick={testLogs}
