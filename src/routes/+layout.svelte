@@ -408,6 +408,5 @@
   <DomainMigrationNotice />
 {/if} -->
 <Modal />
-{#if $debug}
-  <DebugPanel />
-{/if}
+
+<DebugPanel />
