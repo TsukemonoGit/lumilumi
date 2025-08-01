@@ -90,12 +90,12 @@ export default {
           "Segoe UI Symbol",
         ],
       },
-      typography: (theme) => ({
+      typography: (utils) => ({
         DEFAULT: {
           css: {
             code: {
               position: "relative",
-              borderRadius: theme("borderRadius.md"),
+              borderRadius: utils.theme("borderRadius.md"),
             },
           },
         },
