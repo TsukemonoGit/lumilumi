@@ -76,25 +76,18 @@
 
       if (saved && typeof saved === "object" && saved !== null) {
         const sf = saved as any;
-        if (sf.version === 2) {
-          if (typeof sf.adaptMute === "boolean")
-            defaultFilter.adaptMute = sf.adaptMute;
-          if (typeof sf.selectCanversation === "number")
-            defaultFilter.selectCanversation = sf.selectCanversation;
-          if (sf.global && typeof sf.global === "object") {
-            if (typeof sf.global.excludeFollowee === "boolean")
-              defaultFilter.global.excludeFollowee = sf.global.excludeFollowee;
-            if (typeof sf.global.excludeConversation === "boolean")
-              defaultFilter.global.excludeConversation =
-                sf.global.excludeConversation;
-          }
-        } else {
-          if (typeof sf.adaptMute === "boolean")
-            defaultFilter.adaptMute = sf.adaptMute;
-          if (typeof sf.selectCanversation === "number")
-            defaultFilter.selectCanversation = sf.selectCanversation;
-          if (typeof sf.excludeFollowee === "boolean")
-            defaultFilter.global.excludeFollowee = sf.excludeFollowee;
+
+        if (typeof sf.adaptMute === "boolean")
+          defaultFilter.adaptMute = sf.adaptMute;
+        if (typeof sf.selectCanversation === "number")
+          defaultFilter.selectCanversation = sf.selectCanversation;
+
+        if (sf.global && typeof sf.global === "object") {
+          if (typeof sf.global.excludeFollowee === "boolean")
+            defaultFilter.global.excludeFollowee = sf.global.excludeFollowee;
+          if (typeof sf.global.excludeConversation === "boolean")
+            defaultFilter.global.excludeConversation =
+              sf.global.excludeConversation;
         }
       }
 
@@ -142,7 +135,6 @@
       localStorage.setItem = originalSetItem;
     };
   });
-
   function initializeRxNostr() {
     if (!$app?.rxNostr) setRxNostr();
     if (!$app?.rxNostr3) setRxNostr3();

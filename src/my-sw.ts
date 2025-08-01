@@ -29,7 +29,7 @@ const cacheName = cacheNames.runtime;
 
 //avaratのキャッシュ
 const CACHE_NAME = "avatar-cache";
-const MAX_ENTRIES = 200;
+const MAX_ENTRIES = 100;
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7日
 const CHECK_INTERVAL = 30 * 1000; // 30秒
 const REMAINING_TIME_THRESHOLD = 60 * 60 * 24 * 1000; // 1日
@@ -204,7 +204,21 @@ async function handleInstallEvent(event: ExtendableEvent) {
     caches
       .open(cacheName)
       .then(async (cache) => {
-        const existingRequests = await cache.keys();
+        let existingRequests: readonly Request[] = [];
+
+        try {
+          existingRequests = await cache.keys();
+          if (existingRequests.length > 1000) {
+            console.warn(
+              "[SW] Too many cache entries, skipping install cache population"
+            );
+            return;
+          }
+        } catch (e) {
+          console.error("[SW] cache.keys() failed during install:", e);
+          return;
+        }
+
         const existingURLs = new Set(existingRequests.map((req) => req.url));
         const newEntries = cacheEntries.filter(
           (entry) => !existingURLs.has((entry as Request).url)
@@ -214,12 +228,11 @@ async function handleInstallEvent(event: ExtendableEvent) {
           try {
             await cache.addAll(newEntries);
           } catch (err) {
-            console.error("Failed to cache some resources:", err);
+            console.error("[SW] Failed to cache some install resources:", err);
           }
         }
       })
       .then(() => {
-        // キャッシュ追加後にサービスワーカーをすぐにアクティブにする
         self.skipWaiting();
       })
   );
@@ -227,20 +240,42 @@ async function handleInstallEvent(event: ExtendableEvent) {
 
 async function handleActivateEvent(event: ExtendableEvent) {
   event.waitUntil(
-    caches.open(cacheName).then(async (cache) => {
-      const cacheKeys = await cache.keys();
-      for (const request of cacheKeys) {
-        if (!manifestURLs.includes(request.url)) {
-          await cache.delete(request);
+    (async () => {
+      try {
+        const cache = await caches.open(cacheName);
+        const cacheKeys = await cache.keys();
+
+        if (cacheKeys.length > 2000) {
+          console.warn("[SW] Too many cache entries, skipping manifest clean");
+        } else {
+          for (const request of cacheKeys) {
+            if (!manifestURLs.includes(request.url)) {
+              await cache.delete(request);
+            }
+          }
         }
+      } catch (e) {
+        console.error("[SW] cache.keys() failed during activate:", e);
       }
-    }),
-    caches.open(mediaCacheName).then(async (cache) => {
-      const cacheKeys = await cache.keys();
-      for (const request of cacheKeys) {
-        await cache.delete(request);
+    })(),
+
+    (async () => {
+      try {
+        const mediaCache = await caches.open(mediaCacheName);
+        const mediaKeys = await mediaCache.keys();
+
+        if (mediaKeys.length > 1000) {
+          console.warn("[SW] Too many media cache entries, clearing all");
+          await Promise.all(mediaKeys.map((req) => mediaCache.delete(req)));
+        } else {
+          for (const request of mediaKeys) {
+            await mediaCache.delete(request);
+          }
+        }
+      } catch (e) {
+        console.error("[SW] Failed to clear media cache:", e);
       }
-    })
+    })()
   );
 }
 
