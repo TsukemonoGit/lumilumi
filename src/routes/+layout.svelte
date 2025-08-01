@@ -5,7 +5,7 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -158,6 +158,10 @@
       );
       try {
         initThemeSettings();
+      } catch (error) {
+        addDebugLog(`Error loading settings from localStorage: ${error}`);
+      }
+      try {
         const tmp = localStorage.getItem("uploader");
         addDebugLog(
           `Loaded uploader setting from localStorage: ${tmp ?? "not set"}`
@@ -168,9 +172,10 @@
         addDebugLog(`Loaded banner setting from localStorage: ${banner}`);
         showBanner.set(banner);
       } catch (error) {
-        addDebugLog(`Error loading settings from localStorage: ${error}`);
+        addDebugLog(
+          `Error loading uploader showBanner from localStorage: ${error}`
+        );
       }
-
       if (!$app?.rxNostr) {
         addDebugLog("RxNostr not initialized, calling setRxNostr");
         setRxNostr();
@@ -200,6 +205,7 @@
         description: `${$_("nostrlogin.description")}`,
       });
       addDebugLog("Nostr-login initialization completed");
+      await tick();
 
       nlBanner = document.getElementsByTagName(
         "nl-banner"
