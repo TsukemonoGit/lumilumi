@@ -7,13 +7,12 @@
     toggleDebug,
     clearStorage,
     getStorageData,
-    DEBUG_MODE,
+    debug, // これを使用
     debugInfo,
     debugWarn,
     debugError,
     debugSuccess,
     type LogLevel,
-    debug,
   } from "./debug";
 
   // 新しく追加する関数（debug.tsに実装）

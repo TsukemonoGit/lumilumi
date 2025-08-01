@@ -6,7 +6,10 @@ export const DEBUG_MODE =
   import.meta.env.DEV || import.meta.env.VITE_DEBUG === "true";
 
 export type LogLevel = "info" | "warn" | "error" | "success" | "debug";
+
+// DEBUG_MODEの値で初期化
 export const debug = writable(DEBUG_MODE);
+
 export interface DebugLog {
   message: string;
   level: LogLevel;
@@ -23,7 +26,12 @@ export function addDebugLog(
   details?: any,
   level: LogLevel = "info"
 ) {
-  if (!DEBUG_MODE) return;
+  // debug ストアの値をチェック
+  let debugEnabled = false;
+  debug.subscribe((value) => (debugEnabled = value))();
+
+  if (!debugEnabled) return;
+
   const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
 
   const log: DebugLog = {
@@ -34,12 +42,14 @@ export function addDebugLog(
   };
 
   debugLogs.update((logs) => [log, ...logs].slice(0, 50));
-
-  // console.log(`[${level.toUpperCase()}] ${message}`, details);
 }
 
 export function getStorageData(keys = ["timelineFilter", "lumiSetting"]) {
-  if (!DEBUG_MODE) return;
+  let debugEnabled = false;
+  debug.subscribe((value) => (debugEnabled = value))();
+
+  if (!debugEnabled) return;
+
   const data: Record<string, any> = {};
 
   keys.forEach((key) => {
@@ -56,7 +66,11 @@ export function getStorageData(keys = ["timelineFilter", "lumiSetting"]) {
 }
 
 export function toggleDebug() {
-  if (!DEBUG_MODE) return;
+  let debugEnabled = false;
+  debug.subscribe((value) => (debugEnabled = value))();
+
+  if (!debugEnabled) return;
+
   showDebug.update((v) => {
     const next = !v;
     if (next) getStorageData();
