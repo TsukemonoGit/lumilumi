@@ -3,10 +3,6 @@
 import "vite-plugin-pwa/pwa-assets";
 
 declare global {
-  interface Window {
-    __ERUDA_LOADED__?: boolean;
-  }
-
   namespace App {
     // interface Error {}
     // interface Locals {}
