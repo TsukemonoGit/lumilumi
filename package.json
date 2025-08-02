@@ -46,6 +46,7 @@
     "@rx-nostr/crypto": "^0.0.0",
     "@tanstack/svelte-query": "^5.83.1",
     "@tanstack/svelte-query-devtools": "^5.84.0",
+    "eruda": "^3.4.3",
     "graphemesplit": "^2.6.0",
     "leaflet": "^1.9.4",
     "light-bolt11-decoder": "^3.2.0",

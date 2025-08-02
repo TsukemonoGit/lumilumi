@@ -71,6 +71,7 @@
   import { addDebugLog } from "$lib/components/Debug/debug";
 
   import { initThemeSettings } from "$lib/func/theme";
+  import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
 
   let { data, children } = $props<{
     data:
@@ -412,5 +413,7 @@
   <DomainMigrationNotice />
 {/if} -->
 <Modal />
-
+<!--
 <DebugPanel />
+ -->
+<DebugPanel2 />
