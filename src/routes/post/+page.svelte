@@ -15,6 +15,7 @@
   import { convertMetaTags } from "$lib/func/imeta";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { beforeNavigate } from "$app/navigation";
+  import { waitNostr } from "nip07-awaiter";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -127,6 +128,8 @@
 
           // FileListを生成してハンドル関数に渡す
           const fileList = createFileList(files as File[]);
+          //初期化待ち
+          await waitNostr(1000);
           handleFilesUpload(fileList, sharedContent);
         }
       });
