@@ -19,7 +19,7 @@ import {
 } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
 import { generateRandomId } from "./nostr";
-import { Subscription, type Observable } from "rxjs";
+import { type Subscription, type Observable } from "rxjs";
 
 export function useReq(
   {
