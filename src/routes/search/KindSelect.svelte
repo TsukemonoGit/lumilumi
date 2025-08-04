@@ -38,7 +38,7 @@
       <div
         class="item"
         use:melt={$item}
-        onm-click={() => handleClickKind(kind)}
+        on:m-click={() => handleClickKind(kind)}
       >
         {kind}
         {$locale === "ja" ? ja : en}
