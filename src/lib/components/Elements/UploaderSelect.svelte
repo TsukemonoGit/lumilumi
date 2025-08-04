@@ -72,7 +72,7 @@
     >
       {#each options as item}
         <div
-          on:m-click={() => handleClickSelect(item.value)}
+          onm-click={() => handleClickSelect(item.value)}
           class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-100
           hover:bg-magnum-100 focus:z-10
           focus:text-magnum-700

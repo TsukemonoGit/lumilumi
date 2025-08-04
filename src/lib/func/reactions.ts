@@ -3,7 +3,7 @@ import type { ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
 import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
-import { Observable, Subscription } from "rxjs";
+import { type Observable, type Subscription } from "rxjs";
 import * as Nostr from "nostr-typedef";
 
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
