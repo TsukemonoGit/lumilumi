@@ -1,12 +1,12 @@
 <!--Claude-->
 <script lang="ts">
-  import { onMount } from "svelte";
-  import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
-  import { Zap, Cake, Gift, Music, PartyPopper, Sparkles } from "lucide-svelte";
+  import { onMount } from 'svelte';
+  import UserZap from '$lib/components/NostrElements/user/UserZap.svelte';
+  import { Zap, Cake, Gift, Music, PartyPopper, Sparkles } from 'lucide-svelte';
 
-  import UserName from "../NostrElements/user/UserName.svelte";
+  import UserName from '../NostrElements/user/UserName.svelte';
 
-  import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
+  import UserPopupMenu from '../NostrElements/user/UserPopupMenu.svelte';
 
   interface Confetti {
     id: number; // 一意の識別子
@@ -16,7 +16,7 @@
     color: string; // 紙吹雪の色（CSSクラス名）
     size: number; // 紙吹雪のサイズ（rem）
     rotation: number; // 紙吹雪の回転角度（度）
-    shape: "circle" | "square"; // 紙吹雪の形状
+    shape: 'circle' | 'square'; // 紙吹雪の形状
   }
 
   interface Present {
@@ -37,19 +37,19 @@
 
   // 色のテーマを設定
   const colors = [
-    "from-pink-500 to-orange-400",
-    "from-purple-500 to-indigo-500",
-    "from-yellow-400 to-amber-500",
-    "from-green-400 to-emerald-500",
-    "from-blue-400 to-cyan-500",
+    'from-pink-500 to-orange-400',
+    'from-purple-500 to-indigo-500',
+    'from-yellow-400 to-amber-500',
+    'from-green-400 to-emerald-500',
+    'from-blue-400 to-cyan-500'
   ];
 
   // ギフトのスタイル
   const giftStyles = [
-    "from-red-500 to-pink-400 border-yellow-300",
-    "from-blue-500 to-indigo-400 border-purple-300",
-    "from-green-500 to-emerald-400 border-lime-300",
-    "from-orange-500 to-amber-400 border-yellow-300",
+    'from-red-500 to-pink-400 border-yellow-300',
+    'from-blue-500 to-indigo-400 border-purple-300',
+    'from-green-500 to-emerald-400 border-lime-300',
+    'from-orange-500 to-amber-400 border-yellow-300'
   ];
 
   // ランダムな位置を生成
@@ -118,7 +118,7 @@
         color: getRandomItem(colors),
         size: 0.5 + Math.random() * 0.8,
         rotation: randomRotation(),
-        shape: Math.random() > 0.5 ? "circle" : "square",
+        shape: Math.random() > 0.5 ? 'circle' : 'square'
       });
     }
 
@@ -130,7 +130,7 @@
         delay: 1 + Math.random() * 2,
         style: getRandomItem(giftStyles),
         size: 3 + Math.random() * 2,
-        isZap: i % 3 === 0, // いくつかのプレゼントはZapにする
+        isZap: i % 3 === 0 // いくつかのプレゼントはZapにする
       });
     }
 
@@ -180,7 +180,7 @@
         "
       >
         <div
-          class={`bg-gradient-to-br ${item.color} ${item.shape === "circle" ? "rounded-full" : ""} pointer-events-none`}
+          class={`bg-gradient-to-br ${item.color} ${item.shape === 'circle' ? 'rounded-full' : ''} pointer-events-none`}
           style="
             width: {item.size}rem;
             height: {item.size}rem;
@@ -204,7 +204,7 @@
               <div class="flex flex-col items-center">
                 <Zap
                   class="zap bg-gradient-to-r from-yellow-400 to-amber-500 stroke-purple-800 rounded-full hover:scale-110 active:scale-95 transition-transform"
-                  size={present.size + "rem"}
+                  size={present.size + 'rem'}
                 />
                 <PartyPopper
                   class="text-yellow-400 animate-bounce mt-2"
@@ -396,6 +396,7 @@
     background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
     background-size: 300% 300%;
     animation: rainbow 4s linear infinite;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
@@ -445,6 +446,7 @@
     animation: name-pulse 2s infinite;
     background: linear-gradient(90deg, #fff6e0, #ffeda0, #fff6e0);
     background-size: 200% auto;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 600;

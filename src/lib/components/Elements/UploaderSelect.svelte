@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { mediaUploader } from "$lib/func/constants";
-  import { uploader } from "$lib/stores/stores";
-  import { createSelect, melt } from "@melt-ui/svelte";
-  import { Check, ChevronDown } from "lucide-svelte";
-  import { fade } from "svelte/transition";
+  import { mediaUploader } from '$lib/func/constants';
+  import { uploader } from '$lib/stores/stores';
+  import { createSelect, melt } from '@melt-ui/svelte';
+  import { Check, ChevronDown } from 'lucide-svelte';
+  import { fade } from 'svelte/transition';
 
   interface Props {
     selectedUploader: string;
@@ -13,7 +13,7 @@
 
   const options = mediaUploader.map((url, index) => ({
     value: url,
-    label: getHostname(url),
+    label: getHostname(url)
   }));
 
   // console.log(defaultValue);
@@ -24,28 +24,28 @@
       return new URL(url).hostname;
     } catch (error) {
       console.error(`Invalid URL: ${url}`);
-      return "Invalid URL";
+      return 'Invalid URL';
     }
   }
 
   const {
     elements: { trigger, menu, option },
     states: { selected, selectedLabel, open },
-    helpers: { isSelected },
+    helpers: { isSelected }
   } = createSelect<string>({
     forceVisible: true,
 
     positioning: {
-      placement: "bottom",
+      placement: 'bottom',
       fitViewport: true,
-      sameWidth: true,
-    },
+      sameWidth: true
+    }
   });
   //console.log($uploader);
   const handleClickSelect = (value: string) => {
     if (value) {
       selectedUploader = value;
-      localStorage?.setItem("uploader", value);
+      localStorage?.setItem('uploader', value);
     }
   };
 </script>
@@ -58,7 +58,7 @@
     aria-label="Food"
   >
     {($selected?.label ?? $uploader !== undefined)
-      ? getHostname($uploader ?? "")
+      ? getHostname($uploader ?? '')
       : options[0].label}
     <ChevronDown class="size-5" />
   </button>
@@ -72,7 +72,7 @@
     >
       {#each options as item}
         <div
-          onm-click={() => handleClickSelect(item.value)}
+          on:m-click={() => handleClickSelect(item.value)}
           class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-100
           hover:bg-magnum-100 focus:z-10
           focus:text-magnum-700

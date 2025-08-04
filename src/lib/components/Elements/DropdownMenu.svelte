@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { createDropdownMenu, melt } from "@melt-ui/svelte";
+  import { createDropdownMenu, melt } from '@melt-ui/svelte';
 
-  import { fly } from "svelte/transition";
+  import { fly } from 'svelte/transition';
 
   interface Props {
     menuTexts?: { icon: any; text: string }[];
     handleSelectItem: (arg0: number) => any;
-    children?: import("svelte").Snippet;
+    children?: import('svelte').Snippet;
     buttonClass?: string;
     zIndex?: number;
   }
@@ -16,15 +16,15 @@
     handleSelectItem,
     children,
     zIndex = 40,
-    buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden w-fit",
+    buttonClass = 'hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden w-fit'
   }: Props = $props();
   const {
     elements: { trigger, menu, item, separator, arrow, overlay },
 
-    states: { open },
+    states: { open }
   } = createDropdownMenu({
     forceVisible: true,
-    loop: true,
+    loop: true
   });
 </script>
 
@@ -50,7 +50,7 @@
         class="item"
         style={`z-index:${zIndex}`}
         use:melt={$item}
-        onm-click={() => handleSelectItem(index)}
+        on:m-click={() => handleSelectItem(index)}
       >
         {#if Icon}<Icon class="icon mr-2 size-4 " />{/if}{text}
       </div>

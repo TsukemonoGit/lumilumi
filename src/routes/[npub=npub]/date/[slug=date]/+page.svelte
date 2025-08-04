@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import EmptyCardList from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte";
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
+  import { page } from '$app/state';
+  import EmptyCardList from '$lib/components/NostrElements/kindEvents/EventCard/EmptyCardList.svelte';
+  import LatestEvent from '$lib/components/renderSnippets/nostr/LatestEvent.svelte';
 
-  import type { LayoutData } from "../../$types";
-  import * as Nostr from "nostr-typedef";
+  import type { LayoutData } from '../../$types';
+  import * as Nostr from 'nostr-typedef';
 
-  import CalendarWidget from "./CalendarWidget.svelte";
+  import CalendarWidget from './CalendarWidget.svelte';
 
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { queryClient, toastSettings } from "$lib/stores/stores";
+  import OpenPostWindow from '$lib/components/OpenPostWindow.svelte';
+  import { queryClient, toastSettings } from '$lib/stores/stores';
 
-  import { getNip05FromMetadata } from "$lib/func/nip05";
-  import { error } from "@sveltejs/kit";
-  import type { EventPacket } from "rx-nostr";
-  import UserActivityLoader from "./UserActivityLoader.svelte";
+  import { getNip05FromMetadata } from '$lib/func/nip05';
+  import { error } from '@sveltejs/kit';
+  import type { EventPacket } from 'rx-nostr';
+  import UserActivityLoader from './UserActivityLoader.svelte';
 
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
     const slug = page.params.slug;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return null;
+    if (!slug || !/^\d{4}-\d{2}-\d{2}$/.test(slug)) return null;
 
-    const [y, m, d] = slug.split("-").map(Number);
+    const [y, m, d] = slug.split('-').map(Number);
     return new Date(y, m - 1, d); // ローカルの0:00:00
   });
   const maxHeight = undefined;
@@ -51,7 +51,7 @@
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
       .filter(
-        (tag) => tag[0] === "r" && tag.length > 1 //&& relayRegex.test(tag[1])
+        (tag) => tag[0] === 'r' && tag.length > 1 //&& relayRegex.test(tag[1])
         //    && relayRegex.test(tag[1]) &&
         //     (tag.length === 2 || tag[2] === "write")
       )
@@ -59,7 +59,7 @@
       .slice(0, 20);
   };
 
-  $inspect("userRelayList", userRelayList);
+  $inspect('userRelayList', userRelayList);
 
   // 共有機能
   async function handleShare() {
@@ -73,7 +73,7 @@
       try {
         // メタデータからNIP-05アドレスを取得
         const metadataPk: EventPacket | null | undefined =
-          queryClient.getQueryData(["metadata", data.pubkey]);
+          queryClient.getQueryData(['metadata', data.pubkey]);
         if (!metadataPk) throw error;
         const nip05Address = await getNip05FromMetadata(
           metadataPk.event,
@@ -89,7 +89,7 @@
           }
         }
       } catch (error) {
-        console.error("NIP-05 verification failed:", error);
+        console.error('NIP-05 verification failed:', error);
         // エラーが発生した場合は元のURLを使用
       }
     }
@@ -97,19 +97,19 @@
     // 共有処理
     try {
       const shareData = {
-        text: "",
-        url: shareUrl,
+        text: '',
+        url: shareUrl
       };
 
       await navigator.share(shareData);
     } catch (error: any) {
-      console.error("Share failed:", error.message);
+      console.error('Share failed:', error.message);
       // フォールバック処理（クリップボードにコピーなど）
       try {
         await navigator.clipboard.writeText(shareUrl);
-        console.log("URL copied to clipboard");
+        console.log('URL copied to clipboard');
       } catch (clipboardError) {
-        console.error("Failed to copy to clipboard:", clipboardError);
+        console.error('Failed to copy to clipboard:', clipboardError);
       }
     }
   }
@@ -124,7 +124,7 @@
       <!-- メインコンテンツ -->
       <div>
         <LatestEvent
-          queryKey={["relays", data.pubkey]}
+          queryKey={['relays', data.pubkey]}
           filters={[{ kinds: [10002], authors: [data.pubkey], limit: 1 }]}
           {onChange}
         >
@@ -213,7 +213,7 @@
   <OpenPostWindow
     options={{
       tags: [],
-      kind: 1,
+      kind: 1
     }}
   />
 </div>
