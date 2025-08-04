@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { eventKinds } from "$lib/func/kinds";
-  import { createDropdownMenu, melt } from "@melt-ui/svelte";
-  import { ChevronDown } from "lucide-svelte";
-  import { locale } from "@konemono/svelte5-i18n";
-  import { fly } from "svelte/transition";
+  import { eventKinds } from '$lib/func/kinds';
+  import { createDropdownMenu, melt } from '@melt-ui/svelte';
+  import { ChevronDown } from 'lucide-svelte';
+  import { locale } from '@konemono/svelte5-i18n';
+  import { fly } from 'svelte/transition';
 
   interface Props {
     selectedKind?: number | undefined;
@@ -13,10 +13,10 @@
   const {
     elements: { trigger, menu, item, separator, arrow },
 
-    states: { open },
+    states: { open }
   } = createDropdownMenu({
     forceVisible: true,
-    loop: true,
+    loop: true
   });
 
   const handleClickKind = (kind: number) => {
@@ -38,10 +38,10 @@
       <div
         class="item"
         use:melt={$item}
-        onm-click={() => handleClickKind(kind)}
+        on:m-click={() => handleClickKind(kind)}
       >
         {kind}
-        {$locale === "ja" ? ja : en}
+        {$locale === 'ja' ? ja : en}
       </div>
     {/each}
   </div>

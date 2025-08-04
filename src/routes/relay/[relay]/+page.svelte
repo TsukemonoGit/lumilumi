@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { afterNavigate, beforeNavigate } from "$app/navigation";
-  import RelayCard from "$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte";
-  import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { onMount } from "svelte";
-  import GlobalTimeline from "../../global/GlobalTimeline.svelte";
-  import type { PageData } from "./$types";
+  import { afterNavigate, beforeNavigate } from '$app/navigation';
+  import RelayCard from '$lib/components/NostrElements/kindEvents/EventCard/RelayCard.svelte';
+  import OpenPostWindow from '$lib/components/OpenPostWindow.svelte';
+  import { onMount } from 'svelte';
+  import GlobalTimeline from '../../global/GlobalTimeline.svelte';
+  import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
 
@@ -17,14 +17,14 @@
     init();
   });
   afterNavigate((navigate) => {
-    if (navigate.type === "form" || isMount) {
+    if (navigate.type === 'form' || isMount) {
       return;
     }
     init();
   });
 
   beforeNavigate((navigate) => {
-    if (navigate.type !== "form") {
+    if (navigate.type !== 'form') {
       relayUrl = undefined;
     }
   });
@@ -41,7 +41,7 @@
 
 {#if relayUrl}
   <div class="rounded-md border border-magnum-500">
-    <RelayCard url={relayUrl} write={false} read={false} />
+    <RelayCard url={relayUrl} write={false} read={false} zIndex={10} />
   </div>
 
   <GlobalTimeline globalRelays={[relayUrl]} timelineQuery={[relayUrl]} />
@@ -50,7 +50,7 @@
     <OpenPostWindow
       options={{
         tags: [],
-        kind: 1,
+        kind: 1
       }}
     />
   </div>
