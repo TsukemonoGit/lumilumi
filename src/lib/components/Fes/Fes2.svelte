@@ -396,6 +396,7 @@
     background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
     background-size: 300% 300%;
     animation: rainbow 4s linear infinite;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
@@ -445,6 +446,7 @@
     animation: name-pulse 2s infinite;
     background: linear-gradient(90deg, #fff6e0, #ffeda0, #fff6e0);
     background-size: 200% auto;
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 600;
