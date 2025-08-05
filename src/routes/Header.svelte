@@ -14,6 +14,7 @@
   import GlobalOptions from "./GlobalOptions.svelte";
   import { browser } from "$app/environment";
   import { debug, DEBUG_MODE } from "$lib/components/Debug/debug";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let _showBanner: boolean = $state(showBanner.get());
 
@@ -57,7 +58,10 @@
       try {
         const tlFilter = { ...cur, adaptMute: !cur.adaptMute };
         if (browser) {
-          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+          localStorage.setItem(
+            STORAGE_KEYS.TIMELINE_FILTER,
+            JSON.stringify(tlFilter)
+          );
         }
         return tlFilter;
       } catch (error: any) {
