@@ -37,7 +37,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   const STORAGE_KEY = "lumiSetting";
-  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+  const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
 

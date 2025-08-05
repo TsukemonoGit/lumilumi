@@ -15,6 +15,7 @@
   import { loginUser, verifier } from "$lib/stores/globalRunes.svelte";
 
   import { Progress } from "melt/builders";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
     buttonClass?: string;
@@ -189,7 +190,7 @@
       event: kind10030event,
     };
     try {
-      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+      localStorage.setItem(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
     } catch (error) {
       console.log("failed to save localStorage");
     }
