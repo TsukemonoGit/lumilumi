@@ -333,6 +333,7 @@
       amount: amount,
       comment: zapComment,
       zapRelays: zapRelays,
+      kind: note.kind,
     });
     if (zapInvoice === null) {
       $toastSettings = {
