@@ -4,6 +4,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable } from "svelte/store";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   const optionsArr = [
     ["0", `${$_("filter.canversation.all")}`],
@@ -29,7 +30,10 @@
         console.log(cur);
         try {
           const tlFilter = { ...cur, selectCanversation: Number(value) };
-          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+          localStorage.setItem(
+            STORAGE_KEYS.TIMELINE_FILTER,
+            JSON.stringify(tlFilter)
+          );
 
           return tlFilter;
         } catch (error) {

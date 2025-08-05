@@ -226,29 +226,19 @@ export interface DecodedGeohash {
   longitude: number;
 }
 
-export interface Kind30078LumiSetting {
+export interface LumiSettingBase {
+  lumiSetting: LumiSetting;
+  showBanner: boolean;
+  theme: string;
+  colorScheme: string;
+  timelineFilter: TimelineFilter;
+  uploader: string;
+  globalRegexFilter: string;
+}
+
+export interface Kind30078LumiSetting extends LumiSettingBase {
   name: string;
-  lumiSetting: LumiSetting;
-  showBanner: boolean;
-  theme: string;
-  colorScheme: string;
-  timelineFilter: TimelineFilter;
-  uploader: string;
   created_at: number;
-  // lumiSetting: string;
-  // showBanner: string;
-  // theme: string;
-  // timelineFilter: string;
-  // uploader: string;
-
-  //created_at: string;
 }
 
-export interface Kind30078LumiSettingObj {
-  lumiSetting: LumiSetting;
-  showBanner: boolean;
-  theme: string;
-  colorScheme: string;
-  timelineFilter: TimelineFilter;
-  uploader: string;
-}
+export interface Kind30078LumiSettingObj extends LumiSettingBase {}

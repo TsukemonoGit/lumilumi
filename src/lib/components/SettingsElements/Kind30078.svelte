@@ -33,6 +33,7 @@
     setThemeMode,
     type ColorScheme,
   } from "$lib/func/theme";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
     settingsChanged: () => boolean;
@@ -71,9 +72,12 @@
         lumiSetting: settings,
         showBanner: showBanner.get(),
         theme: localStorage.getItem("theme") ?? "system",
-        colorScheme: localStorage.getItem("colorScheme") ?? "default",
+        colorScheme:
+          localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) ?? "default",
         timelineFilter: timelineFilter.get(),
         uploader: $uploader,
+        globalRegexFilter:
+          localStorage.getItem(STORAGE_KEYS.REGEX_FILTER) ?? "",
       };
     } catch (error) {}
     //オープンするときに最新の30078確認する
@@ -229,12 +233,22 @@
     if (loadData.colorScheme) {
       setColorScheme((loadData.colorScheme || "default") as ColorScheme);
       try {
-        localStorage?.setItem("colorScheme", loadData.colorScheme);
+        localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, loadData.colorScheme);
       } catch (error) {
         debugError("failed to save", error);
       }
     } else {
       setColorScheme("default");
+    }
+    if (loadData.globalRegexFilter) {
+      try {
+        localStorage?.setItem(
+          STORAGE_KEYS.REGEX_FILTER,
+          loadData.globalRegexFilter
+        );
+      } catch (error) {
+        debugError("failed to save", error);
+      }
     }
     if (loadData.timelineFilter) {
       try {
@@ -265,7 +279,10 @@
 
         timelineFilter.set(mergedFilter);
         try {
-          localStorage?.setItem("timelineFilter", JSON.stringify(mergedFilter));
+          localStorage?.setItem(
+            STORAGE_KEYS.TIMELINE_FILTER,
+            JSON.stringify(mergedFilter)
+          );
         } catch (e) {
           console.warn("Failed to save loaded timelineFilter:", e);
         }
@@ -282,7 +299,7 @@
         timelineFilter.set(defaultFilter);
         try {
           localStorage?.setItem(
-            "timelineFilter",
+            STORAGE_KEYS.TIMELINE_FILTER,
             JSON.stringify(defaultFilter)
           );
         } catch (e) {

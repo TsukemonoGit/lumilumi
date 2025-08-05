@@ -34,6 +34,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import { addDebugLog, getStorageData } from "$lib/components/Debug/debug";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   const STORAGE_KEY = "lumiSetting";
   const lumiEmoji_STORAGE_KEY = "lumiEmoji";
@@ -59,7 +60,7 @@
       const followee = localStorage.getItem("onlyFollowee");
       if (followee === "true") $onlyFollowee = true;
 
-      const raw = localStorage.getItem("timelineFilter");
+      const raw = localStorage.getItem(STORAGE_KEYS.TIMELINE_FILTER);
       let saved: unknown = null;
       if (raw && raw !== "undefined" && raw !== "null") {
         try {
@@ -93,7 +94,10 @@
 
       timelineFilter.set(defaultFilter);
       try {
-        localStorage.setItem("timelineFilter", JSON.stringify(defaultFilter));
+        localStorage.setItem(
+          STORAGE_KEYS.TIMELINE_FILTER,
+          JSON.stringify(defaultFilter)
+        );
       } catch (e) {
         addDebugLog(`Failed to save timelineFilter: ${e}`);
       }
@@ -113,7 +117,7 @@
     getStorageData();
 
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "timelineFilter" || e.key === STORAGE_KEY) {
+      if (e.key === STORAGE_KEYS.TIMELINE_FILTER || e.key === STORAGE_KEY) {
         addDebugLog(`Storage changed: ${e.key}`);
         getStorageData();
       }
@@ -123,7 +127,7 @@
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = function (key: string, value: string) {
       originalSetItem.call(this, key, value);
-      if (key === "timelineFilter" || key === STORAGE_KEY) {
+      if (key === STORAGE_KEYS.TIMELINE_FILTER || key === STORAGE_KEY) {
         addDebugLog(`Storage updated: ${key}`);
         getStorageData();
       }

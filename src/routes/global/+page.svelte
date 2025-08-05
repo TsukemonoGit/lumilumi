@@ -28,6 +28,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import RegexFilter from "./RegexFilter.svelte";
 
   // Constants
   //const TIE_KEY = "global";
@@ -224,6 +225,9 @@
   $effect(() => {
     reinitializeTimeline();
   });
+
+  let regexFilter: RegExp | null = $state(null);
+
   const checkGlobalFilter = (note: Nostr.Event): boolean => {
     try {
       let check = true;
@@ -269,6 +273,12 @@
         }
       }
 
+      // ここで regexFilter が null でなければ note.content にマッチするか確認
+      //console.log(regexFilter);
+      if (regexFilter !== null && !regexFilter.test(note.content)) {
+        return false;
+      }
+
       return check;
     } catch (error) {
       console.warn("Error in checkGlobalFilter:", error);
@@ -305,7 +315,7 @@
         Description={GlobalDescription}
       />
     {/if}
-
+    <RegexFilter bind:filter={regexFilter} />
     <!-- {#snippet children()} -->
     {#if openGlobalTimeline && globalRelays.length > 0}
       <GlobalTimeline

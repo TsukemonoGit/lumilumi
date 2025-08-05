@@ -1,6 +1,7 @@
 <!--ColorThemeSe.EthiopicCalendar.svelte-->
 
 <script lang="ts">
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { setColorScheme, type ColorScheme } from "$lib/func/theme";
   import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
   import { onMount } from "svelte";
@@ -17,7 +18,7 @@
   let currentScheme: ColorScheme = "default";
 
   onMount(() => {
-    const stored = localStorage?.getItem("colorScheme");
+    const stored = localStorage?.getItem(STORAGE_KEYS.COLOR_SCHEME);
     if (stored === "default" || stored === "gray") {
       currentScheme = stored;
     }
@@ -42,7 +43,7 @@
       const selected = optionToScheme(next ?? curr ?? colorSchemes[0]);
       currentScheme = selected;
       setColorScheme(selected);
-      localStorage?.setItem("colorScheme", selected);
+      localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, selected);
       return schemeToOption(selected);
     },
   });
