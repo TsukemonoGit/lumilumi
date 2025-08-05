@@ -2,7 +2,7 @@
   import { goto } from "$app/navigation";
   import { CalendarDate } from "@internationalized/date";
   import { createCalendar, melt } from "@melt-ui/svelte";
-
+  import "./calendar.css";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
   import { locale as l } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
@@ -78,22 +78,6 @@
     },
   });
 
-  // 日付クリック処理
-  const handleDateClick = (date: Date) => {
-    const dateString = formatDate(date);
-    const currentPath = page.url.pathname;
-    const pathParts = currentPath.split("/");
-
-    // 最後の部分が日付なら置き換え、それ以外なら追加
-    const lastPart = pathParts[pathParts.length - 1];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(lastPart)) {
-      pathParts[pathParts.length - 1] = dateString;
-    } else {
-      pathParts.push(dateString);
-    }
-    goto(pathParts.join("/"));
-  };
-
   // 曜日のスタイル
   const getDayStyle = (dayIndex: number): string => {
     if (dayIndex === 0) return "text-red-500"; // 日曜日
@@ -159,49 +143,3 @@
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  [data-melt-calendar] {
-    @apply w-fit rounded-lg bg-neutral-950 p-3 text-magnum-200 shadow-sm;
-  }
-
-  header {
-    @apply flex items-center justify-between pb-2;
-  }
-
-  header + div {
-    @apply flex items-center gap-8;
-  }
-
-  [data-melt-calendar-prevbutton] {
-    @apply rounded-lg p-1 transition-all hover:bg-magnum-900;
-  }
-
-  [data-melt-calendar-nextbutton] {
-    @apply rounded-lg p-1 transition-all hover:bg-magnum-900;
-  }
-
-  [data-melt-calendar-heading] {
-    @apply font-semibold text-magnum-200;
-  }
-
-  th {
-    @apply text-sm font-semibold text-magnum-200;
-
-    & div {
-      @apply flex h-6 w-6 items-center justify-center p-4;
-    }
-  }
-
-  [data-melt-calendar-grid] {
-    @apply w-full;
-  }
-
-  [data-melt-calendar-cell] {
-    @apply flex h-6 w-6 cursor-pointer select-none items-center justify-center rounded-lg p-4 hover:bg-magnum-900 focus:ring focus:ring-magnum-600 data-[outside-visible-months]:pointer-events-none data-[outside-visible-months]:cursor-default data-[range-highlighted]:bg-magnum-200 data-[selected]:bg-magnum-700 data-[selected]:text-magnum-100 data-[disabled]:opacity-40 data-[outside-visible-months]:opacity-40 data-[outside-visible-months]:hover:bg-transparent;
-  }
-
-  [data-melt-calendar-cell][data-outside-month="true"][data-outside-visible-months="true"] {
-    @apply opacity-0;
-  }
-</style>
