@@ -1,12 +1,12 @@
 <script lang="ts">
-  import '$lib/i18n/index.ts';
+  import "$lib/i18n/index.ts";
   //@ts-ignore
-  import { pwaInfo } from 'virtual:pwa-info';
-  import { pwaAssetsHead } from 'virtual:pwa-assets/head';
+  import { pwaInfo } from "virtual:pwa-info";
+  import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
-  import Header from './Header.svelte';
-  import { onMount, tick } from 'svelte';
-  import { waitNostr } from 'nip07-awaiter';
+  import Header from "./Header.svelte";
+  import { onMount, tick } from "svelte";
+  import { waitNostr } from "nip07-awaiter";
   import {
     app,
     nowProgress,
@@ -14,64 +14,64 @@
     uploader,
     viewMediaModal,
     ogDescription,
-    ogTitle
-  } from '$lib/stores/stores';
+    ogTitle,
+  } from "$lib/stores/stores";
   import {
     relaysReconnectChallenge,
     setRelays,
     setRxNostr,
-    usePromiseReq
-  } from '$lib/func/nostr';
-  import { pipe } from 'rxjs';
-  import { browser } from '$app/environment';
-  import '../app.css';
+    usePromiseReq,
+  } from "$lib/func/nostr";
+  import { pipe } from "rxjs";
+  import { browser } from "$app/environment";
+  import "../app.css";
 
-  import Toast from '$lib/components/Elements/Toast.svelte';
+  import Toast from "$lib/components/Elements/Toast.svelte";
 
-  import { QueryClientProvider } from '@tanstack/svelte-query';
-  import LoadingElement from '$lib/components/LoadingElement.svelte';
-  import Menu from './Menu.svelte';
-  import Sidebar from './Sidebar.svelte';
-  import { afterNavigate } from '$app/navigation';
-  import NostrMain from '$lib/components/renderSnippets/nostr/NostrMain.svelte';
-  import SetDefaultRelays from '$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte';
+  import { QueryClientProvider } from "@tanstack/svelte-query";
+  import LoadingElement from "$lib/components/LoadingElement.svelte";
+  import Menu from "./Menu.svelte";
+  import Sidebar from "./Sidebar.svelte";
+  import { afterNavigate } from "$app/navigation";
+  import NostrMain from "$lib/components/renderSnippets/nostr/NostrMain.svelte";
+  import SetDefaultRelays from "$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
 
-  import workerUrl from '$lib/worker?worker&url';
+  import workerUrl from "$lib/worker?worker&url";
   import {
     createNoopClient,
-    createVerificationServiceClient
-  } from 'rx-nostr-crypto';
-  import { LUMI_STORAGE_KEY, mediaUploader } from '$lib/func/constants';
-  import MediaDisplay from '$lib/components/Elements/MediaDisplay.svelte';
+    createVerificationServiceClient,
+  } from "rx-nostr-crypto";
+  import { LUMI_STORAGE_KEY, mediaUploader } from "$lib/func/constants";
+  import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
 
-  import SetRepoReactions from '$lib/components/renderSnippets/nostr/SetRepoReactions.svelte';
-  import ReactionToast from '$lib/components/Elements/ReactionToast.svelte';
+  import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
+  import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
   import {
     rxNostr3RelaysReconnectChallenge,
-    setRxNostr3
-  } from '$lib/func/reactions';
-  import { writable, type Writable } from 'svelte/store';
+    setRxNostr3,
+  } from "$lib/func/reactions";
+  import { writable, type Writable } from "svelte/store";
   import {
     displayEvents,
     loginUser,
     lumiSetting,
     showBanner,
-    verifier
-  } from '$lib/stores/globalRunes.svelte';
-  import { defaultRelays } from '$lib/stores/relays';
+    verifier,
+  } from "$lib/stores/globalRunes.svelte";
+  import { defaultRelays } from "$lib/stores/relays";
   //import DomainMigrationNotice from "$lib/components/DomainMigrationNotice.svelte";
-  import { page } from '$app/state';
-  import { t as _ } from '@konemono/svelte5-i18n';
-  import Popstate from './Popstate.svelte';
-  import Modal from './Modal.svelte';
+  import { page } from "$app/state";
+  import { t as _ } from "@konemono/svelte5-i18n";
+  import Popstate from "./Popstate.svelte";
+  import Modal from "./Modal.svelte";
 
-  import { latest, type EventPacket } from 'rx-nostr';
-  import { setRelaysByKind10002 } from '$lib/stores/useRelaySet';
-  import DebugPanel from '$lib/components/Debug/DebugPanel.svelte';
-  import { addDebugLog } from '$lib/components/Debug/debug';
+  import { latest, type EventPacket } from "rx-nostr";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
+  //import DebugPanel from '$lib/components/Debug/DebugPanel.svelte';
+  import { addDebugLog } from "$lib/components/Debug/debug";
 
-  import { initThemeSettings } from '$lib/func/theme';
-  import DebugPanel2 from '$lib/components/Debug/DebugPanel2.svelte';
+  import { initThemeSettings } from "$lib/func/theme";
+  import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
 
   let { data, children } = $props<{
     data:
@@ -79,44 +79,44 @@
           relays?: string[] | undefined;
         }
       | undefined;
-    children: import('svelte').Snippet;
+    children: import("svelte").Snippet;
   }>();
 
   let SvelteQueryDevtools: any = $state();
 
   // Conditionally load SvelteQueryDevtools during development
-  if (import.meta.env.MODE === 'development') {
+  if (import.meta.env.MODE === "development") {
     // Dynamically import SvelteQueryDevtools only in development mode
-    import('@tanstack/svelte-query-devtools').then((module) => {
+    import("@tanstack/svelte-query-devtools").then((module) => {
       SvelteQueryDevtools = module.SvelteQueryDevtools;
-      addDebugLog('SvelteQueryDevtools loaded in development mode');
+      addDebugLog("SvelteQueryDevtools loaded in development mode");
     });
   }
 
-  let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
+  let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 
   //https://github.com/penpenpng/rx-nostr/pull/138
   const verificationClient = browser
     ? createVerificationServiceClient({
-        worker: new Worker(workerUrl, { type: 'module' }),
-        timeout: 600000
+        worker: new Worker(workerUrl, { type: "module" }),
+        timeout: 600000,
       })
     : createNoopClient();
   verificationClient.start();
   verifier.set(verificationClient.verifier);
-  addDebugLog('Verification client initialized and started');
+  addDebugLog("Verification client initialized and started");
 
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
-    addDebugLog('Component mounted, starting initialization');
+    addDebugLog("Component mounted, starting initialization");
 
-    document.addEventListener('nlAuth', (e: Event) => {
-      addDebugLog('nlAuth event received');
+    document.addEventListener("nlAuth", (e: Event) => {
+      addDebugLog("nlAuth event received");
       const customEvent = e as CustomEvent;
       const pub = customEvent.detail.pubkey;
       addDebugLog(
-        `Extracted pubkey from nlAuth: ${pub ? 'present' : 'missing'}`
+        `Extracted pubkey from nlAuth: ${pub ? "present" : "missing"}`
       );
 
       if (pub) {
@@ -124,12 +124,12 @@
         loginUser.set(pub);
         if (!lumiSetting.get().pubkey) {
           addDebugLog(
-            'No existing pubkey in settings, updating with new pubkey'
+            "No existing pubkey in settings, updating with new pubkey"
           );
           lumiSetting.update((val) => {
             return {
               ...val,
-              pubkey: pub
+              pubkey: pub,
             };
           });
           try {
@@ -138,14 +138,14 @@
               LUMI_STORAGE_KEY,
               JSON.stringify(lumiSetting.get())
             );
-            addDebugLog('Settings saved to localStorage successfully');
+            addDebugLog("Settings saved to localStorage successfully");
           } catch (error) {
             addDebugLog(`Failed to save settings to localStorage: ${error}`);
-            console.log('Failed to save');
+            console.log("Failed to save");
           }
           setUserRelay();
         } else {
-          addDebugLog('Pubkey already exists in settings, skipping update');
+          addDebugLog("Pubkey already exists in settings, skipping update");
         }
       }
       console.log(customEvent);
@@ -155,7 +155,7 @@
     // window.nostr calls are made
     if (browser && !nlBanner) {
       addDebugLog(
-        'Browser environment detected, initializing browser-specific features'
+        "Browser environment detected, initializing browser-specific features"
       );
       try {
         initThemeSettings();
@@ -163,13 +163,13 @@
         addDebugLog(`Error loading settings from localStorage: ${error}`);
       }
       try {
-        const tmp = localStorage.getItem('uploader');
+        const tmp = localStorage.getItem("uploader");
         addDebugLog(
-          `Loaded uploader setting from localStorage: ${tmp ?? 'not set'}`
+          `Loaded uploader setting from localStorage: ${tmp ?? "not set"}`
         );
         $uploader = tmp ?? mediaUploader[0];
 
-        const banner: boolean = localStorage.getItem('showBanner') == 'true';
+        const banner: boolean = localStorage.getItem("showBanner") == "true";
         addDebugLog(`Loaded banner setting from localStorage: ${banner}`);
         showBanner.set(banner);
       } catch (error) {
@@ -178,53 +178,53 @@
         );
       }
       if (!$app?.rxNostr) {
-        addDebugLog('RxNostr not initialized, calling setRxNostr');
+        addDebugLog("RxNostr not initialized, calling setRxNostr");
         setRxNostr();
       } else {
-        addDebugLog('RxNostr already initialized');
+        addDebugLog("RxNostr already initialized");
       }
 
       if (!$app?.rxNostr3) {
-        addDebugLog('RxNostr3 not initialized, calling setRxNostr3');
+        addDebugLog("RxNostr3 not initialized, calling setRxNostr3");
         setRxNostr3();
       } else {
-        addDebugLog('RxNostr3 already initialized');
+        addDebugLog("RxNostr3 already initialized");
       }
 
-      addDebugLog('Importing nostr-login module');
-      const nostrLogin = await import('nostr-login');
-      addDebugLog('Nostr-login module imported successfully');
+      addDebugLog("Importing nostr-login module");
+      const nostrLogin = await import("nostr-login");
+      addDebugLog("Nostr-login module imported successfully");
 
-      addDebugLog('Waiting for nostr availability');
+      addDebugLog("Waiting for nostr availability");
       await waitNostr(1000);
-      addDebugLog('Nostr wait completed');
+      addDebugLog("Nostr wait completed");
 
-      addDebugLog('Initializing nostr-login');
+      addDebugLog("Initializing nostr-login");
       await nostrLogin.init({
         //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
         /*options*/
-        description: `${$_('nostrlogin.description')}`
+        description: `${$_("nostrlogin.description")}`,
       });
-      addDebugLog('Nostr-login initialization completed');
+      addDebugLog("Nostr-login initialization completed");
       await tick();
 
       nlBanner = document.getElementsByTagName(
-        'nl-banner'
+        "nl-banner"
       )?.[0] as HTMLElement | null;
       if (nlBanner) {
-        addDebugLog('nl-banner element found and configured');
+        addDebugLog("nl-banner element found and configured");
         showBanner.setBanner(nlBanner);
         console.log(nlBanner);
       } else {
-        addDebugLog('nl-banner element not found');
+        addDebugLog("nl-banner element not found");
       }
     }
   });
 
   function onVisibilityChange() {
     addDebugLog(`Page visibility changed to: ${document?.visibilityState}`);
-    if (document?.visibilityState === 'visible') {
-      addDebugLog('Page became visible, triggering relays reconnect');
+    if (document?.visibilityState === "visible") {
+      addDebugLog("Page became visible, triggering relays reconnect");
       relaysReconnectChallenge();
       rxNostr3RelaysReconnectChallenge();
     }
@@ -236,21 +236,21 @@
     );
 
     //ページが変わったらリセット
-    if (navigate.type !== 'form') {
-      addDebugLog('Resetting display events for navigation');
+    if (navigate.type !== "form") {
+      addDebugLog("Resetting display events for navigation");
       displayEvents.set([]);
 
       //設定ページに変わった場合バナーを表示
-      if (navigate.to?.route.id === '/settings' && nlBanner) {
-        addDebugLog('Navigated to settings page, showing banner');
-        nlBanner.style.display = '';
+      if (navigate.to?.route.id === "/settings" && nlBanner) {
+        addDebugLog("Navigated to settings page, showing banner");
+        nlBanner.style.display = "";
         //設定ページ以外に変わった場合はshowBannerの値によっていれる
       } else if (nlBanner) {
         const shouldShow = showBanner.get();
         addDebugLog(
-          `Navigated away from settings, banner display: ${shouldShow ? 'show' : 'hide'}`
+          `Navigated away from settings, banner display: ${shouldShow ? "show" : "hide"}`
         );
-        nlBanner.style.display = shouldShow ? '' : 'none';
+        nlBanner.style.display = shouldShow ? "" : "none";
       }
     }
   });
@@ -287,16 +287,16 @@
     addDebugLog(`setUserRelay called for pubkey: ${currentPubkey}`);
 
     const data: EventPacket[] | undefined = queryClient.getQueryData([
-      'defaultRelay',
-      currentPubkey
+      "defaultRelay",
+      currentPubkey,
     ]);
     addDebugLog(
-      `Cached relay data found: ${data ? `${data.length} items` : 'none'}`
+      `Cached relay data found: ${data ? `${data.length} items` : "none"}`
     );
     console.log(data);
 
     if (data && data.length > 0) {
-      addDebugLog('Using cached relay data to set relays');
+      addDebugLog("Using cached relay data to set relays");
       // データがある場合はイベントの形を整えてセット
       const relays = setRelaysByKind10002(data[0].event);
       setRelays(relays);
@@ -304,11 +304,11 @@
         `Set relays from cached data: ${Object.keys(relays).length} relays`
       );
     } else {
-      addDebugLog('No cached data, fetching relay information from network');
+      addDebugLog("No cached data, fetching relay information from network");
       const relays = await usePromiseReq(
         {
           filters: [{ authors: [currentPubkey], kinds: [10002], limit: 1 }],
-          operator: pipe(latest())
+          operator: pipe(latest()),
         },
         undefined,
         undefined
@@ -322,7 +322,7 @@
           `Set relays from network data: ${Object.keys(processedRelays).length} relays`
         );
       } else {
-        addDebugLog('No relay data found on network');
+        addDebugLog("No relay data found on network");
       }
     }
   }
