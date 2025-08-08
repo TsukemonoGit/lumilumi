@@ -44,26 +44,17 @@ export function contentCheck(
   // Process NIP-19 matches
 
   const nip19Matches = text.matchAll(nip19Regex);
-  [...nip19Matches].map((match) => {
+
+  for (const match of nip19Matches) {
+    const matchValue = match?.[1] ?? match?.[0]; // fallback
+
+    if (!matchValue) continue;
+
     try {
-      let decoded = nip19.decode(match[1]);
+      const decoded = nip19.decode(matchValue);
+
       switch (decoded.type) {
-        //pはリアクタブルに追加削除してるからnoteだけみる(q,aタグ追加のチェック)
-        //case "nprofile":
-        // if (decoded.data.relays) {
-        //   newTags.push([
-        //     "p",
-        //     decoded.data.pubkey,
-        //     decoded.data.relays[0] ?? "",
-        //   ]);
-        // } else {
-        //   newTags.push(["p", decoded.data.pubkey]);
-        // }
-        // break;
-        // case "nrelay":
-        //   newTags.push(["r", decoded.data]);
-        //   break;
-        case "nevent":
+        case "nevent": {
           const neventTag = [
             "q",
             decoded.data.id,
@@ -75,35 +66,36 @@ export function contentCheck(
           }
           newTags.push(neventTag);
           break;
-        case "naddr":
-          if (decoded.data.relays) {
-            newTags.push([
-              "q", //   "a",//https://github.com/nostr-protocol/nips/blob/master/18.md#quote-reposts
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-              decoded.data.relays?.[0] ?? "",
-            ]);
-          } else {
-            newTags.push([
-              "q", //   "a",
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-            ]);
+        }
+
+        case "naddr": {
+          const addrTag = [
+            "q",
+            `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+          ];
+
+          if (decoded.data.relays?.[0]) {
+            addrTag.push(decoded.data.relays[0]);
           }
+
+          newTags.push(addrTag);
           break;
-        // case "nsec":
-        //   break;
-        // case "npub":
-        //   newTags.push(["p", decoded.data]);
-        //   break;
+        }
+
         case "note":
           newTags.push(["q", decoded.data]);
           break;
+
         default:
           break;
       }
     } catch (error) {
-      console.log("Failed to decode NIP-19 identifier:", match[1]);
+      console.log(
+        "Failed to decode NIP-19 identifier:",
+        match?.[1] ?? match?.[0]
+      );
     }
-  });
+  }
 
   // Process URL matches
   const urlMatches = text.matchAll(urlRegex);

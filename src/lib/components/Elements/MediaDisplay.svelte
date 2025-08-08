@@ -60,7 +60,7 @@
 
     // 2. フィルター
     const filtered = itemsWithType.filter((item) => {
-      console.log(item);
+      // console.log(item);
       return item.type === "image" || item.type === "svg";
     });
 

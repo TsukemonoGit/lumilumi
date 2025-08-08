@@ -2,8 +2,6 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import type { Token } from "@konemono/nostr-content-parser";
 
-  import { t as _ } from "@konemono/svelte5-i18n";
-
   interface Props {
     part: Token;
     height?: number;
