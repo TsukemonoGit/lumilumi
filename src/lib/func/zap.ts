@@ -324,14 +324,19 @@ export function lnurlToZapAddress(lud06: string): string | undefined {
     const lnurl = new TextDecoder().decode(data);
 
     const match = lnurl.match(
-      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/(.+)$/
+      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/([^\/]+)$/
     );
-    if (match) {
-      const [, domain, username] = match;
+
+    if (match && match.length >= 3) {
+      const domain = match[1];
+      const username = match[2];
       return `${username}@${domain}`;
     }
+
+    return undefined;
   } catch (error) {
-    return;
+    // console.error("Invalid LNURL:", error);
+    return undefined;
   }
 }
 

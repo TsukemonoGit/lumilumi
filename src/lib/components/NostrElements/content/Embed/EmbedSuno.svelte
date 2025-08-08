@@ -15,7 +15,6 @@
   height={144}
   frameborder="0"
   allow="encrypted-media; fullscreen; autoplay"
-  allowfullscreen
   loading="lazy"
   onerror={handleError}
   title="Embedded Suno player"

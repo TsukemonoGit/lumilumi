@@ -394,18 +394,24 @@ function extractDirectEmojis(event: Nostr.Event): string[][] {
 function createNaddrFilters(event: Nostr.Event): FilterWithId[] {
   return (event.tags as string[][]).reduce(
     (acc: FilterWithId[], [tag, value]) => {
-      console.log(tag, value);
       if (tag === "a") {
         const matches = value.match(nip33Regex);
-        console.log(matches);
-        if (matches) {
-          const filter: Nostr.Filter = {
-            kinds: [Number(matches[1])],
-            authors: [matches[2]],
-            "#d": [matches[3]],
-            limit: 1,
-          };
-          acc.push({ id: value, filter });
+
+        // matches が null でない、かつ 必要なグループ数を満たしていることを確認
+        if (matches && matches.length >= 4) {
+          const kind = Number(matches[1]);
+          const pubkey = matches[2];
+          const identifier = matches[3];
+
+          if (!isNaN(kind) && pubkey && identifier) {
+            const filter: Nostr.Filter = {
+              kinds: [kind],
+              authors: [pubkey],
+              "#d": [identifier],
+              limit: 1,
+            };
+            acc.push({ id: value, filter });
+          }
         }
       }
       return acc;
