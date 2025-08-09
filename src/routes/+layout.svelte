@@ -193,18 +193,17 @@
 
       addDebugLog("Importing nostr-login module");
       const nostrLogin = await import("nostr-login");
-      addDebugLog("Nostr-login module imported successfully");
 
-      addDebugLog("Waiting for nostr availability");
       await waitNostr(1000);
-      addDebugLog("Nostr wait completed");
-
-      addDebugLog("Initializing nostr-login");
-      await nostrLogin.init({
-        //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
-        /*options*/
-        description: `${$_("nostrlogin.description")}`,
-      });
+      try {
+        await nostrLogin.init({
+          //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
+          /*options*/
+          description: `${$_("nostrlogin.description")}`,
+        });
+      } catch (error) {
+        console.log(error);
+      }
       addDebugLog("Nostr-login initialization completed");
       await tick();
 

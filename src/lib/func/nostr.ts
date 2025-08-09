@@ -459,7 +459,8 @@ export async function promisePublishEvent(
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
-    const event = await signer.signEvent(ev);
+    const event = await signer.signEvent(ev); //この段階ででかすぎるときエラーになる
+
     return promisePublishSignedEvent(event, relays);
   } catch (error: any) {
     if (error.message.includes("invalid plaintext size")) {
