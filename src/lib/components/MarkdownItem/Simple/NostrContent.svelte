@@ -54,7 +54,7 @@
 
   const openModal = (index: number) => {
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
-    console.log(index, $state.snapshot(mediaList));
+    //console.log(index, $state.snapshot(mediaList));
   };
 
   const nip19Decode = (

@@ -49,7 +49,17 @@
 
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
-  let parts: Token[] = $derived(parseContent(text, tags));
+  let parts: Token[] = $derived.by(() => {
+    const parts = parseContent(text, tags);
+    // image URL の出現順に number を追加
+    let imageIndex = 0;
+    for (const token of parts) {
+      if (token.type === TokenType.URL && token.metadata?.type === "image") {
+        token.metadata.number = imageIndex++;
+      }
+    }
+    return parts;
+  });
 
   let mediaList = $derived(
     parts
@@ -60,6 +70,7 @@
 
   const openModal = (index: number) => {
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
+
     console.log(index, $state.snapshot(mediaList));
   };
 

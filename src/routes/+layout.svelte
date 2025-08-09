@@ -264,6 +264,7 @@
       );
       modalIndex = e.index;
       mediaList = e.mediaList;
+
       setTimeout(() => {
         $showModal = true;
       }, 0);
