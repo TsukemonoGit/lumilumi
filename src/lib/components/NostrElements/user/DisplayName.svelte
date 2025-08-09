@@ -1,13 +1,11 @@
 <!--カスタム絵文字展開付きのName-->
 <script lang="ts">
-  import { parseEmojiText } from "$lib/func/displayname";
   import {
     parseContent,
     TokenType,
     type Token,
   } from "@konemono/nostr-content-parser";
   import CustomEmoji from "../content/CustomEmoji.svelte";
-  import { untrack } from "svelte";
 
   interface Props {
     tags: string[][];

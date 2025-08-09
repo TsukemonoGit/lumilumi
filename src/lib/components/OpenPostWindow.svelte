@@ -297,7 +297,7 @@
   // ----------------------------------------
   async function postNote() {
     if (text.trim().length <= 0 || isPosting) return;
-
+    checkCustomEmojis(text.trim());
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
       tags
@@ -581,10 +581,10 @@
     }
   }
 
-  function handleKeyDown(event: KeyboardEvent) {
+  async function handleKeyDown(event: KeyboardEvent) {
     // Submit on Ctrl+Enter
     if (event.ctrlKey && event.key === "Enter") {
-      postNote();
+      await postNote();
       return;
     }
 
