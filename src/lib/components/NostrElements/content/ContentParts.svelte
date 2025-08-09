@@ -49,7 +49,20 @@
 
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
-  let parts: Token[] = $derived(parseContent(text, tags));
+
+  let parts: Token[] = $derived.by(() => {
+    let rawParts = parseContent(text, tags);
+    let imageIndex = 0;
+    return rawParts.map((token) => {
+      if (token.type === TokenType.URL && token.metadata?.type === "image") {
+        return {
+          ...token,
+          metadata: { ...token.metadata, number: imageIndex++ },
+        };
+      }
+      return token;
+    });
+  });
 
   let mediaList = $derived(
     parts
@@ -60,6 +73,7 @@
 
   const openModal = (index: number) => {
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
+
     console.log(index, $state.snapshot(mediaList));
   };
 

@@ -147,7 +147,7 @@
           addDebugLog("Pubkey already exists in settings, skipping update");
         }
       }
-      console.log(customEvent);
+      //  console.log(customEvent);
     });
 
     // make sure this is called before any
@@ -264,6 +264,7 @@
       );
       modalIndex = e.index;
       mediaList = e.mediaList;
+
       setTimeout(() => {
         $showModal = true;
       }, 0);

@@ -52,7 +52,7 @@
     // 1. map でPromise配列を作る
     const itemsWithType = await Promise.all(
       imageUrls.map(async (url, index) => {
-        console.log(url);
+        //console.log(url);
         const data: UrlType | null = await userPromiseUrl(url);
         return { url, originalIndex: index, type: data || "url" };
       })
