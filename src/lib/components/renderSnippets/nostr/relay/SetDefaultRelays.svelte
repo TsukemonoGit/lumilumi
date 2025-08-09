@@ -60,7 +60,7 @@
     localRelays.length > 0 ||
     (paramRelays && paramRelays.length > 0) ||
     !lumiSetting.get().pubkey;
-  console.log(zyouken);
+  // console.log(zyouken);
   let _relays: DefaultRelayConfig[] | string[] =
     paramRelays && paramRelays.length > 0 //neventとかのやつ
       ? paramRelays

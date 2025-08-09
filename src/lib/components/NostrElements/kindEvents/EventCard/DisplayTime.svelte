@@ -5,19 +5,20 @@
   let { note, displayMenu } = $props();
 </script>
 
-{#if displayMenu}
-  <a
-    href={`/${noteLink(note)}`}
-    class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
+<!-- 
+{#if displayMenu} -->
+<a
+  href={`/${noteLink(note)}`}
+  class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs hover:underline"
+>
+  <time datetime={datetime(note.created_at)}
+    >{formatAbsoluteDateFromUnix(note.created_at)}</time
   >
-    <time datetime={datetime(note.created_at)}
-      >{formatAbsoluteDateFromUnix(note.created_at)}</time
-    >
-  </a>
-{:else}
+</a>
+<!-- {:else}
   <div class="inline-flex ml-auto mr-1 min-w-7 text-magnum-100 text-xs">
     <time datetime={datetime(note.created_at)}
       >{formatAbsoluteDateFromUnix(note.created_at)}</time
     >
   </div>
-{/if}
+{/if} -->

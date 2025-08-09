@@ -41,7 +41,7 @@
   import { nipLink } from "$lib/func/util";
   import { muteCheck } from "$lib/func/muteCheck";
   import { EyeOff } from "lucide-svelte";
-  import { addDebugLog } from "./Debug/debug";
+  import PopupUserName from "./NostrElements/user/PopupUserName.svelte";
 
   // Props definition
   interface Props {
@@ -68,11 +68,10 @@
   let tags = $derived(event.tags || []);
   // Constants
   const displayMenu = false;
-  const mini = false;
   const depth = 0;
 
   const repostable = false;
-  const zIndex = 50;
+  const zIndex = 100;
   const maxHeight = undefined;
 
   // State
@@ -239,8 +238,9 @@
               pubkey={signPubkey}
               {metadata}
               size={40}
-              displayMenu={false}
+              displayMenu={true}
               depth={0}
+              {zIndex}
             />{/if}
         {/snippet}
 
@@ -258,7 +258,7 @@
           {#if replyUsers.length > 0}
             <ReplyTo
               >{#each replyUsers as user}
-                <UserName pubhex={user} />
+                <PopupUserName pubkey={user} {zIndex} />
               {/each}</ReplyTo
             >{/if}
         {/snippet}

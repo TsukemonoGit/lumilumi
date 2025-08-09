@@ -1,17 +1,25 @@
 // +layout.ts
+import "$lib/i18n/index.ts";
 
-//import { locale, waitLocale } from "@konemono/svelte5-i18n";
 import type { LayoutLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
 import { relayRegex2 } from "$lib/func/regex";
 import { error } from "@sveltejs/kit";
+import { browser } from "$app/environment";
+import { setLocale, waitLocale } from "@konemono/svelte5-i18n";
 
 //デフォリレーを設定するために必要
 //めんどくさいから必要なもの(relays)だけ
 export const load: LayoutLoad = async (
   params
 ): Promise<{ relays?: string[] | undefined } | undefined> => {
-  //await waitLocale();
+  if (browser) {
+    const browserLang = window.navigator.language.split("-")[0]; // ja-JP -> ja
+    const supportedLocales = ["en", "ja"];
+    const locale = supportedLocales.includes(browserLang) ? browserLang : "en";
+    setLocale(locale);
+  }
+  await waitLocale();
   const p = params; // キャストして kind を取得
 
   //pram
