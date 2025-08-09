@@ -284,11 +284,17 @@
 
     emojiMatches.forEach((emoji) => {
       const emojiName = emoji.slice(1, -1);
-      const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-
-      if (customEmoji) {
-        addEmojiTag(customEmoji);
+      //tagsに既に同じ名前のタグがったらreturn
+      if (tags.find((tag) => tag[0] === "emoji" && tag[1] === emojiName)) {
+        return;
       }
+
+      //なかったら絵文字リストにあるか探す
+      const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
+      if (!customEmoji) return;
+
+      //あったら入れる
+      addEmojiTag(customEmoji);
     });
   }
 
@@ -297,7 +303,7 @@
   // ----------------------------------------
   async function postNote() {
     if (text.trim().length <= 0 || isPosting) return;
-    checkCustomEmojis(text.trim());
+    //  checkCustomEmojis(text.trim());
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
       tags
@@ -550,11 +556,11 @@
       $nowProgress = false;
     }
 
-    // Check for custom emojis in pasted text
+    /*  // Check for custom emojis in pasted text
     const pastedText = event.clipboardData.getData("text");
     if (pastedText) {
       checkCustomEmojis(pastedText);
-    }
+    } */
   }
 
   async function handleDrop(event: DragEvent) {
@@ -581,10 +587,10 @@
     }
   }
 
-  async function handleKeyDown(event: KeyboardEvent) {
+  function handleKeyDown(event: KeyboardEvent) {
     // Submit on Ctrl+Enter
     if (event.ctrlKey && event.key === "Enter") {
-      await postNote();
+      postNote();
       return;
     }
 
@@ -955,8 +961,6 @@
             oninput={(e) => {
               //  handleTextareaInput(e);
               clickEscape = 0;
-            }}
-            onchange={(e) => {
               checkCustomEmojis(text);
             }}
             onclick={(e) => {

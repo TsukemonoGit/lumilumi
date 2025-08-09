@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import { debugError } from "$lib/components/Debug/debug";
 import { tick } from "svelte";
+import { STORAGE_KEYS } from "./localStorageKeys";
 
 export type ColorScheme = "default" | "gray";
 export type ThemeMode = "light" | "dark" | "system";
