@@ -41,15 +41,17 @@
   let tags = $derived(event.tags || []);
 
   let parts: Token[] = $derived.by(() => {
-    const parts = parseContent(text, tags);
-    // image URL の出現順に number を追加
+    let rawParts = parseContent(text, tags);
     let imageIndex = 0;
-    for (const token of parts) {
+    return rawParts.map((token) => {
       if (token.type === TokenType.URL && token.metadata?.type === "image") {
-        token.metadata.number = imageIndex++;
+        return {
+          ...token,
+          metadata: { ...token.metadata, number: imageIndex++ },
+        };
       }
-    }
-    return parts;
+      return token;
+    });
   });
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
