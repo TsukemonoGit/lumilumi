@@ -1,11 +1,10 @@
 <script lang="ts">
-  import "$lib/i18n/index.ts";
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick } from "svelte";
+  import { onMount, tick, type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -79,7 +78,7 @@
           relays?: string[] | undefined;
         }
       | undefined;
-    children: import("svelte").Snippet;
+    children: Snippet;
   }>();
 
   let SvelteQueryDevtools: any = $state();

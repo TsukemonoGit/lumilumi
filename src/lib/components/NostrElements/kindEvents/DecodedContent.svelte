@@ -3,7 +3,7 @@
   import Note from "./Note.svelte";
   import { Quote } from "lucide-svelte";
   import PopupUserName from "$lib/components/NostrElements/user/PopupUserName.svelte";
-  import UserName from "../user/UserName.svelte";
+  //import UserName from "../user/UserName.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
 
   interface Props {
@@ -77,19 +77,19 @@
 <div class="inline overflow-hidden">
   {#if decoded.type === "npub"}
     <span class="text-magnum-300 align-middle">
-      {#if displayMenu}
-        <PopupUserName pubkey={decoded.data} {zIndex} />
-      {:else}
+      <!--   {#if displayMenu} -->
+      <PopupUserName pubkey={decoded.data} {zIndex} />
+      <!--   {:else}
         <UserName pubhex={decoded.data} />
-      {/if}
+      {/if} -->
     </span>
   {:else if decoded.type === "nprofile"}
     <span class="text-magnum-300 align-middle">
-      {#if displayMenu}
-        <PopupUserName pubkey={decoded.data.pubkey} {zIndex} />
-      {:else}
+      <!--    {#if displayMenu} -->
+      <PopupUserName pubkey={decoded.data.pubkey} {zIndex} />
+      <!--  {:else}
         <UserName pubhex={decoded.data.pubkey} />
-      {/if}
+      {/if} -->
     </span>
   {:else if decoded.type === "nevent"}
     {@const relayHint = findRelayHint([
