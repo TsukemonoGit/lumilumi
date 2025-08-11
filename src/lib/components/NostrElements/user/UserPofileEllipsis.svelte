@@ -12,12 +12,13 @@
     prof?: Profile;
 
     tab?: string | undefined;
+    zIndex: number;
   }
 
-  let { pubkey, metadata, prof, tab }: Props = $props();
+  let { pubkey, metadata, prof, tab, zIndex }: Props = $props();
 </script>
 
-<Popover ariaLabel="user menu" showCloseButton={false}>
+<Popover ariaLabel="user menu" showCloseButton={false} {zIndex}>
   <button
     type="button"
     class="h-[32px] w-[32px] rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"

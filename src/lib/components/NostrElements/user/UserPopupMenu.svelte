@@ -66,7 +66,7 @@
     {#snippet popoverContent()}
       <div class="p-1 w-[24rem] max-w-full">
         <UserProfile
-          {zIndex}
+          zIndex={zIndex + 10}
           {pubkey}
           bannerHeight={60}
           iconSize={56}
