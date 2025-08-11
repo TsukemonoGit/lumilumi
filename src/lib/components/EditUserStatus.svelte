@@ -270,6 +270,7 @@
                 <div>
                   <div
                     class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+                    style="overflow-anchor: auto;"
                   >
                     {#each $emojis.list as e, index}
                       {#if customReaction === "" || e[0]

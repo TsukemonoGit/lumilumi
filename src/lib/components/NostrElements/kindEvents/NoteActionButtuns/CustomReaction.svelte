@@ -149,6 +149,7 @@
               aria-label={`Select emoji ${e[0]}`}
               onclick={() => handleClickEmoji(e)}
               class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              style="overflow-anchor: auto;"
             >
               {#if lumiSetting.get().showImg}
                 <img
