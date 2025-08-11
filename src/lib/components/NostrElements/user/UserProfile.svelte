@@ -152,7 +152,7 @@
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
-          <UserPofileEllipsis {pubkey} />
+          <UserPofileEllipsis {pubkey} {zIndex} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
               {pubkey}
@@ -175,7 +175,7 @@
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
-          <UserPofileEllipsis {pubkey} />
+          <UserPofileEllipsis {pubkey} {zIndex} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
               {pubkey}
@@ -198,7 +198,7 @@
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
-          <UserPofileEllipsis {pubkey} />
+          <UserPofileEllipsis {pubkey} {zIndex} />
 
           {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
               {pubkey}
@@ -303,7 +303,13 @@
                   >
                   {#if prof.lud16 || prof.lud06}
                     <UserZap {metadata} />
-                  {/if}<UserPofileEllipsis {pubkey} {metadata} {prof} {tab} />
+                  {/if}<UserPofileEllipsis
+                    {pubkey}
+                    {metadata}
+                    {prof}
+                    {tab}
+                    {zIndex}
+                  />
                 </div>
                 <div class="flex flex-row ml-auto gap-2">
                   {#if lumiSetting.get().pubkey === pubkey}<UserEditEllipsis
