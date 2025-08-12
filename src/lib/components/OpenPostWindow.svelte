@@ -17,6 +17,7 @@
   import {
     getMetadataList,
     promisePublishSignedEvent,
+    usePromiseReq,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -33,15 +34,24 @@
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
+  import {
+    filesUpload,
+    delay,
+    displayShortPub,
+    nip19Decode,
+  } from "$lib/func/util";
 
-  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
+  import type {
+    DefaultPostOptions,
+    MargePostOptions,
+    Profile,
+  } from "$lib/types";
 
-  import { nip07Signer, type EventPacket } from "rx-nostr";
+  import { latest, nip07Signer, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nsecRegex } from "$lib/func/regex";
+  import { npubRegex, nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
   import { convertMetaTags } from "$lib/func/imeta";
@@ -56,6 +66,8 @@
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
+  import { nip19 } from "nostr-tools";
+  import { json } from "@sveltejs/kit";
 
   // ----------------------------------------
   // Component Props
@@ -277,12 +289,12 @@
     }
   }
 
-  function checkCustomEmojis(input: string) {
+  async function checkCustomEmojis(input: string) {
     const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
 
     if (!emojiMatches) return;
 
-    emojiMatches.forEach((emoji) => {
+    const processEmoji = async (emoji: string): Promise<void> => {
       const emojiName = emoji.slice(1, -1);
       //tagsに既に同じ名前のタグがったらreturn
       if (tags.find((tag) => tag[0] === "emoji" && tag[1] === emojiName)) {
@@ -291,11 +303,51 @@
 
       //なかったら絵文字リストにあるか探す
       const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-      if (!customEmoji) return;
+      if (customEmoji) {
+        //あったら入れる
+        addEmojiTag(customEmoji);
+      } else if (npubRegex.test(emojiName)) {
+        //npubだったら
+        //
+        try {
+          const hex = nip19.decode(emojiName)?.data as string;
+          console.log(hex);
+          const profile = await getUserProfile(hex);
+          const picture = profile?.picture;
+          if (picture) addEmojiTag([emojiName, picture]);
+        } catch (error) {
+          return;
+        }
+      }
+    };
+    await Promise.allSettled(emojiMatches.map(processEmoji));
+  }
 
-      //あったら入れる
-      addEmojiTag(customEmoji);
-    });
+  async function getUserProfile(hex: string): Promise<Profile | null> {
+    // キャッシュされたデータを確認
+    const cachedData = queryClient.getQueryData(["metadata", hex]) as
+      | EventPacket
+      | undefined;
+
+    if (cachedData?.event) {
+      return JSON.parse(cachedData.event.content) as Profile;
+    }
+
+    // ネットワークから取得
+    const metadata = await usePromiseReq(
+      {
+        filters: [{ authors: [hex], limit: 1, kinds: [0] }],
+        operator: latest(),
+      },
+      undefined,
+      3000
+    );
+
+    if (metadata[0]?.event) {
+      return JSON.parse(metadata[0].event.content) as Profile;
+    }
+
+    return null;
   }
 
   // ----------------------------------------
