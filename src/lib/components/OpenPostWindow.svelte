@@ -330,7 +330,11 @@
       | undefined;
 
     if (cachedData?.event) {
-      return JSON.parse(cachedData.event.content) as Profile;
+      try {
+        return JSON.parse(cachedData.event.content) as Profile;
+      } catch (error) {
+        return null;
+      }
     }
 
     // ネットワークから取得
@@ -342,10 +346,15 @@
       undefined,
       3000
     );
-
-    if (metadata[0]?.event) {
-      return JSON.parse(metadata[0].event.content) as Profile;
+    if (metadata.length === 0) {
+      return null;
     }
+    const packet = metadata[0];
+    queryClient.setQueryData(["metadata", hex], packet);
+
+    try {
+      return JSON.parse(packet.event.content) as Profile;
+    } catch (error) {}
 
     return null;
   }
