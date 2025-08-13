@@ -3,6 +3,7 @@
   import Reaction from "../kindEvents/Reaction.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import UserPopupMenu from "../user/UserPopupMenu.svelte";
+  import { publishEvent } from "$lib/func/nostr";
 
   interface Props {
     events: Nostr.Event[];
@@ -31,13 +32,27 @@
       (event) => (event.content || "+") === content
     ) as Nostr.Event;
   };
+
+  const reaction = (ev: Nostr.Event) => {
+    const eventParam: Nostr.EventParameters = {
+      tags: $state.snapshot(ev.tags),
+      content: ev.content,
+      kind: ev.kind,
+    };
+
+    publishEvent(eventParam);
+  };
 </script>
 
 {#each uniqueContents as content}
+  {@const reactionEvent = findEvent(content)}
   <div class="flex max-w-full p-0.5 overflow-hidden">
-    <div class="min-w-6 flex justify-center">
-      <Reaction event={findEvent(content)} />
-    </div>
+    <button
+      onclick={() => reaction(reactionEvent)}
+      class="min-w-6 flex justify-center hover:border border-magnum-500 rounded-full w-6 h-6"
+    >
+      <Reaction event={reactionEvent} />
+    </button>
     <div class="flex-wrap px-2 gap-1 h-fit">
       {#each filterEventsByContent(validEvents, content) as event (event.id)}
         <!-- 修正: validEvents を使用 -->
