@@ -9,7 +9,7 @@
 
   import { publishEvent } from "$lib/func/nostr";
   import Popover from "./Elements/Popover.svelte";
-  import { checkCustomEmojis, contentEmojiCheck } from "$lib/func/contentCheck";
+  import { contentEmojiCheck } from "$lib/func/contentCheck";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import * as nip19 from "nostr-tools/nip19";
@@ -21,6 +21,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
+  import { checkCustomEmojis } from "$lib/func/customEmoji";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -129,7 +130,10 @@
       }
     }
 
-    const emojitag: string[][] | undefined = checkCustomEmojis(userStatus);
+    const emojitag: string[][] | undefined = await checkCustomEmojis(
+      tags,
+      userStatus
+    );
     if (emojitag) {
       tags = [...tags, ...emojitag];
     }
