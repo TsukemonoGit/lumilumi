@@ -68,6 +68,7 @@
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
   import { nip19 } from "nostr-tools";
   import { json } from "@sveltejs/kit";
+  import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
 
   // ----------------------------------------
   // Component Props
@@ -240,126 +241,6 @@
   }
 
   // ----------------------------------------
-  // Tag Management
-  // ----------------------------------------
-  function addEmojiTag(emoji: string[]) {
-    // 1. URLが同じ絵文字を探す
-    const sameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
-    );
-
-    if (sameEmoji) {
-      // 同じURLの絵文字があれば、その名前を使う
-      emoji[0] = sameEmoji[1];
-    }
-
-    // 2. 同じ名前の絵文字があるか確認
-    let sameNameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-    );
-
-    // 3. 絵文字の条件に従って追加処理
-    if (sameNameEmoji) {
-      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
-      if (sameNameEmoji[2] !== emoji[1]) {
-        // 元の名前を保存
-        const baseName = emoji[0];
-        let num = 1;
-
-        // 重複しない名前が見つかるまでnumをインクリメント
-        emoji[0] = `${baseName}_${num}`;
-        sameNameEmoji = tags.find(
-          (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-        );
-
-        while (sameNameEmoji) {
-          num++;
-          emoji[0] = `${baseName}_${num}`;
-          sameNameEmoji = tags.find(
-            (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-          );
-        }
-
-        tags.push(["emoji", ...emoji]);
-      }
-      // 完全に同じ名前・URLの絵文字がある場合は何もしない
-    } else {
-      // 同じ名前もURLもない場合、新しい絵文字として追加
-      tags.push(["emoji", ...emoji]);
-    }
-  }
-
-  async function checkCustomEmojis(input: string) {
-    const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
-
-    if (!emojiMatches) return;
-
-    const processEmoji = async (emoji: string): Promise<void> => {
-      const emojiName = emoji.slice(1, -1);
-      //tagsに既に同じ名前のタグがったらreturn
-      if (tags.find((tag) => tag[0] === "emoji" && tag[1] === emojiName)) {
-        return;
-      }
-
-      //なかったら絵文字リストにあるか探す
-      const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-      if (customEmoji) {
-        //あったら入れる
-        addEmojiTag(customEmoji);
-      } else if (npubRegex.test(emojiName)) {
-        //npubだったら
-        //
-        try {
-          const hex = nip19.decode(emojiName)?.data as string;
-          console.log(hex);
-          const profile = await getUserProfile(hex);
-          const picture = profile?.picture;
-          if (picture) addEmojiTag([emojiName, picture]);
-        } catch (error) {
-          return;
-        }
-      }
-    };
-    await Promise.allSettled(emojiMatches.map(processEmoji));
-  }
-
-  async function getUserProfile(hex: string): Promise<Profile | null> {
-    // キャッシュされたデータを確認
-    const cachedData = queryClient.getQueryData(["metadata", hex]) as
-      | EventPacket
-      | undefined;
-
-    if (cachedData?.event) {
-      try {
-        return JSON.parse(cachedData.event.content) as Profile;
-      } catch (error) {
-        return null;
-      }
-    }
-
-    // ネットワークから取得
-    const metadata = await usePromiseReq(
-      {
-        filters: [{ authors: [hex], limit: 1, kinds: [0] }],
-        operator: latest(),
-      },
-      undefined,
-      3000
-    );
-    if (metadata.length === 0) {
-      return null;
-    }
-    const packet = metadata[0];
-    queryClient.setQueryData(["metadata", hex], packet);
-
-    try {
-      return JSON.parse(packet.event.content) as Profile;
-    } catch (error) {}
-
-    return null;
-  }
-
-  // ----------------------------------------
   // Event Publishing
   // ----------------------------------------
   async function postNote() {
@@ -509,7 +390,7 @@
 
   function handleClickEmoji(e: string[]) {
     const emoji = [...e];
-    addEmojiTag(emoji);
+    tags = addEmojiTag(tags, emoji);
 
     const emojiText = `:${emoji[0]}:`;
     insertTextAtCursor(emojiText);
@@ -1019,10 +900,10 @@
             id="note"
             bind:this={textarea}
             bind:value={text}
-            oninput={(e) => {
+            oninput={async (e) => {
               //  handleTextareaInput(e);
               clickEscape = 0;
-              checkCustomEmojis(text);
+              tags = await checkCustomEmojis(tags, text);
             }}
             onclick={(e) => {
               //  handleTextareaInput(e);
