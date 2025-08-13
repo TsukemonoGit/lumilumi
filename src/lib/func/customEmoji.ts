@@ -54,11 +54,23 @@ export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
   return newTags;
 }
 
+// 試行済みのhexを記録するSet
+const attemptedHexes = new Set<string>();
+// 記録をリセットする関数
+export function resetEmojiCache(): void {
+  attemptedHexes.clear();
+}
+
+// 特定のhexのみリセットする関数（オプション）
+export function resetEmojiCacheForHex(hex: string): void {
+  attemptedHexes.delete(hex);
+}
+
 export async function checkCustomEmojis(
   tags: string[][],
   input: string
 ): Promise<string[][]> {
-  let returnTags = [...tags]; // 元の配列をコピー
+  let returnTags = [...tags];
   const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
 
   if (!emojiMatches) return returnTags;
@@ -80,7 +92,9 @@ export async function checkCustomEmojis(
     } else if (npubRegex.test(emojiName)) {
       try {
         const hex = nip19.decode(emojiName)?.data as string;
+
         const profile = await getUserProfile(hex);
+
         const picture = profile?.picture;
         if (picture) {
           returnTags = addEmojiTag(returnTags, [emojiName, picture]);
@@ -95,7 +109,7 @@ export async function checkCustomEmojis(
   return returnTags;
 }
 
-export async function getUserProfile(hex: string): Promise<Profile | null> {
+export const getUserProfile = async (hex: string): Promise<Profile | null> => {
   // キャッシュされたデータを確認
   const cachedData = queryClient.getQueryData(["metadata", hex]) as
     | EventPacket
@@ -105,9 +119,17 @@ export async function getUserProfile(hex: string): Promise<Profile | null> {
     try {
       return JSON.parse(cachedData.event.content) as Profile;
     } catch (error) {
-      return null;
+      console.warn(`Failed to parse cached profile for ${hex}:`, error);
     }
   }
+
+  // 既に試行済みならスキップ
+  if (attemptedHexes.has(hex)) {
+    return null;
+  }
+
+  // 試行済みとしてマーク（ネットワーク取得前に）
+  attemptedHexes.add(hex);
 
   // ネットワークから取得
   const metadata = await usePromiseReq(
@@ -118,15 +140,14 @@ export async function getUserProfile(hex: string): Promise<Profile | null> {
     undefined,
     3000
   );
-  if (metadata.length === 0) {
-    return null;
-  }
-  const packet = metadata[0];
-  queryClient.setQueryData(["metadata", hex], packet);
 
-  try {
-    return JSON.parse(packet.event.content) as Profile;
-  } catch (error) {}
+  if (metadata[0]?.event) {
+    try {
+      return JSON.parse(metadata[0].event.content) as Profile;
+    } catch (error) {
+      console.warn(`Failed to parse profile for ${hex}:`, error);
+    }
+  }
 
   return null;
-}
+};
