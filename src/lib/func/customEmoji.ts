@@ -116,15 +116,22 @@ export const getUserProfile = async (hex: string): Promise<Profile | null> => {
     | undefined;
 
   if (cachedData?.event) {
-    return JSON.parse(cachedData.event.content) as Profile;
+    try {
+      return JSON.parse(cachedData.event.content) as Profile;
+    } catch (error) {
+      console.warn(`Failed to parse cached profile for ${hex}:`, error);
+    }
   }
-  // 既に試行済みならスキップ//試行済みでもキャッシュある分は確認する
+
+  // 既に試行済みならスキップ
   if (attemptedHexes.has(hex)) {
     return null;
   }
+
   // 試行済みとしてマーク（ネットワーク取得前に）
   attemptedHexes.add(hex);
-  // ネットワークから取得（ここに到達するのは初回のみ）
+
+  // ネットワークから取得
   const metadata = await usePromiseReq(
     {
       filters: [{ authors: [hex], limit: 1, kinds: [0] }],
@@ -135,7 +142,11 @@ export const getUserProfile = async (hex: string): Promise<Profile | null> => {
   );
 
   if (metadata[0]?.event) {
-    return JSON.parse(metadata[0].event.content) as Profile;
+    try {
+      return JSON.parse(metadata[0].event.content) as Profile;
+    } catch (error) {
+      console.warn(`Failed to parse profile for ${hex}:`, error);
+    }
   }
 
   return null;
