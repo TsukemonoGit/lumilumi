@@ -2,6 +2,7 @@
 import type { QueryKey } from "@tanstack/svelte-query";
 import {
   completeOnTimeout,
+  createUniq,
   uniq,
   type DefaultRelayConfig,
   type EventPacket,
@@ -36,8 +37,10 @@ export function useRelaySet(
 ): ReqResult<DefaultRelayConfig[]> | undefined {
   console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
-
-  const operator = pipe(tie, uniq(), saveEachNote(), completeOnTimeout(5000));
+  // イベントID に基づいて重複を排除する
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+  const [uniq, eventIds] = createUniq(keyFn);
+  const operator = pipe(tie, uniq, saveEachNote(), completeOnTimeout(5000));
   //console.log(queryKey, filters, operator, req);
   const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
     staleTime: Infinity,
