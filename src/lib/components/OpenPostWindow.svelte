@@ -17,7 +17,6 @@
   import {
     getMetadataList,
     promisePublishSignedEvent,
-    usePromiseReq,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -34,24 +33,15 @@
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import {
-    filesUpload,
-    delay,
-    displayShortPub,
-    nip19Decode,
-  } from "$lib/func/util";
+  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
 
-  import type {
-    DefaultPostOptions,
-    MargePostOptions,
-    Profile,
-  } from "$lib/types";
+  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
 
-  import { latest, nip07Signer, type EventPacket } from "rx-nostr";
+  import { nip07Signer, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { npubRegex, nsecRegex } from "$lib/func/regex";
+  import { nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
   import { convertMetaTags } from "$lib/func/imeta";
@@ -66,8 +56,6 @@
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
-  import { nip19 } from "nostr-tools";
-  import { json } from "@sveltejs/kit";
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
 
   // ----------------------------------------
@@ -92,7 +80,6 @@
   // ----------------------------------------
   // Constants
   // ----------------------------------------
-  const zIndex = 50;
   const bulkReplyThreshold = 30;
 
   // ----------------------------------------
