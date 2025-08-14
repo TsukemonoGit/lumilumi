@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { debug } from "$lib/stores/stores";
   import { onMount, untrack } from "svelte";
-  import { debug } from "./debug";
 
   let erudaInstance: any;
 

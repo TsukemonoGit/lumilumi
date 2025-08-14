@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, untrack } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
@@ -42,12 +41,6 @@
   // Types
   import type { ReqStatus } from "$lib/types";
   import { replaceState } from "$app/navigation";
-  import {
-    addDebugLog,
-    debugError,
-    debugInfo,
-    debugWarn,
-  } from "$lib/components/Debug/debug";
 
   // Constants
   const CONFIG = {
@@ -129,9 +122,7 @@
 
   // Rx-Nostr setup
   const keyFn = (packet: EventPacket): string => packet.event.id;
-  const onCache = (packet: EventPacket): void => {};
-  const onHit = (packet: EventPacket): void => {};
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+  const [uniq, eventIds] = createUniq(keyFn);
 
   // Query setup
   let result = $derived(
@@ -334,7 +325,6 @@
         queryClient?.getQueryData([...queryKey, "olderData"]);
 
       if (existingEvents && existingEvents.length > 0) {
-        addDebugLog(`既存データ${existingEvents.length}件を使用`);
         //  updateViewEvent();
 
         //ページ復元
@@ -357,14 +347,11 @@
       timelineManager.isLoadingOlderEvents = true;
 
       if (readUrls && readUrls.length > 0) {
-        addDebugLog("リレー接続を確立中...");
         await waitForConnections();
       }
 
       const initialFilters = createInitialFilters();
       const handleIncrementalData = createIncrementalHandler();
-
-      addDebugLog("初期データを取得中...");
 
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
@@ -377,10 +364,7 @@
       if (olderEvents.length > 0) {
         updateQueryData(olderEvents);
       }
-
-      addDebugLog(`初期化完了: ${olderEvents.length}件のイベントを取得`);
     } catch (error) {
-      addDebugLog("Timeline初期化エラー:", error);
       handleFallbackData();
     } finally {
       updateViewEvent();
@@ -432,10 +416,6 @@
       ...queryKey,
       "olderData",
     ]) as EventPacket[];
-
-    if (fallbackData && fallbackData.length > 0) {
-      addDebugLog("フォールバックデータを使用");
-    }
   }
 
   /**
@@ -470,7 +450,6 @@
 
       // 👇 ストック不足でリクエスト中なら return
       if (timelineManager.isLoadingOlderEvents) {
-        addDebugLog("前回のデータ取得が完了していません");
         return;
       }
       const older = queryClient?.getQueryData([
@@ -481,7 +460,6 @@
       const untilTime = older?.[older.length - 1]?.event.created_at;
 
       if (!untilTime) {
-        debugWarn("No existing events to determine untilTime");
         return;
       }
 
@@ -539,7 +517,6 @@
       }
       updateViewEvent();
     } catch (error) {
-      debugError("loadOlderAndMoveDown error:", error);
     } finally {
       $nowProgress = false;
       timelineManager.isLoadingOlderEvents = false;
@@ -616,39 +593,7 @@
     }
   });
 
-  /*  // Lifecycle
- //effectでやってるからいらん
-  onMount(async () => {
-    if (timelineManager.isOnMount || !lumiSetting.get().pubkey) return;
-
-    if (!timelineManager.isOnMount) {
-      timelineManager.isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      timelineManager.isOnMount = false;
-      $nowProgress = false;
-    }
-  });
-
-  afterNavigate(async (navigate) => {
-    if (
-      navigate.type === "form" ||
-      timelineManager.isOnMount ||
-      !lumiSetting.get().pubkey
-    )
-      return;
-
-    if (!timelineManager.isOnMount) {
-      timelineManager.isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      timelineManager.isOnMount = false;
-      $nowProgress = false;
-    }
-  }); */
-
   onDestroy(() => {
-    debugInfo("main timeline destroy");
     timelineManager.destroyed = true;
     if (timelineManager.timeoutId) {
       clearTimeout(timelineManager.timeoutId);

@@ -7,7 +7,6 @@
   import { changeEmit } from "$lib/func/reactions";
   import { untrack, type Snippet } from "svelte";
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
-  import { addDebugLog } from "$lib/components/Debug/debug";
 
   interface Props {
     error?: Snippet;
@@ -58,10 +57,7 @@
 
     timeoutId = setTimeout(() => {
       performUpdate();
-      addDebugLog("Debounced reaction filter update: etag/atag count", {
-        e: etagList.length,
-        a: atagList.length,
-      });
+
       updating = false;
     }, updateInterval);
 

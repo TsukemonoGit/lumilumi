@@ -43,7 +43,6 @@
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
   import { normalizeURL } from "nostr-tools/utils";
-  import { addDebugLog, debugError, debugInfo } from "../Debug/debug";
   import ColorThemeSelect from "./ColorThemeSelect.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
@@ -90,24 +89,14 @@
   });
 
   onMount(async () => {
-    addDebugLog("Component mounted - starting initialization");
-
     const savedSettings = loadSettings();
-    addDebugLog("Loaded settings from localStorage", savedSettings);
 
     if (savedSettings) {
       settings = { ...settings, ...savedSettings };
-      addDebugLog("Merged saved settings into current state");
       try {
         inputPubkey = nip19.npubEncode(settings.pubkey);
-        addDebugLog("Encoded pubkey to npub", inputPubkey);
-      } catch (error) {
-        addDebugLog("Failed to encode pubkey", error);
-      }
+      } catch (error) {}
     } else {
-      addDebugLog(
-        "No valid saved settings found - calling initializeSettings()"
-      );
       initializeSettings();
     }
 
@@ -119,14 +108,9 @@
       $mutes = mute ? JSON.parse(mute) : initLumiMute;
       $emojis = emoji ? JSON.parse(emoji) : initLumiEmoji;
       $mutebykinds = mutebykind ? JSON.parse(mutebykind) : initLumiMuteByKind;
-
-      addDebugLog("Loaded mutes/emojis/mutebykind from localStorage");
-    } catch (error) {
-      addDebugLog("Error while loading mute/emoji/mutebykind", error);
-    }
+    } catch (error) {}
 
     originalSettings = $state.snapshot(settings);
-    addDebugLog("Captured originalSettings snapshot", originalSettings);
   });
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
@@ -153,21 +137,17 @@
     try {
       const saved = localStorage.getItem(LUMI_STORAGE_KEY);
       if (!saved) {
-        addDebugLog("No lumiSetting found in localStorage");
         return null;
       }
 
       const parsed = JSON.parse(saved);
       if (isValidLumiSetting(parsed)) {
-        addDebugLog("Parsed valid lumiSetting from localStorage", parsed);
         $relaySetValue = parsed.useRelaySet;
         return parsed;
       } else {
-        addDebugLog("Invalid lumiSetting structure", parsed);
         return null;
       }
     } catch (e) {
-      addDebugLog("Error loading lumiSetting", e);
       return null;
     }
   }
@@ -276,17 +256,6 @@
           setRelays(setRelaysByKind10002(relays[0].event));
         }
       }
-      //else {
-      // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
-      //コンポーネント外やでerrorがでる
-      // useRelaySet(
-      //   ["defaultRelay", lumiSetting.get().pubkey],
-      //   [
-      //     { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
-      //   ] as Nostr.Filter[],
-      //   undefined
-      // );
-      //}
     }
   }
 
@@ -429,13 +398,10 @@
     shouldReload = true;
 
     try {
-      debugInfo("リロード実行", { shouldReload });
       location.reload();
     } catch (e) {
       if (e instanceof DOMException && e.name === "SecurityError") {
-        debugError("リロード失敗: セキュリティエラー", e);
       } else {
-        debugError("リロード失敗: その他のエラー", e);
         // throw e; // 不明な例外は再スロー（必要に応じて）
       }
     }

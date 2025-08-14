@@ -10,7 +10,6 @@ import { pipe, type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
-import { debugInfo, debugWarn } from "$lib/components/Debug/debug";
 
 // Type definition for enhanced event packet
 type EnhancedEventPacket = EventPacket & {
@@ -118,14 +117,6 @@ export async function firstLoadOlderEvents(
     sift
   );
 
-  debugInfo(`📡 Older events fetch completed`, {
-    requested: sift || "unlimited",
-    received: olderEvents.length,
-    relays: relays?.length || "default",
-    filtersCount: filters.length,
-    hasCallback: !!onData,
-  });
-
   // Return either all events or limited by sift
   //return olderEvents.slice(0, sift === 0 ? undefined : sift);
   return olderEvents;
@@ -168,20 +159,12 @@ export async function waitForConnections(
     const totalRelays = normalizedReadUrls.length;
     const connectionRatio = finalStateCount / totalRelays;
 
-    debugInfo(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
-
     if (connectionRatio >= REQUIRED_CONNECTION_RATIO) {
-      debugInfo(
-        `${Math.round(
-          connectionRatio * 100
-        )}% relays are in a final state. Proceeding...`
-      );
       break;
     }
 
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= maxWaitTime) {
-      debugWarn("Maximum wait time exceeded. Proceeding...");
       break;
     }
 

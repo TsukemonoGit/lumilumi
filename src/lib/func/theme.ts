@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import { debugError } from "$lib/components/Debug/debug";
+
 import { tick } from "svelte";
 import { STORAGE_KEYS } from "./localStorageKeys";
 
@@ -14,9 +14,7 @@ export function initThemeSettings() {
 
     applyThemeMode(theme);
     applyColorScheme(scheme);
-  } catch (error: any) {
-    debugError(error);
-  }
+  } catch (error: any) {}
 }
 
 export async function setThemeMode(mode: ThemeMode) {
@@ -33,9 +31,7 @@ export function setColorScheme(scheme: ColorScheme) {
   try {
     localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, scheme);
     applyColorScheme(scheme);
-  } catch (error: any) {
-    debugError(error);
-  }
+  } catch (error: any) {}
 }
 
 function applyThemeMode(mode: ThemeMode) {
@@ -93,7 +89,6 @@ function getCurrentColorScheme(): ColorScheme {
       "default"
     );
   } catch (error: any) {
-    debugError(error);
     return "default";
   }
 }

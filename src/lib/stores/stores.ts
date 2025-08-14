@@ -22,6 +22,11 @@ import {
 import { createTie } from "./operators";
 //import type { Part } from "$lib/func/content";
 
+export const DEBUG_MODE =
+  import.meta.env.DEV || import.meta.env.VITE_DEBUG === "true";
+// DEBUG_MODEの値で初期化
+export const debug = writable(DEBUG_MODE);
+
 export interface Popstate {
   id: string;
   mediaview?: {

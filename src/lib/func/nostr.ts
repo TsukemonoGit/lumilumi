@@ -54,7 +54,6 @@ import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
-import { addDebugLog, debugInfo } from "$lib/components/Debug/debug";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -87,17 +86,14 @@ export function setRxNostr() {
           type: "AUTH";
         }
       ) => {
-        addDebugLog("AUTH", e);
         if (!authRelay.get().includes(e.from)) {
           authRelay.update((v) => [...v, e.from]);
         }
-        addDebugLog("authRelay", authRelay.get());
       }
     );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  addDebugLog("setRelays", relays);
   if (rxNostr && defaultRelays) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());
@@ -241,8 +237,6 @@ export function generateRandomId(length: number = 6): string {
 const req = createRxForwardReq();
 
 export function changeMainEmit(filters: Nostr.Filter[]) {
-  debugInfo("changeMainEmit", filters);
-
   req.emit(filters);
 }
 export const makeMainFilters = (
@@ -301,7 +295,6 @@ export const makeMainFilters = (
     kinds: [10003],
     authors: [lumiSetting.get().pubkey],
   });
-  // addDebugLog("mineFilters", filters);
 
   return { mainFilters: filters, olderFilters: olderFilters };
 };
@@ -388,13 +381,7 @@ export function publishEvent(ev: Nostr.EventParameters) {
     console.log("error");
     throw Error();
   }
-  _rxNostr.send(ev).subscribe((packet) => {
-    addDebugLog(
-      `リレー ${packet.from} への送信が ${
-        packet.ok ? "成功" : "失敗"
-      } しました。`
-    );
-  });
+  _rxNostr.send(ev).subscribe((packet) => {});
 }
 
 export async function promisePublishSignedEvent(
@@ -441,11 +428,6 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
-        addDebugLog(
-          `リレー ${packet.from} への送信が ${
-            packet.ok ? "成功" : "失敗"
-          } しました。`
-        );
         results.push(packet);
       },
       complete: () => resolve(results),
