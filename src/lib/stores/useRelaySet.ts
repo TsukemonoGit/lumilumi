@@ -3,7 +3,6 @@ import type { QueryKey } from "@tanstack/svelte-query";
 import {
   completeOnTimeout,
   createUniq,
-  uniq,
   type DefaultRelayConfig,
   type EventPacket,
   type RxReq,
@@ -15,14 +14,13 @@ import type { ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";
 import type { Event } from "nostr-typedef";
 import { pipe } from "rxjs";
-import { derived, get } from "svelte/store";
+import { derived } from "svelte/store";
 import { setRelays } from "$lib/func/nostr";
 import { relaySearchRelays } from "./relays";
-import { app, tie } from "./stores";
+import { tie } from "./stores";
 import { saveEachNote } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
-import { debugError, debugInfo } from "$lib/components/Debug/debug";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
@@ -84,7 +82,6 @@ export function toRelaySet(
       }
     });
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）
-    debugInfo("rxNostr.getDefaultRelays:", get(app).rxNostr.getDefaultRelays());
     return relay;
   } else {
     const relay =
@@ -93,13 +90,12 @@ export function toRelaySet(
         : setRelaysByKind10002(value.event);
 
     setRelays(relay); //ここでデフォルトリレーにセットしてみる（）
-    debugInfo("rxNostr.getDefaultRelays:", get(app).rxNostr.getDefaultRelays());
+
     return relay;
   }
 }
 
 export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
-  debugInfo("setRelaysByKind3", event);
   try {
     const relayList: { [key: string]: { read: boolean; write: boolean } } =
       JSON.parse(event.content);
@@ -109,13 +105,12 @@ export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
       write: config.write,
     }));
   } catch (error) {
-    debugError("Error parsing relays by kind 3", error);
+    console.log(error);
     return [];
   }
 }
 
 export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
-  debugInfo("setRelaysByKind10002", event);
   try {
     const relayList: string[][] = event.tags;
     return relayList.map(([, url, ...config]) => {
@@ -129,7 +124,7 @@ export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
       return conf;
     });
   } catch (error) {
-    debugError("Error parsing relays by kind 10002", error);
+    console.log(error);
     return [];
   }
 }

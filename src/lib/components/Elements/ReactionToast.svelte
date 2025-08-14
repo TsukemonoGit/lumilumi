@@ -33,6 +33,7 @@
     try {
       return JSON.parse(data.description) as Nostr.Event;
     } catch (error) {
+      console.log(error);
       return;
     }
   };

@@ -1,6 +1,5 @@
 // src/lib/i18n/index.ts
 
-import { addDebugLog } from "$lib/components/Debug/debug";
 import { initI18n, registerLocale } from "@konemono/svelte5-i18n";
 
 const defaultLocale = "en";
@@ -13,6 +12,4 @@ try {
     defaultLocale: defaultLocale,
     supportedLocales: ["ja", "en"],
   });
-} catch (error: any) {
-  addDebugLog(error);
-}
+} catch (error: any) {}

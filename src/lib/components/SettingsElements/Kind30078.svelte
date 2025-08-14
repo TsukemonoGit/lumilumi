@@ -27,7 +27,6 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
-  import { debugError, debugInfo } from "../Debug/debug";
   import {
     setColorScheme,
     setThemeMode,
@@ -160,7 +159,6 @@
 
     const result = await publishSettings(newLumiSettings);
     if (result) {
-      debugInfo("publish kidn30078", newLumiSettings);
       saveName = "";
       $toastSettings = {
         title: "Success",
@@ -212,31 +210,25 @@
       return;
     }
     $nowProgress = true;
-    debugInfo("loadData", loadData);
+
     if (loadData.showBanner) {
       showBanner.set(loadData.showBanner);
       try {
         localStorage?.setItem("showBanner", loadData.showBanner.toString());
-      } catch (error) {
-        debugError("failed to save", error);
-      }
+      } catch (error) {}
     }
 
     if (loadData.theme) {
       setThemeMode(loadData.theme as Theme);
       try {
         localStorage?.setItem("theme", loadData.theme);
-      } catch (error) {
-        debugError("failed to save", error);
-      }
+      } catch (error) {}
     }
     if (loadData.colorScheme) {
       setColorScheme((loadData.colorScheme || "default") as ColorScheme);
       try {
         localStorage?.setItem(STORAGE_KEYS.COLOR_SCHEME, loadData.colorScheme);
-      } catch (error) {
-        debugError("failed to save", error);
-      }
+      } catch (error) {}
     } else {
       setColorScheme("default");
     }
@@ -247,7 +239,7 @@
           loadData.globalRegexFilter
         );
       } catch (error) {
-        debugError("failed to save", error);
+        console.log(error);
       }
     }
     if (loadData.timelineFilter) {

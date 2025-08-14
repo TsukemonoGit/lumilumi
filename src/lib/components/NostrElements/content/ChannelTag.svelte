@@ -23,6 +23,7 @@
     try {
       return JSON.parse(text.content) as ChannelData;
     } catch (error) {
+      console.log(error);
       return undefined;
     }
   };
@@ -43,6 +44,7 @@
     try {
       return `/channel/${nip19.noteEncode(heyaId)}`;
     } catch (error) {
+      console.log(error);
       return "";
     }
   }
