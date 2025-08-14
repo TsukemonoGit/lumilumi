@@ -216,12 +216,12 @@
 </script>
 
 {#if lumiSetting.get().showPreview}
-  <div
-    class="rounded-md bg-neutral-900
-    p-6 pt-3 shadow-lg mb-4"
-  >
-    <div class="font-medium text-magnum-400">preview</div>
-    <div class="relative border border-magnum-500 rounded-md min-h-[6.6rem]">
+  <div class=" mb-4">
+    <div
+      class="p-2 bg-neutral-900
+     relative shadow-lg rounded-md min-h-[6.6rem]"
+    >
+      <div class="px-1 font-medium text-magnum-400">preview</div>
       <NoteComponent warningText={onWarning ? warningText : undefined}>
         {#snippet icon()}
           <!-- ミュート投稿のアイコン表示 -->
@@ -337,15 +337,13 @@
 
 <Dialog id={"showMore_preview"} bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
-    <div class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
-      <ContentParts
-        {maxHeight}
-        {event}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {zIndex}
-      />
-    </div>
+    <ContentParts
+      {maxHeight}
+      {event}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {zIndex}
+    />
   {/snippet}</Dialog
 >
