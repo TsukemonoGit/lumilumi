@@ -765,9 +765,10 @@
       transition:fade={{ duration: 150 }}
       onclick={handleOverlayClick}
     ></button>
+    <!--真ん中よりちょい上に表示したい-->
     <div
-      class="fixed left-1/2 top-12 z-50 max-h-[90vh] w-[640px]
-            max-w-[95vw] -translate-x-1/2 overflow-y-auto"
+      class="fixed left-1/2 top-[calc(50%-32px)] z-50 max-h-[90vh] w-[640px]
+            max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
       <PostPreview
