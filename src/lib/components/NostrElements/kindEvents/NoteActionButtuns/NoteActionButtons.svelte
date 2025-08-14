@@ -436,7 +436,11 @@
   });
 
   $effect(() => {
-    if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
+    if (
+      viewEventIds.get().length > 0 ||
+      lumiSetting.get().showAllReactions ||
+      viewAllReactions
+    ) {
       untrack(() => {
         scheduleUpdate();
       });
