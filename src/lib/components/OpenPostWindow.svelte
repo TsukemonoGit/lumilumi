@@ -766,8 +766,8 @@
       onclick={handleOverlayClick}
     ></button>
     <div
-      class="fixed left-1/2 top-[40%] z-50 max-h-[85vh] w-[640px]
-            max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
+      class="fixed left-1/2 top-12 z-50 max-h-[90vh] w-[640px]
+            max-w-[95vw] -translate-x-1/2 overflow-y-auto"
       use:melt={$content}
     >
       <PostPreview
@@ -787,7 +787,7 @@
         {addUser}
       />
 
-      <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">
+      <div class="relative rounded-md bg-neutral-900 px-6 py-4 shadow-lg">
         <button
           use:melt={$close}
           aria-label="close"
