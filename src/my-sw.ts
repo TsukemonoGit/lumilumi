@@ -52,6 +52,9 @@ let targetData: {
 };
 
 const manifest = self.__WB_MANIFEST as Array<ManifestEntry>;
+if (manifest && manifest.length > 0) {
+  precacheAndRoute(manifest);
+}
 
 const cacheEntries: RequestInfo[] = [];
 
@@ -284,8 +287,10 @@ async function handleFetchEvent(event: FetchEvent) {
     event.request.method === "POST" &&
     new URL(event.request.url).pathname === "/post"
   ) {
-    return handlePostRequest(event.request);
+    event.respondWith(handlePostRequest(event.request));
+    return;
   }
+  // 他のリクエストはデフォルトハンドラーに任せる
 }
 
 async function handlePostRequest(request) {
