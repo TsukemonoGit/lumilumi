@@ -1,11 +1,10 @@
 <script lang="ts">
-  import "$lib/i18n/index.ts";
   //@ts-ignore
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick } from "svelte";
+  import { onMount, tick, type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -67,7 +66,7 @@
 
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
-  import DebugPanel from "$lib/components/Debug/DebugPanel.svelte";
+  //import DebugPanel from '$lib/components/Debug/DebugPanel.svelte';
   import { addDebugLog } from "$lib/components/Debug/debug";
 
   import { initThemeSettings } from "$lib/func/theme";
@@ -79,7 +78,7 @@
           relays?: string[] | undefined;
         }
       | undefined;
-    children: import("svelte").Snippet;
+    children: Snippet;
   }>();
 
   let SvelteQueryDevtools: any = $state();
@@ -148,7 +147,7 @@
           addDebugLog("Pubkey already exists in settings, skipping update");
         }
       }
-      console.log(customEvent);
+      //  console.log(customEvent);
     });
 
     // make sure this is called before any
@@ -193,18 +192,17 @@
 
       addDebugLog("Importing nostr-login module");
       const nostrLogin = await import("nostr-login");
-      addDebugLog("Nostr-login module imported successfully");
 
-      addDebugLog("Waiting for nostr availability");
       await waitNostr(1000);
-      addDebugLog("Nostr wait completed");
-
-      addDebugLog("Initializing nostr-login");
-      await nostrLogin.init({
-        //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
-        /*options*/
-        description: `${$_("nostrlogin.description")}`,
-      });
+      try {
+        await nostrLogin.init({
+          //methods: ["connect", "readOnly", "extension", "local"], //, 'otp']
+          /*options*/
+          description: `${$_("nostrlogin.description")}`,
+        });
+      } catch (error) {
+        console.log(error);
+      }
       addDebugLog("Nostr-login initialization completed");
       await tick();
 
@@ -266,6 +264,7 @@
       );
       modalIndex = e.index;
       mediaList = e.mediaList;
+
       setTimeout(() => {
         $showModal = true;
       }, 0);
@@ -348,14 +347,14 @@
     <link {...link} />
   {/each}
 
-  <link
+  <!--   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/reset.css"
   />
   <script
     type="module"
     src="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/makibishi-component.js"
-  ></script>
+  ></script> -->
 </svelte:head>
 
 <Popstate />

@@ -275,28 +275,36 @@
       ],
     };
     const signer = nip07Signer();
-    const event = await signer.signEvent(ev);
-    if (event.pubkey !== lumiSetting.get().pubkey) {
-      $toastSettings = {
-        title: "Error",
-        description: "login pubkey ≠ sign pubkey",
-        color: "bg-red-500",
-      };
-      $nowProgress = false;
-      return;
-    } else {
-      const { event: ev, res } = await promisePublishSignedEvent(event);
-      const isSuccessRelays: OkPacketAgainstEvent[] = res.filter(
-        (item) => item.ok
-      );
-
-      if (isSuccessRelays.length <= 0) {
+    try {
+      const event = await signer.signEvent(ev);
+      if (event.pubkey !== lumiSetting.get().pubkey) {
         $toastSettings = {
-          title: "Failed",
-          description: "failed to publish",
+          title: "Error",
+          description: "login pubkey ≠ sign pubkey",
           color: "bg-red-500",
         };
+        $nowProgress = false;
+        return;
+      } else {
+        const { event: ev, res } = await promisePublishSignedEvent(event);
+        const isSuccessRelays: OkPacketAgainstEvent[] = res.filter(
+          (item) => item.ok
+        );
+
+        if (isSuccessRelays.length <= 0) {
+          $toastSettings = {
+            title: "Failed",
+            description: "failed to publish",
+            color: "bg-red-500",
+          };
+        }
       }
+    } catch (error) {
+      $toastSettings = {
+        title: "Failed",
+        description: "failed to sign event",
+        color: "bg-red-500",
+      };
     }
     $nowProgress = false;
   };

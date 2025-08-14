@@ -52,7 +52,7 @@
     // 1. map でPromise配列を作る
     const itemsWithType = await Promise.all(
       imageUrls.map(async (url, index) => {
-        console.log(url);
+        //console.log(url);
         const data: UrlType | null = await userPromiseUrl(url);
         return { url, originalIndex: index, type: data || "url" };
       })
@@ -60,7 +60,7 @@
 
     // 2. フィルター
     const filtered = itemsWithType.filter((item) => {
-      console.log(item);
+      // console.log(item);
       return item.type === "image" || item.type === "svg";
     });
 

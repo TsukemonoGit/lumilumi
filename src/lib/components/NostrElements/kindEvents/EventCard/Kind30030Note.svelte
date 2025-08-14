@@ -24,6 +24,8 @@
   import CustomEmoji from "../../content/CustomEmoji.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { updateEmojiListFromEvent } from "$lib/func/updateEmojiList";
 
   interface Props {
     note: Nostr.Event;
@@ -141,7 +143,7 @@
         event: ev,
       };
       $emojis = $emojis;
-      localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
+      localStorage.setItem(STORAGE_KEYS.LUMI_EMOJI, JSON.stringify($emojis));
     } finally {
       $nowProgress = false;
       disabled = false;
@@ -214,7 +216,7 @@
         newestKind10030 = ev;
       }
 
-      // 以下の処理があるなら続ける...
+      await updateEmojiListFromEvent(newestKind10030);
     } finally {
       $nowProgress = false;
       disabled = false;
@@ -286,16 +288,9 @@
       }
       newestKind10030 = ev;
     }
-    //localStorageのデータを新しいのにする。
+
+    await updateEmojiListFromEvent(newestKind10030);
     $nowProgress = false;
-    const list = await createEmojiListFrom10030(newestKind10030);
-    $emojis = {
-      list: list,
-      updated: Math.floor(Date.now() / 1000),
-      event: newestKind10030,
-    };
-    $emojis = $emojis;
-    localStorage.setItem("lumiEmoji", JSON.stringify($emojis));
     disabled = false;
   }
   //今の同期されたデータと別ユーザーの可能性

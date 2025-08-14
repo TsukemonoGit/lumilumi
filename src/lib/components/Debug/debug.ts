@@ -1,5 +1,6 @@
 // src/lib/utils/debug.ts
 
+import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 import { writable } from "svelte/store";
 
 export const DEBUG_MODE =
@@ -44,7 +45,9 @@ export function addDebugLog(
   debugLogs.update((logs) => [log, ...logs].slice(0, 50));
 }
 
-export function getStorageData(keys = ["timelineFilter", "lumiSetting"]) {
+export function getStorageData(
+  keys = [STORAGE_KEYS.TIMELINE_FILTER, "lumiSetting"]
+) {
   let debugEnabled = false;
   debug.subscribe((value) => (debugEnabled = value))();
 

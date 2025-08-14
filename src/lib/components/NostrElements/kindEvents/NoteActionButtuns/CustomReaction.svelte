@@ -7,6 +7,9 @@
   import { clientTag } from "$lib/func/constants";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
+  import { npubRegex } from "$lib/func/regex";
+  import { nip19 } from "nostr-tools";
+  import { getUserProfile } from "$lib/func/customEmoji";
 
   interface Props {
     note: Nostr.Event | undefined;
@@ -107,6 +110,21 @@
       handleClickCustomReaction();
     }
   }
+
+  const getEmojiTag = async (pub: string): Promise<string | null> => {
+    try {
+      const hex = nip19.decode(pub)?.data as string;
+      const profile = await getUserProfile(hex);
+      const picture = profile?.picture;
+      if (picture) {
+        return picture;
+      }
+      return null;
+    } catch (error) {
+      console.warn(`Failed to process npub emoji: ${pub}`, error);
+    }
+    return null;
+  };
 </script>
 
 <Popover
@@ -149,6 +167,7 @@
               aria-label={`Select emoji ${e[0]}`}
               onclick={() => handleClickEmoji(e)}
               class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+              style="overflow-anchor: auto;"
             >
               {#if lumiSetting.get().showImg}
                 <img
@@ -162,6 +181,27 @@
             </button>
           {/if}
         {/each}
+        {#if npubRegex.test(customReaction)}
+          {#await getEmojiTag(customReaction) then url}
+            {#if url}
+              <button
+                aria-label={`Select emoji ${customReaction}`}
+                onclick={() => handleClickEmoji([customReaction, url])}
+                class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
+                style="overflow-anchor: auto;"
+              >
+                {#if lumiSetting.get().showImg}
+                  <img
+                    height="24px"
+                    loading="lazy"
+                    class="h-6 min-w-6 object-contain justify-self-center"
+                    src={url}
+                    alt={customReaction}
+                    title={customReaction}
+                  />{:else}{customReaction}{/if}
+              </button>{/if}
+          {/await}
+        {/if}
         <EmojiListUpdate
           buttonClass="ml-auto p-1 m-1 rounded-full hover:opacity-75 active:opacity-50 bg-magnum-600 text-magnum-200"
         >

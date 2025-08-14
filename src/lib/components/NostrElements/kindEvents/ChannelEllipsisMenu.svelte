@@ -7,7 +7,7 @@
     SquareArrowOutUpRight,
     Radio,
     Share,
-    Edit,
+    SquarePen,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -73,7 +73,7 @@
     if (note.pubkey === lumiSetting.get().pubkey) {
       menu.unshift({
         text: `${$_("menu.editChannelInfo")}`,
-        icon: Edit,
+        icon: SquarePen,
         num: 8,
       }); //配列の先頭に挿入
     }
@@ -196,6 +196,4 @@
   <Ellipsis size="20" />
 </DropdownMenu>
 
-<!--JSON no Dialog
-<ModalJson bind:dialogOpen {note}  />-->
 <EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} />

@@ -40,8 +40,19 @@
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
 
-  let parts: Token[] = $derived(parseContent(text, tags));
-  //プレビューにも使ってるからconstだとだめ
+  let parts: Token[] = $derived.by(() => {
+    let rawParts = parseContent(text, tags);
+    let imageIndex = 0;
+    return rawParts.map((token) => {
+      if (token.type === TokenType.URL && token.metadata?.type === "image") {
+        return {
+          ...token,
+          metadata: { ...token.metadata, number: imageIndex++ },
+        };
+      }
+      return token;
+    });
+  });
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
 
@@ -54,7 +65,7 @@
 
   const openModal = (index: number) => {
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
-    console.log(index, $state.snapshot(mediaList));
+    //console.log(index, $state.snapshot(mediaList));
   };
 
   const nip19Decode = (

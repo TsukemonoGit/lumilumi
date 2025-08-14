@@ -2,6 +2,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { followList, timelineFilter } from "$lib/stores/globalRunes.svelte";
   import { browser } from "$app/environment";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   const onChangeExcludeFollowee = () => {
     timelineFilter.update((cur) => {
@@ -15,7 +16,10 @@
       };
       try {
         if (browser) {
-          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+          localStorage.setItem(
+            STORAGE_KEYS.TIMELINE_FILTER,
+            JSON.stringify(tlFilter)
+          );
         }
       } catch (error: any) {
         console.warn("Failed to save timelineFilter:", error);
@@ -36,7 +40,10 @@
       };
       try {
         if (browser) {
-          localStorage.setItem("timelineFilter", JSON.stringify(tlFilter));
+          localStorage.setItem(
+            STORAGE_KEYS.TIMELINE_FILTER,
+            JSON.stringify(tlFilter)
+          );
         }
       } catch (error: any) {
         console.warn("Failed to save timelineFilter:", error);

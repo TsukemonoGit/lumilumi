@@ -109,6 +109,7 @@
       size={mini ? 20 : 40}
       {displayMenu}
       {depth}
+      {zIndex}
     />
   {/snippet}
   {#snippet seenOn()}

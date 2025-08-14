@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import { debugError } from "$lib/components/Debug/debug";
 import { tick } from "svelte";
+import { STORAGE_KEYS } from "./localStorageKeys";
 
 export type ColorScheme = "default" | "gray";
 export type ThemeMode = "light" | "dark" | "system";
@@ -30,7 +31,7 @@ export async function setThemeMode(mode: ThemeMode) {
 export function setColorScheme(scheme: ColorScheme) {
   if (!browser) return;
   try {
-    localStorage.setItem("colorScheme", scheme);
+    localStorage.setItem(STORAGE_KEYS.COLOR_SCHEME, scheme);
     applyColorScheme(scheme);
   } catch (error: any) {
     debugError(error);
@@ -87,7 +88,10 @@ export async function toggleDarkMode() {
 function getCurrentColorScheme(): ColorScheme {
   if (!browser) return "default";
   try {
-    return (localStorage.getItem("colorScheme") as ColorScheme) ?? "default";
+    return (
+      (localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) as ColorScheme) ??
+      "default"
+    );
   } catch (error: any) {
     debugError(error);
     return "default";

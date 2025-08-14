@@ -16,6 +16,7 @@ export interface InvoiceProp {
   amount: number;
   comment: string;
   zapRelays: string[];
+  kind?: number;
 }
 export async function makeInvoice({
   metadata,
@@ -23,6 +24,7 @@ export async function makeInvoice({
   amount, //1000かけたやつをいれる
   comment,
   zapRelays,
+  kind,
 }: InvoiceProp): Promise<string | null> {
   try {
     const zapEndpoint = await getZapEndpoint(metadata);
@@ -37,6 +39,7 @@ export async function makeInvoice({
       amount: amount,
       relays: zapRelays,
       comment: comment,
+      ...(kind !== undefined ? { kind } : {}),
     });
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(
       zapRequest
@@ -283,12 +286,14 @@ export function makeZapRequest({
   amount,
   relays,
   comment = "",
+  kind,
 }: {
   profile: string;
   eventTag: string[] | null;
   amount: number;
   comment: string;
   relays: string[];
+  kind?: number;
 }): EventTemplate {
   if (!amount) throw new Error("amount not given");
   if (!profile) throw new Error("profile not given");
@@ -301,6 +306,7 @@ export function makeZapRequest({
       ["p", profile],
       ["amount", amount.toString()],
       ["relays", ...relays],
+      ...(kind !== undefined ? [["k", kind.toString()]] : []),
     ],
   };
 
@@ -318,14 +324,19 @@ export function lnurlToZapAddress(lud06: string): string | undefined {
     const lnurl = new TextDecoder().decode(data);
 
     const match = lnurl.match(
-      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/(.+)$/
+      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/([^\/]+)$/
     );
-    if (match) {
-      const [, domain, username] = match;
+
+    if (match && match.length >= 3) {
+      const domain = match[1];
+      const username = match[2];
       return `${username}@${domain}`;
     }
+
+    return undefined;
   } catch (error) {
-    return;
+    // console.error("Invalid LNURL:", error);
+    return undefined;
   }
 }
 

@@ -17,6 +17,7 @@
   import {
     getMetadataList,
     promisePublishSignedEvent,
+    usePromiseReq,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -33,15 +34,24 @@
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
+  import {
+    filesUpload,
+    delay,
+    displayShortPub,
+    nip19Decode,
+  } from "$lib/func/util";
 
-  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
+  import type {
+    DefaultPostOptions,
+    MargePostOptions,
+    Profile,
+  } from "$lib/types";
 
-  import { nip07Signer, type EventPacket } from "rx-nostr";
+  import { latest, nip07Signer, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { nsecRegex } from "$lib/func/regex";
+  import { npubRegex, nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
   import { convertMetaTags } from "$lib/func/imeta";
@@ -56,6 +66,9 @@
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
+  import { nip19 } from "nostr-tools";
+  import { json } from "@sveltejs/kit";
+  import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
 
   // ----------------------------------------
   // Component Props
@@ -228,76 +241,11 @@
   }
 
   // ----------------------------------------
-  // Tag Management
-  // ----------------------------------------
-  function addEmojiTag(emoji: string[]) {
-    // 1. URLが同じ絵文字を探す
-    const sameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
-    );
-
-    if (sameEmoji) {
-      // 同じURLの絵文字があれば、その名前を使う
-      emoji[0] = sameEmoji[1];
-    }
-
-    // 2. 同じ名前の絵文字があるか確認
-    let sameNameEmoji = tags.find(
-      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-    );
-
-    // 3. 絵文字の条件に従って追加処理
-    if (sameNameEmoji) {
-      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
-      if (sameNameEmoji[2] !== emoji[1]) {
-        // 元の名前を保存
-        const baseName = emoji[0];
-        let num = 1;
-
-        // 重複しない名前が見つかるまでnumをインクリメント
-        emoji[0] = `${baseName}_${num}`;
-        sameNameEmoji = tags.find(
-          (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-        );
-
-        while (sameNameEmoji) {
-          num++;
-          emoji[0] = `${baseName}_${num}`;
-          sameNameEmoji = tags.find(
-            (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-          );
-        }
-
-        tags.push(["emoji", ...emoji]);
-      }
-      // 完全に同じ名前・URLの絵文字がある場合は何もしない
-    } else {
-      // 同じ名前もURLもない場合、新しい絵文字として追加
-      tags.push(["emoji", ...emoji]);
-    }
-  }
-
-  function checkCustomEmojis(input: string) {
-    const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
-
-    if (!emojiMatches) return;
-
-    emojiMatches.forEach((emoji) => {
-      const emojiName = emoji.slice(1, -1);
-      const customEmoji = $emojis.list.find((e) => e[0] === emojiName);
-
-      if (customEmoji) {
-        addEmojiTag(customEmoji);
-      }
-    });
-  }
-
-  // ----------------------------------------
   // Event Publishing
   // ----------------------------------------
   async function postNote() {
     if (text.trim().length <= 0 || isPosting) return;
-
+    //  checkCustomEmojis(text.trim());
     const { text: checkedText, tags: checkedTags } = contentCheck(
       text.trim(),
       tags
@@ -442,7 +390,7 @@
 
   function handleClickEmoji(e: string[]) {
     const emoji = [...e];
-    addEmojiTag(emoji);
+    tags = addEmojiTag(tags, emoji);
 
     const emojiText = `:${emoji[0]}:`;
     insertTextAtCursor(emojiText);
@@ -550,11 +498,11 @@
       $nowProgress = false;
     }
 
-    // Check for custom emojis in pasted text
+    /*  // Check for custom emojis in pasted text
     const pastedText = event.clipboardData.getData("text");
     if (pastedText) {
       checkCustomEmojis(pastedText);
-    }
+    } */
   }
 
   async function handleDrop(event: DragEvent) {
@@ -817,8 +765,9 @@
       transition:fade={{ duration: 150 }}
       onclick={handleOverlayClick}
     ></button>
+    <!--真ん中よりちょい上に表示したい-->
     <div
-      class="fixed left-1/2 top-[40%] z-50 max-h-[85vh] w-[640px]
+      class="fixed left-1/2 top-[calc(50%-32px)] z-50 max-h-[90vh] w-[640px]
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
@@ -839,7 +788,7 @@
         {addUser}
       />
 
-      <div class="relative rounded-md bg-neutral-900 p-6 shadow-lg">
+      <div class="relative rounded-md bg-neutral-900 px-6 py-4 shadow-lg">
         <button
           use:melt={$close}
           aria-label="close"
@@ -952,12 +901,10 @@
             id="note"
             bind:this={textarea}
             bind:value={text}
-            oninput={(e) => {
+            oninput={async (e) => {
               //  handleTextareaInput(e);
               clickEscape = 0;
-            }}
-            onchange={(e) => {
-              checkCustomEmojis(text);
+              tags = await checkCustomEmojis(tags, text);
             }}
             onclick={(e) => {
               //  handleTextareaInput(e);
@@ -1064,6 +1011,7 @@
         {#if viewCustomEmojis}
           <div
             class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+            style="overflow-anchor: auto;"
           >
             {#each $emojis.list as e, index}
               {#if customReaction === "" || e[0]

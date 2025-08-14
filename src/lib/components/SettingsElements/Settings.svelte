@@ -45,8 +45,9 @@
   import { normalizeURL } from "nostr-tools/utils";
   import { addDebugLog, debugError, debugInfo } from "../Debug/debug";
   import ColorThemeSelect from "./ColorThemeSelect.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
-  const lumiEmoji_STORAGE_KEY = "lumiEmoji";
+  const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = $state({ ...initSettings });

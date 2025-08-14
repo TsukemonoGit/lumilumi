@@ -27,7 +27,7 @@ import {
   uniq,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
-import { Observable, type OperatorFunction } from "rxjs";
+import { type Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import {
   bookmark,
@@ -459,7 +459,8 @@ export async function promisePublishEvent(
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
-    const event = await signer.signEvent(ev);
+    const event = await signer.signEvent(ev); //この段階ででかすぎるときエラーになる
+
     return promisePublishSignedEvent(event, relays);
   } catch (error: any) {
     if (error.message.includes("invalid plaintext size")) {

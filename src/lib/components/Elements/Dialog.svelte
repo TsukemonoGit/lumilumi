@@ -26,6 +26,8 @@
     closeOnOutsideClick = true,
   }: Props = $props();
 
+  let scrollContainer: HTMLDivElement | null = $state(null);
+
   const {
     elements: { overlay, content, title, close, portalled },
     states: { open: dialogOpen },
@@ -34,49 +36,54 @@
     closeOnOutsideClick: closeOnOutsideClick,
   });
 
-  // ダイアログを開く際に新しい履歴エントリを作成
-  function openDialogWithHistory() {
-    pushState("", {
-      dialogOpen: {
-        id: id,
-      },
+  const resetScrollPosition = () => {
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+    }
+  };
+
+  const openDialog = () => {
+    $dialogOpen = true;
+    pushState("", { dialogOpen: { id } });
+  };
+
+  const closeDialog = () => {
+    $dialogOpen = false;
+    popStack.update((stack) => stack.filter((entry) => entry.id !== id));
+  };
+
+  // ダイアログ開放時のスクロール位置リセット
+  $effect(() => {
+    if ($dialogOpen && scrollContainer) {
+      setTimeout(resetScrollPosition, 0);
+    }
+  });
+
+  // 外部からのダイアログ制御
+  $effect(() => {
+    if (!open) return;
+
+    return open.subscribe((value) => {
+      value ? openDialog() : closeDialog();
     });
-  }
-
-  // 外部からダイアログを開く要求があった場合の処理
-
-  open?.subscribe((value) => {
-    if (value) {
-      $dialogOpen = true;
-      openDialogWithHistory();
-    } else {
-      $dialogOpen = false;
-      popStack.update((stack) => stack.filter((entry) => entry.id !== id));
-    }
   });
 
-  // ブラウザバックなどでpopStackからナビゲーション変更があった場合
+  // ブラウザバック処理
   $effect(() => {
-    const logEntry = $popStack?.[0]?.id === id;
+    const isCurrentDialog = $popStack?.[0]?.id === id;
+    if (isCurrentDialog) {
+      untrack(() => ($dialogOpen = false));
+    }
+  });
 
-    if (logEntry) {
-      untrack(() => {
-        $dialogOpen = false;
-      });
-    }
-  });
-  dialogOpen.subscribe((value) => {
-    if (!value) $open = false;
-  });
-  /*   // 外部からのページ状態変更を監視
+  // ダイアログ状態の同期
   $effect(() => {
-    const currentDialogState = page.state?.dialogOpen?.id === id;
-    if ($dialogOpen && !currentDialogState) {
-      untrack(() => {
-        $dialogOpen = false;
-      });
-    }
-  });  */
+    return dialogOpen.subscribe((value) => {
+      if (!value && open) {
+        $open = false;
+      }
+    });
+  });
 </script>
 
 {#if $dialogOpen}
@@ -94,7 +101,7 @@
       use:melt={$content}
       class="fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))]
              -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-             p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]"
+             p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col"
       style:z-index={zIndex}
     >
       <!-- ヘッダー -->
@@ -103,7 +110,9 @@
       </h2>
 
       <!-- メインコンテンツ -->
-      {@render main?.()}
+      <div class="flex-1 overflow-auto" bind:this={scrollContainer}>
+        {@render main?.()}
+      </div>
 
       <!-- フッター -->
       <div class="mt-4 flex justify-end gap-4">

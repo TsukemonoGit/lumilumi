@@ -44,26 +44,17 @@ export function contentCheck(
   // Process NIP-19 matches
 
   const nip19Matches = text.matchAll(nip19Regex);
-  [...nip19Matches].map((match) => {
+
+  for (const match of nip19Matches) {
+    const matchValue = match?.[1] ?? match?.[0]; // fallback
+
+    if (!matchValue) continue;
+
     try {
-      let decoded = nip19.decode(match[1]);
+      const decoded = nip19.decode(matchValue);
+
       switch (decoded.type) {
-        //pはリアクタブルに追加削除してるからnoteだけみる(q,aタグ追加のチェック)
-        //case "nprofile":
-        // if (decoded.data.relays) {
-        //   newTags.push([
-        //     "p",
-        //     decoded.data.pubkey,
-        //     decoded.data.relays[0] ?? "",
-        //   ]);
-        // } else {
-        //   newTags.push(["p", decoded.data.pubkey]);
-        // }
-        // break;
-        // case "nrelay":
-        //   newTags.push(["r", decoded.data]);
-        //   break;
-        case "nevent":
+        case "nevent": {
           const neventTag = [
             "q",
             decoded.data.id,
@@ -75,35 +66,36 @@ export function contentCheck(
           }
           newTags.push(neventTag);
           break;
-        case "naddr":
-          if (decoded.data.relays) {
-            newTags.push([
-              "q", //   "a",//https://github.com/nostr-protocol/nips/blob/master/18.md#quote-reposts
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-              decoded.data.relays?.[0] ?? "",
-            ]);
-          } else {
-            newTags.push([
-              "q", //   "a",
-              `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
-            ]);
+        }
+
+        case "naddr": {
+          const addrTag = [
+            "q",
+            `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+          ];
+
+          if (decoded.data.relays?.[0]) {
+            addrTag.push(decoded.data.relays[0]);
           }
+
+          newTags.push(addrTag);
           break;
-        // case "nsec":
-        //   break;
-        // case "npub":
-        //   newTags.push(["p", decoded.data]);
-        //   break;
+        }
+
         case "note":
           newTags.push(["q", decoded.data]);
           break;
+
         default:
           break;
       }
     } catch (error) {
-      console.log("Failed to decode NIP-19 identifier:", match[1]);
+      console.log(
+        "Failed to decode NIP-19 identifier:",
+        match?.[1] ?? match?.[0]
+      );
     }
-  });
+  }
 
   // Process URL matches
   const urlMatches = text.matchAll(urlRegex);
@@ -139,68 +131,4 @@ export function contentEmojiCheck(
   });
 
   return { text, tags: newTags };
-}
-
-export function checkCustomEmojis(input: string): string[][] | undefined {
-  const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
-
-  if (!emojiMatches) return;
-  let returnTags: string[][] = [];
-  emojiMatches.forEach((emoji) => {
-    const emojiName = emoji.slice(1, -1);
-    const customEmoji = get(emojis).list.find((e) => e[0] === emojiName);
-
-    if (customEmoji) {
-      returnTags = addEmojiTag(returnTags, customEmoji);
-    }
-  });
-  return returnTags;
-}
-
-function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
-  // 1. URLが同じ絵文字を探す
-  const sameEmoji = tags.find(
-    (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
-  );
-
-  if (sameEmoji) {
-    // 同じURLの絵文字があれば、その名前を使う
-    emoji[0] = sameEmoji[1];
-  }
-
-  // 2. 同じ名前の絵文字があるか確認
-  let sameNameEmoji = tags.find(
-    (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-  );
-
-  // 3. 絵文字の条件に従って追加処理
-  if (sameNameEmoji) {
-    // 名前が同じでURLが異なる場合、新しい名前を付けて追加
-    if (sameNameEmoji[2] !== emoji[1]) {
-      // 元の名前を保存
-      const baseName = emoji[0];
-      let num = 1;
-
-      // 重複しない名前が見つかるまでnumをインクリメント
-      emoji[0] = `${baseName}_${num}`;
-      sameNameEmoji = tags.find(
-        (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-      );
-
-      while (sameNameEmoji) {
-        num++;
-        emoji[0] = `${baseName}_${num}`;
-        sameNameEmoji = tags.find(
-          (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
-        );
-      }
-
-      tags.push(["emoji", ...emoji]);
-    }
-    // 完全に同じ名前・URLの絵文字がある場合は何もしない
-  } else {
-    // 同じ名前もURLもない場合、新しい絵文字として追加
-    tags.push(["emoji", ...emoji]);
-  }
-  return tags;
 }

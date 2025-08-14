@@ -19,7 +19,7 @@
   let { data }: { data: LayoutData } = $props();
   let localDate: Date | null = $derived.by(() => {
     const slug = page.params.slug;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return null;
+    if (!slug||!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return null;
 
     const [y, m, d] = slug.split("-").map(Number);
     return new Date(y, m - 1, d); // ローカルの0:00:00

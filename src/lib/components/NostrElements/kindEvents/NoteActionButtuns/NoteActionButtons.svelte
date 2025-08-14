@@ -272,17 +272,24 @@
     }
     prosessing = false;
   };
+
   function encodeNaddr(atag: string, relayhints: string[]): string | null {
     const matches = atag.match(nip33Regex);
-    if (!matches) {
+    if (!matches || matches.length < 4) {
       return null;
     }
+
+    const [, kindStr, pubkey, identifier] = matches;
+    const kind = Number(kindStr);
+    if (isNaN(kind)) return null;
+
     const naddrAddress: nip19.AddressPointer = {
-      kind: Number(matches[1]),
-      pubkey: matches[2],
-      identifier: matches[3],
+      kind,
+      pubkey,
+      identifier,
       relays: relayhints,
     };
+
     try {
       return nip19.naddrEncode(naddrAddress);
     } catch (error) {
@@ -333,6 +340,7 @@
       amount: amount,
       comment: zapComment,
       zapRelays: zapRelays,
+      kind: note.kind,
     });
     if (zapInvoice === null) {
       $toastSettings = {
@@ -428,6 +436,7 @@
   });
 
   $effect(() => {
+    viewAllReactions;
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
       untrack(() => {
         scheduleUpdate();

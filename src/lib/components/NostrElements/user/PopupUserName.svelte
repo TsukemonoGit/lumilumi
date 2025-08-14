@@ -18,7 +18,7 @@
   let { pubkey, zIndex }: Props = $props();
 </script>
 
-<Popover ariaLabel="user profile"
+<Popover ariaLabel="user profile" zIndex={zIndex || 0 + 10}
   >{#snippet children()}<UserName pubhex={pubkey} />
   {/snippet}
   {#snippet popoverContent()}

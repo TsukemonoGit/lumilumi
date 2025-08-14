@@ -35,24 +35,12 @@
 
   // svelte-ignore non_reactive_update
   let showMore: Writable<boolean> = writable(false);
-  let dialogContentRef: HTMLDivElement | undefined = $state();
+
   const onClickShowMore = () => {
     console.log("showMore");
 
     $showMore = true;
   };
-
-  // $effect(() => {
-  //   if (dialogContentRef) {
-  //これでやるとふぁぼとかおしたときもかわるからはっかしちゃう
-  //     console.log("dialogContentRef", dialogContentRef);
-  //     untrack(() => {
-  //       setTimeout(() => {
-  //         (dialogContentRef as HTMLDivElement).scrollTop = 0;
-  //       }, 0);
-  //     });
-  //   }
-  // });
 </script>
 
 {#if maxHeight !== 0}
@@ -88,20 +76,15 @@
   zIndex={zIndex + 10}
 >
   {#snippet main()}
-    <div
-      class=" rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden"
-      bind:this={dialogContentRef}
-    >
-      <ContentParts
-        {maxHeight}
-        {event}
-        {isShowClientTag}
-        {displayMenu}
-        {depth}
-        {repostable}
-        {zIndex}
-        {displayTags}
-      />
-    </div>
+    <ContentParts
+      {maxHeight}
+      {event}
+      {isShowClientTag}
+      {displayMenu}
+      {depth}
+      {repostable}
+      {zIndex}
+      {displayTags}
+    />
   {/snippet}</Dialog
 >

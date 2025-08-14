@@ -22,10 +22,17 @@
     metadata?: Nostr.Event | undefined;
     displayMenu?: boolean;
     depth: number;
+    zIndex?: number;
   }
 
-  let { pubkey, size, metadata, displayMenu = true, depth }: Props = $props();
-  const zIndex = 30;
+  let {
+    pubkey,
+    size,
+    metadata,
+    displayMenu = true,
+    depth,
+    zIndex = 30,
+  }: Props = $props();
   let profile = $derived(getProfile(metadata));
   let url = $derived(profile?.picture);
   let title = $derived.by(() => {
@@ -50,7 +57,7 @@
   {/if}
   <!-- </div> -->
 {:else}
-  <Popover ariaLabel="user profile">
+  <Popover ariaLabel="user profile" {zIndex}>
     {#if lumiSetting.get().showImg && url && url !== ""}
       <UserAvatar {url} name={pubkey} {pubkey} {size} {title} />
     {:else}
@@ -59,7 +66,7 @@
     {#snippet popoverContent()}
       <div class="p-1 w-[24rem] max-w-full">
         <UserProfile
-          {zIndex}
+          zIndex={zIndex + 10}
           {pubkey}
           bannerHeight={60}
           iconSize={56}

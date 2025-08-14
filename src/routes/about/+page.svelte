@@ -1,38 +1,38 @@
 <script lang="ts">
-  import UniqueEventList from "$lib/components/renderSnippets/nostr/UniqueEventList.svelte";
-  import { page } from "$app/state";
-  import Link from "$lib/components/Elements/Link.svelte";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
-  import { Share, BriefcaseMedical } from "lucide-svelte";
-  import Github from "../settings/Github.svelte";
-  import { t as _ } from "@konemono/svelte5-i18n";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import UniqueEventList from '$lib/components/renderSnippets/nostr/UniqueEventList.svelte';
+  import { page } from '$app/state';
+  import Link from '$lib/components/Elements/Link.svelte';
+  import { nowProgress, queryClient, toastSettings } from '$lib/stores/stores';
+  import { Share, BriefcaseMedical } from 'lucide-svelte';
+  import Github from '../settings/Github.svelte';
+  import { t as _ } from '@konemono/svelte5-i18n';
+  import AlertDialog from '$lib/components/Elements/AlertDialog.svelte';
 
-  import type { EventTemplate } from "nostr-tools";
-  import { monoZap } from "$lib/func/constants";
-  import * as Nostr from "nostr-typedef";
-  import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
-  import { QueryObserver, type QueryKey } from "@tanstack/svelte-query";
-  import { now } from "rx-nostr";
-  import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
-  import { makeZapRequest } from "$lib/func/zap";
-  import ZapList from "$lib/components/NostrElements/AllReactionsElement/ZapList.svelte";
+  import type { EventTemplate } from 'nostr-tools';
+  import { monoZap } from '$lib/func/constants';
+  import * as Nostr from 'nostr-typedef';
+  import ZapInvoiceWindow from '$lib/components/Elements/ZapInvoiceWindow.svelte';
+  import { QueryObserver, type QueryKey } from '@tanstack/svelte-query';
+  import { now } from 'rx-nostr';
+  import { lumiSetting, viewEventIds } from '$lib/stores/globalRunes.svelte';
+  import { makeZapRequest } from '$lib/func/zap';
+  import ZapList from '$lib/components/NostrElements/AllReactionsElement/ZapList.svelte';
 
   const handleClickShare = async () => {
     //share link
     const shareData = {
       title: `LUMILUMI the NOSTR client`,
       //  text:  undefined,
-      url: page.url.origin,
+      url: page.url.origin
     };
     try {
       await navigator.share(shareData);
     } catch (error: any) {
       console.error(error.message);
       $toastSettings = {
-        title: "Error",
-        description: "Failed to share",
-        color: "bg-orange-500",
+        title: 'Error',
+        description: 'Failed to share',
+        color: 'bg-orange-500'
       };
     }
   };
@@ -40,16 +40,16 @@
 
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(0);
-  let zapComment: string = $state("");
+  let zapComment: string = $state('');
   let invoice: string | undefined = $state(undefined);
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
   const observer2 = new QueryObserver(queryClient, {
     queryKey: [
-      "reactions",
+      'reactions',
       monoZap.eventTag[1],
-      "zapped",
-      lumiSetting.get().pubkey,
-    ],
+      'zapped',
+      lumiSetting.get().pubkey
+    ]
   });
   let unsubscribe: () => void = $state(() => {});
   async function onClickZap() {
@@ -68,24 +68,24 @@
         eventTag: monoZap.eventTag,
         amount: amount,
         relays: monoZap.relays,
-        comment: zapComment,
+        comment: zapComment
       });
       const signedRequest = await (
         window.nostr as Nostr.Nip07.Nostr
       )?.signEvent(zapRequest);
       const encoded = encodeURI(JSON.stringify(signedRequest));
       const url = `${monoZap.endoiunt}?amount=${amount}&nostr=${encoded}`;
-      console.log("[zap url]", url);
+      console.log('[zap url]', url);
       const response = await fetch(url);
       if (!response.ok) {
-        console.error("[zap failed]", await response.text());
+        console.error('[zap failed]', await response.text());
 
         throw Error;
       }
       const payment = await response.json();
       const { pr: zapInvoice } = payment;
       if (zapInvoice === undefined) {
-        console.error("[zap failed]", payment);
+        console.error('[zap failed]', payment);
         throw Error;
       }
       dialogOpen?.(false);
@@ -105,15 +105,15 @@
           const index = viewEventIds
             .get()
             .findIndex(
-              (item) => item[0] === "a" && item[1] === monoZap.eventTag[1]
+              (item) => item[0] === 'a' && item[1] === monoZap.eventTag[1]
             );
           if (index !== -1) {
             viewEventIds.get().splice(index, 1);
           }
           $toastSettings = {
-            title: "Success",
-            description: "Thank you for the zap!",
-            color: "bg-green-500",
+            title: 'Success',
+            description: 'Thank you for the zap!',
+            color: 'bg-green-500'
           };
         }
       });
@@ -122,31 +122,29 @@
       // viewEventIds.get = viewEventIds.get;
     } catch (error) {
       $toastSettings = {
-        title: "Error",
-        description: "Failed to zap",
-        color: "bg-red-500",
+        title: 'Error',
+        description: 'Failed to zap',
+        color: 'bg-red-500'
       };
       $nowProgress = false;
       //toast
     }
   }
-  const zappedQuery: QueryKey = ["reactions", monoZap.eventTag[1], "zapped"]; //atag
+  const zappedQuery: QueryKey = ['reactions', monoZap.eventTag[1], 'zapped']; //atag
   const zappedFilters: Nostr.Filter[] = [
     {
       kinds: [9735],
-      "#a": [monoZap.eventTag[1]],
+      '#a': [monoZap.eventTag[1]]
     },
     {
       kinds: [9735],
 
-      "#e": [
-        "df6034a5676deca7bc687abc7dc2ea703a8de01954f0d87879cbc790a5ead234",
-      ],
-    },
+      '#e': ['df6034a5676deca7bc687abc7dc2ea703a8de01954f0d87879cbc790a5ead234']
+    }
   ];
 
   const zapperEvent = (event: Nostr.Event): Nostr.Event | undefined => {
-    const desc = event.tags.find((tag) => tag[0] === "description");
+    const desc = event.tags.find((tag) => tag[0] === 'description');
     if (!desc || desc.length <= 1) {
       return;
     }
@@ -161,9 +159,9 @@
     return events.filter(
       (event) =>
         zapperEvent(event)?.pubkey !==
-          "5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60" &&
+          '5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60' &&
         zapperEvent(event)?.pubkey !==
-          "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5"
+          '84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5'
     ); //テストザップ除く
   };
 </script>
@@ -212,15 +210,15 @@
       </div>
     </li>
     <li>
-      <div class="list">{$_("features.title")}</div>
+      <div class="list">{$_('features.title')}</div>
       <div class="item">
         <ul class="list-disc ml-4 space-y-1">
-          <li>{$_("features.bookmark")}</li>
+          <li>{$_('features.bookmark')}</li>
         </ul>
       </div>
     </li>
     <li>
-      <div class="list">{$_("shortcut.title")}</div>
+      <div class="list">{$_('shortcut.title')}</div>
       <div class="item">
         <table>
           <thead>
@@ -230,15 +228,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr> <td>N</td><td>{$_("shortcut.N")}</td></tr>
-            <tr><td>Ctrl+Enter</td><td>{$_("shortcut.CtrlEnter")}</td></tr>
-            <tr><td>Esc Esc</td><td>{$_("shortcut.EscEsc")}</td></tr>
+            <tr> <td>N</td><td>{$_('shortcut.N')}</td></tr>
+            <tr><td>Ctrl+Enter</td><td>{$_('shortcut.CtrlEnter')}</td></tr>
+            <tr><td>Esc Esc</td><td>{$_('shortcut.EscEsc')}</td></tr>
           </tbody>
         </table>
       </div>
     </li>
     <li>
-      <div class="list">{$_("sourceCode")}</div>
+      <div class="list">{$_('sourceCode')}</div>
       <div class="item">
         <Link
           href="https://github.com/TsukemonoGit/lumilumi"
@@ -248,7 +246,7 @@
       </div>
     </li>
     <li>
-      <div class="list">{$_("author")}</div>
+      <div class="list">{$_('author')}</div>
       <div class="item">
         <Link
           href="https://lumilumi.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
@@ -257,7 +255,7 @@
       </div>
     </li>
     <li>
-      <div class="list">{$_("mascot")}</div>
+      <div class="list">{$_('mascot')}</div>
       <div class="item">
         Illustration by <a
           class="underline"
@@ -285,7 +283,7 @@
       </div>
     </li>
     <li>
-      <div class="list">{$_("others")}</div>
+      <div class="list">{$_('others')}</div>
       <ul>
         <li>
           <div class="item flex flex-wrap gap-2 items-center">
@@ -294,7 +292,7 @@
               className="flex gap-1 items-center underline"
               ><BriefcaseMedical />Luminostr</Link
             >
-            <span class="text-sm">{$_("about.luminostr")}</span>
+            <span class="text-sm">{$_('about.luminostr')}</span>
           </div>
         </li>
         <li>
@@ -302,7 +300,7 @@
             <Link
               href="https://github.com/TsukemonoGit/lumilumi/issues/new/choose"
               className="flex gap-1 items-center underline"
-              >{$_("about.houkoku")}</Link
+              >{$_('about.houkoku')}</Link
             >
           </div>
         </li>
@@ -312,16 +310,16 @@
             <button
               onclick={handleClickShare}
               class="flex gap-1 items-center underline"
-              >{$_("about.share")}<Share size="20" class="text-magnum-500 " /> Lumilumi</button
+              >{$_('about.share')}<Share size="20" class="text-magnum-500 " /> Lumilumi</button
             >
           </div>
         </li>
-        <li>
+        <!-- <li>
           <div class="item">
             <makibishi-component url={page.url.origin} hide-reaction-list={true}
             ></makibishi-component>
           </div>
-        </li>
+        </li> -->
       </ul>
     </li>
   </ul>
@@ -371,7 +369,7 @@
 
     align-items: center;
 
-    color: theme("colors.magnum.400");
+    color: theme('colors.magnum.400');
     font-weight: 700;
     font-size: var(--text-xl);
     text-transform: uppercase;
@@ -385,7 +383,7 @@
     @apply ml-4;
   }
 
-  /* Reset */
+  /* 
 
   makibishi-component::part(button) {
     background-color: transparent;
@@ -399,7 +397,7 @@
     text-decoration: none;
   }
 
-  /* Theme */
+
 
   makibishi-component {
     display: inline-grid;
@@ -413,25 +411,25 @@
     display: inline-grid;
     place-content: center;
     border: 1px solid;
-    /*background-color: #fcfcff;*/
+ 
     border-inline-end: none;
-    /* border-color: #c8c3ec;*/
+
     border-radius: 8px 0 0 8px;
     @apply bg-magnum-900/20 border border-magnum-600;
   }
 
   makibishi-component::part(button):not(:disabled):hover {
-    /* background-color: #dceeff; */
+  
     @apply bg-magnum-900/50;
   }
 
   makibishi-component::part(button):not(:disabled):active {
-    /* background-color: #bdd4e9; */
+ 
     @apply bg-magnum-900/80;
   }
 
   makibishi-component::part(button):disabled {
-    /* background-color: #cecece; */
+   
     @apply bg-neutral-800;
   }
 
@@ -439,10 +437,10 @@
     display: inline-grid;
     place-content: center;
     font-size: 11px;
-    /* background-color: #f1efff; */
+ 
     border: 1px solid;
     border-inline-start: none;
-    /* border-color: #c8c3ec; */
+ 
     border-radius: 0 8px 8px 0;
     @apply bg-neutral-800 border border-magnum-600 text-neutral-50;
   }
@@ -488,7 +486,7 @@
   makibishi-component::part(ellipsis) {
     padding-inline: 6px;
   }
-
+*/
   table {
     width: 100%;
     border-collapse: collapse;
@@ -500,10 +498,10 @@
   td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid theme("colors.neutral.600");
+    border-bottom: 1px solid theme('colors.neutral.600');
   }
   th {
-    background-color: theme("colors.neutral.700");
+    background-color: theme('colors.neutral.700');
     font-weight: bold;
   }
 </style>
