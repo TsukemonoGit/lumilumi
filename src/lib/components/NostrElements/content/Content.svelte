@@ -5,7 +5,6 @@
   import ContentParts from "./ContentParts.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
   import { writable, type Writable } from "svelte/store";
-  import { untrack } from "svelte";
   import * as Nostr from "nostr-typedef";
   interface Props {
     event: Partial<Nostr.Event>;

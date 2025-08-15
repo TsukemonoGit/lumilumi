@@ -452,7 +452,8 @@
         if (data.nip94_event) {
           tags.push(convertMetaTags(data.nip94_event));
         }
-
+        //アップロード完了がURLに反映されるまで（？）文字挿入前にちょっと待ってみる
+        await delay(10);
         // Insert URL at cursor position
         insertTextAtCursor(url, {
           addSpaceBefore: true,
