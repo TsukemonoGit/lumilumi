@@ -1,4 +1,3 @@
-<!--Truncate.svelte-->
 <script lang="ts">
   import { useTruncate } from "$lib/func/useTruncate";
   import type { Snippet } from "svelte";
@@ -18,7 +17,7 @@
     depth = 0,
     truncate,
   }: Props = $props();
-  let threshold = $derived(maxHeight * 0.35); // 160例えば20px以上大きい場合にのみ"Show More"ボタンを表示
+  let threshold = $derived(maxHeight * 0.35);
   let isTruncated = $state(false);
 
   function toggleShowMore() {
@@ -26,13 +25,10 @@
   }
 
   // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
-  let minHeight = $derived(maxHeight * 0.2); // 100 最小の高さを設定
+  let minHeight = $derived(maxHeight * 0.2);
   let contentHeight = $derived(
     Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
   );
-
-  // maxHeight = 380のとき、
-  // depth が 4 以上 のときに contentHeight が 100 を下回ります。
 </script>
 
 {#if contentHeight}
@@ -42,9 +38,9 @@
       isTruncated: (value) => (isTruncated = value),
       threshold,
     }}
-    class="mt-0.5 overflow-hidden max-w-full relative"
+    class="mt-0.5 max-w-full relative"
     style={!isTruncated
-      ? ""
+      ? `max-height: ${contentHeight + threshold}px; overflow-y: auto;`
       : `max-height: ${contentHeight}px; overflow: hidden;`}
   >
     {@render children?.()}
@@ -69,10 +65,10 @@
 <style>
   .truncate-overlay {
     position: absolute;
-    bottom: 0; /* ボタンの高さに合わせて調整 */
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 2rem; /* フェードアウトの高さ */
+    height: 2rem;
     background: linear-gradient(
       to bottom,
       rgb(var(--color-neutral-900) / 0),
