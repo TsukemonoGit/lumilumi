@@ -18,14 +18,13 @@
     truncate,
   }: Props = $props();
   let threshold = $derived(maxHeight * 0.35);
-  let isTruncated = $state(false); // 初期状態では切り詰められていない
+  let isTruncated = $state(false);
 
   function toggleShowMore() {
-    // isTruncatedをfalseにすることで、切り詰めを解除
-    isTruncated = false;
     onClickShowMore?.();
   }
 
+  // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
   let minHeight = $derived(maxHeight * 0.2);
   let contentHeight = $derived(
     Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
@@ -36,7 +35,7 @@
   <div
     use:useTruncate={{
       maxHeight: contentHeight,
-      isTruncated: (value) => (isTruncated = value), // useTruncateの判定結果をisTruncatedに反映
+      isTruncated: (value) => (isTruncated = value),
       threshold,
     }}
     class="mt-0.5 max-w-full relative"
