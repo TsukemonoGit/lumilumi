@@ -3,11 +3,12 @@
 import type { PageServerLoad } from "./$types";
 import { createRxNostr, createRxBackwardReq, type EventPacket } from "rx-nostr";
 import * as nip19 from "nostr-tools/nip19";
-import { firstValueFrom, timeout, catchError, of, filter, tap } from "rxjs";
+import { filter } from "rxjs";
 import type { nip19 as Nip19 } from "nostr-tools";
 import { verifier } from "@rx-nostr/crypto";
 import WebSocket from "ws";
 import { defaultRelays } from "$lib/stores/relays";
+import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
   const secFetchDest = request.headers.get("sec-fetch-dest") || "";
@@ -65,27 +66,33 @@ export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
     const events = rxNostr.use(req);
 
     const noteEventPromise = new Promise<EventPacket | undefined>((resolve) => {
-      const subscription = events
-        .pipe(
-          filter((packet: EventPacket) => packet.event.id === eventId),
-          timeout(5000),
-          catchError(() => {
-            console.warn("イベント取得がタイムアウトしました");
-            return of(undefined);
-          })
-        )
-        .subscribe((packet) => {
-          resolve(packet);
-          subscription.unsubscribe();
+      const eventsSub = events
+        .pipe(filter((packet: EventPacket) => packet.event.id === eventId))
+        .subscribe({
+          next: (packet) => {
+            resolve(packet);
+            eventsSub.unsubscribe();
+          },
+          error: () => {
+            resolve(undefined);
+          },
         });
 
       // 接続状態を監視して、1つでもConnectになったらemit
       const connSub = rxNostr
         .createConnectionStateObservable()
         .subscribe((packet) => {
-          if (packet.state === "connected") {
+          if (packet.state.toLowerCase() === "connect") {
+            // 小文字比較で安全
             req.emit({ ids: [eventId] });
-            connSub.unsubscribe(); // 一度emitしたら監視解除
+
+            // 接続確立後にのみタイムアウト開始
+            setTimeout(() => {
+              resolve(undefined); // 5秒以内に来なければundefined
+              eventsSub.unsubscribe();
+            }, 5000);
+
+            connSub.unsubscribe();
           }
         });
     });
@@ -97,7 +104,8 @@ export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
       const ogpDescription =
         note.event.content.substring(0, 150) +
         (note.event.content.length > 150 ? "..." : "");
-
+      ogTitle.set(ogpTitle);
+      ogDescription.set(ogpDescription);
       return {
         ogp: { title: ogpTitle, description: ogpDescription },
         noteData: note.event,
