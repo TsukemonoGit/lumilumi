@@ -337,7 +337,10 @@
 
   <meta name="description" content={$ogDescription || "The Nostr Client"} />
 
-  <meta property="og:description" content={$ogDescription} />
+  <meta
+    property="og:description"
+    content={$ogDescription || "The Nostr Client"}
+  />
 
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}

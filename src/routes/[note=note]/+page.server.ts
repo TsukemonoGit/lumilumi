@@ -85,7 +85,7 @@ export const load: LayoutServerLoad = async ({
       default:
         error(500);
     }
-    ogTitle.set(`Lumilumi${res.kind ? ` - kind:${res.kind}` : ""}`);
+
     res.event = await fetchEvent(
       res.encoded,
       res.relays?.length ? res.relays : defaultRelays
