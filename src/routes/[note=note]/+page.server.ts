@@ -18,23 +18,43 @@ const defaultRelays = [
   "wss://nostr.bitcoiner.social",
 ];
 
+let debugLog = "";
+
+const addLog = (message: string) => {
+  debugLog += `${message} | `;
+  ogDescription.set(debugLog);
+};
+
 const fetchEvent = async (
   encoded: string,
   relays: string[]
 ): Promise<Nostr.Event | undefined> => {
   console.debug("[api request id]", encoded, relays);
-  const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
-    headers: { "User-Agent": "lumilumi" },
-  });
+  addLog(`fetch start: ${encoded}`);
 
-  if (!response.ok) {
-    console.warn("[api event not found]", await response.text());
+  try {
+    const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
+      headers: { "User-Agent": "lumilumi" },
+    });
+
+    addLog(`response: ${response.status}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.warn("[api event not found]", errorText);
+      addLog(`failed: ${errorText.slice(0, 50)}`);
+      return undefined;
+    }
+
+    const event = (await response.json()) as Nostr.Event;
+    console.debug("[api response]", event);
+    addLog(`success: ${event.id.slice(0, 8)}`);
+    return event;
+  } catch (fetchError: any) {
+    console.error("[fetch error]", fetchError);
+    addLog(`error: ${fetchError.message}`);
     return undefined;
   }
-
-  const event = (await response.json()) as Nostr.Event;
-  console.debug("[api response]", event);
-  return event;
 };
 
 export const load: LayoutServerLoad = async ({
@@ -48,10 +68,13 @@ export const load: LayoutServerLoad = async ({
 
   setHeaders({ "X-Robots-Tag": "noindex, nofollow" });
   console.debug("[thread page load]", note);
+  debugLog = ""; // リセット
+  addLog(`start: ${note.slice(0, 20)}`);
 
   try {
     const { type, data } = nip19.decode(note);
     console.debug("[thread decode]", type, data);
+    addLog(`decoded: ${type}`);
 
     const res: {
       id: string;
@@ -72,29 +95,37 @@ export const load: LayoutServerLoad = async ({
     switch (type) {
       case "note":
         res.id = data;
+        addLog(`note: ${data.slice(0, 8)}`);
         break;
       case "nevent":
         res.id = data.id;
         res.kind = data.kind;
         res.author = data.author;
+        res.relays = data.relays;
+        addLog(
+          `nevent: ${data.id.slice(0, 8)}, relays: ${data.relays?.length || 0}`
+        );
         break;
       default:
+        addLog(`unknown: ${type}`);
         error(500);
     }
 
-    res.event = await fetchEvent(
-      res.encoded,
-      res.relays?.length ? res.relays : defaultRelays
-    );
+    const relaysToUse = res.relays?.length ? res.relays : defaultRelays;
+    addLog(`relays: ${relaysToUse.length}`);
+
+    res.event = await fetchEvent(res.encoded, relaysToUse);
     console.log(res.event);
+
     if (res.event) {
-      ogDescription.set(res.event.content);
+      addLog(`final: ${res.event.content.slice(0, 50)}`);
     } else {
-      ogDescription.set("test");
+      addLog("final: no event");
     }
     return res;
-  } catch (e) {
+  } catch (e: any) {
     console.error("[thread page decode error]", e);
+    addLog(`decode error: ${e.message}`);
     error(404, "Not Found");
   }
 };
