@@ -79,8 +79,15 @@ export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
           subscription.unsubscribe();
         });
 
-      // 購読開始後に一度だけemit
-      req.emit({ ids: [eventId] });
+      // 接続状態を監視して、1つでもConnectになったらemit
+      const connSub = rxNostr
+        .createConnectionStateObservable()
+        .subscribe((packet) => {
+          if (packet.state === "connected") {
+            req.emit({ ids: [eventId] });
+            connSub.unsubscribe(); // 一度emitしたら監視解除
+          }
+        });
     });
 
     const note = await noteEventPromise;
