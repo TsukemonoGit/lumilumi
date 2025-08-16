@@ -15,6 +15,7 @@
   import * as Nostr from "nostr-typedef";
   import NoteInfo from "$lib/components/NostrElements/kindEvents/NoteInfo.svelte";
   import { type PageData } from "./$types";
+  import type { Profile } from "$lib/types";
 
   let { data }: { data: PageData } = $props();
 
@@ -28,17 +29,37 @@
 
   const handleChannelRedirect = (event: Nostr.Event): boolean => {
     if (event.kind === 40) {
-      goto(`/channel/${nip19.noteEncode(event.id)}`);
+      goto(`/channel/${data.encoded}`);
       return true;
     }
     return false;
   };
+  let metadata: Profile | null = $state(null);
+  const onCheangeMetadata = (ev: Nostr.Event) => {
+    try {
+      metadata = JSON.parse(ev.content) as Profile;
+    } catch (error) {}
+  };
 </script>
 
+<svelte:head>
+  <title>
+    Lumilumi - {data.event !== undefined
+      ? `${metadata?.displayName}: ${data.event.content}`
+      : data.encoded}
+  </title>
+  {#if data.event !== undefined}
+    <meta property="og:title" content={data.event.content} />
+  {/if}
+</svelte:head>
 {#snippet eventDisplay(event: Nostr.Event)}
   {@const isChannel = handleChannelRedirect(event)}
   {#if !isChannel}
-    <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+    <Metadata
+      queryKey={["metadata", event.pubkey]}
+      pubkey={event.pubkey}
+      onChange={onCheangeMetadata}
+    >
       {#snippet loading()}
         <div
           class="w-full divide-y divide-magnum-600/30 p-1 rounded-md border border-magnum-400/50"

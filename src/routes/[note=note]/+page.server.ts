@@ -50,12 +50,14 @@ export const load: LayoutServerLoad = async ({
       kind?: number;
       author?: string;
       event?: Nostr.Event;
+      encoded: string;
     } = {
       id: "",
       relays: undefined,
       kind: undefined,
       author: undefined,
       event: undefined,
+      encoded: note,
     };
 
     switch (type) {
