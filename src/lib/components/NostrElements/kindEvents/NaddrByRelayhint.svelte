@@ -85,12 +85,16 @@
       >
     {/snippet}
     {#snippet nodata()}
-      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+      <EmptyCard
+        pulse={false}
+        naddr={displayMenu ? content?.slice(6) : undefined}
         >Nodata {content ?? ""}</EmptyCard
       >
     {/snippet}
     {#snippet error()}
-      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+      <EmptyCard
+        pulse={false}
+        naddr={displayMenu ? content?.slice(6) : undefined}
         >Nodata {content ?? ""}</EmptyCard
       >
     {/snippet}

@@ -83,6 +83,59 @@
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
+  let { naddr, nevent, encodedPubkey } = $derived.by(() => {
+    if (!note) {
+      return { naddr: undefined, nevent: undefined, encodedPubkey: undefined };
+    }
+
+    const encodeAddress = () => {
+      try {
+        const naddrpointer: nip19.AddressPointer = {
+          kind: note.kind,
+          identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
+          pubkey: note.pubkey,
+          relays: getRelaysById(note.id),
+        };
+        return nip19.naddrEncode(naddrpointer);
+      } catch {
+        return undefined;
+      }
+    };
+
+    const encodeEvent = () => {
+      try {
+        const eventpointer: nip19.EventPointer = {
+          id: note.id,
+          relays: getRelaysById(note.id),
+          author: note.pubkey,
+          kind: note.kind,
+        };
+        return nip19.neventEncode(eventpointer);
+      } catch {
+        return undefined;
+      }
+    };
+
+    const encodePubkey = () => {
+      try {
+        return nip19.npubEncode(note.pubkey);
+      } catch {
+        return undefined;
+      }
+    };
+
+    return replaceable
+      ? {
+          naddr: encodeAddress(),
+          nevent: undefined,
+          encodedPubkey: encodePubkey(),
+        }
+      : {
+          naddr: undefined,
+          nevent: encodeEvent(),
+          encodedPubkey: encodePubkey(),
+        };
+  });
   // メニュー項目の定義を論理的な順序で整理
   let menuTexts = $derived.by(() => {
     const menuItems = [
@@ -260,7 +313,6 @@
 
   const handleSelectItem = async (index: number) => {
     const selectedItem = menuTexts[index];
-
     switch (selectedItem.action) {
       case "view_json":
         $modalState = {
@@ -469,45 +521,6 @@
         break;
     }
   };
-
-  let { naddr, nevent, encodedPubkey } = $derived.by(() => {
-    let nevent: string | undefined = undefined;
-    let naddr: string | undefined = undefined;
-    let encodedPubkey: string | undefined = undefined;
-    if (note) {
-      try {
-        if (replaceable) {
-          const naddrpointer: nip19.AddressPointer = {
-            kind: note.kind,
-            identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-            pubkey: note.pubkey,
-            relays: getRelaysById(note.id),
-          };
-          naddr = nip19.naddrEncode(naddrpointer);
-          nevent = undefined;
-        } else {
-          const eventpointer: nip19.EventPointer = {
-            id: note.id,
-            relays: getRelaysById(note.id),
-            author: note.pubkey,
-            kind: note.kind,
-          };
-
-          nevent = nip19.neventEncode(eventpointer);
-          naddr = undefined;
-        }
-      } catch (error) {
-        nevent = undefined;
-        naddr = undefined;
-      }
-      try {
-        encodedPubkey = nip19.npubEncode(note.pubkey);
-      } catch {
-        encodedPubkey = undefined;
-      }
-    }
-    return { naddr, nevent, encodedPubkey };
-  });
 
   const onClickOK = async () => {
     deleteDialogOpen(false);

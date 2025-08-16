@@ -82,11 +82,15 @@
                   >loading {filteredList[index]}</EmptyCard
                 >
               {/snippet}
-              {#snippet nodata()}<EmptyCard naddr={nip19.naddrEncode(naddr)}
+              {#snippet nodata()}<EmptyCard
+                  pulse={false}
+                  naddr={nip19.naddrEncode(naddr)}
                   >not found {filteredList[index]}</EmptyCard
                 >
               {/snippet}
-              {#snippet error()}<EmptyCard naddr={nip19.naddrEncode(naddr)}
+              {#snippet error()}<EmptyCard
+                  pulse={false}
+                  naddr={nip19.naddrEncode(naddr)}
                   >not found {filteredList[index]}</EmptyCard
                 >
               {/snippet}

@@ -63,12 +63,12 @@
       >
     {/snippet}
     {#snippet nodata()}
-      <EmptyCard nevent={displayMenu ? loadingText : undefined}
+      <EmptyCard pulse={false} nevent={displayMenu ? loadingText : undefined}
         >Nodata {loadingText}</EmptyCard
       >
     {/snippet}
     {#snippet error()}
-      <EmptyCard nevent={displayMenu ? loadingText : undefined}
+      <EmptyCard pulse={false} nevent={displayMenu ? loadingText : undefined}
         >Nodata {loadingText}</EmptyCard
       >
     {/snippet}
