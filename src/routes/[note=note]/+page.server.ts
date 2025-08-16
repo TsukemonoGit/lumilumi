@@ -8,7 +8,6 @@ import type { nip19 as Nip19 } from "nostr-tools";
 import { verifier } from "@rx-nostr/crypto";
 import WebSocket from "ws";
 import { defaultRelays } from "$lib/stores/relays";
-import { ogDescription, ogTitle } from "$lib/stores/stores";
 
 export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
   const secFetchDest = request.headers.get("sec-fetch-dest") || "";
@@ -104,8 +103,6 @@ export const load: PageServerLoad = async ({ request, params, setHeaders }) => {
       const ogpDescription =
         note.event.content.substring(0, 150) +
         (note.event.content.length > 150 ? "..." : "");
-      ogTitle.set(ogpTitle);
-      ogDescription.set(ogpDescription);
       return {
         ogp: { title: ogpTitle, description: ogpDescription },
         noteData: note.event,
