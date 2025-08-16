@@ -5,7 +5,12 @@ import {
   queryClient,
   tieMap,
 } from "$lib/stores/stores";
-import type { ReqStatus, Profile, UsePromiseReqOpts } from "$lib/types";
+import type {
+  ReqStatus,
+  Profile,
+  UsePromiseReqOpts,
+  ReqResult,
+} from "$lib/types";
 import { createQuery, type QueryKey } from "@tanstack/svelte-query";
 
 import {
@@ -25,14 +30,16 @@ import {
   filterByType,
   type AuthPacket,
   uniq,
+  createUniq,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
-import { type Observable, type OperatorFunction } from "rxjs";
+import { count, pipe, tap, type Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import {
   bookmark,
   mediaOperator,
   metadata,
+  scanArray,
   type MediaOperatorOutput,
   type MediaOperatorState,
   type MediaResult,
@@ -784,4 +791,155 @@ export function useMediaPromiseReq(
 
     _req.emit(filters);
   });
+}
+
+export function usePaginatedReq(
+  {
+    filters,
+    req,
+    limit = 300,
+    maxLoop = 50,
+  }: {
+    filters: Array<any>;
+    req?: RxReq<"backward"> &
+      RxReqEmittable<{ relays: string[] }> &
+      RxReqOverable &
+      RxReqPipeable;
+    limit?: number;
+    maxLoop?: number;
+  },
+  relays: string[] | undefined,
+  timeout: number | undefined = 3000
+): ReqResult<EventPacket[]> {
+  const data = writable<EventPacket[] | null>(null);
+  const status = writable<ReqStatus>("loading");
+  const error = writable<Error | null>(null);
+
+  (async () => {
+    try {
+      const allEvents: EventPacket[] = [];
+      const globalSeenEventIds = new Set<string>();
+
+      for (const filter of filters) {
+        let until: number | undefined;
+        let hasMore = true;
+
+        for (let loop = 0; loop < maxLoop && hasMore; loop++) {
+          const pagedFilter = { ...filter, limit, ...(until ? { until } : {}) };
+          console.log(pagedFilter);
+
+          const chunk = await usePromiseReq(
+            { filters: [pagedFilter], operator: scanArray(), req },
+            relays,
+            timeout,
+            (intermediateData) => {
+              // チャンクごとの重複除去
+              const chunkSeenIds = new Set<string>();
+              const uniqueChunkData = intermediateData.filter((packet) => {
+                if (chunkSeenIds.has(packet.event.id)) {
+                  return false;
+                }
+                chunkSeenIds.add(packet.event.id);
+                return true;
+              });
+
+              // チャンク内重複除去後にスライス
+              const slicedChunk = uniqueChunkData.slice(0, limit);
+
+              // 全体での重複除去
+              const globalUniqueChunk = slicedChunk.filter((packet) => {
+                return !globalSeenEventIds.has(packet.event.id);
+              });
+
+              // 現在の全データ + 新しいユニークデータでUI更新
+              const tempAllEvents = [...allEvents, ...globalUniqueChunk];
+              tempAllEvents.sort(
+                (a, b) => b.event.created_at - a.event.created_at
+              );
+              data.set(tempAllEvents);
+            }
+          );
+
+          // チャンクが空の場合は終了
+          if (chunk.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // チャンクごとの重複除去
+          const chunkSeenIds = new Set<string>();
+          const uniqueChunk = chunk.filter((packet) => {
+            if (chunkSeenIds.has(packet.event.id)) {
+              return false;
+            }
+            chunkSeenIds.add(packet.event.id);
+            return true;
+          });
+
+          // チャンク内重複除去後にスライス
+          const sliced = uniqueChunk.slice(0, limit);
+
+          // 全体での重複除去
+          const globalUniqueChunk = sliced.filter((packet) => {
+            if (globalSeenEventIds.has(packet.event.id)) {
+              return false;
+            }
+            globalSeenEventIds.add(packet.event.id);
+            return true;
+          });
+
+          allEvents.push(...globalUniqueChunk);
+
+          // 最終確定データで更新
+          const sortedAllEvents = [...allEvents];
+          sortedAllEvents.sort(
+            (a, b) => b.event.created_at - a.event.created_at
+          );
+          data.set(sortedAllEvents);
+
+          // limit未満の場合は最後のページ（受信件数で判定）
+          if (chunk.length < limit) {
+            hasMore = false;
+            break;
+          }
+
+          // 次のページのためのuntilを設定
+          // globalUniqueChunkの最後（最古）のイベントのcreated_atを使用
+          if (globalUniqueChunk.length > 0) {
+            const lastEvent = globalUniqueChunk[globalUniqueChunk.length - 1];
+            until = lastEvent.event.created_at;
+
+            // 無限ループ防止：untilが変わらない場合
+            if (
+              loop > 0 &&
+              until >= (globalUniqueChunk[0]?.event.created_at || 0)
+            ) {
+              console.warn("Until value not progressing, breaking loop");
+              hasMore = false;
+              break;
+            }
+          } else {
+            // globalUniqueChunkが空の場合、元のchunkから設定
+            const lastEvent = chunk[chunk.length - 1];
+            until = lastEvent.event.created_at;
+          }
+        }
+      }
+
+      // created_atで降順ソート（新しい順）
+      allEvents.sort((a, b) => b.event.created_at - a.event.created_at);
+
+      data.set(allEvents);
+      status.set(
+        allEvents.length > 0
+          ? ("success" as ReqStatus)
+          : ("nodata" as ReqStatus)
+      );
+    } catch (e) {
+      error.set(e instanceof Error ? e : new Error(String(e)));
+      status.set("error");
+    }
+  })();
+
+  return { data, status, error };
 }

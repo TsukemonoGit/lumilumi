@@ -44,7 +44,7 @@ export const timelineFilterInit: TimelineFilter = {
 export interface ReqResult<A> {
   data: Readable<A | undefined | null>;
   status: Readable<ReqStatus>;
-  error: Readable<Error>;
+  error: Readable<Error | null>;
 }
 
 export interface UseConnectionsOpts {
