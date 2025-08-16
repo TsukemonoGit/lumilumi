@@ -22,7 +22,7 @@ const fetchEvent = async (
   encoded: string,
   relays: string[]
 ): Promise<Nostr.Event | undefined> => {
-  console.debug("[api request id]", id, relays);
+  console.debug("[api request id]", encoded, relays);
   const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
     headers: { "User-Agent": "lumilumi" },
   });
