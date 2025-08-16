@@ -70,15 +70,17 @@ export const load: PageServerLoad = async ({
       event: undefined,
       encoded: naddr,
     };
+    const kindString = eventKinds.get(res.kind)?.[
+      get(locale) === "ja" ? "ja" : "en"
+    ];
 
+    ogTitle.set(
+      `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+    );
     res.event = await fetchEvent(
       res.encoded,
       res.relays?.length ? res.relays : defaultRelays
     );
-
-    const kindString = eventKinds.get(res.kind)?.[
-      get(locale) === "ja" ? "ja" : "en"
-    ];
 
     if (res.event) {
       const title = res.event.tags.find((tag) => tag[0] === "title")?.[1];
@@ -92,9 +94,6 @@ export const load: PageServerLoad = async ({
       );
       ogDescription.set(desc || "");
     } else {
-      ogTitle.set(
-        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
-      );
       ogDescription.set(`Id:${res.identifier}`);
     }
 

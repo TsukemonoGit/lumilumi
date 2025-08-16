@@ -46,7 +46,11 @@ export const load: LayoutServerLoad = async ({
 }) => {
   const { note } = params;
 
-  setHeaders({ "X-Robots-Tag": "noindex, nofollow" });
+  setHeaders({
+    "Cache-Control": "public, max-age=3600",
+    "X-Robots-Tag": "index, follow", // noindexを変更
+    "Content-Type": "text/html; charset=utf-8",
+  });
   console.debug("[thread page load]", note);
 
   try {
@@ -81,17 +85,15 @@ export const load: LayoutServerLoad = async ({
       default:
         error(500);
     }
-
+    ogTitle.set(`Lumilumi - kind:${res.kind}`);
     res.event = await fetchEvent(
       res.encoded,
       res.relays?.length ? res.relays : defaultRelays
     );
     console.log(res.event);
     if (res.event) {
-      ogTitle.set(`Lumilumi - kind:${res.kind}`);
       ogDescription.set(res.event.content);
     } else {
-      ogTitle.set(`Lumilumi - kind:${res.kind}`);
     }
     return res;
   } catch (e) {
