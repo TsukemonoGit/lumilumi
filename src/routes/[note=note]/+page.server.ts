@@ -1,7 +1,6 @@
 import type { LayoutServerLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
-import { defaultRelays } from "$lib/stores/relays";
 import * as Nostr from "nostr-typedef";
 import { ogDescription } from "$lib/stores/stores";
 
@@ -9,15 +8,24 @@ interface CustomParams {
   note: string;
 }
 
+const defaultRelays = [
+  //'wss://tes'
+  //'wss://relay.nostr.wirednet.jp'
+  "wss://relay.nostr.band",
+  "wss://nos.lol",
+  // "wss://relayable.org",
+
+  "wss://nostr.bitcoiner.social",
+];
+
 const fetchEvent = async (
-  id: string,
+  encoded: string,
   relays: string[]
 ): Promise<Nostr.Event | undefined> => {
   console.debug("[api request id]", id, relays);
-  const response = await fetch(
-    `https://restr.mono3.workers.dev/${nip19.neventEncode({ id, relays })}`,
-    { headers: { "User-Agent": "lumilumi" } }
-  );
+  const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
+    headers: { "User-Agent": "lumilumi" },
+  });
 
   if (!response.ok) {
     console.warn("[api event not found]", await response.text());
@@ -75,7 +83,7 @@ export const load: LayoutServerLoad = async ({
     }
 
     res.event = await fetchEvent(
-      res.id,
+      res.encoded,
       res.relays?.length ? res.relays : defaultRelays
     );
     console.log(res.event);
