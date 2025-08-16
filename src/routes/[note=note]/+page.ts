@@ -77,7 +77,7 @@ async function fetchEventIfNotBrowser(
   request: Request,
   eventId: string
 ): Promise<Nostr.Event | undefined> {
-  const userAgent = request.headers.get("user-agent") || "";
+  const userAgent = request?.headers?.get("user-agent") || "";
 
   if (!/Mozilla|Chrome|Safari|Edge/.test(userAgent)) {
     try {
