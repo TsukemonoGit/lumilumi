@@ -2,6 +2,9 @@ import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
 import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { eventKinds } from "$lib/func/kinds";
+import { locale } from "@konemono/svelte5-i18n";
+import { get } from "svelte/store";
 
 interface CustomParams {
   note: string;
@@ -18,22 +21,28 @@ const defaultRelays = [
 ];
 
 const fetchEvent = async (
-  encoded: string,
+  id: string,
   relays: string[]
 ): Promise<Nostr.Event | undefined> => {
-  console.debug("[api request id]", encoded, relays);
-  const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
-    headers: { "User-Agent": "lumilumi" },
-  });
+  try {
+    const nevent = nip19.neventEncode({ id: id, relays: relays.slice(0, 3) });
 
-  if (!response.ok) {
-    console.warn("[api event not found]", await response.text());
+    console.debug("[api request id]", nevent, relays);
+    const response = await fetch(`https://restr.mono3.workers.dev/${nevent}`, {
+      headers: { "User-Agent": "lumilumi" },
+    });
+
+    if (!response.ok) {
+      console.warn("[api event not found]", await response.text());
+      return undefined;
+    }
+
+    const event = (await response.json()) as Nostr.Event;
+    console.debug("[api response]", event);
+    return event;
+  } catch (error) {
     return undefined;
   }
-
-  const event = (await response.json()) as Nostr.Event;
-  console.debug("[api response]", event);
-  return event;
 };
 
 export const load = async ({
@@ -86,15 +95,27 @@ export const load = async ({
     }
 
     res.event = await fetchEvent(
-      res.encoded,
+      res.id,
       res.relays?.length ? res.relays : defaultRelays
     );
     console.log(res.event);
     if (res.event) {
+      const kindString = eventKinds.get(res.event.kind)?.[
+        get(locale) === "ja" ? "ja" : "en"
+      ];
       ogTitle.set(
-        `Lumilumi${res.event.kind ? ` - kind:${res.event.kind}` : ""}`
+        `Lumilumi - kind:${res.event.kind} ${
+          kindString ? `(${kindString})` : ""
+        }`
       );
       ogDescription.set(res.event.content);
+    } else if (res.kind) {
+      const kindString = eventKinds.get(res.kind)?.[
+        get(locale) === "ja" ? "ja" : "en"
+      ];
+      ogTitle.set(
+        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+      );
     }
     return res;
   } catch (e) {
