@@ -87,7 +87,7 @@ export const load: PageServerLoad = async ({
       )?.[1];
       ogTitle.set(
         `Lumilumi - kind:${res.kind} ${
-          title || kindString ? `(${kindString})` : ""
+          title ? title : kindString ? `(${kindString})` : ""
         }`
       );
       ogDescription.set(desc || "");
