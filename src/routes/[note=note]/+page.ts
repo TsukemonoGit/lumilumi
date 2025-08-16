@@ -83,8 +83,7 @@ async function fetchEventIfNotBrowser(
     try {
       const res = await fetch(`https://restr.mono3.workers.dev/${eventId}`);
       if (res.ok) {
-        const restrData = await res.json();
-        return restrData.event;
+        return await res.json();
       }
     } catch (error) {
       // フェッチエラーの場合はundefinedを返す
