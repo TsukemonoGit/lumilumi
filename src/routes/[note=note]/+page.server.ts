@@ -95,7 +95,6 @@ export const load = async ({
         `Lumilumi${res.event.kind ? ` - kind:${res.event.kind}` : ""}`
       );
       ogDescription.set(res.event.content);
-    } else {
     }
     return res;
   } catch (e) {
