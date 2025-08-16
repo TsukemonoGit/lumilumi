@@ -71,16 +71,13 @@
 
   import { initThemeSettings } from "$lib/func/theme";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
+  import type { LayoutData } from "./$types";
 
   let { data, children } = $props<{
-    data:
-      | {
-          relays?: string[] | undefined;
-        }
-      | undefined;
+    data: LayoutData;
     children: Snippet;
   }>();
-
+  let ogp = $derived(data.ogp);
   let SvelteQueryDevtools: any = $state();
 
   // Conditionally load SvelteQueryDevtools during development
@@ -332,12 +329,20 @@
   <title>Lumilumi</title
   ><!--ここを{$ogTitle}にするとMenubarの項目をホバーするだけでタイトル変わる謎になる-->
 
-  <meta property="og:title" content={$ogTitle} />
-  <meta property="og:image" content={`${page.url.origin}/ogp.webp`} />
-
-  <meta name="description" content={$ogDescription} />
-
-  <meta property="og:description" content={$ogDescription} />
+  {#if ogp}
+    <meta property="og:title" content={ogp.title} />
+    <meta
+      property="og:image"
+      content={ogp.image || `${page.url.origin}/ogp.webp`}
+    />
+    <meta name="description" content={ogp.description} />
+    <meta property="og:description" content={ogp.description} />
+  {:else}
+    <meta property="og:title" content={$ogTitle} />
+    <meta property="og:image" content={`${page.url.origin}/ogp.webp`} />
+    <meta name="description" content={$ogDescription} />
+    <meta property="og:description" content={$ogDescription} />
+  {/if}
 
   {@html webManifestLink}
   {#if pwaAssetsHead.themeColor}
