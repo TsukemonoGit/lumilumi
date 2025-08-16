@@ -48,7 +48,7 @@ export const load: LayoutServerLoad = async ({
 
   setHeaders({
     "Cache-Control": "public, max-age=3600",
-    "X-Robots-Tag": "noindex, follow",
+    "X-Robots-Tag": "noindex, nofollow",
     "Content-Type": "text/html; charset=utf-8",
   });
   console.debug("[thread page load]", note);
