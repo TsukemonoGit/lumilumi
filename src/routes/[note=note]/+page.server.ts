@@ -2,6 +2,9 @@ import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
 import { ogDescription, ogTitle } from "$lib/stores/stores";
+import { eventKinds } from "$lib/func/kinds";
+import { locale } from "@konemono/svelte5-i18n";
+import { get } from "svelte/store";
 
 interface CustomParams {
   note: string;
@@ -91,10 +94,22 @@ export const load = async ({
     );
     console.log(res.event);
     if (res.event) {
+      const kindString = eventKinds.get(res.event.kind)?.[
+        get(locale) === "ja" ? "ja" : "en"
+      ];
       ogTitle.set(
-        `Lumilumi${res.event.kind ? ` - kind:${res.event.kind}` : ""}`
+        `Lumilumi - kind:${res.event.kind} ${
+          kindString ? `(${kindString})` : ""
+        }`
       );
       ogDescription.set(res.event.content);
+    } else if (res.kind) {
+      const kindString = eventKinds.get(res.kind)?.[
+        get(locale) === "ja" ? "ja" : "en"
+      ];
+      ogTitle.set(
+        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+      );
     }
     return res;
   } catch (e) {
