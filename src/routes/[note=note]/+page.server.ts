@@ -3,6 +3,7 @@ import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import { defaultRelays } from "$lib/stores/relays";
 import * as Nostr from "nostr-typedef";
+import { ogDescription } from "$lib/stores/stores";
 
 interface CustomParams {
   note: string;
@@ -77,7 +78,9 @@ export const load: LayoutServerLoad = async ({
       res.id,
       res.relays?.length ? res.relays : defaultRelays
     );
-
+    if (res.event) {
+      ogDescription.set(res.event.content);
+    }
     return res;
   } catch (e) {
     console.error("[thread page decode error]", e);

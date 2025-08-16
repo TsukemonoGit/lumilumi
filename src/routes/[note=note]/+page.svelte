@@ -42,16 +42,6 @@
   };
 </script>
 
-<svelte:head>
-  <title>
-    Lumilumi - {data.event !== undefined
-      ? `${metadata?.displayName}: ${data.event.content}`
-      : data.encoded}
-  </title>
-  {#if data.event !== undefined}
-    <meta property="og:title" content={data.event.content} />
-  {/if}
-</svelte:head>
 {#snippet eventDisplay(event: Nostr.Event)}
   {@const isChannel = handleChannelRedirect(event)}
   {#if !isChannel}
