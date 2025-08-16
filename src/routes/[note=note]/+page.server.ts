@@ -78,8 +78,11 @@ export const load: LayoutServerLoad = async ({
       res.id,
       res.relays?.length ? res.relays : defaultRelays
     );
+    console.log(res.event);
     if (res.event) {
       ogDescription.set(res.event.content);
+    } else {
+      ogDescription.set("test");
     }
     return res;
   } catch (e) {
