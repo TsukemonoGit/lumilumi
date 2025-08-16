@@ -21,22 +21,28 @@ const defaultRelays = [
 ];
 
 const fetchEvent = async (
-  encoded: string,
+  id: string,
   relays: string[]
 ): Promise<Nostr.Event | undefined> => {
-  console.debug("[api request id]", encoded, relays);
-  const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
-    headers: { "User-Agent": "lumilumi" },
-  });
+  try {
+    const nevent = nip19.neventEncode({ id: id, relays: relays.slice(0, 3) });
 
-  if (!response.ok) {
-    console.warn("[api event not found]", await response.text());
+    console.debug("[api request id]", nevent, relays);
+    const response = await fetch(`https://restr.mono3.workers.dev/${nevent}`, {
+      headers: { "User-Agent": "lumilumi" },
+    });
+
+    if (!response.ok) {
+      console.warn("[api event not found]", await response.text());
+      return undefined;
+    }
+
+    const event = (await response.json()) as Nostr.Event;
+    console.debug("[api response]", event);
+    return event;
+  } catch (error) {
     return undefined;
   }
-
-  const event = (await response.json()) as Nostr.Event;
-  console.debug("[api response]", event);
-  return event;
 };
 
 export const load = async ({
@@ -89,7 +95,7 @@ export const load = async ({
     }
 
     res.event = await fetchEvent(
-      res.encoded,
+      res.id,
       res.relays?.length ? res.relays : defaultRelays
     );
     console.log(res.event);

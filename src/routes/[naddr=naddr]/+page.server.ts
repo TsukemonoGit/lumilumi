@@ -19,22 +19,26 @@ const defaultRelays = [
 ];
 
 const fetchEvent = async (
-  encoded: string,
-  relays: string[]
+  naddrPointer: nip19.AddressPointer
 ): Promise<Nostr.Event | undefined> => {
-  console.debug("[api request id]", encoded, relays);
-  const response = await fetch(`https://restr.mono3.workers.dev/${encoded}`, {
-    headers: { "User-Agent": "lumilumi" },
-  });
+  try {
+    const naddr = nip19.naddrEncode(naddrPointer);
+    console.debug("[api request id]", naddr);
+    const response = await fetch(`https://restr.mono3.workers.dev/${naddr}`, {
+      headers: { "User-Agent": "lumilumi" },
+    });
 
-  if (!response.ok) {
-    console.warn("[api event not found]", await response.text());
+    if (!response.ok) {
+      console.warn("[api event not found]", await response.text());
+      return undefined;
+    }
+
+    const event = (await response.json()) as Nostr.Event;
+    console.debug("[api response]", event);
+    return event;
+  } catch (error) {
     return undefined;
   }
-
-  const event = (await response.json()) as Nostr.Event;
-  console.debug("[api response]", event);
-  return event;
 };
 
 export const load: PageServerLoad = async ({
@@ -77,10 +81,12 @@ export const load: PageServerLoad = async ({
     ogTitle.set(
       `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
     );
-    res.event = await fetchEvent(
-      res.encoded,
-      res.relays?.length ? res.relays : defaultRelays
-    );
+    res.event = await fetchEvent({
+      identifier: res.identifier,
+      pubkey: res.pubkey,
+      kind: res.kind,
+      relays: (res.relays?.length ? res.relays : defaultRelays).slice(0, 3),
+    });
 
     if (res.event) {
       const title = res.event.tags.find((tag) => tag[0] === "title")?.[1];
