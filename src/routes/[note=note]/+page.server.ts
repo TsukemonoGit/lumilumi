@@ -1,4 +1,3 @@
-import type { LayoutServerLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
@@ -37,7 +36,7 @@ const fetchEvent = async (
   return event;
 };
 
-export const load: LayoutServerLoad = async ({
+export const load = async ({
   params,
   setHeaders,
 }: {
