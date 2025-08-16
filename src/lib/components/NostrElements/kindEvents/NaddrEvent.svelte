@@ -59,6 +59,13 @@
       dynamicClasses = `${className} ml-5 opacity-90 text-sm`;
     }
   };
+  let naddrString: string | undefined = $derived.by(() => {
+    try {
+      return nip19.naddrEncode(data);
+    } catch (error) {
+      return undefined;
+    }
+  });
 </script>
 
 {#if queryKey && data}
@@ -85,7 +92,7 @@
         ]}
       >
         {#snippet loading()}<EmptyCard
-            naddr={displayMenu ? content?.slice(6) : undefined}
+            naddr={displayMenu ? naddrString : undefined}
             >Loading {content ?? ""}</EmptyCard
           >{/snippet}
         {#snippet nodata()}
@@ -104,17 +111,16 @@
                 {zIndex}
               />
             {:else}
-              <div
-                class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
-              >
-                Nodata {content ?? ""}{#if displayMenu}<EllipsisMenuNaddr
-                    naddr={content?.slice(6)}
-                  />{/if}
-              </div>{/if}
+              <EmptyCard
+                pulse={false}
+                naddr={displayMenu ? naddrString : undefined}
+                >Nodata {content ?? ""}</EmptyCard
+              >{/if}
           </div>
         {/snippet}
         {#snippet error()}<EmptyCard
-            naddr={displayMenu ? content?.slice(6) : undefined}
+            pulse={false}
+            naddr={displayMenu ? naddrString : undefined}
             >Nodata {content ?? ""}</EmptyCard
           >
         {/snippet}
@@ -179,7 +185,7 @@
         {/snippet}
       </LatestEvent>
     {:else}
-      <EmptyCard naddr={displayMenu ? content?.slice(6) : undefined}
+      <EmptyCard naddr={displayMenu ? naddrString : undefined}
         >Loading {content ?? ""}</EmptyCard
       >{/if}
   </div>

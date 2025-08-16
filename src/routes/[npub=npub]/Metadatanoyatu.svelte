@@ -27,10 +27,14 @@
       >
     {/snippet}
     {#snippet nodata()}
-      <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
+      <EmptyCard pulse={false} nevent={encodedPub}
+        >not found {encodedPub}</EmptyCard
+      >
     {/snippet}
     {#snippet error()}
-      <EmptyCard nevent={encodedPub}>not found {encodedPub}</EmptyCard>
+      <EmptyCard pulse={false} nevent={encodedPub}
+        >not found {encodedPub}</EmptyCard
+      >
     {/snippet}
     {#snippet content({ metadata })}
       <Kind0Note

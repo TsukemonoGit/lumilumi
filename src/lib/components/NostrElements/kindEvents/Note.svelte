@@ -87,12 +87,16 @@
               {relayhint}
               {zIndex}
             />
-          {:else}<EmptyCard nevent={displayMenu ? loadingText : undefined}
+          {:else}<EmptyCard
+              pulse={false}
+              nevent={displayMenu ? loadingText : undefined}
               >nodata {loadingText}</EmptyCard
             >{/if}
         {/snippet}
         {#snippet error()}
-          <EmptyCard nevent={displayMenu ? loadingText : undefined}
+          <EmptyCard
+            pulse={false}
+            nevent={displayMenu ? loadingText : undefined}
             >nodata {loadingText}</EmptyCard
           >
         {/snippet}

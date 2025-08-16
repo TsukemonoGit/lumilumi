@@ -6,12 +6,15 @@
     children?: any;
     nevent?: string | undefined;
     naddr?: string | undefined;
+    pulse?: boolean;
   }
-  let { children, nevent, naddr }: Props = $props();
+  let { children, nevent, naddr, pulse = true }: Props = $props();
 </script>
 
 <div
-  class={"grid grid-cols-[auto_1fr] w-full overflow-hidden my-1 justify-start gap-1 pt-0.5 px-1 animate-pulse"}
+  class={`grid grid-cols-[auto_1fr] w-full overflow-hidden my-1 justify-start gap-1 pt-0.5 px-1 ${
+    pulse ? "animate-pulse" : ""
+  }`}
 >
   <!--icon-->
   <div class="rounded-full bg-neutral-700 w-10 h-10"></div>
