@@ -1,4 +1,3 @@
-import type { LayoutServerLoad } from "./$types";
 import * as nip19 from "nostr-tools/nip19";
 import { error } from "@sveltejs/kit";
 import * as Nostr from "nostr-typedef";
@@ -37,7 +36,7 @@ const fetchEvent = async (
   return event;
 };
 
-export const load: LayoutServerLoad = async ({
+export const load = async ({
   params,
   setHeaders,
 }: {
@@ -48,7 +47,7 @@ export const load: LayoutServerLoad = async ({
 
   setHeaders({
     "Cache-Control": "public, max-age=3600",
-    "X-Robots-Tag": "index, follow", // noindexを変更
+    "X-Robots-Tag": "noindex, nofollow",
     "Content-Type": "text/html; charset=utf-8",
   });
   console.debug("[thread page load]", note);
@@ -85,15 +84,17 @@ export const load: LayoutServerLoad = async ({
       default:
         error(500);
     }
-    ogTitle.set(`Lumilumi - kind:${res.kind}`);
+
     res.event = await fetchEvent(
       res.encoded,
       res.relays?.length ? res.relays : defaultRelays
     );
     console.log(res.event);
     if (res.event) {
+      ogTitle.set(
+        `Lumilumi${res.event.kind ? ` - kind:${res.event.kind}` : ""}`
+      );
       ogDescription.set(res.event.content);
-    } else {
     }
     return res;
   } catch (e) {
