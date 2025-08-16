@@ -126,7 +126,7 @@
           {/snippet}
         </Metadata>
 
-        <AllReactions queryKey={["allreactions", atag]} {atag}>
+        <AllReactions {atag}>
           {#snippet loading()}
             <div>loading</div>
           {/snippet}

@@ -129,9 +129,8 @@
 
   // Rx-Nostr setup
   const keyFn = (packet: EventPacket): string => packet.event.id;
-  const onCache = (packet: EventPacket): void => {};
-  const onHit = (packet: EventPacket): void => {};
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+
+  const [uniq, eventIds] = createUniq(keyFn);
 
   // Query setup
   let result = $derived(

@@ -2,7 +2,6 @@
   import { useAllReactions } from "$lib/stores/useAllReactions";
   import type { ReqResult, ReqStatus } from "$lib/types";
 
-  import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
     EventPacket,
@@ -15,7 +14,6 @@
   import { readable } from "svelte/store";
 
   interface Props {
-    queryKey: QueryKey;
     id?: string | undefined;
     atag?: string | undefined;
     req?:
@@ -47,7 +45,6 @@
     req = undefined,
     id = undefined,
     atag = undefined,
-    queryKey,
 
     error,
     loading,
@@ -55,7 +52,7 @@
     children,
   }: Props = $props();
 
-  let result = $derived(useAllReactions(queryKey, id, atag, req));
+  let result = $derived(useAllReactions(id, atag, req));
 
   // debounce用の状態
   let debounceTimeoutId: NodeJS.Timeout | undefined = undefined;
@@ -84,20 +81,6 @@
   let data = $derived(debouncedResult.data);
   let status = $derived(debouncedResult.status);
   let errorData = $derived(debouncedResult.error);
-
-  interface $$Slots {
-    default: {
-      kind1: Nostr.Event[];
-      kind6: Nostr.Event[];
-      kind7: Nostr.Event[];
-      kind9735: Nostr.Event[];
-      status: ReqStatus;
-    };
-    loading: Record<never, never>;
-    error: { error: Error };
-    nodata: Record<never, never>;
-  }
-  //  $: console.log($status);
 </script>
 
 {#if $errorData}

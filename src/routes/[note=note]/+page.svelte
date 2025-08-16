@@ -122,7 +122,7 @@
 
             <!--noteのkindが40の場合はチャンネルページに飛ばすのでノート詠み込まれたあとでAllReactions取得するようにする-->
             <div>
-              <AllReactions queryKey={["allreactions", data.id]} id={data.id}>
+              <AllReactions id={data.id}>
                 {#snippet loading()}
                   <div>loading</div>
                 {/snippet}
