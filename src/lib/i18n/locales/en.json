@@ -122,7 +122,8 @@
       "naddr": "Copy naddr",
       "nevent": "Copy EventID",
       "relayURL": "Copy relayURL",
-      "text": "Copy text"
+      "text": "Copy text",
+      "embed": "Copy Embed Code"
     },
     "broadcast": "broadcast",
     "open": {

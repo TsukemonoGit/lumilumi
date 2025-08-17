@@ -122,7 +122,8 @@
       "naddr": "naddr をコピー",
       "nevent": "イベントIDをコピー",
       "relayURL": "リレーURLをコピー",
-      "text": "テキストをコピー"
+      "text": "テキストをコピー",
+      "embed": "埋め込みコードをコピー"
     },
     "broadcast": "ブロードキャスト",
     "open": {
