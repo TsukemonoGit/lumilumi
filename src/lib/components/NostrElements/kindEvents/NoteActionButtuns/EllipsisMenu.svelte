@@ -24,6 +24,7 @@
     RefreshCw,
     BookmarkMinus,
     BookmarkPlus,
+    CodeXml,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -136,6 +137,29 @@
           encodedPubkey: encodePubkey(),
         };
   });
+
+  // 埋め込みコードを生成する関数
+  const generateEmbedCode = (): string => {
+    const seenon = getRelaysById(note.id);
+    const scriptTag = `<${"script"} src="https://cdn.jsdelivr.net/npm/@konemono/nostr-web-components@latest/dist/nostr-web-components.iife.js"></${"script"}>`;
+
+    // relays配列をJSON形式でエスケープして文字列化
+    const relaysAttr =
+      seenon && seenon.length > 0 ? ` relays='${JSON.stringify(seenon)}'` : "";
+
+    if (replaceable) {
+      return [
+        scriptTag,
+        `<nostr-naddr href="https://lumilumi.app/{id}" naddr="${naddr}"${relaysAttr}></nostr-naddr>`,
+      ].join("\n");
+    } else {
+      return [
+        scriptTag,
+        `<nostr-note href="https://lumilumi.app/{id}" id="${nevent}"${relaysAttr}></nostr-note>`,
+      ].join("\n");
+    }
+  };
+
   // メニュー項目の定義を論理的な順序で整理
   let menuTexts = $derived.by(() => {
     const menuItems = [
@@ -150,6 +174,14 @@
         icon: Copy,
         action: "copy_id",
       },
+
+      // 埋め込みコード（条件付き）
+      {
+        text: `${$_("menu.copy.embed")}`,
+        icon: CodeXml,
+        action: "copy_embed_code",
+      },
+
       {
         text: `${$_("menu.note")}`,
         icon: Notebook,
@@ -300,6 +332,7 @@
         13: "open_makimono",
         14: "refresh_data",
         15: "toggle_bookmark",
+        16: "copy_embed_code",
       };
 
       const allowedActions = indexes
@@ -395,6 +428,26 @@
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
+            color: "bg-orange-500",
+          };
+        }
+        break;
+
+      case "copy_embed_code":
+        try {
+          const embedCode = generateEmbedCode();
+          await navigator.clipboard.writeText(embedCode);
+
+          $toastSettings = {
+            title: "Success",
+            description: "Embed code copied to clipboard",
+            color: "bg-green-500",
+          };
+        } catch (error: any) {
+          console.error(error.message);
+          $toastSettings = {
+            title: "Error",
+            description: "Failed to copy embed code",
             color: "bg-orange-500",
           };
         }
