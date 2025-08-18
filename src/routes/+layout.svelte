@@ -67,7 +67,6 @@
   import { latest, type EventPacket } from "rx-nostr";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   //import DebugPanel from '$lib/components/Debug/DebugPanel.svelte';
-  import { addDebugLog } from "$lib/components/Debug/debug";
 
   import { initThemeSettings } from "$lib/func/theme";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
@@ -88,7 +87,6 @@
     // Dynamically import SvelteQueryDevtools only in development mode
     import("@tanstack/svelte-query-devtools").then((module) => {
       SvelteQueryDevtools = module.SvelteQueryDevtools;
-      addDebugLog("SvelteQueryDevtools loaded in development mode");
     });
   }
 
@@ -103,28 +101,17 @@
     : createNoopClient();
   verificationClient.start();
   verifier.set(verificationClient.verifier);
-  addDebugLog("Verification client initialized and started");
 
   let nlBanner: HTMLElement | null = null;
 
   onMount(async () => {
-    addDebugLog("Component mounted, starting initialization");
-
     document.addEventListener("nlAuth", (e: Event) => {
-      addDebugLog("nlAuth event received");
       const customEvent = e as CustomEvent;
       const pub = customEvent.detail.pubkey;
-      addDebugLog(
-        `Extracted pubkey from nlAuth: ${pub ? "present" : "missing"}`
-      );
 
       if (pub) {
-        addDebugLog(`Setting login user: ${pub}`);
         loginUser.set(pub);
         if (!lumiSetting.get().pubkey) {
-          addDebugLog(
-            "No existing pubkey in settings, updating with new pubkey"
-          );
           lumiSetting.update((val) => {
             return {
               ...val,
@@ -137,14 +124,10 @@
               LUMI_STORAGE_KEY,
               JSON.stringify(lumiSetting.get())
             );
-            addDebugLog("Settings saved to localStorage successfully");
           } catch (error) {
-            addDebugLog(`Failed to save settings to localStorage: ${error}`);
             console.log("Failed to save");
           }
           setUserRelay();
-        } else {
-          addDebugLog("Pubkey already exists in settings, skipping update");
         }
       }
       //  console.log(customEvent);
@@ -153,44 +136,26 @@
     // make sure this is called before any
     // window.nostr calls are made
     if (browser && !nlBanner) {
-      addDebugLog(
-        "Browser environment detected, initializing browser-specific features"
-      );
       try {
         initThemeSettings();
-      } catch (error) {
-        addDebugLog(`Error loading settings from localStorage: ${error}`);
-      }
+      } catch (error) {}
       try {
         const tmp = localStorage.getItem("uploader");
-        addDebugLog(
-          `Loaded uploader setting from localStorage: ${tmp ?? "not set"}`
-        );
+
         $uploader = tmp ?? mediaUploader[0];
 
         const banner: boolean = localStorage.getItem("showBanner") == "true";
-        addDebugLog(`Loaded banner setting from localStorage: ${banner}`);
+
         showBanner.set(banner);
-      } catch (error) {
-        addDebugLog(
-          `Error loading uploader showBanner from localStorage: ${error}`
-        );
-      }
+      } catch (error) {}
       if (!$app?.rxNostr) {
-        addDebugLog("RxNostr not initialized, calling setRxNostr");
         setRxNostr();
-      } else {
-        addDebugLog("RxNostr already initialized");
       }
 
       if (!$app?.rxNostr3) {
-        addDebugLog("RxNostr3 not initialized, calling setRxNostr3");
         setRxNostr3();
-      } else {
-        addDebugLog("RxNostr3 already initialized");
       }
 
-      addDebugLog("Importing nostr-login module");
       const nostrLogin = await import("nostr-login");
 
       await waitNostr(1000);
@@ -203,51 +168,38 @@
       } catch (error) {
         console.log(error);
       }
-      addDebugLog("Nostr-login initialization completed");
+
       await tick();
 
       nlBanner = document.getElementsByTagName(
         "nl-banner"
       )?.[0] as HTMLElement | null;
       if (nlBanner) {
-        addDebugLog("nl-banner element found and configured");
         showBanner.setBanner(nlBanner);
         console.log(nlBanner);
-      } else {
-        addDebugLog("nl-banner element not found");
       }
     }
   });
 
   function onVisibilityChange() {
-    addDebugLog(`Page visibility changed to: ${document?.visibilityState}`);
     if (document?.visibilityState === "visible") {
-      addDebugLog("Page became visible, triggering relays reconnect");
       relaysReconnectChallenge();
       rxNostr3RelaysReconnectChallenge();
     }
   }
 
   afterNavigate((navigate) => {
-    addDebugLog(
-      `Navigation occurred: type=${navigate.type}, route=${navigate.to?.route.id}`
-    );
-
     //ページが変わったらリセット
     if (navigate.type !== "form") {
-      addDebugLog("Resetting display events for navigation");
       displayEvents.set([]);
 
       //設定ページに変わった場合バナーを表示
       if (navigate.to?.route.id === "/settings" && nlBanner) {
-        addDebugLog("Navigated to settings page, showing banner");
         nlBanner.style.display = "";
         //設定ページ以外に変わった場合はshowBannerの値によっていれる
       } else if (nlBanner) {
         const shouldShow = showBanner.get();
-        addDebugLog(
-          `Navigated away from settings, banner display: ${shouldShow ? "show" : "hide"}`
-        );
+
         nlBanner.style.display = shouldShow ? "" : "none";
       }
     }
@@ -259,9 +211,6 @@
   let mediaList: string[] = $state.raw([]);
   viewMediaModal.subscribe((e) => {
     if (e && e.mediaList.length > 0) {
-      addDebugLog(
-        `Media modal triggered with ${e.mediaList.length} items, index: ${e.index}`
-      );
       modalIndex = e.index;
       mediaList = e.mediaList;
 
@@ -283,27 +232,19 @@
   //設定データない人で、nostr-loginに公開鍵セットされたら、デフォリレーを更新する
   async function setUserRelay() {
     const currentPubkey = lumiSetting.get().pubkey;
-    addDebugLog(`setUserRelay called for pubkey: ${currentPubkey}`);
 
     const data: EventPacket[] | undefined = queryClient.getQueryData([
       "defaultRelay",
       currentPubkey,
     ]);
-    addDebugLog(
-      `Cached relay data found: ${data ? `${data.length} items` : "none"}`
-    );
+
     console.log(data);
 
     if (data && data.length > 0) {
-      addDebugLog("Using cached relay data to set relays");
       // データがある場合はイベントの形を整えてセット
       const relays = setRelaysByKind10002(data[0].event);
       setRelays(relays);
-      addDebugLog(
-        `Set relays from cached data: ${Object.keys(relays).length} relays`
-      );
     } else {
-      addDebugLog("No cached data, fetching relay information from network");
       const relays = await usePromiseReq(
         {
           filters: [{ authors: [currentPubkey], kinds: [10002], limit: 1 }],
@@ -314,14 +255,8 @@
       );
       console.log(relays);
       if (relays) {
-        addDebugLog(`Fetched relay data from network: ${relays.length} events`);
         const processedRelays = setRelaysByKind10002(relays[0].event);
         setRelays(processedRelays);
-        addDebugLog(
-          `Set relays from network data: ${Object.keys(processedRelays).length} relays`
-        );
-      } else {
-        addDebugLog("No relay data found on network");
       }
     }
   }

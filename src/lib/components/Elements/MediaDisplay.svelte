@@ -9,6 +9,7 @@
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import { untrack } from "svelte";
+  import CloseButton from "./CloseButton.svelte";
 
   interface Props {
     open: Writable<boolean>;
@@ -275,13 +276,7 @@
     </div>
 
     <!-- 閉じるボタン -->
-    <button
-      use:melt={$close}
-      class="fixed sm:right-4 sm:top-4 right-2 top-2 z-[999] rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      aria-label="close"
-    >
-      <X size={24} />
-    </button>
+    <CloseButton useMelt={$close} ariaLabel="close" zIndex={999} />
 
     <!-- 画像カウンター -->
     <div

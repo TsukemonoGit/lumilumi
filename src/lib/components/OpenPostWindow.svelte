@@ -69,6 +69,7 @@
   import { nip19 } from "nostr-tools";
   import { json } from "@sveltejs/kit";
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
+  import CloseButton from "./Elements/CloseButton.svelte";
 
   // ----------------------------------------
   // Component Props
@@ -790,16 +791,7 @@
       />
 
       <div class="relative rounded-md bg-neutral-900 px-6 py-4 shadow-lg">
-        <button
-          use:melt={$close}
-          aria-label="close"
-          title="Close (Esc)"
-          class="absolute right-0 top-1 inline-flex h-7 w-7 appearance-none
-                items-center justify-center rounded-full text-magnum-800 bg-magnum-100
-                hover:bg-magnum-100/75 active:shadow-magnum-400"
-        >
-          <X size={32} />
-        </button>
+        <CloseButton useMelt={$close} ariaLabel="close" title="Close (Esc)" />
 
         <div class="flex flex-row gap-1 md:gap-2 mb-1">
           <button

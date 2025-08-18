@@ -10,6 +10,7 @@
   import { page } from "$app/state";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
+  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
 
   const {
     elements: {
@@ -92,15 +93,7 @@
     >
       <modal.component {...modal.props} />
 
-      <button
-        use:melt={$close}
-        aria-label="close"
-        class="absolute right-4 top-4 inline-flex appearance-none
-                  items-center justify-center rounded-full p-1 text-magnum-800
-                  hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
-      >
-        <X class="size-6" />
-      </button>
+      <CloseButton useMelt={$close} ariaLabel="close" />
     </div>
   </div>
 {/if}

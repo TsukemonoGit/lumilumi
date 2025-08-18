@@ -7,6 +7,7 @@
   import type { Writable } from "svelte/store";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
+  import CloseButton from "./CloseButton.svelte";
 
   interface Props {
     dialogTitle?: string;
@@ -125,17 +126,11 @@
         </button>
       </div>
 
-      <!-- 閉じるボタン -->
-      <button
-        use:melt={$close}
-        aria-label="close"
-        class="absolute right-4 top-4 inline-flex appearance-none
-               items-center justify-center rounded-full p-1 text-magnum-800
-               hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
-        style:z-index={zIndex + 1}
-      >
-        <X class="size-6" />
-      </button>
+      <!-- 閉じるボタン --><CloseButton
+        useMelt={$close}
+        zIndex={zIndex + 1}
+        ariaLabel="close"
+      />
     </div>
   </div>
 {/if}

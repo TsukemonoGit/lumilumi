@@ -22,6 +22,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import { checkCustomEmojis } from "$lib/func/customEmoji";
+  import CloseButton from "./Elements/CloseButton.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -338,15 +339,7 @@
           Save changes
         </button>
       </div>
-      <button
-        use:melt={$close}
-        aria-label="close"
-        class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
-      >
-        <X class="size-4" />
-      </button>
+      <CloseButton useMelt={$close} ariaLabel="close" />
     </div>
   </div>
 {/if}
