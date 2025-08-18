@@ -1,5 +1,6 @@
 <script lang="ts">
   import { mediaUploader } from "$lib/func/constants";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { uploader } from "$lib/stores/stores";
   import { createSelect, melt } from "@melt-ui/svelte";
   import { Check, ChevronDown } from "lucide-svelte";
@@ -45,7 +46,7 @@
   const handleClickSelect = (value: string) => {
     if (value) {
       selectedUploader = value;
-      localStorage?.setItem("uploader", value);
+      localStorage?.setItem(STORAGE_KEYS.UPLOADER, value);
     }
   };
 </script>

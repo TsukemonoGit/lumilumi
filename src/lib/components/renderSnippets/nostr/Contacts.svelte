@@ -1,6 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <script lang="ts">
   import { browser } from "$app/environment";
+  import { getKind3Key } from "$lib/func/localStorageKeys";
   import { pubkeysIn } from "$lib/func/nostr";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { app } from "$lib/stores/stores";
@@ -51,8 +52,8 @@
 
   let storageKind3: Nostr.Event;
 
-  let kind3key = `kind3-${pubkey}`; // New format by pubkey
-  let oldKind3key = "kind3";
+  let kind3key = getKind3Key(pubkey); // New format by pubkey
+
   onMount(() => {
     if (browser) {
       const tmp = localStorage.getItem(kind3key);
@@ -62,12 +63,6 @@
         } catch (error) {
           console.log("parse error");
         }
-      }
-
-      //旧形式のデータを削除
-      const oldTmp = localStorage.getItem(oldKind3key);
-      if (oldTmp) {
-        localStorage.removeItem(oldKind3key);
       }
     }
   });

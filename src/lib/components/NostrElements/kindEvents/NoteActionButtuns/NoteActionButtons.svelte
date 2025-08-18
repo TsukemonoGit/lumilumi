@@ -55,6 +55,7 @@
   import Reposted from "$lib/components/renderSnippets/nostr/reaction/Reposted.svelte";
   import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let {
     note,
@@ -308,7 +309,7 @@
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
   const handleClickZap = () => {
-    const storagezap = localStorage.getItem("zap");
+    const storagezap = localStorage.getItem(STORAGE_KEYS.ZAP);
     if (storagezap) {
       zapAmount = Number(storagezap);
     }
@@ -359,7 +360,7 @@
 
     //サップの量保存
     try {
-      localStorage.setItem("zap", zapAmount.toString());
+      localStorage.setItem(STORAGE_KEYS.ZAP, zapAmount.toString());
     } catch (error) {
       console.log("Failed to save zap amount to localStorage.");
     }

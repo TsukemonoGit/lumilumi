@@ -10,6 +10,7 @@
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import DisplayName from "./DisplayName.svelte";
   import { type Writable, writable } from "svelte/store";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
     metadata: Nostr.Event;
@@ -69,7 +70,7 @@
     invOp = true;
     try {
       //サップの量保存
-      localStorage.setItem("zap", zapAmount.toString());
+      localStorage.setItem(STORAGE_KEYS.ZAP, zapAmount.toString());
     } catch (error) {
       console.log("failed to save localStorage");
     }
@@ -79,7 +80,7 @@
 
   const handleClickZap = async () => {
     console.log("zap");
-    const storagezap = localStorage.getItem("zap");
+    const storagezap = localStorage.getItem(STORAGE_KEYS.ZAP);
     if (storagezap) {
       zapAmount = Number(storagezap);
     }

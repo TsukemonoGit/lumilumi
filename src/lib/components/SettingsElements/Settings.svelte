@@ -36,7 +36,6 @@
     initLumiMute,
     initLumiEmoji,
     initLumiMuteByKind,
-    LUMI_STORAGE_KEY,
   } from "$lib/func/constants";
   import { relayRegex2, npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -151,7 +150,7 @@
   }
   function loadSettings(): LumiSetting | null {
     try {
-      const saved = localStorage.getItem(LUMI_STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEYS.LUMI_SETTINGS);
       if (!saved) {
         addDebugLog("No lumiSetting found in localStorage");
         return null;
@@ -217,7 +216,10 @@
     if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
     $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
     try {
-      localStorage.setItem(LUMI_STORAGE_KEY, JSON.stringify(settings));
+      localStorage.setItem(
+        STORAGE_KEYS.LUMI_SETTINGS,
+        JSON.stringify(settings)
+      );
 
       $nowProgress = true;
       toastSettings.set({

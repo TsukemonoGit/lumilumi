@@ -66,10 +66,10 @@
   import { untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
-  import { nip19 } from "nostr-tools";
-  import { json } from "@sveltejs/kit";
+
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   // ----------------------------------------
   // Component Props
@@ -151,7 +151,7 @@
     if (!viewMetadataList) return {};
 
     try {
-      const metadataStr = localStorage.getItem("metadata");
+      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
       if (!metadataStr) return {};
 
       const metadataQueryData: [QueryKey, EventPacket][] =

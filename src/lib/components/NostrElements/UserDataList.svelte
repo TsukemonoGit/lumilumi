@@ -8,6 +8,7 @@
   import type { EventPacket } from "rx-nostr";
   import type { QueryKey } from "@tanstack/svelte-query";
   import Popover from "../Elements/Popover.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let inputMetadata = $state("");
 
@@ -25,7 +26,7 @@
 
   function setMetadataList() {
     try {
-      const metadataStr = localStorage.getItem("metadata");
+      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
       let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
         ? JSON.parse(metadataStr)
         : [];

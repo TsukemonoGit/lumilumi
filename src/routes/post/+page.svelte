@@ -16,6 +16,7 @@
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { beforeNavigate } from "$app/navigation";
   import { waitNostr } from "nip07-awaiter";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -25,7 +26,7 @@
   const setSettings = async () => {
     $nowProgress = true;
     try {
-      const lumi = localStorage.getItem("lumiSetting");
+      const lumi = localStorage.getItem(STORAGE_KEYS.LUMI_SETTINGS);
 
       if (lumi) {
         const savedSettings: LumiSetting = JSON.parse(lumi);
@@ -37,7 +38,7 @@
       console.log(error);
     }
 
-    let savedUploader = localStorage.getItem("uploader");
+    let savedUploader = localStorage.getItem(STORAGE_KEYS.UPLOADER);
     if (!savedUploader) {
       $uploader = mediaUploader[0];
     } else {

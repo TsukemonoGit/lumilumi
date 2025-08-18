@@ -42,7 +42,10 @@
         showBanner.set(_showBanner);
         try {
           if (browser) {
-            localStorage.setItem("showBanner", showBanner.get().toString());
+            localStorage.setItem(
+              STORAGE_KEYS.SHOW_BANNER,
+              showBanner.get().toString()
+            );
           }
         } catch (error: any) {
           console.warn("Failed to save timelineFilter:", error);

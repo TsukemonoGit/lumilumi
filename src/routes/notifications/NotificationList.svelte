@@ -62,18 +62,13 @@
 
   // State
   let untilTime: number;
-  let allUniqueNotifi: Nostr.Event[] = [];
+  let allUniqueNotifi: Nostr.Event[] = $state([]);
   let isOnMount = false;
 
   // Create unique events filter
   const keyFn = (packet: EventPacket): string => packet.event.id;
-  const onCache = (packet: EventPacket): void => {
-    // Optional logging: console.log(`${packet.event.id} observed for the first time`);
-  };
-  const onHit = (packet: EventPacket): void => {
-    // Optional logging: console.log(`${packet.event.id} already observed`);
-  };
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+
+  const [uniq, eventIds] = createUniq(keyFn);
 
   // Setup query operator
   let operator = $derived(pipe(tie, uniq, scanArray()));
@@ -307,7 +302,7 @@
   {@render children?.({ events: displayEvents.get(), len: $data?.length ?? 0 })}
 {/if}
 
-{#if displayEvents.get() && displayEvents.get().length > 0}
+{#if (displayEvents.get() && displayEvents.get().length > 0) || (allUniqueNotifi.length > 0 && viewIndex === 0)}
   <button
     disabled={$nowProgress}
     class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"

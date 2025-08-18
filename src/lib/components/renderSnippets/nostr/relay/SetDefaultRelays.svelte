@@ -97,7 +97,7 @@
         }
       }
     });
-    result?.error.subscribe((value: Error | undefined) => {
+    result?.error.subscribe((value: Error | null) => {
       if (value) {
         errorData = value;
       }

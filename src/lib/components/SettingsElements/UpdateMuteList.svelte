@@ -12,6 +12,7 @@
   import MuteTabList from "./MuteTabList.svelte";
   import { writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
     pubkey: string;
@@ -70,7 +71,7 @@
           event: pk.event,
         };
         try {
-          localStorage.setItem("lumiMute", JSON.stringify($mutes));
+          localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
         } catch (error) {
           console.log("Failed to save");
         }

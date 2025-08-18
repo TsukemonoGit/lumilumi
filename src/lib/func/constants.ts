@@ -58,8 +58,7 @@ export const mediaUploader = [
   "https://nostpic.com",
   "https://yabu.me",
 ];
-export const LUMI_STORAGE_KEY = "lumiSetting";
-export const BOOKMARK_STORAGE_KEY = "kind10003";
+
 export const initSettings: LumiSetting = {
   relays: [],
   useRelaySet: "0",
