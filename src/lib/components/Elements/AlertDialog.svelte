@@ -2,6 +2,7 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
   import { writable, type Writable } from "svelte/store";
+  import CloseButton from "./CloseButton.svelte";
 
   interface Props {
     onClickOK: () => void;
@@ -88,15 +89,7 @@
         </button>
       </div>
 
-      <button
-        use:melt={$close}
-        aria-label="Close"
-        class="absolute right-[10px] top-[10px] inline-flex h-6 w-6
-                appearance-none items-center justify-center rounded-full text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
-      >
-        <X class="size-4" />
-      </button>
+      <CloseButton useMelt={$close} ariaLabel="close" />
     </div>
   </div>
 {/if}

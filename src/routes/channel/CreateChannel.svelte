@@ -22,6 +22,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import CloseButton from "$lib/components/Elements/CloseButton.svelte";
 
   let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
 
@@ -418,16 +419,7 @@
         </button>
       </div>
 
-      <button
-        use:melt={$close}
-        aria-label="close"
-        onclick={closeDialog}
-        class="absolute right-4 top-4 inline-flex appearance-none
-        items-center justify-center rounded-full p-1 text-magnum-800
-        hover:bg-magnum-300 focus:shadow-magnum-400 bg-magnum-100"
-      >
-        <X class="size-6" />
-      </button>
+      <CloseButton useMelt={$close} ariaLabel="close" onclick={closeDialog} />
     </div>
   </div>
 {/if}

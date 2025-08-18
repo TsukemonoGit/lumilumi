@@ -9,6 +9,7 @@
   import { fade } from "svelte/transition";
   import { type EventPacket } from "rx-nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import CloseButton from "./CloseButton.svelte";
 
   interface Props {
     invoice: string | undefined;
@@ -161,15 +162,7 @@
           Cancel
         </button>
       </div>
-      <button
-        use:melt={$close}
-        aria-label="close"
-        class="absolute right-4 top-4 inline-flex h-6 w-6 appearance-none
-                items-center justify-center rounded-full p-1 text-magnum-800
-                hover:bg-magnum-100 focus:shadow-magnum-400"
-      >
-        <X class="size-4" />
-      </button>
+      <CloseButton useMelt={$close} ariaLabel="close" />
     </div>
   </div>
 {/if}
