@@ -62,6 +62,7 @@ import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
 import { addDebugLog, debugInfo } from "$lib/components/Debug/debug";
+import { STORAGE_KEYS } from "./localStorageKeys";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -123,7 +124,7 @@ metadataQueue.subscribe((queue) => {
   if (followList.get().size > 0) {
     try {
       // まず、現在のローカルストレージのデータを取得
-      const metadataStr = localStorage.getItem("metadata");
+      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
       let currentMetadata: [QueryKey, EventPacket][] = metadataStr
         ? JSON.parse(metadataStr)
         : [];
@@ -141,7 +142,10 @@ metadataQueue.subscribe((queue) => {
         currentMetadata = savedMetadata;
       }
       if (metadataChanged) {
-        localStorage?.setItem("metadata", JSON.stringify(currentMetadata));
+        localStorage?.setItem(
+          STORAGE_KEYS.METADATA,
+          JSON.stringify(currentMetadata)
+        );
         metadataChanged = false;
       }
     } catch (error) {}
@@ -224,7 +228,7 @@ const saveMetadataToLocalStorage = (
 
 export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
   try {
-    const metadataStr = localStorage.getItem("metadata");
+    const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
     if (!metadataStr) {
       return;
     }

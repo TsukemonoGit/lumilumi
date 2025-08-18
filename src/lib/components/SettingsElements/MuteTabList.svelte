@@ -17,6 +17,7 @@
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   // export let muteList: LumiMute;
   const {
@@ -131,7 +132,7 @@
     };
     // $mutes = $mutes;
     try {
-      localStorage.setItem("lumiMute", JSON.stringify($mutes));
+      localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
     } catch (error) {
       console.log("failed to save localStorage");
     }

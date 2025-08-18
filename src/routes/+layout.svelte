@@ -40,7 +40,7 @@
     createNoopClient,
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
-  import { LUMI_STORAGE_KEY, mediaUploader } from "$lib/func/constants";
+  import { mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
 
   import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
@@ -70,6 +70,7 @@
 
   import { initThemeSettings } from "$lib/func/theme";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let { data, children } = $props<{
     data:
@@ -121,7 +122,7 @@
           try {
             //設定ない人で公開鍵ログインされたらそれで設定保存する
             localStorage.setItem(
-              LUMI_STORAGE_KEY,
+              STORAGE_KEYS.LUMI_SETTINGS,
               JSON.stringify(lumiSetting.get())
             );
           } catch (error) {
@@ -140,11 +141,12 @@
         initThemeSettings();
       } catch (error) {}
       try {
-        const tmp = localStorage.getItem("uploader");
+        const tmp = localStorage.getItem(STORAGE_KEYS.UPLOADER);
 
         $uploader = tmp ?? mediaUploader[0];
 
-        const banner: boolean = localStorage.getItem("showBanner") == "true";
+        const banner: boolean =
+          localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";
 
         showBanner.set(banner);
       } catch (error) {}

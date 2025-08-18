@@ -7,10 +7,12 @@
   import { getThemeCtx, setThemeCtx } from "./themeswitch";
   import { setTheme } from "$lib/func/settings";
   import { onMount } from "svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let userPrefersMode: Theme = $state("system");
   onMount(() => {
-    userPrefersMode = (localStorage?.getItem("theme") as Theme) ?? "system";
+    userPrefersMode =
+      (localStorage?.getItem(STORAGE_KEYS.THEME) as Theme) ?? "system";
   });
 
   const themes: SelectOption<Theme>[] = [
@@ -31,7 +33,7 @@
     positioning: { placement: "bottom", gutter: 10 },
     forceVisible: true,
     defaultSelected: modeToOption(
-      (localStorage?.getItem("theme") as Theme) ?? "system"
+      (localStorage?.getItem(STORAGE_KEYS.THEME) as Theme) ?? "system"
     ),
     loop: false,
     onSelectedChange: ({ curr, next }) => {
@@ -39,7 +41,7 @@
       userPrefersMode = optionToMode(definedNext);
       setTheme(userPrefersMode);
       console.log(userPrefersMode);
-      localStorage?.setItem("theme", userPrefersMode);
+      localStorage?.setItem(STORAGE_KEYS.THEME, userPrefersMode);
       return definedNext;
     },
   });

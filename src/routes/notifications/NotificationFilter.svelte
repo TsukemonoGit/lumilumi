@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { followList } from "$lib/stores/globalRunes.svelte";
 
   import { onlyFollowee } from "$lib/stores/stores";
@@ -8,7 +9,10 @@
   const handleChangeChecked = () => {
     console.log($onlyFollowee);
     try {
-      localStorage.setItem("onlyFollowee", $onlyFollowee.toString());
+      localStorage.setItem(
+        STORAGE_KEYS.OLD_ONLY_FOLLOWEE,
+        $onlyFollowee.toString()
+      );
     } catch (error) {
       console.log("Failed to save");
     }

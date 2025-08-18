@@ -22,10 +22,10 @@ import {
   userStatusMap,
 } from "$lib/stores/globalRunes.svelte";
 import { SvelteMap } from "svelte/reactivity";
-import { BOOKMARK_STORAGE_KEY } from "$lib/func/constants";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { urlRegex } from "$lib/func/regex";
 import { userPromiseUrl } from "$lib/func/useUrl";
+import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
 export function createTie<P extends EventPacket>(): [
   OperatorFunction<P, P & { seenOn: Set<string>; isNew: boolean }>,
@@ -172,7 +172,7 @@ export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
         queryClient.getQueryData(queryKey);
       if (!preMeta || pk.event.created_at > preMeta.event.created_at) {
         queryClient.setQueryData(queryKey, pk);
-        localStorage?.setItem(BOOKMARK_STORAGE_KEY, JSON.stringify(pk));
+        localStorage?.setItem(STORAGE_KEYS.BOOKMARK, JSON.stringify(pk));
         bookmark10003.set(pk.event);
       }
     }

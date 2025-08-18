@@ -71,7 +71,7 @@
       localLumisetting = {
         lumiSetting: settings,
         showBanner: showBanner.get(),
-        theme: localStorage.getItem("theme") ?? "system",
+        theme: localStorage.getItem(STORAGE_KEYS.THEME) ?? "system",
         colorScheme:
           localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) ?? "default",
         timelineFilter: timelineFilter.get(),
@@ -216,7 +216,10 @@
     if (loadData.showBanner) {
       showBanner.set(loadData.showBanner);
       try {
-        localStorage?.setItem("showBanner", loadData.showBanner.toString());
+        localStorage?.setItem(
+          STORAGE_KEYS.SHOW_BANNER,
+          loadData.showBanner.toString()
+        );
       } catch (error) {
         debugError("failed to save", error);
       }
@@ -225,7 +228,7 @@
     if (loadData.theme) {
       setThemeMode(loadData.theme as Theme);
       try {
-        localStorage?.setItem("theme", loadData.theme);
+        localStorage?.setItem(STORAGE_KEYS.THEME, loadData.theme);
       } catch (error) {
         debugError("failed to save", error);
       }
@@ -311,7 +314,7 @@
     if (loadData.uploader) {
       $uploader = loadData.uploader;
       if (loadData.uploader) {
-        localStorage?.setItem("uploader", loadData.uploader);
+        localStorage?.setItem(STORAGE_KEYS.UPLOADER, loadData.uploader);
       }
     }
     if (loadData.lumiSetting) {

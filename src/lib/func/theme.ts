@@ -9,7 +9,8 @@ export type ThemeMode = "light" | "dark" | "system";
 export function initThemeSettings() {
   if (!browser) return;
   try {
-    const theme = (localStorage.getItem("theme") as ThemeMode) ?? "system";
+    const theme =
+      (localStorage.getItem(STORAGE_KEYS.THEME) as ThemeMode) ?? "system";
     const scheme = getCurrentColorScheme();
 
     applyThemeMode(theme);
@@ -21,7 +22,7 @@ export function initThemeSettings() {
 
 export async function setThemeMode(mode: ThemeMode) {
   if (!browser) return;
-  localStorage.setItem("theme", mode);
+  localStorage.setItem(STORAGE_KEYS.THEME, mode);
   applyThemeMode(mode);
   await tick();
   // 再描画のため現在のカラースキーム再適用
@@ -79,7 +80,7 @@ export async function toggleDarkMode() {
   const root = document.documentElement;
   const newIsDark = !root.classList.contains("dark");
   root.classList.toggle("dark", newIsDark);
-  localStorage.setItem("theme", newIsDark ? "dark" : "light");
+  localStorage.setItem(STORAGE_KEYS.THEME, newIsDark ? "dark" : "light");
   await tick();
   // カラースキーム再適用
   applyColorScheme(getCurrentColorScheme());

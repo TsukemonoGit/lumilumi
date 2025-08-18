@@ -16,6 +16,7 @@
 
   import { writable, type Writable } from "svelte/store";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
     pubkey: string;
@@ -76,7 +77,10 @@
         updated: Math.floor(Date.now() / 1000),
       };
       try {
-        localStorage.setItem("lumiMuteByKind", JSON.stringify($mutebykinds));
+        localStorage.setItem(
+          STORAGE_KEYS.LUMI_MUTE_BY_KIND,
+          JSON.stringify($mutebykinds)
+        );
       } catch (error) {
         console.log("Failed to save");
       }
