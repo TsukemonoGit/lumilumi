@@ -1,21 +1,20 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="%lang%">
+  <head prefix="og: https://ogp.me/ns#">
+    <meta charset="utf-8" />
 
-<head prefix="og: https://ogp.me/ns#">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<meta charset="utf-8" />
+    %sveltekit.head%
+  </head>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!--https://svelte.dev/docs/kit/link-options-->
 
-	%sveltekit.head%
-</head>
-
-<!--https://svelte.dev/docs/kit/link-options-->
-
-<body data-sveltekit-preload-data="hover">
-	<div style="display: contents">%sveltekit.body%</div>
-	<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
-
-</body>
-
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+    <script
+      type="module"
+      src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
+    ></script>
+  </body>
 </html>
