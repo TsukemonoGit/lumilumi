@@ -100,14 +100,16 @@
         3000
       );
       console.log(newKind10005);
-      if (
-        newKind10005 &&
-        newKind10005.length > 0 &&
+      const hasNew = newKind10005 && newKind10005.length > 0;
+      const isNewer =
+        hasNew &&
         (!kind10005data ||
-          newKind10005[0].event.created_at > kind10005data.event.created_at)
-      ) {
+          newKind10005[0]?.event?.created_at >
+            kind10005data?.event?.created_at);
+
+      if (isNewer) {
         kind10005 = newKind10005[0].event;
-        queryClient.setQueryData(querykey, newKind10005[0].event);
+        queryClient.setQueryData(querykey, kind10005);
       } else if (kind10005data) {
         kind10005 = kind10005data.event;
       }
