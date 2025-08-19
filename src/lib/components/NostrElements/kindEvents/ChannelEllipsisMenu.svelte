@@ -8,6 +8,7 @@
     Radio,
     Share,
     SquarePen,
+    Tv,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -15,15 +16,17 @@
   import * as nip19 from "nostr-tools/nip19";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-  import { t as _, locale } from "@konemono/svelte5-i18n";
+  import { t as _ } from "@konemono/svelte5-i18n";
 
   import { page } from "$app/state";
   import type { ChannelData } from "$lib/types";
-  import { translateText } from "$lib/func/util";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { writable } from "svelte/store";
   import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { getChannelLink } from "$lib/func/channel";
+  import { goto } from "$app/navigation";
+  import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
 
   interface Props {
     note: Nostr.Event; //kind40か41
@@ -40,7 +43,6 @@
 
     heyaId,
   }: Props = $props();
-  let editChannelListOpen = $state(writable(false));
   // svelte-ignore non_reactive_update
   // let dialogOpen: Writable<boolean> = writable(false);
 
@@ -53,10 +55,10 @@
       },
       { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
       { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-      //{ text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-      // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
 
       { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
+      { icon: SquarePen, text: `${$_("channel.menu.edit")}`, num: 4 },
+      { text: `${$_("channel.menu.open")}`, icon: Tv, num: 2 },
     ];
 
     //NIP-70
@@ -84,6 +86,10 @@
     return menu;
   });
 
+  let editChannelDataOpen = $state(writable(false));
+  let editChannelListOpen = $state(writable(false));
+  let channelLink = $derived(getChannelLink(heyaId));
+
   const handleSelectItem = async (index: number) => {
     switch (menuTexts[index].num) {
       case 0:
@@ -103,13 +109,9 @@
 
         window.open(url, "_blank", "noreferrer");
         break;
-
       case 2:
-        //Translate
-
-        const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${translateText(note.content)}`;
-
-        window.open(translateUrl, "_blank", "noreferrer");
+        //open
+        goto(channelLink);
         break;
 
       case 3:
@@ -130,17 +132,10 @@
           };
         }
         break;
-      // case 4:
-      //   //Goto Note page
-      //   goto(`/${replaceable ? naddr : nevent}`);
-      //   break;
-      // case 5:
-      //   //open in emojito
-      //   const emojito = `https://emojito.meme/a/${naddr}`;
-
-      //   window.open(emojito, "_blank", "noreferrer");
-      //   break;
-
+      case 4:
+        //Edit Channel Info
+        $editChannelListOpen = true;
+        break;
       case 6:
         //broadcast
         publishEvent(note);
@@ -169,7 +164,7 @@
         break;
       case 8:
         //Edit Channel Info
-        $editChannelListOpen = true;
+        $editChannelDataOpen = true;
         break;
     }
   };
@@ -196,4 +191,5 @@
   <Ellipsis size="20" />
 </DropdownMenu>
 
-<EditChannelInfo {editChannelListOpen} {heyaId} {note} {channelData} />
+<EditChannelInfo {editChannelDataOpen} {heyaId} {note} {channelData} />
+<EditChannelList bind:editChannelListOpen {heyaId} />

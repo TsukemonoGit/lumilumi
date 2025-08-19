@@ -25,13 +25,13 @@
   import CloseButton from "$lib/components/Elements/CloseButton.svelte";
 
   interface Props {
-    editChannelListOpen: Writable<boolean>;
+    editChannelDataOpen: Writable<boolean>;
     heyaId: string;
     note: Nostr.Event; //kind40か41
     channelData: ChannelData;
   }
   let {
-    editChannelListOpen = $bindable(),
+    editChannelDataOpen = $bindable(),
     heyaId,
     note,
     channelData,
@@ -53,7 +53,7 @@
   let addToList = $state(true);
   let error = $state("");
   const id = "editChannelInformation";
-  editChannelListOpen.subscribe((value) => {
+  editChannelDataOpen.subscribe((value) => {
     if (value) {
       $dialogOpen = true;
       pushState("", {
@@ -224,7 +224,7 @@
 
   dialogOpen.subscribe((value) => {
     if (!value) {
-      $editChannelListOpen = false;
+      $editChannelDataOpen = false;
     }
   });
 </script>
