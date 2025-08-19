@@ -1,5 +1,7 @@
 // hooks.server.ts
 import type { Handle } from "@sveltejs/kit";
+import { setLocale, locale, waitLocale } from "@konemono/svelte5-i18n";
+import { get } from "svelte/store";
 
 // 許可するオリジンを設定（必要に応じて）
 const allowedOrigins = [
@@ -8,10 +10,24 @@ const allowedOrigins = [
 ]; //, "https://another-example.com"];
 
 export const handle: Handle = async ({ event, resolve }) => {
+  // 言語設定の処理
+
+  const langHeader = event.request.headers
+    .get("accept-language")
+    ?.split(",")[0];
+
+  const lang = langHeader?.split("-")[0]; // "en-US" → "en"
+  if (lang) {
+    setLocale(lang);
+    await waitLocale();
+  }
+
   // CORSのプリフライトリクエストに対応
   if (event.url.pathname.startsWith("/api")) {
     const origin = event.request.headers.get("Origin");
-    const response = await resolve(event);
+    const response = await resolve(event, {
+      transformPageChunk: ({ html }) => html.replace("%lang%", get(locale)),
+    });
 
     // OPTIONSリクエスト（プリフライトリクエスト）
     if (event.request.method === "OPTIONS") {
@@ -42,7 +58,13 @@ export const handle: Handle = async ({ event, resolve }) => {
   // CSRFトークンの検証は不要 (Share APIの場合)
   if (event.url.pathname.startsWith("/post")) {
     // CSRFトークンの検証処理を行わない
+    return resolve(event, {
+      transformPageChunk: ({ html }) => html.replace("%lang%", get(locale)),
+    });
   }
 
-  return resolve(event);
+  // 通常のレスポンス（言語設定を適用）
+  return resolve(event, {
+    transformPageChunk: ({ html }) => html.replace("%lang%", get(locale)),
+  });
 };

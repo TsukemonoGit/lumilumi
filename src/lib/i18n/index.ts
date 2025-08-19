@@ -11,7 +11,7 @@ try {
 
   initI18n({
     defaultLocale: defaultLocale,
-    supportedLocales: ["ja", "en"],
+    supportedLocales: ["en", "ja"],
   });
 } catch (error: any) {
   addDebugLog(error);
