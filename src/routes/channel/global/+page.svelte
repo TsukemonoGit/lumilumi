@@ -63,7 +63,7 @@
       queryKey={timelineQuery}
       filters={[
         {
-          kinds: [42],
+          kinds: [42, 40, 41], //チャンネル情報の変更も購読してみる
           since: since,
         },
         {
@@ -75,7 +75,7 @@
       ]}
       olderFilters={[
         {
-          kinds: [42],
+          kinds: [42, 40, 41],
           since: since,
         },
         {
