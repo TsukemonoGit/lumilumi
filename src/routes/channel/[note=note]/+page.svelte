@@ -78,12 +78,14 @@
   let isMute = $derived(
     channelMuteCheck(data.id, timelineFilter.get().adaptMute)
   );
+  let heyaRelay: string = $state("");
 </script>
 
 {#if view}
   <section class="w-full break-words overflow-hidden">
     <div class="text-left w-full bg-neutral-800 rounded-lg overflow-hidden p-2">
       <ChannelMetadata
+        bind:heyaRelay
         id={data.id}
         linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
         clickAction={false}
@@ -167,5 +169,7 @@
   </section>
 {/if}
 <div class="postWindow">
-  <OpenPostWindow options={{ tags: [["e", data.id, "", "root"]], kind: 42 }} />
+  <OpenPostWindow
+    options={{ tags: [["e", data.id, heyaRelay, "root"]], kind: 42 }}
+  />
 </div>

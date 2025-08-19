@@ -31,7 +31,7 @@
     content?: import("svelte").Snippet<
       [{ data: Nostr.Event; status: ReqStatus }]
     >;
-    onChange?: (metadata: Nostr.Event) => void;
+    onChange?: (event: Nostr.Event) => void;
   }
 
   let {
