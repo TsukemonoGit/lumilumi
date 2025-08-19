@@ -3,7 +3,6 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import type { Writable } from "svelte/store";
   import { fade } from "svelte/transition";
-  import { X } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { latest, type EventPacket } from "rx-nostr";
   import { usePromiseReq } from "$lib/func/nostr";
@@ -20,7 +19,7 @@
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import CloseButton from "$lib/components/Elements/CloseButton.svelte";
@@ -85,35 +84,10 @@
       });
       // 最新の10005を取得する
       $nowProgress = true;
-
-      const kind10005data: EventPacket | undefined =
-        queryClient.getQueryData(querykey);
-      console.log(kind10005data);
-      const newKind10005: EventPacket[] = await usePromiseReq(
-        {
-          filters: [
-            { kinds: [10005], authors: [lumiSetting.get().pubkey], limit: 1 },
-          ],
-          operator: pipe(latest()),
-        },
-        undefined,
-        3000
-      );
-      console.log(newKind10005);
-      if (
-        newKind10005 &&
-        newKind10005.length > 0 &&
-        (!kind10005data ||
-          newKind10005[0].event.created_at > kind10005data.event.created_at)
-      ) {
-        kind10005 = newKind10005[0].event;
-        queryClient.setQueryData(querykey, newKind10005[0].event);
-      } else if (kind10005data) {
-        kind10005 = kind10005data.event;
-      }
+      console.log(heyaId);
+      kind10005 = await getNewestData();
 
       $nowProgress = false;
-
       // heyaIDが入ってるか確認
       if (
         kind10005 &&
@@ -128,6 +102,36 @@
     }
   });
 
+  async function getNewestData(): Promise<Nostr.Event | undefined> {
+    const kind10005data: EventPacket | undefined =
+      queryClient.getQueryData(querykey);
+    console.log(kind10005data);
+    const newKind10005: EventPacket[] = await usePromiseReq(
+      {
+        filters: [
+          { kinds: [10005], authors: [lumiSetting.get().pubkey], limit: 1 },
+        ],
+        operator: pipe(latest()),
+      },
+      undefined,
+      3000
+    );
+    console.log(newKind10005);
+    const hasNew = newKind10005 && newKind10005.length > 0;
+    const isNewer =
+      hasNew &&
+      (!kind10005data ||
+        newKind10005[0]?.event?.created_at > kind10005data?.event?.created_at);
+
+    if (isNewer) {
+      const newData = newKind10005[0].event;
+      queryClient.setQueryData(querykey, newKind10005[0]); //EventPacketで保存
+      return newData;
+    } else if (kind10005data) {
+      return kind10005data.event;
+    }
+    return undefined;
+  }
   async function updateChannelList() {
     $nowProgress = true;
 

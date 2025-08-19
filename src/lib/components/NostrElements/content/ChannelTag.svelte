@@ -1,9 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { getRelaysById } from "$lib/func/nostr";
   import type { ChannelData } from "$lib/types";
   import { MessagesSquare } from "lucide-svelte";
-  import * as nip19 from "nostr-tools/nip19";
   import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
@@ -11,6 +9,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable } from "svelte/store";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
+  import { getChannelLink } from "$lib/func/channel";
 
   interface Props {
     heyaId: string | undefined;
@@ -27,25 +26,6 @@
     }
   };
 
-  const handleClickToChannel = () => {
-    if (!heyaId) {
-      return;
-    }
-    const neventPointer: nip19.EventPointer = {
-      id: heyaId,
-      relays: getRelaysById(heyaId),
-    };
-    goto(`/channel/${nip19.neventEncode(neventPointer)}`);
-  };
-
-  function getChannelLink(heyaId: string | undefined): string {
-    if (!heyaId) return "";
-    try {
-      return `/channel/${nip19.noteEncode(heyaId)}`;
-    } catch (error) {
-      return "";
-    }
-  }
   let channelLink = $derived(getChannelLink(heyaId));
   const menuTexts: { icon: any; text: string; num: number }[] = [
     { icon: undefined, text: `${$_("channel.menu.edit")}`, num: 0 },

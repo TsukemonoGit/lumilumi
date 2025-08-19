@@ -174,62 +174,56 @@
       // 現在のKind 10005を取得
       const kind10005data: EventPacket | undefined =
         queryClient.getQueryData(querykey);
-      if (kind10005data) {
-        // 新しいタグリストを作成
-        const newTags = [...kind10005data.event.tags, ["e", channelId]];
 
-        // 新しいイベントを作成して送信
-        // 新しいイベントを作成
-        const newEvent: Nostr.EventParameters = {
-          kind: 10005,
-          content: "",
-          tags: $state.snapshot(newTags),
-          created_at: Math.floor(Date.now() / 1000),
-        };
+      // 新しいタグリストを作成
+      //  リストもってないときは新しく作っちゃうよ
+      const newTags = [...(kind10005data?.event.tags || []), ["e", channelId]];
 
-        // イベントを送信する処理（実際のアプリケーションに合わせて実装）
-        const result = await safePublishEvent(newEvent);
-        if ("errorCode" in result) {
-          if (result.isCanceled) {
-            return; // キャンセル時は何もしない
-          }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
-          return;
+      // 新しいイベントを作成して送信
+      // 新しいイベントを作成
+      const newEvent: Nostr.EventParameters = {
+        kind: 10005,
+        content: "",
+        tags: $state.snapshot(newTags),
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      // イベントを送信する処理（実際のアプリケーションに合わせて実装）
+      const result = await safePublishEvent(newEvent);
+      if ("errorCode" in result) {
+        if (result.isCanceled) {
+          return; // キャンセル時は何もしない
         }
-        // 成功時の処理
-        const { event: signedkind10005, res } = result;
-        console.log("イベントを送信:", signedkind10005);
-
-        const isSuccess = res
-          .filter((item) => item.ok)
-          .map((item) => item.from);
-        const isFailed = res
-          .filter((item) => !item.ok)
-          .map((item) => item.from);
-        const message = generateResultMessage(isSuccess, isFailed);
         $toastSettings = {
-          title: isSuccess.length > 0 ? "Success" : "Failed",
-          description: message,
-          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
         };
-
-        if (isSuccess.length > 0) {
-          // 成功したら状態を更新
-
-          queryClient.setQueryData(
-            querykey,
-            formatToEventPacket(signedkind10005)
-          );
-        }
-
-        console.log("Added channel to list:", channelId);
-      } else {
-        throw new Error("Failed to fetch kind 10005 data");
+        return;
       }
+      // 成功時の処理
+      const { event: signedkind10005, res } = result;
+      console.log("イベントを送信:", signedkind10005);
+
+      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+      const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
+      const message = generateResultMessage(isSuccess, isFailed);
+      $toastSettings = {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: message,
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      };
+
+      if (isSuccess.length > 0) {
+        // 成功したら状態を更新
+
+        queryClient.setQueryData(
+          querykey,
+          formatToEventPacket(signedkind10005)
+        );
+      }
+
+      console.log("Added channel to list:", channelId);
     } catch (err) {
       console.error("リスト追加エラー:", err);
     }
