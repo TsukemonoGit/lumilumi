@@ -3,7 +3,6 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
   import {
-    X,
     SquarePen,
     SmilePlus,
     Send,
@@ -17,7 +16,6 @@
   import {
     getMetadataList,
     promisePublishSignedEvent,
-    usePromiseReq,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -34,24 +32,15 @@
 
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import {
-    filesUpload,
-    delay,
-    displayShortPub,
-    nip19Decode,
-  } from "$lib/func/util";
+  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
 
-  import type {
-    DefaultPostOptions,
-    MargePostOptions,
-    Profile,
-  } from "$lib/types";
+  import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
 
-  import { latest, nip07Signer, type EventPacket } from "rx-nostr";
+  import { nip07Signer, type EventPacket } from "rx-nostr";
   import { writable, type Writable } from "svelte/store";
 
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { npubRegex, nsecRegex } from "$lib/func/regex";
+  import { nsecRegex } from "$lib/func/regex";
   import { clientTag } from "$lib/func/constants";
 
   import { convertMetaTags } from "$lib/func/imeta";
@@ -93,7 +82,7 @@
   // ----------------------------------------
   // Constants
   // ----------------------------------------
-  const zIndex = 50;
+
   const bulkReplyThreshold = 30;
 
   // ----------------------------------------
@@ -112,8 +101,8 @@
   // State Management
   // ----------------------------------------
   let geohash: string = $state("");
-  let text: string = $state(options.content ?? "");
-  let tags: string[][] = $state([...options.tags]);
+  let text: string = $derived(options.content ?? "");
+  let tags: string[][] = $derived([...options.tags]);
   // let cursorPosition: number = 0;
   let onWarning: boolean = $state<boolean>(false);
   let warningText = $state("");
@@ -127,7 +116,7 @@
   let signPubkey: string | undefined = $state();
   let isPosting: boolean = $state(false);
   let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
-  let initOptions: MargePostOptions = $state({
+  let initOptions: MargePostOptions = $derived({
     ...options,
     kind: options.kind ?? 1,
   });
