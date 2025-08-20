@@ -99,9 +99,6 @@
 
       if (loginUser.get()) {
         signPubkey = loginUser.get();
-        const metadata = (
-          queryClient.getQueryData(["metadata", signPubkey]) as EventPacket
-        )?.event;
       }
     } catch (error) {
       showToast("Error", "Failed to get sign pubkey", "bg-red-500");
