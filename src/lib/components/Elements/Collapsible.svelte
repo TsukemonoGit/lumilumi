@@ -1,10 +1,11 @@
 <script lang="ts">
   import { createCollapsible, melt } from "@melt-ui/svelte";
   import { ChevronsUpDown, X } from "lucide-svelte";
+  import type { Snippet } from "svelte";
   import { slide } from "svelte/transition";
   interface Props {
-    title?: import("svelte").Snippet;
-    contentEle?: import("svelte").Snippet;
+    title?: Snippet;
+    contentEle?: Snippet;
   }
 
   let { title, contentEle }: Props = $props();
