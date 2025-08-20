@@ -36,7 +36,7 @@
   import PostPreview from "./PostPreview.svelte";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import GeohashMap from "./GeohashMap.svelte";
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
@@ -139,7 +139,14 @@
       $uploader = value;
     }
   });
-
+  $effect(() => {
+    if (textarea) {
+      untrack(async () => {
+        await tick();
+        textarea?.focus();
+      });
+    }
+  });
   // resetCreatePost関数を設定
   $effect(() => {
     resetCreatePost = () => {
@@ -172,7 +179,7 @@
   // ----------------------------------------
   // Text Handling
   // ----------------------------------------
-  function insertTextAtCursor(
+  async function insertTextAtCursor(
     insertText: string,
     options: {
       addSpaceBefore?: boolean;
@@ -210,10 +217,9 @@
     text =
       text.slice(0, insertStart) + finalInsertText + text.slice(insertStart);
 
-    setTimeout(() => {
-      textarea?.focus();
-      textarea?.setSelectionRange(insertEnd, insertEnd);
-    }, 0);
+    await tick();
+    textarea?.focus();
+    textarea?.setSelectionRange(insertEnd, insertEnd);
   }
 
   function handleClickEmoji(e: string[]) {
@@ -337,14 +343,13 @@
     }
   }
 
-  function handleClickCustomReaction() {
+  async function handleClickCustomReaction() {
     viewCustomEmojis = !viewCustomEmojis;
 
     if (viewCustomEmojis) {
-      setTimeout(() => {
-        emojiInput?.focus();
-        emojiInput?.setSelectionRange(0, 0);
-      });
+      await tick();
+      emojiInput?.focus();
+      emojiInput?.setSelectionRange(0, 0);
     }
 
     if (viewMetadataList && viewCustomEmojis) {
@@ -352,14 +357,13 @@
     }
   }
 
-  function handleClickMetadata() {
+  async function handleClickMetadata() {
     viewMetadataList = !viewMetadataList;
 
     if (viewMetadataList) {
-      setTimeout(() => {
-        metadataInput?.focus();
-        metadataInput?.setSelectionRange(0, 0);
-      });
+      await tick();
+      metadataInput?.focus();
+      metadataInput?.setSelectionRange(0, 0);
     }
 
     if (viewMetadataList && viewCustomEmojis) {
@@ -446,7 +450,7 @@
       onclick={async () => {
         onWarning = !onWarning;
         if (onWarning) {
-          await delay(10);
+          await tick();
           warningTextarea?.focus();
         }
       }}
