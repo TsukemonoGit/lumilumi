@@ -134,7 +134,7 @@
             {repostable}
           />
         </div>
-        {#if page.params.note || page.params.naddr}
+        {#if page.route.id === "/[note=note]" || page.route.id === "/[naddr=naddr]"}<!--channel/[note=note]ではなんないように-->
           {#if polltype === "multiplechoice"}
             <PollMultiBuilder {note} {hasEnded} {endsAt} />
           {:else}
