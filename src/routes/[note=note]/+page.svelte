@@ -95,12 +95,12 @@
         {#snippet error()}
           <div>{error}</div>
         {/snippet}
-        {#snippet children({ kind1, kind6, kind7, kind9735 })}
-          <NoteRepostList events={kind6} />
-          <NoteReactionList events={kind7} />
-          <ZapReactionList events={kind9735} />
+        {#snippet children({ kind1, kind6, kind7, kind9735, status })}
+          <NoteRepostList events={kind6} {status} />
+          <NoteReactionList events={kind7} {status} />
+          <ZapReactionList events={kind9735} {status} />
 
-          <CollapsibleList title="Comments" amount={kind1.length}>
+          <CollapsibleList title="Comments" amount={kind1.length} {status}>
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >

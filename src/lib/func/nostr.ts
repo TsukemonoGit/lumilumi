@@ -813,7 +813,7 @@ export function usePaginatedReq(
     maxLoop?: number;
   },
   relays: string[] | undefined,
-  timeout: number | undefined = 3000
+  timeout: number | undefined = 5000
 ): ReqResult<EventPacket[]> {
   const data = writable<EventPacket[] | null>(null);
   const status = writable<ReqStatus>("loading");

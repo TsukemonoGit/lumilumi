@@ -4,14 +4,16 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
 
   import ZapList from "./ZapList.svelte";
+  import type { ReqStatus } from "$lib/types";
 
   interface Props {
     events: Nostr.Event[];
+    status: ReqStatus;
   }
 
-  let { events = $bindable() }: Props = $props();
+  let { events = $bindable(), status }: Props = $props();
 </script>
 
-<CollapsibleList title="Zap" amount={events.length}>
+<CollapsibleList title="Zap" amount={events.length} {status}>
   <ZapList {events} />
 </CollapsibleList>

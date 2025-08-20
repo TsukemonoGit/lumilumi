@@ -137,18 +137,18 @@
             <div>error</div>
           {/snippet}
 
-          {#snippet children({ kind1, kind6, kind7, kind9735 })}
+          {#snippet children({ kind1, kind6, kind7, kind9735, status })}
             <!--kind6-->
-            <NoteRepostList events={kind6} />
+            <NoteRepostList events={kind6} {status} />
 
             <!--kind7-->
-            <NoteReactionList events={kind7} />
+            <NoteReactionList events={kind7} {status} />
 
             <!--zap レシート-->
-            <ZapReactionList events={kind9735} />
+            <ZapReactionList events={kind9735} {status} />
 
             <!--kind1,42-->
-            <CollapsibleList title="Comments" amount={kind1.length}>
+            <CollapsibleList title="Comments" amount={kind1.length} {status}>
               <div
                 class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
               >
