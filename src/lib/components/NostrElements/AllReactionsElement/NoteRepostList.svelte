@@ -3,14 +3,16 @@
   import CollapsibleList from "$lib/components/Elements/CollapsibleList.svelte";
 
   import RepostList from "./RepostList.svelte";
+  import type { ReqStatus } from "$lib/types";
   interface Props {
     events: Nostr.Event[];
+    status: ReqStatus;
   }
 
-  let { events }: Props = $props();
+  let { events, status }: Props = $props();
 </script>
 
-<CollapsibleList title="Repost" amount={events.length}>
+<CollapsibleList title="Repost" amount={events.length} {status}>
   <div class="mx-2">
     <RepostList {events} />
   </div>
