@@ -137,7 +137,7 @@
 
     // make sure this is called before any
     // window.nostr calls are made
-    if (browser && !nlBanner) {
+    if (browser) {
       try {
         initThemeSettings();
       } catch (error) {}

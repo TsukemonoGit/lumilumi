@@ -218,10 +218,11 @@
 {#if lumiSetting.get().showPreview}
   <div class=" mb-4">
     <div
-      class="p-2 bg-neutral-900
-     relative shadow-lg rounded-md min-h-[6.6rem]"
+      class="p-2 pb-1 bg-neutral-900
+     relative shadow-lg rounded-md min-h-[9.5rem]"
     >
       <div class="px-1 font-medium text-magnum-400">preview</div>
+
       <NoteComponent warningText={onWarning ? warningText : undefined}>
         {#snippet icon()}
           <!-- ミュート投稿のアイコン表示 -->
