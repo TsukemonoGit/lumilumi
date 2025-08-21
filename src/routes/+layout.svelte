@@ -71,6 +71,7 @@
   import { initThemeSettings } from "$lib/func/theme";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
 
   let { data, children } = $props<{
     data:
@@ -312,6 +313,11 @@
         {#snippet error()}error
         {/snippet}
         {#snippet contents()}
+          {#if lumiSetting.get().pubkey}<!--どのページでもkind3読み込んであるようにここに書いておく-->
+            <Contacts
+              queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
+              pubkey={lumiSetting.get().pubkey}
+            ></Contacts>{/if}
           <Header />
           <SetRepoReactions />
           <Menu />
