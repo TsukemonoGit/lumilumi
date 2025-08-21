@@ -219,7 +219,7 @@
   <div class=" mb-4">
     <div
       class="p-2 pb-1 bg-neutral-900
-     relative shadow-lg rounded-md min-h-[9.5rem]"
+     relative shadow-lg rounded-md min-h-[8.3rem]"
     >
       <div class="px-1 font-medium text-magnum-400">preview</div>
 
