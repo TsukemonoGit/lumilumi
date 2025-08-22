@@ -203,7 +203,7 @@
       const saved = localStorage.getItem(STORAGE_KEYS.LUMI_SETTINGS);
       if (!saved) return null;
       const parsed = JSON.parse(saved);
-      console.log(isValidLumiSetting(parsed));
+
       return isValidLumiSetting(parsed) ? parsed : null;
     } catch (error: any) {
       console.log(error);
