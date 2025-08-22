@@ -270,50 +270,76 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
   }
 };
 
-export function reactionCheck() {
+/**
+ * タイムライン表示およびリアクション通知を処理するイベントフィルター
+ * @param show リアクションイベントを通知トーストとして表示するかどうか
+ */
+export function reactionCheck(show: boolean) {
   return filter((packet: EventPacket) => {
+    // イベントとログインユーザーの情報を取得
+    const { event } = packet;
     const loginUserPubkey = lumiSetting.get().pubkey;
-    const isFollowingUser = (pubkey: string) =>
-      followList.get() && followList.get().has(pubkey);
 
-    const isTargetEventKind = [1, 6, 16, 42].includes(packet.event.kind); //TLに表示されるかもしれない
-    const isSelfPost = packet.event.pubkey === loginUserPubkey;
-    const containsUserTag = packet.event.tags.some(
+    // フォロー中かどうかを判定するヘルパー関数
+    const isFollowingUser = (pubkey: string): boolean =>
+      followList.get()?.has(pubkey) ?? false;
+
+    // 自分の投稿かどうか
+    const isSelfPost = event.pubkey === loginUserPubkey;
+
+    // 投稿に自分のユーザーID（pタグ）が含まれているか
+    const containsUserTag = event.tags.some(
       (tag) => tag[0] === "p" && tag[1] === loginUserPubkey
     );
+
+    // タイムラインに通常表示されるイベント種別を定義
+    const isTargetEventKind = [1, 6, 16, 42].includes(event.kind);
+
+    // タイムラインに流さず、自分へのリアクションとして処理されるイベントか
     const isReactionEvent =
       !isTargetEventKind && containsUserTag && !isSelfPost;
 
+    // 通知を設定するヘルパー関数
+    const maybeSetReaction = (canShow: boolean) => {
+      // 'show' が true で、かつ条件を満たす場合に通知をセット
+      if (show && canShow) {
+        setReactionEvent(packet);
+      }
+    };
+
+    // タイムラインに表示されるイベント種別の処理
     if (isTargetEventKind) {
-      // 通常の投稿や特定のイベント種別の場合
+      // 自分の投稿へのメンションやリプライがある場合
       if (!isSelfPost && containsUserTag) {
-        // 自分の投稿への反応
-        if (isFollowingUser(packet.event.pubkey)) {
-          // フォロイーからの反応 → タイムラインに表示
-          if (muteCheckEvent(packet.event) === "null") {
-            setReactionEvent(packet);
-          }
+        const isFollower = isFollowingUser(event.pubkey);
+
+        // 自分のフォロイーからの反応
+        if (isFollower) {
+          // タイムラインに表示し、ミュートされていなければ通知をセット
+          maybeSetReaction(muteCheckEvent(event) === "null");
           return true;
         } else {
-          // フォロー外からの反応 → 通知のみ、タイムラインには表示しない
-          if (muteCheckEvent(packet.event) === "null" && !get(onlyFollowee)) {
-            setReactionEvent(packet);
-          }
+          // フォロー外からの反応は通知のみ
+          const canShow =
+            muteCheckEvent(event) === "null" && !get(onlyFollowee);
+          maybeSetReaction(canShow);
           return false;
         }
       } else {
-        // 通常の投稿として流す
+        // それ以外（自分への言及がない通常の投稿）はタイムラインに流す
         return true;
-      }
-    } else if (isReactionEvent) {
-      // タイムラインには流さないイベント種別で、自分への反応
-      if (isFollowingUser(packet.event.pubkey)) {
-        setReactionEvent(packet);
-      } else if (!get(onlyFollowee)) {
-        setReactionEvent(packet);
       }
     }
 
+    // リアクションイベント（タイムラインに流さない）の処理
+    if (isReactionEvent) {
+      // フォロイーからのリアクション、または「フォロイーのみ」設定がオフの場合に通知をセット
+      const isFollower = isFollowingUser(event.pubkey);
+      const canShow = isFollower || !get(onlyFollowee);
+      maybeSetReaction(canShow);
+    }
+
+    // タイムラインに流さない場合はfalseを返す
     return false;
   });
 }

@@ -1,33 +1,41 @@
-<!--ColorThemeSe.EthiopicCalendar.svelte-->
-
+<!-- ColorThemeSe.EthiopicCalendar.svelte -->
 <script lang="ts">
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { setColorScheme, type ColorScheme } from "$lib/func/theme";
   import { melt, createSelect, type SelectOption } from "@melt-ui/svelte";
   import { onMount } from "svelte";
 
-  // カラースキームの型定義
+  // スキーム定義（ここだけ編集すればOK）
+  const colorSchemeMeta: Record<ColorScheme, { label: string; color: string }> =
+    {
+      default: { label: "Orange", color: "#f38d1c" },
+      blue: { label: "Blue", color: "#38a1f3" },
+      gray: { label: "Gray", color: "#999" },
+    };
 
-  // 選択候補
-  const colorSchemes: SelectOption<ColorScheme>[] = [
-    { value: "default", label: "Orange" },
-    { value: "gray", label: "Gray" },
-  ];
+  // 選択肢配列を自動生成
+  const colorSchemes: SelectOption<ColorScheme>[] = Object.entries(
+    colorSchemeMeta
+  ).map(([value, { label }]) => ({
+    value: value as ColorScheme,
+    label,
+  }));
 
-  // 保存されたスキームを取得
+  // value → option の対応Map
+  const optionByValue = new Map(colorSchemes.map((o) => [o.value, o]));
+
   let currentScheme: ColorScheme = "default";
 
   onMount(() => {
     const stored = localStorage?.getItem(STORAGE_KEYS.COLOR_SCHEME);
-    if (stored === "default" || stored === "gray") {
-      currentScheme = stored;
+    if (stored && stored in colorSchemeMeta) {
+      currentScheme = stored as ColorScheme;
+      setColorScheme(currentScheme);
     }
   });
 
   function schemeToOption(scheme: ColorScheme): SelectOption<ColorScheme> {
-    return (
-      colorSchemes.find(({ value }) => value === scheme) ?? colorSchemes[0]
-    );
+    return optionByValue.get(scheme) ?? colorSchemes[0];
   }
 
   function optionToScheme(option: SelectOption<ColorScheme>): ColorScheme {
@@ -49,12 +57,8 @@
   });
 
   const {
-    elements: { trigger, menu, arrow },
+    elements: { trigger, menu, arrow, option },
     states: { open },
-  } = select;
-
-  const {
-    elements: { option },
   } = select;
 </script>
 
@@ -83,7 +87,7 @@
       >
         <div
           class="w-3 h-3 rounded-full"
-          style="background-color: {value === 'default' ? '#f38d1c' : '#999'}"
+          style="background-color: {colorSchemeMeta[value].color}"
         ></div>
         <span class="text-sm font-semibold">{label}</span>
       </button>

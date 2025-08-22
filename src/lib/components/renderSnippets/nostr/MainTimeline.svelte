@@ -158,9 +158,10 @@
       operator = pipe(operator, userStatus());
     }
 
-    if (lumiSetting.get().showReactioninTL) {
-      operator = pipe(operator, reactionCheck());
-    }
+    operator = pipe(
+      operator,
+      reactionCheck(lumiSetting.get().showReactioninTL)
+    );
 
     return pipe(operator, saveEachNote(), scanArray());
   }
