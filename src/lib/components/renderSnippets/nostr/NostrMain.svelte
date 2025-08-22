@@ -8,7 +8,7 @@
     queryClient,
   } from "$lib/stores/stores";
   import { setRxNostr, setRelays } from "$lib/func/nostr";
-  import { onMount } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import {
     timelineFilterInit,
     type LumiEmoji,
@@ -37,8 +37,8 @@
     contents,
     loading,
   }: {
-    loading: import("svelte").Snippet;
-    contents: import("svelte").Snippet<[{ localRelays: DefaultRelayConfig[] }]>;
+    loading: Snippet;
+    contents: Snippet<[{ localRelays: DefaultRelayConfig[] }]>;
   } = $props();
 
   let localRelays: DefaultRelayConfig[] = $state.raw([]);
@@ -112,22 +112,33 @@
   }
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
-    if (typeof obj !== "object" || obj === null) return false;
+    if (typeof obj !== "object" || obj === null) {
+      console.log("obj is not object or is null:", obj);
+      return false;
+    }
 
     const o = obj as any;
 
     // 必須の文字列プロパティ
-    if (typeof o.pubkey !== "string" || typeof o.useRelaySet !== "string") {
+    if (typeof o.pubkey !== "string") {
+      console.log("pubkey is invalid:", o.pubkey);
+      return false;
+    }
+    if (typeof o.useRelaySet !== "string") {
+      console.log("useRelaySet is invalid:", o.useRelaySet);
       return false;
     }
 
     // relays配列のチェック
-    if (!Array.isArray(o.relays)) return false;
+    if (!Array.isArray(o.relays)) {
+      console.log("relays is not array:", o.relays);
+      return false;
+    }
 
     // booleanプロパティのチェック
     const boolKeys = [
       "showImg",
-      "embed",
+      // "embed",後で追加しやつだからこのプロパティがない状態で保存されていることもある 昔保存したデータをずっと使ってる人にはこのプロパティが存在しない。
       "showPreview",
       "menuleft",
       "showRelayIcon",
@@ -139,28 +150,48 @@
       "addClientTag",
     ];
     for (const key of boolKeys) {
-      if (typeof o[key] !== "boolean") return false;
+      if (typeof o[key] !== "boolean") {
+        console.log(`boolean property ${key} is invalid:`, o[key]);
+        return false;
+      }
     }
 
-    // numberプロパティのチェック
-    if (typeof o.picQuarity !== "number") return false;
+    // numberプロパティのチェック ,後で追加しやつだからこのプロパティがない状態で保存されていることもある
+    /*   if (typeof o.picQuarity !== "number") {
+      console.log("picQuarity is invalid:", o.picQuarity);
+      return false;
+    } */
 
-    // imageAutoExpandのチェック（"all" | "following" | "manual"）
-    if (
+    // imageAutoExpandのチェック 後で追加しやつだからこのプロパティがない状態で保存されていることもある
+    /*  if (
       typeof o.imageAutoExpand !== "string" ||
       !["all", "following", "manual"].includes(o.imageAutoExpand)
     ) {
+      console.log("imageAutoExpand is invalid:", o.imageAutoExpand);
       return false;
-    }
+    } */
 
     // defaultReactionオブジェクトのチェック
-    if (
-      typeof o.defaultReaction !== "object" ||
-      o.defaultReaction === null ||
-      typeof o.defaultReaction.content !== "string" ||
-      !Array.isArray(o.defaultReaction.tag) ||
-      !o.defaultReaction.tag.every((t: unknown) => typeof t === "string")
-    ) {
+    if (typeof o.defaultReaction !== "object" || o.defaultReaction === null) {
+      console.log("defaultReaction is invalid:", o.defaultReaction);
+      return false;
+    }
+    if (typeof o.defaultReaction.content !== "string") {
+      console.log(
+        "defaultReaction.content is invalid:",
+        o.defaultReaction.content
+      );
+      return false;
+    }
+    if (!Array.isArray(o.defaultReaction.tag)) {
+      console.log("defaultReaction.tag is not array:", o.defaultReaction.tag);
+      return false;
+    }
+    if (!o.defaultReaction.tag.every((t: unknown) => typeof t === "string")) {
+      console.log(
+        "defaultReaction.tag contains non-string:",
+        o.defaultReaction.tag
+      );
       return false;
     }
 
@@ -172,6 +203,7 @@
       const saved = localStorage.getItem(STORAGE_KEYS.LUMI_SETTINGS);
       if (!saved) return null;
       const parsed = JSON.parse(saved);
+
       return isValidLumiSetting(parsed) ? parsed : null;
     } catch (error: any) {
       console.log(error);
