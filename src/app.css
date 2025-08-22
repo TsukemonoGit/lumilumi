@@ -201,31 +201,31 @@
     --color-magnum-950: 10 10 10;
   }
   html.blue {
-    --color-magnum-50: 245 249 255;
-    --color-magnum-100: 229 239 254;
-    --color-magnum-200: 206 224 252;
-    --color-magnum-300: 171 204 247;
-    --color-magnum-400: 125 179 240;
-    --color-magnum-500: 88 152 230;
-    --color-magnum-600: 70 123 208;
-    --color-magnum-700: 61 100 184;
-    --color-magnum-800: 54 82 149;
-    --color-magnum-900: 49 69 118;
-    --color-magnum-950: 35 45 75;
+    --color-magnum-50: 247 249 252;
+    --color-magnum-100: 232 238 246;
+    --color-magnum-200: 208 222 237;
+    --color-magnum-300: 178 200 225;
+    --color-magnum-400: 141 174 210;
+    --color-magnum-500: 108 148 192;
+    --color-magnum-600: 86 122 167;
+    --color-magnum-700: 71 100 142;
+    --color-magnum-800: 60 83 117;
+    --color-magnum-900: 51 68 95;
+    --color-magnum-950: 36 45 66;
   }
 
   html.blue:not(.dark) {
-    --color-magnum-50: 35 45 75;
-    --color-magnum-100: 49 69 118;
-    --color-magnum-200: 54 82 149;
-    --color-magnum-300: 61 100 184;
-    --color-magnum-400: 70 123 208;
-    --color-magnum-500: 88 152 230;
-    --color-magnum-600: 125 179 240;
-    --color-magnum-700: 171 204 247;
-    --color-magnum-800: 206 224 252;
-    --color-magnum-900: 229 239 254;
-    --color-magnum-950: 245 249 255;
+    --color-magnum-50: 36 45 66;
+    --color-magnum-100: 51 68 95;
+    --color-magnum-200: 60 83 117;
+    --color-magnum-300: 71 100 142;
+    --color-magnum-400: 86 122 167;
+    --color-magnum-500: 108 148 192;
+    --color-magnum-600: 141 174 210;
+    --color-magnum-700: 178 200 225;
+    --color-magnum-800: 208 222 237;
+    --color-magnum-900: 232 238 246;
+    --color-magnum-950: 247 249 252;
   }
 }
 
