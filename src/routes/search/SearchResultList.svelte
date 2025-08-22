@@ -81,7 +81,7 @@
   };
 
   const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
-  const operator = pipe(uniq, userStatus(), reactionCheck(), scanArray());
+  const operator = pipe(uniq, userStatus(), /* reactionCheck(), */ scanArray());
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
   let reqFilters = $derived(
