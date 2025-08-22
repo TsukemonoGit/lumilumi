@@ -270,7 +270,7 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
   }
 };
 
-export function reactionCheck() {
+export function reactionCheck(show: boolean) {
   return filter((packet: EventPacket) => {
     const loginUserPubkey = lumiSetting.get().pubkey;
     const isFollowingUser = (pubkey: string) =>
@@ -290,13 +290,17 @@ export function reactionCheck() {
         // 自分の投稿への反応
         if (isFollowingUser(packet.event.pubkey)) {
           // フォロイーからの反応 → タイムラインに表示
-          if (muteCheckEvent(packet.event) === "null") {
+          if (show && muteCheckEvent(packet.event) === "null") {
             setReactionEvent(packet);
           }
           return true;
         } else {
           // フォロー外からの反応 → 通知のみ、タイムラインには表示しない
-          if (muteCheckEvent(packet.event) === "null" && !get(onlyFollowee)) {
+          if (
+            show &&
+            muteCheckEvent(packet.event) === "null" &&
+            !get(onlyFollowee)
+          ) {
             setReactionEvent(packet);
           }
           return false;
@@ -307,9 +311,9 @@ export function reactionCheck() {
       }
     } else if (isReactionEvent) {
       // タイムラインには流さないイベント種別で、自分への反応
-      if (isFollowingUser(packet.event.pubkey)) {
+      if (show && isFollowingUser(packet.event.pubkey)) {
         setReactionEvent(packet);
-      } else if (!get(onlyFollowee)) {
+      } else if (show && !get(onlyFollowee)) {
         setReactionEvent(packet);
       }
     }
