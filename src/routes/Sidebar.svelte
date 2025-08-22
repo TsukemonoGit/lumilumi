@@ -114,7 +114,7 @@
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
-    color: rgb(var(--color-magnum-50));
+    color: theme("colors.magnum.50");
     font-weight: 700;
     font-size: var(--text-xl);
     text-transform: uppercase;
@@ -138,7 +138,7 @@
     display: flex;
     align-items: center;
     padding: 0 0.5rem;
-    color: rgb(var(--color-magnum-50));
+    color: theme("colors.magnum.50");
     font-weight: 700;
     font-size: var(--text-xl);
     text-transform: uppercase;
@@ -147,7 +147,7 @@
     transition: color 0.2s linear;
   }
   nav li[aria-current="page"] a {
-    color: rgb(var(--color-magnum-400));
+    color: theme("colors.magnum.400");
   }
   /* .title {
     display: flex;
