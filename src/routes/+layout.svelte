@@ -104,8 +104,6 @@
   verificationClient.start();
   verifier.set(verificationClient.verifier);
 
-  let nlBanner: HTMLElement | null = null;
-
   onMount(async () => {
     document.addEventListener("nlAuth", (e: Event) => {
       const customEvent = e as CustomEvent;
