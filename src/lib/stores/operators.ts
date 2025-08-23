@@ -2,12 +2,7 @@ import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import { filter, from, map, mergeMap, of, pipe, scan, tap } from "rxjs";
-import {
-  metadataQueue,
-  onlyFollowee,
-  queryClient,
-  reactionToast,
-} from "./stores";
+import { metadataQueue, queryClient, reactionToast } from "./stores";
 import { get } from "svelte/store";
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
@@ -18,6 +13,7 @@ import {
   bookmark10003,
   followList,
   lumiSetting,
+  notifiSettings,
   timelineFilter,
   userStatusMap,
 } from "$lib/stores/globalRunes.svelte";
@@ -321,7 +317,8 @@ export function reactionCheck(show: boolean) {
         } else {
           // フォロー外からの反応は通知のみ
           const canShow =
-            muteCheckEvent(event) === "null" && !get(onlyFollowee);
+            muteCheckEvent(event) === "null" &&
+            !notifiSettings.get().onlyFollowee;
           maybeSetReaction(canShow);
           return false;
         }
@@ -335,7 +332,7 @@ export function reactionCheck(show: boolean) {
     if (isReactionEvent) {
       // フォロイーからのリアクション、または「フォロイーのみ」設定がオフの場合に通知をセット
       const isFollower = isFollowingUser(event.pubkey);
-      const canShow = isFollower || !get(onlyFollowee);
+      const canShow = isFollower || !notifiSettings.get().onlyFollowee;
       maybeSetReaction(canShow);
     }
 
