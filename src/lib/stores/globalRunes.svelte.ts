@@ -30,7 +30,7 @@ export const userStatusMap = createCustomStore<
 >(new SvelteMap());
 export const viewEventIds = createCustomStore<string[][]>([]);
 export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
-export const showBanner = createShowBanner();
+export const showBanner = createCustomStore<boolean>(true);
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
 export const authRelay = createCustomStore<string[]>([]);
@@ -60,32 +60,6 @@ function createCustomStore<T>(initialValue: T) {
       return () => {
         subscribers = subscribers.filter((s) => s !== subscriber);
       };
-    },
-  };
-}
-
-function createShowBanner() {
-  let _showBanner: boolean = $state(true);
-  let nlBanner: HTMLElement | null;
-
-  return {
-    setBanner: (banner: HTMLElement) => {
-      nlBanner = banner;
-    },
-    get: () => _showBanner,
-    set: (value: boolean) => {
-      _showBanner = value;
-      if (!nlBanner) {
-        nlBanner = document.getElementsByTagName(
-          "nl-banner"
-        )?.[0] as HTMLElement | null;
-      }
-      if (nlBanner) {
-        nlBanner.style.display = _showBanner ? "" : "none";
-      }
-    },
-    update: (updater: (current: boolean) => boolean) => {
-      _showBanner = updater(_showBanner);
     },
   };
 }

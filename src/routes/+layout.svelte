@@ -4,7 +4,7 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick, type Snippet } from "svelte";
+  import { onMount, tick, untrack, type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -171,39 +171,8 @@
       } catch (error) {
         console.log(error);
       }
-
-      nlBanner = await waitForBanner();
-
-      if (nlBanner) {
-        showBanner.setBanner(nlBanner);
-        console.log(nlBanner);
-      } else {
-        console.warn("nl-bannerが見つかりませんでした。");
-      }
     }
   });
-  // waitForBanner関数は変更なし
-  const waitForBanner = () => {
-    return new Promise<HTMLElement | null>((resolve) => {
-      const banner = document.querySelector("nl-banner") as HTMLElement | null;
-      if (banner) {
-        resolve(banner);
-        return;
-      }
-
-      const observer = new MutationObserver((mutations, obs) => {
-        const foundBanner = document.querySelector(
-          "nl-banner"
-        ) as HTMLElement | null;
-        if (foundBanner) {
-          resolve(foundBanner);
-          obs.disconnect();
-        }
-      });
-
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
-  };
 
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
@@ -216,19 +185,6 @@
     // フォーム送信以外でページが変わったらリセット
     if (navigate.type !== "form") {
       displayEvents.set([]);
-
-      // nlBannerがまだ取得されていなければ取得する
-      // awaitでnlBannerがDOMに追加されるまで待機
-      if (!nlBanner) {
-        nlBanner = await waitForBanner();
-      }
-
-      // nlBannerが取得できた場合にのみ、表示ロジックを実行
-      if (nlBanner) {
-        const isSettingsPage = navigate.to?.route.id === "/settings";
-        const shouldShow = isSettingsPage || showBanner.get();
-        nlBanner.style.display = shouldShow ? "" : "none";
-      }
     }
   });
 
@@ -287,6 +243,14 @@
       }
     }
   }
+
+  $effect(() => {
+    if (browser) {
+      const isSettingsPage = page.route.id === "/settings";
+      const shouldShow = isSettingsPage || showBanner.get();
+      document.body.classList.toggle("hide-nostr-login", !shouldShow);
+    }
+  });
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />
