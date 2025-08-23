@@ -375,3 +375,7 @@ article {
 .actionButton {
   @apply hover:opacity-75 active:bg-magnum-400/20  active:opacity-100 rounded-full text-magnum-500/75 overflow-hidden px-1 py-0.5 disabled:opacity-0;
 }
+
+body.hide-nostr-login nl-banner {
+  display: none;
+}

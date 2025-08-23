@@ -1,11 +1,6 @@
 import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 import { notifiSettings } from "$lib/stores/globalRunes.svelte";
-import { NOTIFICATION_TYPES } from "./notificationTypes";
-
-export type NotifiSettings = {
-  onlyFollowee: boolean;
-  selects: string[];
-};
+import { NOTIFICATION_TYPES, type NotifiSettings } from "./notificationTypes";
 
 // load or migrate (but not auto-save updates)
 export function migrateNotifiSettings() {

@@ -4,7 +4,7 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick, type Snippet } from "svelte";
+  import { onMount, tick, untrack, type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -104,8 +104,6 @@
   verificationClient.start();
   verifier.set(verificationClient.verifier);
 
-  let nlBanner: HTMLElement | null = null;
-
   onMount(async () => {
     document.addEventListener("nlAuth", (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -171,16 +169,6 @@
       } catch (error) {
         console.log(error);
       }
-
-      await tick();
-
-      nlBanner = document.getElementsByTagName(
-        "nl-banner"
-      )?.[0] as HTMLElement | null;
-      if (nlBanner) {
-        showBanner.setBanner(nlBanner);
-        console.log(nlBanner);
-      }
     }
   });
 
@@ -191,20 +179,10 @@
     }
   }
 
-  afterNavigate((navigate) => {
-    //ページが変わったらリセット
+  afterNavigate(async (navigate) => {
+    // フォーム送信以外でページが変わったらリセット
     if (navigate.type !== "form") {
       displayEvents.set([]);
-
-      //設定ページに変わった場合バナーを表示
-      if (navigate.to?.route.id === "/settings" && nlBanner) {
-        nlBanner.style.display = "";
-        //設定ページ以外に変わった場合はshowBannerの値によっていれる
-      } else if (nlBanner) {
-        const shouldShow = showBanner.get();
-
-        nlBanner.style.display = shouldShow ? "" : "none";
-      }
     }
   });
 
@@ -263,6 +241,14 @@
       }
     }
   }
+
+  $effect(() => {
+    if (browser) {
+      const isSettingsPage = page.route.id === "/settings";
+      const shouldShow = isSettingsPage || showBanner.get();
+      document.body.classList.toggle("hide-nostr-login", !shouldShow);
+    }
+  });
 </script>
 
 <svelte:document on:visibilitychange={onVisibilityChange} />

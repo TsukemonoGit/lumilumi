@@ -1,6 +1,11 @@
 import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
 import { notificationKinds } from "$lib/func/constants";
 
+export type NotifiSettings = {
+  onlyFollowee: boolean;
+  selects: string[];
+};
+
 export type NotificationType = {
   id: string;
   title: any;
