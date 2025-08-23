@@ -172,14 +172,15 @@
         console.log(error);
       }
 
-      await tick();
-
-      nlBanner = document.getElementsByTagName(
-        "nl-banner"
-      )?.[0] as HTMLElement | null;
-      if (nlBanner) {
-        showBanner.setBanner(nlBanner);
-        console.log(nlBanner);
+      for (let i = 0; i < 2; i++) {
+        await tick();
+        nlBanner = document.querySelector("nl-banner") as HTMLElement | null;
+        if (nlBanner) {
+          showBanner.setBanner(nlBanner);
+          console.log(nlBanner);
+          break;
+        }
+        await tick();
       }
     }
   });

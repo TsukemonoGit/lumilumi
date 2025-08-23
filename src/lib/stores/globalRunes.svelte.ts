@@ -8,8 +8,11 @@ import * as Nostr from "nostr-typedef";
 import type { ConnectionState } from "rx-nostr";
 import type { EventVerifier } from "rx-nostr-crypto";
 import { SvelteMap } from "svelte/reactivity";
-import type { NotifiSettings } from "../../routes/notifications/notifiSettingsRepository";
-import { notifiInit } from "../../routes/notifications/notificationTypes";
+
+import {
+  notifiInit,
+  type NotifiSettings,
+} from "../../routes/notifications/notificationTypes";
 
 export const notifiSettings = createCustomStore<NotifiSettings>(notifiInit);
 export const loginUser = createCustomStore<string>("");

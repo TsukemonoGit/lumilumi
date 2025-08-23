@@ -12,6 +12,7 @@ import type {
 } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import type { Readable } from "svelte/store";
+import type { NotifiSettings } from "../routes/notifications/notificationTypes";
 
 export type RxReqBase = RxReq;
 
