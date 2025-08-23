@@ -4,7 +4,6 @@
     emojis,
     mutebykinds,
     mutes,
-    onlyFollowee,
     queryClient,
   } from "$lib/stores/stores";
   import { setRxNostr, setRelays } from "$lib/func/nostr";
@@ -32,6 +31,7 @@
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
 
   let {
     contents,
@@ -47,8 +47,9 @@
   onMount(() => {
     try {
       initializeRxNostr();
-      const followee = localStorage.getItem(STORAGE_KEYS.OLD_ONLY_FOLLOWEE);
-      if (followee === "true") $onlyFollowee = true;
+      // Load migrated settings
+
+      migrateNotifiSettings();
 
       const raw = localStorage.getItem(STORAGE_KEYS.TIMELINE_FILTER);
       let saved: unknown = null;

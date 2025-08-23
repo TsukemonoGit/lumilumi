@@ -1,12 +1,7 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import {
-    nowProgress,
-    onlyFollowee,
-    queryClient,
-    tie,
-  } from "$lib/stores/stores";
+  import { nowProgress, queryClient, tie } from "$lib/stores/stores";
   import {
     type QueryKey,
     createQuery,
@@ -29,7 +24,11 @@
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
-  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    displayEvents,
+    lumiSetting,
+    notifiSettings,
+  } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const SLIDE_AMOUNT = 40; // Amount to slide when navigating
@@ -159,7 +158,7 @@
   });
 
   // Update view when follow filter changes
-  onlyFollowee.subscribe(() => {
+  notifiSettings.subscribe(() => {
     updateViewNotifi();
   });
 

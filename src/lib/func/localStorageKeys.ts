@@ -16,7 +16,7 @@ export const STORAGE_KEYS = {
   // 移行前の旧キー
   OLD_ONLY_FOLLOWEE: "onlyFollowee",
   // 移行後の新キー
-  NOTIFI_SETTINGS: "lumi-notifications", //{onluFollowee:boolean,selects:string[]}
+  NOTIFI_SETTINGS: "lumi-notifi", //{onluFollowee:boolean,selects:string[]}
 };
 
 export const getKind3Key = (pubkey: string) => `kind3-${pubkey}`;

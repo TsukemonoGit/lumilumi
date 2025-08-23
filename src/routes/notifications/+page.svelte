@@ -1,13 +1,12 @@
 <script lang="ts">
   import { now, type EventPacket } from "rx-nostr";
-  import { onlyFollowee, queryClient } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { onMount } from "svelte";
   import { createToggleGroup, melt } from "@melt-ui/svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import type { QueryKey } from "@tanstack/svelte-query";
   import type * as Nostr from "nostr-typedef";
-  import { Heart, Repeat2, Reply, Zap } from "lucide-svelte";
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import NotificationFilter from "./NotificationFilter.svelte";
@@ -15,43 +14,29 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import NotificationList from "./NotificationList.svelte";
   import { extractKind9734 } from "$lib/func/zap";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    followList,
+    lumiSetting,
+    notifiSettings,
+  } from "$lib/stores/globalRunes.svelte";
+
   import { notificationKinds } from "$lib/func/constants";
+  import { NOTIFICATION_TYPES } from "./notificationTypes";
+  import { saveNotifiSettings } from "./notifiSettingsRepository";
 
   // Constants
   const TIMELINE_QUERY: QueryKey = ["notifications"];
-
   const DISPLAY_AMOUNT = 50;
   const INITIAL_LOAD_LIMIT = 100;
 
-  // Notification types configuration
-  type NotificationType = {
-    id: string;
-    title: any;
-    kinds: number[];
-  };
-
-  // Define base notification types
-  const BASE_NOTIFICATION_TYPES: NotificationType[] = [
-    { id: "reaction", title: Heart, kinds: [7] },
-    { id: "reply", title: Reply, kinds: [1] },
-    { id: "repost", title: Repeat2, kinds: [6, 16] },
-    { id: "zap", title: Zap, kinds: [9735] },
-  ];
-
-  // Get all kinds covered by specific notification types
-  const coveredKinds = BASE_NOTIFICATION_TYPES.flatMap((type) => type.kinds);
-
-  // Generate "other" kinds dynamically
-  const otherKinds = notificationKinds.filter(
-    (kind) => !coveredKinds.includes(kind)
-  );
-
-  // Complete notification types including "other" category
-  const NOTIFICATION_TYPES: NotificationType[] = [
-    ...BASE_NOTIFICATION_TYPES,
-    { id: "other", title: "other", kinds: otherKinds },
-  ];
+  // Initialize toggle group for notification filtering
+  const {
+    elements: { root, item },
+    states: { value },
+  } = createToggleGroup({
+    type: "multiple",
+    defaultValue: notifiSettings.get().selects,
+  });
 
   // State
   let viewIndex = 0;
@@ -73,15 +58,6 @@
         ]
       : null
   );
-
-  // Initialize toggle group for notification filtering
-  const {
-    elements: { root, item },
-    states: { value },
-  } = createToggleGroup({
-    type: "multiple",
-    defaultValue: NOTIFICATION_TYPES.map((type) => type.id),
-  });
 
   // Lifecycle hooks
   onMount(async () => {
@@ -111,35 +87,29 @@
   // Subscribe to filter changes
   value?.subscribe((val) => {
     setTimeout(() => {
-      if (val !== undefined && updateViewNotifi) {
+      if (Array.isArray(val) && updateViewNotifi) {
         updateViewNotifi();
+
+        saveNotifiSettings({
+          onlyFollowee: notifiSettings.get().onlyFollowee,
+          selects: val,
+        });
       }
-    }, 0); // Delay to ensure value is updated
+    }, 0);
   });
 
   // Filter helpers
   function getNotificationFilterPredicate(event: Nostr.Event): boolean {
-    // Skip self-notifications
-    if (event.pubkey === lumiSetting.get()?.pubkey) {
-      return false;
+    if (event.pubkey === lumiSetting.get()?.pubkey) return false;
+
+    if (notifiSettings.get().onlyFollowee && followList.get()) {
+      if (!isEventFromFollowedUser(event)) return false;
     }
 
-    // Apply follow filter if needed
-    if ($onlyFollowee && followList.get()) {
-      if (!isEventFromFollowedUser(event)) {
-        return false;
-      }
-    }
-
-    // Verify p-tag addresses the current user for certain event kinds
     if ([7, 6, 16].includes(event.kind)) {
-      //別のユーザーあての可能性あるからラストが自分か確認
-      if (!isEventAddressedToUser(event)) {
-        return false;
-      }
+      if (!isEventAddressedToUser(event)) return false;
     }
 
-    // Apply selected notification type filters
     return isSelectedNotificationType(event);
   }
 
@@ -150,7 +120,6 @@
     if (event.kind !== 9735) {
       return followListSet.has(event.pubkey);
     } else {
-      // For zap receipts, check the sender from kind 9734
       const kind9734 = extractKind9734(event);
       return (kind9734 && followListSet.has(kind9734.pubkey)) || false;
     }
@@ -160,7 +129,6 @@
     const targetPubkey = event.tags.findLast(
       (tag) => tag[0] === "p" && tag.length > 1
     )?.[1];
-
     return targetPubkey === lumiSetting.get().pubkey;
   }
 
@@ -174,6 +142,7 @@
       return typeConfig.kinds.includes(event.kind);
     });
   }
+
   // Toggle button handlers
   function selectAllNotificationTypes() {
     value.set(NOTIFICATION_TYPES.map((type) => type.id));
@@ -189,12 +158,10 @@
       queryClient?.getQueryData(TIMELINE_QUERY);
     if (!filters) return;
     if (!existingEvents || existingEvents.length <= 0) {
-      // First load - get historical events
       filters[0].since = undefined;
       filters[0].limit = INITIAL_LOAD_LIMIT;
       filters[0].until = now();
     } else {
-      // Subsequent load - get new events since last known
       filters[0].since = existingEvents[0].event.created_at;
       filters[0].until = now();
     }
@@ -308,16 +275,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     user-select: none;
-
     border-radius: 0;
     background-color: theme("colors.neutral.800");
-
     color: theme("colors.magnum.200");
     font-weight: 500;
     line-height: 1;
-
     flex: 1;
     height: theme(spacing.12);
     padding-inline: theme(spacing.2);
@@ -363,6 +326,7 @@
   .toggle-item[data-state="on"] {
     @apply bg-magnum-200 text-magnum-900;
   }
+
   .toggle-item:disabled {
     @apply bg-magnum-200 text-magnum-900;
   }

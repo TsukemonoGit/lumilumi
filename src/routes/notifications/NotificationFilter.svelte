@@ -1,21 +1,20 @@
 <script lang="ts">
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { followList } from "$lib/stores/globalRunes.svelte";
-
-  import { onlyFollowee } from "$lib/stores/stores";
+  import { followList, notifiSettings } from "$lib/stores/globalRunes.svelte";
 
   import { t as _ } from "@konemono/svelte5-i18n";
+  import { saveNotifiSettings } from "./notifiSettingsRepository";
+
+  let onlyFollowee = $derived(notifiSettings.get().onlyFollowee);
 
   const handleChangeChecked = () => {
-    console.log($onlyFollowee);
-    try {
-      localStorage.setItem(
-        STORAGE_KEYS.OLD_ONLY_FOLLOWEE,
-        $onlyFollowee.toString()
-      );
-    } catch (error) {
-      console.log("Failed to save");
-    }
+    notifiSettings.update((current) => {
+      const updated = {
+        ...current,
+        onlyFollowee: !notifiSettings.get().onlyFollowee,
+      };
+      saveNotifiSettings(updated);
+      return updated;
+    });
   };
 </script>
 
@@ -24,7 +23,7 @@
     <input
       type="checkbox"
       class="rounded-checkbox"
-      bind:checked={$onlyFollowee}
+      bind:checked={onlyFollowee}
       onchange={handleChangeChecked}
     />
     {$_("notifications.onlyFollowee")}
