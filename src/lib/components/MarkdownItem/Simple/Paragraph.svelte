@@ -58,7 +58,7 @@
 
 <style>
   p {
-    margin-bottom: 0.5rem; /* 1.5remから値を小さく調整 */
-    line-height: 1.6;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
   }
 </style>
