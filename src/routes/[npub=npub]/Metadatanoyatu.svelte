@@ -31,7 +31,7 @@
   <Metadata queryKey={["metadata", pubkey]} {pubkey}>
     {#snippet loading()}
       <EmptyCard nevent={encodedPub} name={cardName}>
-        <div class="ml-auto">
+        <div class="float-end">
           <FollowButton {pubkey} />
         </div>
         loading {encodedPub}
