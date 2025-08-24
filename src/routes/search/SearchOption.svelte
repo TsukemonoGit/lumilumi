@@ -18,6 +18,7 @@
   interface Props {
     searchWord: string | undefined;
     followee: boolean;
+    excludeProxy: boolean;
     createFilter: () => void;
     searchKind: number | undefined;
     searchPubkey: string | undefined;
@@ -33,6 +34,7 @@
     searchWord = $bindable(),
     followee = $bindable(),
     createFilter,
+    excludeProxy = $bindable(),
     searchKind = $bindable(undefined),
     searchPubkey = $bindable(),
     searchPubkeyTo = $bindable(),
@@ -153,6 +155,16 @@
           {$_("search.followee")}
         </label>
       </div>{/if}
+    <div class="py-2 self-start">
+      <label class="justify-center flex items-center gap-1">
+        <input
+          type="checkbox"
+          class="rounded-checkbox"
+          bind:checked={excludeProxy}
+        />
+        {$_("search.excludeproxynote")}
+      </label>
+    </div>
   </div>
   <button
     class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
