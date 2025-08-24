@@ -710,16 +710,10 @@ interface UseMediaPromiseReqOpts<T> {
   filters: any;
   req?: any;
 }
-
 export function useMediaPromiseReq(
-  {
-    filters,
-
-    req,
-  }: UseMediaPromiseReqOpts<MediaOperatorOutput>,
+  { filters, req }: UseMediaPromiseReqOpts<MediaOperatorOutput>,
   relays: string[] | undefined,
   timeout: number | undefined = 3000,
-
   sift: number,
   onData?: (result: MediaResult) => void
 ): Promise<MediaOperatorOutput> {
@@ -746,11 +740,14 @@ export function useMediaPromiseReq(
 
   let accumulatedData: MediaResult[] = [];
   let oldestCreatedAt = 0;
-  let totalPacketsProcessed = 0;
+  let lastReceivedData: MediaOperatorState | null = null; // 最後に受け取ったデータを保持
 
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+  const [uniq, eventIds] = createUniq(keyFn);
+  eventIds.clear();
   const obs: Observable<MediaOperatorState> = _rxNostr
     .use(_req, { relays: relays })
-    .pipe(uniq(), mediaOperator(sift), completeOnTimeout(timeout));
+    .pipe(uniq, mediaOperator(sift), completeOnTimeout(timeout));
 
   return new Promise<MediaOperatorOutput>((resolve, reject) => {
     const timeoutId = setTimeout(() => {
@@ -758,16 +755,15 @@ export function useMediaPromiseReq(
       resolve({
         result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
         oldestCreatedAt,
-        totalPacketsProcessed,
+        totalPacketsProcessed: lastReceivedData?.totalPacketsProcessed ?? 0,
       });
     }, timeout + 10000);
 
     const subscription = obs.subscribe({
       next: (v) => {
-        //console.log(v.result);
+        lastReceivedData = v; // 最後に受け取ったデータを保存
         accumulatedData = [...accumulatedData, v.result];
         oldestCreatedAt = v.oldestCreatedAt;
-        totalPacketsProcessed = v.totalPacketsProcessed;
 
         if (onData) {
           onData(v.result);
@@ -778,7 +774,7 @@ export function useMediaPromiseReq(
         resolve({
           result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
           oldestCreatedAt,
-          totalPacketsProcessed,
+          totalPacketsProcessed: lastReceivedData?.totalPacketsProcessed ?? 0,
         });
       },
       error: (e) => {
@@ -788,7 +784,7 @@ export function useMediaPromiseReq(
         resolve({
           result: accumulatedData.slice(0, sift === 0 ? undefined : sift),
           oldestCreatedAt,
-          totalPacketsProcessed,
+          totalPacketsProcessed: lastReceivedData?.totalPacketsProcessed ?? 0,
         });
       },
     });

@@ -162,13 +162,8 @@
   });
 
   const keyFn = (packet: EventPacket): string => packet.event.id;
-  const onCache = (packet: EventPacket): void => {
-    // Event observed for the first time
-  };
-  const onHit = (packet: EventPacket): void => {
-    // Event has already been observed
-  };
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+
+  const [uniq, eventIds] = createUniq(keyFn);
 
   // Create the timeline event list
   let result = useTimelineEventList(
