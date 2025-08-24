@@ -52,7 +52,7 @@
     >
       <UserZap {metadata} comment="Happy Birthday🎉"
         ><Zap
-          class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 stroke-yellow-400 fill-yellow-400 rounded-full hover:brightness-125   hover:scale-110 active:scale-90 transition duration-150 ease-in-out transform hover:rotate-180"
+          class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 stroke-yellow-400 fill-yellow-400 rounded-full hover:brightness-125   hover:scale-110 active:scale-90 transition duration-150 ease-in-out transform hover:rotate-180 "
           size="{character.size}rem"
         /></UserZap
       >
