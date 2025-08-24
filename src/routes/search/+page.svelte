@@ -47,6 +47,8 @@
 
   let searchRelays = $state(nip50relays);
 
+  let excludeProxy = $state(false);
+
   let isMount = false;
   afterNavigate((navigate) => {
     openSearchResult = false;
@@ -273,6 +275,19 @@
     // }
     $nowProgress = false;
   };
+
+  const eventFilter = (ev: Nostr.Event): boolean => {
+    // excludeProxy が false の場合は、常に true (フィルタリングしない) を返す
+    if (!excludeProxy) {
+      return true;
+    }
+
+    // "proxy" タグの値を取得する
+    const proxyTagValue = ev.tags.find((tag) => tag[0] === "proxy")?.[2];
+    if (!proxyTagValue) return true;
+    // "rss", "web" 以外は false を返してフィルター
+    return ["rss", "web"].includes(proxyTagValue);
+  };
 </script>
 
 <section>
@@ -283,6 +298,7 @@
       {onClickSave}
       Description={SearchDescription}
     />{/if}<SearchOption
+    bind:excludeProxy
     bind:searchKind
     bind:searchHashtag
     bind:searchWord
@@ -307,6 +323,7 @@
   </div>
   {#if openSearchResult}
     <SearchResult
+      {eventFilter}
       bind:this={compRef}
       filters={showFilters}
       relays={searchRelays}

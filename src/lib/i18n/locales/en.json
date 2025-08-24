@@ -329,7 +329,8 @@
     "ward": "Search word",
     "followee": "only followee",
     "options": "Options",
-    "search": "Search"
+    "search": "Search",
+    "excludeproxynote": "Exclude posts from other social media."
   },
   "settei": {
     "search": "Search Relays",

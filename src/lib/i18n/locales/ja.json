@@ -329,7 +329,8 @@
     "ward": "検索ワード",
     "followee": "フォロイーのみ",
     "options": "追加条件",
-    "search": "検索"
+    "search": "検索",
+    "excludeproxynote": "他SNSの投稿を除外する"
   },
   "settei": {
     "search": "検索リレー",

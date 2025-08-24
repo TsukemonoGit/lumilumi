@@ -27,7 +27,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { readable } from "svelte/store";
   import { sortEvents } from "$lib/func/util";
-  import { userStatus, reactionCheck, scanArray } from "$lib/stores/operators";
+  import { userStatus, scanArray } from "$lib/stores/operators";
   import { pipe } from "rxjs";
   import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { useSearchEventList } from "$lib/stores/useSearchEventList";
@@ -73,14 +73,7 @@
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
 
-  const onCache = (packet: EventPacket): void => {
-    //console.log(`${packet.event.id} を初めて観測しました`);
-  };
-  const onHit = (packet: EventPacket): void => {
-    //  console.log(`${packet.event.id} はすでに観測されています`);
-  };
-
-  const [uniq, eventIds] = createUniq(keyFn, { onCache, onHit });
+  const [uniq, eventIds] = createUniq(keyFn);
   const operator = pipe(uniq, userStatus(), /* reactionCheck(), */ scanArray());
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空

@@ -17,9 +17,10 @@
   interface Props {
     filters: Nostr.Filter[];
     relays: string[];
+    eventFilter: (ev: Nostr.Event) => boolean;
   }
 
-  let { filters, relays }: Props = $props();
+  let { filters, relays, eventFilter }: Props = $props();
   const req = createRxForwardReq();
   $inspect(filters);
 
@@ -40,6 +41,7 @@
   <!--untilが設定されてたら現在のあれをあれしなくていいことかんがえておいて何日から何日までってできるけど何日までの新しいのから何個分を表示してる感じになってるから何日までの方の設定だけでいいかも後ろのやつは🔻で足せるし-->
   <SearchResultList
     queryKey={["search"]}
+    {eventFilter}
     {filters}
     {req}
     {viewIndex}
