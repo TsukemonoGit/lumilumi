@@ -1,8 +1,9 @@
 <script lang="ts">
   import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
   import Kind0Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind0Note.svelte";
-
+  import FollowButton from "$lib/components/NostrElements/user/FollowButton.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
+  import { followList } from "$lib/stores/globalRunes.svelte";
   import * as nip19 from "nostr-tools/nip19";
 
   interface Props {
@@ -10,32 +11,51 @@
   }
 
   let { pubkey }: Props = $props();
-  let encodedPub: string | undefined = $derived.by(() => {
-    if (!pubkey) return undefined;
+
+  const encodedPub = $derived.by(() => {
     try {
-      return nip19.npubEncode(pubkey);
+      if (pubkey) {
+        return nip19.npubEncode(pubkey);
+      }
     } catch (error) {
-      return undefined;
+      console.error("NIP-19 encoding failed:", error);
     }
+    return undefined;
   });
+
+  const petname = $derived(followList.get().get(pubkey));
+  const cardName = $derived(petname ? `📛${petname}` : undefined);
 </script>
 
 <div class="w-full overflow-hidden">
   <Metadata queryKey={["metadata", pubkey]} {pubkey}>
-    {#snippet loading()}<EmptyCard nevent={encodedPub}
-        >loading {encodedPub}</EmptyCard
-      >
+    {#snippet loading()}
+      <EmptyCard nevent={encodedPub} name={cardName}>
+        <div class="ml-auto">
+          <FollowButton {pubkey} />
+        </div>
+        loading {encodedPub}
+      </EmptyCard>
     {/snippet}
+
     {#snippet nodata()}
-      <EmptyCard pulse={false} nevent={encodedPub}
-        >not found {encodedPub}</EmptyCard
-      >
+      <EmptyCard pulse={false} nevent={encodedPub} name={cardName} menu={false}
+        ><div class="float-end">
+          <FollowButton {pubkey} />
+        </div>
+        not found {encodedPub}
+      </EmptyCard>
     {/snippet}
+
     {#snippet error()}
-      <EmptyCard pulse={false} nevent={encodedPub}
-        >not found {encodedPub}</EmptyCard
-      >
+      <EmptyCard pulse={false} nevent={encodedPub} name={cardName} menu={false}>
+        <div class="float-end">
+          <FollowButton {pubkey} />
+        </div>
+        not found {encodedPub}
+      </EmptyCard>
     {/snippet}
+
     {#snippet content({ metadata })}
       <Kind0Note
         note={metadata}

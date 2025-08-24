@@ -51,7 +51,7 @@
               />
             </span>{/if}{/if}{#if petname}<span class="text-magnum-100"
             >📛{petname}</span
-          >{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}{/if}
+          >{/if}{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}
       </div>
       <div class="ml-auto">
         <FollowButton pubkey={note.pubkey} />
