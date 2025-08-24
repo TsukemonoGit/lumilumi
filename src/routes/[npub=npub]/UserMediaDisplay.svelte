@@ -157,6 +157,7 @@
                   a.eventPacket.event.created_at
               );
 
+            const previousOldestCreatedAt = oldestCreatedAt;
             oldestCreatedAt = results.oldestCreatedAt;
             currentUntil = results.oldestCreatedAt;
 
@@ -168,14 +169,30 @@
               "required:",
               page * MEDIA_PER_PAGE + MEDIA_PER_PAGE,
               "mediaLen:",
-              mediaEvents.length
+              mediaEvents.length,
+              "totalPackets:",
+              results.totalPacketsProcessed
             );
 
+            // 必要な数に達したら終了
             if (mediaEvents.length >= page * MEDIA_PER_PAGE + MEDIA_PER_PAGE) {
+              console.log("必要な数のメディアを取得完了");
               break;
             }
 
-            if (results.totalPacketsProcessed < LOAD_LIMIT) {
+            // より確実な終了判定
+            if (results.totalPacketsProcessed <= 0) {
+              console.log("もうイベントないよ（新しいイベントが0個）");
+              maxPage = page;
+              break;
+            }
+
+            // 追加の安全チェック: oldestCreatedAtが変わらない場合
+            if (
+              previousOldestCreatedAt === results.oldestCreatedAt &&
+              retryCount > 0
+            ) {
+              console.log("もうイベントないよ（時刻が進まない）");
               maxPage = page;
               break;
             }
