@@ -3,12 +3,45 @@
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
   import { X } from "lucide-svelte";
+  import { onMount } from "svelte";
 
   let { metadata } = $props();
   let zapOpen = $state(false);
   let visible = $state(true);
   let fadingOut = $state(false);
+  let animationTimer: ReturnType<typeof setTimeout> | null; // アニメーションタイマーの参照を保持
+  // アニメーションタイマーをセットする関数
+  function setAnimationTimer() {
+    // 既存のタイマーがあればクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+    }
 
+    // 新しいタイマーをセット
+    animationTimer = setTimeout(() => {
+      // タイマー終了時にzapOpenがtrueの場合は延長
+      if (zapOpen) {
+        // タイマーを再設定（延長）
+        setAnimationTimer();
+      } else {
+        // zapOpenがfalseならアニメーションを終了
+        endAnimation();
+      }
+    }, 12000); // 元のタイマーと同じ12秒に設定
+  }
+  function endAnimation() {
+    visible = false;
+    // タイマーをクリア
+    if (animationTimer) {
+      clearTimeout(animationTimer);
+      animationTimer = null;
+    }
+  }
+
+  onMount(() => {
+    // アニメーションタイマーを設定
+    setAnimationTimer();
+  });
   function close() {
     fadingOut = true;
     setTimeout(() => (visible = false), 500);
