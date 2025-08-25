@@ -6,7 +6,7 @@
   import { encodetoNote } from "$lib/func/encode";
   import EmptyListCard from "./layout/EmptyListCard.svelte";
   import * as Nostr from "nostr-typedef";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelayById } from "$lib/func/nostr";
 
   interface Props {
     id: string; //kind40 channel id
@@ -28,9 +28,7 @@
 
   let loadingText = $derived(encodetoNote(id));
   const onChange = (event: Nostr.Event) => {
-    heyaRelay = getRelaysById(id).filter((relay) =>
-      relay.startsWith("wss://")
-    )[0];
+    heyaRelay = getRelayById(id);
   };
 </script>
 

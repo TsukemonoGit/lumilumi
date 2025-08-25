@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { MessagesSquare, X, Plus, Minus } from "lucide-svelte";
+  import { MessagesSquare, Plus, Minus } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";

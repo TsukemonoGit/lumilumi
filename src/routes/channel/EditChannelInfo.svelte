@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { X, Plus, Minus } from "lucide-svelte";
+  import { Plus, Minus } from "lucide-svelte";
   import { fade } from "svelte/transition";
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
@@ -13,7 +13,7 @@
   import { clientTag } from "$lib/func/constants";
   import InputImageFromFile from "../[npub=npub]/profile/InputImageFromFile.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelayById } from "$lib/func/nostr";
   import { formatToEventPacket, generateResultMessage } from "$lib/func/util";
 
   import type { Writable } from "svelte/store";
@@ -118,17 +118,9 @@
         about: channelAbout.trim(),
         picture: channelPicture.trim(),
       };
-      const relayhints = getRelaysById(note.id);
+      const relayhint = getRelayById(note.id);
       // tags の作成
-      const tags: string[][] = [
-        [
-          "e",
-          heyaId,
-          relayhints.filter((r) => r.startsWith("wss://"))?.[0] ?? "",
-          "root",
-          note.pubkey,
-        ],
-      ];
+      const tags: string[][] = [["e", heyaId, relayhint, "root", note.pubkey]];
 
       // カテゴリータグを追加
       categories.forEach((cat) => {

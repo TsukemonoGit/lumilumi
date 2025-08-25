@@ -10,6 +10,7 @@
   import { npubRegex } from "$lib/func/regex";
   import { nip19 } from "nostr-tools";
   import { getUserProfile } from "$lib/func/customEmoji";
+  import { getRelayById } from "$lib/func/nostr";
 
   interface Props {
     note: Nostr.Event | undefined;
@@ -58,10 +59,15 @@
 
     const tags: string[][] = root ? [root] : [];
 
+    const relayHint = getRelayById(note.id);
     //atagでもetagもいれてリアクションするらしい
-    tags.push(["p", note.pubkey], ["e", note.id], ["k", note.kind.toString()]);
+    tags.push(
+      ["p", note.pubkey],
+      ["e", note.id, relayHint, note.pubkey],
+      ["k", note.kind.toString()]
+    );
     if (atag) {
-      tags.push(["a", atag]);
+      tags.push(["a", atag, relayHint]);
     }
 
     if (lumiSetting.get().addClientTag) {
@@ -85,15 +91,17 @@
 
     const tags: string[][] = root ? [root] : [];
 
+    const relayHint = getRelayById(note.id);
+    //atagでもetagもいれてリアクションするらしい
+    tags.push(
+      ["p", note.pubkey],
+      ["e", note.id, relayHint, note.pubkey],
+      ["k", note.kind.toString()]
+    );
     if (atag) {
-      tags.push(["p", note.pubkey], ["a", atag], ["k", note.kind.toString()]);
-    } else {
-      tags.push(
-        ["p", note.pubkey],
-        ["e", note.id],
-        ["k", note.kind.toString()]
-      );
+      tags.push(["a", atag, relayHint]);
     }
+
     tags.push(["emoji", ...e]);
 
     const ev: Nostr.EventParameters = {
