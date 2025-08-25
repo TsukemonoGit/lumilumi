@@ -557,10 +557,38 @@ export function reconnectRelay(url: string) {
   get(app).rxNostr.reconnect(url);
 }
 
+/**
+ * 指定した id に対応するすべてのリレーを返す。
+ * - tieMap に存在しない場合は空配列を返す。
+ * - Set の順序は挿入順を保持するため、その順序で返される。
+ */
 export function getRelaysById(id: string): string[] {
   return Array.from(tieMap?.get(id) || []);
 }
 
+/**
+ * 指定した id に対応するリレーから1件を選んで返す。
+ * 選択ルール:
+ *  1. ws:// で始まらない候補を優先
+ *     - その中で authRelay.get() に含まれない最初の要素があればそれを返す
+ *     - なければ最初の要素を返す
+ *  2. ws:// の候補しかない場合
+ *     - 同様に authRelay.get() に含まれない最初の要素を返す
+ *     - なければ最初の要素を返す
+ * tieMap に存在しない場合や空の場合は "" を返す。
+ */
+export function getRelayById(id: string): string {
+  const tieSet = tieMap?.get(id);
+  if (!tieSet || tieSet.size === 0) return "";
+
+  const authList = authRelay.get();
+  const list = Array.from(tieSet); // Set は挿入順を保持する → 小さい番号優先
+
+  const select = (candidates: string[]): string =>
+    candidates.find((r) => !authList.includes(r)) ?? candidates[0];
+
+  return select(list.filter((r) => !r.startsWith("ws://"))) ?? select(list);
+}
 export function usePromiseReq(
   {
     filters,

@@ -11,7 +11,7 @@
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
 
-  import { getRelaysById } from "$lib/func/nostr";
+  import { getRelayById, getRelaysById } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
 
   import type { AdditionalPostOptions } from "$lib/types";
@@ -102,10 +102,15 @@
     //console.log("atag:", atag);
     const tags: string[][] = root ? [root] : [];
 
+    const relayHint = getRelayById(note.id);
     //atagでもetagもいれてリアクションするらしい
-    tags.push(["p", note.pubkey], ["e", note.id], ["k", note.kind.toString()]);
+    tags.push(
+      ["p", note.pubkey],
+      ["e", note.id, relayHint, note.pubkey],
+      ["k", note.kind.toString()]
+    );
     if (atag) {
-      tags.push(["a", atag]);
+      tags.push(["a", atag, relayHint]);
     }
 
     if (lumiSetting.get().addClientTag) {
@@ -197,6 +202,7 @@
     const relayhints = getRelaysById(note.id).filter((relay) =>
       relay.startsWith("wss://")
     );
+    const relayHint = getRelayById(note.id);
     const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: relayhints,
@@ -212,8 +218,7 @@
           [
             "e", //a tagのやつにもeもいれる
             note.id,
-            relayhints?.[0] ?? "", //ws://は除く
-            /*  "" marker,*/
+            relayHint,
             note.pubkey,
           ],
         ];
@@ -229,7 +234,7 @@
         //replaceable
 
         if (atag) {
-          tags.push(["a", atag, relayhints?.[0] ?? ""]);
+          tags.push(["a", atag, relayHint]);
         }
         if (note.kind !== 1) {
           tags.push(["k", note.kind.toString()]);
@@ -369,17 +374,15 @@
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
     tags.push(["p", note.pubkey]);
-    const relaylist = getRelaysById(note.id);
+    const relaylist = getRelayById(note.id);
     const root = note.tags.find(
       (item) =>
         (item[0] === "e" || item[0] === "a") &&
         item.length > 2 &&
         item[3] === "root"
     );
-    const hint = relaylist.filter((r) => r.startsWith("wss://")); //ws://は除く
-    const addTag = atag
-      ? ["a", atag, hint?.[0] ?? ""]
-      : ["e", note.id, hint?.[0] ?? ""];
+
+    const addTag = atag ? ["a", atag, relaylist] : ["e", note.id, relaylist];
 
     if (root) {
       // if (note.kind !== 42) {
