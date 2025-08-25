@@ -11,12 +11,8 @@ interface CustomParams {
 }
 
 const defaultRelays = [
-  //'wss://tes'
-  //'wss://relay.nostr.wirednet.jp'
   "wss://relay.nostr.band",
   "wss://nos.lol",
-  // "wss://relayable.org",
-
   "wss://nostr.bitcoiner.social",
 ];
 
@@ -47,9 +43,11 @@ const fetchEvent = async (
 
 export const load = async ({
   params,
+  request,
   setHeaders,
 }: {
   params: CustomParams;
+  request: Request;
   setHeaders: (headers: Record<string, string>) => void;
 }) => {
   const { note } = params;
@@ -59,7 +57,23 @@ export const load = async ({
     "X-Robots-Tag": "noindex, nofollow",
     "Content-Type": "text/html; charset=utf-8",
   });
+
   console.debug("[thread page load]", note);
+
+  // リファラーをチェックして自分のサイトからの遷移かどうかを判定
+  const referer = request.headers.get("referer") || "";
+  const host = request.headers.get("host") || "";
+
+  // 自分のサイトからの遷移かどうか
+  const isInternalNavigation = referer.includes(host) && host !== "";
+
+  // 自分のサイトからの遷移でない場合にフェッチする
+  const shouldFetch = !isInternalNavigation;
+
+  console.debug("[thread page] referer:", referer);
+  console.debug("[thread page] host:", host);
+  console.debug("[thread page] is internal navigation:", isInternalNavigation);
+  console.debug("[thread page] should fetch:", shouldFetch);
 
   try {
     const { type, data } = nip19.decode(note);
@@ -72,6 +86,7 @@ export const load = async ({
       author?: string;
       event?: Nostr.Event;
       encoded: string;
+      skipFetch?: boolean;
     } = {
       id: "",
       relays: undefined,
@@ -79,6 +94,7 @@ export const load = async ({
       author: undefined,
       event: undefined,
       encoded: note,
+      skipFetch: !shouldFetch,
     };
 
     switch (type) {
@@ -94,29 +110,48 @@ export const load = async ({
         error(500);
     }
 
-    res.event = await fetchEvent(
-      res.id,
-      res.relays?.length ? res.relays : defaultRelays
-    );
-    console.log(res.event);
-    if (res.event) {
-      const kindString = eventKinds.get(res.event.kind)?.[
-        get(locale) === "ja" ? "ja" : "en"
-      ];
-      ogTitle.set(
-        `Lumilumi - kind:${res.event.kind} ${
-          kindString ? `(${kindString})` : ""
-        }`
+    // OGPクローラーの場合のみフェッチする
+    if (shouldFetch) {
+      res.event = await fetchEvent(
+        res.id,
+        res.relays?.length ? res.relays : defaultRelays
       );
-      ogDescription.set(res.event.content);
-    } else if (res.kind) {
-      const kindString = eventKinds.get(res.kind)?.[
-        get(locale) === "ja" ? "ja" : "en"
-      ];
-      ogTitle.set(
-        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+      console.log(res.event);
+
+      if (res.event) {
+        const kindString = eventKinds.get(res.event.kind)?.[
+          get(locale) === "ja" ? "ja" : "en"
+        ];
+        ogTitle.set(
+          `Lumilumi - kind:${res.event.kind} ${
+            kindString ? `(${kindString})` : ""
+          }`
+        );
+        ogDescription.set(res.event.content);
+      } else if (res.kind) {
+        const kindString = eventKinds.get(res.kind)?.[
+          get(locale) === "ja" ? "ja" : "en"
+        ];
+        ogTitle.set(
+          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+        );
+      }
+    } else {
+      console.debug(
+        "[thread page] skipping fetch - internal navigation from same site"
       );
+
+      // 内部遷移の場合でも、kindが分かっている場合は最低限のOG設定
+      if (res.kind) {
+        const kindString = eventKinds.get(res.kind)?.[
+          get(locale) === "ja" ? "ja" : "en"
+        ];
+        ogTitle.set(
+          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+        );
+      }
     }
+
     return res;
   } catch (e) {
     console.error("[thread page decode error]", e);
