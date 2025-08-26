@@ -19,6 +19,7 @@
 
   import type { PageData } from "./$types";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { decryptContent } from "$lib/func/settings";
   let { data }: { data: PageData } = $props();
 
   const atag = `${data.kind}:${data.pubkey}${data.identifier}`;
@@ -80,24 +81,13 @@
       return pubList;
     }
     try {
-      const prvListStr = await (
-        window.nostr as Nostr.Nip07.Nostr
-      ).nip04?.decrypt(
-        lumiSetting.get().pubkey ??
-          loginUser.get() ??
-          (await (window.nostr as Nostr.Nip07.Nostr).getPublicKey()),
-        event.content
-      );
-      if (prvListStr) {
-        const prvList: string[][] = JSON.parse(prvListStr);
-        if (prvList.length > 0) {
-          const prv = prvList
-            .filter((tag) => tag[0] === "p")
-            .map((tag) => tag[1]);
-          return Array.from(new Set([...pubList, ...prv]));
-        } else {
-          return pubList;
-        }
+      const prvList = await decryptContent(event);
+
+      if (prvList && prvList.length > 0) {
+        const prv = prvList
+          .filter((tag) => tag[0] === "p")
+          .map((tag) => tag[1]);
+        return Array.from(new Set([...pubList, ...prv]));
       } else {
         return pubList;
       }
