@@ -19,7 +19,7 @@
     type RxReqEmittable,
     type RxReqPipeable,
   } from "rx-nostr";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, onMount, tick, untrack } from "svelte";
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
@@ -68,7 +68,7 @@
   }: Props = $props();
 
   // export let lastVisible: Element | null;
-  let allUniqueEvents: Nostr.Event[];
+  let allUniqueEvents: Nostr.Event[] = [];
 
   // イベントID に基づいて重複を排除する
   const keyFn = (packet: EventPacket): string => packet.event.id;
@@ -80,11 +80,10 @@
   let reqFilters = $derived(
     filters.map((filter: Nostr.Filter) => ({
       ...filter,
-      since: filter.since === undefined ? now() : filter.since,
-
       limit: 50,
     }))
   );
+
   let result = $derived(
     filters[0].since === undefined
       ? useSearchEventList(queryKey, reqFilters, operator, req, relays)
@@ -98,13 +97,16 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
   let readUrls: string[] = [];
-  if ($defaultRelays) {
-    readUrls = Object.values($defaultRelays)
-      .filter((config) => config.read)
-      .map((config) => config.url);
-  }
   $effect(() => {
-    if (($data && viewIndex >= 0) || !$nowProgress) {
+    if ($defaultRelays) {
+      readUrls = Object.values($defaultRelays)
+        .filter((config) => config.read)
+        .map((config) => config.url);
+    }
+  });
+  $effect(() => {
+    // データが存在するか、初期化が完了している場合に実行
+    if ($data !== undefined || !$nowProgress) {
       untrack(() => dataChange($data, viewIndex, $nowProgress));
     }
   });
@@ -161,7 +163,18 @@
         newFilters,
 
         tie,
-        relays
+        relays,
+        // 追加: 途中データを処理するコールバック
+        (newEvents) => {
+          queryClient.setQueryData(
+            [...queryKey, "olderData"],
+            (olddata: EventPacket[] | undefined) => [
+              ...(olddata ?? []),
+              ...newEvents,
+            ]
+          );
+          updateViewEvent($data);
+        }
       );
 
       if (older.length > 0) {
@@ -193,7 +206,18 @@
 
         untilTime,
         tie,
-        relays
+        relays,
+        // 追加: 途中データを処理するコールバック
+        (newEvents) => {
+          queryClient.setQueryData(
+            [...queryKey, "olderData"],
+            (olderdatas: EventPacket[] | undefined) => [
+              ...(olderdatas ?? []),
+              ...newEvents,
+            ]
+          );
+          updateViewEvent($data);
+        }
       );
       console.log(older);
       if (older.length > 0) {
@@ -234,14 +258,21 @@
     }
   };
 
-  function updateViewEvent(data: EventPacket[] | undefined | null) {
+  async function updateViewEvent(data?: EventPacket[] | undefined | null) {
+    // dataがundefinedの場合は古いデータ(olderData)のみを使う
     const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);
-    // console.log("test");
-    const allEvents =
-      data && olderdatas ? [...data, ...olderdatas] : (olderdatas ?? []);
+    console.log("updateViewEvent", "data:", data, "olderdatas:", olderdatas);
+    const allEvents = [...(data || []), ...(olderdatas || [])];
+
+    if (allEvents.length === 0) {
+      displayEvents.set([]);
+      allUniqueEvents = [];
+      untilTime = now();
+      return;
+    }
 
     untilTime =
       allEvents.length > 0
@@ -257,9 +288,26 @@
 
     allUniqueEvents = uniqueEvents.filter(eventFilter);
 
-    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
-
-    //  console.log($slicedEvent);
+    // 新しいデータ(data)が存在する場合は、表示イベントにマージする
+    if (data && data.length > 0) {
+      const newEvents = data.map((d) => d.event).filter(eventFilter);
+      const currentDisplayEvents = displayEvents.get();
+      // 現在表示されているイベントと新しいイベントをマージして重複を排除
+      const mergedEvents = sortEvents(
+        Array.from(
+          new Map(
+            [...newEvents, ...currentDisplayEvents].map((event) => [
+              event.id,
+              event,
+            ])
+          ).values()
+        )
+      );
+      displayEvents.set(mergedEvents.slice(0, viewIndex + amount));
+    } else {
+      // 新しいデータがない場合は、古いデータからスライスして表示
+      displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+    }
   }
 
   function handleClickTop() {

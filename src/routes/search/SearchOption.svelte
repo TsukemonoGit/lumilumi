@@ -26,7 +26,6 @@
     searchHashtag: string | undefined;
     searchUntil: number | undefined;
     resetValue: () => void;
-    filters: Nostr.Filter[];
     handleClickSearch: () => void;
   }
 
@@ -41,7 +40,6 @@
     searchHashtag = $bindable(),
     searchUntil = $bindable(),
     resetValue,
-    filters,
     handleClickSearch,
   }: Props = $props();
 
