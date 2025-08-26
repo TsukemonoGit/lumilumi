@@ -69,5 +69,8 @@
     "svelte-boring-avatars": "^1.2.6",
     "unfurl.js": "^6.4.0",
     "ws": "^8.18.3"
+  },
+  "overrides": {
+    "picomatch": "4.0.3"
   }
 }
