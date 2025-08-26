@@ -222,18 +222,6 @@
       viewIndex = Math.max(viewIndex - sift, 0);
     }
     updateViewEvent($data);
-    //スマホではスクロールちゃんとなってたからでかいときだけやる
-    if (window.innerWidth > 640) {
-      //px
-
-      const firstVisibleElement = document?.querySelector(".first-visible");
-      setTimeout(() => {
-        //データが更新終わるのを待ってからスライドしてみる
-        if (firstVisibleElement) {
-          firstVisibleElement.scrollIntoView(true);
-        }
-      }, 10);
-    }
   };
 
   let debounceTimer: NodeJS.Timeout | null = null;

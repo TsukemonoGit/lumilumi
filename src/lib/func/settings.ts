@@ -162,14 +162,11 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
   };
   if (event.content !== "") {
     try {
-      const privateContent = await (
-        window?.nostr as Nostr.Nip07.Nostr
-      )?.nip04?.decrypt(event.pubkey, event.content);
-      if (privateContent) {
-        const parsedContent: string[][] = JSON.parse(privateContent);
-        if (parsedContent.length > 0) {
-          tags = parsedContent;
-        }
+      //旧式？新式？
+      const privateContent = await decryptContent(event);
+
+      if (privateContent && privateContent.length > 0) {
+        tags = privateContent;
       }
     } catch (error) {
       console.log("failed to decrypt");
@@ -335,9 +332,15 @@ export async function decryptContent(
   event: Nostr.Event
 ): Promise<string[][] | null> {
   try {
-    const privateTagsJson = await (
-      window?.nostr as Nostr.Nip07.Nostr
-    )?.nip04?.decrypt(event.pubkey, event.content);
+    const privateTagsJson = event.content.includes("?iv=")
+      ? await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(
+          event.pubkey,
+          event.content
+        )
+      : await (window?.nostr as Nostr.Nip07.Nostr)?.nip44?.decrypt(
+          event.pubkey,
+          event.content
+        );
     return privateTagsJson ? JSON.parse(privateTagsJson) : null;
   } catch (error) {
     console.error("Failed to decrypt content:", error);
