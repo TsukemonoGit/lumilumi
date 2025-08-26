@@ -191,7 +191,7 @@
           All
         </button>
 
-        {#each NOTIFICATION_TYPES as type}
+        {#each NOTIFICATION_TYPES as type  (type)}
           <button use:melt={$item(type.id)} class="toggle-item relative w-full">
             {#if typeof type.title === "string"}
               {type.title}
@@ -219,7 +219,7 @@
           eventFilter={getNotificationFilterPredicate}
           bind:updateViewNotifi
         >
-          {#snippet children({ events })}
+          {#snippet children( events )}
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >

@@ -350,7 +350,7 @@
 
         <label class="block text-neutral-300 mb-6"
           >{$_("channel.create.categories")}
-          {#each categories as category, index}
+          {#each categories as category, index (category.value)}
             <div class="flex gap-2 mb-2 text-neutral-100">
               <input
                 type="text"

@@ -11,6 +11,7 @@
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { SvelteSet } from "svelte/reactivity";
 
   // 定数
   const LOAD_LIMIT = 300;
@@ -142,7 +143,7 @@
 
             // 重複排除して結合（mediaUrl ベースでユニークに）
             const merged = [...originalMediaEvents, ...results.result];
-            const seen = new Set<string>();
+            const seen = new SvelteSet<string>();
             mediaEvents = merged
               .filter((m) => {
                 if (seen.has(m.mediaUrl)) return false;
@@ -238,7 +239,7 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 
   <div class="media-grid">
-    {#each Array(MEDIA_PER_PAGE) as _, index}
+    {#each Array(MEDIA_PER_PAGE) as _, index (index)}
       {@const media = viewList[index]}
       {#if media}
         <button class="media-item" onclick={() => openModal(media)}>

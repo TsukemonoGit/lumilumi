@@ -12,8 +12,8 @@
   import { monoZap } from '$lib/func/constants';
   import * as Nostr from 'nostr-typedef';
   import ZapInvoiceWindow from '$lib/components/Elements/ZapInvoiceWindow.svelte';
-  import { QueryObserver, type QueryKey } from '@tanstack/svelte-query';
-  import { now } from 'rx-nostr';
+  import { QueryObserver, type QueryKey,type QueryObserverResult } from '@tanstack/svelte-query';
+  import { now, type EventPacket } from 'rx-nostr';
   import { lumiSetting, viewEventIds } from '$lib/stores/globalRunes.svelte';
   import { makeZapRequest } from '$lib/func/zap';
   import ZapList from '$lib/components/NostrElements/AllReactionsElement/ZapList.svelte';
@@ -27,8 +27,8 @@
     };
     try {
       await navigator.share(shareData);
-    } catch (error: any) {
-      console.error(error.message);
+    } catch (error) {
+     
       $toastSettings = {
         title: 'Error',
         description: 'Failed to share',
@@ -95,9 +95,10 @@
 
       //開いた時間（過去ザップしたことあったら開いた後すぐ閉じちゃうから）
       const date = now();
-      unsubscribe = observer2.subscribe((result: any) => {
+      unsubscribe = observer2.subscribe((result: QueryObserverResult<unknown, Error>) => {
         console.log(result);
-        if (result?.data?.event && result.data.event.created_at >= date) {
+        const packet = result?.data as EventPacket|null;
+        if (packet?.event && packet.event.created_at >= date) {
           invoiceOpen?.(false);
           unsubscribe?.();
 

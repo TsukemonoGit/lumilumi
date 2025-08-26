@@ -31,7 +31,7 @@
       pubkey={lumiSetting.get().pubkey}
     >
       {#snippet children({ event })}
-        {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id]}
+        {#each event.tags.filter((tag) => tag[0] === "e") as [tag, id] (id)}
           <div
             class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
           >

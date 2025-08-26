@@ -259,7 +259,7 @@
       use:melt={$menu}
       transition:fade={{ duration: 150 }}
     >
-      {#each options as item}
+      {#each options as item (item)}
         <div
           class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-200
               hover:bg-magnum-100 focus:z-10

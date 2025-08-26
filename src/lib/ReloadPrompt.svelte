@@ -1,5 +1,5 @@
 <script lang="ts">
-  //@ts-ignore
+  //@ts-expect-error: virtual:pwa-register/svelte is a Vite plugin import not recognized by TypeScript
   import { useRegisterSW } from "virtual:pwa-register/svelte";
 
   // // replaced dynamically
@@ -12,10 +12,10 @@
   const { updateServiceWorker } = useRegisterSW({
     autoReload: false, // 自動リロードを無効化
     immediate: false, // 手動でチェックを行うように設定
-    onRegistered(swr: any) {
+    onRegistered(swr: unknown) {
       console.log(`SW registered: ${swr}`);
     },
-    onRegisterError(error: any) {
+    onRegisterError(error: unknown) {
       console.log("SW registration error", error);
     },
     onNeedRefresh() {
@@ -32,7 +32,7 @@
       .then(() => {
         console.log("Service Worker updated successfully");
       })
-      .catch((error: any) => {
+      .catch((error: unknown) => {
         console.error("Failed to update Service Worker:", error);
       });
     close();

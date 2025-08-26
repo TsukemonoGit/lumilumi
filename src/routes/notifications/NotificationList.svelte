@@ -12,7 +12,7 @@
   import type Nostr from "nostr-typedef";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { pipe } from "rxjs";
 
@@ -44,7 +44,7 @@
     relays?: string[];
 
     updateViewNotifi?: () => void;
-    children?: import("svelte").Snippet<[any]>;
+    children?: Snippet<[ events:Nostr.Event[], len: number ]>;
   }
 
   let {
@@ -298,7 +298,7 @@
 {/if}
 
 {#if displayEvents.get() && displayEvents.get()?.length > 0}
-  {@render children?.({ events: displayEvents.get(), len: $data?.length ?? 0 })}
+  {@render children?.(displayEvents.get(), $data?.length ?? 0)}
 {/if}
 
 {#if (displayEvents.get() && displayEvents.get().length > 0) || (allUniqueNotifi.length > 0 && viewIndex === 0)}

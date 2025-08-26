@@ -39,7 +39,9 @@
         if (pub) {
           return pub;
         }
-      } catch (error) {}
+      } catch (error) {
+        //
+      }
     }
     return undefined;
   }
@@ -121,7 +123,7 @@
         <ul
           class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
         >
-          {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
+          {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey } (Icon)}
             {#if alt === "edit status"}
               <li>
                 <button onclick={openEditStatusDialog} use:melt={$close}

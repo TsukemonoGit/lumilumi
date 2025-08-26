@@ -41,7 +41,7 @@
 
   //-------------------------------------mute menu
   const {
-    elements: { trigger, content, arrow },
+    elements: { trigger, content },
     states: { open },
   } = createTooltip({
     positioning: {
@@ -193,7 +193,7 @@
       try {
         localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "repost") {
@@ -278,7 +278,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "reaction") {
@@ -365,7 +365,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "zap") {
@@ -451,7 +451,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     }
@@ -540,7 +540,7 @@
       try {
         localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "repost") {
@@ -629,7 +629,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "reaction") {
@@ -716,7 +716,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else if (id === "zap") {
@@ -805,7 +805,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     }
@@ -909,7 +909,7 @@
       try {
         localStorage.setItem(STORAGE_KEYS.LUMI_MUTE, JSON.stringify($mutes));
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     } else {
@@ -926,7 +926,7 @@
           JSON.stringify($mutebykinds)
         );
       } catch (error) {
-        console.log("failed to save localStorage");
+        console.log("failed to save localStorage", error);
       }
       $nowProgress = false;
     }
@@ -944,7 +944,7 @@
     <div
       class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
     >
-      {#each muteMenu as { id, addText, removeText, Icon }}
+      {#each muteMenu as { id, addText, removeText, Icon } (id)}
         {#if !muteStatus?.[id]}
           <button
             onclick={() => handleAddMute(id)}

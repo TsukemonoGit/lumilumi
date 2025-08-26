@@ -38,7 +38,8 @@
   const onCheangeMetadata = (ev: Nostr.Event) => {
     try {
       metadata = JSON.parse(ev.content) as Profile;
-    } catch (error) {}
+    } catch {//
+      }
   };
 </script>
 

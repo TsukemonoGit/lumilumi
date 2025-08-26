@@ -50,7 +50,7 @@
               >{$_("nostviewstr.kind30000")}</Link
             >
           {:else}
-            {#each peopleList as event}
+            {#each peopleList as event (event.id)}
               <button
                 onclick={() => handleClickToList(event)}
                 class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"

@@ -59,7 +59,7 @@
       .slice(0, 20);
   };
 
-  $inspect("userRelayList", userRelayList);
+  //$inspect("userRelayList", userRelayList);
 
   // 共有機能
   async function handleShare() {
@@ -102,8 +102,8 @@
       };
 
       await navigator.share(shareData);
-    } catch (error: any) {
-      console.error("Share failed:", error.message);
+    } catch (error) {
+      console.error("Share failed:", (error as Error).message);
       // フォールバック処理（クリップボードにコピーなど）
       try {
         await navigator.clipboard.writeText(shareUrl);

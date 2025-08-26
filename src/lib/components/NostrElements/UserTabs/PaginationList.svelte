@@ -89,7 +89,7 @@
     </p>
   </nav>
 
-  {#each viewList as li, index}
+  {#each viewList as li, index (li)}
     {@render children?.(li, index + $range.start)}
   {/each}
   <nav

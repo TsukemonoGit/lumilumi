@@ -34,7 +34,7 @@
     use:melt={$menu}
     transition:fly={{ duration: 150, y: -10 }}
   >
-    {#each Array.from(eventKinds.entries()) as [kind, { ja, en }]}
+    {#each Array.from(eventKinds.entries()) as [kind, { ja, en }] (kind)}
       <div
         class="item"
         use:melt={$item}

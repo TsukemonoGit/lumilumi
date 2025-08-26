@@ -273,7 +273,7 @@
             {#if !kind10005}
               No Channel List (kind:10005)
             {:else}
-              {#each kind10005.tags.filter((tag) => tag[0] === "e") as [tag, id]}
+              {#each kind10005.tags.filter((tag) => tag[0] === "e") as [tag, id] (id)}
                 <ChannelMetadata
                   clickAction={false}
                   {id}

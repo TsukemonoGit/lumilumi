@@ -24,7 +24,9 @@
         if (pub) {
           return pub;
         }
-      } catch (error) {}
+      } catch  {
+        //
+      }
     }
     return undefined;
   }
@@ -37,7 +39,7 @@
 <div class="sidebar fixed top-28 bottom-12">
   <nav class="h-full overflow-hidden">
     <ul class="flex flex-col gap-6 overflow-y-auto h-full">
-      {#each mainMenuItems as { Icon, link, alt, noPubkey }}
+      {#each mainMenuItems as { Icon, link, alt, noPubkey } (Icon)}
         {#if alt === "profile"}
           {#if lumiSetting.get().pubkey && encodedPub}
             <li

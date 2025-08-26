@@ -97,8 +97,7 @@
     console.log(page.url);
     try {
       await navigator.share(shareData);
-    } catch (error: any) {
-      console.error(error.message);
+    } catch  {
       $toastSettings = {
         title: "Error",
         description: "Failed to share",
@@ -111,15 +110,41 @@
     const url = new URL(page.url.origin + page.url.pathname);
     const params = url.searchParams;
 
-    searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
-    searchWord ? params.set("word", searchWord) : params.delete("word");
-    searchKind !== undefined && searchKind !== null
-      ? params.set("k", String(searchKind))
-      : params.delete("k");
-    searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
-    searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
-    searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
-    followee ? params.set("f", String(followee)) : params.delete("f");
+    if (searchHashtag) {
+      params.set("t", searchHashtag);
+    } else {
+      params.delete("t");
+    }
+    if (searchWord) {
+      params.set("word", searchWord);
+    } else {
+      params.delete("word");
+    }
+    if (searchKind !== undefined && searchKind !== null) {
+      params.set("k", String(searchKind));
+    } else {
+      params.delete("k");
+    }
+    if (searchPubkey) {
+      params.set("author", searchPubkey);
+    } else {
+      params.delete("author");
+    }
+    if (searchPubkeyTo) {
+      params.set("p", searchPubkeyTo);
+    } else {
+      params.delete("p");
+    }
+    if (searchUntil) {
+      params.set("u", String(searchUntil));
+    } else {
+      params.delete("u");
+    }
+    if (followee) {
+      params.set("f", String(followee));
+    } else {
+      params.delete("f");
+    }
 
     console.log(url.toString());
     return url.toString();

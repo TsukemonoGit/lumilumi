@@ -252,7 +252,7 @@
   ]}
 >
   {#snippet children({ event })}
-    {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index}
+    {#each event.tags.filter((tag: string[]) => (tag[0] === "e" && hexRegex.test(tag[1])) || (tag[0] === "a" && nip33Regex.test(tag[1]))) as [e, id], index (index)}
       <div>
         <button
           onclick={() => confirmDelete([e, id])}

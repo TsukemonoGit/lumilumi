@@ -65,7 +65,7 @@
   let componentKey = 0; // Key to force re-render
   let view: boolean = $state(false);
 
-  // svelte-ignore non_reactive_update
+
   let req = createRxForwardReq();
   /*  const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
@@ -218,7 +218,7 @@
           class="flex shrink-0 flex-wrap overflow-x-auto
                   data-[orientation=vertical]:flex-col data-[orientation=vertical]:border-r"
         >
-          {#each triggers as triggerItem}
+          {#each triggers as triggerItem ,index (index)}
             <button
               use:melt={$trigger(triggerItem.id)}
               class="trigger relative flex-col gap-1 min-w-16 text-sm"
@@ -567,7 +567,7 @@
               {/snippet}
 
               {#snippet children({ event })}
-                {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
+                {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index (index)}
                   <div class=" overflow-hidden p-1">
                     <RelayCard
                       zIndex={0}
@@ -645,7 +645,7 @@
                 No articles found
               {/snippet}
               {#snippet children({ events })}
-                {#each events as event}
+                {#each events as event (event.id)}
                   <EventCard note={event} {metadata} />
                 {/each}
               {/snippet}

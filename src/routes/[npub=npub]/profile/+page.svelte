@@ -195,10 +195,10 @@
         if (birthArray) {
           newProfile = { ...newProfile, birth: birthArray };
         } */
-      } catch (error: any) {
+      } catch (error) {
         $toastSettings = {
           title: "Error",
-          description: `Invalid ${error.message}`,
+          description: `Invalid ${(error as Error).message}`,
           color: "bg-orange-500",
         };
         return;
@@ -445,7 +445,7 @@
                 <div
                   class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
                 >
-                  {#each $emojis.list as e, index}
+                  {#each $emojis.list as e, index (index)}
                     {#if customReaction === "" || e[0]
                         .toLowerCase()
                         .includes(customReaction
@@ -512,7 +512,7 @@
                 <div
                   class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
                 >
-                  {#each $emojis.list as e, index}
+                  {#each $emojis.list as e, index (index)}
                     {#if customReaction === "" || e[0]
                         .toLowerCase()
                         .includes(customReaction

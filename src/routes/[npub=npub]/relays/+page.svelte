@@ -162,7 +162,7 @@
       if (relaydata && relaydata.length > 0) {
         queryClient.setQueryData(
           ["defaultRelay", pubkey],
-          (oldData: any) => relaydata[0]
+          () => relaydata[0]
         );
         return relaydata[0];
       }
@@ -363,7 +363,7 @@
       return;
     }
     //10002を使う設定にしてる場合デフォリレー更新
-    queryClient.setQueryData(["defaultRelay", ev.pubkey], (oldData: any) =>
+    queryClient.setQueryData(["defaultRelay", ev.pubkey], () =>
       formatToEventPacket(ev, from)
     );
     // イベントの形を整えてセット

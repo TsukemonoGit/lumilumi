@@ -50,7 +50,7 @@
     {$_("filter.menu.canversation")}
   </div>
   <div use:melt={$root} class="radio-group" aria-label="View density">
-    {#each optionsArr as [index, option]}
+    {#each optionsArr as [index, option] (index)}
       <div class="radio-item">
         <button
           use:melt={$item(index)}

@@ -7,12 +7,12 @@
   import { toastSettings } from "$lib/stores/stores";
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
-  import { untrack } from "svelte";
+  import { untrack, type Component } from "svelte";
   import { normalizeURL } from "nostr-tools/utils";
   interface Props {
     relays?: string[];
     title: string;
-    Description: any;
+    Description:  Component ;
     onClickSave: (relays: string[]) => void;
   }
 
@@ -108,7 +108,7 @@
           onclick={() => ($newRelays = relays)}>RESET</button
         >
         <div class="text-sm p-1">
-          {#each $newRelays as relay}
+          {#each $newRelays as relay (relay)}
             <div class="flex items-center gap-1">
               <RelayStatusColor {relay} />{relay}<button
                 class="ml-1 rounded-full bg-magnum-700 hover:opacity-75 active:opacity-50"

@@ -21,7 +21,7 @@
             JSON.stringify(tlFilter)
           );
         }
-      } catch (error: any) {
+      } catch (error) {
         console.warn("Failed to save timelineFilter:", error);
       }
       return tlFilter;
@@ -45,7 +45,7 @@
             JSON.stringify(tlFilter)
           );
         }
-      } catch (error: any) {
+      } catch (error) {
         console.warn("Failed to save timelineFilter:", error);
       }
       return tlFilter;

@@ -1,10 +1,10 @@
 <script lang="ts">
-  //@ts-ignore
+  //@ts-expect-error: virtual:pwa-info is a Vite plugin import not recognized by TypeScript
   import { pwaInfo } from "virtual:pwa-info";
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick, untrack, type Snippet } from "svelte";
+  import { onMount,  type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
@@ -82,6 +82,7 @@
     children: Snippet;
   }>();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let SvelteQueryDevtools: any = $state();
 
   // Conditionally load SvelteQueryDevtools during development
@@ -138,7 +139,9 @@
     if (browser) {
       try {
         initThemeSettings();
-      } catch (error) {}
+      } catch (error) {
+        //
+      }
       try {
         const tmp = localStorage.getItem(STORAGE_KEYS.UPLOADER);
 
@@ -148,7 +151,9 @@
           localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";
 
         showBanner.set(banner);
-      } catch (error) {}
+      } catch (error) {
+        //
+      }
       if (!$app?.rxNostr) {
         setRxNostr();
       }
@@ -270,7 +275,7 @@
   {#if pwaAssetsHead.themeColor}
     <meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
   {/if}
-  {#each pwaAssetsHead.links as link}
+  {#each pwaAssetsHead.links as link (link)}
     <link {...link} />
   {/each}
 
