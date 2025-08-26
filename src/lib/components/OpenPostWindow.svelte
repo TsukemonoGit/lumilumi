@@ -9,12 +9,11 @@
     nowProgress,
     postWindowOpen,
     additionalPostOptions,
-    queryClient,
     toastSettings,
   } from "$lib/stores/stores";
 
   import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
-  import { nip07Signer, type EventPacket } from "rx-nostr";
+  import { nip07Signer} from "rx-nostr";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CreatePost from "./CreatePost.svelte";
@@ -64,7 +63,6 @@
   let signPubkey: string | undefined = $state();
   let isPosting: boolean = $state(false);
   let additionalReplyUsers: string[] = $state([]);
-  let hasText: boolean = $state(false);
   let initOptions: MargePostOptions = $state({
     tags: [],
     kind: 1,
@@ -75,6 +73,8 @@
   let openConfirm: (bool: boolean) => void = $state(() => {});
   let openHellConfirm: (bool: boolean) => void = $state(() => {});
   let resetCreatePost: () => void = $state(() => {});
+
+  let textarea: HTMLTextAreaElement | undefined=$state();
 
   // ----------------------------------------
   // User Authentication
@@ -204,11 +204,9 @@
   // UI Interaction
   // ----------------------------------------
   function handleOverlayClick(event: MouseEvent) {
-    if (hasText) {
+if(textarea?.value.trim()){
       openConfirm?.(true);
-    } else {
-      $open = false;
-    }
+   }else{$open=false}
   }
 
   function keyboardShortcut(event: KeyboardEvent) {
@@ -339,7 +337,7 @@
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      <CreatePost
+      <CreatePost bind:textarea={textarea}
         {close}
         {initOptions}
         {signPubkey}

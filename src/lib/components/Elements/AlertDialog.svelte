@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { X } from "lucide-svelte";
   import { writable, type Writable } from "svelte/store";
   import CloseButton from "./CloseButton.svelte";
 
