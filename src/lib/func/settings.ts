@@ -162,7 +162,6 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
   };
   if (event.content !== "") {
     try {
-      //旧式？新式？
       const privateContent = await decryptContent(event);
 
       if (privateContent && privateContent.length > 0) {
@@ -332,6 +331,7 @@ export async function decryptContent(
   event: Nostr.Event
 ): Promise<string[][] | null> {
   try {
+    //旧式nip04 新式nip44 対応
     const privateTagsJson = event.content.includes("?iv=")
       ? await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(
           event.pubkey,
