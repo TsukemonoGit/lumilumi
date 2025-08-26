@@ -59,7 +59,7 @@
       onWarning: boolean;
       warningText: string;
       additionalReplyUsers: string[];
-    }) => Promise<void>;
+    }) => Promise<void>;textarea: HTMLTextAreaElement | undefined
   }
 
   let {
@@ -69,7 +69,7 @@
     isPosting,
     additionalReplyUsers = $bindable(),
     resetCreatePost = $bindable(),
-    onSendEvent,
+    onSendEvent,textarea=$bindable()
   }: Props = $props();
 
   // ----------------------------------------
@@ -90,7 +90,6 @@
   let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
 
   // DOM references
-  let textarea: HTMLTextAreaElement | undefined = $state();
   let warningTextarea: HTMLInputElement | undefined = $state();
   let emojiInput: HTMLInputElement | undefined = $state();
   let metadataInput: HTMLInputElement | undefined = $state();
