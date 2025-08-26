@@ -200,7 +200,13 @@
     $nowProgress = true;
     // updateQueryParams();
     showFilters = filters.map((filter) => {
-      return { ...filter, limit: 50 };
+      const cleanFilter = { ...filter, limit: 50 };
+
+      return Object.fromEntries(
+        Object.entries(cleanFilter).filter(
+          ([key, value]) => value !== undefined
+        )
+      ) as Nostr.Filter;
     });
 
     if (openSearchResult) {
@@ -309,7 +315,6 @@
     {handleClickSearch}
     {createFilter}
     {resetValue}
-    {filters}
   />
   <div class="w-full mt-4 opacity-80">
     <div
