@@ -42,7 +42,7 @@
 
   let {
     pubkey,
-    bannerHeight = 180,
+    bannerHeight = 200,
     iconSize = 80,
     depth,
 
@@ -235,15 +235,22 @@
               </div>
             </div>
             <div
-              class="bg-magnum-800 w-full border-b border-magnum-400"
-              style="height:{bannerHeight}px"
+              class="bg-magnum-800 w-full border-b border-magnum-400 overflow-hidden"
+              style="height:{bannerHeight}px;"
             >
               {#if lumiSetting.get().showImg && prof.banner}
                 <img
                   src={prof.banner}
                   alt="banner"
-                  class="object-cover mx-auto"
-                  style="height: 100%;  object-fit: cover; object-position: center;"
+                  class="mx-auto"
+                  style="
+        width:100%;
+        height:100%;
+        object-fit: cover;
+        object-position: center center;
+      
+        max-width:calc(min({bannerHeight * 3}px,100%));
+      "
                   loading="lazy"
                 />
               {/if}
