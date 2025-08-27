@@ -18,7 +18,7 @@
 
     displayMenu: boolean;
 
-    mini: any;
+    mini: boolean;
     message?: string | undefined; // console.log(message);
     showStatus?: boolean;
   }

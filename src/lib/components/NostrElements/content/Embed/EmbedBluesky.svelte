@@ -17,7 +17,7 @@
   }
 
   async function extractBskyUri(url: string): Promise<string> {
-    const match = url.match(/bsky\.app\/profile\/([^\/]+)\/post\/([^\/]+)/);
+    const match = url.match(/bsky\.app\/profile\/([^/]+)\/post\/([^/]+)/);
     if (!match) {
       onError();
       throw new Error("Invalid bsky.app URL format");

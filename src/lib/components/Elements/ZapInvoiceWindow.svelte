@@ -1,7 +1,7 @@
 <script lang="ts">
   import { queryClient, toastSettings } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { QueryObserver } from "@tanstack/svelte-query";
+  import { QueryObserver,type  QueryObserverResult } from "@tanstack/svelte-query";
   import { ClipboardCopy, X } from "lucide-svelte";
 
   import QRCode from "qrcode";
@@ -45,8 +45,7 @@
 
   const url = $derived(invoice ? `lightning:${invoice}` : undefined);
 
-  let zapped: { data: EventPacket; status: any; error: any } | undefined =
-    $state();
+let zapped: QueryObserverResult<EventPacket[]> | undefined = $state();
 
   let unsubscribe: (() => void) | undefined = undefined; // Start as undefined
 
@@ -55,20 +54,21 @@
   open.subscribe((openState) => {
     //console.log(openState);
     if (openState && !zapped) {
-      const observer:
-        | QueryObserver<unknown, Error, unknown, unknown, string[]>
-        | undefined = id
-        ? new QueryObserver(queryClient, {
-            queryKey: ["reactions", id, "zapped", lumiSetting.get().pubkey],
-          })
-        : undefined;
+  const observer:
+  | QueryObserver<EventPacket[], Error, EventPacket[], EventPacket[], readonly unknown[]>
+  | undefined = id
+  ? new QueryObserver<EventPacket[]>(queryClient, {
+      queryKey: ["reactions", id, "zapped", lumiSetting.get().pubkey],
+    })
+  : undefined;
+  
       //ザップ一回したら押せなくなるけど
-      unsubscribe = observer?.subscribe((value: any) => {
+      unsubscribe = observer?.subscribe((value) => {
         if (!value) return;
         const data = value?.data as EventPacket[];
         if (data && data.length > 0) {
-          zapped = value[0];
-          console.log(zapped);
+          console.log(value)
+          zapped = value ;
           $open = false;
           unsubscribe?.();
         }
@@ -95,8 +95,7 @@
       } else {
         throw new Error("No invoice");
       }
-    } catch (error: any) {
-      console.error(error.message);
+    } catch {
       $toastSettings = {
         title: "Warning",
         description: "Failed to copy",

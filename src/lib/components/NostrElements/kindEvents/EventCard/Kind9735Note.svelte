@@ -15,12 +15,12 @@
   interface Props {
     note: Nostr.Event;
     depth: number;
-    excludefunc?: any;
+    excludefunc?: (event: Nostr.Event) => boolean;
     repostable: boolean;
     maxHeight: number | undefined;
     displayMenu: boolean;
 
-    mini: any;
+    mini: boolean;
     zIndex?: number;
   }
 

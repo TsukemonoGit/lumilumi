@@ -1,9 +1,10 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import EmptyCard from "./EmptyCard.svelte";
 
   interface Props {
     length?: number;
-    children?: any;
+    children?: Snippet;
   }
 
   const { length = 5, children }: Props = $props();

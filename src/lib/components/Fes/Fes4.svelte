@@ -1,19 +1,46 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
-
   import UserPopupMenu from "$lib/components/NostrElements/user/UserPopupMenu.svelte";
   import { Zap, Cake, Sparkles, Star } from "lucide-svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
 
   const { metadata } = $props();
-  const fireworks: any[] = $state([]);
-  const balloons: any[] = $state([]);
-  const stars: any[] = $state([]);
+
+  // 'any' を置き換えるための型定義
+  type Firework = {
+    id: number;
+    left: number;
+    top: number;
+    delay: number;
+    size: number;
+    color: string;
+  };
+
+  type Balloon = {
+    id: number;
+    left: number;
+    delay: number;
+    size: number;
+    color: string;
+  };
+
+  type Star = {
+    id: number;
+    left: number;
+    top: number;
+    delay: number;
+    size: number;
+  };
+
+  const fireworks: Firework[] = $state([]);
+  const balloons: Balloon[] = $state([]);
+  const stars: Star[] = $state([]);
+
   let cakeVisible = $state(false);
   let animationActive = $state(true);
-  let zapOpen = $state(false); // zapOpenの状態を追跡
-  let animationTimer: ReturnType<typeof setTimeout> | null; // アニメーションタイマーの参照を保持
+  let zapOpen = $state(false);
+  let animationTimer: ReturnType<typeof setTimeout> | null;
 
   const colors = [
     "from-red-500 to-yellow-400",
@@ -32,33 +59,25 @@
     return Math.random() * 100;
   }
 
-  function getRandomItem(array: any[]) {
+  function getRandomItem<T>(array: T[]): T {
     return array[Math.floor(Math.random() * array.length)];
   }
 
-  // アニメーションタイマーをセットする関数
   function setAnimationTimer() {
-    // 既存のタイマーがあればクリア
     if (animationTimer) {
       clearTimeout(animationTimer);
     }
-
-    // 新しいタイマーをセット
     animationTimer = setTimeout(() => {
-      // タイマー終了時にzapOpenがtrueの場合は延長
       if (zapOpen) {
-        // タイマーを再設定（延長）
         setAnimationTimer();
       } else {
-        // zapOpenがfalseならアニメーションを終了
         endAnimation();
       }
-    }, 12000); // 元のタイマーと同じ12秒に設定
+    }, 12000);
   }
 
   function endAnimation() {
     animationActive = false;
-    // タイマーをクリア
     if (animationTimer) {
       clearTimeout(animationTimer);
       animationTimer = null;
@@ -66,7 +85,6 @@
   }
 
   onMount(() => {
-    // 花火を生成
     for (let i = 0; i < 20; i++) {
       fireworks.push({
         id: i,
@@ -78,44 +96,38 @@
       });
     }
 
-    // 風船を生成
     for (let i = 0; i < 15; i++) {
       balloons.push({
         id: i,
         left: randomPosition(),
-        delay: Math.random() * 5, // アニメーション遅延をランダム化
+        delay: Math.random() * 5,
         size: 3 + Math.random() * 2,
         color: getRandomItem(balloonColors),
       });
     }
 
-    // 星を生成
     for (let i = 0; i < 30; i++) {
       stars.push({
         id: i,
         left: randomPosition(),
-        top: Math.random() * 10, // 上部に配置
+        top: Math.random() * 10,
         delay: Math.random() * 5,
         size: 0.5 + Math.random() * 1.5,
       });
     }
 
-    // ケーキを表示
     setTimeout(() => {
       cakeVisible = true;
     }, 3000);
 
-    // アニメーションタイマーを設定
     setAnimationTimer();
   });
 </script>
 
 {#if animationActive}
   <div class="animation-container">
-    <!-- 背景 -->
     <div class="background-gradient"></div>
 
-    <!-- 星 -->
     {#each stars as star}
       <div
         class="star"
@@ -130,7 +142,6 @@
       </div>
     {/each}
 
-    <!-- 花火 -->
     {#each fireworks as firework}
       <div
         class="firework"
@@ -147,21 +158,19 @@
       </div>
     {/each}
 
-    <!-- 風船 -->
     {#each balloons as balloon}
       <div
         class={`balloon ${balloon.color}`}
         style="
           left: {balloon.left}%;
           animation-delay: {balloon.delay}s;
-          animation-duration: 6s; /* アニメーションの持続時間を調整 */
+          animation-duration: 6s;
           width: {balloon.size}rem;
           height: {balloon.size * 1.2}rem;
         "
       ></div>
     {/each}
 
-    <!-- ケーキとユーザー情報 -->
     {#if cakeVisible}
       <div class="cake-container">
         <Cake size="6rem" class="cake-icon" />
@@ -190,7 +199,6 @@
       </div>
     {/if}
 
-    <!-- 閉じるボタン -->
     <button class="close-btn" onclick={endAnimation}>✕</button>
   </div>
 {/if}
@@ -229,8 +237,8 @@
 
   .balloon {
     position: absolute;
-    bottom: -10%; /* 初期位置を画面外の下に設定 */
-    animation: floatUp 6s ease-in-out infinite; /* アニメーションの持続時間を調整 */
+    bottom: -10%;
+    animation: floatUp 6s ease-in-out infinite;
     border-radius: 50%;
   }
 
@@ -251,7 +259,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem; /* 行間を広げる */
+    gap: 1rem;
     padding: 1.5rem;
   }
 
@@ -281,7 +289,7 @@
     color: #fff;
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
     text-align: center;
-    word-wrap: break-word; /* テキストが長い場合に改行を許可 */
+    word-wrap: break-word;
   }
 
   .title-deco {
@@ -299,7 +307,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem; /* 行間を広げる */
+    gap: 1rem;
   }
 
   .username {
@@ -343,7 +351,7 @@
       opacity: 1;
     }
     100% {
-      transform: translateY(-120vh); /* 画面外の上まで移動 */
+      transform: translateY(-120vh);
       opacity: 0;
     }
   }

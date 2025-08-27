@@ -3,9 +3,17 @@
   import UserZap from "$lib/components/NostrElements/user/UserZap.svelte";
   import { Zap } from "lucide-svelte";
   import { onMount } from "svelte";
+type Character = {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+  character: string;
+  size: number;
+};
 
   const { metadata } = $props();
-  const characters: any[] = $state([]);
+  const characters: Character[] = $state([]);
 
   function getRandomCharacter() {
     const characters = [

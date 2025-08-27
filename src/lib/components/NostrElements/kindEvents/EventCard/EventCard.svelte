@@ -2,7 +2,6 @@
   import * as Nostr from "nostr-typedef";
   import { EyeOff, Repeat2 } from "lucide-svelte";
   import { onDestroy, untrack } from "svelte";
-  import * as nip19 from "nostr-tools/nip19";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { page } from "$app/state";
 
@@ -349,7 +348,7 @@
 
         <!--リアクションしたノートの情報（リポストのを使いまわし）-->
         {@const { kind, tag } = repostedId(note.tags)}
-        <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある　nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
+        <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
         {#if tag}
           <RepostedNote
             {tag}

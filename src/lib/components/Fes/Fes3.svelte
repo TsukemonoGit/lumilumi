@@ -4,11 +4,21 @@
   import { Zap } from "lucide-svelte";
   import { onMount } from "svelte";
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
+type Character = {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+  character: string;
+  size: number;
+  rotation: number;
+  scale: number;
+};
 
   const { metadata } = $props();
   let showCelebration = $state(true);
   let isFadingOut = $state(false);
-  const characters: any[] = $state([]);
+  const characters: Character[] = $state([]);
   let zapOpen = $state(false); // zapOpenの状態を追跡
   let animationTimer: ReturnType<typeof setTimeout>; // タイマー参照を保持
   let characterInterval: ReturnType<typeof setInterval>; // キャラクター生成インターバルの参照

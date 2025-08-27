@@ -8,6 +8,7 @@
 
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
 
+
   interface Confetti {
     id: number; // 一意の識別子
     left: number; // 横方向の位置（%）
@@ -62,12 +63,13 @@
     return Math.floor(Math.random() * 360);
   }
 
-  function getRandomItem(array: string | any[]) {
+  function getRandomItem(array: string | string[]) {
     return array[Math.floor(Math.random() * array.length)];
   }
 
   let zapOpen: boolean = $state(false);
   // 初期タイマー設定
+  // eslint-disable-next-line no-undef
   let animationTimer: NodeJS.Timeout | null;
 
   // アニメーションを終了する
