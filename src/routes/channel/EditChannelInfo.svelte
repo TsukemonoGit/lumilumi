@@ -225,15 +225,15 @@
   <div class="" use:melt={$portalled}>
     <div
       use:melt={$overlay}
-      class={`fixed inset-0 bg-black/50`}
-      style={`z-index:10`}
+      class="fixed inset-0 bg-black/50"
+      style="z-index:10"
       transition:fade={{ duration: 150 }}
     ></div>
     <div
       class={`fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))]
                  -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
                  p-2 sm:p-6 shadow-lg overflow-hidden grid grid-rows-[auto_1fr_auto]`}
-      style={`z-index:10`}
+      style="z-index:10"
       use:melt={$content}
     >
       <h2 use:melt={$title} class="m-0 text-lg font-medium mb-4">

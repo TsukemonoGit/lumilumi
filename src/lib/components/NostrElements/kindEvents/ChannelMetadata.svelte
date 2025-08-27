@@ -26,7 +26,7 @@
     heyaRelay = $bindable(),
   }: Props = $props();
 
-  let loadingText = $derived(encodetoNote(id));
+  const loadingText = $derived(encodetoNote(id));
   const onChange = (event: Nostr.Event) => {
     heyaRelay = getRelayById(id);
   };

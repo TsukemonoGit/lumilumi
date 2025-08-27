@@ -5,7 +5,7 @@
     part: Token;
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 
   // checked属性があるかどうかで判定
   const isChecked = part.meta.checked;

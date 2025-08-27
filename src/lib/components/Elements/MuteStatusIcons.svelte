@@ -8,11 +8,11 @@
     pubkey: string;
   }
 
-  let { pubkey }: Props = $props();
+  const { pubkey }: Props = $props();
 
-  let muteStatus =
+  const muteStatus =
     $derived($mutes || $mutebykinds ? userMuteStatus(pubkey) : initUserMuteStatus);
-  let existMuteStatus = $derived((
+  const existMuteStatus = $derived((
     Object.keys(muteStatus) as Array<keyof UserMuteStatus>
   ).find((key) => muteStatus[key] === true));
 </script>

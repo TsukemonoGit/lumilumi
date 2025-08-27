@@ -10,14 +10,14 @@
     onClickShowMore?: () => void;
     truncate?: Snippet;
   }
-  let {
+  const {
     maxHeight = 460,
     children,
     onClickShowMore,
     depth = 0,
     truncate,
   }: Props = $props();
-  let threshold = $derived(maxHeight * 0.35);
+  const threshold = $derived(maxHeight * 0.35);
   let isTruncated = $state(false);
 
   function toggleShowMore() {
@@ -25,8 +25,8 @@
   }
 
   // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
-  let minHeight = $derived(maxHeight * 0.2);
-  let contentHeight = $derived(
+  const minHeight = $derived(maxHeight * 0.2);
+  const contentHeight = $derived(
     Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
   );
 </script>

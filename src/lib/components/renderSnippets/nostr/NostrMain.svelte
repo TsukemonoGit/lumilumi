@@ -33,7 +33,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
 
-  let {
+  const {
     contents,
     loading,
   }: {
@@ -61,7 +61,7 @@
         }
       }
 
-      let defaultFilter: TimelineFilter = {
+      const defaultFilter: TimelineFilter = {
         ...timelineFilterInit,
         global: { ...timelineFilterInit.global },
       };

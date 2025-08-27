@@ -19,7 +19,7 @@
     tag: string[];
   }
 
-  let { tag }: Props = $props();
+  const { tag }: Props = $props();
   const naddrFilter = (): Nostr.Filter | undefined => {
     const match = tag[1].match(nip33Regex);
     //console.log(match);

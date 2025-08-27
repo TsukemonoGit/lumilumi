@@ -28,7 +28,7 @@
     zIndex?: number;
   }
 
-  let {
+  const {
     note,
     depth,
     excludefunc = (event: Nostr.Event) => false,
@@ -78,13 +78,13 @@
       {#snippet content({ metadata })}
         <div class="flex gap-1 items-center align-middle">
           {#if message}
-            <Popover ariaLabel={`zap status`}>
+            <Popover ariaLabel="zap status">
               <div
                 class="relative text-magnum-400 text-sm drop-shadow-md flex min-w-[20px] mt-auto mb-auto"
               >
-                <Zap class={`stroke-magnum-600`} size={20} />
+                <Zap class="stroke-magnum-600" size={20} />
                 <X
-                  class={`absolute right-0  bottom-0 stroke-magnum-300`}
+                  class="absolute right-0  bottom-0 stroke-magnum-300"
                   size={10}
                 />
               </div>
@@ -96,7 +96,7 @@
             >
           {:else}
             <Zap
-              class={`min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400`}
+              class="min-w-[20px] mt-auto mb-auto stroke-magnum-400 fill-magnum-400"
               size={20}
             />{/if}
           {amount}

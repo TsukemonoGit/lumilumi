@@ -19,11 +19,11 @@
     zIndex: number;
   }
 
-  let { url, write, read, zIndex }: Props = $props();
+  const { url, write, read, zIndex }: Props = $props();
 
-  let imageLoaded = true;
+  const imageLoaded = true;
 
-  let size = 48;
+  const size = 48;
 
   let relayInfo: Nip11.RelayInfo | undefined = $state();
   $effect(() => {

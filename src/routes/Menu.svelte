@@ -28,7 +28,7 @@
     forceVisible: true,
   });
 
-  let encodedPub: string | undefined = $derived(
+  const encodedPub: string | undefined = $derived(
     pubCheck(lumiSetting.get().pubkey)
   );
 
@@ -54,10 +54,10 @@
     }
   }
 
-  let menuPosition = $derived(
+  const menuPosition = $derived(
     lumiSetting.get().menuleft ? "left-2 flex flex-row-reverse" : "right-2 "
   );
-  let menuPosition2 = $derived(
+  const menuPosition2 = $derived(
     lumiSetting.get().menuleft ? "right-5 " : "left-5"
   );
 
@@ -74,7 +74,7 @@
 >
   <!--/90 backdrop-blur-->
   <div class="absolute {menuPosition2} h-full mt-2">
-    <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
+    <a href={`/${encodedPub}`} class="item cursor-pointer" title="user page">
       <UserAvatar2 size={36} /></a
     >
   </div>

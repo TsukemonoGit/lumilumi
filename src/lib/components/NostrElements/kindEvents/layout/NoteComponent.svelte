@@ -15,7 +15,7 @@
     actionButtons?: Snippet;
     bookmark?: Snippet;
   }
-  let {
+  const {
     warningText,
     icon,
     seenOn,
@@ -30,7 +30,7 @@
   }: Props = $props();
 </script>
 
-<div class={"grid grid-cols-[auto_1fr] max-w-full overflow-hidden my-1"}>
+<div class="grid grid-cols-[auto_1fr] max-w-full overflow-hidden my-1">
   <div class="grid grid-rows-[auto_1fr] p-1">
     <div>
       {@render icon?.()}
@@ -47,7 +47,7 @@
       {@render bookmark?.()}
     </div>
     {#if status}
-      <div class={`text-sm text-zinc-500`}>
+      <div class="text-sm text-zinc-500">
         {@render status?.()}
       </div>{/if}
     <div class="max-w-full overflow-hidden flex flex-col gap-0.5">

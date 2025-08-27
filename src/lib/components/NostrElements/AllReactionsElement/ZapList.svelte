@@ -10,7 +10,7 @@
     events: Nostr.Event[];
   }
 
-  let { events }: Props = $props();
+  const { events }: Props = $props();
 
   //とりあえずデコード失敗したら0になるようになってるけどちゃんと取り除いて
 
@@ -38,7 +38,7 @@
     return events.filter((event) => getAmount(event) === amount);
   };
 
-  let amounts = $derived(
+  const amounts = $derived(
     [...new Set(events.map((event) => getAmount(event) ?? -1))].sort(
       (a, b) => b - a
     )

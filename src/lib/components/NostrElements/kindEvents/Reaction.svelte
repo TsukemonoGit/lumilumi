@@ -6,7 +6,7 @@
     event: Nostr.Event;
   }
 
-  let { event }: Props = $props();
+  const { event }: Props = $props();
 
   export const getEmoji = (
     ev: Nostr.Event

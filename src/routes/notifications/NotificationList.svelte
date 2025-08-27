@@ -70,7 +70,7 @@
   const [uniq, eventIds] = createUniq(keyFn);
 
   // Setup query operator
-  let operator = $derived(pipe(tie, uniq, scanArray()));
+  const operator = $derived(pipe(tie, uniq, scanArray()));
 
   // Initialize query
   createQuery({

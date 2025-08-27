@@ -6,7 +6,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import EmbedSuno from "./Embed/EmbedSuno.svelte";
 
-  let { url } = $props();
+  const { url } = $props();
   let error = $state(false);
 
   const onError = () => {

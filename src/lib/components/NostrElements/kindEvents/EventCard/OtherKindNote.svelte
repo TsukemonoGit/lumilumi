@@ -27,7 +27,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     note,
     metadata,
     displayMenu,
@@ -41,23 +41,23 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let title = $derived(
+  const title = $derived(
     note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
   );
-  let dtag = $derived(
+  const dtag = $derived(
     note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
   );
-  let description = $derived(
+  const description = $derived(
     note.tags.find(
       (tag) =>
         (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
     )?.[1]
   );
-  let image = $derived(
+  const image = $derived(
     note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
   );
 
-  let warning = $derived(checkContentWarning(note?.tags));
+  const warning = $derived(checkContentWarning(note?.tags));
 </script>
 
 {#if deleted}

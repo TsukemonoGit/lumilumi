@@ -10,18 +10,18 @@
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
   import type { ConnectionState } from "rx-nostr";
 
-  let readRelays = $derived(
+  const readRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.read)
       : []
   );
-  let writeRelays = $derived(
+  const writeRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.write)
       : []
   );
 
-  let overallStateColor: string = $derived.by(() => setAllStatusState());
+  const overallStateColor: string = $derived.by(() => setAllStatusState());
   // allStatus 内の state を設定する関数
   function setAllStatusState(): string {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
@@ -76,7 +76,7 @@
 </script>
 
 <!--reconnect relayは readable default relayだけ-->
-<Popover ariaLabel={"relays status"}>
+<Popover ariaLabel="relays status">
   <div class="flex gap-0.5 items-end">
     <RadioTower
       size="20"

@@ -40,7 +40,7 @@
   let relaySettei = $state(false);
 
   // Derived values
-  let timelineQuery = $derived(["global", "feed"]);
+  const timelineQuery = $derived(["global", "feed"]);
 
   /**
    * Handles saving the global relay configuration

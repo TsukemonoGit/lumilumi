@@ -8,8 +8,8 @@
     relay: string;
   }
 
-  let { relay }: Props = $props();
-  let relayUrl = $derived(cleanRelayUrl(relay)); // /がついてるほう
+  const { relay }: Props = $props();
+  const relayUrl = $derived(cleanRelayUrl(relay)); // /がついてるほう
 </script>
 
 <Popover ariaLabel={`${relay} status`}>

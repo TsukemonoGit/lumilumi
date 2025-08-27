@@ -7,7 +7,7 @@
 
   let {
     value = $bindable(),
-    placeholder = "YYYY-MM-DD",
+    placeholder = $bindable("YYYY-MM-DD"),
     title,
   }: Props = $props();
 </script>

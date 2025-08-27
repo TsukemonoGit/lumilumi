@@ -10,15 +10,15 @@
     url: string;
   }
 
-  let { contents, url }: Props = $props();
+  const { contents, url }: Props = $props();
 
   let imageURL = $state(
     isvalidURL(contents.image) ? contents.image : undefined
   );
-  let favicon = $state(
+  const favicon = $state(
     isvalidURL(contents.favicon) ? contents.favicon : undefined
   );
-  let hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");
+  const hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");
 </script>
 
 <LinkCheck {url}>

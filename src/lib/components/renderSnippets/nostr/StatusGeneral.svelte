@@ -8,8 +8,8 @@
     children?: import("svelte").Snippet<[{ event: Nostr.Event }]>;
   }
 
-  let { pubkey, loading, children }: Props = $props();
-  let data: Nostr.Event | undefined = $derived(
+  const { pubkey, loading, children }: Props = $props();
+  const data: Nostr.Event | undefined = $derived(
     userStatusMap.get().get(pubkey)?.get("general")
   );
 </script>

@@ -7,7 +7,7 @@
     height?: number;
   }
 
-  let { part, height = 24 }: Props = $props();
+  const { part, height = 24 }: Props = $props();
   let imgError: boolean = $state(false);
   let imgLoad: boolean = $state(false);
 </script>
@@ -18,7 +18,7 @@
     alt={`${part.content}`}
     src={part.metadata!.url as string}
     title={`${part.content}`}
-    class={`inline object-contain m-0 overflow-hidden align-bottom`}
+    class="inline object-contain m-0 overflow-hidden align-bottom"
     style={`height:${height}px`}
     onload={() => {
       imgLoad = true;

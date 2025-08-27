@@ -20,13 +20,13 @@
   interface Props {
     userPubkey: string;
   }
-  let { userPubkey }: Props = $props();
-  let queryKey: QueryKey = $derived([
+  const { userPubkey }: Props = $props();
+  const queryKey: QueryKey = $derived([
     "naddr",
     `10001:${userPubkey}:""`,
   ] as QueryKey);
 
-  let editable = $derived(userPubkey === $loginUser);
+  const editable = $derived(userPubkey === $loginUser);
 
   let inputValue = $state("");
   let previewData = $state<{

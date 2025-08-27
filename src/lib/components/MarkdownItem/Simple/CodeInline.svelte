@@ -5,7 +5,7 @@
     part: Token;
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 </script>
 
 <pre class="inline"><code>{part.content}</code></pre>

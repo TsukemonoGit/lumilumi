@@ -37,7 +37,7 @@
       [{ relays: DefaultRelayConfig[] | string[]; status: ReqStatus }]
     >;
   }
-  let {
+  const {
     req = undefined,
     // pubkey,
     localRelays,
@@ -47,28 +47,28 @@
     loading,
     contents,
   }: Props = $props();
-  let pubkey = lumiSetting.get().pubkey;
-  let queryKey = ["defaultRelay", pubkey];
-  let filters = [
+  const pubkey = lumiSetting.get().pubkey;
+  const queryKey = ["defaultRelay", pubkey];
+  const filters = [
     // { authors: [pubkey], kinds: [3], limit: 1 },
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ] as Nostr.Filter[];
 
   //パラムリレーがあったりlocalリレーがあるときはそれを返す。なくて、ログインしてるときに10002とる。ログインしてなかったらデフォリレーをセットする。
 
-  let zyouken =
+  const zyouken =
     localRelays.length > 0 ||
     (paramRelays && paramRelays.length > 0) ||
     !lumiSetting.get().pubkey;
   // console.log(zyouken);
-  let _relays: DefaultRelayConfig[] | string[] =
+  const _relays: DefaultRelayConfig[] | string[] =
     paramRelays && paramRelays.length > 0 //neventとかのやつ
       ? paramRelays
       : localRelays.length > 0 //設定でローカルのリレー使うことにしてるときのやつ
         ? localRelays
         : [];
 
-  let result = zyouken ? undefined : useRelaySet(queryKey, filters, req);
+  const result = zyouken ? undefined : useRelaySet(queryKey, filters, req);
 
   let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();
@@ -89,7 +89,7 @@
         status = value;
         if (
           value === "success" &&
-          (!result.data || (get(result.data) || []).length <= 0)
+          ( (get(result.data) || []).length <= 0)
         ) {
           // console.log(defaultRelays);
           setRelays(defaultRelays);

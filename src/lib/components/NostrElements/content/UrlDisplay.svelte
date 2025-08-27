@@ -15,7 +15,7 @@
     openModal: (index: number) => void;
     author: string;
   }
-  let { part, openModal, author }: Props = $props();
+  const { part, openModal, author }: Props = $props();
 </script>
 
 {#if part.content}

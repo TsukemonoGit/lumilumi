@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { relayInfo } = $props();
+  const { relayInfo } = $props();
 </script>
 
 <h2 class="m-0 text-lg font-medium">Relay Information</h2>

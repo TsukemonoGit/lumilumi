@@ -39,13 +39,13 @@
   });
 
   // State
-  let viewIndex = 0;
+  const viewIndex = 0;
   let isOnMount = false;
   let view = $state(false);
   let updateViewNotifi: () => void = $state(() => {});
 
   // Build initial filters
-  let filters: Nostr.Filter[] | null = $derived(
+  const filters: Nostr.Filter[] | null = $derived(
     lumiSetting.get()?.pubkey
       ? [
           {

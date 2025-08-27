@@ -12,7 +12,7 @@ import { mutebykinds, mutes } from "$lib/stores/stores";
 import { urlRegex } from "./regex";
 import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
-export let noReactionKind = [3, 10000, 30000];
+export const noReactionKind = [3, 10000, 30000];
 
 export const profile = (ev: Nostr.Event | undefined): Profile | undefined => {
   if (!ev) {
@@ -202,7 +202,7 @@ export async function filesUpload(
   signal?: AbortSignal // 新たに signal を受け取る
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
-  let res: FileUploadResponse[] = [];
+  const res: FileUploadResponse[] = [];
   for (const file of Array.from(files)) {
     try {
       const serverConfig = await readServerConfig(uploader);
@@ -250,7 +250,7 @@ export async function fileUpload(
   signal?: AbortSignal // 新たに signal を受け取る
 ): Promise<FileUploadResponse[]> {
   console.log(file, uploader);
-  let res: FileUploadResponse[] = [];
+  const res: FileUploadResponse[] = [];
 
   try {
     const serverConfig = await readServerConfig(uploader);
@@ -326,7 +326,7 @@ export const getRelayInfo = async (
 };
 
 export function formatUrl(url: string) {
-  let httpsUrl = url.startsWith("wss://")
+  const httpsUrl = url.startsWith("wss://")
     ? url.replace(/^wss:/, "https:")
     : url.replace(/^ws:/, "http:");
   try {

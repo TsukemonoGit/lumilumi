@@ -124,7 +124,7 @@
     if (!check) {
       //含まれてなかったたらデータを更新してpublishしてから
       //privateに追加する
-      let newTags = privateTags ?? [];
+      const newTags = privateTags ?? [];
 
       newTags.push(addTag);
       const newEvPara: Nostr.EventParameters = {

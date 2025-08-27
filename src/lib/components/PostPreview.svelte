@@ -55,7 +55,7 @@
   }
 
   // Initialize props
-  let {
+  const {
     event,
     onWarning,
     warningText,
@@ -64,8 +64,8 @@
     replyUsers,
     addUser,
   }: Props = $props();
-  let text = $derived(event.content || "");
-  let tags = $derived(event.tags || []);
+  const text = $derived(event.content || "");
+  const tags = $derived(event.tags || []);
   // Constants
   const displayMenu = false;
   const depth = 0;
@@ -75,13 +75,13 @@
   const maxHeight = undefined;
 
   // State
-  let parts: Token[] = $derived(
+  const parts: Token[] = $derived(
     parseContent(text, tags, { hashtagsFromTagsOnly: false })
   );
   let showMore: Writable<boolean> = $state(writable(false));
 
   // Computed values
-  let metadata = $derived(
+  const metadata = $derived(
     signPubkey
       ? (
           queryClient?.getQueryData([
@@ -92,25 +92,25 @@
       : undefined
   );
 
-  let replyTag = $derived.by(() => {
+  const replyTag = $derived.by(() => {
     if ([1, 42, 4, 1111].includes(event.kind || 1) && tags.length > 0) {
       return replyedEvent(tags, event.kind || 1).replyTag;
     }
     return undefined;
   });
 
-  let mediaList = $derived(
+  const mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)
       .filter((t) => t !== undefined)
   );
 
-  let geohash = $derived(
+  const geohash = $derived(
     tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
   );
 
-  let proxy = $derived(tags.find((item) => item[0] === "proxy"));
+  const proxy = $derived(tags.find((item) => item[0] === "proxy"));
 
   // Effects
   $effect(() => {
@@ -206,7 +206,7 @@
   };
 
   //ミュートメニューの設定は考慮しない
-  let muteType = $derived.by(() => {
+  const muteType = $derived.by(() => {
     if (!$mutes || (!$mutebykinds && !timelineFilter.get())) {
       return "null";
     }
@@ -297,7 +297,7 @@
                 <CustomEmoji {part} />
               {:else if part.type === "hashtag"}
                 <a
-                  aria-label={"Search for events containing the hashtag"}
+                  aria-label="Search for events containing the hashtag"
                   href={`/search?t=${part.metadata!.tag}`}
                   class="underline text-magnum-300 break-all">{part.content}</a
                 >
@@ -336,7 +336,7 @@
   </div>
 {/if}
 
-<Dialog id={"showMore_preview"} bind:open={showMore} zIndex={zIndex + 10}>
+<Dialog id="showMore_preview" bind:open={showMore} zIndex={zIndex + 10}>
   {#snippet main()}
     <ContentParts
       {maxHeight}

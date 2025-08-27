@@ -9,7 +9,7 @@
   // import Fes8 from "./Fes8.svelte";
   // import Fes9 from "./Fes9.svelte";
   // import Fes10 from "./Fes10.svelte";
-  let { metadata } = $props();
+  const { metadata } = $props();
 
   // コンポーネントのリスト
   const festivals = [

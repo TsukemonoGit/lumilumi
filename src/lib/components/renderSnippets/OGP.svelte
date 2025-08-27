@@ -7,10 +7,10 @@
     nodata?: import("svelte").Snippet;
   }
 
-  let { url, renderContent, nodata }: Props = $props();
+  const { url, renderContent, nodata }: Props = $props();
 
-  let ogp = $derived(useOgp(url));
-  let data = $derived(ogp.data);
+  const ogp = $derived(useOgp(url));
+  const data = $derived(ogp.data);
 </script>
 
 {#if $data && renderContent}

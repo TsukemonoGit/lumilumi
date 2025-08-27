@@ -13,9 +13,9 @@
     author: string;
   }
 
-  let { url, number = undefined, openModal, author }: Props = $props();
+  const { url, number = undefined, openModal, author }: Props = $props();
   let view = $state(false);
-  let showDirectly = $derived(
+  const showDirectly = $derived(
     lumiSetting.get().imageAutoExpand === "all" ||
       (lumiSetting.get().imageAutoExpand === "following" &&
         author &&

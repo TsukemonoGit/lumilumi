@@ -22,11 +22,11 @@
     zIndex = 0,
   }: Props = $props();
 
-  let replaceable = $derived(
+  const replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
-  let { naddr, nevent, encodedPubkey } = $derived.by(() => {
+  const { naddr, nevent, encodedPubkey } = $derived.by(() => {
     let nevent: string | undefined = undefined;
     let naddr: string | undefined = undefined;
     let encodedPubkey: string | undefined = undefined;

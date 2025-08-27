@@ -54,7 +54,7 @@
   let originalSettings: LumiSetting | undefined = undefined;
 
   //const optionsArr = ["0", "1"];
-  let optionsArrStr = $derived([
+  const optionsArrStr = $derived([
     `${$_("settings.relayMenuText0")}`,
     `${$_("settings.relayMenuText1")}`,
   ]);
@@ -187,7 +187,7 @@
   function addRelay() {
     if (!relayInput) return;
     try {
-      let input = normalizeURL(relayInput.trim());
+      const input = normalizeURL(relayInput.trim());
 
       if (relayRegex2.test(input)) {
         settings.relays = [
@@ -667,7 +667,7 @@
         {$_("settings.display.loadImage")}
       </label>
       {#if settings.showImg}
-        <label class={`ml-8`}>
+        <label class="ml-8">
           <input
             type="checkbox"
             class="rounded-checkbox"
@@ -816,7 +816,7 @@
       {$_("settings.emoji.notes")}
       <Link
         className="underline text-magnum-300"
-        href={"https://github.com/nostr-protocol/nips/blob/master/30.md"}
+        href="https://github.com/nostr-protocol/nips/blob/master/30.md"
         >(NIP-30)</Link
       >
     </div>
@@ -876,7 +876,7 @@
   </div>
 </form>
 
-<Dialog bind:open id={"mutebykind_image"}
+<Dialog bind:open id="mutebykind_image"
   >{#snippet main()}
     <div class="flex w-full justify-center">
       <img

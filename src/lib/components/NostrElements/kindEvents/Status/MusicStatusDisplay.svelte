@@ -9,7 +9,7 @@
 
     color?: string | undefined;
   }
-  let { link, event, color }: Props = $props();
+  const { link, event, color }: Props = $props();
   let deleted = $state(false);
 </script>
 

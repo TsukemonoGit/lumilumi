@@ -10,7 +10,7 @@
   {$_("relay.description.search3")}
   <Link
     className="underline hover:opacity-75"
-    href={"https://github.com/nostr-protocol/nips/blob/master/50.md"}
+    href="https://github.com/nostr-protocol/nips/blob/master/50.md"
     >(NIP-50)</Link
   >
 </p>

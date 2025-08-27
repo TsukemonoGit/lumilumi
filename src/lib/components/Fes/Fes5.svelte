@@ -5,7 +5,7 @@
   import { X } from "lucide-svelte";
   import { onMount } from "svelte";
 
-  let { metadata } = $props();
+  const { metadata } = $props();
   let zapOpen = $state(false);
   let visible = $state(true);
   let fadingOut = $state(false);

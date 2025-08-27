@@ -264,7 +264,7 @@ export async function getMuteByList(
   events: Nostr.Event[],
   beforeMuteByList: LumiMuteByKindList[] | undefined
 ): Promise<LumiMuteByKindList[]> {
-  let muteByList: LumiMuteByKindList[] = [];
+  const muteByList: LumiMuteByKindList[] = [];
 
   for (const packet of events) {
     const beforeData = beforeMuteByList?.find(

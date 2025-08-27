@@ -15,7 +15,7 @@
     zIndex?: number;
   }
 
-  let { pubkey, zIndex }: Props = $props();
+  const { pubkey, zIndex }: Props = $props();
 </script>
 
 <Popover ariaLabel="user profile" zIndex={zIndex || 0 + 10}

@@ -7,16 +7,16 @@
   import { toastSettings } from "$lib/stores/stores";
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
-  import { untrack } from "svelte";
+  import { untrack, type Component } from "svelte";
   import { normalizeURL } from "nostr-tools/utils";
   interface Props {
     relays?: string[];
     title: string;
-    Description: any;
+    Description: Component;
     onClickSave: (relays: string[]) => void;
   }
 
-  let { relays = [], title, Description, onClickSave }: Props = $props();
+  const { relays = [], title, Description, onClickSave }: Props = $props();
 
   const newRelays = writable<string[]>([...(relays ?? [])]);
   $effect(() => {
@@ -80,7 +80,7 @@
 </script>
 
 <div
-  class={"mx-auto w-full rounded-xl bg-neutral-800 shadow-md overflow-hidden mb-1"}
+  class="mx-auto w-full rounded-xl bg-neutral-800 shadow-md overflow-hidden mb-1"
   {...$root}
 >
   <h2 class="flex w-full px-2">

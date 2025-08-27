@@ -35,7 +35,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     replyUsers,
     mini,
     note,
@@ -51,14 +51,14 @@
   }: Props = $props();
   let deleted = $state(false);
 
-  let pollEventId: string | undefined = $derived.by(() => {
+  const pollEventId: string | undefined = $derived.by(() => {
     const id = note?.tags.find((tag) => tag[0] === "e")?.[1];
     if (id && hexRegex.test(id)) {
       return id;
     }
   });
 
-  let response: string[] | undefined = $derived(
+  const response: string[] | undefined = $derived(
     note.tags
       .filter((tag: string[]) => tag[0] === "response")
       .map((tag) => tag[1])

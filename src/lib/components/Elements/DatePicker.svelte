@@ -12,13 +12,13 @@
     maxValue?: DateValue | undefined;
   }
 
-  let {
+  const {
     title = "Date",
     minValue = undefined,
     maxValue = undefined,
   }: Props = $props();
 
-  let {
+  const {
     elements: {
       calendar,
       cell,

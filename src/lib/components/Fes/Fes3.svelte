@@ -5,10 +5,10 @@
   import { onMount } from "svelte";
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
 
-  let { metadata } = $props();
+  const { metadata } = $props();
   let showCelebration = $state(true);
   let isFadingOut = $state(false);
-  let characters: any[] = $state([]);
+  const characters: any[] = $state([]);
   let zapOpen = $state(false); // zapOpenの状態を追跡
   let animationTimer: ReturnType<typeof setTimeout>; // タイマー参照を保持
   let characterInterval: ReturnType<typeof setInterval>; // キャラクター生成インターバルの参照

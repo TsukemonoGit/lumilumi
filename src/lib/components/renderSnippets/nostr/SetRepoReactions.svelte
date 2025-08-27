@@ -15,7 +15,7 @@
     content?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
     loading?: Snippet;
   }
-  let { error, nodata, content, loading }: Props = $props();
+  const { error, nodata, content, loading }: Props = $props();
 
   let filters: Nostr.Filter[] = [];
   let result: { data: any; status: any; error: any };
@@ -114,9 +114,9 @@
 
   result = useRepReactionList();
 
-  let data = $derived(result?.data);
-  let status = $derived(result?.status);
-  let errorData = $derived(result?.error);
+  const data = $derived(result?.data);
+  const status = $derived(result?.status);
+  const errorData = $derived(result?.error);
 
   //なんかたまにリアクション取得されないときの対策でビジブル変わったときにフィルター再設置してみる
   function onVisibilityChange() {

@@ -39,7 +39,7 @@
     omit,
     isOmitted = $bindable(),
   }: Props = $props();
-  let loadingText = $derived(encodetoNote(id));
+  const loadingText = $derived(encodetoNote(id));
   const queryCheck = async (id: string) => {
     //if (!queryClient.getQueryData(["note", id])) {//見つかんないときにリレーヒントから探すからない
     queryClient.removeQueries({ queryKey: ["note", id] });

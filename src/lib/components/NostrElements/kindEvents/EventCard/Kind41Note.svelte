@@ -19,7 +19,7 @@
     zIndex?: number;
   }
 
-  let {
+  const {
     note,
     metadata,
     displayMenu,
@@ -31,7 +31,7 @@
     zIndex,
   }: Props = $props();
 
-  let root = note.tags.find((tag) => tag[0] === "e")?.[1];
+  const root = note.tags.find((tag) => tag[0] === "e")?.[1];
 
   const handleClickToChannel = (id: string) => {
     if (!id) {

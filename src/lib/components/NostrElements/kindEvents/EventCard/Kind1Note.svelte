@@ -57,9 +57,9 @@
     showStatus,
   }: Props = $props();
 
-  let warning = $derived(checkContentWarning(note?.tags));
+  const warning = $derived(checkContentWarning(note?.tags));
 
-  let isBookmarked: boolean = $derived(
+  const isBookmarked: boolean = $derived(
     bookmark10003
       .get()
       ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false

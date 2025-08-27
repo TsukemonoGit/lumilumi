@@ -77,7 +77,7 @@
   const operator = pipe(uniq, userStatus(), /* reactionCheck(), */ scanArray());
   //sinceとuntilは両方undefinedか、両方値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
-  let reqFilters = $derived(
+  const reqFilters = $derived(
     filters.map((filter: Nostr.Filter) => ({
       ...filter,
 
@@ -85,7 +85,7 @@
     }))
   );
 
-  let result = $derived(
+  const result = $derived(
     filters[0].since === undefined
       ? useSearchEventList(queryKey, reqFilters, operator, req, relays)
       : {
@@ -94,9 +94,9 @@
           error: undefined,
         }
   );
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
   let readUrls: string[] = [];
   $effect(() => {
     if ($defaultRelays) {
@@ -224,6 +224,7 @@
     updateViewEvent($data);
   };
 
+  // eslint-disable-next-line no-undef
   let debounceTimer: NodeJS.Timeout | null = null;
   const DEBOUNCE_TIME = 200; // 200ミリ秒
   function updateViewEvent(data?: EventPacket[] | undefined | null) {

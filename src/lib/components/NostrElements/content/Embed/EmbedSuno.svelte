@@ -1,6 +1,6 @@
 <!-- EmbedSuno.svelte -->
 <script lang="ts">
-  let { url, onError } = $props();
+  const { url, onError } = $props();
 
   // エラーハンドリング用
   const handleError = () => {

@@ -13,7 +13,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import LumiIcon from "$lib/assets/lumi-chan.webp";
 
-  let encodedPub: string | undefined = $derived(
+  const encodedPub: string | undefined = $derived(
     pubCheck(lumiSetting.get().pubkey)
   );
 
@@ -24,7 +24,10 @@
         if (pub) {
           return pub;
         }
-      } catch (error) {}
+      } catch  {
+        //
+        
+      }
     }
     return undefined;
   }
@@ -83,7 +86,7 @@
         class=" mt-auto"
         aria-current={page.url.pathname === `/about` ? "page" : undefined}
       >
-        <a href={`/about`}>
+        <a href="/about">
           {#if lumiSetting.get().showImg}
             <img
               loading="lazy"

@@ -18,7 +18,7 @@
   import { waitNostr } from "nip07-awaiter";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
-  let tags: string[][] = [];
+  const tags: string[][] = [];
   let signPubkey: string | undefined = $state();
   let sharedContent: string; // = [data.title, data.text, data.url]
   //   .filter(Boolean)
@@ -38,7 +38,7 @@
       console.log(error);
     }
 
-    let savedUploader = localStorage.getItem(STORAGE_KEYS.UPLOADER);
+    const savedUploader = localStorage.getItem(STORAGE_KEYS.UPLOADER);
     if (!savedUploader) {
       $uploader = mediaUploader[0];
     } else {

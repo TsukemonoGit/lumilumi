@@ -36,7 +36,7 @@
     heyaId: string;
   }
 
-  let {
+  const {
     note,
     indexes = undefined,
     channelData,
@@ -46,7 +46,7 @@
   // svelte-ignore non_reactive_update
   // let dialogOpen: Writable<boolean> = writable(false);
 
-  let menuTexts = $derived.by(() => {
+  const menuTexts = $derived.by(() => {
     let menu = [
       {
         text: `${$_("menu.copy.nevent")}`,
@@ -86,9 +86,9 @@
     return menu;
   });
 
-  let editChannelDataOpen = $state(writable(false));
+  const editChannelDataOpen = $state(writable(false));
   let editChannelListOpen = $state(writable(false));
-  let channelLink = $derived(getChannelLink(heyaId));
+  const channelLink = $derived(getChannelLink(heyaId));
 
   const handleSelectItem = async (index: number) => {
     switch (menuTexts[index].num) {
@@ -169,7 +169,7 @@
     }
   };
 
-  let nevent: string | undefined = $derived.by(() => {
+  const nevent: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
     }

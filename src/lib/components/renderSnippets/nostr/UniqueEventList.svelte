@@ -29,7 +29,7 @@
     loading: Snippet;
   }
 
-  let {
+  const {
     queryKey,
     filters,
     req = undefined,
@@ -39,10 +39,10 @@
     content,
   }: Props = $props();
 
-  let result = $derived(useUniqueEventList(queryKey, filters, req));
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const result = $derived(useUniqueEventList(queryKey, filters, req));
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 </script>
 
 {#if $errorData}

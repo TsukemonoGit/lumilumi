@@ -12,15 +12,15 @@
   import { defaultRelays, queryClient } from "$lib/stores/stores";
   import { unsucscribeSearch } from "$lib/func/useReq";
 
-  let amount = 50;
-  let viewIndex = 0;
+  const amount = 50;
+  const viewIndex = 0;
   interface Props {
     filters: Nostr.Filter[];
     relays: string[];
     eventFilter: (ev: Nostr.Event) => boolean;
   }
 
-  let { filters, relays, eventFilter }: Props = $props();
+  const { filters, relays, eventFilter }: Props = $props();
   const req = createRxForwardReq();
   $inspect(filters);
 

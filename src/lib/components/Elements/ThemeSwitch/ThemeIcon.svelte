@@ -7,7 +7,7 @@
     size?: "sm" | "md" | "lg";
   }
 
-  let { theme = "light", size = "md" }: Props = $props();
+  const { theme = "light", size = "md" }: Props = $props();
 
   const sizeMap = {
     sm: "h-3 w-3",
@@ -15,7 +15,7 @@
     lg: "h-7 w-7",
   };
 
-  let component = $derived(theme === "dark" ? Moon : theme === "light" ? Sun : Monitor);
+  const component = $derived(theme === "dark" ? Moon : theme === "light" ? Sun : Monitor);
 
   const SvelteComponent = $derived(component);
 </script>

@@ -36,7 +36,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     replyUsers,
     mini,
     note,
@@ -51,14 +51,14 @@
     showStatus = true,
   }: Props = $props();
   let deleted = $state(false);
-  let imeta: Imeta[] | undefined = $derived(
+  const imeta: Imeta[] | undefined = $derived(
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
       ?.map((i) => reverseConvertMetaTags(i))
       .filter((url) => url !== undefined)
   );
   //console.log(imeta);
-  let imageList = $derived(
+  const imageList = $derived(
     imeta.map((i) => i.url).filter((tag) => tag !== undefined)
   );
 
@@ -68,7 +68,7 @@
     // console.log(imageList, index);
     $viewMediaModal = { index: index, mediaList: imageList };
   };
-  let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
+  const title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
 </script>
 
 {#if deleted}
@@ -133,7 +133,7 @@
         {zIndex}
       />
       <span
-        class={"float-end text-neutral-400    text-sm font-semibold px-1"}
+        class="float-end text-neutral-400    text-sm font-semibold px-1"
         title="kind:20"
       >
         Picture</span

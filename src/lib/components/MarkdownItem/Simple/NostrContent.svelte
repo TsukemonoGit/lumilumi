@@ -27,7 +27,7 @@
     zIndex?: number | undefined;
   }
 
-  let {
+  const {
     event,
     displayMenu,
     depth,
@@ -37,11 +37,11 @@
     zIndex,
   }: Props = $props();
 
-  let text = $derived(event.content || "");
-  let tags = $derived(event.tags || []);
+  const text = $derived(event.content || "");
+  const tags = $derived(event.tags || []);
 
-  let parts: Token[] = $derived.by(() => {
-    let rawParts = parseContent(text, tags);
+  const parts: Token[] = $derived.by(() => {
+    const rawParts = parseContent(text, tags);
     let imageIndex = 0;
     return rawParts.map((token) => {
       if (token.type === TokenType.URL && token.metadata?.type === "image") {
@@ -56,7 +56,7 @@
 
   //ツイッターとかぶるすこも画像だけ拡大されて複数だったら横で次のやつ見れるようになってるらしい
 
-  let mediaList = $derived(
+  const mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)

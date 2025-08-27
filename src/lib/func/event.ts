@@ -218,11 +218,11 @@ export const checkContentWarning = (tags: string[][]): string[] | undefined => {
 };
 
 export const noteLink = (note: Nostr.Event): string /**nevent or naddr */ => {
-  let replaceable =
+  const replaceable =
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind));
 
   if (!replaceable) {
-    let eventpointer: nip19.EventPointer = {
+    const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: getRelaysById(note.id),
       author: note.pubkey,
@@ -230,7 +230,7 @@ export const noteLink = (note: Nostr.Event): string /**nevent or naddr */ => {
     };
     return nip19.neventEncode(eventpointer);
   } else {
-    let naddrpointer: nip19.AddressPointer = {
+    const naddrpointer: nip19.AddressPointer = {
       kind: note.kind,
       identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
       pubkey: note.pubkey,

@@ -2,8 +2,8 @@
   import { isvalidURL } from "$lib/func/ogp";
   import type { Snippet } from "svelte";
 
-  let { url, ok, ng }: { url: string; ok: Snippet; ng: Snippet } = $props();
-  let status = $state(isvalidURL(url));
+  const { url, ok, ng }: { url: string; ok: Snippet; ng: Snippet } = $props();
+  const status = $state(isvalidURL(url));
 </script>
 
 {#if status}

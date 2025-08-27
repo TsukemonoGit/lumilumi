@@ -16,7 +16,7 @@
     square?: boolean;
   }
 
-  let { size = 24, square = false }: Props = $props();
+  const { size = 24, square = false }: Props = $props();
   const picture = (metadata: Nostr.Event): string | null => {
     if (!metadata) {
       return null;
@@ -29,7 +29,7 @@
     }
   };
 
-  let avatarColor = $derived(splitHexColorString(lumiSetting.get().pubkey));
+  const avatarColor = $derived(splitHexColorString(lumiSetting.get().pubkey));
 </script>
 
 {#if lumiSetting.get().pubkey}

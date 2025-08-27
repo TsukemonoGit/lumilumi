@@ -11,7 +11,7 @@
     event: Nostr.Event;
   }
 
-  let { event }: Props = $props();
+  const { event }: Props = $props();
 
   const getHandledTag = (event: Nostr.Event): string[] | undefined => {
     switch (event.kind) {
@@ -29,7 +29,7 @@
         return replyTag;
     }
   };
-  let handledTag = $derived(getHandledTag(event));
+  const handledTag = $derived(getHandledTag(event));
   //$inspect(event.kind);
 </script>
 

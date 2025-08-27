@@ -69,16 +69,16 @@
     deleted: boolean;
   } = $props();
 
-  let warning = $derived(
+  const warning = $derived(
     note?.tags.find((item) => item[0] === "content-warning")
   );
-  let root = $derived(
+  const root = $derived(
     note?.tags.find(
       (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
     ) as string[] | undefined
   );
 
-  let atag: string | undefined = $derived.by(() => {
+  const atag: string | undefined = $derived.by(() => {
     if (
       note &&
       ((note.kind >= 10000 && note.kind < 20000) ||
@@ -94,7 +94,7 @@
     }
   });
 
-  let queryId = $derived(atag ?? note?.id);
+  const queryId = $derived(atag ?? note?.id);
   let prosessing = false;
   const handleClickReaction = async () => {
     if (prosessing) return;
@@ -183,7 +183,7 @@
   //https://translate.google.com/?sl=auto&op=translate&text={0}
   //https://www.deepl.com/translator?share=generic#auto/auto/{0}
 
-  let allPtag: string[] = note.tags.reduce((acc, item) => {
+  const allPtag: string[] = note.tags.reduce((acc, item) => {
     if (item[0] === "p" && !acc.includes(item[1]) && item[1] !== note.pubkey) {
       acc.push(item[1]);
     }
@@ -213,7 +213,7 @@
     switch (menuTexts[index].num) {
       case 0:
         //repost
-        let tags: string[][] = [
+        const tags: string[][] = [
           ["p", note.pubkey],
           [
             "e", //a tagのやつにもeもいれる
@@ -372,7 +372,7 @@
   };
 
   const onClickReplyIcon = () => {
-    let tags: string[][] = [];
+    const tags: string[][] = [];
     tags.push(["p", note.pubkey]);
     const relaylist = getRelayById(note.id);
     const root = note.tags.find(
@@ -414,11 +414,11 @@
   let repost: Nostr.Event[] = $state([]);
   let reaction: Nostr.Event[] = $state([]);
   let zap: Nostr.Event[] = $state([]);
-  let repost_length: number = $derived(repost.length);
+  const repost_length: number = $derived(repost.length);
 
-  let reaction_length: number = $derived(reaction.length);
+  const reaction_length: number = $derived(reaction.length);
 
-  let zap_length: number = $derived(zap.length);
+  const zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
   const updateInterval = 1000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
@@ -656,7 +656,7 @@
         <Reposted id={atag ?? note.id}>
           {#snippet loading()}
             <DropdownMenu
-              buttonClass={"actionButton"}
+              buttonClass="actionButton"
               {menuTexts}
               {handleSelectItem}
             >
@@ -665,7 +665,7 @@
 
           {#snippet content({ event })}
             <DropdownMenu
-              buttonClass={"actionButton"}
+              buttonClass="actionButton"
               {menuTexts}
               {handleSelectItem}
             >
@@ -680,7 +680,7 @@
         class="actionButton"
         onclick={() => handleSelectItem(1)}
       >
-        <Quote size="20" class={"stroke-magnum-500/75"} />
+        <Quote size="20" class="stroke-magnum-500/75" />
       </button>
     {/if}
     <!--リプライ, kind1,42以外は NIP-22 により kind1111 -->

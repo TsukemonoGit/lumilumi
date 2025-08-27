@@ -28,9 +28,9 @@
     isZap: boolean; // Zapアイコンを表示するかどうか
   }
 
-  let { metadata } = $props();
-  let confetti: Confetti[] = $state([]);
-  let presents: Present[] = $state([]);
+  const { metadata } = $props();
+  const confetti: Confetti[] = $state([]);
+  const presents: Present[] = $state([]);
   let cakeIsVisible = $state(false);
   let animationActive = $state(true);
   let containerOpacity = $state(1);

@@ -29,7 +29,7 @@
     };
   }
 
-  let { note, indexes = undefined, listData }: Props = $props();
+  const { note, indexes = undefined, listData }: Props = $props();
 
   // svelte-ignore non_reactive_update
   //let dialogOpen: Writable<boolean> = writable(false);
@@ -128,7 +128,7 @@
     }
   };
 
-  let naddr: string | undefined = $derived.by(() => {
+  const naddr: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
     }

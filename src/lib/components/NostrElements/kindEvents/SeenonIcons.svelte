@@ -12,11 +12,11 @@
     width: number;
   }
 
-  let { id, width }: Props = $props();
+  const { id, width }: Props = $props();
 
-  let size = 16;
+  const size = 16;
   let viewAll = $state(false);
-  let relays: string[] = $derived.by(() => {
+  const relays: string[] = $derived.by(() => {
     if (displayEvents.get()) {
       return getRelaysById(id);
     } else return [];

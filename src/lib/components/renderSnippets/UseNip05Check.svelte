@@ -23,15 +23,15 @@
     >;
   }
 
-  let { pubkey, nip05Address, loading, error, nodata, content }: Props =
+  const { pubkey, nip05Address, loading, error, nodata, content }: Props =
     $props();
 
   //export let pubkey: string;
   //export let nip05Address: string;
-  let nip05 = $derived(useNip05Check(nip05Address, pubkey));
-  let data = $derived(nip05.data);
-  let status = $derived(nip05.status);
-  let errorData = $derived(nip05.error);
+  const nip05 = $derived(useNip05Check(nip05Address, pubkey));
+  const data = $derived(nip05.data);
+  const status = $derived(nip05.status);
+  const errorData = $derived(nip05.error);
   // $: console.log($data);
 </script>
 

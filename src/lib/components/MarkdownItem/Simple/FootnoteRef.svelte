@@ -5,7 +5,7 @@
     part: Token; // $: console.log(part);
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 
   
 </script>

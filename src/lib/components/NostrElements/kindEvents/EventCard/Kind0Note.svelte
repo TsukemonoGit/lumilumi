@@ -19,9 +19,9 @@
 
   let { displayMenu, note = $bindable(), depth, repostable }: Props = $props();
 
-  let prof = $derived(profile(note));
-  let petname = $derived(followList.get().get(note.pubkey));
-  let isBirthDay = $derived(checkBirthDay(prof));
+  const prof = $derived(profile(note));
+  const petname = $derived(followList.get().get(note.pubkey));
+  const isBirthDay = $derived(checkBirthDay(prof));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">

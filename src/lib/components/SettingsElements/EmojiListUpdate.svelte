@@ -16,13 +16,14 @@
 
   import { Progress } from "melt/builders";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import type { Snippet } from "svelte";
 
   interface Props {
     buttonClass?: string;
-    children?: () => any;
+    children?:Snippet;
   }
 
-  let { buttonClass, children }: Props = $props();
+  const { buttonClass, children }: Props = $props();
   const progress = new Progress();
 
   let progressState = $state({

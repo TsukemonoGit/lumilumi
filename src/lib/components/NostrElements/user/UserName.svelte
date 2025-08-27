@@ -11,10 +11,10 @@
     pubhex: string;
   }
 
-  let { pubhex }: Props = $props();
+  const { pubhex }: Props = $props();
 
-  let petname = $derived(followList.get().get(pubhex));
-  let pubString = $derived(displayShortPub(pubhex));
+  const petname = $derived(followList.get().get(pubhex));
+  const pubString = $derived(displayShortPub(pubhex));
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {
     if (!hasLoaded) {

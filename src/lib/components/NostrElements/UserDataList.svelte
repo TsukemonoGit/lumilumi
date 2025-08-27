@@ -27,13 +27,13 @@
   function setMetadataList() {
     try {
       const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-      let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
+      const metadataQueryData: [QueryKey, EventPacket][] = metadataStr
         ? JSON.parse(metadataStr)
         : [];
       metadataList = getMetadataList(metadataQueryData);
     } catch (error) {}
   }
-  let onOpenStateChange = (bool: boolean) => {
+  const onOpenStateChange = (bool: boolean) => {
     if (bool) {
       setMetadataList();
     }

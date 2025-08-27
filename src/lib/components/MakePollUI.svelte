@@ -16,7 +16,7 @@
     onPolled: (id: string) => void;
   }
 
-  let { onPolled }: Props = $props();
+  const { onPolled }: Props = $props();
 
   let dialogOpen: Writable<boolean> = $state(writable(false));
   // アンケートのオプションを文字列の配列として管理

@@ -33,7 +33,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     thread,
     displayMenu,
     note,
@@ -53,7 +53,7 @@
     (tag) => tag[0] === "e" && tag[3] === "root"
   )?.[1];
 
-  let warning = $derived(checkContentWarning(note.tags));
+  const warning = $derived(checkContentWarning(note.tags));
 </script>
 
 <NoteComponent

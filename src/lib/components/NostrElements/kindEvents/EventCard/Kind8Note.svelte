@@ -58,21 +58,21 @@
     showStatus = true,
   }: Props = $props();
 
-  let replyUsers: string[] = $derived(
+  const replyUsers: string[] = $derived(
     note.tags
       .filter(
         (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1])
       )
       .map((tag) => tag[1])
   );
-  let badgeAddress: nip19.AddressPointer | undefined = $derived.by(() => {
+  const badgeAddress: nip19.AddressPointer | undefined = $derived.by(() => {
     const atag = note.tags.find(
       (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
     );
     return atag ? parseNaddr(atag) : undefined;
   });
 
-  let nevent: string | undefined = $derived.by(() => {
+  const nevent: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
     }

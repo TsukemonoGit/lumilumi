@@ -11,7 +11,7 @@
     status: ReqStatus;
   }
 
-  let { events, status }: Props = $props();
+  const { events, status }: Props = $props();
 </script>
 
 <CollapsibleList title="Reaction" amount={events.length} {status}>

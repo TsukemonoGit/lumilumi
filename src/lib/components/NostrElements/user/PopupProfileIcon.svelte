@@ -16,7 +16,7 @@
     zIndex?: number;
   }
 
-  let { pubkey, zIndex }: Props = $props();
+  const { pubkey, zIndex }: Props = $props();
 
   const getPicture = (content: string): string | undefined => {
     try {
@@ -30,7 +30,7 @@
       return undefined;
     }
   };
-  let avatarColor = $derived(splitHexColorString(pubkey));
+  const avatarColor = $derived(splitHexColorString(pubkey));
 </script>
 
 <Popover ariaLabel="user profile">

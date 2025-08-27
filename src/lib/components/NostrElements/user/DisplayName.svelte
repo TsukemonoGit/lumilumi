@@ -13,13 +13,13 @@
     height: number;
   }
 
-  let { tags, name, height }: Props = $props();
+  const { tags, name, height }: Props = $props();
 
-  let emojiTags = $derived(
+  const emojiTags = $derived(
     tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
   );
 
-  let parts: Token[] | undefined = $derived(
+  const parts: Token[] | undefined = $derived(
     emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined
   );
 </script>

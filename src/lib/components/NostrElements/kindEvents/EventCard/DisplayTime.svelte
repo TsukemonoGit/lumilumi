@@ -2,7 +2,7 @@
   import { noteLink } from "$lib/func/event";
   import { datetime, formatAbsoluteDateFromUnix } from "$lib/func/util";
 
-  let { note, displayMenu } = $props();
+  const { note, displayMenu } = $props();
 </script>
 
 <!-- 

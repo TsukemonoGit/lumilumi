@@ -27,7 +27,7 @@
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
-  let timelineQuery: QueryKey = ["timeline", "feed", lumiSetting.get().pubkey];
+  const timelineQuery: QueryKey = ["timeline", "feed", lumiSetting.get().pubkey];
 
   onMount(async () => {
     if (!isOnMount) {

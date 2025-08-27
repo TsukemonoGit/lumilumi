@@ -57,7 +57,7 @@
   let decrypt: string | undefined = $state(undefined);
 
   //自分宛て？もしくは自分が書いた？
-  let forme = $derived(
+  const forme = $derived(
     note.pubkey === lumiSetting.get().pubkey ||
       note.tags.find(
         (tag) =>

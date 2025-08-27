@@ -10,7 +10,7 @@
     pubkey: string;
   }
 
-  let { pubkey }: Props = $props();
+  const { pubkey }: Props = $props();
 
   const encodedPub = $derived.by(() => {
     try {

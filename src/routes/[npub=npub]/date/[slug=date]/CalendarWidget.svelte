@@ -13,7 +13,7 @@
     pubkey?: string;
   }
 
-  let { currentDate, pubkey }: Props = $props();
+  const { currentDate, pubkey }: Props = $props();
 
   function toCalendarDate(date: Date): CalendarDate {
     return new CalendarDate(
@@ -51,7 +51,7 @@
   }
 
   // Melt UIのカレンダーを作成
-  let {
+  const {
     elements: { calendar, heading, grid, cell, prevButton, nextButton },
     states: { months, headingValue, weekdays },
     helpers: { isDateDisabled, isDateUnavailable },

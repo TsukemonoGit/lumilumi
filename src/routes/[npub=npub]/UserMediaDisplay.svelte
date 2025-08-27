@@ -30,7 +30,7 @@
   type ImageLoadStatus = "loading" | "success" | "error";
 
   // Props
-  let { pubkey }: { pubkey: string } = $props();
+  const { pubkey }: { pubkey: string } = $props();
 
   // 状態管理
   let mediaEvents = $state<MediaEvent[]>([]);
@@ -45,7 +45,7 @@
   let showModal: Writable<boolean> = $state(writable(false));
   let isCancelled = false;
   // 派生状態
-  let viewList = $derived(
+  const viewList = $derived(
     mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
   );
 
@@ -289,7 +289,7 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 </div>
 
-<Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
+<Dialog id="showMore_preview" bind:open={showModal} zIndex={10}>
   {#snippet main()}
     {#if selectedEvent?.eventPacket}
       <div class="rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">

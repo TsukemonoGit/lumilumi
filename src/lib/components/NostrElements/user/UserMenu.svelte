@@ -39,9 +39,9 @@
     tab?: string | undefined;
   }
 
-  let { metadata, pubkey, profile, tab }: Props = $props();
+  const { metadata, pubkey, profile, tab }: Props = $props();
 
-  let encodedPubkey = $derived.by(() => {
+  const encodedPubkey = $derived.by(() => {
     if (pubkey) {
       try {
         return nip19.npubEncode(pubkey);
@@ -52,7 +52,7 @@
   });
 
   // メニュー項目の定義を論理的な順序で整理
-  let menuTexts = $derived.by(() => {
+  const menuTexts = $derived.by(() => {
     const menuItems = [
       // 基本操作グループ
       {

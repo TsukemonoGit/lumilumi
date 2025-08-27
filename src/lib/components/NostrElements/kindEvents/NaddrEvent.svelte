@@ -27,7 +27,7 @@
     className?: string;
   }
 
-  let {
+  const {
     data,
     content,
     depth,
@@ -40,7 +40,7 @@
     omit = false,
     className,
   }: Props = $props();
-  let queryKey = $derived([
+  const queryKey = $derived([
     "naddr",
     `${data.kind}:${data.pubkey}:${data.identifier}`,
   ] as QueryKey);
@@ -59,7 +59,7 @@
       dynamicClasses = `${className} ml-5 opacity-90 text-sm`;
     }
   };
-  let naddrString: string | undefined = $derived.by(() => {
+  const naddrString: string | undefined = $derived.by(() => {
     try {
       return nip19.naddrEncode(data);
     } catch (error) {

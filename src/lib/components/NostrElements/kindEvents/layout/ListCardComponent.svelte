@@ -17,7 +17,7 @@
     menu: Snippet;
   }
 
-  let {
+  const {
     clickAction,
     linkButtonTitle,
     handleClickToChannel,

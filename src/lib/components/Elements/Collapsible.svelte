@@ -8,7 +8,7 @@
     contentEle?: Snippet;
   }
 
-  let { title, contentEle }: Props = $props();
+  const { title, contentEle }: Props = $props();
 
   const {
     elements: { root, content, trigger },

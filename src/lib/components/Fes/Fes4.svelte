@@ -6,10 +6,10 @@
   import { Zap, Cake, Sparkles, Star } from "lucide-svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
 
-  let { metadata } = $props();
-  let fireworks: any[] = $state([]);
-  let balloons: any[] = $state([]);
-  let stars: any[] = $state([]);
+  const { metadata } = $props();
+  const fireworks: any[] = $state([]);
+  const balloons: any[] = $state([]);
+  const stars: any[] = $state([]);
   let cakeVisible = $state(false);
   let animationActive = $state(true);
   let zapOpen = $state(false); // zapOpenの状態を追跡

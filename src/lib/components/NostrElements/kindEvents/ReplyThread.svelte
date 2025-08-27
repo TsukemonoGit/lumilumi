@@ -14,7 +14,7 @@
     repostable: boolean;
   }
 
-  let { replyTag, displayMenu, depth, repostable }: Props = $props();
+  const { replyTag, displayMenu, depth, repostable }: Props = $props();
 
   const openModal = (index: number) => {
     // modalIndex = index;
@@ -63,7 +63,7 @@
     <!---->
     {#if replyTag[1].startsWith("http")}
       {@const part = toPart(replyTag)}
-      <UrlDisplay {part} {openModal} author={""} />
+      <UrlDisplay {part} {openModal} author="" />
     {:else}
       <!---->
       {replyTag[1]}

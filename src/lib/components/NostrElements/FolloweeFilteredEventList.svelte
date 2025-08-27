@@ -8,7 +8,7 @@
     events: Nostr.Event<number>[];
   }
 
-  let { events }: Props = $props();
+  const { events }: Props = $props();
 </script>
 
 {#if events && events.length > 0}

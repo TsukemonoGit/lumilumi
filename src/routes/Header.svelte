@@ -20,7 +20,7 @@
 
   //-----
   // 現在のページに基づいてアイコンを設定
-  let currentPage = $derived.by(() => {
+  const currentPage = $derived.by(() => {
     const { pathname } = page.url;
     // アイテムを部分一致でチェック
     const matchedItem = mainMenuItems.find((item) => {
@@ -54,7 +54,7 @@
     }
   });
   // $inspect(_showBanner);
-  let Icon = $derived(currentPage?.Icon);
+  const Icon = $derived(currentPage?.Icon);
   const onMuteChange = () => {
     timelineFilter.update((cur) => {
       console.log(cur);

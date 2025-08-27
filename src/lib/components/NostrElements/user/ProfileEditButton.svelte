@@ -8,7 +8,7 @@
     metadata: Nostr.Event;
   }
 
-  let { metadata }: Props = $props();
+  const { metadata }: Props = $props();
 
   const handleClickEdit = () => {
     goto(`${nip19.npubEncode(metadata.pubkey)}/profile`);

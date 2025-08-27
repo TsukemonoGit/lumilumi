@@ -190,7 +190,7 @@ export class FilteredChunkManager {
     const cumulative = this.cumulativeFilterInfo.get(configHash) || [];
     const requiredChunks: number[] = [];
 
-    let currentFilteredIndex = 0;
+    const currentFilteredIndex = 0;
     const targetEndIndex = filteredStartIndex + amount;
 
     for (const chunkIndex of Array.from(this.loadedChunks).sort(

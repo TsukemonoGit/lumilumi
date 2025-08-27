@@ -35,7 +35,7 @@
     displayTags?: boolean;
   }
 
-  let {
+  const {
     event,
     displayMenu,
     depth,
@@ -47,11 +47,11 @@
     displayTags = true,
   }: Props = $props();
 
-  let text = $derived(event.content || "");
-  let tags = $derived(event.tags || []);
+  const text = $derived(event.content || "");
+  const tags = $derived(event.tags || []);
 
-  let parts: Token[] = $derived.by(() => {
-    let rawParts = parseContent(text, tags);
+  const parts: Token[] = $derived.by(() => {
+    const rawParts = parseContent(text, tags);
     let imageIndex = 0;
     return rawParts.map((token) => {
       if (token.type === TokenType.URL && token.metadata?.type === "image") {
@@ -64,7 +64,7 @@
     });
   });
 
-  let mediaList = $derived(
+  const mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)
@@ -107,10 +107,10 @@
       return undefined;
     }
   };
-  let geohash = $derived(
+  const geohash = $derived(
     tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
   ); // string | undefined
-  let proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
+  const proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
 
   const arekore = (
     type: string,
@@ -168,7 +168,7 @@
     <CustomEmoji {part} />
   {:else if part.type === "hashtag"}
     <a
-      aria-label={"Search for events containing the hashtag"}
+      aria-label="Search for events containing the hashtag"
       href={`/search?t=${part.metadata!.tag}&k=${event.kind || 1}`}
       class="underline text-magnum-300 break-all">{part.content}</a
     >

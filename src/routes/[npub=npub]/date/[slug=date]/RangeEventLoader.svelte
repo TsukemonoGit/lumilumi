@@ -15,7 +15,7 @@
     children: Snippet<[Nostr.Event[]]>;
   }
 
-  let { relays, range, filter, children }: Props = $props();
+  const { relays, range, filter, children }: Props = $props();
 
   const SIFT_SIZE = 200; // 1回で取得する件数
   const events = writable<Nostr.Event[]>([]);
@@ -168,7 +168,7 @@
   }
 
   // リアルタイムでeventsストアの変更を監視
-  let currentEvents = $derived($events);
+  const currentEvents = $derived($events);
 </script>
 
 {#if error}

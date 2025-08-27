@@ -7,9 +7,9 @@
     note: Nostr.Event;
   }
 
-  let { note }: Props = $props();
+  const { note }: Props = $props();
 
-  let clientTag = $derived(note.tags.find((tag) => tag[0] === "client"));
+  const clientTag = $derived(note.tags.find((tag) => tag[0] === "client"));
 
   const onClickClientTag = (atag: string[]) => {
     const naddrAddress = parseNaddr(["a", ...atag]);
@@ -25,7 +25,7 @@
 
   {#if clientTag}
     - {#if clientTag.length > 2}<button
-        title={"open in nostrapp.link"}
+        title="open in nostrapp.link"
         onclick={() => onClickClientTag(clientTag.slice(2))}
         class={` text-magnum-200 hover:underline w-fit whitespace-pre-wrap break-words`}
         style="word-break: break-word;"

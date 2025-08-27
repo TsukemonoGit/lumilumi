@@ -28,7 +28,7 @@
     className?: string;
   }
 
-  let {
+  const {
     id,
     mini = false,
     maxHeight,
@@ -43,7 +43,7 @@
     onChange,
     className,
   }: Props = $props();
-  let loadingText = $derived(encodetoNote(id));
+  const loadingText = $derived(encodetoNote(id));
 
   let hasLoaded = $state(false);
   const handleEnterViewport = () => {

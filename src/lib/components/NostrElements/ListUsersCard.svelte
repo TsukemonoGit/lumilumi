@@ -5,7 +5,7 @@
     pubkeys: string[];
   }
 
-  let { pubkeys }: Props = $props();
+  const { pubkeys }: Props = $props();
   const depth: number = 0;
 </script>
 

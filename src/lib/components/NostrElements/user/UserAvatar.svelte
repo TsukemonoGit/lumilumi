@@ -14,7 +14,7 @@
     handleStateError?: any;
   }
 
-  let {
+  const {
     url,
     name,
     pubkey,
@@ -24,7 +24,7 @@
     handleStateError = () => {},
   }: Props = $props();
 
-  let avatarUrl = $derived.by(() => {
+  const avatarUrl = $derived.by(() => {
     if (!url) return "";
     try {
       const aUrl = new URL(url);

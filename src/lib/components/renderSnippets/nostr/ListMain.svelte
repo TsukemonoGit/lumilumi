@@ -33,7 +33,7 @@
     >;
   }
 
-  let {
+  const {
     req = undefined,
 
     queryKey,
@@ -52,10 +52,10 @@
       //  import { latestList } from "$lib/func/event";でやってる
     }), */
 
-  let result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 </script>
 
 {#if $errorData}

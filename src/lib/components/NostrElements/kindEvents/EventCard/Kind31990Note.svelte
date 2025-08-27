@@ -27,7 +27,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     note,
     data,
     metadata,

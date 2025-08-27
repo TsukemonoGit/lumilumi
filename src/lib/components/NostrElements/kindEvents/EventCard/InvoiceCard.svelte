@@ -8,7 +8,7 @@
     invoice: string;
   }
 
-  let { invoice }: Props = $props();
+  const { invoice }: Props = $props();
   // svelte-ignore non_reactive_update
   let invoiceOpen: (bool: boolean) => void = () => {};
 
@@ -30,10 +30,10 @@
     invoiceOpen?.(true);
   };
 
-  let decoded = $derived(invoiceDecode(invoice));
+  const decoded = $derived(invoiceDecode(invoice));
 
   // 金額（satoshi単位）を取得
-  let amount: number | undefined = $derived(
+  const amount: number | undefined = $derived(
     decoded ? getAmountSats(decoded) : undefined
   );
 

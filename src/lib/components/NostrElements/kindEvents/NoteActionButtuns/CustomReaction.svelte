@@ -137,7 +137,7 @@
 
 <Popover
   bind:openPopover
-  buttonClass={"actionButton"}
+  buttonClass="actionButton"
   ariaLabel="Open emoji picker"
 >
   <SmilePlus size="20" class="stroke-magnum-500/75" />

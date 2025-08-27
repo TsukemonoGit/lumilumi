@@ -37,7 +37,7 @@
     children?: import("svelte").Snippet;
   }
 
-  let { pubkey, children }: Props = $props();
+  const { pubkey, children }: Props = $props();
 
   //-------------------------------------mute menu
   const {
@@ -94,7 +94,7 @@
     },
   ];
 
-  let muteStatus = $derived(
+  const muteStatus = $derived(
     $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined
   );
 
@@ -140,7 +140,7 @@
       if (!check) {
         //含まれてなかったたらデータを更新してpublishしてから
         //privateに追加する
-        let newTags = privateTags ?? [];
+        const newTags = privateTags ?? [];
 
         newTags.push(["p", pubkey]);
         const newEvPara: Nostr.EventParameters = {
@@ -217,7 +217,7 @@
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
         (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
       );
-      let newTags = privateTags ?? [];
+      const newTags = privateTags ?? [];
       if (!check) {
         //含まれてなかったたらデータを更新してpublishしてから
         //privateに追加する
@@ -304,7 +304,7 @@
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
         (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
       );
-      let newTags = privateTags ?? [];
+      const newTags = privateTags ?? [];
       if (!check) {
         //含まれてなかったたらデータを更新してpublishしてから
         //privateに追加する
@@ -390,7 +390,7 @@
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
         (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
       );
-      let newTags = privateTags ?? [];
+      const newTags = privateTags ?? [];
       if (!check) {
         //含まれてなかったたらデータを更新してpublishしてから
         //privateに追加する

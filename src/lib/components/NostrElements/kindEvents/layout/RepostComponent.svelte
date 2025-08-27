@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { kindIcon, userIcon, name, actionButtons } = $props();
+  const { kindIcon, userIcon, name, actionButtons } = $props();
 </script>
 
 <div class="flex gap-1 items-center bg-magnum-800/25">

@@ -15,7 +15,7 @@
     heyaId: string | undefined;
   }
 
-  let { heyaId }: Props = $props();
+  const { heyaId }: Props = $props();
 
   const size = 18;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
@@ -26,7 +26,7 @@
     }
   };
 
-  let channelLink = $derived(getChannelLink(heyaId));
+  const channelLink = $derived(getChannelLink(heyaId));
   const menuTexts: { icon: any; text: string; num: number }[] = [
     { icon: undefined, text: `${$_("channel.menu.edit")}`, num: 0 },
     { icon: undefined, text: `${$_("channel.menu.open")}`, num: 1 },

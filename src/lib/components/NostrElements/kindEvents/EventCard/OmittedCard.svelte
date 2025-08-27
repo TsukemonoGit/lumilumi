@@ -22,7 +22,7 @@
     zIndex?: number;
   }
 
-  let {
+  const {
     repostable,
     displayMenu,
     depth,

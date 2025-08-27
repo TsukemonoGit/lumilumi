@@ -18,14 +18,14 @@
   import type { PageData } from "./$types";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
 
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   //チャンネルでのリポストって誰に向けて見せたくてリポストしてるのかわからんくて扱いにくいから
   //引用だけにしてみる
   //Globalのチャンネルフィードにはkind16リポストk=16を表示することにしてみる。
   //repostable={false}チャンネル部屋ではリポストできないようにしてみる（kindで判断じゃなくてチャンネル部屋にいるときだけだけどダイジョブ？？？）
-  let amount = 50;
-  let viewIndex = 0;
+  const amount = 50;
+  const viewIndex = 0;
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
@@ -74,8 +74,8 @@
     const eMutes = $mutes.list.e || [];
     return eMutes.includes(id);
   }
-  let timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
-  let isMute = $derived(
+  const timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
+  const isMute = $derived(
     channelMuteCheck(data.id, timelineFilter.get().adaptMute)
   );
   let heyaRelay: string = $state("");

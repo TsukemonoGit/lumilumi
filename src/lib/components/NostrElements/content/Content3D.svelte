@@ -12,7 +12,7 @@
   }
 
   // svelte-ignore non_reactive_update
-  let { content = undefined, url = undefined }: Props = $props();
+  const { content = undefined, url = undefined }: Props = $props();
   let view = $state(false);
 
   // svelte-ignore non_reactive_update

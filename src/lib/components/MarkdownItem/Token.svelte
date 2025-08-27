@@ -16,7 +16,7 @@
     zIndex?: number | undefined;
   }
 
-  let {
+  const {
     part,
     displayMenu,
     depth,

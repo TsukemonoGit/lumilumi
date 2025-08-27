@@ -5,7 +5,7 @@
     part: Token; // console.log("[codeBlock]", part);
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 
   
 </script>

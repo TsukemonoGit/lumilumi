@@ -33,7 +33,7 @@
     note: Nostr.Event;
   }
 
-  let {
+  const {
     note,
 
     displayMenu,
@@ -54,7 +54,7 @@
   });
 
   //プレビューにも使ってるからconstだとだめ
-  let tokens = $derived(
+  const tokens = $derived(
     md
       .use(markdownTaskListPlugin)
       .use(markdownImgPlugin)
@@ -71,7 +71,7 @@
 
       .parse(note.content, {})
   );
-  let parts = $derived(transformTokens(tokens));
+  const parts = $derived(transformTokens(tokens));
 
   //let modalIndex = 0;
   const openModal = (index: number) => {

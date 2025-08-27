@@ -22,7 +22,7 @@
     clickAction: boolean;
   }
 
-  let {
+  const {
     id,
     handleClickToChannel = undefined,
     linkButtonTitle,
@@ -30,7 +30,7 @@
 
     clickAction,
   }: Props = $props();
-  let size = clickAction ? 96 : 66;
+  const size = clickAction ? 96 : 66;
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
       const kategories = text.tags.reduce((result, tag) => {

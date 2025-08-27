@@ -24,7 +24,7 @@
     zIndex?: number;
   }
 
-  let {
+  const {
     note,
     depth,
     excludefunc = (event: Nostr.Event) => false,
@@ -68,7 +68,7 @@
       {displayMenu}
       {mini}
       {zIndex}
-      message={"failed to get zapped user"}
+      message="failed to get zapped user"
     />
 
     <!-- <Kind9735Invalid
@@ -94,7 +94,7 @@
           {displayMenu}
           {mini}
           {zIndex}
-          message={"loading zap recipient's data..."}
+          message="loading zap recipient's data..."
         />
 
         <!-- <Kind9735Invalid
@@ -119,7 +119,7 @@
           {displayMenu}
           {mini}
           {zIndex}
-          message={"failed to get zap recipient's data."}
+          message="failed to get zap recipient's data."
         />
 
         <!-- <Kind9735Invalid
@@ -144,7 +144,7 @@
           {displayMenu}
           {mini}
           {zIndex}
-          message={"error to get zap recipient's data."}
+          message="error to get zap recipient's data."
         />
 
         <!-- <Kind9735Invalid
@@ -170,7 +170,7 @@
             {displayMenu}
             {mini}
             {zIndex}
-            message={"Checking the LNURL Server's pubkey..."}
+            message="Checking the LNURL Server's pubkey..."
           />
 
           <!-- <Kind9735Invalid

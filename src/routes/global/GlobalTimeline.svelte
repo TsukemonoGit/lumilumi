@@ -12,8 +12,8 @@
   import * as Nostr from "nostr-typedef";
 
   let isOnMount = false;
-  let amount = 50;
-  let viewIndex = 0;
+  const amount = 50;
+  const viewIndex = 0;
   interface Props {
     timelineQuery: QueryKey;
 
@@ -21,7 +21,7 @@
     eventFilter?: (event: Nostr.Event) => boolean;
   }
   const req = createRxForwardReq("global");
-  let {
+  const {
     timelineQuery,
 
     globalRelays,

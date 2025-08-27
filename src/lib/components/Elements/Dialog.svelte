@@ -3,7 +3,6 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { untrack, type Snippet } from "svelte";
   import { fade } from "svelte/transition";
-  import { X } from "lucide-svelte";
   import type { Writable } from "svelte/store";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
@@ -65,6 +64,7 @@
     if (!open) return;
 
     return open.subscribe((value) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       value ? openDialog() : closeDialog();
     });
   });

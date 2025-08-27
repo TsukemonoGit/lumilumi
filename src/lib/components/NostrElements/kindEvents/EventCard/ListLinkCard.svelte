@@ -15,7 +15,7 @@
     depth: number;
   }
 
-  let { event, depth }: Props = $props();
+  const { event, depth }: Props = $props();
 
   const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
   const title = event.tags.find((tag) => tag[0] === "title")?.[1];

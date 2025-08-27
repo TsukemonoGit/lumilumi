@@ -17,7 +17,7 @@
     tags?: string[][];
   }
 
-  let {
+  const {
     displayMenu,
     content,
     depth,

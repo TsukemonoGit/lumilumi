@@ -14,7 +14,7 @@ export type Ogp = {
   playerStream?: string; // twitter:player:stream
 };
 
-export let isvalidURL = (str: string | null): boolean => {
+export const isvalidURL = (str: string | null): boolean => {
   if (!str) return false;
   try {
     const url = new URL(str);

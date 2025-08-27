@@ -5,7 +5,7 @@
     url: string;
     onError: () => void;
   }
-  let { url, onError }: Props = $props();
+  const { url, onError }: Props = $props();
 
   async function resolveHandleToDid(handle: string): Promise<string> {
     const response = await fetch(

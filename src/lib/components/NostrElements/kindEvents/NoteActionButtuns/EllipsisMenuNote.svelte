@@ -13,7 +13,7 @@
     iconClass?: string;
   }
 
-  let {
+  const {
     encodedId,
     indexes = undefined,
     TriggerIcon = Ellipsis,
@@ -21,7 +21,7 @@
     iconClass = "",
   }: Props = $props();
 
-  let menuTexts = $derived.by(() => {
+  const menuTexts = $derived.by(() => {
     let menu = [
       {
         text: `${$_("menu.copy.nevent")}`,

@@ -6,7 +6,7 @@
     originalUrl: string;
     onError: () => void;
   }
-  let { url, onError, originalUrl }: Props = $props();
+  const { url, onError, originalUrl }: Props = $props();
   //  $inspect("twitterUrl:", url);
 </script>
 

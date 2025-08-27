@@ -75,7 +75,7 @@
     // updateViewEvent: (partialdata?: EventPacket[] | null | undefined) => void;
   }
 
-  let {
+  const {
     queryKey,
     filters,
     olderFilters,
@@ -133,7 +133,7 @@
   const [uniq, eventIds] = createUniq(keyFn);
 
   // Query setup
-  let result = $derived(
+  const result = $derived(
     useMainTimeline(queryKey, configureOperators(), filters)
   );
   const data = $derived(result.data);

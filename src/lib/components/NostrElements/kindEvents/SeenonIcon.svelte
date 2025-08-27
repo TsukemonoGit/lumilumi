@@ -7,7 +7,7 @@
   import UserAvatar from "../user/UserAvatar.svelte";
   import RelayCard from "./EventCard/RelayCard.svelte";
 
-  let { url, size, zIndex } = $props();
+  const { url, size, zIndex } = $props();
 
   const handleStateError = (url: string) => {
     if (!$relayIconErrorStore.includes(url)) {

@@ -54,15 +54,15 @@
     status,
     kindInfo = false,
   }: Props = $props();
-  let petname = $derived(followList.get().get(note.pubkey));
+  const petname = $derived(followList.get().get(note.pubkey));
 
-  let replaceable = $derived(
+  const replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
-  let prof = $derived(profile(metadata));
-  let isBirthDay = $derived(checkBirthDay(prof));
-  let warning: string[] | undefined = $derived(checkContentWarning(note?.tags));
+  const prof = $derived(profile(metadata));
+  const isBirthDay = $derived(checkBirthDay(prof));
+  const warning: string[] | undefined = $derived(checkContentWarning(note?.tags));
 </script>
 
 <NoteComponent

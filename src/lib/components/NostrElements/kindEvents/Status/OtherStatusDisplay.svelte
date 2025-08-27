@@ -8,7 +8,7 @@
     link: string | undefined;
     event: Nostr.Event;
   }
-  let { link, event }: Props = $props();
+  const { link, event }: Props = $props();
   let deleted = $state(false);
 </script>
 

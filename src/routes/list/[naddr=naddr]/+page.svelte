@@ -20,15 +20,15 @@
   import type { PageData } from "./$types";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { decryptContent } from "$lib/func/settings";
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   const atag = `${data.kind}:${data.pubkey}${data.identifier}`;
   const filters: Nostr.Filter[] = [
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ];
   //console.log(filters);
-  let amount = 50;
-  let viewIndex = 0;
+  const amount = 50;
+  const viewIndex = 0;
 
   let loading = $state(true);
 

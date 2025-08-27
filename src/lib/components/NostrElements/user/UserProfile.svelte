@@ -40,7 +40,7 @@
     tab?: string | undefined;
   }
 
-  let {
+  const {
     pubkey,
     bannerHeight = 180,
     iconSize = 80,
@@ -49,11 +49,11 @@
     zIndex = 0,
     tab,
   }: Props = $props();
-  let petname = $derived(followList.get().get(pubkey));
+  const petname = $derived(followList.get().get(pubkey));
 
-  let pubcheck = $derived(hexRegex.test(pubkey));
+  const pubcheck = $derived(hexRegex.test(pubkey));
 
-  let loadingText = $derived(encodetoNpub(pubkey));
+  const loadingText = $derived(encodetoNpub(pubkey));
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
@@ -63,7 +63,7 @@
   const metadataChange = (metadata: Nostr.Event) => {
     prof = profile(metadata);
   };
-  let zapAddress: string | undefined = $derived.by(() => {
+  const zapAddress: string | undefined = $derived.by(() => {
     if (prof?.lud16) {
       return prof.lud16;
     }
@@ -127,11 +127,11 @@
     }
   };
 
-  let avatarColor = $derived(splitHexColorString(pubkey));
-  let birthDay = $derived(formatBirth(prof));
-  let isBirthday = $derived(checkBirthDay(prof));
+  const avatarColor = $derived(splitHexColorString(pubkey));
+  const birthDay = $derived(formatBirth(prof));
+  const isBirthday = $derived(checkBirthDay(prof));
 
-  let mini = $derived(bannerHeight !== 180);
+  const mini = $derived(bannerHeight !== 180);
 </script>
 
 {#if !pubcheck}
@@ -148,7 +148,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-            title={"Daity User Activity"}
+            title="Daity User Activity"
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -171,7 +171,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-            title={"Daity User Activity"}
+            title="Daity User Activity"
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -194,7 +194,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-            title={"Daity User Activity"}
+            title="Daity User Activity"
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -297,7 +297,7 @@
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}<button
                     class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-                    title={"Daity User Activity"}
+                    title="Daity User Activity"
                     onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
                     ><CalendarSearch /></button
                   >
@@ -330,7 +330,7 @@
               </div>{/if}
           </div>
           {#if lumiSetting.get().showUserStatus}
-            <div class={`text-sm text-zinc-500`}>
+            <div class="text-sm text-zinc-500">
               <ShowStatus {pubkey} />
             </div>
           {/if}

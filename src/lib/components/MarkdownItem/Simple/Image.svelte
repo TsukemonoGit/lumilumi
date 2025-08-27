@@ -7,24 +7,24 @@
     part: Token;
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 
   // console.log("[image]", part);
 
   let view = $state(false);
 
-  let src = $derived(part?.attrs?.find((attr) => attr[0] === "src")?.[1]);
-  let alt = $derived(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]);
-  let title = $derived(part?.attrs?.find((attr) => attr[0] === "title")?.[1]);
-  let button = $derived(
+  const src = $derived(part?.attrs?.find((attr) => attr[0] === "src")?.[1]);
+  const alt = $derived(part?.attrs?.find((attr) => attr[0] === "alt")?.[1]);
+  const title = $derived(part?.attrs?.find((attr) => attr[0] === "title")?.[1]);
+  const button = $derived(
     `Expand Image${title && title !== "" ? title : alt && alt !== "" ? alt : ""}`
   );
   //$: console.log(part);
 
-  let width = $derived(
+  const width = $derived(
     part.attrs?.find((tag) => tag[0] === "width")?.[1] ?? "288"
   );
-  let height = $derived(
+  const height = $derived(
     part.attrs?.find((tag) => tag[0] === "height")?.[1] ?? "288"
   );
 </script>

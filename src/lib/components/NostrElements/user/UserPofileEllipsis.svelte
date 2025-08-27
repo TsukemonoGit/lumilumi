@@ -15,7 +15,7 @@
     zIndex: number;
   }
 
-  let { pubkey, metadata, prof, tab, zIndex }: Props = $props();
+  const { pubkey, metadata, prof, tab, zIndex }: Props = $props();
 </script>
 
 <Popover ariaLabel="user menu" showCloseButton={false} {zIndex}>

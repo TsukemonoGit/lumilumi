@@ -17,7 +17,7 @@
     zIndex?: number | undefined;
   }
 
-  let {
+  const {
     part,
     displayMenu,
     depth,
@@ -29,7 +29,7 @@
     zIndex,
   }: Props = $props();
 
-  let children: Token[] = $derived(transformTokens(part.children ?? []));
+  const children: Token[] = $derived(transformTokens(part.children ?? []));
 </script>
 
 {#if part.children && children}

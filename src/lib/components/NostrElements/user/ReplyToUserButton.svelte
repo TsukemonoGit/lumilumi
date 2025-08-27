@@ -9,11 +9,11 @@
     pubkey: string;
   }
 
-  let { pubkey }: Props = $props();
+  const { pubkey }: Props = $props();
 
   function handleClickRelayToUser() {
     let kind = 1; // Default kind for normal notes
-    let tags: string[][] = [["p", pubkey]];
+    const tags: string[][] = [["p", pubkey]];
     // Extract the note ID from URL params
     const noteParam = page.params.note;
 
@@ -55,5 +55,5 @@
 <button
   onclick={handleClickRelayToUser}
   class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-  title={"reply"}><Reply /></button
+  title="reply"><Reply /></button
 >

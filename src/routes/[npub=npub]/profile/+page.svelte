@@ -32,7 +32,7 @@
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
 
-  let { data }: { data: LayoutData } = $props();
+  const { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
   console.log(data.pubkey);
   const bannerHeight = 120;
@@ -134,7 +134,7 @@
         const { birth, ...restProfile } = newProfile;
         newProfile = restProfile;
       }
-      let { lud06, lud16 } = profile;
+      const { lud06, lud16 } = profile;
       if (lud16) {
         lud = lud16;
       } else if (lud06) {
@@ -233,7 +233,7 @@
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
-      let str = generateResultMessage(isSuccess, isFailed);
+      const str = generateResultMessage(isSuccess, isFailed);
       console.log(str);
 
       $toastSettings = {
@@ -260,7 +260,7 @@
   };
 
   let cursorPosition: number = 0;
-  let customReaction: string = "";
+  const customReaction: string = "";
 
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;

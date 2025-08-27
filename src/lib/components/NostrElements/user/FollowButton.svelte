@@ -36,7 +36,7 @@
     pubkey: string;
   }
 
-  let { pubkey }: Props = $props();
+  const { pubkey }: Props = $props();
 
   let beforeKind3: Nostr.Event | undefined = $state();
   let afterEventParameters: Nostr.EventParameters | undefined = $state();
@@ -44,12 +44,12 @@
   // svelte-ignore non_reactive_update
   let dialogOpen: (bool: boolean) => void = () => {};
 
-  let contactsQueryKey: QueryKey = $derived([
+  const contactsQueryKey: QueryKey = $derived([
     "timeline",
     "contacts",
     lumiSetting.get().pubkey,
   ]);
-  let isfollowee: boolean = $derived(followList.get().has(pubkey));
+  const isfollowee: boolean = $derived(followList.get().has(pubkey));
 
   // Public key validation
   const CheckLoginPubkey = async (): Promise<boolean> => {
@@ -223,7 +223,7 @@
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
-    let kind3Event: EventPacket | undefined =
+    const kind3Event: EventPacket | undefined =
       queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
     petnameInput = followList.get().get(pubkey) ?? "";

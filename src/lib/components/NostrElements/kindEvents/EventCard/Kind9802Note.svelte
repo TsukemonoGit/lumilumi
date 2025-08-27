@@ -38,7 +38,7 @@
     replyUsers: string[];
   }
 
-  let {
+  const {
     note,
     metadata,
     displayMenu,
@@ -54,7 +54,7 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let referenceTag = $derived(
+  const referenceTag = $derived(
     note.tags.find((tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e")
   ); //https://github.com/nostr-protocol/nips/blob/master/84.md#references
 

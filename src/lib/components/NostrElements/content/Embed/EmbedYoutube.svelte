@@ -3,7 +3,7 @@
     id: string;
     onError: () => void;
   }
-  let { id, onError }: Props = $props();
+  const { id, onError }: Props = $props();
 </script>
 
 <div class="youtube-embed aspect-video w-full max-h-64">

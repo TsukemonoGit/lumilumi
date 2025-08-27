@@ -41,7 +41,7 @@
     >;
   }
 
-  let {
+  const {
     req = undefined,
     id = undefined,
     atag = undefined,
@@ -52,10 +52,10 @@
     children,
   }: Props = $props();
 
-  let result = $derived(useAllReactions(id, atag, req));
+  const result = $derived(useAllReactions(id, atag, req));
 
   // debounce用の状態
-  let debounceTimeoutId: NodeJS.Timeout | undefined = undefined;
+  let debounceTimeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
   let debouncedResult: ReqResult<EventPacket[]> = $state({
     data: readable([] as EventPacket[]),
     status: readable("loading"),
@@ -78,9 +78,9 @@
     }, debounceInterval);
   });
 
-  let data = $derived(debouncedResult.data);
-  let status = $derived(debouncedResult.status);
-  let errorData = $derived(debouncedResult.error);
+  const data = $derived(debouncedResult.data);
+  const status = $derived(debouncedResult.status);
+  const errorData = $derived(debouncedResult.error);
 </script>
 
 {#if $errorData}

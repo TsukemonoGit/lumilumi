@@ -22,7 +22,7 @@
     >;
   }
 
-  let { id, loading, content }: Props = $props();
+  const { id, loading, content }: Props = $props();
 
   let data: Nostr.Event | undefined = $state();
 
@@ -42,7 +42,7 @@
     const observer1 = new QueryObserver(queryClient, {
       queryKey: ["reactions", id, "reaction", lumiSetting.get().pubkey],
     });
-    unsubscribe = observer1.subscribe((result: any) => {
+    unsubscribe = observer1.subscribe((result) => {
       const packets = result?.data as EventPacket[] | undefined;
 
       if (

@@ -17,7 +17,7 @@
     zIndex?: number | undefined;
   }
 
-  let {
+  const {
     part,
     displayMenu,
     depth,
@@ -29,10 +29,10 @@
     zIndex,
   }: Props = $props();
   //console.log(part);
-  let children: Token[] = $derived(transformTokens(part.children ?? []));
+  const children: Token[] = $derived(transformTokens(part.children ?? []));
 
-  let url = $derived(part.attrs?.find((attr) => attr[0] === "href")?.[1]);
-  let href = $derived(url?.startsWith("nostr:") ? `./${url.slice(6)}` : url);
+  const url = $derived(part.attrs?.find((attr) => attr[0] === "href")?.[1]);
+  const href = $derived(url?.startsWith("nostr:") ? `./${url.slice(6)}` : url);
 </script>
 
 <a

@@ -5,7 +5,7 @@
     part: Token; //console.log("[fence]", part);
   }
 
-  let { part }: Props = $props();
+  const { part }: Props = $props();
 
   
 </script>

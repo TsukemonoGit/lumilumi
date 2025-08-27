@@ -90,7 +90,7 @@ export async function fetchZapLNURLPubkey(
 ): Promise<{ pub: string | undefined; error?: string }> {
   try {
     let lnurl: string = "";
-    let { lud06, lud16 } = JSON.parse(metadata.content);
+    const { lud06, lud16 } = JSON.parse(metadata.content);
 
     //lud16( name@domain )優先
     if (lud16) {
@@ -298,7 +298,7 @@ export function makeZapRequest({
   if (!amount) throw new Error("amount not given");
   if (!profile) throw new Error("profile not given");
 
-  let zr: EventTemplate = {
+  const zr: EventTemplate = {
     kind: 9734,
     created_at: Math.round(Date.now() / 1000),
     content: comment,
@@ -347,23 +347,23 @@ export async function getZapEndpoint(
 ): Promise<null | string> {
   try {
     let lnurl: string = "";
-    let { lud06, lud16 } = JSON.parse(metadata.content);
+    const { lud06, lud16 } = JSON.parse(metadata.content);
 
     if (lud16) {
-      let [name, domain] = lud16.split("@");
+      const [name, domain] = lud16.split("@");
       lnurl = new URL(
         `/.well-known/lnurlp/${name}`,
         `https://${domain}`
       ).toString();
     } else if (lud06) {
-      let { words } = bech32.decode(lud06, 1000);
-      let data = bech32.fromWords(words);
+      const { words } = bech32.decode(lud06, 1000);
+      const data = bech32.fromWords(words);
       lnurl = utf8Decoder.decode(data);
     } else {
       return null;
     }
 
-    let body = await getNurlFetch(lnurl);
+    const body = await getNurlFetch(lnurl);
 
     if (body && body.allowsNostr && body.nostrPubkey) {
       return body.callback;

@@ -9,8 +9,8 @@
     depth: number;
   }
 
-  let { tags, isShowClientTag = true, depth }: Props = $props();
-  let clientTag = $derived(tags.find((tag) => tag[0] === "client"));
+  const { tags, isShowClientTag = true, depth }: Props = $props();
+  const clientTag = $derived(tags.find((tag) => tag[0] === "client"));
 
   const onClickClientTag = (atag: string[]) => {
     const naddrAddress = parseNaddr(["a", ...atag]);
@@ -21,13 +21,13 @@
 
 {#if clientTag && isShowClientTag && !(page.route.id === "/[note=note]" || (page.route.id === "/[naddr=naddr]" && depth === 0))}
   {#if clientTag.length > 2}<button
-      title={"open in nostrapp.link"}
+      title="open in nostrapp.link"
       onclick={() => onClickClientTag(clientTag.slice(2))}
       class={`ml-1 inline float-end text-sm font-semibold text-magnum-500/75 hover:underline hover:text-magnum-400/80 w-fit whitespace-pre-wrap break-words `}
       style="word-break: break-word;"
       >via {clientTag[1]}
     </button>{:else}<span
-      class={`ml-1 inline float-end text-sm font-semibold text-neutral-200/50 w-fit whitespace-pre-wrap break-words`}
+      class="ml-1 inline float-end text-sm font-semibold text-neutral-200/50 w-fit whitespace-pre-wrap break-words"
       style="word-break: break-word;"
       >via {clientTag[1]}
     </span>{/if}

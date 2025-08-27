@@ -4,8 +4,8 @@
   import { Zap } from "lucide-svelte";
   import { onMount } from "svelte";
 
-  let { metadata } = $props();
-  let characters: any[] = $state([]);
+  const { metadata } = $props();
+  const characters: any[] = $state([]);
 
   function getRandomCharacter() {
     const characters = [

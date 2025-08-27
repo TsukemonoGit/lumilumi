@@ -9,12 +9,12 @@
     geohash: string;
   }
 
-  let { geohash }: Props = $props();
-  let decoded = $derived(decodeGeohash(geohash));
+  const { geohash }: Props = $props();
+  const decoded = $derived(decodeGeohash(geohash));
   //https://www.google.com/maps/@42.60500787757337,140.85379661992192,10z//ズームレベル変わるけどピンが刺さらない
   //https://www.google.com/maps?q=42.60500787757337,140.85379661992192//ピンが刺さるけどズームされすぎ
   //`https://www.openstreetmap.org/#map=10/${decoded.latitude}/${decoded.longitude}`
-  let mapLink = $derived(
+  const mapLink = $derived(
     `https://www.google.com/maps?q=${decoded.latitude},${decoded.longitude}`
   );
 

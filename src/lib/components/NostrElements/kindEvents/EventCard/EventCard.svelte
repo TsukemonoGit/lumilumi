@@ -95,7 +95,7 @@
   let loadThread = $state(false);
 
   // Process reply tags
-  let { replyTag, replyUsers } = $derived.by(() => {
+  const { replyTag, replyUsers } = $derived.by(() => {
     if (note && [1, 42, 4, 1111].includes(note.kind) && note.tags.length > 0) {
       const res = replyedEvent(note.tags, note.kind);
 
@@ -104,7 +104,7 @@
     return { replyTag: undefined, replyUsers: [] };
   });
   // Derived state
-  let atag: string | undefined = $derived.by(() => {
+  const atag: string | undefined = $derived.by(() => {
     if (
       !note ||
       (!isReplaceableKind(note.kind) && !isAddressableKind(note.kind))
@@ -116,12 +116,12 @@
     return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
   });
 
-  let paramNoteId = $derived(
+  const paramNoteId = $derived(
     page.params.note ? getIDbyParam(page.params.note) : undefined
   );
 
   //ミュートメニューの設定は考慮しない
-  let muteType = $derived.by(() => {
+  const muteType = $derived.by(() => {
     if (!$mutes && !$mutebykinds && !timelineFilter.get()) {
       return "null";
     }
@@ -132,7 +132,7 @@
     return muteCheck(note);
   });
 
-  let warning = $derived(checkContentWarning(note?.tags));
+  const warning = $derived(checkContentWarning(note?.tags));
 
   function checkContentWarning(tags: string[][]): string[] | undefined {
     return tags.find((item) => item[0] === "content-warning");

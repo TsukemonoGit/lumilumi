@@ -9,14 +9,14 @@
     nodata?: import('svelte').Snippet;
   }
 
-  let {
+  const {
     geohash,
     decoded,
     children,
     nodata
   }: Props = $props();
-  let ogp = $derived(useGeohash(geohash, decoded));
-  let data = $derived(ogp.data);
+  const ogp = $derived(useGeohash(geohash, decoded));
+  const data = $derived(ogp.data);
 
   interface $$Slots {
     default: { contents: Geohash };

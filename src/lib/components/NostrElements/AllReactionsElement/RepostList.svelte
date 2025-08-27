@@ -8,7 +8,7 @@
     events: Nostr.Event[];
   }
 
-  let { events }: Props = $props();
+  const { events }: Props = $props();
 </script>
 
 <div class="flex gap-1 m-1">

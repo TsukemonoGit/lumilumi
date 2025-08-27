@@ -49,7 +49,7 @@
     zIndex,
     showStatus = true,
   }: Props = $props();
-  let siteUrl = $derived.by(() => {
+  const siteUrl = $derived.by(() => {
     const urlTag = note.tags.find(
       (tag) => tag[0] == "d" && tag.length > 1
     )?.[1];
@@ -60,13 +60,13 @@
       return urlTag;
     }
   });
-  let title = $derived(
+  const title = $derived(
     note.tags.find((tag) => tag[0] == "title" && tag.length > 1)?.[1]
   );
-  let published_at = $derived(
+  const published_at = $derived(
     note.tags.find((tag) => tag[0] == "published_at" && tag.length > 1)?.[1]
   );
-  let hashTags = $derived(
+  const hashTags = $derived(
     note.tags
       .filter((tag) => tag[0] == "t" && tag.length > 1)
       .map((tag) => tag[1])
@@ -127,7 +127,7 @@
       <div class="mt-2">
         {#each hashTags as hash}
           <a
-            aria-label={"Search for events containing the hashtag"}
+            aria-label="Search for events containing the hashtag"
             href={`/search?t=${hash}`}
             class="underline text-magnum-300 break-all mr-1">#{hash}</a
           >

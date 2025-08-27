@@ -17,7 +17,7 @@
   import { type PageData } from "./$types";
   import type { Profile } from "$lib/types";
 
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   const EVENT_CONSTANTS = {
     repostable: true,

@@ -23,9 +23,9 @@
 
 <button aria-label="open map" onclick={handleClickOpenMap} class="button">
   {#if geohash}
-    <MapPinCheck size="20" class={"stroke-magnum-500"} />
+    <MapPinCheck size="20" class="stroke-magnum-500" />
   {:else}
-    <MapPinPlus size="20" class={"stroke-magnum-300"} />
+    <MapPinPlus size="20" class="stroke-magnum-300" />
   {/if}
 </button>
 <Dialog bind:open={dialogOpen} zIndex={9999} id="setGiohash"

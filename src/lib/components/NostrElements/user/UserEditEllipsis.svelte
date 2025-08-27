@@ -11,7 +11,7 @@
     pubkey: string;
   }
 
-  let { pubkey }: Props = $props();
+  const { pubkey }: Props = $props();
 
   const menuTexts = [
     { text: `${$_("user.profileEdit")}`, icon: User, num: 0 },

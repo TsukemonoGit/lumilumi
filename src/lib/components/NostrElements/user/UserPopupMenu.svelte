@@ -25,7 +25,7 @@
     zIndex?: number;
   }
 
-  let {
+  const {
     pubkey,
     size,
     metadata,
@@ -33,9 +33,9 @@
     depth,
     zIndex = 30,
   }: Props = $props();
-  let profile = $derived(getProfile(metadata));
-  let url = $derived(profile?.picture);
-  let title = $derived.by(() => {
+  const profile = $derived(getProfile(metadata));
+  const url = $derived(profile?.picture);
+  const title = $derived.by(() => {
     if (profile && profile.name) {
       return `@${profile.name}`;
     } else {
@@ -43,9 +43,9 @@
     }
   });
 
-  let pubcheck = $derived(hexRegex.test(pubkey));
+  const pubcheck = $derived(hexRegex.test(pubkey));
 
-  let avatarColor = $derived(splitHexColorString(pubkey));
+  const avatarColor = $derived(splitHexColorString(pubkey));
 </script>
 
 {#if !displayMenu || !pubcheck}

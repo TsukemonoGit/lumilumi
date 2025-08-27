@@ -21,7 +21,7 @@
     iconClass?: string;
   }
 
-  let {
+  const {
     naddr,
     indexes = undefined,
     TriggerIcon = Ellipsis,
@@ -29,7 +29,7 @@
     iconClass = "",
   }: Props = $props();
 
-  let dialogOpen: Writable<boolean> = writable(false);
+  const dialogOpen: Writable<boolean> = writable(false);
 
   const decodeNaddr = (str: string | undefined) => {
     if (str === undefined) return undefined;
@@ -44,8 +44,8 @@
     }
   };
 
-  let menuTexts = $derived.by(() => {
-    let naddrpointer = decodeNaddr(naddr);
+  const menuTexts = $derived.by(() => {
+    const naddrpointer = decodeNaddr(naddr);
     let menu = [
       {
         text: `${$_("menu.copy.naddr")}`,

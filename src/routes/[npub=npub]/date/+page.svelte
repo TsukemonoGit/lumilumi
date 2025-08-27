@@ -6,7 +6,7 @@
   import CalendarWidget from "./[slug=date]/CalendarWidget.svelte";
   // 今日のローカル日付の 0:00:00
 
-  let { data }: { data: LayoutData } = $props();
+  const { data }: { data: LayoutData } = $props();
 
   const now = new Date();
   const localDate: Date = new Date(

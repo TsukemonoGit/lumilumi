@@ -80,11 +80,11 @@
 
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
-  let replaceable = $derived(
+  const replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
-  let { naddr, nevent, encodedPubkey } = $derived.by(() => {
+  const { naddr, nevent, encodedPubkey } = $derived.by(() => {
     if (!note) {
       return { naddr: undefined, nevent: undefined, encodedPubkey: undefined };
     }
@@ -161,7 +161,7 @@
   };
 
   // メニュー項目の定義を論理的な順序で整理
-  let menuTexts = $derived.by(() => {
+  const menuTexts = $derived.by(() => {
     const menuItems = [
       // 基本操作グループ
       {
@@ -598,7 +598,7 @@
 
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
-      let str = generateResultMessage(isSuccess, isFailed);
+      const str = generateResultMessage(isSuccess, isFailed);
 
       $toastSettings = {
         title: isSuccess.length > 0 ? "Success" : "Failed",

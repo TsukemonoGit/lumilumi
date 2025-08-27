@@ -16,10 +16,10 @@
   }
 
   // Props
-  let { url, author }: { url: string; author: string } = $props();
+  const { url, author }: { url: string; author: string } = $props();
 
   // State - loadFailedをembedStateに統合
-  let embedState = $state<{
+  const embedState = $state<{
     forceExpand: boolean;
     loadFailed: boolean;
     hasAttemptedLoad: boolean;

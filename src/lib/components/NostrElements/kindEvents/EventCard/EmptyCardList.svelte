@@ -6,7 +6,7 @@
     children?: any;
   }
 
-  let { length = 5, children }: Props = $props();
+  const { length = 5, children }: Props = $props();
 </script>
 
 <div

@@ -10,11 +10,11 @@
     nip05Address: string;
   }
 
-  let { pubkey, nip05Address }: Props = $props();
+  const { pubkey, nip05Address }: Props = $props();
   const size = 16;
   let doCheck = $state(false);
 
-  let data = $derived(
+  const data = $derived(
     queryClient?.getQueryData(["nip05", pubkey, nip05Address])
   );
   $effect(() => {

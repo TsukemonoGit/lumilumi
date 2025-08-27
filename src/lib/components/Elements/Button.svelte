@@ -29,7 +29,7 @@
     size?: Size;
   }
 
-  let {
+  const {
     variant = "menu",
     type = "button",
     disabled = false,

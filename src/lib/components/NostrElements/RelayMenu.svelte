@@ -26,9 +26,9 @@
     relayInfo?: Nip11.RelayInfo | undefined;
   }
 
-  let { url, zIndex, children, relayInfo }: Props = $props();
+  const { url, zIndex, children, relayInfo }: Props = $props();
 
-  let encodedUrl = $derived(encodeURIComponent(url));
+  const encodedUrl = $derived(encodeURIComponent(url));
 
   // svelte-ignore non_reactive_update
   const menuTexts = [

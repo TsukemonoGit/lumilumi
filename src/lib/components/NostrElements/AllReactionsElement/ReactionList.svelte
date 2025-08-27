@@ -9,10 +9,10 @@
     events: Nostr.Event[];
   }
 
-  let { events }: Props = $props();
+  const { events }: Props = $props();
 
   // undefined や null を除外した配列を作成
-  let validEvents = $derived(
+  const validEvents = $derived(
     events.filter((event) => event !== undefined && event !== null)
   );
 
@@ -22,7 +22,7 @@
   };
 
   // ユニークな内容を取得する部分
-  let uniqueContents = $derived(
+  const uniqueContents = $derived(
     [...new Set(validEvents.map((event) => event.content || "+"))].sort()
   ); // Get unique contents and sort them
 

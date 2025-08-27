@@ -74,7 +74,7 @@
       popup.openOn(leafletMap);
     }
   };
-  let geohash = $derived(
+  const geohash = $derived(
     encodeGeohash(latLng(position).lat, latLng(position).lng)
   );
   let searchWord = $state("");

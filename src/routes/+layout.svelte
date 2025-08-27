@@ -73,7 +73,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
 
-  let { data, children } = $props<{
+  const { data, children } = $props<{
     data:
       | {
           relays?: string[] | undefined;
@@ -92,7 +92,7 @@
     });
   }
 
-  let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
+  const webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : "");
 
   //https://github.com/penpenpng/rx-nostr/pull/138
   const verificationClient = browser
@@ -201,7 +201,7 @@
     }
   });
 
-  let dataRelays = $derived(
+  const dataRelays = $derived(
     data?.relays && data?.relays.length > 0
       ? [...data.relays, ...defaultRelays].slice(
           0,

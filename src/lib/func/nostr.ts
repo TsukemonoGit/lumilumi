@@ -419,7 +419,7 @@ export async function promisePublishSignedEvent(
   }
 
   return new Promise<OkPacketAgainstEvent[]>((resolve) => {
-    let results: OkPacketAgainstEvent[] = [];
+    const results: OkPacketAgainstEvent[] = [];
     let elapsedTime = 0;
     const interval = 500;
     const maxWaitingTime = 3000;

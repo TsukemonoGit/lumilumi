@@ -33,7 +33,7 @@
     >;
     onChange?: (metadata: Nostr.Event) => void;
   }
-  let {
+  const {
     req = undefined,
     relays = undefined,
     queryKey,
@@ -45,11 +45,11 @@
     onChange,
   }: Props = $props();
 
-  let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
-  let result = $derived(useLatestEvent(queryKey, filters, req, max3relays));
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
+  const result = $derived(useLatestEvent(queryKey, filters, req, max3relays));
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 
   $effect(() => {
     if ($data?.event) {

@@ -104,8 +104,8 @@ export const fetchGeohashContent = async (
  */
 export function decodeGeohash(geohash: string): DecodedGeohash {
   let even = true;
-  let lat = [-90.0, 90.0];
-  let lon = [-180.0, 180.0];
+  const lat = [-90.0, 90.0];
+  const lon = [-180.0, 180.0];
 
   // Update range based on bit value
   const updateRange = (range: number[], bit: number): void => {

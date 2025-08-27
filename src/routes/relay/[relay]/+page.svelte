@@ -6,7 +6,7 @@
   import GlobalTimeline from '../../global/GlobalTimeline.svelte';
   import type { PageData } from './$types';
 
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   let relayUrl: string | undefined = $state();
   let isMount = false;

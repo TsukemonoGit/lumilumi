@@ -40,7 +40,7 @@
     omit,
     isOmitted = $bindable(),
   }: Props = $props();
-  let queryKey = $derived([
+  const queryKey = $derived([
     "naddr",
     `${data.kind}:${data.pubkey}:${data.identifier}`,
   ] as QueryKey);

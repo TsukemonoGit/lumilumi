@@ -18,8 +18,8 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   const timelineQuery: QueryKey = ["globalchannel"];
-  let amount = 50;
-  let viewIndex = 0;
+  const amount = 50;
+  const viewIndex = 0;
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);

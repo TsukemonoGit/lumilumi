@@ -199,8 +199,8 @@
   });
 
   // 現在の画像URL取得
-  let currentImageUrl = $derived(displayImages[displayIndex]?.url ?? "");
-  let currentImageType = $derived(displayImages[displayIndex]?.type ?? "image");
+  const currentImageUrl = $derived(displayImages[displayIndex]?.url ?? "");
+  const currentImageType = $derived(displayImages[displayIndex]?.type ?? "image");
 </script>
 
 {#if $dialogOpen && displayImages.length > 0}

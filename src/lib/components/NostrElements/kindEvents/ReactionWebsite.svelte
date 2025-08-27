@@ -21,9 +21,9 @@
 
     repostable: boolean;
   }
-  let { note, metadata, displayMenu, depth, repostable }: Props = $props();
+  const { note, metadata, displayMenu, depth, repostable }: Props = $props();
   let deleted = $state(false);
-  let website = $derived(reactionWebsite(note));
+  const website = $derived(reactionWebsite(note));
   function reactionWebsite(note: Nostr.Event): string | undefined {
     const webTag = note.tags.find((tag) => tag[0] === "r");
     if (webTag && webTag.length > 1) {

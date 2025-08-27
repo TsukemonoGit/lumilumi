@@ -10,7 +10,7 @@
     note: Nostr.Event;
   }
 
-  let { note }: Props = $props();
+  const { note }: Props = $props();
   const handleClickToChannel = (id: string) => {
     if (!id) {
       return;

@@ -20,7 +20,7 @@
 
   let { pubkey = $bindable() }: Props = $props();
   //export let muteList: LumiMute | undefined;
-  let dialogOpen: any = writable(false);
+  const dialogOpen: any = writable(false);
   async function handleClickMute() {
     const beforeList = $mutes?.event;
     try {
@@ -102,7 +102,7 @@
   >{/if}
 <!--JSON no Dialog-->
 
-<Dialog open={dialogOpen} id={"mute"}>
+<Dialog open={dialogOpen} id="mute">
   {#snippet main()}
     <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
       {#if $mutes}

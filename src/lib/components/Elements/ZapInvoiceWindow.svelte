@@ -43,7 +43,7 @@
     $open = bool;
   };
 
-  let url = $derived(invoice ? `lightning:${invoice}` : undefined);
+  const url = $derived(invoice ? `lightning:${invoice}` : undefined);
 
   let zapped: { data: EventPacket; status: any; error: any } | undefined =
     $state();

@@ -139,7 +139,7 @@
   let isOnMount = false;
 
   let readUrls: string[] = [];
-  let olderQueryKey = $derived([...queryKey, "olderData"]);
+  const olderQueryKey = $derived([...queryKey, "olderData"]);
 
   onDestroy(() => {
     console.log("timeline destroy");
@@ -166,16 +166,16 @@
   const [uniq, eventIds] = createUniq(keyFn);
 
   // Create the timeline event list
-  let result = useTimelineEventList(
+  const result = useTimelineEventList(
     queryKey,
     filters,
     configureOperators(),
     req,
     relays
   );
-  let globalData = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const globalData = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 
   // Update the view with current events
 

@@ -10,7 +10,7 @@
   import EmptyCardList from "../kindEvents/EventCard/EmptyCardList.svelte";
   import EmptyCard from "../kindEvents/EventCard/EmptyCard.svelte";
 
-  let { pubkey } = $props();
+  const { pubkey } = $props();
 </script>
 
 <LatestEvent

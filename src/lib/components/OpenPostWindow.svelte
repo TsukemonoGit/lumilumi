@@ -29,7 +29,7 @@
     visible?: boolean;
   }
 
-  let {
+  const {
     options = {
       tags: [],
       kind: 1,
@@ -337,7 +337,7 @@ if(textarea?.value.trim()){
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      <CreatePost bind:textarea={textarea}
+      <CreatePost bind:textarea={textarea} bind:clickEscape
         {close}
         {initOptions}
         {signPubkey}

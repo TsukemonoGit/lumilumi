@@ -15,21 +15,21 @@
     mini: boolean;
   }
 
-  let { displayMenu, repostable, maxHeight, tag, depth, zIndex, mini }: Props =
+  const { displayMenu, repostable, maxHeight, tag, depth, zIndex, mini }: Props =
     $props();
 
   const validateTag = (tag: string[], expectedType: string) =>
     tag && Array.isArray(tag) && tag.length > 1 && tag[0] === expectedType;
 
-  let isETag = $derived(validateTag(tag, "e"));
-  let isATag = $derived(validateTag(tag, "a"));
-  let tagId = $derived(tag?.[1]);
-  let relayHint = $derived(tag?.[2]?.trim() ? [tag[2].trim()] : undefined);
-  let isNotificationRoute = $derived(
+  const isETag = $derived(validateTag(tag, "e"));
+  const isATag = $derived(validateTag(tag, "a"));
+  const tagId = $derived(tag?.[1]);
+  const relayHint = $derived(tag?.[2]?.trim() ? [tag[2].trim()] : undefined);
+  const isNotificationRoute = $derived(
     page.route?.id === "/notifications" && depth === 1
   );
 
-  let commonProps = $derived({
+  const commonProps = $derived({
     displayMenu,
     depth,
     repostable,

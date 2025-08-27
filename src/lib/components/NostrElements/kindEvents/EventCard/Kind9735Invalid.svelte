@@ -23,7 +23,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     note,
     depth,
     repostable,
@@ -36,7 +36,7 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let warning = $derived(checkContentWarning(note?.tags));
+  const warning = $derived(checkContentWarning(note?.tags));
 </script>
 
 {#if deleted}

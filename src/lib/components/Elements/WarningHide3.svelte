@@ -6,7 +6,7 @@
     text: string;
   }
 
-  let { text }: Props = $props();
+  const { text }: Props = $props();
 
   const {
     elements: { root, range, thumbs },

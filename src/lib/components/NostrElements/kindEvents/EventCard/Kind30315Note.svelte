@@ -32,7 +32,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     note,
     metadata,
     displayMenu,
@@ -47,9 +47,9 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let statusTag = $derived(note.tags.find((tag) => tag[0] === "d")?.[1]);
+  const statusTag = $derived(note.tags.find((tag) => tag[0] === "d")?.[1]);
 
-  let statusLink = $derived(getStatusLink(note, page.url.origin));
+  const statusLink = $derived(getStatusLink(note, page.url.origin));
 </script>
 
 {#if deleted}

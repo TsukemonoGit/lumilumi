@@ -33,7 +33,7 @@
     >;
   }
 
-  let {
+  const {
     req = undefined,
 
     queryKey,
@@ -44,12 +44,12 @@
     children,
   }: Props = $props();
 
-  let result = $derived(
+  const result = $derived(
     useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req)
   );
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 </script>
 
 {#if $errorData}

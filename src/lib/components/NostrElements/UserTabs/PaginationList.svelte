@@ -10,7 +10,7 @@
     children?: Snippet<[string | Nostr.Event, number]>;
   }
 
-  let { list, children, perPage = 20 }: Props = $props();
+  const { list, children, perPage = 20 }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
 
   onMount(() => {
@@ -32,7 +32,7 @@
   $effect(() => {
     count.set(list.length);
   });
-  let viewList = $derived(list.slice($range.start, $range.end));
+  const viewList = $derived(list.slice($range.start, $range.end));
 
   range.subscribe((value) => {
     if (value) {

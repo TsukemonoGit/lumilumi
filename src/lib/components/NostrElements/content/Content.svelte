@@ -19,7 +19,7 @@
     kind?: number;
   }
 
-  let {
+  const {
     event,
     displayMenu,
     depth,
@@ -30,7 +30,7 @@
     zIndex = 0,
     displayTags,
   }: Props = $props();
-  let text = $derived(event.content || "");
+  const text = $derived(event.content || "");
 
   // svelte-ignore non_reactive_update
   let showMore: Writable<boolean> = writable(false);

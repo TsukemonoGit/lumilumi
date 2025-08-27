@@ -16,8 +16,8 @@
   import type { EventPacket } from "rx-nostr";
   import UserActivityLoader from "./UserActivityLoader.svelte";
 
-  let { data }: { data: LayoutData } = $props();
-  let localDate: Date | null = $derived.by(() => {
+  const { data }: { data: LayoutData } = $props();
+  const localDate: Date | null = $derived.by(() => {
     const slug = page.params.slug;
     if (!slug||!/^\d{4}-\d{2}-\d{2}$/.test(slug)) return null;
 
@@ -33,7 +33,7 @@
   // ページネーション設定
   const ITEMS_PER_PAGE = 20;
 
-  let getLocalDayRange: { since: number; until: number } | null = $derived.by(
+  const getLocalDayRange: { since: number; until: number } | null = $derived.by(
     () => {
       if (!localDate) return null;
 

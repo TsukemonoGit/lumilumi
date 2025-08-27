@@ -20,7 +20,7 @@
   import { page } from "$app/state";
   import type { PageData } from "./$types";
 
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   const atag = `${data.kind}:${data.pubkey}:${data.identifier}`;
   const filters: Nostr.Filter[] = [

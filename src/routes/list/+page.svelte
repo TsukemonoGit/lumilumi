@@ -24,7 +24,7 @@
   const filtered = (events: Nostr.Event[]) => {
     return events.filter((event) => event.tags.find((item) => item[0] === "p"));
   };
-  let encodePub = $derived(encodetoNpub(lumiSetting.get().pubkey));
+  const encodePub = $derived(encodetoNpub(lumiSetting.get().pubkey));
 </script>
 
 {#if !lumiSetting.get()?.pubkey}

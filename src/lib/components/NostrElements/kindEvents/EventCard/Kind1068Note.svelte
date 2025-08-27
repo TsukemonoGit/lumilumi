@@ -38,7 +38,7 @@
     showStatus?: boolean;
   }
 
-  let {
+  const {
     note,
     metadata,
     displayMenu,
@@ -53,14 +53,14 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let polltype: string | undefined = $derived(
+  const polltype: string | undefined = $derived(
     note.tags.find((tag) => tag[0] === "polltype" && tag.length > 1)?.[1]
   );
-  let endsAt: number | undefined = $derived(
+  const endsAt: number | undefined = $derived(
     Number(note.tags.find((tag) => tag[0] === "endsAt" && tag.length > 1)?.[1])
   );
 
-  let nevent: string | undefined = $derived.by(() => {
+  const nevent: string | undefined = $derived.by(() => {
     if (!note) {
       return undefined;
     }
@@ -76,7 +76,7 @@
       return undefined;
     }
   });
-  let hasEnded = $derived(Math.floor(Date.now() / 1000) > endsAt);
+  const hasEnded = $derived(Math.floor(Date.now() / 1000) > endsAt);
 
   const handleclickGotoPoll = () => {
     goto(`./${nevent}`);

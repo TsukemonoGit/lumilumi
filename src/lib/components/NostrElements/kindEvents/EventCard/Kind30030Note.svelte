@@ -40,7 +40,7 @@
   }
 
   let deleted = $state(false);
-  let {
+  const {
     note,
     repostable,
     maxHeight,
@@ -51,20 +51,20 @@
     showStatus = true,
     depth,
   }: Props = $props();
-  let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
-  let title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
-  let description = $derived(
+  const dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
+  const title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
+  const description = $derived(
     note.tags.find(
       (tag) =>
         (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
     )?.[1]
   );
-  let image = $derived(
+  const image = $derived(
     note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
   );
-  let atag = $derived(`${note.kind}:${note.pubkey}:${dtag}`);
+  const atag = $derived(`${note.kind}:${note.pubkey}:${dtag}`);
   //このカスタム絵文字が10030に含まれるかチェック
-  let inMyCustomEmoji = $derived(
+  const inMyCustomEmoji = $derived(
     $emojis.event?.tags.find(
       (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
     )
@@ -318,7 +318,7 @@
       return $state.snapshot($emojis.event);
     }
   }
-  let warning = $derived(checkContentWarning(note?.tags));
+  const warning = $derived(checkContentWarning(note?.tags));
 </script>
 
 {#if deleted}

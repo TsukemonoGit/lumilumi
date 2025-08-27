@@ -18,7 +18,7 @@
     zIndex?: number;
   }
 
-  let { replyTag, displayMenu, depth, repostable, zIndex }: Props = $props();
+  const { replyTag, displayMenu, depth, repostable, zIndex }: Props = $props();
   let loadNote = $state(false);
   //$inspect(replyTag);
   const openModal = (index: number) => {
@@ -59,7 +59,7 @@
           ? [replyTag[2]]
           : undefined}
       <Note
-        className={"border rounded-md border-magnum-600/30"}
+        className="border rounded-md border-magnum-600/30"
         {relayhint}
         id={replyTag[1]}
         mini={true}
@@ -72,7 +72,7 @@
       <!---->
       {@const naddr = parseNaddr(replyTag)}
       <NaddrEvent
-        className={"border rounded-md border-magnum-600/30"}
+        className="border rounded-md border-magnum-600/30"
         data={naddr}
         {displayMenu}
         depth={depth + 1}
@@ -84,7 +84,7 @@
       <!---->
       {#if replyTag[1].startsWith("http")}
         {@const part = toPart(replyTag)}
-        <UrlDisplay {part} {openModal} author={""} />
+        <UrlDisplay {part} {openModal} author="" />
       {:else}
         <!---->
         {replyTag.toString()}

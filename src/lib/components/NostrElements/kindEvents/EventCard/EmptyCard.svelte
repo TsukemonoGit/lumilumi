@@ -10,7 +10,7 @@
     name?: string;
     menu?: boolean;
   }
-  let {
+  const {
     children,
     nevent,
     naddr,

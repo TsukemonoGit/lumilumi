@@ -16,7 +16,7 @@
     size?: number; // Xアイコンサイズ
   }
 
-  let {
+  const {
     type = "button",
     disabled = false,
     onclick,

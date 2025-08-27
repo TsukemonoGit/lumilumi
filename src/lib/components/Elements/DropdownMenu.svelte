@@ -1,17 +1,18 @@
 <script lang="ts">
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
+  import type { Component } from "svelte";
 
   import { fly } from "svelte/transition";
 
   interface Props {
-    menuTexts?: { icon: any; text: string }[];
-    handleSelectItem: (arg0: number) => any;
+    menuTexts?: { icon: Component; text: string }[];
+    handleSelectItem: (arg0: number) => void;
     children?: import("svelte").Snippet;
     buttonClass?: string;
     zIndex?: number;
   }
 
-  let {
+  const {
     menuTexts = [],
     handleSelectItem,
     children,

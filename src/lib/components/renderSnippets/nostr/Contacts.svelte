@@ -39,7 +39,7 @@
     >;
   }
 
-  let {
+  const {
     req = undefined,
     relays = undefined,
     queryKey,
@@ -52,7 +52,7 @@
 
   let storageKind3: Nostr.Event;
 
-  let kind3key = getKind3Key(pubkey); // New format by pubkey
+  const kind3key = getKind3Key(pubkey); // New format by pubkey
 
   onMount(() => {
     if (browser) {
@@ -71,17 +71,17 @@
     $app?.rxNostr.setDefaultRelays(relays);
   }
 
-  let result = $derived(
+  const result = $derived(
     $app?.rxNostr
       ? useContacts($app?.rxNostr, queryKey, pubkey, req)
       : undefined
   );
 
-  let data = $derived(result?.data);
-  let status = $derived(result?.status);
-  let errorData = $derived(result?.error);
+  const data = $derived(result?.data);
+  const status = $derived(result?.status);
+  const errorData = $derived(result?.error);
 
-  let kind3Data: Nostr.Event | undefined = $derived.by(() => {
+  const kind3Data: Nostr.Event | undefined = $derived.by(() => {
     if (data && $data) {
       if (storageKind3 && storageKind3.created_at > $data.event.created_at) {
         return storageKind3;

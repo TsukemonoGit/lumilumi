@@ -2,7 +2,7 @@
   import { splitHexColorString } from "$lib/func/util";
   import Avatar from "svelte-boring-avatars";
   const size = 42; //96;
-  let { handleClickToChannel, linkButtonTitle, id, children } = $props();
+  const { handleClickToChannel, linkButtonTitle, id, children } = $props();
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">

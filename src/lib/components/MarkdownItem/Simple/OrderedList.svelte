@@ -18,7 +18,7 @@
     zIndex?: number | undefined;
   }
 
-  let {
+  const {
     part,
     displayMenu,
     depth,
@@ -30,9 +30,9 @@
     zIndex,
   }: Props = $props();
 
-  let children: Token[] = $derived(transformTokens(part.children ?? []));
+  const children: Token[] = $derived(transformTokens(part.children ?? []));
 
-  let firstNum = $derived(children[0].info);
+  const firstNum = $derived(children[0].info);
   // $: console.log(firstNum);
 </script>
 

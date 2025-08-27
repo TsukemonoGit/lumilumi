@@ -38,7 +38,7 @@
     >;
     onChange?: (metadata: Nostr.Event) => void;
   }
-  let {
+  const {
     req = undefined,
     pubkey,
     queryKey,
@@ -52,15 +52,15 @@
 
   //let initialDataUpdatedAt: number;
   const staleTime: number = Infinity;
-  let refetchInterval: number = Infinity;
+  const refetchInterval: number = Infinity;
   //initialEataのUpdatedAtを古めにしておいてstaleTimeはちょっと長めにしておくことで、とりあえず前回の最新メタデータを表示しておいて後々最新のMetadataを取ってくることができる？
-  let localData = $derived(getMetadata(queryKey));
+  const localData = $derived(getMetadata(queryKey));
   //console.log(localData);
-  let initData: EventPacket | undefined = $derived(
+  const initData: EventPacket | undefined = $derived(
     lumiSetting.get().showImg ? undefined : localData
   ); //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
 
-  let result = $derived(
+  const result = $derived(
     useMetadata(
       $app.rxNostr,
       queryKey,
@@ -73,11 +73,11 @@
     )
   );
 
-  let data = $derived(result.data);
-  let status = $derived(result.status);
-  let errorData = $derived(result.error);
+  const data = $derived(result.data);
+  const status = $derived(result.status);
+  const errorData = $derived(result.error);
 
-  let metadata = $derived($data?.event ?? localData?.event);
+  const metadata = $derived($data?.event ?? localData?.event);
   $effect(() => {
     if (metadata) {
       untrack(() => onChange?.(metadata));

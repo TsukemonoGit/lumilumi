@@ -26,9 +26,9 @@
   import { safePublishEvent } from "$lib/func/publishError";
   import { normalizeURL } from "nostr-tools/utils";
 
-  let { data }: { data: LayoutData } = $props();
+  const { data }: { data: LayoutData } = $props();
 
-  let deleted = $state(false);
+  const deleted = $state(false);
 
   let kind10002: Nostr.Event | undefined = $state();
   let newTags: string[][] = $state([]);
@@ -322,7 +322,7 @@
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
-      let str = generateResultMessage(isSuccess, isFailed);
+      const str = generateResultMessage(isSuccess, isFailed);
       console.log(str);
 
       $toastSettings = {
@@ -380,7 +380,7 @@
   let dragOverIndex: number | null = $state(null);
 
   // 並べ替えロジック
-  let sortedTags = $derived(
+  const sortedTags = $derived(
     sortConfig.key
       ? [...newTags].sort((a, b) => {
           let aVal, bVal;

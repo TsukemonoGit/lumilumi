@@ -397,7 +397,7 @@
   onclick={handleClickUpDownload}>{$_("settings.load.title")}</button
 >
 
-<Dialog bind:open={dialogOpen} id={"30078"}>
+<Dialog bind:open={dialogOpen} id="30078">
   {#snippet main()}
     <h2 class="text-magnum-300 text-lg font-bold">
       {$_("settings.load.title2")}
@@ -479,7 +479,7 @@
 <AlertDialog
   bind:openDialog={alertdialogOpen}
   onClickOK={handleClickPublish}
-  title={`SAVE`}
+  title="SAVE"
   okButtonName="OK"
   >{#snippet main()}
     {#if kind30078LumiSettings.find((data) => data.name === saveName)}

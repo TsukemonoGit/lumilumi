@@ -14,7 +14,7 @@
   import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { RefreshCw } from "lucide-svelte";
 
-  let {
+  const {
     note,
     hasEnded,
     endsAt,
@@ -29,7 +29,7 @@
   let selectedIds: string[] = $state([]);
   let isSubmitting: boolean = $state(false);
 
-  let optionTags: string[][] = $derived(
+  const optionTags: string[][] = $derived(
     note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || []
   );
 

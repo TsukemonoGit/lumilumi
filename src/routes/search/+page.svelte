@@ -29,7 +29,7 @@
   import { page } from "$app/state";
   import { safePublishEvent } from "$lib/func/publishError";
 
-  let { data }: { data: PageData } = $props();
+  const { data }: { data: PageData } = $props();
 
   let searchWord: string | undefined = $state();
   let searchKind: number | undefined = $state();
@@ -39,7 +39,7 @@
   let searchPubkeyTo: string = $state("");
   let followee = $state(false);
   // const filters: Writable<Nostr.Filter[]> = writable([]);
-  let filters = $derived(createFilter());
+  const filters = $derived(createFilter());
   let showFilters: Nostr.Filter[] = $state.raw([]);
 
   let compRef: SvelteComponent | undefined = $state();
@@ -158,7 +158,7 @@
   function getHex(str: string): string {
     try {
       return nip19.decode(str).data as string;
-    } catch (error) {
+    } catch {
       console.log("pubkey error");
       return "";
     }
@@ -204,7 +204,7 @@
 
       return Object.fromEntries(
         Object.entries(cleanFilter).filter(
-          ([key, value]) => value !== undefined
+          ([, value]) => value !== undefined
         )
       ) as Nostr.Filter;
     });
@@ -255,7 +255,7 @@
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
-    let str = generateResultMessage(isSuccess, isFailed);
+    const str = generateResultMessage(isSuccess, isFailed);
     console.log(str);
 
     $toastSettings = {

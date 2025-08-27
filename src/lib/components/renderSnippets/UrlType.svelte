@@ -8,10 +8,10 @@
     loading?: Snippet;
   }
 
-  let { url, content, loading }: Props = $props();
+  const { url, content, loading }: Props = $props();
 
-  let urlType = $derived(useUrl(url));
-  let data = $derived(urlType.data);
+  const urlType = $derived(useUrl(url));
+  const data = $derived(urlType.data);
 </script>
 
 {#if $data}

@@ -21,7 +21,7 @@
 </script>
 
 <div {...group.root} class="space-y-3 ml-8 my-2">
-  <!-- svelte-ignore a11y_label_has_associated_control -- https://github.com/sveltejs/svelte/issues/15067 -->
+ 
   <label {...group.label} class="font-medium">
     {$_("settings.display.imageAutoExpand.label")}
   </label>

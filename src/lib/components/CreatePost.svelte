@@ -47,6 +47,7 @@
   // Component Props
   // ----------------------------------------
   interface Props {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     close: any;
     initOptions: MargePostOptions;
     signPubkey?: string;
@@ -59,7 +60,7 @@
       onWarning: boolean;
       warningText: string;
       additionalReplyUsers: string[];
-    }) => Promise<void>;textarea: HTMLTextAreaElement | undefined
+    }) => Promise<void>;textarea: HTMLTextAreaElement | undefined;clickEscape:number
   }
 
   let {
@@ -69,7 +70,7 @@
     isPosting,
     additionalReplyUsers = $bindable(),
     resetCreatePost = $bindable(),
-    onSendEvent,textarea=$bindable()
+    onSendEvent,textarea=$bindable(),clickEscape=$bindable()
   }: Props = $props();
 
   // ----------------------------------------
@@ -86,8 +87,7 @@
   let viewCustomEmojis: boolean = $state<boolean>(false);
   let viewMetadataList: boolean = $state(false);
   let inputMetadata: string = $state("");
-  let clickEscape: number = $state(0);
-  let nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
+  const nsecCheck = $derived(nsecRegex.test(text) || nsecRegex.test(warningText));
 
   // DOM references
   let warningTextarea: HTMLInputElement | undefined = $state();
@@ -100,11 +100,11 @@
   let uploadAbortController: AbortController | null = $state(null);
 
   // Derived data
-  let metadataList: MetadataList = $derived.by(() => {
+  const metadataList: MetadataList = $derived.by(() => {
     if (!viewMetadataList) return {};
 
     try {
-      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
+      const metadataStr = localStorage?.getItem(STORAGE_KEYS.METADATA);
       if (!metadataStr) return {};
 
       const metadataQueryData: [QueryKey, EventPacket][] =

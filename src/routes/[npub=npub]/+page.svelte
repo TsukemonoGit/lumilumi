@@ -58,15 +58,15 @@
     };
   }
 
-  let { data }: Props = $props();
+  const { data }: Props = $props();
 
-  let amount = 50;
+  const amount = 50;
 
-  let componentKey = 0; // Key to force re-render
+  const componentKey = 0; // Key to force re-render
   let view: boolean = $state(false);
 
   // svelte-ignore non_reactive_update
-  let req = createRxForwardReq();
+  const req = createRxForwardReq();
   /*  const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
   }; */
@@ -74,11 +74,11 @@
     return event.kind === 7 && event.pubkey === data.pubkey;
   };
 
-  let userPubkey = $derived(data.pubkey); // Make pubkey reactive
+  const userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
-  let timelineQuery = $derived(["user", "post", userPubkey]);
+  const timelineQuery = $derived(["user", "post", userPubkey]);
 
   const {
     elements: { root, list, content, trigger },

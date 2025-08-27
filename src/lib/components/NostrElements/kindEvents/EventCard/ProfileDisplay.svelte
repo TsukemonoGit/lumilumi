@@ -14,11 +14,11 @@
     kindInfo?: boolean;
     kind?: number;
   }
-  let { pubkey, metadata, kind, kindInfo }: Props = $props();
+  const { pubkey, metadata, kind, kindInfo }: Props = $props();
 
-  let petname = $derived(followList.get().get(pubkey));
-  let prof = $derived(profile(metadata));
-  let isBirthDay = $derived(checkBirthDay(prof));
+  const petname = $derived(followList.get().get(pubkey));
+  const prof = $derived(profile(metadata));
+  const isBirthDay = $derived(checkBirthDay(prof));
 </script>
 
 {#if petname}

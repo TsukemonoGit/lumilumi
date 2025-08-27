@@ -99,11 +99,12 @@
           }
         }
         $nowProgress = false;
-      } catch (error: any) {
-        if (error?.message) {
+      } catch (error) {
+        const message=(error as Error)?.message
+        if (message) {
           $toastSettings = {
             title: "Error",
-            description: error.message,
+            description: message,
             color: "bg-orange-500",
           };
         }
@@ -194,7 +195,7 @@
     }, 0);
   };
 
-  let customReaction: string = "";
+  const customReaction: string = "";
 
   function createNewAddTag(str: string): string[] {
     const nip19Regex =

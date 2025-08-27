@@ -8,7 +8,7 @@
   let {
     dateValue = $bindable(),
     timeValue = $bindable(),
-    title = "Until",
+    title = $bindable("Until"),
   }: Props = $props();
 </script>
 

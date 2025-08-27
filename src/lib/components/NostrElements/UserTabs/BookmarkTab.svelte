@@ -10,7 +10,7 @@
   import PaginationList from "./PaginationList.svelte";
   import EmptyCardList from "../kindEvents/EventCard/EmptyCardList.svelte";
 
-  let { pubkey } = $props();
+  const { pubkey } = $props();
 </script>
 
 <!---->
