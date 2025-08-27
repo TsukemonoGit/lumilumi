@@ -93,9 +93,7 @@
             } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
               userURL = nip19.naddrEncode(parseNaddr(raeTags));
             }
-            /*    emojiTags = statusEvent.tags.filter(
-              (tag) => tag[0] === "emoji" && tag.length >= 3
-            ); */
+           
           }
         }
         $nowProgress = false;
@@ -195,7 +193,7 @@
     }, 0);
   };
 
-  const customReaction: string = "";
+  let customReaction: string = "";
 
   function createNewAddTag(str: string): string[] {
     const nip19Regex =

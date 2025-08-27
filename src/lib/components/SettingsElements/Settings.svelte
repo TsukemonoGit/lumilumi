@@ -78,8 +78,10 @@
     states: { value: relaySetValue },
     helpers: { isChecked: radioGroupisChecked },
   } = createRadioGroup({
+  
+    // eslint-disable-next-line svelte/no-unused-svelte-ignore
     // svelte-ignore state_referenced_locally
-    defaultValue: settings.useRelaySet,
+        defaultValue: settings.useRelaySet,
   });
 
   relaySetValue.subscribe((value) => {
@@ -132,15 +134,17 @@
     if (
       typeof obj !== "object" ||
       obj === null ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       typeof (obj as any).pubkey !== "string" ||
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       typeof (obj as any).useRelaySet !== "string"
     ) {
       return false;
     }
 
     // useRelaySet が "1" の場合は relays が配列かつ non-empty であることを確認
-    if (
-      (obj as any).useRelaySet === "1" &&
+    if ( // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (obj as any).useRelaySet === "1" && // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (!Array.isArray((obj as any).relays) || (obj as any).relays.length === 0)
     ) {
       return false;
@@ -403,7 +407,7 @@
     console.log("$originalSettings", originalSettings);
     // オリジナル設定のプロパティをループ
     for (const key in originalSettings) {
-      if (originalSettings.hasOwnProperty(key) && key in currentSettings) {
+      if (Object.prototype.hasOwnProperty.call(originalSettings, key) && key in currentSettings) {
         if (
           originalSettings[key as keyof LumiSetting]?.toString() !==
           currentSettings[key as keyof LumiSetting]?.toString()
@@ -466,6 +470,7 @@
     }
     // ダイアログ関連のナビゲーションを識別するための条件
     const isDialog =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (navigation.to?.url as any).state?.dialogOpen !== undefined;
     // ダイアログ操作ではなく、フォーム送信でもなく、変更がある場合のみ確認
     if (isDialog && settingsChanged()) {

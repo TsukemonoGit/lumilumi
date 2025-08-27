@@ -11,6 +11,7 @@
   import { nip19 } from "nostr-tools";
   import { getUserProfile } from "$lib/func/customEmoji";
   import { getRelayById } from "$lib/func/nostr";
+  import type { QueryKey } from "@tanstack/svelte-query";
 
   interface Props {
     note: Nostr.Event | undefined;
@@ -18,8 +19,8 @@
     atag: string | undefined;
     customReaction?: string;
     emoji?: string[];
-    handleClickOk?: any | undefined;
-    publishAndSetQuery: any;
+    handleClickOk?: (()=>void )| undefined;
+    publishAndSetQuery: (ev: Nostr.EventParameters<number>,queryKey:QueryKey)=>void;
   }
 
   let {
@@ -53,7 +54,7 @@
       return;
     }
     if (!note) {
-      handleClickOk();
+      handleClickOk?.();
       return;
     }
 
@@ -78,7 +79,7 @@
       tags: tags,
       content: customReaction,
     };
-    await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
+    await publishAndSetQuery?.(ev, ["reactions", atag ?? note.id, "reaction"]);
     openPopover?.(false);
     customReaction = "";
   };
@@ -109,7 +110,7 @@
       tags: tags,
       content: `:${e[0]}:`,
     };
-    await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
+    await publishAndSetQuery?.(ev, ["reactions", atag ?? note.id, "reaction"]);
     openPopover?.(false);
     customReaction = "";
   };

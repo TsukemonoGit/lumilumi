@@ -25,6 +25,7 @@
     BookmarkMinus,
     BookmarkPlus,
     CodeXml,
+    type IconProps,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -57,11 +58,12 @@
     lumiSetting,
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import type { SvelteComponent } from "svelte";
 
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
-    TriggerIcon?: any;
+    TriggerIcon?: typeof SvelteComponent<IconProps>;
     iconSize?: number;
     iconClass?: string;
     deleted: boolean;
@@ -355,17 +357,18 @@
         };
         break;
 
-      case "open_njump":
+      case "open_njump": {
         const njumpUrl = `https://njump.me/${replaceable ? naddr : nevent}`;
         window.open(njumpUrl, "_blank", "noreferrer");
         break;
+      }
 
-      case "translate":
+      case "translate":{
         const translateUrl = `https://translate.google.com/?sl=auto&tl=${$locale}&op=translate&text=${translateText(note.content)}`;
         window.open(translateUrl, "_blank", "noreferrer");
         break;
-
-      case "copy_id":
+ }
+      case "copy_id":{
         try {
           await navigator.clipboard.writeText(
             replaceable ? (naddr ?? "") : (nevent ?? "")
@@ -375,8 +378,7 @@
             description: `Copied to clipboard`,
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch{
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
@@ -384,29 +386,29 @@
           };
         }
         break;
-
+}
       case "goto_note":
         goto(`/${replaceable ? naddr : nevent}`);
         break;
 
-      case "open_emojito":
+      case "open_emojito":{
         const emojito = `https://emojito.meme/a/${naddr}`;
         window.open(emojito, "_blank", "noreferrer");
         break;
-
+}
       case "broadcast":
         publishEvent(note);
         break;
 
-      case "share_link":
+      case "share_link":{
         const shareData = {
           title: "",
           url: `${page.url.origin}/${replaceable ? naddr : nevent}`,
         };
         try {
           await navigator.share(shareData);
-        } catch (error: any) {
-          console.error(error.message);
+        } catch  {
+       
           $toastSettings = {
             title: "Error",
             description: "Failed to share",
@@ -414,8 +416,8 @@
           };
         }
         break;
-
-      case "copy_text":
+}
+      case "copy_text":{
         try {
           await navigator.clipboard.writeText(note.content);
           $toastSettings = {
@@ -423,8 +425,8 @@
             description: `Copied to clipboard`,
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch{
+       
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
@@ -432,8 +434,8 @@
           };
         }
         break;
-
-      case "copy_embed_code":
+}
+      case "copy_embed_code":{
         try {
           const embedCode = generateEmbedCode();
           await navigator.clipboard.writeText(embedCode);
@@ -443,8 +445,8 @@
             description: "Embed code copied to clipboard",
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch  {
+        
           $toastSettings = {
             title: "Error",
             description: "Failed to copy embed code",
@@ -452,31 +454,31 @@
           };
         }
         break;
-
-      case "open_zapstream":
+}
+      case "open_zapstream":{
         const zapStream = `https://zap.stream/${naddr}`;
         window.open(zapStream, "_blank", "noreferrer");
         break;
-
-      case "open_nostviewstr":
+}
+      case "open_nostviewstr":{
         const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
         window.open(nostviewer, "_blank", "noreferrer");
         break;
-
-      case "open_nostrapp":
+}
+      case "open_nostrapp":{
         const nostrapp = `https://nostrapp.link/a/${naddr}`;
         window.open(nostrapp, "_blank", "noreferrer");
         break;
-
+}
       case "delete":
         deleteDialogOpen(true);
         break;
 
-      case "open_makimono":
+      case "open_makimono":{
         const makimono = `https://makimono.lumilumi.app//${naddr}`;
         window.open(makimono, "_blank", "noreferrer");
-        break;
-      case "refresh_data":
+        break;}
+      case "refresh_data":{
         $nowProgress = true;
         const key: QueryKey = [
           "naddr",
@@ -487,8 +489,8 @@
           $nowProgress = false;
         }, 1000);
         break;
-
-      case "toggle_bookmark":
+}
+      case "toggle_bookmark":{
         try {
           // isBookmarked の状態を確認
           if (typeof isBookmarked === "undefined") {
@@ -571,7 +573,7 @@
           };
           $nowProgress = false;
         }
-        break;
+        break;}
     }
   };
 

@@ -1,14 +1,15 @@
 <script lang="ts">
   import { toastSettings } from "$lib/stores/stores";
-  import { Copy, Ellipsis, SquareArrowOutUpRight } from "lucide-svelte";
+  import { Copy, Ellipsis, SquareArrowOutUpRight, type IconProps } from "lucide-svelte";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { t as _ } from "@konemono/svelte5-i18n";
+  import type { SvelteComponent } from "svelte";
   interface Props {
     encodedId: string;
     indexes?: number[] | undefined;
-    TriggerIcon?: any;
+    TriggerIcon?: typeof SvelteComponent<IconProps>;
     iconSize?: number;
     iconClass?: string;
   }
@@ -40,15 +41,16 @@
 
   const handleSelectItem = async (index: number) => {
     switch (menuTexts[index].num) {
-      case 1:
+      case 1: {
         //open in njump
 
         const url = `https://njump.me/${encodedId}`;
 
         window.open(url, "_blank", "noreferrer");
         break;
+      }
 
-      case 3:
+      case 3: {
         //Copy EventID
         try {
           await navigator.clipboard.writeText(encodedId);
@@ -57,8 +59,7 @@
             description: `Copied to clipboard`,
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
@@ -66,10 +67,12 @@
           };
         }
         break;
-      case 4:
+      }
+      case 4: {
         //Goto encodedId page
         goto(`/${encodedId}`);
         break;
+      }
     }
   };
 </script>

@@ -7,16 +7,18 @@
     Smile,
     Tv,
     Squirrel,
+    type IconProps,
   } from "lucide-svelte";
 
   import * as nip19 from "nostr-tools/nip19";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
+  import type { SvelteComponent } from "svelte";
   interface Props {
     naddr: string | undefined;
     indexes?: number[] | undefined;
-    TriggerIcon?: any;
+    TriggerIcon?: typeof SvelteComponent<IconProps>;
     iconSize?: number;
     iconClass?: string;
   }
@@ -90,13 +92,14 @@
         $dialogOpen = true;
         break;
 
-      case 1:
+      case 1: {
         //open in njump
 
         const url = `https://njump.me/${naddr}`;
 
         window.open(url, "_blank", "noreferrer");
         break;
+      }
 
       case 3:
         //Copy EventID
@@ -107,8 +110,8 @@
             description: `Copied to clipboard`,
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
+         
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
@@ -116,26 +119,28 @@
           };
         }
         break;
-
-      case 5:
+      case 5: {
         //open in emojito
         const emojito = `https://emojito.meme/a/${naddr}`;
 
         window.open(emojito, "_blank", "noreferrer");
         break;
-
-      case 9:
+      }
+      case 9: {
         //open in zap.stream
         const zapStream = `https://zap.stream/${naddr}`;
 
         window.open(zapStream, "_blank", "noreferrer");
         break;
-      case 10:
+      }
+      case 10: {
         //open in nostviewer
         const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
 
         window.open(nostviewer, "_blank", "noreferrer");
         break;
+      }
+      
     }
   };
 </script>

@@ -86,7 +86,7 @@
         note.kind === 0 ||
         note.kind === 3)
     ) {
-      //atag　で　りぽすと
+      //atag で りぽすと
       const dtag = note.tags.find((tag) => tag[0] === "d");
       return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
     } else {
@@ -211,7 +211,7 @@
     };
     const nevent = nip19.neventEncode(eventpointer);
     switch (menuTexts[index].num) {
-      case 0:
+      case 0: {
         //repost
         const tags: string[][] = [
           ["p", note.pubkey],
@@ -255,9 +255,9 @@
                 content: "",
               };
         await publishAndSetQuery(ev, ["reactions", queryId, "repost"]);
-
         break;
-      case 1:
+      }
+      case 1: {
         //Quote
 
         const options: AdditionalPostOptions = {
@@ -275,6 +275,7 @@
         }, 2);
 
         break;
+      }
     }
     prosessing = false;
   };
@@ -422,7 +423,7 @@
   let hasReactions: boolean = $state(false);
 
   const updateInterval = 1000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
-  let timeoutId: NodeJS.Timeout | undefined = undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
 
   function scheduleUpdate() {
     if (timeoutId) {
@@ -440,7 +441,7 @@
   });
 
   $effect(() => {
-    viewAllReactions;
+    viewAllReactions=viewAllReactions;//trueでもfalseでもじっこう
     if (viewEventIds.get().length > 0 || lumiSetting.get().showAllReactions) {
       untrack(() => {
         scheduleUpdate();
