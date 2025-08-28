@@ -395,7 +395,11 @@
   },
   "features": {
     "title": "機能",
-    "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。"
+    "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。",
+    "bookmarkLink": {
+      "before": "非公開やブクマの整頓には",
+      "after": "をご使用ください。"
+    }
   },
   "date": {
     "activity_on": "{date}の活動",

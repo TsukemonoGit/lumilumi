@@ -353,9 +353,10 @@ export async function encryptPrvTags(
   prvTags: string[][]
 ): Promise<string | undefined> {
   try {
+    //44で暗号化
     const privateString = await (
       window?.nostr as Nostr.Nip07.Nostr
-    )?.nip04?.encrypt(pubkey, JSON.stringify(prvTags));
+    )?.nip44?.encrypt(pubkey, JSON.stringify(prvTags));
     return privateString;
   } catch (error) {
     console.error("Failed to decrypt content:", error);

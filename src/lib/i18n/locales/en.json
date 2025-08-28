@@ -395,7 +395,11 @@
   },
   "features": {
     "title": "Features",
-    "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported."
+    "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported.",
+    "bookmarkLink": {
+      "before": "For private bookmarks or bookmark organization, please use ",
+      "after": "."
+    }
   },
   "date": {
     "activity_on": "Activity on {date}",
