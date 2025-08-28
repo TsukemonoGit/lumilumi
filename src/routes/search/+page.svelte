@@ -23,7 +23,7 @@
 
   import type { PageData } from "./$types";
   import { pipe } from "rxjs";
-  import { latest } from "rx-nostr";
+  import { latest, type EventPacket } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { page } from "$app/state";
@@ -134,8 +134,13 @@
         undefined,
         undefined
       );
+
       $nowProgress = false;
       if (fetchRelays.length > 0) {
+        queryClient.setQueryData(
+          ["naddr", `10007:${lumiSetting.get().pubkey}:`],
+          fetchRelays[0]
+        );
         const relaylist = toGlobalRelaySet(fetchRelays[0].event);
         if (relaylist.length > 0) {
           queryClient.setQueryData(
@@ -233,9 +238,13 @@
     const newTags: string[][] = [];
     relays.map((relay) => newTags.push(["relay", relay]));
     console.log(newTags);
-
+    const ev: EventPacket | undefined = queryClient.getQueryData([
+      "naddr",
+      `10007:${lumiSetting.get().pubkey}:`,
+    ]);
+    //   console.log(ev);
     const result = await safePublishEvent({
-      content: "",
+      content: ev?.event.content || "",
       tags: newTags,
       kind: 10007,
     });
