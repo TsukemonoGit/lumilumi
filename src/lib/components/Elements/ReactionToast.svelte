@@ -26,7 +26,7 @@
       addToast({
         data: value,
       });
-      if ($toasts.length > 5) {
+      if ($toasts.length > 4) {
         console.log($toasts);
         removeToast($toasts[$toasts.length - 1].id);
       }
