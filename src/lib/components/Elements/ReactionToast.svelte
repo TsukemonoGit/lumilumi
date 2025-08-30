@@ -10,7 +10,7 @@
 
   const {
     elements: { content, title, description, close },
-    helpers: { addToast },
+    helpers: { addToast, removeToast },
     states: { toasts },
     actions: { portal },
   } = createToaster<ToastData>();
@@ -26,6 +26,10 @@
       addToast({
         data: value,
       });
+      if ($toasts.length > 5) {
+        console.log($toasts);
+        removeToast($toasts[$toasts.length - 1].id);
+      }
     }
   });
 
