@@ -109,8 +109,8 @@ export const eventKinds = new Map<number, { ja: string; en: string }>([
   [
     17,
     {
-      ja: "ウェブサイトへの反応",
-      en: "Reaction to a website",
+      ja: "外部コンテンツのリアクション",
+      en: "External Content Reactions",
     },
   ],
   //
