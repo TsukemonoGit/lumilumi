@@ -24,13 +24,21 @@
   let { note, metadata, displayMenu, depth, repostable }: Props = $props();
   let deleted = $state(false);
   let website = $derived(reactionWebsite(note));
+
   function reactionWebsite(note: Nostr.Event): string | undefined {
-    const webTag = note.tags.find((tag) => tag[0] === "r");
-    if (webTag && webTag.length > 1) {
-      return webTag[1];
-    } else {
-      return undefined;
+    // "i" タグを優先して探す
+    const iTag = note.tags.find((tag) => tag[0] === "i");
+    if (iTag && iTag.length > 2) {
+      return iTag[2]; // URLは3番目
     }
+
+    // 従来の r タグやURLタグがあれば fallback
+    const rTag = note.tags.find((tag) => tag[0] === "r");
+    if (rTag && rTag.length > 1) {
+      return rTag[1];
+    }
+
+    return undefined;
   }
 </script>
 
