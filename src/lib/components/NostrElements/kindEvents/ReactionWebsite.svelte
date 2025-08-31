@@ -18,28 +18,25 @@
     metadata: Nostr.Event | undefined;
     displayMenu: boolean;
     depth: number;
-
     repostable: boolean;
   }
   let { note, metadata, displayMenu, depth, repostable }: Props = $props();
   let deleted = $state(false);
-  let website = $derived(reactionWebsite(note));
 
-  function reactionWebsite(note: Nostr.Event): string | undefined {
-    // "i" タグを優先して探す
-    const iTag = note.tags.find((tag) => tag[0] === "i");
-    if (iTag && iTag.length > 2) {
-      return iTag[2]; // URLは3番目
-    }
+  // iタグを全件取得
+  let iTags = $derived(
+    note.tags.filter((tag) => tag[0] === "i" && tag.length > 2)
+  );
 
-    // 従来の r タグやURLタグがあれば fallback
-    const rTag = note.tags.find((tag) => tag[0] === "r");
-    if (rTag && rTag.length > 1) {
-      return rTag[1];
-    }
+  // rタグを全件取得
+  let rTags = $derived(
+    note.tags.filter((tag) => tag[0] === "r" && tag.length > 1)
+  );
 
-    return undefined;
-  }
+  // 表示用配列。iタグがあればそれを使い、なければrタグ
+  let websiteTags = $derived(
+    iTags.length > 0 ? iTags.map((tag) => tag[2]) : rTags.map((tag) => tag[1])
+  );
 </script>
 
 {#if deleted}
@@ -66,19 +63,21 @@
 
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted />
+      {/if}
     {/snippet}
   </RepostComponent>
-  <!--リアクションしたノートの情報（リポストのを使いまわし）-->
 
-  {#if website}
+  <!-- 複数URLを順に表示 -->
+  {#each websiteTags as url}
     <div class="p-2">
-      {#if lumiSetting.get().showImg && isvalidURL(website)}
-        <MediaEmbedSwitcher url={website || ""} author={note.pubkey} />
+      {#if lumiSetting.get().showImg && isvalidURL(url)}
+        <MediaEmbedSwitcher {url} author={note.pubkey} />
       {:else}
-        <Link className="underline text-magnum-300 break-all " href={website}
-          >{website}</Link
-        >{/if}
+        <Link className="underline text-magnum-300 break-all" href={url}>
+          {url}
+        </Link>
+      {/if}
     </div>
-  {/if}
+  {/each}
 {/if}
