@@ -240,10 +240,13 @@
   <div class="media-grid">
     {#each Array(MEDIA_PER_PAGE) as _, index}
       {@const media = viewList[index]}
+      {@const warning = media?.eventPacket?.event?.tags?.find(
+        (tag) => tag[0] === "content-warning"
+      )}
       {#if media}
         <button class="media-item" onclick={() => openModal(media)}>
           <div
-            class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm"
+            class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm z-10"
           >
             {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
           </div>
@@ -260,16 +263,24 @@
                 onerror={() => handleImageError(media.mediaUrl)}
                 onloadstart={() => initImageLoad(media.mediaUrl)}
                 class:loading={imageLoadStatus[media.mediaUrl] === "loading"}
+                class:blur-md={warning}
               />
               {#if imageLoadStatus[media.mediaUrl] === "loading"}
                 <div class="image-loading-placeholder"></div>
               {/if}
             {/if}
           {:else if media.mediaType === "movie"}
-            <video src={media.mediaUrl} muted preload="metadata">
-              <track kind="captions" />
-            </video>
-            <div class="media-type-indicator">🎬</div>
+            <div class="relative w-full h-full">
+              <video
+                src={media.mediaUrl}
+                muted
+                preload="metadata"
+                class:blur-md={warning}
+              >
+                <track kind="captions" />
+              </video>
+              <div class="media-type-indicator">🎬</div>
+            </div>
           {:else if media.mediaType === "audio"}
             <div class="audio-placeholder">
               <span>🎵</span>
@@ -278,6 +289,10 @@
             <div class="media-3d-placeholder">
               <span>🎲</span>
             </div>
+          {/if}
+
+          {#if warning}
+            <div class="warning-indicator">⚠️</div>
           {/if}
         </button>
       {:else}
@@ -392,9 +407,12 @@
     right: 8px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 4px 8px;
+    width: 1.6em;
+    height: 1.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 4px;
-    font-size: 12px;
   }
 
   .audio-placeholder,
@@ -406,5 +424,19 @@
     height: 100%;
     font-size: 3rem;
     color: #666;
+  }
+
+  .warning-indicator {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 4px;
+    width: 1.6em;
+    height: 1.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 </style>
