@@ -8,7 +8,7 @@
   } from "$lib/stores/stores";
   import type { Profile } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { pipe } from "rxjs";
   import { latest, uniq, type EventPacket } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
@@ -31,6 +31,7 @@
   import Birth from "./Birth.svelte";
   import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import InputCustomEmoji from "$lib/components/InputCustomEmoji.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -260,7 +261,6 @@
   };
 
   let cursorPosition: number = 0;
-  let customReaction: string = "";
 
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;
@@ -281,13 +281,15 @@
       newProfile.about?.slice(cursorPosition);
     cursorPosition += emojiText.length;
   };
-  const handleClickEmojiDisplayName = (e: string[]) => {
+  const handleClickEmojiDisplayName = async (e: string[]) => {
     if (!newProfile) return;
     const emojiTag = ["emoji", ...e];
+
     if (!newTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
-      newTags.push(emojiTag);
+      newTags = [...newTags, emojiTag];
     }
     const emojiText = `:${e[0]}:`;
+
     newProfile.display_name = newProfile.display_name + emojiText;
   };
 
@@ -361,15 +363,22 @@
         </div>
 
         <div
-          class="bg-magnum-800 w-full border-b border-magnum-400"
+          class="bg-magnum-800 w-full border-b border-magnum-400 overflow-hidden"
           style="height:{bannerHeight}px"
         >
           {#if newProfile.banner}
             <img
               src={newProfile.banner}
               alt="banner"
-              class="object-cover mx-auto"
-              style="height: 100%;  object-fit: cover; object-position: center;"
+              class="mx-auto"
+              style="
+        width:100%;
+        height:100%;
+        object-fit: cover;
+        object-position: center center;
+      
+        max-width:calc(min({bannerHeight * 3}px,100%));
+      "
               loading="lazy"
             />
           {/if}
@@ -433,46 +442,15 @@
       {$_("profile.display_name")}
       <input
         type="text"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
+        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
         bind:value={newProfile.display_name}
         placeholder="display_name"
-      />{#if $emojis && $emojis.list.length > 0}
-        <div class="w-fit flex self-end">
-          <Popover ariaLabel="custom emoji">
-            <SmilePlus size="20" />
-            {#snippet popoverContent()}
-              <div>
-                <div
-                  class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
-                >
-                  {#each $emojis.list as e, index}
-                    {#if customReaction === "" || e[0]
-                        .toLowerCase()
-                        .includes(customReaction
-                            .replace(":", "")
-                            .toLowerCase())}
-                      <button
-                        onclick={() => handleClickEmojiDisplayName(e)}
-                        class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                      >
-                        {#if lumiSetting.get().showImg}
-                          <img
-                            height="24px"
-                            loading="lazy"
-                            class="h-6 min-w-6 object-contain justify-self-center"
-                            src={e[1]}
-                            alt={e[0]}
-                            title={e[0]}
-                          />{:else}{e[0]}{/if}
-                      </button>
-                    {/if}
-                  {/each}
-                </div>
-              </div>
-            {/snippet}
-          </Popover>
-        </div>
-      {/if}
+      />
+      <div class="w-fit flex self-end mb-1">
+        {#if $emojis && $emojis.list.length > 0}
+          <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
+        {/if}
+      </div>
       <div class="flex gap-2 mb-2 items-end justify-between">
         {$_("profile.picture")}<InputImageFromFile
           bind:inputText={newProfile.picture}
@@ -498,51 +476,18 @@
 
       {$_("profile.about")}
       <textarea
-        class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800 mb-2"
+        class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800"
         bind:value={newProfile.about}
         oninput={handleTextareaInput}
         onclick={handleTextareaInput}
       ></textarea>
-      {#if $emojis && $emojis.list.length > 0}
-        <div class="w-fit flex self-end">
-          <Popover ariaLabel="custom emoji">
-            <SmilePlus size="20" />
-            {#snippet popoverContent()}
-              <div>
-                <div
-                  class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
-                >
-                  {#each $emojis.list as e, index}
-                    {#if customReaction === "" || e[0]
-                        .toLowerCase()
-                        .includes(customReaction
-                            .replace(":", "")
-                            .toLowerCase())}
-                      <button
-                        onclick={() => handleClickEmoji(e)}
-                        class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                        style="overflow-anchor: auto;"
-                      >
-                        {#if lumiSetting.get().showImg}
-                          <img
-                            height="24px"
-                            loading="lazy"
-                            class="h-6 min-w-6 object-contain justify-self-center"
-                            src={e[1]}
-                            alt={e[0]}
-                            title={e[0]}
-                          />{:else}{e[0]}{/if}
-                      </button>
-                    {/if}
-                  {/each}<EmojiListUpdate>
-                    <RefreshCw />
-                  </EmojiListUpdate>
-                </div>
-              </div>
-            {/snippet}
-          </Popover>
-        </div>
-      {/if}
+
+      <div class="w-fit flex self-end mb-2">
+        {#if $emojis && $emojis.list.length > 0}
+          <InputCustomEmoji onClickEmoji={handleClickEmoji} />
+        {/if}
+      </div>
+
       {$_("profile.nip05")}
       <input
         type="text"

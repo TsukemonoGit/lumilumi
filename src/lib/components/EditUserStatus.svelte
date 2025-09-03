@@ -23,6 +23,7 @@
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import { checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
+  import InputCustomEmoji from "./InputCustomEmoji.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -267,47 +268,7 @@
           bind:value={userStatus}
         />{#if $emojis && $emojis.list.length > 0}
           <div class=" w-fit flex self-end">
-            <Popover bind:openPopover ariaLabel="custom emoji" zIndex={100}>
-              <div class="actionButton">
-                <SmilePlus size="20" />
-              </div>
-              {#snippet popoverContent()}
-                <div>
-                  <div
-                    class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
-                    style="overflow-anchor: auto;"
-                  >
-                    {#each $emojis.list as e, index}
-                      {#if customReaction === "" || e[0]
-                          .toLowerCase()
-                          .includes(customReaction
-                              .replace(":", "")
-                              .toLowerCase())}
-                        <button
-                          onclick={() => handleClickEmojiDisplayName(e)}
-                          class="rounded-md border m-0.5 p-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
-                        >
-                          {#if lumiSetting.get().showImg}
-                            <img
-                              height="24px"
-                              loading="lazy"
-                              class="h-6 min-w-6 object-contain justify-self-center"
-                              src={e[1]}
-                              alt={e[0]}
-                              title={e[0]}
-                            />{:else}{e[0]}{/if}
-                        </button>
-                      {/if}
-                    {/each}
-                    <EmojiListUpdate
-                      buttonClass="ml-auto p-1 m-1 rounded-full   hover:opacity-75 active:opacity-50 bg-magnum-600/70 text-magnum-300"
-                    >
-                      <RefreshCw />
-                    </EmojiListUpdate>
-                  </div>
-                </div>
-              {/snippet}
-            </Popover>
+            <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
           </div>
         {/if}
       </fieldset>
