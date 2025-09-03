@@ -3,6 +3,7 @@
   import { createPopover, melt } from "@melt-ui/svelte";
   import { X } from "lucide-svelte";
   import { fade } from "svelte/transition";
+  import CloseButton from "./CloseButton.svelte";
   const {
     elements: { trigger, content, arrow, close },
     states: { open },
@@ -52,9 +53,7 @@
   >
     <div use:melt={$arrow}></div>
     <div class="flex flex-col gap-2.5">{@render popoverContent?.()}</div>
-    {#if showCloseButton}<button class="close" use:melt={$close}>
-        <X class="size-4" /></button
-      >{/if}
+    {#if showCloseButton}<CloseButton useMelt={$close} ariaLabel="close" />{/if}
   </div>{/if}
 
 <style lang="postcss">
@@ -70,13 +69,6 @@
     @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-white p-0;
     @apply text-sm font-medium text-magnum-900 transition-colors hover:bg-white/90;
     @apply focus-visible:ring focus-visible:ring-magnum-400 focus-visible:ring-offset-2;
-  }
-
-  .close {
-    @apply absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full;
-    @apply text-magnum-900 transition-colors hover:bg-magnum-100/50;
-    @apply focus-visible:ring focus-visible:ring-magnum-400 focus-visible:ring-offset-2;
-    @apply bg-white p-0 text-sm font-medium;
   }
 
   .content {

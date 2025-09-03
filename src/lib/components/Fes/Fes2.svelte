@@ -283,7 +283,7 @@
 
     <!-- 閉じるボタン -->
     <button
-      class="absolute top-4 right-4 bg-white bg-opacity-20 text-white rounded-full p-2 text-sm z-50 hover:bg-opacity-30 transition-all"
+      class="absolute top-4 right-4 bg-white bg-opacity-20 text-white rounded-full p-2 text-sm z-50 hover:bg-opacity-30 transition-all w-7 h-7 flex justify-center items-center"
       onclick={endAnimation}
     >
       ✕

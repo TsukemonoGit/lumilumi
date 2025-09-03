@@ -29,18 +29,34 @@
   }: Props = $props();
 </script>
 
-<button
-  {type}
-  {disabled}
-  {onclick}
-  title={title ?? ariaLabel}
-  aria-label={ariaLabel}
-  use:melt={useMelt}
-  style={`z-index: ${zIndex};`}
-  class={`absolute right-1 top-1 inline-flex h-7 w-7 appearance-none
+{#if useMelt}
+  <button
+    {type}
+    {disabled}
+    {onclick}
+    title={title ?? ariaLabel}
+    aria-label={ariaLabel}
+    use:melt={useMelt}
+    style={`z-index: ${zIndex};width:${size}px; height:${size}px`}
+    class={`absolute right-1 top-1 inline-flex  appearance-none
                 items-center justify-center rounded-full text-magnum-800 bg-magnum-200 scale-95
                  opacity-80 hover:opacity-100 hover:scale-100 active:bg-magnum-200 active:scale-90 ${className}
   `}
->
-  <X {size} />
-</button>
+  >
+    <X size={size - 2} />
+  </button>
+{:else}<button
+    {type}
+    {disabled}
+    {onclick}
+    title={title ?? ariaLabel}
+    aria-label={ariaLabel}
+    style={`z-index: ${zIndex};width:${size}px; height:${size}px`}
+    class={`absolute right-1 top-1 inline-flex  appearance-none
+                items-center justify-center rounded-full text-magnum-800 bg-magnum-200 scale-95
+                 opacity-80 hover:opacity-100 hover:scale-100 active:bg-magnum-200 active:scale-90 ${className}
+  `}
+  >
+    <X size={size - 2} />
+  </button>
+{/if}
