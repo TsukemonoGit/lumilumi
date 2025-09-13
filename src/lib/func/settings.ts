@@ -464,12 +464,25 @@ async function processChunksInParallel(
   );
 }
 
+// ショートコードを正規化する関数（無効な場合はnullを返す）
+function normalizeShortcode(shortcode: string): string | null {
+  const normalized = shortcode.replace(/[^a-zA-Z0-9_]/g, "_");
+  // 英数字が含まれているかチェック
+  if (!/[a-zA-Z0-9]/.test(normalized)) {
+    return null;
+  }
+  return normalized;
+}
+
 // イベントから絵文字を抽出
 function extractEmojisFromEvent(event: any): string[][] {
   return event.tags.reduce(
     (acc: string[][], [tag, shortcode, url]: string[]) => {
-      if (tag === "emoji" && emojiShortcodeRegex.test(shortcode)) {
-        return [...acc, [shortcode, url]];
+      if (tag === "emoji") {
+        const normalizedShortcode = normalizeShortcode(shortcode);
+        if (normalizedShortcode !== null) {
+          return [...acc, [normalizedShortcode, url]];
+        }
       }
       return acc;
     },
