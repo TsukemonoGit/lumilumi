@@ -19,7 +19,7 @@
   } from "./timelineList";
   import { now, type DefaultRelayConfig, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { createUniq } from "rx-nostr/src";
   import {
@@ -27,7 +27,7 @@
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
-  import { saveEachNote, scanArray } from "$lib/stores/operators";
+  import { scanArray } from "$lib/stores/operators";
   import { sortEventPackets } from "$lib/func/util";
   import { page } from "$app/state";
 
@@ -41,10 +41,10 @@
     relays?: string[] | undefined;
 
     eventFilter?: (event: Nostr.Event) => boolean;
-    error?: import("svelte").Snippet<[Error]>;
-    nodata?: import("svelte").Snippet;
-    loading?: import("svelte").Snippet;
-    content?: import("svelte").Snippet<
+    error?: Snippet<[Error]>;
+    nodata?: Snippet;
+    loading?: Snippet;
+    content?: Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
     //  updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
@@ -177,6 +177,7 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
+  let loadMoreDisabled = $state(false);
   // Update the view with current events
 
   /**
@@ -456,11 +457,19 @@
 
       timelineManager.updateCounts();
 
-      // 👇 最後のチェック: ストック足りないなら移動しない
+      //
       if (
         !viewMoved &&
-        timelineManager.currentEventCount >=
+        timelineManager.currentEventCount <
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
+      ) {
+        loadMoreDisabled = true;
+      }
+
+      // 👇 最後のチェック: 次のページのイベントが少しでもあったら移動
+      if (
+        !viewMoved &&
+        timelineManager.currentEventCount > viewIndex + amount
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
 
@@ -565,7 +574,7 @@
 
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
-    disabled={$nowProgress}
+    disabled={$nowProgress || loadMoreDisabled}
     class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
     onclick={() => handleNext()}
   >

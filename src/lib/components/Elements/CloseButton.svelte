@@ -25,7 +25,7 @@
     ariaLabel,
     className = "",
     zIndex = 0,
-    size = 24,
+    size = 26,
   }: Props = $props();
 </script>
 

@@ -114,12 +114,6 @@
         req={createRxForwardReq()}
         {viewIndex}
         {amount}
-        eventFilter={(event) =>
-          (event.kind === 42 &&
-            event.tags.find(
-              (tag) => tag[0] === "e" && tag.length > 1 && tag[1] === data.id
-            ) !== undefined) ||
-          event.kind !== 42}
       >
         {#snippet content({ events, len })}
           <!-- <SetRepoReactions /> -->
