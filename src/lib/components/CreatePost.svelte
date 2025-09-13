@@ -39,7 +39,7 @@
   import { tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
-  import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
+  import { checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
@@ -59,7 +59,8 @@
       onWarning: boolean;
       warningText: string;
       additionalReplyUsers: string[];
-    }) => Promise<void>;textarea: HTMLTextAreaElement | undefined
+    }) => Promise<void>;
+    textarea: HTMLTextAreaElement | undefined;
   }
 
   let {
@@ -69,7 +70,8 @@
     isPosting,
     additionalReplyUsers = $bindable(),
     resetCreatePost = $bindable(),
-    onSendEvent,textarea=$bindable()
+    onSendEvent,
+    textarea = $bindable(),
   }: Props = $props();
 
   // ----------------------------------------
@@ -223,7 +225,7 @@
 
   function handleClickEmoji(e: string[]) {
     const emoji = [...e];
-    tags = addEmojiTag(tags, emoji);
+    addEmojiTag(emoji);
     const emojiText = `:${emoji[0]}:`;
     insertTextAtCursor(emojiText);
   }
@@ -239,6 +241,56 @@
 
   function handleClickQuote() {
     insertTextAtCursor("nostr:", { addSpaceBefore: true });
+  }
+
+  // ----------------------------------------
+  // Emoji Tag Management
+  // ----------------------------------------
+  function addEmojiTag(emoji: string[]) {
+    // 1. URLが同じ絵文字を探す
+    const sameEmoji = tags.find(
+      (tag) => tag[0] === "emoji" && tag[2] === emoji[1] // URLが同じ
+    );
+
+    if (sameEmoji) {
+      // 同じURLの絵文字があれば、その名前を使う
+      emoji[0] = sameEmoji[1];
+    }
+
+    // 2. 同じ名前の絵文字があるか確認
+    let sameNameEmoji = tags.find(
+      (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+    );
+
+    // 3. 絵文字の条件に従って追加処理
+    if (sameNameEmoji) {
+      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
+      if (sameNameEmoji[2] !== emoji[1]) {
+        // 元の名前を保存
+        const baseName = emoji[0];
+        let num = 1;
+
+        // 重複しない名前が見つかるまでnumをインクリメント
+        emoji[0] = `${baseName}_${num}`;
+        sameNameEmoji = tags.find(
+          (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+        );
+
+        while (sameNameEmoji) {
+          num++;
+          emoji[0] = `${baseName}_${num}`;
+          sameNameEmoji = tags.find(
+            (tag) => tag[0] === "emoji" && tag[1] === emoji[0]
+          );
+        }
+
+        tags.push(["emoji", ...emoji]);
+      }
+      // 完全に同じ名前・URLの絵文字がある場合は何もしない
+    } else {
+      // 同じ名前もURLもない場合、新しい絵文字として追加
+      tags.push(["emoji", ...emoji]);
+    }
   }
 
   // ----------------------------------------

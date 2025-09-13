@@ -7,7 +7,7 @@ import { usePromiseReq } from "./nostr";
 import { npubRegex } from "./regex";
 
 // ----------------------------------------
-// Tag Management
+//Emoji Tag Management
 // ----------------------------------------
 export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
   const newTags = [...tags]; // 元の配列をコピー
