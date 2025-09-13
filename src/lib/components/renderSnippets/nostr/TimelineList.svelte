@@ -177,6 +177,7 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
+  let loadMoreDisabled = $state(false);
   // Update the view with current events
 
   /**
@@ -456,6 +457,15 @@
 
       timelineManager.updateCounts();
 
+      //
+      if (
+        !viewMoved &&
+        timelineManager.currentEventCount <
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT
+      ) {
+        loadMoreDisabled = true;
+      }
+
       // 👇 最後のチェック: 次のページのイベントが少しでもあったら移動
       if (
         !viewMoved &&
@@ -564,7 +574,7 @@
 
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
-    disabled={$nowProgress}
+    disabled={$nowProgress || loadMoreDisabled}
     class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
     onclick={() => handleNext()}
   >
