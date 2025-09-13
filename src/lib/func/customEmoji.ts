@@ -7,10 +7,13 @@ import { usePromiseReq } from "./nostr";
 import { npubRegex } from "./regex";
 
 // ----------------------------------------
-//Emoji Tag Management
+// Emoji Tag Management
 // ----------------------------------------
-export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
-  const newTags = [...tags]; // 元の配列をコピー
+export function addEmojiTag(
+  tags: string[][],
+  emoji: string[]
+): { tags: string[][]; finalName: string } {
+  const newTags = [...tags];
 
   // 1. URLが同じ絵文字を探す
   const sameEmoji = newTags.find(
@@ -18,8 +21,7 @@ export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
   );
 
   if (sameEmoji) {
-    // 同じURLの絵文字があれば、その名前を使う（何もしない）
-    return newTags;
+    return { tags: newTags, finalName: sameEmoji[1] };
   }
 
   // 2. 同じ名前の絵文字があるか確認
@@ -31,7 +33,6 @@ export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
   // 3. 名前の重複を解決
   if (sameNameEmoji) {
     if (sameNameEmoji[2] !== emoji[1]) {
-      // 名前が同じでURLが異なる場合、新しい名前を付けて追加
       const baseName = currentEmojiName;
       let num = 1;
 
@@ -45,17 +46,17 @@ export function addEmojiTag(tags: string[][], emoji: string[]): string[][] {
 
       newTags.push(["emoji", currentEmojiName, emoji[1]]);
     }
-    // 完全に同じ名前・URLの絵文字がある場合は何もしない
   } else {
-    // 同じ名前もURLもない場合、新しい絵文字として追加
     newTags.push(["emoji", currentEmojiName, emoji[1]]);
   }
 
-  return newTags;
+  console.log(newTags);
+  return { tags: newTags, finalName: currentEmojiName };
 }
 
 // 試行済みのhexを記録するSet
 const attemptedHexes = new Set<string>();
+
 // 記録をリセットする関数
 export function resetEmojiCache(): void {
   attemptedHexes.clear();
@@ -88,7 +89,8 @@ export async function checkCustomEmojis(
     // 絵文字リストから探す
     const customEmoji = emojiList.list.find((e) => e[0] === emojiName);
     if (customEmoji) {
-      returnTags = addEmojiTag(returnTags, customEmoji);
+      const result = addEmojiTag(returnTags, customEmoji);
+      returnTags = result.tags;
     } else if (npubRegex.test(emojiName)) {
       try {
         const hex = nip19.decode(emojiName)?.data as string;
@@ -97,7 +99,8 @@ export async function checkCustomEmojis(
 
         const picture = profile?.picture;
         if (picture) {
-          returnTags = addEmojiTag(returnTags, [emojiName, picture]);
+          const result = addEmojiTag(returnTags, [emojiName, picture]);
+          returnTags = result.tags;
         }
       } catch (error) {
         console.warn(`Failed to process npub emoji: ${emojiName}`, error);
