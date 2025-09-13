@@ -525,12 +525,12 @@
         updateQueryDataForOlder(olderEvents);
       }
 
-      // 👇 最後のチェック: ストック足りないなら移動しない
+      // 👇 最後のチェック: 次のページのイベントが少しでもあったら移動
       if (
         !viewMoved &&
         timelineManager.filteredNewerEventCount +
-          timelineManager.filteredOlderEventCount >=
-          viewIndex + amount + CONFIG.SLIDE_AMOUNT * 0.1 //フィルター考慮
+          timelineManager.filteredOlderEventCount >
+          viewIndex + amount
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         // viewIndexが変更された場合のみ履歴を更新
