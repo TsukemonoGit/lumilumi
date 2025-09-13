@@ -811,7 +811,7 @@
       <UpdateEmojiList />
     </div>
     <div
-      class="border rounded-md border-magnum-400 p-1 m-2 before:content-['*']"
+      class="border rounded-md border-magnum-400 px-2 py-1 my-2 mx-4 text-sm"
     >
       {$_("settings.emoji.notes")}
       <Link

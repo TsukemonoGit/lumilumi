@@ -50,7 +50,7 @@
     "lastUpdated": "Last Updated",
     "refreshPage": "Settings have been updated. ",
     "emoji": {
-      "notes": "Emojis that contain NIP violation shortcodes are excluded."
+      "notes": "Emojis with invalid characters are automatically corrected and registered. However, emojis containing no valid characters are excluded."
     },
     "relay": "The changes will take effect after reloading.",
     "kind10002": "Edit Relays",
