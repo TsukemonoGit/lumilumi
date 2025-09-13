@@ -33,15 +33,15 @@
   };
 
   // 共通のNote用props
-  const baseNoteProps = {
+  let baseNoteProps = $derived({
     className: "border rounded-md border-magnum-600/30",
     mini: true,
     displayMenu,
     depth,
     repostable,
     maxHeight,
-    zIndex,
-  };
+    zIndex: (zIndex || 0) + 10,
+  });
 
   // 共通のNaddrEvent用props
   const baseNaddrProps = {

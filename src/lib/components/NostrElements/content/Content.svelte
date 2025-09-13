@@ -82,7 +82,7 @@
       {displayMenu}
       {depth}
       {repostable}
-      {zIndex}
+      zIndex={zIndex + 10}
       {displayTags}
     />
   {/snippet}</Dialog
