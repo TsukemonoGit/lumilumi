@@ -36,7 +36,9 @@
   ariaLabel="custom emoji"
   zIndex={100}
 >
-  <div class="actionButton">
+  <div
+    class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
+  >
     <SmilePlus size="20" />
   </div>
   {#snippet popoverContent()}

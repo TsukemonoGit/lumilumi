@@ -199,8 +199,9 @@
         onkeyup={updateCursorPosition}
       ></textarea>
       <div class="flex gap-2 justify-between">
-        <UserPicker onClickUser={inputUserPub} />
         <div class="flex gap-2">
+          <UserPicker onClickUser={inputUserPub} />
+
           <Popover
             bind:openPopover={showTimePicker}
             ariaLabel="DateTimeInput"
@@ -217,49 +218,46 @@
               </div>
             {/snippet}
           </Popover>
+        </div>
+        <Popover
+          bind:openPopover={showSyntaxHelp}
+          ariaLabel="SyntaxHelp"
+          zIndex={10}
+        >
+          <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
+            <CircleQuestionMark size={18} />
+          </div>
 
-          <Popover
-            bind:openPopover={showSyntaxHelp}
-            ariaLabel="SyntaxHelp"
-            zIndex={10}
-          >
-            <div
-              class="text-magnum-400 hover:text-magnum-200 transition-colors"
-            >
-              <CircleQuestionMark size={18} />
-            </div>
+          {#snippet popoverContent()}
+            <div class="flex flex-col items-start max-w-[600px]">
+              <div class="font-medium mb-2 text-magnum-200">
+                {$_("search.syntaxExamplesTitle")}
+              </div>
 
-            {#snippet popoverContent()}
-              <div class="flex flex-col items-start max-w-[600px]">
-                <div class="font-medium mb-2 text-magnum-200">
-                  {$_("search.syntaxExamplesTitle")}
-                </div>
-
-                {#each syntaxExamples as example}
-                  <button
-                    class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
+              {#each syntaxExamples as example}
+                <button
+                  class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
           text-start p-2 rounded-md w-full
             bg-none hover:bg-magnum-700/50 whitespace-pre-wrap break-words"
-                    style="word-break: break-word;"
-                    onclick={() => {
-                      searchWord = example;
-                      showSyntaxHelp(false);
-                    }}
-                  >
-                    {example}
-                  </button>
-                {/each}
-
-                <div
-                  class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
                   style="word-break: break-word;"
+                  onclick={() => {
+                    searchWord = example;
+                    showSyntaxHelp(false);
+                  }}
                 >
-                  {$_("search.syntaxProperties")}
-                </div>
+                  {example}
+                </button>
+              {/each}
+
+              <div
+                class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
+                style="word-break: break-word;"
+              >
+                {$_("search.syntaxProperties")}
               </div>
-            {/snippet}
-          </Popover>
-        </div>
+            </div>
+          {/snippet}
+        </Popover>
       </div>
     </div>
 
