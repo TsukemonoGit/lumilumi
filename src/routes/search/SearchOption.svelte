@@ -1,7 +1,12 @@
 <script lang="ts">
   import { nowProgress, toastSettings } from "$lib/stores/stores";
 
-  import { Share, Search, CircleQuestionMark } from "lucide-svelte";
+  import {
+    Share,
+    Search,
+    CircleQuestionMark,
+    CalendarClock,
+  } from "lucide-svelte"; // CalendarClockを追加
 
   import * as nip19 from "nostr-tools/nip19";
 
@@ -11,6 +16,9 @@
   import { tick, untrack } from "svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import UserPicker from "$lib/components/UserPicker.svelte";
+  import DatePicker from "$lib/components/Elements/DatePicker.svelte";
+  import DateTimeInput from "./DateTimeInput.svelte";
+  import DateTimePicker from "$lib/components/DateTimePicker.svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -33,6 +41,7 @@
   }: Props = $props();
 
   let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
+  let showTimePicker: (bool: boolean) => void = $state(() => {}); // 新しい状態変数
   let inputElement: HTMLTextAreaElement;
   let lastCursorPosition = 0;
 
@@ -71,10 +80,17 @@
       userIdentifier = pubhex;
     }
 
-    let insertToken = `author:${userIdentifier}`;
+    // 直前が:ならauthor:を付けない
+    let insertToken = beforeCursor.endsWith(":")
+      ? userIdentifier
+      : `author:${userIdentifier}`;
 
-    // 直前が空白でなければスペースを入れる
-    if (beforeCursor.length > 0 && !/\s$/.test(beforeCursor)) {
+    // 直前が空白でも:でもなければスペースを入れる
+    if (
+      beforeCursor.length > 0 &&
+      !/\s$/.test(beforeCursor) &&
+      !beforeCursor.endsWith(":")
+    ) {
       insertToken = " " + insertToken;
     }
 
@@ -88,6 +104,26 @@
       inputElement.focus();
       inputElement.setSelectionRange(newCursorPos, newCursorPos);
     }
+  }
+
+  function handleDateTimeChange(date: Date) {
+    console.log(date);
+    // until: キーワードの形式を作成
+    const untilKeyword = `until:${date.toISOString().slice(0, 19)}`;
+
+    // 既存の until: キーワードを検索して置換
+    const existingUntilRegex = /\s*until:\S+/;
+    if (searchWord && existingUntilRegex.test(searchWord)) {
+      searchWord = searchWord.replace(existingUntilRegex, ` ${untilKeyword}`);
+    } else {
+      // untilが存在しない場合、末尾に追加
+      if (searchWord && searchWord.trim() !== "") {
+        searchWord = `${searchWord.trim()} ${untilKeyword}`;
+      } else {
+        searchWord = untilKeyword;
+      }
+    }
+    showTimePicker(false); // ポップオーバーを閉じる
   }
 
   async function handleClickShare() {
@@ -164,46 +200,66 @@
       ></textarea>
       <div class="flex gap-2 justify-between">
         <UserPicker onClickUser={inputUserPub} />
-
-        <Popover
-          bind:openPopover={showSyntaxHelp}
-          ariaLabel="SyntaxHelp"
-          zIndex={10}
-        >
-          <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
-            <CircleQuestionMark size={18} />
-          </div>
-
-          {#snippet popoverContent()}
-            <div class="flex flex-col items-start max-w-[600px]">
-              <div class="font-medium mb-2 text-magnum-200">
-                {$_("search.syntaxExamplesTitle")}
-              </div>
-
-              {#each syntaxExamples as example}
-                <button
-                  class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
-          text-start p-2 rounded-md w-full
-           bg-none hover:bg-magnum-700/50 whitespace-pre-wrap break-words"
-                  style="word-break: break-word;"
-                  onclick={() => {
-                    searchWord = example;
-                    showSyntaxHelp(false);
-                  }}
-                >
-                  {example}
-                </button>
-              {/each}
-
-              <div
-                class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
-                style="word-break: break-word;"
-              >
-                {$_("search.syntaxProperties")}
-              </div>
+        <div class="flex gap-2">
+          <Popover
+            bind:openPopover={showTimePicker}
+            ariaLabel="DateTimeInput"
+            zIndex={10}
+          >
+            <div
+              class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
+            >
+              <CalendarClock size={18} />
             </div>
-          {/snippet}
-        </Popover>
+            {#snippet popoverContent()}
+              <div class="flex flex-col items-start max-w-[600px] p-2">
+                <DateTimePicker onChange={handleDateTimeChange} />
+              </div>
+            {/snippet}
+          </Popover>
+
+          <Popover
+            bind:openPopover={showSyntaxHelp}
+            ariaLabel="SyntaxHelp"
+            zIndex={10}
+          >
+            <div
+              class="text-magnum-400 hover:text-magnum-200 transition-colors"
+            >
+              <CircleQuestionMark size={18} />
+            </div>
+
+            {#snippet popoverContent()}
+              <div class="flex flex-col items-start max-w-[600px]">
+                <div class="font-medium mb-2 text-magnum-200">
+                  {$_("search.syntaxExamplesTitle")}
+                </div>
+
+                {#each syntaxExamples as example}
+                  <button
+                    class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
+          text-start p-2 rounded-md w-full
+            bg-none hover:bg-magnum-700/50 whitespace-pre-wrap break-words"
+                    style="word-break: break-word;"
+                    onclick={() => {
+                      searchWord = example;
+                      showSyntaxHelp(false);
+                    }}
+                  >
+                    {example}
+                  </button>
+                {/each}
+
+                <div
+                  class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
+                  style="word-break: break-word;"
+                >
+                  {$_("search.syntaxProperties")}
+                </div>
+              </div>
+            {/snippet}
+          </Popover>
+        </div>
       </div>
     </div>
 
