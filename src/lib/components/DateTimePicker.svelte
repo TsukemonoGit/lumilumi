@@ -23,7 +23,7 @@
 
 <div class="flex flex-col gap-2">
   <label class="flex flex-col">
-    日付
+    DATE
     <input
       type="date"
       bind:value={selectedDate}
@@ -33,7 +33,7 @@
   </label>
 
   <label class="flex flex-col">
-    時間
+    TIME
     <input
       type="time"
       bind:value={selectedTime}
