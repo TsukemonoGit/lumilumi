@@ -77,56 +77,29 @@
 
   async function init() {
     setSearchRelay();
-    const load = page.url.searchParams.get("load");
 
-    // // URLパラメータから検索条件を復元
-    // searchHashtag = data.searchHashtag;
-    // searchWord = data.searchWord;
-    // searchKind = data.searchKind;
-    // searchPubkey = data.searchPubkey;
-    // searchPubkeyTo = data.searchPubkeyTo;
-    // searchUntil = data.searchUntil;
-    // followee = data.followee;
+    const params = page.url.searchParams;
 
-    // // 統合検索用のクエリ文字列を生成
-    // if (
-    //   searchHashtag ||
-    //   searchWord ||
-    //   searchPubkey ||
-    //   searchPubkeyTo ||
-    //   searchUntil ||
-    //   searchKind ||
-    //   searchKind === 0
-    // ) {
-    //   // 従来のフィールドから統合検索クエリを生成
-    //   const tempFilter: Partial<Nostr.Filter> = {};
-    //   if (searchWord) tempFilter.search = searchWord;
-    //   if (searchKind !== undefined) tempFilter.kinds = [searchKind];
-    //   if (searchPubkey) tempFilter.authors = [searchPubkey];
-    //   if (searchPubkeyTo) tempFilter["#p"] = [searchPubkeyTo];
-    //   if (searchHashtag) tempFilter["#t"] = [searchHashtag];
-    //   if (searchUntil) tempFilter.until = searchUntil;
+    // followee パラメータ復元（例: ?followee=1）
+    const f = params.get("followee");
+    if (f === "1" || f === "true") {
+      followee = true;
+    }
 
-    //   // formatSearchQuery関数を使って統合クエリを生成
-    //   unifiedSearchQuery = formatSearchQuery(tempFilter as Nostr.Filter);
-    // }
+    // excludeProxy パラメータ復元（例: ?excludeProxy=1）
+    const e = params.get("excludeProxy");
+    if (e === "1" || e === "true") {
+      excludeProxy = true;
+    }
 
-    // if (
-    //   searchHashtag ||
-    //   searchWord ||
-    //   searchPubkey ||
-    //   searchPubkeyTo ||
-    //   searchUntil ||
-    //   searchKind ||
-    //   searchKind === 0
-    // ) {
-    //   await waitForDefaultRelays(5000);
-    //   console.log("showFilters", showFilters);
-    //   console.log("searchRelays", searchRelays);
-    //   if (load !== "false") {
-    //     handleClickSearch();
-    //   }
-    // }
+    // q パラメータ復元
+    const q = params.get("q");
+    if (q) {
+      searchWord = q;
+      createFilter(q);
+      await waitForDefaultRelays(5000);
+      handleClickSearch();
+    }
     isMount = false;
   }
 

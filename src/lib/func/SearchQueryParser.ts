@@ -7,9 +7,26 @@ export interface ParsedSearch {
   kinds?: number[];
   ids?: string[];
   tags?: Record<string, string[]>;
-  //  since?: number;
   until?: number;
 }
+
+interface PropertyMatch {
+  fullMatch: string;
+  property: string;
+  value: string;
+}
+
+interface HashtagMatch {
+  fullMatch: string;
+  hashtag: string;
+}
+
+const PROPERTY_PATTERN = /(\w+):((?:"[^"]*"|[^\s]+))/g;
+const HASHTAG_PATTERN = /#(\w+)/g;
+const HEX_64_PATTERN = /^[0-9a-fA-F]{64}$/;
+const HEX_MIN_PATTERN = /^[0-9a-fA-F]+$/;
+const BECH32_PATTERN = /^(npub|note|naddr|nevent|nprofile)1[02-9ac-hj-np-z]+$/;
+const TIMESTAMP_PATTERN = /^\d+$/;
 
 export function parseSearchInput(input: string): ParsedSearch {
   if (!input?.trim()) return {};
@@ -17,155 +34,65 @@ export function parseSearchInput(input: string): ParsedSearch {
   const result: ParsedSearch = {};
   let remainingInput = input.trim();
 
-  // プロパティ:値 の正規表現を修正（スペース区切りを考慮）
-  const propertyPattern = /(\w+):((?:"[^"]*"|[^\s]+))/g;
+  const propertyMatches = extractPropertyMatches(input);
+  remainingInput = removeMatchesFromInput(remainingInput, propertyMatches);
 
-  // #hashtag の正規表現
-  const hashtagPattern = /#(\w+)/g;
+  processPropertyMatches(propertyMatches, result);
 
-  // すべてのマッチを先に取得
-  const matches = [];
-  let match;
-  while ((match = propertyPattern.exec(input)) !== null) {
-    matches.push({
-      fullMatch: match[0],
-      property: match[1],
-      value: match[2].replace(/^"|"$/g, ""), // クォート除去
-    });
-  }
+  const hashtagMatches = extractHashtagMatches(remainingInput);
+  remainingInput = removeMatchesFromInput(remainingInput, hashtagMatches);
+  processHashtagMatches(hashtagMatches, result);
 
-  // マッチした部分を文字列から削除
-  for (const matchItem of matches) {
-    remainingInput = remainingInput.replace(matchItem.fullMatch, "").trim();
-  }
-
-  // プロパティごとに処理
-  for (const matchItem of matches) {
-    const { property, value } = matchItem;
-
-    switch (property.toLowerCase()) {
-      case "author":
-      case "authors": {
-        const authors = parseMultiValue(value)
-          .map((v) => convertToHex(v))
-          .filter((v) => v.length > 0);
-
-        if (authors.length > 0) {
-          if (!result.authors) result.authors = [];
-          result.authors.push(...authors);
-        }
-        break;
-      }
-
-      case "kind":
-      case "kinds":
-        const kinds = parseMultiValue(value)
-          .map((v) => parseInt(v, 10))
-          .filter((v) => !isNaN(v) && v >= 0);
-        if (kinds.length > 0) {
-          result.kinds = kinds;
-        }
-        break;
-
-      case "id":
-      case "ids":
-        const ids = parseMultiValue(value)
-          .map((v) => convertToHex(v))
-          .filter((v) => v.length > 0);
-        if (ids.length > 0) {
-          result.ids = ids;
-        }
-        break;
-
-      /* case "since":
-        const sinceTime = parseDateTime(value);
-        if (sinceTime) result.since = sinceTime;
-        break; */
-
-      case "until":
-        const untilTime = parseDateTime(value);
-        if (untilTime) result.until = untilTime;
-        break;
-
-      case "t":
-      case "tag":
-      case "hashtag":
-        const tagValues = parseMultiValue(value);
-        if (tagValues.length > 0) {
-          if (!result.tags) result.tags = {};
-          if (!result.tags["t"]) result.tags["t"] = [];
-          result.tags["t"].push(...tagValues);
-        }
-        break;
-
-      case "p":
-      case "mention":
-        const mentions = parseMultiValue(value)
-          .map((v) => convertToHex(v))
-          .filter((v) => v.length > 0);
-        if (mentions.length > 0) {
-          if (!result.tags) result.tags = {};
-          if (!result.tags["p"]) result.tags["p"] = [];
-          result.tags["p"].push(...mentions);
-        }
-        break;
-
-      case "r":
-      case "url":
-      case "link":
-        const urls = parseMultiValue(value);
-        if (urls.length > 0) {
-          if (!result.tags) result.tags = {};
-          if (!result.tags["r"]) result.tags["r"] = [];
-          result.tags["r"].push(...urls);
-        }
-        break;
-
-      default:
-        // その他のタグとして処理（1文字のタグのみ）
-        if (property.length === 1) {
-          const customTagValues = parseMultiValue(value);
-          if (customTagValues.length > 0) {
-            if (!result.tags) result.tags = {};
-            if (!result.tags[property]) result.tags[property] = [];
-            result.tags[property].push(...customTagValues);
-          }
-        }
-        break;
-    }
-  }
-
-  // #hashtag の解析（すべてのハッシュタグを処理）
-  hashtagPattern.lastIndex = 0;
-  const hashtags: string[] = [];
-  let hashtagMatch;
-  // 全てのマッチを先に取得
-  const hashtagMatches = [];
-  while ((hashtagMatch = hashtagPattern.exec(remainingInput)) !== null) {
-    hashtagMatches.push({
-      fullMatch: hashtagMatch[0],
-      hashtag: hashtagMatch[1],
-    });
-  }
-
-  // 全てのハッシュタグを配列に追加し、文字列から削除
-  for (const match of hashtagMatches) {
-    hashtags.push(match.hashtag);
-    remainingInput = remainingInput.replace(match.fullMatch, "").trim();
-  }
-
-  if (hashtags.length > 0) {
-    if (!result.tags) result.tags = {};
-    if (!result.tags["t"]) result.tags["t"] = [];
-    result.tags["t"].push(...hashtags);
-  }
-
-  // 残りのテキストをsearchプロパティに設定
   if (remainingInput.trim()) {
     result.search = remainingInput.trim();
   }
 
   return result;
+}
+
+function extractPropertyMatches(input: string): PropertyMatch[] {
+  const matches: PropertyMatch[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = PROPERTY_PATTERN.exec(input)) !== null) {
+    matches.push({
+      fullMatch: match[0],
+      property: match[1],
+      value: removeQuotes(match[2]),
+    });
+  }
+
+  return matches;
+}
+
+function extractHashtagMatches(input: string): HashtagMatch[] {
+  const matches: HashtagMatch[] = [];
+  let match: RegExpExecArray | null;
+
+  HASHTAG_PATTERN.lastIndex = 0;
+  while ((match = HASHTAG_PATTERN.exec(input)) !== null) {
+    matches.push({
+      fullMatch: match[0],
+      hashtag: match[1],
+    });
+  }
+
+  return matches;
+}
+
+function removeMatchesFromInput(
+  input: string,
+  matches: Array<{ fullMatch: string }>
+): string {
+  let result = input;
+  for (const match of matches) {
+    result = result.replace(match.fullMatch, "").trim();
+  }
+  return result;
+}
+
+function removeQuotes(value: string): string {
+  return value.replace(/^"|"$/g, "");
 }
 
 function parseMultiValue(value: string): string[] {
@@ -175,18 +102,161 @@ function parseMultiValue(value: string): string[] {
     .filter((v) => v.length > 0);
 }
 
+function processPropertyMatches(
+  matches: PropertyMatch[],
+  result: ParsedSearch
+): void {
+  for (const { property, value } of matches) {
+    const propertyLower = property.toLowerCase();
+
+    switch (propertyLower) {
+      case "author":
+      case "authors":
+        processAuthors(value, result);
+        break;
+      case "kind":
+      case "kinds":
+        processKinds(value, result);
+        break;
+      case "id":
+      case "ids":
+        processIds(value, result);
+        break;
+      case "until":
+        processUntil(value, result);
+        break;
+      case "t":
+      case "tag":
+      case "hashtag":
+        processTagValues(value, result, "t");
+        break;
+      case "p":
+      case "mention":
+        processMentions(value, result);
+        break;
+      case "r":
+      case "url":
+      case "link":
+        processTagValues(value, result, "r");
+        break;
+      default:
+        if (property.length === 1) {
+          processCustomTag(property, value, result);
+        }
+        break;
+    }
+  }
+}
+
+function processAuthors(value: string, result: ParsedSearch): void {
+  const authors = parseMultiValue(value)
+    .map((v) => convertToHex(v))
+    .filter((v) => v.length > 0);
+
+  if (authors.length > 0) {
+    if (!result.authors) result.authors = [];
+    result.authors.push(...authors);
+  }
+}
+
+function processKinds(value: string, result: ParsedSearch): void {
+  const kinds = parseMultiValue(value)
+    .map((v) => parseInt(v, 10))
+    .filter((v) => !isNaN(v) && v >= 0);
+
+  if (kinds.length > 0) {
+    result.kinds = kinds;
+  }
+}
+
+function processIds(value: string, result: ParsedSearch): void {
+  const ids = parseMultiValue(value)
+    .map((v) => convertToHex(v))
+    .filter((v) => v.length > 0);
+
+  if (ids.length > 0) {
+    result.ids = ids;
+  }
+}
+
+function processUntil(value: string, result: ParsedSearch): void {
+  const untilTime = parseDateTime(value);
+  if (untilTime) {
+    result.until = untilTime;
+  }
+}
+
+function processTagValues(
+  value: string,
+  result: ParsedSearch,
+  tagKey: string
+): void {
+  const tagValues = parseMultiValue(value);
+  if (tagValues.length > 0) {
+    initializeTags(result);
+    if (!result.tags![tagKey]) result.tags![tagKey] = [];
+    result.tags![tagKey].push(...tagValues);
+  }
+}
+
+function processMentions(value: string, result: ParsedSearch): void {
+  const mentions = parseMultiValue(value)
+    .map((v) => convertToHex(v))
+    .filter((v) => v.length > 0);
+
+  if (mentions.length > 0) {
+    initializeTags(result);
+    if (!result.tags!["p"]) result.tags!["p"] = [];
+    result.tags!["p"].push(...mentions);
+  }
+}
+
+function processCustomTag(
+  property: string,
+  value: string,
+  result: ParsedSearch
+): void {
+  const customTagValues = parseMultiValue(value).map(
+    (v) => convertToHexForTag(property, v) || v
+  );
+
+  if (customTagValues.length > 0) {
+    initializeTags(result);
+    if (!result.tags![property]) result.tags![property] = [];
+    result.tags![property].push(...customTagValues);
+  }
+}
+
+function processHashtagMatches(
+  matches: HashtagMatch[],
+  result: ParsedSearch
+): void {
+  const hashtags = matches.map((match) => match.hashtag);
+
+  if (hashtags.length > 0) {
+    initializeTags(result);
+    if (!result.tags!["t"]) result.tags!["t"] = [];
+    result.tags!["t"].push(...hashtags);
+  }
+}
+
+function initializeTags(result: ParsedSearch): void {
+  if (!result.tags) {
+    result.tags = {};
+  }
+}
+
 function parseDateTime(dateStr: string): number | undefined {
   try {
-    // ISO 8601形式やタイムスタンプをサポート
-    if (/^\d+$/.test(dateStr)) {
-      // Unix timestamp
+    if (TIMESTAMP_PATTERN.test(dateStr)) {
       const timestamp = parseInt(dateStr, 10);
       return timestamp > 1000000000 ? timestamp : timestamp * 1000;
     }
 
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return undefined;
-    return Math.floor(date.getTime() / 1000);
+    return isNaN(date.getTime())
+      ? undefined
+      : Math.floor(date.getTime() / 1000);
   } catch {
     return undefined;
   }
@@ -195,74 +265,123 @@ function parseDateTime(dateStr: string): number | undefined {
 function convertToHex(value: string): string {
   if (!value) return "";
 
-  // bech32形式の場合の変換処理
-  if (value.match(/^(npub|note|naddr|nevent|nprofile)1[02-9ac-hj-np-z]+$/)) {
-    try {
-      const decoded = nip19.decode(value);
-      switch (decoded.type) {
-        case "note":
-        case "npub":
-          return decoded.data;
-        case "nevent":
-          return decoded.data.id;
-        case "nprofile":
-          return decoded.data.pubkey;
-        case "naddr":
-          return `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`;
-        default:
-          return "";
-      }
-    } catch (error) {
-      return "";
-    }
+  if (BECH32_PATTERN.test(value)) {
+    return convertBech32ToHex(value);
   }
 
-  // hex形式の検証
-  if (/^[0-9a-fA-F]{64}$/.test(value)) {
+  if (HEX_64_PATTERN.test(value)) {
     return value.toLowerCase();
   }
 
-  // 短いhex形式も許可
-  if (/^[0-9a-fA-F]+$/.test(value) && value.length >= 8) {
+  if (HEX_MIN_PATTERN.test(value) && value.length >= 8) {
     return value.toLowerCase();
   }
 
   return "";
 }
 
-export function toNostrFilter(parsed: ParsedSearch): Nostr.Filter {
-  const filter: any = {};
+function convertBech32ToHex(value: string): string {
+  try {
+    const decoded = nip19.decode(value);
+    switch (decoded.type) {
+      case "note":
+      case "npub":
+        return decoded.data as string;
+      case "nevent":
+        return (decoded.data as any).id;
+      case "nprofile":
+        return (decoded.data as any).pubkey;
+      case "naddr":
+        const addrData = decoded.data as any;
+        return `${addrData.kind}:${addrData.pubkey}:${addrData.identifier}`;
+      default:
+        return "";
+    }
+  } catch {
+    return "";
+  }
+}
 
-  if (parsed.search) filter.search = parsed.search;
-  if (parsed.authors && parsed.authors.length > 0)
-    filter.authors = parsed.authors;
-  if (parsed.kinds && parsed.kinds.length > 0) filter.kinds = parsed.kinds;
-  if (parsed.ids && parsed.ids.length > 0) filter.ids = parsed.ids;
-  // if (parsed.since) filter.since = parsed.since;
-  if (parsed.until) filter.until = parsed.until;
+function convertToHexForTag(property: string, value: string): string {
+  if (!value) return "";
 
-  // タグの処理
-  if (parsed.tags) {
-    Object.entries(parsed.tags).forEach(([key, values]) => {
-      if (values && values.length > 0) {
-        filter[`#${key}`] = values;
-      }
-    });
+  if (BECH32_PATTERN.test(value)) {
+    return convertBech32ToHexForTag(property, value);
   }
 
-  return filter;
+  if (HEX_64_PATTERN.test(value)) return value.toLowerCase();
+  if (HEX_MIN_PATTERN.test(value) && value.length >= 8)
+    return value.toLowerCase();
+
+  return "";
+}
+
+function convertBech32ToHexForTag(property: string, value: string): string {
+  try {
+    const decoded = nip19.decode(value);
+    switch (decoded.type) {
+      case "note":
+      case "npub":
+        return decoded.data as string;
+      case "nevent":
+        if (property === "e" || property === "q") {
+          return (decoded.data as any).id;
+        }
+        return "";
+      case "nprofile":
+        if (property === "p" || property === "authors") {
+          return (decoded.data as any).pubkey;
+        }
+        return "";
+      case "naddr":
+        const addrData = decoded.data as any;
+        return `${addrData.kind}:${addrData.pubkey}:${addrData.identifier}`;
+      default:
+        return "";
+    }
+  } catch {
+    return "";
+  }
+}
+
+export function toNostrFilter(parsed: ParsedSearch): Nostr.Filter {
+  const filter: Record<string, any> = {};
+
+  if (parsed.search) filter.search = parsed.search;
+  if (parsed.authors?.length) filter.authors = parsed.authors;
+  if (parsed.kinds?.length) filter.kinds = parsed.kinds;
+  if (parsed.ids?.length) filter.ids = parsed.ids;
+  if (parsed.until) filter.until = parsed.until;
+
+  if (parsed.tags) {
+    for (const [key, values] of Object.entries(parsed.tags)) {
+      if (values?.length) {
+        filter[`#${key}`] = values;
+      }
+    }
+  }
+
+  return filter as Nostr.Filter;
 }
 
 export function formatSearchQuery(filter: Nostr.Filter): string {
   const parts: string[] = [];
 
-  // search text (最初に配置)
   if (filter.search) {
     parts.push(filter.search);
   }
 
-  // authors
-  if (filter.authors && filter.authors.length > 0) {
+  addAuthorsPart(filter, parts);
+  addKindsPart(filter, parts);
+  addIdsPart(filter, parts);
+  addUntilPart(filter, parts);
+  addTagParts(filter, parts);
+
+  return parts.join(" ");
+}
+
+function addAuthorsPart(filter: Nostr.Filter, parts: string[]): void {
+  if (filter.authors?.length) {
     const npubs = filter.authors.map((hex) => {
       try {
         return nip19.npubEncode(hex);
@@ -272,14 +391,16 @@ export function formatSearchQuery(filter: Nostr.Filter): string {
     });
     parts.push(`authors:${npubs.join(",")}`);
   }
+}
 
-  // kinds
-  if (filter.kinds && filter.kinds.length > 0) {
+function addKindsPart(filter: Nostr.Filter, parts: string[]): void {
+  if (filter.kinds?.length) {
     parts.push(`kinds:${filter.kinds.join(",")}`);
   }
+}
 
-  // ids
-  if (filter.ids && filter.ids.length > 0) {
+function addIdsPart(filter: Nostr.Filter, parts: string[]): void {
+  if (filter.ids?.length) {
     const noteIds = filter.ids.map((hex) => {
       try {
         return nip19.noteEncode(hex);
@@ -289,45 +410,47 @@ export function formatSearchQuery(filter: Nostr.Filter): string {
     });
     parts.push(`ids:${noteIds.join(",")}`);
   }
+}
 
-  // since/until
-  //   if (filter.since) {
-  //     const date = new Date(filter.since * 1000);
-  //     parts.push(`since:${date.toISOString()}`);
-  //   }
-
+function addUntilPart(filter: Nostr.Filter, parts: string[]): void {
   if (filter.until) {
     const date = new Date(filter.until * 1000);
     parts.push(`until:${date.toISOString()}`);
   }
-
-  // tags
-  Object.entries(filter).forEach(([key, value]) => {
-    if (key.startsWith("#") && Array.isArray(value) && value.length > 0) {
-      const tagKey = key.substring(1);
-      if (tagKey === "t") {
-        // ハッシュタグは #形式で表示
-        parts.push(...(value as string[]).map((v) => `#${v}`));
-      } else if (tagKey === "p") {
-        // メンションはnpub形式で表示
-        const npubs = (value as string[]).map((hex) => {
-          try {
-            return nip19.npubEncode(hex);
-          } catch {
-            return hex;
-          }
-        });
-        parts.push(`p:${npubs.join(",")}`);
-      } else {
-        parts.push(`${tagKey}:${(value as string[]).join(",")}`);
-      }
-    }
-  });
-
-  return parts.join(" ");
 }
 
-// デバッグ用のヘルパー
+function addTagParts(filter: Nostr.Filter, parts: string[]): void {
+  for (const [key, value] of Object.entries(filter)) {
+    if (key.startsWith("#") && Array.isArray(value) && value.length > 0) {
+      const tagKey = key.substring(1);
+      addSpecificTagPart(tagKey, value, parts);
+    }
+  }
+}
+
+function addSpecificTagPart(
+  tagKey: string,
+  value: string[] | number[],
+  parts: string[]
+): void {
+  const stringValues = Array.isArray(value) ? value.map((v) => String(v)) : [];
+
+  if (tagKey === "t") {
+    parts.push(...stringValues.map((v) => `#${v}`));
+  } else if (tagKey === "p") {
+    const npubs = stringValues.map((hex) => {
+      try {
+        return nip19.npubEncode(hex);
+      } catch {
+        return hex;
+      }
+    });
+    parts.push(`p:${npubs.join(",")}`);
+  } else {
+    parts.push(`${tagKey}:${stringValues.join(",")}`);
+  }
+}
+
 export function debugParseSearch(input: string): void {
   console.log(`入力: "${input}"`);
   const parsed = parseSearchInput(input);

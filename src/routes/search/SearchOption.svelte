@@ -36,7 +36,7 @@
   }: Props = $props();
 
   let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
-  let inputElement: HTMLInputElement;
+  let inputElement: HTMLTextAreaElement;
   let lastCursorPosition = 0;
 
   // 統合検索から従来フィールドへの同期
@@ -111,15 +111,14 @@
     const url = new URL(page.url.origin + page.url.pathname);
     const params = url.searchParams;
 
-    // searchHashtag ? params.set("t", searchHashtag) : params.delete("t");
-    // searchWord ? params.set("word", searchWord) : params.delete("word");
-    // searchKind !== undefined && searchKind !== null
-    //   ? params.set("k", String(searchKind))
-    //   : params.delete("k");
-    // searchPubkey ? params.set("author", searchPubkey) : params.delete("author");
-    // searchPubkeyTo ? params.set("p", searchPubkeyTo) : params.delete("p");
-    // searchUntil ? params.set("u", String(searchUntil)) : params.delete("u");
-    followee ? params.set("f", String(followee)) : params.delete("f");
+    if (searchWord && searchWord.trim()) {
+      params.set("q", searchWord.trim());
+    } else {
+      params.delete("q");
+    }
+
+    followee ? params.set("f", "1") : params.delete("f");
+    excludeProxy ? params.set("x", "1") : params.delete("x");
 
     return url.toString();
   }
@@ -149,11 +148,10 @@
 >
   <div class="w-full flex flex-col items-start justify-center">
     <div class="w-full relative">
-      <input
+      <textarea
         bind:this={inputElement}
-        type="text"
         id="unified-search"
-        class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm"
+        class="w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm resize-none h-24 bg-neutral-800"
         placeholder="bitcoin author:npub1xxx kind:1 #nostr until:2025-01-01"
         bind:value={searchWord}
         onkeydown={(e) => {
@@ -162,11 +160,11 @@
             handleUnifiedSearch();
           }
         }}
-        onselectionchange={updateCursorPosition}
+        onselect={updateCursorPosition}
         onclick={updateCursorPosition}
         onkeyup={updateCursorPosition}
-      />
-      <div class="flex gap-2">
+      ></textarea>
+      <div class="flex gap-2 justify-between">
         <UserPicker onClickUser={inputUserPub} />
 
         <Popover
@@ -232,7 +230,8 @@
       </label>
     </div>
   </div>
-
+</div>
+<div class="flex gap-2">
   <button
     class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
     disabled={$nowProgress}

@@ -347,4 +347,24 @@ describe("特殊ケース", () => {
       authors: [pubkey1, pubkey2],
     });
   });
+  test("nevent/q/e タグのデコード処理", () => {
+    const testNevent =
+      "nevent1qvzqqqqqqypzqmjxss3dld622uu8q25gywum9qtg4w4cv4064jmg20xsac2aam5nqyghwumn8ghj7mnxwfjkccte9eshquqpz3mhxue69uhhyetvv9ujuerpd46hxtnfduq3vamnwvaz7tmjv4kxz7fwdehhxarj9e3xzmnyqqstx5hnzj2d6n8yx693lcgrkhk707v723kmyl0tksmnr7q59prw8jsynhypv";
+    const decoded = nip19.decode(testNevent);
+
+    expect(parseSearchInput(`e:${testNevent}`)).toEqual({
+      tags: { e: [decoded.data.id] },
+    });
+
+    expect(parseSearchInput(`q:${testNevent}`)).toEqual({
+      tags: { q: [decoded.data.id] },
+    });
+  });
+
+  test("t: の場合は変換しない", () => {
+    const input = "t:abc123";
+    expect(parseSearchInput(input)).toEqual({
+      tags: { t: ["abc123"] },
+    });
+  });
 });
