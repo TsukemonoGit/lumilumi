@@ -330,7 +330,9 @@
     "followee": "フォロイーのみ",
     "options": "追加条件",
     "search": "検索",
-    "excludeproxynote": "他SNSの投稿を除外する"
+    "excludeproxynote": "他SNSの投稿を除外する",
+    "syntaxExamplesTitle": "例",
+    "syntaxProperties": "プロパティ: author/authors, kind/kinds, id/ids, p (メンション), e/q (引用), t/hashtag, r (URL), until"
   },
   "settei": {
     "search": "検索リレー",

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { emojis } from "$lib/stores/stores";
   import { RefreshCw, SmilePlus } from "lucide-svelte";
 
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";

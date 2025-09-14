@@ -330,7 +330,9 @@
     "followee": "only followee",
     "options": "Options",
     "search": "Search",
-    "excludeproxynote": "Exclude posts from other social media."
+    "excludeproxynote": "Exclude posts from other social media.",
+    "syntaxExamplesTitle": "Syntax Examples:",
+    "syntaxProperties": "Properties: author/authors, kind/kinds, id/ids, p (mention), e/q (quote), t/hashtag, r (url), until"
   },
   "settei": {
     "search": "Search Relays",

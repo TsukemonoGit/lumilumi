@@ -1,11 +1,8 @@
 <script lang="ts">
   import { nowProgress, toastSettings } from "$lib/stores/stores";
-  import { createCollapsible } from "@melt-ui/svelte";
-  import { Share, Search, CircleQuestionMark } from "lucide-svelte";
-  import { locale } from "@konemono/svelte5-i18n";
-  import { slide } from "svelte/transition";
 
-  import { parseSearchInput } from "$lib/func/SearchQueryParser";
+  import { Share, Search, CircleQuestionMark } from "lucide-svelte";
+
   import * as nip19 from "nostr-tools/nip19";
 
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -173,13 +170,15 @@
           zIndex={10}
         >
           <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
-            <CircleQuestionMark size={14} />
+            <CircleQuestionMark size={18} />
           </div>
+
           {#snippet popoverContent()}
-            <div class=" w-full flex flex-col items-start">
+            <div class="w-full flex flex-col items-start">
               <div class="font-medium mb-2 text-magnum-200">
-                Syntax Examples:
+                {$_("search.syntaxExamplesTitle")}
               </div>
+
               {#each syntaxExamples as example}
                 <button
                   class="font-mono text-magnum-300 mb-1 cursor-pointer hover:text-magnum-100 transition-colors"
@@ -191,9 +190,9 @@
                   {example}
                 </button>
               {/each}
+
               <div class="text-xs text-magnum-400 mt-2">
-                Properties: author/authors, kind/kinds, id/ids, p (mention),
-                t/hashtag, r (url), until
+                {$_("search.syntaxProperties")}
               </div>
             </div>
           {/snippet}
