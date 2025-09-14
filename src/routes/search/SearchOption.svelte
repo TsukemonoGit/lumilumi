@@ -132,11 +132,12 @@
   }
 
   const syntaxExamples = [
-    "nostr author:npub1xxx kind:1",
-    "#bitcoin #nostr kinds:1,3,7",
-    "nostr p:npub1xxx until:2025-01-01",
-    "id:nevent1xxx",
+    "nostr author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1",
+    "#lumilumi #nostr kinds:1,3,7",
+    "nostr p:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw until:2025-01-01",
+    "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
     "kind:0 until:2025-01-01T18:30:00",
+    "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
   ];
 </script>
 
@@ -174,14 +175,17 @@
           </div>
 
           {#snippet popoverContent()}
-            <div class="w-full flex flex-col items-start">
+            <div class="flex flex-col items-start max-w-[600px]">
               <div class="font-medium mb-2 text-magnum-200">
                 {$_("search.syntaxExamplesTitle")}
               </div>
 
               {#each syntaxExamples as example}
                 <button
-                  class="font-mono text-magnum-300 mb-1 cursor-pointer hover:text-magnum-100 transition-colors"
+                  class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
+          text-start p-2 rounded-md w-full
+           bg-none hover:bg-magnum-700/50 whitespace-pre-wrap break-words"
+                  style="word-break: break-word;"
                   onclick={() => {
                     searchWord = example;
                     showSyntaxHelp(false);
@@ -191,7 +195,10 @@
                 </button>
               {/each}
 
-              <div class="text-xs text-magnum-400 mt-2">
+              <div
+                class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
+                style="word-break: break-word;"
+              >
                 {$_("search.syntaxProperties")}
               </div>
             </div>

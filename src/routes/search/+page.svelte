@@ -19,7 +19,6 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { nip50relays } from "$lib/func/constants";
-  import { npubRegex } from "$lib/func/regex";
   import { parseSearchInput, toNostrFilter } from "$lib/func/SearchQueryParser";
 
   import type { PageData } from "./$types";
@@ -149,15 +148,6 @@
     }
   });
 
-  function getHex(str: string): string {
-    try {
-      return nip19.decode(str).data as string;
-    } catch (error) {
-      console.log("pubkey error");
-      return "";
-    }
-  }
-
   function createFilter(ward: string): void {
     const parsed = parseSearchInput(ward);
     const filter = toNostrFilter(parsed);
@@ -206,68 +196,6 @@
 
   function resetValue() {
     searchWord = "";
-  }
-
-  // formatSearchQuery関数を追加（SearchQueryParserから）
-  function formatSearchQuery(filter: Nostr.Filter): string {
-    const parts: string[] = [];
-
-    if (filter.search) {
-      parts.push(filter.search);
-    }
-
-    if (filter.authors && filter.authors.length > 0) {
-      const npubs = filter.authors.map((hex) => {
-        try {
-          return nip19.npubEncode(hex);
-        } catch {
-          return hex;
-        }
-      });
-      parts.push(`authors:${npubs.join(",")}`);
-    }
-
-    if (filter.kinds && filter.kinds.length > 0) {
-      parts.push(`kinds:${filter.kinds.join(",")}`);
-    }
-
-    if (filter.ids && filter.ids.length > 0) {
-      const noteIds = filter.ids.map((hex) => {
-        try {
-          return nip19.noteEncode(hex);
-        } catch {
-          return hex;
-        }
-      });
-      parts.push(`ids:${noteIds.join(",")}`);
-    }
-
-    if (filter.until) {
-      const date = new Date(filter.until * 1000);
-      parts.push(`until:${date.toISOString()}`);
-    }
-
-    Object.entries(filter).forEach(([key, value]) => {
-      if (key.startsWith("#") && Array.isArray(value) && value.length > 0) {
-        const tagKey = key.substring(1);
-        if (tagKey === "t") {
-          parts.push(...(value as string[]).map((v) => `#${v}`));
-        } else if (tagKey === "p") {
-          const npubs = (value as string[]).map((hex) => {
-            try {
-              return nip19.npubEncode(hex);
-            } catch {
-              return hex;
-            }
-          });
-          parts.push(`p:${npubs.join(",")}`);
-        } else {
-          parts.push(`${tagKey}:${(value as string[]).join(",")}`);
-        }
-      }
-    });
-
-    return parts.join(" ");
   }
 
   const onClickSave = async (relays: string[]) => {
