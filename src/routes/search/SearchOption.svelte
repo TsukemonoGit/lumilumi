@@ -151,7 +151,7 @@
       <textarea
         bind:this={inputElement}
         id="unified-search"
-        class="w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm resize-none h-24 bg-neutral-800"
+        class="w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm resize-y h-20 bg-neutral-800"
         placeholder="bitcoin author:npub1xxx kind:1 #nostr until:2025-01-01"
         bind:value={searchWord}
         onkeydown={(e) => {
