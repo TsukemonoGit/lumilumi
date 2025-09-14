@@ -133,7 +133,7 @@
 
   const syntaxExamples = [
     "nostr author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1",
-    "#lumilumi #nostr kinds:1,3,7",
+    "#lumilumi kinds:1",
     "nostr p:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw until:2025-01-01",
     "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
     "kind:0 until:2025-01-01T18:30:00",
@@ -150,7 +150,7 @@
         bind:this={inputElement}
         id="unified-search"
         class="w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm resize-y h-20 bg-neutral-800"
-        placeholder="bitcoin author:npub1xxx kind:1 #nostr until:2025-01-01"
+        placeholder="nostr author:npub1xxx kind:1 #nostr until:2025-01-01"
         bind:value={searchWord}
         onkeydown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
