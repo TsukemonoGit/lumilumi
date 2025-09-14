@@ -328,4 +328,23 @@ describe("特殊ケース", () => {
       until: 100000,
     });
   });
+  test("複数のauthor", () => {
+    const npub1 =
+      "npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw";
+    const npub2 =
+      "npub12egp0pvh2f0fp6sk5nt6ncehqzkz8zsma8dl8agf8p3f98v6resqku4w26";
+
+    const decoded1 = nip19.decode(npub1);
+    const decoded2 = nip19.decode(npub2);
+
+    const pubkey1 = decoded1.type === "npub" ? decoded1.data : undefined;
+    const pubkey2 = decoded2.type === "npub" ? decoded2.data : undefined;
+
+    const input = `author:${npub1} author:${npub2}`;
+    const result = parseSearchInput(input);
+
+    expect(result).toEqual({
+      authors: [pubkey1, pubkey2],
+    });
+  });
 });

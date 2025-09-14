@@ -42,6 +42,7 @@
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { checkUserInput, userName } from "$lib/func/user";
 
   // ----------------------------------------
   // Component Props
@@ -372,35 +373,6 @@
     if (viewMetadataList && viewCustomEmojis) {
       viewCustomEmojis = false;
     }
-  }
-
-  function checkUserInput(input: string, userData: UserData) {
-    if (input === "") return true;
-
-    const searchTerm = input.toLowerCase();
-
-    return (
-      (userData.name && userData.name.toLowerCase().includes(searchTerm)) ||
-      (userData.display_name &&
-        userData.display_name.toLowerCase().includes(searchTerm)) ||
-      (userData.nip05 && userData.nip05.toLowerCase().includes(searchTerm)) ||
-      (userData.petname && userData.petname.toLowerCase().includes(searchTerm))
-    );
-  }
-
-  function userName(pubkey: string, profile: UserData) {
-    if (profile.petname) {
-      return `📛${profile.petname}`;
-    }
-
-    if (
-      (!profile.display_name || profile.display_name === "") &&
-      (!profile.name || profile.name === "")
-    ) {
-      return displayShortPub(pubkey);
-    }
-
-    return `${profile.display_name ?? ""}${profile.name ? `@${profile.name}` : ""}`;
   }
 
   function addUser(user: string | undefined) {

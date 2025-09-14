@@ -45,14 +45,17 @@ export function parseSearchInput(input: string): ParsedSearch {
 
     switch (property.toLowerCase()) {
       case "author":
-      case "authors":
+      case "authors": {
         const authors = parseMultiValue(value)
           .map((v) => convertToHex(v))
           .filter((v) => v.length > 0);
+
         if (authors.length > 0) {
-          result.authors = authors;
+          if (!result.authors) result.authors = [];
+          result.authors.push(...authors);
         }
         break;
+      }
 
       case "kind":
       case "kinds":

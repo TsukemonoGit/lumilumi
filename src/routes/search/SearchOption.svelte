@@ -1,4 +1,3 @@
-<!--SearchOption.svelte-->
 <script lang="ts">
   import { nowProgress, toastSettings } from "$lib/stores/stores";
   import { createCollapsible } from "@melt-ui/svelte";
@@ -7,12 +6,14 @@
   import { slide } from "svelte/transition";
 
   import { parseSearchInput } from "$lib/func/SearchQueryParser";
+  import * as nip19 from "nostr-tools/nip19";
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import { followList } from "$lib/stores/globalRunes.svelte";
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
+  import UserPicker from "$lib/components/UserPicker.svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -33,7 +34,10 @@
     resetValue,
     handleClickSearch,
   }: Props = $props();
+
   let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
+  let inputElement: HTMLInputElement;
+  let lastCursorPosition = 0;
 
   // 統合検索から従来フィールドへの同期
   $effect(() => {
@@ -46,6 +50,48 @@
       });
     }
   });
+
+  // カーソル位置を記録する関数
+  function updateCursorPosition(event: Event) {
+    const target = event.target as HTMLInputElement;
+    lastCursorPosition = target.selectionStart || 0;
+  }
+
+  async function inputUserPub(pubhex: string) {
+    if (!inputElement) return;
+
+    const currentValue = searchWord || "";
+    const cursorPos = lastCursorPosition;
+
+    const beforeCursor = currentValue.slice(0, cursorPos);
+    const afterCursor = currentValue.slice(cursorPos);
+
+    // npubエンコード
+    let userIdentifier: string;
+    try {
+      userIdentifier = nip19.npubEncode(pubhex);
+    } catch {
+      userIdentifier = pubhex;
+    }
+
+    let insertToken = `author:${userIdentifier}`;
+
+    // 直前が空白でなければスペースを入れる
+    if (beforeCursor.length > 0 && !/\s$/.test(beforeCursor)) {
+      insertToken = " " + insertToken;
+    }
+
+    const newValue = beforeCursor + insertToken + afterCursor;
+    searchWord = newValue;
+
+    const newCursorPos = beforeCursor.length + insertToken.length;
+    await tick();
+
+    if (inputElement) {
+      inputElement.focus();
+      inputElement.setSelectionRange(newCursorPos, newCursorPos);
+    }
+  }
 
   async function handleClickShare() {
     const shareData = { url: sharaParam() };
@@ -104,6 +150,7 @@
   <div class="w-full flex flex-col items-start justify-center">
     <div class="w-full relative">
       <input
+        bind:this={inputElement}
         type="text"
         id="unified-search"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm"
@@ -115,36 +162,45 @@
             handleUnifiedSearch();
           }
         }}
+        onselectionchange={updateCursorPosition}
+        onclick={updateCursorPosition}
+        onkeyup={updateCursorPosition}
       />
-      <Popover
-        bind:openPopover={showSyntaxHelp}
-        ariaLabel="SyntaxHelp"
-        zIndex={10}
-      >
-        <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
-          <CircleQuestionMark size={14} />
-        </div>
-        {#snippet popoverContent()}
-          <div class=" w-full flex flex-col items-start">
-            <div class="font-medium mb-2 text-magnum-200">Syntax Examples:</div>
-            {#each syntaxExamples as example}
-              <button
-                class="font-mono text-magnum-300 mb-1 cursor-pointer hover:text-magnum-100 transition-colors"
-                onclick={() => {
-                  searchWord = example;
-                  showSyntaxHelp(false);
-                }}
-              >
-                {example}
-              </button>
-            {/each}
-            <div class="text-xs text-magnum-400 mt-2">
-              Properties: author/authors, kind/kinds, id/ids, p (mention),
-              t/hashtag, r (url), until
-            </div>
+      <div class="flex gap-2">
+        <UserPicker onClickUser={inputUserPub} />
+
+        <Popover
+          bind:openPopover={showSyntaxHelp}
+          ariaLabel="SyntaxHelp"
+          zIndex={10}
+        >
+          <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
+            <CircleQuestionMark size={14} />
           </div>
-        {/snippet}
-      </Popover>
+          {#snippet popoverContent()}
+            <div class=" w-full flex flex-col items-start">
+              <div class="font-medium mb-2 text-magnum-200">
+                Syntax Examples:
+              </div>
+              {#each syntaxExamples as example}
+                <button
+                  class="font-mono text-magnum-300 mb-1 cursor-pointer hover:text-magnum-100 transition-colors"
+                  onclick={() => {
+                    searchWord = example;
+                    showSyntaxHelp(false);
+                  }}
+                >
+                  {example}
+                </button>
+              {/each}
+              <div class="text-xs text-magnum-400 mt-2">
+                Properties: author/authors, kind/kinds, id/ids, p (mention),
+                t/hashtag, r (url), until
+              </div>
+            </div>
+          {/snippet}
+        </Popover>
+      </div>
     </div>
 
     {#if followList.get() !== undefined && followList.get().size > 0 && page.url.searchParams.get("load") !== "false"}
