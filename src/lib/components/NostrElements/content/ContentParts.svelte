@@ -173,8 +173,8 @@
       class="underline text-magnum-300 break-all">{part.content}</a
     >
   {:else if part.type === "relay"}
-    <RelayMenu url={part.content} zIndex={zIndex || 0}>
-      <span class="text-magnum-300 break-all">{part.content}</span></RelayMenu
+    <RelayMenu url={part.content} zIndex={zIndex || 0}
+      ><span class="text-magnum-300 break-all">{part.content}</span></RelayMenu
     >{:else if part.type === TokenType.NIP_IDENTIFIER}
     <Link
       props={{ "aria-label": `External Links: ${part.content}` }}

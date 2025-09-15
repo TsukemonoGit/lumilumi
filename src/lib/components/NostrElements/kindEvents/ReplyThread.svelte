@@ -33,21 +33,19 @@
 </script>
 
 {#if replyTag}
-  {#if replyTag[0] === "e" || replyTag[0] === "E"}
-    {@const relayhint =
-      replyTag && replyTag.length > 2 && relayRegex.test(replyTag[2])
-        ? [replyTag[2]]
-        : undefined}
+  {@const [tagName, id, relay, marker] = replyTag}
+  {#if tagName === "e" || tagName === "E"}
+    {@const relayhint = relay && relayRegex.test(relay) ? [relay] : undefined}
     <Note
       {relayhint}
-      id={replyTag[1]}
+      {id}
       mini={true}
       {displayMenu}
       thread={true}
       depth={depth + 1}
       {repostable}
     />
-  {:else if replyTag[0] === "a" || replyTag[0] === "A"}
+  {:else if tagName === "a" || tagName === "A"}
     <!---->
     {@const naddr = parseNaddr(replyTag)}
     <NaddrEvent
@@ -55,21 +53,21 @@
       {displayMenu}
       {depth}
       {repostable}
-      content={replyTag[1]}
+      content={id}
       mini={true}
       thread={true}
     />
-  {:else if replyTag[0] === "I" || replyTag[0] === "i"}
+  {:else if tagName === "I" || tagName === "i"}
     <!---->
-    {#if replyTag[1].startsWith("http")}
+    {#if id.startsWith("http")}
       {@const part = toPart(replyTag)}
       <UrlDisplay {part} {openModal} author={""} />
     {:else}
       <!---->
-      {replyTag[1]}
+      {id}
     {/if}
   {:else}
     <!---->
-    {replyTag[1]}
+    {id}
   {/if}
 {/if}
