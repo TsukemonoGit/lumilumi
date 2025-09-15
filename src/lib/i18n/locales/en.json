@@ -207,7 +207,7 @@
   "relay": {
     "description": {
       "global": "Use relay set with dtag of kind:30002 as global.",
-      "search": "Use kind:10007 (search relay).",
+      "search": "Use kind:10007 (search relay) if a search word is provided.",
       "search2": "If kind:10007 is not found, use default relay settings.",
       "search3": "Please set up relays that has search function."
     }

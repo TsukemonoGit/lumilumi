@@ -11,6 +11,7 @@
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";
   import { unsucscribeSearch } from "$lib/func/useReq";
+  import { derived } from "svelte/store";
 
   let amount = 50;
   let viewIndex = 0;
@@ -35,6 +36,18 @@
     queryClient.removeQueries({ queryKey: ["search", "olderData"] });
     //console.log("cancelQueries");
   });
+
+  // eventFilterにsearchプロパティがあるかチェックして、リレーを決定
+  let selectedRelays = $derived.by(() => {
+    // eventFilterにsearchプロパティがある場合はnip50relaysを使用
+    if (!("search" in filters && filters.search)) {
+      return undefined;
+    }
+    if (relays.length > 0) {
+      return relays;
+    }
+    return nip50relays;
+  });
 </script>
 
 {#if filters && Object.values($defaultRelays).length > 0}
@@ -46,7 +59,7 @@
     {req}
     {viewIndex}
     {amount}
-    relays={relays.length > 0 ? relays : nip50relays}
+    relays={selectedRelays}
   >
     {#snippet children({ events, len })}
       <!-- <SetRepoReactions /> -->

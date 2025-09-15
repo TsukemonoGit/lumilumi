@@ -221,7 +221,7 @@
           const insertPos = lastKindMatch.index! + lastKindMatch[0].length;
           newValue =
             newValue.slice(0, insertPos) +
-            ` ${kindValue}` +
+            ` kind:${kindValue} ` +
             newValue.slice(insertPos);
         } else {
           // kind: がなければ新しく追加
