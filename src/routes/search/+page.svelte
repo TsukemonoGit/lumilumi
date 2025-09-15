@@ -1,7 +1,7 @@
 <script lang="ts">
   import { usePromiseReq } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
-  import * as nip19 from "nostr-tools/nip19";
+
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
@@ -19,7 +19,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { nip50relays } from "$lib/func/constants";
-  import { npubRegex } from "$lib/func/regex";
+  import { parseSearchInput, toNostrFilter } from "$lib/func/SearchQueryParser";
 
   import type { PageData } from "./$types";
   import { pipe } from "rxjs";
@@ -32,14 +32,10 @@
   let { data }: { data: PageData } = $props();
 
   let searchWord: string | undefined = $state();
-  let searchKind: number | undefined = $state();
-  let searchPubkey = $state("");
-  let searchUntil: number | undefined = $state();
-  let searchHashtag: string | undefined = $state();
-  let searchPubkeyTo: string = $state("");
+
   let followee = $state(false);
-  // const filters: Writable<Nostr.Filter[]> = writable([]);
-  let filters = $derived(createFilter());
+
+  let filters: Nostr.Filter[] = $state([]);
   let showFilters: Nostr.Filter[] = $state.raw([]);
 
   let compRef: SvelteComponent | undefined = $state();
@@ -65,7 +61,7 @@
   });
 
   async function waitForDefaultRelays(maxWaitTime: number) {
-    const interval = 100; // 100ms ごとにチェック
+    const interval = 100;
     let waitedTime = 0;
 
     while (!$defaultRelays || Object.keys($defaultRelays).length === 0) {
@@ -80,41 +76,33 @@
 
   async function init() {
     setSearchRelay();
-    const load = page.url.searchParams.get("load");
-    searchHashtag = data.searchHashtag;
-    searchWord = data.searchWord;
-    searchKind = data.searchKind;
-    searchPubkey = data.searchPubkey;
-    searchPubkeyTo = data.searchPubkeyTo;
-    searchUntil = data.searchUntil;
-    followee = data.followee;
-    //kindはデフォ値があるから含めない
-    if (
-      searchHashtag ||
-      searchWord ||
-      searchPubkey ||
-      searchPubkeyTo ||
-      searchUntil ||
-      searchKind ||
-      searchKind === 0
-    ) {
-      await waitForDefaultRelays(5000);
 
-      // filters = createFilter();
-      // showFilters = filters.map((filter) => {
-      //   return { ...filter, limit: 50 };
-      // });
-      console.log("showFilters", showFilters);
-      console.log("searchRelays", searchRelays);
-      if (load !== "false") {
-        handleClickSearch();
-      }
+    const params = page.url.searchParams;
+
+    // followee パラメータ復元（例: ?followee=1）
+    const f = params.get("followee");
+    if (f === "1" || f === "true") {
+      followee = true;
+    }
+
+    // excludeProxy パラメータ復元（例: ?excludeProxy=1）
+    const e = params.get("excludeProxy");
+    if (e === "1" || e === "true") {
+      excludeProxy = true;
+    }
+
+    // q パラメータ復元
+    const q = params.get("q");
+    if (q) {
+      searchWord = q;
+      createFilter(q);
+      await waitForDefaultRelays(5000);
+      handleClickSearch();
     }
     isMount = false;
   }
 
   const setSearchRelay = async () => {
-    //すでにあるならデータをセットする
     const data: string[] | undefined = queryClient.getQueryData([
       "searchRelay",
       lumiSetting.get().pubkey,
@@ -160,50 +148,29 @@
     }
   });
 
-  function getHex(str: string): string {
-    try {
-      return nip19.decode(str).data as string;
-    } catch (error) {
-      console.log("pubkey error");
-      return "";
+  function createFilter(ward: string): void {
+    const parsed = parseSearchInput(ward);
+    const filter = toNostrFilter(parsed);
+
+    // followee フィルターを適用
+    if (followee && followList.get() && followList.get().size > 0) {
+      if (filter.authors) {
+        // 既存のauthorsとfolloweeを組み合わせ（重複除去）
+        const existingAuthors = new Set(filter.authors);
+        const followeeAuthors = Array.from(followList.get().keys());
+        filter.authors = Array.from(
+          new Set([...existingAuthors, ...followeeAuthors])
+        );
+      } else {
+        filter.authors = Array.from(followList.get().keys());
+      }
     }
-  }
-
-  function createFilter(): Nostr.Filter[] {
-    let filter: Nostr.Filter;
-
-    filter = {
-      search: searchWord || undefined,
-
-      authors: npubRegex.test(searchPubkey?.trim() ?? "")
-        ? [getHex(searchPubkey?.trim() ?? "")]
-        : followee && followList.get()
-          ? Array.from(followList.get().keys())
-          : undefined,
-
-      until: !Number.isNaN(searchUntil) ? searchUntil : undefined,
-      // "#t": searchHashtag ? [searchHashtag] : [],
-      // "#p": npubRegex.test(searchPubkeyTo) ? [getHex(searchPubkeyTo)] : [],
-    };
-
-    if (searchHashtag) {
-      filter = { ...filter, "#t": [searchHashtag] };
-    }
-    if (npubRegex.test(searchPubkeyTo?.trim() ?? "")) {
-      filter = { ...filter, "#p": [getHex(searchPubkeyTo?.trim() ?? "")] };
-    }
-
-    filter.kinds =
-      searchKind === undefined || searchKind === null
-        ? undefined
-        : [searchKind];
-
-    return [filter];
+    filters = [filter];
   }
 
   function handleClickSearch() {
     $nowProgress = true;
-    // updateQueryParams();
+
     showFilters = filters.map((filter) => {
       const cleanFilter = { ...filter, limit: 50 };
 
@@ -228,7 +195,7 @@
   }
 
   function resetValue() {
-    searchUntil = undefined;
+    searchWord = "";
   }
 
   const onClickSave = async (relays: string[]) => {
@@ -242,7 +209,7 @@
       "naddr",
       `10007:${lumiSetting.get().pubkey}:`,
     ]);
-    //   console.log(ev);
+
     const result = await safePublishEvent({
       content: ev?.event.content || "",
       tags: newTags,
@@ -250,7 +217,7 @@
     });
     if ("errorCode" in result) {
       if (result.isCanceled) {
-        return; // キャンセル時は何もしない
+        return;
       }
       $toastSettings = {
         title: "Error",
@@ -259,7 +226,7 @@
       };
       return;
     }
-    // 成功時の処理
+
     const { event: event, res } = result;
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
@@ -283,24 +250,16 @@
         searchRelays = relaylist;
       }
     }
-    // if (isSuccess.length > 0) {
-    //   queryClient.refetchQueries({
-    //     queryKey: key,
-    //   });
-    // }
     $nowProgress = false;
   };
 
   const eventFilter = (ev: Nostr.Event): boolean => {
-    // excludeProxy が false の場合は、常に true (フィルタリングしない) を返す
     if (!excludeProxy) {
       return true;
     }
 
-    // "proxy" タグの値を取得する
     const proxyTagValue = ev.tags.find((tag) => tag[0] === "proxy")?.[2];
     if (!proxyTagValue) return true;
-    // "rss", "web" 以外は false を返してフィルター
     return ["rss", "web"].includes(proxyTagValue);
   };
 </script>
@@ -312,29 +271,35 @@
       relays={searchRelays}
       {onClickSave}
       Description={SearchDescription}
-    />{/if}<SearchOption
+    />
+  {/if}
+
+  <SearchOption
     bind:excludeProxy
-    bind:searchKind
-    bind:searchHashtag
     bind:searchWord
-    bind:searchPubkey
-    bind:searchPubkeyTo
-    bind:searchUntil
     bind:followee
     {handleClickSearch}
     {createFilter}
     {resetValue}
+    {filters}
   />
-  <div class="w-full mt-4 opacity-80">
+
+  <!-- <div class="w-full mt-4 opacity-80">
     <div
       class="border border-magnum-500/80 rounded-md max-h-40 break-all overflow-y-auto p-1"
     >
       <div class="font-semibold text-magnum-400">Filters</div>
       {#each filters as filter}
-        {JSON.stringify(filter, null, 2)}
+        <pre
+          class="text-xs text-magnum-300 whitespace-pre-wrap">{JSON.stringify(
+            filter,
+            null,
+            2
+          )}</pre>
       {/each}
     </div>
-  </div>
+  </div> -->
+
   {#if openSearchResult}
     <SearchResult
       {eventFilter}

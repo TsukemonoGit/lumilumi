@@ -2,7 +2,7 @@
 import { expect, test } from "vitest";
 import { contentCheck } from "./contentCheck";
 
-test("", () => {
+test("1", () => {
   const text =
     "nostr:npub12egp0pvh2f0fp6sk5nt6ncehqzkz8zsma8dl8agf8p3f98v6resqku4w26\n:nostopus_spin:";
   const tags = [

@@ -330,7 +330,17 @@
     "followee": "フォロイーのみ",
     "options": "追加条件",
     "search": "検索",
-    "excludeproxynote": "他SNSの投稿を除外する"
+    "excludeproxynote": "他SNSの投稿を除外する",
+    "syntaxExamplesTitle": "例",
+    "syntaxProperties": "プロパティ: author/authors, kind/kinds, id/ids, p (メンション), e/q (引用), t/hashtag, r (URL), until",
+    "syntaxExample": {
+      "userPosts": "特定ユーザーの投稿を検索",
+      "userPostsUntil": "あるユーザーのテキスト投稿を指定日まで検索",
+      "noteItself": "特定のノートそのものを検索",
+      "noteReactions": "特定ノートへの反応（返信やリアクション）を検索",
+      "taggedPosts": "特定タグを含むテキスト投稿を検索",
+      "profileUntil": "プロフィール情報を指定日時まで検索"
+    }
   },
   "settei": {
     "search": "検索リレー",

@@ -1,7 +1,7 @@
 <script lang="ts">
   //Popover.svelte
   import { createPopover, melt } from "@melt-ui/svelte";
-  import { X } from "lucide-svelte";
+
   import { fade } from "svelte/transition";
   import CloseButton from "./CloseButton.svelte";
   const {

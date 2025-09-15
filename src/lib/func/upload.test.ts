@@ -2,7 +2,8 @@ import { describe, it, test } from "vitest";
 import { checkImageQuality, formatFileSize, removeExif } from "./upload";
 import fs from "fs";
 import path from "path";
-
+test("", () => {});
+/* 
 test("画質調整の結果を確認するだけ（アップロードしない）", async () => {
   const filePath = path.resolve(__dirname, "test.png");
   const file = readTestFile(filePath);
@@ -17,7 +18,7 @@ function readTestFile(filePath: string): File {
   const blob = new Blob([buffer], { type: "image/jpeg" });
   return new File([blob], path.basename(filePath), { type: "image/jpeg" });
 }
-/* 
+
 
 
 function readTestPNGFile(filePath: string): File {

@@ -330,7 +330,17 @@
     "followee": "only followee",
     "options": "Options",
     "search": "Search",
-    "excludeproxynote": "Exclude posts from other social media."
+    "excludeproxynote": "Exclude posts from other social media.",
+    "syntaxExamplesTitle": "Syntax Examples:",
+    "syntaxProperties": "Properties: author/authors, kind/kinds, id/ids, p (mention), e/q (quote), t/hashtag, r (url), until",
+    "syntaxExample": {
+      "userPosts": "Search posts from a specific user",
+      "userPostsUntil": "Search text posts from a user until a specified date",
+      "noteItself": "Search for a specific note itself",
+      "noteReactions": "Search for reactions (replies or likes) to a specific note",
+      "taggedPosts": "Search text posts containing a specific tag",
+      "profileUntil": "Search profile information until a specified date and time"
+    }
   },
   "settei": {
     "search": "Search Relays",
