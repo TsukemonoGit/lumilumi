@@ -367,4 +367,12 @@ describe("特殊ケース", () => {
       tags: { t: ["abc123"] },
     });
   });
+  test("複数 kinds の別々指定", () => {
+    const input = "kind:1 kind:2 kind:30023";
+    const result = parseSearchInput(input);
+    console.log(result);
+    expect(result).toEqual({
+      kinds: [1, 2, 30023],
+    });
+  });
 });

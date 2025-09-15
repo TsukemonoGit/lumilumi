@@ -165,7 +165,8 @@ function processKinds(value: string, result: ParsedSearch): void {
     .filter((v) => !isNaN(v) && v >= 0);
 
   if (kinds.length > 0) {
-    result.kinds = kinds;
+    if (!result.kinds) result.kinds = [];
+    result.kinds.push(...kinds);
   }
 }
 

@@ -16,9 +16,9 @@
   import { tick, untrack } from "svelte";
   import Popover from "$lib/components/Elements/Popover.svelte";
   import UserPicker from "$lib/components/UserPicker.svelte";
-  import DatePicker from "$lib/components/Elements/DatePicker.svelte";
-  import DateTimeInput from "./DateTimeInput.svelte";
+
   import DateTimePicker from "$lib/components/DateTimePicker.svelte";
+  import KindSelect from "./KindSelect.svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -41,9 +41,10 @@
   }: Props = $props();
 
   let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
-  let showTimePicker: (bool: boolean) => void = $state(() => {}); // 新しい状態変数
+  let showTimePicker: (bool: boolean) => void = $state(() => {});
   let inputElement: HTMLTextAreaElement;
   let lastCursorPosition = 0;
+  let selectedKind: string | undefined = $state("");
 
   // 統合検索から従来フィールドへの同期
   $effect(() => {
@@ -83,7 +84,7 @@
     // 直前が:ならauthor:を付けない
     let insertToken = beforeCursor.endsWith(":")
       ? userIdentifier
-      : `author:${userIdentifier}`;
+      : `author:${userIdentifier} `;
 
     // 直前が空白でも:でもなければスペースを入れる
     if (
@@ -109,7 +110,7 @@
   function handleDateTimeChange(date: Date) {
     console.log(date);
     // until: キーワードの形式を作成
-    const untilKeyword = `until:${date.toISOString().slice(0, 19)}`;
+    const untilKeyword = `until:${date.toISOString().slice(0, 19)} `;
 
     // 既存の until: キーワードを検索して置換
     const existingUntilRegex = /\s*until:\S+/;
@@ -175,6 +176,35 @@
     "kind:0 until:2025-01-01T18:30:00",
     "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
   ];
+
+  $effect(() => {
+    if (selectedKind !== undefined && selectedKind !== "") {
+      untrack(() => {
+        const kindValue = selectedKind;
+        let newValue = searchWord || "";
+
+        // 直前が kind: の場合はそのまま追加
+        const kindRegex = /kind:(\S+)/g;
+        const lastKindMatch = Array.from(newValue.matchAll(kindRegex)).pop();
+
+        if (lastKindMatch) {
+          // 既存の kind にスペースで追加
+          const insertPos = lastKindMatch.index! + lastKindMatch[0].length;
+          newValue =
+            newValue.slice(0, insertPos) +
+            ` ${kindValue}` +
+            newValue.slice(insertPos);
+        } else {
+          // kind: がなければ新しく追加
+          newValue = newValue.trim()
+            ? `${newValue.trim()} kind:${kindValue} `
+            : `kind:${kindValue} `;
+        }
+
+        searchWord = newValue;
+      });
+    }
+  });
 </script>
 
 <div
@@ -200,6 +230,7 @@
       ></textarea>
       <div class="flex gap-2 justify-between">
         <div class="flex gap-2">
+          <KindSelect bind:selectedKind />
           <UserPicker onClickUser={inputUserPub} />
 
           <Popover
