@@ -6,6 +6,7 @@
     Search,
     CircleQuestionMark,
     CalendarClock,
+    Braces,
   } from "lucide-svelte"; // CalendarClockを追加
 
   import * as nip19 from "nostr-tools/nip19";
@@ -19,6 +20,7 @@
 
   import DateTimePicker from "$lib/components/DateTimePicker.svelte";
   import KindSelect from "./KindSelect.svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface Props {
     searchWord: string | undefined;
@@ -28,6 +30,7 @@
 
     resetValue: () => void;
     handleClickSearch: () => void;
+    filters: Nostr.Filter[];
   }
 
   let {
@@ -38,10 +41,13 @@
 
     resetValue,
     handleClickSearch,
+    filters,
   }: Props = $props();
 
   let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
   let showTimePicker: (bool: boolean) => void = $state(() => {});
+  let showFilter: (bool: boolean) => void = $state(() => {});
+
   let inputElement: HTMLTextAreaElement;
   let lastCursorPosition = 0;
   let selectedKind: string | undefined = $state("");
@@ -168,13 +174,35 @@
     }
   }
 
-  const syntaxExamples = [
-    "nostr author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1",
-    "#lumilumi kinds:1",
-    "nostr p:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw until:2025-01-01",
-    "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
-    "kind:0 until:2025-01-01T18:30:00",
-    "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
+  const syntaxExamples: { example: string; description: string }[] = [
+    {
+      example:
+        "author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw",
+      description: $_("search.syntaxExample.userPosts"), // 特定ユーザーの投稿
+    },
+    {
+      example:
+        "author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw kind:1 until:2025-01-01",
+      description: $_("search.syntaxExample.userPostsUntil"), // ユーザーのテキスト投稿を指定日まで
+    },
+    {
+      example:
+        "id:nevent1qvzqqqqqqypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhkuenjv4kxz7fwv9c8qqpqyy4tksfxhc2tew78a6t24x0wwqsfwhzt80geraeq4sysrtke0qnq2t44at",
+      description: $_("search.syntaxExample.noteItself"), // 特定ノートそのもの
+    },
+    {
+      example:
+        "e:note10kw6pxzztsuvz4mqxfaze7jjwm44d4mcyt4xejdgdvtkqc5p80zs2ps8aj",
+      description: $_("search.syntaxExample.noteReactions"), // 特定ノートへの反応
+    },
+    {
+      example: "#lumilumi kind:1",
+      description: $_("search.syntaxExample.taggedPosts"), // 特定タグを含むテキスト投稿
+    },
+    {
+      example: "kind:0 until:2025-01-01T18:30:00",
+      description: $_("search.syntaxExample.profileUntil"), // プロフィール情報を指定日時まで
+    },
   ];
 
   $effect(() => {
@@ -250,45 +278,78 @@
             {/snippet}
           </Popover>
         </div>
-        <Popover
-          bind:openPopover={showSyntaxHelp}
-          ariaLabel="SyntaxHelp"
-          zIndex={10}
-        >
-          <div class="text-magnum-400 hover:text-magnum-200 transition-colors">
-            <CircleQuestionMark size={18} />
-          </div>
 
-          {#snippet popoverContent()}
-            <div class="flex flex-col items-start max-w-[600px]">
-              <div class="font-medium mb-2 text-magnum-200">
-                {$_("search.syntaxExamplesTitle")}
-              </div>
-
-              {#each syntaxExamples as example}
-                <button
-                  class="font-mono text-magnum-300 mb-2 cursor-pointer transition-colors
-          text-start p-2 rounded-md w-full
-            bg-none hover:bg-magnum-700/50 whitespace-pre-wrap break-words"
-                  style="word-break: break-word;"
-                  onclick={() => {
-                    searchWord = example;
-                    showSyntaxHelp(false);
-                  }}
-                >
-                  {example}
-                </button>
-              {/each}
-
-              <div
-                class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
-                style="word-break: break-word;"
-              >
-                {$_("search.syntaxProperties")}
-              </div>
+        <div class="flex gap-2">
+          <Popover
+            bind:openPopover={showFilter}
+            ariaLabel="search filter"
+            zIndex={10}
+          >
+            <div
+              class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
+            >
+              <Braces size={18} />
             </div>
-          {/snippet}
-        </Popover>
+            {#snippet popoverContent()}
+              <div
+                class="border border-magnum-500/80 rounded-md max-h-60 break-all overflow-y-auto p-1 w-[360px]"
+              >
+                <div class="font-semibold text-magnum-400">Filters</div>
+                {#each filters as filter}
+                  <pre
+                    class="text-xs text-magnum-300 whitespace-pre-wrap">{JSON.stringify(
+                      filter,
+                      null,
+                      2
+                    )}</pre>
+                {/each}
+              </div>
+            {/snippet}
+          </Popover>
+          <Popover
+            bind:openPopover={showSyntaxHelp}
+            ariaLabel="SyntaxHelp"
+            zIndex={10}
+          >
+            <div
+              class="text-magnum-400 hover:text-magnum-200 transition-colors"
+            >
+              <CircleQuestionMark size={18} />
+            </div>
+
+            {#snippet popoverContent()}
+              <div class="flex flex-col items-start max-w-[600px]">
+                <div class="font-medium mb-2 text-magnum-200">
+                  {$_("search.syntaxExamplesTitle")}
+                </div>
+
+                {#each syntaxExamples as { example, description }}
+                  <button
+                    type="button"
+                    class="font-mono text-magnum-300 cursor-pointer transition-colors
+      text-start p-2 rounded-md w-full
+      bg-none hover:bg-magnum-700/50 break-words"
+                    style="word-break: break-word;"
+                    onclick={() => {
+                      searchWord = example;
+                      showSyntaxHelp(false);
+                    }}
+                  >
+                    <div class="text-xs text-magnum-400">{description}</div>
+                    <div class="text-sm">{example}</div>
+                  </button>
+                {/each}
+
+                <div
+                  class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
+                  style="word-break: break-word;"
+                >
+                  {$_("search.syntaxProperties")}
+                </div>
+              </div>
+            {/snippet}
+          </Popover>
+        </div>
       </div>
     </div>
 
@@ -324,7 +385,7 @@
 </div>
 <div class="flex gap-2">
   <button
-    class="h-10 rounded-md bg-magnum-200 w-20 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
+    class="h-10 rounded-md bg-magnum-200 w-32 font-medium text-magnum-900 hover:opacity-75 active:opacity-50 disabled:opacity-25 flex items-center justify-center"
     disabled={$nowProgress}
     onclick={handleUnifiedSearch}
   >

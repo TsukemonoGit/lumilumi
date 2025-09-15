@@ -1,7 +1,7 @@
 <script lang="ts">
   import { usePromiseReq } from "$lib/func/nostr";
   import { awaitInterval, generateResultMessage } from "$lib/func/util";
-  import * as nip19 from "nostr-tools/nip19";
+
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
@@ -281,9 +281,10 @@
     {handleClickSearch}
     {createFilter}
     {resetValue}
+    {filters}
   />
 
-  <div class="w-full mt-4 opacity-80">
+  <!-- <div class="w-full mt-4 opacity-80">
     <div
       class="border border-magnum-500/80 rounded-md max-h-40 break-all overflow-y-auto p-1"
     >
@@ -297,7 +298,7 @@
           )}</pre>
       {/each}
     </div>
-  </div>
+  </div> -->
 
   {#if openSearchResult}
     <SearchResult
