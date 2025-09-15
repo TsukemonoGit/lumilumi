@@ -326,20 +326,32 @@
     "description": "このサイトはNostrネットワークを利用しています。おもちのNostrアカウントでログインするか、新しくアカウントを作成して参加することができます。"
   },
   "search": {
-    "ward": "検索ワード",
-    "followee": "フォロイーのみ",
-    "options": "追加条件",
+    "ward": "検索語",
+    "followee": "フォローのみ",
+    "options": "オプション",
     "search": "検索",
-    "excludeproxynote": "他SNSの投稿を除外する",
-    "syntaxExamplesTitle": "例",
-    "syntaxProperties": "プロパティ: author/authors, kind/kinds, id/ids, p (メンション), e/q (引用), t/hashtag, r (URL), until",
+    "excludeproxynote": "他のソーシャルメディアからの投稿を除外",
+    "syntaxPropertiesTitle": "検索プロパティ",
+    "syntaxPropertiesDescription": "プロパティを指定しない場合は投稿内容から検索されます。以下の形式で絞り込み検索が可能です：",
+    "syntaxExamplesTitle": "検索例",
+    "propertyDescription": {
+      "author": "投稿者の公開鍵を指定",
+      "kind": "イベント種類を指定（1=テキスト投稿、7=リアクションなど）",
+      "id": "特定のイベントIDを指定",
+      "until": "指定時刻より前の投稿のみ検索",
+      "mention": "投稿内で言及されている公開鍵を指定",
+      "quote": "引用しているイベントIDを指定",
+      "hashtag": "投稿内のハッシュタグを指定",
+      "url": "投稿内のURLを指定",
+      "oneCharOthers": "ほか英字1文字（大文字・小文字）"
+    },
     "syntaxExample": {
       "userPosts": "特定ユーザーの投稿を検索",
-      "userPostsUntil": "あるユーザーのテキスト投稿を指定日まで検索",
-      "noteItself": "特定のノートそのものを検索",
-      "noteReactions": "特定ノートへの反応（返信やリアクション）を検索",
-      "taggedPosts": "特定タグを含むテキスト投稿を検索",
-      "profileUntil": "プロフィール情報を指定日時まで検索"
+      "userPostsUntil": "特定ユーザーの指定日時までのテキスト投稿を検索",
+      "noteItself": "特定のノート自体を検索",
+      "noteReactions": "特定ノートへのリアクション（返信・いいね）を検索",
+      "taggedPosts": "特定タグ付きテキスト投稿を検索",
+      "profileUntil": "指定日時までのプロフィール情報を検索"
     }
   },
   "settei": {

@@ -163,7 +163,7 @@
         break;
 
       case "search_user":
-        goto(`search?author=${encodedPubkey}&load=false`);
+        goto(`search?q=author:${encodedPubkey}&load=false`);
         break;
 
       case "update_profile":
