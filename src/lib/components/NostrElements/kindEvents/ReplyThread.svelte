@@ -15,7 +15,7 @@
   }
 
   let { replyTag, displayMenu, depth, repostable }: Props = $props();
-
+  let [tagName, id, relay, marker] = $derived(replyTag || []);
   const openModal = (index: number) => {
     // modalIndex = index;
     // if (showModal) $showModal = true;
@@ -33,7 +33,6 @@
 </script>
 
 {#if replyTag}
-  {@const [tagName, id, relay, marker] = replyTag}
   {#if tagName === "e" || tagName === "E"}
     {@const relayhint = relay && relayRegex.test(relay) ? [relay] : undefined}
     <Note
