@@ -1,64 +1,55 @@
 <script lang="ts">
   import { eventKinds } from "$lib/func/kinds";
-  import { createDropdownMenu, melt } from "@melt-ui/svelte";
-
   import { locale } from "@konemono/svelte5-i18n";
   import { fly } from "svelte/transition";
+  import InputNumber from "./InputNumber.svelte";
+  import Popover from "$lib/components/Elements/Popover.svelte";
 
   interface Props {
     selectedKind?: string | undefined;
   }
 
   let { selectedKind = $bindable(undefined) }: Props = $props();
-  const {
-    elements: { trigger, menu, item, separator, arrow },
-
-    states: { open },
-  } = createDropdownMenu({
-    forceVisible: true,
-    loop: true,
-  });
 
   const handleClickKind = (kind: number) => {
     selectedKind = kind.toString();
+    openPopover(false);
+  };
+
+  let openPopover: (bool: boolean) => void = $state(() => {});
+
+  const handleConfirmCustom = (customKind: number) => {
+    const value = String(customKind);
+    if (value.trim() !== "" && !isNaN(Number(value))) {
+      selectedKind = value;
+    }
+    openPopover(false);
   };
 </script>
 
-<button
-  type="button"
-  class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
-  use:melt={$trigger}
->
-  K
-</button>
-
-{#if $open}
+<Popover ariaLabel="kind select" bind:openPopover>
   <div
-    class=" menu"
-    use:melt={$menu}
-    transition:fly={{ duration: 150, y: -10 }}
+    class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
   >
-    {#each Array.from(eventKinds.entries()) as [kind, { ja, en }]}
-      <div
-        class="item"
-        use:melt={$item}
-        onm-click={() => handleClickKind(kind)}
-      >
-        {kind}
-        {$locale === "ja" ? ja : en}
-      </div>
-    {/each}
+    K
   </div>
-{/if}
 
-<style lang="postcss">
-  .menu {
-    @apply z-40 flex max-h-[min(100vh,400px)] min-w-[240px] flex-col shadow-lg overflow-y-auto cursor-pointer;
-    @apply rounded-md bg-neutral-800 border border-neutral-700 p-1;
-    @apply ring-0 !important;
-  }
-
-  .item {
-    @apply hover:bg-neutral-700 p-1;
-  }
-</style>
+  {#snippet popoverContent()}
+    <div class="menu" transition:fly={{ duration: 150, y: -10 }}>
+      <InputNumber onConfirm={handleConfirmCustom} />
+      <div class="border-t border-neutral-700 my-1"></div>
+      <div class="flex flex-col max-h-80 overflow-y-auto">
+        {#each Array.from(eventKinds.entries()) as [kind, { ja, en }]}
+          <button
+            type="button"
+            class="p-1 w-full border border-transparent hover:border-magnum-400 rounded-md text-start"
+            onclick={() => handleClickKind(kind)}
+          >
+            {kind}
+            {$locale === "ja" ? ja : en}
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/snippet}
+</Popover>
