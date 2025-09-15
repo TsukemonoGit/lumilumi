@@ -79,17 +79,24 @@
 
     const params = page.url.searchParams;
 
-    // followee パラメータ復元（例: ?followee=1）
+    // followee パラメータ復元
     const f = params.get("followee");
     if (f === "1" || f === "true") {
       followee = true;
     }
 
-    // excludeProxy パラメータ復元（例: ?excludeProxy=1）
+    // excludeProxy パラメータ復元
     const e = params.get("excludeProxy");
     if (e === "1" || e === "true") {
       excludeProxy = true;
     }
+
+    // load パラメータ確認（例: ?load=false）
+    const loadParam = params.get("load");
+    const shouldLoad = !(
+      loadParam &&
+      (loadParam === "0" || loadParam === "false")
+    );
 
     // q パラメータ復元
     const q = params.get("q");
@@ -97,7 +104,9 @@
       searchWord = q;
       createFilter(q);
       await waitForDefaultRelays(5000);
-      handleClickSearch();
+      if (shouldLoad) {
+        handleClickSearch();
+      }
     }
     isMount = false;
   }

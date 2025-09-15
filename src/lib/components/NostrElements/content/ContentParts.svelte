@@ -169,7 +169,7 @@
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}
-      href={`/search?t=${part.metadata!.tag}&k=${event.kind || 1}`}
+      href={`/search?q=t:${part.metadata!.tag} kind:${event.kind || 1}`}
       class="underline text-magnum-300 break-all">{part.content}</a
     >
   {:else if part.type === "relay"}

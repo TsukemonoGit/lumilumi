@@ -331,15 +331,27 @@
     "options": "Options",
     "search": "Search",
     "excludeproxynote": "Exclude posts from other social media.",
-    "syntaxExamplesTitle": "Syntax Examples:",
-    "syntaxProperties": "Properties: author/authors, kind/kinds, id/ids, p (mention), e/q (quote), t/hashtag, r (url), until",
+    "syntaxPropertiesTitle": "Search Properties",
+    "syntaxPropertiesDescription": "Search content if no properties specified. Use following formats for filtered search:",
+    "syntaxExamplesTitle": "Search Examples",
+    "propertyDescription": {
+      "author": "Specify author's public key",
+      "kind": "Specify event kind (1=text note, 7=reaction, etc.)",
+      "id": "Specify specific event ID",
+      "until": "Search posts before specified time",
+      "mention": "Specify public key mentioned in post",
+      "quote": "Specify quoted event ID",
+      "hashtag": "Specify hashtag in post",
+      "url": "Specify URL in post",
+      "oneCharOthers": "other single letters (case-insensitive)"
+    },
     "syntaxExample": {
-      "userPosts": "Search posts from a specific user",
-      "userPostsUntil": "Search text posts from a user until a specified date",
-      "noteItself": "Search for a specific note itself",
-      "noteReactions": "Search for reactions (replies or likes) to a specific note",
-      "taggedPosts": "Search text posts containing a specific tag",
-      "profileUntil": "Search profile information until a specified date and time"
+      "userPosts": "Search posts from specific user",
+      "userPostsUntil": "Search text posts from specific user until specified date",
+      "noteItself": "Search specific note itself",
+      "noteReactions": "Search reactions (replies, likes) to specific note",
+      "taggedPosts": "Search text posts with specific tag",
+      "profileUntil": "Search profile info until specified date"
     }
   },
   "settei": {

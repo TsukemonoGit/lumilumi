@@ -164,10 +164,10 @@
     return url.toString();
   }
 
-  function handleResetValue() {
+  /* function handleResetValue() {
     searchWord = "";
     resetValue();
-  }
+  } */
 
   function handleUnifiedSearch() {
     if (searchWord || "".trim()) {
@@ -178,7 +178,7 @@
   const syntaxExamples: { example: string; description: string }[] = [
     {
       example:
-        "author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw",
+        "lumilumi author:npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw",
       description: $_("search.syntaxExample.userPosts"), // 特定ユーザーの投稿
     },
     {
@@ -320,32 +320,57 @@
 
             {#snippet popoverContent()}
               <div class="flex flex-col items-start max-w-[600px]">
+                <!-- プロパティ説明セクション -->
+                <div class="font-medium mb-2 text-magnum-200">
+                  {$_("search.syntaxPropertiesTitle")}
+                </div>
+
+                <div
+                  class="text-xs text-magnum-400 mb-3 whitespace-pre-wrap break-words"
+                  style="word-break: break-word;"
+                >
+                  {$_("search.syntaxPropertiesDescription")}
+                </div>
+
+                <ul class="list-disc list-inside text-sm text-magnum-300 mb-2">
+                  <li>
+                    author/authors: {$_("search.propertyDescription.author")}
+                  </li>
+                  <li>kind/kinds: {$_("search.propertyDescription.kind")}</li>
+                  <li>id/ids: {$_("search.propertyDescription.id")}</li>
+                  <li>until: {$_("search.propertyDescription.until")}</li>
+                  <li>p: {$_("search.propertyDescription.mention")}</li>
+                  <li>e/q: {$_("search.propertyDescription.quote")}</li>
+                  <li>t: {$_("search.propertyDescription.hashtag")}</li>
+                  <li>r: {$_("search.propertyDescription.url")}</li>
+                </ul>
+
+                <div class="text-xs text-magnum-400 mb-6">
+                  {$_("search.propertyDescription.oneCharOthers")}
+                </div>
+
+                <!-- 例セクション -->
                 <div class="font-medium mb-2 text-magnum-200">
                   {$_("search.syntaxExamplesTitle")}
                 </div>
 
-                {#each syntaxExamples as { example, description }}
-                  <button
-                    type="button"
-                    class="font-mono text-magnum-300 cursor-pointer transition-colors
-      text-start p-2 rounded-md w-full
-      bg-none hover:bg-magnum-700/50 break-words"
-                    style="word-break: break-word;"
-                    onclick={() => {
-                      searchWord = example;
-                      showSyntaxHelp(false);
-                    }}
-                  >
-                    <div class="text-xs text-magnum-400">{description}</div>
-                    <div class="text-sm">{example}</div>
-                  </button>
-                {/each}
-
-                <div
-                  class="text-xs text-magnum-400 mt-2 whitespace-pre-wrap break-words"
-                  style="word-break: break-word;"
-                >
-                  {$_("search.syntaxProperties")}
+                <div class="w-full space-y-1 max-h-60 overflow-y-auto">
+                  {#each syntaxExamples as { example, description }}
+                    <button
+                      type="button"
+                      class="font-mono text-magnum-300 cursor-pointer transition-colors text-start p-2 rounded-md w-full bg-none border border-magnum-700 hover:bg-magnum-700/50 break-words"
+                      style="word-break: break-word;"
+                      onclick={() => {
+                        searchWord = example;
+                        showSyntaxHelp(false);
+                      }}
+                    >
+                      <div class="text-xs text-magnum-400 mb-1">
+                        {description}
+                      </div>
+                      <div class="text-sm">{example}</div>
+                    </button>
+                  {/each}
                 </div>
               </div>
             {/snippet}
