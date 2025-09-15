@@ -9,13 +9,11 @@
   let selectedTime: string = $state("");
 
   let combinedDateTime = $derived(
-    selectedDate && selectedTime
-      ? new Date(`${selectedDate}T${selectedTime}`)
-      : null
+    selectedDate ? new Date(`${selectedDate}T${selectedTime || "00:00"}`) : null
   );
 
   function handleChange() {
-    if (combinedDateTime && onChange) {
+    if (selectedDate && selectedTime && combinedDateTime && onChange) {
       onChange(combinedDateTime);
     }
   }

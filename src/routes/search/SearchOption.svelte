@@ -115,8 +115,9 @@
 
   function handleDateTimeChange(date: Date) {
     console.log(date);
-    // until: キーワードの形式を作成
-    const untilKeyword = `until:${date.toISOString().slice(0, 19)} `;
+    // DateをUNIXタイムスタンプ（秒）に変換
+    const unixTimestamp = Math.floor(date.getTime() / 1000);
+    const untilKeyword = `until:${unixTimestamp} `;
 
     // 既存の until: キーワードを検索して置換
     const existingUntilRegex = /\s*until:\S+/;

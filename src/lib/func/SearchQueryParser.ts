@@ -249,12 +249,20 @@ function initializeTags(result: ParsedSearch): void {
 
 function parseDateTime(dateStr: string): number | undefined {
   try {
+    // タイムスタンプが10桁（秒単位）または13桁（ミリ秒単位）かチェック
     if (TIMESTAMP_PATTERN.test(dateStr)) {
       const timestamp = parseInt(dateStr, 10);
-      return timestamp > 1000000000 ? timestamp : timestamp * 1000;
+
+      // 10桁のUnix時間（秒）であればそのまま返す
+      if (timestamp.toString().length === 10) {
+        return timestamp;
+      }
     }
 
-    const date = new Date(dateStr);
+    // 時間指定がない日付文字列をUTCで解釈させるために'T00:00'を追加
+    const date = new Date(dateStr.includes("T") ? dateStr : `${dateStr}T00:00`);
+
+    // getTime()でミリ秒単位のUnix Timeを取得し、1000で割って秒単位にする
     return isNaN(date.getTime())
       ? undefined
       : Math.floor(date.getTime() / 1000);
