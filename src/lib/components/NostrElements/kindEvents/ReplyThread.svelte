@@ -32,7 +32,7 @@
   };
 </script>
 
-{#if replyTag}
+{#if replyTag && id}
   {#if tagName === "e" || tagName === "E"}
     {@const relayhint = relay && relayRegex.test(relay) ? [relay] : undefined}
     <Note
