@@ -11,7 +11,6 @@
   import SearchResultList from "./SearchResultList.svelte";
   import { defaultRelays, queryClient } from "$lib/stores/stores";
   import { unsucscribeSearch } from "$lib/func/useReq";
-  import { derived } from "svelte/store";
 
   let amount = 50;
   let viewIndex = 0;
@@ -39,8 +38,8 @@
 
   // eventFilterにsearchプロパティがあるかチェックして、リレーを決定
   let selectedRelays = $derived.by(() => {
-    // eventFilterにsearchプロパティがある場合はnip50relaysを使用
-    if (!("search" in filters && filters.search)) {
+    // eventFilterにsearchプロパティがない、または値が空の場合
+    if (!("search" in filters) || !filters.search) {
       return undefined;
     }
     if (relays.length > 0) {
