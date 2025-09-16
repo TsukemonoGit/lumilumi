@@ -217,7 +217,9 @@
         // Load older events
         const olderEvents = await loadOlderEvents(
           fetchAmount,
-          filters,
+          filters.map((filter) => {
+            return { ...filter, since: undefined };
+          }),
           untilTime,
           tie,
           relays
