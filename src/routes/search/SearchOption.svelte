@@ -57,7 +57,7 @@
     if (searchWord) {
       untrack(() => {
         if (searchWord) {
-          console.log(searchWord);
+          //  console.log(searchWord);
           createFilter(searchWord);
         }
       });
