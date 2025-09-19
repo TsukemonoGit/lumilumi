@@ -193,7 +193,8 @@
   "about": {
     "houkoku": "バグ報告",
     "share": "共有",
-    "luminostr": "フォローリストなどが飛んだとき"
+    "luminostr": "フォローリストなどが飛んだとき",
+    "userChannel": "Lumilumiに関する質問・要望・不具合報告・使い方相談など"
   },
   "notifications": {
     "onlyFollowee": "フォロイーのみ"
