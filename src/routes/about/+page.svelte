@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
   import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
-  import { Share, BriefcaseMedical } from "lucide-svelte";
+  import { Share, BriefcaseMedical, MessageCircle } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -300,6 +300,16 @@
     <li>
       <div class="list">{$_("others")}</div>
       <ul>
+        <li>
+          <div class="item flex flex-wrap gap-2 items-center">
+            <Link
+              href="https://lumilumi.app/channel/nevent1qvzqqqqq9ypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qyxhwumn8ghj77tpvf6jumt9qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz4mhxue69uhhyetvv9ujucnpwf5kuefwvdhszythwden5te0den8yetvv9ujuctswqq3gamnwvaz7tmjv4kxz7fwv3sk6atn9e5k7qghwaehxw309ahx7um5wghxjar5v9hx6mewd4jkuqgkwaehxw309aex2mrp0yhxummnw3ezucnpdejqz8thwden5te0dehhxarj9e3k7mtsd9kx2tt9wfex7u3wdejhgqgcwaehxw309aex2mrp0yhx6mmddaehgu3wwp5ku6cqyp8uzmk3qnfhm35effk8cg0m9w6xayatqt6dveuaef5shnxt3ftaqaffc9h"
+              className="flex gap-1 items-center underline"
+              ><MessageCircle size="20" />Lumilumi User Channel</Link
+            >
+            <span class="text-sm">{$_("about.userChannel")}</span>
+          </div>
+        </li>
         <li>
           <div class="item flex flex-wrap gap-2 items-center">
             <Link

@@ -193,7 +193,8 @@
   "about": {
     "houkoku": "Bug Reports",
     "share": "Share",
-    "luminostr": "When your follow list, bookmarks, etc. are lost"
+    "luminostr": "When your follow list, bookmarks, etc. are lost",
+    "userChannel": "Questions, requests, bug reports, usage help, and more about Lumilumi"
   },
   "notifications": {
     "onlyFollowee": "only followee"
