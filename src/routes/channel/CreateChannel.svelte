@@ -5,6 +5,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as Nostr from "nostr-typedef";
   import {
+    defaultRelays,
     nowProgress,
     popStack,
     queryClient,
@@ -97,6 +98,7 @@
         name: channelName.trim(),
         about: channelAbout.trim(),
         picture: channelPicture.trim(),
+        relays: Object.keys($defaultRelays).slice(0, 6),
       };
 
       // tags の作成
