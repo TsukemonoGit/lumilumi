@@ -320,7 +320,7 @@
     {#if openGlobalTimeline && globalRelays.length > 0}
       <GlobalTimeline
         bind:this={compRef}
-        globalRelays={$state.snapshot(globalRelays)}
+        {globalRelays}
         {timelineQuery}
         eventFilter={(note) => {
           return checkGlobalFilter(note);
