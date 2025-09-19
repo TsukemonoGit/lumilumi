@@ -245,7 +245,7 @@
         bind:this={inputElement}
         id="unified-search"
         class="w-full rounded-md px-3 py-2 border border-magnum-500 font-mono text-sm resize-y h-20 bg-neutral-800"
-        placeholder="nostr author:npub1xxx kind:1 #nostr until:2025-01-01"
+        placeholder="nostr kind:1 author:npub1xxx #nostr until:2025-01-01"
         bind:value={searchWord}
         onkeydown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
@@ -267,9 +267,7 @@
             ariaLabel="DateTimeInput"
             zIndex={10}
           >
-            <div
-              class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
-            >
+            <div class="text-magnum-400 transition-colors cursor-pointer">
               <CalendarClock size={18} />
             </div>
             {#snippet popoverContent()}
@@ -286,9 +284,7 @@
             ariaLabel="search filter"
             zIndex={10}
           >
-            <div
-              class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
-            >
+            <div class="text-magnum-400 transition-colors cursor-pointer">
               <Braces size={18} />
             </div>
             {#snippet popoverContent()}
@@ -313,9 +309,9 @@
             zIndex={10}
           >
             <div
-              class="text-magnum-400 hover:text-magnum-200 transition-colors"
+              class="text-magnum-400 transition-colors flex-row flex items-center gap-0.5"
             >
-              <CircleQuestionMark size={18} />
+              <CircleQuestionMark size={18} />Tips
             </div>
 
             {#snippet popoverContent()}
