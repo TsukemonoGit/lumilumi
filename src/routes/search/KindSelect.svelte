@@ -29,7 +29,7 @@
 
 <Popover ariaLabel="kind select" bind:openPopover>
   <div
-    class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer w-5 h-5 rounded-full border border-magnum-400 text-xs font-bold"
+    class="text-magnum-400 transition-colors cursor-pointer w-5 h-5 rounded-full border border-magnum-400 text-xs font-bold"
   >
     K
   </div>
