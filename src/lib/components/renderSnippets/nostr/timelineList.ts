@@ -116,7 +116,6 @@ export async function firstLoadOlderEvents(
     onData,
     sift
   );
-
   console.log(`📡 Older events fetch completed`, {
     requested: sift || "unlimited",
     received: olderEvents.length,
