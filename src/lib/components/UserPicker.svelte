@@ -9,10 +9,10 @@
   import type { EventPacket } from "rx-nostr";
   import { checkUserInput, userName } from "$lib/func/user";
   interface Props {
-    input?: string;
     onClickUser: (pubhex: string) => void;
   }
-  let { input = "", onClickUser }: Props = $props();
+  let input = $state("");
+  let { onClickUser }: Props = $props();
   let openPopover: (bool: boolean) => void = $state(() => {});
   // Derived data
   let metadataList: MetadataList = $state({});
@@ -43,8 +43,16 @@
   </div>
   {#snippet popoverContent()}
     <div>
+      <input
+        type="text"
+        id="npub"
+        class="h-8 w-full rounded-md text-magnum-100 border-2
+         border-magnum-400"
+        bind:value={input}
+      />
+
       <div
-        class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto max-w-[calc(min(100vw,400px))]"
+        class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto w-[calc(min(100vw,400px))]"
         style="overflow-anchor: auto;"
       >
         {#each Object.entries(metadataList) as [pubkey, profile], index}
@@ -58,11 +66,6 @@
             </button>
           {/if}
         {/each}
-        <EmojiListUpdate
-          buttonClass="ml-auto p-1 m-1 rounded-full   hover:opacity-75 active:opacity-50 bg-magnum-600/70 text-magnum-300"
-        >
-          <RefreshCw />
-        </EmojiListUpdate>
       </div>
     </div>
   {/snippet}

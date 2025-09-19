@@ -13,7 +13,7 @@
   import ReplyTo from "./NostrElements/kindEvents/layout/ReplyTo.svelte";
   import Reply from "./NostrElements/kindEvents/Reply.svelte";
   import ShowStatus from "./NostrElements/kindEvents/Status/ShowStatus.svelte";
-  import UserName from "./NostrElements/user/UserName.svelte";
+
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
 
   import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
