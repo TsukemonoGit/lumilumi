@@ -77,37 +77,20 @@
   async function init() {
     setSearchRelay();
 
-    const params = page.url.searchParams;
+    // +page.tsから受け取ったデータを使用
+    searchWord = data.searchWord;
+    followee = data.followee;
+    excludeProxy = data.excludeProxy;
 
-    // followee パラメータ復元
-    const f = params.get("followee");
-    if (f === "1" || f === "true") {
-      followee = true;
-    }
-
-    // excludeProxy パラメータ復元
-    const e = params.get("excludeProxy");
-    if (e === "1" || e === "true") {
-      excludeProxy = true;
-    }
-
-    // load パラメータ確認（例: ?load=false）
-    const loadParam = params.get("load");
-    const shouldLoad = !(
-      loadParam &&
-      (loadParam === "0" || loadParam === "false")
-    );
-
-    // q パラメータ復元
-    const q = params.get("q");
-    if (q) {
-      searchWord = q;
-      createFilter(q);
+    // 検索ワードがある場合は検索を実行
+    if (searchWord) {
+      createFilter(searchWord);
       await waitForDefaultRelays(5000);
-      if (shouldLoad) {
+      if (data.shouldLoad) {
         handleClickSearch();
       }
     }
+
     isMount = false;
   }
 
