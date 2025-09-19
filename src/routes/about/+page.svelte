@@ -302,10 +302,10 @@
       <ul>
         <li>
           <div class="item flex flex-wrap gap-2 items-center">
-            <Link
-              href="https://lumilumi.app/channel/nevent1qvzqqqqq9ypzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qyxhwumn8ghj77tpvf6jumt9qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz4mhxue69uhhyetvv9ujucnpwf5kuefwvdhszythwden5te0den8yetvv9ujuctswqq3gamnwvaz7tmjv4kxz7fwv3sk6atn9e5k7qghwaehxw309ahx7um5wghxjar5v9hx6mewd4jkuqgkwaehxw309aex2mrp0yhxummnw3ezucnpdejqz8thwden5te0dehhxarj9e3k7mtsd9kx2tt9wfex7u3wdejhgqgcwaehxw309aex2mrp0yhx6mmddaehgu3wwp5ku6cqyp8uzmk3qnfhm35effk8cg0m9w6xayatqt6dveuaef5shnxt3ftaqaffc9h"
-              className="flex gap-1 items-center underline"
-              ><MessageCircle size="20" />Lumilumi User Channel</Link
+            <a
+              href="/channel/nevent1qvzqqqqq9qq36amnwvaz7tmnwf68yetvv9ujucedwd6x2mrvv9ezumn9wshsz8nhwden5te0dehhxarj9e3k7mtsd9kx2tt9wfex7u3wdejhgtcppemhxue69uhhjctzw5hx6ef0qyshwumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5up0qy08wumn8ghj7mnjv4kxz7fddfczucedwd6x2mrvv9ezumn9wshszxrhwden5te0dehhxarj9e5hgarpdekk7tndv4hz7qgkwaehxw309aex2mrp0yhxyctjd9hx2tnrduhsqgranksfssju8rq4wcpj0gk055nkadtdw7pzafkvn2rtzasx9qfmc5k4s3cs"
+              class="flex gap-1 items-center underline"
+              ><MessageCircle size="20" />Lumilumi User Channel</a
             >
             <span class="text-sm">{$_("about.userChannel")}</span>
           </div>

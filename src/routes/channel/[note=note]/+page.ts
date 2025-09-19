@@ -9,12 +9,11 @@ interface CustomParams {
 }
 //https://kit.svelte.jp/docs/load
 //ページを読み込む前に有効なparamかチェック
-export const load: PageLoad<{
-  id: string;
-  relays?: string[] | undefined;
-  kind?: number | undefined;
-  author?: string | undefined;
-}> = ({ params }: { params: RouteParams }) => {
+export const load: PageLoad<nip19.EventPointer> = ({
+  params,
+}: {
+  params: RouteParams;
+}) => {
   const { note } = params as CustomParams; // キャストして kind を取得
 
   //console.log(note);
@@ -31,7 +30,6 @@ RoomId:${nip19.neventEncode({
         id: data.id,
         relays: data.relays ?? [],
       })}`);
-
       return nevent;
     } else if (type === "note") {
       ogDescription.set(`Public chat 
@@ -39,7 +37,7 @@ RoomId:${nip19.neventEncode({
         id: data,
       })}`);
 
-      return { id: data as string };
+      return { id: data as string } as nip19.EventPointer;
     } else {
       throw Error;
     }

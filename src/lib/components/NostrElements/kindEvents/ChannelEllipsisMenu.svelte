@@ -24,7 +24,7 @@
   import { writable } from "svelte/store";
   import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { getChannelLink } from "$lib/func/channel";
+  import { getChannelLink, getHeyaRelays } from "$lib/func/channel";
   import { goto } from "$app/navigation";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
 
@@ -89,6 +89,10 @@
   let editChannelDataOpen = $state(writable(false));
   let editChannelListOpen = $state(writable(false));
   let channelLink = $derived(getChannelLink(heyaId));
+  let heyaRelays = $derived(getHeyaRelays(note));
+  let heyaNevent = $derived(
+    nip19.neventEncode({ id: heyaId, relays: heyaRelays, kind: 40 })
+  );
 
   const handleSelectItem = async (index: number) => {
     switch (menuTexts[index].num) {
@@ -105,7 +109,7 @@
       case 1:
         //open in njump
 
-        const url = `https://njump.me/${nevent}`;
+        const url = `https://njump.me/${heyaNevent}`;
 
         window.open(url, "_blank", "noreferrer");
         break;
@@ -117,7 +121,7 @@
       case 3:
         //Copy EventID
         try {
-          await navigator.clipboard.writeText(nevent ?? "");
+          await navigator.clipboard.writeText(heyaNevent ?? "");
           $toastSettings = {
             title: "Success",
             description: `Copied to clipboard`,
@@ -149,7 +153,7 @@
         const shareData = {
           title: `【Channel】${channelData.name}`,
           text: channelData.about,
-          url: `${page.url.origin}/channel/${nevent}`,
+          url: `${page.url.origin}/channel/${heyaNevent}`,
         };
         try {
           await navigator.share(shareData);
@@ -168,23 +172,6 @@
         break;
     }
   };
-
-  let nevent: string | undefined = $derived.by(() => {
-    if (!note) {
-      return undefined;
-    }
-    try {
-      const eventpointer: nip19.EventPointer = {
-        id: note.id,
-        relays: getRelaysById(note.id),
-        author: note.pubkey,
-        kind: note.kind,
-      };
-      return nip19.neventEncode(eventpointer);
-    } catch {
-      return undefined;
-    }
-  });
 </script>
 
 <DropdownMenu {menuTexts} {handleSelectItem}>
