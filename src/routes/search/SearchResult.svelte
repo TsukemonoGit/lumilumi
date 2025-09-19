@@ -39,7 +39,10 @@
   // eventFilterにsearchプロパティがあるかチェックして、リレーを決定
   let selectedRelays = $derived.by(() => {
     // eventFilterにsearchプロパティがない、または値が空の場合
-    if (!("search" in filters) || !filters.search) {
+
+    const search = filters.find((fil) => fil.search);
+    //console.log(search);
+    if (!search) {
       return undefined;
     }
     if (relays.length > 0) {
