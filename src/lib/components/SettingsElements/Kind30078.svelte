@@ -13,6 +13,7 @@
     type Kind30078LumiSettingObj,
     type LumiSetting,
     type Theme,
+    type UploaderOption,
   } from "$lib/types";
   import { now } from "rx-nostr/src";
   import type { EventParameters } from "nostr-typedef";
@@ -313,7 +314,19 @@
     }
 
     if (loadData.uploader) {
-      $uploader = loadData.uploader;
+      if (loadData.uploader) {
+        // loadData.uploaderの型がstringかどうかをチェック
+        if (typeof loadData.uploader === "string") {
+          uploader.set({
+            type: "nip96",
+            address: loadData.uploader,
+          } as UploaderOption);
+        } else {
+          // string型でない場合
+          uploader.set(loadData.uploader as UploaderOption);
+        }
+      }
+
       if (loadData.uploader) {
         localStorage?.setItem(
           STORAGE_KEYS.UPLOADER,

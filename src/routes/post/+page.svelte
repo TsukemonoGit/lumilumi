@@ -41,12 +41,6 @@
       console.log(error);
     }
 
-    /*  let savedUploader = localStorage.getItem(STORAGE_KEYS.UPLOADER);
-    if (!savedUploader) {
-      $uploader = blossomMediaUploader[0];
-    } else {
-      $uploader = savedUploader;
-    } */
     if (!loginUser.get()) {
       const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pubkey) {

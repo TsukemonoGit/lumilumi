@@ -56,7 +56,9 @@
     use:melt={$trigger}
     aria-label="Uploader"
   >
-    [{$uploader.type}] {getHostname($uploader.address) || "Select an uploader"}
+    {$uploader.address
+      ? `[${$uploader.type}] ${getHostname($uploader.address)}`
+      : "Select an uploader"}
     <ChevronDown class="size-5" />
   </button>
 
