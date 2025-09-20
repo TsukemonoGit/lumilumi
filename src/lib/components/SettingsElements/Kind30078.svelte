@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { nowProgress, toastSettings, uploader } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
 
-  import { getQueryRelays, setTheme } from "$lib/func/settings";
+  import { getQueryRelays } from "$lib/func/settings";
   import type { EventPacket, DefaultRelayConfig } from "rx-nostr";
   import {
     timelineFilterInit,
@@ -25,6 +25,7 @@
     lumiSetting,
     showBanner,
     timelineFilter,
+    uploader,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { debugError, debugInfo } from "../Debug/debug";
@@ -314,7 +315,10 @@
     if (loadData.uploader) {
       $uploader = loadData.uploader;
       if (loadData.uploader) {
-        localStorage?.setItem(STORAGE_KEYS.UPLOADER, loadData.uploader);
+        localStorage?.setItem(
+          STORAGE_KEYS.UPLOADER,
+          JSON.stringify(loadData.uploader)
+        );
       }
     }
     if (loadData.lumiSetting) {

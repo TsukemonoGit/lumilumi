@@ -232,7 +232,7 @@ export interface LumiSettingBase {
   theme: string;
   colorScheme: string;
   timelineFilter: TimelineFilter;
-  uploader: string;
+  uploader: UploaderOption;
   globalRegexFilter: string;
 }
 
