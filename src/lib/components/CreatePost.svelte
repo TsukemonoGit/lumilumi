@@ -250,28 +250,32 @@
         uploadAbortController.signal
       );
 
-      const promises = uploadedURPs.map(async (data) => {
-        if (data.status !== "success") {
-          $toastSettings = {
-            title: "error",
-            description: uploadedURPs[0].message,
-            color: "bg-red-400",
-          };
-          return;
-        }
-        const url = data.nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
-        if (!url) return;
+      const promises = uploadedURPs.map(
+        async ({ status, nip94_event, url }) => {
+          if (status !== "success") {
+            $toastSettings = {
+              title: "error",
+              description: uploadedURPs[0].message,
+              color: "bg-red-400",
+            };
+            return;
+          }
+          const uploadUrl = url
+            ? url
+            : nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+          if (!uploadUrl) return;
 
-        if (data.nip94_event) {
-          tags.push(convertMetaTags(data.nip94_event));
+          if (nip94_event) {
+            tags.push(convertMetaTags(nip94_event));
+          }
+          await delay(10);
+          insertTextAtCursor(uploadUrl, {
+            addSpaceBefore: true,
+            addSpaceAfter: true,
+          });
+          await delay(10);
         }
-        await delay(10);
-        insertTextAtCursor(url, {
-          addSpaceBefore: true,
-          addSpaceAfter: true,
-        });
-        await delay(10);
-      });
+      );
 
       await Promise.all(promises);
     } catch (error) {

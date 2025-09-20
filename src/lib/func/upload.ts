@@ -1,13 +1,13 @@
-import {
-  readServerConfig,
-  type FileUploadResponse,
-  type OptionalFormDataFields,
-} from "./nip96";
+import { readServerConfig, type OptionalFormDataFields } from "./nip96";
 import { getToken } from "nostr-tools/nip98";
 import * as Nostr from "nostr-typedef";
 import { adjustImageQuality, removeExif } from "./imageProcessor";
 import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 import type { UploaderOption } from "$lib/types";
+import { BlossomClient, type BlobDescriptor } from "nostr-tools/nipb7";
+import { nip07Signer } from "rx-nostr";
+import { type VerifiedEvent, verifiedSymbol } from "nostr-tools";
+import type { Signer } from "nostr-tools/signer";
 // エラーコードを定数として定義
 const ERROR_CODES = {
   FILE_TOO_LARGE: 413,
@@ -15,7 +15,16 @@ const ERROR_CODES = {
   FORBIDDEN: 403,
   PAYMENT_REQUIRED: 402,
 };
-
+export type FileUploadResponse = {
+  status: "success" | "error" | "processing";
+  message: string;
+  processing_url?: string;
+  url?: string; // Blossom用に追加
+  nip94_event?: {
+    tags: Array<[string, string]>;
+    content: string;
+  };
+};
 // エラーメッセージを定数として定義
 const ERROR_MESSAGES = {
   [ERROR_CODES.FILE_TOO_LARGE]: "File too large!",
@@ -396,22 +405,6 @@ async function uploadFileNip96(
   );
 }
 
-// Blossom用のアップロード処理（未実装）
-async function uploadFileBlossom(
-  file: File,
-  options: {
-    serverApiUrl: string;
-    authorizationHeader: string;
-    signal?: AbortSignal;
-  }
-): Promise<FileUploadResponse> {
-  // TODO: Blossomのアップロード処理を実装
-  // - Blossomプロトコルに従ったリクエスト形式
-  // - 認証ヘッダーの処理
-  // - レスポンスの解析
-  throw new Error("Blossom upload not implemented yet");
-}
-
 // メインのアップロード関数
 export async function filesUpload(
   files: FileList,
@@ -490,13 +483,29 @@ export async function filesUpload(
       try {
         // TODO: Blossomサーバー設定の取得
         // TODO: Blossom認証ヘッダーの生成
+        const nip07RawSigner = nip07Signer();
+        const verifiedSigner: Signer = {
+          ...nip07RawSigner,
+          signEvent: async (event) => {
+            // nip07Signerで署名
+            const signedEvent = await nip07RawSigner.signEvent(event);
 
-        const response: FileUploadResponse = await uploadFileBlossom(file, {
-          serverApiUrl: address, // 仮の実装
-          authorizationHeader: "", // TODO: 適切な認証ヘッダー
-          signal: signal,
-        });
+            // [verifiedSymbol]プロパティを追加
+            (signedEvent as VerifiedEvent)[verifiedSymbol] = true;
 
+            return signedEvent as VerifiedEvent;
+          },
+        };
+        const client = new BlossomClient(address, verifiedSigner);
+        const fileUploadResponse: BlobDescriptor = await client.uploadFile(
+          file
+        );
+        // BlobDescriptorをFileUploadResponseに変換
+        const response: FileUploadResponse = {
+          status: "success",
+          message: "File uploaded successfully",
+          url: fileUploadResponse.url,
+        };
         results.push(response);
       } catch (error: any) {
         if (error.name === "AbortError") {

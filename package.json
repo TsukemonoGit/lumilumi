@@ -59,7 +59,7 @@
     "melt": "^0.38.0",
     "nip07-awaiter": "^1.1.0",
     "nostr-login": "^1.7.11",
-    "nostr-tools": "^2.16.2",
+    "nostr-tools": "^2.17.0",
     "nostr-typedef": "^0.13.0",
     "punycode": "^2.3.1",
     "qrcode": "^1.5.4",
