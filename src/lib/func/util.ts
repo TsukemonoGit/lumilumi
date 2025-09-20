@@ -1,8 +1,6 @@
 import type { Profile, UserMuteStatus } from "$lib/types";
 import * as Nostr from "nostr-typedef";
-import { readServerConfig, type FileUploadResponse } from "./nip96";
-import { getToken } from "nostr-tools/nip98";
-import { uploadFile } from "./upload";
+
 import { Nip11Registry, type EventPacket } from "rx-nostr";
 import type { Nip11 } from "nostr-typedef";
 import { binarySearch, normalizeURL } from "nostr-tools/utils";
@@ -10,7 +8,6 @@ import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
 import { urlRegex } from "./regex";
-import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
 export let noReactionKind = [3, 10000, 30000];
 
@@ -195,55 +192,7 @@ export function datetime(unixtime: number) {
 
   return time.toISOString();
 }
-
-export async function filesUpload(
-  files: FileList,
-  uploader: string,
-  signal?: AbortSignal // 新たに signal を受け取る
-): Promise<FileUploadResponse[]> {
-  console.log(files, uploader);
-  let res: FileUploadResponse[] = [];
-  for (const file of Array.from(files)) {
-    try {
-      const serverConfig = await readServerConfig(uploader);
-      console.log(serverConfig);
-      const header = await getToken(
-        serverConfig.api_url,
-        "POST",
-        async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-        true
-      );
-      console.log(file);
-      console.log(header);
-      console.log(serverConfig.api_url);
-      console.log(file.type);
-      const response: FileUploadResponse = await uploadFile(file, {
-        serverApiUrl: serverConfig.api_url,
-        nip98AuthorizationHeader: header,
-        optionalFormDataFields: { content_type: file.type },
-        imageQuality: lumiSetting.get().picQuarity,
-        signal: signal, // signal を渡す
-      });
-      console.log(response);
-      res.push(response);
-    } catch (error: any) {
-      if (error.name === "AbortError") {
-        console.log("Upload aborted:", file.name);
-        res.push({
-          status: "error",
-          message: "Upload aborted: " + file.name,
-        } as FileUploadResponse);
-      } else {
-        console.error("Error uploading file:", error);
-        res.push({
-          status: "error",
-          message: "Failed to upload file: " + file.name,
-        } as FileUploadResponse);
-      }
-    }
-  }
-  return res;
-}
+/* 
 export async function fileUpload(
   file: File,
   uploader: string,
@@ -291,7 +240,7 @@ export async function fileUpload(
   }
 
   return res;
-}
+} */
 
 export const generateResultMessage = (
   isSuccess: string[],

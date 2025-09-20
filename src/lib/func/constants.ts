@@ -3,6 +3,7 @@ import type {
   LumiEmoji,
   LumiMute,
   LumiMuteByKind,
+  UploaderOption,
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 
@@ -50,7 +51,7 @@ export const nip50relays = [
   "wss://nostr.wine", //クソながフィルターでも返ってくるけどなんかデータがぬけぬけかも？
 ];
 
-export const mediaUploader = [
+export const nip96MediaUploader = [
   "https://nostrcheck.me",
   "https://nostr.build",
   "https://void.cat",
@@ -58,7 +59,13 @@ export const mediaUploader = [
   "https://nostpic.com",
   "https://yabu.me",
 ];
-
+export const blossomMediaUploader = [
+  "https://blossom.band",
+  "https://cdn.nostrcheck.me",
+  "https://nostr.download",
+  "https://blossom.primal.net",
+  "https://cdn.satellite.earth",
+];
 export const initSettings: LumiSetting = {
   relays: [],
   useRelaySet: "0",
@@ -110,3 +117,8 @@ export const nostviewstrable = [
   //30008, ばっじ
   30015, 30030,
 ];
+
+export const initUploaderOption: UploaderOption = {
+  type: "blossom",
+  address: blossomMediaUploader[0],
+};

@@ -12,7 +12,6 @@ import type {
 } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
 import type { Readable } from "svelte/store";
-import type { NotifiSettings } from "../routes/notifications/notificationTypes";
 
 export type RxReqBase = RxReq;
 
@@ -243,3 +242,9 @@ export interface Kind30078LumiSetting extends LumiSettingBase {
 }
 
 export interface Kind30078LumiSettingObj extends LumiSettingBase {}
+
+export type UploaderType = "nip96" | "blossom";
+export interface UploaderOption {
+  type: UploaderType;
+  address: string;
+}

@@ -1,6 +1,13 @@
-import { type FileUploadResponse, type OptionalFormDataFields } from "./nip96";
+import {
+  readServerConfig,
+  type FileUploadResponse,
+  type OptionalFormDataFields,
+} from "./nip96";
 import { getToken } from "nostr-tools/nip98";
 import * as Nostr from "nostr-typedef";
+import { adjustImageQuality, removeExif } from "./imageProcessor";
+import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+import type { UploaderOption } from "$lib/types";
 // エラーコードを定数として定義
 const ERROR_CODES = {
   FILE_TOO_LARGE: 413,
@@ -57,28 +64,6 @@ export function formatFileSize(bytes: number): string {
     return (bytes / 1024).toFixed(2) + " KB";
   } else {
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-  }
-}
-
-// 画質調整機能
-async function adjustImageQuality(
-  file: File,
-  quality: number
-): Promise<ProcessedImageInfo> {
-  if (file.type === "image/jpeg" || file.type === "image/jpg") {
-    // JPG処理
-    return await processJpg(file, quality);
-    // } else if (file.type === 'image/png') {
-    //   // PNG専用処理
-    //   return await processPng(file);
-  } else {
-    // その他のファイル形式はそのまま
-    return {
-      file,
-      originalSize: file.size,
-      processedSize: file.size,
-      quality: 100,
-    };
   }
 }
 
@@ -336,31 +321,57 @@ export function revokePreviewUrl(url: string): void {
   URL.revokeObjectURL(url);
 }
 
-export async function uploadFile(
+// 共通の画像処理機能
+async function processImages(
+  files: FileList,
+  imageQuality: number = 100,
+  onProcessed?: (
+    originalSize: number,
+    processedSize: number,
+    quality: number
+  ) => void
+): Promise<File[]> {
+  const processedFiles: File[] = [];
+
+  for (const file of Array.from(files)) {
+    // 画質調整を行う
+    const processedImageInfo = await adjustImageQuality(file, imageQuality);
+
+    // コールバックがあれば実行
+    if (onProcessed) {
+      onProcessed(
+        processedImageInfo.originalSize,
+        processedImageInfo.processedSize,
+        processedImageInfo.quality
+      );
+    }
+
+    // Exif情報を削除
+    const processedFile = await removeExif(processedImageInfo.file);
+    processedFiles.push(processedFile);
+  }
+
+  return processedFiles;
+}
+
+// NIP96用のアップロード処理
+async function uploadFileNip96(
   file: File,
-  options: UploadOptions
+  options: {
+    serverApiUrl: string;
+    nip98AuthorizationHeader: string;
+    optionalFormDataFields?: Record<string, string>;
+    signal?: AbortSignal;
+    maxWaitTime?: number;
+  }
 ): Promise<FileUploadResponse> {
   const {
     serverApiUrl,
     nip98AuthorizationHeader,
     optionalFormDataFields,
     signal,
-    imageQuality = 100, // デフォルトは100%（最高画質）
-    maxWaitTime = 8000, // デフォルトは8秒
-    onProcessed,
+    maxWaitTime = 8000,
   } = options;
-
-  // 画質調整を行う
-  const processedImageInfo = await adjustImageQuality(file, imageQuality);
-
-  // コールバックがあれば実行
-  if (onProcessed) {
-    onProcessed(
-      processedImageInfo.originalSize,
-      processedImageInfo.processedSize,
-      processedImageInfo.quality
-    );
-  }
 
   const formData = new FormData();
   formData.append("Authorization", nip98AuthorizationHeader);
@@ -373,9 +384,8 @@ export async function uploadFile(
       }
     });
   }
-  // Exif情報を削除
-  const processedFile = await removeExif(processedImageInfo.file);
-  formData.append("file", processedFile);
+
+  formData.append("file", file);
 
   return pollUploadStatus(
     serverApiUrl,
@@ -384,6 +394,131 @@ export async function uploadFile(
     signal,
     maxWaitTime
   );
+}
+
+// Blossom用のアップロード処理（未実装）
+async function uploadFileBlossom(
+  file: File,
+  options: {
+    serverApiUrl: string;
+    authorizationHeader: string;
+    signal?: AbortSignal;
+  }
+): Promise<FileUploadResponse> {
+  // TODO: Blossomのアップロード処理を実装
+  // - Blossomプロトコルに従ったリクエスト形式
+  // - 認証ヘッダーの処理
+  // - レスポンスの解析
+  throw new Error("Blossom upload not implemented yet");
+}
+
+// メインのアップロード関数
+export async function filesUpload(
+  files: FileList,
+  uploader: UploaderOption,
+  signal?: AbortSignal
+): Promise<FileUploadResponse[]> {
+  console.log(files, uploader);
+
+  // 共通で画像処理をする
+  const processedFiles = await processImages(
+    files,
+    lumiSetting.get().picQuarity,
+    (originalSize, processedSize, quality) => {
+      console.log(
+        `Image processed: ${originalSize} -> ${processedSize} (${quality}%)`
+      );
+    }
+  );
+
+  const { type, address } = uploader;
+  let results: FileUploadResponse[] = [];
+
+  // typeによってアップロード処理を分ける
+  if (type === "nip96") {
+    for (let i = 0; i < processedFiles.length; i++) {
+      const file = processedFiles[i];
+      const originalFile = Array.from(files)[i];
+
+      try {
+        const serverConfig = await readServerConfig(address);
+        console.log(serverConfig);
+
+        const header = await getToken(
+          serverConfig.api_url,
+          "POST",
+          async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
+          true
+        );
+
+        console.log(file);
+        console.log(header);
+        console.log(serverConfig.api_url);
+        console.log(originalFile.type);
+
+        const response: FileUploadResponse = await uploadFileNip96(file, {
+          serverApiUrl: serverConfig.api_url,
+          nip98AuthorizationHeader: header,
+          optionalFormDataFields: { content_type: originalFile.type },
+          signal: signal,
+        });
+
+        console.log(response);
+        results.push(response);
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          console.log("Upload aborted:", originalFile.name);
+          results.push({
+            status: "error",
+            message: "Upload aborted: " + originalFile.name,
+          } as FileUploadResponse);
+        } else {
+          console.error("Error uploading file:", error);
+          results.push({
+            status: "error",
+            message: "Failed to upload file: " + originalFile.name,
+          } as FileUploadResponse);
+        }
+      }
+    }
+  } else if (type === "blossom") {
+    // TODO: Blossomのアップロード処理
+    for (let i = 0; i < processedFiles.length; i++) {
+      const file = processedFiles[i];
+      const originalFile = Array.from(files)[i];
+
+      try {
+        // TODO: Blossomサーバー設定の取得
+        // TODO: Blossom認証ヘッダーの生成
+
+        const response: FileUploadResponse = await uploadFileBlossom(file, {
+          serverApiUrl: address, // 仮の実装
+          authorizationHeader: "", // TODO: 適切な認証ヘッダー
+          signal: signal,
+        });
+
+        results.push(response);
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          console.log("Upload aborted:", originalFile.name);
+          results.push({
+            status: "error",
+            message: "Upload aborted: " + originalFile.name,
+          } as FileUploadResponse);
+        } else {
+          console.error("Error uploading file:", error);
+          results.push({
+            status: "error",
+            message: "Failed to upload file: " + originalFile.name,
+          } as FileUploadResponse);
+        }
+      }
+    }
+  } else {
+    throw new Error(`Unsupported uploader type: ${type}`);
+  }
+
+  return results;
 }
 
 // 画質チェック機能 - ファイル処理するが実際にはアップロードしない
@@ -395,7 +530,7 @@ export async function checkImageQuality(
   return processedImageInfo;
 }
 
-// アップロード状態をポーリングする関数
+// 既存のpollUploadStatus関数はそのまま使用
 async function pollUploadStatus(
   serverApiUrl: string,
   formData: FormData,
@@ -513,116 +648,4 @@ async function pollUploadStatus(
 
     throw new Error("Unexpected processing status");
   }
-}
-
-export async function removeExif(file: File): Promise<File> {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-
-    if (file.type === "image/jpeg") {
-      const cleanedFile = removeExifFromJPEG(arrayBuffer);
-      return new File([cleanedFile], file.name, { type: file.type });
-    } else if (file.type === "image/png") {
-      const cleanedFile = removeMetadataFromPNG(arrayBuffer);
-      return new File([cleanedFile], file.name, { type: file.type });
-    }
-  } catch (error) {
-    console.error("Failed to remove Exif data:", error);
-  }
-
-  return file; // エラーが発生した場合や他の形式の場合、元のファイルを返す
-}
-
-function removeExifFromJPEG(data: ArrayBuffer): ArrayBuffer {
-  const dataView = new DataView(data);
-  let offset = 2; // JPEGは0xFFD8で始まるので、最初の2バイトをスキップ
-  const length = data.byteLength;
-
-  // JPEGは通常0xFFD8で始まり、0xFFD9で終わる
-  // Exifデータは0xFFE1セグメントに格納されることが多い
-  while (offset < length) {
-    // JPEGセグメントの先頭は0xFFで始まるので、0xFF以外のバイトが出てきたら終了
-    if (dataView.getUint8(offset) !== 0xff) break;
-
-    // セグメントタイプを取得
-    const segmentType = dataView.getUint8(offset + 1);
-
-    // Exifセグメントの識別子（0xFFE1）
-    if (segmentType === 0xe1) {
-      const segmentLength = dataView.getUint16(offset + 2); // セグメントの長さ
-
-      const newLength = length - segmentLength - 2; // Exifデータを削除した新しい長さ
-
-      // 新しいArrayBufferの作成
-      const newData = new ArrayBuffer(newLength);
-      const newUint8Array = new Uint8Array(newData);
-
-      // これまでのデータをコピー
-      const beforeExif = new Uint8Array(data, 0, offset); // Exif前の部分
-      const afterExif = new Uint8Array(
-        data,
-        offset + 2 + segmentLength,
-        length - (offset + 2 + segmentLength)
-      ); // Exif後の部分
-
-      // 新しいArrayBufferにExif前とExif後のデータをコピー
-      newUint8Array.set(beforeExif, 0); // Exif前
-      newUint8Array.set(afterExif, beforeExif.length); // Exif後
-
-      return newData; // Exifデータを削除した新しいArrayBufferを返す
-    }
-
-    // 次のセグメントへ移動
-    const segmentLength = dataView.getUint16(offset + 2); // セグメントの長さ
-    offset += 2 + segmentLength; // オフセットを次のセグメントに進める
-  }
-
-  return data; // Exifが見つからない場合、そのままのデータを返す
-}
-
-// PNGのメタデータ削除
-export function removeMetadataFromPNG(arrayBuffer: ArrayBuffer): ArrayBuffer {
-  const data = new Uint8Array(arrayBuffer);
-  const pngSignature = new Uint8Array([
-    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-  ]);
-
-  // PNGシグネチャの検証
-  if (!pngSignature.every((value, index) => data[index] === value)) {
-    return arrayBuffer; // PNG形式でなければそのまま返す
-  }
-
-  const chunks: Uint8Array[] = [];
-  let offset = 8; // 最初の8バイトはシグネチャ
-
-  // 除外するチャンクタイプ
-  const metadataChunks = ["tEXt", "iTXt", "zTXt", "gAMA", "pHYs"];
-
-  while (offset < data.length) {
-    const length = new DataView(data.buffer).getUint32(offset); // チャンク長
-    const typeBytes = data.subarray(offset + 4, offset + 8);
-    const type = String.fromCharCode(...typeBytes);
-
-    // メタデータに関連するチャンクを除外
-    if (!metadataChunks.includes(type)) {
-      chunks.push(data.subarray(offset, offset + 12 + length)); // 長さ + タイプ + データ + CRC
-    }
-
-    offset += 12 + length; // チャンク長さ+12バイト(ヘッダ+CRC)
-  }
-
-  // 新しいバッファを作成
-  const cleanedBuffer = new Uint8Array(
-    pngSignature.byteLength +
-      chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-  );
-  cleanedBuffer.set(pngSignature, 0);
-
-  let position = pngSignature.byteLength;
-  for (const chunk of chunks) {
-    cleanedBuffer.set(chunk, position);
-    position += chunk.byteLength;
-  }
-
-  return cleanedBuffer.buffer;
 }

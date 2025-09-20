@@ -9,25 +9,14 @@
     Bell,
     RefreshCw,
   } from "lucide-svelte";
-  import {
-    getMetadataList,
-    type MetadataList,
-    type UserData,
-  } from "$lib/func/nostr";
-  import {
-    emojis,
-    nowProgress,
-    uploader,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { getMetadataList, type MetadataList } from "$lib/func/nostr";
+  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
 
-  import UploaderSelect from "./Elements/UploaderSelect.svelte";
   import MediaPicker from "./Elements/MediaPicker.svelte";
-  import { filesUpload, delay, displayShortPub } from "$lib/func/util";
+  import { delay } from "$lib/func/util";
 
   import type { MargePostOptions } from "$lib/types";
   import { type EventPacket } from "rx-nostr";
-  import { writable, type Writable } from "svelte/store";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { nsecRegex } from "$lib/func/regex";
   import { convertMetaTags } from "$lib/func/imeta";
@@ -43,6 +32,9 @@
   import CloseButton from "./Elements/CloseButton.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { checkUserInput, userName } from "$lib/func/user";
+  import { uploader } from "$lib/stores/globalRunes.svelte";
+  import { filesUpload } from "$lib/func/upload";
+  import UploaderSelect from "./Elements/UploaderSelect.svelte";
 
   // ----------------------------------------
   // Component Props
@@ -118,9 +110,6 @@
     }
   });
 
-  // Stores
-  const selectedUploader: Writable<string> = writable();
-
   // Geohash effect
   $effect(() => {
     if (geohash) {
@@ -135,12 +124,6 @@
     }
   });
 
-  // Uploader subscription
-  selectedUploader.subscribe((value) => {
-    if (value) {
-      $uploader = value;
-    }
-  });
   $effect(() => {
     if (textarea) {
       untrack(async () => {
@@ -444,9 +427,7 @@
     >
       <Quote size="20" class="stroke-magnum-300 " />
     </button>
-
-    <UploaderSelect bind:selectedUploader={$selectedUploader} />
-
+    <UploaderSelect />
     <MediaPicker
       class="button"
       bind:files
