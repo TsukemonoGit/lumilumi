@@ -54,7 +54,7 @@ export const nip50relays = [
 export const nip96MediaUploader = [
   "https://nostrcheck.me",
   "https://nostr.build",
-  //"https://void.cat",//死んでる blossomに移行したのかも
+  //"https://void.cat",//死んでる blossomに移行したのかも https://nostr.download/ らしい
   "https://files.sovbit.host",
   "https://nostpic.com",
   "https://yabu.me",
