@@ -1,8 +1,9 @@
-import { initSettings } from "$lib/func/constants";
+import { initSettings, initUploaderOption } from "$lib/func/constants";
 import {
   timelineFilterInit,
   type LumiSetting,
   type TimelineFilter,
+  type UploaderOption,
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 import type { ConnectionState } from "rx-nostr";
@@ -37,6 +38,7 @@ export const authRelay = createCustomStore<string[]>([]);
 
 export const bookmark10003 = createCustomStore<Nostr.Event | null>(null);
 
+export const uploader = createCustomStore<UploaderOption>(initUploaderOption);
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数

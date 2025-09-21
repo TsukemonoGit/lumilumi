@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { nowProgress, toastSettings, uploader } from "$lib/stores/stores";
+  import { nowProgress, toastSettings } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
 
-  import { getQueryRelays, setTheme } from "$lib/func/settings";
+  import { getQueryRelays } from "$lib/func/settings";
   import type { EventPacket, DefaultRelayConfig } from "rx-nostr";
   import {
     timelineFilterInit,
@@ -13,6 +13,7 @@
     type Kind30078LumiSettingObj,
     type LumiSetting,
     type Theme,
+    type UploaderOption,
   } from "$lib/types";
   import { now } from "rx-nostr/src";
   import type { EventParameters } from "nostr-typedef";
@@ -25,6 +26,7 @@
     lumiSetting,
     showBanner,
     timelineFilter,
+    uploader,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { debugError, debugInfo } from "../Debug/debug";
@@ -312,9 +314,24 @@
     }
 
     if (loadData.uploader) {
-      $uploader = loadData.uploader;
       if (loadData.uploader) {
-        localStorage?.setItem(STORAGE_KEYS.UPLOADER, loadData.uploader);
+        // loadData.uploaderの型がstringかどうかをチェック
+        if (typeof loadData.uploader === "string") {
+          uploader.set({
+            type: "nip96",
+            address: loadData.uploader,
+          } as UploaderOption);
+        } else {
+          // string型でない場合
+          uploader.set(loadData.uploader as UploaderOption);
+        }
+      }
+
+      if (loadData.uploader) {
+        localStorage?.setItem(
+          STORAGE_KEYS.UPLOADER,
+          JSON.stringify(loadData.uploader)
+        );
       }
     }
     if (loadData.lumiSetting) {

@@ -4,13 +4,12 @@
   import { pwaAssetsHead } from "virtual:pwa-assets/head";
 
   import Header from "./Header.svelte";
-  import { onMount, tick, untrack, type Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import { waitNostr } from "nip07-awaiter";
   import {
     app,
     nowProgress,
     queryClient,
-    uploader,
     viewMediaModal,
     ogDescription,
     ogTitle,
@@ -34,13 +33,13 @@
   import { afterNavigate } from "$app/navigation";
   import NostrMain from "$lib/components/renderSnippets/nostr/NostrMain.svelte";
   import SetDefaultRelays from "$lib/components/renderSnippets/nostr/relay/SetDefaultRelays.svelte";
+  import { uploader } from "$lib/stores/globalRunes.svelte";
 
   import workerUrl from "$lib/worker?worker&url";
   import {
     createNoopClient,
     createVerificationServiceClient,
   } from "rx-nostr-crypto";
-  import { mediaUploader } from "$lib/func/constants";
   import MediaDisplay from "$lib/components/Elements/MediaDisplay.svelte";
 
   import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
@@ -72,6 +71,7 @@
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
+  import type { UploaderOption } from "$lib/types";
 
   let { data, children } = $props<{
     data:
@@ -140,9 +140,16 @@
         initThemeSettings();
       } catch (error) {}
       try {
-        const tmp = localStorage.getItem(STORAGE_KEYS.UPLOADER);
-
-        $uploader = tmp ?? mediaUploader[0];
+        // 初期値読み込み
+        const stored = localStorage.getItem(STORAGE_KEYS.UPLOADER);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as UploaderOption;
+            uploader.set(parsed);
+          } catch {
+            uploader.set({ type: "nip96", address: stored } as UploaderOption);
+          }
+        }
 
         const banner: boolean =
           localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";

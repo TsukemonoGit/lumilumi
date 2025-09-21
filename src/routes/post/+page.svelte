@@ -1,22 +1,25 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { delay, filesUpload } from "$lib/func/util";
+  import { delay } from "$lib/func/util";
   import {
     additionalPostOptions,
     nowProgress,
     postWindowOpen,
-    uploader,
   } from "$lib/stores/stores";
   import type { LumiSetting } from "$lib/types";
   import { onMount } from "svelte";
-  import { mediaUploader } from "$lib/func/constants";
   import { page } from "$app/state";
   import { convertMetaTags } from "$lib/func/imeta";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    loginUser,
+    lumiSetting,
+    uploader,
+  } from "$lib/stores/globalRunes.svelte";
   import { beforeNavigate } from "$app/navigation";
   import { waitNostr } from "nip07-awaiter";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { filesUpload } from "$lib/func/upload";
 
   let tags: string[][] = [];
   let signPubkey: string | undefined = $state();
@@ -38,12 +41,6 @@
       console.log(error);
     }
 
-    let savedUploader = localStorage.getItem(STORAGE_KEYS.UPLOADER);
-    if (!savedUploader) {
-      $uploader = mediaUploader[0];
-    } else {
-      $uploader = savedUploader;
-    }
     if (!loginUser.get()) {
       const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pubkey) {

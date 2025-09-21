@@ -2,10 +2,10 @@
   import MediaPicker from "$lib/components/Elements/MediaPicker.svelte";
   import UploaderSelect from "$lib/components/Elements/UploaderSelect.svelte";
   import type { FileUploadResponse } from "$lib/func/nip96";
-  import { filesUpload } from "$lib/func/util";
-  import { nowProgress, uploader } from "$lib/stores/stores";
+  import { filesUpload } from "$lib/func/upload";
+  import { uploader } from "$lib/stores/globalRunes.svelte";
 
-  import { writable, type Writable } from "svelte/store";
+  import { nowProgress } from "$lib/stores/stores";
 
   interface Props {
     inputText: string | undefined;
@@ -13,14 +13,9 @@
 
   let { inputText = $bindable() }: Props = $props();
 
-  const selectedUploader: Writable<string> = writable();
   let files: FileList | undefined = $state();
   let fileInput: HTMLInputElement | undefined = $state();
-  selectedUploader.subscribe((value) => {
-    if (value) {
-      $uploader = value;
-    }
-  });
+
   // アップロードキャンセル用のコントローラーを作成
   let uploadAbortController: AbortController | null = null;
 
@@ -32,7 +27,7 @@
   };
 
   const handleFileUpload = async (fileList: FileList) => {
-    if (!fileList || fileList.length <= 0 || !$uploader) return;
+    if (!fileList || fileList.length <= 0 || !uploader.get()) return;
     $nowProgress = true;
 
     // 既存のアップロードがある場合はキャンセルする
@@ -73,7 +68,7 @@
 </script>
 
 <div class="flex w-60 max-w-full gap-1">
-  <UploaderSelect bind:selectedUploader={$selectedUploader} /><MediaPicker
+  <UploaderSelect /><MediaPicker
     bind:files
     bind:fileInput
     onchange={onChangeHandler}

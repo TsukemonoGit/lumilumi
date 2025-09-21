@@ -1,54 +1,52 @@
 <script lang="ts">
-  import { mediaUploader } from "$lib/func/constants";
-  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import { uploader } from "$lib/stores/stores";
   import { createSelect, melt } from "@melt-ui/svelte";
-  import { Check, ChevronDown } from "lucide-svelte";
   import { fade } from "svelte/transition";
+  import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import {
+    nip96MediaUploader,
+    blossomMediaUploader,
+  } from "$lib/func/constants";
+  import { Check, ChevronDown } from "lucide-svelte";
+  import type { UploaderOption, UploaderType } from "$lib/types";
 
-  interface Props {
-    selectedUploader: string;
-  }
+  import { uploader } from "$lib/stores/globalRunes.svelte";
 
-  let { selectedUploader = $bindable() }: Props = $props();
-
-  const options = mediaUploader.map((url, index) => ({
-    value: url,
-    label: getHostname(url),
-  }));
-
-  // console.log(defaultValue);
-  //console.log(options);
-
-  function getHostname(url: string): string {
+  function getHostname(url: string) {
     try {
       return new URL(url).hostname;
-    } catch (error) {
-      console.error(`Invalid URL: ${url}`);
-      return "Invalid URL";
+    } catch {
+      return url;
     }
   }
 
-  const {
-    elements: { trigger, menu, option },
-    states: { selected, selectedLabel, open },
-    helpers: { isSelected },
-  } = createSelect<string>({
-    forceVisible: true,
+  const groupedOptions: Record<UploaderType, UploaderOption[]> = {
+    nip96: nip96MediaUploader.map((url) => ({ type: "nip96", address: url })),
+    blossom: blossomMediaUploader.map((url) => ({
+      type: "blossom",
+      address: url,
+    })),
+  };
 
+  const {
+    elements: { trigger, menu, option, group, groupLabel, label },
+    states: { selectedLabel, open },
+    helpers: { isSelected },
+  } = createSelect<UploaderOption>({
+    defaultSelected: { value: $uploader },
+    forceVisible: true,
     positioning: {
       placement: "bottom",
       fitViewport: true,
       sameWidth: true,
     },
+    onSelectedChange: ({ curr, next }) => {
+      if (next?.value) {
+        $uploader = next.value;
+        localStorage.setItem(STORAGE_KEYS.UPLOADER, JSON.stringify(next.value));
+      }
+      return next; // ChangeFn なので next を返す
+    },
   });
-  //console.log($uploader);
-  const handleClickSelect = (value: string) => {
-    if (value) {
-      selectedUploader = value;
-      localStorage?.setItem(STORAGE_KEYS.UPLOADER, value);
-    }
-  };
 </script>
 
 <div class="flex flex-col gap-1 w-full">
@@ -56,13 +54,14 @@
     class="flex h-9 items-center justify-between rounded-lg bg-zinc-900 px-3 py-2 border border-magnum-500
     text-magnum-300 shadow transition-opacity hover:opacity-90"
     use:melt={$trigger}
-    aria-label="Food"
+    aria-label="Uploader"
   >
-    {($selected?.label ?? $uploader !== undefined)
-      ? getHostname($uploader ?? "")
-      : options[0].label}
+    {$uploader.address
+      ? `[${$uploader.type}] ${getHostname($uploader.address)}`
+      : "Select an uploader"}
     <ChevronDown class="size-5" />
   </button>
+
   {#if $open}
     <div
       class="z-[60] flex max-h-[300px] flex-col
@@ -71,20 +70,32 @@
       use:melt={$menu}
       transition:fade={{ duration: 150 }}
     >
-      {#each options as item}
-        <div
-          onm-click={() => handleClickSelect(item.value)}
-          class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-100
-          hover:bg-magnum-100 focus:z-10
-          focus:text-magnum-700
-          data-[highlighted]:bg-magnum-500/25 data-[highlighted]:text-neutral-100
-          data-[disabled]:opacity-50"
-          use:melt={$option({ value: item.value })}
-        >
-          <div class="check {$isSelected(item.value) ? 'block' : 'hidden'}">
-            <Check class="size-4" />
+      {#each Object.entries(groupedOptions) as [key, arr]}
+        <div use:melt={$group(key)}>
+          <div
+            class="py-1 pl-4 pr-4 font-semibold capitalize text-neutral-100"
+            use:melt={$groupLabel(key)}
+          >
+            {key}
           </div>
-          {item.label}
+          {#each arr as item}
+            <div
+              class="relative cursor-pointer rounded-lg py-1 pl-8 pr-4 text-neutral-100
+              hover:bg-magnum-100 focus:z-10
+              focus:text-magnum-700
+              data-[highlighted]:bg-magnum-500/25 data-[highlighted]:text-neutral-100
+              data-[disabled]:opacity-50"
+              use:melt={$option({
+                value: item,
+                label: `[${item.type}] ${getHostname(item.address)}`,
+              })}
+            >
+              <div class="check {$isSelected(item) ? 'block' : 'hidden'}">
+                <Check class="size-4" />
+              </div>
+              {getHostname(item.address)}
+            </div>
+          {/each}
         </div>
       {/each}
     </div>

@@ -66,8 +66,6 @@ export const nowProgress = writable<boolean>(false);
 //export const tieMapStore = writable<Map<string, Set<string>>>();
 export const [tie, tieMap] = createTie();
 
-export const uploader = writable<string>();
-
 export const postWindowOpen = writable<boolean>();
 
 export const additionalPostOptions = writable<
