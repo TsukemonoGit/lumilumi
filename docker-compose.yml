@@ -7,12 +7,10 @@ services:
       dockerfile: Dockerfile
     container_name: lumilumi
     ports:
-      # ホストのポート 5173 を、コンテナのポート 5173 にマッピングする
-      - "5173:5173" 
+      - "5173:5173"
     environment:
       - NODE_ENV=development
     restart: always
     volumes:
-      - '.:/app'
-      - '/app/node_modules'
+      - '.:/app'  # ホストのコードをマウント
     command: sh -c "npm install && npm run dev -- --host"

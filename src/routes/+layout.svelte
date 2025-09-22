@@ -290,7 +290,6 @@
     src="https://cdn.jsdelivr.net/npm/makibishi-component@0.2.0/dist/makibishi-component.js"
   ></script> -->
 </svelte:head>
-
 <Popstate />
 <QueryClientProvider client={queryClient}>
   <NostrMain>
