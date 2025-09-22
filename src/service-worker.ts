@@ -1,4 +1,4 @@
-//my-sw
+//service-worker
 /// <reference lib="WebWorker" />
 /// <reference types="vite/client" />
 /// <reference no-default-lib="true"/>
