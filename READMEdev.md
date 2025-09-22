@@ -4,18 +4,20 @@
 
 #### 1\. 前提条件
 
-- **Docker** と **Docker Compose** がインストールされていること。
+- **Docker Desktop**がインストールされていること。Docker Desktop には、Docker Compose v2 が含まれています。
 
 #### 2\. 開発環境の起動
 
 プロジェクトのルートディレクトリに移動し、以下のコマンドを実行します。
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 - **`--build`** は、Dockerfile に変更があった場合に、イメージを再構築するために使用します。初回起動時にも必要です。
 - このコマンドにより、コンテナがバックグラウンドで起動し、ポート`3000`がホストマシンに公開されます。
+
+---
 
 #### 3\. ソースコードの編集
 
@@ -23,14 +25,16 @@ docker-compose up --build
 
 `docker-compose.yml`で設定されたボリュームマウントにより、ホストの編集内容がコンテナに同期されます。
 
+---
+
 #### 4\. その他の便利なコマンド
 
 - **コンテナを停止する**:
   ```bash
-  docker-compose down
+  docker compose down
   ```
 - **コンテナ内のシェルに入る**:
   ```bash
-  docker-compose exec lumilumi sh
+  docker compose exec lumilumi sh
   ```
   これにより、コンテナ内部で`npm install`やその他のコマンドを実行できます。
