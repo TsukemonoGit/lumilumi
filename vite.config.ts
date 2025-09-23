@@ -9,6 +9,9 @@ export default defineConfig({
     headers: {
       "Content-Security-Policy": "worker-src 'self'; script-src 'self';",
     },
+    watch: {
+      usePolling: true, // ボリューム越しでも変更を検知
+    },
   },
   plugins: [
     svelteTesting(),
@@ -17,7 +20,7 @@ export default defineConfig({
       // サービスワーカーの戦略を指定
       strategies: "injectManifest", // ここでサービスワーカーを生成する設定
       srcDir: "./src",
-      filename: "my-sw.ts", // 自作のサービスワーカーのファイル名を指定
+      filename: "service-worker.ts", // 自作のサービスワーカーのファイル名を指定
       scope: "/",
       // サービスワーカーの登録に関連する設定
       injectRegister: "auto", // サービスワーカーを自動的にインジェクト

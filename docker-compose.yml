@@ -1,0 +1,12 @@
+services:
+  lumilumi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lumilumi
+    ports:
+      - "5173:5173"
+    tty: true
+    environment:
+      PORT: 5173
+      HOST: 0.0.0.0

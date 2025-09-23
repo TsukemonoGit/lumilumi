@@ -423,7 +423,6 @@
         class={onWarning ? "stroke-magnum-500  " : "stroke-magnum-300"}
       />
     </button>
-
     <button
       aria-label="open name list"
       onclick={handleClickQuote}
