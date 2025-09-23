@@ -9,6 +9,9 @@ export default defineConfig({
     headers: {
       "Content-Security-Policy": "worker-src 'self'; script-src 'self';",
     },
+    watch: {
+      usePolling: true, // ボリューム越しでも変更を検知
+    },
   },
   plugins: [
     svelteTesting(),
