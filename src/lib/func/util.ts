@@ -479,13 +479,14 @@ export const nip19NoteRegex =
 
 //   return encodeURIComponent(finalText);
 // };
-
-export const translateText = (text: string) => {
-  const replacedText = text
+export const replaceText = (text: string) => {
+  return text
     .replace(nip19UserRegex, "[👤]")
     .replace(nip19NoteRegex, "[🗒️]")
     .replace(urlRegex, "[🔗]");
-  return encodeURIComponent(replacedText);
+};
+export const translateText = (text: string) => {
+  return encodeURIComponent(replaceText(text));
 };
 
 export function formatToEventPacket(
