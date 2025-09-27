@@ -1,7 +1,7 @@
 <script lang="ts">
   import * as nip19 from "nostr-tools/nip19";
 
-  import { parseNaddr } from "$lib/func/util";
+  import { parseNaddr, replaceText } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
@@ -87,10 +87,14 @@
       </div>
     {/snippet}
     {#snippet content({ data: text })}
-      <div class="mx-2 text-sm">
+      {@const replacedText = replaceText(text.content)}
+      {replacedText.length < contentLen
+        ? replacedText
+        : `${replacedText.slice(0, contentLen)}...`}
+      <!-- <div class="mx-2 text-sm">
         <Content
           event={{
-            ...event,
+            ...text,
             content:
               text.content.length < contentLen
                 ? (text.content ?? "")
@@ -101,7 +105,7 @@
           repostable={false}
           isShowClientTag={false}
         />
-      </div>
+      </div> -->
     {/snippet}
   </Text>
 {:else if tag[0] === "a"}
@@ -126,7 +130,11 @@
       {/snippet}
 
       {#snippet children({ event })}
-        <Content
+        {@const replacedText = replaceText(event.content)}
+        {replacedText.length < contentLen
+          ? replacedText
+          : `${replacedText.slice(0, contentLen)}...`}
+        <!--  <Content
           event={{
             ...event,
             content:
@@ -137,7 +145,7 @@
           displayMenu={false}
           depth={0}
           repostable={false}
-        />
+        /> -->
       {/snippet}
     </LatestEvent>
   {/if}
