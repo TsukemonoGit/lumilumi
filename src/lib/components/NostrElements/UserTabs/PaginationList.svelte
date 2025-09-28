@@ -3,14 +3,16 @@
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { onMount, type Snippet } from "svelte";
+  import EllipsisMenu from "../kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
   interface Props {
+    ev?: Nostr.Event;
     list: string[] | Nostr.Event[];
     perPage?: number;
     children?: Snippet<[string | Nostr.Event, number]>;
   }
 
-  let { list, children, perPage = 20 }: Props = $props();
+  let { ev, list, children, perPage = 20 }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
 
   onMount(() => {
@@ -58,7 +60,10 @@
     aria-label="pagination"
     use:melt={$root}
   >
-    <div class="flex items-center gap-2" style="overflow-anchor: auto;">
+    <div
+      class="flex items-center gap-2 relative w-full justify-center"
+      style="overflow-anchor: auto;"
+    >
       <button
         class="grid h-8 items-center rounded-md bg-neutral-800 px-3 text-sm text-magnum-100 shadow-sm
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-100
@@ -82,7 +87,9 @@
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-100
     data-[selected]:text-neutral-800"
         use:melt={$nextButton}><ChevronRight class="size-4" /></button
-      >
+      >{#if ev}<div class="absolute float-end right-0">
+          <EllipsisMenu iconSize={20} note={ev} />
+        </div>{/if}
     </div>
     <p class="text-center text-magnum-100">
       {$range.start} - {$range.end}

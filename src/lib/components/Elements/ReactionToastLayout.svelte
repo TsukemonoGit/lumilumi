@@ -6,10 +6,12 @@
   import ReactionToastContent from "../NostrElements/kindEvents/ReactionToastContent.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
   import { extractKind9734, extractAmount } from "$lib/func/zap";
-  import Content from "../NostrElements/content/Content.svelte";
+
+  import { replaceText } from "$lib/func/util";
   interface Props {
     event: Nostr.Event;
   }
+  const contentLen = 40;
 
   let { event }: Props = $props();
 
@@ -64,7 +66,11 @@
       />
     </div>
     <UserName pubhex={event.pubkey} />
-    <div class="px-2 w-full">
+    {@const replacedText = replaceText(event.content)}
+    {replacedText.length < contentLen
+      ? replacedText
+      : `${replacedText.slice(0, contentLen)}...`}
+    <!-- <div class="px-2 w-full">
       <Content
         event={{
           ...event,
@@ -77,7 +83,7 @@
         depth={0}
         repostable={false}
       />
-    </div>
+    </div> -->
   {/if}
 {/if}
 
