@@ -64,7 +64,7 @@
     TriggerIcon?: any;
     iconSize?: number;
     iconClass?: string;
-    deleted: boolean;
+    deleted?: boolean;
     isBookmarked?: boolean;
   }
 

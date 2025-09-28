@@ -9,7 +9,6 @@
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
-  import Content from "../content/Content.svelte";
   import { nip33Regex } from "$lib/func/regex";
 
   const contentLen = 40;

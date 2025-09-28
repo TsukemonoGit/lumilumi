@@ -43,6 +43,7 @@
           tag.length > 1
       )}
       <PaginationList
+        ev={event}
         list={filteredList
           .map((tag) => tag[1])
           .slice()
