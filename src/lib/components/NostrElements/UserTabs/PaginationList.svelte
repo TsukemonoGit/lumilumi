@@ -3,14 +3,16 @@
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { onMount, type Snippet } from "svelte";
+  import EllipsisMenu from "../kindEvents/NoteActionButtuns/EllipsisMenu.svelte";
 
   interface Props {
+    ev?: Nostr.Event;
     list: string[] | Nostr.Event[];
     perPage?: number;
     children?: Snippet<[string | Nostr.Event, number]>;
   }
 
-  let { list, children, perPage = 20 }: Props = $props();
+  let { ev, list, children, perPage = 20 }: Props = $props();
   let paginationElement: Element | null | undefined = $state();
 
   onMount(() => {
@@ -82,7 +84,7 @@
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-100
     data-[selected]:text-neutral-800"
         use:melt={$nextButton}><ChevronRight class="size-4" /></button
-      >
+      >{#if ev}<EllipsisMenu iconSize={20} note={ev} />{/if}
     </div>
     <p class="text-center text-magnum-100">
       {$range.start} - {$range.end}
