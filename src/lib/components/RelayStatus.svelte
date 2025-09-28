@@ -89,7 +89,7 @@
 
   {#snippet popoverContent()}
     <div class="max-h-80 overflow-x-auto max-w-80">
-      <div>
+      <div class="mr-2">
         <div class="text-magnum-200 font-bold text-lg mt-2">read</div>
         <ul>
           {#each readRelays as relay, index}
@@ -100,9 +100,9 @@
               >
               {#if relayStateMap.get().get(relayUrl) === "error"}<button
                   onclick={() => handleClickReconnect(relayUrl)}
-                  class="rounded-full bg-neutral-100 hover:opacity-75 active:opacity-50 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
+                  class="rounded-full hover:opacity-75 active:opacity-50 bg-magnum-600 text-magnum-200 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
-                  ><RefreshCcw class="text-magnum-700 " size={16} /></button
+                  ><RefreshCcw size={16} /></button
                 >{/if}
             </li>
           {/each}
