@@ -60,7 +60,10 @@
     aria-label="pagination"
     use:melt={$root}
   >
-    <div class="flex items-center gap-2" style="overflow-anchor: auto;">
+    <div
+      class="flex items-center gap-2 relative w-full justify-center"
+      style="overflow-anchor: auto;"
+    >
       <button
         class="grid h-8 items-center rounded-md bg-neutral-800 px-3 text-sm text-magnum-100 shadow-sm
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-100
@@ -84,7 +87,9 @@
       hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-50 data-[selected]:bg-magnum-100
     data-[selected]:text-neutral-800"
         use:melt={$nextButton}><ChevronRight class="size-4" /></button
-      >{#if ev}<EllipsisMenu iconSize={20} note={ev} />{/if}
+      >{#if ev}<div class="absolute float-end right-0">
+          <EllipsisMenu iconSize={20} note={ev} />
+        </div>{/if}
     </div>
     <p class="text-center text-magnum-100">
       {$range.start} - {$range.end}
