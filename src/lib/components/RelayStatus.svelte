@@ -97,12 +97,12 @@
             <li class="flex align-middle items-center break-all">
               <RelayStatusColor relay={relay.url} /><span class="inline w-60"
                 >{relayUrl}</span
-              >
-              {#if relayStateMap.get().get(relayUrl) === "error"}<button
+              >{#if relayStateMap.get().get(relayUrl) === "error"}
+                <button
                   onclick={() => handleClickReconnect(relayUrl)}
-                  class="rounded-full hover:opacity-75 active:opacity-50 bg-magnum-600 text-magnum-200 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
+                  class=" hover:opacity-75 active:opacity-50 text-magnum-400 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
-                  ><RefreshCcw size={16} /></button
+                  ><RefreshCcw size={16} strokeWidth={2.5} /></button
                 >{/if}
             </li>
           {/each}
