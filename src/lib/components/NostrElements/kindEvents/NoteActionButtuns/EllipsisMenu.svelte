@@ -521,6 +521,7 @@
               pre = null;
             }
           }
+          const relayHint = getRelaysById(note.id)[0];
           const tags = (): string[][] => {
             const [tagType, tagValue] = replaceable
               ? [
@@ -533,7 +534,7 @@
 
             return isBookmarked
               ? existing.filter((t) => !(t[0] === tagType && t[1] === tagValue))
-              : [...existing, [tagType, tagValue]];
+              : [...existing, [tagType, tagValue, relayHint]];
           };
           const eventParam: Nostr.EventParameters = {
             kind: 10003,
