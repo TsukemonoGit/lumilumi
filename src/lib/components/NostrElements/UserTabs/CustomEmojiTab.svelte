@@ -35,11 +35,11 @@
     {#if event}
       {@const filteredList = event.tags
         .filter(
-          (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1
+          (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1,
         )
         .slice()
         .reverse()}
-      <PaginationList list={filteredList.map((tag) => tag[1])}>
+      <PaginationList ev={event} list={filteredList.map((tag) => tag[1])}>
         {#snippet children(li, index)}
           {@const id = li as string}
           {#if filteredList[index][0] === "emoji"}

@@ -40,9 +40,10 @@
             tag[0] === "t" ||
             tag[0] === "r" ||
             tag[0] === "a") &&
-          tag.length > 1
+          tag.length > 1,
       )}
       <PaginationList
+        ev={event}
         list={filteredList
           .map((tag) => tag[1])
           .slice()

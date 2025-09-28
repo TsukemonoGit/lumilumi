@@ -10,3 +10,6 @@ services:
     environment:
       PORT: 5173
       HOST: 0.0.0.0
+    volumes:
+      - .:/app  # ローカルとコンテナを同期
+      - /app/node_modules  # コンテナの node_modules を保持

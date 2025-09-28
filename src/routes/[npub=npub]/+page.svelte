@@ -170,7 +170,7 @@
         ["nip05", data.pubkey, data.nip05Address.toLowerCase()],
         {
           result: true,
-        }
+        },
       );
     }
   }
@@ -605,6 +605,7 @@
               {#snippet content({ contacts, status })}
                 {#if contacts}
                   <PaginationList
+                    ev={contacts}
                     list={contacts.tags
                       .filter((tag) => tag[0] === "p" && tag.length > 1)
                       .map((tag) => tag[1])

@@ -64,7 +64,7 @@
     TriggerIcon?: any;
     iconSize?: number;
     iconClass?: string;
-    deleted: boolean;
+    deleted?: boolean;
     isBookmarked?: boolean;
   }
 
@@ -81,7 +81,7 @@
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -368,7 +368,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? "")
+            replaceable ? (naddr ?? "") : (nevent ?? ""),
           );
           $toastSettings = {
             title: "Success",
@@ -512,7 +512,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000
+              2000,
             );
 
             if (bookmarkEvent.length > 0) {
@@ -521,13 +521,16 @@
               pre = null;
             }
           }
+          const relayHint = getRelaysById(note.id);
+
           const tags = (): string[][] => {
             const [tagType, tagValue] = replaceable
               ? [
                   "a",
                   `${note.kind}:${note.pubkey}:${note.tags.find((t) => t[0] === "d")?.[1] || ""}`,
+                  relayHint[0] || "",
                 ]
-              : ["e", note.id];
+              : ["e", note.id, relayHint[0] || ""];
 
             const existing = pre?.tags || [];
 
