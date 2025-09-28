@@ -7,6 +7,7 @@
   import UserName from "../NostrElements/user/UserName.svelte";
   import { extractKind9734, extractAmount } from "$lib/func/zap";
   import Content from "../NostrElements/content/Content.svelte";
+  import { replaceText } from "$lib/func/util";
   interface Props {
     event: Nostr.Event;
   }
@@ -65,18 +66,7 @@
     </div>
     <UserName pubhex={event.pubkey} />
     <div class="px-2 w-full">
-      <Content
-        event={{
-          ...event,
-          content:
-            event.content && event.content.length > 40
-              ? `${event.content.slice(0, 40)}...`
-              : (event.content ?? ""),
-        }}
-        displayMenu={false}
-        depth={0}
-        repostable={false}
-      />
+      {@const replacedText = replaceText(event.content)}
     </div>
   {/if}
 {/if}

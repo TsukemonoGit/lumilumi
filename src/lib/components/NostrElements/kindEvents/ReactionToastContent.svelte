@@ -91,21 +91,6 @@
       {replacedText.length < contentLen
         ? replacedText
         : `${replacedText.slice(0, contentLen)}...`}
-      <!-- <div class="mx-2 text-sm">
-        <Content
-          event={{
-            ...text,
-            content:
-              text.content.length < contentLen
-                ? (text.content ?? "")
-                : `${text.content.slice(0, contentLen)}...`,
-          }}
-          displayMenu={false}
-          depth={0}
-          repostable={false}
-          isShowClientTag={false}
-        />
-      </div> -->
     {/snippet}
   </Text>
 {:else if tag[0] === "a"}
@@ -134,18 +119,6 @@
         {replacedText.length < contentLen
           ? replacedText
           : `${replacedText.slice(0, contentLen)}...`}
-        <!--  <Content
-          event={{
-            ...event,
-            content:
-              event.content.length < contentLen
-                ? (event.content ?? "")
-                : `${event.content.slice(0, contentLen)}...`,
-          }}
-          displayMenu={false}
-          depth={0}
-          repostable={false}
-        /> -->
       {/snippet}
     </LatestEvent>
   {/if}

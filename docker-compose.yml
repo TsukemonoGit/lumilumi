@@ -7,9 +7,15 @@ services:
     ports:
       - "5173:5173"
     tty: true
-    environment:
-      PORT: 5173
-      HOST: 0.0.0.0
+    # HOSTはDockerfileで設定済みなので不要。PORTもアプリのデフォルトが5173なら不要。
+    # environment:
+    #   PORT: 5173
+    #   HOST: 0.0.0.0 
+    
+    # 開発用: ホストのコードをマウントし、node_modulesはコンテナ内に隔離
     volumes:
-      - .:/app  # ローカルとコンテナを同期
-      - /app/node_modules  # コンテナの node_modules を保持
+      - ./:/app 
+      - /app/node_modules # コンテナ内のnode_modulesをホストと切り離す
+
+    # コンテナ起動時に開発サーバーを実行
+    # command: npm run dev # アプリケーションの実行コマンドに変更してください

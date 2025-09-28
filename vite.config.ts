@@ -10,7 +10,15 @@ export default defineConfig({
       "Content-Security-Policy": "worker-src 'self'; script-src 'self';",
     },
     watch: {
-      usePolling: true, // ボリューム越しでも変更を検知
+      usePolling: true, // ボリューム越しの変更を確実に検知
+      // 監視対象を限定
+      ignored: [
+        "node_modules/**",
+        "prerendered/**",
+        "client/assets/**",
+        ".svelte-kit/**",
+        ".git/**"
+      ],
     },
   },
   plugins: [
@@ -88,7 +96,7 @@ export default defineConfig({
       },
 
       devOptions: {
-        enabled: true,
+        enabled: false,
         suppressWarnings: process.env.SUPPRESS_WARNING === "true",
         type: "module",
       },
