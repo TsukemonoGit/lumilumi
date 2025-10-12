@@ -31,7 +31,7 @@
       <p>nodata</p>
     </div>
   {/snippet}
-  {#snippet children({ event, status })}
+  {#snippet success({ event, status })}
     {#if event}
       {@const filteredList = event.tags
         .filter(
@@ -94,7 +94,7 @@
                   >not found {filteredList[index]}</EmptyCard
                 >
               {/snippet}
-              {#snippet children({ event })}
+              {#snippet success({ event })}
                 <Metadata
                   queryKey={["metadata", event.pubkey]}
                   pubkey={event.pubkey}
