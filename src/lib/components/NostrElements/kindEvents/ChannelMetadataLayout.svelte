@@ -20,6 +20,7 @@
     event: Nostr.Event; //40か41
 
     clickAction: boolean;
+    mini?: boolean;
   }
 
   let {
@@ -27,6 +28,7 @@
     handleClickToChannel = undefined,
     linkButtonTitle,
     event,
+    mini,
 
     clickAction,
   }: Props = $props();
@@ -52,6 +54,7 @@
 
 {#if channelData}
   <ListCardComponent
+    {mini}
     {clickAction}
     {linkButtonTitle}
     {handleClickToChannel}

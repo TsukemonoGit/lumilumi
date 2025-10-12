@@ -18,6 +18,15 @@
 </script>
 
 <Text queryKey={["timeline", id]} {id} {onChange}>
+  {#snippet loading()}
+    {@render channelMetadata?.(null)}
+  {/snippet}
+  {#snippet nodata()}
+    {@render channelMetadata?.(null)}
+  {/snippet}
+  {#snippet error()}
+    {@render channelMetadata?.(null)}
+  {/snippet}
   {#snippet content({ data: kind40Event })}
     <LatestEvent
       queryKey={["channel", "kind41", id]}
