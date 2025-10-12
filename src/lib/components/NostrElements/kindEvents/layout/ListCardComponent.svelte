@@ -15,6 +15,7 @@
     };
     userAvatar: Snippet;
     menu: Snippet;
+    mini?: boolean;
   }
 
   let {
@@ -25,6 +26,7 @@
     userAvatar,
     listProps,
     menu,
+    mini,
   }: Props = $props();
 </script>
 
@@ -49,7 +51,7 @@
         </div>
 
         <div class="text-sm text-magnum-100 max-w-full">
-          {#if clickAction}
+          {#if clickAction || mini}
             <div
               class="line-clamp-4"
               style="white-space: pre-wrap; word-break: break-word;"

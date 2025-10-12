@@ -23,6 +23,9 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import CloseButton from "$lib/components/Elements/CloseButton.svelte";
+  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "$lib/func/encode";
+  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -230,11 +233,29 @@
           {#if includeHeyaId}
             <div class="p-3 bg-red-900/20 rounded-lg border border-red-500">
               <!-- 追加または削除しようとしている部屋ID -->
-              <ChannelMetadata
-                id={heyaId}
-                clickAction={false}
-                linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
-              />
+              <ChannelMetadata id={heyaId}>
+                {#snippet channelMetadata(event)}
+                  {#if event}
+                    <ChannelMetadataLayout
+                      mini={true}
+                      handleClickToChannel={() => {}}
+                      id={heyaId}
+                      linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
+                      clickAction={false}
+                      {event}
+                    />
+                  {:else}
+                    <EmptyListCard
+                      handleClickToChannel={() => {}}
+                      linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
+                      id={heyaId}
+                    >
+                      {encodetoNote(heyaId)}
+                    </EmptyListCard>
+                  {/if}
+                {/snippet}
+              </ChannelMetadata>
+
               <p class="mt-4">{$_("channel.menu.removeConfirm")}</p>
               <button
                 class="mt-2 bg-red-600/90 hover:bg-red-700/90 text-white font-medium py-2 px-4 rounded-md"
@@ -246,11 +267,28 @@
           {:else}
             <div class="p-3 bg-green-900/30 rounded-lg border border-green-500">
               <!-- 追加または削除しようとしている部屋ID -->
-              <ChannelMetadata
-                id={heyaId}
-                clickAction={false}
-                linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
-              />
+              <ChannelMetadata id={heyaId}>
+                {#snippet channelMetadata(event)}
+                  {#if event}
+                    <ChannelMetadataLayout
+                      mini={true}
+                      handleClickToChannel={() => {}}
+                      id={heyaId}
+                      linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
+                      clickAction={false}
+                      {event}
+                    />
+                  {:else}
+                    <EmptyListCard
+                      handleClickToChannel={() => {}}
+                      linkButtonTitle={`/channel/${nip19.noteEncode(heyaId)}`}
+                      id={heyaId}
+                    >
+                      {encodetoNote(heyaId)}
+                    </EmptyListCard>
+                  {/if}
+                {/snippet}
+              </ChannelMetadata>
               <p class="mt-4">{$_("channel.menu.addConfirm")}</p>
               <button
                 class="mt-2 bg-green-600/90 hover:bg-green-700/90 text-white font-medium py-2 px-4 rounded-md"
@@ -274,11 +312,28 @@
               No Channel List (kind:10005)
             {:else}
               {#each kind10005.tags.filter((tag) => tag[0] === "e") as [tag, id]}
-                <ChannelMetadata
-                  clickAction={false}
-                  {id}
-                  linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-                />
+                <ChannelMetadata {id}>
+                  {#snippet channelMetadata(event)}
+                    {#if event}
+                      <ChannelMetadataLayout
+                        mini={true}
+                        handleClickToChannel={() => {}}
+                        {id}
+                        linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+                        clickAction={false}
+                        {event}
+                      />
+                    {:else}
+                      <EmptyListCard
+                        handleClickToChannel={() => {}}
+                        linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+                        {id}
+                      >
+                        {encodetoNote(id)}
+                      </EmptyListCard>
+                    {/if}
+                  {/snippet}
+                </ChannelMetadata>
               {/each}{/if}
           </div>
         </div>
