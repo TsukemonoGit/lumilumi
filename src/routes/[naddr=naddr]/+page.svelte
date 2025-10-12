@@ -73,7 +73,7 @@
         <div>nodata</div>
       {/snippet}
 
-      {#snippet content({ event })}
+      {#snippet success({ event })}
         <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
           {#snippet loading()}
             <div
