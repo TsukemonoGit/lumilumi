@@ -45,7 +45,7 @@
                     handleClickToChannel={() => handleClickToChannel(id)}
                     {id}
                     linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-                    clickAction={false}
+                    clickAction={true}
                     {event}
                   />
                 {:else}
