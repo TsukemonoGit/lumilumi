@@ -232,6 +232,7 @@
   // ----------------------------------------
   // File Upload
   // ----------------------------------------
+  // デバッグ用のエラーハンドリングを追加
   async function handleFileUpload(fileList: FileList) {
     if (!fileList || fileList.length <= 0 || !$uploader) {
       return;
@@ -244,6 +245,8 @@
     uploadAbortController = new AbortController();
 
     try {
+      // filesUpload内でエラーが発生している可能性
+      console.log("Starting file upload...", fileList);
       const uploadedURPs = await filesUpload(
         fileList,
         $uploader,
@@ -252,34 +255,54 @@
 
       const promises = uploadedURPs.map(
         async ({ status, nip94_event, url }) => {
-          if (status !== "success") {
-            $toastSettings = {
-              title: "error",
-              description: uploadedURPs[0].message,
-              color: "bg-red-400",
-            };
-            return;
-          }
-          const uploadUrl = url
-            ? url
-            : nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
-          if (!uploadUrl) return;
+          try {
+            if (status !== "success") {
+              $toastSettings = {
+                title: "error",
+                description: uploadedURPs[0].message,
+                color: "bg-red-400",
+              };
+              return;
+            }
+            const uploadUrl = url
+              ? url
+              : nip94_event?.tags.find((tag) => tag[0] === "url")?.[1];
+            if (!uploadUrl) return;
 
-          if (nip94_event) {
-            tags.push(convertMetaTags(nip94_event));
+            if (nip94_event) {
+              // convertMetaTags内でデコードエラーが発生している可能性
+              console.log("Converting meta tags...", nip94_event);
+              tags.push(convertMetaTags(nip94_event));
+            }
+            await delay(10);
+            insertTextAtCursor(uploadUrl, {
+              addSpaceBefore: true,
+              addSpaceAfter: true,
+            });
+            await delay(10);
+          } catch (innerError) {
+            console.error("Error processing individual upload:", innerError);
+            // エラーの詳細をログ出力
+            if (innerError instanceof DOMException) {
+              console.error("DOMException details:", {
+                name: innerError.name,
+                message: innerError.message,
+                code: innerError.code,
+              });
+            }
           }
-          await delay(10);
-          insertTextAtCursor(uploadUrl, {
-            addSpaceBefore: true,
-            addSpaceAfter: true,
-          });
-          await delay(10);
         }
       );
 
       await Promise.all(promises);
     } catch (error) {
-      console.log(error);
+      console.error("Upload error:", error);
+      // InvalidStateErrorの詳細を確認
+      if (error instanceof DOMException && error.name === "InvalidStateError") {
+        console.error(
+          "Image decode error - check image file format and validity"
+        );
+      }
     } finally {
       uploadAbortController = null;
     }
