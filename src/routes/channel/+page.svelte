@@ -11,6 +11,9 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import CreateChannel from "./CreateChannel.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "$lib/func/encode";
 
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
@@ -35,11 +38,27 @@
           <div
             class="text-left w-full border border-magnum-500 rounded-lg overflow-hidden"
           >
-            <ChannelMetadata
-              handleClickToChannel={() => handleClickToChannel(id)}
-              {id}
-              linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
-            />
+            <ChannelMetadata {id}>
+              {#snippet channelMetadata(event)}
+                {#if event}
+                  <ChannelMetadataLayout
+                    handleClickToChannel={() => handleClickToChannel(id)}
+                    {id}
+                    linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+                    clickAction={false}
+                    {event}
+                  />
+                {:else}
+                  <EmptyListCard
+                    handleClickToChannel={() => handleClickToChannel(id)}
+                    linkButtonTitle={`/channel/${nip19.noteEncode(id)}`}
+                    {id}
+                  >
+                    {encodetoNote(id)}
+                  </EmptyListCard>
+                {/if}
+              {/snippet}
+            </ChannelMetadata>
           </div>
         {/each}
       {/snippet}

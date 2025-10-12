@@ -98,7 +98,7 @@
         >Nodata {content ?? ""}</EmptyCard
       >
     {/snippet}
-    {#snippet children({ event })}
+    {#snippet success({ event })}
       <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
         {#snippet loading()}
           <div>

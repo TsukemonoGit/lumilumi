@@ -60,7 +60,7 @@
       />
     </div>
   {/snippet}
-  {#snippet children({ event })}
+  {#snippet success({ event })}
     <ChannelMetadataLayout
       clickAction={true}
       linkButtonTitle={`/channel/${nip19.noteEncode(note.id)}`}

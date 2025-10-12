@@ -566,7 +566,7 @@
                 </div>
               {/snippet}
 
-              {#snippet children({ event })}
+              {#snippet success({ event })}
                 {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
                   <div class=" overflow-hidden p-1">
                     <RelayCard

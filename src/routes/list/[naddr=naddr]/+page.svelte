@@ -111,7 +111,7 @@
       {#snippet nodata()}
         <div>nodata</div>
       {/snippet}
-      {#snippet children({ event })}
+      {#snippet success({ event })}
         <div class="w-full flex justify-between">
           <ListLinkCard {event} depth={0} />
         </div>

@@ -17,6 +17,9 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import type { PageData } from "./$types";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
+  import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
+  import { encodetoNote } from "$lib/func/encode";
 
   let { data }: { data: PageData } = $props();
 
@@ -84,12 +87,27 @@
 {#if view}
   <section class="w-full break-words overflow-hidden">
     <div class="text-left w-full bg-neutral-800 rounded-lg overflow-hidden p-2">
-      <ChannelMetadata
-        bind:heyaRelay
-        id={data.id}
-        linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
-        clickAction={false}
-      />
+      <ChannelMetadata bind:heyaRelay id={data.id}>
+        {#snippet channelMetadata(event)}
+          {#if event}
+            <ChannelMetadataLayout
+              handleClickToChannel={undefined}
+              id={data.id}
+              linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+              clickAction={false}
+              {event}
+            />
+          {:else}
+            <EmptyListCard
+              handleClickToChannel={undefined}
+              linkButtonTitle={`/channel/${nip19.noteEncode(data.id)}`}
+              id={data.id}
+            >
+              {encodetoNote(data.id)}
+            </EmptyListCard>
+          {/if}
+        {/snippet}
+      </ChannelMetadata>
     </div>
     {#if isMute}
       <!---->

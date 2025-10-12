@@ -28,7 +28,7 @@
     nodata?: import("svelte").Snippet;
     loading?: import("svelte").Snippet;
 
-    children?: import("svelte").Snippet<
+    success?: import("svelte").Snippet<
       [{ event: Nostr.Event; status: ReqStatus }]
     >;
     onChange?: (metadata: Nostr.Event) => void;
@@ -41,7 +41,7 @@
     error,
     loading,
     nodata,
-    children,
+    success,
     onChange,
   }: Props = $props();
 
@@ -63,7 +63,7 @@
 {:else if $status === "success" && !$data}
   {@render nodata?.()}
 {:else if $data && $data.event}
-  {@render children?.({ event: $data.event, status: $status })}
+  {@render success?.({ event: $data.event, status: $status })}
 {:else}
   {@render loading?.()}
 {/if}

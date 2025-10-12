@@ -10,6 +10,7 @@
   import { writable } from "svelte/store";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
   import { getChannelLink } from "$lib/func/channel";
+  import ChannelMetadata from "../kindEvents/ChannelMetadata.svelte";
 
   interface Props {
     heyaId: string | undefined;
@@ -55,25 +56,20 @@
     {handleSelectItem}
     buttonClass="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
   >
-    <Text queryKey={["note", heyaId]} id={heyaId}>
-      {#snippet loading()}
-        <MessagesSquare {size} class="mr-1" />kind:42
-      {/snippet}
-      {#snippet nodata()}
-        <MessagesSquare {size} class="mr-1" />kind:42
-      {/snippet}
-      {#snippet error()}
-        <MessagesSquare {size} class="mr-1" />kind:42
-      {/snippet}
-      {#snippet content({ data: text })}
-        {@const channelData = getContent(text)}
-        {#if channelData}
-          <MessagesSquare {size} class="mr-1" />{channelData.name}
+    <ChannelMetadata id={heyaId}>
+      {#snippet channelMetadata(event)}
+        {#if event}
+          {@const channelData = getContent(event)}
+          {#if channelData}
+            <MessagesSquare {size} class="mr-1" />{channelData.name}
+          {:else}
+            <MessagesSquare {size} class="mr-1" />kind:42
+          {/if}
         {:else}
           <MessagesSquare {size} class="mr-1" />kind:42
         {/if}
       {/snippet}
-    </Text>
+    </ChannelMetadata>
   </DropdownMenu>
 
   <EditChannelList bind:editChannelListOpen {heyaId} />
