@@ -1,448 +1,447 @@
 {
   "settings": {
-    "relayMenuText0": "Nostr共通のリレー設定 (Kind:10002) を使う",
-    "relayMenuText1": "固有のリレー設定を使う",
+    "relayMenuText0": "Use the Nostr common relay setting (kind: 10002)",
+    "relayMenuText1": "Use custom relay settings",
     "toast": {
-      "relayError": "リレーのリストには少なくとも1つの読み取りと書き込み可能なリレーが含まれている必要があります。",
-      "resetData": "設定がリセットされました。",
-      "pubkeyError": "公開鍵を確認してください"
+      "relayError": "The list of relays must include at least one read and one writeable relay.",
+      "resetData": "Settings have been reset.",
+      "pubkeyError": "Check the pubkey you entered"
     },
     "beforeUnload": {
-      "message": "変更された設定が保存されていません。ページを離れますか？"
+      "message": "Changed settings are not saved. Would you like to leave the page?"
     },
     "nostviewstr": {
-      "kind10002": "NostViewstr で Relaylist (kind:10002) を編集する",
-      "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する",
-      "kind10000": "NostViewstr で MuteList ( kind:10000 ) を編集する",
-      "kind30007": "NostViewstr で Mute by kind( kind:30007 ) を編集する",
-      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する",
-      "kind10001": "Pinを編集"
+      "kind10002": "Edit Relaylist (kind:10002) in NostViewstr",
+      "kind30002": "Edit Relay Sets (kind:30002) in NostViewstr",
+      "kind10000": "Edit Mute list (kind:10000) in NostViewstr",
+      "kind30007": "Edit Mute by kind (kind:30007) in NostViewstr",
+      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr",
+      "kind10001": "Edit Pin"
     },
-    "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
+    "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
-      "loadImage": "すべての画像を読み込み表示する (プロフィールのリアルタイム更新ON/OFF)",
-      "preview": "ノート作成時にプレビューを表示する",
-      "menu": "menuボタンを左側に表示する",
-      "showRelayIcon": "アイコンの下にリレー情報を表示する",
-      "showReactioninTL": "通知Toastを表示する",
-      "showUserStatus": "ユーザーステータスを表示する",
-      "banner": "右側のアカウントバナーを表示する",
-      "showKind16": "kind16(kind1以外のリポスト)を表示する",
-      "showClientTag": "TLにもクライアントタグ(via)を表示",
-      "showAllReaction": "みんなのリアクションを表示する",
-      "kind42inTL": "パブリックチャットをHomeTLに表示する",
-      "embed": "埋め込み対応したコンテンツを埋め込み表示する",
+      "loadImage": "Load and display all image (Real-time profile update ON/OFF)",
+      "preview": "Show preview when creating notes",
+      "menu": "Display the menu button on the left side.",
+      "showRelayIcon": "Relay information is displayed under the icon",
+      "showReactioninTL": "show reaction toast",
+      "showUserStatus": "show user status",
+      "banner": "Show the account banner on the right",
+      "showKind16": "Show kind16 (reposts other than kind1)",
+      "showClientTag": "Show Display client tag (via) in TL",
+      "showAllReaction": "Show everyone's reactions",
+      "kind42inTL": "Display public chats on HomeTL",
+      "embed": "Embed supported content?",
       "imageAutoExpand": {
-        "label": "画像の自動展開",
-        "all": "すべて自動展開",
-        "following": "フォローユーザーのみ自動展開",
-        "manual": "手動展開（すべてクリック）"
+        "label": "Auto-expand images",
+        "all": "Auto-expand all images",
+        "following": "Auto-expand images from following users only",
+        "manual": "Manual expand (click to view)"
       }
     },
     "post": {
-      "addClientTag": "投稿にClientタグ(via)をつける",
-      "defaultReaction": "デフォルト リアクション",
-      "picQuarity": "投稿写真品質（JPG専用）"
+      "addClientTag": "Add client tag (via) to post",
+      "defaultReaction": "Default Reaction",
+      "picQuarity": "Upload Photo Quality (JPG Only)"
     },
     "douki": {
-      "title": "データの同期"
+      "title": "Sync"
     },
-    "lastUpdated": "最終更新日時",
-    "refreshPage": "設定を保存しました。",
+    "lastUpdated": "Last Updated",
+    "refreshPage": "Settings have been updated. ",
     "emoji": {
-      "notes": "無効な文字を含む絵文字は自動で修正して登録します。ただし、有効な文字が一つも含まれない場合は除外されます。"
+      "notes": "Emojis with invalid characters are automatically corrected and registered. However, emojis containing no valid characters are excluded."
     },
-    "relay": "リロード後に変更が反映されます。",
-    "kind10002": "リレー編集",
+    "relay": "The changes will take effect after reloading.",
+    "kind10002": "Edit Relays",
     "usage": {
-      "title": "通信量に影響を与える設定: ↑高↓低"
+      "title": "Settings that affect data consumption: ↑Highest to ↓Lowest"
     },
     "save": {
-      "rewrite": "同じ名前のデータが存在します。上書きしていいですか？",
-      "new": "上記名前で新規作成していいですか？"
+      "rewrite": "A data entry with the same name already exists. Do you want to overwrite it?",
+      "new": "Do you want to create a new entry with the specified name?"
     },
     "load": {
-      "title": "設定の読み込み/保存",
-      "description": "kind:30078 ID:lumi-settings でリレーに保管します（NIP-78）",
-      "title2": "設定の読み込み/現在の設定をリレーに保存",
-      "description2": "同名のデータが存在する場合、上書きされます。"
-    }
-  },
-  "user": {
-    "following": "フォロー中",
-    "follow": "フォローする",
-    "profileEdit": "プロフィールの編集",
-    "followList": {
-      "update": "followList の 更新"
-    },
-    "petname": {
-      "petname": "ニックネーム (petname)",
-      "write": "フォローユーザーの表示名を設定できます。",
-      "edit": "ニックネーム (petname) の編集",
-      "warning": "公開情報のため、他の人が見ても問題ないものにしましょう。"
+      "title": "Load/Save Settings",
+      "description": "Stored in the relay with kind: 30078 ID: lumi-settings (NIP-78)",
+      "title2": "Load Settings / Save Current Settings to Relay",
+      "description2": "If a data entry with the same name exists, it will be overwritten."
     }
   },
   "nostviewstr": {
-    "kind10005": "NostViewstr で Public Chats (kind:10005) を編集する",
-    "kind30000": "NostViewstr で People sets (kind:30000) を編集する",
-    "kind3": "NostViewstr で Follow List ( kind:3 ) を編集する"
+    "kind10005": "Edit Public Chats (kind:10005) in Nostviewstr",
+    "kind30000": "Edit People sets (kind:30000) in Nostviewstr",
+    "kind3": "Edit Follow List (kind:3) in NostViewstr"
   },
   "post": {
-    "confirm": "投稿されていないテキストがあります。閉じますか？",
-    "nsecAlart": "警告: 入力にプライベートキー(nsec)が含まれています",
-    "placeholder": "いま どうしてる？",
-    "quote": "nostr:npub... , nostr:nevent1... ,  で ユーザー、投稿を引用できます。",
-    "hell": "30人以上にリプライを送ろうとしています。本当に送信してもよろしいですか？",
-    "delete": "本当に削除しますか？この操作は元に戻せません。"
+    "confirm": "There is unposted text. Are you sure you want to close?",
+    "nsecAlart": "Warning: Input contains private key (nsec)",
+    "placeholder": "What's happening?",
+    "quote": "You can cite users and posts with nostr:npub..., nostr:nevent....",
+    "hell": "You are about to reply to more than 30 people. Are you sure you want to proceed?",
+    "delete": "Are you sure you want to delete this? This action cannot be undone."
+  },
+  "user": {
+    "profileEdit": "Edit profile",
+    "following": "Following",
+    "follow": "Follow",
+    "followList": {
+      "update": "Update Follow List"
+    },
+    "petname": {
+      "petname": "Petname",
+      "write": "Can set the display name (petname) of the follow users.",
+      "edit": "Edit Petname",
+      "warning": "Since it's public, avoid names that could be problematic."
+    }
   },
   "profile": {
-    "display_name": "表示名",
-    "name": "ユーザー名",
-    "picture": "アイコン画像",
-    "banner": "バナー画像",
-    "website": "ウェブサイト",
-    "nip05": "ドメイン証明（NIP-05）",
-    "lud": "LNURLアドレス / ライトニングアドレス",
-    "about": "自己紹介",
-    "birth": "誕生日"
+    "name": "Name",
+    "display_name": "Display name",
+    "picture": "Picture",
+    "banner": "Banner",
+    "website": "Website",
+    "nip05": "Domain authentication (NIP-05)",
+    "lud": "LNURL address / Lightning address",
+    "about": "About",
+    "birth": "Birthday"
   },
   "menu": {
-    "json": "Json で見る",
-    "njump": "njump で開く",
-    "translate": "(Google) 翻訳する",
-    "note": "note ページを見る",
-    "emoji": "emojito で開く",
-    "userPage": "ユーザーページを見る",
-    "updateProfile": "プロフィールを更新する",
-    "repost": "リポスト",
-    "quote": "引用",
+    "json": "View Json",
+    "njump": "Open in njump",
+    "translate": "Google Translate",
+    "note": "Goto Note Page",
+    "emoji": "Open in emojito",
+    "userPage": "Goto UserPage",
+    "updateProfile": "Update profile",
+    "repost": "Repost",
+    "quote": "Quote",
     "copy": {
-      "pubkey": "公開鍵をコピー",
-      "note": "noteID をコピー",
-      "naddr": "naddr をコピー",
-      "nevent": "イベントIDをコピー",
-      "relayURL": "リレーURLをコピー",
-      "text": "テキストをコピー",
-      "embed": "埋め込みコードをコピー"
+      "pubkey": "Copy pubkey",
+      "note": "Copy noteID",
+      "naddr": "Copy naddr",
+      "nevent": "Copy EventID",
+      "relayURL": "Copy relayURL",
+      "text": "Copy text",
+      "embed": "Copy Embed Code"
     },
-    "broadcast": "ブロードキャスト",
+    "broadcast": "broadcast",
     "open": {
-      "relayHtml": "リレーのサイトを開く",
-      "relayTimeline": "リレータイムラインを見る"
+      "relayHtml": "Open relay site",
+      "relayTimeline": "Goto RelayTimeline"
     },
-    "nostr-watch": "nostr.watch で開く",
-    "nostrrr": "Nostrrr で開く",
-    "sharelink": "リンクの共有",
-    "stream": "zap.streamで開く",
-    "channel": "チャンネルを開く",
-    "nostviewstr": "のすとびうあ で開く",
-    "nostrapp": "App Manager で開く",
-    "mention": "メンションを送る",
-    "userSearch": "ユーザー検索",
-    "delete": "削除",
-    "editChannelInfo": "チャンネル情報の修正",
-    "copylink": "リンクをコピー",
-    "MAKIMONO": "MAKIMONOで編集する",
-    "refresh": "最新データを取得",
+    "nostr-watch": "Open in nostr.watch",
+    "nostrrr": "Open in Nostrrr",
+    "copylink": "Copy link",
+    "sharelink": "Share Link",
+    "stream": "Open in zap.stream",
+    "channel": "Open channel",
+    "nostviewstr": "Open in nostviewstr",
+    "nostrapp": "Open in App Manager",
+    "mention": "Send Mention",
+    "userSearch": "Search User",
+    "delete": "Delete",
+    "editChannelInfo": "Edit Channel Information",
+    "MAKIMONO": "Edit with MAKIMONO",
+    "refresh": "Get Latest Data",
     "bookmark": {
-      "add": "ブックマークに追加",
-      "remove": "ブックマークを削除"
+      "add": "Add Bookmark",
+      "remove": "Remove Bookmark"
     }
   },
   "channel": {
-    "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
-    "global": "Globalチャンネルフィードへ",
+    "settingswarning": "To view the channel page, you need to set up a pubkey.",
+    "global": "goto Global Channel Feed",
     "menu": {
-      "edit": "チャンネルリストの編集",
-      "open": "チャンネルページを開く",
-      "removeConfirm": "このチャンネルをリストから削除しますか？",
-      "remove": "チャンネルを削除",
-      "addConfirm": "このチャンネルをリストに追加しますか？",
-      "add": "チャンネルを追加",
-      "currentList": "現在のチャンネルリスト"
+      "edit": "Edit Channel List",
+      "open": "Open Channel",
+      "removeConfirm": "Do you want to remove this channel from your list?",
+      "remove": "Remove Channel",
+      "addConfirm": "Do you want to add this channel to your list?",
+      "add": "Add Channel",
+      "currentList": "Current Channel List"
     },
     "create": {
-      "title": "新規チャンネル作成",
-      "name": "チャンネル名",
-      "namePlaceholder": "チャンネル名を入力",
-      "about": "説明",
-      "aboutPlaceholder": "このチャンネルについて記述...",
-      "picture": "画像URL",
-      "categories": "カテゴリー",
-      "categoryPlaceholder": "カテゴリーを入力（例：nostr、開発、雑談）",
-      "addCategory": "カテゴリーを追加",
-      "addToList": "このチャンネルを自分のリストに追加する",
-      "submit": "チャンネルを作成",
-      "success": "チャンネルが正常に作成されました！",
-      "error": "チャンネルの作成に失敗しました。もう一度お試しください。",
-      "errorNameRequired": "チャンネル名は必須です。"
+      "title": "Create New Channel",
+      "name": "Channel Name",
+      "namePlaceholder": "Enter channel name",
+      "about": "Description",
+      "aboutPlaceholder": "Write about this channel...",
+      "picture": "Picture URL",
+      "categories": "Categories",
+      "categoryPlaceholder": "Enter category (e.g. nostr, dev, chat)",
+      "addCategory": "Add Category",
+      "addToList": "Add this channel to my personal list",
+      "submit": "Create Channel",
+      "success": "Channel created successfully!",
+      "error": "Failed to create channel. Please try again.",
+      "errorNameRequired": "Channel name is required."
     },
     "edit": {
-      "title": "チャンネル情報の修正",
-      "submit": "チャンネルを更新"
+      "title": "Edit Channel Information",
+      "submit": "Update Channel"
     }
   },
   "list": {
-    "settingswarning": "リストページを閲覧するには、公開鍵の設定が必要です。"
+    "settingswarning": "To view the list page, you need to set up a pubkey"
   },
   "alia": {
     "label": {
-      "image": "画像を拡大して表示"
+      "image": "Enlarge image"
     }
   },
   "about": {
-    "houkoku": "バグ報告",
-    "share": "共有",
-    "luminostr": "フォローリストなどが飛んだとき",
-    "userChannel": "Lumilumiに関する質問・要望・不具合報告・使い方相談など"
+    "houkoku": "Bug Reports",
+    "share": "Share",
+    "luminostr": "When your follow list, bookmarks, etc. are lost",
+    "userChannel": "Questions, requests, bug reports, usage help, and more about Lumilumi"
   },
   "notifications": {
-    "onlyFollowee": "フォロイーのみ"
+    "onlyFollowee": "only followee"
   },
   "create_kind3": {
-    "message": "フォローリストが見つかりません。下記ボタンをクリックしてフォローリストを新規作成してください",
-    "create": "フォローリストを新規作成",
-    "newMessage": "フォローリストがすでに存在する場合、リセットされますが、新しく作成してもよろしいですか？",
-    "reload": "作成後リロードします"
+    "create": "Create new Follow List",
+    "newMessage": "If a follow list already exists, it will be reset. Is it okay to create a new one?",
+    "message": "The follow list could not be found. Please click the button below to create a new follow list.",
+    "reload": "The page will reload after creation."
   },
   "relay": {
     "description": {
-      "search": "検索ワードがある場合は、kind:10007 ( 検索リレー ) を使用します。",
-      "search2": "kind:10007 が見つからない場合はデフォルトのリレー設定で検索を行います",
-      "search3": "リレーは検索機能を持ったリレーを設定してください。",
-      "global": "kind:30002 の dtag を global としたリレーセットを使用します。"
+      "global": "Use relay set with dtag of kind:30002 as global.",
+      "search": "Use kind:10007 (search relay) if a search word is provided.",
+      "search2": "If kind:10007 is not found, use default relay settings.",
+      "search3": "Please set up relays that has search function."
     }
   },
   "customEmoji": {
-    "remove": "絵文字リストから削除",
-    "add": "絵文字リストに追加",
-    "title": "絵文字リスト"
+    "remove": "Remove from My Emojis",
+    "add": "Add to My Emojis",
+    "title": "Emojis"
   },
   "create": {
     "10030": {
-      "title": "カスタム絵文字リスト作成の確認",
-      "text": "既存のカスタム絵文字リスト（kind:10030）が見つからないため新規作成してもよいですか？"
+      "title": "Confirm creation of custom emoji list",
+      "text": "Missing existing custom emoji list (kind:10030), create a new one?"
     },
     "kind10000": {
-      "title": "ミュートリスト作成の確認",
-      "text": "既存のミュートリスト（kind:10000）が見つかリませんでした。新規作成してもよいですか？"
+      "text": "An existing mute list (KIND:10000) could not be found. Is it OK to create a new one?",
+      "title": "Confirm mute list creation"
     },
     "kind30007": {
       "6": {
-        "title": "リポストのミュートリスト作成の確認",
-        "text": "既存のリポストのミュートリスト（kind:30007 dtag: 6 ）が見つかリませんでした。新規作成してもよいですか？"
+        "title": "Confirmation of mute list creation for repost",
+        "text": "An existing repost mute list (kind:30007 dtag: 6) could not be found. Is it OK to create a new one?"
       },
       "7": {
-        "title": "リアクションのミュートリスト作成の確認",
-        "text": "既存のリアクションのミュートリスト（kind:30007 dtag: 7 ）が見つかリませんでした。新規作成してもよいですか？"
+        "title": "Confirmation of mute list creation for reaction",
+        "text": "An existing reaction mute list (kind:30007 dtag: 7) could not be found. Is it OK to create a new one?"
       },
       "3974": {
-        "title": "zapのミュートリスト作成の確認",
-        "text": "既存の zap のミュートリスト（kind:30007 dtag: 9734 ）が見つかリませんでした。新規作成してもよいですか？"
+        "title": "Confirmation of mute list creation for zap",
+        "text": "An existing zap mute list (kind:30007 dtag: 9734) could not be found. Is it OK to create a new one?"
       }
     }
   },
-  "mute": {
-    "user": {
-      "add": "ユーザーをミュートする",
-      "remove": "ユーザーミュートを解除する"
-    },
-    "repost": {
-      "add": "リポストをミュートする",
-      "remove": "リポストミュートを解除する"
-    },
-    "reaction": {
-      "add": "リアクションをミュートする",
-      "remove": "リアクションミュートを解除する"
-    },
-    "zap": {
-      "add": "ZAPをミュートする",
-      "remove": "ZAPミュートを解除する"
-    },
-    "type": {
-      "select": "ミュートの種類"
-    },
-    "channel": "ミュート中のチャンネルです"
-  },
   "event": {
     "kind4": {
-      "text": "(旧仕様のDM)",
-      "decrypt": "復号して内容を見る"
+      "text": "( Old specification DM )",
+      "decrypt": "Decrypt and view contents"
     }
   },
-  "filter": {
-    "canversation": {
-      "all": "すべての会話を表示",
-      "onlyFollowee": "フォローユーザーとの会話のみ表示",
-      "none": "会話を表示しない"
+  "mute": {
+    "type": {
+      "select": "Select the type of mute"
     },
+    "user": {
+      "add": "Mute the user",
+      "remove": "Unmute the user"
+    },
+    "repost": {
+      "add": "Mute reposts",
+      "remove": "Unmute reposts"
+    },
+    "reaction": {
+      "add": "Mute Reactions",
+      "remove": "Unmute Reactions"
+    },
+    "zap": {
+      "add": "Mute ZAP",
+      "remove": "Unmute ZAP"
+    },
+    "channel": "Channel on mute."
+  },
+  "filter": {
     "menu": {
-      "canversation": "会話の表示",
-      "muteOn": "ミュートを適応する",
-      "globalExcludeFollowee": "フォロイーの投稿を除外する"
+      "muteOn": "Adapt Mute",
+      "canversation": "Conversation Display Levels",
+      "globalExcludeFollowee": "Exclude posts from followees"
+    },
+    "canversation": {
+      "all": "Show all conversations",
+      "onlyFollowee": "Show Conversations with Followed Users Only",
+      "none": "Hide Conversations"
     }
   },
   "timeline": {
-    "viewParentPost": "返信元を表示",
-    "hideParentPost": "隠す"
+    "viewParentPost": "View Parent",
+    "hideParentPost": "Hide"
   },
   "global": {
-    "gotoSetting": "設定ページへ",
-    "explain": "設定ページで公開鍵を設定（してkind:30002 id:globalを設定）するか、次のようなURLにアクセスすると、グローバルタイムラインを閲覧できます"
+    "explain": "Set up your public key (and configure kind:30002 id:global) on the settings page, or access the global timeline by using the following URL:",
+    "gotoSetting": "Go to Settings Page"
   },
   "setting": {
-    "pubkey": "設定ページで公開鍵を入力するか、右側のバナーからNostrログインしてください。"
+    "pubkey": "Please enter your public key on the settings page or log in via the Nostr banner in the right."
   },
   "nip05": {
-    "verify": "検証",
+    "verify": "Verify",
     "error": {
-      "formatError": "NIP-05フォーマットエラー",
-      "fetchResponseError": "レスポンスコードエラー",
-      "noPubkey": "nostr.jsonにこの公開鍵の情報がありません",
-      "impersonation": "なりすましの可能性があります",
-      "fetchError": "データの取得中にエラーが発生しました",
-      "corsError": "CORSエラー"
+      "formatError": "NIP-05 format error",
+      "fetchResponseError": "Wrong response code",
+      "noPubkey": "Pubkey not set in nostr.json",
+      "impersonation": "Possibility of impersonation",
+      "fetchError": "An error occurred during fetch",
+      "corsError": "CORS error."
     }
   },
   "shortcut": {
-    "title": "キーボードショートカット",
-    "N": "投稿作成画面を開く",
-    "CtrlEnter": "投稿を送信（投稿作成画面で）",
-    "EscEsc": "投稿作成画面を閉じる"
+    "title": "Keyboard Shortcut",
+    "N": "Open Create Post Window",
+    "CtrlEnter": "Submit the post (from the Create Post Window)",
+    "EscEsc": "Close the Create Post Window"
   },
-  "sourceCode": "ソースコード",
-  "author": "作",
-  "mascot": "マスコット",
-  "others": "他",
+  "sourceCode": "Source code",
+  "author": "Author",
+  "mascot": "Mascot of lumilumi",
+  "others": "Others",
   "domainnotice": {
-    "title": "ドメイン移行のお知らせ",
+    "title": "Domain transfer announcement",
     "message": {
-      "0": "るみるみをご利用いただきありがとうございます。今後は新しいドメイン https://lumilumi.app をご利用いただきますようお願い申し上げます。",
-      "1": "設定を引き継ぎたい場合は、設定ページ下部の「現在の設定をリレーにアップロード/リレーからダウンロード」ボタンをクリックして、設定の保存および復元が可能です。",
-      "2": "「データの同期」の項目は引き継がれませんので再度各ボタンをクリックして同期を行ってください。"
+      "0": "Thank you for using Lumilumi. Please use the new domain https://lumilumi.app from now on.",
+      "1": "If you want to transfer your settings, you can save and restore them by clicking the \"Upload/Download current configuration to relay\" button at the bottom of the settings page.",
+      "2": "The \"Sync\" settings will not be transferred, so please click each button again to synchronize."
     },
-    "movebutton": "新しいドメインへ移動する"
+    "movebutton": "Move to a new domain"
   },
   "nostrlogin": {
-    "description": "このサイトはNostrネットワークを利用しています。おもちのNostrアカウントでログインするか、新しくアカウントを作成して参加することができます。"
+    "description": "This website is part of the Nostr network. Log in with your Nostr profile or sign up to join."
   },
   "search": {
-    "ward": "検索語",
-    "followee": "フォローのみ",
-    "options": "オプション",
-    "search": "検索",
-    "excludeproxynote": "他のソーシャルメディアからの投稿を除外",
-    "syntaxPropertiesTitle": "検索プロパティ",
-    "syntaxPropertiesDescription": "プロパティを指定しない場合は投稿内容から検索されます。以下の形式で絞り込み検索が可能です：",
-    "syntaxExamplesTitle": "検索例",
+    "ward": "Search word",
+    "followee": "only followee",
+    "options": "Options",
+    "search": "Search",
+    "excludeproxynote": "Exclude posts from other social media.",
+    "syntaxPropertiesTitle": "Search Properties",
+    "syntaxPropertiesDescription": "Search content if no properties specified. Use following formats for filtered search:",
+    "syntaxExamplesTitle": "Search Examples",
     "propertyDescription": {
-      "author": "投稿者の公開鍵を指定",
-      "kind": "イベント種類を指定（1=テキスト投稿、7=リアクションなど）",
-      "id": "特定のイベントIDを指定",
-      "until": "指定時刻より前の投稿のみ検索",
-      "mention": "投稿内で言及されている公開鍵を指定",
-      "quote": "引用しているイベントIDを指定",
-      "hashtag": "投稿内のハッシュタグを指定",
-      "url": "投稿内のURLを指定",
-      "oneCharOthers": "ほか英字1文字（大文字・小文字）"
+      "author": "Specify author's public key",
+      "kind": "Specify event kind (1=text note, 7=reaction, etc.)",
+      "id": "Specify specific event ID",
+      "until": "Search posts before specified time",
+      "mention": "Specify public key mentioned in post",
+      "quote": "Specify quoted event ID",
+      "hashtag": "Specify hashtag in post",
+      "url": "Specify URL in post",
+      "oneCharOthers": "other single letters (case-insensitive)"
     },
     "syntaxExample": {
-      "userPosts": "特定ユーザーの投稿を検索",
-      "userPostsUntil": "特定ユーザーの指定日時までのテキスト投稿を検索",
-      "noteItself": "特定のノート自体を検索",
-      "noteReactions": "特定ノートへのリアクション（返信・いいね）を検索",
-      "taggedPosts": "特定タグ付きテキスト投稿を検索",
-      "profileUntil": "指定日時までのプロフィール情報を検索"
+      "userPosts": "Search posts from specific user",
+      "userPostsUntil": "Search text posts from specific user until specified date",
+      "noteItself": "Search specific note itself",
+      "noteReactions": "Search reactions (replies, likes) to specific note",
+      "taggedPosts": "Search text posts with specific tag",
+      "profileUntil": "Search profile info until specified date"
     }
   },
   "settei": {
-    "search": "検索リレー",
-    "global": "グローバルリレー"
+    "search": "Search Relays",
+    "global": "Global Relays"
   },
   "status": {
-    "edit": "ステータスの編集"
+    "edit": "Edit status"
   },
   "common": {
-    "close": "閉じる",
-    "cancel": "キャンセル"
+    "close": "Close",
+    "cancel": "CANCEL"
   },
   "geo": {
-    "location": "現在地を取得",
-    "submit": "位置を決定",
-    "delete": "位置情報を削除"
+    "location": "Get My Location",
+    "submit": "Confirm Location",
+    "delete": "Delete Location"
   },
   "poll": {
-    "vote": "投票",
-    "submitting": "投票中...",
-    "change": "投票を変更",
-    "voted": "投票済み",
-    "goto_poll": "投票にいく",
-    "view_results": "結果を見る",
+    "vote": "Vote",
+    "submitting": "Submitting...",
+    "change": "Change Vote",
+    "voted": "Voted",
+    "goto_poll": "Vote Now",
+    "view_results": "View Results",
     "warning": {
       "title": "Error",
-      "description": "すべての選択肢にテキストを入力してください",
-      "pollTitle": "アンケートタイトルを入力してください"
+      "description": "Please enter text for all options",
+      "pollTitle": "Please enter a poll title."
     },
-    "title": "アンケート",
+    "title": "Poll",
     "select": {
-      "title": "選択肢",
-      "add": "選択肢を追加",
-      "multi": "複数選択可"
+      "title": "Options",
+      "add": "Add Option",
+      "multi": "Multiple Selection Allowed"
     },
-    "limit": "アンケート期限",
-    "publish": "アンケートを投稿",
+    "limit": "Poll Expiration",
+    "publish": "Submit Poll",
     "lim": {
-      "300": "5分",
-      "1800": "30分",
-      "3600": "1時間",
-      "21600": "6時間",
-      "86400": "1日",
-      "259200": "3日",
-      "604800": "7日"
+      "300": "5 minutes",
+      "1800": "30 minutes",
+      "3600": "1 hour",
+      "21600": "6 hours",
+      "86400": "1 day",
+      "259200": "3 days",
+      "604800": "7 days"
     }
   },
   "truncate": {
-    "expand": "続きを読む",
-    "openpage": "記事を開く"
+    "expand": "Read More",
+    "openpage": "Open Article"
   },
   "signError": {
-    "eventSize": "イベントデータのサイズが無効です（1-65535バイトである必要があります）",
-    "cancel": "署名がキャンセルされました",
-    "signFailed": "イベントの署名に失敗しました",
-    "publishFailed": "イベントの公開に失敗しました"
+    "eventSize": "Invalid event data size (must be between 1 and 65535 bytes)",
+    "signFailed": "Failed to sign event",
+    "cancel": "Signature was canceled by user",
+    "publishFailed": "Failed to publish event"
   },
   "process": {
-    "chunk": "チャンク",
-    "merging": "統合中",
-    "processing": "処理中"
+    "chunk": "Chunk",
+    "merging": "Merging",
+    "processing": "Processing"
   },
   "features": {
-    "title": "機能",
-    "bookmark": "公開ブックマーク（kind 10003）のみ対応。非公開ブックマークは非対応です。",
+    "title": "Features",
+    "bookmark": "Public bookmarks (kind 10003) only. Private bookmarks are not supported.",
     "bookmarkLink": {
-      "before": "非公開やブクマの整頓には",
-      "after": "をご使用ください。"
+      "before": "For private bookmarks or bookmark organization, please use ",
+      "after": "."
     }
   },
   "date": {
-    "activity_on": "{date}の活動",
-    "relay_fetch_failed": "リレー情報の取得に失敗しました: {error}",
-    "relay_not_found": "リレー情報が見つかりません",
-    "post": "投稿",
-    "repost": "リポスト",
-    "total": "合計",
-    "no_posts_today": "この日の投稿はありません"
+    "activity_on": "Activity on {date}",
+    "relay_fetch_failed": "Failed to fetch relay information: {error}",
+    "relay_not_found": "No relay information found",
+    "post": "Post",
+    "repost": "Repost",
+    "total": "Total",
+    "no_posts_today": "No posts on this day"
   },
-  "error": "エラー: {error}",
+  "error": "Error: {error}",
   "data": {
-    "nodata": "データがありません",
-    "loading": "データを読み込み中..."
+    "loading": "Loading data..."
   },
   "pin": {
-    "delete": "このPINを削除してもよろしいですか？",
-    "invalid": "無効なIDです",
-    "label": "ピンするIDを入力",
-    "addTitle": "PIN追加",
-    "deleteTitle": "PIN削除"
+    "label": "Enter ID to pin",
+    "invalid": "Invalid ID",
+    "delete": "Are you sure you want to delete this pin?",
+    "addTitle": "Add Pin",
+    "deleteTitle": "Delete Pin"
   }
 }
