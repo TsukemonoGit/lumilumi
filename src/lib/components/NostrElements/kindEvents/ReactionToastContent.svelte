@@ -128,7 +128,7 @@
         </div>
       {/snippet}
 
-      {#snippet content({ event })}
+      {#snippet success({ event })}
         {@const replacedText = replaceText(event.content)}
         {replacedText.length < contentLen
           ? replacedText
