@@ -413,25 +413,51 @@ export async function filesUpload(
 ): Promise<FileUploadResponse[]> {
   console.log(files, uploader);
 
-  // 共通で画像処理をする
-  const processedFiles = await processImages(
-    files,
-    lumiSetting.get().picQuarity,
-    (originalSize, processedSize, quality) => {
-      console.log(
-        `Image processed: ${originalSize} -> ${processedSize} (${quality}%)`
-      );
+  // ファイルを画像と動画に分類
+  const imageFiles: File[] = [];
+  const videoFiles: File[] = [];
+  const fileArray = Array.from(files);
+
+  fileArray.forEach((file) => {
+    if (file.type.startsWith("image/")) {
+      imageFiles.push(file);
+    } else if (file.type.startsWith("video/")) {
+      videoFiles.push(file);
+    } else {
+      videoFiles.push(file);
     }
-  );
+  });
+
+  // 画像のみprocessImagesで処理
+  let processedFiles: File[] = [];
+
+  if (imageFiles.length > 0) {
+    // DataTransferを使ってFileListを作成
+    const dataTransfer = new DataTransfer();
+    imageFiles.forEach((file) => dataTransfer.items.add(file));
+
+    const processed = await processImages(
+      dataTransfer.files,
+      lumiSetting.get().picQuarity,
+      (originalSize, processedSize, quality) => {
+        console.log(
+          `Image processed: ${originalSize} -> ${processedSize} (${quality}%)`
+        );
+      }
+    );
+    processedFiles.push(...processed);
+  }
+
+  // 動画はそのまま追加
+  processedFiles.push(...videoFiles);
 
   const { type, address } = uploader;
   let results: FileUploadResponse[] = [];
 
-  // typeによってアップロード処理を分ける
   if (type === "nip96") {
     for (let i = 0; i < processedFiles.length; i++) {
       const file = processedFiles[i];
-      const originalFile = Array.from(files)[i];
+      const originalFile = fileArray[i];
 
       try {
         const serverConfig = await readServerConfig(address);
@@ -443,11 +469,6 @@ export async function filesUpload(
           async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
           true
         );
-
-        console.log(file);
-        console.log(header);
-        console.log(serverConfig.api_url);
-        console.log(originalFile.type);
 
         const response: FileUploadResponse = await uploadFileNip96(file, {
           serverApiUrl: serverConfig.api_url,
@@ -475,24 +496,17 @@ export async function filesUpload(
       }
     }
   } else if (type === "blossom") {
-    // TODO: Blossomのアップロード処理
     for (let i = 0; i < processedFiles.length; i++) {
       const file = processedFiles[i];
-      const originalFile = Array.from(files)[i];
+      const originalFile = fileArray[i];
 
       try {
-        // TODO: Blossomサーバー設定の取得
-        // TODO: Blossom認証ヘッダーの生成
         const nip07RawSigner = nip07Signer();
         const verifiedSigner: Signer = {
           ...nip07RawSigner,
           signEvent: async (event) => {
-            // nip07Signerで署名
             const signedEvent = await nip07RawSigner.signEvent(event);
-
-            // [verifiedSymbol]プロパティを追加
             (signedEvent as VerifiedEvent)[verifiedSymbol] = true;
-
             return signedEvent as VerifiedEvent;
           },
         };
@@ -500,7 +514,6 @@ export async function filesUpload(
         const fileUploadResponse: BlobDescriptor = await client.uploadFile(
           file
         );
-        // BlobDescriptorをFileUploadResponseに変換
         const response: FileUploadResponse = {
           status: "success",
           message: "File uploaded successfully",
