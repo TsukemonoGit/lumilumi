@@ -8,7 +8,7 @@
       "pubkeyError": "Check the pubkey you entered"
     },
     "beforeUnload": {
-      "message": "Changed settings are not saved. Would you like to leave the page?"
+      "message": "Changed settings are not saved. Are you sure you want to leave the page?"
     },
     "nostviewstr": {
       "kind10002": "Edit Relaylist (kind:10002) in NostViewstr",
@@ -20,18 +20,18 @@
     },
     "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
-      "loadImage": "Load and display all image (Real-time profile update ON/OFF)",
-      "preview": "Show preview when creating notes",
-      "menu": "Display the menu button on the left side.",
-      "showRelayIcon": "Relay information is displayed under the icon",
-      "showReactioninTL": "show reaction toast",
-      "showUserStatus": "show user status",
+      "loadImage": "Load and display all images (Real-time profile update ON/OFF)",
+      "preview": "Show preview when composing notes",
+      "menu": "Display the menu on the left side",
+      "showRelayIcon": "Display relay informations under the user icons",
+      "showReactioninTL": "Show reaction toast",
+      "showUserStatus": "Show user status",
       "banner": "Show the account banner on the right",
       "showKind16": "Show kind16 (reposts other than kind1)",
-      "showClientTag": "Show Display client tag (via) in TL",
+      "showClientTag": "Display client tag (via) in TL",
       "showAllReaction": "Show everyone's reactions",
       "kind42inTL": "Display public chats on HomeTL",
-      "embed": "Embed supported content?",
+      "embed": "Show embed supported content?",
       "imageAutoExpand": {
         "label": "Auto-expand images",
         "all": "Auto-expand all images",
@@ -40,9 +40,9 @@
       }
     },
     "post": {
-      "addClientTag": "Add client tag (via) to post",
+      "addClientTag": "Add client tag (via) to your posts",
       "defaultReaction": "Default Reaction",
-      "picQuarity": "Upload Photo Quality (JPG Only)"
+      "picQuarity": "Upload Photo Quality (for JPEG/JPG Only)"
     },
     "douki": {
       "title": "Sync"
@@ -59,7 +59,7 @@
     },
     "save": {
       "rewrite": "A data entry with the same name already exists. Do you want to overwrite it?",
-      "new": "Do you want to create a new entry with the specified name?"
+      "new": "Are you sure you want to create a new entry with the specified name?"
     },
     "load": {
       "title": "Load/Save Settings",
@@ -84,13 +84,13 @@
   "user": {
     "profileEdit": "Edit profile",
     "following": "Following",
-    "follow": "Follow",
+    "follow": "Follows",
     "followList": {
       "update": "Update Follow List"
     },
     "petname": {
       "petname": "Petname",
-      "write": "Can set the display name (petname) of the follow users.",
+      "write": "Able to set the display name (petname) of the follow users.",
       "edit": "Edit Petname",
       "warning": "Since it's public, avoid names that could be problematic."
     }
@@ -109,7 +109,7 @@
   "menu": {
     "json": "View Json",
     "njump": "Open in njump",
-    "translate": "Google Translate",
+    "translate": "Translate",
     "note": "Goto Note Page",
     "emoji": "Open in emojito",
     "userPage": "Goto UserPage",
@@ -150,14 +150,14 @@
     }
   },
   "channel": {
-    "settingswarning": "To view the channel page, you need to set up a pubkey.",
-    "global": "goto Global Channel Feed",
+    "settingswarning": "To view the channel page, you must set up a pubkey first.",
+    "global": "Goto Global Channel Feed",
     "menu": {
       "edit": "Edit Channel List",
       "open": "Open Channel",
-      "removeConfirm": "Do you want to remove this channel from your list?",
+      "removeConfirm": "Are you sure you want to remove this channel from your list?",
       "remove": "Remove Channel",
-      "addConfirm": "Do you want to add this channel to your list?",
+      "addConfirm": "Are you sure you want to add this channel to your list?",
       "add": "Add Channel",
       "currentList": "Current Channel List"
     },
@@ -183,7 +183,7 @@
     }
   },
   "list": {
-    "settingswarning": "To view the list page, you need to set up a pubkey"
+    "settingswarning": "To view the list page, you must set up a pubkey first."
   },
   "alia": {
     "label": {
@@ -191,25 +191,25 @@
     }
   },
   "about": {
-    "houkoku": "Bug Reports",
+    "houkoku": "Report Bugs",
     "share": "Share",
-    "luminostr": "When your follow list, bookmarks, etc. are lost",
-    "userChannel": "Questions, requests, bug reports, usage help, and more about Lumilumi"
+    "luminostr": "Use it when your follow list, bookmarks, etc. have been lost",
+    "userChannel": "Questions, requests, bug reports, usage helps, and more about Lumilumi!"
   },
   "notifications": {
     "onlyFollowee": "only followee"
   },
   "create_kind3": {
-    "create": "Create new Follow List",
-    "newMessage": "If a follow list already exists, it will be reset. Is it okay to create a new one?",
-    "message": "The follow list could not be found. Please click the button below to create a new follow list.",
-    "reload": "The page will reload after creation."
+    "create": "Create a new Follow List",
+    "newMessage": "If a follow list already exists, it will be reset. Are tou sure to create a new one?",
+    "message": "Couldn't find any follow lists. Please click the button below to create a new follow list.",
+    "reload": "The page will be reload after the creation."
   },
   "relay": {
     "description": {
-      "global": "Use relay set with dtag of kind:30002 as global.",
-      "search": "Use kind:10007 (search relay) if a search word is provided.",
-      "search2": "If kind:10007 is not found, use default relay settings.",
+      "global": "Use relay set with dtag of kind:30002 as global",
+      "search": "Use kind:10007 (search relay) if some search words are provided",
+      "search2": "If kind:10007 is not found, use default relay settings",
       "search3": "Please set up relays that has search function."
     }
   },
@@ -220,25 +220,25 @@
   },
   "create": {
     "10030": {
-      "title": "Confirm creation of custom emoji list",
-      "text": "Missing existing custom emoji list (kind:10030), create a new one?"
+      "title": "Confirm creation of the custom emoji list",
+      "text": "Custom emoji list (kind:10030) is missing. Create a new one?"
     },
     "kind10000": {
-      "text": "An existing mute list (KIND:10000) could not be found. Is it OK to create a new one?",
+      "text": "Mute list (KIND:10000) not found. Create a new one?",
       "title": "Confirm mute list creation"
     },
     "kind30007": {
       "6": {
-        "title": "Confirmation of mute list creation for repost",
-        "text": "An existing repost mute list (kind:30007 dtag: 6) could not be found. Is it OK to create a new one?"
+        "title": "Confirm creation of mute list for repost",
+        "text": "Repost mute list (kind:30007 dtag: 6) not found. Create a new one?"
       },
       "7": {
-        "title": "Confirmation of mute list creation for reaction",
-        "text": "An existing reaction mute list (kind:30007 dtag: 7) could not be found. Is it OK to create a new one?"
+        "title": "Confirm creating mute list for reaction",
+        "text": "Reaction mute list (kind:30007 dtag: 7) not found. Create a new one?"
       },
       "3974": {
         "title": "Confirmation of mute list creation for zap",
-        "text": "An existing zap mute list (kind:30007 dtag: 9734) could not be found. Is it OK to create a new one?"
+        "text": "Zap mute list (kind:30007 dtag: 9734) not found. Create a new one?"
       }
     }
   },
@@ -268,7 +268,7 @@
       "add": "Mute ZAP",
       "remove": "Unmute ZAP"
     },
-    "channel": "Channel on mute."
+    "channel": "Channel is on mute."
   },
   "filter": {
     "menu": {
@@ -278,7 +278,7 @@
     },
     "canversation": {
       "all": "Show all conversations",
-      "onlyFollowee": "Show Conversations with Followed Users Only",
+      "onlyFollowee": "Show Conversations with Followees Only",
       "none": "Hide Conversations"
     }
   },
@@ -287,11 +287,11 @@
     "hideParentPost": "Hide"
   },
   "global": {
-    "explain": "Set up your public key (and configure kind:30002 id:global) on the settings page, or access the global timeline by using the following URL:",
+    "explain": "Set up your public key (and configure kind:30002 id:global) on the settings page, or access the global timeline by using the following URL to see the global timeline:",
     "gotoSetting": "Go to Settings Page"
   },
   "setting": {
-    "pubkey": "Please enter your public key on the settings page or log in via the Nostr banner in the right."
+    "pubkey": "Please enter your public key on the settings page or log in via the Nostr banner on the right."
   },
   "nip05": {
     "verify": "Verify",
@@ -308,11 +308,11 @@
     "title": "Keyboard Shortcut",
     "N": "Open Create Post Window",
     "CtrlEnter": "Submit the post (from the Create Post Window)",
-    "EscEsc": "Close the Create Post Window"
+    "EscEsc": "Close Create Post Window"
   },
   "sourceCode": "Source code",
   "author": "Author",
-  "mascot": "Mascot of lumilumi",
+  "mascot": "The Mascot of lumilumi",
   "others": "Others",
   "domainnotice": {
     "title": "Domain transfer announcement",
@@ -328,10 +328,10 @@
   },
   "search": {
     "ward": "Search word",
-    "followee": "only followee",
+    "followee": "Include events from only followee",
     "options": "Options",
-    "search": "Search",
-    "excludeproxynote": "Exclude posts from other social media.",
+    "search": "Do search!",
+    "excludeproxynote": "Exclude posts from other social media",
     "syntaxPropertiesTitle": "Search Properties",
     "syntaxPropertiesDescription": "Search content if no properties specified. Use following formats for filtered search:",
     "syntaxExamplesTitle": "Search Examples",
@@ -435,7 +435,7 @@
   },
   "error": "Error: {error}",
   "data": {
-    "loading": "Loading data..."
+    "loading": "Loading..."
   },
   "pin": {
     "label": "Enter ID to pin",
