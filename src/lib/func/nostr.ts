@@ -597,7 +597,7 @@ export function usePromiseReq(
     initData = [],
   }: UsePromiseReqOpts<EventPacket[] | EventPacket>,
   relays: string[] | undefined,
-  timeout: number | undefined = 3000,
+  timeout: number | undefined = 4000,
   onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
   sift?: number
 ): Promise<EventPacket[]> {

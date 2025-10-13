@@ -23,6 +23,7 @@
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
+    waitForConnections,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { readable } from "svelte/store";
@@ -75,7 +76,7 @@
 
   const [uniq, eventIds] = createUniq(keyFn);
   const operator = pipe(uniq, userStatus(), /* reactionCheck(), */ scanArray());
-  //sinceとuntilは両方undefinedか、両方値あり。
+  //untilはundefinedか値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
   let reqFilters = $derived(
     filters.map((filter: Nostr.Filter) => ({
@@ -86,7 +87,7 @@
   );
 
   let result = $derived(
-    filters[0].since === undefined
+    filters[0].until !== undefined
       ? useSearchEventList(queryKey, reqFilters, operator, req, relays)
       : {
           data: undefined,
@@ -146,35 +147,28 @@
   });
 
   async function init() {
-    const ev: EventPacket[] | undefined = queryClient.getQueryData([
-      ...queryKey,
-      "olderData",
-    ]);
+    const newFilters = filters.map((filter: Nostr.Filter) => ({
+      ...filter,
 
-    if (!ev || ev?.length <= 0) {
-      const newFilters = filters.map((filter: Nostr.Filter) => ({
-        ...filter,
+      until: filter.until === undefined ? now() : filter.until,
+      limit: 50,
+    }));
+    await waitForConnections();
+    const older = await firstLoadOlderEvents(
+      50,
+      newFilters,
 
-        until: filter.until === undefined ? now() : filter.until,
-        limit: 50,
-      }));
-      const older = await firstLoadOlderEvents(
-        50,
-        newFilters,
+      tie,
+      relays,
+      undefined,
+      5000
+    );
 
-        tie,
-        relays
-      );
-
-      if (older.length > 0) {
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (olddata: EventPacket[] | undefined) => [...(olddata ?? []), ...older]
-        );
-      }
-      updateViewEvent($data);
-      result.status = readable("success");
+    if (older.length > 0) {
+      queryClient.setQueryData([...queryKey, "olderData"], () => older);
     }
+    updateViewEvent($data);
+    result.status = readable("success");
   }
 
   const handleNext = async () => {
@@ -195,7 +189,9 @@
 
         untilTime,
         tie,
-        relays
+        relays,
+        undefined,
+        5000
       );
       console.log(older);
       if (older.length > 0) {

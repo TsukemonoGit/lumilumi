@@ -31,6 +31,7 @@ const createOperatorPipeline = (
  * @param until - Timestamp boundary for event retrieval
  * @param tie - RxJS operator for event processing
  * @param relays - List of relay URLs
+ *  @param timeout - timeout miri seconds
  * @returns Promise containing array of event packets
  */
 export async function loadOlderEvents(
@@ -39,7 +40,8 @@ export async function loadOlderEvents(
   until: number,
   tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
   relays?: string[],
-  onData?: (data: EventPacket[]) => void // 処理途中のデータを受け取るコールバック
+  onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
+  timeout?: number
 ): Promise<EventPacket[]> {
   // Check if display events exist
   if (!displayEvents.get() || displayEvents.get().length < 0) {
@@ -69,7 +71,7 @@ export async function loadOlderEvents(
       req: newReq,
     },
     relays,
-    undefined,
+    timeout,
     onData,
     sift
   );
@@ -99,7 +101,8 @@ export async function firstLoadOlderEvents(
   filters: Filter[],
   tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
   relays?: string[],
-  onData?: (data: EventPacket[]) => void // 処理途中のデータを受け取るコールバック
+  onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
+  timeout?: number
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
   const operator = createOperatorPipeline(tie);
@@ -112,7 +115,7 @@ export async function firstLoadOlderEvents(
       req: newReq,
     },
     relays,
-    4000,
+    timeout,
     onData,
     sift
   );
