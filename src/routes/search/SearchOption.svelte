@@ -64,6 +64,12 @@
     }
   });
 
+  let currentUntilTimestamp = $derived.by(() => {
+    if (!searchWord) return undefined;
+    const match = searchWord.match(/until:(\d+)/);
+    return match ? parseInt(match[1]) : undefined;
+  });
+
   // カーソル位置を記録する関数
   function updateCursorPosition(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -276,6 +282,11 @@
               </div>
             {/snippet}
           </Popover>
+          {#if currentUntilTimestamp}
+            <span class="text-xs ml-1">
+              {new Date(currentUntilTimestamp * 1000).toLocaleString()}
+            </span>
+          {/if}
         </div>
 
         <div class="flex gap-2">
