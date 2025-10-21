@@ -119,18 +119,13 @@
     }
   }
 
-  function handleDateTimeChange(date: Date) {
-    console.log(date);
-    // DateをUNIXタイムスタンプ（秒）に変換
-    const unixTimestamp = Math.floor(date.getTime() / 1000);
-    const untilKeyword = `until:${unixTimestamp} `;
+  function handleDateTimeChange(dateTimeString: string) {
+    const untilKeyword = `until:${dateTimeString}`;
 
-    // 既存の until: キーワードを検索して置換
-    const existingUntilRegex = /\s*until:\S+/;
+    const existingUntilRegex = /until:\S+/;
     if (searchWord && existingUntilRegex.test(searchWord)) {
-      searchWord = searchWord.replace(existingUntilRegex, ` ${untilKeyword}`);
+      searchWord = searchWord.replace(existingUntilRegex, untilKeyword);
     } else {
-      // untilが存在しない場合、末尾に追加
       if (searchWord && searchWord.trim() !== "") {
         searchWord = `${searchWord.trim()} ${untilKeyword}`;
       } else {
@@ -282,11 +277,6 @@
               </div>
             {/snippet}
           </Popover>
-          {#if currentUntilTimestamp}
-            <span class="text-xs ml-1">
-              {new Date(currentUntilTimestamp * 1000).toLocaleString()}
-            </span>
-          {/if}
         </div>
 
         <div class="flex gap-2">

@@ -1,40 +1,26 @@
 <script lang="ts">
   interface Props {
-    value?: number;
-    onChange?: (date: Date) => void;
+    value?: string;
+    onChange?: (dateTimeString: string) => void;
     label?: string;
     required?: boolean;
   }
 
   let { value, onChange, label, required = false }: Props = $props();
 
-  let dateTimeValue: string = $state(value ? formatDateTimeLocal(value) : "");
-
-  function formatDateTimeLocal(unixTime: number): string {
-    const date = new Date(unixTime * 1000);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  let dateObject = $derived.by(() => {
-    if (!dateTimeValue) return null;
-    return new Date(dateTimeValue);
-  });
-
-  let unixTime = $derived.by(() => {
-    if (!dateObject) return null;
-    return Math.floor(dateObject.getTime() / 1000);
-  });
+  let dateTimeValue: string = $state(value || "");
 
   function handleSubmit() {
-    if (dateObject && onChange) {
-      onChange(dateObject);
+    if (dateTimeValue && onChange) {
+      onChange(dateTimeValue);
     }
   }
+
+  $effect(() => {
+    if (value) {
+      dateTimeValue = value;
+    }
+  });
 </script>
 
 <div class="flex flex-col gap-2 mr-2">
@@ -46,7 +32,7 @@
       type="datetime-local"
       bind:value={dateTimeValue}
       {required}
-      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-magnum-500 focus:outline-none focus:ring-1 focus:ring-magnum-500"
     />
     <button
       type="button"
@@ -57,10 +43,4 @@
       OK
     </button>
   </div>
-
-  {#if unixTime !== null}
-    <div class="text-xs text-gray-500">
-      UNIX: {unixTime}
-    </div>
-  {/if}
 </div>
