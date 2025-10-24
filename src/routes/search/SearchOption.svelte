@@ -21,6 +21,7 @@
   import DateTimePicker from "$lib/components/DateTimePicker.svelte";
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
+  import { pushState } from "$app/navigation";
 
   interface Props {
     searchWord: string | undefined;
@@ -172,6 +173,21 @@
 
   function handleUnifiedSearch() {
     if (searchWord || "".trim()) {
+      // URLパラメータを更新
+      const url = new URL(window.location.href);
+      if (searchWord && searchWord.trim()) {
+        url.searchParams.set("q", searchWord.trim());
+      } else {
+        url.searchParams.delete("q");
+      }
+
+      followee ? url.searchParams.set("f", "1") : url.searchParams.delete("f");
+      excludeProxy
+        ? url.searchParams.set("x", "1")
+        : url.searchParams.delete("x");
+
+      pushState(url.toString(), {});
+
       handleClickSearch();
     }
   }
