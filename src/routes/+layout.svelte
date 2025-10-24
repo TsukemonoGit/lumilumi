@@ -44,10 +44,7 @@
 
   import SetRepoReactions from "$lib/components/renderSnippets/nostr/SetRepoReactions.svelte";
   import ReactionToast from "$lib/components/Elements/ReactionToast.svelte";
-  import {
-    rxNostr3RelaysReconnectChallenge,
-    setRxNostr3,
-  } from "$lib/func/reactions";
+
   import { writable, type Writable } from "svelte/store";
   import {
     displayEvents,
@@ -160,10 +157,6 @@
         setRxNostr();
       }
 
-      if (!$app?.rxNostr3) {
-        setRxNostr3();
-      }
-
       const nostrLogin = await import("nostr-login");
 
       await waitNostr(1000);
@@ -182,7 +175,6 @@
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
       relaysReconnectChallenge();
-      rxNostr3RelaysReconnectChallenge();
     }
   }
 

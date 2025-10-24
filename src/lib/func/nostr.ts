@@ -44,7 +44,7 @@ import {
   type MediaOperatorState,
   type MediaResult,
 } from "$lib/stores/operators";
-import { set3Relays } from "./reactions";
+//import { set3Relays } from "./reactions";
 import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import * as nip19 from "nostr-tools/nip19";
 import { hexRegex } from "./regex";
@@ -61,7 +61,6 @@ import { notificationKinds } from "./constants";
 import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
-import { addDebugLog, debugInfo } from "$lib/components/Debug/debug";
 import { STORAGE_KEYS } from "./localStorageKeys";
 
 let rxNostr: RxNostr;
@@ -95,22 +94,21 @@ export function setRxNostr() {
           type: "AUTH";
         }
       ) => {
-        addDebugLog("AUTH", e);
+        console.log(e.type, e.from, e.message);
+
         if (!authRelay.get().includes(e.from)) {
           authRelay.update((v) => [...v, e.from]);
         }
-        addDebugLog("authRelay", authRelay.get());
       }
     );
 }
 
 export function setRelays(relays: AcceptableDefaultRelaysConfig) {
-  addDebugLog("setRelays", relays);
   if (rxNostr && defaultRelays) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());
   }
-  set3Relays(relays);
+  //set3Relays(relays);
 }
 export function getDefaultWriteRelays(): string[] {
   const relays = rxNostr.getDefaultRelays();
@@ -252,7 +250,7 @@ export function generateRandomId(length: number = 6): string {
 const req = createRxForwardReq();
 
 export function changeMainEmit(filters: Nostr.Filter[]) {
-  debugInfo("changeMainEmit", filters);
+  //debugInfo("changeMainEmit", filters);
 
   req.emit(filters);
 }
@@ -312,12 +310,10 @@ export const makeMainFilters = (
     kinds: [10003],
     authors: [lumiSetting.get().pubkey],
   });
-  // addDebugLog("mineFilters", filters);
-
+  console.log(filters);
   return { mainFilters: filters, olderFilters: olderFilters };
 };
-//これメインTL用のreqで一つだけのforwardreqのやつ
-//rxNostr3ようのやつは別であるけど
+
 //changeMainEmitでフィルターを更新する
 export function useMainTimelineReq(
   operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
@@ -400,11 +396,11 @@ export function publishEvent(ev: Nostr.EventParameters) {
     throw Error();
   }
   _rxNostr.send(ev).subscribe((packet) => {
-    addDebugLog(
+    /* addDebugLog(
       `リレー ${packet.from} への送信が ${
         packet.ok ? "成功" : "失敗"
       } しました。`
-    );
+    ); */
   });
 }
 
@@ -452,11 +448,11 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
-        addDebugLog(
+        /*  addDebugLog(
           `リレー ${packet.from} への送信が ${
             packet.ok ? "成功" : "失敗"
           } しました。`
-        );
+        ); */
         results.push(packet);
       },
       complete: () => resolve(results),
@@ -513,44 +509,6 @@ export function relaysReconnectChallenge() {
   //   // 接続が完了するまで待機する
   //   await waitForConnection(key);
   // }
-}
-
-// 接続完了を待機する補助関数
-async function waitForConnection(relayUrl: string, timeout = 5000) {
-  return new Promise<void>((resolve) => {
-    // ここで明示的に Promise<void> と型を指定
-    const checkInterval = 300; // 300msごとにチェック
-    const maxAttempts = timeout / checkInterval;
-    let attempts = 0;
-
-    const checkConnection = () => {
-      attempts++;
-      const status = get(app).rxNostr.getRelayStatus(relayUrl)?.connection;
-
-      // 接続済みまたはエラー終了の場合は完了
-      if (
-        status === "connected" ||
-        status === "error" ||
-        status === "rejected"
-      ) {
-        resolve(); // 値なしで resolve を呼び出す
-        return;
-      }
-
-      // タイムアウトした場合も次に進む
-      if (attempts >= maxAttempts) {
-        console.warn(`Connection timeout for relay: ${relayUrl}`);
-        resolve(); // 値なしで resolve を呼び出す
-        return;
-      }
-
-      // まだ接続中なら再度チェック
-      setTimeout(checkConnection, checkInterval);
-    };
-
-    // 初回チェック開始
-    checkConnection();
-  });
 }
 
 export function reconnectRelay(url: string) {

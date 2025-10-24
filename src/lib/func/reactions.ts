@@ -1,72 +1,19 @@
-import { app, defaultRelays, queryClient } from "$lib/stores/stores";
+import { app, queryClient } from "$lib/stores/stores";
 import type { ReqStatus } from "$lib/types";
 import { createQuery } from "@tanstack/svelte-query";
-import { createRxNostr, createRxForwardReq, type EventPacket } from "rx-nostr";
+import { createRxForwardReq, type EventPacket } from "rx-nostr";
 import { get, writable, derived, type Readable } from "svelte/store";
 import { type Observable, type Subscription } from "rxjs";
 import * as Nostr from "nostr-typedef";
 
-import { verifier as cryptoVerifier } from "rx-nostr-crypto";
 import { zappedPubkey } from "$lib/stores/operators";
 import { sortEventPackets } from "./util";
-import { authRelay, verifier } from "$lib/stores/globalRunes.svelte";
-//import { addDebugLog } from "$lib/components/Debug/debug";
 
-// const rxNostr3 = createRxNostr({
-//   verifier: get(verifier) ?? cryptoVerifier,
-//   connectionStrategy: "aggressive",
-// }); //reaction repost用
-const req3 = createRxForwardReq();
-export function setRxNostr3() {
-  if (get(app)?.rxNostr3) {
-    return;
-  }
-  const rxNostr3 = createRxNostr({
-    verifier: verifier.get() ?? cryptoVerifier,
-    connectionStrategy: "lazy-keep",
-  });
-  app.update((be) => {
-    return { ...be, rxNostr3: rxNostr3 };
-  });
-}
-export function set3Relays(relays: any) {
-  if (!get(app).rxNostr3) {
-    get(app).rxNostr3 = createRxNostr({
-      verifier: verifier.get() ?? cryptoVerifier,
-      connectionStrategy: "lazy-keep",
-    }); //reaction repost用
-  }
-  get(app).rxNostr3.setDefaultRelays(relays);
-}
-
-export function rxNostr3RelaysReconnectChallenge() {
-  if (Object.entries(get(defaultRelays)).length == 0) {
-    return;
-  }
-  //AUTHチャレンジが必要なリレーは除く
-  const relays = Object.entries(get(defaultRelays)).filter(
-    ([key, value]) =>
-      value.read &&
-      !authRelay.get().includes(key) &&
-      get(app).rxNostr3.getRelayStatus(key)?.connection === "error"
-  );
-  if (relays.length === 0) return;
-
-  relays.forEach(([key, value]) => {
-    get(app).rxNostr.reconnect(key);
-  });
-}
-
-export function rxNostr3Status() {
-  console.log(get(app).rxNostr3.getAllRelayStatus());
-}
-export function rxNostr3ReccoctRelay(url: string) {
-  get(app).rxNostr3.reconnect(url);
-}
+//forward 1インスタンスにいっこだけと思いきやuseでなんか複数いけるらしい
+const reactionlistReq = createRxForwardReq();
 
 export function changeEmit(filters: Nostr.Filter[]) {
-  // addDebugLog("rxNostr3 changeEmit", filters);
-  req3.emit(filters);
+  reactionlistReq.emit(filters);
 }
 
 export function useReq3(): {
@@ -83,7 +30,7 @@ export function useReq3(): {
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
 
-  const obs: Observable<EventPacket> = get(app).rxNostr3.use(req3);
+  const obs: Observable<EventPacket> = get(app).rxNostr.use(reactionlistReq);
 
   const query = createQuery({
     queryKey: ["reactions"],
