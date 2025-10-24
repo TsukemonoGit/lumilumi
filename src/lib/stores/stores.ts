@@ -46,7 +46,7 @@ const config: QueryClientConfig = {
 export const metadataQueue = writable<[QueryKey, EventPacket][]>([]);
 export const queryClient = new QueryClient(config);
 
-export const app = writable<{ rxNostr: RxNostr; rxNostr3: RxNostr }>();
+export const app = writable<{ rxNostr: RxNostr }>();
 
 export const toastSettings = writable<{
   title: string;

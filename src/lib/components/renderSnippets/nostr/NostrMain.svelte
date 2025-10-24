@@ -21,7 +21,7 @@
     initLumiMute,
     initLumiMuteByKind,
   } from "$lib/func/constants";
-  import { setRxNostr3 } from "$lib/func/reactions";
+
   import {
     bookmark10003,
     lumiSetting,
@@ -109,7 +109,6 @@
   });
   function initializeRxNostr() {
     if (!$app?.rxNostr) setRxNostr();
-    if (!$app?.rxNostr3) setRxNostr3();
   }
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
