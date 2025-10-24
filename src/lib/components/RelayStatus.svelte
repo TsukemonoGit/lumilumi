@@ -64,9 +64,10 @@
   const errorStates: ConnectionState[] = ["error", "rejected", "terminated"];
   let errorRelayCount: number = $state(0);
   relayStateMap.subscribe((value) => {
-    //   stateが "error" 、"rejected"、 "terminated"のリレーの数を数える
-    errorRelayCount = [...value.values()].filter((state) =>
-      errorStates.includes(state)
+    const relayKeys = Object.keys($defaultRelays);
+
+    errorRelayCount = [...value.entries()].filter(
+      ([url, state]) => relayKeys.includes(url) && errorStates.includes(state)
     ).length;
   });
 </script>
