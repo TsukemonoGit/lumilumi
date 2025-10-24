@@ -54,7 +54,6 @@
   const handleClickReconnect = (url: string) => {
     reconnectRelay(url);
 
-    //リアクションの方の接続情報がわからないから全体のリコネクトチャレンジする
     disabledButton = url;
     setTimeout(() => {
       disabledButton = undefined;
