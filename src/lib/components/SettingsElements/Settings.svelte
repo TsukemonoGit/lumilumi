@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { createLabel, createRadioGroup, melt } from "@melt-ui/svelte";
   import * as Nostr from "nostr-typedef";
@@ -9,27 +9,18 @@
     mutes,
     mutebykinds,
     toastSettings,
-    nowProgress,
     queryClient,
+    nowProgress,
   } from "$lib/stores/stores";
   import * as nip19 from "nostr-tools/nip19";
 
   import type { LumiSetting } from "$lib/types";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { beforeNavigate } from "$app/navigation";
+  // import { beforeNavigate } from "$app/navigation";
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import {
-    Save,
-    X,
-    Image,
-    RotateCw,
-    ArrowUpRight,
-    HelpCircle,
-    CircleQuestionMark,
-    MessageCircleMore,
-  } from "lucide-svelte";
+  import { X, Image, ArrowUpRight, MessageCircleMore } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -60,8 +51,6 @@
   const lumiMuteByKind_STORAGE_KEY = "lumiMuteByKind";
   let settings: LumiSetting = $state({ ...initSettings });
 
-  let originalSettings: LumiSetting | undefined = undefined;
-
   //const optionsArr = ["0", "1"];
   let optionsArrStr = $derived([
     `${$_("settings.relayMenuText0")}`,
@@ -76,7 +65,6 @@
   let relayInput: string = $state("");
   let inputPubkey: string = $state("");
 
-  const selectedRelayset = writable<string>();
   // ラジオボタン設定
   const {
     elements: {
@@ -98,13 +86,17 @@
   });
 
   onMount(async () => {
+    $nowProgress = true;
     const savedSettings = loadSettings();
 
     if (savedSettings) {
       settings = { ...settings, ...savedSettings };
-      try {
-        inputPubkey = nip19.npubEncode(settings.pubkey);
-      } catch (error) {}
+      beforeRelays = settings.relays;
+      if (settings.pubkey) {
+        try {
+          inputPubkey = nip19.npubEncode(settings.pubkey);
+        } catch (error) {}
+      }
     } else {
       initializeSettings();
     }
@@ -118,8 +110,7 @@
       $emojis = emoji ? JSON.parse(emoji) : initLumiEmoji;
       $mutebykinds = mutebykind ? JSON.parse(mutebykind) : initLumiMuteByKind;
     } catch (error) {}
-
-    originalSettings = $state.snapshot(settings);
+    $nowProgress = false;
   });
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
@@ -195,38 +186,63 @@
     }
   }
 
+  let saveTimeout: ReturnType<typeof setTimeout> | undefined =
+    $state(undefined);
+
+  $effect(() => {
+    const snapshot = $state.snapshot(settings);
+    inputPubkey;
+
+    untrack(() => {
+      //リードリレーかライトリレーがないときはセーブしない
+      if (isRelaySelectionInvalid()) return;
+
+      // 既存のタイマーをクリア
+      if (saveTimeout !== undefined || $nowProgress) {
+        clearTimeout(saveTimeout);
+      }
+
+      isPubkeyValid(); //settings.pubkeyここで更新される invalidでも保存はできるようにする
+
+      // デバウンス処理: 300ms後に実行
+      saveTimeout = setTimeout(() => {
+        saveSettings();
+        saveTimeout = undefined;
+      }, 300);
+    });
+  });
+
   function removeRelay(url: string) {
     settings.relays = settings.relays.filter((relay) => relay.url !== url);
   }
 
-  function saveSettings(event?: Event) {
-    event?.preventDefault();
+  function saveSettings() {
+    if ($nowProgress) return; // 既に実行中なら中断
+    $nowProgress = true;
+
     console.log("save");
-    if (isRelaySelectionInvalid()) return;
-    if (!isPubkeyValid()) return; //settings.pubkeyここで更新される
-    $relaySetValue = settings.useRelaySet ?? "0"; //ラジオボタンの状態更新
+
     try {
       localStorage.setItem(
         STORAGE_KEYS.LUMI_SETTINGS,
         JSON.stringify(settings)
       );
 
-      $nowProgress = true;
+      /* $nowProgress = true;
       toastSettings.set({
         title: "Success",
         description: `${$_("settings.refreshPage")}`,
         color: "bg-green-500",
-      });
+      }); */
 
       updateStores(settings);
-
-      originalSettings = $state.snapshot(settings);
     } catch (error) {
-      toastSettings.set({
+      console.log(error);
+      /*   toastSettings.set({
         title: "Error",
         description: `Failed to save`,
         color: "bg-red-500",
-      });
+      }); */
     }
 
     //  location.reload();
@@ -242,7 +258,7 @@
       setRelays(settings.relays as DefaultRelayConfig[]);
     } else {
       // queryKey: ["defaultRelay", lumiSetting.get().pubkey] のデータがあるか確認
-
+      if (!lumiSetting.get().pubkey) return;
       const data: EventPacket[] | undefined = queryClient.getQueryData([
         "defaultRelay",
         lumiSetting.get().pubkey,
@@ -274,17 +290,9 @@
   function updateStores(settings: LumiSetting) {
     lumiSetting.get().pubkey = settings.pubkey || "";
 
-    //relayset情報を更新する前に確認
-    console.log($selectedRelayset, settings.useRelaySet);
-    if (
-      $selectedRelayset !== settings.useRelaySet ||
-      (settings.useRelaySet === "1" &&
-        JSON.stringify(beforeRelays) !== JSON.stringify(settings.relays))
-    ) {
-      resetDefaultRelay(settings);
-    }
+    resetDefaultRelay(settings);
+
     beforeRelays = settings.relays;
-    $selectedRelayset = settings.useRelaySet;
     lumiSetting.set(settings);
   }
 
@@ -294,11 +302,14 @@
       const hasRead = currentRelays.some((relay) => relay.read);
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
-        toastSettings.set({
+        console.log("リードリレーかライトリレーがない");
+        /*  
+      toastSettings.set({
           title: "Error",
           description: `${$_("settings.toast.relayError")}`,
           color: "bg-red-500",
         });
+        */
         return true;
       }
     }
@@ -307,46 +318,28 @@
 
   function isPubkeyValid() {
     if (!npubRegex.test(inputPubkey)) {
-      toastSettings.set({
+      /*  toastSettings.set({
         title: "Error",
         description: `${$_("settings.toast.pubkeyError")}`,
         color: "bg-red-500",
-      });
+      }); */
+      settings.pubkey = "";
       return false;
     }
     try {
-      console.log(inputPubkey);
+      //console.log(inputPubkey);
       settings.pubkey = nip19.decode(inputPubkey).data as string;
     } catch (error) {
       console.log(error);
-      toastSettings.set({
+      /*   toastSettings.set({
         title: "Error",
         description: "failed to save pubkey",
         color: "bg-red-500",
-      });
+      }); */
+      settings.pubkey = "";
       return false;
     }
     return true;
-  }
-
-  function cancelSettings() {
-    console.log("cancel");
-    const savedSettings = loadSettings();
-
-    settings = { ...initSettings };
-
-    originalSettings = $state.snapshot(settings);
-
-    $relaySetValue = settings.useRelaySet; //ラジオボタンの状態更新
-    if (savedSettings) {
-      settings = savedSettings;
-      inputPubkey = nip19.npubEncode(settings.pubkey);
-      toastSettings.set({
-        title: "Success",
-        description: `${$_("settings.toast.resetData")}`,
-        color: "bg-green-500",
-      });
-    }
   }
 
   async function handleClickLogin() {
@@ -361,78 +354,6 @@
       console.log(error);
     }
   }
-
-  //変更があったらtrue
-  function settingsChanged(): boolean {
-    const changedFields: string[] = [];
-    if (!originalSettings) {
-      //公開鍵が設定されてないとロードするデータが探せないからね
-      return true;
-    }
-    let currentSettings = $state.snapshot(settings);
-    try {
-      currentSettings = {
-        ...currentSettings,
-        pubkey: nip19.decode(inputPubkey).data as string,
-      };
-    } catch (error) {
-      return true;
-    }
-    console.log("currentSettings", currentSettings);
-    console.log("$originalSettings", originalSettings);
-    // オリジナル設定のプロパティをループ
-    for (const key in originalSettings) {
-      if (originalSettings.hasOwnProperty(key) && key in currentSettings) {
-        if (
-          originalSettings[key as keyof LumiSetting]?.toString() !==
-          currentSettings[key as keyof LumiSetting]?.toString()
-        ) {
-          changedFields.push(key as keyof LumiSetting);
-        }
-      } else {
-        return true;
-      }
-    }
-
-    if (changedFields.length > 0) {
-      console.log("Changed fields:", changedFields);
-      return true;
-    }
-
-    return false;
-  }
-
-  let shouldReload = false;
-  // リロード前にフラグを設定してイベントリスナーを無効にする関数
-  function reloadWithoutWarning() {
-    shouldReload = true;
-
-    try {
-      location.reload();
-    } catch (e) {}
-  }
-
-  beforeNavigate((navigation) => {
-    console.log("beforeNavigate", navigation.type);
-
-    if (navigation.from?.url.href === navigation.to?.url.href) {
-      navigation.cancel();
-      return;
-    }
-    // ダイアログ関連のナビゲーションを識別するための条件
-    const isDialog =
-      (navigation.to?.url as any).state?.dialogOpen !== undefined;
-    // ダイアログ操作ではなく、フォーム送信でもなく、変更がある場合のみ確認
-    if (isDialog && settingsChanged()) {
-      if (
-        !confirm(
-          "You have unsaved changes. Are you sure you want to leave this page?"
-        )
-      ) {
-        navigation.cancel();
-      }
-    }
-  });
 
   const emojiTag: Writable<string[]> = writable([]);
   let customString: string = $state("");
@@ -600,11 +521,6 @@
         </label>
       </li>
       <li>
-        {$_("settings.post.picQuarity")}
-        {settings.picQuarity}%
-        <PicQuarity bind:value={settings.picQuarity} />
-      </li>
-      <li>
         <label>
           <input
             type="checkbox"
@@ -626,6 +542,11 @@
             </div>
           {/snippet}</Popover
         >
+      </li>
+      <li>
+        {$_("settings.post.picQuarity")}
+        {settings.picQuarity}%
+        <PicQuarity bind:value={settings.picQuarity} />
       </li>
     </ul>
   </fieldset>
@@ -830,9 +751,9 @@
     </div>
   </fieldset>
 
-  <Kind30078 {settingsChanged} bind:settings saveLumiSettings={saveSettings} />
+  <Kind30078 bind:settings saveLumiSettings={saveSettings} />
 
-  <div
+  <!--  <div
     class="sticky bottom-14 md:bottom-2 bg-neutral-200/80 border border-magnum-500 rounded-md flex flex-row items-center gap-4 mt-1 justify-center p-2 w-fit ml-auto"
   >
     <button
@@ -851,7 +772,7 @@
       class=" rounded-md bg-magnum-200 w-20 h-10 font-medium text-magnum-800 hover:bg-magnum-500 active:opacity-50"
       onclick={cancelSettings}>CANCEL</button
     >
-  </div>
+  </div> -->
 </form>
 
 <Dialog bind:open id={"mutebykind_image"}

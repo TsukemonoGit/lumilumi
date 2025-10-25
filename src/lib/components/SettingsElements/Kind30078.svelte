@@ -38,15 +38,10 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   interface Props {
-    settingsChanged: () => boolean;
     saveLumiSettings: () => void;
     settings: LumiSetting;
   }
-  let {
-    settingsChanged,
-    saveLumiSettings,
-    settings = $bindable(),
-  }: Props = $props();
+  let { saveLumiSettings, settings = $bindable() }: Props = $props();
 
   let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;
@@ -57,17 +52,6 @@
   let alertdialogOpen: (bool: boolean) => void = () => {};
 
   async function handleClickUpDownload() {
-    if (settingsChanged()) {
-      //編集中の項目があります。さきにsave（またはリセット）してください
-      $toastSettings = {
-        title: "Error",
-        description:
-          "編集中の項目があります。さきにsave（またはリセット）してください",
-        color: "bg-red-500",
-      };
-      return;
-    }
-
     //localのデータを整形 nameは未定？
     try {
       localLumisetting = {
