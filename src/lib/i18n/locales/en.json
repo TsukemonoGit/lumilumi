@@ -106,7 +106,7 @@
     "banner": "Banner",
     "website": "Website",
     "nip05": "Domain authentication (NIP-05)",
-    "lud": "LNURL address / Lightning address",
+    "lud": "Lightning address",
     "about": "About",
     "birth": "Birthday"
   },

@@ -151,11 +151,12 @@
 
   const handleClickSave = async () => {
     if (newProfile) {
+      lud = lud.trim();
       if (lud !== "") {
-        if (LUD06Regex.test(lud.trim())) {
+        if (LUD06Regex.test(lud)) {
           newProfile.lud06 = lud;
           delete newProfile.lud16;
-        } else if (newProfile && LUD16Regex.test(lud.trim())) {
+        } else if (newProfile && LUD16Regex.test(lud)) {
           newProfile.lud16 = lud;
           delete newProfile.lud06;
         } else {
@@ -508,7 +509,7 @@
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500 mb-2"
         bind:value={lud}
-        placeholder="LURL1XXXXXX / lightning@wallet.com"
+        placeholder="lightning@wallet.com"
       />
 
       {$_("profile.birth")}
