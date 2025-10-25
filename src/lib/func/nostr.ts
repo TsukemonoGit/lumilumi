@@ -451,7 +451,7 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
-        console.log(packet);
+        //console.log(packet);
         /*  addDebugLog(
           `リレー ${packet.from} への送信が ${
             packet.ok ? "成功" : "失敗"
