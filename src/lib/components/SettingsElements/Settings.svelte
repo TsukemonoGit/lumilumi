@@ -20,7 +20,16 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { Save, X, Image, RotateCw, ArrowUpRight } from "lucide-svelte";
+  import {
+    Save,
+    X,
+    Image,
+    RotateCw,
+    ArrowUpRight,
+    HelpCircle,
+    CircleQuestionMark,
+    MessageCircleMore,
+  } from "lucide-svelte";
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
@@ -44,6 +53,7 @@
   import ColorThemeSelect from "./ColorThemeSelect.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import Dialog from "../Elements/Dialog.svelte";
+  import Popover from "../Elements/Popover.svelte";
 
   const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -601,13 +611,21 @@
             class="rounded-checkbox"
             bind:checked={settings.protectedEvents}
           />
-          {$_("settings.post.protectedEvents")}
+          {$_("settings.post.protectedEvents.title")}
           <Link
             className="text-sm underline text-magnum-300"
             href="https://github.com/nostr-protocol/nips/blob/master/70.md"
             >(NIP-70)</Link
           >
-        </label>
+        </label><Popover ariaLabel="protected events"
+          ><MessageCircleMore
+            size={16}
+            class="ml-1 text-magnum-500"
+          />{#snippet popoverContent()}<div class="w-52 pt-4 text-sm">
+              {$_("settings.post.protectedEvents.message")}
+            </div>
+          {/snippet}</Popover
+        >
       </li>
     </ul>
   </fieldset>

@@ -62,6 +62,7 @@ import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
 import { STORAGE_KEYS } from "./localStorageKeys";
+import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -390,7 +391,12 @@ export function useMainTimelineReq(
 }
 
 export function publishEvent(ev: Nostr.EventParameters) {
-  if (lumiSetting.get().protectedEvents) {
+  //プロテクト設定かつ書き換え可能イベント以外
+  if (
+    lumiSetting.get().protectedEvents &&
+    !isAddressableKind(ev.kind) &&
+    !isReplaceableKind(ev.kind)
+  ) {
     ev.tags = [["-"], ...(ev.tags || [])];
   }
   const _rxNostr = get(app).rxNostr;
@@ -470,7 +476,12 @@ export async function promisePublishEvent(
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
-    if (lumiSetting.get().protectedEvents) {
+    //プロテクト設定かつ書き換え可能イベント以外
+    if (
+      lumiSetting.get().protectedEvents &&
+      !isAddressableKind(ev.kind) &&
+      !isReplaceableKind(ev.kind)
+    ) {
       ev.tags = [["-"], ...(ev.tags || [])];
     }
     const event = await signer.signEvent(ev); //この段階ででかすぎるときエラーになる
