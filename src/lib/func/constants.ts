@@ -90,6 +90,7 @@ export const initSettings: LumiSetting = {
   showAllReactions: false,
   kind42inTL: false,
   imageAutoExpand: "all", //画像自動展開ありなし
+  protectedEvents: false, //NIP-70
 };
 export const initLumiEmoji: LumiEmoji = {
   list: [],

@@ -62,6 +62,7 @@ import { SigningError } from "./publishError";
 
 import { throttle } from "$lib/func/throttle";
 import { STORAGE_KEYS } from "./localStorageKeys";
+import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -390,6 +391,14 @@ export function useMainTimelineReq(
 }
 
 export function publishEvent(ev: Nostr.EventParameters) {
+  //プロテクト設定かつ書き換え可能イベント以外
+  if (
+    lumiSetting.get().protectedEvents &&
+    !isAddressableKind(ev.kind) &&
+    !isReplaceableKind(ev.kind)
+  ) {
+    ev.tags = [["-"], ...(ev.tags || [])];
+  }
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("error");
@@ -448,6 +457,7 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
+        //console.log(packet);
         /*  addDebugLog(
           `リレー ${packet.from} への送信が ${
             packet.ok ? "成功" : "失敗"
@@ -466,6 +476,14 @@ export async function promisePublishEvent(
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
+    //プロテクト設定かつ書き換え可能イベント以外
+    if (
+      lumiSetting.get().protectedEvents &&
+      !isAddressableKind(ev.kind) &&
+      !isReplaceableKind(ev.kind)
+    ) {
+      ev.tags = [["-"], ...(ev.tags || [])];
+    }
     const event = await signer.signEvent(ev); //この段階ででかすぎるときエラーになる
 
     return promisePublishSignedEvent(event, relays);

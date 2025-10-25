@@ -42,7 +42,11 @@
     "post": {
       "addClientTag": "Add client tag (via) to your posts",
       "defaultReaction": "Default Reaction",
-      "picQuarity": "Upload Photo Quality (for JPEG/JPG Only)"
+      "picQuarity": "Upload Photo Quality (for JPEG/JPG Only)",
+      "protectedEvents": {
+        "title": "Protected Events",
+        "message": "Except for replaceable configuration events like relay lists, the relay will reject broadcasts of an event by anyone other than its author."
+      }
     },
     "douki": {
       "title": "Sync"
