@@ -390,6 +390,9 @@ export function useMainTimelineReq(
 }
 
 export function publishEvent(ev: Nostr.EventParameters) {
+  if (lumiSetting.get().protectedEvents) {
+    ev.tags = [["-"], ...(ev.tags || [])];
+  }
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
     console.log("error");
@@ -448,6 +451,7 @@ export async function promisePublishSignedEvent(
 
     _rxNostr.send(event, { relays: relays }).subscribe({
       next: (packet) => {
+        console.log(packet);
         /*  addDebugLog(
           `リレー ${packet.from} への送信が ${
             packet.ok ? "成功" : "失敗"
@@ -466,6 +470,9 @@ export async function promisePublishEvent(
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
+    if (lumiSetting.get().protectedEvents) {
+      ev.tags = [["-"], ...(ev.tags || [])];
+    }
     const event = await signer.signEvent(ev); //この段階ででかすぎるときエラーになる
 
     return promisePublishSignedEvent(event, relays);

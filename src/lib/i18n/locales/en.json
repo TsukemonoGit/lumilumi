@@ -42,7 +42,8 @@
     "post": {
       "addClientTag": "Add client tag (via) to your posts",
       "defaultReaction": "Default Reaction",
-      "picQuarity": "Upload Photo Quality (for JPEG/JPG Only)"
+      "picQuarity": "Upload Photo Quality (for JPEG/JPG Only)",
+      "protectedEvents": "Protected Events"
     },
     "douki": {
       "title": "Sync"

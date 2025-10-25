@@ -146,6 +146,7 @@ export interface LumiSetting {
   addClientTag: boolean;
   imageAutoExpand: ImageAutoExpand; //画像表示のワンクッションあり
   defaultReaction: { content: string; tag: string[] };
+  protectedEvents: boolean; //NIP-70
 }
 export interface LumiEmoji {
   list: string[][];

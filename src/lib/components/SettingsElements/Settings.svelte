@@ -24,7 +24,6 @@
 
   import CustomReaction from "../NostrElements/kindEvents/NoteActionButtuns/CustomReaction.svelte";
   import Link from "../Elements/Link.svelte";
-  import Dialog from "../Elements/Dialog.svelte";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { type DefaultRelayConfig, latest } from "rx-nostr";
   import { pipe } from "rxjs";
@@ -42,9 +41,9 @@
   import PicQuarity from "./PicQuarity.svelte";
   import ImageAutoExpand from "./ImageAutoExpand.svelte";
   import { normalizeURL } from "nostr-tools/utils";
-  import { addDebugLog, debugError, debugInfo } from "../Debug/debug";
   import ColorThemeSelect from "./ColorThemeSelect.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import Dialog from "../Elements/Dialog.svelte";
 
   const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -89,24 +88,14 @@
   });
 
   onMount(async () => {
-    addDebugLog("Component mounted - starting initialization");
-
     const savedSettings = loadSettings();
-    addDebugLog("Loaded settings from localStorage", savedSettings);
 
     if (savedSettings) {
       settings = { ...settings, ...savedSettings };
-      addDebugLog("Merged saved settings into current state");
       try {
         inputPubkey = nip19.npubEncode(settings.pubkey);
-        addDebugLog("Encoded pubkey to npub", inputPubkey);
-      } catch (error) {
-        addDebugLog("Failed to encode pubkey", error);
-      }
+      } catch (error) {}
     } else {
-      addDebugLog(
-        "No valid saved settings found - calling initializeSettings()"
-      );
       initializeSettings();
     }
 
@@ -118,14 +107,9 @@
       $mutes = mute ? JSON.parse(mute) : initLumiMute;
       $emojis = emoji ? JSON.parse(emoji) : initLumiEmoji;
       $mutebykinds = mutebykind ? JSON.parse(mutebykind) : initLumiMuteByKind;
-
-      addDebugLog("Loaded mutes/emojis/mutebykind from localStorage");
-    } catch (error) {
-      addDebugLog("Error while loading mute/emoji/mutebykind", error);
-    }
+    } catch (error) {}
 
     originalSettings = $state.snapshot(settings);
-    addDebugLog("Captured originalSettings snapshot", originalSettings);
   });
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
@@ -152,21 +136,17 @@
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.LUMI_SETTINGS);
       if (!saved) {
-        addDebugLog("No lumiSetting found in localStorage");
         return null;
       }
 
       const parsed = JSON.parse(saved);
       if (isValidLumiSetting(parsed)) {
-        addDebugLog("Parsed valid lumiSetting from localStorage", parsed);
         $relaySetValue = parsed.useRelaySet;
         return parsed;
       } else {
-        addDebugLog("Invalid lumiSetting structure", parsed);
         return null;
       }
     } catch (e) {
-      addDebugLog("Error loading lumiSetting", e);
       return null;
     }
   }
@@ -278,17 +258,6 @@
           setRelays(setRelaysByKind10002(relays[0].event));
         }
       }
-      //else {
-      // データがない場合は useRelaySet を呼び出してデフォルトのリレーを設定//これなくてもちゃんと動いてそう（？？）
-      //コンポーネント外やでerrorがでる
-      // useRelaySet(
-      //   ["defaultRelay", lumiSetting.get().pubkey],
-      //   [
-      //     { authors: [lumiSetting.get().pubkey], kinds: [10002], limit: 1 },
-      //   ] as Nostr.Filter[],
-      //   undefined
-      // );
-      //}
     }
   }
 
@@ -408,8 +377,6 @@
           originalSettings[key as keyof LumiSetting]?.toString() !==
           currentSettings[key as keyof LumiSetting]?.toString()
         ) {
-          // console.log(originalSettings[key as keyof LumiSetting]);
-          // console.log(currentSettings[key as keyof LumiSetting]);
           changedFields.push(key as keyof LumiSetting);
         }
       } else {
@@ -431,31 +398,9 @@
     shouldReload = true;
 
     try {
-      debugInfo("リロード実行", { shouldReload });
       location.reload();
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "SecurityError") {
-        debugError("リロード失敗: セキュリティエラー", e);
-      } else {
-        debugError("リロード失敗: その他のエラー", e);
-        // throw e; // 不明な例外は再スロー（必要に応じて）
-      }
-    }
+    } catch (e) {}
   }
-
-  // function handleBeforeUnload(e: BeforeUnloadEvent) {
-  //   if (!shouldReload && settingsChanged()) {
-  //     e.preventDefault();
-  //     e.returnValue = "";
-  //   }
-  // }
-
-  // onDestroy(() => {
-  //   console.log("onDestroy", shouldReload);
-  //   if (browser && !shouldReload) {
-  //     window?.removeEventListener("beforeunload", handleBeforeUnload);
-  //   }
-  // });
 
   beforeNavigate((navigation) => {
     console.log("beforeNavigate", navigation.type);
@@ -648,6 +593,21 @@
         {$_("settings.post.picQuarity")}
         {settings.picQuarity}%
         <PicQuarity bind:value={settings.picQuarity} />
+      </li>
+      <li>
+        <label>
+          <input
+            type="checkbox"
+            class="rounded-checkbox"
+            bind:checked={settings.protectedEvents}
+          />
+          {$_("settings.post.protectedEvents")}
+          <Link
+            className="text-sm underline text-magnum-300"
+            href="https://github.com/nostr-protocol/nips/blob/master/70.md"
+            >(NIP-70)</Link
+          >
+        </label>
       </li>
     </ul>
   </fieldset>

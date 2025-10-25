@@ -13,7 +13,7 @@
   } from "$lib/stores/stores";
 
   import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
-  import { nip07Signer} from "rx-nostr";
+  import { nip07Signer } from "rx-nostr";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import AlertDialog from "./Elements/AlertDialog.svelte";
   import CreatePost from "./CreatePost.svelte";
@@ -74,7 +74,7 @@
   let openHellConfirm: (bool: boolean) => void = $state(() => {});
   let resetCreatePost: () => void = $state(() => {});
 
-  let textarea: HTMLTextAreaElement | undefined=$state();
+  let textarea: HTMLTextAreaElement | undefined = $state();
 
   // ----------------------------------------
   // User Authentication
@@ -123,9 +123,13 @@
     isPosting = true;
     $nowProgress = true;
     const signer = nip07Signer();
-
+    const newevent = $state.snapshot(newev);
     try {
-      const event = await signer.signEvent($state.snapshot(newev));
+      if (lumiSetting.get().protectedEvents) {
+        newevent.tags = [["-"], ...(newevent.tags || [])];
+      }
+
+      const event = await signer.signEvent($state.snapshot(newevent));
       const { event: ev, res } = await promisePublishSignedEvent(event);
 
       const successRelays = res
@@ -204,9 +208,11 @@
   // UI Interaction
   // ----------------------------------------
   function handleOverlayClick(event: MouseEvent) {
-if(textarea?.value.trim()){
+    if (textarea?.value.trim()) {
       openConfirm?.(true);
-   }else{$open=false}
+    } else {
+      $open = false;
+    }
   }
 
   function keyboardShortcut(event: KeyboardEvent) {
@@ -337,7 +343,8 @@ if(textarea?.value.trim()){
             max-w-[95vw] -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       use:melt={$content}
     >
-      <CreatePost bind:textarea={textarea}
+      <CreatePost
+        bind:textarea
         {close}
         {initOptions}
         {signPubkey}
