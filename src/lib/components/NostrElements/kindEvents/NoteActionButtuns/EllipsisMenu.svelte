@@ -189,7 +189,7 @@
       },
 
       // ブックマーク（条件付き）
-      ...(note.kind === 1 || note.kind === 30023
+      ...(note.kind === 1 || note.kind === 42 || note.kind === 30023
         ? [
             {
               text: `${isBookmarked ? `${$_("menu.bookmark.remove")}` : `${$_("menu.bookmark.add")}`}`,
