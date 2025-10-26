@@ -203,6 +203,7 @@
 
 <!-- ✅ UI部分 -->
 <button
+  type="button"
   class={buttonClass ||
     "hover:opacity-75 active:opacity-50 disabled:opacity-25"}
   disabled={$nowProgress}

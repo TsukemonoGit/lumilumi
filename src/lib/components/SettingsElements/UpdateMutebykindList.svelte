@@ -96,6 +96,7 @@
 </script>
 
 <button
+  type="button"
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   onclick={handleClickMuteByKind}>MuteByKind</button
@@ -104,6 +105,7 @@
     ? formatAbsoluteDateFromUnix($mutebykinds?.updated)
     : ""}</time
 >{#if $mutebykinds}<button
+    type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
