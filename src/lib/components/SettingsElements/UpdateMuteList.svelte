@@ -21,7 +21,8 @@
   let { pubkey = $bindable() }: Props = $props();
   //export let muteList: LumiMute | undefined;
   let dialogOpen: any = writable(false);
-  async function handleClickMute() {
+  async function handleClickMute(e: MouseEvent) {
+  //  e.preventDefault();
     const beforeList = $mutes?.event;
     try {
       const gotPubkey = await (
@@ -88,7 +89,7 @@
   }
 </script>
 
-<button
+<button type="button"
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   onclick={handleClickMute}>Mute</button
@@ -96,7 +97,7 @@
   >{$_("settings.lastUpdated")}: {$mutes
     ? formatAbsoluteDateFromUnix($mutes?.updated)
     : ""}</time
->{#if $mutes}<button
+>{#if $mutes}<button type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}
