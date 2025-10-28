@@ -133,6 +133,7 @@
     if (navigate.type !== "form") {
       view = false;
       if (!isOnMount) {
+        isOnMount = true;
         since = undefined;
         await init();
 
