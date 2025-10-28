@@ -10,6 +10,7 @@
   import { now } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
   import * as Nostr from "nostr-typedef";
+  import { awaitInterval } from "$lib/func/util";
 
   let isOnMount = false;
   let amount = 50;
@@ -77,73 +78,75 @@
   });
 </script>
 
-{#if since && globalRelays && globalRelays.length > 0}
-  <TimelineList
-    bind:resetUniq
-    queryKey={timelineQuery}
-    filters={[
-      {
-        kinds: [1, 6, 16],
+{#await awaitInterval(100) then}
+  {#if since && globalRelays && globalRelays.length > 0}
+    <TimelineList
+      bind:resetUniq
+      queryKey={timelineQuery}
+      filters={[
+        {
+          kinds: [1, 6, 16],
 
-        since: since,
-      },
-    ]}
-    olderFilters={[
-      {
-        kinds: [1, 6, 16],
+          since: since,
+        },
+      ]}
+      olderFilters={[
+        {
+          kinds: [1, 6, 16],
 
-        since: since,
-      },
-    ]}
-    {req}
-    {viewIndex}
-    {amount}
-    relays={globalRelays}
-    {eventFilter}
-  >
-    {#snippet content({ events, len })}
-      <!-- <SetRepoReactions /> -->
-      <div
-        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-      >
-        {#if events && events.length > 0}
-          {#each events as event, index (event.id)}
-            <Metadata
-              queryKey={["metadata", event.pubkey]}
-              pubkey={event.pubkey}
-            >
-              {#snippet loading()}
-                <div class="w-full">
-                  <EventCard note={event} />
-                </div>
-              {/snippet}
-              {#snippet nodata()}
-                <div class="w-full">
-                  <EventCard note={event} />
-                </div>
-              {/snippet}
-              {#snippet error()}
-                <div class="w-full">
-                  <EventCard note={event} />
-                </div>
-              {/snippet}
-              {#snippet content({ metadata })}
-                <EventCard {metadata} note={event} />
-              {/snippet}
-            </Metadata>
-            <!-- </div> -->
-          {/each}{/if}
-      </div>{/snippet}
-    {#snippet loading()}
-      <div>
-        <p>Loading...</p>
-      </div>
-    {/snippet}
+          since: since,
+        },
+      ]}
+      {req}
+      {viewIndex}
+      {amount}
+      relays={globalRelays}
+      {eventFilter}
+    >
+      {#snippet content({ events, len })}
+        <!-- <SetRepoReactions /> -->
+        <div
+          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+        >
+          {#if events && events.length > 0}
+            {#each events as event, index (event.id)}
+              <Metadata
+                queryKey={["metadata", event.pubkey]}
+                pubkey={event.pubkey}
+              >
+                {#snippet loading()}
+                  <div class="w-full">
+                    <EventCard note={event} />
+                  </div>
+                {/snippet}
+                {#snippet nodata()}
+                  <div class="w-full">
+                    <EventCard note={event} />
+                  </div>
+                {/snippet}
+                {#snippet error()}
+                  <div class="w-full">
+                    <EventCard note={event} />
+                  </div>
+                {/snippet}
+                {#snippet content({ metadata })}
+                  <EventCard {metadata} note={event} />
+                {/snippet}
+              </Metadata>
+              <!-- </div> -->
+            {/each}{/if}
+        </div>{/snippet}
+      {#snippet loading()}
+        <div>
+          <p>Loading...</p>
+        </div>
+      {/snippet}
 
-    {#snippet error()}
-      <div>
-        <p>{error}</p>
-      </div>
-    {/snippet}
-  </TimelineList>
-{/if}
+      {#snippet error()}
+        <div>
+          <p>{error}</p>
+        </div>
+      {/snippet}
+    </TimelineList>
+  {/if}
+{/await}
