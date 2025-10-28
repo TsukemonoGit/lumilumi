@@ -27,7 +27,7 @@
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
-  import { queryClient } from "$lib/stores/stores";
+  import { defaultRelays, queryClient } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
@@ -134,6 +134,7 @@
       view = false;
       if (!isOnMount) {
         isOnMount = true;
+        since = undefined;
         await init();
 
         isOnMount = false;
@@ -154,15 +155,15 @@
     if (!lumiSetting.get().pubkey && data.relays && data.relays.length > 0) {
       setRelays(data.relays);
     }
-    since = undefined;
+
     const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);
-    if (!ev || ev.length <= 0) {
-      since = now();
-    } else {
+    if (ev && ev[0]?.event?.created_at) {
       since = ev[0].event.created_at;
+    } else {
+      since = now();
     }
     // console.log(data.nip05Address);
     if (data.nip05Address) {
@@ -197,6 +198,7 @@
     isBirthDay = checkBirthDay(prof);
   };
   beforeNavigate(() => {
+    since = undefined;
     isBirthDay = false;
   });
 </script>
@@ -244,7 +246,7 @@
           {#if $value === "post"}
             <PinList {userPubkey} />
 
-            {#if since}
+            {#if since && Object.keys($defaultRelays).length > 0}
               <TimelineList
                 queryKey={timelineQuery}
                 filters={[
