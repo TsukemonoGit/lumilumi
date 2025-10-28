@@ -7,7 +7,7 @@
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
-  import { now, type EventPacket } from "rx-nostr/src";
+  import { now } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
   import * as Nostr from "nostr-typedef";
 
@@ -39,6 +39,7 @@
   afterNavigate(async (navigate) => {
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
+      since = undefined;
       await init();
 
       isOnMount = false;
@@ -47,23 +48,23 @@
 
   let since: number | undefined = $state(undefined);
   async function init() {
-    since = undefined;
-
+    /* 
     const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
     ]);
 
-    if (!ev || ev.length <= 0) {
-      since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
-    } else {
+    if (!ev || ev.length <= 0) { */
+    since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
+    /*  } else {
       since = ev[0].event.created_at;
-    }
+    }*/
   }
 
   // svelte-ignore non_reactive_update
   let resetUniq: () => void;
   onDestroy(() => {
+    since = undefined;
     queryClient.removeQueries({
       queryKey: timelineQuery,
     });
