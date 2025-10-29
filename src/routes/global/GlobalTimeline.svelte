@@ -78,7 +78,6 @@
   });
 </script>
 
-{since}
 {#if since && globalRelays && globalRelays.length > 0}
   <TimelineList
     bind:resetUniq
