@@ -56,7 +56,7 @@
     ]);
 
     if (!ev || ev.length <= 0) { */
-    since = since = now() - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
+    since = Math.floor(Date.now() / 1000) - 10 * 60; //10分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する //now();
     /*  } else {
       since = ev[0].event.created_at;
     }*/
@@ -78,75 +78,74 @@
   });
 </script>
 
-{#await awaitInterval(100) then}
-  {#if since && globalRelays && globalRelays.length > 0}
-    <TimelineList
-      bind:resetUniq
-      queryKey={timelineQuery}
-      filters={[
-        {
-          kinds: [1, 6, 16],
+{since}
+{#if since && globalRelays && globalRelays.length > 0}
+  <TimelineList
+    bind:resetUniq
+    queryKey={timelineQuery}
+    filters={[
+      {
+        kinds: [1, 6, 16],
 
-          since: since,
-        },
-      ]}
-      olderFilters={[
-        {
-          kinds: [1, 6, 16],
+        since: since,
+      },
+    ]}
+    olderFilters={[
+      {
+        kinds: [1, 6, 16],
 
-          since: since,
-        },
-      ]}
-      {req}
-      {viewIndex}
-      {amount}
-      relays={globalRelays}
-      {eventFilter}
-    >
-      {#snippet content({ events, len })}
-        <!-- <SetRepoReactions /> -->
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event, index (event.id)}
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-              >
-                {#snippet loading()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet nodata()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet error()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet content({ metadata })}
-                  <EventCard {metadata} note={event} />
-                {/snippet}
-              </Metadata>
-              <!-- </div> -->
-            {/each}{/if}
-        </div>{/snippet}
-      {#snippet loading()}
-        <div>
-          <p>Loading...</p>
-        </div>
-      {/snippet}
+        since: since,
+      },
+    ]}
+    {req}
+    {viewIndex}
+    {amount}
+    relays={globalRelays}
+    {eventFilter}
+  >
+    {#snippet content({ events, len })}
+      <!-- <SetRepoReactions /> -->
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+      >
+        {#if events && events.length > 0}
+          {#each events as event, index (event.id)}
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet loading()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet error()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard {metadata} note={event} />
+              {/snippet}
+            </Metadata>
+            <!-- </div> -->
+          {/each}{/if}
+      </div>{/snippet}
+    {#snippet loading()}
+      <div>
+        <p>Loading...</p>
+      </div>
+    {/snippet}
 
-      {#snippet error()}
-        <div>
-          <p>{error}</p>
-        </div>
-      {/snippet}
-    </TimelineList>
-  {/if}
-{/await}
+    {#snippet error()}
+      <div>
+        <p>{error}</p>
+      </div>
+    {/snippet}
+  </TimelineList>
+{/if}

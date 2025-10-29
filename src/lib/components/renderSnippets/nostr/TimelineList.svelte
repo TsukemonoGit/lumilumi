@@ -164,7 +164,7 @@
   const keyFn = (packet: EventPacket): string => packet.event.id;
 
   const [uniq, eventIds] = createUniq(keyFn);
-
+  console.log(filters);
   // Create the timeline event list
   let result = useTimelineEventList(
     queryKey,
