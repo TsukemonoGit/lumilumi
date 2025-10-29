@@ -30,11 +30,7 @@
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
   import RegexFilter from "./RegexFilter.svelte";
 
-  // Constants
-  //const TIE_KEY = "global";
-
   // State variables
-  let compRef: SvelteComponent | undefined = $state();
   let openGlobalTimeline: boolean = $state(false);
   let globalRelays: string[] = $state.raw([]);
   let relaySettei = $state(false);
@@ -316,10 +312,8 @@
       />
     {/if}
     <RegexFilter bind:filter={regexFilter} />
-    <!-- {#snippet children()} -->
     {#if openGlobalTimeline && globalRelays.length > 0}
       <GlobalTimeline
-        bind:this={compRef}
         {globalRelays}
         {timelineQuery}
         eventFilter={(note) => {
@@ -327,7 +321,6 @@
         }}
       />
     {/if}
-    <!-- {/snippet} -->
   </section>
 {/if}
 <div class="postWindow">
