@@ -65,16 +65,15 @@
   // svelte-ignore non_reactive_update
   let resetUniq: () => void;
   onDestroy(() => {
+    resetUniq?.();
     since = undefined;
-    queryClient.removeQueries({
+    queryClient.resetQueries({
       queryKey: timelineQuery,
     });
-    queryClient.removeQueries({
+    queryClient.resetQueries({
       queryKey: [...timelineQuery, "olderData"],
     });
     console.log("GlobalTimelineDestroy");
-
-    resetUniq?.();
   });
 </script>
 
@@ -92,8 +91,6 @@
     olderFilters={[
       {
         kinds: [1, 6, 16],
-
-        since: since,
       },
     ]}
     {req}

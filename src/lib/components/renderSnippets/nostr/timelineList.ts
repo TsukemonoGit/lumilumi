@@ -17,13 +17,6 @@ type EnhancedEventPacket = EventPacket & {
   isNew: boolean;
 };
 
-// Common operator pipeline function
-const createOperatorPipeline = (
-  tie: OperatorFunction<EventPacket, EnhancedEventPacket>
-) => {
-  return pipe(tie, uniq(), scanArray());
-};
-
 /**
  * Load older events based on filters and timestamp
  * @param sift - Number of events to retrieve
@@ -38,7 +31,7 @@ export async function loadOlderEvents(
   sift: number,
   filters: Filter[],
   until: number,
-  tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
+  operator: OperatorFunction<EventPacket, EventPacket[]>,
   relays?: string[],
   onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
   timeout?: number
@@ -61,7 +54,6 @@ export async function loadOlderEvents(
 
   // Create request and operator pipeline
   const newReq = createRxBackwardReq();
-  const operator = createOperatorPipeline(tie);
 
   // Fetch events
   const olderEvents = await usePromiseReq(
@@ -99,13 +91,12 @@ export async function loadOlderEvents(
 export async function firstLoadOlderEvents(
   sift: number,
   filters: Filter[],
-  tie: OperatorFunction<EventPacket, EnhancedEventPacket>,
+  operator: OperatorFunction<EventPacket, EventPacket[]>,
   relays?: string[],
   onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
   timeout?: number
 ): Promise<EventPacket[]> {
   const newReq = createRxBackwardReq();
-  const operator = createOperatorPipeline(tie);
 
   // Fetch events with longer timeout (4000ms)
   const olderEvents = await usePromiseReq(
@@ -123,7 +114,7 @@ export async function firstLoadOlderEvents(
     requested: sift || "unlimited",
     received: olderEvents.length,
     relays: relays?.length || "default",
-    filtersCount: filters.length,
+    filters: filters,
     hasCallback: !!onData,
   });
 

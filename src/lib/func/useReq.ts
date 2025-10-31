@@ -413,7 +413,7 @@ export function useGlobalReq(
 
         globalSubscription = obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //console.log(v);
+            // console.log(v);
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
             } else {
