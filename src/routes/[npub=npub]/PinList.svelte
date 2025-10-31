@@ -28,7 +28,9 @@
 
   let editable = $derived(userPubkey === $loginUser);
 
-  let inputValue = $state("");
+  let inputValue = $state(
+    "naddr1qvzqqqr4gupzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qyxhwumn8ghj77tpvf6jumt9qyshwumn8ghj7cmpvakxjmmnw3ezucm0d4cxjmr994jhyun0wghxuet5qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhhstntda4xjunp9e5k7qgawaehxw309ahx7um5wghxxmmdwp5kcefdv4e8ymmj9ehx2aqpzamhxue69uhkummnw3ezu6t5w3skumt09ekk2mspz3mhxue69uhhyetvv9ujuerpd46hxtnfduq3vamnwvaz7tmjv4kxz7fwdehhxarj9e3xzmnyqyv8wumn8ghj7un9d3shjtnddakk7um5wgh8q6twdvqq5mt0dehj6ar0dak8xpj50v0"
+  );
   let previewData = $state<{
     type: "note" | "naddr" | null;
     id: string | nip19.AddressPointer;
@@ -285,9 +287,10 @@
   {onClickOK}
 >
   {#snippet main()}
-    {#if dialogMode === "add"}
-      <!-- PIN追加モード -->
-      <div class="space-y-4">
+    <div class="space-y-4">
+      {#if dialogMode === "add"}
+        <!-- PIN追加モード -->
+
         <div>
           <label
             for="pin-input"
@@ -308,19 +311,21 @@
             <h3 class="text-sm font-medium text-neutral-300 mb-2">Preview</h3>
 
             {#if previewData.isValid}
-              <div class="bg-neutral-800 rounded-md p-3">
+              <div
+                class="bg-neutral-800 rounded-md p-1 h-fit overflow-y-auto max-h-[40vh]"
+              >
                 {#if previewData.type === "note"}
                   <Note
                     id={previewData.id as string}
                     displayMenu={false}
-                    depth={1}
+                    depth={4}
                     repostable={false}
                   />
                 {:else if previewData.type === "naddr"}
                   <NaddrEvent
                     data={previewData.id as nip19.AddressPointer}
                     displayMenu={false}
-                    depth={1}
+                    depth={4}
                     repostable={false}
                     content={undefined}
                   />
@@ -335,33 +340,34 @@
             {/if}
           </div>
         {/if}
-      </div>
-    {:else}
-      <!-- PIN削除モード -->
-      <div class="space-y-4">
+      {:else}
+        <!-- PIN削除モード -->
+
         <p class="text-neutral-300">{$t("pin.delete")}</p>
 
         {#if deletingTag && currentEvent}
-          <div class="bg-neutral-800 rounded-md p-3">
+          <div
+            class="bg-neutral-800 rounded-md p-1 h-fit overflow-y-auto max-h-[40vh]"
+          >
             {#if deletingTag[0] === "e"}
               <Note
                 id={deletingTag[1]}
                 displayMenu={false}
-                depth={1}
+                depth={4}
                 repostable={false}
               />
             {:else}
               <NaddrEvent
                 data={parseNaddr(deletingTag)}
                 displayMenu={false}
-                depth={1}
+                depth={4}
                 repostable={false}
                 content={deletingTag[1]}
               />
             {/if}
           </div>
         {/if}
-      </div>
-    {/if}
+      {/if}
+    </div>
   {/snippet}
 </AlertDialog>

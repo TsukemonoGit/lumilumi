@@ -340,7 +340,7 @@
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         newFilters,
-        tie,
+        configureOperators(),
         relays,
         handleIncrementalData
       );
@@ -430,7 +430,7 @@
           return { ...fil, since: undefined };
         }),
         untilTime,
-        tie,
+        configureOperators(),
         relays,
         (partialData) => {
           if (partialData.length === 0) return;
