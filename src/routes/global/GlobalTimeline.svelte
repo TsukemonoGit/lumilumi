@@ -7,10 +7,8 @@
   import { queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { createRxForwardReq } from "rx-nostr";
-  import { now } from "rx-nostr/src";
   import { onDestroy, onMount } from "svelte";
   import * as Nostr from "nostr-typedef";
-  import { awaitInterval } from "$lib/func/util";
 
   let isOnMount = false;
   let amount = 50;
@@ -73,6 +71,7 @@
     queryClient.resetQueries({
       queryKey: [...timelineQuery, "olderData"],
     });
+
     console.log("GlobalTimelineDestroy");
   });
 </script>
