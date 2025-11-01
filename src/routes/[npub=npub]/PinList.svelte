@@ -28,9 +28,7 @@
 
   let editable = $derived(userPubkey === $loginUser);
 
-  let inputValue = $state(
-    "naddr1qvzqqqr4gupzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qyxhwumn8ghj77tpvf6jumt9qyshwumn8ghj7cmpvakxjmmnw3ezucm0d4cxjmr994jhyun0wghxuet5qys8wumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5uqpz9mhxue69uhhstntda4xjunp9e5k7qgawaehxw309ahx7um5wghxxmmdwp5kcefdv4e8ymmj9ehx2aqpzamhxue69uhkummnw3ezu6t5w3skumt09ekk2mspz3mhxue69uhhyetvv9ujuerpd46hxtnfduq3vamnwvaz7tmjv4kxz7fwdehhxarj9e3xzmnyqyv8wumn8ghj7un9d3shjtnddakk7um5wgh8q6twdvqq5mt0dehj6ar0dak8xpj50v0"
-  );
+  let inputValue = $state("");
   let previewData = $state<{
     type: "note" | "naddr" | null;
     id: string | nip19.AddressPointer;

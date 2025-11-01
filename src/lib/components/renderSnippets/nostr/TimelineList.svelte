@@ -143,7 +143,7 @@
 
   onDestroy(() => {
     console.log("timeline destroy");
-    timelineManager.destroyed = true;
+    timelineManager.fullReset();
     if (timelineManager.timeoutId) {
       clearTimeout(timelineManager.timeoutId);
     }
