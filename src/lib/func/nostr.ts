@@ -71,7 +71,7 @@ export function setRxNostr() {
   }
   rxNostr = createRxNostr({
     verifier: verifier.get() ?? cryptoVerifier,
-    connectionStrategy: "lazy-keep",
+    connectionStrategy: "aggressive",
     authenticator: "auto", //https://penpenpng.github.io/rx-nostr/ja/v3/auth.html
     eoseTimeout: 10000, //フォワードはEOSEで終わらないから影響しない
   });

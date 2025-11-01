@@ -409,18 +409,17 @@ export function useGlobalReq(
     gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
       return new Promise((resolve, reject) => {
-        // let fulfilled = false;
+        let fulfilled = false;
 
         globalSubscription = obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //    console.log(v);
-            /*  if (fulfilled) {
-              console.log(false);
+            // console.log(v);
+            if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
-            } else { */
-            resolve(v);
-
-            // }
+            } else {
+              resolve(v);
+              fulfilled = true;
+            }
           },
 
           complete: () => status.set("success"),
@@ -429,11 +428,11 @@ export function useGlobalReq(
             status.set("error");
             error.set(e);
 
-            // if (!fulfilled) {
-            console.log("fulfilled");
-            reject(e);
-            //  fulfilled = true;
-            //   }
+            if (!fulfilled) {
+              console.log("fulfilled");
+              reject(e);
+              fulfilled = true;
+            }
           },
         });
         req.emit(filters);
