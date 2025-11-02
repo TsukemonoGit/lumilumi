@@ -5,41 +5,43 @@
   import { reconnectRelay } from "$lib/func/nostr";
   import { cleanRelayUrl, getColor } from "$lib/func/util";
   import RelayStatusColor from "./RelayStatusColor.svelte";
-
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
   import type { ConnectionState } from "rx-nostr";
+
+  const ERROR_STATES: ConnectionState[] = ["error", "rejected", "terminated"];
+  const RECONNECT_COOLDOWN = 3000;
+
+  let disabledButton: string | undefined = $state();
+  let errorRelayCount: number = $state(0);
 
   let readRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.read)
       : []
   );
+
   let writeRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.write)
       : []
   );
 
-  let overallStateColor: string = $derived.by(() => setAllStatusState());
-  // allStatus 内の state を設定する関数
-  function setAllStatusState(): string {
+  let overallStateColor = $derived.by(() => {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
       relayStateMap.get().get(cleanRelayUrl(relay.url))
     );
 
     const stateCount: Record<string, number> = {};
     allStatus.forEach((state) => {
-      // console.log(state);
       if (state) {
         stateCount[state] = (stateCount[state] || 0) + 1;
       }
     });
 
     let maxCount = 0;
-    let overallState = "initialized"; // デフォルトは接続中とする
+    let overallState = "initialized";
 
     for (const [state, count] of Object.entries(stateCount)) {
-      //  console.log(state);
       if (count > maxCount) {
         maxCount = count;
         overallState = state;
@@ -47,37 +49,31 @@
     }
 
     return getColor(overallState);
-    //console.log(overallStateColor);
-  }
+  });
 
-  let disabledButton: string | undefined = $state();
   const handleClickReconnect = (url: string) => {
     reconnectRelay(url);
-
     disabledButton = url;
     setTimeout(() => {
       disabledButton = undefined;
-      //updateOverallStateColor(); // 状態を更新
-    }, 3000);
+    }, RECONNECT_COOLDOWN);
   };
-  // エラー状態として扱う状態のリスト
-  const errorStates: ConnectionState[] = ["error", "rejected", "terminated"];
-  let errorRelayCount: number = $state(0);
+
   relayStateMap.subscribe((value) => {
-    const relayKeys = Object.keys($defaultRelays);
+    const readRelayUrls = readRelays.map((relay) => cleanRelayUrl(relay.url));
 
     errorRelayCount = [...value.entries()].filter(
-      ([url, state]) => relayKeys.includes(url) && errorStates.includes(state)
+      ([url, state]) =>
+        readRelayUrls.includes(url) && ERROR_STATES.includes(state)
     ).length;
   });
 </script>
 
-<!--reconnect relayは readable default relayだけ-->
-<Popover ariaLabel={"relays status"}>
+<Popover ariaLabel="relays status">
   <div class="flex gap-0.5 items-end">
     <RadioTower
       size="20"
-      class={`${overallStateColor}  hover:opacity-75 active:opacity-50`}
+      class="{overallStateColor} hover:opacity-75 active:opacity-50"
     />
     <div class="font-bold text-xs text-red-500">
       {errorRelayCount !== 0 ? errorRelayCount : ""}
@@ -89,43 +85,44 @@
       <div class="mr-2">
         <div class="text-magnum-200 font-bold text-lg mt-2">read</div>
         <ul>
-          {#each readRelays as relay, index}
+          {#each readRelays as relay}
             {@const relayUrl = cleanRelayUrl(relay.url)}
+            {@const state = relayStateMap.get().get(relayUrl)}
             <li class="flex align-middle items-center break-all">
-              <RelayStatusColor relay={relay.url} /><span class="inline w-60"
-                >{relayUrl}</span
-              >{#if relayStateMap.get().get(relayUrl) === "error"}
+              <RelayStatusColor relay={relay.url} />
+              <span class="inline w-60">{relayUrl}</span>
+              {#if state === "error"}
                 <button
                   onclick={() => handleClickReconnect(relayUrl)}
-                  class=" hover:opacity-75 active:opacity-50 text-magnum-400 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
+                  class="hover:opacity-75 active:opacity-50 text-magnum-400 disabled:opacity-25 w-[20px] h-[20px] flex justify-center items-center"
                   disabled={relayUrl === disabledButton}
-                  ><RefreshCcw size={16} strokeWidth={2.5} /></button
-                >{/if}
+                >
+                  <RefreshCcw size={16} strokeWidth={2.5} />
+                </button>
+              {/if}
             </li>
           {/each}
         </ul>
         <div class="text-magnum-200 font-bold text-lg">write</div>
         <ul>
-          {#each writeRelays as relay, index}
+          {#each writeRelays as relay}
             {@const relayUrl = cleanRelayUrl(relay.url)}
+            {@const state = relayStateMap.get().get(relayUrl)}
             <li class="flex align-middle items-center break-all">
-              <Popover ariaLabel={`${relay.url} status`}>
+              <Popover ariaLabel="{relay.url} status">
                 <Circle
                   size="20"
-                  class="{getColor(
-                    relayStateMap.get().get(relayUrl)
-                  )} fill-current  min-w-[20px] mr-1"
+                  class="{getColor(state)} fill-current min-w-[20px] mr-1"
                 />
                 {#snippet popoverContent()}
-                  <div class="mr-8">
-                    {relayStateMap.get().get(relayUrl)}
-                  </div>
-                {/snippet}</Popover
-              ><span class="inline w-60">{relayUrl}</span>
+                  <div class="mr-8">{state}</div>
+                {/snippet}
+              </Popover>
+              <span class="inline w-60">{relayUrl}</span>
             </li>
           {/each}
         </ul>
       </div>
     </div>
-  {/snippet}</Popover
->
+  {/snippet}
+</Popover>
