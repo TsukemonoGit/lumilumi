@@ -14,19 +14,19 @@
   let disabledButton: string | undefined = $state();
   let errorRelayCount: number = $state(0);
 
-  const readRelays = $derived(
+  let readRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.read)
       : []
   );
 
-  const writeRelays = $derived(
+  let writeRelays = $derived(
     $defaultRelays
       ? Object.values($defaultRelays).filter((config) => config.write)
       : []
   );
 
-  const overallStateColor = $derived.by(() => {
+  let overallStateColor = $derived.by(() => {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
       relayStateMap.get().get(cleanRelayUrl(relay.url))
     );
