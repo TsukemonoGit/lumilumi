@@ -124,10 +124,10 @@
   });
 
   // リレーが設定されているかチェック
-  const hasRelays = $derived(globalRelays && globalRelays.length > 0);
+  let hasRelays = $derived(globalRelays && globalRelays.length > 0);
 
   // タイムラインを表示する条件: since値が設定され、リレーが存在する
-  const canRender = $derived(since !== undefined && hasRelays);
+  let canRender = $derived(since !== undefined && hasRelays);
 </script>
 
 {#if canRender}

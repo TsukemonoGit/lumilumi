@@ -41,13 +41,13 @@
   let isInitializing = false;
 
   // タイムラインクエリキー
-  const timelineQuery = $derived(["global", "feed"]);
+  let timelineQuery = $derived(["global", "feed"]);
 
   // ユーザーがログインしているか
-  const hasUser = $derived(lumiSetting.get().pubkey);
+  let hasUser = $derived(lumiSetting.get().pubkey);
 
   // リレーが設定されているか
-  const hasRelays = $derived(globalRelays.length > 0);
+  let hasRelays = $derived(globalRelays.length > 0);
 
   /**
    * グローバルリレー設定を保存
