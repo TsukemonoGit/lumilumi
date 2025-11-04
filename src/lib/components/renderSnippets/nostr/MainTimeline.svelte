@@ -369,7 +369,7 @@
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         initialFilters,
-        tie,
+        pipe(tie, uniq, scanArray()),
         relays,
         handleIncrementalData
       );
@@ -495,7 +495,7 @@
           return { ...fil, since: undefined };
         }),
         untilTime,
-        tie,
+        pipe(tie, uniq, scanArray()),
         relays,
         (partialData) => {
           if (partialData.length === 0) return;

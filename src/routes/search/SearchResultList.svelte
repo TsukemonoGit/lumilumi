@@ -75,7 +75,12 @@
   const keyFn = (packet: EventPacket): string => packet.event.id;
 
   const [uniq, eventIds] = createUniq(keyFn);
-  const operator = pipe(uniq, userStatus(), /* reactionCheck(), */ scanArray());
+  const operator = pipe(
+    tie,
+    uniq,
+    userStatus(),
+    /* reactionCheck(), */ scanArray()
+  );
   //untilはundefinedか値あり。
   //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
   let reqFilters = $derived(
@@ -158,7 +163,7 @@
       50,
       newFilters,
 
-      tie,
+      operator,
       relays,
       undefined,
       5000
@@ -188,7 +193,7 @@
         filters,
 
         untilTime,
-        tie,
+        operator,
         relays,
         undefined,
         5000
