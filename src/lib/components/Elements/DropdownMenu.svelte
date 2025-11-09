@@ -112,7 +112,7 @@
 <style lang="postcss">
   .menu {
     @apply flex max-h-[400px] min-w-[220px] flex-col shadow-lg;
-    @apply rounded-md bg-magnum-950 p-1 shadow-black/30 lg:max-h-none;
+    @apply rounded-md bg-neutral-800 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
   .subMenu {
@@ -120,7 +120,7 @@
   }
   .item {
     @apply relative h-8 min-h-[24px] select-none rounded-sm pl-6 pr-1;
-    @apply text-magnum-50 outline-none;
+    @apply text-magnum-100 outline-none;
     @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
     @apply data-[disabled]:text-neutral-600;
     @apply flex items-center text-sm leading-none;
@@ -133,7 +133,7 @@
     @apply ml-auto;
   }
   .separator {
-    @apply m-[5px] h-[1px] bg-magnum-700;
+    @apply m-[2px] h-[1px] bg-magnum-200/20;
   }
   .icon {
     @apply h-[13px] w-[13px];
