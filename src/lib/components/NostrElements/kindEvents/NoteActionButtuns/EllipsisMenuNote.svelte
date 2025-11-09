@@ -1,13 +1,13 @@
 <script lang="ts">
   import { toastSettings } from "$lib/stores/stores";
   import { Copy, Ellipsis, SquareArrowOutUpRight } from "lucide-svelte";
-
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { goto } from "$app/navigation";
   import { t as _ } from "@konemono/svelte5-i18n";
+
   interface Props {
     encodedId: string;
-    indexes?: number[] | undefined;
+    indexes?: number[];
     TriggerIcon?: any;
     iconSize?: number;
     iconClass?: string;
@@ -21,59 +21,58 @@
     iconClass = "",
   }: Props = $props();
 
-  let menuTexts = $derived.by(() => {
-    let menu = [
-      {
-        text: `${$_("menu.copy.nevent")}`,
-        icon: Copy,
-        num: 3,
-      },
-
-      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
+  const menuGroups = $derived.by(() => {
+    const copyGroup = [
+      { text: $_("menu.copy.nevent"), icon: Copy, action: "copyId" },
     ];
 
-    if (indexes !== undefined) {
-      menu = menu.filter((item) => indexes.includes(item.num));
-    }
-    return menu;
+    const externalGroup = [
+      {
+        text: $_("menu.external.njump"),
+        icon: SquareArrowOutUpRight,
+        action: "njump",
+      },
+    ];
+
+    const filterItems = (items: typeof copyGroup | typeof externalGroup) =>
+      indexes ? items.filter((_, idx) => indexes.includes(idx)) : items;
+
+    return [
+      { label: $_("menu.group.copy"), items: filterItems(copyGroup) },
+      externalGroup.length > 0
+        ? {
+            label: $_("menu.group.external"),
+            items: filterItems(externalGroup),
+          }
+        : null,
+    ].filter(Boolean) as { label: string; items: typeof copyGroup }[];
   });
 
-  const handleSelectItem = async (index: number) => {
-    switch (menuTexts[index].num) {
-      case 1:
-        //open in njump
-
-        const url = `https://njump.me/${encodedId}`;
-
-        window.open(url, "_blank", "noreferrer");
-        break;
-
-      case 3:
-        //Copy EventID
+  const handleSelectItem = async (action: string) => {
+    switch (action) {
+      case "copyId":
         try {
           await navigator.clipboard.writeText(encodedId);
           $toastSettings = {
-            title: "Success",
-            description: `Copied to clipboard`,
+            title: $_("toast.success"),
+            description: $_("toast.copied_clipboard"),
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
           $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
+            title: $_("toast.error"),
+            description: $_("toast.failed_copy"),
             color: "bg-orange-500",
           };
         }
         break;
-      case 4:
-        //Goto encodedId page
-        goto(`/${encodedId}`);
+      case "njump":
+        window.open(`https://njump.me/${encodedId}`, "_blank", "noreferrer");
         break;
     }
   };
 </script>
 
-<DropdownMenu {menuTexts} {handleSelectItem}>
+<DropdownMenu {menuGroups} {handleSelectItem}>
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>

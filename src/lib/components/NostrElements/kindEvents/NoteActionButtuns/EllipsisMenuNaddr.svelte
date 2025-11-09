@@ -13,6 +13,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
+
   interface Props {
     naddr: string | undefined;
     indexes?: number[] | undefined;
@@ -32,114 +33,111 @@
   let dialogOpen: Writable<boolean> = writable(false);
 
   const decodeNaddr = (str: string | undefined) => {
-    if (str === undefined) return undefined;
+    if (!str) return undefined;
     try {
       const decoded = nip19.decode(str);
-      if (decoded.type === "naddr") {
-        return decoded.data as nip19.AddressPointer;
-      }
-      return undefined;
-    } catch (error) {
-      return undefined;
-    }
+      if (decoded.type === "naddr") return decoded.data as nip19.AddressPointer;
+    } catch {}
+    return undefined;
   };
 
-  let menuTexts = $derived.by(() => {
-    let naddrpointer = decodeNaddr(naddr);
-    let menu = [
+  const menuGroups = $derived.by(() => {
+    const naddrpointer = decodeNaddr(naddr);
+
+    const viewGroup = [
+      { text: $_("menu.view.json"), icon: Copy, action: "viewJson" },
+    ];
+
+    const copyGroup = [
+      { text: $_("menu.copy.naddr"), icon: Copy, action: "copyNaddr" },
+    ];
+
+    const externalGroup = [
       {
-        text: `${$_("menu.copy.naddr")}`,
-        icon: Copy,
-        num: 3,
-      },
-
-      { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-
-      //replaceable のすとびうあのリンク
-
-      {
-        text: `${$_("menu.nostviewstr")}`,
+        text: $_("menu.external.nostviewstr"),
         icon: Squirrel,
-        num: 10,
+        action: "nostviewstr",
+      },
+      {
+        text: $_("menu.external.njump"),
+        icon: SquareArrowOutUpRight,
+        action: "njump",
       },
     ];
 
-    //30030 emojitoリンク
     if (naddrpointer?.kind === 30030) {
-      menu.push({ text: `${$_("menu.emoji")}`, icon: Smile, num: 5 });
+      externalGroup.push({
+        text: $_("menu.external.emoji"),
+        icon: Smile,
+        action: "emojito",
+      });
     }
 
-    //30311 zap.streamリンク
     if (naddrpointer?.kind === 30311) {
-      menu.push({ text: `${$_("menu.stream")}`, icon: Tv, num: 9 });
+      externalGroup.push({
+        text: $_("menu.external.stream"),
+        icon: Tv,
+        action: "zapStream",
+      });
     }
 
-    if (indexes !== undefined) {
-      menu = menu.filter((item) => indexes.includes(item.num));
-    }
-    return menu;
+    const filterItems = (
+      items: typeof viewGroup | typeof copyGroup | typeof externalGroup
+    ) => (indexes ? items.filter((_, idx) => indexes.includes(idx)) : items);
+
+    return [
+      { label: $_("menu.group.view"), items: filterItems(viewGroup) },
+      { label: $_("menu.group.copy"), items: filterItems(copyGroup) },
+      {
+        label: $_("menu.group.external"),
+        items: filterItems(externalGroup),
+      },
+    ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
   });
 
-  const handleSelectItem = async (index: number) => {
-    if (!naddr) {
-      return;
-    }
-    switch (menuTexts[index].num) {
-      case 0:
-        //view json
+  const handleSelectItem = async (action: string) => {
+    if (!naddr) return;
+
+    switch (action) {
+      case "viewJson":
         $dialogOpen = true;
         break;
-
-      case 1:
-        //open in njump
-
-        const url = `https://njump.me/${naddr}`;
-
-        window.open(url, "_blank", "noreferrer");
-        break;
-
-      case 3:
-        //Copy EventID
+      case "copyNaddr":
         try {
           await navigator.clipboard.writeText(naddr);
           $toastSettings = {
-            title: "Success",
-            description: `Copied to clipboard`,
+            title: $_("toast.success"),
+            description: $_("toast.copied_clipboard"),
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
           $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
+            title: $_("toast.error"),
+            description: $_("toast.failed_copy"),
             color: "bg-orange-500",
           };
         }
         break;
-
-      case 5:
-        //open in emojito
-        const emojito = `https://emojito.meme/a/${naddr}`;
-
-        window.open(emojito, "_blank", "noreferrer");
+      case "njump":
+        window.open(`https://njump.me/${naddr}`, "_blank", "noreferrer");
         break;
-
-      case 9:
-        //open in zap.stream
-        const zapStream = `https://zap.stream/${naddr}`;
-
-        window.open(zapStream, "_blank", "noreferrer");
+      case "emojito":
+        window.open(`https://emojito.meme/a/${naddr}`, "_blank", "noreferrer");
         break;
-      case 10:
-        //open in nostviewer
-        const nostviewer = `https://nostviewstr.vercel.app/${naddr}`;
-
-        window.open(nostviewer, "_blank", "noreferrer");
+      case "zapStream":
+        window.open(`https://zap.stream/${naddr}`, "_blank", "noreferrer");
+        break;
+      case "nostviewstr":
+        window.open(
+          `https://nostviewstr.vercel.app/${naddr}`,
+          "_blank",
+          "noreferrer"
+        );
         break;
     }
   };
 </script>
 
-<DropdownMenu {menuTexts} {handleSelectItem}>
+<DropdownMenu {menuGroups} {handleSelectItem}>
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>

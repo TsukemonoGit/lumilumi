@@ -2,7 +2,6 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
-
   import { formatUrl } from "$lib/func/util";
   import { modalState, toastSettings } from "$lib/stores/stores";
   import {
@@ -14,86 +13,88 @@
   } from "lucide-svelte";
   import ModalRelayInfo from "./kindEvents/EventCard/ModalRelayInfo.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-
-  import { type Snippet } from "svelte";
-  import { type Nip11 } from "nostr-typedef";
+  import type { Snippet } from "svelte";
+  import type { Nip11 } from "nostr-typedef";
 
   interface Props {
     url: string;
-
     zIndex: number;
     children: Snippet;
-    relayInfo?: Nip11.RelayInfo | undefined;
+    relayInfo?: Nip11.RelayInfo;
   }
 
   let { url, zIndex, children, relayInfo }: Props = $props();
 
-  let encodedUrl = $derived(encodeURIComponent(url));
+  let encodedUrl = encodeURIComponent(url);
 
-  // svelte-ignore non_reactive_update
-  const menuTexts = [
-    { text: `${$_("menu.open.relayTimeline")}`, icon: RadioTower, num: 5 },
-    { text: `${$_("menu.copy.relayURL")}`, icon: Copy, num: 3 },
-    ...(relayInfo !== undefined
-      ? [{ text: `${$_("menu.json")}`, icon: FileJson2, num: 0 }]
-      : []),
+  const menuGroups = $derived([
     {
-      text: `${$_("menu.open.relayHtml")}`,
-      icon: SquareArrowOutUpRight,
-      num: 4,
+      label: $_("menu.group.view"),
+      items: [
+        {
+          text: $_("menu.view.relayTimeline"),
+          icon: RadioTower,
+          action: "relayTimeline",
+        },
+        ...(relayInfo
+          ? [{ text: $_("menu.view.json"), icon: FileJson2, action: "json" }]
+          : []),
+      ],
     },
     {
-      text: `${$_("menu.nostr-watch")}`,
-      icon: SquareArrowOutUpRight,
-      num: 1,
+      label: $_("menu.group.copy"),
+      items: [
+        { text: $_("menu.copy.relayURL"), icon: Copy, action: "copyRelay" },
+        { text: $_("menu.copy.sharelink"), icon: Share, action: "share" },
+      ],
     },
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 6 },
-  ];
+    {
+      label: $_("menu.group.external"),
+      items: [
+        {
+          text: $_("menu.external.relayHtml"),
+          icon: SquareArrowOutUpRight,
+          action: "openRelay",
+        },
+        {
+          text: $_("menu.external.nostr-watch"),
+          icon: SquareArrowOutUpRight,
+          action: "nostrWatch",
+        },
+      ],
+    },
+  ]);
 
-  const handleSelectItem = async (index: number) => {
+  const handleSelectItem = async (action: string) => {
     try {
-      //const encodedrelay = nip19.nrelayEncode(url);
       const hostname = new URL(url).hostname;
 
-      switch (menuTexts[index].num) {
-        case 0:
-          //view json
-          //$dialogOpen = true;
+      switch (action) {
+        case "json":
           $modalState = {
             isOpen: true,
             component: ModalRelayInfo,
-            props: { relayInfo: relayInfo },
+            props: { relayInfo },
           };
-
           break;
 
-        case 1:
-          //nostrWatch
-          //https://legacy.nostr.watch/
-
+        case "nostrWatch":
           window.open(
             `https://legacy.nostr.watch/relay/${hostname}`,
             "_blank",
             "noreferrer"
           );
-
-          // `https://nostr.watch/relay/${html.hostname}`,
-          //const njumpURL = `https://njump.me/${encodedrelay}`;
-
-          //  window.open(njumpURL, "_blank", "noreferrer");
           break;
 
-        case 3:
-          //Copy relayURL
+        case "copyRelay":
           try {
             await navigator.clipboard.writeText(url);
             $toastSettings = {
               title: "Success",
-              description: `Copied to clipboard`,
+              description: "Copied to clipboard",
               color: "bg-green-500",
             };
-          } catch (error: any) {
-            console.error(error.message);
+          } catch (e: any) {
             $toastSettings = {
               title: "Error",
               description: "Failed to copy",
@@ -101,29 +102,23 @@
             };
           }
           break;
-        case 4:
-          //open relay site
 
+        case "openRelay":
           window.open(formatUrl(url), "_blank", "noreferrer");
-
           break;
-        case 5:
-          //goto relay page
 
+        case "relayTimeline":
           goto(`/relay/${encodedUrl}`);
           break;
-        case 6:
-          //share relay page
+
+        case "share":
           const shareData = {
             title: "",
-            //text: "lumilumi",
             url: `${page.url.origin}/relay/${encodedUrl}`,
           };
-
           try {
             await navigator.share(shareData);
-          } catch (error: any) {
-            console.error(error.message);
+          } catch (e: any) {
             $toastSettings = {
               title: "Error",
               description: "Failed to share",
@@ -132,8 +127,7 @@
           }
           break;
       }
-    } catch (error) {
-      console.log("relay encode error");
+    } catch {
       $toastSettings = {
         title: "Error",
         description: "relay encode error",
@@ -143,6 +137,6 @@
   };
 </script>
 
-<DropdownMenu {menuTexts} {zIndex} {handleSelectItem}
-  >{@render children?.()}</DropdownMenu
->
+<DropdownMenu {menuGroups} {zIndex} {handleSelectItem}>
+  {@render children?.()}
+</DropdownMenu>

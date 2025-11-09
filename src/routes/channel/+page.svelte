@@ -14,6 +14,7 @@
   import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
   import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
   import { encodetoNote } from "$lib/func/encode";
+  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
 
   const handleClickToChannel = (id: string) => {
     goto(`/channel/${nip19.noteEncode(id)}`);
@@ -55,6 +56,9 @@
                     {id}
                   >
                     {encodetoNote(id)}
+                    {#snippet menu()}
+                      <ChannelEllipsisMenu heyaId={id} />
+                    {/snippet}
                   </EmptyListCard>
                 {/if}
               {/snippet}

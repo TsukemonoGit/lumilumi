@@ -13,6 +13,15 @@ import type {
 import type { OperatorFunction } from "rxjs";
 import type { Readable } from "svelte/store";
 
+export interface MenuGroup {
+  label?: string;
+  items: MenuItem[];
+}
+export interface MenuItem {
+  icon: any;
+  text: string;
+  action: string;
+}
 export type RxReqBase = RxReq;
 
 export type ReqStatus = "loading" | "success" | "error";

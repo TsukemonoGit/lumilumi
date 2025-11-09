@@ -1,62 +1,111 @@
+<!--DropdownMenu-->
 <script lang="ts">
   import { createDropdownMenu, melt } from "@melt-ui/svelte";
-
   import { fly } from "svelte/transition";
+  import { ChevronRight } from "lucide-svelte";
+  import { get } from "svelte/store";
+  import type { Snippet } from "svelte";
+  import type { MenuGroup } from "$lib/types";
 
   interface Props {
-    menuTexts?: { icon: any; text: string }[];
-    handleSelectItem: (arg0: number) => any;
-    children?: import("svelte").Snippet;
+    menuGroups?: MenuGroup[];
+    handleSelectItem: (action: string) => any;
+    children?: Snippet;
     buttonClass?: string;
     zIndex?: number;
   }
 
   let {
-    menuTexts = [],
+    menuGroups = [],
     handleSelectItem,
     children,
     zIndex = 40,
     buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden w-fit",
   }: Props = $props();
-  const {
-    elements: { trigger, menu, item, separator, arrow, overlay },
 
+  const {
+    elements: { trigger, menu, item, separator },
+    builders: { createSubmenu },
     states: { open },
   } = createDropdownMenu({
-    forceVisible: true,
     loop: true,
+  });
+
+  const subMenus = menuGroups.map(() => {
+    const {
+      elements: { subTrigger, subMenu },
+      states: { subOpen },
+    } = createSubmenu();
+    return { subTrigger, subMenu, subOpen };
+  });
+  let subM: any = $state();
+  let subT: any = $state();
+
+  subMenus.map((m) => {
+    m.subTrigger.subscribe(() => {
+      subT = subMenus.map((m) => get(m.subTrigger));
+    });
+  });
+  subMenus.map((m) => {
+    m.subTrigger.subscribe(() => {
+      subM = subMenus.map((m) => get(m.subMenu));
+    });
   });
 </script>
 
-<button
-  type="button"
-  class={buttonClass}
-  use:melt={$trigger}
-  aria-label="Update dimensions">{@render children?.()}</button
->{#if $open}
+<button type="button" class={buttonClass} use:melt={$trigger} aria-label="Menu">
+  {@render children?.()}
+</button>
+
+{#if $open}
   <div
-    use:melt={$overlay}
-    class="fixed inset-0"
-    style={`z-index:${zIndex}`}
-  ></div>
-  <div
-    class=" menu"
-    style={`z-index:${zIndex}`}
+    class="menu"
+    style="z-index:{zIndex}"
     use:melt={$menu}
     transition:fly={{ duration: 150, y: -10 }}
   >
-    {#each menuTexts as { icon: Icon, text }, index}
-      <div
-        class="item"
-        style={`z-index:${zIndex}`}
-        use:melt={$item}
-        onm-click={() => handleSelectItem(index)}
-      >
-        {#if Icon}<Icon class="icon mr-2 size-4 " />{/if}{text}
-      </div>
-    {/each}
+    {#if menuGroups.length > 0 && menuGroups[0].label}
+      <!-- グループあり -->
+      {#each menuGroups as group, groupIndex}
+        {#if groupIndex > 0}
+          <div class="separator" use:melt={$separator}></div>
+        {/if}
 
-    <div use:melt={$arrow}></div>
+        <div class="item group-trigger" use:melt={subT[groupIndex]}>
+          <span>{group.label}</span>
+          <div class="rightSlot">
+            <ChevronRight class="size-4" />
+          </div>
+        </div>
+
+        <div class="menu subMenu" use:melt={subM[groupIndex]}>
+          {#each group.items as { icon: Icon, text, action }}
+            <div
+              class="item"
+              use:melt={$item}
+              onclick={() => handleSelectItem(action)}
+            >
+              {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
+              {text}
+            </div>
+          {/each}
+        </div>
+      {/each}
+    {:else}
+      <!-- グループなし -->
+      {#each menuGroups as group}
+        {#each group.items as { icon: Icon, text, action }}
+          <div
+            class="item"
+            use:melt={$item}
+            onclick={() => handleSelectItem(action)}
+          >
+            {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
+            {text}
+          </div>
+        {/each}
+      {/each}
+    {/if}
   </div>
 {/if}
 
@@ -77,36 +126,16 @@
     @apply flex items-center text-sm leading-none;
     @apply ring-0 !important;
   }
-  .trigger {
-    @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-black;
-    @apply text-magnum-50 transition-colors hover:bg-black/90;
-    @apply data-[highlighted]:ring-magnum-500/75 data-[highlighted]:ring-offset-2 !important;
-    @apply p-0 text-sm font-medium  data-[highlighted]:outline-none;
+  .group-trigger {
+    @apply justify-between;
   }
-  .check {
-    @apply absolute left-2 top-1/2 text-magnum-400;
-    translate: 0 calc(-50% + 1px);
+  .rightSlot {
+    @apply ml-auto;
   }
-
-  .dot {
-    @apply h-[4.75px] w-[4.75px] rounded-full bg-magnum-50;
-  }
-
   .separator {
     @apply m-[5px] h-[1px] bg-magnum-700;
   }
-
-  .rightSlot {
-    @apply ml-auto pl-5;
-  }
-
   .icon {
     @apply h-[13px] w-[13px];
-  }
-  .check {
-    @apply absolute left-0 inline-flex w-6 items-center justify-center;
-  }
-  .text {
-    @apply pl-6 text-xs leading-6 text-neutral-300;
   }
 </style>

@@ -49,7 +49,7 @@
       return undefined;
     }
   };
-  const channelData = getContent(event);
+  let channelData = $derived(getContent(event));
 </script>
 
 {#if channelData}
@@ -119,8 +119,6 @@
         {/snippet}
       </Metadata>{/snippet}
     {#snippet menu()}
-      <button class="text-magnum-400"
-        ><ChannelEllipsisMenu note={event} {channelData} heyaId={id} /></button
-      >{/snippet}
+      <ChannelEllipsisMenu note={event} {channelData} heyaId={id} />{/snippet}
   </ListCardComponent>
 {/if}

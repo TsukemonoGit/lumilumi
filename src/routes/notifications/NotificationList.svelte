@@ -221,7 +221,7 @@
             return { ...filter, since: undefined };
           }),
           untilTime,
-          tie,
+          operator,
           relays
         );
 

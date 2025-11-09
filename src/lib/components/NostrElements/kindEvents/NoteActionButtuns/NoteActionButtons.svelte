@@ -14,7 +14,7 @@
   import { getRelayById, getRelaysById } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
 
-  import type { AdditionalPostOptions } from "$lib/types";
+  import type { AdditionalPostOptions, MenuGroup } from "$lib/types";
 
   import EllipsisMenu from "./EllipsisMenu.svelte";
   import CustomReaction from "./CustomReaction.svelte";
@@ -190,15 +190,20 @@
     return acc;
   }, []);
 
-  const menuTexts = [
-    { text: `${$_("menu.repost")}`, icon: Repeat2, num: 0 },
-    { text: `${$_("menu.quote")}`, icon: Quote, num: 1 },
+  const menuGroups: MenuGroup[] = [
+    {
+      // label は不要なので省略
+      items: [
+        { text: $_("menu.action.repost"), icon: Repeat2, action: "repost" },
+        { text: $_("menu.action.quote"), icon: Quote, action: "quote" },
+      ],
+    },
   ];
 
-  const handleSelectItem = async (index: number) => {
+  const handleSelectItem = async (action: string) => {
     if (prosessing) return;
     prosessing = true;
-    console.log(menuTexts[index].num);
+
     const relayhints = getRelaysById(note.id).filter((relay) =>
       relay.startsWith("wss://")
     );
@@ -210,56 +215,27 @@
       kind: note.kind,
     };
     const nevent = nip19.neventEncode(eventpointer);
-    switch (menuTexts[index].num) {
-      case 0:
-        //repost
+
+    switch (action) {
+      case "repost":
         let tags: string[][] = [
           ["p", note.pubkey],
-          [
-            "e", //a tagのやつにもeもいれる
-            note.id,
-            relayHint,
-            note.pubkey,
-          ],
+          ["e", note.id, relayHint, note.pubkey],
         ];
 
-        //markerについて
-        //NIP-10 にはマーカー部分あるけど
-        //   NIP-22 および NIP-25 のeタグの例は詰めてる
+        if (atag) tags.push(["a", atag, relayHint]);
+        if (note.kind !== 1) tags.push(["k", note.kind.toString()]);
+        if (lumiSetting.get().addClientTag) tags.push(clientTag);
 
-        //リポストはetagのことしか書いてない
-        //https://github.com/nostr-protocol/nips/blob/master/18.md
-        // atag etag 両方いれることにする(リアクションと同じに)
-
-        //replaceable
-
-        if (atag) {
-          tags.push(["a", atag, relayHint]);
-        }
-        if (note.kind !== 1) {
-          tags.push(["k", note.kind.toString()]);
-        }
-        if (lumiSetting.get().addClientTag) {
-          tags.push(clientTag);
-        }
         const ev: Nostr.EventParameters =
           note.kind === 1
-            ? {
-                kind: 6,
-                tags: tags,
-                content: "",
-              }
-            : {
-                kind: 16,
-                tags: tags,
-                content: "",
-              };
+            ? { kind: 6, tags, content: "" }
+            : { kind: 16, tags, content: "" };
+
         await publishAndSetQuery(ev, ["reactions", queryId, "repost"]);
-
         break;
-      case 1:
-        //Quote
 
+      case "quote":
         const options: AdditionalPostOptions = {
           tags: [],
           content: atag
@@ -273,12 +249,11 @@
         setTimeout(() => {
           $postWindowOpen = true;
         }, 2);
-
         break;
     }
+
     prosessing = false;
   };
-
   function encodeNaddr(atag: string, relayhints: string[]): string | null {
     const matches = atag.match(nip33Regex);
     if (!matches || matches.length < 4) {
@@ -656,21 +631,23 @@
         <Reposted id={atag ?? note.id}>
           {#snippet loading()}
             <DropdownMenu
-              buttonClass={"actionButton"}
-              {menuTexts}
+              buttonClass="actionButton"
+              {menuGroups}
               {handleSelectItem}
             >
               <Repeat2 size="22" />
-            </DropdownMenu>{/snippet}
+            </DropdownMenu>
+          {/snippet}
 
           {#snippet content({ event })}
             <DropdownMenu
-              buttonClass={"actionButton"}
-              {menuTexts}
+              buttonClass="actionButton"
+              {menuGroups}
               {handleSelectItem}
             >
-              <Repeat2 size="22" class={event ? "text-magnum-200 " : ""} />
-            </DropdownMenu>{/snippet}
+              <Repeat2 size="22" class={event ? "text-magnum-200" : ""} />
+            </DropdownMenu>
+          {/snippet}
         </Reposted>{#if lumiSetting.get().showAllReactions && repost_length > 0}<span
             class="text-sm">{repost_length}</span
           >{/if}
@@ -678,9 +655,9 @@
     {:else}<button
         aria-label="quote"
         class="actionButton"
-        onclick={() => handleSelectItem(1)}
+        onclick={() => handleSelectItem("quote")}
       >
-        <Quote size="20" class={"stroke-magnum-500/75"} />
+        <Quote size="20" class="stroke-magnum-500/75" />
       </button>
     {/if}
     <!--リプライ, kind1,42以外は NIP-22 により kind1111 -->

@@ -61,21 +61,21 @@
         action: "copy_pubkey",
       },
       {
-        text: `${$_("menu.userPage")}`,
+        text: `${$_("menu.view.userPage")}`,
         icon: User,
         action: "goto_user",
       },
 
       // 検索・発見グループ
       {
-        text: `${$_("menu.userSearch")}`,
+        text: `${$_("menu.action.userSearch")}`,
         icon: Search,
         action: "search_user",
       },
 
       // データ更新・管理グループ
       {
-        text: `${$_("menu.updateProfile")}`,
+        text: `${$_("menu.action.updateProfile")}`,
         icon: RefreshCcw,
         action: "update_profile",
       },
@@ -88,7 +88,7 @@
       )
         ? [
             {
-              text: `${$_("menu.broadcast")}`,
+              text: `${$_("menu.action.broadcast")}`,
               icon: Radio,
               action: "broadcast",
             },
@@ -99,7 +99,7 @@
       ...(tab
         ? [
             {
-              text: `${$_("menu.sharelink")}`,
+              text: `${$_("menu.copy.sharelink")}`,
               icon: Share,
               action: "share_link",
             },
@@ -110,7 +110,7 @@
       ...(metadata
         ? [
             {
-              text: `${$_("menu.json")}`,
+              text: `${$_("menu.view.json")}`,
               icon: FileJson2,
               action: "view_json",
             },

@@ -1,4 +1,10 @@
 {
+  "toast": {
+    "success": "成功",
+    "copied_clipboard": "クリップボードにコピーしました",
+    "error": "エラー",
+    "failed_copy": "コピーに失敗しました"
+  },
   "settings": {
     "relayMenuText0": "Nostr共通のリレー設定 (Kind:10002) を使う",
     "relayMenuText1": "固有のリレー設定を使う",
@@ -15,8 +21,7 @@
       "kind30002": "NostViewstr で Relay Sets (kind:30002) を編集する",
       "kind10000": "NostViewstr で MuteList ( kind:10000 ) を編集する",
       "kind30007": "NostViewstr で Mute by kind( kind:30007 ) を編集する",
-      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する",
-      "kind10001": "Pinを編集"
+      "kind10030": "NostViewstr で EmojiList ( kind:10030 ) を編集する"
     },
     "globalRelay": "(kind:30002のID(d tag)をglobalとしたリストをGlobal Relayとして使用します)",
     "display": {
@@ -110,16 +115,41 @@
     "about": "自己紹介",
     "birth": "誕生日"
   },
+
   "menu": {
-    "json": "Json で見る",
-    "njump": "njump で開く",
-    "translate": "(Google) 翻訳する",
-    "note": "note ページを見る",
-    "emoji": "emojito で開く",
-    "userPage": "ユーザーページを見る",
-    "updateProfile": "プロフィールを更新する",
-    "repost": "リポスト",
-    "quote": "引用",
+    "group": {
+      "view": "表示",
+      "action": "アクション",
+      "copy": "コピー/共有",
+      "external": "外部サービス",
+      "other": "その他"
+    },
+    "view": {
+      "json": "Json で見る",
+      "translate": "(Google) 翻訳する",
+      "note": "note ページを見る",
+      "userPage": "ユーザーページを見る",
+      "refresh": "最新データを取得",
+      "relayTimeline": "リレータイムラインを見る",
+      "channel": "チャンネルを開く"
+    },
+    "action": {
+      "repost": "リポスト",
+      "quote": "引用",
+      "broadcast": "ブロードキャスト",
+      "mention": "メンションを送る",
+      "userSearch": "ユーザー検索",
+      "delete": "削除",
+      "pin": "投稿をピン止めする",
+      "bookmark": {
+        "add": "ブックマークに追加",
+        "remove": "ブックマークを削除"
+      },
+      "MAKIMONO": "MAKIMONOで編集する",
+      "refresh": "最新データを取得",
+      "updateProfile": "プロフィールを更新する",
+      "editChannelInfo": "チャンネル情報の修正"
+    },
     "copy": {
       "pubkey": "公開鍵をコピー",
       "note": "noteID をコピー",
@@ -127,32 +157,23 @@
       "nevent": "イベントIDをコピー",
       "relayURL": "リレーURLをコピー",
       "text": "テキストをコピー",
-      "embed": "埋め込みコードをコピー"
+      "embed": "埋め込みコードをコピー",
+      "copylink": "リンクをコピー",
+      "sharelink": "リンクの共有"
     },
-    "broadcast": "ブロードキャスト",
-    "open": {
+
+    "external": {
+      "njump": "njump で開く",
+      "emoji": "emojito で開く",
       "relayHtml": "リレーのサイトを開く",
-      "relayTimeline": "リレータイムラインを見る"
-    },
-    "nostr-watch": "nostr.watch で開く",
-    "nostrrr": "Nostrrr で開く",
-    "sharelink": "リンクの共有",
-    "stream": "zap.streamで開く",
-    "channel": "チャンネルを開く",
-    "nostviewstr": "のすとびうあ で開く",
-    "nostrapp": "App Manager で開く",
-    "mention": "メンションを送る",
-    "userSearch": "ユーザー検索",
-    "delete": "削除",
-    "editChannelInfo": "チャンネル情報の修正",
-    "copylink": "リンクをコピー",
-    "MAKIMONO": "MAKIMONOで編集する",
-    "refresh": "最新データを取得",
-    "bookmark": {
-      "add": "ブックマークに追加",
-      "remove": "ブックマークを削除"
+      "nostr-watch": "nostr.watch で開く",
+      "nostrrr": "Nostrrr で開く",
+      "stream": "zap.streamで開く",
+      "nostviewstr": "のすとびうあ で開く",
+      "nostrapp": "App Manager で開く"
     }
   },
+
   "channel": {
     "settingswarning": "チャンネルページを閲覧するには公開鍵の設定が必要です。",
     "global": "Globalチャンネルフィードへ",

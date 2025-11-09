@@ -38,13 +38,13 @@
         {@render channelMetadata?.(kind41Event)}
       {/snippet}
       {#snippet loading()}
-        {@render channelMetadata?.(null)}
+        {@render channelMetadata?.(kind40Event)}
       {/snippet}
       {#snippet nodata()}
         {@render channelMetadata?.(kind40Event)}
       {/snippet}
       {#snippet error()}
-        {@render channelMetadata?.(null)}
+        {@render channelMetadata?.(kind40Event)}
       {/snippet}
     </LatestEvent>
   {/snippet}

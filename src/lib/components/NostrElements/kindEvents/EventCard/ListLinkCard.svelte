@@ -91,10 +91,8 @@
     </Metadata>
   {/snippet}
   {#snippet menu()}
-    <button class="text-magnum-400"
-      ><ListEllipsisMenu
-        note={event}
-        listData={{ dtag: dtag, title: title, description: description }}
-      />
-    </button>{/snippet}
+    <ListEllipsisMenu
+      note={event}
+      listData={{ dtag: dtag, title: title, description: description }}
+    />{/snippet}
 </ListCardComponent>

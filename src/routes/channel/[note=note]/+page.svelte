@@ -20,6 +20,7 @@
   import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
   import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
   import { encodetoNote } from "$lib/func/encode";
+  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -104,6 +105,9 @@
               id={data.id}
             >
               {encodetoNote(data.id)}
+              {#snippet menu()}
+                <ChannelEllipsisMenu heyaId={data.id} />
+              {/snippet}
             </EmptyListCard>
           {/if}
         {/snippet}

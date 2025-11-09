@@ -51,12 +51,9 @@
             >
           {:else}
             {#each peopleList as event}
-              <button
-                onclick={() => handleClickToList(event)}
-                class="border border-magnum-500 hover:opacity-75 focus:opacity-50 rounded-lg overflow-hidden"
-              >
-                <ListLinkCard {event} depth={0} /></button
-              >
+              <div class="border border-magnum-500 rounded-lg overflow-hidden">
+                <ListLinkCard {event} depth={0} />
+              </div>
             {/each}
           {/if}
         {/snippet}

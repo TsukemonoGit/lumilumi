@@ -8,11 +8,9 @@
     Radio,
     Share,
   } from "lucide-svelte";
-
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
-
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
@@ -21,79 +19,92 @@
 
   interface Props {
     note: Nostr.Event;
-    indexes?: number[] | undefined;
-    listData: {
-      dtag: string | undefined;
-      title: string | undefined;
-      description: string | undefined;
-    };
+    indexes?: number[];
+    listData: { dtag?: string; title?: string; description?: string };
   }
 
-  let { note, indexes = undefined, listData }: Props = $props();
+  let { note, indexes, listData }: Props = $props();
 
-  // svelte-ignore non_reactive_update
-  //let dialogOpen: Writable<boolean> = writable(false);
+  let naddr = $derived.by(() => {
+    if (!note) return undefined;
+    try {
+      const naddrPointer: nip19.AddressPointer = {
+        kind: note.kind,
+        identifier: note.tags.find((t) => t[0] === "d")?.[1] ?? "",
+        pubkey: note.pubkey,
+        relays: getRelaysById(note.id),
+      };
+      return nip19.naddrEncode(naddrPointer);
+    } catch {
+      return undefined;
+    }
+  });
 
-  // svelte-ignore non_reactive_update
-  let menuTexts = [
-    {
-      text: `${$_("menu.copy.naddr")}`,
-      icon: Copy,
-      num: 3,
-    },
-    { text: `${$_("menu.json")}`, icon: FileJson2, num: 0 },
-    { text: `${$_("menu.njump")}`, icon: SquareArrowOutUpRight, num: 1 },
-    //{ text: `${$_("menu.translate")}`, icon: Earth, num: 2 },
-    // { text: `${$_("menu.note")}`, icon: Notebook, num: 4 },
+  const menuGroups = $derived.by(() => {
+    const viewGroup = [
+      { text: $_("menu.view.json"), icon: FileJson2, action: "viewJson" },
+    ];
 
-    { text: `${$_("menu.sharelink")}`, icon: Share, num: 7 },
-  ];
+    const copyGroup = [
+      { text: $_("menu.copy.naddr"), icon: Copy, action: "copyNaddr" },
+      { text: $_("menu.copy.sharelink"), icon: Share, action: "shareLink" },
+    ];
 
-  //NIP-70
-  if (
-    !(
-      note.tags.find((tag) => tag[0] === "-") &&
-      note.pubkey !== lumiSetting.get().pubkey
-    )
-  ) {
-    menuTexts.push({ text: `${$_("menu.broadcast")}`, icon: Radio, num: 6 });
-  }
+    const actionGroup: { text: string; icon: any; action: string }[] = [];
+    // NIP-70 条件
+    if (
+      !(
+        note.tags.find((t) => t[0] === "-") &&
+        note.pubkey !== lumiSetting.get().pubkey
+      )
+    ) {
+      actionGroup.push({
+        text: $_("menu.action.broadcast"),
+        icon: Radio,
+        action: "broadcast",
+      });
+    }
+    const externalGroup = [
+      {
+        text: $_("menu.external.njump"),
+        icon: SquareArrowOutUpRight,
+        action: "njump",
+      },
+    ];
+    // indexes 指定があればフィルタ
+    const filterItems = (
+      items: typeof viewGroup | typeof copyGroup | typeof actionGroup
+    ) => (indexes ? items.filter((_, idx) => indexes.includes(idx)) : items);
 
-  if (indexes !== undefined) {
-    menuTexts = menuTexts.filter((item) => indexes.includes(item.num));
-  }
+    return [
+      { label: $_("menu.group.view"), items: filterItems(viewGroup) },
+      { label: $_("menu.group.copy"), items: filterItems(copyGroup) },
+      actionGroup.length > 0
+        ? { label: $_("menu.group.action"), items: filterItems(actionGroup) }
+        : null,
+      { label: $_("menu.group.external"), items: filterItems(externalGroup) },
+    ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
+  });
 
-  const handleSelectItem = async (index: number) => {
-    switch (menuTexts[index].num) {
-      case 0:
-        //view json
-        //$dialogOpen = true;
-        $modalState = {
-          isOpen: true,
-          component: ModalJson,
-          props: { note: note },
-        };
+  const handleSelectItem = async (action: string) => {
+    switch (action) {
+      case "viewJson":
+        $modalState = { isOpen: true, component: ModalJson, props: { note } };
         break;
 
-      case 1:
-        //open in njump
-
-        const url = `https://njump.me/${naddr}`;
-
-        window.open(url, "_blank", "noreferrer");
+      case "njump":
+        window.open(`https://njump.me/${naddr}`, "_blank", "noreferrer");
         break;
 
-      case 3:
-        //Copy EventID
+      case "copyNaddr":
         try {
           await navigator.clipboard.writeText(naddr ?? "");
           $toastSettings = {
             title: "Success",
-            description: `Copied to clipboard`,
+            description: "Copied to clipboard",
             color: "bg-green-500",
           };
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
           $toastSettings = {
             title: "Error",
             description: "Failed to copy",
@@ -102,22 +113,19 @@
         }
         break;
 
-      case 6:
-        //broadcast
+      case "broadcast":
         publishEvent(note);
-
         break;
-      case 7:
-        //share link
+
+      case "shareLink":
         const shareData = {
           title: `【List】${listData.title ?? listData.dtag ?? ""}`,
-          text: listData.description ?? undefined,
+          text: listData.description,
           url: `${page.url.origin}/list/${naddr}`,
         };
         try {
           await navigator.share(shareData);
-        } catch (error: any) {
-          console.error(error.message);
+        } catch {
           $toastSettings = {
             title: "Error",
             description: "Failed to share",
@@ -127,28 +135,8 @@
         break;
     }
   };
-
-  let naddr: string | undefined = $derived.by(() => {
-    if (!note) {
-      return undefined;
-    }
-    try {
-      const naddrpointer: nip19.AddressPointer = {
-        kind: note.kind,
-        identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-        pubkey: note.pubkey,
-        relays: getRelaysById(note.id),
-      };
-      return nip19.naddrEncode(naddrpointer);
-    } catch (error) {
-      return undefined;
-    }
-  });
 </script>
 
-<DropdownMenu {menuTexts} {handleSelectItem}>
+<DropdownMenu {menuGroups} {handleSelectItem}>
   <Ellipsis size="20" />
 </DropdownMenu>
-
-<!--JSON no Dialog
-<ModalJson bind:dialogOpen {note}  />-->

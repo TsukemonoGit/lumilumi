@@ -1,4 +1,10 @@
 {
+  "toast": {
+    "success": "Success",
+    "copied_clipboard": "Copied to clipboard",
+    "error": "Error",
+    "failed_copy": "Failed to copy"
+  },
   "settings": {
     "relayMenuText0": "Use the Nostr common relay setting (kind: 10002)",
     "relayMenuText1": "Use custom relay settings",
@@ -15,8 +21,7 @@
       "kind30002": "Edit Relay Sets (kind:30002) in NostViewstr",
       "kind10000": "Edit Mute list (kind:10000) in NostViewstr",
       "kind30007": "Edit Mute by kind (kind:30007) in NostViewstr",
-      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr",
-      "kind10001": "Edit Pin"
+      "kind10030": "Edit Emoji list (kind:10030) in NostViewstr"
     },
     "globalRelay": "(List with ID (d tag) of KIND:30002 as global is used as Global Relay.)",
     "display": {
@@ -111,46 +116,61 @@
     "birth": "Birthday"
   },
   "menu": {
-    "json": "View Json",
-    "njump": "Open in njump",
-    "translate": "Translate",
-    "note": "Goto Note Page",
-    "emoji": "Open in emojito",
-    "userPage": "Goto UserPage",
-    "updateProfile": "Update profile",
-    "repost": "Repost",
-    "quote": "Quote",
+    "group": {
+      "view": "View",
+      "action": "Action",
+      "copy": "Copy/Share",
+      "edit": "Edit/Manage",
+      "external": "External Service",
+      "other": "Other"
+    },
+    "view": {
+      "json": "View as JSON",
+      "translate": "Translate (Google)",
+      "note": "View note page",
+      "userPage": "View user page",
+      "refresh": "Fetch latest data",
+      "relayTimeline": "View relay timeline"
+    },
+    "action": {
+      "repost": "Repost",
+      "quote": "Quote",
+      "broadcast": "Broadcast",
+      "mention": "Send mention",
+      "userSearch": "User search",
+      "delete": "Delete",
+      "pin": "Pin post",
+      "bookmark": {
+        "add": "Add to Bookmark",
+        "remove": "Remove Bookmark"
+      },
+      "MAKIMONO": "Edit with MAKIMONO",
+      "refresh": "Fetch latest data",
+      "updateProfile": "Update Profile",
+      "editChannelInfo": "Edit Channel Info"
+    },
     "copy": {
-      "pubkey": "Copy pubkey",
-      "note": "Copy noteID",
+      "pubkey": "Copy public key",
+      "note": "Copy note ID",
       "naddr": "Copy naddr",
-      "nevent": "Copy EventID",
-      "relayURL": "Copy relayURL",
+      "nevent": "Copy event ID",
+      "relayURL": "Copy relay URL",
       "text": "Copy text",
-      "embed": "Copy Embed Code"
+      "embed": "Copy embed code",
+      "copylink": "Copy link",
+      "sharelink": "Share link"
     },
-    "broadcast": "broadcast",
-    "open": {
-      "relayHtml": "Open relay site",
-      "relayTimeline": "Goto RelayTimeline"
-    },
-    "nostr-watch": "Open in nostr.watch",
-    "nostrrr": "Open in Nostrrr",
-    "copylink": "Copy link",
-    "sharelink": "Share Link",
-    "stream": "Open in zap.stream",
-    "channel": "Open channel",
-    "nostviewstr": "Open in nostviewstr",
-    "nostrapp": "Open in App Manager",
-    "mention": "Send Mention",
-    "userSearch": "Search User",
-    "delete": "Delete",
-    "editChannelInfo": "Edit Channel Information",
-    "MAKIMONO": "Edit with MAKIMONO",
-    "refresh": "Get Latest Data",
-    "bookmark": {
-      "add": "Add Bookmark",
-      "remove": "Remove Bookmark"
+
+    "external": {
+      "njump": "Open with njump",
+      "emoji": "Open with emojito",
+      "relayHtml": "Open relay website",
+      "nostr-watch": "Open with nostr.watch",
+      "nostrrr": "Open with Nostrrr",
+      "stream": "Open with zap.stream",
+      "channel": "Open Channel",
+      "nostviewstr": "Open with Nostviewstr",
+      "nostrapp": "Open with App Manager"
     }
   },
   "channel": {
