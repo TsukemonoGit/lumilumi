@@ -130,10 +130,10 @@
     @apply justify-between;
   }
   .rightSlot {
-    @apply ml-auto;
+    @apply ml-auto text-magnum-500;
   }
   .separator {
-    @apply m-[2px] h-[1px] bg-magnum-500/20;
+    @apply m-[2px] h-[1px] bg-magnum-500/50;
   }
   .icon {
     @apply h-[13px] w-[13px];
