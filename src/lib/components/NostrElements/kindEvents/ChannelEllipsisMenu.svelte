@@ -16,7 +16,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
-  import type { ChannelData } from "$lib/types";
+  import type { ChannelData, MenuGroup, MenuItem } from "$lib/types";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { writable } from "svelte/store";
   import EditChannelInfo from "../../../../routes/channel/EditChannelInfo.svelte";
@@ -43,88 +43,72 @@
     nip19.neventEncode({ id: heyaId, relays: heyaRelays, kind: 40 })
   );
 
-  const menuGroups = $derived.by(() => {
-    // View group
-    const viewGroup = note
+  function makeMenuItem(
+    textKey: string,
+    icon: typeof Copy,
+    action: string
+  ): MenuItem {
+    return { text: $_(textKey), icon, action };
+  }
+
+  const menuGroups: MenuGroup[] = $derived.by(() => {
+    const viewGroup: MenuItem[] = note
       ? [
-          { text: $_("menu.view.json"), icon: FileJson2, action: "viewJson" },
-          {
-            text: $_("menu.external.njump"),
-            icon: SquareArrowOutUpRight,
-            action: "njump",
-          },
-          { text: $_("channel.menu.open"), icon: Tv, action: "openChannel" },
+          makeMenuItem("menu.view.json", FileJson2, "viewJson"),
+          makeMenuItem("channel.menu.open", Tv, "openChannel"),
         ]
-      : [
-          {
-            text: $_("menu.external.njump"),
-            icon: SquareArrowOutUpRight,
-            action: "njump",
-          },
-        ];
+      : [];
 
-    // Copy/Share group
-    const copyGroup = [
-      { text: $_("menu.copy.nevent"), icon: Copy, action: "copyEvent" },
-      channelData && {
-        text: $_("menu.copy.sharelink"),
-        icon: Share,
-        action: "shareLink",
-      },
-    ].filter(Boolean) as { text: string; icon: any; action: string }[];
+    const copyGroup: MenuItem[] = [
+      makeMenuItem("menu.copy.nevent", Copy, "copyEvent"),
+      channelData && makeMenuItem("menu.copy.sharelink", Share, "shareLink"),
+    ].filter(Boolean) as MenuItem[];
 
-    // Action group
-    const actionGroup: { text: string; icon: any; action: string }[] = [];
+    const externalGroup: MenuItem[] = [
+      makeMenuItem("menu.external.njump", SquareArrowOutUpRight, "njump"),
+    ];
 
-    if (note) {
-      if (
-        !(
-          note.tags.find((t) => t[0] === "-") &&
-          note.pubkey !== lumiSetting.get().pubkey
-        )
-      ) {
-        actionGroup.push({
-          text: $_("menu.action.broadcast"),
-          icon: Radio,
-          action: "broadcast",
-        });
-      }
-
-      if (note.pubkey === lumiSetting.get().pubkey) {
-        actionGroup.unshift({
-          text: $_("menu.action.editChannelInfo"),
-          icon: SquarePen,
-          action: "editInfo",
-        });
-      }
-    }
-
+    const actionGroup: MenuItem[] = [];
+    const selfPubkey = lumiSetting.get().pubkey;
     if (channelData) {
-      actionGroup.push({
-        text: $_("channel.menu.edit"),
-        icon: SquarePen,
-        action: "editList",
-      });
+      actionGroup.push(
+        makeMenuItem("channel.menu.edit", SquarePen, "editList")
+      );
+    }
+    if (note) {
+      const blocked = note.tags.find((t) => t[0] === "-");
+      const isSelf = note.pubkey === selfPubkey;
+
+      if (!(blocked && !isSelf)) {
+        actionGroup.push(
+          makeMenuItem("menu.action.broadcast", Radio, "broadcast")
+        );
+      }
+      if (isSelf) {
+        actionGroup.unshift(
+          makeMenuItem("menu.action.editChannelInfo", SquarePen, "editInfo")
+        );
+      }
     }
 
-    const filterItems = (
-      items: typeof viewGroup | typeof copyGroup | typeof actionGroup
-    ) => (indexes ? items.filter((_, idx) => indexes.includes(idx)) : items);
+    const filterItems = (items: MenuItem[]) =>
+      indexes ? items.filter((_, i) => indexes.includes(i)) : items;
+
+    function buildGroup(labelKey: string, items: MenuItem[]) {
+      return items.length
+        ? { label: $_(labelKey), items: filterItems(items) }
+        : null;
+    }
 
     return [
-      viewGroup.length > 0
-        ? { label: $_("menu.group.view"), items: filterItems(viewGroup) }
-        : null,
-      copyGroup.length > 0
-        ? { label: $_("menu.group.copy"), items: filterItems(copyGroup) }
-        : null,
-      actionGroup.length > 0
-        ? { label: $_("menu.group.action"), items: filterItems(actionGroup) }
-        : null,
-    ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
+      buildGroup("menu.group.view", viewGroup),
+      buildGroup("menu.group.copy", copyGroup),
+      buildGroup("menu.group.action", actionGroup),
+      buildGroup("menu.group.external", externalGroup),
+    ].filter(Boolean) as MenuGroup[];
   });
 
-  const handleSelectItem = async (action: string) => {
+  async function handleSelectItem(action: string) {
     switch (action) {
       case "viewJson":
         if (note)
@@ -180,12 +164,15 @@
         $editChannelDataOpen = true;
         break;
     }
-  };
+  }
 </script>
 
 <DropdownMenu {menuGroups} {handleSelectItem}>
   <Ellipsis size="20" />
 </DropdownMenu>
+
 {#if note && channelData}
-  <EditChannelInfo {editChannelDataOpen} {heyaId} {note} {channelData} />{/if}
+  <EditChannelInfo {editChannelDataOpen} {heyaId} {note} {channelData} />
+{/if}
+
 <EditChannelList bind:editChannelListOpen {heyaId} />

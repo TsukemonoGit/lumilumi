@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Nostr from "nostr-typedef";
   import { UserCog, Pin, RadioTower, User } from "lucide-svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 

@@ -3,7 +3,6 @@
   import type { ChannelData, MenuGroup } from "$lib/types";
   import { MessagesSquare } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
-  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";

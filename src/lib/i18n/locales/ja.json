@@ -130,7 +130,8 @@
       "note": "note ページを見る",
       "userPage": "ユーザーページを見る",
       "refresh": "最新データを取得",
-      "relayTimeline": "リレータイムラインを見る"
+      "relayTimeline": "リレータイムラインを見る",
+      "channel": "チャンネルを開く"
     },
     "action": {
       "repost": "リポスト",
@@ -168,7 +169,6 @@
       "nostr-watch": "nostr.watch で開く",
       "nostrrr": "Nostrrr で開く",
       "stream": "zap.streamで開く",
-      "channel": "チャンネルを開く",
       "nostviewstr": "のすとびうあ で開く",
       "nostrapp": "App Manager で開く"
     }
