@@ -112,7 +112,7 @@
 <style lang="postcss">
   .menu {
     @apply flex max-h-[400px] min-w-[220px] flex-col shadow-lg;
-    @apply rounded-md bg-magnum-950 p-1 shadow-black/30 lg:max-h-none;
+    @apply rounded-md bg-neutral-800 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
   .subMenu {
@@ -130,10 +130,10 @@
     @apply justify-between;
   }
   .rightSlot {
-    @apply ml-auto;
+    @apply ml-auto text-magnum-500;
   }
   .separator {
-    @apply m-[5px] h-[1px] bg-magnum-700;
+    @apply m-[2px] h-[1px] bg-magnum-500/50;
   }
   .icon {
     @apply h-[13px] w-[13px];
