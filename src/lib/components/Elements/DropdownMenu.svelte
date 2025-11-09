@@ -68,7 +68,7 @@
       <!-- グループあり -->
       {#each menuGroups as group, groupIndex}
         {#if groupIndex > 0}
-          <div class="separator" use:melt={$separator} />
+          <div class="separator" use:melt={$separator}></div>
         {/if}
 
         <div class="item group-trigger" use:melt={subT[groupIndex]}>

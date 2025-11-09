@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { ChannelData } from "$lib/types";
+  import type { ChannelData, MenuGroup } from "$lib/types";
   import { MessagesSquare } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
@@ -28,19 +28,24 @@
   };
 
   let channelLink = $derived(getChannelLink(heyaId));
-  const menuTexts: { icon: any; text: string; num: number }[] = [
-    { icon: undefined, text: `${$_("channel.menu.edit")}`, num: 0 },
-    { icon: undefined, text: `${$_("channel.menu.open")}`, num: 1 },
+  const menuGroups: MenuGroup[] = [
+    {
+      // label は不要なので省略
+      items: [
+        { icon: undefined, text: `${$_("channel.menu.edit")}`, action: "edit" },
+        { icon: undefined, text: `${$_("channel.menu.open")}`, action: "open" },
+      ],
+    },
   ];
+
   let editChannelListOpen = $state(writable(false));
-  const handleSelectItem = (index: number) => {
-    console.log(index);
-    switch (menuTexts[index].num) {
-      case 0:
+  const handleSelectItem = async (action: string) => {
+    switch (action) {
+      case "edit":
         //edit
         $editChannelListOpen = true;
         break;
-      case 1:
+      case "open":
         //open
         goto(channelLink);
         break;
@@ -52,8 +57,8 @@
 
 {#if heyaId}
   <DropdownMenu
-    {menuTexts}
     {handleSelectItem}
+    {menuGroups}
     buttonClass="flex ml-auto hover:opacity-75 focus:opacity-50 text-magnum-300 text-sm"
   >
     <ChannelMetadata id={heyaId}>

@@ -26,6 +26,7 @@
   import EmptyListCard from "$lib/components/NostrElements/kindEvents/layout/EmptyListCard.svelte";
   import { encodetoNote } from "$lib/func/encode";
   import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
+  import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -251,6 +252,9 @@
                       id={heyaId}
                     >
                       {encodetoNote(heyaId)}
+                      {#snippet menu()}
+                        <ChannelEllipsisMenu heyaId={id} />
+                      {/snippet}
                     </EmptyListCard>
                   {/if}
                 {/snippet}
@@ -285,6 +289,9 @@
                       id={heyaId}
                     >
                       {encodetoNote(heyaId)}
+                      {#snippet menu()}
+                        <ChannelEllipsisMenu heyaId={id} />
+                      {/snippet}
                     </EmptyListCard>
                   {/if}
                 {/snippet}
@@ -330,6 +337,9 @@
                         {id}
                       >
                         {encodetoNote(id)}
+                        {#snippet menu()}
+                          <ChannelEllipsisMenu heyaId={id} />
+                        {/snippet}
                       </EmptyListCard>
                     {/if}
                   {/snippet}

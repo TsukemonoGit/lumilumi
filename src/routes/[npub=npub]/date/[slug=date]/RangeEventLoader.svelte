@@ -1,12 +1,14 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
   import { untrack, type Snippet } from "svelte";
-
+  import { pipe } from "rxjs";
   import { writable } from "svelte/store";
   import { loadOlderEvents } from "$lib/components/renderSnippets/nostr/timelineList";
   import { tie } from "$lib/stores/stores";
 
   import { t } from "@konemono/svelte5-i18n";
+  import { scanArray } from "$lib/stores/operators";
+  import { uniq } from "rx-nostr";
 
   interface Props {
     relays: string[] | undefined;
@@ -59,7 +61,7 @@
       });
     }
   });
-
+  let operator = $derived(pipe(tie, uniq(), scanArray()));
   // loadOlderEventsを使用してデータを段階的に取得
   async function fetchRangeData(): Promise<Nostr.Event[]> {
     if (isLoading) return [];
@@ -98,7 +100,7 @@
           SIFT_SIZE,
           currentFilters,
           currentUntil,
-          tie,
+          operator,
           relays,
           (data) => {
             if (abortController?.signal.aborted) return;
