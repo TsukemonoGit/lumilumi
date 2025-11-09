@@ -43,11 +43,6 @@
   const menuGroups = $derived.by(() => {
     const viewGroup = [
       { text: $_("menu.view.json"), icon: FileJson2, action: "viewJson" },
-      {
-        text: $_("menu.external.njump"),
-        icon: SquareArrowOutUpRight,
-        action: "njump",
-      },
     ];
 
     const copyGroup = [
@@ -69,7 +64,13 @@
         action: "broadcast",
       });
     }
-
+    const externalGroup = [
+      {
+        text: $_("menu.external.njump"),
+        icon: SquareArrowOutUpRight,
+        action: "njump",
+      },
+    ];
     // indexes 指定があればフィルタ
     const filterItems = (
       items: typeof viewGroup | typeof copyGroup | typeof actionGroup
@@ -81,6 +82,7 @@
       actionGroup.length > 0
         ? { label: $_("menu.group.action"), items: filterItems(actionGroup) }
         : null,
+      { label: $_("menu.group.external"), items: filterItems(externalGroup) },
     ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
   });
 

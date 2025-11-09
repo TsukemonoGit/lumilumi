@@ -50,18 +50,18 @@
 
     const copyGroup = [
       { text: $_("menu.copy.naddr"), icon: Copy, action: "copyNaddr" },
-      {
-        text: $_("menu.external.njump"),
-        icon: SquareArrowOutUpRight,
-        action: "njump",
-      },
     ];
 
     const externalGroup = [
       {
-        text: $_("menu.external.nostviewer"),
+        text: $_("menu.external.nostviewstr"),
         icon: Squirrel,
-        action: "nostviewer",
+        action: "nostviewstr",
+      },
+      {
+        text: $_("menu.external.njump"),
+        icon: SquareArrowOutUpRight,
+        action: "njump",
       },
     ];
 
@@ -88,12 +88,10 @@
     return [
       { label: $_("menu.group.view"), items: filterItems(viewGroup) },
       { label: $_("menu.group.copy"), items: filterItems(copyGroup) },
-      externalGroup.length > 0
-        ? {
-            label: $_("menu.group.external"),
-            items: filterItems(externalGroup),
-          }
-        : null,
+      {
+        label: $_("menu.group.external"),
+        items: filterItems(externalGroup),
+      },
     ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
   });
 
@@ -129,7 +127,7 @@
       case "zapStream":
         window.open(`https://zap.stream/${naddr}`, "_blank", "noreferrer");
         break;
-      case "nostviewer":
+      case "nostviewstr":
         window.open(
           `https://nostviewstr.vercel.app/${naddr}`,
           "_blank",
