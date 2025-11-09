@@ -30,6 +30,8 @@
   import { checkBirthDay } from "$lib/func/event";
   import { goto } from "$app/navigation";
 
+  import { MenuButtonClass } from "$lib/func/constants";
+
   interface Props {
     pubkey: string;
     bannerHeight?: number;
@@ -147,7 +149,7 @@
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
-            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            class={`${MenuButtonClass} my-auto`}
             title={"Daity User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
@@ -170,7 +172,7 @@
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
-            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            class={`${MenuButtonClass} my-auto`}
             title={"Daity User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
@@ -193,7 +195,7 @@
           {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
-            class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+            class={`${MenuButtonClass} my-auto `}
             title={"Daity User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
@@ -299,11 +301,11 @@
                 {/if}
               </div>
               <div class="flex flex-col gap-2">
-                <div class="flex flex-row ml-auto gap-2">
+                <div class="flex flex-row ml-auto gap-1">
                   {#if lumiSetting.get().pubkey !== pubkey}<MuteStatusIcons
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}<button
-                    class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
+                    class={`${MenuButtonClass} my-auto`}
                     title={"Daity User Activity"}
                     onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
                     ><CalendarSearch /></button

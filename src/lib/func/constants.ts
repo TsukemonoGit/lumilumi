@@ -7,6 +7,8 @@ import type {
 } from "$lib/types";
 import * as Nostr from "nostr-typedef";
 
+export const MenuButtonClass =
+  "rounded-full h-[32px] w-[32px] border border-magnum-300 break-keep disabled:opacity-25 font-medium leading-none text-magnum-300    flex justify-center items-center p-1 scale-95 hover:scale-100 active:scale-90";
 export const notificationKinds = [
   1, // Note
   4, // Direct message (legacy)
