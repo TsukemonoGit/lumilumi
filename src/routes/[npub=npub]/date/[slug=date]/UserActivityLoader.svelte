@@ -117,7 +117,7 @@
               onclick={handleShare}
             >
               <Share class="w-4 h-4" />
-              <span>{$t("menu.sharelink")}</span>
+              <span>{$t("menu.copy.sharelink")}</span>
             </button>
           </div>
           <div class="grid grid-cols-3 gap-4 text-center">

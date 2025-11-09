@@ -2,7 +2,7 @@
   import { splitHexColorString } from "$lib/func/util";
   import Avatar from "svelte-boring-avatars";
   const size = 42; //96;
-  let { handleClickToChannel, linkButtonTitle, id, children } = $props();
+  let { handleClickToChannel, linkButtonTitle, id, children, menu } = $props();
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">
@@ -36,4 +36,7 @@
         ></div>{/if}
     </div></button
   >
+  <div class="content-center p-1">
+    {@render menu?.()}
+  </div>
 </div>

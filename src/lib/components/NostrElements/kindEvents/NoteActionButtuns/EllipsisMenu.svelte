@@ -58,6 +58,17 @@
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
 
+  interface MenuItem {
+    text: string;
+    icon: any;
+    action: string;
+  }
+
+  interface MenuGroup {
+    label: string;
+    items: MenuItem[];
+  }
+
   interface Props {
     note: Nostr.Event;
     indexes?: number[] | undefined;
@@ -159,194 +170,173 @@
       ].join("\n");
     }
   };
+  // メニュー項目を階層構造に整理
+  let menuGroups: MenuGroup[] = $derived.by(() => {
+    const viewItems: MenuItem[] = [];
+    const copyItems: MenuItem[] = [];
+    const actionItems: MenuItem[] = [];
+    const editItems: MenuItem[] = [];
+    const otherItems: MenuItem[] = [];
+    const externalItems: MenuItem[] = [];
+    // 表示グループ
+    viewItems.push({
+      text: `${$_("menu.view.note")}`,
+      icon: Notebook,
+      action: "goto_note",
+    });
+    externalItems.push({
+      text: `${$_("menu.external.njump")}`,
+      icon: SquareArrowOutUpRight,
+      action: "open_njump",
+    });
+    viewItems.push({
+      text: `${$_("menu.view.json")}`,
+      icon: FileJson2,
+      action: "view_json",
+    });
 
-  // メニュー項目の定義を論理的な順序で整理
-  let menuTexts = $derived.by(() => {
-    const menuItems = [
-      // 基本操作グループ
-      {
-        text: `${$_("menu.copy.text")}`,
-        icon: NotepadText,
-        action: "copy_text",
-      },
-      {
-        text: `${replaceable ? `${$_("menu.copy.naddr")}` : `${$_("menu.copy.nevent")}`}`,
-        icon: Copy,
-        action: "copy_id",
-      },
+    viewItems.push({
+      text: `${$_("menu.view.translate")}`,
+      icon: Earth,
+      action: "translate",
+    });
+    // コピーグループ
+    copyItems.push({
+      text: `${$_("menu.copy.text")}`,
+      icon: NotepadText,
+      action: "copy_text",
+    });
+    copyItems.push({
+      text: `${replaceable ? `${$_("menu.copy.naddr")}` : `${$_("menu.copy.nevent")}`}`,
+      icon: Copy,
+      action: "copy_id",
+    });
+    copyItems.push({
+      text: `${$_("menu.copy.embed")}`,
+      icon: CodeXml,
+      action: "copy_embed_code",
+    });
 
-      // 埋め込みコード（条件付き）
-      {
-        text: `${$_("menu.copy.embed")}`,
-        icon: CodeXml,
-        action: "copy_embed_code",
-      },
+    copyItems.push({
+      text: `${$_("menu.copy.sharelink")}`,
+      icon: Share,
+      action: "share_link",
+    });
 
-      {
-        text: `${$_("menu.note")}`,
-        icon: Notebook,
-        action: "goto_note",
-      },
-
-      // ブックマーク（条件付き）
-      ...(note.kind === 1 || note.kind === 42 || note.kind === 30023
-        ? [
-            {
-              text: `${isBookmarked ? `${$_("menu.bookmark.remove")}` : `${$_("menu.bookmark.add")}`}`,
-              icon: isBookmarked ? BookmarkMinus : BookmarkPlus,
-              action: "toggle_bookmark",
-            },
-          ]
-        : []),
-
-      // データ更新ボタン（条件付き）
-      ...(replaceable
-        ? [
-            {
-              text: `${$_("menu.refresh")}`,
-              icon: RefreshCw,
-              action: "refresh_data",
-            },
-          ]
-        : []),
-
-      // 共有・外部リンクグループ
-      {
-        text: `${$_("menu.sharelink")}`,
-        icon: Share,
-        action: "share_link",
-      },
-      {
-        text: `${$_("menu.njump")}`,
-        icon: SquareArrowOutUpRight,
-        action: "open_njump",
-      },
-
-      // 外部サービス（条件付き）
-      ...(note.kind === 30030
-        ? [
-            {
-              text: `${$_("menu.emoji")}`,
-              icon: Smile,
-              action: "open_emojito",
-            },
-          ]
-        : []),
-
-      ...(note.kind === 30311
-        ? [
-            {
-              text: `${$_("menu.stream")}`,
-              icon: Tv,
-              action: "open_zapstream",
-            },
-          ]
-        : []),
-
-      ...(note.kind === 31990
-        ? [
-            {
-              text: `${$_("menu.nostrapp")}`,
-              icon: Layers,
-              action: "open_nostrapp",
-            },
-          ]
-        : []),
-
-      ...(nostviewstrable.includes(note.kind)
-        ? [
-            {
-              text: `${$_("menu.nostviewstr")}`,
-              icon: Squirrel,
-              action: "open_nostviewstr",
-            },
-          ]
-        : []),
-
-      ...(note.pubkey === lumiSetting.get().pubkey && note.kind === 30023
-        ? [
-            {
-              text: `${$_("menu.MAKIMONO")}`,
-              icon: FilePenLine,
-              action: "open_makimono",
-            },
-          ]
-        : []),
-
-      // Broadcast（条件付き）
-      ...(!(
+    // アクショングループ
+    if (
+      !(
         note.tags.find((tag) => tag[0] === "-") &&
         note.pubkey !== lumiSetting.get().pubkey
       )
-        ? [
-            {
-              text: `${$_("menu.broadcast")}`,
-              icon: Radio,
-              action: "broadcast",
-            },
-          ]
-        : []),
-
-      // ツール・ユーティリティグループ
-      {
-        text: `${$_("menu.translate")}`,
-        icon: Earth,
-        action: "translate",
-      },
-      {
-        text: `${$_("menu.json")}`,
-        icon: FileJson2,
-        action: "view_json",
-      },
-
-      // 削除ボタン（条件付き、最後に配置）
-      ...(note.pubkey === lumiSetting.get().pubkey &&
-      note.kind !== 5 &&
-      note.kind !== 62
-        ? [
-            {
-              text: `${$_("menu.delete")}`,
-              icon: Trash,
-              action: "delete",
-            },
-          ]
-        : []),
-    ];
-
-    // indexes指定時の処理を変更
-    if (indexes !== undefined) {
-      const numToActionMap: Record<number, string> = {
-        0: "view_json",
-        1: "open_njump",
-        2: "translate",
-        3: "copy_id",
-        4: "goto_note",
-        5: "open_emojito",
-        6: "broadcast",
-        7: "share_link",
-        8: "copy_text",
-        9: "open_zapstream",
-        10: "open_nostviewstr",
-        11: "open_nostrapp",
-        12: "delete",
-        13: "open_makimono",
-        14: "refresh_data",
-        15: "toggle_bookmark",
-        16: "copy_embed_code",
-      };
-
-      const allowedActions = indexes
-        .map((i) => numToActionMap[i])
-        .filter(Boolean);
-      return menuItems.filter((item) => allowedActions.includes(item.action));
+    ) {
+      actionItems.push({
+        text: `${$_("menu.action.broadcast")}`,
+        icon: Radio,
+        action: "broadcast",
+      });
     }
 
-    return menuItems;
+    if (note.pubkey === lumiSetting.get().pubkey && note.kind === 30023) {
+      actionItems.push({
+        text: `${$_("menu.action.MAKIMONO")}`,
+        icon: FilePenLine,
+        action: "open_makimono",
+      });
+    }
+
+    if (note.kind === 1 || note.kind === 42 || note.kind === 30023) {
+      actionItems.push({
+        text: `${isBookmarked ? `${$_("menu.action.bookmark.remove")}` : `${$_("menu.action.bookmark.add")}`}`,
+        icon: isBookmarked ? BookmarkMinus : BookmarkPlus,
+        action: "toggle_bookmark",
+      });
+    }
+
+    if (replaceable) {
+      actionItems.push({
+        text: `${$_("menu.action.refresh")}`,
+        icon: RefreshCw,
+        action: "refresh_data",
+      });
+    }
+
+    if (
+      note.pubkey === lumiSetting.get().pubkey &&
+      note.kind !== 5 &&
+      note.kind !== 62
+    ) {
+      actionItems.push({
+        text: `${$_("menu.action.delete")}`,
+        icon: Trash,
+        action: "delete",
+      });
+    }
+
+    // 外部リンクグループ
+
+    if (note.kind === 30030) {
+      externalItems.push({
+        text: `${$_("menu.external.emoji")}`,
+        icon: Smile,
+        action: "open_emojito",
+      });
+    }
+
+    if (note.kind === 30311) {
+      externalItems.push({
+        text: `${$_("menu.external.stream")}`,
+        icon: Tv,
+        action: "open_zapstream",
+      });
+    }
+
+    if (note.kind === 31990) {
+      externalItems.push({
+        text: `${$_("menu.external.nostrapp")}`,
+        icon: Layers,
+        action: "open_nostrapp",
+      });
+    }
+
+    if (nostviewstrable.includes(note.kind)) {
+      externalItems.push({
+        text: `${$_("menu.external.nostviewstr")}`,
+        icon: Squirrel,
+        action: "open_nostviewstr",
+      });
+    }
+    // グループを構築
+    const groups = [];
+
+    if (viewItems.length > 0) {
+      groups.push({ label: `${$_("menu.group.view")}`, items: viewItems });
+    }
+
+    if (copyItems.length > 0) {
+      groups.push({ label: `${$_("menu.group.copy")}`, items: copyItems });
+    }
+    if (actionItems.length > 0) {
+      groups.push({ label: `${$_("menu.group.action")}`, items: actionItems });
+    }
+    if (editItems.length > 0) {
+      groups.push({ label: `${$_("menu.group.edit")}`, items: editItems });
+    }
+    if (externalItems.length > 0) {
+      groups.push({
+        label: `${$_("menu.group.external")}`,
+        items: externalItems,
+      });
+    }
+    if (otherItems.length > 0) {
+      groups.push({ label: `${$_("menu.group.other")}`, items: otherItems });
+    }
+
+    return groups;
   });
 
-  const handleSelectItem = async (index: number) => {
-    const selectedItem = menuTexts[index];
-    switch (selectedItem.action) {
+  const handleSelectItem = async (action: string) => {
+    switch (action) {
       case "view_json":
         $modalState = {
           isOpen: true,
@@ -476,6 +466,7 @@
         const makimono = `https://makimono.lumilumi.app//${naddr}`;
         window.open(makimono, "_blank", "noreferrer");
         break;
+
       case "refresh_data":
         $nowProgress = true;
         const key: QueryKey = [
@@ -490,7 +481,6 @@
 
       case "toggle_bookmark":
         try {
-          // isBookmarked の状態を確認
           if (typeof isBookmarked === "undefined") {
             console.error("isBookmarked is undefined");
             break;
@@ -505,7 +495,6 @@
           }
 
           if (!pre || pre.pubkey !== pub) {
-            //なかったらほんとにないのか確認する
             const bookmarkEvent = await usePromiseReq(
               {
                 filters: [{ kinds: [10003], authors: [pub], limit: 1 }],
@@ -575,7 +564,6 @@
         break;
     }
   };
-
   const onClickOK = async () => {
     deleteDialogOpen(false);
     try {
@@ -624,7 +612,7 @@
 
 <DropdownMenu
   buttonClass="actionButton flex items-center"
-  {menuTexts}
+  {menuGroups}
   {handleSelectItem}
 >
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />

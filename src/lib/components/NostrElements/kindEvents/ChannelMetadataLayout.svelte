@@ -119,8 +119,6 @@
         {/snippet}
       </Metadata>{/snippet}
     {#snippet menu()}
-      <button class="text-magnum-400"
-        ><ChannelEllipsisMenu note={event} {channelData} heyaId={id} /></button
-      >{/snippet}
+      <ChannelEllipsisMenu note={event} {channelData} heyaId={id} />{/snippet}
   </ListCardComponent>
 {/if}

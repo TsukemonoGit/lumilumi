@@ -939,7 +939,7 @@
   <div
     use:melt={$content}
     transition:fade={{ duration: 100 }}
-    class=" z-20 rounded-lg bg-white shadow"
+    class=" z-50 rounded-lg bg-white shadow"
   >
     <div
       class="flex flex-col flex-wrap divide-y divide-zinc-500 bg-zinc-800 border border-zinc-100 rounded-md w-64 max-w-full p-1"
