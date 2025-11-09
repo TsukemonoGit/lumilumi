@@ -1,5 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { MenuButtonClass } from "$lib/func/constants";
+
   import { additionalPostOptions, postWindowOpen } from "$lib/stores/stores";
   import type { AdditionalPostOptions } from "$lib/types";
   import { Reply } from "lucide-svelte";
@@ -54,6 +56,8 @@
 
 <button
   onclick={handleClickRelayToUser}
-  class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50 h-fit my-auto"
-  title={"reply"}><Reply /></button
+  class={`${MenuButtonClass} my-auto`}
+  title="reply"
 >
+  <Reply />
+</button>

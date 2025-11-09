@@ -11,6 +11,7 @@
   import DisplayName from "./DisplayName.svelte";
   import { type Writable, writable } from "svelte/store";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { MenuButtonClass } from "$lib/func/constants";
 
   interface Props {
     metadata: Nostr.Event;
@@ -109,9 +110,7 @@
   >{#if children !== undefined}
     {@render children()}
   {:else}
-    <Zap
-      class="h-[32px] w-[32px] rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-    />
+    <Zap class={`${MenuButtonClass} `} />
   {/if}
 </button>
 <AlertDialog

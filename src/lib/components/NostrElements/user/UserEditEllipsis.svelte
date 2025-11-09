@@ -7,6 +7,7 @@
   import { goto } from "$app/navigation";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import type { MenuGroup } from "$lib/types";
+  import { MenuButtonClass } from "$lib/func/constants";
   interface Props {
     pubkey: string;
   }
@@ -49,10 +50,7 @@
 </script>
 
 <DropdownMenu {menuGroups} {handleSelectItem}>
-  <div
-    class="w-fit rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-    title="user setting"
-  >
+  <div class={`${MenuButtonClass}`} title="user setting">
     <UserCog />
   </div></DropdownMenu
 >

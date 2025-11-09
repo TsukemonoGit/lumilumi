@@ -5,6 +5,7 @@
   import UserMenu from "./UserMenu.svelte";
   import type { Profile } from "$lib/types";
   import Popover from "$lib/components/Elements/Popover.svelte";
+  import { MenuButtonClass } from "$lib/func/constants";
 
   interface Props {
     pubkey: string;
@@ -19,10 +20,8 @@
 </script>
 
 <Popover ariaLabel="user menu" showCloseButton={false} {zIndex}>
-  <button
-    type="button"
-    class="h-[32px] w-[32px] rounded-full bg-neutral-200 text-magnum-600 p-1 hover:opacity-75 active:opacity-50"
-    title="menu"><Ellipsis /></button
+  <button type="button" class={`${MenuButtonClass}`} title="menu"
+    ><Ellipsis /></button
   >
 
   {#snippet popoverContent()}
