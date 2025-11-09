@@ -49,7 +49,7 @@
       return undefined;
     }
   };
-  const channelData = getContent(event);
+  let channelData = $derived(getContent(event));
 </script>
 
 {#if channelData}
