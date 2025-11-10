@@ -32,7 +32,7 @@
   let zapComment: string = $state(comment ?? "");
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
-  const prof = profile(metadata);
+  let prof = $derived(profile(metadata));
   let invOp = false;
   const onClickOK = async () => {
     invoice = undefined;
