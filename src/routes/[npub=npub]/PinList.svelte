@@ -100,7 +100,18 @@
   };
 
   const addPin = async () => {
-    if (!previewData.isValid || !previewData.type || !currentEvent) return;
+    if (!previewData.isValid || !previewData.type) {
+      console.log(previewData.isValid);
+      console.log(previewData.type);
+      console.log(currentEvent);
+      $toastSettings = {
+        color: "bg-red-500",
+        title: "Error",
+        description: "なんかエラー",
+      };
+      return;
+    }
+
     // 新しいタグを作成
     const newTag: string[] =
       previewData.type === "note"
@@ -111,8 +122,8 @@
           ];
 
     try {
-      // 重複チェック
-      const isDuplicate = currentEvent.tags.some(
+      // 既存イベントがある場合は重複チェック
+      const isDuplicate = currentEvent?.tags.some(
         (tag: string[]) => tag[0] === newTag[0] && tag[1] === newTag[1]
       );
 
@@ -126,8 +137,8 @@
         return;
       }
       const newPin: EventParameters = {
-        content: currentEvent.content || "",
-        tags: $state.snapshot([...(currentEvent.tags || []), newTag]),
+        content: currentEvent?.content || "",
+        tags: $state.snapshot([...(currentEvent?.tags || []), newTag]),
         kind: 10001,
       };
 
