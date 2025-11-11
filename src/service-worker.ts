@@ -4,11 +4,9 @@
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 import { precacheAndRoute } from "workbox-precaching";
-import {
-  cacheNames,
-  clientsClaim,
-  type RouteHandlerCallbackOptions,
-} from "workbox-core";
+// service-worker.ts
+import { cacheNames, clientsClaim } from "workbox-core";
+import type { RouteHandlerCallbackOptions } from "workbox-core";
 import { NetworkFirst, NetworkOnly, Strategy } from "workbox-strategies";
 import {
   registerRoute,
@@ -16,26 +14,49 @@ import {
   setDefaultHandler,
 } from "workbox-routing";
 import { ExpirationPlugin } from "workbox-expiration";
-
-import type { ManifestEntry } from "workbox-build";
 import type { StrategyHandler } from "workbox-strategies";
 
-// Give TypeScript the correct global.
+// TypeScriptのグローバル型定義
 declare let self: ServiceWorkerGlobalScope;
 declare type ExtendableEvent = any;
 
+// 型定義
+interface ManifestEntry {
+  url: string;
+  revision?: string | null;
+}
+
+interface TargetData {
+  url?: string;
+  text?: string;
+  title?: string;
+  media?: File[];
+}
+
+interface LatestData {
+  title?: string;
+  text?: string;
+  url?: string;
+  media?: string[] | null;
+}
+
+// キャッシュ名定義
 const mediaCacheName = "media-cache";
 const cacheName = cacheNames.runtime;
-
-//avaratのキャッシュ
 const CACHE_NAME = "avatar-cache";
+
+// キャッシュ設定
 const MAX_ENTRIES = 100;
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7日
 const CHECK_INTERVAL = 30 * 1000; // 30秒
 const REMAINING_TIME_THRESHOLD = 60 * 60 * 24 * 1000; // 1日
 
-let media: string[] | null;
+// グローバル変数
+let media: string[] | null = null;
+let targetData: TargetData = {};
+let lastCheckedTime = 0;
 
+// 設定
 const config = {
   race: false,
   debug: false,
@@ -44,40 +65,34 @@ const config = {
   fallback: "app.html",
 };
 
-let targetData: {
-  url: string | undefined;
-  text: string | undefined;
-  title: string | undefined;
-  media: File[] | undefined;
-};
-
-const manifest = self.__WB_MANIFEST as Array<ManifestEntry>;
-
+// マニフェスト処理
+const manifest = self.__WB_MANIFEST as ManifestEntry[];
 const cacheEntries: RequestInfo[] = [];
-
 const manifestURLs = manifest.map(
   (entry) => new URL(entry.url, self.location.href).href
 );
 
-// --- Event Listeners ---
+// --- イベントリスナー登録 ---
 self.addEventListener("install", handleInstallEvent);
 self.addEventListener("activate", handleActivateEvent);
 self.addEventListener("fetch", handleFetchEvent);
 self.addEventListener("message", handleMessageEvent);
 
-//リソースの取得方法を定義し、ネットワーク優先の戦略（NetworkFirst）を使用しています。
+// ルート登録: マニフェストリソース
 registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
-//これmanifestURLsがvite.configのglobPatternsの部分？
 
-// #cache を含む URL だけをキャッシュ
-let lastCheckedTime = 0; // 最後にチェックしたタイムスタンプ
-
-const cacheKeyWillBeUsed = async ({ request }): Promise<string> => {
+// キャッシュキー生成(ハッシュ削除)
+const cacheKeyWillBeUsed = async ({
+  request,
+}: {
+  request: Request;
+}): Promise<string> => {
   const url = new URL(request.url);
-  url.hash = ""; // ハッシュを削除
+  url.hash = "";
   return url.toString();
 };
 
+// キャッシュレスポンス処理(期限チェック)
 const cachedResponseWillBeUsed = async ({
   cacheName,
   cachedResponse,
@@ -86,21 +101,18 @@ const cachedResponseWillBeUsed = async ({
   cacheName: string;
   cachedResponse?: Response;
   request: Request;
-}) => {
+}): Promise<Response | null> => {
   const now = Date.now();
 
-  // チェック間隔を制御 (例: 最小30秒間隔)
   if (now - lastCheckedTime < CHECK_INTERVAL) {
-    return cachedResponse; // 前回チェックから30秒以内ならキャッシュをそのまま利用
+    return cachedResponse || null;
   }
 
-  lastCheckedTime = now; // チェック時間を更新
+  lastCheckedTime = now;
 
   if (!cachedResponse) return null;
 
   const cache = await caches.open(cacheName);
-  const url = new URL(request.url);
-  url.hash = "";
   const dateHeader = cachedResponse.headers.get("date");
 
   if (dateHeader) {
@@ -111,9 +123,11 @@ const cachedResponseWillBeUsed = async ({
       await cache.put(request, cachedResponse.clone());
     }
   }
+
   return cachedResponse;
 };
 
+// ルート登録: #cache付きURL
 registerRoute(
   ({ url }) => url.hash === "#cache",
   new NetworkFirst({
@@ -128,19 +142,18 @@ registerRoute(
     ],
   })
 );
-//この修正により、https://example.com/image.jpg#cache という形式のリクエストでもキャッシュを利用可能になります。同時に、https://example.com/image.jpg のリクエストも同じキャッシュを利用できるため、柔軟な対応が可能です。
-//一定間隔（例: 30秒）以内のリクエストでは期限チェックをスキップし、キャッシュをそのまま返します。
 
-// その他の画像、動画はキャッシュしない
+// ルート登録: 画像・動画(キャッシュしない)
 registerRoute(
   ({ request }) =>
     request.destination === "image" || request.destination === "video",
   new NetworkOnly()
 );
 
+// デフォルトハンドラ
 setDefaultHandler(new NetworkFirst({ cacheName }));
 
-// fallback to app-shell for document request
+// フォールバック処理
 setCatchHandler(
   async (options: RouteHandlerCallbackOptions): Promise<Response> => {
     if (options.request.destination === "document") {
@@ -150,18 +163,17 @@ setCatchHandler(
     return Response.error();
   }
 );
-// this is necessary, since the new service worker will keep on skipWaiting state
-// and then, caches will not be cleared since it is not activated
-self.skipWaiting();
-clientsClaim();
 
+// ユーザーが明示的に更新ボタンをクリックするまで、新しいService Workerの適用を待機
+// skipWaiting()とclientsClaim()を即座に実行すると、通知UIが表示される前にリロードされる
+/* self.skipWaiting();
+clientsClaim(); */
+
+// ストラテジー構築
 function buildStrategy(): Strategy {
   if (config.race) {
     class CacheNetworkRace extends Strategy {
-      _handle(
-        request: Request,
-        handler: StrategyHandler
-      ): Promise<Response | undefined> {
+      _handle(request: Request, handler: StrategyHandler): Promise<Response> {
         const fetchAndCachePutDone: Promise<Response> =
           handler.fetchAndCachePut(request);
         const cacheMatchDone: Promise<Response | undefined> =
@@ -169,12 +181,13 @@ function buildStrategy(): Strategy {
 
         return new Promise((resolve, reject) => {
           fetchAndCachePutDone.then(resolve).catch((e) => {
-            if (config.debug)
+            if (config.debug) {
               console.log(`Cannot fetch resource: ${request.url}`, e);
+            }
           });
+
           cacheMatchDone.then((response) => response && resolve(response));
 
-          // Reject if both network and cache error or find no response.
           Promise.allSettled([fetchAndCachePutDone, cacheMatchDone]).then(
             (results) => {
               const [fetchAndCachePutResult, cacheMatchResult] = results;
@@ -182,8 +195,9 @@ function buildStrategy(): Strategy {
                 fetchAndCachePutResult.status === "rejected" &&
                 cacheMatchResult.status === "fulfilled" &&
                 !cacheMatchResult.value
-              )
+              ) {
                 reject(fetchAndCachePutResult.reason);
+              }
             }
           );
         });
@@ -191,6 +205,7 @@ function buildStrategy(): Strategy {
     }
     return new CacheNetworkRace();
   }
+
   return config.networkTimeoutSeconds > 0
     ? new NetworkFirst({
         cacheName,
@@ -199,13 +214,13 @@ function buildStrategy(): Strategy {
     : new NetworkFirst({ cacheName });
 }
 
-async function handleInstallEvent(event: ExtendableEvent) {
+// installイベント処理
+async function handleInstallEvent(event: ExtendableEvent): Promise<void> {
   event.waitUntil(
     caches
       .open(cacheName)
       .then(async (cache) => {
         let existingRequests: readonly Request[] = [];
-
         try {
           existingRequests = await cache.keys();
           if (existingRequests.length > 1000) {
@@ -238,158 +253,182 @@ async function handleInstallEvent(event: ExtendableEvent) {
   );
 }
 
-async function handleActivateEvent(event: ExtendableEvent) {
+// activateイベント処理
+async function handleActivateEvent(event: ExtendableEvent): Promise<void> {
   event.waitUntil(
-    (async () => {
-      try {
-        const cache = await caches.open(cacheName);
-        const cacheKeys = await cache.keys();
-
-        if (cacheKeys.length > 2000) {
-          console.warn("[SW] Too many cache entries, skipping manifest clean");
-        } else {
-          for (const request of cacheKeys) {
-            if (!manifestURLs.includes(request.url)) {
-              await cache.delete(request);
-            }
+    Promise.all([
+      // ランタイムキャッシュのクリーンアップ
+      (async () => {
+        try {
+          const cache = await caches.open(cacheName);
+          const cacheKeys = await cache.keys();
+          if (cacheKeys.length > 2000) {
+            console.warn(
+              "[SW] Too many cache entries, skipping manifest clean"
+            );
+          } else {
+            await Promise.all(
+              cacheKeys.map((request) => {
+                if (!manifestURLs.includes(request.url)) {
+                  return cache.delete(request);
+                }
+                return Promise.resolve(false);
+              })
+            );
           }
+        } catch (e) {
+          console.error("[SW] cache.keys() failed during activate:", e);
         }
-      } catch (e) {
-        console.error("[SW] cache.keys() failed during activate:", e);
-      }
-    })(),
-
-    (async () => {
-      try {
-        const mediaCache = await caches.open(mediaCacheName);
-        const mediaKeys = await mediaCache.keys();
-
-        if (mediaKeys.length > 1000) {
-          console.warn("[SW] Too many media cache entries, clearing all");
+      })(),
+      // メディアキャッシュのクリア
+      (async () => {
+        try {
+          const mediaCache = await caches.open(mediaCacheName);
+          const mediaKeys = await mediaCache.keys();
+          if (mediaKeys.length > 1000) {
+            console.warn("[SW] Too many media cache entries, clearing all");
+          }
           await Promise.all(mediaKeys.map((req) => mediaCache.delete(req)));
-        } else {
-          for (const request of mediaKeys) {
-            await mediaCache.delete(request);
-          }
+        } catch (e) {
+          console.error("[SW] Failed to clear media cache:", e);
         }
-      } catch (e) {
-        console.error("[SW] Failed to clear media cache:", e);
-      }
-    })()
+      })(),
+    ])
   );
 }
 
-async function handleFetchEvent(event: FetchEvent) {
+// fetchイベント処理
+async function handleFetchEvent(event: FetchEvent): Promise<void> {
   if (
     event.request.method === "POST" &&
     new URL(event.request.url).pathname === "/post"
   ) {
-    return handlePostRequest(event.request);
+    event.respondWith(handlePostRequest(event.request));
   }
 }
 
-async function handlePostRequest(request) {
+// POSTリクエスト処理
+async function handlePostRequest(request: Request): Promise<Response> {
   if (!request) {
     console.error("Request is undefined");
     return new Response("Invalid Request", { status: 400 });
   }
 
-  const formData = await request.clone().formData();
-  targetData = {
-    url: formData.get("url"),
-    text: formData.get("text"),
-    title: formData.get("title"),
-    media: formData.getAll("media"),
-  };
-  console.log("data", targetData);
-  // メディアキャッシュ処理
-  if (targetData.media && targetData.media.length > 0) {
-    const cache = await caches.open(mediaCacheName);
+  try {
+    const formData = await request.clone().formData();
+
+    const getString = (v: FormDataEntryValue | null): string | undefined =>
+      typeof v === "string" ? v : undefined;
+
+    const mediaEntries = formData
+      .getAll("media")
+      .filter((v): v is File => v instanceof File);
+
+    targetData = {
+      url: getString(formData.get("url")),
+      text: getString(formData.get("text")),
+      title: getString(formData.get("title")),
+      media: mediaEntries.length > 0 ? mediaEntries : undefined,
+    };
+
+    console.log("data", targetData);
+
+    // メディアキャッシュ処理
+    if (targetData.media && targetData.media.length > 0) {
+      const cache = await caches.open(mediaCacheName);
+      await Promise.all(
+        targetData.media.map(async (file, index) => {
+          const cacheRequest = new Request(
+            `/cached-media/${file.name}-${index}`,
+            { method: "GET" }
+          );
+          const cacheResponse = new Response(file, {
+            headers: { "Content-Type": file.type },
+          });
+          await cache.put(cacheRequest, cacheResponse);
+        })
+      );
+    }
+
+    // クライアントへの送信
+    const allClients = await (self as any).clients.matchAll({
+      includeUncontrolled: true,
+    });
+
+    media = targetData.media
+      ? targetData.media.map(
+          (file, index) => `/cached-media/${file.name}-${index}`
+        )
+      : null;
+
+    console.log(media);
+
+    const payload: LatestData = {
+      title: targetData.title,
+      text: targetData.text,
+      url: targetData.url,
+      media,
+    };
+
+    const typedClients = allClients as ReadonlyArray<Client>;
     await Promise.all(
-      targetData.media.map(async (file, index) => {
-        const cacheRequest = new Request(
-          `/cached-media/${file.name}-${index}`,
-          {
-            method: "GET",
-          }
-        );
-        const cacheResponse = new Response(file, {
-          headers: {
-            "Content-Type": file.type,
-          },
-        });
-        await cache.put(cacheRequest, cacheResponse);
-      })
+      typedClients.map((client) => Promise.resolve(client.postMessage(payload)))
     );
+
+    return new Response("", { status: 200 });
+  } catch (error) {
+    console.error("Error handling POST request:", error);
+    return new Response("Internal Server Error", { status: 500 });
   }
-
-  // クライアントへの送信
-  const allClients = await (self as any).clients.matchAll({
-    includeUncontrolled: true,
-  });
-  media = targetData.media
-    ? targetData.media.map(
-        (file, index) => `/cached-media/${file.name}-${index}`
-      )
-    : null;
-  console.log(media);
-  await Promise.all(
-    allClients.map((client) => {
-      return client.postMessage({
-        title: targetData.title,
-        text: targetData.text,
-        url: targetData.url,
-        media: media,
-      });
-    })
-  );
-
-  return new Response("", { status: 200 });
 }
 
-async function handleMessageEvent(event) {
+// messageイベント処理
+async function handleMessageEvent(
+  event: ExtendableMessageEvent
+): Promise<void> {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
   }
+
   console.log(event);
 
-  // 以前キャッシュされたデータを再送信する
-  if (event.data && event.data.type === "requestLatestData") {
-    //event.source?.postMessage(clonedRequest);
-    await sendLatestDataToClient(event.source);
+  // 最新データの再送信
+  if (event.data?.type === "requestLatestData") {
+    const source = event.source;
+    if (source && "postMessage" in source) {
+      await sendLatestDataToClient(source);
+    }
     return;
   }
 
-  //共有用メディアキャッシュ削除
+  // メディアキャッシュ削除
   if (event.data && event.data.type === "DELETE_CACHE") {
-    caches
-      .open(mediaCacheName)
-      .then(async (cache) => {
-        const cacheKeys = await cache.keys();
-        for (const request of cacheKeys) {
-          await cache.delete(request);
-        }
-      })
-      .finally(() => {
-        event.ports[0].postMessage({ success: true });
-      });
-    //const cache = await caches.open("media-cache");
-    //await cache.delete(event.data.url);
-    //event.ports[0].postMessage({ success: true });
+    try {
+      const cache = await caches.open(mediaCacheName);
+      const cacheKeys = await cache.keys();
+      await Promise.all(cacheKeys.map((request) => cache.delete(request)));
+      event.ports[0].postMessage({ success: true });
+    } catch (error) {
+      console.error("Error deleting cache:", error);
+      event.ports[0].postMessage({ success: false, error: String(error) });
+    }
   }
 }
 
-async function sendLatestDataToClient(client) {
-  // キャッシュから最新データを取得して送信
+// クライアントへ最新データを送信
+async function sendLatestDataToClient(
+  client: Client | MessagePort | ServiceWorker
+): Promise<void> {
+  const response: LatestData | null =
+    Object.keys(targetData).length > 0
+      ? {
+          title: targetData.title,
+          text: targetData.text,
+          url: targetData.url,
+          media,
+        }
+      : null;
 
-  const response = targetData
-    ? {
-        title: targetData.title,
-        text: targetData.text,
-        url: targetData.url,
-        media: media,
-      }
-    : null;
   client.postMessage(response);
 }
