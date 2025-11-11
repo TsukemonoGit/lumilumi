@@ -10,24 +10,17 @@
   //https://vite-pwa-org.netlify.app/frameworks/svelte.html#prompt-for-update
   //const { offlineReady, needRefresh, updateServiceWorker } =
 
-  let needRefresh = $state(false);
-  const { updateServiceWorker } = useRegisterSW({
-    needRefresh: writable(false),
-    autoReload: false, // 自動リロードを無効化
-    immediate: false, // 手動でチェックを行うように設定
+  const { needRefresh, updateServiceWorker } = useRegisterSW({
     onRegistered(swr: any) {
       console.log(`SW registered: ${swr}`);
     },
     onRegisterError(error: any) {
       console.log("SW registration error", error);
     },
-    onNeedRefresh() {
-      needRefresh = true;
-    },
   });
 
   function close() {
-    needRefresh = false;
+    needRefresh.set(false);
   }
 
   function handleClickReload() {
@@ -42,7 +35,7 @@
   }
 </script>
 
-{#if needRefresh}
+{#if $needRefresh}
   <div class="pwa-toast" role="alert">
     <div class="message">
       <span> New content available, click on reload button to update. </span>
