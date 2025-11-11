@@ -63,6 +63,7 @@ import { SigningError } from "./publishError";
 import { throttle } from "$lib/func/throttle";
 import { STORAGE_KEYS } from "./localStorageKeys";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
+import { set3Relays } from "./reactions";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -109,7 +110,7 @@ export function setRelays(relays: AcceptableDefaultRelaysConfig) {
     rxNostr.setDefaultRelays(relays);
     defaultRelays.set(rxNostr.getDefaultRelays());
   }
-  //set3Relays(relays);
+  set3Relays(relays);
 }
 export function getDefaultWriteRelays(): string[] {
   const relays = rxNostr.getDefaultRelays();
