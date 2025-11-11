@@ -166,8 +166,8 @@ setCatchHandler(
 
 // ユーザーが明示的に更新ボタンをクリックするまで、新しいService Workerの適用を待機
 // skipWaiting()とclientsClaim()を即座に実行すると、通知UIが表示される前にリロードされる
-/* self.skipWaiting();
-clientsClaim(); */
+self.skipWaiting();
+clientsClaim();
 
 // ストラテジー構築
 function buildStrategy(): Strategy {
