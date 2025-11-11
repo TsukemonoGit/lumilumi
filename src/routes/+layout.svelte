@@ -69,6 +69,10 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
   import type { UploaderOption } from "$lib/types";
+  import {
+    rxNostr3RelaysReconnectChallenge,
+    setRxNostr3,
+  } from "$lib/func/reactions";
 
   let { data, children } = $props<{
     data:
@@ -156,6 +160,9 @@
       if (!$app?.rxNostr) {
         setRxNostr();
       }
+      if (!$app?.rxNostr3) {
+        setRxNostr3();
+      }
 
       const nostrLogin = await import("nostr-login");
 
@@ -175,6 +182,7 @@
   function onVisibilityChange() {
     if (document?.visibilityState === "visible") {
       relaysReconnectChallenge();
+      rxNostr3RelaysReconnectChallenge();
     }
   }
 

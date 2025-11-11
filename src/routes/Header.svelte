@@ -13,7 +13,7 @@
   import HomeOptions from "./HomeOptions.svelte";
   import GlobalOptions from "./GlobalOptions.svelte";
   import { browser } from "$app/environment";
-  import { debug, DEBUG_MODE } from "$lib/components/Debug/debug";
+  import { debug } from "$lib/components/Debug/debug";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   let _showBanner: boolean = $state(showBanner.get());

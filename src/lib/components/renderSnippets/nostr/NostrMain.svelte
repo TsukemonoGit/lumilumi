@@ -32,6 +32,7 @@
 
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { migrateNotifiSettings } from "../../../../routes/notifications/notifiSettingsRepository";
+  import { setRxNostr3 } from "$lib/func/reactions";
 
   let {
     contents,
@@ -109,6 +110,7 @@
   });
   function initializeRxNostr() {
     if (!$app?.rxNostr) setRxNostr();
+    if (!$app?.rxNostr3) setRxNostr3();
   }
 
   function isValidLumiSetting(obj: unknown): obj is LumiSetting {
