@@ -28,13 +28,13 @@
   }
 
   function handleClickReload() {
-    updateServiceWorker();
-    /*  .then(() => {
+    updateServiceWorker(true)
+      .then(() => {
         console.log("Service Worker updated successfully");
       })
       .catch((error: any) => {
         console.error("Failed to update Service Worker:", error);
-      }); */
+      });
     close();
   }
 </script>
