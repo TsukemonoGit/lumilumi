@@ -342,9 +342,9 @@
   {/if}
   <!-- <SvelteQueryDevtools initialIsOpen={false} /> -->
 </QueryClientProvider>
-{#await import("$lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
+<!-- {#await import("$lib/ReloadPrompt.svelte") then { default: ReloadPrompt }}
   <ReloadPrompt />
-{/await}
+{/await} -->
 
 <!-- {#if new URL(page.url.origin).hostname !== "lumilumi.app" && import.meta.env.PROD}
   <DomainMigrationNotice />
