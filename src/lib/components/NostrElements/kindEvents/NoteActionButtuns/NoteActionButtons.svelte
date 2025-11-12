@@ -190,7 +190,7 @@
     return acc;
   }, []);
 
-  const menuGroups: MenuGroup[] = [
+  let menuGroups: MenuGroup[] = $derived([
     {
       // label は不要なので省略
       items: [
@@ -198,7 +198,7 @@
         { text: $_("menu.action.quote"), icon: Quote, action: "quote" },
       ],
     },
-  ];
+  ]);
 
   const handleSelectItem = async (action: string) => {
     if (prosessing) return;

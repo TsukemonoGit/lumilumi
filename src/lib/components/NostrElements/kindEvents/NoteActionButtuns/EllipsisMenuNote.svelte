@@ -21,7 +21,7 @@
     iconClass = "",
   }: Props = $props();
 
-  const menuGroups = $derived.by(() => {
+  let menuGroups = $derived.by(() => {
     const copyGroup = [
       { text: $_("menu.copy.nevent"), icon: Copy, action: "copyId" },
     ];

@@ -51,7 +51,7 @@
     return { text: $_(textKey), icon, action };
   }
 
-  const menuGroups: MenuGroup[] = $derived.by(() => {
+  let menuGroups: MenuGroup[] = $derived.by(() => {
     const viewGroup: MenuItem[] = note
       ? [
           makeMenuItem("menu.view.json", FileJson2, "viewJson"),
