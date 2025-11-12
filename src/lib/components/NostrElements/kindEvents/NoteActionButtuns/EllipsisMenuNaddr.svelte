@@ -41,7 +41,7 @@
     return undefined;
   };
 
-  const menuGroups = $derived.by(() => {
+  let menuGroups = $derived.by(() => {
     const naddrpointer = decodeNaddr(naddr);
 
     const viewGroup = [

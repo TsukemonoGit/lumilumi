@@ -14,7 +14,7 @@
 
   let { pubkey }: Props = $props();
 
-  const menuGroups: MenuGroup[] = [
+  let menuGroups: MenuGroup[] = $derived([
     {
       // label は不要なので省略
       items: [
@@ -31,7 +31,7 @@
         },
       ],
     },
-  ];
+  ]);
 
   const handleSelectItem = async (action: string) => {
     const encodedPub = nip19.npubEncode(pubkey);
