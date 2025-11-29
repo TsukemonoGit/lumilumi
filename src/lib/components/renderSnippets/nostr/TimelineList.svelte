@@ -21,7 +21,7 @@
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
-  import { createUniq } from "rx-nostr/src";
+  import { createUniq, uniq } from "rx-nostr/src";
   import {
     displayEvents,
     lumiSetting,
@@ -90,21 +90,6 @@
     currentEventCount = $state(0);
     requiredEventCount = $state(0);
 
-    get loadMoreDisabled() {
-      // nowProgressまたは初期化中の場合は常に無効
-      if ($nowProgress || this.isOnMount) return true;
-
-      // 前回のデータ取得中の場合
-      if (this.isLoadingOlderEvents) {
-        // ストックが十分にある場合のみ有効
-        const hasEnoughStock =
-          this.currentEventCount >= viewIndex + amount + CONFIG.SLIDE_AMOUNT;
-        return !hasEnoughStock;
-      }
-
-      return false;
-    }
-
     reset() {
       this.updating = false;
       this.isUpdateScheduled = false;
@@ -135,6 +120,7 @@
   });
 
   const timelineManager: TimelineManager = new TimelineManager();
+  const configureOperators = pipe(tie, uniq(), scanArray());
 
   let isOnMount = false;
 
@@ -161,15 +147,12 @@
     });
   });
 
-  const keyFn = (packet: EventPacket): string => packet.event.id;
-
-  const [uniq, eventIds] = createUniq(keyFn);
   console.log(filters);
   // Create the timeline event list
   let result = useTimelineEventList(
     queryKey,
     filters,
-    configureOperators(),
+    configureOperators,
     req,
     relays
   );
@@ -271,7 +254,7 @@
       timelineManager.isUpdateScheduled = false;
     } finally {
       timelineManager.updating = false;
-      $nowProgress = false;
+      // $nowProgress = false;
       timelineManager.updateCounts();
 
       if (timelineManager.isUpdateScheduled) {
@@ -279,14 +262,6 @@
       }
     }
   }
-
-  function configureOperators() {
-    return pipe(tie, uniq, scanArray());
-  }
-
-  resetUniq = () => {
-    eventIds.clear();
-  };
 
   // Effect to handle reactive state changes
   $effect(() => {
@@ -315,9 +290,12 @@
       updateViewEvent(partialData);
     };
   }
-
+  let initRunning = false;
   // Initialize the component
   async function init() {
+    if (initRunning) return;
+    initRunning = true;
+    $nowProgress = true;
     timelineManager.updating = false;
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
@@ -334,13 +312,14 @@
       }));
       timelineManager.isLoadingOlderEvents = true;
       // Wait for relay connections before proceeding
+
       await waitForConnections();
       const handleIncrementalData = createIncrementalHandler();
 
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         newFilters,
-        configureOperators(),
+        configureOperators,
         relays,
         handleIncrementalData
       );
@@ -357,34 +336,27 @@
         }, 10);
       }
     }
+    $nowProgress = false;
+    initRunning = false;
   }
 
   // Lifecycle hooks
   onMount(async () => {
-    if (!isOnMount) {
-      $nowProgress = true;
-      isOnMount = true;
-      await init();
-      isOnMount = false;
-      $nowProgress = false;
-    }
+    await init();
   });
 
   afterNavigate(async (navigate) => {
     if (navigate.type !== "form" && !isOnMount) {
-      $nowProgress = true;
-      isOnMount = true;
       await init();
-      isOnMount = false;
-      $nowProgress = false;
     }
   });
+
+  const fetchAmount = CONFIG.LOAD_LIMIT * 5;
 
   // UI action handlers
   const handleNext = async () => {
     if ($nowProgress) return;
 
-    $nowProgress = true;
     let viewMoved = false;
 
     try {
@@ -422,17 +394,18 @@
 
       timelineManager.isLoadingOlderEvents = true;
 
-      const fetchAmount = CONFIG.LOAD_LIMIT * 5;
-
+      const fil = olderFilters.map((fil) => {
+        return { ...fil, since: undefined };
+      });
+      console.log(fil);
       const olderEvents = await loadOlderEvents(
         fetchAmount,
-        olderFilters.map((fil) => {
-          return { ...fil, since: undefined };
-        }),
+        fil,
         untilTime,
-        configureOperators(),
+        configureOperators,
         relays,
         (partialData) => {
+          console.log(partialData);
           if (partialData.length === 0) return;
 
           timelineManager.updateCounts();
@@ -460,6 +433,7 @@
       //
       if (
         !viewMoved &&
+        olderEvents.length < fetchAmount &&
         timelineManager.currentEventCount <
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
@@ -472,15 +446,14 @@
         timelineManager.currentEventCount > viewIndex + amount
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-
-        setTimeout(() => {
-          updateViewEvent();
-        }, 0);
       }
     } catch (error) {
       console.error("loadOlderAndMoveDown error:", error);
     } finally {
-      $nowProgress = false;
+      setTimeout(() => {
+        updateViewEvent();
+      }, 0);
+
       timelineManager.isLoadingOlderEvents = false;
       timelineManager.updateCounts();
     }
@@ -509,7 +482,7 @@
       });
 
       viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
-
+      loadMoreDisabled = false;
       setTimeout(() => {
         updateViewEvent?.($globalData);
       }, 100);
