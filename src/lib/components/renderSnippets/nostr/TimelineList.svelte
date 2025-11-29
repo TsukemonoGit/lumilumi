@@ -21,7 +21,7 @@
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
-  import { createUniq, uniq } from "rx-nostr/src";
+  import { createUniq } from "rx-nostr/src";
   import {
     displayEvents,
     lumiSetting,
@@ -119,8 +119,12 @@
     }
   });
 
+  const keyFn = (packet: EventPacket): string => packet.event.id;
+
+  const [uniq, eventIds] = createUniq(keyFn);
+
   const timelineManager: TimelineManager = new TimelineManager();
-  const configureOperators = pipe(tie, uniq(), scanArray());
+  const configureOperators = pipe(tie, uniq, scanArray());
 
   let isOnMount = false;
 
