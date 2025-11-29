@@ -122,7 +122,9 @@
   const keyFn = (packet: EventPacket): string => packet.event.id;
 
   const [uniq, eventIds] = createUniq(keyFn);
-
+  resetUniq = () => {
+    eventIds.clear();
+  };
   const timelineManager: TimelineManager = new TimelineManager();
   const configureOperators = pipe(tie, uniq, scanArray());
 
