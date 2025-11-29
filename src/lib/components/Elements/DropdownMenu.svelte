@@ -111,15 +111,15 @@
 
 <style lang="postcss">
   .menu {
-    @apply flex max-h-[400px] min-w-[220px] flex-col shadow-lg;
+    @apply flex max-h-[400px] min-w-[160px] flex-col shadow-lg;
     @apply rounded-md bg-neutral-800 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
   .subMenu {
-    @apply min-w-[220px] shadow-md shadow-black/30;
+    @apply min-w-[160px] shadow-md shadow-black/30;
   }
   .item {
-    @apply relative h-8 min-h-[24px] select-none rounded-sm pl-6 pr-1;
+    @apply relative h-8 min-h-[24px] select-none rounded-sm pl-1 pr-1;
     @apply text-magnum-50 outline-none;
     @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
     @apply data-[disabled]:text-neutral-600;
