@@ -50,7 +50,7 @@ export async function loadOlderEvents(
     //since: undefined,
   }));
 
-  console.log(newFilters);
+  console.log(newFilters, sift, operator);
 
   // Create request and operator pipeline
   const newReq = createRxBackwardReq();
@@ -68,6 +68,7 @@ export async function loadOlderEvents(
     sift
   );
 
+  newReq.over();
   // Filter events by timestamp
   const filteredOlderEvents = olderEvents.filter(
     (packet) => packet.event.created_at <= until
