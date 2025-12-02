@@ -7,17 +7,13 @@
   let videoLoad: boolean = $state(false);
 
   interface Props {
-    src?: string | undefined;
-    url?: string | undefined;
-    number?: number | undefined;
+    url: string;
 
     author: string;
   }
 
   let {
-    src = undefined,
-    url = undefined,
-    number = undefined,
+    url,
 
     author,
   }: Props = $props();
@@ -36,7 +32,7 @@
     <Link
       props={{ "aria-label": `External Links: ${url}` }}
       className="underline text-magnum-300 break-all"
-      href={url ?? ""}>{src}</Link
+      href={url ?? ""}>{url}</Link
     >
   {/if}
   <div>
@@ -45,7 +41,7 @@
       width="288"
       height="200"
       class="max-w-[min(18rem,100%)] max-h-[18rem] object-contain overflow-hidden"
-      {src}
+      src={url}
       controls
       preload="metadata"
       onloadeddata={() => (videoLoad = true)}
@@ -58,7 +54,7 @@
   <Link
     props={{ "aria-label": `External Links: ${url}` }}
     className="underline text-magnum-300 break-all"
-    href={url ?? ""}>{src}</Link
+    href={url ?? ""}>{url}</Link
   >
 {:else}
   <button

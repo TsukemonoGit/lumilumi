@@ -50,7 +50,7 @@ export async function loadOlderEvents(
     //since: undefined,
   }));
 
-  console.log(newFilters, sift, operator);
+  //console.log(newFilters, sift, operator);
 
   // Create request and operator pipeline
   const newReq = createRxBackwardReq();

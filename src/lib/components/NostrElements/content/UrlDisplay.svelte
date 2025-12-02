@@ -9,6 +9,7 @@
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
   import ContentVideo from "./ContentVideo.svelte";
   import type { Token } from "@konemono/nostr-content-parser";
+  import ContentAudio from "./ContentAudio.svelte";
 
   interface Props {
     part: Token;
@@ -37,21 +38,9 @@
           {author}
         />
       {:else if type === "movie"}
-        <ContentVideo src={part.content} url={part.content} {author} />
+        <ContentVideo url={part.content} {author} />
       {:else if type === "audio"}
-        {#if lumiSetting.get().showImg}
-          <audio
-            aria-label="audio contents"
-            controls
-            src={part.content}
-            class=" object-contain max-w-[min(20rem,100%)] max-h-80"
-            ><track default kind="captions" /></audio
-          >
-        {:else}<Link
-            props={{ "aria-label": `External Links: ${part.content}` }}
-            className="underline text-magnum-300 break-all hover:opacity-80"
-            href={part.content ?? ""}>{part.content}</Link
-          >{/if}
+        <ContentAudio url={part.content} />
       {:else if type === "3D"}
         <Content3D content={part.content} url={part.content} />
       {:else if type === "url"}
