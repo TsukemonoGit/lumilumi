@@ -2,7 +2,7 @@
 
 import { usePromiseReq } from "$lib/func/nostr";
 import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
-import { scanArray } from "$lib/stores/operators";
+//import { scanArray } from "$lib/stores/operators";
 import { defaultRelays } from "$lib/stores/stores";
 import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
@@ -11,11 +11,11 @@ import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
 
-// Type definition for enhanced event packet
-type EnhancedEventPacket = EventPacket & {
-  seenOn: Set<string>;
-  isNew: boolean;
-};
+// // Type definition for enhanced event packet
+// type EnhancedEventPacket = EventPacket & {
+//   seenOn: Set<string>;
+//   isNew: boolean;
+// };
 
 /**
  * Load older events based on filters and timestamp
