@@ -12,7 +12,8 @@
   import { SkipForward, Triangle } from "lucide-svelte";
   import type Nostr from "nostr-typedef";
   import {
-    createUniq,
+    /*  createUniq, */
+    uniq,
     now,
     type EventPacket,
     type RxReq,
@@ -32,7 +33,7 @@
   import { pipe } from "rxjs";
   import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { useSearchEventList } from "$lib/stores/useSearchEventList";
-
+  import { sortEventPackets } from "$lib/func/util";
   const sift = 40; //スライドする量
   let untilTime: number = 0;
 
@@ -70,30 +71,27 @@
 
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-
+  const fetchAmount = 250; // 50 * 5;
   // イベントID に基づいて重複を排除する
-  const keyFn = (packet: EventPacket): string => packet.event.id;
+  // const keyFn = (packet: EventPacket): string => packet.event.id;
 
-  const [uniq, eventIds] = createUniq(keyFn);
+  //const [uniq, eventIds] = createUniq(keyFn);
   const operator = pipe(
     tie,
-    uniq,
+    uniq(),
     userStatus(),
     /* reactionCheck(), */ scanArray()
-  );
-  //untilはundefinedか値あり。
-  //で設定ある場合はリアルタイムのイベントは必要ないから$dataは常に空
-  let reqFilters = $derived(
-    filters.map((filter: Nostr.Filter) => ({
-      ...filter,
-
-      limit: 50,
-    }))
   );
 
   let result = $derived(
     filters[0].until !== undefined
-      ? useSearchEventList(queryKey, reqFilters, operator, req, relays)
+      ? useSearchEventList(
+          queryKey,
+          $state.snapshot(filters),
+          operator,
+          req,
+          relays
+        )
       : {
           data: undefined,
           status: readable("loading" as ReqStatus),
@@ -150,17 +148,27 @@
       $nowProgress = false;
     }
   });
+  function updateQueryDataForOlder(events: EventPacket[]) {
+    queryClient.setQueryData(
+      [...queryKey, "olderData"],
+      (oldData: EventPacket[] | undefined) => {
+        const merged = [...(oldData ?? []), ...events];
 
+        const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
+
+        return sortEventPackets(Array.from(dedupMap.values()));
+      }
+    );
+  }
   async function init() {
     const newFilters = filters.map((filter: Nostr.Filter) => ({
       ...filter,
 
       until: filter.until === undefined ? now() : filter.until,
-      limit: 50,
     }));
     await waitForConnections();
     const older = await firstLoadOlderEvents(
-      50,
+      fetchAmount,
       newFilters,
 
       operator,
@@ -170,7 +178,11 @@
     );
 
     if (older.length > 0) {
-      queryClient.setQueryData([...queryKey, "olderData"], () => older);
+      // data にない id を除外
+      const existingIds = new Set(($data ?? []).map((p) => p.event.id));
+      const filtered = older.filter((p) => !existingIds.has(p.event.id));
+
+      queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
     }
     updateViewEvent($data);
     result.status = readable("success");
@@ -185,11 +197,9 @@
       //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
       //500
       $nowProgress = true;
-      const syutokusururyou =
-        viewIndex + amount - allUniqueEvents?.length + 5 * sift; //一回分だと４０くらいしか取らないのもなんかもったいないけど無駄にいっぱい取るのもなんかもったいないし40*5=200件分くらい取る？
-      //limitで最大何個くらいまで取れるんだろうの最小値//500件くらいじゃなかったっけ(リレーによる)
+
       const older = await loadOlderEvents(
-        syutokusururyou,
+        fetchAmount,
         filters,
 
         untilTime,
@@ -200,13 +210,7 @@
       );
       console.log(older);
       if (older.length > 0) {
-        queryClient.setQueryData(
-          [...queryKey, "olderData"],
-          (olderdatas: EventPacket[] | undefined) => [
-            ...(olderdatas ?? []),
-            ...older,
-          ]
-        );
+        updateQueryDataForOlder(older);
       }
     }
     // console.log(allUniqueEvents?.length);

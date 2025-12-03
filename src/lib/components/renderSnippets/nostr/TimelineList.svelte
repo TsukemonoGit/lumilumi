@@ -21,7 +21,7 @@
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
-  import { createUniq } from "rx-nostr/src";
+  import { /* createUniq , */ uniq } from "rx-nostr/src";
   import {
     displayEvents,
     lumiSetting,
@@ -119,14 +119,14 @@
     }
   });
 
-  const keyFn = (packet: EventPacket): string => packet.event.id;
+  // const keyFn = (packet: EventPacket): string => packet.event.id;
 
-  const [uniq, eventIds] = createUniq(keyFn);
-  resetUniq = () => {
-    eventIds.clear();
-  };
+  // const [uniq, eventIds] = createUniq(keyFn);
+  // resetUniq = () => {
+  //   eventIds.clear();
+  // };
   const timelineManager: TimelineManager = new TimelineManager();
-  const configureOperators = pipe(tie, uniq, scanArray());
+  const configureOperators = pipe(tie, uniq(), scanArray());
 
   let isOnMount = false;
 
@@ -331,10 +331,17 @@
       );
 
       if (olderEvents.length > 0) {
-        queryClient.setQueryData(
-          olderQueryKey,
-          (oldData: EventPacket[] | undefined) => [...olderEvents]
-        );
+        if (olderEvents.length > 0) {
+          // data にない id を除外
+          const existingIds = new Set(
+            ($globalData ?? []).map((p) => p.event.id)
+          );
+          const filtered = olderEvents.filter(
+            (p) => !existingIds.has(p.event.id)
+          );
+
+          queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
+        }
 
         setTimeout(() => {
           updateViewEvent?.($globalData);
@@ -468,16 +475,11 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
-        return sortEventPackets(
-          Array.from(
-            new Map(
-              [...(oldData ?? []), ...events].map((packet) => [
-                packet.event.id,
-                packet,
-              ])
-            ).values()
-          )
-        );
+        const merged = [...(oldData ?? []), ...events];
+
+        const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
+
+        return sortEventPackets(Array.from(dedupMap.values()));
       }
     );
   }
