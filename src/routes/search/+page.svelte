@@ -26,7 +26,7 @@
   import { latest, type EventPacket } from "rx-nostr";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { page } from "$app/state";
+
   import { safePublishEvent } from "$lib/func/publishError";
 
   let { data }: { data: PageData } = $props();

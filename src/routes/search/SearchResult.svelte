@@ -37,18 +37,25 @@
   });
 
   // eventFilterにsearchプロパティがあるかチェックして、リレーを決定
-  let selectedRelays = $derived.by(() => {
-    // eventFilterにsearchプロパティがない、または値が空の場合
+  const selectedRelays = $derived.by(() => {
+    // 1. 検索フィルターが存在するかをチェック
+    const hasSearchFilter = filters.some((fil) => fil.search);
 
-    const search = filters.find((fil) => fil.search);
-    //console.log(search);
-    if (!search) {
-      return undefined;
+    if (hasSearchFilter) {
+      // 2. 検索フィルターがある場合:
+      //    'relays'が存在すればそれを使用し、なければ'nip50relays'を使用
+      return relays.length > 0 ? relays : nip50relays;
     }
-    if (relays.length > 0) {
-      return relays;
-    }
-    return nip50relays;
+
+    // 1. デフォルトリレーから読み取り可能なURLを取得
+    const readRelayUrls: string[] = $defaultRelays
+      ? Object.entries($defaultRelays)
+          .filter(([url, config]) => config.read)
+          .map(([url, config]) => config.url)
+      : [];
+
+    //  URLで重複を排除し、ユニークなリレーのリストを返す
+    return Array.from(new Set([...readRelayUrls, ...relays]));
   });
 </script>
 

@@ -71,7 +71,12 @@
 
   // export let lastVisible: Element | null;
   let allUniqueEvents: Nostr.Event[];
-  const fetchAmount = 250; // 50 * 5;
+  const fetchAmount = 50; // 50 * 5;
+  //これ50とってそこからさらに50だと取れるデータがfetchamount100とかにすると取れない
+  // http://localhost:5173/search?q=author%3Anpub12egp0pvh2f0fp6sk5nt6ncehqzkz8zsma8dl8agf8p3f98v6resqku4w26+kind%3A1+until%3A2024-06-13T09%3A00
+  //取得中のデータも表示するようにしたらそんなに読み込み遅くないような気がするから
+  //とりあえず一回での取得量を減らしておく
+
   // イベントID に基づいて重複を排除する
   // const keyFn = (packet: EventPacket): string => packet.event.id;
 
@@ -82,17 +87,21 @@
     userStatus(),
     /* reactionCheck(), */ scanArray()
   );
-
+  $inspect(filters[0].until);
   let result = $derived(
-    filters[0].until !== undefined
+    filters[0].until === undefined //untilがなかったら、未来の投稿も取得するためのレックを発行
       ? useSearchEventList(
           queryKey,
-          $state.snapshot(filters),
+          $state.snapshot(filters).map((f) => ({
+            ...f,
+            since: now() - 15 * 60,
+          })),
           operator,
           req,
           relays
         )
-      : {
+      : //untilがあったら、未来の投稿はいらないから適当にウメトク
+        {
           data: undefined,
           status: readable("loading" as ReqStatus),
           error: undefined,
@@ -120,32 +129,26 @@
     index: number,
     progress: boolean
   ) {
+    console.log("dataChange");
     if ((data && index >= 0) || !progress) {
-      updateViewEvent?.(data);
+      updateViewEvent?.();
     }
   }
 
   let isOnMount = false;
 
   onMount(async () => {
+    console.log("onMount");
     if (!isOnMount) {
-      console.log("onMount");
-      $nowProgress = true;
-      isOnMount = true;
       await init();
-      isOnMount = false;
-      $nowProgress = false;
     }
   });
 
   afterNavigate(async (navigate) => {
     if (navigate.type !== "form" && !isOnMount) {
       console.log("afterNavigate");
-      $nowProgress = true;
-      isOnMount = true;
+
       await init();
-      isOnMount = false;
-      $nowProgress = false;
     }
   });
   function updateQueryDataForOlder(events: EventPacket[]) {
@@ -161,11 +164,18 @@
     );
   }
   async function init() {
-    const newFilters = filters.map((filter: Nostr.Filter) => ({
-      ...filter,
+    if (isOnMount) {
+      return;
+    }
+    isOnMount = true;
 
-      until: filter.until === undefined ? now() : filter.until,
-    }));
+    const newFilters = $state.snapshot(
+      filters.map((filter: Nostr.Filter) => ({
+        ...filter,
+
+        until: filter.until === undefined ? now() - 15 * 60 : filter.until,
+      }))
+    );
     await waitForConnections();
     const older = await firstLoadOlderEvents(
       fetchAmount,
@@ -173,7 +183,10 @@
 
       operator,
       relays,
-      undefined,
+      (partialData: EventPacket[]) => {
+        if (partialData.length === 0) return;
+        updateViewEvent(partialData);
+      },
       5000
     );
 
@@ -184,18 +197,19 @@
 
       queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
     }
-    updateViewEvent($data);
+    updateViewEvent();
     result.status = readable("success");
-  }
 
+    isOnMount = false;
+  }
   const handleNext = async () => {
+    console.log("handleNext", viewIndex);
+    let viewMoved = false;
     // console.log(length, viewIndex, amount, sift);
     if (
       !allUniqueEvents ||
       allUniqueEvents?.length < viewIndex + amount + sift
     ) {
-      //viewIndexは表示される最初のインデックスで今表示されてるものの最後のインデックスが＋５０でそれぷらす20なかったらロードする
-      //500
       $nowProgress = true;
 
       const older = await loadOlderEvents(
@@ -205,70 +219,93 @@
         untilTime,
         operator,
         relays,
-        undefined,
+        (partialData) => {
+          // console.log(partialData);
+          if (partialData.length === 0) return;
+
+          const stillNotEnough =
+            allUniqueEvents.length + partialData.length <
+            viewIndex + amount + sift + 10; //重複考慮
+
+          if (!viewMoved && !stillNotEnough) {
+            viewIndex += sift;
+            viewMoved = true;
+            updateViewEvent(partialData);
+          }
+
+          updateViewEvent(partialData);
+        },
         5000
       );
-      console.log(older);
+      //console.log(older);
       if (older.length > 0) {
         updateQueryDataForOlder(older);
       }
     }
     // console.log(allUniqueEvents?.length);
-    if (allUniqueEvents?.length >= viewIndex + amount - 10) {
+    if (allUniqueEvents?.length >= viewIndex + amount - 10 && !viewMoved) {
       //表示量のイベントなかったらスライドしない
       viewIndex += sift; //スライドする量
     }
-    updateViewEvent($data);
+    updateViewEvent();
     $nowProgress = false;
   };
 
   const handlePrev = () => {
+    console.log("handlePrev", viewIndex);
     if (viewIndex > 0) {
       viewIndex = Math.max(viewIndex - sift, 0);
     }
-    updateViewEvent($data);
+    updateViewEvent();
   };
 
   let debounceTimer: NodeJS.Timeout | null = null;
   const DEBOUNCE_TIME = 200; // 200ミリ秒
-  function updateViewEvent(data?: EventPacket[] | undefined | null) {
+  function updateViewEvent(partialData?: EventPacket[] | undefined) {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
     debounceTimer = setTimeout(() => {
-      update(data);
+      update(partialData);
       debounceTimer = null;
     }, DEBOUNCE_TIME);
   }
 
-  function update(data?: EventPacket[] | undefined | null) {
+  function update(partialData?: EventPacket[] | undefined) {
     const olderdatas: EventPacket[] | undefined = queryClient.getQueryData([
       ...queryKey,
       "olderData",
     ]);
     //console.log(olderdatas);
-    const allEvents = [...(data || []), ...(olderdatas || [])];
+    const allEvents = [...($data || []), ...(olderdatas || [])];
+    console.log("update", allEvents);
 
-    untilTime =
-      allEvents.length > 0
-        ? allEvents[allEvents.length - 1].event.created_at
-        : now();
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(
-          allEvents.map((event) => [event.event.id, event.event])
+          [...allEvents, ...(partialData || [])].map((event) => [
+            event.event.id,
+            event.event,
+          ])
         ).values()
       )
     );
+    const allEv = uniqueEvents.filter(eventFilter);
+    if (!partialData) {
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
+      //allUniqueEvents全イベント数の更新はpartialDataがないときだけ
+      allUniqueEvents = allEv;
+    }
 
-    allUniqueEvents = uniqueEvents.filter(eventFilter);
-
-    displayEvents.set(allUniqueEvents.slice(viewIndex, viewIndex + amount));
+    displayEvents.set(allEv.slice(viewIndex, viewIndex + amount));
   }
 
   function handleClickTop() {
     viewIndex = 0;
-    updateViewEvent($data);
+    updateViewEvent();
   }
 
   onDestroy(() => {
