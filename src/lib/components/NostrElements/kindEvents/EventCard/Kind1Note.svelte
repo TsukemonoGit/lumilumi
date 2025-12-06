@@ -80,21 +80,7 @@
       stroke-linecap="round"
       stroke-linejoin="round"
     />
-  </svg><!-- <svg
-    class="absolute right-0 fill-magnum-500/75"
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="18"
-    viewBox="0 0 16 18"
-    fill="none"
-  >
-    <path
-      d="M1 1V17L8 13L15 17V1"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg> -->{/if}
+  </svg>{/if}
 <NoteComponent
   warningText={warning !== undefined
     ? warning.length > 1

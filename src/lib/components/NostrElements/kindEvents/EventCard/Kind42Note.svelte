@@ -8,7 +8,7 @@
   import Reply from "../Reply.svelte";
   import { checkContentWarning } from "$lib/func/event";
   import ChannelTag from "../../content/ChannelTag.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { bookmark10003, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import ShowStatus from "../Status/ShowStatus.svelte";
   import NoteComponent from "../layout/NoteComponent.svelte";
   import UserPopupMenu from "../../user/UserPopupMenu.svelte";
@@ -54,8 +54,29 @@
   )?.[1];
 
   let warning = $derived(checkContentWarning(note.tags));
+
+  let isBookmarked: boolean = $derived(
+    bookmark10003
+      .get()
+      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false
+  );
 </script>
 
+{#if isBookmarked}<svg
+    class="absolute right-0 -top-0.5 fill-magnum-500/75"
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="12"
+    viewBox="0 0 16 12"
+    fill="none"
+  >
+    <path
+      d="M1 1V11L8 5L15 11V1"
+      stroke-width="1"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>{/if}
 <NoteComponent
   warningText={warning !== undefined
     ? warning.length > 1
@@ -113,6 +134,6 @@
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+      <NoteActionButtons {note} {repostable} bind:deleted {isBookmarked} />{/if}
   {/snippet}
 </NoteComponent>
