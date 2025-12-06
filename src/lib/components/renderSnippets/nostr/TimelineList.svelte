@@ -1,8 +1,10 @@
-<!--メインTL以外のTL（グローバルとか、リストとか、ユーザーページのやつとか）-->
+<!--
+  メインTL以外のタイムラインコンポーネント
+  （グローバルTL、リストTL、ユーザーページのTLなど）
+-->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import {
-    defaultRelays,
     nowProgress,
     queryClient,
     tie,
@@ -47,17 +49,17 @@
     content?: Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    //  updateViewEvent: (_data?: EventPacket[] | undefined | null) => void;
     resetUniq?: () => void;
   }
-  // Constants
+  // タイムライン設定定数
   const CONFIG = {
-    SLIDE_AMOUNT: 40,
-    UPDATE_DELAY: 20,
-    LOAD_LIMIT: 50,
-    FUTURE_EVENT_TOLERANCE: 10,
-    SCROLL_ADJUSTMENT: 120,
-    SCROLL_DELAY: 100,
+    SLIDE_AMOUNT: 40, // 一度に移動するイベント数
+    UPDATE_DELAY: 20, // ビュー更新の遅延時間（ms）
+    LOAD_LIMIT: 50, // 一度に読み込むイベント数
+    FUTURE_EVENT_TOLERANCE: 10, // 未来のイベントを許容する秒数
+    SCROLL_ADJUSTMENT: 120, // スクロール位置調整のピクセル数
+    SCROLL_DELAY: 100, // スクロール後の更新遅延時間（ms）
+    INIT_UPDATE_DELAY: 10, // 初期化後の更新遅延時間（ms）
   };
 
   let {
@@ -74,79 +76,86 @@
     loading,
     nodata,
     content,
-    //  updateViewEvent = $bindable(),
     resetUniq = $bindable(),
   }: Props = $props();
 
   // State management
-  class TimelineManager {
-    allUniqueEvents: Nostr.Event[] = $state([]);
-    updating = $state(false);
-    timeoutId: NodeJS.Timeout | null = null;
-    isOnMount = $state(false);
-    isLoadingOlderEvents = $state(false);
-    isUpdateScheduled = $state(false);
-    destroyed = $state(false);
-    currentEventCount = $state(0);
-    requiredEventCount = $state(0);
-    initRunning = $state(false);
+  let allUniqueEvents: Nostr.Event[] = $state([]);
+  let updating = $state(false);
+  let timeoutId: NodeJS.Timeout | null = null;
+  let isOnMount = $state(false);
+  let isLoadingOlderEvents = $state(false);
+  let isUpdateScheduled = $state(false);
+  let destroyed = $state(false);
+  let currentEventCount = $state(0);
+  let initRunning = $state(false);
 
-    reset() {
-      this.updating = false;
-      this.isUpdateScheduled = false;
-      $nowProgress = false;
-    }
+  /**
+   * タイムラインの更新状態をリセット
+   */
+  function resetTimeline() {
+    updating = false;
+    isUpdateScheduled = false;
+    $nowProgress = false;
+  }
 
-    fullReset() {
-      console.log("timelineManager full reset");
-      this.allUniqueEvents = [];
-      this.timeoutId = null;
-      this.isOnMount = false;
-      this.isLoadingOlderEvents = false;
-      this.destroyed = false;
-      this.currentEventCount = 0;
-      this.requiredEventCount = 0;
-      this.initRunning = false;
-      this.reset();
-    }
+  /**
+   * タイムラインの全状態をリセット（コンポーネント破棄時やユーザー変更時など）
+   */
+  function fullResetTimeline() {
+    allUniqueEvents = [];
+    timeoutId = null;
+    isOnMount = false;
+    isLoadingOlderEvents = false;
+    destroyed = false;
+    currentEventCount = 0;
+    initRunning = false;
+    resetTimeline();
+  }
 
-    updateCounts() {
-      this.currentEventCount = this.allUniqueEvents?.length || 0;
-      this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
-    }
+  /**
+   * 現在のイベント数を更新
+   */
+  function updateCounts() {
+    currentEventCount = allUniqueEvents.length;
+  }
 
-    clearTimeout() {
-      if (this.timeoutId) {
-        clearTimeout(this.timeoutId);
-        this.timeoutId = null;
-      }
+  /**
+   * タイムライン更新用のタイムアウトをクリア
+   */
+  function clearTimelineTimeout() {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
     }
   }
 
+  /**
+   * ユーザーIDが変更された時にタイムラインをリセット
+   */
   $effect(() => {
-    // ユーザーIDが変更された時にリセット
     if (page.params.npub) {
-      timelineManager.fullReset();
+      fullResetTimeline();
     }
   });
 
-  // const keyFn = (packet: EventPacket): string => packet.event.id;
-
-  // const [uniq, eventIds] = createUniq(keyFn);
-  // resetUniq = () => {
-  //   eventIds.clear();
-  // };
-  const timelineManager: TimelineManager = new TimelineManager();
   const configureOperators = pipe(tie, uniq(), scanArray());
 
   let olderQueryKey = $derived([...queryKey, "olderData"]);
 
+  /**
+   * コンポーネント破棄時のクリーンアップ
+   */
   onDestroy(() => {
-    console.log("timeline destroy");
-    timelineManager.clearTimeout();
-    timelineManager.fullReset();
+    destroyed = true;
+    clearTimelineTimeout();
+    fullResetTimeline();
   });
-  // Create query for older data
+
+  /**
+   * 古いイベントデータ用のクエリを作成
+   * キャッシュとして使用するため、自動リフェッチは無効
+   */
   $effect(() => {
     createQuery({
       queryKey: olderQueryKey,
@@ -158,7 +167,6 @@
     });
   });
 
-  console.log(filters);
   // Create the timeline event list
   let result = useTimelineEventList(
     queryKey,
@@ -175,31 +183,43 @@
   // Update the view with current events
 
   /**
-   * Update scheduling and execution
+   * ビュー更新をスケジュール
+   * 既にスケジュール済みの場合は何もしない
+   * @param partialdata 追加でマージするイベントデータ（オプション）
    */
   const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
-    if (timelineManager.isUpdateScheduled) return;
+    if (isUpdateScheduled) return;
 
-    timelineManager.isUpdateScheduled = true;
+    isUpdateScheduled = true;
 
-    if (!timelineManager.updating) {
+    if (!updating) {
       scheduleUpdate(partialdata || []);
     }
   };
 
+  /**
+   * 更新処理を遅延実行するためのタイムアウトを設定
+   * コンポーネントが破棄されている場合は処理を中断
+   * @param partialdata 追加でマージするイベントデータ（オプション）
+   */
   function scheduleUpdate(partialdata?: EventPacket[]) {
-    timelineManager.clearTimeout();
+    clearTimelineTimeout();
 
-    timelineManager.timeoutId = setTimeout(() => {
-      if (timelineManager.destroyed) {
-        timelineManager.reset();
+    timeoutId = setTimeout(() => {
+      if (destroyed) {
+        resetTimeline();
         return;
       }
       processUpdate(partialdata);
     }, CONFIG.UPDATE_DELAY);
   }
   /**
-   * Event deduplication and merging utility
+   * イベントの重複排除とマージ
+   * current と older は既に重複がない前提で、partial との重複のみチェック
+   * @param current 現在のイベントデータ
+   * @param older 古いイベントデータ
+   * @param partial 追加でマージするイベントデータ（重複チェック対象）
+   * @returns マージされたイベント配列
    */
   function mergeEvents(
     current: EventPacket[] | null | undefined,
@@ -212,7 +232,6 @@
     }
 
     // partialがある場合のみ重複チェック
-    // current, olderは重複なし、partialとの重複のみチェック
     const existingIds = new Set<string>();
     const result: EventPacket[] = [];
 
@@ -232,53 +251,69 @@
     return result;
   }
 
+  /**
+   * タイムラインの更新処理を実行
+   * イベントをマージ、フィルタリング、表示範囲を計算して表示イベントを更新
+   * @param partialdata 追加でマージするイベントデータ（オプション）
+   */
   function processUpdate(partialdata?: EventPacket[]) {
     try {
-      timelineManager.updating = true;
+      updating = true;
 
+      // キャッシュから古いイベントを取得
       const olderEvents: EventPacket[] | undefined = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]);
 
+      // イベントをマージ
       const allEvents = mergeEvents($globalData, olderEvents, partialdata);
 
-      timelineManager.allUniqueEvents = allEvents
+      // フィルタリング: イベントフィルタと未来のイベントを除外
+      allUniqueEvents = allEvents
         .map((event) => event.event)
         .filter(eventFilter)
         .filter(
           (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
         );
 
+      // 表示範囲を計算
       const startIndex = Math.max(0, viewIndex);
       const endIndex = startIndex + amount;
 
+      // 表示イベントを更新
       displayEvents.set(
-        timelineManager.allUniqueEvents.slice(startIndex, endIndex)
+        allUniqueEvents.slice(startIndex, endIndex)
       );
 
-      timelineManager.isUpdateScheduled = false;
+      isUpdateScheduled = false;
     } catch (error) {
       console.error("Error during update", error);
-      timelineManager.isUpdateScheduled = false;
+      isUpdateScheduled = false;
     } finally {
-      timelineManager.updating = false;
-      // $nowProgress = false;
-      timelineManager.updateCounts();
+      updating = false;
+      updateCounts();
 
-      if (timelineManager.isUpdateScheduled) {
+      // 更新がスケジュールされている場合は再実行
+      if (isUpdateScheduled) {
         scheduleUpdate();
       }
     }
   }
 
-  // Effect to handle reactive state changes
+  /**
+   * グローバルデータやviewIndexが変更された時にビューを更新
+   */
   $effect(() => {
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => updateViewEvent());
     }
   });
 
+  /**
+   * インクリメンタルデータ受信時のハンドラを作成
+   * 部分的なデータが到着した際にビューを更新する
+   */
   function createIncrementalHandler() {
     return (partialData: EventPacket[]) => {
       if (partialData.length === 0) return;
@@ -286,16 +321,20 @@
     };
   }
 
-  // Initialize the component
+  /**
+   * コンポーネントの初期化
+   * 既存のキャッシュがない場合、古いイベントを読み込む
+   */
   async function init() {
-    if (timelineManager.initRunning) return;
-    timelineManager.initRunning = true;
+    if (initRunning) return;
+    initRunning = true;
     $nowProgress = true;
-    timelineManager.updating = false;
+    updating = false;
     const existingEvents: EventPacket[] | undefined =
       queryClient.getQueryData(olderQueryKey);
 
     if (!existingEvents || existingEvents.length <= 0) {
+      // フィルタを準備: sinceを削除し、untilを設定
       const newFilters: Nostr.Filter[] = olderFilters.map((filter) => ({
         ...filter,
         since: undefined,
@@ -305,12 +344,13 @@
             : filter.until,
         limit: CONFIG.LOAD_LIMIT,
       }));
-      timelineManager.isLoadingOlderEvents = true;
-      // Wait for relay connections before proceeding
+      isLoadingOlderEvents = true;
 
+      // リレー接続を待機
       await waitForConnections();
       const handleIncrementalData = createIncrementalHandler();
 
+      // 古いイベントを読み込み
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         newFilters,
@@ -320,74 +360,78 @@
       );
 
       if (olderEvents.length > 0) {
-        if (olderEvents.length > 0) {
-          // data にない id を除外
-          const existingIds = new Set(
-            ($globalData ?? []).map((p) => p.event.id)
-          );
-          const filtered = olderEvents.filter(
-            (p) => !existingIds.has(p.event.id)
-          );
+        // グローバルデータに既に存在するIDを除外して重複を防ぐ
+        const existingIds = new Set(
+          ($globalData ?? []).map((p) => p.event.id)
+        );
+        const filtered = olderEvents.filter(
+          (p) => !existingIds.has(p.event.id)
+        );
 
-          queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
-        }
+        // キャッシュに保存
+        queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
 
+        // 少し遅延してからビューを更新
         setTimeout(() => {
           updateViewEvent?.($globalData);
-          timelineManager.isLoadingOlderEvents = false;
-        }, 10);
+          isLoadingOlderEvents = false;
+        }, CONFIG.INIT_UPDATE_DELAY);
       }
     }
     $nowProgress = false;
-    timelineManager.initRunning = false;
+    initRunning = false;
   }
 
-  // Lifecycle hooks
+  /**
+   * コンポーネントマウント時の初期化
+   */
   onMount(async () => {
-    timelineManager.isOnMount = true;
+    isOnMount = true;
     await init();
   });
 
+  /**
+   * ナビゲーション後の初期化
+   * フォーム送信以外のナビゲーションで、まだ初期化されていない場合のみ実行
+   */
   afterNavigate(async (navigate) => {
-    if (navigate.type !== "form" && !timelineManager.isOnMount) {
+    if (navigate.type !== "form" && !isOnMount) {
       await init();
     }
   });
 
   const fetchAmount = CONFIG.LOAD_LIMIT * 5;
 
-  // UI action handlers
+  /**
+   * 「Load more」ボタンがクリックされた時の処理
+   * 十分なイベントがある場合は表示位置を移動、不足している場合は古いイベントを読み込む
+   */
   const handleNext = async () => {
     if ($nowProgress) return;
 
     let viewMoved = false;
 
     try {
+      // 十分なイベントがある場合は表示位置を移動するだけ
       const hasEnoughStock =
-        timelineManager.currentEventCount >=
+        currentEventCount >=
         viewIndex + amount + CONFIG.SLIDE_AMOUNT;
-      // console.log(
-      //   timelineManager.currentEventCount,
-      //   viewIndex + amount + CONFIG.SLIDE_AMOUNT
-      // );
+
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-
         updateViewEvent();
-
         return;
       }
 
-      // 👇 ストック不足でリクエスト中なら return
-      if (timelineManager.isLoadingOlderEvents) {
-        console.log("前回のデータ取得が完了していません");
+      // 既に読み込み中の場合は何もしない
+      if (isLoadingOlderEvents) {
         return;
       }
 
-      // 👇 ストック不足でloadしても上限に満たなかったら中断
+      // 最後のイベントのタイムスタンプを取得（untilTimeとして使用）
       const untilTime =
-        timelineManager.allUniqueEvents?.[
-          timelineManager.allUniqueEvents.length - 1
+        allUniqueEvents?.[
+          allUniqueEvents.length - 1
         ]?.created_at;
 
       if (!untilTime) {
@@ -395,58 +439,60 @@
         return;
       }
 
-      timelineManager.isLoadingOlderEvents = true;
+      isLoadingOlderEvents = true;
 
-      const fil = olderFilters.map((fil) => {
-        return { ...fil, since: undefined };
-      });
-      console.log(fil);
+      // sinceを削除したフィルタを作成
+      const filtersWithoutSince = olderFilters.map((filter) => ({
+        ...filter,
+        since: undefined,
+      }));
+
+      // 古いイベントを読み込み
       const olderEvents = await loadOlderEvents(
         fetchAmount,
-        fil,
+        filtersWithoutSince,
         untilTime,
         configureOperators,
         relays,
         (partialData) => {
-          console.log(partialData);
           if (partialData.length === 0) return;
 
-          timelineManager.updateCounts();
-          //console.log(timelineManager.currentEventCount);
+          updateCounts();
+          // まだ十分でない場合は表示位置を移動
           const stillNotEnough =
-            timelineManager.currentEventCount <
-            viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; //重複考慮
+            currentEventCount <
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT + 10; // 重複考慮のマージン
 
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
             viewMoved = true;
-            updateViewEvent(partialData);
           }
 
           updateViewEvent(partialData);
         }
       );
 
+      // 読み込んだイベントをキャッシュに保存
       if (olderEvents.length > 0) {
         updateQueryDataForOlder(olderEvents);
       }
 
-      timelineManager.updateCounts();
+      updateCounts();
 
-      //
+      // 読み込んだイベントが少なく、まだ十分でない場合は「Load more」を無効化
       if (
         !viewMoved &&
         olderEvents.length < fetchAmount &&
-        timelineManager.currentEventCount <
+        currentEventCount <
           viewIndex + amount + CONFIG.SLIDE_AMOUNT
       ) {
         loadMoreDisabled = true;
       }
 
-      // 👇 最後のチェック: 次のページのイベントが少しでもあったら移動
+      // 最後のチェック: 次のページのイベントが少しでもあったら移動
       if (
         !viewMoved &&
-        timelineManager.currentEventCount > viewIndex + amount
+        currentEventCount > viewIndex + amount
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
       }
@@ -457,43 +503,59 @@
         updateViewEvent();
       }, 0);
 
-      timelineManager.isLoadingOlderEvents = false;
-      timelineManager.updateCounts();
+      isLoadingOlderEvents = false;
+      updateCounts();
     }
   };
+  /**
+   * 古いイベントデータをキャッシュに保存
+   * 既存データとマージし、重複を排除してソート
+   * @param events 追加するイベントデータ
+   */
   function updateQueryDataForOlder(events: EventPacket[]) {
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
         const merged = [...(oldData ?? []), ...events];
 
+        // 重複を排除（同じIDのイベントは最新のものを保持）
         const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
 
         return sortEventPackets(Array.from(dedupMap.values()));
       }
     );
   }
+
+  /**
+   * 前のページに戻る
+   * スクロール位置を調整してから表示位置を移動
+   */
   const handlePrev = () => {
     if (viewIndex > 0) {
       scroll({
-        top: window.scrollY + 120,
+        top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT,
       });
 
       viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
       loadMoreDisabled = false;
       setTimeout(() => {
         updateViewEvent?.($globalData);
-      }, 100);
+      }, CONFIG.SCROLL_DELAY);
     }
   };
 
+  /**
+   * タイムラインの先頭に戻る
+   */
   const handleClickTop = () => {
     viewIndex = 0;
     updateViewEvent?.($globalData);
   };
 
+  /**
+   * タイムラインフィルタが変更された時にビューを更新
+   */
   $effect(() => {
-    // Handle timeline filter changes
     if (timelineFilter.get()) {
       untrack(() => updateViewEvent?.($globalData));
     }
