@@ -173,7 +173,7 @@
       filters.map((filter: Nostr.Filter) => ({
         ...filter,
 
-        until: filter.until === undefined ? now() : filter.until,
+        until: filter.until === undefined ? now() - 15 * 60 : filter.until,
       }))
     );
     await waitForConnections();
@@ -183,7 +183,10 @@
 
       operator,
       relays,
-      undefined,
+      (partialData: EventPacket[]) => {
+        if (partialData.length === 0) return;
+        updateViewEvent(partialData);
+      },
       5000
     );
 
@@ -196,9 +199,8 @@
     }
     updateViewEvent();
     result.status = readable("success");
-    setTimeout(() => {
-      isOnMount = false;
-    }, 100);
+
+    isOnMount = false;
   }
   const handleNext = async () => {
     console.log("handleNext", viewIndex);
@@ -277,10 +279,7 @@
     //console.log(olderdatas);
     const allEvents = [...($data || []), ...(olderdatas || [])];
     console.log("update", allEvents);
-    untilTime =
-      allEvents.length > 0
-        ? allEvents[allEvents.length - 1].event.created_at
-        : now();
+
     const uniqueEvents = sortEvents(
       Array.from(
         new Map(
@@ -293,6 +292,10 @@
     );
     const allEv = uniqueEvents.filter(eventFilter);
     if (!partialData) {
+      untilTime =
+        allEvents.length > 0
+          ? allEvents[allEvents.length - 1].event.created_at
+          : now();
       //allUniqueEvents全イベント数の更新はpartialDataがないときだけ
       allUniqueEvents = allEv;
     }
