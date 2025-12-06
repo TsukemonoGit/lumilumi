@@ -17,7 +17,7 @@
     loadOlderEvents,
     waitForConnections,
   } from "./timelineList";
-  import { now, type DefaultRelayConfig, type EventPacket } from "rx-nostr";
+  import { now, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
   import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
@@ -89,12 +89,14 @@
     destroyed = $state(false);
     currentEventCount = $state(0);
     requiredEventCount = $state(0);
+    initRunning = $state(false);
 
     reset() {
       this.updating = false;
       this.isUpdateScheduled = false;
       $nowProgress = false;
     }
+
     fullReset() {
       console.log("timelineManager full reset");
       this.allUniqueEvents = [];
@@ -104,11 +106,20 @@
       this.destroyed = false;
       this.currentEventCount = 0;
       this.requiredEventCount = 0;
-      this.reset(); // 既存のresetメソッドを呼び出し
+      this.initRunning = false;
+      this.reset();
     }
+
     updateCounts() {
       this.currentEventCount = this.allUniqueEvents?.length || 0;
       this.requiredEventCount = viewIndex + amount + CONFIG.SLIDE_AMOUNT;
+    }
+
+    clearTimeout() {
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
     }
   }
 
@@ -128,18 +139,12 @@
   const timelineManager: TimelineManager = new TimelineManager();
   const configureOperators = pipe(tie, uniq(), scanArray());
 
-  let isOnMount = false;
-
-  let readUrls: string[] = [];
   let olderQueryKey = $derived([...queryKey, "olderData"]);
 
   onDestroy(() => {
     console.log("timeline destroy");
+    timelineManager.clearTimeout();
     timelineManager.fullReset();
-    if (timelineManager.timeoutId) {
-      clearTimeout(timelineManager.timeoutId);
-    }
-    // 他のクリーンアップ処理
   });
   // Create query for older data
   $effect(() => {
@@ -183,9 +188,7 @@
   };
 
   function scheduleUpdate(partialdata?: EventPacket[]) {
-    if (timelineManager.timeoutId) {
-      clearTimeout(timelineManager.timeoutId);
-    }
+    timelineManager.clearTimeout();
 
     timelineManager.timeoutId = setTimeout(() => {
       if (timelineManager.destroyed) {
@@ -271,24 +274,10 @@
 
   // Effect to handle reactive state changes
   $effect(() => {
-    if ($defaultRelays) {
-      untrack(() => updateRelayUrls($defaultRelays));
-    }
-  });
-  $effect(() => {
     if (($globalData && viewIndex >= 0) || !$nowProgress) {
       untrack(() => updateViewEvent());
     }
   });
-
-  // Update relay URLs when default relays change
-  function updateRelayUrls(relays: Record<string, DefaultRelayConfig>) {
-    if (relays) {
-      readUrls = Object.values(relays)
-        .filter((config) => config.read)
-        .map((config) => config.url);
-    }
-  }
 
   function createIncrementalHandler() {
     return (partialData: EventPacket[]) => {
@@ -296,11 +285,11 @@
       updateViewEvent(partialData);
     };
   }
-  let initRunning = false;
+
   // Initialize the component
   async function init() {
-    if (initRunning) return;
-    initRunning = true;
+    if (timelineManager.initRunning) return;
+    timelineManager.initRunning = true;
     $nowProgress = true;
     timelineManager.updating = false;
     const existingEvents: EventPacket[] | undefined =
@@ -350,16 +339,17 @@
       }
     }
     $nowProgress = false;
-    initRunning = false;
+    timelineManager.initRunning = false;
   }
 
   // Lifecycle hooks
   onMount(async () => {
+    timelineManager.isOnMount = true;
     await init();
   });
 
   afterNavigate(async (navigate) => {
-    if (navigate.type !== "form" && !isOnMount) {
+    if (navigate.type !== "form" && !timelineManager.isOnMount) {
       await init();
     }
   });
