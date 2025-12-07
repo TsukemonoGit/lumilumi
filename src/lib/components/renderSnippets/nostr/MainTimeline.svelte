@@ -72,7 +72,6 @@
     content?: import("svelte").Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
-    // updateViewEvent: (partialdata?: EventPacket[] | null | undefined) => void;
   }
 
   let {
@@ -86,10 +85,10 @@
     loading,
     nodata,
     content,
-    // updateViewEvent = $bindable(),
   }: Props = $props();
   let viewIndex = $state(0);
   const amount = 50;
+
   // State management
   class TimelineManager {
     updating = $state(false);
@@ -98,20 +97,21 @@
     isLoadingOlderEvents = $state(false);
     isUpdateScheduled = $state(false);
     destroyed = $state(false);
-    filteredOlderEventCount = $state(0); // currentEventCount から filteredOlderEventCount に変更
+    filteredOlderEventCount = $state(0);
     filteredNewerEventCount = $state(0);
     requiredEventCount = $derived(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
 
+    // Map による管理
+    currentEventsMap = $state<Map<string, Nostr.Event>>(new Map());
+    olderEventsMap = $state<Map<string, Nostr.Event>>(new Map());
+
     get loadMoreDisabled() {
-      // nowProgressまたは初期化中の場合は常に無効
       if ($nowProgress || this.isOnMount) return true;
 
-      // 前回のデータ取得中の場合
       if (this.isLoadingOlderEvents) {
-        // ストックが十分にある場合のみ有効
         const hasEnoughStock =
           this.filteredOlderEventCount >=
-          viewIndex + amount + CONFIG.SLIDE_AMOUNT; // filteredOlderEventCountを使用
+          viewIndex + amount + CONFIG.SLIDE_AMOUNT;
         return !hasEnoughStock;
       }
 
@@ -122,6 +122,11 @@
       this.updating = false;
       this.isUpdateScheduled = false;
       $nowProgress = false;
+    }
+
+    clear() {
+      this.currentEventsMap.clear();
+      this.olderEventsMap.clear();
     }
   }
 
@@ -148,9 +153,6 @@
       .map((config) => config.url);
   });
 
-  /**
-   * Configures the rx-nostr operators pipeline
-   */
   function configureOperators() {
     let operator = pipe(tie, uniq);
 
@@ -167,37 +169,60 @@
   }
 
   /**
-   * Event deduplication and merging utility
+   * イベントをフィルタリングして Map に追加
    */
-  function mergeEvents(
-    current: EventPacket[] | null | undefined,
-    older: EventPacket[] | undefined,
-    partial: EventPacket[] | undefined
-  ): EventPacket[] {
-    // partialがない場合は単純結合（重複チェック不要）
-    if (!partial || partial.length === 0) {
-      return [...(current || []), ...(older || [])];
-    }
-
-    // partialがある場合のみ重複チェック
-    // current, olderは重複なし、partialとの重複のみチェック
-    const existingIds = new Set<string>();
-    const result: EventPacket[] = [];
-
-    // current, olderを先に追加（重複なし前提）
-    [...(current || []), ...(older || [])].forEach((pk) => {
-      existingIds.add(pk.event.id);
-      result.push(pk);
-    });
-
-    // partialから重複していないもののみ追加
-    partial.forEach((pk) => {
-      if (!existingIds.has(pk.event.id)) {
-        result.push(pk);
+  function filterAndAddToMap(
+    events: EventPacket[],
+    targetMap: Map<string, Nostr.Event>
+  ): number {
+    let count = 0;
+    events.forEach((pk) => {
+      const event = pk.event;
+      if (
+        eventFilter(event) &&
+        event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+      ) {
+        targetMap.set(event.id, event);
+        count++;
       }
     });
+    return count;
+  }
 
-    return result;
+  /**
+   * 複数の Map を結合して配列を生成
+   */
+  function combineFilteredEvents(
+    currentMap: Map<string, Nostr.Event>,
+    olderMap: Map<string, Nostr.Event>,
+    partialEvents?: EventPacket[]
+  ): Nostr.Event[] {
+    const resultMap = new Map<string, Nostr.Event>();
+
+    // currentMap を追加
+    currentMap.forEach((event, id) => {
+      resultMap.set(id, event);
+    });
+
+    // olderMap を追加
+    olderMap.forEach((event, id) => {
+      resultMap.set(id, event);
+    });
+
+    // partialEvents をフィルタリングして追加
+    if (partialEvents) {
+      partialEvents.forEach((pk) => {
+        const event = pk.event;
+        if (
+          eventFilter(event) &&
+          event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
+        ) {
+          resultMap.set(event.id, event);
+        }
+      });
+    }
+
+    return Array.from(resultMap.values());
   }
 
   /**
@@ -231,38 +256,41 @@
     try {
       timelineManager.updating = true;
 
-      // 表示範囲を計算
       const { startIndex, endIndex } = calculateDisplayRange();
 
-      // 現在のデータをフィルタリング
-      const currentEvents = filterEvents($data || []);
-      timelineManager.filteredNewerEventCount = currentEvents.length;
-      // 現在のデータだけで表示範囲をカバーできるかチェック
-      if (currentEvents.length >= endIndex) {
-        // 十分な場合：現在のデータのみ使用
-        displayEvents.set(currentEvents.slice(startIndex, endIndex));
+      // currentEventsMap を更新
+      timelineManager.currentEventsMap.clear();
+      timelineManager.filteredNewerEventCount = filterAndAddToMap(
+        $data || [],
+        timelineManager.currentEventsMap
+      );
+
+      // 現在のデータだけで十分かチェック
+      if (timelineManager.currentEventsMap.size >= endIndex) {
+        const events = Array.from(timelineManager.currentEventsMap.values());
+        displayEvents.set(events.slice(startIndex, endIndex));
       } else {
-        // 不十分な場合：古いデータも個別にフィルタリングして結合
+        // 古いデータも取得して結合
         const olderEvents: EventPacket[] | null | undefined =
           queryClient?.getQueryData([...queryKey, "olderData"]);
-        const filteredOlderEvents = olderEvents
-          ? filterEvents(olderEvents)
-          : [];
-        //フィルターは変わるからこっちでカウント数える
-        timelineManager.filteredOlderEventCount = filteredOlderEvents.length;
-        const filteredPartialEvents = partialdata
-          ? filterEvents(partialdata)
-          : [];
 
-        // フィルタリング済みのイベントを結合
+        if (olderEvents) {
+          timelineManager.olderEventsMap.clear();
+          timelineManager.filteredOlderEventCount = filterAndAddToMap(
+            olderEvents,
+            timelineManager.olderEventsMap
+          );
+        }
+
         const allFilteredEvents = combineFilteredEvents(
-          currentEvents,
-          filteredOlderEvents,
-          filteredPartialEvents
+          timelineManager.currentEventsMap,
+          timelineManager.olderEventsMap,
+          partialdata
         );
 
         displayEvents.set(allFilteredEvents.slice(startIndex, endIndex));
       }
+
       timelineManager.isUpdateScheduled = false;
     } catch (error) {
       console.error("Error during update", error);
@@ -276,50 +304,13 @@
       }
     }
   }
-  /**
-   * フィルタリング済みのイベント配列を結合
-   * 重複除去と時系列ソートを行う
-   * @param currentEvents - 現在のイベント
-   * @param olderEvents - 古いイベント
-   * @param partialEvents - 部分的なイベント
-   * @returns 結合済みのイベント配列
-   */
-  function combineFilteredEvents(
-    currentEvents: Nostr.Event[],
-    olderEvents: Nostr.Event[],
-    partialEvents: Nostr.Event[]
-  ) {
-    // 全イベントを結合
-    const allEvents = [...currentEvents, ...olderEvents, ...partialEvents];
 
-    // 重複除去（IDベース）
-    return Array.from(
-      new Map(allEvents.map((event) => [event.id, event])).values()
-    );
-  }
-  /**
-   * 表示範囲のインデックスを計算
-   * @returns 開始と終了インデックス
-   */
   function calculateDisplayRange() {
     const startIndex = Math.max(0, viewIndex);
     const endIndex = startIndex + amount;
     return { startIndex, endIndex };
   }
 
-  /**
-   * イベントデータをフィルタリング
-   * @param events - フィルタリング対象のイベント配列
-   * @returns フィルタリング済みのイベント配列
-   */
-  function filterEvents(events: EventPacket[]) {
-    return events
-      .map((event) => event.event)
-      .filter(eventFilter)
-      .filter(
-        (event) => event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
-      );
-  }
   /**
    * Timeline initialization
    */
@@ -335,9 +326,7 @@
 
       if (existingEvents && existingEvents.length > 0) {
         addDebugLog(`既存データ${existingEvents.length}件を使用`);
-        //  updateViewEvent();
 
-        //ページ復元
         const allLen = [...($data || []), ...existingEvents].length;
 
         if (savedViewIndex && allLen > parseInt(savedViewIndex, 10) + amount) {
@@ -350,7 +339,6 @@
         updateViewEvent();
         return;
       }
-      //ページ復元
 
       updateHistoryState();
 
@@ -408,18 +396,23 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
+        // Map で重複削除
+        const eventMap = new Map<string, EventPacket>();
+        [...(oldData ?? []), ...events].forEach((packet) => {
+          eventMap.set(packet.event.id, packet);
+        });
+
         const deduplicatedData = sortEventPackets(
-          Array.from(
-            new Map(
-              [...(oldData ?? []), ...events].map((packet) => [
-                packet.event.id,
-                packet,
-              ])
-            ).values()
-          )
+          Array.from(eventMap.values())
         );
-        timelineManager.filteredOlderEventCount =
-          filterEvents(deduplicatedData).length;
+
+        // フィルタリング後のカウントを更新
+        const tempMap = new Map<string, Nostr.Event>();
+        timelineManager.filteredOlderEventCount = filterAndAddToMap(
+          deduplicatedData,
+          tempMap
+        );
+
         return CONFIG.LOAD_LIMIT > 0
           ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
           : deduplicatedData;
@@ -446,21 +439,21 @@
 
     $nowProgress = true;
     let viewMoved = false;
-    //const previousViewIndex = viewIndex; // 元の位置を保存
+
     try {
       const hasEnoughStock =
         timelineManager.filteredNewerEventCount +
           timelineManager.filteredOlderEventCount >=
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1;
+
       console.log(
         timelineManager.filteredNewerEventCount +
           timelineManager.filteredOlderEventCount,
         viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
       );
+
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-        // viewIndexが変更された場合のみ履歴を更新
-
         updateHistoryState();
         setTimeout(() => {
           updateViewEvent();
@@ -468,16 +461,16 @@
         return;
       }
 
-      // 👇 ストック不足でリクエスト中なら return
       if (timelineManager.isLoadingOlderEvents) {
         addDebugLog("前回のデータ取得が完了していません");
         return;
       }
+
       const older = queryClient?.getQueryData([
         ...queryKey,
         "olderData",
       ]) as EventPacket[];
-      // 👇 ストック不足でloadしても上限に満たなかったら中断
+
       const untilTime = older?.[older.length - 1]?.event.created_at;
 
       if (!untilTime) {
@@ -504,16 +497,12 @@
             timelineManager.filteredNewerEventCount +
               timelineManager.filteredOlderEventCount +
               partialData.length <
-            viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1; //フィルター考慮
+            viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1;
 
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
-            // viewIndexが変更された場合のみ履歴を更新
-
             updateHistoryState();
-
             viewMoved = true;
-
             updateViewEvent(partialData);
           }
 
@@ -525,7 +514,6 @@
         updateQueryDataForOlder(olderEvents);
       }
 
-      // 👇 最後のチェック: 次のページのイベントが少しでもあったら移動
       if (
         !viewMoved &&
         timelineManager.filteredNewerEventCount +
@@ -533,8 +521,6 @@
           viewIndex + amount
       ) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
-        // viewIndexが変更された場合のみ履歴を更新
-
         updateHistoryState();
       }
       updateViewEvent();
@@ -550,18 +536,13 @@
     queryClient.setQueryData(
       [...queryKey, "olderData"],
       (oldData: EventPacket[] | undefined) => {
-        const older = sortEventPackets(
-          Array.from(
-            new Map(
-              [...(oldData ?? []), ...events].map((packet) => [
-                packet.event.id,
-                packet,
-              ])
-            ).values()
-          )
-        );
+        // Map で重複削除
+        const eventMap = new Map<string, EventPacket>();
+        [...(oldData ?? []), ...events].forEach((packet) => {
+          eventMap.set(packet.event.id, packet);
+        });
 
-        return older;
+        return sortEventPackets(Array.from(eventMap.values()));
       }
     );
   }
@@ -574,8 +555,6 @@
     }
 
     viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
-
-    // 履歴を更新
     updateHistoryState();
 
     setTimeout(() => {
@@ -585,11 +564,7 @@
 
   function moveToTop() {
     viewIndex = 0;
-
-    // 履歴を更新
-
     updateHistoryState();
-
     updateViewEvent();
   }
 
@@ -616,49 +591,18 @@
     }
   });
 
-  /*  // Lifecycle
- //effectでやってるからいらん
-  onMount(async () => {
-    if (timelineManager.isOnMount || !lumiSetting.get().pubkey) return;
-
-    if (!timelineManager.isOnMount) {
-      timelineManager.isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      timelineManager.isOnMount = false;
-      $nowProgress = false;
-    }
-  });
-
-  afterNavigate(async (navigate) => {
-    if (
-      navigate.type === "form" ||
-      timelineManager.isOnMount ||
-      !lumiSetting.get().pubkey
-    )
-      return;
-
-    if (!timelineManager.isOnMount) {
-      timelineManager.isOnMount = true;
-      $nowProgress = true;
-      await initializeTimeline();
-      timelineManager.isOnMount = false;
-      $nowProgress = false;
-    }
-  }); */
-
   onDestroy(() => {
     debugInfo("main timeline destroy");
     timelineManager.destroyed = true;
     if (timelineManager.timeoutId) {
       clearTimeout(timelineManager.timeoutId);
     }
+    timelineManager.clear();
   });
+
   $effect(() => {
     if (lumiSetting.get().pubkey) {
       untrack(async () => {
-        // console.log(filters);
-
         timelineManager.isOnMount = true;
         $nowProgress = true;
         await initializeTimeline();
@@ -668,7 +612,6 @@
     }
   });
 
-  // 履歴管理用の関数（replaceStateのみ使用）
   function updateHistoryState() {
     if (typeof window !== "undefined") {
       const currentUrl = new URL(window.location.href);
