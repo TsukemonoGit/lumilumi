@@ -238,7 +238,7 @@
   }
 
   $effect(() => {
-    if (($globalData && viewIndex >= 0) || !$nowProgress) {
+    if ((($globalData && viewIndex >= 0) || !$nowProgress) && !destroyed) {
       untrack(() => updateViewEvent());
     }
   });
@@ -290,6 +290,7 @@
         queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
 
         setTimeout(() => {
+          if (destroyed) return;
           updateViewEvent?.($globalData);
           isLoadingOlderEvents = false;
         }, CONFIG.INIT_UPDATE_DELAY);

@@ -122,7 +122,7 @@
     return menuItems.filter((item) => {
       if (
         item.action === "goto_user" &&
-        page.url.pathname === `/${encodedPubkey}#post`
+        page.url.pathname === `/${encodedPubkey}`
       ) {
         return false;
       }
