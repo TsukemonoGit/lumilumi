@@ -3,7 +3,7 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
@@ -131,6 +131,7 @@
 
   afterNavigate(async (navigate) => {
     if (navigate.type !== "form") {
+      console.log("form");
       view = false;
       if (!isOnMount) {
         isOnMount = true;
@@ -139,10 +140,14 @@
 
         isOnMount = false;
       }
+      await tick();
       view = true;
     }
   });
-
+  beforeNavigate(() => {
+    view = false;
+    value.set("");
+  });
   async function init() {
     console.log(page.url.hash);
     const hash = triggers.find((t) => `#${t.id}` === page.url.hash);

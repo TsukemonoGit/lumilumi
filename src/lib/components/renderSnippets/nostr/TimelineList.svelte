@@ -127,6 +127,7 @@
   let olderQueryKey = $derived([...queryKey, "olderData"]);
 
   onDestroy(() => {
+    console.log("destroy");
     destroyed = true;
     clearTimelineTimeout();
     fullResetTimeline();
@@ -157,6 +158,7 @@
   let loadMoreDisabled = $state(false);
 
   const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
+    if (destroyed) return;
     if (isUpdateScheduled) return;
 
     isUpdateScheduled = true;
@@ -188,7 +190,7 @@
     partial: EventPacket[] | undefined
   ): void {
     allUniqueEventsMap.clear();
-
+    if (destroyed) return;
     [...(current || []), ...(older || []), ...(partial || [])].forEach((pk) => {
       if (
         eventFilter(pk.event) &&
@@ -200,6 +202,7 @@
   }
 
   function processUpdate(partialdata?: EventPacket[]) {
+    if (destroyed) return;
     try {
       updating = true;
 
@@ -235,14 +238,14 @@
   }
 
   $effect(() => {
-    if (($globalData && viewIndex >= 0) || !$nowProgress) {
+    if ((($globalData && viewIndex >= 0) || !$nowProgress) && !destroyed) {
       untrack(() => updateViewEvent());
     }
   });
 
   function createIncrementalHandler() {
     return (partialData: EventPacket[]) => {
-      if (partialData.length === 0) return;
+      if (destroyed || partialData.length === 0) return;
       updateViewEvent(partialData);
     };
   }
@@ -277,7 +280,7 @@
         relays,
         handleIncrementalData
       );
-
+      if (destroyed) return;
       if (olderEvents.length > 0) {
         const existingIds = new Set(($globalData ?? []).map((p) => p.event.id));
         const filtered = olderEvents.filter(
@@ -287,6 +290,7 @@
         queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
 
         setTimeout(() => {
+          if (destroyed) return;
           updateViewEvent?.($globalData);
           isLoadingOlderEvents = false;
         }, CONFIG.INIT_UPDATE_DELAY);
@@ -350,7 +354,7 @@
         configureOperators,
         relays,
         (partialData) => {
-          if (partialData.length === 0) return;
+          if (destroyed || partialData.length === 0) return;
 
           updateCounts();
           const stillNotEnough =
@@ -364,7 +368,7 @@
           updateViewEvent(partialData);
         }
       );
-
+      if (destroyed) return;
       if (olderEvents.length > 0) {
         updateQueryDataForOlder(olderEvents);
       }
