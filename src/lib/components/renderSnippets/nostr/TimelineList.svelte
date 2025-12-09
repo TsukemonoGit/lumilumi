@@ -99,7 +99,7 @@
     timeoutId = null;
     isOnMount = false;
     isLoadingOlderEvents = false;
-    destroyed = false;
+
     currentEventCount = 0;
     initRunning = false;
     resetTimeline();
@@ -118,6 +118,7 @@
 
   $effect(() => {
     if (page.params.npub) {
+      destroyed = false;
       fullResetTimeline();
     }
   });
@@ -127,10 +128,10 @@
   let olderQueryKey = $derived([...queryKey, "olderData"]);
 
   onDestroy(() => {
-    console.log("destroy");
     destroyed = true;
-    clearTimelineTimeout();
+    console.log("destroy");
     fullResetTimeline();
+    clearTimelineTimeout();
   });
 
   $effect(() => {
@@ -231,7 +232,7 @@
       updating = false;
       updateCounts();
 
-      if (isUpdateScheduled) {
+      if (isUpdateScheduled && !destroyed) {
         scheduleUpdate();
       }
     }
@@ -271,6 +272,7 @@
       isLoadingOlderEvents = true;
 
       await waitForConnections();
+      if (destroyed) return;
       const handleIncrementalData = createIncrementalHandler();
 
       const olderEvents = await firstLoadOlderEvents(
@@ -286,7 +288,6 @@
         const filtered = olderEvents.filter(
           (p) => !existingIds.has(p.event.id)
         );
-
         queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
 
         setTimeout(() => {
@@ -425,6 +426,7 @@
       viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
       loadMoreDisabled = false;
       setTimeout(() => {
+        if (destroyed) return;
         updateViewEvent?.($globalData);
       }, CONFIG.SCROLL_DELAY);
     }
