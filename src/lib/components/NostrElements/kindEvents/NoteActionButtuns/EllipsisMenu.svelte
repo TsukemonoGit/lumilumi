@@ -25,6 +25,7 @@
     BookmarkMinus,
     BookmarkPlus,
     CodeXml,
+    Route,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -195,6 +196,12 @@
       text: `${$_("menu.view.json")}`,
       icon: FileJson2,
       action: "view_json",
+    });
+
+    viewItems.push({
+      text: `${$_("menu.view.neighbor")}`,
+      icon: Route,
+      action: "goto_feed",
     });
 
     viewItems.push({
@@ -379,6 +386,10 @@
 
       case "goto_note":
         goto(`/${replaceable ? naddr : nevent}`);
+        break;
+
+      case "goto_feed":
+        goto(`/${replaceable ? naddr : nevent}/feed`);
         break;
 
       case "open_emojito":

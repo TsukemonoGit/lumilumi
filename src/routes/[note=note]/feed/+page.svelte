@@ -29,11 +29,20 @@
         if (noteParam) {
             try {
                 const { type, data } = nip19.decode(noteParam);
+                let newId = "";
                 if (type === "note") {
-                    id = data;
+                    newId = data;
                 } else if (type === "nevent") {
-                    id = data.id;
+                    newId = data.id;
                     if (data.relays) relays = data.relays;
+                }
+
+                if (newId && newId !== id) {
+                    id = newId;
+                    targetEvent = undefined;
+                    contactsEvent = undefined;
+                    feed = undefined;
+                    // Force re-fetch logic to trigger by clearing these
                 }
             } catch (e) {
                 console.error(e);

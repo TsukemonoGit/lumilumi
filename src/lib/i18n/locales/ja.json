@@ -131,7 +131,8 @@
       "userPage": "ユーザーページを見る",
       "refresh": "最新データを取得",
       "relayTimeline": "リレータイムラインを見る",
-      "channel": "チャンネルを開く"
+      "channel": "チャンネルを開く",
+      "neighbor": "前後のTLを見る"
     },
     "action": {
       "repost": "リポスト",
