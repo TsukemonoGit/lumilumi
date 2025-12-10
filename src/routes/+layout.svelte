@@ -164,7 +164,7 @@
         setRxNostr3();
       }
 
-      const nostrLogin = await import("nostr-login");
+      const nostrLogin = await import("@konemono/nostr-login");
 
       await waitNostr(1000);
       try {
