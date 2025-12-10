@@ -25,6 +25,7 @@
     BookmarkMinus,
     BookmarkPlus,
     CodeXml,
+    Route,
   } from "lucide-svelte";
 
   import * as Nostr from "nostr-typedef";
@@ -77,9 +78,11 @@
     iconClass?: string;
     deleted?: boolean;
     isBookmarked?: boolean;
+    zIndex?: number;
   }
 
   let {
+    zIndex,
     note,
     indexes = undefined,
     TriggerIcon = Ellipsis,
@@ -92,7 +95,7 @@
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -193,6 +196,12 @@
       text: `${$_("menu.view.json")}`,
       icon: FileJson2,
       action: "view_json",
+    });
+
+    viewItems.push({
+      text: `${$_("menu.view.neighbor")}`,
+      icon: Route,
+      action: "goto_feed",
     });
 
     viewItems.push({
@@ -358,7 +367,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? "")
+            replaceable ? (naddr ?? "") : (nevent ?? ""),
           );
           $toastSettings = {
             title: "Success",
@@ -377,6 +386,10 @@
 
       case "goto_note":
         goto(`/${replaceable ? naddr : nevent}`);
+        break;
+
+      case "goto_feed":
+        goto(`/${replaceable ? naddr : nevent}/feed`);
         break;
 
       case "open_emojito":
@@ -501,7 +514,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000
+              2000,
             );
 
             if (bookmarkEvent.length > 0) {
@@ -611,6 +624,7 @@
 </script>
 
 <DropdownMenu
+  {zIndex}
   buttonClass="actionButton flex items-center"
   {menuGroups}
   {handleSelectItem}

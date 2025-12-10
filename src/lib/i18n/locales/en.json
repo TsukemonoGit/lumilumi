@@ -130,7 +130,8 @@
       "note": "View note page",
       "userPage": "View user page",
       "refresh": "Fetch latest data",
-      "relayTimeline": "View relay timeline"
+      "relayTimeline": "View relay timeline",
+      "neighbor": "View Surrounding TL"
     },
     "action": {
       "repost": "Repost",

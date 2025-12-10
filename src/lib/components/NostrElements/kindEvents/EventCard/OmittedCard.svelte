@@ -76,13 +76,13 @@
         {repostable}
       />{#if text.kind !== 1}{#if text.kind === 42}{@const heyaId =
             text.tags.find(
-              (tag) => tag[0] === "e" && tag[3] === "root"
+              (tag) => tag[0] === "e" && tag[3] === "root",
             )?.[1]}<ChannelTag {heyaId} />{:else}<span
             class="flex ml-auto hover:opacity-75 focus:opacity-50 text-neutral-300 text-sm"
             style="word-break: break-word;">kind:{text.kind}</span
           >{/if}{/if}
     {/if}
     {#if displayMenu}
-      <NoteActionButtons note={text} {repostable} bind:deleted />{/if}
+      <NoteActionButtons note={text} {repostable} bind:deleted {zIndex} />{/if}
   </div>
 {/if}

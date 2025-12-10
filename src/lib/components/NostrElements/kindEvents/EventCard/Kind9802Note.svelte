@@ -55,7 +55,7 @@
 
   let deleted = $state(false);
   let referenceTag = $derived(
-    note.tags.find((tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e")
+    note.tags.find((tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e"),
   ); //https://github.com/nostr-protocol/nips/blob/master/84.md#references
 
   // 引用元へのリンクパスを取得する関数
@@ -159,7 +159,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

@@ -61,7 +61,7 @@
   let response: string[] | undefined = $derived(
     note.tags
       .filter((tag: string[]) => tag[0] === "response")
-      .map((tag) => tag[1])
+      .map((tag) => tag[1]),
   );
 
   let selectedOptionTags: string[][] | undefined = $state(undefined);
@@ -71,7 +71,7 @@
     if (response) {
       selectedOptionTags = ev.tags.filter(
         (tag) =>
-          tag[0] === "option" && tag.length > 2 && response.includes(tag[1])
+          tag[0] === "option" && tag.length > 2 && response.includes(tag[1]),
       );
     }
     //console.log(selectedOptionTags);
@@ -169,7 +169,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

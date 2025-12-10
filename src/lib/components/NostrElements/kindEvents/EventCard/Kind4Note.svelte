@@ -63,20 +63,20 @@
         (tag) =>
           tag[0] === "p" &&
           tag.length > 1 &&
-          tag[1] === lumiSetting.get().pubkey
-      )
+          tag[1] === lumiSetting.get().pubkey,
+      ),
   );
 
   //どっちがどっち
   async function decryptMessage() {
     const user = note.tags.find(
       (tag) =>
-        tag[0] === "p" && tag.length > 1 && tag[1] !== lumiSetting.get().pubkey
+        tag[0] === "p" && tag.length > 1 && tag[1] !== lumiSetting.get().pubkey,
     )?.[1];
     try {
       decrypt = await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(
         user ?? note.pubkey,
-        note.content
+        note.content,
       );
 
       if (!decrypt) {
@@ -157,6 +157,6 @@
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+      <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
   {/snippet}
 </NoteComponent>

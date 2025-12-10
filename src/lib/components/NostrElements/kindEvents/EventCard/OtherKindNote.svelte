@@ -42,19 +42,19 @@
 
   let deleted = $state(false);
   let title = $derived(
-    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1],
   );
   let dtag = $derived(
-    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1],
   );
   let description = $derived(
     note.tags.find(
       (tag) =>
-        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-    )?.[1]
+        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1,
+    )?.[1],
   );
   let image = $derived(
-    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1],
   );
 
   let warning = $derived(checkContentWarning(note?.tags));
@@ -149,7 +149,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

@@ -51,7 +51,7 @@
   }: Props = $props();
   let siteUrl = $derived.by(() => {
     const urlTag = note.tags.find(
-      (tag) => tag[0] == "d" && tag.length > 1
+      (tag) => tag[0] == "d" && tag.length > 1,
     )?.[1];
     if (!urlTag) return;
     if (!urlTag?.startsWith("http")) {
@@ -61,15 +61,15 @@
     }
   });
   let title = $derived(
-    note.tags.find((tag) => tag[0] == "title" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] == "title" && tag.length > 1)?.[1],
   );
   let published_at = $derived(
-    note.tags.find((tag) => tag[0] == "published_at" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] == "published_at" && tag.length > 1)?.[1],
   );
   let hashTags = $derived(
     note.tags
       .filter((tag) => tag[0] == "t" && tag.length > 1)
-      .map((tag) => tag[1])
+      .map((tag) => tag[1]),
   );
 </script>
 
@@ -142,6 +142,6 @@
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+      <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
   {/snippet}
 </NoteComponent>
