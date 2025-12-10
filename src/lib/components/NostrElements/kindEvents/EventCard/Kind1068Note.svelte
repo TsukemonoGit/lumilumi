@@ -54,10 +54,10 @@
 
   let deleted = $state(false);
   let polltype: string | undefined = $derived(
-    note.tags.find((tag) => tag[0] === "polltype" && tag.length > 1)?.[1]
+    note.tags.find((tag) => tag[0] === "polltype" && tag.length > 1)?.[1],
   );
   let endsAt: number | undefined = $derived(
-    Number(note.tags.find((tag) => tag[0] === "endsAt" && tag.length > 1)?.[1])
+    Number(note.tags.find((tag) => tag[0] === "endsAt" && tag.length > 1)?.[1]),
   );
 
   let nevent: string | undefined = $derived.by(() => {
@@ -190,7 +190,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

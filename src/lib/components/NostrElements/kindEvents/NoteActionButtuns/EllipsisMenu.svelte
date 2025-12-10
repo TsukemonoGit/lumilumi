@@ -77,9 +77,11 @@
     iconClass?: string;
     deleted?: boolean;
     isBookmarked?: boolean;
+    zIndex?: number;
   }
 
   let {
+    zIndex,
     note,
     indexes = undefined,
     TriggerIcon = Ellipsis,
@@ -92,7 +94,7 @@
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -358,7 +360,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? "")
+            replaceable ? (naddr ?? "") : (nevent ?? ""),
           );
           $toastSettings = {
             title: "Success",
@@ -501,7 +503,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000
+              2000,
             );
 
             if (bookmarkEvent.length > 0) {
@@ -611,6 +613,7 @@
 </script>
 
 <DropdownMenu
+  {zIndex}
   buttonClass="actionButton flex items-center"
   {menuGroups}
   {handleSelectItem}

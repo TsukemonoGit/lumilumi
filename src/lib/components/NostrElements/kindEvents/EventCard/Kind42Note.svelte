@@ -50,7 +50,7 @@
 
   let deleted = $state(false);
   const heyaId = note.tags.find(
-    (tag) => tag[0] === "e" && tag[3] === "root"
+    (tag) => tag[0] === "e" && tag[3] === "root",
   )?.[1];
 
   let warning = $derived(checkContentWarning(note.tags));
@@ -58,7 +58,7 @@
   let isBookmarked: boolean = $derived(
     bookmark10003
       .get()
-      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false
+      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false,
   );
 </script>
 
@@ -134,6 +134,12 @@
   {/snippet}
   {#snippet actionButtons()}
     {#if displayMenu}
-      <NoteActionButtons {note} {repostable} bind:deleted {isBookmarked} />{/if}
+      <NoteActionButtons
+        {note}
+        {repostable}
+        bind:deleted
+        {isBookmarked}
+        {zIndex}
+      />{/if}
   {/snippet}
 </NoteComponent>

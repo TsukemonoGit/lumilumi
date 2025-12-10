@@ -55,11 +55,11 @@
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
       ?.map((i) => reverseConvertMetaTags(i))
-      .filter((url) => url !== undefined)
+      .filter((url) => url !== undefined),
   );
   //console.log(imeta);
   let imageList = $derived(
-    imeta.map((i) => i.url).filter((tag) => tag !== undefined)
+    imeta.map((i) => i.url).filter((tag) => tag !== undefined),
   );
 
   const openModal = (index: number) => {
@@ -141,7 +141,7 @@
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}
-        <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+        <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />{/if}
     {/snippet}
   </NoteComponent>
 {/if}

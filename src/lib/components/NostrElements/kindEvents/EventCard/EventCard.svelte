@@ -117,7 +117,7 @@
   });
 
   let paramNoteId = $derived(
-    page.params.note ? getIDbyParam(page.params.note) : undefined
+    page.params.note ? getIDbyParam(page.params.note) : undefined,
   );
 
   //ミュートメニューの設定は考慮しない
@@ -148,7 +148,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag)
+          removeFirstMatchingId(value, currentNoteTag),
         );
       }
 
@@ -168,7 +168,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag)
+          removeFirstMatchingId(value, currentNoteTag),
         );
       }
 
@@ -203,7 +203,7 @@
   onDestroy(() => {
     if (currentNoteTag) {
       viewEventIds.update((value) =>
-        removeFirstMatchingId(value, currentNoteTag)
+        removeFirstMatchingId(value, currentNoteTag),
       );
     }
   });
@@ -302,7 +302,12 @@
 
           {#snippet actionButtons()}
             {#if displayMenu}
-              <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+              <NoteActionButtons
+                {note}
+                {repostable}
+                bind:deleted
+                {zIndex}
+              />{/if}
           {/snippet}
         </RepostComponent>
 
@@ -343,7 +348,12 @@
 
           {#snippet actionButtons()}
             {#if displayMenu}
-              <NoteActionButtons {note} {repostable} bind:deleted />{/if}
+              <NoteActionButtons
+                {note}
+                {repostable}
+                bind:deleted
+                {zIndex}
+              />{/if}
           {/snippet}
         </RepostComponent>
 

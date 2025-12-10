@@ -138,7 +138,7 @@
             {depth}
           />
           <div class="ml-auto">
-            <NoteActionButtons {note} {repostable} bind:deleted />
+            <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />
           </div>
         </div>
         <div class="break-all text-sm px-2">
