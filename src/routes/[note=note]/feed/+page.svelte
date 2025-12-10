@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-    import { onDestroy, onMount } from "svelte";
-    import { derived, get, writable } from "svelte/store";
+    import { page } from "$app/state";
+    import { get } from "svelte/store";
     import { app } from "$lib/stores/stores";
-    import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
+    import { createRxBackwardReq, uniq } from "rx-nostr";
     import * as Nostr from "nostr-typedef";
     import * as nip19 from "nostr-tools/nip19";
     import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
     import { useContacts } from "$lib/stores/useContacts";
-    import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
     import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
     import { pubkeysIn } from "$lib/func/nostr";
     import { createNeighborFeed } from "$lib/stores/useNeighborFeed.svelte";
+    import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
+    import { profile } from "$lib/func/util";
 
     // State
     let id: string = $state("");
@@ -25,7 +25,7 @@
 
     // Parse ID
     $effect(() => {
-        const noteParam = $page.params.note;
+        const noteParam = page.params.note;
         if (noteParam) {
             try {
                 const { type, data } = nip19.decode(noteParam);
@@ -41,7 +41,7 @@
         }
     });
 
-    let layoutData: any = $derived($page.data);
+    let layoutData: any = $derived(page.data);
 
     // Fetch Target Event
     $effect(() => {
@@ -94,6 +94,34 @@
             feed.loadNewer();
         }
     });
+
+    let targetNoteElement: HTMLDivElement;
+    let targetPosition: "visible" | "above" | "below" = $state("visible");
+
+    $effect(() => {
+        if (!targetNoteElement) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    targetPosition = "visible";
+                } else {
+                    targetPosition =
+                        entry.boundingClientRect.top < 0 ? "above" : "below";
+                }
+            },
+            { threshold: 0 },
+        );
+        observer.observe(targetNoteElement);
+        return () => observer.disconnect();
+    });
+
+    const scrollToTarget = () => {
+        targetNoteElement?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+    };
 </script>
 
 <div class="container mx-auto max-w-2xl px-4 py-8">
@@ -101,14 +129,14 @@
         <!-- Newer Button -->
         <div class="flex justify-center mb-4">
             <button
-                class="bg-magnum-600 hover:bg-magnum-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50"
                 onclick={feed.loadNewer}
                 disabled={feed.isLoadingNewer}
             >
                 {#if feed.isLoadingNewer}
                     Loading...
                 {:else}
-                    Load Newer (+10m)
+                    Load Newer
                 {/if}
             </button>
         </div>
@@ -136,9 +164,11 @@
         </div>
     {/if}
 
-    <!-- Target Event (Sticky) -->
+    <!-- Target Event (Anchor) -->
     <div
-        class="sticky top-0 bottom-0 z-50 my-8 shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
+        id="target-note"
+        bind:this={targetNoteElement}
+        class=" shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
     >
         {#if targetEvent}
             <Metadata
@@ -191,7 +221,7 @@
         <!-- Older Button -->
         <div class="flex justify-center mt-4">
             <button
-                class="bg-neutral-600 hover:bg-neutral-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50"
                 onclick={feed.loadOlder}
                 disabled={feed.isLoadingOlder}
             >
@@ -203,16 +233,77 @@
             </button>
         </div>
 
-        <!--   <div
-            class="fixed bottom-4 right-4 bg-magnum-400/80 p-2 rounded text-xs text-white"
-        >
-            Offset: +{Math.floor(
-                ((feed.newestLoaded || 0) - (targetEvent?.created_at || 0)) /
-                    60,
-            )}m / -{Math.floor(
-                ((targetEvent?.created_at || 0) - (feed.oldestLoaded || 0)) /
-                    60,
-            )}m
-        </div> -->
+        <!-- Floating Action Button -->
+        <div class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10">
+            {#if targetPosition !== "visible"}
+                <button
+                    class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
+                    onclick={scrollToTarget}
+                    aria-label="Scroll to target"
+                >
+                    {#if targetEvent}
+                        <Metadata
+                            queryKey={["metadata", targetEvent.pubkey]}
+                            pubkey={targetEvent.pubkey}
+                        >
+                            {#snippet content({ metadata })}
+                                {@const prof = profile(metadata)}
+                                <UserAvatar
+                                    url={prof?.picture}
+                                    name={prof?.name}
+                                    pubkey={prof?.pubkey}
+                                    size={28}
+                                />
+                            {/snippet}
+                            {#snippet loading()}
+                                <UserAvatar
+                                    size={28}
+                                    pubkey={targetEvent?.pubkey}
+                                    url={undefined}
+                                    name={undefined}
+                                />
+                            {/snippet}
+                            {#snippet error()}
+                                <UserAvatar
+                                    size={28}
+                                    pubkey={targetEvent?.pubkey}
+                                    url={undefined}
+                                    name={undefined}
+                                />
+                            {/snippet}
+                        </Metadata>
+                        <span class="text-sm font-semibold">Main Post</span>
+                        {#if targetPosition === "above"}
+                            <!-- Arrow Up -->
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path d="m18 15-6-6-6 6" /></svg
+                            >
+                        {:else}
+                            <!-- Arrow Down -->
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path d="m6 9 6 6 6-6" /></svg
+                            >
+                        {/if}{/if}
+                </button>
+            {/if}
+        </div>
     {/if}
 </div>

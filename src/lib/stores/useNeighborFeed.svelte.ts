@@ -95,9 +95,15 @@ export function createNeighborFeed(rxNostr: RxNostr, targetEvent: Nostr.Event, a
                 
                 if (uniqueNew.length > 0) {
                      newerEvents = [...uniqueNew, ...newerEvents];
-                     newestLoaded = t1;
+                     // Update cursor to the NEWEST event we just found (which is at index 0 of sorted)
+                     // Because sorted is Descending (Newest first).
+                     // Next fetch will start from this time.
+                     newestLoaded = sorted[0].created_at; 
                 } else {
-                     newestLoaded = t1;
+                     // If no events found, maybe we are at the top?
+                     // Or maybe we should just slightly increment to avoid getting stuck?
+                     // For 'since' without until, getting 0 means no newer events exist at all.
+                     // So we don't need to advance aggressively.
                 }
                 isLoadingNewer = false;
             },
