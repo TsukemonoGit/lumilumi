@@ -8,7 +8,7 @@
 
   let { value, onChange, label, required = false }: Props = $props();
 
-  let dateTimeValue: string = $state(value || "");
+  let dateTimeValue: string = $derived(value || "");
 
   function handleSubmit() {
     if (dateTimeValue && onChange) {

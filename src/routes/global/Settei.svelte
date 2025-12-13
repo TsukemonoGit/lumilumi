@@ -18,7 +18,7 @@
 
   let { relays = [], title, Description, onClickSave }: Props = $props();
 
-  const newRelays = writable<string[]>([...(relays ?? [])]);
+  let newRelays = $derived(writable<string[]>([...(relays ?? [])]));
   $effect(() => {
     if (relays) {
       untrack(() => newRelays.set([...relays]));

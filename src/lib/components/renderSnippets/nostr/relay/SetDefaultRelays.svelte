@@ -56,19 +56,23 @@
 
   //パラムリレーがあったりlocalリレーがあるときはそれを返す。なくて、ログインしてるときに10002とる。ログインしてなかったらデフォリレーをセットする。
 
-  let zyouken =
+  let zyouken = $derived(
     localRelays.length > 0 ||
-    (paramRelays && paramRelays.length > 0) ||
-    !lumiSetting.get().pubkey;
+      (paramRelays && paramRelays.length > 0) ||
+      !lumiSetting.get().pubkey
+  );
   // console.log(zyouken);
-  let _relays: DefaultRelayConfig[] | string[] =
+  let _relays: DefaultRelayConfig[] | string[] = $derived(
     paramRelays && paramRelays.length > 0 //neventとかのやつ
       ? paramRelays
       : localRelays.length > 0 //設定でローカルのリレー使うことにしてるときのやつ
         ? localRelays
-        : [];
+        : []
+  );
 
-  let result = zyouken ? undefined : useRelaySet(queryKey, filters, req);
+  let result = $derived(
+    zyouken ? undefined : useRelaySet(queryKey, filters, req)
+  );
 
   let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();

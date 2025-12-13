@@ -49,7 +49,9 @@
       new Date().getDate()
     ),
     locale: $locale ?? undefined,
+    // svelte-ignore state_referenced_locally
     minValue: minValue ?? undefined,
+    // svelte-ignore state_referenced_locally
     maxValue: maxValue ?? undefined,
   });
   export const value: any = _value;

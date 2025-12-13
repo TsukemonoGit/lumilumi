@@ -52,7 +52,7 @@
 
   let storageKind3: Nostr.Event;
 
-  let kind3key = getKind3Key(pubkey); // New format by pubkey
+  let kind3key = $derived(getKind3Key(pubkey)); // New format by pubkey
 
   onMount(() => {
     if (browser) {
@@ -67,9 +67,13 @@
     }
   });
 
-  if (relays && relays.length > 0 && $app?.rxNostr) {
-    $app?.rxNostr.setDefaultRelays(relays);
-  }
+  $effect(() => {
+    if (relays && relays.length > 0 && $app?.rxNostr) {
+      untrack(() => {
+        $app?.rxNostr.setDefaultRelays(relays);
+      });
+    }
+  });
 
   let result = $derived(
     $app?.rxNostr

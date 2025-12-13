@@ -12,10 +12,10 @@
 
   let { contents, url }: Props = $props();
 
-  let imageURL = $state(
+  let imageURL = $derived(
     isvalidURL(contents.image) ? contents.image : undefined
   );
-  let favicon = $state(
+  let favicon = $derived(
     isvalidURL(contents.favicon) ? contents.favicon : undefined
   );
   let hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");

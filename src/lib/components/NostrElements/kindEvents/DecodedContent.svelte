@@ -44,7 +44,7 @@
   });
 
   // 共通のNaddrEvent用props
-  const baseNaddrProps = {
+  let baseNaddrProps = $derived({
     className: "border rounded-md border-magnum-600/30",
     displayMenu,
     depth,
@@ -52,7 +52,7 @@
     content,
     zIndex,
     mini: true,
-  };
+  });
 
   // 複数のタグからリレーヒントを検索
   const findRelayHint = (searchTags: string[][]) => {

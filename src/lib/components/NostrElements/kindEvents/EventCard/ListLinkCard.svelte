@@ -17,17 +17,19 @@
 
   let { event, depth }: Props = $props();
 
-  const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
-  const title = event.tags.find((tag) => tag[0] === "title")?.[1];
-  const description = event.tags.find((tag) => tag[0] === "description")?.[1];
-  const image = event.tags.find((tag) => tag[0] === "image")?.[1];
+  let dtag = $derived(event.tags.find((tag) => tag[0] === "d")?.[1]);
+  let title = $derived(event.tags.find((tag) => tag[0] === "title")?.[1]);
+  let description = $derived(
+    event.tags.find((tag) => tag[0] === "description")?.[1]
+  );
+  let image = $derived(event.tags.find((tag) => tag[0] === "image")?.[1]);
   const size = 80;
 
-  const naddr: nip19.AddressPointer = {
+  let naddr: nip19.AddressPointer = $derived({
     identifier: dtag ?? "",
     kind: event.kind,
     pubkey: event.pubkey,
-  };
+  });
 
   const handleClickToList = (event: Nostr.Event) => {
     // const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
