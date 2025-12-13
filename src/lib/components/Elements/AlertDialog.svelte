@@ -39,6 +39,7 @@
   } = createDialog({
     role: "alertdialog",
     forceVisible: true,
+    // svelte-ignore state_referenced_locally
     closeOnOutsideClick: closeOnOutsideClick,
   });
 

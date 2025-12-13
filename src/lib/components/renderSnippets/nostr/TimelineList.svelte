@@ -145,6 +145,7 @@
     });
   });
 
+  //svelte-ignore state_referenced_locally
   let result = useTimelineEventList(
     queryKey,
     filters,

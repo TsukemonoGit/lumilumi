@@ -22,10 +22,10 @@
 
   let { data }: { data: PageData } = $props();
 
-  const atag = `${data.kind}:${data.pubkey}:${data.identifier}`;
-  const filters: Nostr.Filter[] = [
+  let atag = $derived(`${data.kind}:${data.pubkey}:${data.identifier}`);
+  let filters: Nostr.Filter[] = $derived([
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
-  ];
+  ]);
 
   let loading = $state(true);
 

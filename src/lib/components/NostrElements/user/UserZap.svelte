@@ -29,7 +29,7 @@
   let invoice: string | undefined = $state();
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
-  let zapComment: string = $state(comment ?? "");
+  let zapComment: string = $derived(comment ?? "");
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
 
   let prof = $derived(profile(metadata));

@@ -8,7 +8,7 @@
   let { part }: Props = $props();
 
   // checked属性があるかどうかで判定
-  const isChecked = part.meta.checked;
+  let isChecked = $derived(part.meta.checked);
   // console.log(part);
 </script>
 

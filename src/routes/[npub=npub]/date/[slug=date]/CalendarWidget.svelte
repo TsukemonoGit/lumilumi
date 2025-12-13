@@ -57,6 +57,7 @@
     helpers: { isDateDisabled, isDateUnavailable },
     options: { locale },
   } = createCalendar({
+    // svelte-ignore state_referenced_locally
     defaultValue: currentDate ? toCalendarDate(currentDate) : undefined,
     locale: $l,
     isDateDisabled: (date) => {

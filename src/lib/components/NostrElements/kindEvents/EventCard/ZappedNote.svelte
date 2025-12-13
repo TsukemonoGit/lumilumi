@@ -45,17 +45,19 @@
   let deleted = $state(false);
   let viewMuteEvent: boolean = $state(false);
 
-  const zappedId: {
+  let zappedId: {
     tag: string[];
-  } = extractZappedId(zapRequestEvent?.tags || []);
+  } = $derived(extractZappedId(zapRequestEvent?.tags || []));
 
-  const muteType = !zapRequestEvent
-    ? "null"
-    : excludefunc(zapRequestEvent)
+  let muteType = $derived(
+    !zapRequestEvent
       ? "null"
-      : $mutes || $mutebykinds
-        ? muteCheck(zapRequestEvent)
-        : "null";
+      : excludefunc(zapRequestEvent)
+        ? "null"
+        : $mutes || $mutebykinds
+          ? muteCheck(zapRequestEvent)
+          : "null"
+  );
 </script>
 
 {#if deleted}

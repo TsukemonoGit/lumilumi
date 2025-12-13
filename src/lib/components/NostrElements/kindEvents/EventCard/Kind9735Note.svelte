@@ -37,9 +37,11 @@
   }: Props = $props();
 
   //kind9734の取得と検証
-  const zapRequestEvent = extractKind9734(note);
+  let zapRequestEvent = $derived(extractKind9734(note));
 
-  const amount: number | undefined = extractAmount(note, zapRequestEvent);
+  let amount: number | undefined = $derived(
+    extractAmount(note, zapRequestEvent)
+  );
 </script>
 
 {#if !zapRequestEvent || !amount}

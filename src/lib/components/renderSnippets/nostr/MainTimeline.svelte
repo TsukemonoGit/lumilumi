@@ -568,6 +568,7 @@
     updateViewEvent();
   }
 
+  //svelte-ignore state_referenced_locally
   // Query for older data
   createQuery({
     queryKey: [...queryKey, "olderData"],

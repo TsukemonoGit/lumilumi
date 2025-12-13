@@ -52,7 +52,7 @@
     }
   };
   let isOmitted = $state(false);
-  let dynamicClasses = $state(className);
+  let dynamicClasses = $derived(className);
   const onChange = (ev: Nostr.Event) => {
     isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
     if (isOmitted) {

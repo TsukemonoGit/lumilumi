@@ -25,23 +25,22 @@
   import InputImageFromFile from "./InputImageFromFile.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
-  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser } from "$lib/stores/globalRunes.svelte";
 
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
-  import EmojiListUpdate from "$lib/components/SettingsElements/EmojiListUpdate.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import InputCustomEmoji from "$lib/components/InputCustomEmoji.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
-  console.log(data.pubkey);
+
   const bannerHeight = 120;
   const iconSize = 40;
   let profile: Profile;
   let metadata: Nostr.Event;
-  const key: QueryKey = ["metadata", data.pubkey];
-  const filters = [{ kinds: [0], authors: [data.pubkey], limit: 1 }];
+  let key: QueryKey = $derived(["metadata", data.pubkey]);
+  let filters = $derived([{ kinds: [0], authors: [data.pubkey], limit: 1 }]);
   const operator = pipe(latest(), uniq());
 
   let newProfile: Profile | undefined = $state();

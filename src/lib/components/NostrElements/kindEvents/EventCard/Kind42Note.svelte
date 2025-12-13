@@ -49,16 +49,16 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  const heyaId = note.tags.find(
-    (tag) => tag[0] === "e" && tag[3] === "root",
-  )?.[1];
+  let heyaId = $derived(
+    note.tags.find((tag) => tag[0] === "e" && tag[3] === "root")?.[1]
+  );
 
   let warning = $derived(checkContentWarning(note.tags));
 
   let isBookmarked: boolean = $derived(
     bookmark10003
       .get()
-      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false,
+      ?.tags.some((tag) => tag[0] === "e" && tag[1] === note.id) ?? false
   );
 </script>
 

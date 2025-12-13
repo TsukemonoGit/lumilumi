@@ -3,7 +3,7 @@
   import type { Snippet } from "svelte";
 
   let { url, ok, ng }: { url: string; ok: Snippet; ng: Snippet } = $props();
-  let status = $state(isvalidURL(url));
+  let status = $derived(isvalidURL(url));
 </script>
 
 {#if status}

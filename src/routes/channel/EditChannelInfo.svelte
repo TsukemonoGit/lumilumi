@@ -39,10 +39,10 @@
   }: Props = $props();
 
   // フォームの状態を管理
-  let channelName = $state(channelData.name);
-  let channelAbout = $state(channelData.about || "");
-  let channelPicture = $state(channelData.picture || "");
-  let categories = $state(
+  let channelName = $derived(channelData.name);
+  let channelAbout = $derived(channelData.about || "");
+  let channelPicture = $derived(channelData.picture || "");
+  let categories = $derived(
     note.tags.reduce<{ value: string }[]>((a, b) => {
       if (b[0] === "t") {
         return [...a, { value: b[1] }];

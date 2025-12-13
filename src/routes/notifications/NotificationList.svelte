@@ -73,22 +73,32 @@
   let operator = $derived(pipe(tie, uniq, scanArray()));
 
   // Initialize query
-  createQuery({
-    queryKey: queryKey,
-    queryFn: undefined,
-    staleTime: Infinity,
-    gcTime: Infinity,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+  $effect(() => {
+    createQuery({
+      queryKey: queryKey,
+      queryFn: undefined,
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    });
   });
 
   // Observer setup for query data changes
-  const observer = new QueryObserver(queryClient, { queryKey });
+  let observer = $derived.by(() => {
+    return new QueryObserver(queryClient, { queryKey });
+  });
   const data: Writable<EventPacket[]> = writable<EventPacket[]>();
-  observer.subscribe((result: QueryObserverResult<unknown, Error>) => {
-    if (result.data) {
-      $data = result.data as EventPacket[];
-    }
+
+  $effect(() => {
+    const unsubscribe = observer.subscribe(
+      (result: QueryObserverResult<unknown, Error>) => {
+        if (result.data) {
+          $data = result.data as EventPacket[];
+        }
+      }
+    );
+    return () => unsubscribe();
   });
 
   // Define update view function with debounce

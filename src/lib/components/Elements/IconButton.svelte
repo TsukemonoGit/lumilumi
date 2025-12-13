@@ -34,7 +34,7 @@
     ghost: "bg-transparent text-magnum-800",
   };
 
-  const buttonSizeClassName = `h-[${size + 12}px] w-[${size + 12}px]`;
+  let buttonSizeClassName = $derived(`h-[${size + 12}px] w-[${size + 12}px]`);
 
   const commonClasses = [
     "inline-flex",
