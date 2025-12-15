@@ -16,12 +16,12 @@
   <Circle
     size="20"
     class="{getColor(
-      relayStateMap.get().get(relayUrl)
+      relayStateMap.get(relayUrl)
     )} fill-current  min-w-[20px] mr-1"
   />
   {#snippet popoverContent()}
     <div class="mr-8">
-      {relayStateMap.get().get(relayUrl)}
+      {relayStateMap.get(relayUrl)}
     </div>
   {/snippet}</Popover
 >

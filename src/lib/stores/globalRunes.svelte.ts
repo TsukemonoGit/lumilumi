@@ -23,12 +23,12 @@ export const timelineFilter =
 export const followList = createCustomStore<Map<string, string | undefined>>(
   new Map()
 );
-export const relayStateMap = createCustomStore<
-  SvelteMap<string, ConnectionState>
->(new SvelteMap());
-export const userStatusMap = createCustomStore<
-  SvelteMap<string, SvelteMap<string, Nostr.Event>>
->(new SvelteMap());
+export let relayStateMap: SvelteMap<string, ConnectionState> = new SvelteMap();
+
+export let userStatusMap: SvelteMap<
+  string,
+  SvelteMap<string, Nostr.Event>
+> = new SvelteMap();
 export const viewEventIds = createCustomStore<string[][]>([]);
 export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
 export const showBanner = createCustomStore<boolean>(true);
