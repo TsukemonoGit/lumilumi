@@ -185,35 +185,28 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
     if (!dtag) {
       return false;
     }
-    //console.log(packet);
 
     // 現在の store から pubkey と dtag に対応するイベントを取得
-    const pre: Nostr.Event | undefined = userStatusMap
-      .get()
-      .get(packet.event.pubkey)
-      ?.get(dtag);
+    const pubkeyMap = userStatusMap.get(packet.event.pubkey);
+    const pre: Nostr.Event | undefined = pubkeyMap?.get(dtag);
 
     // 以前のイベントが存在しないか、作成日時が新しい場合に更新
     if (!pre || packet.event.created_at > pre.created_at) {
-      // store を更新
-      userStatusMap.update((store) => {
-        // pubkey に対応する Map を取得または初期化
-        let pubkeyMap = store.get(packet.event.pubkey);
-        if (!pubkeyMap) {
-          pubkeyMap = new SvelteMap<string, Nostr.Event>();
-          store.set(packet.event.pubkey, pubkeyMap);
-        }
+      // pubkey に対応する Map を取得または初期化
+      let targetMap = userStatusMap.get(packet.event.pubkey);
+      if (!targetMap) {
+        targetMap = new SvelteMap<string, Nostr.Event>();
+        userStatusMap.set(packet.event.pubkey, targetMap);
+      }
 
-        // dtag に対応するイベントをセット
-        pubkeyMap.set(dtag, packet.event);
-
-        return store;
-      });
+      // dtag に対応するイベントをセット
+      targetMap.set(dtag, packet.event);
     }
 
     return false; //30315は通過させずストアにいれるだけ
   });
 }
+
 export function latestbyId<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return pipe(
     scan((acc: Map<string, A>, eventPacket: A) => {

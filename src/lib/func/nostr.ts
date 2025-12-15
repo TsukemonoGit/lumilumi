@@ -29,11 +29,11 @@ import {
   createRxForwardReq,
   filterByType,
   type AuthPacket,
-  uniq,
   createUniq,
+  type ConnectionStatePacket,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
-import { count, pipe, tap, type Observable, type OperatorFunction } from "rxjs";
+import { type Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import {
   bookmark,
@@ -64,6 +64,7 @@ import { throttle } from "$lib/func/throttle";
 import { STORAGE_KEYS } from "./localStorageKeys";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { set3Relays } from "./reactions";
+import { untrack } from "svelte";
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -81,9 +82,8 @@ export function setRxNostr() {
   });
 
   rxNostr.createConnectionStateObservable().subscribe((packet) => {
-    //  console.log(`${packet.from} の接続状況が ${packet.state} に変化しました。`);
-    relayStateMap.update((value) => {
-      return value.set(packet.from, packet.state);
+    untrack(() => {
+      relayStateMap.set(packet.from, packet.state);
     });
   });
 

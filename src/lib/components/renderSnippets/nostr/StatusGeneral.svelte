@@ -10,7 +10,7 @@
 
   let { pubkey, loading, children }: Props = $props();
   let data: Nostr.Event | undefined = $derived(
-    userStatusMap.get().get(pubkey)?.get("general")
+    userStatusMap.get(pubkey)?.get("general")
   );
 </script>
 

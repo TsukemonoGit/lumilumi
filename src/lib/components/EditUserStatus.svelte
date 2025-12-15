@@ -75,7 +75,7 @@
         //   ["userStatus", "general", pubkey]
         // );
         const statusEvent: Nostr.Event | undefined = userStatusMap
-          .get()
+
           .get(loginUser.get())
           ?.get("general");
         //console.log(statusEvent);

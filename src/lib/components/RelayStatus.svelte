@@ -8,12 +8,12 @@
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
   import type { ConnectionState } from "rx-nostr";
   import { rxNostr3ReccoctRelay } from "$lib/func/reactions";
+  import { untrack } from "svelte";
 
   const ERROR_STATES: ConnectionState[] = ["error", "rejected", "terminated"];
   const RECONNECT_COOLDOWN = 3000;
 
   let disabledButton: string | undefined = $state();
-  let errorRelayCount: number = $state(0);
 
   let readRelays = $derived(
     $defaultRelays
@@ -29,7 +29,7 @@
 
   let overallStateColor = $derived.by(() => {
     const allStatus = [...readRelays, ...writeRelays].map((relay) =>
-      relayStateMap.get().get(cleanRelayUrl(relay.url))
+      relayStateMap.get(cleanRelayUrl(relay.url))
     );
 
     const stateCount: Record<string, number> = {};
@@ -61,10 +61,12 @@
     }, RECONNECT_COOLDOWN);
   };
 
-  relayStateMap.subscribe((value) => {
+  let errorRelayCount = $derived.by(() => {
+    // relayStateMapを参照することで変更を検知
+    const map = relayStateMap;
     const readRelayUrls = readRelays.map((relay) => cleanRelayUrl(relay.url));
 
-    errorRelayCount = [...value.entries()].filter(
+    return [...map.entries()].filter(
       ([url, state]) =>
         readRelayUrls.includes(url) && ERROR_STATES.includes(state)
     ).length;
@@ -89,7 +91,7 @@
         <ul>
           {#each readRelays as relay}
             {@const relayUrl = cleanRelayUrl(relay.url)}
-            {@const state = relayStateMap.get().get(relayUrl)}
+            {@const state = relayStateMap.get(relayUrl)}
             <li class="flex align-middle items-center break-all">
               <RelayStatusColor relay={relay.url} />
               <span class="inline w-60">{relayUrl}</span>
@@ -109,7 +111,7 @@
         <ul>
           {#each writeRelays as relay}
             {@const relayUrl = cleanRelayUrl(relay.url)}
-            {@const state = relayStateMap.get().get(relayUrl)}
+            {@const state = relayStateMap.get(relayUrl)}
             <li class="flex align-middle items-center break-all">
               <Popover ariaLabel="{relay.url} status">
                 <Circle
