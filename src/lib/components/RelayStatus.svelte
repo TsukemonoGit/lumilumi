@@ -8,7 +8,6 @@
   import { relayStateMap } from "$lib/stores/globalRunes.svelte";
   import type { ConnectionState } from "rx-nostr";
   import { rxNostr3ReccoctRelay } from "$lib/func/reactions";
-  import { untrack } from "svelte";
 
   const ERROR_STATES: ConnectionState[] = ["error", "rejected", "terminated"];
   const RECONNECT_COOLDOWN = 3000;
