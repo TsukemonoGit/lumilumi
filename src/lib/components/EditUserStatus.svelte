@@ -8,19 +8,13 @@
   import * as Nostr from "nostr-typedef";
 
   import { publishEvent } from "$lib/func/nostr";
-  import Popover from "./Elements/Popover.svelte";
   import { contentEmojiCheck } from "$lib/func/contentCheck";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import * as nip19 from "nostr-tools/nip19";
   import { nip07Signer } from "rx-nostr";
-  import {
-    loginUser,
-    lumiSetting,
-    userStatusMap,
-  } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, userStatusMap } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import { checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import InputCustomEmoji from "./InputCustomEmoji.svelte";

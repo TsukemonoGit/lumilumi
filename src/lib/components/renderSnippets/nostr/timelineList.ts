@@ -6,7 +6,7 @@ import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
 import { defaultRelays } from "$lib/stores/stores";
 import type { Filter } from "nostr-typedef";
 import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
-import { pipe, type OperatorFunction } from "rxjs";
+import { type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
 import { normalizeURL } from "nostr-tools/utils";
@@ -141,7 +141,7 @@ export async function waitForConnections(
   maxWaitTime: number = 5000
 ): Promise<void> {
   const readUrls = getRelayUrls();
-  const stateMap = relayStateMap.get() as Map<string, string>;
+  const stateMap = relayStateMap as Map<string, string>;
   const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
   const startTime = Date.now();
   const RELAY_CHECK_INTERVAL = 500; // milliseconds
