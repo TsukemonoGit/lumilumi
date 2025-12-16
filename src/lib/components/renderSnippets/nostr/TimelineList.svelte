@@ -28,6 +28,7 @@
   import { scanArray } from "$lib/stores/operators";
   import { sortEventPackets } from "$lib/func/util";
   import { page } from "$app/state";
+  import { SvelteMap } from "svelte/reactivity";
 
   interface Props {
     queryKey: QueryKey;
@@ -76,8 +77,7 @@
   }: Props = $props();
 
   // Map による状態管理
-  let allUniqueEventsMap = $state<Map<string, Nostr.Event>>(new Map());
-  let allUniqueEvents = $derived(Array.from(allUniqueEventsMap.values()));
+  const allUniqueEventsMap: SvelteMap<string, Nostr.Event> = new SvelteMap();
 
   let updating = $state(false);
   let timeoutId: NodeJS.Timeout | null = null;
@@ -327,6 +327,7 @@
       if (hasEnoughStock) {
         viewIndex += CONFIG.SLIDE_AMOUNT;
         updateViewEvent();
+
         return;
       }
 
@@ -334,8 +335,11 @@
         return;
       }
 
-      const untilTime =
-        allUniqueEvents?.[allUniqueEvents.length - 1]?.created_at;
+      const olderData: EventPacket[] | undefined = queryClient?.getQueryData([
+        ...queryKey,
+        "olderData",
+      ]);
+      const untilTime = olderData?.[olderData.length - 1]?.event.created_at;
 
       if (!untilTime) {
         console.warn("No existing events to determine untilTime");
@@ -348,6 +352,8 @@
         ...filter,
         since: undefined,
       }));
+
+      $nowProgress = true;
 
       const olderEvents = await loadOlderEvents(
         fetchAmount,
@@ -365,6 +371,7 @@
           if (!viewMoved && !stillNotEnough) {
             viewIndex += CONFIG.SLIDE_AMOUNT;
             viewMoved = true;
+            $nowProgress = false;
           }
 
           updateViewEvent(partialData);
@@ -397,6 +404,7 @@
 
       isLoadingOlderEvents = false;
       updateCounts();
+      $nowProgress = false;
     }
   };
 
