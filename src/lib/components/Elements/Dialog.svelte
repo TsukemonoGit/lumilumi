@@ -34,6 +34,7 @@
     states: { open: dialogOpen },
   } = createDialog({
     forceVisible: true,
+    //svelte-ignore state_referenced_locally
     closeOnOutsideClick: closeOnOutsideClick,
   });
 

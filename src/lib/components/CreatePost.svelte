@@ -25,7 +25,7 @@
   import PostPreview from "./PostPreview.svelte";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import GeohashMap from "./GeohashMap.svelte";
-  import { tick, untrack } from "svelte";
+  import { onMount, tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
   import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
@@ -70,13 +70,11 @@
   // ----------------------------------------
   // State Management
   // ----------------------------------------
-  let text: string = $state(initOptions.content ?? "");
-  let tags: string[][] = $state([...(initOptions.tags ?? [])]);
+  let text: string = $state("");
+  let tags: string[][] = $state([]);
   let geohash: string = $state("");
-  let onWarning: boolean = $state<boolean>(
-    initOptions.warningText ? true : false
-  );
-  let warningText = $state(initOptions.warningText || "");
+  let onWarning: boolean = $state<boolean>(false);
+  let warningText = $state("");
   let customReaction: string = $state("");
   let viewCustomEmojis: boolean = $state<boolean>(false);
   let viewMetadataList: boolean = $state(false);
@@ -127,6 +125,12 @@
   $effect(() => {
     if (textarea) {
       untrack(async () => {
+        console.log("textarea が生成されたときに初期化");
+        text = initOptions.content ?? "";
+        tags = [...(initOptions.tags ?? [])];
+        onWarning = initOptions.warningText ? true : false;
+        warningText = initOptions.warningText || "";
+
         await tick();
         textarea?.focus();
       });

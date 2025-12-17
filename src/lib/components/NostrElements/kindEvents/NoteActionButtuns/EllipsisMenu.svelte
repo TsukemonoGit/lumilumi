@@ -95,7 +95,7 @@
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -367,7 +367,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? ""),
+            replaceable ? (naddr ?? "") : (nevent ?? "")
           );
           $toastSettings = {
             title: "Success",
@@ -500,7 +500,7 @@
           }
 
           let pre: Nostr.Event<number> | null = bookmark10003.get();
-          const pub = loginUser.get();
+          const pub = loginUser.value;
 
           if (!pub) {
             console.error("User not logged in");
@@ -514,7 +514,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000,
+              2000
             );
 
             if (bookmarkEvent.length > 0) {

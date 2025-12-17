@@ -16,7 +16,7 @@
   import { debug } from "$lib/components/Debug/debug";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
-  let _showBanner: boolean = $state(showBanner.get());
+  let _showBanner: boolean = $state(showBanner.value);
 
   //-----
   // 現在のページに基づいてアイコンを設定
@@ -39,12 +39,12 @@
     if (_showBanner !== undefined && _showBanner !== null) {
       //console.log(_showBanner);
       untrack(() => {
-        showBanner.set(_showBanner);
+        showBanner.value = _showBanner;
         try {
           if (browser) {
             localStorage.setItem(
               STORAGE_KEYS.SHOW_BANNER,
-              showBanner.get().toString()
+              showBanner.value.toString()
             );
           }
         } catch (error: any) {

@@ -9,13 +9,13 @@ export const validateLoginPubkey = async (): Promise<{
   const user = lumiSetting.get().pubkey;
   if (!user || user === "") return { status: false, message: "prease login" };
   try {
-    if (!loginUser.get()) {
+    if (!loginUser.value) {
       const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pubkey) {
-        loginUser.set(pubkey);
+        loginUser.value = pubkey;
       }
     }
-    if (user !== loginUser.get()) {
+    if (user !== loginUser.value) {
       return { status: false, message: "login pubkey ≠ sign pubkey" };
     }
     return { status: true };

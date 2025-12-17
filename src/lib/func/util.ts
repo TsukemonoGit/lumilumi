@@ -8,6 +8,7 @@ import * as nip19 from "nostr-tools/nip19";
 import { get } from "svelte/store";
 import { mutebykinds, mutes } from "$lib/stores/stores";
 import { urlRegex } from "./regex";
+import type { Attachment } from "svelte/attachments";
 
 export let noReactionKind = [3, 10000, 30000];
 

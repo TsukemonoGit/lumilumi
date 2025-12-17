@@ -30,16 +30,16 @@
   async function handleClickMuteByKind() {
     const beforeList = $mutebykinds?.list;
     try {
-      if (!loginUser.get()) {
+      if (!loginUser.value) {
         const gpubkey = await (
           window.nostr as Nostr.Nip07.Nostr
         )?.getPublicKey();
         if (gpubkey) {
-          loginUser.set(gpubkey);
+          loginUser.value = gpubkey;
         }
       }
-      if (loginUser.get()) {
-        pubkey = loginUser.get();
+      if (loginUser.value) {
+        pubkey = loginUser.value;
       }
     } catch (error) {
       console.log(error);

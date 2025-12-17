@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useRelaySet } from "$lib/stores/useRelaySet";
-  import type { ReqStatus } from "$lib/types";
+  import type { ReqResult, ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
   import {
@@ -12,9 +12,11 @@
   } from "rx-nostr";
   import { setRelays } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
+  import { defaultRelays as defo } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
-  import { get } from "svelte/store";
+  import { get, type Unsubscriber } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     // pubkey: string;
@@ -33,9 +35,7 @@
 
     loading?: import("svelte").Snippet;
 
-    contents?: import("svelte").Snippet<
-      [{ relays: DefaultRelayConfig[] | string[]; status: ReqStatus }]
-    >;
+    contents?: import("svelte").Snippet;
   }
   let {
     req = undefined,
@@ -69,49 +69,68 @@
         ? localRelays
         : []
   );
+  let result: ReqResult<DefaultRelayConfig[]> | undefined = $state(undefined);
 
-  let result = $derived(
-    zyouken ? undefined : useRelaySet(queryKey, filters, req)
-  );
+  $effect(() => {
+    if (!zyouken) {
+      untrack(() => {
+        result = useRelaySet(queryKey, filters, req);
+      });
+    }
+  });
 
   let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();
   let errorData: Error | undefined = $state();
+  $effect(() => {
+    let unsubData: Unsubscriber | undefined;
+    let unsubStatus: Unsubscriber | undefined;
+    let unsubError: Unsubscriber | undefined;
+    if (result) {
+      untrack(() => {
+        unsubData = result?.data.subscribe(
+          (value: DefaultRelayConfig[] | null | undefined) => {
+            if (value && value.length > 0) {
+              data = value;
+            }
+          }
+        );
 
-  if (result) {
-    result?.data.subscribe((value: DefaultRelayConfig[] | null | undefined) => {
-      // console.log(value);
-      if (value && value.length > 0) {
-        data = value;
-        //setRelays(defaultRelays);セットリレーはuseRelaySetの方にかいてあるからいらない
-      }
-    });
-    result?.status.subscribe((value: ReqStatus | undefined) => {
-      // console.log(value);
-      //resultがsuccessなのにdataがない（りれーがせっとされてない）ときはデフォリレーをいれる。
-      if (value) {
-        status = value;
-        if (
-          value === "success" &&
-          (!result.data || (get(result.data) || []).length <= 0)
-        ) {
-          // console.log(defaultRelays);
-          setRelays(defaultRelays);
-          data = defaultRelays;
-        }
-      }
-    });
-    result?.error.subscribe((value: Error | null) => {
-      if (value) {
-        errorData = value;
-      }
-    });
-  } else if (_relays.length > 0) {
-    setRelays(_relays);
-  } else if (!lumiSetting.get().pubkey) {
-    //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
-    setRelays(defaultRelays);
-  }
+        unsubStatus = result?.status.subscribe(
+          (value: ReqStatus | undefined) => {
+            if (value) {
+              status = value;
+              if (
+                value === "success" &&
+                (!result?.data || (get(result.data) || []).length <= 0)
+              ) {
+                setRelays(defaultRelays);
+                data = defaultRelays;
+              }
+            }
+          }
+        );
+
+        unsubError = result?.error.subscribe((value: Error | null) => {
+          if (value) {
+            errorData = value;
+          }
+        });
+      });
+    } else if (_relays.length > 0) {
+      setRelays(_relays);
+    } else if (!lumiSetting.get().pubkey) {
+      //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
+      setRelays(defaultRelays);
+    }
+
+    // クリーンアップ
+    return () => {
+      unsubData?.();
+      unsubStatus?.();
+      unsubError?.();
+    };
+  });
 
   app.subscribe((value) => {
     // console.log(value, localRelays, paramRelays);
@@ -130,21 +149,8 @@
 
 {#if errorData}
   {@render error?.(errorData)}
-{:else if data && data.length > 0}
-  {@render contents?.({
-    relays: data,
-    status: status ?? "success",
-  })}
+{:else if $defo && Object.values($defo).length > 0}
+  {@render contents?.()}
 {:else if status === "loading"}
   {@render loading?.()}
-{:else if localRelays.length > 0 || (paramRelays && paramRelays.length > 0)}
-  {@render contents?.({
-    relays: _relays,
-    status: "success",
-  })}
-{:else}
-  {@render contents?.({
-    relays: defaultRelays,
-    status: status ?? "success",
-  })}
 {/if}

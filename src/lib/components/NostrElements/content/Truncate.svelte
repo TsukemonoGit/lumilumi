@@ -24,7 +24,6 @@
     onClickShowMore?.();
   }
 
-  // depth が深くなるほど contentHeight が小さくなるように計算し、最小の高さを設定
   let minHeight = $derived(maxHeight * 0.2);
   let contentHeight = $derived(
     Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
@@ -33,11 +32,11 @@
 
 {#if contentHeight}
   <div
-    use:useTruncate={{
+    {@attach useTruncate(() => ({
       maxHeight: contentHeight,
       isTruncated: (value) => (isTruncated = value),
       threshold,
-    }}
+    }))}
     class="mt-0.5 max-w-full relative overflow-x-hidden"
     style={!isTruncated
       ? `max-height: ${contentHeight + threshold}px; overflow-y: hidden;`

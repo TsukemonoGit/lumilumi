@@ -53,12 +53,12 @@
     if (value && !$nowProgress) {
       $nowProgress = true;
       try {
-        if (!loginUser.get()) {
+        if (!loginUser.value) {
           const pubkey = await (
             window.nostr as Nostr.Nip07.Nostr
           )?.getPublicKey();
           if (pubkey) {
-            loginUser.set(pubkey);
+            loginUser.value = pubkey;
           }
           //throw Error("failed to get pubkey");
           if (!pubkey) {
@@ -70,7 +70,7 @@
         // );
         const statusEvent: Nostr.Event | undefined = userStatusMap
 
-          .get(loginUser.get())
+          .get(loginUser.value)
           ?.get("general");
         //console.log(statusEvent);
 

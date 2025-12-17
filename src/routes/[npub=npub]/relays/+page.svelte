@@ -71,15 +71,15 @@
     }
 
     try {
-      if (!loginUser.get()) {
+      if (!loginUser.value) {
         const pubkey = await (
           window.nostr as Nostr.Nip07.Nostr
         )?.getPublicKey();
         if (pubkey) {
-          loginUser.set(pubkey);
+          loginUser.value = pubkey;
         }
       }
-      if (data.pubkey !== loginUser.get()) {
+      if (data.pubkey !== loginUser.value) {
         $toastSettings = {
           title: "Error",
           description: "login pubkey ≠ sign pubkey",

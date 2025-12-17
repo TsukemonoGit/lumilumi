@@ -56,7 +56,7 @@
     try {
       localLumisetting = {
         lumiSetting: settings,
-        showBanner: showBanner.get(),
+        showBanner: showBanner.value,
         theme: localStorage.getItem(STORAGE_KEYS.THEME) ?? "system",
         colorScheme:
           localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) ?? "default",
@@ -200,7 +200,7 @@
     $nowProgress = true;
     debugInfo("loadData", loadData);
     if (loadData.showBanner) {
-      showBanner.set(loadData.showBanner);
+      showBanner.value = loadData.showBanner;
       try {
         localStorage?.setItem(
           STORAGE_KEYS.SHOW_BANNER,
