@@ -26,6 +26,7 @@
   } = createPagination({
     // svelte-ignore state_referenced_locally
     count: list.length,
+    // svelte-ignore state_referenced_locally
     perPage: perPage,
     defaultPage: 1,
     siblingCount: 1,

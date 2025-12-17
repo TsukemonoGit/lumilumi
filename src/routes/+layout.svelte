@@ -111,7 +111,7 @@
       const pub = customEvent.detail.pubkey;
 
       if (pub) {
-        loginUser.set(pub);
+        loginUser.value = pub;
         if (!lumiSetting.get().pubkey) {
           lumiSetting.update((val) => {
             return {
@@ -155,7 +155,7 @@
         const banner: boolean =
           localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";
 
-        showBanner.set(banner);
+        showBanner.value = banner;
       } catch (error) {}
       if (!$app?.rxNostr) {
         setRxNostr();
@@ -252,7 +252,7 @@
   $effect(() => {
     if (browser) {
       const isSettingsPage = page.route.id === "/settings";
-      const shouldShow = isSettingsPage || showBanner.get();
+      const shouldShow = isSettingsPage || showBanner.value;
       document.body.classList.toggle("hide-nostr-login", !shouldShow);
     }
   });

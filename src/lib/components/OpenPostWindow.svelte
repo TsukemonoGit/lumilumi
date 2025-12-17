@@ -88,17 +88,17 @@
     $nowProgress = true;
 
     try {
-      if (!loginUser.get()) {
+      if (!loginUser.value) {
         const pubkey = await (
           window.nostr as Nostr.Nip07.Nostr
         )?.getPublicKey();
         if (pubkey) {
-          loginUser.set(pubkey);
+          loginUser.value = pubkey;
         }
       }
 
-      if (loginUser.get()) {
-        signPubkey = loginUser.get();
+      if (loginUser.value) {
+        signPubkey = loginUser.value;
       }
     } catch (error) {
       showToast("Error", "Failed to get sign pubkey", "bg-red-500");

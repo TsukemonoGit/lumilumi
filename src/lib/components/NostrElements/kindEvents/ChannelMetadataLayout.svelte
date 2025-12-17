@@ -32,7 +32,7 @@
 
     clickAction,
   }: Props = $props();
-  let size = clickAction ? 96 : 66;
+  let size = $derived(clickAction ? 96 : 66);
   const getContent = (text: Nostr.Event): ChannelData | undefined => {
     try {
       const kategories = text.tags.reduce((result, tag) => {

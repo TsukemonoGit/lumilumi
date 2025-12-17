@@ -116,11 +116,11 @@
     const beforeEvent = $emojis?.event;
 
     try {
-      if (!loginUser.get()) {
+      if (!loginUser.value) {
         const got = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
-        if (got) loginUser.set(got);
+        if (got) loginUser.value = got;
       }
-      pubkey = loginUser.get() ?? "";
+      pubkey = loginUser.value ?? "";
     } catch (error) {
       console.error(error);
     }

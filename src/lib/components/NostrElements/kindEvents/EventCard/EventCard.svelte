@@ -117,7 +117,7 @@
   });
 
   let paramNoteId = $derived(
-    page.params.note ? getIDbyParam(page.params.note) : undefined,
+    page.params.note ? getIDbyParam(page.params.note) : undefined
   );
 
   //ミュートメニューの設定は考慮しない
@@ -148,7 +148,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag),
+          removeFirstMatchingId(value, currentNoteTag)
         );
       }
 
@@ -168,7 +168,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag),
+          removeFirstMatchingId(value, currentNoteTag)
         );
       }
 
@@ -203,7 +203,7 @@
   onDestroy(() => {
     if (currentNoteTag) {
       viewEventIds.update((value) =>
-        removeFirstMatchingId(value, currentNoteTag),
+        removeFirstMatchingId(value, currentNoteTag)
       );
     }
   });
@@ -212,7 +212,7 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  {#if note.pubkey !== loginUser.get() && timelineFilter.get().adaptMute && muteType !== "null" && depth >= 1}
+  {#if note.pubkey !== loginUser.value && timelineFilter.get().adaptMute && muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
       onclick={() => (viewMuteEvent = !viewMuteEvent)}
@@ -220,7 +220,7 @@
       {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
     </button>
   {/if}
-  {#if !timelineFilter.get().adaptMute || note.pubkey === loginUser.get() || muteType === "null" || viewMuteEvent}
+  {#if !timelineFilter.get().adaptMute || note.pubkey === loginUser.value || muteType === "null" || viewMuteEvent}
     {#if thread && replyTag}
       {#if depth >= 1 && depth % 6 === 0 && !loadThread}
         <button

@@ -41,16 +41,16 @@
       console.log(error);
     }
 
-    if (!loginUser.get()) {
+    if (!loginUser.value) {
       const pubkey = await (window.nostr as Nostr.Nip07.Nostr)?.getPublicKey();
       if (pubkey) {
-        loginUser.set(pubkey);
+        loginUser.value = pubkey;
       }
     }
 
-    if (loginUser.get()) {
-      console.log(loginUser.get());
-      signPubkey = loginUser.get();
+    if (loginUser.value) {
+      console.log(loginUser.value);
+      signPubkey = loginUser.value;
     }
     $nowProgress = false;
   };

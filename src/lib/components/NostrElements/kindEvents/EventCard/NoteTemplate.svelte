@@ -56,10 +56,6 @@
   }: Props = $props();
   let petname = $derived(followList.get().get(note.pubkey));
 
-  let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
-  );
-
   let prof = $derived(profile(metadata));
   let isBirthDay = $derived(checkBirthDay(prof));
   let warning: string[] | undefined = $derived(checkContentWarning(note?.tags));

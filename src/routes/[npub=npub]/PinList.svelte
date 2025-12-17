@@ -26,7 +26,7 @@
     `10001:${userPubkey}:""`,
   ] as QueryKey);
 
-  let editable = $derived(userPubkey === $loginUser);
+  let editable = $derived(userPubkey === loginUser.value);
 
   let inputValue = $state("");
   let previewData = $state<{
@@ -237,7 +237,7 @@
   };
 </script>
 
-{#if userPubkey === loginUser.get()}
+{#if userPubkey === loginUser.value}
   <div class="flex flex-row-reverse gap-2 mx-1 items-center">
     <button
       class="rounded-md p-1 m-1 border border-magnum-300 text-magnum-300 font-bold hover:bg-magnum-800/50"

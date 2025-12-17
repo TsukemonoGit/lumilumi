@@ -16,7 +16,7 @@ import {
 } from "../../routes/notifications/notificationTypes";
 
 export const notifiSettings = createCustomStore<NotifiSettings>(notifiInit);
-export const loginUser = createCustomStore<string>("");
+export const loginUser: { value: string } = $state({ value: "" });
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
 export const timelineFilter =
   createCustomStore<TimelineFilter>(timelineFilterInit);
@@ -31,7 +31,7 @@ export let userStatusMap: SvelteMap<
 > = new SvelteMap();
 export const viewEventIds = createCustomStore<string[][]>([]);
 export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
-export const showBanner = createCustomStore<boolean>(true);
+export const showBanner: { value: boolean } = $state({ value: true });
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
 export const authRelay = createCustomStore<string[]>([]);
