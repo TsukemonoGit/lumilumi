@@ -1,160 +1,115 @@
-import { onMount } from "svelte";
-
-function debounce(func: () => void, wait: number) {
-  let timeout: ReturnType<typeof setTimeout>;
-  return () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(func, wait);
-  };
-}
+import type { Attachment } from "svelte/attachments";
+import { tick } from "svelte";
 
 export function useTruncate(
-  node: HTMLElement,
-  {
-    maxHeight,
-    isTruncated,
-    threshold,
-  }: {
+  getConfig: () => {
     maxHeight: number;
     isTruncated?: (value: boolean) => void;
     threshold: number;
   }
-) {
-  // debounce を使用してResizeObserverのループエラーを防ぐ
-  const checkHeight = debounce(() => {
-    // DOM が存在し、まだ接続されているかチェック
-    if (!node || !node.isConnected) {
+): Attachment {
+  return (element: Element) => {
+    if (!(element instanceof HTMLElement)) {
+      console.warn("useTruncate requires an HTMLElement");
       return;
     }
 
-    try {
-      const truncated = node.scrollHeight > maxHeight + threshold;
-      if (isTruncated) {
-        isTruncated(truncated);
+    let resizeObserver: ResizeObserver | null = null;
+    let isDestroyed = false;
+    let rafId: number | null = null;
+    let initialTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const checkHeight = () => {
+      if (isDestroyed || !element.isConnected) return;
+
+      try {
+        const { maxHeight, isTruncated, threshold } = getConfig();
+        const truncated = element.scrollHeight > maxHeight + threshold;
+        isTruncated?.(truncated);
+      } catch (error) {
+        console.warn("Height calculation error:", error);
       }
-    } catch (error) {
-      // サイズ計算でエラーが発生した場合は無視
-      console.warn("Height calculation error:", error);
-    }
-  }, 100); // debounce を短めに設定
+    };
 
-  let resizeObserver: ResizeObserver | null = null;
-  let isDestroyed = false;
-
-  function handleImageLoad() {
-    if (!isDestroyed) {
-      checkHeight();
-    }
-  }
-
-  onMount(() => {
-    // 初期チェックもdebounce
-    const initialCheck = debounce(() => {
-      if (!isDestroyed) {
+    // RAF で重複チェックを防止
+    const scheduledCheck = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
         checkHeight();
-      }
-    }, 50);
+      });
+    };
+
+    const initialCheck = async () => {
+      await tick();
+      if (isDestroyed) return;
+
+      // 即座チェック
+      scheduledCheck();
+
+      // 遅延チェック（メディア読み込み考慮）
+      initialTimeout = setTimeout(() => {
+        if (!isDestroyed) scheduledCheck();
+      }, 300);
+    };
 
     initialCheck();
 
-    // ResizeObserver でエラー処理を追加
-    try {
-      resizeObserver = new ResizeObserver((entries) => {
-        // エントリーが空の場合は処理しない
-        if (entries.length === 0 || isDestroyed) {
-          return;
-        }
+    // ResizeObserver
+    resizeObserver = new ResizeObserver(() => {
+      if (!isDestroyed) scheduledCheck();
+    });
+    resizeObserver.observe(element);
 
-        // RAF を使用してレンダリングサイクルと同期
-        requestAnimationFrame(() => {
-          if (!isDestroyed) {
-            checkHeight();
-          }
-        });
-      });
+    // メディア要素の読み込み監視
+    const handleMediaLoad = () => {
+      if (!isDestroyed) scheduledCheck();
+    };
 
-      resizeObserver.observe(node);
-    } catch (error) {
-      console.warn("ResizeObserver initialization failed:", error);
-    }
-
-    // 画像の読み込みが終わったときに高さをチェック
-    const images = node.querySelectorAll("img");
+    const images = element.querySelectorAll("img");
     images.forEach((img) => {
-      // 既に読み込み済みの画像もチェック
-      if (img.complete) {
-        handleImageLoad();
-      } else {
-        img.addEventListener("load", handleImageLoad, { once: true });
-        img.addEventListener("error", handleImageLoad, { once: true });
+      if (!img.complete) {
+        img.addEventListener("load", handleMediaLoad, { once: true });
+        img.addEventListener("error", handleMediaLoad, { once: true });
       }
+    });
+
+    const videos = element.querySelectorAll("video");
+    videos.forEach((video) => {
+      video.addEventListener("loadedmetadata", handleMediaLoad, { once: true });
+    });
+
+    const iframes = element.querySelectorAll("iframe");
+    iframes.forEach((iframe) => {
+      iframe.addEventListener("load", handleMediaLoad, { once: true });
     });
 
     return () => {
       isDestroyed = true;
 
-      if (resizeObserver) {
-        try {
-          resizeObserver.disconnect();
-        } catch (error) {
-          console.warn("ResizeObserver disconnect failed:", error);
-        }
-        resizeObserver = null;
-      }
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (initialTimeout) clearTimeout(initialTimeout);
+
+      resizeObserver?.disconnect();
+      resizeObserver = null;
 
       images.forEach((img) => {
-        img.removeEventListener("load", handleImageLoad);
-        img.removeEventListener("error", handleImageLoad);
+        img.removeEventListener("load", handleMediaLoad);
+        img.removeEventListener("error", handleMediaLoad);
       });
+
+      videos.forEach((video) => {
+        video.removeEventListener("loadedmetadata", handleMediaLoad);
+      });
+
+      iframes.forEach((iframe) => {
+        iframe.removeEventListener("load", handleMediaLoad);
+      });
+
+      if (element.style) {
+        element.style.maxHeight = "";
+        element.style.overflow = "";
+      }
     };
-  });
-
-  return {
-    update({
-      maxHeight: newMaxHeight,
-      threshold: newThreshold,
-    }: {
-      maxHeight: number;
-      threshold?: number;
-    }) {
-      if (isDestroyed) return;
-
-      maxHeight = newMaxHeight;
-      if (newThreshold !== undefined) {
-        threshold = newThreshold;
-      }
-
-      // update時もdebounce
-      const debouncedUpdate = debounce(() => {
-        if (!isDestroyed) {
-          checkHeight();
-        }
-      }, 50);
-
-      debouncedUpdate();
-    },
-
-    destroy() {
-      isDestroyed = true;
-
-      if (resizeObserver) {
-        try {
-          resizeObserver.disconnect();
-        } catch (error) {
-          console.warn("ResizeObserver disconnect in destroy failed:", error);
-        }
-        resizeObserver = null;
-      }
-
-      // スタイルのリセット
-      try {
-        if (node && node.style) {
-          node.style.maxHeight = "";
-          node.style.overflow = "";
-        }
-      } catch (error) {
-        console.warn("Style reset failed:", error);
-      }
-    },
   };
 }
