@@ -163,15 +163,15 @@
   });
 
   // 条件
-  let ready = $derived(
+  /*   let ready = $derived(
     leadRelayCount > 0 && connectedCount >= Math.ceil(leadRelayCount / 3)
   );
-  $inspect("[defaultRelay]", $defo, "[connedted ready]", ready);
+  $inspect("[defaultRelay]", $defo, "[connedted ready]", ready); */
 </script>
 
 {#if errorData}
   {@render error?.(errorData)}
-{:else if $defo && Object.values($defo).length > 0 && ready}
+{:else if $defo && Object.values($defo).length > 0}
   {@render contents?.()}
 {:else if status === "loading"}
   {@render loading?.()}
