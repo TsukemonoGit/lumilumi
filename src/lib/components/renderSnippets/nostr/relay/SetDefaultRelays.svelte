@@ -15,8 +15,9 @@
   import { defaultRelays as defo } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
   import { get, type Unsubscriber } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { lumiSetting, relayStateMap } from "$lib/stores/globalRunes.svelte";
   import { untrack } from "svelte";
+  import { cleanRelayUrl } from "$lib/func/util";
 
   interface Props {
     // pubkey: string;
@@ -125,7 +126,7 @@
       unsubError?.();
     };
   });
-  //$inspect($defo);
+
   let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();
   let errorData: Error | undefined = $state();
@@ -142,12 +143,35 @@
       setRelays(_relays);
     }
   });
-  // $inspect(data, localRelays, paramRelays, errorData);
+
+  let readRelays = $derived(
+    $defo ? Object.values($defo).filter((config) => config.read) : []
+  );
+
+  // リードリレー数
+  let leadRelayCount = $derived(Object.values($defo ?? {}).length);
+
+  // 接続済みリレー数
+  let connectedCount = $derived.by(() => {
+    // relayStateMapを参照することで変更を検知
+    const map = relayStateMap;
+    const readRelayUrls = readRelays.map((relay) => cleanRelayUrl(relay.url));
+
+    return [...map.entries()].filter(
+      ([url, state]) => readRelayUrls.includes(url) && state === "connected"
+    ).length;
+  });
+
+  // 条件
+  let ready = $derived(
+    leadRelayCount > 0 && connectedCount >= Math.ceil(leadRelayCount / 3)
+  );
+  $inspect("[defaultRelay]", $defo, "[connedted ready]", ready);
 </script>
 
 {#if errorData}
   {@render error?.(errorData)}
-{:else if $defo && Object.values($defo).length > 0}
+{:else if $defo && Object.values($defo).length > 0 && ready}
   {@render contents?.()}
 {:else if status === "loading"}
   {@render loading?.()}

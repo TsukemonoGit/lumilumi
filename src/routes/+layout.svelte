@@ -299,10 +299,10 @@
     {#snippet contents({ localRelays })}
       <SetDefaultRelays paramRelays={dataRelays} {localRelays}>
         {#snippet loading()}
-          loading
+          Connecting to relays
         {/snippet}
 
-        {#snippet error()}error
+        {#snippet error()}An error occurred while connecting to relays
         {/snippet}
         {#snippet contents()}
           {#if lumiSetting.get().pubkey}<!--どのページでもkind3読み込んであるようにここに書いておく-->

@@ -25,40 +25,23 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
 
-  let isOnMount = false;
   let since: number | undefined = $state(undefined);
-  let timelineQuery: QueryKey = ["timeline", "feed", lumiSetting.get().pubkey];
+  let timelineQuery: QueryKey = $derived([
+    "timeline",
+    "feed",
+    lumiSetting.get().pubkey,
+  ]);
 
-  onMount(async () => {
-    if (!isOnMount) {
-      isOnMount = true;
-      await init();
-
-      isOnMount = false;
-    }
-  });
-  afterNavigate(async (navigate) => {
-    if (navigate.type !== "form" && !isOnMount) {
-      isOnMount = true;
-      await init();
-
-      isOnMount = false;
-    }
-  });
   $effect(() => {
     if (lumiSetting.get().pubkey) {
       untrack(async () => {
-        if (!isOnMount) {
-          isOnMount = true;
-          await init();
-          isOnMount = false;
-        }
+        await init();
       });
     }
   });
   async function init() {
     since = undefined;
-    if (!lumiSetting.get().pubkey) return;
+
     const ev: EventPacket[] | undefined = queryClient?.getQueryData([
       ...timelineQuery,
       "olderData",
