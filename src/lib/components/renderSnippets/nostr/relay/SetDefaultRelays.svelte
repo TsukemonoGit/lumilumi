@@ -69,25 +69,14 @@
         ? localRelays
         : []
   );
-  let result: ReqResult<DefaultRelayConfig[]> | undefined = $state(undefined);
 
-  $effect(() => {
-    if (!zyouken) {
-      untrack(() => {
-        result = useRelaySet(queryKey, filters, req);
-      });
-    }
-  });
-
-  let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
-  let status: ReqStatus | undefined = $state();
-  let errorData: Error | undefined = $state();
   $effect(() => {
     let unsubData: Unsubscriber | undefined;
     let unsubStatus: Unsubscriber | undefined;
     let unsubError: Unsubscriber | undefined;
-    if (result) {
+    if (!zyouken) {
       untrack(() => {
+        const result = useRelaySet(queryKey, filters, req);
         unsubData = result?.data.subscribe(
           (value: DefaultRelayConfig[] | null | undefined) => {
             if (value && value.length > 0) {
@@ -115,6 +104,12 @@
           if (value) {
             errorData = value;
           }
+          if (!data && _relays.length > 0) {
+            setRelays(_relays);
+          } else if (!data && !lumiSetting.get().pubkey) {
+            //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
+            setRelays(defaultRelays);
+          }
         });
       });
     } else if (_relays.length > 0) {
@@ -123,7 +118,6 @@
       //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
       setRelays(defaultRelays);
     }
-
     // クリーンアップ
     return () => {
       unsubData?.();
@@ -131,6 +125,10 @@
       unsubError?.();
     };
   });
+  //$inspect($defo);
+  let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
+  let status: ReqStatus | undefined = $state();
+  let errorData: Error | undefined = $state();
 
   app.subscribe((value) => {
     // console.log(value, localRelays, paramRelays);
