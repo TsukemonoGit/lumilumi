@@ -34,7 +34,7 @@ export function useRelaySet(
         RxReqPipeable)
     | undefined
 ): ReqResult<DefaultRelayConfig[]> | undefined {
-  console.log(relaySearchRelays, queryKey);
+  // console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
 
   const operator = pipe(tie, uniq(), saveEachNote(), completeOnTimeout(5000));
