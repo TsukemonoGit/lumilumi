@@ -143,7 +143,7 @@
       setRelays(_relays);
     }
   });
-
+  /*  
   let readRelays = $derived(
     $defo ? Object.values($defo).filter((config) => config.read) : []
   );
@@ -163,7 +163,7 @@
   });
 
   // 条件
-  /*   let ready = $derived(
+ let ready = $derived(
     leadRelayCount > 0 && connectedCount >= Math.ceil(leadRelayCount / 3)
   );
   $inspect("[defaultRelay]", $defo, "[connedted ready]", ready); */
