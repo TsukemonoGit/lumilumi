@@ -208,11 +208,16 @@
       return "ogp";
     }
 
+    // 読み込み失敗時は常にOGPにフォールバック
+    if (embedState.loadFailed) {
+      return "ogp";
+    }
+
     if (!shouldExpand) {
       return "button";
     }
 
-    if (!embedEnabled || embedState.loadFailed) {
+    if (!embedEnabled) {
       return "ogp";
     }
 
