@@ -106,15 +106,18 @@ export const fetchOgpContent = async (
 };
 
 // YouTubeのURLからビデオIDを抽出する関数
+
 export function getYoutubeVideoId(url: string): string | null {
   if (!isvalidURL(url)) return null;
 
   const urlObj = new URL(url);
+  const hostname = urlObj.hostname.toLowerCase();
 
-  // youtube.comドメインの場合
+  // youtube.comドメインの場合（モバイル版含む）
   if (
-    urlObj.hostname === "www.youtube.com" ||
-    urlObj.hostname === "youtube.com"
+    hostname === "www.youtube.com" ||
+    hostname === "youtube.com" ||
+    hostname === "m.youtube.com"
   ) {
     // 通常の動画URL (watch?v=XXXX)
     const videoId = urlObj.searchParams.get("v");
@@ -126,7 +129,7 @@ export function getYoutubeVideoId(url: string): string | null {
     }
   }
   // youtu.beドメインの場合（短縮URL）
-  else if (urlObj.hostname === "youtu.be") {
+  else if (hostname === "youtu.be") {
     // パスから直接ビデオID取得 (/XXXX)
     return urlObj.pathname.substring(1);
   }
