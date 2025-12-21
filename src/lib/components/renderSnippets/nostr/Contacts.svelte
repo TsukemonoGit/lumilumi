@@ -32,8 +32,15 @@
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
   }
 
-  let { req, relays, queryKey, pubkey, loading, nodata, content }: Props =
-    $props();
+  let {
+    req = undefined,
+    relays = undefined,
+    queryKey,
+    pubkey,
+    loading,
+    nodata,
+    content,
+  }: Props = $props();
 
   let storageKind3: Nostr.Event | undefined = $state<Nostr.Event | undefined>(
     undefined
