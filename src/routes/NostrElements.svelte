@@ -153,9 +153,7 @@
           <MakeNewKind3 />{/await}
       </div>
     {/snippet}
-    {#snippet error()}
-      <div><MakeNewKind3 /></div>
-    {/snippet}
+
     {#snippet nodata()}
       <div><MakeNewKind3 /></div>
     {/snippet}

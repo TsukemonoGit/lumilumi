@@ -599,11 +599,6 @@
                 <EmptyCardList length={10} />
               {/snippet}
 
-              {#snippet error()}
-                <div class="p-1">
-                  <p>{error}</p>
-                </div>
-              {/snippet}
               {#snippet nodata()}
                 <div class="p-1">
                   <p>nodata</p>
