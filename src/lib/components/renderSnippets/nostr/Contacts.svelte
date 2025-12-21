@@ -78,19 +78,17 @@
   let status: Readable<ReqStatus> | undefined = $derived(result?.status);
 
   let kind3Data: Nostr.Event<number> | undefined = $derived.by(() => {
-    const eventData = data && $data?.event;
-
-    if (eventData) {
-      return storageKind3 && storageKind3.created_at > eventData.created_at
-        ? storageKind3
-        : eventData;
+    if ($status === "success" || $status === "error") {
+      const eventData = data && $data?.event;
+      if (eventData && eventData.created_at > (storageKind3?.created_at || 0)) {
+        return eventData;
+      } else {
+        return storageKind3;
+      }
+    } else {
+      //loading中はまだローカルデータをセットしない
+      return undefined;
     }
-
-    if (($status === "success" || $status === "error") && !eventData) {
-      return storageKind3;
-    }
-
-    return undefined;
   });
 
   $effect(() => {
