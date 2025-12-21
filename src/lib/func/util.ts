@@ -193,55 +193,6 @@ export function datetime(unixtime: number) {
 
   return time.toISOString();
 }
-/* 
-export async function fileUpload(
-  file: File,
-  uploader: string,
-  signal?: AbortSignal // 新たに signal を受け取る
-): Promise<FileUploadResponse[]> {
-  console.log(file, uploader);
-  let res: FileUploadResponse[] = [];
-
-  try {
-    const serverConfig = await readServerConfig(uploader);
-    console.log(serverConfig);
-    const header = await getToken(
-      serverConfig.api_url,
-      "POST",
-      async (e) => await (window.nostr as Nostr.Nip07.Nostr).signEvent(e),
-      true
-    );
-    // console.log(file);
-    //console.log(header);
-    // console.log(serverConfig.api_url);
-    //console.log(file.type);
-    const response: FileUploadResponse = await uploadFile(file, {
-      serverApiUrl: serverConfig.api_url,
-      nip98AuthorizationHeader: header,
-      optionalFormDataFields: { content_type: file.type },
-      signal: signal, // signal を渡す
-      imageQuality: lumiSetting.get().picQuarity,
-    });
-    console.log(response);
-    res.push(response);
-  } catch (error: any) {
-    if (error.name === "AbortError") {
-      console.log("Upload aborted:", file.name);
-      res.push({
-        status: "error",
-        message: "Upload aborted: " + file.name,
-      } as FileUploadResponse);
-    } else {
-      console.error("Error uploading file:", error);
-      res.push({
-        status: "error",
-        message: "Failed to upload file: " + file.name,
-      } as FileUploadResponse);
-    }
-  }
-
-  return res;
-} */
 
 export const generateResultMessage = (
   isSuccess: string[],
@@ -391,13 +342,6 @@ export const nip19Decode = (
     return undefined;
   }
 };
-export async function awaitInterval(time: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, time);
-  });
-}
 
 export function splitArray<T>(array: T[], chunkSize: number): T[][] {
   return array.reduce((acc, _, index) => {

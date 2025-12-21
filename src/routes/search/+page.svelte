@@ -1,6 +1,6 @@
 <script lang="ts">
   import { usePromiseReq } from "$lib/func/nostr";
-  import { awaitInterval, generateResultMessage } from "$lib/func/util";
+  import { delay, generateResultMessage } from "$lib/func/util";
 
   import SearchResult from "./SearchResult.svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
@@ -68,7 +68,7 @@
       if (waitedTime >= maxWaitTime) {
         return;
       }
-      await awaitInterval(interval);
+      await delay(interval);
       waitedTime += interval;
     }
     return;

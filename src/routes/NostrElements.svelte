@@ -14,7 +14,7 @@
   import FolloweeFilteredEventList from "../lib/components/NostrElements/FolloweeFilteredEventList.svelte";
 
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { awaitInterval } from "$lib/func/util";
+  import { delay } from "$lib/func/util";
   import MakeNewKind3 from "../lib/components/NostrElements/kindEvents/MakeNewKind3.svelte";
   import SampleGlobalLink from "../lib/components/NostrElements/kindEvents/SampleGlobalLink.svelte";
   import MainTimeline from "../lib/components/renderSnippets/nostr/MainTimeline.svelte";
@@ -172,7 +172,7 @@
             </div>{/snippet}
           {#snippet loading()}
             <div>
-              {#await awaitInterval(3000) then}event loading <SampleGlobalLink
+              {#await delay(3000) then}event loading <SampleGlobalLink
                 />{/await}
             </div>
           {/snippet}
