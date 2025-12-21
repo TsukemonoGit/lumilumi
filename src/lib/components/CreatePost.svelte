@@ -278,7 +278,7 @@
               console.log("Converting meta tags...", nip94_event);
               tags.push(convertMetaTags(nip94_event));
             }
-            await delay(10);
+            await delay(100);
             insertTextAtCursor(uploadUrl, {
               addSpaceBefore: true,
               addSpaceAfter: true,
