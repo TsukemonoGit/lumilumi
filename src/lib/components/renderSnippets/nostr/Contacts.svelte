@@ -78,8 +78,8 @@
   let status: Readable<ReqStatus> | undefined = $derived(result?.status);
 
   let kind3Data: Nostr.Event<number> | undefined = $derived.by(() => {
-    const eventData = data && $data?.event;
     if ($status === "success" || $status === "error") {
+      const eventData = data && $data?.event;
       if (eventData && eventData.created_at > (storageKind3?.created_at || 0)) {
         return eventData;
       } else {
