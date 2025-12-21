@@ -147,13 +147,6 @@
     queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
     pubkey={lumiSetting.get().pubkey}
   >
-    {#snippet loading()}
-      <div>
-        {#await awaitInterval(3000) then}
-          <MakeNewKind3 />{/await}
-      </div>
-    {/snippet}
-
     {#snippet nodata()}
       <div><MakeNewKind3 /></div>
     {/snippet}
