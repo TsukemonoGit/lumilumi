@@ -36,10 +36,10 @@ export function useReplaceableEvent(
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
 
   const operator = pipe(
-    tie, // リレー接続状態に応じた再実行制御
-    uniq(), // 重複イベント除去(同一idは1回のみ通過)
+    tie,
+    uniq(),
     debounceTime(bufferTimeMs), // 最後の受信からN ms経過後に処理開始
-    latest() // created_atが最新のイベントのみ出力
+    latest()
   );
 
   return useReq(
