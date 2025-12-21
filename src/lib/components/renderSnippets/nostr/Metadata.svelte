@@ -77,7 +77,18 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
 
-  let metadata = $derived($data?.event ?? localData?.event);
+  let metadata = $derived.by(() => {
+    const localEvent = localData?.event;
+    const remoteEvent = $data?.event;
+
+    if (!remoteEvent) return localEvent;
+    if (!localEvent) return remoteEvent;
+
+    return localEvent.created_at > remoteEvent.created_at
+      ? localEvent
+      : remoteEvent;
+  });
+
   $effect(() => {
     if (metadata) {
       untrack(() => onChange?.(metadata));
