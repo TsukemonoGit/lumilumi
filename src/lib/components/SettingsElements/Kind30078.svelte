@@ -60,7 +60,7 @@
         theme: localStorage.getItem(STORAGE_KEYS.THEME) ?? "system",
         colorScheme:
           localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) ?? "default",
-        timelineFilter: timelineFilter.get(),
+        timelineFilter: timelineFilter,
         uploader: $uploader,
         globalRegexFilter:
           localStorage.getItem(STORAGE_KEYS.REGEX_FILTER) ?? "",
@@ -265,8 +265,8 @@
             ...(filter.global || {}),
           },
         };
+        Object.assign(timelineFilter, mergedFilter);
 
-        timelineFilter.set(mergedFilter);
         try {
           localStorage?.setItem(
             STORAGE_KEYS.TIMELINE_FILTER,
@@ -285,7 +285,9 @@
 
         // エラー時はデフォルト値を使用
         const defaultFilter = { ...timelineFilterInit };
-        timelineFilter.set(defaultFilter);
+
+        Object.assign(timelineFilter, defaultFilter);
+
         try {
           localStorage?.setItem(
             STORAGE_KEYS.TIMELINE_FILTER,

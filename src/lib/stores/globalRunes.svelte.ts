@@ -18,8 +18,7 @@ import {
 export const notifiSettings = createCustomStore<NotifiSettings>(notifiInit);
 export const loginUser: { value: string } = $state({ value: "" });
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
-export const timelineFilter =
-  createCustomStore<TimelineFilter>(timelineFilterInit);
+export const timelineFilter: TimelineFilter = $state(timelineFilterInit);
 export const followList = createCustomStore<Map<string, string | undefined>>(
   new Map()
 );

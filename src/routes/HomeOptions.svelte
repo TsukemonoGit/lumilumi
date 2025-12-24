@@ -1,44 +1,43 @@
-<!--HomeOption.svelte-->
 <script lang="ts">
-  import { createRadioGroup, melt } from "@melt-ui/svelte";
+  import { RadioGroup } from "melt/builders";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { writable } from "svelte/store";
   import { timelineFilter } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { browser } from "$app/environment";
+  import { untrack } from "svelte";
 
-  const optionsArr = [
-    ["0", `${$_("filter.canversation.all")}`],
-    ["1", `${$_("filter.canversation.onlyFollowee")}`],
-    ["2", `${$_("filter.canversation.none")}`],
-  ];
+  const group = new RadioGroup({});
 
-  const selected = writable<string>(
-    optionsArr[timelineFilter.get().selectCanversation][0]
-  );
+  let optionsArr = $derived([
+    ["0", $_("filter.canversation.all")],
+    ["1", $_("filter.canversation.onlyFollowee")],
+    ["2", $_("filter.canversation.none")],
+  ]);
 
-  const {
-    elements: { root, item, hiddenInput },
-    helpers: { isChecked },
-  } = createRadioGroup({
-    defaultValue: optionsArr[timelineFilter.get().selectCanversation][0],
-    value: selected,
+  // runesの値をRadioGroupに同期
+  $effect(() => {
+    group.value = timelineFilter.selectCanversation.toString();
   });
-  // $: console.log(timelineFilter.get.adaptMute);
-  selected.subscribe((value) => {
-    if (value !== undefined && value !== null) {
-      timelineFilter.update((cur) => {
-        console.log(cur);
-        try {
-          const tlFilter = { ...cur, selectCanversation: Number(value) };
-          localStorage.setItem(
-            STORAGE_KEYS.TIMELINE_FILTER,
-            JSON.stringify(tlFilter)
-          );
 
-          return tlFilter;
-        } catch (error) {
-          console.log("Failed to save");
-          return cur;
+  // RadioGroupの変更をrunesとlocalStorageに反映
+  $effect(() => {
+    const value = group.value;
+    if (value !== undefined && value !== null) {
+      untrack(() => {
+        const numValue = Number(value);
+        if (timelineFilter.selectCanversation !== numValue) {
+          timelineFilter.selectCanversation = numValue;
+
+          if (browser) {
+            try {
+              localStorage.setItem(
+                STORAGE_KEYS.TIMELINE_FILTER,
+                JSON.stringify(timelineFilter)
+              );
+            } catch (error) {
+              console.warn("Failed to save timelineFilter:", error);
+            }
+          }
         }
       });
     }
@@ -49,30 +48,34 @@
   <div class="section-title">
     {$_("filter.menu.canversation")}
   </div>
-  <div use:melt={$root} class="radio-group" aria-label="View density">
+  <div {...group.root} class="radio-group" aria-label="Conversation filter">
     {#each optionsArr as [index, option]}
+      {@const item = group.getItem(index)}
       <div class="radio-item">
         <button
-          use:melt={$item(index)}
+          {...item.attrs}
           class="radio-button"
-          id={option}
-          aria-labelledby="{option}-label"
+          id="conversation-{index}"
+          aria-labelledby="conversation-{index}-label"
         >
-          {#if $isChecked(index)}
+          {#if item.checked}
             <div class="radio-indicator"></div>
           {/if}
         </button>
-        <label for={option} id="{option}-label" class="option-label">
+        <label
+          for="conversation-{index}"
+          id="conversation-{index}-label"
+          class="option-label"
+        >
           {option}
         </label>
       </div>
     {/each}
-    <input name="line-height" use:melt={$hiddenInput} />
+    <input {...group.hiddenInput} />
   </div>
 </li>
 
 <style lang="postcss">
-  /* オプションセクション共通スタイル */
   .option-section {
     padding: 12px;
     margin-bottom: 8px;
@@ -86,7 +89,6 @@
     margin-bottom: 0;
   }
 
-  /* セクションタイトル */
   .section-title {
     font-size: 0.875rem;
     font-weight: 600;
@@ -96,7 +98,6 @@
     border-bottom: 1px solid theme("colors.neutral.700");
   }
 
-  /* ラジオボタングループ */
   .radio-group {
     display: flex;
     flex-direction: column;
@@ -133,18 +134,6 @@
     background-color: theme("colors.magnum.400");
   }
 
-  /* チェックボックスグループ */
-  .checkbox-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .checkbox-item {
-    padding: 4px 0;
-  }
-
-  /* 共通のラベルスタイル */
   .option-label {
     display: flex;
     align-items: center;
@@ -153,22 +142,5 @@
     color: theme("colors.neutral.200");
     cursor: pointer;
     user-select: none;
-  }
-
-  /* チェックボックスのスタイル調整 */
-  .rounded-checkbox {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
-
-  .option {
-    @apply absolute top-0 h-8 flex  right-8;
-  }
-
-  @media (max-width: 768px) {
-    .option {
-      @apply absolute top-0 h-8 flex right-0;
-    }
   }
 </style>

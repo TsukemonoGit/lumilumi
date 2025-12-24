@@ -175,18 +175,17 @@
     events: EventPacket[],
     targetMap: Map<string, Nostr.Event>
   ): number {
-    let count = 0;
-    events.forEach((pk) => {
+    return events.reduce((count, pk) => {
       const event = pk.event;
       if (
         eventFilter(event) &&
         event.created_at <= now() + CONFIG.FUTURE_EVENT_TOLERANCE
       ) {
         targetMap.set(event.id, event);
-        count++;
+        return count + 1;
       }
-    });
-    return count;
+      return count;
+    }, 0);
   }
 
   /**
@@ -587,9 +586,10 @@
   });
 
   $effect(() => {
-    if (timelineFilter.get()) {
-      untrack(() => updateViewEvent());
-    }
+    // オブジェクト全体を展開して全プロパティを参照
+    const _ = { ...timelineFilter };
+
+    untrack(() => updateViewEvent());
   });
 
   onDestroy(() => {

@@ -79,9 +79,7 @@
     return eMutes.includes(id);
   }
   let timelineQuery = $derived(["channel", "feed", data.id]); //部屋から部屋に移動したときにconstだとだめだった
-  let isMute = $derived(
-    channelMuteCheck(data.id, timelineFilter.get().adaptMute)
-  );
+  let isMute = $derived(channelMuteCheck(data.id, timelineFilter.adaptMute));
   let heyaRelay: string = $state("");
 </script>
 

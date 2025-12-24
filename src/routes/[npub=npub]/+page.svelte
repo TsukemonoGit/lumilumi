@@ -34,7 +34,7 @@
   import PaginationList from "../../lib/components/NostrElements/UserTabs/PaginationList.svelte";
   import Metadatanoyatu from "./Metadatanoyatu.svelte";
 
-  import { profile } from "$lib/func/util";
+  import { delay, profile } from "$lib/func/util";
 
   import CustomEmojiTab from "$lib/components/NostrElements/UserTabs/CustomEmojiTab.svelte";
   import BookmarkTab from "$lib/components/NostrElements/UserTabs/BookmarkTab.svelte";
@@ -248,74 +248,75 @@
           use:melt={$content("post")}
           class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
         >
-          {#if $value === "post"}
-            <PinList {userPubkey} />
+          {#await delay(100) then}
+            {#if $value === "post"}
+              <PinList {userPubkey} />
 
-            {#if since && Object.keys($defaultRelays).length > 0}
-              <TimelineList
-                queryKey={timelineQuery}
-                filters={[
-                  {
-                    kinds: [1, 6, 16],
+              {#if since && Object.keys($defaultRelays).length > 0}
+                <TimelineList
+                  queryKey={timelineQuery}
+                  filters={[
+                    {
+                      kinds: [1, 6, 16],
 
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                olderFilters={[
-                  {
-                    kinds: [1, 6, 16],
+                      authors: [userPubkey],
+                      since: since,
+                    },
+                  ]}
+                  olderFilters={[
+                    {
+                      kinds: [1, 6, 16],
 
-                    authors: [userPubkey],
-                    since: since,
-                  },
-                ]}
-                {req}
-                {amount}
-              >
-                {#snippet content({ events, len })}
-                  <!-- <SetRepoReactions /> -->
+                      authors: [userPubkey],
+                      since: since,
+                    },
+                  ]}
+                  {req}
+                  {amount}
+                >
+                  {#snippet content({ events, len })}
+                    <!-- <SetRepoReactions /> -->
 
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                      >
-                        {#snippet loading()}
-                          <div>
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet nodata()}
-                          <div>
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet error()}
-                          <div>
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet content({ metadata })}
-                          <EventCard {metadata} note={event} />
-                        {/snippet}
-                      </Metadata>
-                      <!-- </div> -->
-                    {/each}
-                  {/if}
-                {/snippet}
-                {#snippet loading()}
-                  <EmptyCardList length={10} />
-                {/snippet}
+                    {#if events && events.length > 0}
+                      {#each events as event, index (event.id)}
+                        <Metadata
+                          queryKey={["metadata", event.pubkey]}
+                          pubkey={event.pubkey}
+                        >
+                          {#snippet loading()}
+                            <div>
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet nodata()}
+                            <div>
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet error()}
+                            <div>
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet content({ metadata })}
+                            <EventCard {metadata} note={event} />
+                          {/snippet}
+                        </Metadata>
+                        <!-- </div> -->
+                      {/each}
+                    {/if}
+                  {/snippet}
+                  {#snippet loading()}
+                    <EmptyCardList length={10} />
+                  {/snippet}
 
-                {#snippet error()}
-                  <div>
-                    <p>{error}</p>
-                  </div>
-                {/snippet}
-              </TimelineList>{/if}
-          {/if}
+                  {#snippet error()}
+                    <div>
+                      <p>{error}</p>
+                    </div>
+                  {/snippet}
+                </TimelineList>{/if}
+            {/if}{/await}
         </div>
         <div
           use:melt={$content("chat")}
