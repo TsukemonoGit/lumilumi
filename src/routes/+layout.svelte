@@ -146,9 +146,12 @@
         if (stored) {
           try {
             const parsed = JSON.parse(stored) as UploaderOption;
-            uploader.set(parsed);
+            Object.assign(uploader, parsed);
           } catch {
-            uploader.set({ type: "nip96", address: stored } as UploaderOption);
+            Object.assign(uploader, {
+              type: "nip96",
+              address: stored,
+            } as UploaderOption);
           }
         }
 

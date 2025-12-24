@@ -32,7 +32,7 @@
     states: { selectedLabel, open },
     helpers: { isSelected },
   } = createSelect<UploaderOption>({
-    defaultSelected: { value: $uploader },
+    defaultSelected: { value: uploader },
     forceVisible: true,
     positioning: {
       placement: "bottom",
@@ -41,7 +41,9 @@
     },
     onSelectedChange: ({ curr, next }) => {
       if (next?.value) {
-        $uploader = next.value;
+        uploader.address = next.value.address;
+        uploader.type = next.value.type;
+
         localStorage.setItem(STORAGE_KEYS.UPLOADER, JSON.stringify(next.value));
       }
       return next; // ChangeFn なので next を返す
@@ -56,8 +58,8 @@
     use:melt={$trigger}
     aria-label="Uploader"
   >
-    {$uploader.address
-      ? `[${$uploader.type}] ${getHostname($uploader.address)}`
+    {uploader.address
+      ? `[${uploader.type}] ${getHostname(uploader.address)}`
       : "Select an uploader"}
     <ChevronDown class="size-5" />
   </button>

@@ -27,7 +27,7 @@
   };
 
   const handleFileUpload = async (fileList: FileList) => {
-    if (!fileList || fileList.length <= 0 || !uploader.get()) return;
+    if (!fileList || fileList.length <= 0 || !uploader) return;
     $nowProgress = true;
 
     // 既存のアップロードがある場合はキャンセルする
@@ -41,7 +41,7 @@
     try {
       const uploadedURPs: FileUploadResponse[] = await filesUpload(
         fileList,
-        $uploader,
+        uploader,
         uploadAbortController.signal // アップロード中断のシグナルを渡す
       );
 
