@@ -346,7 +346,7 @@ function setReactionEvent(packet: EventPacket) {
 
   // 未観測の場合のみ追加
   //ミュートチェックする
-  if (!timelineFilter.get().adaptMute || muteCheck(packet.event) === "null") {
+  if (!timelineFilter.adaptMute || muteCheck(packet.event) === "null") {
     observedEvents.add(packet.event.id);
 
     reactionToast.set({

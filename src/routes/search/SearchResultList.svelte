@@ -278,7 +278,7 @@
     ]);
     //console.log(olderdatas);
     const allEvents = [...($data || []), ...(olderdatas || [])];
-    console.log("update", allEvents);
+    // console.log("update", allEvents);
 
     const uniqueEvents = sortEvents(
       Array.from(

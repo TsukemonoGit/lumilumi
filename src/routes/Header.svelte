@@ -55,23 +55,20 @@
   });
   // $inspect(_showBanner);
   let Icon = $derived(currentPage?.Icon);
+
   const onMuteChange = () => {
-    timelineFilter.update((cur) => {
-      console.log(cur);
+    timelineFilter.adaptMute = !timelineFilter.adaptMute;
+
+    if (browser) {
       try {
-        const tlFilter = { ...cur, adaptMute: !cur.adaptMute };
-        if (browser) {
-          localStorage.setItem(
-            STORAGE_KEYS.TIMELINE_FILTER,
-            JSON.stringify(tlFilter)
-          );
-        }
-        return tlFilter;
+        localStorage.setItem(
+          STORAGE_KEYS.TIMELINE_FILTER,
+          JSON.stringify(timelineFilter)
+        );
       } catch (error: any) {
         console.warn("Failed to save timelineFilter:", error);
-        return cur;
       }
-    });
+    }
   };
 </script>
 
@@ -110,7 +107,7 @@
                     <input
                       type="checkbox"
                       class="rounded-checkbox"
-                      checked={timelineFilter.get().adaptMute}
+                      checked={timelineFilter.adaptMute}
                       onchange={onMuteChange}
                     />
                     {$_("filter.menu.muteOn")}

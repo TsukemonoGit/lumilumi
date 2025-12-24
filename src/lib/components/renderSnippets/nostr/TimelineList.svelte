@@ -447,7 +447,7 @@
   };
 
   $effect(() => {
-    if (timelineFilter.get()) {
+    if (timelineFilter) {
       untrack(() => updateViewEvent?.($globalData));
     }
   });

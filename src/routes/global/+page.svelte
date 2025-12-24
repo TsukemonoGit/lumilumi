@@ -222,7 +222,7 @@
    */
   const checkGlobalFilter = (note: Nostr.Event): boolean => {
     try {
-      const filter = timelineFilter.get();
+      const filter = timelineFilter;
       const global = filter?.global;
 
       if (!global) return true;

@@ -1,6 +1,15 @@
 // sum.test.js
 import { expect, test } from "vitest";
 import { parseText } from "./content";
+const testEvent = {
+  content: "https://m.youtube.com/watch?v=Get3bvmmD64",
+  created_at: 1766225693,
+  id: "2478d792c2746af6b897e8b481aeb8f41bf95f49b132a765c70d55c77e770772",
+  kind: 1,
+  pubkey: "96203d66276e3214ea93b6c78a577c3c9a7279f9ee7e51b22f3b8c17643a819c",
+  sig: "a146ccc5880ee36844453391df84b3d212c73b41339ab7350e68e9f6880e90f0028690043e7e3888283142f9a0af60eb34091d478335cb39e196a365941a5fd1",
+  tags: [["r", "https://m.youtube.com/watch?v=Get3bvmmD64"]],
+};
 
 const testcontent =
   "lnbc200u1png5z54pp5chs5g354nd83t99ltnhdul8acaywsal9rdczeeu6tl43nega3jtsdz29pjxjumrda6kuar9vs5jqmn0wd68ytnzw45kcepqxycyw62zypskgepqdahzqum5daexzem9yqcqzzsxqrrsssp5u0jl5c3xwar6kzv9k73fpaeckxpn84lu3t3vkfjer39n9n8cgprs9qxpqysgq4vf56c827rhleyyn6eyadunmlyq25kscvrxamvax7xajg7n75td88zjl0dl0r2q8505eavyh8y3ycc3slfwehzncwe9av6g8qytm8xgphg4y60";

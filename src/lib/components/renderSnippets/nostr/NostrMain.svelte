@@ -84,7 +84,7 @@
         }
       }
 
-      timelineFilter.set(defaultFilter);
+      Object.assign(timelineFilter, defaultFilter);
       try {
         localStorage.setItem(
           STORAGE_KEYS.TIMELINE_FILTER,

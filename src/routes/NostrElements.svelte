@@ -39,6 +39,7 @@
       });
     }
   });
+
   async function init() {
     since = undefined;
 
@@ -47,7 +48,7 @@
       "olderData",
     ]);
     if (!ev || ev.length <= 0) {
-      since = now() - 15 * 60; //15分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する
+      since = now() - 15 * 60;
     } else {
       const data: EventPacket[] | undefined =
         queryClient?.getQueryData(timelineQuery);
@@ -77,11 +78,7 @@
     }
   };
 
-  function checkCanvasation(
-    note: Nostr.Event,
-
-    select: number
-  ): boolean {
+  function checkCanvasation(note: Nostr.Event, select: number): boolean {
     if (page.url.pathname !== "/") {
       return true;
     }
@@ -98,41 +95,43 @@
       )
       .map((tag) => tag[1]);
 
-    //ログインユーザーの会話はどれでも表示
     if (
       note.pubkey === lumiSetting.get().pubkey ||
       pTags.includes(lumiSetting.get().pubkey)
     ) {
       return true;
     }
-    //自分以外のpTags
+
     if (select === 2) {
-      if (pTags.length > 0) {
-        return false;
-      } else {
-        return true;
-      }
+      return pTags.length === 0;
     }
+
     if (select === 1) {
       if (pTags.length <= 0) {
         return true;
       }
-      // フォローリストに一つも含まれない場合は false を返す
-      const hasFollowed = pTags.some((pub) => followList.get().has(pub));
-      return hasFollowed;
-    } else {
-      return true;
+      return pTags.some((pub) => followList.get().has(pub));
     }
+
+    return true;
   }
 
-  //kind0がTLに流れるのをあれするやつ
-  const excludeKind0 = (note: Nostr.Event): boolean => {
-    if (note.kind === 0) {
-      return false;
-    } else {
-      return true;
-    }
+  const excludeKind0 = (note: Nostr.Event): boolean => note.kind !== 0;
+
+  // フィルター関数を合成
+  const composeFilters = (
+    ...filters: Array<(note: Nostr.Event) => boolean>
+  ) => {
+    return (note: Nostr.Event) => filters.every((filter) => filter(note));
   };
+
+  // 合成されたイベントフィルター
+  const eventFilter = $derived(
+    composeFilters(
+      (note) => checkCanvasation(note, timelineFilter.selectCanversation),
+      excludeKind0
+    )
+  );
 </script>
 
 {#if !lumiSetting.get().pubkey}
@@ -156,20 +155,15 @@
           queryKey={timelineQuery}
           filters={makeMainFilters(contacts, since).mainFilters}
           olderFilters={makeMainFilters(contacts, since).olderFilters}
-          eventFilter={(note) => {
-            return (
-              checkCanvasation(note, timelineFilter.get().selectCanversation) &&
-              excludeKind0(note)
-            );
-          }}
+          {eventFilter}
         >
           {#snippet content({ events, len })}
-            <!-- <SetRepoReactions /> -->
             <div
               class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
             >
               <FolloweeFilteredEventList {events} />
-            </div>{/snippet}
+            </div>
+          {/snippet}
           {#snippet loading()}
             <div>
               {#await delay(3000) then}event loading <SampleGlobalLink

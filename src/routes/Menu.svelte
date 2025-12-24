@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { AlignJustify, House, TrendingUp } from "lucide-svelte";
+  import { TextAlignJustify, House, TrendingUp } from "lucide-svelte";
   import { fade, fly } from "svelte/transition";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
@@ -85,7 +85,7 @@
       class="trigger"
       use:melt={$trigger}
       aria-label="Update dimensions"
-      ><AlignJustify class="size-6" />
+      ><TextAlignJustify class="size-6" />
     </button>
     <button onclick={handleClickHome} class="trigger" title="Home"
       ><House class="size-6" />
