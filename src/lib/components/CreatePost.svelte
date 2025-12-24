@@ -238,7 +238,7 @@
   // ----------------------------------------
   // デバッグ用のエラーハンドリングを追加
   async function handleFileUpload(fileList: FileList) {
-    if (!fileList || fileList.length <= 0 || !$uploader) {
+    if (!fileList || fileList.length <= 0 || !uploader) {
       return;
     }
 
@@ -253,7 +253,7 @@
       console.log("Starting file upload...", fileList);
       const uploadedURPs = await filesUpload(
         fileList,
-        $uploader,
+        uploader,
         uploadAbortController.signal
       );
 

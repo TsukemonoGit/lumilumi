@@ -157,7 +157,7 @@
       if (files) {
         $nowProgress = true;
         // ファイルアップロード
-        const urlResults = await filesUpload(files, $uploader);
+        const urlResults = await filesUpload(files, uploader);
 
         // URLが正常にアップロードされているかチェック
         urlResults.map(async (data) => {

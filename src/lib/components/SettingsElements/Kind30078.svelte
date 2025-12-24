@@ -61,7 +61,7 @@
         colorScheme:
           localStorage.getItem(STORAGE_KEYS.COLOR_SCHEME) ?? "default",
         timelineFilter: timelineFilter,
-        uploader: $uploader,
+        uploader: uploader,
         globalRegexFilter:
           localStorage.getItem(STORAGE_KEYS.REGEX_FILTER) ?? "",
       };
@@ -300,30 +300,23 @@
     }
 
     if (loadData.uploader) {
-      if (loadData.uploader) {
-        // loadData.uploaderの型がstringかどうかをチェック
-        if (typeof loadData.uploader === "string") {
-          uploader.set({
-            type: "nip96",
-            address: loadData.uploader,
-          } as UploaderOption);
-        } else {
-          // string型でない場合
-          uploader.set(loadData.uploader as UploaderOption);
-        }
-      }
+      const uploaderData =
+        typeof loadData.uploader === "string"
+          ? ({ type: "nip96", address: loadData.uploader } as UploaderOption)
+          : (loadData.uploader as UploaderOption);
 
-      if (loadData.uploader) {
-        localStorage?.setItem(
-          STORAGE_KEYS.UPLOADER,
-          JSON.stringify(loadData.uploader)
-        );
-      }
+      Object.assign(uploader, uploaderData);
+      localStorage?.setItem(
+        STORAGE_KEYS.UPLOADER,
+        JSON.stringify(uploaderData)
+      );
     }
+
     if (loadData.lumiSetting) {
       settings = loadData.lumiSetting;
       saveLumiSettings();
     }
+
     $nowProgress = false;
   };
 
