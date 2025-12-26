@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { EyeOff, Repeat2 } from "lucide-svelte";
+  import { EyeOff, Repeat2, Shield } from "lucide-svelte";
   import { onDestroy, untrack } from "svelte";
   import * as nip19 from "nostr-tools/nip19";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
@@ -54,6 +54,8 @@
   import Kind39701Note from "./Kind39701Note.svelte";
   import Kind9802Note from "./Kind9802Note.svelte";
   import { getIDbyParam } from "$lib/func/util";
+  import Protected from "$lib/components/Elements/Protected.svelte";
+  import Muted from "$lib/components/Elements/Muted.svelte";
 
   // Component props interface
   interface Props {
@@ -89,6 +91,7 @@
     showStatus = true,
   }: Props = $props();
 
+  let isProtected = $derived(note.tags.find((tag) => tag[0] === "-"));
   // State variables
   let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
@@ -237,12 +240,10 @@
     <article class="{noteClass()} w-full">
       <!-- ミュート投稿のアイコン表示 -->
       {#if muteType !== "null"}
-        <div
-          class="absolute top-0 left-0 bg-neutral-500/80 rounded-full p-1 text-magnum-700 dark:text-magnum-300"
-          style={`z-index:${zIndex || 10 + 1}`}
-        >
-          <EyeOff size={14} />
-        </div>
+        <Muted {zIndex} />
+      {/if}
+      {#if isProtected}
+        <Protected {zIndex} />
       {/if}
       {#if note.kind === 1 || note.kind === 1111}
         <Kind1Note

@@ -40,8 +40,10 @@
   } from "@konemono/nostr-content-parser";
   import { nipLink } from "$lib/func/util";
   import { muteCheck } from "$lib/func/muteCheck";
-  import { EyeOff } from "lucide-svelte";
+  import { EyeOff, Shield } from "lucide-svelte";
   import PopupUserName from "./NostrElements/user/PopupUserName.svelte";
+  import Protected from "./Elements/Protected.svelte";
+  import Muted from "./Elements/Muted.svelte";
 
   // Props definition
   interface Props {
@@ -98,7 +100,7 @@
     }
     return undefined;
   });
-
+  let isProtected = $derived(lumiSetting.get().protectedEvents);
   let mediaList = $derived(
     parts
       .filter((part) => part.type === "url")
@@ -227,12 +229,10 @@
         {#snippet icon()}
           <!-- ミュート投稿のアイコン表示 -->
           {#if muteType !== "null"}
-            <div
-              class="absolute top-0 left-0 bg-neutral-500/80 rounded-full p-1 text-magnum-700 dark:text-magnum-300"
-              style={`z-index:${zIndex || 10 + 1}`}
-            >
-              <EyeOff size={14} />
-            </div>
+            <Muted {zIndex} />
+          {/if}
+          {#if isProtected}
+            <Protected {zIndex} />
           {/if}
           {#if signPubkey}
             <UserPopupMenu
