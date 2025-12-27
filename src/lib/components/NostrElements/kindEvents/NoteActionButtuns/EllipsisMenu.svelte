@@ -523,6 +523,7 @@
               pre = null;
             }
           }
+
           const relayHint = getRelaysById(note.id)[0];
           const tags = (): string[][] => {
             const [tagType, tagValue] = replaceable
@@ -542,8 +543,9 @@
             kind: 10003,
             pubkey: pub,
             content: pre ? pre.content : "",
-            tags: tags(),
+            tags: $state.snapshot(tags()),
           };
+
           const signer = nip07Signer();
           try {
             const event = await signer.signEvent(eventParam);
