@@ -32,6 +32,15 @@ export function createTie<P extends EventPacket>(): [
   return [
     pipe(
       map((packet) => {
+        if (!packet?.event) {
+          const seenOn = new Set<string>();
+          return {
+            ...packet,
+            seenOn,
+            isNew: false,
+          } as P & { seenOn: Set<string>; isNew: boolean };
+        }
+
         const seenOn = memo.get(packet.event.id) ?? new Set<string>();
         const isNew = seenOn.size <= 0;
 
@@ -54,26 +63,28 @@ export function createTie<P extends EventPacket>(): [
 export function filterId(
   id: string
 ): OperatorFunction<EventPacket, EventPacket> {
-  return filter((packet) => packet.event.id === id);
+  return filter((packet) => !!packet?.event && packet.event.id === id);
 }
 
 export function filterTextList(
   ids: string[]
 ): OperatorFunction<EventPacket, EventPacket> {
-  return filter(({ event }) => event.kind === 1 && ids.includes(event.id));
+  return filter(
+    ({ event }) => !!event && event.kind === 1 && ids.includes(event.id)
+  );
 }
 
 export function filterPubkey(
   pubkey: string
 ): OperatorFunction<EventPacket, EventPacket> {
-  return filter((packet) => packet.event.pubkey === pubkey);
+  return filter((packet) => !!packet?.event && packet.event.pubkey === pubkey);
 }
 
 export function filterMetadataList(
   pubkeys: string[]
 ): OperatorFunction<EventPacket, EventPacket> {
   return filter(
-    ({ event }) => event.kind === 0 && pubkeys.includes(event.pubkey)
+    ({ event }) => !!event && event.kind === 0 && pubkeys.includes(event.pubkey)
   );
 }
 
@@ -84,8 +95,10 @@ export function filterNaddr(
 ): OperatorFunction<EventPacket, EventPacket> {
   return filter(
     ({ event }) =>
+      !!event &&
       event.kind === kind &&
       event.pubkey === pubkey &&
+      !!event.tags?.[0]?.[1] &&
       event.tags[0][1] === identifier
   );
 }
@@ -95,8 +108,11 @@ export function latestEachPubkey(): OperatorFunction<EventPacket, EventPacket> {
 }
 
 export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
-  return latestEach(
-    ({ event }) => `${event.kind}:${event.pubkey}:${event.tags[0][1]}`
+  return pipe(
+    filter((packet) => !!packet?.event),
+    latestEach(
+      ({ event }) => `${event.kind}:${event.pubkey}:${event.tags[0][1]}`
+    )
   );
 }
 
@@ -147,7 +163,7 @@ export function scanArray<A extends EventPacket>(
 
 export function metadata(): OperatorFunction<EventPacket, EventPacket> {
   return tap((event: EventPacket) => {
-    if (event.event.kind === 0) {
+    if (event.event?.kind === 0) {
       metadataQueue.update((queue) => [
         ...queue,
         [["metadata", event.event.pubkey], event],
@@ -157,6 +173,7 @@ export function metadata(): OperatorFunction<EventPacket, EventPacket> {
 }
 export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
   return tap((pk: EventPacket) => {
+    if (!pk?.event) return;
     //最新のブックマークイベントをクエリーに入れてローカルストレージに保存
     if (
       pk.event.kind === 10003 &&
@@ -177,7 +194,7 @@ export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
 
 export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
   return filter((packet: EventPacket) => {
-    if (packet.event.kind !== 30315) {
+    if (!packet?.event || packet.event.kind !== 30315) {
       return true;
     } //30315以外は何もせず通過
 
@@ -210,14 +227,16 @@ export function userStatus(): OperatorFunction<EventPacket, EventPacket> {
 export function latestbyId<A extends EventPacket>(): OperatorFunction<A, A[]> {
   return pipe(
     scan((acc: Map<string, A>, eventPacket: A) => {
-      const tagValue = getTagValue(eventPacket, "d");
-      if (tagValue) {
-        const existingPacket = acc.get(tagValue);
-        if (
-          !existingPacket ||
-          existingPacket.event.created_at < eventPacket.event.created_at
-        ) {
-          acc.set(tagValue, eventPacket);
+      if (eventPacket?.event) {
+        const tagValue = getTagValue(eventPacket, "d");
+        if (tagValue) {
+          const existingPacket = acc.get(tagValue);
+          if (
+            !existingPacket ||
+            existingPacket.event.created_at < eventPacket.event.created_at
+          ) {
+            acc.set(tagValue, eventPacket);
+          }
         }
       }
       return acc;
@@ -230,13 +249,13 @@ function getTagValue(
   eventPacket: EventPacket,
   tagKey: string
 ): string | undefined {
-  const tag = eventPacket.event.tags.find((tag) => tag[0] === tagKey);
+  const tag = eventPacket.event?.tags?.find((tag) => tag[0] === tagKey);
   return tag ? tag[1] : undefined;
 }
 
 export function zapCheck() {
   return filter((event: EventPacket) => {
-    if (event.event.kind !== 9735) {
+    if (!event?.event || event.event.kind !== 9735) {
       return true; // kindが9735でない場合はtrueを返す（イベントを通過させる）
     }
 
@@ -265,6 +284,7 @@ export const zappedPubkey = (event: Nostr.Event): string | undefined => {
  */
 export function reactionCheck(show: boolean) {
   return filter((packet: EventPacket) => {
+    if (!packet?.event) return false;
     // イベントとログインユーザーの情報を取得
     const { event } = packet;
     const loginUserPubkey = lumiSetting.get().pubkey;
@@ -337,6 +357,7 @@ export function reactionCheck(show: boolean) {
 const observedEvents = new Set<string>();
 
 function setReactionEvent(packet: EventPacket) {
+  if (!packet?.event) return;
   //重複チェク
   //未観測の場合のみ追加
   //最後かチェック
@@ -397,6 +418,10 @@ export const mediaOperator = (sift: number) => {
 
   return pipe(
     mergeMap((eventPacket: EventPacket) => {
+      if (!eventPacket?.event) {
+        return from([]);
+      }
+
       eventBuffer.push(eventPacket);
 
       // sift制限（古いものを先に切る）
@@ -405,7 +430,7 @@ export const mediaOperator = (sift: number) => {
         // console.log(eventBuffer[sift - 1].event.created_at);
       }
 
-      const urls = extractMediaUrls(eventPacket.event.content);
+      const urls = extractMediaUrls(eventPacket.event.content ?? "");
 
       return from(urls).pipe(
         mergeMap(async (url) => {
