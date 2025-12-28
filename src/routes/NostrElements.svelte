@@ -6,8 +6,7 @@
   import { makeMainFilters } from "$lib/func/nostr";
 
   import { queryClient } from "$lib/stores/stores";
-  import { afterNavigate } from "$app/navigation";
-  import { onMount, untrack } from "svelte";
+  import { untrack } from "svelte";
   import OpenPostWindow from "../lib/components/OpenPostWindow.svelte";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { extractKind9734 } from "$lib/func/zap";
