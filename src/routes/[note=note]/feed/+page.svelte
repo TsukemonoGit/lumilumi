@@ -64,7 +64,9 @@
         .use(req)
         .pipe(uniq())
         .subscribe((packet) => {
-          targetEvent = packet.event;
+          if (packet?.event) {
+            targetEvent = packet.event;
+          }
         });
       req.emit({ ids: [id] });
     }

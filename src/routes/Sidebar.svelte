@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import logo from "$lib/assets/favicon.svg";
+  import { goto } from "$app/navigation";
 
   import { TrendingUp, User } from "lucide-svelte";
 
@@ -29,6 +30,17 @@
     return undefined;
   }
 
+  function handleClickNav(e: MouseEvent, link?: string) {
+    if (!link) return;
+    if (page.url?.pathname === link) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      e.preventDefault();
+      goto(link);
+    }
+  }
+
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
   // $inspect(page.url.pathname);
@@ -45,7 +57,9 @@
                 ? "page"
                 : undefined}
             >
-              <a href={`/${encodedPub}`}
+              <a
+                href={`/${encodedPub}`}
+                onclick={(e) => handleClickNav(e, `/${encodedPub}`)}
                 ><UserAvatar2 size={24} /><span class="ml-2">profile</span>
               </a>
             </li>
@@ -67,7 +81,11 @@
         {:else}
           <li aria-current={page.url.pathname === link ? "page" : undefined}>
             {#if noPubkey || lumiSetting.get().pubkey}
-              <a href={link} title={alt}>
+              <a
+                href={link}
+                title={alt}
+                onclick={(e) => handleClickNav(e, link)}
+              >
                 <Icon /><span class="ml-2">{alt}</span>
               </a>
             {:else}

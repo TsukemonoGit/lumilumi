@@ -47,7 +47,7 @@ export function createNeighborFeed(
       .pipe(uniq(), completeOnTimeout(3000))
       .subscribe({
         next: (packet) => {
-          if (packet.event.id !== targetEvent.id) {
+          if (packet?.event && packet.event.id !== targetEvent.id) {
             events.push(packet.event);
           }
         },
