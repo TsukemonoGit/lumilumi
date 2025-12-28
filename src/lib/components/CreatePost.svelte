@@ -126,13 +126,19 @@
     if (textarea) {
       untrack(async () => {
         console.log("textarea が生成されたときに初期化");
-        text = initOptions.content ?? "";
+        //text = initOptions.content ?? "";
         tags = [...(initOptions.tags ?? [])];
         onWarning = initOptions.warningText ? true : false;
         warningText = initOptions.warningText || "";
-
+        if (initOptions.content) {
+          insertTextAtCursor(initOptions.content, {
+            addSpaceBefore: true,
+            moveCursor: false,
+          });
+        }
         await tick();
         textarea?.focus();
+        textarea?.scrollTo({ top: 0 });
       });
     }
   });
@@ -173,18 +179,30 @@
     options: {
       addSpaceBefore?: boolean;
       addSpaceAfter?: boolean;
+      /**
+       * If true (default), move the cursor to the end of the inserted text.
+       * Set to false for cases like image insertion or quote insertion where
+       * we want to keep the cursor position unchanged.
+       */
+      moveCursor?: boolean;
     } = {}
   ) {
-    const { addSpaceBefore = false, addSpaceAfter = false } = options;
+    const {
+      addSpaceBefore = false,
+      addSpaceAfter = false,
+      moveCursor = true,
+    } = options;
     const WHITESPACE_REGEX = /^\s+$/;
 
     const finalInsertText = (() => {
       let result = insertText;
-      const isTextStart = textarea?.selectionStart === 0;
 
       if (addSpaceBefore) {
-        if ((!isTextStart && textarea?.selectionStart) || 0 > 0) {
-          const prev = text[textarea?.selectionStart || 0 - 1];
+        const sel = textarea?.selectionStart ?? 0;
+        // If cursor is not at start, or moveCursor is false (explicitly keep cursor),
+        // insert a space before the text when appropriate.
+        if (sel > 0 || moveCursor === false) {
+          const prev = text[sel - 1] ?? "";
           if (!WHITESPACE_REGEX.test(prev)) {
             result = ` ${result}`;
           }
@@ -208,7 +226,12 @@
 
     await tick();
     textarea?.focus();
-    textarea?.setSelectionRange(insertEnd, insertEnd);
+    if (moveCursor) {
+      textarea?.setSelectionRange(insertEnd, insertEnd);
+    } else {
+      // Keep cursor at the original insertion point
+      textarea?.setSelectionRange(insertStart, insertStart);
+    }
   }
 
   function handleClickEmoji(e: string[]) {
@@ -279,9 +302,12 @@
               tags.push(convertMetaTags(nip94_event));
             }
             await delay(100);
+
+            //画像の挿入はカーソル移動しない
             insertTextAtCursor(uploadUrl, {
               addSpaceBefore: true,
               addSpaceAfter: true,
+              moveCursor: false,
             });
             await delay(10);
           } catch (innerError) {
