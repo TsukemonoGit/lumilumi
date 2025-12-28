@@ -196,7 +196,6 @@
 
     const finalInsertText = (() => {
       let result = insertText;
-      const isTextStart = textarea?.selectionStart === 0;
 
       if (addSpaceBefore) {
         const sel = textarea?.selectionStart ?? 0;
