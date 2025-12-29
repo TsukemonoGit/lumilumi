@@ -53,7 +53,7 @@
 
   $effect(() => {
     if ($data?.event) {
-      untrack(() => onChange?.($data?.event));
+      untrack(() => onChange?.($data.event));
     }
   });
 </script>

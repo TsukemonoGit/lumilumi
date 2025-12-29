@@ -151,22 +151,28 @@ export async function waitForConnections(options?: {
     onProgress,
   } = options ?? {};
 
-  const readUrls = getRelayUrls();
   const stateMap = relayStateMap as Map<string, string>;
-  const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
   const startTime = Date.now();
   const RELAY_CHECK_INTERVAL = 300; // milliseconds
 
   // Function to check how many relays have reached a final connection state
   const getFinalStateRelayCount = (): number => {
+    const readUrls = getRelayUrls();
+    const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
+
     return normalizedReadUrls.filter((url) => {
       const state = stateMap.get(normalizeURL(url));
       return state !== "initialize" && state !== "connecting";
     }).length;
   };
 
+  // Wait before starting checks
+  await new Promise((resolve) => setTimeout(resolve, RELAY_CHECK_INTERVAL));
+
   // Wait until sufficient relays are connected or timeout is reached
   while (true) {
+    const readUrls = getRelayUrls();
+    const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
     const finalStateCount = getFinalStateRelayCount();
     const totalRelays = normalizedReadUrls.length;
     const connectionRatio =
