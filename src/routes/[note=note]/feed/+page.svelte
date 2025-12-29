@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { get } from "svelte/store";
-  import { app } from "$lib/stores/stores";
+  import { app, defaultRelays } from "$lib/stores/stores";
   import { createRxBackwardReq, uniq } from "rx-nostr";
   import * as Nostr from "nostr-typedef";
   import * as nip19 from "nostr-tools/nip19";
@@ -13,116 +13,142 @@
   import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
   import { profile } from "$lib/func/util";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { untrack } from "svelte";
+  import { resolve } from "$app/paths";
 
   // State
   let id: string = $state("");
   let relays: string[] = $state([]);
   let targetEvent: Nostr.Event | undefined = $state(undefined);
   let contactsEvent: Nostr.Event | undefined = $state(undefined);
-
-  // Feed Logic
   let feed: ReturnType<typeof createNeighborFeed> | undefined =
     $state(undefined);
-
-  // Parse ID
-  $effect(() => {
-    const noteParam = page.params.note;
-    if (noteParam) {
-      try {
-        const { type, data } = nip19.decode(noteParam);
-        let newId = "";
-        if (type === "note") {
-          newId = data;
-        } else if (type === "nevent") {
-          newId = data.id;
-          if (data.relays) relays = data.relays;
-        }
-
-        if (newId && newId !== id) {
-          id = newId;
-          targetEvent = undefined;
-          contactsEvent = undefined;
-          feed = undefined;
-          // Force re-fetch logic to trigger by clearing these
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  });
+  let targetNoteElement: HTMLDivElement;
+  let targetPosition: "visible" | "above" | "below" = $state("visible");
 
   let layoutData: any = $derived(page.data);
+
+  // Parse ID from URL params
+  $effect(() => {
+    const noteParam = page.params.note;
+    if (!noteParam) return;
+
+    try {
+      const { type, data } = nip19.decode(noteParam);
+      let newId = "";
+
+      if (type === "note") {
+        newId = data;
+      } else if (type === "nevent") {
+        newId = data.id;
+        if (data.relays) relays = data.relays;
+      }
+
+      if (newId && newId !== id) {
+        id = newId;
+        targetEvent = undefined;
+        contactsEvent = undefined;
+        feed = undefined;
+      }
+    } catch (e) {
+      console.error("Failed to decode note param:", e);
+    }
+  });
 
   // Fetch Target Event
   $effect(() => {
     if (layoutData?.event) {
       targetEvent = layoutData.event;
-    } else if (id && !targetEvent) {
+      return;
+    }
+
+    if (!id || targetEvent) return;
+
+    untrack(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await waitForConnections();
       const rxNostr = get(app).rxNostr;
+      //  console.log($defaultRelays); //ここのろぐはでる
       const req = createRxBackwardReq("target-note");
       rxNostr
         .use(req)
         .pipe(uniq())
         .subscribe((packet) => {
           if (packet?.event) {
+            console.log(packet.event);
             targetEvent = packet.event;
           }
         });
+
       req.emit({ ids: [id] });
-    }
+    });
   });
 
   // Fetch Contacts
   $effect(() => {
-    if (targetEvent && !contactsEvent) {
+    if (!targetEvent || contactsEvent) return;
+
+    let cleanup: (() => void) | undefined;
+
+    const fetchContacts = async () => {
       const rxNostr = get(app).rxNostr;
+
       const result = useContacts(
         rxNostr,
-        ["contacts", targetEvent.pubkey],
-        targetEvent.pubkey
+        ["contacts", targetEvent!.pubkey],
+        targetEvent!.pubkey
       );
-      const unsub = result.data.subscribe((packet) => {
+
+      const subscription = result.data.subscribe((packet) => {
         if (packet?.event) {
           contactsEvent = packet.event;
         }
       });
-      return () => unsub();
-    }
+
+      cleanup = () => subscription();
+    };
+
+    fetchContacts();
+
+    return () => {
+      if (cleanup) {
+        cleanup();
+      }
+    };
   });
 
   // Initialize Feed
   $effect(() => {
-    if (contactsEvent && targetEvent && !feed) {
-      const map = pubkeysIn(contactsEvent);
-      const authors = Array.from(map.keys());
-      if (!authors.includes(targetEvent.pubkey)) {
-        authors.push(targetEvent.pubkey);
-      }
+    if (!contactsEvent || !targetEvent || feed) return;
 
-      feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
+    const map = pubkeysIn(contactsEvent);
+    const authors = Array.from(map.keys());
 
-      // Initial load
-      feed.loadOlder();
-      feed.loadNewer();
+    if (!authors.includes(targetEvent.pubkey)) {
+      authors.push(targetEvent.pubkey);
     }
+
+    feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
+    feed.loadOlder();
+    feed.loadNewer();
   });
 
-  let targetNoteElement: HTMLDivElement;
-  let targetPosition: "visible" | "above" | "below" = $state("visible");
-
+  // Intersection Observer for Target Note
   $effect(() => {
     if (!targetNoteElement) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          targetPosition = "visible";
-        } else {
-          targetPosition = entry.boundingClientRect.top < 0 ? "above" : "below";
-        }
+        targetPosition = entry.isIntersecting
+          ? "visible"
+          : entry.boundingClientRect.top < 0
+            ? "above"
+            : "below";
       },
       { threshold: 0 }
     );
+
     observer.observe(targetNoteElement);
     return () => observer.disconnect();
   });
@@ -144,11 +170,7 @@
         onclick={feed.loadNewer}
         disabled={feed.isLoadingNewer}
       >
-        {#if feed.isLoadingNewer}
-          Loading...
-        {:else}
-          Load Newer
-        {/if}
+        {feed.isLoadingNewer ? "Loading..." : "Load Newer"}
       </button>
     </div>
 
@@ -176,7 +198,7 @@
   <div
     id="target-note"
     bind:this={targetNoteElement}
-    class=" shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
+    class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
   >
     {#if targetEvent}
       <Metadata
@@ -225,17 +247,13 @@
         onclick={feed.loadOlder}
         disabled={feed.isLoadingOlder}
       >
-        {#if feed.isLoadingOlder}
-          Loading...
-        {:else}
-          Load Older
-        {/if}
+        {feed.isLoadingOlder ? "Loading..." : "Load Older"}
       </button>
     </div>
 
     <!-- Floating Action Button -->
-    <div class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10">
-      {#if targetPosition !== "visible"}
+    {#if targetPosition !== "visible"}
+      <div class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10">
         <button
           class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
           onclick={scrollToTarget}
@@ -258,7 +276,7 @@
               {#snippet loading()}
                 <UserAvatar
                   size={28}
-                  pubkey={targetEvent?.pubkey}
+                  pubkey={targetEvent!.pubkey}
                   url={undefined}
                   name={undefined}
                 />
@@ -266,7 +284,7 @@
               {#snippet error()}
                 <UserAvatar
                   size={28}
-                  pubkey={targetEvent?.pubkey}
+                  pubkey={targetEvent!.pubkey}
                   url={undefined}
                   name={undefined}
                 />
@@ -274,7 +292,6 @@
             </Metadata>
             <span class="text-sm font-semibold">Main Post</span>
             {#if targetPosition === "above"}
-              <!-- Arrow Up -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -284,10 +301,11 @@
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round"><path d="m18 15-6-6-6 6" /></svg
+                stroke-linejoin="round"
               >
+                <path d="m18 15-6-6-6 6" />
+              </svg>
             {:else}
-              <!-- Arrow Down -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -297,14 +315,18 @@
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg
+                stroke-linejoin="round"
               >
-            {/if}{/if}
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            {/if}
+          {/if}
         </button>
-      {/if}
-    </div>
+      </div>
+    {/if}
   {/if}
 </div>
+
 <div class="postWindow">
   <OpenPostWindow options={{ tags: [], kind: 1 }} />
 </div>
