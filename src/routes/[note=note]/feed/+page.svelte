@@ -1,21 +1,22 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { get } from "svelte/store";
-  import { app, defaultRelays } from "$lib/stores/stores";
-  import { createRxBackwardReq, uniq } from "rx-nostr";
+  import { app } from "$lib/stores/stores";
+
   import * as Nostr from "nostr-typedef";
   import * as nip19 from "nostr-tools/nip19";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
-  import { useContacts } from "$lib/stores/useContacts";
+
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { pubkeysIn } from "$lib/func/nostr";
   import { createNeighborFeed } from "$lib/stores/useNeighborFeed.svelte";
   import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
   import { profile } from "$lib/func/util";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
+  import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
+
+  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
-  import { untrack } from "svelte";
-  import { resolve } from "$app/paths";
 
   // State
   let id: string = $state("");
@@ -26,8 +27,6 @@
     $state(undefined);
   let targetNoteElement: HTMLDivElement;
   let targetPosition: "visible" | "above" | "below" = $state("visible");
-
-  let layoutData: any = $derived(page.data);
 
   // Parse ID from URL params
   $effect(() => {
@@ -56,84 +55,6 @@
     }
   });
 
-  // Fetch Target Event
-  $effect(() => {
-    if (layoutData?.event) {
-      targetEvent = layoutData.event;
-      return;
-    }
-
-    if (!id || targetEvent) return;
-
-    untrack(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await waitForConnections();
-      const rxNostr = get(app).rxNostr;
-      //  console.log($defaultRelays); //ここのろぐはでる
-      const req = createRxBackwardReq("target-note");
-      rxNostr
-        .use(req)
-        .pipe(uniq())
-        .subscribe((packet) => {
-          if (packet?.event) {
-            console.log(packet.event);
-            targetEvent = packet.event;
-          }
-        });
-
-      req.emit({ ids: [id] });
-    });
-  });
-
-  // Fetch Contacts
-  $effect(() => {
-    if (!targetEvent || contactsEvent) return;
-
-    let cleanup: (() => void) | undefined;
-
-    const fetchContacts = async () => {
-      const rxNostr = get(app).rxNostr;
-
-      const result = useContacts(
-        rxNostr,
-        ["contacts", targetEvent!.pubkey],
-        targetEvent!.pubkey
-      );
-
-      const subscription = result.data.subscribe((packet) => {
-        if (packet?.event) {
-          contactsEvent = packet.event;
-        }
-      });
-
-      cleanup = () => subscription();
-    };
-
-    fetchContacts();
-
-    return () => {
-      if (cleanup) {
-        cleanup();
-      }
-    };
-  });
-
-  // Initialize Feed
-  $effect(() => {
-    if (!contactsEvent || !targetEvent || feed) return;
-
-    const map = pubkeysIn(contactsEvent);
-    const authors = Array.from(map.keys());
-
-    if (!authors.includes(targetEvent.pubkey)) {
-      authors.push(targetEvent.pubkey);
-    }
-
-    feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
-    feed.loadOlder();
-    feed.loadNewer();
-  });
-
   // Intersection Observer for Target Note
   $effect(() => {
     if (!targetNoteElement) return;
@@ -158,6 +79,24 @@
       behavior: "smooth",
       block: "center",
     });
+  };
+
+  const onChangeContacts = (event: Nostr.Event) => {
+    contactsEvent = event;
+    const map = pubkeysIn(contactsEvent);
+    const authors = Array.from(map.keys());
+    if (targetEvent) {
+      if (!authors.includes(targetEvent.pubkey)) {
+        authors.push(targetEvent.pubkey);
+      }
+
+      feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
+      feed.loadOlder();
+      feed.loadNewer();
+    }
+  };
+  const onChangeTarget = (event: Nostr.Event) => {
+    targetEvent = event;
   };
 </script>
 
@@ -200,24 +139,49 @@
     bind:this={targetNoteElement}
     class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
   >
-    {#if targetEvent}
-      <Metadata
-        queryKey={["metadata", targetEvent.pubkey]}
-        pubkey={targetEvent.pubkey}
-      >
-        {#snippet content({ metadata })}
-          <EventCard note={targetEvent!} {metadata} thread={true} zIndex={55} />
-        {/snippet}
-        {#snippet loading()}
-          <EventCard note={targetEvent!} zIndex={55} />
-        {/snippet}
-        {#snippet error()}
-          <EventCard note={targetEvent!} zIndex={55} />
-        {/snippet}
-      </Metadata>
-    {:else if id}
+    {#await waitForConnections()}
       <div class="p-4 text-center">Loading Target Note...</div>
-    {/if}
+    {:then d}
+      <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
+        {#snippet loading()}
+          <div class="p-4 text-center">Loading Target Note...</div>
+        {/snippet}
+        {#snippet nodata()}
+          <div class="p-4 text-center">Failed to get Target Event</div>
+        {/snippet}
+        {#snippet content({ data: targetEvent })}
+          <LatestEvent
+            queryKey={["timeline", "contacts", targetEvent.pubkey]}
+            filters={[
+              {
+                kinds: [3],
+                authors: [targetEvent.pubkey],
+                limit: 1,
+              },
+            ]}
+            onChange={onChangeContacts}
+          ></LatestEvent>
+          <Metadata
+            queryKey={["metadata", targetEvent.pubkey]}
+            pubkey={targetEvent.pubkey}
+          >
+            {#snippet content({ metadata })}
+              <EventCard
+                note={targetEvent!}
+                {metadata}
+                thread={true}
+                zIndex={55}
+              />
+            {/snippet}
+            {#snippet loading()}
+              <EventCard note={targetEvent!} zIndex={55} />
+            {/snippet}
+            {#snippet error()}
+              <EventCard note={targetEvent!} zIndex={55} />
+            {/snippet}
+          </Metadata>{/snippet}
+      </Text>
+    {/await}
   </div>
 
   <!-- Older Events -->
@@ -259,7 +223,7 @@
           onclick={scrollToTarget}
           aria-label="Scroll to target"
         >
-          {#if targetEvent}
+          {#if id && targetEvent}
             <Metadata
               queryKey={["metadata", targetEvent.pubkey]}
               pubkey={targetEvent.pubkey}

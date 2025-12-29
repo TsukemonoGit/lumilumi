@@ -61,14 +61,12 @@
 
 {#if $errorData}
   {@render error?.($errorData)}
-  <!-- <slot name="error" error={$error} /> -->
-{:else if $status === "success" && !$data?.event && !$data?.event.id}
-  {@render nodata?.()}
-  <!-- <slot name="nodata" /> -->
 {:else if $data && $data?.event}
-  {@render content?.({ data: $data?.event, status: $status })}
-  <!-- <slot event={$data.event} status={$status} /> -->
+  {@render content?.({
+    data: $data?.event,
+    status: $status,
+  })}{:else if $status === "success" && !$data?.event && !$data?.event.id}
+  {@render nodata?.()}
 {:else}
   {@render loading?.()}
-  <!-- <slot name="loading" /> -->
 {/if}
