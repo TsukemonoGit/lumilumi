@@ -167,24 +167,7 @@
             relayTotal = total;
           });
         } } )}
-    <div class="relay-progress">
-      {@render loading?.()}
-      <div
-        class="progress-bar"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow={relayPercent}
-        aria-label="Relay connection progress"
-      >
-        <div class="progress-fill" style={`width: ${relayPercent}%`}></div>
-      </div>
-      <div class="progress-text">
-        Connecting to relays{relayTotal
-          ? ` (${relayConnected}/${relayTotal}) ${relayPercent}%`
-          : ""}
-      </div>
-    </div>
+    {@render loading?.()}
   {:then}
     {@render contents?.()}
   {:catch e}
@@ -193,29 +176,3 @@
 {:else if status === "loading"}
   {@render loading?.()}
 {/if}
-
-<style>
-  .relay-progress {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  .progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 9999px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #7c3aed, #06b6d4);
-    width: 0%;
-    transition: width 300ms ease;
-  }
-  .progress-text {
-    font-size: 0.875rem;
-    color: var(--color-magnum-50, #f8fafc);
-  }
-</style>

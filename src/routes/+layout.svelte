@@ -73,6 +73,7 @@
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
   } from "$lib/func/reactions";
+  import { delay } from "$lib/func/util";
 
   let { data, children } = $props<{
     data:
@@ -302,7 +303,9 @@
     {#snippet contents({ localRelays })}
       <SetDefaultRelays paramRelays={dataRelays} {localRelays}>
         {#snippet loading()}
-          Connecting to relays
+          {#await delay(1000) then}
+            Connecting to relays
+          {/await}
         {/snippet}
 
         {#snippet error()}An error occurred while connecting to relays

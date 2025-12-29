@@ -151,6 +151,8 @@ export async function waitForConnections(options?: {
     onProgress,
   } = options ?? {};
 
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
   const stateMap = relayStateMap as Map<string, string>;
   const startTime = Date.now();
   const RELAY_CHECK_INTERVAL = 300; // milliseconds
@@ -165,9 +167,6 @@ export async function waitForConnections(options?: {
       return state !== "initialize" && state !== "connecting";
     }).length;
   };
-
-  // Wait before starting checks
-  await new Promise((resolve) => setTimeout(resolve, RELAY_CHECK_INTERVAL));
 
   // Wait until sufficient relays are connected or timeout is reached
   while (true) {
