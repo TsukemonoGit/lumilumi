@@ -134,18 +134,28 @@ const getRelayUrls = () => {
 
 /**
  * Wait for sufficient relay connections before proceeding
-
- * @param maxWaitTime - Maximum time to wait for connections in milliseconds
+ *
+ * @param options - Optional settings
+ * @param options.maxWaitTime - Maximum time to wait for connections in milliseconds (default 5000)
+ * @param options.requiredConnectionRatio - Fraction (0..1) of relays that must be in a final state before proceeding (default 0.8)
  */
-export async function waitForConnections(
-  maxWaitTime: number = 5000
-): Promise<void> {
+export async function waitForConnections(options?: {
+  maxWaitTime?: number;
+  requiredConnectionRatio?: number;
+  /** Callback invoked periodically with (connectedCount, totalRelays) */
+  onProgress?: (connected: number, total: number) => void;
+}): Promise<void> {
+  const {
+    maxWaitTime = 5000,
+    requiredConnectionRatio = 0.8,
+    onProgress,
+  } = options ?? {};
+
   const readUrls = getRelayUrls();
   const stateMap = relayStateMap as Map<string, string>;
   const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
   const startTime = Date.now();
-  const RELAY_CHECK_INTERVAL = 500; // milliseconds
-  const REQUIRED_CONNECTION_RATIO = 0.8; // 80% of relays must be connected
+  const RELAY_CHECK_INTERVAL = 300; // milliseconds
 
   // Function to check how many relays have reached a final connection state
   const getFinalStateRelayCount = (): number => {
@@ -159,11 +169,23 @@ export async function waitForConnections(
   while (true) {
     const finalStateCount = getFinalStateRelayCount();
     const totalRelays = normalizedReadUrls.length;
-    const connectionRatio = finalStateCount / totalRelays;
+    const connectionRatio =
+      totalRelays === 0 ? 1 : finalStateCount / totalRelays;
 
-    console.log(`Progress: ${finalStateCount} out of ${totalRelays} relays`);
+    console.log(
+      `Progress: ${finalStateCount} out of ${totalRelays} relays (target ${Math.round(
+        requiredConnectionRatio * 100
+      )}%)`
+    );
 
-    if (connectionRatio >= REQUIRED_CONNECTION_RATIO) {
+    // Notify progress to caller if callback provided
+    try {
+      onProgress?.(finalStateCount, totalRelays);
+    } catch (e) {
+      console.error("waitForConnections onProgress callback error:", e);
+    }
+
+    if (connectionRatio >= requiredConnectionRatio) {
       console.log(
         `${Math.round(
           connectionRatio * 100
