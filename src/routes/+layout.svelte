@@ -73,7 +73,6 @@
     rxNostr3RelaysReconnectChallenge,
     setRxNostr3,
   } from "$lib/func/reactions";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
 
   let { data, children } = $props<{
     data:
@@ -309,37 +308,35 @@
         {#snippet error()}An error occurred while connecting to relays
         {/snippet}
         {#snippet contents()}
-          {#await waitForConnections({ requiredConnectionRatio: 0.5 }) then}
-            {#if lumiSetting.get().pubkey}<!--どのページでもkind3読み込んであるようにここに書いておく-->
-              <Contacts
-                queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
-                pubkey={lumiSetting.get().pubkey}
-              ></Contacts>{/if}
-            <Header />
-            <SetRepoReactions />
-            <Menu />
+          {#if lumiSetting.get().pubkey}<!--どのページでもkind3読み込んであるようにここに書いておく-->
+            <Contacts
+              queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
+              pubkey={lumiSetting.get().pubkey}
+            ></Contacts>{/if}
+          <Header />
+          <SetRepoReactions />
+          <Menu />
 
-            <Toast /><ReactionToast />
-            <MediaDisplay
-              bind:open={showModal}
-              images={mediaList}
-              bind:currentIndex={modalIndex}
-            />
-            <div class="container">
-              <!-- grid grid-cols-[auto_1fr]-->
-              <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
-                {@render children?.()}
-                {#if $nowProgress}
-                  <div class="fixed right-10 bottom-20 z-[99]">
-                    <LoadingElement />
-                  </div>
-                {/if}
-              </main>
-              <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
-                <Sidebar />
-              </div>
+          <Toast /><ReactionToast />
+          <MediaDisplay
+            bind:open={showModal}
+            images={mediaList}
+            bind:currentIndex={modalIndex}
+          />
+          <div class="container">
+            <!-- grid grid-cols-[auto_1fr]-->
+            <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
+              {@render children?.()}
+              {#if $nowProgress}
+                <div class="fixed right-10 bottom-20 z-[99]">
+                  <LoadingElement />
+                </div>
+              {/if}
+            </main>
+            <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
+              <Sidebar />
             </div>
-          {/await}{/snippet}
+          </div>{/snippet}
       </SetDefaultRelays>
     {/snippet}
   </NostrMain>

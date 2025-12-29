@@ -142,8 +142,14 @@ const getRelayUrls = () => {
 export async function waitForConnections(options?: {
   maxWaitTime?: number;
   requiredConnectionRatio?: number;
+  /** Callback invoked periodically with (connectedCount, totalRelays) */
+  onProgress?: (connected: number, total: number) => void;
 }): Promise<void> {
-  const { maxWaitTime = 5000, requiredConnectionRatio = 0.8 } = options ?? {};
+  const {
+    maxWaitTime = 5000,
+    requiredConnectionRatio = 0.8,
+    onProgress,
+  } = options ?? {};
 
   const readUrls = getRelayUrls();
   const stateMap = relayStateMap as Map<string, string>;
@@ -171,6 +177,13 @@ export async function waitForConnections(options?: {
         requiredConnectionRatio * 100
       )}%)`
     );
+
+    // Notify progress to caller if callback provided
+    try {
+      onProgress?.(finalStateCount, totalRelays);
+    } catch (e) {
+      console.error("waitForConnections onProgress callback error:", e);
+    }
 
     if (connectionRatio >= requiredConnectionRatio) {
       console.log(
