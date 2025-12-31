@@ -132,68 +132,66 @@
 </script>
 
 {#if canRender}
-  {#key since}
-    <TimelineList
-      bind:resetUniq
-      queryKey={timelineQuery}
-      filters={[{ kinds: KINDS, since }]}
-      olderFilters={[{ kinds: KINDS }]}
-      {req}
-      viewIndex={VIEW_INDEX}
-      amount={AMOUNT}
-      relays={globalRelays}
-      eventFilter={wrappedEventFilter}
-    >
-      {#snippet content({ events })}
-        <div
-          class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-        >
-          {#if events && events.length > 0}
-            {#each events as event (event.id)}
-              <Metadata
-                queryKey={["metadata", event.pubkey]}
-                pubkey={event.pubkey}
-              >
-                {#snippet loading()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet nodata()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet error()}
-                  <div class="w-full">
-                    <EventCard note={event} />
-                  </div>
-                {/snippet}
-                {#snippet content({ metadata })}
-                  <EventCard {metadata} note={event} />
-                {/snippet}
-              </Metadata>
-            {/each}
-          {:else}
-            <div class="p-4 text-center text-gray-500">
-              <p>イベントが見つかりませんでした</p>
-              <p class="text-sm">
-                since: {since}, リレー数: {globalRelays?.length}
-              </p>
-            </div>
-          {/if}
-        </div>
-      {/snippet}
-      {#snippet loading()}
-        <div class="p-4 text-center">
-          <p>Loading...</p>
-        </div>
-      {/snippet}
-      {#snippet error()}
-        <div class="p-4 text-center text-red-500">
-          <p>{error}</p>
-        </div>
-      {/snippet}
-    </TimelineList>
-  {/key}
+  <TimelineList
+    bind:resetUniq
+    queryKey={timelineQuery}
+    filters={[{ kinds: KINDS, since }]}
+    olderFilters={[{ kinds: KINDS }]}
+    {req}
+    viewIndex={VIEW_INDEX}
+    amount={AMOUNT}
+    relays={globalRelays}
+    eventFilter={wrappedEventFilter}
+  >
+    {#snippet content({ events })}
+      <div
+        class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+      >
+        {#if events && events.length > 0}
+          {#each events as event (event.id)}
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet loading()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet nodata()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet error()}
+                <div class="w-full">
+                  <EventCard note={event} />
+                </div>
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard {metadata} note={event} />
+              {/snippet}
+            </Metadata>
+          {/each}
+        {:else}
+          <div class="p-4 text-center text-gray-500">
+            <p>イベントが見つかりませんでした</p>
+            <p class="text-sm">
+              since: {since}, リレー数: {globalRelays?.length}
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/snippet}
+    {#snippet loading()}
+      <div class="p-4 text-center">
+        <p>Loading...</p>
+      </div>
+    {/snippet}
+    {#snippet error()}
+      <div class="p-4 text-center text-red-500">
+        <p>{error}</p>
+      </div>
+    {/snippet}
+  </TimelineList>
 {/if}
