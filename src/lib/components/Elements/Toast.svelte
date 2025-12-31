@@ -61,7 +61,7 @@
         animate:flip={{ duration: 500 }}
         in:fly={{ duration: 200, x: 100 }}
         out:fly={{ duration: 200, x: 100 }}
-        class="rounded-lg bg-neutral-800 text-white shadow-md p-3 max-h-26 {toast
+        class="rounded-lg bg-neutral-800 text-white shadow-md p-1 max-h-26 {toast
           .data.color || ''}"
       >
         <div
@@ -98,7 +98,7 @@
 
           <button
             {...toast.close}
-            class="absolute right-1 top-1 grid size-6 place-items-center rounded-full text-white/70 hover:bg-white/10"
+            class="absolute right-0 top-0 grid size-6 place-items-center rounded-full text-white/70 hover:bg-white/10"
             aria-label="dismiss alert"
           >
             <X class="size-4" />
@@ -120,9 +120,7 @@
     gap: 0.5rem; /* gap-2 */
   }
   [data-melt-toaster-root] {
-    position: fixed;
     background: inherit; /* bg-inherit */
     overflow: visible; /* overflow-visible */
-    z-index: 99; /* z-[99] */
   }
 </style>
