@@ -12,7 +12,7 @@
   import CloseButton from "./CloseButton.svelte";
 
   interface Props {
-    open: Writable<boolean>;
+    modalOpen: boolean;
     images?: string[];
     currentIndex?: number;
   }
@@ -32,7 +32,7 @@
   const DIALOG_ID = "mediaView";
 
   let {
-    open = $bindable(),
+    modalOpen = $bindable(),
     images = [],
     currentIndex = $bindable(0),
   }: Props = $props();
@@ -140,16 +140,16 @@
   // ダイアログを閉じる処理
   function closeDialog() {
     $dialogOpen = false;
-    $open = false;
+    modalOpen = false;
     loadingStatus = "loading";
   }
 
   // 外部からの開く要求の処理
   $effect(() => {
-    if ($open && images.length > 0) {
+    if (modalOpen && images.length > 0) {
       untrack(() => {
         openDialog(images, currentIndex);
-        $open = false;
+        modalOpen = false;
       });
     }
   });

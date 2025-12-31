@@ -10,7 +10,7 @@
     RefreshCw,
   } from "lucide-svelte";
   import { getMetadataList, type MetadataList } from "$lib/func/nostr";
-  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "$lib/stores/stores";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
   import { delay } from "$lib/func/util";
@@ -35,6 +35,7 @@
   import { uploader } from "$lib/stores/globalRunes.svelte";
   import { filesUpload } from "$lib/func/upload";
   import UploaderSelect from "./Elements/UploaderSelect.svelte";
+  import { addToast } from "./Elements/Toast.svelte";
 
   // ----------------------------------------
   // Component Props
@@ -284,11 +285,13 @@
         async ({ status, nip94_event, url }) => {
           try {
             if (status !== "success") {
-              $toastSettings = {
-                title: "error",
-                description: uploadedURPs[0].message,
-                color: "bg-red-400",
-              };
+              addToast({
+                data: {
+                  title: "error",
+                  description: uploadedURPs[0].message,
+                  color: "bg-red-400",
+                },
+              });
               return;
             }
             const uploadUrl = url

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { nowProgress } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
@@ -36,6 +36,7 @@
     type ColorScheme,
   } from "$lib/func/theme";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   interface Props {
     saveLumiSettings: () => void;
@@ -81,11 +82,13 @@
     const relays = await getQueryRelays(lumiSetting.get().pubkey);
     console.log(relays);
     if (!relays) {
-      $toastSettings = {
-        title: "Error",
-        description: "relay list not found",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "relay list not found",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     const kind30078: EventPacket[] = await usePromiseReq(
@@ -112,11 +115,13 @@
   const handleClickSave = async () => {
     saveName = saveName.trim();
     if (saveName === "") {
-      $toastSettings = {
-        title: "Error",
-        description: "Name is required.",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Name is required.",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
 
@@ -148,11 +153,13 @@
     if (result) {
       debugInfo("publish kidn30078", newLumiSettings);
       saveName = "";
-      $toastSettings = {
-        title: "Success",
-        description: "Success to Save",
-        color: "bg-green-500",
-      };
+      addToast({
+        data: {
+          title: "Success",
+          description: "Success to Save",
+          color: "bg-green-500",
+        },
+      });
     }
   };
 
@@ -178,11 +185,13 @@
 
     if (result) {
       saveName = "";
-      $toastSettings = {
-        title: "Success",
-        description: "Success to Delete",
-        color: "bg-green-500",
-      };
+      addToast({
+        data: {
+          title: "Success",
+          description: "Success to Delete",
+          color: "bg-green-500",
+        },
+      });
     }
   };
 
@@ -190,11 +199,13 @@
     const loadData: Kind30078LumiSetting | undefined =
       kind30078LumiSettings.find((data) => data.name === name);
     if (!loadData) {
-      $toastSettings = {
-        title: "Error",
-        description: "failed to load", //編集中の項目があります。さきにsave（またはリセット）してください
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "failed to load", //編集中の項目があります。さきにsave（またはリセット）してください
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     $nowProgress = true;
@@ -341,11 +352,13 @@
         if (result.isCanceled) {
           return false; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return false;
       }
       // 成功時の処理
@@ -354,11 +367,13 @@
       console.log(isSuccess);
       if (isSuccess.length <= 0) {
         //しっぱい
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to publish",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to publish",
+            color: "bg-red-500",
+          },
+        });
         $nowProgress = false;
 
         return false;

@@ -9,7 +9,6 @@
     nowProgress,
     postWindowOpen,
     additionalPostOptions,
-    toastSettings,
   } from "$lib/stores/stores";
 
   import type { DefaultPostOptions, MargePostOptions } from "$lib/types";
@@ -19,6 +18,7 @@
   import CreatePost from "./CreatePost.svelte";
   import { contentCheck } from "$lib/func/contentCheck";
   import { clientTag } from "$lib/func/constants";
+  import { addToast } from "./Elements/Toast.svelte";
 
   // ----------------------------------------
   // Component Props
@@ -111,7 +111,9 @@
   // Utility Functions
   // ----------------------------------------
   function showToast(title: string, description: string, color: string) {
-    $toastSettings = { title, description, color };
+    addToast({
+      data: { title, description, color },
+    });
   }
 
   // ----------------------------------------

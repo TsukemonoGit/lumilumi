@@ -8,7 +8,6 @@
     emojis,
     mutes,
     mutebykinds,
-    toastSettings,
     queryClient,
     nowProgress,
   } from "$lib/stores/stores";
@@ -45,6 +44,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import Dialog from "../Elements/Dialog.svelte";
   import Popover from "../Elements/Popover.svelte";
+  import { addToast } from "../Elements/Toast.svelte";
 
   const lumiEmoji_STORAGE_KEY = STORAGE_KEYS.LUMI_EMOJI;
   const lumiMute_STORAGE_KEY = "lumiMute";
@@ -178,10 +178,12 @@
         relayInput = "";
       }
     } catch (error) {
-      toastSettings.set({
-        title: "Error",
-        description: `Invalid URL`,
-        color: "bg-red-500",
+      addToast({
+        data: {
+          title: "Error",
+          description: `Invalid URL`,
+          color: "bg-red-500",
+        },
       });
     }
   }
@@ -228,21 +230,9 @@
         JSON.stringify(settings)
       );
 
-      /* $nowProgress = true;
-      toastSettings.set({
-        title: "Success",
-        description: `${$_("settings.refreshPage")}`,
-        color: "bg-green-500",
-      }); */
-
       updateStores(settings);
     } catch (error) {
       console.log(error);
-      /*   toastSettings.set({
-        title: "Error",
-        description: `Failed to save`,
-        color: "bg-red-500",
-      }); */
     }
 
     //  location.reload();
@@ -303,13 +293,7 @@
       const hasWrite = currentRelays.some((relay) => relay.write);
       if (!hasRead || !hasWrite) {
         console.log("リードリレーかライトリレーがない");
-        /*  
-      toastSettings.set({
-          title: "Error",
-          description: `${$_("settings.toast.relayError")}`,
-          color: "bg-red-500",
-        });
-        */
+
         return true;
       }
     }
@@ -318,11 +302,6 @@
 
   function isPubkeyValid() {
     if (!npubRegex.test(inputPubkey)) {
-      /*  toastSettings.set({
-        title: "Error",
-        description: `${$_("settings.toast.pubkeyError")}`,
-        color: "bg-red-500",
-      }); */
       settings.pubkey = "";
       return false;
     }
@@ -331,11 +310,7 @@
       settings.pubkey = nip19.decode(inputPubkey).data as string;
     } catch (error) {
       console.log(error);
-      /*   toastSettings.set({
-        title: "Error",
-        description: "failed to save pubkey",
-        color: "bg-red-500",
-      }); */
+
       settings.pubkey = "";
       return false;
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
 
   import Avatar from "svelte-boring-avatars";
@@ -26,6 +26,7 @@
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { updateEmojiListFromEvent } from "$lib/func/updateEmojiList";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -79,11 +80,13 @@
     if (res.status) {
       return true;
     } else if (res.message) {
-      $toastSettings = {
-        title: "Error",
-        description: res.message,
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: res.message,
+          color: "bg-red-500",
+        },
+      });
     }
     return false;
   };
@@ -113,11 +116,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
 
@@ -127,11 +132,13 @@
 
       if (isSuccess.length <= 0) {
         //失敗
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to add emoji",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to add emoji",
+            color: "bg-red-500",
+          },
+        });
         return;
       }
 
@@ -190,11 +197,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
 
@@ -205,11 +214,13 @@
           .map((item) => item.from);
 
         if (isSuccess.length <= 0) {
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to add emoji",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to add emoji",
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         //最新を更新
@@ -237,11 +248,13 @@
     if (!newestKind10030) {
       //削除ってことは追加されてるってことで初めてのデータじゃないからないってことはない
       $nowProgress = false;
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to remove emoji",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to remove emoji",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     //新しいリストにほんとに含まれているか確認
@@ -266,22 +279,26 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
       const { event: ev, res } = result;
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       if (isSuccess.length <= 0) {
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to add emoji",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to add emoji",
+            color: "bg-red-500",
+          },
+        });
         $nowProgress = false;
         disabled = false;
         return;

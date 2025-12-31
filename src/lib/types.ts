@@ -111,8 +111,13 @@ export interface UseReqOpts3<A> {
 export type Theme = "light" | "dark" | "system";
 export type ToastData = {
   title: string;
-  description: string;
-  color: string;
+  description?: string;
+  type?: "info" | "success" | "error" | "warning";
+  color?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
 export interface Profile {

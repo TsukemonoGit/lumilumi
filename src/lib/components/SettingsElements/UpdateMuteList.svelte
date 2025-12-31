@@ -4,7 +4,7 @@
 
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
-  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { mutes, nowProgress } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import AddMute from "./AddMute.svelte";
@@ -13,6 +13,7 @@
   import { writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   interface Props {
     pubkey: string;
@@ -22,7 +23,7 @@
   //export let muteList: LumiMute | undefined;
   let dialogOpen: any = writable(false);
   async function handleClickMute(e: MouseEvent) {
-  //  e.preventDefault();
+    //  e.preventDefault();
     const beforeList = $mutes?.event;
     try {
       const gotPubkey = await (
@@ -35,21 +36,25 @@
       console.log(error);
     }
     if (pubkey === "") {
-      $toastSettings = {
-        title: "Error",
-        description: "pubkey not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "pubkey not found ",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     const relays = await getQueryRelays(pubkey);
     console.log(relays);
     if (!relays) {
-      $toastSettings = {
-        title: "Error",
-        description: "relay list not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "relay list not found ",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     $nowProgress = true;
@@ -78,18 +83,21 @@
         }
       }
     } else {
-      $toastSettings = {
-        title: "Warning",
-        description: "mute list not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "mute list not found ",
+          color: "bg-red-500",
+        },
+      });
     }
 
     $nowProgress = false;
   }
 </script>
 
-<button type="button"
+<button
+  type="button"
   disabled={$nowProgress}
   class="h-10 ml-2 rounded-md bg-magnum-600 px-3 py-1 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 disabled:opacity-25"
   onclick={handleClickMute}>Mute</button
@@ -97,7 +105,8 @@
   >{$_("settings.lastUpdated")}: {$mutes
     ? formatAbsoluteDateFromUnix($mutes?.updated)
     : ""}</time
->{#if $mutes}<button type="button"
+>{#if $mutes}<button
+    type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
     onclick={() => ($dialogOpen = true)}>view data</button
   >{/if}

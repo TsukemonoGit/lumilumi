@@ -7,7 +7,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { page } from "$app/state";
 
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "$lib/stores/stores";
   import { usePromiseReq } from "$lib/func/nostr";
   import { generateResultMessage } from "$lib/func/util";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
@@ -24,6 +24,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   // タイムライン表示の制御フラグ
   let openGlobalTimeline: boolean = $state(false);
@@ -70,11 +71,13 @@
 
     if ("errorCode" in result) {
       if (!result.isCanceled) {
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
       }
       $nowProgress = false;
       return;
@@ -84,11 +87,13 @@
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
 
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: generateResultMessage(isSuccess, isFailed),
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
+    addToast({
+      data: {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: generateResultMessage(isSuccess, isFailed),
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      },
+    });
 
     if (isSuccess.length > 0) {
       const relaylist = toGlobalRelaySet(event);

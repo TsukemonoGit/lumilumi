@@ -7,7 +7,7 @@
   } from "$lib/func/settings";
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
   import * as nip19 from "nostr-tools/nip19";
-  import { mutebykinds, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { mutebykinds, nowProgress } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
@@ -17,6 +17,7 @@
   import { writable, type Writable } from "svelte/store";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   interface Props {
     pubkey: string;
@@ -45,22 +46,26 @@
       console.log(error);
     }
     if (pubkey === "") {
-      $toastSettings = {
-        title: "Error",
-        description: "pubkey not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "pubkey not found ",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       return;
     }
     const relays = await getQueryRelays(pubkey);
 
     if (!relays) {
-      $toastSettings = {
-        title: "Error",
-        description: "relay list not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "relay list not found ",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       return;
     }
@@ -85,11 +90,13 @@
         console.log("Failed to save");
       }
     } else {
-      $toastSettings = {
-        title: "Warning",
-        description: "mute by kind list not found ",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "mute by kind list not found ",
+          color: "bg-red-500",
+        },
+      });
     }
     $nowProgress = false;
   }

@@ -25,7 +25,6 @@
   import Reactioned from "$lib/components/renderSnippets/nostr/reaction/Reactioned.svelte";
   import {
     nowProgress,
-    toastSettings,
     postWindowOpen,
     additionalPostOptions,
     queryClient,
@@ -56,6 +55,7 @@
   import Zapped from "$lib/components/renderSnippets/nostr/reaction/Zapped.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let {
     note,
@@ -142,11 +142,13 @@
       if (result.isCanceled) {
         return; // キャンセル時は何もしない
       }
-      $toastSettings = {
-        title: "Error",
-        description: $_(result.errorCode),
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     // 成功時の処理
@@ -332,11 +334,13 @@
       kind: note.kind,
     });
     if (zapInvoice === null) {
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to zap",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to zap",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       dialogOpen?.(false);
       return;

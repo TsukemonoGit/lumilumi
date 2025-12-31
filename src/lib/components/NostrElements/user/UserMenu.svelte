@@ -1,11 +1,6 @@
 <!--UserMenu.svelte-->
 <script lang="ts">
-  import {
-    modalState,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
   import {
     ChevronRight,
     Copy,
@@ -31,6 +26,7 @@
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { getNip05FromProfile } from "$lib/func/nip05";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     metadata: Nostr.Event | undefined;
@@ -138,21 +134,25 @@
         try {
           if (encodedPubkey) {
             await navigator.clipboard.writeText(encodedPubkey);
-            $toastSettings = {
-              title: "Success",
-              description: "Copied to clipboard",
-              color: "bg-green-500",
-            };
+            addToast({
+              data: {
+                title: "Success",
+                description: "Copied to clipboard",
+                color: "bg-green-500",
+              },
+            });
           } else {
             throw new Error("No encoded pubkey");
           }
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Warning",
-            description: "Failed to copy",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Warning",
+              description: "Failed to copy",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
@@ -209,11 +209,13 @@
           await navigator.share(shareData);
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to share",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to share",
+              color: "bg-orange-500",
+            },
+          });
         } finally {
           $nowProgress = false;
         }

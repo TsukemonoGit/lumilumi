@@ -5,7 +5,7 @@
 
   import { t as _ } from "@konemono/svelte5-i18n";
   import * as nip19 from "nostr-tools/nip19";
-  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { mutes, nowProgress } from "$lib/stores/stores";
   import { refetchKind10000 } from "$lib/func/mute";
   import AlertDialog from "../Elements/AlertDialog.svelte";
 
@@ -19,6 +19,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   let muteInput: string = $state("");
 
@@ -98,11 +99,13 @@
     }
     console.log(addTag);
     if (addTag.length <= 1) {
-      $toastSettings = {
-        title: "Error",
-        description: "check your input",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "check your input",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
 
@@ -138,11 +141,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -151,11 +156,13 @@
       console.log(isSuccess);
       if (isSuccess.length <= 0) {
         //しっぱい
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to add mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to add mute",
+            color: "bg-red-500",
+          },
+        });
         $nowProgress = false;
 
         return;
@@ -184,11 +191,13 @@
     dialogOpen?.(false);
 
     if (addTag.length <= 0) {
-      $toastSettings = {
-        title: "Error",
-        description: "",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
     }
     const newEvPara: Nostr.EventParameters = {
@@ -202,11 +211,13 @@
       if (result.isCanceled) {
         return; // キャンセル時は何もしない
       }
-      $toastSettings = {
-        title: "Error",
-        description: $_(result.errorCode),
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     // 成功時の処理
@@ -217,11 +228,13 @@
     addTag = [];
     if (isSuccess.length <= 0) {
       //しっぱい
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to remove mute",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to remove mute",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
 
       return;

@@ -467,5 +467,11 @@
     "label": "ピンするIDを入力",
     "addTitle": "PIN追加",
     "deleteTitle": "PIN削除"
+  },
+  "account_change": {
+    "title": "アカウント変更",
+    "description": "新しいアカウント({pub})でログインしました。TL表示を変更しますか?",
+    "action_label": "変更する",
+    "error_save": "設定の保存に失敗しました"
   }
 }

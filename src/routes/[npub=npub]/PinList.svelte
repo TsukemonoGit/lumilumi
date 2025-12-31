@@ -9,13 +9,14 @@
 
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import { nip19 } from "nostr-tools";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
   import type { EventParameters } from "nostr-typedef";
 
   import { promisePublishEvent } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
   import { t } from "@konemono/svelte5-i18n";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     userPubkey: string;
@@ -104,11 +105,13 @@
       console.log(previewData.isValid);
       console.log(previewData.type);
       console.log(currentEvent);
-      $toastSettings = {
-        color: "bg-red-500",
-        title: "Error",
-        description: "なんかエラー",
-      };
+      addToast({
+        data: {
+          color: "bg-red-500",
+          title: "Error",
+          description: "なんかエラー",
+        },
+      });
       return;
     }
 
@@ -128,11 +131,13 @@
       );
 
       if (isDuplicate) {
-        $toastSettings = {
-          color: "bg-red-500",
-          title: "Error",
-          description: "このアイテムは既にPINされています",
-        };
+        addToast({
+          data: {
+            color: "bg-red-500",
+            title: "Error",
+            description: "このアイテムは既にPINされています",
+          },
+        });
 
         return;
       }
@@ -151,20 +156,24 @@
           formatToEventPacket(event, from.from)
         );
       }
-      $toastSettings = {
-        title: "Published",
-        description: "",
-        color: "bg-green-500",
-      };
+      addToast({
+        data: {
+          title: "Published",
+          description: "",
+          color: "bg-green-500",
+        },
+      });
 
       $nowProgress = false;
       dialogOpen(false);
     } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to publish",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       dialogOpen(false);
     }
@@ -199,20 +208,24 @@
           formatToEventPacket(event, from.from)
         );
       }
-      $toastSettings = {
-        title: "Published",
-        description: "",
-        color: "bg-green-500",
-      };
+      addToast({
+        data: {
+          title: "Published",
+          description: "",
+          color: "bg-green-500",
+        },
+      });
 
       $nowProgress = false;
       dialogOpen(false);
     } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to publish",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       dialogOpen(false);
     }

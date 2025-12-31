@@ -7,7 +7,7 @@
   import { cubicInOut } from "svelte/easing";
   import * as nip19 from "nostr-tools/nip19";
   import { refetchKind10000 } from "$lib/func/mute";
-  import { mutes, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { mutes, nowProgress } from "$lib/stores/stores";
   import {
     toMuteList,
     decryptContent,
@@ -18,6 +18,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   // export let muteList: LumiMute;
   const {
@@ -53,11 +54,13 @@
 
     if (!kind10000) {
       $nowProgress = false;
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to remove mute",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to remove mute",
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     //新しいリストにほんとに含まれているか確認
@@ -97,11 +100,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -112,11 +117,13 @@
 
       if (isSuccess.length <= 0) {
         //しっぱい
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to remove mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to remove mute",
+            color: "bg-red-500",
+          },
+        });
         $nowProgress = false;
 
         return;

@@ -6,7 +6,7 @@
     makeMainFilters,
     changeMainEmit,
   } from "$lib/func/nostr";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "$lib/stores/stores";
   import {
     nip07Signer,
     type EventPacket,
@@ -31,6 +31,7 @@
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     pubkey: string;
@@ -64,7 +65,9 @@
 
   // Show toast notification
   const showToast = (title: string, description: string, color: string) => {
-    $toastSettings = { title, description, color };
+    addToast({
+      data: { title, description, color },
+    });
   };
 
   // svelte-ignore non_reactive_update
@@ -278,11 +281,13 @@
     try {
       const event = await signer.signEvent(ev);
       if (event.pubkey !== lumiSetting.get().pubkey) {
-        $toastSettings = {
-          title: "Error",
-          description: "login pubkey ≠ sign pubkey",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "login pubkey ≠ sign pubkey",
+            color: "bg-red-500",
+          },
+        });
         $nowProgress = false;
         return;
       } else {
@@ -292,19 +297,23 @@
         );
 
         if (isSuccessRelays.length <= 0) {
-          $toastSettings = {
-            title: "Failed",
-            description: "failed to publish",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Failed",
+              description: "failed to publish",
+              color: "bg-red-500",
+            },
+          });
         }
       }
     } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to sign event",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to sign event",
+          color: "bg-red-500",
+        },
+      });
     }
     $nowProgress = false;
   };

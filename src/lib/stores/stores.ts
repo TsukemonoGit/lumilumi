@@ -48,12 +48,6 @@ export const queryClient = new QueryClient(config);
 
 export const app = writable<{ rxNostr: RxNostr; rxNostr3: RxNostr }>();
 
-export const toastSettings = writable<{
-  title: string;
-  description: string;
-  color: string;
-}>();
-
 export const defaultRelays = writable<Record<string, DefaultRelayConfig>>();
 
 export const emojis = writable<LumiEmoji>();

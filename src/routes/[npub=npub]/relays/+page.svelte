@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { setRelays, usePromiseReq } from "$lib/func/nostr";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "$lib/stores/stores";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
@@ -25,6 +25,7 @@
   import Kind10002Note from "$lib/components/NostrElements/kindEvents/EventCard/Kind10002Note.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { normalizeURL } from "nostr-tools/utils";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let { data }: { data: LayoutData } = $props();
 
@@ -80,21 +81,25 @@
         }
       }
       if (data.pubkey !== loginUser.value) {
-        $toastSettings = {
-          title: "Error",
-          description: "login pubkey ≠ sign pubkey",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "login pubkey ≠ sign pubkey",
+            color: "bg-red-500",
+          },
+        });
         isError = true;
 
         return;
       }
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "failed to get sign pubkey",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "failed to get sign pubkey",
+          color: "bg-red-500",
+        },
+      });
       isError = true;
       return;
     }
@@ -208,29 +213,35 @@
       // ここでスラッシュを追加
       newRelay = normalizeURL(newRelay);
     } catch (error) {
-      $toastSettings = {
-        title: "Warning",
-        description: "Invalid URL",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "Invalid URL",
+          color: "bg-orange-500",
+        },
+      });
       return;
     }
     if (!relayRegex2.test(newRelay)) {
-      $toastSettings = {
-        title: "Error",
-        description: "Please check the relay URL format",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Please check the relay URL format",
+          color: "bg-orange-500",
+        },
+      });
       return;
     }
 
     // 重複チェックはsortedTagsで行う方が安全
     if (sortedTags.find((tag) => tag[1] === newRelay)) {
-      $toastSettings = {
-        title: "Warning",
-        description: "The entered relay is already included",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "The entered relay is already included",
+          color: "bg-orange-500",
+        },
+      });
       return;
     }
 
@@ -288,11 +299,13 @@
     });
 
     if (newTags.length <= 0) {
-      $toastSettings = {
-        title: "Warning",
-        description: "At least one new relay tag must be added.",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "At least one new relay tag must be added.",
+          color: "bg-orange-500",
+        },
+      });
       $nowProgress = false;
       return;
     }
@@ -310,11 +323,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -325,21 +340,25 @@
       let str = generateResultMessage(isSuccess, isFailed);
       console.log(str);
 
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: str,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: str,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
       checkDefaultRelay(event, isSuccess[0]);
       //reset押したときに戻るデータを更新
       updateRelayCounts();
       kind10002 = event;
     } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to publish",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        },
+      });
     }
     // 保存後はソート状態をクリアして手動並び順を維持
     sortConfig = { key: null, direction: "asc" };

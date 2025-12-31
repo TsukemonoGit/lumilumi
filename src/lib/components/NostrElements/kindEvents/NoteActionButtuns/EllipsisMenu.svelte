@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    modalState,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
   import {
     Copy,
     Earth,
@@ -58,6 +53,7 @@
     lumiSetting,
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface MenuItem {
     text: string;
@@ -369,18 +365,22 @@
           await navigator.clipboard.writeText(
             replaceable ? (naddr ?? "") : (nevent ?? "")
           );
-          $toastSettings = {
-            title: "Success",
-            description: `Copied to clipboard`,
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: "Success",
+              description: `Copied to clipboard`,
+              color: "bg-green-500",
+            },
+          });
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to copy",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
@@ -410,29 +410,35 @@
           await navigator.share(shareData);
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to share",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to share",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
       case "copy_text":
         try {
           await navigator.clipboard.writeText(note.content);
-          $toastSettings = {
-            title: "Success",
-            description: `Copied to clipboard`,
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: "Success",
+              description: `Copied to clipboard`,
+              color: "bg-green-500",
+            },
+          });
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to copy",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
@@ -441,18 +447,22 @@
           const embedCode = generateEmbedCode();
           await navigator.clipboard.writeText(embedCode);
 
-          $toastSettings = {
-            title: "Success",
-            description: "Embed code copied to clipboard",
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: "Success",
+              description: "Embed code copied to clipboard",
+              color: "bg-green-500",
+            },
+          });
         } catch (error: any) {
           console.error(error.message);
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to copy embed code",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to copy embed code",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
@@ -551,29 +561,35 @@
             const event = await signer.signEvent(eventParam);
 
             publishEvent(event);
-            $toastSettings = {
-              title: "Published",
-              description: "",
-              color: "bg-green-500",
-            };
+            addToast({
+              data: {
+                title: "Published",
+                description: "",
+                color: "bg-green-500",
+              },
+            });
 
             $nowProgress = false;
           } catch (error) {
-            $toastSettings = {
-              title: "Failed",
-              description: "failed to publish",
-              color: "bg-red-500",
-            };
+            addToast({
+              data: {
+                title: "Failed",
+                description: "failed to publish",
+                color: "bg-red-500",
+              },
+            });
 
             $nowProgress = false;
           }
         } catch (error) {
           console.error("Bookmark toggle error:", error);
-          $toastSettings = {
-            title: "Failed",
-            description: "failed to toggle bookmark",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Failed",
+              description: "failed to toggle bookmark",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
         }
         break;
@@ -604,22 +620,26 @@
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       let str = generateResultMessage(isSuccess, isFailed);
 
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: str,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: str,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
       if (isSuccess.length > 0) {
         queryClient.removeQueries({ queryKey: ["note", note.id] });
         deleted = true;
       }
     } catch (error) {
       console.error(error);
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to delete",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to delete",
+          color: "bg-orange-500",
+        },
+      });
     }
     return;
   };
