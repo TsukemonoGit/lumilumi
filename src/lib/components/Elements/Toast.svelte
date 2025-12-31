@@ -98,7 +98,7 @@
 
           <button
             {...toast.close}
-            class="absolute right-0 0 grid size-6 place-items-center rounded-full text-white/70 hover:bg-white/10"
+            class="absolute right-0 top-0 grid size-6 place-items-center rounded-full text-white/70 hover:bg-white/10"
             aria-label="dismiss alert"
           >
             <X class="size-4" />
