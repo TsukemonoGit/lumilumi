@@ -77,7 +77,10 @@
                 </h3>
               {/if}
               {#if toast.data.description}
-                <div {...toast.description} class="text-sm opacity-90">
+                <div
+                  {...toast.description}
+                  class="text-sm opacity-90 whitespace-pre-wrap"
+                >
                   {toast.data.description}
                 </div>
               {/if}
