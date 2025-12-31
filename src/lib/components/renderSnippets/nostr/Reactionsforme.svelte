@@ -10,6 +10,7 @@
     RxReqOverable,
     RxReqPipeable,
   } from "rx-nostr";
+  import type { Snippet } from "svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -22,13 +23,11 @@
           RxReqOverable &
           RxReqPipeable)
       | undefined;
-    error?: import("svelte").Snippet<[Error]>;
-    nodata?: import("svelte").Snippet;
-    loading?: import("svelte").Snippet;
+    error?: Snippet<[Error]>;
+    nodata?: Snippet;
+    loading?: Snippet;
 
-    content?: import("svelte").Snippet<
-      [{ events: Nostr.Event[]; status: ReqStatus }]
-    >;
+    content?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
   }
 
   let { queryKey, filters, req, error, loading, nodata, content }: Props =

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
-  import { onDestroy, onMount, untrack } from "svelte";
+  import { onDestroy, onMount, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
@@ -66,10 +66,10 @@
 
     relays?: string[] | undefined;
     eventFilter: (event: Nostr.Event) => boolean;
-    error?: import("svelte").Snippet<[Error]>;
-    nodata?: import("svelte").Snippet;
-    loading?: import("svelte").Snippet;
-    content?: import("svelte").Snippet<
+    error?: Snippet<[Error]>;
+    nodata?: Snippet;
+    loading?: Snippet;
+    content?: Snippet<
       [{ events: Nostr.Event<number>[]; status: ReqStatus; len: number }]
     >;
   }

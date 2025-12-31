@@ -16,7 +16,7 @@
   } from "rx-nostr";
   import { getMetadata } from "$lib/func/nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import { untrack } from "svelte";
+  import { untrack, type Snippet } from "svelte";
 
   interface Props {
     queryKey: QueryKey;
@@ -29,13 +29,11 @@
           RxReqOverable &
           RxReqPipeable)
       | undefined;
-    error?: import("svelte").Snippet<[Error]>;
-    nodata?: import("svelte").Snippet;
-    loading?: import("svelte").Snippet;
+    error?: Snippet<[Error]>;
+    nodata?: Snippet;
+    loading?: Snippet;
 
-    content?: import("svelte").Snippet<
-      [{ metadata: Nostr.Event; status: ReqStatus }]
-    >;
+    content?: Snippet<[{ metadata: Nostr.Event; status: ReqStatus }]>;
     onChange?: (metadata: Nostr.Event) => void;
   }
   let {
