@@ -1,11 +1,12 @@
 <script lang="ts">
   import { userStatusMap } from "$lib/stores/globalRunes.svelte";
   import type Nostr from "nostr-typedef";
+  import type { Snippet } from "svelte";
 
   interface Props {
     pubkey: string;
-    loading?: import("svelte").Snippet;
-    children?: import("svelte").Snippet<[{ event: Nostr.Event }]>;
+    loading?: Snippet;
+    children?: Snippet<[{ event: Nostr.Event }]>;
   }
 
   let { pubkey, loading, children }: Props = $props();

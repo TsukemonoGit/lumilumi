@@ -40,10 +40,10 @@
   } from "@konemono/nostr-content-parser";
   import { nipLink } from "$lib/func/util";
   import { muteCheck } from "$lib/func/muteCheck";
-  import { EyeOff, Shield } from "lucide-svelte";
   import PopupUserName from "./NostrElements/user/PopupUserName.svelte";
   import Protected from "./Elements/Protected.svelte";
   import Muted from "./Elements/Muted.svelte";
+  import Metadata from "./renderSnippets/nostr/Metadata.svelte";
 
   // Props definition
   interface Props {
@@ -81,18 +81,6 @@
     parseContent(text, tags, { hashtagsFromTagsOnly: false })
   );
   let showMore: Writable<boolean> = $state(writable(false));
-
-  // Computed values
-  let metadata = $derived(
-    signPubkey
-      ? (
-          queryClient?.getQueryData([
-            "metadata",
-            signPubkey,
-          ]) as EventPacket | null
-        )?.event
-      : undefined
-  );
 
   let replyTag = $derived.by(() => {
     if ([1, 42, 4, 1111].includes(event.kind || 1) && tags.length > 0) {
@@ -217,6 +205,22 @@
   });
 </script>
 
+{#snippet userPopupMenu(metadata: Nostr.Event | undefined, pubkey: string)}
+  <UserPopupMenu
+    {pubkey}
+    {metadata}
+    size={40}
+    displayMenu={true}
+    depth={0}
+    {zIndex}
+  />
+{/snippet}
+
+{#snippet profileDisplay(metadata: Nostr.Event | undefined, pubkey: string)}
+  <ProfileDisplay {pubkey} {metadata} />
+{/snippet}
+
+<!----------------------------->
 {#if lumiSetting.get().showPreview}
   <div class=" mb-4">
     <div
@@ -235,19 +239,36 @@
             <Protected {zIndex} />
           {/if}
           {#if signPubkey}
-            <UserPopupMenu
-              pubkey={signPubkey}
-              {metadata}
-              size={40}
-              displayMenu={true}
-              depth={0}
-              {zIndex}
-            />{/if}
+            {#key signPubkey}
+              <Metadata queryKey={["metadata", signPubkey]} pubkey={signPubkey}>
+                {#snippet content({ metadata })}
+                  {@render userPopupMenu(metadata, signPubkey)}
+                {/snippet}
+                {#snippet loading()}
+                  {@render userPopupMenu(undefined, signPubkey)}
+                {/snippet}
+                {#snippet nodata()}
+                  {@render userPopupMenu(undefined, signPubkey)}
+                {/snippet}
+              </Metadata>
+            {/key}
+          {/if}
         {/snippet}
 
         {#snippet name()}
           {#if signPubkey}
-            <ProfileDisplay pubkey={signPubkey} {metadata} />{/if}
+            {#key signPubkey}
+              <Metadata queryKey={["metadata", signPubkey]} pubkey={signPubkey}>
+                {#snippet content({ metadata })}
+                  {@render profileDisplay(metadata, signPubkey)}
+                {/snippet}
+                {#snippet loading()}
+                  {@render profileDisplay(undefined, signPubkey)}
+                {/snippet}
+                {#snippet nodata()}
+                  {@render profileDisplay(undefined, signPubkey)}
+                {/snippet}
+              </Metadata>{/key}{/if}
         {/snippet}
 
         {#snippet status()}
