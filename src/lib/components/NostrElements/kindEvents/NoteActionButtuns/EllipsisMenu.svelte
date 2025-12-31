@@ -534,7 +534,7 @@
             }
           }
 
-          const relayHint = getRelaysById(note.id)[0];
+          const relayHint = getRelayById(note.id);
           const tags = (): string[][] => {
             const [tagType, tagValue] = replaceable
               ? [
