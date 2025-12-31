@@ -2,7 +2,7 @@
   import UniqueEventList from "$lib/components/renderSnippets/nostr/UniqueEventList.svelte";
   import { page } from "$app/state";
   import Link from "$lib/components/Elements/Link.svelte";
-  import { nowProgress, queryClient, toastSettings } from "$lib/stores/stores";
+  import { nowProgress, queryClient } from "$lib/stores/stores";
   import { Share, BriefcaseMedical, MessageCircle } from "lucide-svelte";
   import Github from "../settings/Github.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -17,6 +17,7 @@
   import { lumiSetting, viewEventIds } from "$lib/stores/globalRunes.svelte";
   import { makeZapRequest } from "$lib/func/zap";
   import ZapList from "$lib/components/NostrElements/AllReactionsElement/ZapList.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   const handleClickShare = async () => {
     //share link
@@ -29,11 +30,13 @@
       await navigator.share(shareData);
     } catch (error: any) {
       console.error(error.message);
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to share",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to share",
+          color: "bg-orange-500",
+        },
+      });
     }
   };
   let loadImage: boolean = $state(false);
@@ -110,22 +113,26 @@
           if (index !== -1) {
             viewEventIds.get().splice(index, 1);
           }
-          $toastSettings = {
-            title: "Success",
-            description: "Thank you for the zap!",
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: "Success",
+              description: "Thank you for the zap!",
+              color: "bg-green-500",
+            },
+          });
         }
       });
       //購読対象に追加
       viewEventIds.get().push(monoZap.eventTag);
       // viewEventIds.get = viewEventIds.get;
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to zap",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to zap",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       //toast
     }

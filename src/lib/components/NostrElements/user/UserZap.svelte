@@ -3,7 +3,7 @@
   import * as Nostr from "nostr-typedef";
 
   import { profile } from "$lib/func/util";
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { nowProgress } from "$lib/stores/stores";
 
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
@@ -12,6 +12,7 @@
   import { type Writable, writable } from "svelte/store";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { MenuButtonClass } from "$lib/func/constants";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     metadata: Nostr.Event;
@@ -55,11 +56,13 @@
       zapRelays: zapRelays,
     });
     if (zapInvoice === null) {
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to zap",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to zap",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       zapOpen = false;
       return;

@@ -4,7 +4,6 @@
     encodeGeohash,
     getCurrentLocation,
   } from "$lib/func/geohash";
-  import { toastSettings } from "$lib/stores/stores";
 
   import {
     latLng,
@@ -14,7 +13,8 @@
   import { Check, LocateFixed, Search, X } from "lucide-svelte";
   import { Map, TileLayer, Marker, Popup } from "sveaflet";
   import { onMount } from "svelte";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
+  import { addToast } from "./Elements/Toast.svelte";
 
   interface Props {
     initGeo?: string;
@@ -85,11 +85,13 @@
       setPopupContent("You clicked the map at " + position.toString());
       leafletMap?.flyTo(position);
     } else {
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to find the specified location.",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to find the specified location.",
+          color: "bg-orange-500",
+        },
+      });
     }
   };
   //https://github.com/penpenpng/imhere-nostr/blob/main/src/lib/nominatim.ts

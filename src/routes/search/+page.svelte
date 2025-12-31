@@ -6,12 +6,7 @@
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import SearchDescription from "./SearchDescription.svelte";
   import * as Nostr from "nostr-typedef";
-  import {
-    defaultRelays,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { defaultRelays, nowProgress, queryClient } from "$lib/stores/stores";
   import { onMount, type SvelteComponent } from "svelte";
 
   import Settei from "../global/Settei.svelte";
@@ -28,6 +23,7 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   import { safePublishEvent } from "$lib/func/publishError";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -211,11 +207,13 @@
       if (result.isCanceled) {
         return;
       }
-      $toastSettings = {
-        title: "Error",
-        description: $_(result.errorCode),
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        },
+      });
       return;
     }
 
@@ -226,11 +224,13 @@
     let str = generateResultMessage(isSuccess, isFailed);
     console.log(str);
 
-    $toastSettings = {
-      title: isSuccess.length > 0 ? "Success" : "Failed",
-      description: str,
-      color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-    };
+    addToast({
+      data: {
+        title: isSuccess.length > 0 ? "Success" : "Failed",
+        description: str,
+        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+      },
+    });
 
     if (isSuccess.length > 0) {
       const relaylist = toGlobalRelaySet(event);

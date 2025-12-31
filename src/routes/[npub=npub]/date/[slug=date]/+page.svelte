@@ -9,7 +9,7 @@
   import CalendarWidget from "./CalendarWidget.svelte";
 
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { queryClient, toastSettings } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
 
   import { getNip05FromMetadata } from "$lib/func/nip05";
   import { error } from "@sveltejs/kit";

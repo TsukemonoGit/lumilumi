@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { queryClient, toastSettings } from "$lib/stores/stores";
+  import { queryClient } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { QueryObserver } from "@tanstack/svelte-query";
   import { ClipboardCopy, X } from "lucide-svelte";
@@ -10,6 +10,7 @@
   import { type EventPacket } from "rx-nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import CloseButton from "./CloseButton.svelte";
+  import { addToast } from "./Toast.svelte";
 
   interface Props {
     invoice: string | undefined;
@@ -87,21 +88,25 @@
     try {
       if (invoice) {
         await navigator.clipboard.writeText(invoice);
-        $toastSettings = {
-          title: "Success",
-          description: "Copied to clipboard",
-          color: "bg-green-500",
-        };
+        addToast({
+          data: {
+            title: "Success",
+            description: "Copied to clipboard",
+            color: "bg-green-500",
+          },
+        });
       } else {
         throw new Error("No invoice");
       }
     } catch (error: any) {
       console.error(error.message);
-      $toastSettings = {
-        title: "Warning",
-        description: "Failed to copy",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "Failed to copy",
+          color: "bg-orange-500",
+        },
+      });
     }
   };
 </script>

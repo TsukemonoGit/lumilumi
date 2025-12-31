@@ -1,6 +1,6 @@
 <!--edituserstatus.svelte-->
 <script lang="ts">
-  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
   import { RefreshCw, SmilePlus, X } from "lucide-svelte";
 
@@ -18,6 +18,7 @@
   import { checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import InputCustomEmoji from "./InputCustomEmoji.svelte";
+  import { addToast } from "./Elements/Toast.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
@@ -96,17 +97,21 @@
         $nowProgress = false;
       } catch (error: any) {
         if (error?.message) {
-          $toastSettings = {
-            title: "Error",
-            description: error.message,
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: error.message,
+              color: "bg-orange-500",
+            },
+          });
         }
-        $toastSettings = {
-          title: "Error",
-          description: "failed to get pubkey",
-          color: "bg-orange-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "failed to get pubkey",
+            color: "bg-orange-500",
+          },
+        });
         $nowProgress = false;
       }
       setTimeout(() => {
@@ -144,20 +149,24 @@
       const event = await signer.signEvent(newStatus);
 
       publishEvent(event);
-      $toastSettings = {
-        title: "Published",
-        description: "",
-        color: "bg-green-500",
-      };
+      addToast({
+        data: {
+          title: "Published",
+          description: "",
+          color: "bg-green-500",
+        },
+      });
 
       $nowProgress = false;
       $open = false;
     } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to publish",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to publish",
+          color: "bg-red-500",
+        },
+      });
 
       $nowProgress = false;
       $open = false;

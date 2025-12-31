@@ -3,7 +3,6 @@
   import { promisePublishSignedEvent, usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { nip07Signer, uniq } from "rx-nostr";
-  import { toastSettings } from "$lib/stores/stores";
   import { untrack } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { latestEachPubkey } from "$lib/stores/operators";
@@ -13,6 +12,7 @@
   import { clientTag } from "$lib/func/constants";
   import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { RefreshCw } from "lucide-svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let {
     note,
@@ -146,22 +146,26 @@
       );
 
       if (publishResult.res.length > 0) {
-        $toastSettings = {
-          title: "Voted",
-          description: "",
-          color: "bg-green-500",
-        };
+        addToast({
+          data: {
+            title: "Voted",
+            description: "",
+            color: "bg-green-500",
+          },
+        });
         await fetchVoteEvents();
       } else {
         throw new Error("Publish failed");
       }
     } catch (error) {
       console.error("投票の送信に失敗しました:", error);
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to vote",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Failed",
+          description: "failed to vote",
+          color: "bg-red-500",
+        },
+      });
     } finally {
       isSubmitting = false;
     }

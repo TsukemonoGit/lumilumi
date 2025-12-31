@@ -7,7 +7,7 @@
     type ProgressCallback,
     type ProgressDetails,
   } from "$lib/func/settings";
-  import { emojis, nowProgress, toastSettings } from "$lib/stores/stores";
+  import { emojis, nowProgress } from "$lib/stores/stores";
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { createRxNostr } from "rx-nostr/src";
@@ -16,6 +16,7 @@
 
   import { Progress } from "melt/builders";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "../Elements/Toast.svelte";
 
   interface Props {
     buttonClass?: string;
@@ -126,11 +127,13 @@
     }
 
     if (!pubkey) {
-      $toastSettings = {
-        title: "Error",
-        description: "pubkey not found",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "pubkey not found",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       return;
     }
@@ -138,11 +141,13 @@
     const relays = await getQueryRelays(pubkey);
     console.log(relays);
     if (!relays) {
-      $toastSettings = {
-        title: "Error",
-        description: "relay list not found",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "relay list not found",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       resetProgress();
       return;
@@ -156,11 +161,13 @@
     const pk = await getDoukiList(filters, relays);
 
     if (!pk && !beforeEvent) {
-      $toastSettings = {
-        title: "Warning",
-        description: "emoji list not found",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Warning",
+          description: "emoji list not found",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
       resetProgress();
       return;

@@ -14,12 +14,7 @@
   import { usePromiseReq } from "$lib/func/nostr";
   import { latest } from "rx-nostr";
   import { pipe } from "rxjs";
-  import {
-    mutebykinds,
-    mutes,
-    nowProgress,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { mutebykinds, mutes, nowProgress } from "$lib/stores/stores";
 
   import {
     updateMuteByList,
@@ -32,6 +27,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
   interface Props {
     pubkey: string;
     children?: import("svelte").Snippet;
@@ -155,11 +151,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
 
@@ -171,11 +169,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to add mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to add mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -234,11 +234,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -249,11 +251,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to add mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to add mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -321,11 +325,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -336,11 +342,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to add mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to add mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -407,11 +415,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -422,11 +432,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to add mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to add mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -471,11 +483,13 @@
       console.log(kind10000);
       if (!kind10000) {
         $nowProgress = false;
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to remove mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to remove mute",
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       //新しいリストにほんとに含まれているか確認
@@ -503,11 +517,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -518,11 +534,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to remove mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to remove mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -551,11 +569,13 @@
       console.log(kind30007);
       if (!kind30007) {
         $nowProgress = false;
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to remove mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to remove mute",
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       //新しいリストにほんとに含まれているか確認
@@ -585,11 +605,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -600,11 +622,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to remove mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to remove mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -640,11 +664,13 @@
       console.log(kind30007);
       if (!kind30007) {
         $nowProgress = false;
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to remove mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to remove mute",
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       //新しいリストにほんとに含まれているか確認
@@ -672,11 +698,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -687,11 +715,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to  remove mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to  remove mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -727,11 +757,13 @@
       console.log(kind30007);
       if (!kind30007) {
         $nowProgress = false;
-        $toastSettings = {
-          title: "Error",
-          description: "Failed to remove mute",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to remove mute",
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       //新しいリストにほんとに含まれているか確認
@@ -761,11 +793,13 @@
           if (result.isCanceled) {
             return; // キャンセル時は何もしない
           }
-          $toastSettings = {
-            title: "Error",
-            description: $_(result.errorCode),
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: $_(result.errorCode),
+              color: "bg-red-500",
+            },
+          });
           return;
         }
         // 成功時の処理
@@ -776,11 +810,13 @@
         console.log(isSuccess);
         if (isSuccess.length <= 0) {
           //しっぱい
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to remove mute",
-            color: "bg-red-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to remove mute",
+              color: "bg-red-500",
+            },
+          });
           $nowProgress = false;
 
           return;
@@ -849,11 +885,13 @@
     console.log("kind", kind, "dtag", dtag);
     dialogOpen?.(false);
     if (!kind) {
-      $toastSettings = {
-        title: "Error",
-        description: "",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
 
       return;
@@ -875,11 +913,13 @@
       if (result.isCanceled) {
         return; // キャンセル時は何もしない
       }
-      $toastSettings = {
-        title: "Error",
-        description: $_(result.errorCode),
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: $_(result.errorCode),
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     // 成功時の処理
@@ -888,11 +928,13 @@
     console.log(isSuccess);
     if (isSuccess.length <= 0) {
       //しっぱい
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to remove mute",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to remove mute",
+          color: "bg-red-500",
+        },
+      });
       $nowProgress = false;
 
       return;

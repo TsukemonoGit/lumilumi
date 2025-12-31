@@ -38,7 +38,7 @@
     contents,
     loading,
   }: {
-    loading: Snippet;
+    loading?: Snippet;
     contents: Snippet<[{ localRelays: DefaultRelayConfig[] }]>;
   } = $props();
 
@@ -271,7 +271,7 @@
 </script>
 
 {#if nowLoading}
-  {@render loading()}
+  {@render loading?.()}
 {:else}
   {@render contents({ localRelays })}
 {/if}

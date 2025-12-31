@@ -4,11 +4,11 @@
   import { ChevronDown, X } from "lucide-svelte";
   import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
-  import { toastSettings } from "$lib/stores/stores";
 
   import RelayStatusColor from "$lib/components/RelayStatusColor.svelte";
   import { untrack } from "svelte";
   import { normalizeURL } from "nostr-tools/utils";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
   interface Props {
     relays?: string[];
     title: string;
@@ -44,11 +44,13 @@
 
       console.log(url);
       if (!relayRegex2.test(url) || $newRelays.includes(url)) {
-        $toastSettings = {
-          title: "Error",
-          description: "failed to add relay",
-          color: "bg-orange-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "failed to add relay",
+            color: "bg-orange-500",
+          },
+        });
         return;
       } else {
         $newRelays.push(url);
@@ -56,11 +58,13 @@
         newRelayURL = "";
       }
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "Invalid URL",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Invalid URL",
+          color: "bg-orange-500",
+        },
+      });
       return;
     }
   };

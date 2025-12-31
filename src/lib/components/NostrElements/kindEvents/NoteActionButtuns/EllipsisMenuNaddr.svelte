@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { toastSettings } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -13,6 +12,7 @@
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     naddr: string | undefined;
@@ -105,17 +105,21 @@
       case "copyNaddr":
         try {
           await navigator.clipboard.writeText(naddr);
-          $toastSettings = {
-            title: $_("toast.success"),
-            description: $_("toast.copied_clipboard"),
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: $_("toast.success"),
+              description: $_("toast.copied_clipboard"),
+              color: "bg-green-500",
+            },
+          });
         } catch {
-          $toastSettings = {
-            title: $_("toast.error"),
-            description: $_("toast.failed_copy"),
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: $_("toast.error"),
+              description: $_("toast.failed_copy"),
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
       case "njump":

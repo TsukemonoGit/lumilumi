@@ -9,7 +9,6 @@
     nowProgress,
     popStack,
     queryClient,
-    toastSettings,
   } from "$lib/stores/stores";
 
   import { clientTag } from "$lib/func/constants";
@@ -24,6 +23,7 @@
   import { untrack } from "svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import CloseButton from "$lib/components/Elements/CloseButton.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let querykey: QueryKey = $derived(["kind10005", lumiSetting.get().pubkey]);
 
@@ -131,11 +131,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -143,11 +145,13 @@
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       const message = generateResultMessage(isSuccess, isFailed);
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: message,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: message,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
 
       if (addToList) {
         // チャンネルリスト(kind 10005)に追加する処理
@@ -196,11 +200,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -210,11 +216,13 @@
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       const message = generateResultMessage(isSuccess, isFailed);
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: message,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: message,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
 
       if (isSuccess.length > 0) {
         // 成功したら状態を更新

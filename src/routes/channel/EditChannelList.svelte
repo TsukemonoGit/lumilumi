@@ -6,12 +6,7 @@
   import * as Nostr from "nostr-typedef";
   import { latest, type EventPacket } from "rx-nostr";
   import { usePromiseReq } from "$lib/func/nostr";
-  import {
-    nowProgress,
-    popStack,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { nowProgress, popStack, queryClient } from "$lib/stores/stores";
   import { pipe } from "rxjs";
   import ChannelMetadata from "$lib/components/NostrElements/kindEvents/ChannelMetadata.svelte";
   import * as nip19 from "nostr-tools/nip19";
@@ -27,6 +22,7 @@
   import { encodetoNote } from "$lib/func/encode";
   import ChannelMetadataLayout from "$lib/components/NostrElements/kindEvents/ChannelMetadataLayout.svelte";
   import ChannelEllipsisMenu from "$lib/components/NostrElements/kindEvents/ChannelEllipsisMenu.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     editChannelListOpen: Writable<boolean>;
@@ -165,11 +161,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -179,11 +177,13 @@
       const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
       const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
       const message = generateResultMessage(isSuccess, isFailed);
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: message,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: message,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
 
       if (isSuccess.length > 0) {
         // 成功したら状態を更新

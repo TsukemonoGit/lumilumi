@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, toastSettings } from "$lib/stores/stores";
+  import { modalState } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -24,6 +24,7 @@
   import { getChannelLink, getHeyaRelays } from "$lib/func/channel";
   import { goto } from "$app/navigation";
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     note?: Nostr.Event;
@@ -123,17 +124,21 @@
       case "copyEvent":
         try {
           await navigator.clipboard.writeText(heyaNevent ?? "");
-          $toastSettings = {
-            title: $_("toast.success"),
-            description: $_("toast.copied_clipboard"),
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: $_("toast.success"),
+              description: $_("toast.copied_clipboard"),
+              color: "bg-green-500",
+            },
+          });
         } catch {
-          $toastSettings = {
-            title: $_("toast.error"),
-            description: $_("toast.failed_copy"),
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: $_("toast.error"),
+              description: $_("toast.failed_copy"),
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
       case "editList":
@@ -152,11 +157,13 @@
           try {
             await navigator.share(shareData);
           } catch {
-            $toastSettings = {
-              title: $_("toast.error"),
-              description: $_("toast.failed_copy"),
-              color: "bg-orange-500",
-            };
+            addToast({
+              data: {
+                title: $_("toast.error"),
+                description: $_("toast.failed_copy"),
+                color: "bg-orange-500",
+              },
+            });
           }
         }
         break;

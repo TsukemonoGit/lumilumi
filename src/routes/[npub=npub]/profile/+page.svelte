@@ -1,11 +1,6 @@
 <script lang="ts">
   import { usePromiseReq } from "$lib/func/nostr";
-  import {
-    emojis,
-    nowProgress,
-    queryClient,
-    toastSettings,
-  } from "$lib/stores/stores";
+  import { emojis, nowProgress, queryClient } from "$lib/stores/stores";
   import type { Profile } from "$lib/types";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { onMount, tick } from "svelte";
@@ -19,9 +14,6 @@
   import Content from "$lib/components/NostrElements/content/Content.svelte";
   import { generateResultMessage } from "$lib/func/util";
 
-  import { RefreshCw, SmilePlus } from "lucide-svelte";
-  import Popover from "$lib/components/Elements/Popover.svelte";
-
   import InputImageFromFile from "./InputImageFromFile.svelte";
   import DisplayName from "$lib/components/NostrElements/user/DisplayName.svelte";
   import { LUD06Regex, LUD16Regex } from "$lib/func/regex";
@@ -31,6 +23,7 @@
   import Birth from "./Birth.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import InputCustomEmoji from "$lib/components/InputCustomEmoji.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -67,20 +60,24 @@
         }
       }
       if (data.pubkey !== loginUser.value) {
-        $toastSettings = {
-          title: "Error",
-          description: "login pubkey ≠ sign pubkey",
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: "login pubkey ≠ sign pubkey",
+            color: "bg-red-500",
+          },
+        });
         isError = true;
         return;
       }
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: "failed to get sign pubkey",
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "failed to get sign pubkey",
+          color: "bg-red-500",
+        },
+      });
       isError = true;
       return;
     }
@@ -162,11 +159,13 @@
           delete newProfile.lud06;
           delete newProfile.lud16;
           //ludに何かしら入力があるのに06でも16でもないとき
-          $toastSettings = {
-            title: "Error",
-            description: `Error ${$_("profile.lud")}`,
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: `Error ${$_("profile.lud")}`,
+              color: "bg-orange-500",
+            },
+          });
           return;
         }
       } else {
@@ -197,11 +196,13 @@
           newProfile = { ...newProfile, birth: birthArray };
         } */
       } catch (error: any) {
-        $toastSettings = {
-          title: "Error",
-          description: `Invalid ${error.message}`,
-          color: "bg-orange-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: `Invalid ${error.message}`,
+            color: "bg-orange-500",
+          },
+        });
         return;
       }
     }
@@ -222,11 +223,13 @@
         if (result.isCanceled) {
           return; // キャンセル時は何もしない
         }
-        $toastSettings = {
-          title: "Error",
-          description: $_(result.errorCode),
-          color: "bg-red-500",
-        };
+        addToast({
+          data: {
+            title: "Error",
+            description: $_(result.errorCode),
+            color: "bg-red-500",
+          },
+        });
         return;
       }
       // 成功時の処理
@@ -237,11 +240,13 @@
       let str = generateResultMessage(isSuccess, isFailed);
       console.log(str);
 
-      $toastSettings = {
-        title: isSuccess.length > 0 ? "Success" : "Failed",
-        description: str,
-        color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: isSuccess.length > 0 ? "Success" : "Failed",
+          description: str,
+          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
+        },
+      });
 
       if (isSuccess.length > 0) {
         queryClient.refetchQueries({
@@ -250,11 +255,13 @@
       }
       $nowProgress = false;
     } catch (error) {
-      $toastSettings = {
-        title: "Error",
-        description: `Error  `,
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: `Error  `,
+          color: "bg-orange-500",
+        },
+      });
       $nowProgress = false;
       return;
     }

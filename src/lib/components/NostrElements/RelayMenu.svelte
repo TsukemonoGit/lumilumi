@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { formatUrl } from "$lib/func/util";
-  import { modalState, toastSettings } from "$lib/stores/stores";
+  import { modalState } from "$lib/stores/stores";
   import {
     Copy,
     FileJson2,
@@ -15,6 +15,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import type { Snippet } from "svelte";
   import type { Nip11 } from "nostr-typedef";
+  import { addToast } from "../Elements/Toast.svelte";
 
   interface Props {
     url: string;
@@ -89,17 +90,21 @@
         case "copyRelay":
           try {
             await navigator.clipboard.writeText(url);
-            $toastSettings = {
-              title: "Success",
-              description: "Copied to clipboard",
-              color: "bg-green-500",
-            };
+            addToast({
+              data: {
+                title: "Success",
+                description: "Copied to clipboard",
+                color: "bg-green-500",
+              },
+            });
           } catch (e: any) {
-            $toastSettings = {
-              title: "Error",
-              description: "Failed to copy",
-              color: "bg-orange-500",
-            };
+            addToast({
+              data: {
+                title: "Error",
+                description: "Failed to copy",
+                color: "bg-orange-500",
+              },
+            });
           }
           break;
 
@@ -119,20 +124,24 @@
           try {
             await navigator.share(shareData);
           } catch (e: any) {
-            $toastSettings = {
-              title: "Error",
-              description: "Failed to share",
-              color: "bg-orange-500",
-            };
+            addToast({
+              data: {
+                title: "Error",
+                description: "Failed to share",
+                color: "bg-orange-500",
+              },
+            });
           }
           break;
       }
     } catch {
-      $toastSettings = {
-        title: "Error",
-        description: "relay encode error",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "relay encode error",
+          color: "bg-orange-500",
+        },
+      });
     }
   };
 </script>

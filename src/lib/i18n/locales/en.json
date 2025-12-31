@@ -468,5 +468,11 @@
     "delete": "Are you sure you want to delete this pin?",
     "addTitle": "Add Pin",
     "deleteTitle": "Delete Pin"
+  },
+  "account_change": {
+    "title": "Account Changed",
+    "description": "Logged in as a new account ({pub}). Would you like to switch the timeline view?",
+    "action_label": "Switch",
+    "error_save": "Failed to save settings"
   }
 }

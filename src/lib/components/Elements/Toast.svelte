@@ -1,68 +1,128 @@
+<script lang="ts" module>
+  import type { ToastData } from "$lib/types";
+  import { Toaster } from "melt/builders";
+
+  const toaster = new Toaster<ToastData>({
+    closeDelay: 7000, // 全てのトーストのデフォルト表示時間（ミリ秒）
+  });
+
+  export const addToast = (args: { data: ToastData; duration?: number }) => {
+    toaster.addToast({
+      data: args.data,
+      ...(args.duration !== undefined && { duration: args.duration }),
+    });
+  };
+  export { toaster };
+</script>
+
 <script lang="ts">
-  import { createToaster, melt } from "@melt-ui/svelte";
   import { flip } from "svelte/animate";
   import { fly } from "svelte/transition";
   import X from "lucide-svelte/icons/x";
-  import type { ToastData } from "$lib/types";
-  import { toastSettings } from "$lib/stores/stores";
+  import ReactionToastLayout from "./ReactionToastLayout.svelte";
+  import * as Nostr from "nostr-typedef";
+  import { reactionToast } from "$lib/stores/stores";
 
-  const {
-    elements: { content, title, description, close },
-    helpers: { addToast },
-    states: { toasts },
-    actions: { portal },
-  } = createToaster<ToastData>();
-
-  toastSettings.subscribe((value) => {
-    if (value) {
-      addToast({
+  // reactionToast購読を統合
+  reactionToast.subscribe((value) => {
+    if (
+      value &&
+      !(
+        (!value.title || value.title === "") &&
+        (!value.description || value.description === "")
+      )
+    ) {
+      toaster.addToast({
         data: value,
       });
+      if (toaster.toasts.length > 4) {
+        console.log(toaster.toasts);
+        toaster.removeToast(toaster.toasts[toaster.toasts.length - 1].id);
+      }
     }
   });
+
+  const getEvent = (data: ToastData): Nostr.Event | undefined => {
+    try {
+      return JSON.parse(data.description || "") as Nostr.Event;
+    } catch (error) {
+      return;
+    }
+  };
 </script>
 
-<div
-  class="fixed right-0 top-0 z-[99] m-4 flex flex-col items-end gap-2 md:bottom-0 md:top-auto"
-  use:portal
->
-  {#each $toasts as { id, data } (id)}
-    <div
-      use:melt={$content(id)}
-      animate:flip={{ duration: 500 }}
-      in:fly={{ duration: 150, x: "100%" }}
-      out:fly={{ duration: 150, x: "100%" }}
-      class="rounded-lg bg-neutral-800 text-white shadow-md"
-    >
-      {#if data}
+<div {...toaster.root}>
+  <div class="toast">
+    {#each toaster.toasts as toast (toast.id)}
+      {@const event = getEvent(toast.data)}
+
+      <div
+        {...toast.content}
+        animate:flip={{ duration: 500 }}
+        in:fly={{ duration: 200, x: 100 }}
+        out:fly={{ duration: 200, x: 100 }}
+        class="rounded-lg bg-neutral-800 text-white shadow-md p-3 max-h-26 {toast
+          .data.color || ''}"
+      >
         <div
-          class="relative flex w-[24rem] max-w-[calc(100vw-2rem)] items-center justify-between gap-4 p-5"
+          class="relative flex flex-col w-[16rem] max-w-[calc(100vw-2rem)] gap-1 text-sm"
         >
-          <div>
-            <h3
-              use:melt={$title(id)}
-              class="flex items-center gap-2 font-semibold"
-            >
-              {data.title}
-              <span class="size-1.5 rounded-full {data.color ?? 'bg-green-500'}"
-              ></span>
-            </h3>
-            <div
-              use:melt={$description(id)}
-              class="break-words whitespace-pre-wrap"
-            >
-              {data.description}
+          {#if event}
+            <ReactionToastLayout {event} />
+          {:else}
+            <div>
+              {#if toast.data.title}
+                <h3 {...toast.title} class="font-semibold">
+                  {toast.data.title}
+                </h3>
+              {/if}
+              {#if toast.data.description}
+                <div {...toast.description} class="text-sm opacity-90">
+                  {toast.data.description}
+                </div>
+              {/if}
             </div>
-          </div>
+
+            {#if toast.data.action}
+              <button
+                on:click={() => {
+                  toast.data.action?.onClick();
+                  toaster.removeToast(toast.id);
+                }}
+                class="px-1 py-1 bg-white/20 hover:bg-white/30 rounded text-sm"
+              >
+                {toast.data.action.label}
+              </button>
+            {/if}
+          {/if}
+
           <button
-            use:melt={$close(id)}
-            class="absolute right-4 top-4 grid size-6 place-items-center rounded-full text-magnum-500
-          hover:bg-magnum-900/50"
+            {...toast.close}
+            class="absolute right-1 top-1 grid size-6 place-items-center rounded-full text-white/70 hover:bg-white/10"
+            aria-label="dismiss alert"
           >
             <X class="size-4" />
           </button>
         </div>
-      {/if}
-    </div>
-  {/each}
+      </div>
+    {/each}
+  </div>
 </div>
+
+<style>
+  .toast {
+    position: fixed;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* items-end */
+    gap: 0.5rem; /* gap-2 */
+  }
+  [data-melt-toaster-root] {
+    position: fixed;
+    background: inherit; /* bg-inherit */
+    overflow: visible; /* overflow-visible */
+    z-index: 99; /* z-[99] */
+  }
+</style>

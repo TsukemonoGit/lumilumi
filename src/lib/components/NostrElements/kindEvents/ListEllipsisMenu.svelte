@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState, toastSettings } from "$lib/stores/stores";
+  import { modalState } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -16,6 +16,7 @@
   import { page } from "$app/state";
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     note: Nostr.Event;
@@ -99,17 +100,21 @@
       case "copyNaddr":
         try {
           await navigator.clipboard.writeText(naddr ?? "");
-          $toastSettings = {
-            title: "Success",
-            description: "Copied to clipboard",
-            color: "bg-green-500",
-          };
+          addToast({
+            data: {
+              title: "Success",
+              description: "Copied to clipboard",
+              color: "bg-green-500",
+            },
+          });
         } catch {
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to copy",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to copy",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
 
@@ -126,11 +131,13 @@
         try {
           await navigator.share(shareData);
         } catch {
-          $toastSettings = {
-            title: "Error",
-            description: "Failed to share",
-            color: "bg-orange-500",
-          };
+          addToast({
+            data: {
+              title: "Error",
+              description: "Failed to share",
+              color: "bg-orange-500",
+            },
+          });
         }
         break;
     }

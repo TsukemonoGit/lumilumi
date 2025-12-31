@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { nowProgress, toastSettings } from "$lib/stores/stores";
+  import { nowProgress } from "$lib/stores/stores";
 
   import {
     Share,
@@ -22,6 +22,7 @@
   import KindSelect from "./KindSelect.svelte";
   import * as Nostr from "nostr-typedef";
   import { pushState } from "$app/navigation";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   interface Props {
     searchWord: string | undefined;
@@ -142,11 +143,13 @@
       await navigator.share(shareData);
     } catch (error: any) {
       console.error(error.message);
-      $toastSettings = {
-        title: "Error",
-        description: "Failed to share",
-        color: "bg-orange-500",
-      };
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to share",
+          color: "bg-orange-500",
+        },
+      });
     }
   }
 

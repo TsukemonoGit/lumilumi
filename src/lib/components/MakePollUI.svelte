@@ -5,13 +5,14 @@
   import Dialog from "./Elements/Dialog.svelte";
   import { ChartBar, Check, Plus, X } from "lucide-svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { defaultRelays, toastSettings } from "$lib/stores/stores";
+  import { defaultRelays } from "$lib/stores/stores";
   import * as Nostr from "nostr-typedef";
   import { nip07Signer } from "rx-nostr";
   import { promisePublishSignedEvent } from "$lib/func/nostr";
   import * as nip19 from "nostr-tools/nip19";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { clientTag } from "$lib/func/constants";
+  import { addToast } from "./Elements/Toast.svelte";
   interface Props {
     onPolled: (id: string) => void;
   }
@@ -76,20 +77,24 @@
     // 空の選択肢があるか確認
     const emptyOptions = pollOptions.filter((opt) => opt.trim() === "");
     if (!title) {
-      $toastSettings = {
-        title: `${$_("poll.warning.title")}`,
-        description: `${$_("poll.warning.pollTitle")}`,
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: `${$_("poll.warning.title")}`,
+          description: `${$_("poll.warning.pollTitle")}`,
+          color: "bg-red-500",
+        },
+      });
       return;
     }
     if (emptyOptions.length > 0) {
       //  showErrorMessage('すべての選択肢にテキストを入力してください');
-      $toastSettings = {
-        title: `${$_("poll.warning.title")}`,
-        description: `${$_("poll.warning.description")}`,
-        color: "bg-red-500",
-      };
+      addToast({
+        data: {
+          title: `${$_("poll.warning.title")}`,
+          description: `${$_("poll.warning.description")}`,
+          color: "bg-red-500",
+        },
+      });
       return;
     }
 
@@ -147,11 +152,13 @@
 
       const res = await promisePublishSignedEvent(event);
       if (res.res.length > 0) {
-        $toastSettings = {
-          title: "Published",
-          description: "",
-          color: "bg-green-500",
-        };
+        addToast({
+          data: {
+            title: "Published",
+            description: "",
+            color: "bg-green-500",
+          },
+        });
 
         const nostrId = nip19.neventEncode({
           id: res.event.id,
@@ -162,18 +169,22 @@
         $dialogOpen = false;
         onPolled(nostrId);
       } else {
-        $toastSettings = {
+        addToast({
+          data: {
+            title: "Failed",
+            description: "failed to vote",
+            color: "bg-red-500",
+          },
+        });
+      }
+    } catch (error) {
+      addToast({
+        data: {
           title: "Failed",
           description: "failed to vote",
           color: "bg-red-500",
-        };
-      }
-    } catch (error) {
-      $toastSettings = {
-        title: "Failed",
-        description: "failed to vote",
-        color: "bg-red-500",
-      };
+        },
+      });
       console.error("投票の送信に失敗しました:", error);
     }
   }
