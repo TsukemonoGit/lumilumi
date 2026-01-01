@@ -26,6 +26,7 @@
   import * as Nostr from "nostr-typedef";
   import {
     deleteEvent,
+    getRelayById,
     getRelaysById,
     publishEvent,
     usePromiseReq,
