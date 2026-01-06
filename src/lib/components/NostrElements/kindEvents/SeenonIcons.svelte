@@ -26,7 +26,7 @@
 {#if relays.length > 0}
   <div
     class="flex flex-wrap gap-1 align-baseline h-fit"
-    style="width:{width}px "
+    style="width:{width}px"
   >
     {#each viewAll ? relays : relays.slice(0, 2) as url}
       <SeenonIcon {url} {size} zIndex={20} />

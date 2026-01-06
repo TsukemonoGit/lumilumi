@@ -64,7 +64,7 @@
       <Avatar {size} name={pubkey} variant="beam" colors={avatarColor} />
     {/if}
     {#snippet popoverContent()}
-      <div class="p-1 w-[24rem] max-w-full">
+      <div class="w-[24rem] max-w-full p-1">
         <UserProfile
           zIndex={zIndex + 10}
           {pubkey}

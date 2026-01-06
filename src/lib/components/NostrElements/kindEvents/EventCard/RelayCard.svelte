@@ -82,15 +82,13 @@
             {/if}
           </div>
         {/if}
-        <div class="ml-auto">
-          <RelayMenu {url} {zIndex} {relayInfo}
-            ><div
-              class="w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
-            >
-              <Ellipsis size={20} />
-            </div></RelayMenu
+        <RelayMenu {url} {zIndex} {relayInfo}>
+          <div
+            class="ml-auto w-fit text-magnum-400 p-1 hover:opacity-75 active:opacity-50"
           >
-        </div>
+            <Ellipsis size={20} />
+          </div>
+        </RelayMenu>
       </div>
       {#if relayInfo.description}
         <div

@@ -75,46 +75,40 @@
     {#snippet content({ data: text, status })}
       <Metadata queryKey={["metadata", text.pubkey]} pubkey={text.pubkey}>
         {#snippet loading()}
-          <div>
-            <EventCard
-              note={text}
-              mini={isOmitted || mini}
-              showStatus={!isOmitted}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {zIndex}
-            />
-          </div>
+          <EventCard
+            note={text}
+            mini={isOmitted || mini}
+            showStatus={!isOmitted}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {zIndex}
+          />
         {/snippet}
         {#snippet nodata()}
-          <div>
-            <EventCard
-              note={text}
-              mini={isOmitted || mini}
-              showStatus={!isOmitted}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {zIndex}
-            />
-          </div>
+          <EventCard
+            note={text}
+            mini={isOmitted || mini}
+            showStatus={!isOmitted}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {zIndex}
+          />
         {/snippet}
         {#snippet error()}
-          <div>
-            <EventCard
-              note={text}
-              mini={isOmitted || mini}
-              showStatus={!isOmitted}
-              {maxHeight}
-              {thread}
-              {depth}
-              {repostable}
-              {zIndex}
-            />
-          </div>
+          <EventCard
+            note={text}
+            mini={isOmitted || mini}
+            showStatus={!isOmitted}
+            {maxHeight}
+            {thread}
+            {depth}
+            {repostable}
+            {zIndex}
+          />
         {/snippet}
         {#snippet content({ metadata })}
           <EventCard
