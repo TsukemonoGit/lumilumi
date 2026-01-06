@@ -176,8 +176,8 @@
               {nip19.noteEncode(data.id)}
             </div>
           {/snippet}
-          {#snippet content({ data: text, status })}
-            {@render eventDisplay(text)}
+          {#snippet content({ data: event, status })}
+            {@render eventDisplay(event)}
           {/snippet}
         </Text>
       {/if}

@@ -42,7 +42,7 @@
   };
 </script>
 
-<Truncate {maxHeight} {onClickShowMore} {depth}>
+{#snippet contentDisplay()}
   <ContentParts
     {maxHeight}
     {event}
@@ -53,7 +53,15 @@
     {zIndex}
     {displayTags}
   />
-</Truncate>
+{/snippet}
+
+{#if maxHeight !== 0}
+  <Truncate {maxHeight} {onClickShowMore} {depth}>
+    {@render contentDisplay()}
+  </Truncate>
+{:else}
+  {@render contentDisplay()}
+{/if}
 <!--Show more no Dialog-->
 
 <Dialog

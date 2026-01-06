@@ -1,8 +1,7 @@
 <script lang="ts">
   import * as Nostr from "nostr-typedef";
-  import { EyeOff, Repeat2, Shield } from "lucide-svelte";
+  import { Repeat2 } from "lucide-svelte";
   import { onDestroy, untrack } from "svelte";
-  import * as nip19 from "nostr-tools/nip19";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
   import { page } from "$app/state";
 
