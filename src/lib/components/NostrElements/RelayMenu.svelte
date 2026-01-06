@@ -26,8 +26,6 @@
 
   let { url, zIndex, children, relayInfo }: Props = $props();
 
-  let encodedUrl = encodeURIComponent(url);
-
   const menuGroups = $derived([
     {
       label: $_("menu.group.view"),
@@ -67,6 +65,7 @@
   ]);
 
   const handleSelectItem = async (action: string) => {
+    const encodedUrl = encodeURIComponent(url);
     try {
       const hostname = new URL(url).hostname;
 

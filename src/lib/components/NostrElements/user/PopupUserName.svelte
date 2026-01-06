@@ -37,19 +37,13 @@
         <div class="text-zinc-300 font-bold pl-2 text-md py-2">User Menu</div>
         <Metadata queryKey={["metadata", pubkey]} {pubkey}>
           {#snippet loading()}
-            <div>
-              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
-            </div>
+            <UserMenu {pubkey} metadata={undefined} profile={undefined} />
           {/snippet}
           {#snippet nodata()}
-            <div>
-              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
-            </div>
+            <UserMenu {pubkey} metadata={undefined} profile={undefined} />
           {/snippet}
           {#snippet error()}
-            <div>
-              <UserMenu {pubkey} metadata={undefined} profile={undefined} />
-            </div>
+            <UserMenu {pubkey} metadata={undefined} profile={undefined} />
           {/snippet}
           {#snippet content({ metadata })}
             {@const profile = getProfile(metadata)}

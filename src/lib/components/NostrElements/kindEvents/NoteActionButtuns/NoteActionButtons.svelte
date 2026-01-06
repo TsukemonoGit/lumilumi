@@ -398,9 +398,9 @@
     }, 2);
   };
 
-  let repost: Nostr.Event[] = $state([]);
-  let reaction: Nostr.Event[] = $state([]);
-  let zap: Nostr.Event[] = $state([]);
+  let repost: Nostr.Event[] = $state.raw([]);
+  let reaction: Nostr.Event[] = $state.raw([]);
+  let zap: Nostr.Event[] = $state.raw([]);
   let repost_length: number = $derived(repost.length);
 
   let reaction_length: number = $derived(reaction.length);

@@ -204,8 +204,9 @@
     <div
       class="flex justify-between items-center mb-4 mx-auto flex-col w-[300px] max-w-[90vw]"
     >
-      <label for={select.ids.trigger} class=" flex flex-col gap-1 w-full my-6"
+      <label class=" flex flex-col gap-1 w-full my-6"
         >{$_("poll.title")}<input
+          id="poll-title"
           class="flex-1 border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="text"
           bind:value={title}
@@ -219,6 +220,7 @@
           {#each pollOptions as option, index}
             <div class="flex items-center space-x-2">
               <input
+                id={`poll-option-${index}`}
                 type="text"
                 placeholder={`${$_("poll.select.title")} ${index + 1}`}
                 class="flex-1 border rounded-md px-3 py-2 m-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -250,7 +252,7 @@
       {/if}
 
       <div class=" flex flex-col gap-1 w-full mt-6">
-        <label for={select.ids.trigger}>{$_("poll.limit")}</label>
+        <div class="text-sm font-medium">{$_("poll.limit")}</div>
         <button
           {...select.trigger}
           class="flex items-center justify-between overflow-hidden rounded-xl border border-gray-500 bg-gray-100 py-2 pl-3 pr-4 text-left text-gray-800

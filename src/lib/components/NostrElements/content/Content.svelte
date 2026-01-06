@@ -42,20 +42,7 @@
   };
 </script>
 
-{#if maxHeight !== 0}
-  <Truncate {maxHeight} {onClickShowMore} {depth}>
-    <ContentParts
-      {maxHeight}
-      {event}
-      {isShowClientTag}
-      {displayMenu}
-      {depth}
-      {repostable}
-      {zIndex}
-      {displayTags}
-    />
-  </Truncate>
-{:else}
+<Truncate {maxHeight} {onClickShowMore} {depth}>
   <ContentParts
     {maxHeight}
     {event}
@@ -66,7 +53,7 @@
     {zIndex}
     {displayTags}
   />
-{/if}
+</Truncate>
 <!--Show more no Dialog-->
 
 <Dialog

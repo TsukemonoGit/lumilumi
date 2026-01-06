@@ -91,9 +91,7 @@
                 />
               </div>
               {#snippet popoverContent()}
-                <div class="mr-8">
-                  {message}
-                </div>
+                {message}
               {/snippet}</Popover
             >
           {:else}
@@ -125,12 +123,10 @@
                     height={21}
                     name={`@${prof.name}`}
                     tags={metadata.tags}
-                  />
-                </span>{/if}{/if}
+                  /></span
+                >{/if}{/if}
           {:else}
-            <span class="text-magnum-100 text-sm"
-              >@{encodetoNpub(zapRequestEvent.pubkey)}</span
-            >
+            @{encodetoNpub(zapRequestEvent.pubkey)}
           {/if}
 
           <UserPopupMenu
@@ -142,9 +138,6 @@
           <div class="ml-auto">
             <NoteActionButtons {note} {repostable} bind:deleted {zIndex} />
           </div>
-        </div>
-        <div class="break-all text-sm px-2">
-          {zapRequestEvent.content}
         </div>
 
         {#if zappedId.tag.length > 0}

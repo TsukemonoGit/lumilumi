@@ -127,46 +127,40 @@
         {#snippet success({ event })}
           <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
             {#snippet loading()}
-              <div>
-                <EventCard
-                  showStatus={!isOmitted}
-                  note={event}
-                  {displayMenu}
-                  {repostable}
-                  {depth}
-                  mini={isOmitted || mini}
-                  {thread}
-                  {zIndex}
-                />
-              </div>
+              <EventCard
+                showStatus={!isOmitted}
+                note={event}
+                {displayMenu}
+                {repostable}
+                {depth}
+                mini={isOmitted || mini}
+                {thread}
+                {zIndex}
+              />
             {/snippet}
             {#snippet nodata()}
-              <div>
-                <EventCard
-                  showStatus={!isOmitted}
-                  note={event}
-                  {displayMenu}
-                  {repostable}
-                  {depth}
-                  mini={isOmitted || mini}
-                  {thread}
-                  {zIndex}
-                />
-              </div>
+              <EventCard
+                showStatus={!isOmitted}
+                note={event}
+                {displayMenu}
+                {repostable}
+                {depth}
+                mini={isOmitted || mini}
+                {thread}
+                {zIndex}
+              />
             {/snippet}
             {#snippet error()}
-              <div>
-                <EventCard
-                  showStatus={!isOmitted}
-                  note={event}
-                  {displayMenu}
-                  {repostable}
-                  {depth}
-                  mini={isOmitted || mini}
-                  {thread}
-                  {zIndex}
-                />
-              </div>
+              <EventCard
+                showStatus={!isOmitted}
+                note={event}
+                {displayMenu}
+                {repostable}
+                {depth}
+                mini={isOmitted || mini}
+                {thread}
+                {zIndex}
+              />
             {/snippet}
             {#snippet content({ metadata })}
               <EventCard

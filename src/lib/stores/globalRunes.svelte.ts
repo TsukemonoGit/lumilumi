@@ -16,9 +16,9 @@ import {
 } from "../../routes/notifications/notificationTypes";
 
 export const notifiSettings = createCustomStore<NotifiSettings>(notifiInit);
-export const loginUser: { value: string } = $state({ value: "" });
+export const loginUser: { value: string } = $state.raw({ value: "" });
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
-export const timelineFilter: TimelineFilter = $state(timelineFilterInit);
+export const timelineFilter: TimelineFilter = $state.raw(timelineFilterInit);
 export const followList = createCustomStore<Map<string, string | undefined>>(
   new Map()
 );
@@ -30,19 +30,19 @@ export let userStatusMap: SvelteMap<
 > = new SvelteMap();
 export const viewEventIds = createCustomStore<string[][]>([]);
 export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
-export const showBanner: { value: boolean } = $state({ value: true });
+export const showBanner: { value: boolean } = $state.raw({ value: true });
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
 export const authRelay = createCustomStore<string[]>([]);
 
 export const bookmark10003 = createCustomStore<Nostr.Event | null>(null);
 
-export const uploader: UploaderOption = $state(initUploaderOption);
+export const uploader: UploaderOption = $state.raw(initUploaderOption);
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数
 function createCustomStore<T>(initialValue: T) {
-  let state: T = $state(initialValue);
+  let state: T = $state.raw(initialValue);
   let subscribers: Array<(value: T) => void> = [];
 
   return {

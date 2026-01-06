@@ -31,10 +31,8 @@
 </script>
 
 <div class="w-full grid grid-cols-[1fr_auto]">
-  <!-- コンテンツ部分を共通化 -->
   {#snippet content()}
     <div class="grid grid-cols-[auto_1fr]">
-      <!-- 画像 -->
       <div class="relative">
         {@render listAvatar?.()}
         <div
@@ -44,7 +42,6 @@
         </div>
       </div>
 
-      <!-- テキスト -->
       <div class="ml-2 text-start flex flex-col">
         <div class="text-lg font-bold text-magnum-400">
           {listProps.name}
@@ -72,16 +69,13 @@
           <div
             class="mr-1 mt-auto flex gap-2 justify-end text-magnum-100 text-sm"
           >
-            {#each listProps.kategories as kategory}
-              <div>{kategory}</div>
-            {/each}
+            {#each listProps.kategories as kategory}{kategory}{/each}
           </div>
         {/if}
       </div>
     </div>
   {/snippet}
 
-  <!-- クリック可能かどうかで分岐 -->
   {#if clickAction}
     <button
       title={linkButtonTitle || ""}
