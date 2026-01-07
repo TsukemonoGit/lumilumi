@@ -31,7 +31,7 @@ export function useReplaceableEvent(
   staleTime: number = Infinity,
   initialDataUpdatedAt: number | undefined = undefined,
   refetchInterval: number = Infinity,
-  bufferTimeMs: number = 300
+  bufferTimeMs: number = 1000
 ): ReqResult<EventPacket> {
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
 
