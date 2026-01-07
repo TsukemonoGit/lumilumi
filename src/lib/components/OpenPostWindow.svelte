@@ -132,6 +132,7 @@
       }
 
       const event = await signer.signEvent($state.snapshot(newevent));
+
       const { event: ev, res } = await promisePublishSignedEvent(event);
 
       const successRelays = res
