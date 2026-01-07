@@ -233,7 +233,7 @@
     <!-- Load Buttons (visible only near top/bottom) -->
     {#if isNearEdge}
       <div
-        class="fixed bottom-0 left-1/2 -translate-x-1/2 anchor-none bg-neutral-900/95 backdrop-blur-sm py-3 px-4 rounded-t-xl shadow-2xl z-20"
+        class="fixed bottom-24 left-1/2 -translate-x-1/2 anchor-none bg-neutral-900/95 backdrop-blur-sm py-3 px-4 rounded-t-xl shadow-2xl z-20"
       >
         {#if isNearEdge === "top"}
           <button
