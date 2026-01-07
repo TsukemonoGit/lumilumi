@@ -17,6 +17,7 @@
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import type { Attachment } from "svelte/attachments";
 
   // State
   let id: string = $state("");
@@ -27,6 +28,7 @@
     $state(undefined);
   let targetNoteElement: HTMLDivElement;
   let targetPosition: "visible" | "above" | "below" = $state("visible");
+  let isNearEdge: "top" | "bottom" | null = $state(null);
 
   // Parse ID from URL params
   $effect(() => {
@@ -74,6 +76,29 @@
     return () => observer.disconnect();
   });
 
+  // Scroll position monitor for showing load buttons
+  $effect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+      const threshold = window.innerWidth < 768 ? 150 : 300;
+
+      if (scrollTop < threshold) {
+        isNearEdge = "top";
+      } else if (scrollTop + clientHeight > scrollHeight - threshold) {
+        isNearEdge = "bottom";
+      } else {
+        isNearEdge = null;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  });
+
   const scrollToTarget = () => {
     targetNoteElement?.scrollIntoView({
       behavior: "smooth",
@@ -98,25 +123,26 @@
   const onChangeTarget = (event: Nostr.Event) => {
     targetEvent = event;
   };
+
+  const myAttachment: Attachment = (element) => {
+    console.log(element.nodeName); // 'DIV'
+    const scroller = document.scrollingElement; // body / html
+
+    if (scroller && scroller.scrollTop === 0) {
+      scroller.scrollTop = 100;
+    }
+    return () => {
+      console.log("cleaning up");
+    };
+  };
 </script>
 
-<div class="container mx-auto max-w-2xl px-4 py-8">
+<div class="container mx-auto max-w-2xl px-4 py-8" {@attach myAttachment}>
   {#if feed}
-    <!-- Newer Button -->
-    <div class="flex justify-center mb-4">
-      <button
-        class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50"
-        onclick={feed.loadNewer}
-        disabled={feed.isLoadingNewer}
-      >
-        {feed.isLoadingNewer ? "Loading..." : "Load Newer"}
-      </button>
-    </div>
-
     <!-- Newer Events -->
     <div class="flex flex-col gap-2 mb-4">
       {#each feed.newerEvents as event (event.id)}
-        <div class="border-l-4 border-magnum-300 pl-2">
+        <div class="border-l-4 border-magnum-300 pl-2 anchor-auto">
           <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
             {#snippet content({ metadata })}
               <EventCard note={event} {metadata} />
@@ -137,7 +163,7 @@
   <div
     id="target-note"
     bind:this={targetNoteElement}
-    class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400"
+    class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
   >
     {#await waitForConnections()}
       <div class="p-4 text-center">Loading Target Note...</div>
@@ -186,9 +212,9 @@
 
   <!-- Older Events -->
   {#if feed}
-    <div class="flex flex-col gap-2 mt-4">
+    <div class="flex flex-col gap-2 mt-4 mb-16">
       {#each feed.olderEvents as event (event.id)}
-        <div class="border-l-4 border-neutral-600 pl-2">
+        <div class="border-l-4 border-neutral-600 pl-2 anchor-auto">
           <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
             {#snippet content({ metadata })}
               <EventCard note={event} {metadata} />
@@ -204,20 +230,45 @@
       {/each}
     </div>
 
-    <!-- Older Button -->
-    <div class="flex justify-center mt-4">
-      <button
-        class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50"
-        onclick={feed.loadOlder}
-        disabled={feed.isLoadingOlder}
+    <!-- Load Buttons (visible only near top/bottom) -->
+    {#if isNearEdge}
+      <div
+        class="fixed bottom-0 left-1/2 -translate-x-1/2 anchor-none bg-neutral-900/95 backdrop-blur-sm py-3 px-4 rounded-t-xl shadow-2xl z-20"
       >
-        {feed.isLoadingOlder ? "Loading..." : "Load Older"}
-      </button>
-    </div>
+        {#if isNearEdge === "top"}
+          <button
+            class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
+            onclick={() => {
+              const scroller = document.scrollingElement;
+              if (scroller && scroller.scrollTop === 0) {
+                scroller.scrollTop = 1;
+              }
+              feed?.loadNewer();
+            }}
+            disabled={feed.isLoadingNewer}
+          >
+            {feed.isLoadingNewer ? "Loading..." : "↑ Load Newer"}
+          </button>
+        {:else if isNearEdge === "bottom"}
+          <button
+            class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
+            onclick={() => feed?.loadOlder()}
+            disabled={feed.isLoadingOlder}
+          >
+            {feed.isLoadingOlder ? "Loading..." : "↓ Load Older"}
+          </button>
+        {/if}
+      </div>
+    {/if}
 
     <!-- Floating Action Button -->
     {#if targetPosition !== "visible"}
-      <div class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10">
+      <div
+        class="fixed right-4 flex flex-col gap-2 items-end z-30 anchor-none transition-all duration-300"
+        class:bottom-24={isNearEdge === "bottom"}
+        class:bottom-16={isNearEdge === "top"}
+        class:bottom-12={isNearEdge === null}
+      >
         <button
           class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
           onclick={scrollToTarget}
@@ -294,3 +345,12 @@
 <div class="postWindow">
   <OpenPostWindow options={{ tags: [], kind: 1 }} />
 </div>
+
+<style>
+  .anchor-auto {
+    overflow-anchor: auto;
+  }
+  .anchor-none {
+    overflow-anchor: auto;
+  }
+</style>
