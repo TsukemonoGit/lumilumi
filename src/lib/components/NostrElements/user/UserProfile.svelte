@@ -283,7 +283,7 @@
                     <span class="align-middle">📛{petname}</span>{/if}
                 </div>
 
-                {#if prof.nip05}
+                {#if prof.nip05 && typeof prof.nip05 === "string"}
                   <div class="text-sm flex break-all flex-wrap items-center">
                     {prof.nip05.replace(/^_@/, "")}<Nip05Check
                       {pubkey}
