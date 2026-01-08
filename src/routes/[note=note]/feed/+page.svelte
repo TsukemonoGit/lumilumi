@@ -106,23 +106,42 @@
     });
   };
 
+  // Helper function to create feed
+  const createFeedWithAuthors = (targetEv: Nostr.Event, authors: string[]) => {
+    if (!authors.includes(targetEv.pubkey)) {
+      authors.push(targetEv.pubkey);
+    }
+    const newFeed = createNeighborFeed(get(app).rxNostr, targetEv, authors);
+    newFeed.loadOlder();
+    newFeed.loadNewer();
+    return newFeed;
+  };
+
   const onChangeContacts = (event: Nostr.Event) => {
     contactsEvent = event;
     const map = pubkeysIn(contactsEvent);
     const authors = Array.from(map.keys());
     if (targetEvent) {
-      if (!authors.includes(targetEvent.pubkey)) {
-        authors.push(targetEvent.pubkey);
-      }
-
-      feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
-      feed.loadOlder();
-      feed.loadNewer();
+      feed = createFeedWithAuthors(targetEvent, authors);
     }
   };
+
   const onChangeTarget = (event: Nostr.Event) => {
     targetEvent = event;
+    // Immediately create feed with just the target's pubkey if contacts haven't loaded yet
+    if (!contactsEvent) {
+      feed = createFeedWithAuthors(event, []);
+    }
   };
+
+  // Update feed when both targetEvent and contactsEvent are available
+  $effect(() => {
+    if (targetEvent && contactsEvent && !feed) {
+      const map = pubkeysIn(contactsEvent);
+      const authors = Array.from(map.keys());
+      feed = createFeedWithAuthors(targetEvent, authors);
+    }
+  });
 
   const myAttachment: Attachment = (element) => {
     //console.log(element.nodeName); // 'DIV'
