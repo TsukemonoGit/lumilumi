@@ -28,7 +28,7 @@ export function createNeighborFeed(
     isLoadingOlder = true;
 
     const req = createRxBackwardReq("feed-older");
-    const limit = 30;
+    const limit = 50;
     const until = oldestLoaded;
 
     const filters = [
@@ -79,7 +79,7 @@ export function createNeighborFeed(
 
     const baseTime = newestLoaded;
     const t0 = baseTime;
-    const t1 = baseTime + 60 * 10; // 10 mins
+    const t1 = baseTime + 60 * 20; // 20 mins
 
     const req = createRxBackwardReq("feed-newer");
 
