@@ -125,7 +125,7 @@
   };
 
   const myAttachment: Attachment = (element) => {
-    console.log(element.nodeName); // 'DIV'
+    //console.log(element.nodeName); // 'DIV'
     const scroller = document.scrollingElement; // body / html
 
     if (scroller && scroller.scrollTop === 0) {
@@ -137,211 +137,218 @@
   };
 </script>
 
-<div class="container mx-auto max-w-2xl px-4 py-8" {@attach myAttachment}>
-  {#if feed}
-    <!-- Newer Events -->
-    <div class="flex flex-col gap-2 mb-4">
-      {#each feed.newerEvents as event (event.id)}
-        <div class="border-l-4 border-magnum-300 pl-2 anchor-auto">
-          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
-            {#snippet content({ metadata })}
-              <EventCard note={event} {metadata} />
-            {/snippet}
-            {#snippet loading()}
-              <EventCard note={event} />
-            {/snippet}
-            {#snippet error()}
-              <EventCard note={event} />
-            {/snippet}
-          </Metadata>
-        </div>
-      {/each}
-    </div>
-  {/if}
-
-  <!-- Target Event (Anchor) -->
-  <div
-    id="target-note"
-    bind:this={targetNoteElement}
-    class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
-  >
-    {#await waitForConnections()}
-      <div class="p-4 text-center">Loading Target Note...</div>
-    {:then d}
-      <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
-        {#snippet loading()}
-          <div class="p-4 text-center">Loading Target Note...</div>
-        {/snippet}
-        {#snippet nodata()}
-          <div class="p-4 text-center">Failed to get Target Event</div>
-        {/snippet}
-        {#snippet content({ data: targetEvent })}
-          <LatestEvent
-            queryKey={["timeline", "contacts", targetEvent.pubkey]}
-            filters={[
-              {
-                kinds: [3],
-                authors: [targetEvent.pubkey],
-                limit: 1,
-              },
-            ]}
-            onChange={onChangeContacts}
-          ></LatestEvent>
-          <Metadata
-            queryKey={["metadata", targetEvent.pubkey]}
-            pubkey={targetEvent.pubkey}
-          >
-            {#snippet content({ metadata })}
-              <EventCard
-                note={targetEvent!}
-                {metadata}
-                thread={true}
-                zIndex={55}
-              />
-            {/snippet}
-            {#snippet loading()}
-              <EventCard note={targetEvent!} zIndex={55} />
-            {/snippet}
-            {#snippet error()}
-              <EventCard note={targetEvent!} zIndex={55} />
-            {/snippet}
-          </Metadata>{/snippet}
-      </Text>
-    {/await}
-  </div>
-
-  <!-- Older Events -->
-  {#if feed}
-    <div class="flex flex-col gap-2 mt-4 mb-16">
-      {#each feed.olderEvents as event (event.id)}
-        <div class="border-l-4 border-neutral-600 pl-2 anchor-auto">
-          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
-            {#snippet content({ metadata })}
-              <EventCard note={event} {metadata} />
-            {/snippet}
-            {#snippet loading()}
-              <EventCard note={event} />
-            {/snippet}
-            {#snippet error()}
-              <EventCard note={event} />
-            {/snippet}
-          </Metadata>
-        </div>
-      {/each}
-    </div>
-
-    <!-- Load Buttons (visible only near top/bottom) -->
-    {#if isNearEdge}
-      <div
-        class="fixed bottom-24 left-1/2 -translate-x-1/2 anchor-none bg-neutral-900/95 backdrop-blur-sm py-3 px-4 rounded-t-xl shadow-2xl z-20"
-      >
-        {#if isNearEdge === "top"}
-          <button
-            class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
-            onclick={() => {
-              const scroller = document.scrollingElement;
-              if (scroller && scroller.scrollTop === 0) {
-                scroller.scrollTop = 1;
-              }
-              feed?.loadNewer();
-            }}
-            disabled={feed.isLoadingNewer}
-          >
-            {feed.isLoadingNewer ? "Loading..." : "↑ Load Newer"}
-          </button>
-        {:else if isNearEdge === "bottom"}
-          <button
-            class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
-            onclick={() => feed?.loadOlder()}
-            disabled={feed.isLoadingOlder}
-          >
-            {feed.isLoadingOlder ? "Loading..." : "↓ Load Older"}
-          </button>
-        {/if}
+{#key id}
+  <div class="container mx-auto max-w-2xl px-4 py-8" {@attach myAttachment}>
+    {#if feed}
+      <!-- Newer Events -->
+      <div class="flex flex-col gap-2 mb-4">
+        {#each feed.newerEvents as event (event.id)}
+          <div class="border-l-4 border-magnum-300 pl-2 anchor-auto">
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet content({ metadata })}
+                <EventCard note={event} {metadata} />
+              {/snippet}
+              {#snippet loading()}
+                <EventCard note={event} />
+              {/snippet}
+              {#snippet error()}
+                <EventCard note={event} />
+              {/snippet}
+            </Metadata>
+          </div>
+        {/each}
       </div>
     {/if}
 
-    <!-- Floating Action Button -->
-    {#if targetPosition !== "visible"}
-      <div
-        class="fixed right-4 flex flex-col gap-2 items-end z-30 anchor-none transition-all duration-300"
-        class:bottom-24={isNearEdge === "bottom"}
-        class:bottom-16={isNearEdge === "top"}
-        class:bottom-12={isNearEdge === null}
-      >
-        <button
-          class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
-          onclick={scrollToTarget}
-          aria-label="Scroll to target"
-        >
-          {#if id && targetEvent}
+    <!-- Target Event (Anchor) -->
+    <div
+      id="target-note"
+      bind:this={targetNoteElement}
+      class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
+    >
+      {#await waitForConnections()}
+        <div class="p-4 text-center">Loading Target Note...</div>
+      {:then d}
+        <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
+          {#snippet loading()}
+            <div class="p-4 text-center">Loading Target Note...</div>
+          {/snippet}
+          {#snippet nodata()}
+            <div class="p-4 text-center">Failed to get Target Event</div>
+          {/snippet}
+          {#snippet content({ data: targetEvent })}
+            <LatestEvent
+              queryKey={["timeline", "contacts", targetEvent.pubkey]}
+              filters={[
+                {
+                  kinds: [3],
+                  authors: [targetEvent.pubkey],
+                  limit: 1,
+                },
+              ]}
+              onChange={onChangeContacts}
+            ></LatestEvent>
             <Metadata
               queryKey={["metadata", targetEvent.pubkey]}
               pubkey={targetEvent.pubkey}
             >
               {#snippet content({ metadata })}
-                {@const prof = profile(metadata)}
-                <UserAvatar
-                  url={prof?.picture}
-                  name={prof?.name}
-                  pubkey={prof?.pubkey}
-                  size={28}
+                <EventCard
+                  note={targetEvent!}
+                  {metadata}
+                  thread={true}
+                  zIndex={55}
                 />
               {/snippet}
               {#snippet loading()}
-                <UserAvatar
-                  size={28}
-                  pubkey={targetEvent!.pubkey}
-                  url={undefined}
-                  name={undefined}
-                />
+                <EventCard note={targetEvent!} zIndex={55} />
               {/snippet}
               {#snippet error()}
-                <UserAvatar
-                  size={28}
-                  pubkey={targetEvent!.pubkey}
-                  url={undefined}
-                  name={undefined}
-                />
+                <EventCard note={targetEvent!} zIndex={55} />
+              {/snippet}
+            </Metadata>{/snippet}
+        </Text>
+      {/await}
+    </div>
+
+    <!-- Older Events -->
+    {#if feed}
+      <div class="flex flex-col gap-2 mt-4 mb-16">
+        {#each feed.olderEvents as event (event.id)}
+          <div class="border-l-4 border-neutral-600 pl-2 anchor-auto">
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet content({ metadata })}
+                <EventCard note={event} {metadata} />
+              {/snippet}
+              {#snippet loading()}
+                <EventCard note={event} />
+              {/snippet}
+              {#snippet error()}
+                <EventCard note={event} />
               {/snippet}
             </Metadata>
-            <span class="text-sm font-semibold">Main Post</span>
-            {#if targetPosition === "above"}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m18 15-6-6-6 6" />
-              </svg>
-            {:else}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            {/if}
-          {/if}
-        </button>
+          </div>
+        {/each}
       </div>
-    {/if}
-  {/if}
-</div>
 
+      <!-- Load Buttons (visible only near top/bottom) -->
+      {#if isNearEdge}
+        <div
+          class="fixed bottom-24 left-1/2 -translate-x-1/2 anchor-none bg-neutral-900/95 backdrop-blur-sm py-3 px-4 rounded-t-xl shadow-2xl z-20"
+        >
+          {#if isNearEdge === "top"}
+            <button
+              class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
+              onclick={() => {
+                const scroller = document.scrollingElement;
+                if (scroller && scroller.scrollTop === 0) {
+                  scroller.scrollTop = 1;
+                }
+                feed?.loadNewer();
+              }}
+              disabled={feed.isLoadingNewer}
+            >
+              {feed.isLoadingNewer ? "Loading..." : "↑ Load Newer"}
+            </button>
+          {:else if isNearEdge === "bottom"}
+            <button
+              class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-semibold py-2.5 px-8 md:py-2.5 md:px-8 sm:py-3 sm:px-10 rounded-lg disabled:opacity-50 transition-all active:scale-95 shadow-md"
+              onclick={() => feed?.loadOlder()}
+              disabled={feed.isLoadingOlder}
+            >
+              {feed.isLoadingOlder ? "Loading..." : "↓ Load Older"}
+            </button>
+          {/if}
+        </div>
+      {/if}
+
+      <!-- Floating Action Button -->
+      {#if targetPosition !== "visible"}
+        <div
+          class="fixed right-4 flex flex-col gap-2 items-end z-30 anchor-none transition-all duration-300"
+          class:bottom-24={isNearEdge === "bottom"}
+          class:bottom-16={isNearEdge === "top"}
+          class:bottom-12={isNearEdge === null}
+        >
+          <button
+            class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
+            onclick={scrollToTarget}
+            aria-label="Scroll to target"
+          >
+            {#if id && targetEvent}
+              <Metadata
+                queryKey={["metadata", targetEvent.pubkey]}
+                pubkey={targetEvent.pubkey}
+              >
+                {#snippet content({ metadata })}
+                  {@const prof = profile(metadata)}
+                  <UserAvatar
+                    url={prof?.picture}
+                    name={prof?.name}
+                    pubkey={prof?.pubkey}
+                    size={28}
+                  />
+                {/snippet}
+                {#snippet loading()}
+                  <UserAvatar
+                    size={28}
+                    pubkey={targetEvent!.pubkey}
+                    url={undefined}
+                    name={undefined}
+                  />
+                {/snippet}
+                {#snippet error()}
+                  <UserAvatar
+                    size={28}
+                    pubkey={targetEvent!.pubkey}
+                    url={undefined}
+                    name={undefined}
+                  />
+                {/snippet}
+              </Metadata>
+              <span class="text-sm font-semibold">Main Post</span>
+              {#if targetPosition === "above"}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m18 15-6-6-6 6" />
+                </svg>
+              {:else}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              {/if}
+            {/if}
+          </button>
+        </div>
+      {/if}
+    {/if}
+  </div>
+{/key}
 <div class="postWindow">
   <OpenPostWindow options={{ tags: [], kind: 1 }} />
 </div>
