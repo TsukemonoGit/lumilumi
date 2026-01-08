@@ -17,7 +17,6 @@
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
-  import type { Attachment } from "svelte/attachments";
 
   // State
   let id: string = $state("");
@@ -51,6 +50,14 @@
         targetEvent = undefined;
         contactsEvent = undefined;
         feed = undefined;
+
+        // Scroll down a bit to enable overflow-anchor behavior
+        setTimeout(() => {
+          const scroller = document.scrollingElement;
+          if (scroller && scroller.scrollTop === 0) {
+            scroller.scrollTop = 100;
+          }
+        }, 0);
       }
     } catch (e) {
       console.error("Failed to decode note param:", e);
@@ -117,47 +124,36 @@
     return newFeed;
   };
 
-  const onChangeContacts = (event: Nostr.Event) => {
-    contactsEvent = event;
-    const map = pubkeysIn(contactsEvent);
-    const authors = Array.from(map.keys());
-    if (targetEvent) {
-      feed = createFeedWithAuthors(targetEvent, authors);
+  const onChangeContacts = (event: Nostr.Event | undefined) => {
+    if (event) {
+      contactsEvent = event;
     }
   };
 
-  const onChangeTarget = (event: Nostr.Event) => {
-    targetEvent = event;
-    // Immediately create feed with just the target's pubkey if contacts haven't loaded yet
-    if (!contactsEvent) {
-      feed = createFeedWithAuthors(event, []);
+  const onChangeTarget = (event: Nostr.Event | undefined) => {
+    if (event) {
+      targetEvent = event;
     }
   };
 
-  // Update feed when both targetEvent and contactsEvent are available
+  // Create/update feed when targetEvent is available
   $effect(() => {
-    if (targetEvent && contactsEvent && !feed) {
-      const map = pubkeysIn(contactsEvent);
-      const authors = Array.from(map.keys());
-      feed = createFeedWithAuthors(targetEvent, authors);
+    if (!targetEvent) {
+      feed = undefined;
+      return;
     }
+
+    // Create feed with contacts if available, otherwise just with target
+    const authors = contactsEvent
+      ? Array.from(pubkeysIn(contactsEvent).keys())
+      : [];
+
+    feed = createFeedWithAuthors(targetEvent, authors);
   });
-
-  const myAttachment: Attachment = (element) => {
-    //console.log(element.nodeName); // 'DIV'
-    const scroller = document.scrollingElement; // body / html
-
-    if (scroller && scroller.scrollTop === 0) {
-      scroller.scrollTop = 100;
-    }
-    return () => {
-      console.log("cleaning up");
-    };
-  };
 </script>
 
 {#key id}
-  <div class="container mx-auto max-w-2xl px-4 py-8" {@attach myAttachment}>
+  <div class="container mx-auto max-w-2xl px-4 py-8">
     {#if feed}
       <!-- Newer Events -->
       <div class="flex flex-col gap-2 mb-4">
@@ -209,7 +205,11 @@
                 },
               ]}
               onChange={onChangeContacts}
-            ></LatestEvent>
+            >
+              {#snippet error()}
+                <div style="display: none;"></div>
+              {/snippet}
+            </LatestEvent>
             <Metadata
               queryKey={["metadata", targetEvent.pubkey]}
               pubkey={targetEvent.pubkey}
