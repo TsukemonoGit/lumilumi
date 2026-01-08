@@ -125,7 +125,7 @@
   };
 
   const myAttachment: Attachment = (element) => {
-    console.log(element.nodeName); // 'DIV'
+    //console.log(element.nodeName); // 'DIV'
     const scroller = document.scrollingElement; // body / html
 
     if (scroller && scroller.scrollTop === 0) {
