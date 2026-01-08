@@ -118,7 +118,12 @@
     if (!authors.includes(targetEv.pubkey)) {
       authors.push(targetEv.pubkey);
     }
-    const newFeed = createNeighborFeed(get(app).rxNostr, targetEv, authors);
+    const newFeed = createNeighborFeed(
+      get(app).rxNostr,
+      targetEv,
+      authors,
+      relays.length > 0 ? relays : undefined
+    );
     newFeed.loadOlder();
     newFeed.loadNewer();
     return newFeed;
@@ -187,16 +192,27 @@
       {#await waitForConnections()}
         <div class="p-4 text-center">Loading Target Note...</div>
       {:then d}
-        <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
+        <Text
+          queryKey={["timeline", id]}
+          {id}
+          {relays}
+          onChange={onChangeTarget}
+        >
           {#snippet loading()}
             <div class="p-4 text-center">Loading Target Note...</div>
           {/snippet}
           {#snippet nodata()}
             <div class="p-4 text-center">Failed to get Target Event</div>
           {/snippet}
+          {#snippet error(e)}
+            <div class="p-4 text-center">
+              Failed to get Target Event: {e.message}
+            </div>
+          {/snippet}
           {#snippet content({ data: targetEvent })}
             <LatestEvent
               queryKey={["timeline", "contacts", targetEvent.pubkey]}
+              {relays}
               filters={[
                 {
                   kinds: [3],

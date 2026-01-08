@@ -10,7 +10,8 @@ import type * as Nostr from "nostr-typedef";
 export function createNeighborFeed(
   rxNostr: RxNostr,
   targetEvent: Nostr.Event,
-  authors: string[]
+  authors: string[],
+  relays?: string[]
 ) {
   let olderEvents = $state<Nostr.Event[]>([]);
   let newerEvents = $state<Nostr.Event[]>([]);
@@ -42,33 +43,35 @@ export function createNeighborFeed(
 
     let events: Nostr.Event[] = [];
 
-    rxNostr
-      .use(req)
-      .pipe(uniq(), completeOnTimeout(3000))
-      .subscribe({
-        next: (packet) => {
-          if (packet?.event && packet.event.id !== targetEvent.id) {
-            events.push(packet.event);
-          }
-        },
-        complete: () => {
-          const sorted = sortEvents(events).slice(0, limit);
-          // Filter duplicates against existing
-          const uniqueNew = sorted.filter(
-            (e) => !olderEvents.find((existing) => existing.id === e.id)
-          );
+    const reqToUse =
+      relays && relays.length > 0
+        ? rxNostr.use(req, { relays })
+        : rxNostr.use(req);
 
-          if (uniqueNew.length > 0) {
-            olderEvents = [...olderEvents, ...uniqueNew];
-            oldestLoaded = uniqueNew[uniqueNew.length - 1].created_at - 1;
-          }
-          isLoadingOlder = false;
-        },
-        error: (e) => {
-          console.error(e);
-          isLoadingOlder = false;
-        },
-      });
+    reqToUse.pipe(uniq(), completeOnTimeout(3000)).subscribe({
+      next: (packet) => {
+        if (packet?.event && packet.event.id !== targetEvent.id) {
+          events.push(packet.event);
+        }
+      },
+      complete: () => {
+        const sorted = sortEvents(events).slice(0, limit);
+        // Filter duplicates against existing
+        const uniqueNew = sorted.filter(
+          (e) => !olderEvents.find((existing) => existing.id === e.id)
+        );
+
+        if (uniqueNew.length > 0) {
+          olderEvents = [...olderEvents, ...uniqueNew];
+          oldestLoaded = uniqueNew[uniqueNew.length - 1].created_at - 1;
+        }
+        isLoadingOlder = false;
+      },
+      error: (e) => {
+        console.error(e);
+        isLoadingOlder = false;
+      },
+    });
 
     req.emit(filters);
   }
@@ -94,49 +97,51 @@ export function createNeighborFeed(
 
     let events: Nostr.Event[] = [];
 
-    rxNostr
-      .use(req)
-      .pipe(uniq(), completeOnTimeout(3000))
-      .subscribe({
-        next: (p) => events.push(p.event),
-        complete: () => {
-          const sorted = sortEvents(events); // Descending (Newest first) in chunk
+    const reqToUse =
+      relays && relays.length > 0
+        ? rxNostr.use(req, { relays })
+        : rxNostr.use(req);
 
-          // newerEvents are displayed above target.
-          // We append the new chunk (which is chronologically newer than existing) to the FRONT/TOP of the list?
-          // Wait.
-          // `newerEvents` list: Top = Newest.
-          // If we have [A, B] (A is newer than B).
-          // We fetch [C, D] (C newer than D, both newer than A).
-          // We want [C, D, A, B].
-          // `sorted` is [C, D].
-          // newerEvents = [...sorted, ...newerEvents].
+    reqToUse.pipe(uniq(), completeOnTimeout(3000)).subscribe({
+      next: (p) => events.push(p.event),
+      complete: () => {
+        const sorted = sortEvents(events); // Descending (Newest first) in chunk
 
-          const uniqueNew = sorted.filter(
-            (e) =>
-              !newerEvents.find((existing) => existing.id === e.id) &&
-              e.id !== targetEvent.id
-          );
+        // newerEvents are displayed above target.
+        // We append the new chunk (which is chronologically newer than existing) to the FRONT/TOP of the list?
+        // Wait.
+        // `newerEvents` list: Top = Newest.
+        // If we have [A, B] (A is newer than B).
+        // We fetch [C, D] (C newer than D, both newer than A).
+        // We want [C, D, A, B].
+        // `sorted` is [C, D].
+        // newerEvents = [...sorted, ...newerEvents].
 
-          if (uniqueNew.length > 0) {
-            newerEvents = [...uniqueNew, ...newerEvents];
-            // Update cursor to the NEWEST event we just found (which is at index 0 of sorted)
-            // Because sorted is Descending (Newest first).
-            // Next fetch will start from this time.
-            newestLoaded = sorted[0].created_at;
-          } else {
-            // If no events found, maybe we are at the top?
-            // Or maybe we should just slightly increment to avoid getting stuck?
-            // For 'since' without until, getting 0 means no newer events exist at all.
-            // So we don't need to advance aggressively.
-          }
-          isLoadingNewer = false;
-        },
-        error: (e) => {
-          console.error(e);
-          isLoadingNewer = false;
-        },
-      });
+        const uniqueNew = sorted.filter(
+          (e) =>
+            !newerEvents.find((existing) => existing.id === e.id) &&
+            e.id !== targetEvent.id
+        );
+
+        if (uniqueNew.length > 0) {
+          newerEvents = [...uniqueNew, ...newerEvents];
+          // Update cursor to the NEWEST event we just found (which is at index 0 of sorted)
+          // Because sorted is Descending (Newest first).
+          // Next fetch will start from this time.
+          newestLoaded = sorted[0].created_at;
+        } else {
+          // If no events found, maybe we are at the top?
+          // Or maybe we should just slightly increment to avoid getting stuck?
+          // For 'since' without until, getting 0 means no newer events exist at all.
+          // So we don't need to advance aggressively.
+        }
+        isLoadingNewer = false;
+      },
+      error: (e) => {
+        console.error(e);
+        isLoadingNewer = false;
+      },
+    });
 
     req.emit(filters);
   }
