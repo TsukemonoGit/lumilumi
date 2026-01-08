@@ -17,6 +17,8 @@
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import type { Attachment } from "svelte/attachments";
+  import { untrack } from "svelte";
 
   // State
   let id: string = $state("");
@@ -36,29 +38,23 @@
 
     try {
       const { type, data } = nip19.decode(noteParam);
-      let newId = "";
+      untrack(() => {
+        let newId = "";
 
-      if (type === "note") {
-        newId = data;
-      } else if (type === "nevent") {
-        newId = data.id;
-        if (data.relays) relays = data.relays;
-      }
+        if (type === "note") {
+          newId = data;
+        } else if (type === "nevent") {
+          newId = data.id;
+          if (data.relays) relays = data.relays;
+        }
 
-      if (newId && newId !== id) {
-        id = newId;
-        targetEvent = undefined;
-        contactsEvent = undefined;
-        feed = undefined;
-
-        // Scroll down a bit to enable overflow-anchor behavior
-        setTimeout(() => {
-          const scroller = document.scrollingElement;
-          if (scroller && scroller.scrollTop === 0) {
-            scroller.scrollTop = 100;
-          }
-        }, 0);
-      }
+        if (newId && newId !== id) {
+          id = newId;
+          targetEvent = undefined;
+          contactsEvent = undefined;
+          feed = undefined;
+        }
+      });
     } catch (e) {
       console.error("Failed to decode note param:", e);
     }
@@ -90,14 +86,15 @@
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = window.innerHeight;
       const threshold = window.innerWidth < 768 ? 150 : 300;
-
-      if (scrollTop < threshold) {
-        isNearEdge = "top";
-      } else if (scrollTop + clientHeight > scrollHeight - threshold) {
-        isNearEdge = "bottom";
-      } else {
-        isNearEdge = null;
-      }
+      untrack(() => {
+        if (scrollTop < threshold) {
+          isNearEdge = "top";
+        } else if (scrollTop + clientHeight > scrollHeight - threshold) {
+          isNearEdge = "bottom";
+        } else {
+          isNearEdge = null;
+        }
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -113,52 +110,39 @@
     });
   };
 
-  // Helper function to create feed
-  const createFeedWithAuthors = (targetEv: Nostr.Event, authors: string[]) => {
-    if (!authors.includes(targetEv.pubkey)) {
-      authors.push(targetEv.pubkey);
-    }
-    const newFeed = createNeighborFeed(
-      get(app).rxNostr,
-      targetEv,
-      authors,
-      relays.length > 0 ? relays : undefined
-    );
-    newFeed.loadOlder();
-    newFeed.loadNewer();
-    return newFeed;
-  };
+  const onChangeContacts = (event: Nostr.Event) => {
+    contactsEvent = event;
+    const map = pubkeysIn(contactsEvent);
+    const authors = Array.from(map.keys());
+    if (targetEvent) {
+      if (!authors.includes(targetEvent.pubkey)) {
+        authors.push(targetEvent.pubkey);
+      }
 
-  const onChangeContacts = (event: Nostr.Event | undefined) => {
-    if (event) {
-      contactsEvent = event;
+      feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
+      feed.loadOlder();
+      feed.loadNewer();
     }
   };
-
-  const onChangeTarget = (event: Nostr.Event | undefined) => {
-    if (event) {
-      targetEvent = event;
-    }
+  const onChangeTarget = (event: Nostr.Event) => {
+    targetEvent = event;
   };
 
-  // Create/update feed when targetEvent is available
-  $effect(() => {
-    if (!targetEvent) {
-      feed = undefined;
-      return;
+  const myAttachment: Attachment = (element) => {
+    console.log(element.nodeName); // 'DIV'
+    const scroller = document.scrollingElement; // body / html
+
+    if (scroller && scroller.scrollTop === 0) {
+      scroller.scrollTop = 100;
     }
-
-    // Create feed with contacts if available, otherwise just with target
-    const authors = contactsEvent
-      ? Array.from(pubkeysIn(contactsEvent).keys())
-      : [];
-
-    feed = createFeedWithAuthors(targetEvent, authors);
-  });
+    return () => {
+      console.log("cleaning up");
+    };
+  };
 </script>
 
 {#key id}
-  <div class="container mx-auto max-w-2xl px-4 py-8">
+  <div class="container mx-auto max-w-2xl px-4 py-8" {@attach myAttachment}>
     {#if feed}
       <!-- Newer Events -->
       <div class="flex flex-col gap-2 mb-4">
@@ -192,27 +176,16 @@
       {#await waitForConnections()}
         <div class="p-4 text-center">Loading Target Note...</div>
       {:then d}
-        <Text
-          queryKey={["timeline", id]}
-          {id}
-          {relays}
-          onChange={onChangeTarget}
-        >
+        <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
           {#snippet loading()}
             <div class="p-4 text-center">Loading Target Note...</div>
           {/snippet}
           {#snippet nodata()}
             <div class="p-4 text-center">Failed to get Target Event</div>
           {/snippet}
-          {#snippet error(e)}
-            <div class="p-4 text-center">
-              Failed to get Target Event: {e.message}
-            </div>
-          {/snippet}
           {#snippet content({ data: targetEvent })}
             <LatestEvent
               queryKey={["timeline", "contacts", targetEvent.pubkey]}
-              {relays}
               filters={[
                 {
                   kinds: [3],
@@ -221,11 +194,7 @@
                 },
               ]}
               onChange={onChangeContacts}
-            >
-              {#snippet error()}
-                <div style="display: none;"></div>
-              {/snippet}
-            </LatestEvent>
+            ></LatestEvent>
             <Metadata
               queryKey={["metadata", targetEvent.pubkey]}
               pubkey={targetEvent.pubkey}
