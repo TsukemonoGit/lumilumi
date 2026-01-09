@@ -96,8 +96,6 @@
 
   function fullResetTimeline() {
     allUniqueEventsMap.clear();
-    // queryClientの olderData も明示的にクリア
-    queryClient?.removeQueries({ queryKey: [...queryKey, "olderData"] });
     timeoutId = null;
     isOnMount = false;
     isLoadingOlderEvents = false;
@@ -117,13 +115,6 @@
       timeoutId = null;
     }
   }
-
-  $effect(() => {
-    if (page.params.npub) {
-      destroyed = false;
-      fullResetTimeline();
-    }
-  });
 
   const configureOperators = pipe(tie, uniq(), scanArray());
 
@@ -287,11 +278,7 @@
       );
       if (destroyed) return;
       if (olderEvents.length > 0) {
-        const existingIds = new Set(($globalData ?? []).map((p) => p.event.id));
-        const filtered = olderEvents.filter(
-          (p) => !existingIds.has(p.event.id)
-        );
-        queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
+        queryClient.setQueryData([...queryKey, "olderData"], () => olderEvents);
 
         setTimeout(() => {
           if (destroyed) return;

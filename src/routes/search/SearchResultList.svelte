@@ -191,11 +191,7 @@
     );
 
     if (older.length > 0) {
-      // data にない id を除外
-      const existingIds = new Set(($data ?? []).map((p) => p.event.id));
-      const filtered = older.filter((p) => !existingIds.has(p.event.id));
-
-      queryClient.setQueryData([...queryKey, "olderData"], () => filtered);
+      queryClient.setQueryData([...queryKey, "olderData"], () => older);
     }
     updateViewEvent();
     result.status = readable("success");
