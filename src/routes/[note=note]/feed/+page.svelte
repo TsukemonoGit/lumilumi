@@ -18,6 +18,7 @@
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
   import type { Attachment } from "svelte/attachments";
+  import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
 
   // State
   let id: string = $state("");
@@ -124,42 +125,18 @@
   };
 </script>
 
-<div class="container mx-auto max-w-2xl px-4 my-6" {@attach myAttachment}>
-  <!-- Newer Button -->
-
-  <button
-    class="bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1"
-    onclick={() => {
-      const scroller = document.scrollingElement; // body / html
-
-      if (scroller && scroller.scrollTop === 0) {
-        scroller.scrollTop = 1;
-      }
-
-      feed?.loadNewer();
-    }}
-    disabled={feed?.isLoadingNewer}
-  >
-    {feed?.isLoadingNewer ? "Loading..." : "Load Newer"}
-  </button>
+<div
+  class="relative container mx-auto max-w-2xl px-4 my-6"
+  {@attach myAttachment}
+>
   <!-- Newer Events -->
   <div class="flex flex-col gap-2 mb-4">
-    <!-- Placeholder for missing Newer Events -->
+    <!-- Edge spacer (top) -->
+    <div class="anchor-none h-6"></div>
+    <!-- Missing newer events skeletons -->
     {#each Array(Math.max(0, 3 - (feed?.newerEvents.length ?? 0))) as _, i (i)}
-      <div class="border-l-4 border-magnum-300/50 pl-2 anchor-auto">
-        <div class="bg-neutral-800 rounded-lg p-4 animate-pulse">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-full bg-neutral-700"></div>
-            <div class="flex-1">
-              <div class="h-4 bg-neutral-700 rounded w-24 mb-1"></div>
-              <div class="h-3 bg-neutral-700 rounded w-16"></div>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <div class="h-4 bg-neutral-700 rounded w-full"></div>
-            <div class="h-4 bg-neutral-700 rounded w-3/4"></div>
-          </div>
-        </div>
+      <div class="border-l-4 border-magnum-300/50 pl-2 anchor-none">
+        <EmptyCard />
       </div>
     {/each}
     {#if feed}
@@ -192,14 +169,26 @@
       class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
     >
       {#await waitForConnections()}
-        <div class="p-4 text-center">Loading Target Note...</div>
+        <EmptyCard
+          ><div class="min-h-24 content-center">
+            Loading Target Note...
+          </div></EmptyCard
+        >
       {:then d}
         <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
           {#snippet loading()}
-            <div class="p-4 text-center">Loading Target Note...</div>
+            <EmptyCard
+              ><div class="min-h-24 content-center">
+                Loading Target Note...
+              </div></EmptyCard
+            >
           {/snippet}
           {#snippet nodata()}
-            <div class="p-4 text-center">Failed to get Target Event</div>
+            <EmptyCard
+              ><div class="min-h-24 content-center">
+                Failed to get Target Event
+              </div></EmptyCard
+            >
           {/snippet}
           {#snippet content({ data: targetEvent })}
             <LatestEvent
@@ -256,24 +245,14 @@
         </div>
       {/each}
     {/if}
-    <!-- Placeholder for missing Older Events -->
-    {#each Array(Math.max(0, 10 - (feed?.olderEvents.length ?? 0))) as _, i (i)}
-      <div class="border-l-4 border-neutral-600/50 pl-2 anchor-auto">
-        <div class="bg-neutral-800 rounded-lg p-4 animate-pulse">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-full bg-neutral-700"></div>
-            <div class="flex-1">
-              <div class="h-4 bg-neutral-700 rounded w-24 mb-1"></div>
-              <div class="h-3 bg-neutral-700 rounded w-16"></div>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <div class="h-4 bg-neutral-700 rounded w-full"></div>
-            <div class="h-4 bg-neutral-700 rounded w-3/4"></div>
-          </div>
-        </div>
+    <!-- Missing older events skeletons -->
+    {#each Array(Math.max(0, 8 - (feed?.olderEvents.length ?? 0))) as _, i (i)}
+      <div class="border-l-4 border-neutral-600/50 pl-2 anchor-none">
+        <EmptyCard />
       </div>
     {/each}
+    <!-- Edge spacer (bottom) -->
+    <div class="anchor-none h-8"></div>
   </div>
 
   <!-- Floating Action Button -->
@@ -351,10 +330,29 @@
       </button>
     </div>
   {/if}
+
+  <!-- Newer Button -->
+
+  <button
+    class="absolute top-0 bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 anchor-none"
+    onclick={() => {
+      const scroller = document.scrollingElement; // body / html
+
+      if (scroller && scroller.scrollTop === 0) {
+        scroller.scrollTop = 1;
+      }
+
+      feed?.loadNewer();
+    }}
+    disabled={feed?.isLoadingNewer}
+  >
+    {feed?.isLoadingNewer ? "Loading..." : "Load Newer"}
+  </button>
+
   <!-- Older Button -->
 
   <button
-    class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1"
+    class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 absolute bottom-0"
     onclick={feed?.loadOlder}
     disabled={feed?.isLoadingOlder}
   >
