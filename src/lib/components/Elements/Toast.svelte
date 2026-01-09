@@ -36,7 +36,7 @@
         data: value,
       });
       if (toaster.toasts.length > 4) {
-        console.log(toaster.toasts);
+        // console.log(toaster.toasts);
         toaster.removeToast(toaster.toasts[toaster.toasts.length - 1].id);
       }
     }
