@@ -96,6 +96,8 @@
 
   function fullResetTimeline() {
     allUniqueEventsMap.clear();
+    // queryClientの olderData も明示的にクリア
+    queryClient?.removeQueries({ queryKey: [...queryKey, "olderData"] });
     timeoutId = null;
     isOnMount = false;
     isLoadingOlderEvents = false;
