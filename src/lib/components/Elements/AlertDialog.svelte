@@ -5,7 +5,7 @@
 
   interface Props {
     onClickOK: () => void;
-    title?: string;
+    title?: Snippet;
     description?: string;
     okButtonName?: string;
     main?: Snippet;
@@ -16,7 +16,7 @@
 
   let {
     onClickOK,
-    title = "",
+    title: dialogTitle,
     description = "",
     okButtonName = "Continue",
     main: contentSnippet,
@@ -26,7 +26,8 @@
   }: Props = $props();
 </script>
 
-<Dialog bind:open dialogTitle={title} {id} {closeOnOutsideClick} zIndex={50}>
+<Dialog bind:open {id} {closeOnOutsideClick} zIndex={50}
+  >{#snippet title()}{dialogTitle}{/snippet}
   {#snippet main()}
     {#if description}
       <p class="mb-5 mt-2 leading-normal text-zinc-400">

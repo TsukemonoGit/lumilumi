@@ -361,8 +361,7 @@
   id="zap-mono-dialog"
   bind:open={dialogOpen}
   onClickOK={() => onClickZap()}
-  title="Zap to mono"
->
+  >{#snippet title()}Zap to mono{/snippet}
   {#snippet main()}
     <div class=" text-neutral-200">
       <div class="mt-4 rounded-md">

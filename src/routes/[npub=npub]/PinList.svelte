@@ -304,11 +304,12 @@
 <AlertDialog
   id="pin-dialog"
   bind:open={dialogOpen}
-  title={$t(dialogMode === "add" ? "pin.addTitle" : "pin.deleteTitle")}
   okButtonName={dialogMode === "add" ? "ADD" : "DELETE"}
   closeOnOutsideClick={true}
   {onClickOK}
->
+  >{#snippet title()}{$t(
+      dialogMode === "add" ? "pin.addTitle" : "pin.deleteTitle"
+    )}{/snippet}
   {#snippet main()}
     <div class="space-y-4">
       {#if dialogMode === "add"}

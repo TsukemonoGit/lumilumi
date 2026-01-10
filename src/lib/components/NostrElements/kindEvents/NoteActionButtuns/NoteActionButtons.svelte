@@ -561,8 +561,10 @@
           id="zap-dialog"
           bind:open={dialogOpen}
           onClickOK={() => onClickOK(metadata)}
-          title="Zap"
-          >{#snippet main()}
+          >{#snippet title()}
+            Zap
+          {/snippet}
+          {#snippet main()}
             <div class=" text-neutral-200">
               <div class="rounded-md">
                 <EventCard

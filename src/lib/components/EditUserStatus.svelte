@@ -225,10 +225,10 @@
 <Dialog
   bind:open={dialogOpen}
   id="edit-user-status"
-  dialogTitle={$_("status.edit")}
   zIndex={50}
   contentClass="max-w-[640px]"
 >
+  {#snippet title()}{$_("status.edit")}{/snippet}
   {#snippet main()}
     <fieldset class="mb-4 mt-4 flex flex-col gap-2">
       <label class=" text-zinc-100" for="status"> Status </label>

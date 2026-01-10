@@ -8,7 +8,7 @@
   import CloseButton from "./CloseButton.svelte";
 
   interface Props {
-    dialogTitle?: string;
+    title?: Snippet;
     main?: Snippet;
     footer?: Snippet<[{ close: () => void }]>;
     open?: boolean;
@@ -20,7 +20,7 @@
 
   let {
     open = $bindable(false),
-    dialogTitle = "",
+    title,
     main,
     footer,
     zIndex = 10,
@@ -80,9 +80,9 @@
       interactOutsideBehavior={closeOnOutsideClick ? "close" : "ignore"}
     >
       <!-- ヘッダー -->
-      {#if dialogTitle}
+      {#if title}
         <DialogPrimitive.Title class="m-0 text-lg font-medium">
-          {dialogTitle}
+          {@render title?.()}
         </DialogPrimitive.Title>
       {/if}
 

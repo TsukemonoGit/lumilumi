@@ -121,8 +121,7 @@
   id="zap-user-dialog"
   bind:open={dialogOpen}
   onClickOK={() => onClickOK()}
-  title="Zap"
->
+  >{#snippet title()}Zap{/snippet}
   {#snippet main()}
     <div class=" text-neutral-200">
       <div class="rounded-md">

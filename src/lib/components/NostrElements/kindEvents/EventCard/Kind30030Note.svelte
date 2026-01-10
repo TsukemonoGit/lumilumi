@@ -73,7 +73,7 @@
   );
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen: boolean = $state(false);
 
   // Public key validation
   const CheckLoginPubkey = async (): Promise<boolean> => {
@@ -99,7 +99,7 @@
     //   return;
     // }
     console.log("make new 10030");
-    dialogOpen?.(false);
+    dialogOpen = false;
     $nowProgress = true;
     disabled = true;
 
@@ -172,7 +172,7 @@
       let newestKind10030 = await refetchKind10030();
       if (!newestKind10030) {
         //データないけど新しく作っていいですかnoyatu
-        dialogOpen?.(true);
+        dialogOpen = true;
         return;
       }
 
@@ -437,11 +437,11 @@
 {/if}
 <AlertDialog
   id="make-kind10030-dialog"
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={handleClickMakeKind10030}
-  title={$_("create.10030.title")}
   okButtonName="OK"
->
+  >{#snippet title()}{$_("create.10030.title")}
+  {/snippet}
   {#snippet main()}
     <div>{$_("create.10030.text")}</div>
   {/snippet}

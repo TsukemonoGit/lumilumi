@@ -1021,9 +1021,9 @@
   id="alert-dialog"
   bind:open={dialogOpen}
   onClickOK={handleClickOk}
-  {title}
   okButtonName="OK"
-  >{#snippet main()}
+  >{#snippet title()}
+    {title}{/snippet}{#snippet main()}
     <div>{text}</div>
   {/snippet}</AlertDialog
 >

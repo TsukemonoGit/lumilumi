@@ -415,8 +415,8 @@
   id="follow-list-update-dialog"
   bind:open={dialogOpen}
   onClickOK={publishEvent}
-  title={$_("user.followList.update")}
->
+  >{#snippet title()}{$_("user.followList.update")}
+  {/snippet}
   {#snippet main()}
     <div>
       <div class="text-magnum-500 font-bold text-lg mt-2">Before</div>
@@ -490,9 +490,9 @@
   id="petname-dialog"
   bind:open={openPetnameDialog}
   onClickOK={updatePetname}
-  title={$_("user.petname.petname")}
   okButtonName="OK"
->
+  >{#snippet title()}
+    {$_("user.petname.petname")}{/snippet}
   {#snippet main()}
     <div>
       {#if beforeKind3}
@@ -526,8 +526,7 @@
   id="create-kind3-dialog"
   bind:open={dialogCreateKind3Open}
   {onClickOK}
-  title={$_("create_kind3.create")}
-  >{#snippet main()}
+  >{#snippet title()}{$_("create_kind3.create")}{/snippet}{#snippet main()}
     <div class=" text-neutral-200 whitespace-pre-wrap">
       {$_("create_kind3.newMessage")}
     </div>

@@ -35,7 +35,7 @@
 
   let { note, indexes, channelData, heyaId }: Props = $props();
 
-  let editChannelDataOpen = $state(writable(false));
+  let editChannelDataOpen = $state(false);
   let editChannelListOpen = $state(false);
 
   let channelLink = $derived(getChannelLink(heyaId));
@@ -168,7 +168,7 @@
         }
         break;
       case "editInfo":
-        $editChannelDataOpen = true;
+        editChannelDataOpen = true;
         break;
     }
   }

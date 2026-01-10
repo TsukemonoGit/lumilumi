@@ -659,8 +659,7 @@
   id="delete-note-dialog"
   bind:open={deleteDialogOpen}
   onClickOK={() => onClickOK()}
-  title="Delete note"
->
+  >{#snippet title()}Delete note{/snippet}
   {#snippet main()}
     <p class="my-2">{$_("post.delete")}</p>
     <div class="rounded-md border-magnum-600/30 border">

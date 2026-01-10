@@ -84,7 +84,10 @@
   };
 </script>
 
-<Dialog bind:open id="zap-invoice" dialogTitle="Invoice">
+<Dialog bind:open id="zap-invoice">
+  {#snippet title()}
+    Invoice
+  {/snippet}
   {#snippet main()}
     {#if invoice && url}
       <fieldset class="my-2 flex flex-col items-center gap-6">

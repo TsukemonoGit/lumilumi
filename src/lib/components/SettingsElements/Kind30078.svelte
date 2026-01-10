@@ -489,9 +489,12 @@
   id="save-settings-dialog"
   bind:open={alertdialogOpen}
   onClickOK={handleClickPublish}
-  title={`SAVE`}
   okButtonName="OK"
-  >{#snippet main()}
+>
+  {#snippet title()}
+    SAVE
+  {/snippet}
+  {#snippet main()}
     {#if kind30078LumiSettings.find((data) => data.name === saveName)}
       <p class="font-bold py-2">name: {saveName}</p>
       <p>

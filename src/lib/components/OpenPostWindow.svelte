@@ -369,8 +369,7 @@
     open.set(false);
     openConfirm = false;
   }}
-  title="Confirm close"
->
+  >{#snippet title()}Confirm close{/snippet}
   {#snippet main()}{$_("post.confirm")}
   {/snippet}
 </AlertDialog>
@@ -383,8 +382,8 @@
   onClickOK={async () => {
     openHellConfirm = false;
   }}
-  title="Confirm Reply to Many People"
->
+  >{#snippet title()}
+    Confirm Reply to Many People{/snippet}
   {#snippet main()}{$_("post.hell")}
   {/snippet}
 </AlertDialog>

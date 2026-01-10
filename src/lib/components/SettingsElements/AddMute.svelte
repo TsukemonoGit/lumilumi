@@ -308,9 +308,8 @@
   id="create-kind10000-dialog"
   bind:open={dialogOpen}
   onClickOK={handleClickOk}
-  title={$_("create.kind10000.title")}
   okButtonName="OK"
-  >{#snippet main()}
+  >{#snippet title()}{$_("create.kind10000.title")}{/snippet}{#snippet main()}
     <div>{$_("create.kind10000.text")}</div>
   {/snippet}</AlertDialog
 >
