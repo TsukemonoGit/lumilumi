@@ -201,7 +201,7 @@
       console.log("Nostr Login認証イベントリスナー", pub);
 
       const currentSetting = lumiSetting.get().pubkey;
-      console.log(currentSetting, pub);
+      // console.log(currentSetting, pub);
       // 既存の設定と異なるアカウントでログインした場合
       if (currentSetting && currentSetting !== pub) {
         const userMeta: EventPacket | null | undefined =

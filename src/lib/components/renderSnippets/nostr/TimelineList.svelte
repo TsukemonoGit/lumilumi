@@ -27,7 +27,6 @@
   } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
   import { sortEventPackets } from "$lib/func/util";
-  import { page } from "$app/state";
   import { SvelteMap } from "svelte/reactivity";
 
   interface Props {

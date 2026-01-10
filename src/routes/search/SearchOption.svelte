@@ -46,9 +46,9 @@
     filters,
   }: Props = $props();
 
-  let showSyntaxHelp: (bool: boolean) => void = $state(() => {});
-  let showTimePicker: (bool: boolean) => void = $state(() => {});
-  let showFilter: (bool: boolean) => void = $state(() => {});
+  let showSyntaxHelp: boolean = $state(false);
+  let showTimePicker: boolean = $state(false);
+  let showFilter: boolean = $state(false);
 
   let inputElement: HTMLTextAreaElement;
   let lastCursorPosition = 0;
@@ -134,7 +134,7 @@
         searchWord = untilKeyword;
       }
     }
-    showTimePicker(false); // ポップオーバーを閉じる
+    showTimePicker = false; // ポップオーバーを閉じる
   }
 
   async function handleClickShare() {
@@ -283,7 +283,7 @@
           <UserPicker onClickUser={inputUserPub} />
 
           <Popover
-            bind:openPopover={showTimePicker}
+            bind:open={showTimePicker}
             ariaLabel="DateTimeInput"
             zIndex={10}
           >
@@ -299,11 +299,7 @@
         </div>
 
         <div class="flex gap-2">
-          <Popover
-            bind:openPopover={showFilter}
-            ariaLabel="search filter"
-            zIndex={10}
-          >
+          <Popover bind:open={showFilter} ariaLabel="search filter" zIndex={10}>
             <div class="text-magnum-400 transition-colors cursor-pointer">
               <Braces size={18} />
             </div>
@@ -324,7 +320,7 @@
             {/snippet}
           </Popover>
           <Popover
-            bind:openPopover={showSyntaxHelp}
+            bind:open={showSyntaxHelp}
             ariaLabel="SyntaxHelp"
             zIndex={10}
           >
@@ -378,7 +374,7 @@
                       style="word-break: break-word;"
                       onclick={() => {
                         searchWord = example;
-                        showSyntaxHelp(false);
+                        showSyntaxHelp = false;
                       }}
                     >
                       <div class="text-xs text-magnum-400 mb-1">

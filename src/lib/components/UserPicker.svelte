@@ -8,34 +8,33 @@
   import type { QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
   import { checkUserInput, userName } from "$lib/func/user";
+  import { untrack } from "svelte";
   interface Props {
     onClickUser: (pubhex: string) => void;
   }
   let input = $state("");
   let { onClickUser }: Props = $props();
-  let openPopover: (bool: boolean) => void = $state(() => {});
+  let openPopover: boolean = $state(false);
   // Derived data
   let metadataList: MetadataList = $state({});
-  const onOpenStateChange = (value: boolean) => {
-    if (value) {
-      try {
-        const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-        if (!metadataStr) return {};
 
-        const metadataQueryData: [QueryKey, EventPacket][] =
-          JSON.parse(metadataStr);
-        metadataList = getMetadataList(metadataQueryData);
-      } catch (error) {}
+  $effect(() => {
+    if (openPopover) {
+      untrack(() => {
+        try {
+          const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
+          if (!metadataStr) return {};
+
+          const metadataQueryData: [QueryKey, EventPacket][] =
+            JSON.parse(metadataStr);
+          metadataList = getMetadataList(metadataQueryData);
+        } catch (error) {}
+      });
     }
-  };
+  });
 </script>
 
-<Popover
-  bind:openPopover
-  {onOpenStateChange}
-  ariaLabel="custom emoji"
-  zIndex={100}
->
+<Popover bind:open={openPopover} ariaLabel="custom emoji" zIndex={100}>
   <div
     class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
   >

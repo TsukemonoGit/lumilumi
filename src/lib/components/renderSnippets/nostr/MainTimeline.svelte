@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { onDestroy, onMount, untrack, type Snippet } from "svelte";
+  import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
