@@ -30,7 +30,7 @@
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content forceMount preventScroll={false}>
-      {#snippet child({ wrapperProps, props, open })}{open}
+      {#snippet child({ wrapperProps, props, open })}
         {#if open}
           <div {...wrapperProps}>
             <div
