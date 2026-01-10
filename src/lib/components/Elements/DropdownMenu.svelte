@@ -29,7 +29,7 @@
     {@render children?.()}
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
-    <DropdownMenu.Content preventScroll={false}>
+    <DropdownMenu.Content forceMount preventScroll={false}>
       {#snippet child({ wrapperProps, props, open })}{open}
         {#if open}
           <div {...wrapperProps}>
@@ -53,7 +53,7 @@
                       </div>
                     </DropdownMenu.SubTrigger>
 
-                    <DropdownMenu.SubContent>
+                    <DropdownMenu.SubContent forceMount>
                       {#snippet child({
                         wrapperProps: subWrapperProps,
                         props: subProps,

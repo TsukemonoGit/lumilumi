@@ -11,6 +11,7 @@
   import { goto } from "$app/navigation";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { mainMenuItems } from "./menu";
+  import { fly } from "svelte/transition";
 
   let open = $state(false);
 
@@ -68,97 +69,118 @@
   </div>
   <div class="absolute {menuPosition} mt-1">
     <DialogPrimitive.Root bind:open>
-      <DialogPrimitive.Trigger class="trigger" aria-label="Update dimensions">
-        <TextAlignJustify class="size-6" />
+      <DialogPrimitive.Trigger
+        class="inline-flex items-end gap-1 justify-center rounded-md px-3 py-3 text-magnum-300 transition-colors  text-sm font-medium leading-none focus:z-30 focus:ring"
+        aria-label="Update dimensions"
+      >
+        <TextAlignJustify class="size-6 " />
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay class="fixed inset-0 z-50 bg-black/50" />
         <DialogPrimitive.Content
+          forceMount
           class={`fixed ${lumiSetting.get().menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
                 shadow-lg focus:outline-none`}
         >
-          <nav
-            class="h-full justify-between flex flex-col my-2 overflow-hidden"
-          >
-            <ul
-              class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
-            >
-              {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
-                {#if alt === "edit status"}
-                  <li>
-                    <button
-                      onclick={() => {
-                        openEditStatusDialog();
-                        open = false;
-                      }}
-                    >
-                      <TrendingUp /><span class="ml-2">Edit status</span>
-                    </button>
-                  </li>
-                {:else}
-                  <li
-                    aria-current={page.url?.pathname ===
-                    (link === undefined && lumiSetting.get().pubkey
-                      ? `/${encodedPub}`
-                      : link)
-                      ? "page"
-                      : undefined}
-                  >
-                    {#if noPubkey || lumiSetting.get().pubkey}
-                      <a
-                        href={link ?? `/${encodedPub}`}
-                        onclick={() => (open = false)}
-                        title={alt}
-                      >
-                        <Icon /><span class="ml-2">{alt}</span>
-                      </a>
-                    {:else}
-                      <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
-                      <div
-                        class="disabledLink"
-                        onclick={() => (open = false)}
-                        onkeydown={(e) => e.key === "Enter" && (open = false)}
-                        role="button"
-                        tabindex="0"
-                        title={alt}
-                      >
-                        <Icon /><span class="ml-2">{alt}</span>
-                      </div>
-                    {/if}
-                  </li>{/if}
-              {/each}
-
-              <li
-                aria-current={page.url?.pathname === "/about"
-                  ? "page"
-                  : undefined}
+          {#snippet child({ props, open: dialogOpen })}
+            {#if dialogOpen}
+              <div
+                {...props}
+                transition:fly={{
+                  duration: 150,
+                  x: lumiSetting.get().menuleft ? -10 : 10,
+                }}
               >
-                <a href="/about" onclick={() => (open = false)}>
-                  {#if lumiSetting.get().showImg}
-                    <img
-                      loading="lazy"
-                      src={LumiIcon}
-                      alt="lumi"
-                      width={80}
-                      height={80}
-                    />
-                  {:else}
-                    <img
-                      loading="lazy"
-                      src={logo}
-                      alt="logo"
-                      width={40}
-                      height={40}
-                    />
-                  {/if}<span class="ml-2">about</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
+                <nav
+                  class="h-full justify-between flex flex-col my-2 overflow-hidden"
+                >
+                  <ul
+                    class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
+                  >
+                    {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
+                      {#if alt === "edit status"}
+                        <li>
+                          <button
+                            onclick={() => {
+                              openEditStatusDialog();
+                              open = false;
+                            }}
+                          >
+                            <TrendingUp /><span class="ml-2">Edit status</span>
+                          </button>
+                        </li>
+                      {:else}
+                        <li
+                          aria-current={page.url?.pathname ===
+                          (link === undefined && lumiSetting.get().pubkey
+                            ? `/${encodedPub}`
+                            : link)
+                            ? "page"
+                            : undefined}
+                        >
+                          {#if noPubkey || lumiSetting.get().pubkey}
+                            <a
+                              href={link ?? `/${encodedPub}`}
+                              onclick={() => (open = false)}
+                              title={alt}
+                            >
+                              <Icon /><span class="ml-2">{alt}</span>
+                            </a>
+                          {:else}
+                            <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
+                            <div
+                              class="disabledLink"
+                              onclick={() => (open = false)}
+                              onkeydown={(e) =>
+                                e.key === "Enter" && (open = false)}
+                              role="button"
+                              tabindex="0"
+                              title={alt}
+                            >
+                              <Icon /><span class="ml-2">{alt}</span>
+                            </div>
+                          {/if}
+                        </li>{/if}
+                    {/each}
+
+                    <li
+                      aria-current={page.url?.pathname === "/about"
+                        ? "page"
+                        : undefined}
+                    >
+                      <a href="/about" onclick={() => (open = false)}>
+                        {#if lumiSetting.get().showImg}
+                          <img
+                            loading="lazy"
+                            src={LumiIcon}
+                            alt="lumi"
+                            width={80}
+                            height={80}
+                          />
+                        {:else}
+                          <img
+                            loading="lazy"
+                            src={logo}
+                            alt="logo"
+                            width={40}
+                            height={40}
+                          />
+                        {/if}<span class="ml-2">about</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            {/if}
+          {/snippet}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
-    <button onclick={handleClickHome} class="trigger" title="Home">
+    <button
+      onclick={handleClickHome}
+      class="inline-flex items-end gap-1 justify-center rounded-md px-3 py-3 text-magnum-300 transition-colors text-sm font-medium leading-none focus:z-30 focus:ring"
+      title="Home"
+    >
       <House class="size-6" />
     </button>
   </div>
@@ -179,13 +201,6 @@
     @apply z-20 text-magnum-300 outline-none;
     @apply flex items-center text-sm leading-none;
     @apply cursor-default ring-0 !important;
-  }
-
-  .trigger {
-    @apply inline-flex items-end gap-1 justify-center rounded-md px-3 py-3;
-    @apply text-magnum-300 transition-colors;
-    @apply overflow-visible !important;
-    @apply text-sm font-medium leading-none focus:z-30 focus:ring;
   }
 
   nav a {
