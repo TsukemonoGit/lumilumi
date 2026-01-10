@@ -1,7 +1,7 @@
 <!--Dialog.svelte-->
 <script lang="ts">
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { untrack, type Snippet } from "svelte";
+  import { tick, untrack, type Snippet } from "svelte";
   import { fade } from "svelte/transition";
   import { X } from "lucide-svelte";
   import type { Writable } from "svelte/store";
@@ -57,7 +57,10 @@
   // ダイアログ開放時のスクロール位置リセット
   $effect(() => {
     if ($dialogOpen && scrollContainer) {
-      setTimeout(resetScrollPosition, 0);
+      untrack(async () => {
+        await tick();
+        resetScrollPosition();
+      });
     }
   });
 
