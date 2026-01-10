@@ -349,8 +349,7 @@
     }
   };
 
-  // svelte-ignore non_reactive_update
-  let open: Writable<boolean> = writable(false);
+  let open: boolean = $state(false);
 </script>
 
 <form class=" flex flex-col gap-3">
@@ -675,7 +674,7 @@
           type="button"
           class=" rounded-md px-2 h-full bg-magnum-300 hover:opacity-75 active:opacity-50 text-magnum-800"
           onclick={() => {
-            $open = true;
+            open = true;
           }}><Image /></button
         >
       </div>
