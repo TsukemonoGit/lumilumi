@@ -75,19 +75,6 @@
     console.log("[GlobalTimeline] initialization complete");
   };
 
-  const wrappedEventFilter = (event: Nostr.Event): boolean => {
-    const result = eventFilter(event);
-    if (!result) {
-      console.log("[GlobalTimeline] event filtered out:", {
-        id: event.id.substring(0, 8),
-        pubkey: event.pubkey.substring(0, 8),
-        kind: event.kind,
-        created_at: event.created_at,
-      });
-    }
-    return result;
-  };
-
   onMount(async () => {
     console.log("[GlobalTimeline] component mounted");
     await initialize();
@@ -141,7 +128,7 @@
     viewIndex={VIEW_INDEX}
     amount={AMOUNT}
     relays={globalRelays}
-    eventFilter={wrappedEventFilter}
+    {eventFilter}
   >
     {#snippet content({ events })}
       <div

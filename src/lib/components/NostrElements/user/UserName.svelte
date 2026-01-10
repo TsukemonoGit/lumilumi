@@ -27,18 +27,12 @@
   const userName = (metadata: Nostr.Event) => {
     const usrProfile = profile(metadata);
 
-    if (
-      usrProfile &&
-      usrProfile.display_name &&
-      usrProfile.display_name !== ""
-    ) {
-      return usrProfile.display_name;
-    }
-    if (usrProfile && usrProfile.name && usrProfile.name !== "") {
-      return usrProfile.name;
-    }
-
-    return pubString;
+    return (
+      usrProfile?.display_name?.trim() ||
+      usrProfile?.name?.trim() ||
+      usrProfile?.nip05 ||
+      pubString
+    );
   };
 </script>
 
