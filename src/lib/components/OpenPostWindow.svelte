@@ -70,8 +70,8 @@
   });
 
   // Dialog handlers
-  let openConfirm: (bool: boolean) => void = $state(() => {});
-  let openHellConfirm: (bool: boolean) => void = $state(() => {});
+  let openConfirm: boolean = $state(false);
+  let openHellConfirm: boolean = $state(false);
   let resetCreatePost: () => void = $state(() => {});
 
   let textarea: HTMLTextAreaElement | undefined = $state();
@@ -200,7 +200,7 @@
 
     const pTagCount = checkedTags.filter((tag) => tag[0] === "p").length;
     if (pTagCount > bulkReplyThreshold) {
-      openHellConfirm?.(true);
+      openHellConfirm = true;
       return;
     }
 
@@ -212,7 +212,7 @@
   // ----------------------------------------
   function handleOverlayClick(event: MouseEvent) {
     if (textarea?.value.trim()) {
-      openConfirm?.(true);
+      openConfirm = true;
     } else {
       $open = false;
     }
@@ -361,12 +361,13 @@
 {/if}
 
 <AlertDialog
+  id="confirm-close-dialog"
   okButtonName="Yes, close"
-  bind:openDialog={openConfirm}
+  bind:open={openConfirm}
   closeOnOutsideClick={true}
   onClickOK={() => {
     open.set(false);
-    openConfirm?.(false);
+    openConfirm = false;
   }}
   title="Confirm close"
 >
@@ -375,11 +376,12 @@
 </AlertDialog>
 
 <AlertDialog
+  id="hell-confirm-dialog"
   okButtonName="Yes, send"
-  bind:openDialog={openHellConfirm}
+  bind:open={openHellConfirm}
   closeOnOutsideClick={true}
   onClickOK={async () => {
-    openHellConfirm?.(false);
+    openHellConfirm = false;
   }}
   title="Confirm Reply to Many People"
 >

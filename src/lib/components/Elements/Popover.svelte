@@ -47,8 +47,9 @@
   </PopoverPrimitive.Trigger>
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
+      preventScroll={false}
       class="rounded-[4px] bg-neutral-800 p-2 text-neutral-100 shadow-md max-w-[90vw]"
-      style={`z-index:${zIndex}`}
+      style="z-index: {zIndex};"
       {side}
       {align}
     >

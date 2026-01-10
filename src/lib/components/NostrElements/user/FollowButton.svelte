@@ -44,8 +44,7 @@
   let afterEventParameters: Nostr.EventParameters | undefined = $state();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
-
+  let dialogOpen: boolean = $state(false);
   let contactsQueryKey: QueryKey = $derived([
     "timeline",
     "contacts",
@@ -72,7 +71,7 @@
   };
 
   // svelte-ignore non_reactive_update
-  let dialogCreateKind3Open: (bool: boolean) => void = () => {};
+  let dialogCreateKind3Open: boolean = $state(false);
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
@@ -86,7 +85,7 @@
 
     if (!beforeKind3) {
       //新しいKind3作っていいですかを出す
-      dialogCreateKind3Open?.(true);
+      dialogCreateKind3Open = true;
       return;
     }
 
@@ -219,12 +218,12 @@
     };
 
     $nowProgress = false;
-    dialogOpen?.(true);
+    dialogOpen = true;
   };
 
   // Handle event publishing
   const publishEvent = async () => {
-    dialogOpen?.(false);
+    dialogOpen = false;
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
 
@@ -288,7 +287,7 @@
 
   // Handle petname dialog
   // svelte-ignore non_reactive_update
-  let openPetnameDialog: (bool: boolean) => void = () => {};
+  let openPetnameDialog: boolean = $state(false);
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
@@ -296,7 +295,7 @@
       queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
     petnameInput = followList.get().get(pubkey) ?? "";
-    openPetnameDialog?.(true);
+    openPetnameDialog = true;
     $nowProgress = false;
   };
 
@@ -328,12 +327,12 @@
       pubkey: beforeKind3.pubkey,
     };
     publishEvent();
-    openPetnameDialog?.(false);
+    openPetnameDialog = false;
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    dialogCreateKind3Open?.(false);
+    dialogCreateKind3Open = false;
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -413,7 +412,8 @@
   {/if}
 {/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="follow-list-update-dialog"
+  bind:open={dialogOpen}
   onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
@@ -487,7 +487,8 @@
 </AlertDialog>
 
 <AlertDialog
-  bind:openDialog={openPetnameDialog}
+  id="petname-dialog"
+  bind:open={openPetnameDialog}
   onClickOK={updatePetname}
   title={$_("user.petname.petname")}
   okButtonName="OK"
@@ -522,7 +523,8 @@
 </AlertDialog>
 
 <AlertDialog
-  bind:openDialog={dialogCreateKind3Open}
+  id="create-kind3-dialog"
+  bind:open={dialogCreateKind3Open}
   {onClickOK}
   title={$_("create_kind3.create")}
   >{#snippet main()}

@@ -41,7 +41,7 @@
   };
   let loadImage: boolean = $state(false);
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen: boolean = $state(false);
   let zapAmount: number = $state(0);
   let zapComment: string = $state("");
   let invoice: string | undefined = $state(undefined);
@@ -59,7 +59,7 @@
     invoice = undefined;
     if (zapAmount <= 0) {
       //toast dasite
-      dialogOpen?.(false);
+      dialogOpen = false;
       return;
     }
     $nowProgress = true;
@@ -91,7 +91,7 @@
         console.error("[zap failed]", payment);
         throw Error;
       }
-      dialogOpen?.(false);
+      dialogOpen = false;
       zapWindowOpen = true;
       invoice = zapInvoice;
       $nowProgress = false;
@@ -212,7 +212,7 @@
           data-npub="npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           data-note-id="note15lm4779yy4v7ygdx8dxhgzjuc5ewvsfzw452hew8aq84ztmrgm8q90ks8u"
           data-relays="wss://nostr.mutinywallet.com,wss://relay.nostr.wirednet.jp,wss://relay.nostr.band/"
-          onclick={() => dialogOpen?.(true)}
+          onclick={() => (dialogOpen = true)}
         >
           Zap⚡️Lumilumi
         </button>
@@ -358,7 +358,8 @@
 </section>
 
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="zap-mono-dialog"
+  bind:open={dialogOpen}
   onClickOK={() => onClickZap()}
   title="Zap to mono"
 >

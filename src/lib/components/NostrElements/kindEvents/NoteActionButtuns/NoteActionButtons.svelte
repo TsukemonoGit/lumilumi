@@ -291,7 +291,7 @@
   let invoice: string | undefined = $state(undefined);
 
   //svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen: boolean = $state(false);
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
   let zapWindowOpen = $state(false);
@@ -302,7 +302,7 @@
     if (storagezap) {
       zapAmount = Number(storagezap);
     }
-    dialogOpen?.(true);
+    dialogOpen = true;
     //zapの量決めるダイアログ出す
     setTimeout(() => {
       amountEle?.focus();
@@ -315,7 +315,7 @@
     console.log(zapComment);
     if (zapAmount <= 0) {
       //toast dasite
-      dialogOpen?.(false);
+      dialogOpen = false;
       return;
     }
 
@@ -341,12 +341,12 @@
         },
       });
       $nowProgress = false;
-      dialogOpen?.(false);
+      dialogOpen = false;
       return;
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    dialogOpen?.(false);
+    dialogOpen = false;
     zapWindowOpen = true;
 
     //サップの量保存
@@ -558,7 +558,8 @@
           >
         </div>
         <AlertDialog
-          bind:openDialog={dialogOpen}
+          id="zap-dialog"
+          bind:open={dialogOpen}
           onClickOK={() => onClickOK(metadata)}
           title="Zap"
           >{#snippet main()}

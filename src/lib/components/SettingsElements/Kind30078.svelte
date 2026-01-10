@@ -47,10 +47,9 @@
   let kind30078LumiSettings: Kind30078LumiSetting[] = $state.raw([]);
   let localLumisetting: Kind30078LumiSettingObj;
 
-  // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
-  // svelte-ignore non_reactive_update
-  let alertdialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen: boolean = $state(false);
+
+  let alertdialogOpen: boolean = $state(false);
 
   async function handleClickUpDownload() {
     //localのデータを整形 nameは未定？
@@ -73,7 +72,7 @@
     //set30078(event);
 
     $nowProgress = false;
-    $dialogOpen = true;
+    dialogOpen = true;
   }
 
   let saveName: string = $state("");
@@ -125,11 +124,11 @@
       return;
     }
 
-    alertdialogOpen?.(true);
+    alertdialogOpen = true;
   };
 
   const handleClickPublish = async () => {
-    alertdialogOpen?.(false);
+    alertdialogOpen = false;
     const sameIndex = kind30078LumiSettings.findIndex(
       (data) => data.name === saveName
     );
@@ -488,7 +487,8 @@
 </Dialog>
 
 <AlertDialog
-  bind:openDialog={alertdialogOpen}
+  id="save-settings-dialog"
+  bind:open={alertdialogOpen}
   onClickOK={handleClickPublish}
   title={`SAVE`}
   okButtonName="OK"

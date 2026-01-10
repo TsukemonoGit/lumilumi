@@ -89,7 +89,7 @@
     isBookmarked,
   }: Props = $props();
 
-  let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
+  let deleteDialogOpen: boolean = $state(false);
 
   let replaceable = $derived(
     note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
@@ -483,7 +483,7 @@
         break;
 
       case "delete":
-        deleteDialogOpen(true);
+        deleteDialogOpen = true;
         break;
 
       case "open_makimono":
@@ -597,7 +597,7 @@
     }
   };
   const onClickOK = async () => {
-    deleteDialogOpen(false);
+    deleteDialogOpen = false;
     try {
       const deletetags = [
         ["e", note.id],
@@ -656,11 +656,13 @@
 </DropdownMenu>
 
 <AlertDialog
-  bind:openDialog={deleteDialogOpen}
+  id="delete-note-dialog"
+  bind:open={deleteDialogOpen}
   onClickOK={() => onClickOK()}
   title="Delete note"
 >
-  {#snippet main()}<p>{$_("post.delete")}</p>
+  {#snippet main()}
+    <p class="my-2">{$_("post.delete")}</p>
     <div class="rounded-md border-magnum-600/30 border">
       <Note
         id={note.id}

@@ -39,7 +39,7 @@
   });
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen: boolean = $state(false);
   let addTag: string[] = [];
   async function handleClickAdd() {
     console.log("[type]", $selectedLabel, "[str]", muteInput);
@@ -116,7 +116,7 @@
 
       $nowProgress = false;
 
-      dialogOpen?.(true);
+      dialogOpen = true;
       return;
     }
     //本当に含まれていないか探す
@@ -188,7 +188,7 @@
   }
 
   async function handleClickOk() {
-    dialogOpen?.(false);
+    dialogOpen = false;
 
     if (addTag.length <= 0) {
       addToast({
@@ -305,7 +305,8 @@
   >
 </div>
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="create-kind10000-dialog"
+  bind:open={dialogOpen}
   onClickOK={handleClickOk}
   title={$_("create.kind10000.title")}
   okButtonName="OK"

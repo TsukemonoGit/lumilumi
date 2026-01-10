@@ -38,6 +38,7 @@
     metadata: Nostr.Event | undefined;
     depth: number;
     showStatus?: boolean;
+    zIndex: number | undefined;
   }
 
   let deleted = $state(false);
@@ -45,7 +46,7 @@
     note,
     repostable,
     maxHeight,
-
+    zIndex,
     displayMenu,
     mini,
     metadata,
@@ -409,7 +410,7 @@
               end: 0,
             } as Token}
           />
-        {/each}<ClientTag depth={0} tags={note.tags} />
+        {/each}<ClientTag depth={0} tags={note.tags} {zIndex} />
       </div>
       {#if lumiSetting.get().pubkey}
         {#if inMyCustomEmoji}
@@ -435,11 +436,13 @@
   </NoteComponent>
 {/if}
 <AlertDialog
+  id="make-kind10030-dialog"
   bind:openDialog={dialogOpen}
   onClickOK={handleClickMakeKind10030}
   title={$_("create.10030.title")}
   okButtonName="OK"
-  >{#snippet main()}
-    <div>{$_("create.10030.text")}</div>
-  {/snippet}</AlertDialog
 >
+  {#snippet main()}
+    <div>{$_("create.10030.text")}</div>
+  {/snippet}
+</AlertDialog>

@@ -13,6 +13,7 @@
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { MenuButtonClass } from "$lib/func/constants";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { untrack } from "svelte";
 
   interface Props {
     metadata: Nostr.Event;
@@ -28,7 +29,7 @@
     zapOpen = $bindable(false),
   }: Props = $props();
   let invoice: string | undefined = $state();
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen: boolean = $state(false);
   let zapAmount: number = $state(50);
   let zapComment: string = $derived(comment ?? "");
   let zapWindowOpen = $state(false);
@@ -42,7 +43,7 @@
     if (zapAmount <= 0) {
       zapOpen = false;
       //toast dasite
-      dialogOpen?.(false);
+      dialogOpen = false;
       return;
     }
     $nowProgress = true;
@@ -69,7 +70,7 @@
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    dialogOpen?.(false);
+    dialogOpen = false;
     zapWindowOpen = true;
     invOp = true;
     try {
@@ -89,22 +90,23 @@
       zapAmount = Number(storagezap);
     }
     //amount comment画面を開いてamountのinputにfocus
-    dialogOpen?.(true);
+    dialogOpen = true;
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
     zapOpen = true;
   };
 
-  let dialogStatus: Writable<boolean> = $state(writable(false));
   const closeInvoice = () => {
     zapOpen = false;
     invOp = true;
   };
   // svelte-ignore state_referenced_locally
-  dialogStatus.subscribe((value) => {
-    if (!value && !invOp) {
-      zapOpen = false;
+  $effect(() => {
+    if (!open && !invOp) {
+      untrack(() => {
+        zapOpen = false;
+      });
     }
   });
 </script>
@@ -117,8 +119,8 @@
   {/if}
 </button>
 <AlertDialog
-  bind:dialogStatus
-  bind:openDialog={dialogOpen}
+  id="zap-user-dialog"
+  bind:open={dialogOpen}
   onClickOK={() => onClickOK()}
   title="Zap"
 >

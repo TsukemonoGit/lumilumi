@@ -159,7 +159,7 @@
         {depth}
         {repostable}
         {zIndex}
-      /><ClientTag tags={note.tags} {depth} />
+      /><ClientTag tags={note.tags} {depth} {zIndex} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}

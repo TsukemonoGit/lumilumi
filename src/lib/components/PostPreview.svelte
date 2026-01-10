@@ -338,7 +338,7 @@
                   class="whitespace-pre-wrap break-words"
                   style="word-break: break-word;">{part.content}</span
                 >{/if}{/each}
-            <ClientTag {tags} isShowClientTag={true} {depth} />
+            <ClientTag {tags} isShowClientTag={true} {depth} {zIndex} />
             {#if geohash}
               <Geohash {geohash} />{/if}
             {#if proxy}

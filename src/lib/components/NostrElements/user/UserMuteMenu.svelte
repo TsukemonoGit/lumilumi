@@ -94,7 +94,7 @@
     $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined
   );
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen: boolean = $state(false);
 
   let kind: number | undefined;
   let dtag: string | undefined;
@@ -125,7 +125,7 @@
         text = `${$_("create.kind10000.text")}`;
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -209,7 +209,7 @@
         text = `${$_("create.kind30007.6.text")}`;
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
         return;
       }
       //新しいリストにほんとに含まれてないか確認
@@ -299,7 +299,7 @@
 
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
 
         return;
       }
@@ -389,7 +389,7 @@
 
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
 
         return;
       }
@@ -883,7 +883,7 @@
   async function handleClickOk() {
     //データないけど新しく作っていいよのとこ
     console.log("kind", kind, "dtag", dtag);
-    dialogOpen?.(false);
+    dialogOpen = false;
     if (!kind) {
       addToast({
         data: {
@@ -1018,7 +1018,8 @@
   </div>
 {/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="alert-dialog"
+  bind:open={dialogOpen}
   onClickOK={handleClickOk}
   {title}
   okButtonName="OK"

@@ -11,7 +11,7 @@
   import { pubkeysIn } from "$lib/func/nostr";
   import { createNeighborFeed } from "$lib/stores/useNeighborFeed.svelte";
   import UserAvatar from "$lib/components/NostrElements/user/UserAvatar.svelte";
-  import { profile } from "$lib/func/util";
+  import { delay, profile } from "$lib/func/util";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 

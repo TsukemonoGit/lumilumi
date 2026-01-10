@@ -151,7 +151,7 @@ export async function waitForConnections(options?: {
     onProgress,
   } = options ?? {};
 
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
   const stateMap = relayStateMap as Map<string, string>;
   const startTime = Date.now();

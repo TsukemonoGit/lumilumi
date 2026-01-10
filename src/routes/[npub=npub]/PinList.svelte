@@ -92,12 +92,12 @@
     }
   });
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen: boolean = $state(false);
   const openDialog = () => {
     dialogMode = "add";
     inputValue = "";
     previewData = { type: null, id: "", isValid: false };
-    dialogOpen(true);
+    dialogOpen = true;
   };
 
   const addPin = async () => {
@@ -165,7 +165,7 @@
       });
 
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     } catch (error) {
       addToast({
         data: {
@@ -175,13 +175,13 @@
         },
       });
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     }
   };
   const confirmDelete = (tag: string[]) => {
     dialogMode = "delete";
     deletingTag = tag;
-    dialogOpen(true);
+    dialogOpen = true;
   };
 
   const executeDelete = async () => {
@@ -217,7 +217,7 @@
       });
 
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     } catch (error) {
       addToast({
         data: {
@@ -227,7 +227,7 @@
         },
       });
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = true;
     }
   };
 
@@ -302,7 +302,8 @@
   {/snippet}
 </LatestEvent>
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="pin-dialog"
+  bind:open={dialogOpen}
   title={$t(dialogMode === "add" ? "pin.addTitle" : "pin.deleteTitle")}
   okButtonName={dialogMode === "add" ? "ADD" : "DELETE"}
   closeOnOutsideClick={true}

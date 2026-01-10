@@ -11,16 +11,16 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen: boolean = $state(false);
 
   const handleClickCreateKind3 = () => {
     //つくっていいかがめんだしておｋでかきこむ
-    dialogOpen?.(true);
+    dialogOpen = true;
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    dialogOpen?.(false);
+    dialogOpen = false;
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -90,7 +90,8 @@
     >{$_("create_kind3.create")}</button
   >{/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  id="create_new_kind3"
+  bind:open={dialogOpen}
   {onClickOK}
   title={$_("create_kind3.create")}
   >{#snippet main()}
