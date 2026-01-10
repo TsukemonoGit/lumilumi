@@ -45,7 +45,7 @@
   let zapAmount: number = $state(0);
   let zapComment: string = $state("");
   let invoice: string | undefined = $state(undefined);
-  let invoiceOpen: (bool: boolean) => void = $state(() => {});
+  let zapWindowOpen = $state(false);
   const observer2 = new QueryObserver(queryClient, {
     queryKey: [
       "reactions",
@@ -92,7 +92,7 @@
         throw Error;
       }
       dialogOpen?.(false);
-      invoiceOpen?.(true);
+      zapWindowOpen = true;
       invoice = zapInvoice;
       $nowProgress = false;
 
@@ -101,7 +101,7 @@
       unsubscribe = observer2.subscribe((result: any) => {
         console.log(result);
         if (result?.data?.event && result.data.event.created_at >= date) {
-          invoiceOpen?.(false);
+          zapWindowOpen = false;
           unsubscribe?.();
 
           //購読対象から削除
@@ -386,7 +386,7 @@
   {/snippet}</AlertDialog
 >
 <ZapInvoiceWindow
-  bind:openZapwindow={invoiceOpen}
+  bind:open={zapWindowOpen}
   {invoice}
   id={monoZap.eventTag[1]}
 />

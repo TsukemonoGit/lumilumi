@@ -1,10 +1,9 @@
 <!-- src/lib/components/Modal.svelte -->
 <script lang="ts">
-  import { createDialog, melt } from "@melt-ui/svelte";
-  import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
+  import { Dialog as DialogPrimitive } from "bits-ui";
+  import { ChevronLeft, ChevronRight } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  import type { Writable } from "svelte/store";
-  import { popStack, queryClient } from "$lib/stores/stores";
+  import { popStack } from "$lib/stores/stores";
   import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
@@ -43,10 +42,8 @@
   let isInitialized = $state(false);
   let loadingStatus: "loading" | "error" | "loaded" = $state("loading");
 
-  // ダイアログ作成
-  const { elements, states } = createDialog({ forceVisible: true });
-  const { overlay, content, close, portalled } = elements;
-  const { open: dialogOpen } = states;
+  // ダイアログの開閉状態
+  let dialogOpen = $state(false);
 
   // 画像フィルタリング：表示可能な画像のみを抽出
   async function filterValidImages(imageUrls: string[]): Promise<MediaItem[]> {
@@ -129,7 +126,7 @@
 
     displayIndex = findDisplayIndex(targetIndex);
     currentIndex = getOriginalIndex();
-    $dialogOpen = true;
+    dialogOpen = true;
 
     // 初期化完了後のみ履歴操作
     if (isInitialized) {
@@ -139,7 +136,7 @@
 
   // ダイアログを閉じる処理
   function closeDialog() {
-    $dialogOpen = false;
+    dialogOpen = false;
     modalOpen = false;
     loadingStatus = "loading";
   }
@@ -186,7 +183,7 @@
   // ページ状態変更監視
   $effect(() => {
     const currentDialogState = page.state?.dialogOpen?.id === DIALOG_ID;
-    if ($dialogOpen && !currentDialogState) {
+    if (dialogOpen && !currentDialogState) {
       untrack(() => closeDialog());
     }
   });
@@ -203,89 +200,106 @@
   let currentImageType = $derived(displayImages[displayIndex]?.type ?? "image");
 </script>
 
-{#if $dialogOpen && displayImages.length > 0}
-  <div use:melt={$portalled} class="fixed inset-0 z-[999]">
-    <!-- オーバーレイ -->
-    <div
-      use:melt={$overlay}
-      class="fixed inset-0 bg-black/50"
-      transition:fade={{ duration: 150 }}
-    ></div>
+<DialogPrimitive.Root
+  bind:open={dialogOpen}
+  onOpenChange={(value) => {
+    if (!value) {
+      popStack.update((stack) =>
+        stack.filter((entry) => entry.id !== DIALOG_ID)
+      );
+    }
+  }}
+>
+  {#if dialogOpen && displayImages.length > 0}
+    <DialogPrimitive.Portal>
+      <!-- オーバーレイ -->
+      <DialogPrimitive.Overlay
+        class="fixed inset-0 bg-black/50"
+        style="z-index:999"
+      />
 
-    <div use:melt={$content}>
-      <!-- 画像表示エリア -->
-      <div
-        class="fixed left-1/2 top-1/2 z-[999] max-h-[100vh] max-w-[100vw] -translate-x-1/2 -translate-y-1/2"
-      >
-        <div class="relative w-full h-full">
-          {#if currentImageType === "svg"}
-            <!-- SVG専用の表示 -->
-            <div
-              class="flex items-center justify-center max-h-[100vh] max-w-[100vw]"
-            >
+      <DialogPrimitive.Content class="fixed inset-0" style="z-index:999">
+        <!-- 画像表示エリア -->
+        <div
+          class="fixed left-1/2 top-1/2 max-h-[100vh] max-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+        >
+          <div class="relative w-full h-full">
+            {#if currentImageType === "svg"}
+              <!-- SVG専用の表示 -->
+              <div
+                class="flex items-center justify-center max-h-[100vh] max-w-[100vw]"
+              >
+                <img
+                  src={currentImageUrl}
+                  alt=""
+                  class="h-[100vh] w-[100vh] object-contain"
+                  onload={() => (loadingStatus = "loaded")}
+                  onerror={() => (loadingStatus = "error")}
+                />
+              </div>
+            {:else}
+              <!-- 通常の画像表示 -->
               <img
                 src={currentImageUrl}
                 alt=""
-                class="h-[100vh] w-[100vh] object-contain"
+                class="max-h-[100vh] max-w-[100vw] object-contain"
                 onload={() => (loadingStatus = "loaded")}
                 onerror={() => (loadingStatus = "error")}
               />
-            </div>
-          {:else}
-            <!-- 通常の画像表示 -->
-            <img
-              src={currentImageUrl}
-              alt=""
-              class="max-h-[100vh] max-w-[100vw] object-contain"
-              onload={() => (loadingStatus = "loaded")}
-              onerror={() => (loadingStatus = "error")}
-            />
-          {/if}
+            {/if}
 
-          <!-- ローディング・エラー表示 -->
-          {#if loadingStatus !== "loaded"}
-            <div
-              class="absolute inset-0 flex items-center justify-center bg-black/20"
-            >
-              <span class="text-neutral-200 bg-black/50 px-2 py-1 rounded">
-                {loadingStatus === "error" ? "error" : "loading..."}
-              </span>
-            </div>
+            <!-- ローディング・エラー表示 -->
+            {#if loadingStatus !== "loaded"}
+              <div
+                class="absolute inset-0 flex items-center justify-center bg-black/20"
+              >
+                <span class="text-neutral-200 bg-black/50 px-2 py-1 rounded">
+                  {loadingStatus === "error" ? "error" : "loading..."}
+                </span>
+              </div>
+            {/if}
+          </div>
+        </div>
+
+        <!-- ナビゲーションボタン -->
+        {#if displayImages.length > 1}
+          <button
+            class="fixed sm:left-4 left-1 top-1/2 -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style="z-index:999"
+            onclick={goToPrev}
+            aria-label="prev image"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <button
+            class="fixed sm:right-4 right-1 top-1/2 -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style="z-index:999"
+            onclick={goToNext}
+            aria-label="next image"
+          >
+            <ChevronRight size={24} />
+          </button>
+        {/if}
+
+        <!-- 閉じるボタン -->
+        <CloseButton
+          onclick={() => (dialogOpen = false)}
+          ariaLabel="close"
+          zIndex={999}
+        />
+
+        <!-- 画像カウンター -->
+        <div
+          class="fixed bottom-1 right-1 rounded bg-neutral-800/50 px-3 py-1 text-sm text-neutral-300"
+          style="z-index:999"
+        >
+          {displayIndex + 1} / {displayImages.length}
+          {#if currentImageType === "svg"}
+            <span class="ml-1 text-xs opacity-75">SVG</span>
           {/if}
         </div>
-      </div>
-
-      <!-- ナビゲーションボタン -->
-      {#if displayImages.length > 1}
-        <button
-          class="fixed sm:left-4 left-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onclick={goToPrev}
-          aria-label="prev image"
-        >
-          <ChevronLeft size={24} />
-        </button>
-
-        <button
-          class="fixed sm:right-4 right-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onclick={goToNext}
-          aria-label="next image"
-        >
-          <ChevronRight size={24} />
-        </button>
-      {/if}
-    </div>
-
-    <!-- 閉じるボタン -->
-    <CloseButton useMelt={$close} ariaLabel="close" zIndex={999} />
-
-    <!-- 画像カウンター -->
-    <div
-      class="fixed bottom-1 right-1 z-[999] rounded bg-neutral-800/50 px-3 py-1 text-sm text-neutral-300"
-    >
-      {displayIndex + 1} / {displayImages.length}
-      {#if currentImageType === "svg"}
-        <span class="ml-1 text-xs opacity-75">SVG</span>
-      {/if}
-    </div>
-  </div>
-{/if}
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  {/if}
+</DialogPrimitive.Root>

@@ -1,15 +1,14 @@
 <script lang="ts">
   import { MapPinCheck, MapPinPlus } from "lucide-svelte";
   import Dialog from "./Elements/Dialog.svelte";
-  import { writable, type Writable } from "svelte/store";
   import { browser } from "$app/environment";
   import { addDebugLog } from "./Debug/debug";
 
   let { geohash = $bindable() } = $props();
-  let dialogOpen: Writable<boolean> = $state(writable(false));
+  let dialogOpen = $state(false);
 
   const handleClickOpenMap = () => {
-    $dialogOpen = true;
+    dialogOpen = true;
   };
 
   const onClickSubmit = (geo: string) => {

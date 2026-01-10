@@ -19,7 +19,7 @@
 
   let { onPolled }: Props = $props();
 
-  let dialogOpen: Writable<boolean> = $state(writable(false));
+  let dialogOpen = $state(false);
   // アンケートのオプションを文字列の配列として管理
   let pollOptions = $state(["", ""]);
   const maxOption = 20;
@@ -166,7 +166,7 @@
           author: res.event.pubkey,
           kind: res.event.kind,
         });
-        $dialogOpen = false;
+        dialogOpen = false;
         onPolled(nostrId);
       } else {
         addToast({
@@ -191,7 +191,7 @@
 
   const handleClickOpenMap = () => {
     resetForm();
-    $dialogOpen = true;
+    dialogOpen = true;
   };
 </script>
 

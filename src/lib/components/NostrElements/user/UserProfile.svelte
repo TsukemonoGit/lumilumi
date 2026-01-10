@@ -57,8 +57,7 @@
 
   let loadingText = $derived(encodetoNpub(pubkey));
 
-  // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen = $state(false);
 
   let prof: Profile | undefined = $state();
 
@@ -218,7 +217,7 @@
             >
               <div class=" border border-magnum-400 rounded-full">
                 {#if lumiSetting.get().showImg && prof.picture && prof.picture !== ""}
-                  <button class="flex" onclick={() => ($dialogOpen = true)}>
+                  <button class="flex" onclick={() => (dialogOpen = true)}>
                     <UserAvatar
                       url={prof.picture}
                       name={pubkey}

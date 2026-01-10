@@ -10,7 +10,6 @@
   import AddMute from "./AddMute.svelte";
 
   import MuteTabList from "./MuteTabList.svelte";
-  import { writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
@@ -21,7 +20,7 @@
 
   let { pubkey = $bindable() }: Props = $props();
   //export let muteList: LumiMute | undefined;
-  let dialogOpen: any = writable(false);
+  let dialogOpen = $state(false);
   async function handleClickMute(e: MouseEvent) {
     //  e.preventDefault();
     const beforeList = $mutes?.event;
@@ -108,11 +107,11 @@
 >{#if $mutes}<button
     type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
+    onclick={() => (dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 
-<Dialog open={dialogOpen} id={"mute"}>
+<Dialog bind:open={dialogOpen} id={"mute"}>
   {#snippet main()}
     <div class="w-full h-[480px] max-h-[90vh] overflow-x-hidden">
       {#if $mutes}

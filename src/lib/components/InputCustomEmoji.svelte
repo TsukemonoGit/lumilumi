@@ -10,10 +10,9 @@
     onClickEmoji: (eTag: string[]) => void;
   }
   let { input = "", onClickEmoji }: Props = $props();
-  let openPopover: (bool: boolean) => void = $state(() => {});
 </script>
 
-<Popover bind:openPopover ariaLabel="custom emoji" zIndex={100}>
+<Popover ariaLabel="custom emoji" zIndex={100}>
   <div class="actionButton">
     <SmilePlus size="20" />
   </div>

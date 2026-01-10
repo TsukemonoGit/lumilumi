@@ -294,8 +294,7 @@
   let dialogOpen: (bool: boolean) => void = () => {};
   let zapAmount: number = $state(50);
   let zapComment: string = $state("");
-  //svelte-ignore non_reactive_update
-  let invoiceOpen: (bool: boolean) => void = () => {};
+  let zapWindowOpen = $state(false);
   let amountEle: HTMLInputElement | undefined = $state(undefined);
 
   const handleClickZap = () => {
@@ -348,7 +347,7 @@
     $nowProgress = false;
     invoice = zapInvoice;
     dialogOpen?.(false);
-    invoiceOpen?.(true);
+    zapWindowOpen = true;
 
     //サップの量保存
     try {
@@ -705,11 +704,7 @@
   {/if}
 {/if}
 
-<ZapInvoiceWindow
-  bind:openZapwindow={invoiceOpen}
-  {invoice}
-  id={atag ?? note.id}
-/>
+<ZapInvoiceWindow bind:open={zapWindowOpen} {invoice} id={atag ?? note.id} />
 
 <style lang="postcss">
   input[type="text"] {

@@ -1,10 +1,8 @@
 <script lang="ts">
   import { Box, ZoomIn } from "lucide-svelte";
   import loaderIcon from "$lib/assets/loader.svg";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
-
-  import { type Writable, writable } from "svelte/store";
 
   interface Props {
     content?: string | undefined;
@@ -15,8 +13,7 @@
   let { content = undefined, url = undefined }: Props = $props();
   let view = $state(false);
 
-  // svelte-ignore non_reactive_update
-  let showMore: Writable<boolean> = writable(false);
+  let showMore = $state(false);
 </script>
 
 {#if view}
@@ -34,7 +31,7 @@
     <div class="absolute bottom-0 right-0 flex flex-col gap-2">
       <button
         class="text-magnum-300 hover:opacity-80"
-        onclick={() => ($showMore = true)}
+        onclick={() => (showMore = true)}
       >
         <ZoomIn /></button
       >

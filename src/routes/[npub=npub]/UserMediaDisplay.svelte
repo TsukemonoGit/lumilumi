@@ -2,7 +2,6 @@
   import { useMediaPromiseReq } from "$lib/func/nostr";
   import * as Nostr from "nostr-typedef";
   import { onDestroy, onMount, untrack } from "svelte";
-  import { writable, type Writable } from "svelte/store";
 
   import { type MediaEvent, type MediaResult } from "$lib/stores/operators";
   import Controls from "./Controls.svelte";
@@ -42,7 +41,7 @@
   let imageLoadStatus = $state<Record<string, ImageLoadStatus>>({});
   let isInitialized = $state(false);
   let selectedEvent = $state<MediaEvent | null>(null);
-  let showModal: Writable<boolean> = $state(writable(false));
+  let showModal = $state(false);
   let isCancelled = false;
   // 派生状態
   let viewList = $derived(
@@ -75,7 +74,7 @@
   // モーダル処理
   const openModal = (media: MediaEvent) => {
     selectedEvent = media;
-    $showModal = true;
+    showModal = true;
   };
 
   // 初期化処理
@@ -89,7 +88,7 @@
     loadingProgress = "";
     imageLoadStatus = {};
     selectedEvent = null;
-    showModal.set(false);
+    showModal = false;
     isCancelled = false;
   };
 

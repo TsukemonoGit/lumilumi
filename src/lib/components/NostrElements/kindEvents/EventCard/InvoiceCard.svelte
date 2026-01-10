@@ -9,8 +9,7 @@
   }
 
   let { invoice }: Props = $props();
-  // svelte-ignore non_reactive_update
-  let invoiceOpen: (bool: boolean) => void = () => {};
+  let zapWindowOpen = $state(false);
 
   const invoiceDecode = (
     str: string | undefined
@@ -27,7 +26,7 @@
   };
   const handleClickPay = () => {
     console.log("pay");
-    invoiceOpen?.(true);
+    zapWindowOpen = true;
   };
 
   let decoded = $derived(invoiceDecode(invoice));
@@ -94,4 +93,4 @@
       >
     </div>
   </div>{/if}
-<ZapInvoiceWindow bind:openZapwindow={invoiceOpen} {invoice} id={undefined} />
+<ZapInvoiceWindow bind:open={zapWindowOpen} {invoice} id={undefined} />

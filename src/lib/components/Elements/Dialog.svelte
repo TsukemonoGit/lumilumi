@@ -1,10 +1,8 @@
 <!--Dialog.svelte-->
 <script lang="ts">
-  import { createDialog, melt } from "@melt-ui/svelte";
+  import { Dialog as DialogPrimitive } from "bits-ui";
   import { untrack, type Snippet } from "svelte";
-  import { fade } from "svelte/transition";
-  import { X } from "lucide-svelte";
-  import type { Writable } from "svelte/store";
+
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
   import CloseButton from "./CloseButton.svelte";
@@ -12,31 +10,26 @@
   interface Props {
     dialogTitle?: string;
     main?: Snippet;
-    open?: Writable<boolean>;
+    footer?: Snippet<[{ close: () => void }]>;
+    open?: boolean;
     zIndex?: number;
     id: string;
     closeOnOutsideClick?: boolean;
+    contentClass?: string;
   }
 
   let {
-    open = $bindable(),
+    open = $bindable(false),
     dialogTitle = "",
     main,
+    footer,
     zIndex = 10,
     id,
     closeOnOutsideClick = true,
+    contentClass = "",
   }: Props = $props();
 
   let scrollContainer: HTMLDivElement | null = $state(null);
-
-  const {
-    elements: { overlay, content, title, close, portalled },
-    states: { open: dialogOpen },
-  } = createDialog({
-    forceVisible: true,
-    //svelte-ignore state_referenced_locally
-    closeOnOutsideClick: closeOnOutsideClick,
-  });
 
   const resetScrollPosition = () => {
     if (scrollContainer) {
@@ -45,71 +38,59 @@
   };
 
   const openDialog = () => {
-    $dialogOpen = true;
+    open = true;
     pushState("", { dialogOpen: { id } });
   };
 
   const closeDialog = () => {
-    $dialogOpen = false;
+    open = false;
     popStack.update((stack) => stack.filter((entry) => entry.id !== id));
   };
 
   // ダイアログ開放時のスクロール位置リセット
   $effect(() => {
-    if ($dialogOpen && scrollContainer) {
+    if (open && scrollContainer) {
       setTimeout(resetScrollPosition, 0);
     }
-  });
-
-  // 外部からのダイアログ制御
-  $effect(() => {
-    if (!open) return;
-
-    return open.subscribe((value) => {
-      value ? openDialog() : closeDialog();
-    });
   });
 
   // ブラウザバック処理
   $effect(() => {
     const isCurrentDialog = $popStack?.[0]?.id === id;
     if (isCurrentDialog) {
-      untrack(() => ($dialogOpen = false));
+      untrack(() => (open = false));
     }
-  });
-
-  // ダイアログ状態の同期
-  $effect(() => {
-    return dialogOpen.subscribe((value) => {
-      if (!value && open) {
-        $open = false;
-      }
-    });
   });
 </script>
 
-{#if $dialogOpen}
-  <div use:melt={$portalled}>
-    <!-- オーバーレイ -->
-    <div
-      use:melt={$overlay}
+<DialogPrimitive.Root
+  bind:open
+  onOpenChange={(value) => {
+    if (value) {
+      pushState("", { dialogOpen: { id } });
+    } else {
+      popStack.update((stack) => stack.filter((entry) => entry.id !== id));
+    }
+  }}
+>
+  <DialogPrimitive.Portal>
+    <DialogPrimitive.Overlay
       class="fixed inset-0 bg-black/50"
-      style:z-index={zIndex}
-      transition:fade={{ duration: 150 }}
-    ></div>
-
-    <!-- ダイアログコンテンツ -->
-    <div
-      use:melt={$content}
+      style={`z-index:${zIndex}`}
+    />
+    <DialogPrimitive.Content
       class="fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))]
              -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-             p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col"
-      style:z-index={zIndex}
+             p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col {contentClass}"
+      style={`z-index:${zIndex}`}
+      interactOutsideBehavior={closeOnOutsideClick ? "close" : "ignore"}
     >
       <!-- ヘッダー -->
-      <h2 use:melt={$title} class="m-0 text-lg font-medium">
-        {dialogTitle}
-      </h2>
+      {#if dialogTitle}
+        <DialogPrimitive.Title class="m-0 text-lg font-medium">
+          {dialogTitle}
+        </DialogPrimitive.Title>
+      {/if}
 
       <!-- メインコンテンツ -->
       <div class="flex-1 overflow-auto" bind:this={scrollContainer}>
@@ -117,21 +98,25 @@
       </div>
 
       <!-- フッター -->
-      <div class="mt-4 flex justify-end gap-4">
-        <button
-          use:melt={$close}
-          class="inline-flex h-8 items-center justify-center rounded-sm
-                 bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-        >
-          Close
-        </button>
-      </div>
+      {#if footer}
+        {@render footer({ close: closeDialog })}
+      {:else}
+        <div class="mt-4 flex justify-end gap-4">
+          <DialogPrimitive.Close
+            class="inline-flex h-8 items-center justify-center rounded-sm
+                   bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
+          >
+            Close
+          </DialogPrimitive.Close>
+        </div>
+      {/if}
 
-      <!-- 閉じるボタン --><CloseButton
-        useMelt={$close}
+      <!-- 閉じるボタン -->
+      <CloseButton
+        onclick={() => (open = false)}
         zIndex={zIndex + 1}
         ariaLabel="close"
       />
-    </div>
-  </div>
-{/if}
+    </DialogPrimitive.Content>
+  </DialogPrimitive.Portal>
+</DialogPrimitive.Root>

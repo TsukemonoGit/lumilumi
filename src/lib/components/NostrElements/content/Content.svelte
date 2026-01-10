@@ -4,7 +4,6 @@
   import Truncate from "./Truncate.svelte";
   import ContentParts from "./ContentParts.svelte";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
-  import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   interface Props {
     event: Partial<Nostr.Event>;
@@ -32,13 +31,12 @@
   }: Props = $props();
   let text = $derived(event.content || "");
 
-  // svelte-ignore non_reactive_update
-  let showMore: Writable<boolean> = writable(false);
+  let showMore = $state(false);
 
   const onClickShowMore = () => {
     console.log("showMore");
 
-    $showMore = true;
+    showMore = true;
   };
 </script>
 

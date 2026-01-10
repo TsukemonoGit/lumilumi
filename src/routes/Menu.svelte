@@ -1,8 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { createDialog, melt } from "@melt-ui/svelte";
+  import { Dialog as DialogPrimitive } from "bits-ui";
   import { TextAlignJustify, House, TrendingUp } from "lucide-svelte";
-  import { fade, fly } from "svelte/transition";
 
   import UserAvatar2 from "./UserAvatar2.svelte";
   import * as nip19 from "nostr-tools/nip19";
@@ -10,23 +9,10 @@
   import LumiIcon from "$lib/assets/lumi-chan.webp";
   import logo from "$lib/assets/favicon.svg";
   import { goto } from "$app/navigation";
-  import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { mainMenuItems } from "./menu";
-  const {
-    elements: {
-      trigger,
-      overlay,
-      content,
-      title,
-      description,
-      close,
-      portalled,
-    },
-    states: { open },
-  } = createDialog({
-    forceVisible: true,
-  });
+
+  let open = $state(false);
 
   let encodedPub: string | undefined = $derived(
     pubCheck(lumiSetting.get().pubkey)
@@ -43,7 +29,6 @@
     }
     return undefined;
   }
-  // beforeNavigate(() => ($open = false));
 
   function handleClickHome() {
     // 現在のパスが `/` ならトップにスクロール
@@ -61,10 +46,9 @@
     lumiSetting.get().menuleft ? "right-5 " : "left-5"
   );
 
-  // svelte-ignore non_reactive_update
-  let editStatusOpen: Writable<boolean> = writable(false);
+  let editStatusOpen = $state(false);
   const openEditStatusDialog = () => {
-    $editStatusOpen = true;
+    editStatusOpen = true;
   };
 </script>
 
@@ -79,108 +63,102 @@
     >
   </div>
   <div class="absolute {menuPosition} mt-1">
-    <!-- <div use:melt={$menubar}> -->
-    <button
-      type="button"
-      class="trigger"
-      use:melt={$trigger}
-      aria-label="Update dimensions"
-      ><TextAlignJustify class="size-6" />
-    </button>
-    <button onclick={handleClickHome} class="trigger" title="Home"
-      ><House class="size-6" />
-    </button>
-  </div>
-</div>
-<!-- </div> -->
-
-{#if $open}
-  <div use:melt={$portalled}>
-    <div
-      use:melt={$overlay}
-      class="fixed inset-0 z-50 bg-black/50"
-      transition:fade={{ duration: 150 }}
-    ></div>
-    <div
-      use:melt={$content}
-      class={`fixed ${lumiSetting.get().menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
-            shadow-lg focus:outline-none`}
-      transition:fly={lumiSetting.get().menuleft
-        ? {
-            x: -350,
-            duration: 300,
-            opacity: 1,
-          }
-        : {
-            x: 350,
-            duration: 300,
-            opacity: 1,
-          }}
-    >
-      <nav class="h-full justify-between flex flex-col my-2 overflow-hidden">
-        <ul
-          class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
+    <DialogPrimitive.Root bind:open>
+      <DialogPrimitive.Trigger class="trigger" aria-label="Update dimensions">
+        <TextAlignJustify class="size-6" />
+      </DialogPrimitive.Trigger>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay class="fixed inset-0 z-50 bg-black/50" />
+        <DialogPrimitive.Content
+          class={`fixed ${lumiSetting.get().menuleft ? "left-0" : "right-0"} top-0 z-50 h-full w-full max-w-[250px] bg-neutral-900 p-6
+                shadow-lg focus:outline-none`}
         >
-          {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
-            {#if alt === "edit status"}
-              <li>
-                <button onclick={openEditStatusDialog} use:melt={$close}
-                  ><TrendingUp /><span class="ml-2">Edit status</span></button
-                >
-              </li>
-            {:else}
+          <nav
+            class="h-full justify-between flex flex-col my-2 overflow-hidden"
+          >
+            <ul
+              class="flex flex-col gap-6 overflow-y-auto mt-auto max-h-[100vh] mb-2"
+            >
+              {#each mainMenuItems.filter((item) => item.alt !== "profile") as { Icon, link, alt, noPubkey }}
+                {#if alt === "edit status"}
+                  <li>
+                    <button
+                      onclick={() => {
+                        openEditStatusDialog();
+                        open = false;
+                      }}
+                    >
+                      <TrendingUp /><span class="ml-2">Edit status</span>
+                    </button>
+                  </li>
+                {:else}
+                  <li
+                    aria-current={page.url?.pathname ===
+                    (link === undefined && lumiSetting.get().pubkey
+                      ? `/${encodedPub}`
+                      : link)
+                      ? "page"
+                      : undefined}
+                  >
+                    {#if noPubkey || lumiSetting.get().pubkey}
+                      <a
+                        href={link ?? `/${encodedPub}`}
+                        onclick={() => (open = false)}
+                        title={alt}
+                      >
+                        <Icon /><span class="ml-2">{alt}</span>
+                      </a>
+                    {:else}
+                      <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
+                      <div
+                        class="disabledLink"
+                        onclick={() => (open = false)}
+                        onkeydown={(e) => e.key === "Enter" && (open = false)}
+                        role="button"
+                        tabindex="0"
+                        title={alt}
+                      >
+                        <Icon /><span class="ml-2">{alt}</span>
+                      </div>
+                    {/if}
+                  </li>{/if}
+              {/each}
+
               <li
-                aria-current={page.url?.pathname ===
-                (link === undefined && lumiSetting.get().pubkey
-                  ? `/${encodedPub}`
-                  : link)
+                aria-current={page.url?.pathname === "/about"
                   ? "page"
                   : undefined}
               >
-                {#if noPubkey || lumiSetting.get().pubkey}
-                  <a
-                    href={link ?? `/${encodedPub}`}
-                    use:melt={$close}
-                    title={alt}
-                  >
-                    <Icon /><span class="ml-2">{alt}</span>
-                  </a>
-                {:else}
-                  <!--ぷぶキーセットされてないとクリックできない方のメニュー-->
-                  <div class="disabledLink" use:melt={$close} title={alt}>
-                    <Icon /><span class="ml-2">{alt}</span>
-                  </div>
-                {/if}
-              </li>{/if}
-          {/each}
-
-          <li
-            aria-current={page.url?.pathname === "/about" ? "page" : undefined}
-          >
-            <a href="/about" use:melt={$close}
-              >{#if lumiSetting.get().showImg}
-                <img
-                  loading="lazy"
-                  src={LumiIcon}
-                  alt="lumi"
-                  width={80}
-                  height={80}
-                />
-              {:else}
-                <img
-                  loading="lazy"
-                  src={logo}
-                  alt="logo"
-                  width={40}
-                  height={40}
-                />{/if}<span class="ml-2">about</span></a
-            >
-          </li>
-        </ul>
-      </nav>
-    </div>
+                <a href="/about" onclick={() => (open = false)}>
+                  {#if lumiSetting.get().showImg}
+                    <img
+                      loading="lazy"
+                      src={LumiIcon}
+                      alt="lumi"
+                      width={80}
+                      height={80}
+                    />
+                  {:else}
+                    <img
+                      loading="lazy"
+                      src={logo}
+                      alt="logo"
+                      width={40}
+                      height={40}
+                    />
+                  {/if}<span class="ml-2">about</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+    <button onclick={handleClickHome} class="trigger" title="Home">
+      <House class="size-6" />
+    </button>
   </div>
-{/if}
+</div>
 
 <style lang="postcss">
   .menuGroup {
@@ -195,16 +173,14 @@
   .item {
     @apply relative w-[40px] h-[40px] select-none rounded-sm;
     @apply z-20 text-magnum-300 outline-none;
-    @apply data-[highlighted]:bg-magnum-300 data-[highlighted]:text-magnum-300;
-    @apply data-[disabled]:text-neutral-300;
     @apply flex items-center text-sm leading-none;
     @apply cursor-default ring-0 !important;
   }
 
   .trigger {
     @apply inline-flex items-end gap-1 justify-center rounded-md px-3 py-3;
-    @apply text-magnum-300 transition-colors  data-[highlighted]:outline-none;
-    @apply overflow-visible data-[highlighted]:bg-magnum-300 data-[highlighted]:ring-magnum-400 !important;
+    @apply text-magnum-300 transition-colors;
+    @apply overflow-visible !important;
     @apply text-sm font-medium leading-none focus:z-30 focus:ring;
   }
 

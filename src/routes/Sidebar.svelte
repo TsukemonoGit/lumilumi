@@ -10,7 +10,6 @@
   import EditUserStatus from "$lib/components/EditUserStatus.svelte";
   //  import { melt } from "@melt-ui/svelte";
   import { mainMenuItems } from "./menu";
-  import { writable, type Writable } from "svelte/store";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import LumiIcon from "$lib/assets/lumi-chan.webp";
 
@@ -42,7 +41,7 @@
   }
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen = $state(false);
   // $inspect(page.url.pathname);
 </script>
 
@@ -74,7 +73,7 @@
           <li>
             <button
               onclick={() => {
-                $dialogOpen = true;
+                dialogOpen = true;
               }}><TrendingUp /><span class="ml-2">Edit status</span></button
             >
           </li>

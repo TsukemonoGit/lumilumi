@@ -193,5 +193,5 @@
   {#if proxy}
     <ProxyTag proxyTag={proxy} />
   {/if}
-  <ClientTag {tags} {isShowClientTag} {depth} />
+  <ClientTag {tags} {isShowClientTag} {depth} {zIndex} />
 {/if}

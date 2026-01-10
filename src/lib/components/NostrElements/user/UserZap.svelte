@@ -31,7 +31,7 @@
   let dialogOpen: (bool: boolean) => void = $state(() => {});
   let zapAmount: number = $state(50);
   let zapComment: string = $derived(comment ?? "");
-  let invoiceOpen: (bool: boolean) => void = $state(() => {});
+  let zapWindowOpen = $state(false);
 
   let prof = $derived(profile(metadata));
   let invOp = false;
@@ -70,7 +70,7 @@
     $nowProgress = false;
     invoice = zapInvoice;
     dialogOpen?.(false);
-    invoiceOpen?.(true);
+    zapWindowOpen = true;
     invOp = true;
     try {
       //サップの量保存
@@ -167,7 +167,7 @@
 >
 
 <ZapInvoiceWindow
-  bind:openZapwindow={invoiceOpen}
+  bind:open={zapWindowOpen}
   {invoice}
   id={undefined}
   {closeInvoice}

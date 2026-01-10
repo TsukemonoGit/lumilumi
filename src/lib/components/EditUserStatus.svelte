@@ -1,10 +1,8 @@
 <!--edituserstatus.svelte-->
 <script lang="ts">
   import { emojis, nowProgress } from "$lib/stores/stores";
-  import { createDialog, melt } from "@melt-ui/svelte";
-  import { RefreshCw, SmilePlus, X } from "lucide-svelte";
+  import Dialog from "./Elements/Dialog.svelte";
 
-  import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
 
   import { publishEvent } from "$lib/func/nostr";
@@ -16,109 +14,93 @@
   import { loginUser, userStatusMap } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
   import { checkCustomEmojis } from "$lib/func/customEmoji";
-  import CloseButton from "./Elements/CloseButton.svelte";
   import InputCustomEmoji from "./InputCustomEmoji.svelte";
   import { addToast } from "./Elements/Toast.svelte";
+  import { untrack } from "svelte";
 
-  let { dialogOpen = $bindable() } = $props();
+  let { dialogOpen = $bindable(false) }: { dialogOpen?: boolean } = $props();
 
   let openPopover: (bool: boolean) => void = $state(() => {});
-  const {
-    elements: {
-      trigger,
-      overlay,
-      content,
-      title,
-      description,
-      close,
-      portalled,
-    },
-    states: { open },
-  } = createDialog({
-    forceVisible: true,
-  });
-  dialogOpen?.subscribe((value: boolean) => {
-    // console.log(value);
-    if (value) {
-      $open = value;
-      $dialogOpen = false;
-    }
-  });
 
   let userStatus: string = $state("");
   let userURL: string = $state("");
-  //  $open = true;
 
-  open.subscribe(async (value) => {
-    // console.log(value);
-    if (value && !$nowProgress) {
-      $nowProgress = true;
-      try {
-        if (!loginUser.value) {
-          const pubkey = await (
-            window.nostr as Nostr.Nip07.Nostr
-          )?.getPublicKey();
-          if (pubkey) {
-            loginUser.value = pubkey;
-          }
-          //throw Error("failed to get pubkey");
-          if (!pubkey) {
-            throw Error("failed to get pubkey");
-          }
-        }
-        // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
-        //   ["userStatus", "general", pubkey]
-        // );
-        const statusEvent: Nostr.Event | undefined = userStatusMap
+  $effect(() => {
+    if (dialogOpen) {
+      untrack(() => {
+        handleDialogOpen();
+      });
+    }
+  });
 
-          .get(loginUser.value)
-          ?.get("general");
-        //console.log(statusEvent);
+  async function handleDialogOpen() {
+    if ($nowProgress) return;
+    $nowProgress = true;
+    try {
+      if (!loginUser.value) {
+        const pubkey = await (
+          window.nostr as Nostr.Nip07.Nostr
+        )?.getPublicKey();
+        if (pubkey) {
+          loginUser.value = pubkey;
+        }
+        //throw Error("failed to get pubkey");
+        if (!pubkey) {
+          throw Error("failed to get pubkey");
+        }
+      }
+      // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
+      //   ["userStatus", "general", pubkey]
+      // );
+      const statusEvent: Nostr.Event | undefined = userStatusMap
 
-        if (statusEvent) {
-          userStatus = statusEvent.content;
-          //userURL
-          const raeTags = statusEvent.tags.find(
-            (tag) => tag[0] === "r" || tag[0] === "e" || tag[0] === "a"
-          );
-          if (raeTags && raeTags.length >= 2) {
-            if (raeTags[0] === "r") {
-              userURL = raeTags[1];
-            } else if (raeTags[0] === "e" && hexRegex.test(raeTags[1])) {
-              userURL = nip19.noteEncode(raeTags[1]);
-            } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
-              userURL = nip19.naddrEncode(parseNaddr(raeTags));
-            }
-            /*    emojiTags = statusEvent.tags.filter(
-              (tag) => tag[0] === "emoji" && tag.length >= 3
-            ); */
+        .get(loginUser.value)
+        ?.get("general");
+      //console.log(statusEvent);
+
+      if (statusEvent) {
+        userStatus = statusEvent.content;
+        //userURL
+        const raeTags = statusEvent.tags.find(
+          (tag) => tag[0] === "r" || tag[0] === "e" || tag[0] === "a"
+        );
+        if (raeTags && raeTags.length >= 2) {
+          if (raeTags[0] === "r") {
+            userURL = raeTags[1];
+          } else if (raeTags[0] === "e" && hexRegex.test(raeTags[1])) {
+            userURL = nip19.noteEncode(raeTags[1]);
+          } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
+            userURL = nip19.naddrEncode(parseNaddr(raeTags));
           }
+          /*    emojiTags = statusEvent.tags.filter(
+            (tag) => tag[0] === "emoji" && tag.length >= 3
+          ); */
         }
-        $nowProgress = false;
-      } catch (error: any) {
-        if (error?.message) {
-          addToast({
-            data: {
-              title: "Error",
-              description: error.message,
-              color: "bg-orange-500",
-            },
-          });
-        }
+      }
+      $nowProgress = false;
+    } catch (error: any) {
+      if (error?.message) {
         addToast({
           data: {
             title: "Error",
-            description: "failed to get pubkey",
+            description: error.message,
             color: "bg-orange-500",
           },
         });
-        $nowProgress = false;
       }
-      setTimeout(() => {
-        statusInput?.setSelectionRange(userStatus.length, userStatus.length);
-      }, 1);
+      addToast({
+        data: {
+          title: "Error",
+          description: "failed to get pubkey",
+          color: "bg-orange-500",
+        },
+      });
+      $nowProgress = false;
     }
-  });
+    setTimeout(() => {
+      statusInput?.setSelectionRange(userStatus.length, userStatus.length);
+    }, 1);
+  }
 
   const handleClickSave = async () => {
     $nowProgress = true;
@@ -158,7 +140,7 @@
       });
 
       $nowProgress = false;
-      $open = false;
+      dialogOpen = false;
     } catch (error) {
       addToast({
         data: {
@@ -169,7 +151,7 @@
       });
 
       $nowProgress = false;
-      $open = false;
+      dialogOpen = false;
     }
   };
 
@@ -240,70 +222,59 @@
   }
 </script>
 
-{#if $open}
-  <div class="" use:melt={$portalled}>
-    <div
-      use:melt={$overlay}
-      class="fixed inset-0 z-50 bg-black/50"
-      transition:fade={{ duration: 150 }}
-    ></div>
-    <div
-      class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw]
-            max-w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-            p-6 shadow-lg"
-      use:melt={$content}
-    >
-      <h2 use:melt={$title} class="m-0 text-lg font-medium text-magnum-300">
-        {$_("status.edit")}
-      </h2>
-      <!-- <p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
-        Make changes to your profile here. Click save when you're done.
-      </p> -->
-
-      <fieldset class="mb-4 mt-4 flex flex-col gap-2">
-        <label class=" text-zinc-100" for="status"> Status </label>
-        <input
-          bind:this={statusInput}
-          class="h-8 w-full
+<Dialog
+  bind:open={dialogOpen}
+  id="edit-user-status"
+  dialogTitle={$_("status.edit")}
+  zIndex={50}
+  contentClass="max-w-[640px]"
+>
+  {#snippet main()}
+    <fieldset class="mb-4 mt-4 flex flex-col gap-2">
+      <label class=" text-zinc-100" for="status"> Status </label>
+      <input
+        bind:this={statusInput}
+        class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
-          id="status"
-          type="text"
-          bind:value={userStatus}
-        />{#if $emojis && $emojis.list.length > 0}
-          <div class=" w-fit flex self-end">
-            <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
-          </div>
-        {/if}
-      </fieldset>
+        id="status"
+        type="text"
+        bind:value={userStatus}
+      />{#if $emojis && $emojis.list.length > 0}
+        <div class=" w-fit flex self-end">
+          <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
+        </div>
+      {/if}
+    </fieldset>
 
-      <fieldset class="mb-4 flex flex-col items-start gap-2">
-        <label class=" text-zinc-100" for="URL">URL or EventID (option)</label>
-        <input
-          class="h-8 w-full
+    <fieldset class="mb-4 flex flex-col items-start gap-2">
+      <label class=" text-zinc-100" for="URL">URL or EventID (option)</label>
+      <input
+        class="h-8 w-full
                     rounded-sm border border-solid px-1 leading-none text-zinc-100"
-          id="statusURL"
-          type="url"
-          bind:value={userURL}
-          placeholder="https,note,npub,naddr,etc"
-        />
-      </fieldset>
-      <div class="mt-6 flex justify-end gap-4">
-        <button
-          use:melt={$close}
-          class="inline-flex h-8 items-center justify-center rounded-sm
+        id="statusURL"
+        type="url"
+        bind:value={userURL}
+        placeholder="https,note,npub,naddr,etc"
+      />
+    </fieldset>
+  {/snippet}
+
+  {#snippet footer({ close })}
+    <div class="mt-6 flex justify-end gap-4">
+      <button
+        onclick={close}
+        class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-zinc-100 px-4 font-medium leading-none text-zinc-600"
-        >
-          Cancel
-        </button>
-        <button
-          onclick={handleClickSave}
-          class="inline-flex h-8 items-center justify-center rounded-sm
+      >
+        Cancel
+      </button>
+      <button
+        onclick={handleClickSave}
+        class="inline-flex h-8 items-center justify-center rounded-sm
                     bg-magnum-100 px-4 font-medium leading-none text-magnum-900"
-        >
-          Save changes
-        </button>
-      </div>
-      <CloseButton useMelt={$close} ariaLabel="close" />
+      >
+        Save changes
+      </button>
     </div>
-  </div>
-{/if}
+  {/snippet}
+</Dialog>

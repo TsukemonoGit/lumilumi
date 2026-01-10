@@ -17,7 +17,6 @@
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
 
   import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
-  import { type Writable, writable } from "svelte/store";
   import Dialog from "./Elements/Dialog.svelte";
   import ContentParts from "./NostrElements/content/ContentParts.svelte";
   import Truncate from "./NostrElements/content/Truncate.svelte";
@@ -80,7 +79,7 @@
   let parts: Token[] = $derived(
     parseContent(text, tags, { hashtagsFromTagsOnly: false })
   );
-  let showMore: Writable<boolean> = $state(writable(false));
+  let showMore = $state(false);
 
   let replyTag = $derived.by(() => {
     if ([1, 42, 4, 1111].includes(event.kind || 1) && tags.length > 0) {
@@ -185,7 +184,7 @@
   };
 
   const onClickShowMore = () => {
-    $showMore = true;
+    showMore = true;
   };
 
   const openModal = (index: number) => {
