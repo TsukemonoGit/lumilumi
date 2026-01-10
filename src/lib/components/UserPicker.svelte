@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { RefreshCw, SmilePlus } from "lucide-svelte";
+  import { SmilePlus } from "lucide-svelte";
 
-  import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import Popover from "./Elements/Popover.svelte";
   import { getMetadataList, type MetadataList } from "$lib/func/nostr";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
