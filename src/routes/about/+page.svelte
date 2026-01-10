@@ -181,7 +181,7 @@
   <ul class="w-full px-4">
     <li>
       <div class="list">Many Thanks for the Zaps!</div>
-      <div class="item">
+      <div class="about-item">
         <p>
           Including those sent through other notes—your support means a lot!
         </p>
@@ -220,7 +220,7 @@
     </li>
     <li>
       <div class="list">{$_("features.title")}</div>
-      <div class="item">
+      <div class="about-item">
         <ul class="list-disc ml-4 space-y-1">
           <li>
             {$_("features.bookmark")}
@@ -241,7 +241,7 @@
     </li>
     <li>
       <div class="list">{$_("shortcut.title")}</div>
-      <div class="item">
+      <div class="about-item">
         <table>
           <thead>
             <tr>
@@ -259,7 +259,7 @@
     </li>
     <li>
       <div class="list">{$_("sourceCode")}</div>
-      <div class="item">
+      <div class="about-item">
         <Link
           href="https://github.com/TsukemonoGit/lumilumi"
           className="flex gap-1 items-center underline"
@@ -269,7 +269,7 @@
     </li>
     <li>
       <div class="list">{$_("author")}</div>
-      <div class="item">
+      <div class="about-item">
         <Link
           href="https://lumilumi.app/npub1sjcvg64knxkrt6ev52rywzu9uzqakgy8ehhk8yezxmpewsthst6sw3jqcw"
           className="flex gap-1 items-center underline">@mono</Link
@@ -278,7 +278,7 @@
     </li>
     <li>
       <div class="list">{$_("mascot")}</div>
-      <div class="item">
+      <div class="about-item">
         Illustration by <a
           class="underline"
           href="/npub1e09suzmq9mp6nt0ud9ttl03790qjx70wzwlc2pwwghcusvwju54qs0c800"
@@ -308,7 +308,7 @@
       <div class="list">{$_("others")}</div>
       <ul>
         <li>
-          <div class="item flex flex-wrap gap-2 items-center">
+          <div class="about-item flex flex-wrap gap-2 items-center">
             <a
               href="/channel/nevent1qvzqqqqq9qq36amnwvaz7tmnwf68yetvv9ujucedwd6x2mrvv9ezumn9wshsz8nhwden5te0dehhxarj9e3k7mtsd9kx2tt9wfex7u3wdejhgtcppemhxue69uhhjctzw5hx6ef0qyshwumn8ghj7un9d3shjtt2wqhxummnw3ezuamfwfjkgmn9wshx5up0qy08wumn8ghj7mnjv4kxz7fddfczucedwd6x2mrvv9ezumn9wshszxrhwden5te0dehhxarj9e5hgarpdekk7tndv4hz7qgkwaehxw309aex2mrp0yhxyctjd9hx2tnrduhsqgranksfssju8rq4wcpj0gk055nkadtdw7pzafkvn2rtzasx9qfmc5k4s3cs"
               class="flex gap-1 items-center underline"
@@ -318,7 +318,7 @@
           </div>
         </li>
         <li>
-          <div class="item flex flex-wrap gap-2 items-center">
+          <div class="about-item flex flex-wrap gap-2 items-center">
             <Link
               href="https://tsukemonogit.github.io/luminostr/"
               className="flex gap-1 items-center underline"
@@ -328,7 +328,7 @@
           </div>
         </li>
         <li>
-          <div class="item">
+          <div class="about-item">
             <Link
               href="https://github.com/TsukemonoGit/lumilumi/issues/new/choose"
               className="flex gap-1 items-center underline"
@@ -338,7 +338,7 @@
         </li>
 
         <li>
-          <div class="item">
+          <div class="about-item">
             <button
               onclick={handleClickShare}
               class="flex gap-1 items-center underline"
@@ -412,7 +412,7 @@
   .list {
     @apply font-bold  mt-6 mb-2 text-lg border-b border-magnum-500 p-1 text-magnum-500;
   }
-  .item {
+  .about-item {
     @apply ml-4;
   }
 

@@ -58,7 +58,11 @@
 >
   <!--/90 backdrop-blur-->
   <div class="absolute {menuPosition2} h-full mt-2">
-    <a href={`/${encodedPub}`} class="item cursor-pointer" title={"user page"}>
+    <a
+      href={`/${encodedPub}`}
+      class="menu-item cursor-pointer"
+      title={"user page"}
+    >
       <UserAvatar2 size={36} /></a
     >
   </div>
@@ -170,7 +174,7 @@
     }
   }
 
-  .item {
+  .menu-item {
     @apply relative w-[40px] h-[40px] select-none rounded-sm;
     @apply z-20 text-magnum-300 outline-none;
     @apply flex items-center text-sm leading-none;

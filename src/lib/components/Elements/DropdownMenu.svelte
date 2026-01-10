@@ -35,20 +35,20 @@
           <div {...wrapperProps}>
             <div
               {...props}
-              class="menu"
+              class="dm-menu"
               style="z-index:{zIndex}"
               transition:fly={{ duration: 150, y: -10 }}
             >
               {#if hasGroups}
                 {#each menuGroups as group, groupIndex}
                   {#if groupIndex > 0}
-                    <DropdownMenu.Separator class="separator" />
+                    <DropdownMenu.Separator class="dm-separator" />
                   {/if}
 
                   <DropdownMenu.Sub>
-                    <DropdownMenu.SubTrigger class="item group-trigger">
+                    <DropdownMenu.SubTrigger class="dm-item dm-group-trigger">
                       <span>{group.label}</span>
-                      <div class="rightSlot">
+                      <div class="dm-rightSlot">
                         <ChevronRight class="size-4" />
                       </div>
                     </DropdownMenu.SubTrigger>
@@ -63,16 +63,16 @@
                           <div {...subWrapperProps}>
                             <div
                               {...subProps}
-                              class="menu subMenu"
+                              class="dm-menu dm-subMenu"
                               transition:fly={{ duration: 150, x: -10 }}
                             >
                               {#each group.items as { icon: Icon, text, action }}
                                 <DropdownMenu.Item
-                                  class="item"
+                                  class="dm-item"
                                   onSelect={() => handleSelectItem(action)}
                                 >
                                   {#if Icon}<Icon
-                                      class="icon mr-2 size-4"
+                                      class="dm-icon mr-2 size-4"
                                     />{/if}
                                   {text}
                                 </DropdownMenu.Item>
@@ -88,10 +88,10 @@
                 {#each menuGroups as group}
                   {#each group.items as { icon: Icon, text, action }}
                     <DropdownMenu.Item
-                      class="item"
+                      class="dm-item"
                       onSelect={() => handleSelectItem(action)}
                     >
-                      {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
+                      {#if Icon}<Icon class="dm-icon mr-2 size-4" />{/if}
                       {text}
                     </DropdownMenu.Item>
                   {/each}
@@ -106,42 +106,44 @@
 </DropdownMenu.Root>
 
 <style lang="postcss">
-  :global(.menu) {
+  :global(.dm-menu) {
     @apply flex max-h-[400px] min-w-[160px] flex-col shadow-lg;
     @apply rounded-md bg-neutral-800 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
 
-  :global(.subMenu) {
+  :global(.dm-subMenu) {
     @apply min-w-[160px] shadow-md shadow-black/30;
   }
 
-  :global(.item) {
+  :global(.dm-item) {
     @apply relative h-8 min-h-[24px] select-none rounded-sm pl-1 pr-1;
     @apply text-magnum-50 outline-none;
-
     @apply flex items-center text-sm leading-none cursor-default;
     @apply ring-0 !important;
   }
-  :global(.item[data-highlighted]) {
+
+  :global(.dm-item[data-highlighted]) {
     @apply bg-magnum-700 text-magnum-50;
   }
-  :global(.item[data-disabled]) {
+
+  :global(.dm-item[data-disabled]) {
     @apply text-neutral-600;
   }
-  :global(.group-trigger) {
+
+  :global(.dm-group-trigger) {
     @apply justify-between;
   }
 
-  :global(.rightSlot) {
+  :global(.dm-rightSlot) {
     @apply ml-auto text-magnum-500;
   }
 
-  :global(.separator) {
+  :global(.dm-separator) {
     @apply m-[2px] h-[1px] bg-magnum-500/50;
   }
 
-  :global(.icon) {
+  :global(.dm-icon) {
     @apply h-[13px] w-[13px];
   }
 </style>
