@@ -15,7 +15,7 @@
 </script>
 
 {#if ((link && link !== "") || event.content.trim() !== "") && !deleted}
-  <div class=" min-w-[16px] h-[16px]">
+  <div class="min-w-[16px] h-[16px] flex items-center">
     <EllipsisMenu
       TriggerIcon={TrendingUp}
       note={event}
@@ -32,23 +32,9 @@
       title={link}
       href={link}
     >
-      <div
-        class="truncate line-clamp-2 max-w-full"
-        style="white-space: pre-wrap; word-break: break-word;"
-      >
-        <DisplayName
-          height={20}
-          name={event.content || link}
-          tags={event.tags}
-        />
-      </div>
+      <DisplayName height={20} name={event.content || link} tags={event.tags} />
     </a>
   {:else}
-    <div
-      class="truncate line-clamp-2 max-w-full"
-      style="white-space: pre-wrap; word-break: break-word;"
-    >
-      <DisplayName height={20} name={event.content} tags={event.tags} />
-    </div>
+    <DisplayName height={20} name={event.content} tags={event.tags} />
   {/if}
 {/if}

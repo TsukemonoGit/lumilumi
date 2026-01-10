@@ -11,9 +11,10 @@
     tags: string[][];
     name: string;
     height: number;
+    class?: string;
   }
 
-  let { tags, name, height }: Props = $props();
+  let { tags, name, height, class: className }: Props = $props();
 
   let emojiTags = $derived(
     tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
@@ -25,7 +26,7 @@
 </script>
 
 <span
-  class=" line-clamp-1 truncate max-w-full overflow-hidden"
+  class={[" line-clamp-1 truncate max-w-full overflow-hidden", className]}
   style="white-space: normal; word-break: break-word; overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
