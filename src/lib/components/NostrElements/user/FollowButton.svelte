@@ -138,7 +138,6 @@
             ).toISOString(),
             p_tags_count: newKind3[0].event.tags.filter((t) => t[0] === "p")
               .length,
-            from_relay: newKind3[0].relay,
           }
         : "no data from network"
     );
