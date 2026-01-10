@@ -142,6 +142,12 @@
     // ネットワークから取得
     $nowProgress = true;
 
+    //一定数の接続が確立するまで待つ
+    await waitForConnections({
+      maxWaitTime: 5000,
+      requiredConnectionRatio: 0.7,
+    });
+
     const fetchRelays = await usePromiseReq(
       {
         filters: [
@@ -155,7 +161,7 @@
         operator: pipe(latest()),
       },
       undefined,
-      undefined
+      5000
     );
 
     $nowProgress = false;
