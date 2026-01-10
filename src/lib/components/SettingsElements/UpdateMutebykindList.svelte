@@ -14,7 +14,6 @@
   import { eventKinds } from "$lib/func/kinds";
   import { locale } from "@konemono/svelte5-i18n";
 
-  import { writable, type Writable } from "svelte/store";
   import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
@@ -26,8 +25,7 @@
   let { pubkey = $bindable() }: Props = $props();
   // export let mutebykindList: LumiMuteByKind | undefined = undefined;
 
-  // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen: boolean = $state(false);
   async function handleClickMuteByKind() {
     const beforeList = $mutebykinds?.list;
     try {
@@ -114,7 +112,7 @@
 >{#if $mutebykinds}<button
     type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
+    onclick={() => (dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen} id={"mutebykind"}>

@@ -12,7 +12,7 @@
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: Writable<boolean> = writable(false);
+  let dialogOpen: boolean = $state(false);
 </script>
 
 <EmojiListUpdate
@@ -27,7 +27,7 @@
 >{#if $emojis}<button
     type="button"
     class="rounded-md border ml-2 p-1 m-1 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50"
-    onclick={() => ($dialogOpen = true)}>view data</button
+    onclick={() => (dialogOpen = true)}>view data</button
   >{/if}
 <!--JSON no Dialog-->
 <Dialog bind:open={dialogOpen} id={"emoji"}>
