@@ -37,12 +37,12 @@
     },
   ];
 
-  let editChannelListOpen = $state(writable(false));
+  let editChannelListOpen = $state(false);
   const handleSelectItem = async (action: string) => {
     switch (action) {
       case "edit":
         //edit
-        $editChannelListOpen = true;
+        editChannelListOpen = true;
         break;
       case "open":
         //open

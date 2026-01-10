@@ -37,11 +37,6 @@
     }
   };
 
-  const openDialog = () => {
-    open = true;
-    pushState("", { dialogOpen: { id } });
-  };
-
   const closeDialog = () => {
     open = false;
     popStack.update((stack) => stack.filter((entry) => entry.id !== id));

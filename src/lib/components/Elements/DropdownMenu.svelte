@@ -1,9 +1,7 @@
-<!--DropdownMenu-->
 <script lang="ts">
-  import { createDropdownMenu, melt } from "@melt-ui/svelte";
+  import { DropdownMenu } from "bits-ui";
   import { fly } from "svelte/transition";
   import { ChevronRight } from "lucide-svelte";
-  import { get } from "svelte/store";
   import type { Snippet } from "svelte";
   import type { MenuGroup } from "$lib/types";
 
@@ -23,119 +21,127 @@
     buttonClass = "hover:opacity-75 active:opacity-50 text-magnum-500/75 overflow-hidden w-fit",
   }: Props = $props();
 
-  const {
-    elements: { trigger, menu, item, separator },
-    builders: { createSubmenu },
-    states: { open },
-  } = createDropdownMenu({
-    loop: true,
-  });
-
-  const subMenus = menuGroups.map(() => {
-    const {
-      elements: { subTrigger, subMenu },
-      states: { subOpen },
-    } = createSubmenu();
-    return { subTrigger, subMenu, subOpen };
-  });
-  let subM: any = $state();
-  let subT: any = $state();
-
-  subMenus.map((m) => {
-    m.subTrigger.subscribe(() => {
-      subT = subMenus.map((m) => get(m.subTrigger));
-    });
-  });
-  subMenus.map((m) => {
-    m.subTrigger.subscribe(() => {
-      subM = subMenus.map((m) => get(m.subMenu));
-    });
-  });
+  let hasGroups = $derived(menuGroups.length > 0 && menuGroups[0].label);
 </script>
 
-<button type="button" class={buttonClass} use:melt={$trigger} aria-label="Menu">
-  {@render children?.()}
-</button>
-
-{#if $open}
-  <div
-    class="menu"
-    style="z-index:{zIndex}"
-    use:melt={$menu}
-    transition:fly={{ duration: 150, y: -10 }}
-  >
-    {#if menuGroups.length > 0 && menuGroups[0].label}
-      <!-- グループあり -->
-      {#each menuGroups as group, groupIndex}
-        {#if groupIndex > 0}
-          <div class="separator" use:melt={$separator}></div>
-        {/if}
-
-        <div class="item group-trigger" use:melt={subT[groupIndex]}>
-          <span>{group.label}</span>
-          <div class="rightSlot">
-            <ChevronRight class="size-4" />
-          </div>
-        </div>
-
-        <div class="menu subMenu" use:melt={subM[groupIndex]}>
-          {#each group.items as { icon: Icon, text, action }}
+<DropdownMenu.Root>
+  <DropdownMenu.Trigger class={buttonClass} aria-label="Menu">
+    {@render children?.()}
+  </DropdownMenu.Trigger>
+  <DropdownMenu.Portal>
+    <DropdownMenu.Content preventScroll={false}>
+      {#snippet child({ wrapperProps, props, open })}{open}
+        {#if open}
+          <div {...wrapperProps}>
             <div
-              class="item"
-              use:melt={$item}
-              onclick={() => handleSelectItem(action)}
+              {...props}
+              class="menu"
+              style="z-index:{zIndex}"
+              transition:fly={{ duration: 150, y: -10 }}
             >
-              {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
-              {text}
+              {#if hasGroups}
+                {#each menuGroups as group, groupIndex}
+                  {#if groupIndex > 0}
+                    <DropdownMenu.Separator class="separator" />
+                  {/if}
+
+                  <DropdownMenu.Sub>
+                    <DropdownMenu.SubTrigger class="item group-trigger">
+                      <span>{group.label}</span>
+                      <div class="rightSlot">
+                        <ChevronRight class="size-4" />
+                      </div>
+                    </DropdownMenu.SubTrigger>
+
+                    <DropdownMenu.SubContent>
+                      {#snippet child({
+                        wrapperProps: subWrapperProps,
+                        props: subProps,
+                        open: subOpen,
+                      })}
+                        {#if subOpen}
+                          <div {...subWrapperProps}>
+                            <div
+                              {...subProps}
+                              class="menu subMenu"
+                              transition:fly={{ duration: 150, x: -10 }}
+                            >
+                              {#each group.items as { icon: Icon, text, action }}
+                                <DropdownMenu.Item
+                                  class="item"
+                                  onSelect={() => handleSelectItem(action)}
+                                >
+                                  {#if Icon}<Icon
+                                      class="icon mr-2 size-4"
+                                    />{/if}
+                                  {text}
+                                </DropdownMenu.Item>
+                              {/each}
+                            </div>
+                          </div>
+                        {/if}
+                      {/snippet}
+                    </DropdownMenu.SubContent>
+                  </DropdownMenu.Sub>
+                {/each}
+              {:else}
+                {#each menuGroups as group}
+                  {#each group.items as { icon: Icon, text, action }}
+                    <DropdownMenu.Item
+                      class="item"
+                      onSelect={() => handleSelectItem(action)}
+                    >
+                      {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
+                      {text}
+                    </DropdownMenu.Item>
+                  {/each}
+                {/each}
+              {/if}
             </div>
-          {/each}
-        </div>
-      {/each}
-    {:else}
-      <!-- グループなし -->
-      {#each menuGroups as group}
-        {#each group.items as { icon: Icon, text, action }}
-          <div
-            class="item"
-            use:melt={$item}
-            onclick={() => handleSelectItem(action)}
-          >
-            {#if Icon}<Icon class="icon mr-2 size-4" />{/if}
-            {text}
           </div>
-        {/each}
-      {/each}
-    {/if}
-  </div>
-{/if}
+        {/if}
+      {/snippet}
+    </DropdownMenu.Content></DropdownMenu.Portal
+  >
+</DropdownMenu.Root>
 
 <style lang="postcss">
-  .menu {
+  :global(.menu) {
     @apply flex max-h-[400px] min-w-[160px] flex-col shadow-lg;
     @apply rounded-md bg-neutral-800 p-1 shadow-black/30 lg:max-h-none;
     @apply ring-0 !important;
   }
-  .subMenu {
+
+  :global(.subMenu) {
     @apply min-w-[160px] shadow-md shadow-black/30;
   }
-  .item {
+
+  :global(.item) {
     @apply relative h-8 min-h-[24px] select-none rounded-sm pl-1 pr-1;
     @apply text-magnum-50 outline-none;
-    @apply data-[highlighted]:bg-magnum-700 data-[highlighted]:text-magnum-50;
-    @apply data-[disabled]:text-neutral-600;
-    @apply flex items-center text-sm leading-none;
+
+    @apply flex items-center text-sm leading-none cursor-default;
     @apply ring-0 !important;
   }
-  .group-trigger {
+  :global(.item[data-highlighted]) {
+    @apply bg-magnum-700 text-magnum-50;
+  }
+  :global(.item[data-disabled]) {
+    @apply text-neutral-600;
+  }
+  :global(.group-trigger) {
     @apply justify-between;
   }
-  .rightSlot {
+
+  :global(.rightSlot) {
     @apply ml-auto text-magnum-500;
   }
-  .separator {
+
+  :global(.separator) {
     @apply m-[2px] h-[1px] bg-magnum-500/50;
   }
-  .icon {
+
+  :global(.icon) {
     @apply h-[13px] w-[13px];
   }
 </style>

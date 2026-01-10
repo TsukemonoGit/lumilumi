@@ -2,7 +2,6 @@
 <script lang="ts">
   import { Dialog as DialogPrimitive } from "bits-ui";
   import { ChevronLeft, ChevronRight } from "lucide-svelte";
-  import { fade } from "svelte/transition";
   import { popStack } from "$lib/stores/stores";
   import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";
   import { pushState } from "$app/navigation";

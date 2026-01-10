@@ -36,7 +36,7 @@
   let { note, indexes, channelData, heyaId }: Props = $props();
 
   let editChannelDataOpen = $state(writable(false));
-  let editChannelListOpen = $state(writable(false));
+  let editChannelListOpen = $state(false);
 
   let channelLink = $derived(getChannelLink(heyaId));
   let heyaRelays = $derived(note ? getHeyaRelays(note) : []);
@@ -142,7 +142,7 @@
         }
         break;
       case "editList":
-        $editChannelListOpen = true;
+        editChannelListOpen = true;
         break;
       case "broadcast":
         if (note) publishEvent(note);
