@@ -35,8 +35,7 @@
   let customReactionError: boolean = $state(false);
   let customReactionErrorMessage: string = $state("");
 
-  // svelte-ignore non_reactive_update
-  let openPopover: (bool: boolean) => void = () => {};
+  let openPopover: boolean = $state(false);
 
   const handleClickCustomReaction = async () => {
     // console.log("atag:", atag);
@@ -79,7 +78,7 @@
       content: customReaction,
     };
     await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
-    openPopover?.(false);
+    openPopover = false;
     customReaction = "";
   };
 
@@ -110,7 +109,7 @@
       content: `:${e[0]}:`,
     };
     await publishAndSetQuery(ev, ["reactions", atag ?? note.id, "reaction"]);
-    openPopover?.(false);
+    openPopover = false;
     customReaction = "";
   };
   function handleKeyDown(event: KeyboardEvent) {
@@ -136,7 +135,7 @@
 </script>
 
 <Popover
-  bind:openPopover
+  bind:open={openPopover}
   buttonClass={"actionButton"}
   ariaLabel="Open emoji picker"
 >

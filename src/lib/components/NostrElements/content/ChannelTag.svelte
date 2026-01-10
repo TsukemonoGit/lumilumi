@@ -6,7 +6,7 @@
 
   import DropdownMenu from "$lib/components/Elements/DropdownMenu.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { writable } from "svelte/store";
+
   import EditChannelList from "../../../../routes/channel/EditChannelList.svelte";
   import { getChannelLink } from "$lib/func/channel";
   import ChannelMetadata from "../kindEvents/ChannelMetadata.svelte";

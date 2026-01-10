@@ -9,7 +9,6 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import DisplayName from "./DisplayName.svelte";
-  import { type Writable, writable } from "svelte/store";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { MenuButtonClass } from "$lib/func/constants";
   import { addToast } from "$lib/components/Elements/Toast.svelte";

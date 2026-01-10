@@ -4,14 +4,12 @@
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import { writable, type Writable } from "svelte/store";
   import * as nip19 from "nostr-tools/nip19";
 
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { SmilePlus } from "lucide-svelte";
   import EmojiListUpdate from "./EmojiListUpdate.svelte";
 
-  // svelte-ignore non_reactive_update
   let dialogOpen: boolean = $state(false);
 </script>
 

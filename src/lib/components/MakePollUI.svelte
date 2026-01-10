@@ -1,6 +1,5 @@
 <!-- PollDialog.svelte -->
 <script lang="ts">
-  import { writable, type Writable } from "svelte/store";
   import { Select } from "melt/builders";
   import Dialog from "./Elements/Dialog.svelte";
   import { ChartBar, Check, Plus, X } from "lucide-svelte";

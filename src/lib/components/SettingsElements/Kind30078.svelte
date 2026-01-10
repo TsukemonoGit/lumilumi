@@ -21,7 +21,6 @@
   import { datetime } from "$lib/func/util";
   import AlertDialog from "../Elements/AlertDialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { writable, type Writable } from "svelte/store";
   import {
     lumiSetting,
     showBanner,
