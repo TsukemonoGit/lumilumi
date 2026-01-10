@@ -19,39 +19,48 @@
   let petname = $derived(followList.get().get(pubkey));
   let prof = $derived(profile(metadata));
   let isBirthDay = $derived(checkBirthDay(prof));
+  let hasDisplayName = $derived(prof?.display_name && prof.display_name !== "");
+  let hasName = $derived(prof?.name && prof.name !== "");
+  let hasNip05 = $derived(prof?.nip05 && prof.nip05 !== "");
 </script>
 
 {#if petname}
   <span class="text-magnum-100">📛{petname}</span>
-{:else if metadata && prof}
-  <span
-    class="line-clamp-1 truncate overflow-hidden max-w-full"
-    style="white-space: normal; word-break: break-word;"
-  >
+{:else if hasDisplayName || hasName || hasNip05}
+  {#if hasDisplayName}
     <DisplayName
       height={21}
-      name={prof.display_name ?? ""}
-      tags={metadata.tags}
+      name={prof!.display_name!}
+      tags={metadata?.tags ?? []}
     />
-  </span>
-  {#if prof.name && prof.name !== ""}
+  {/if}
+
+  {#if hasName}
+    <DisplayName
+      height={21}
+      name={`@${prof!.name}`}
+      tags={metadata?.tags ?? []}
+    />
+  {:else if hasNip05 && !hasDisplayName}
     <span
-      class="text-magnum-100 text-sm line-clamp-1 truncate overflow-hidden max-w-full"
-      style="white-space: normal; word-break: break-word;"
+      class="line-clamp-1 truncate max-w-full overflow-hidden italic"
+      style="white-space: normal; word-break: break-word; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;"
     >
-      <DisplayName height={21} name={`@${prof.name}`} tags={metadata.tags} />
+      {prof!.nip05}
     </span>
   {/if}
 {:else}
   <span class="text-magnum-100 text-sm break-all">
-    @{nip19.npubEncode(pubkey)}
+    {nip19.npubEncode(pubkey)}
   </span>
 {/if}
+
 {#if isBirthDay}
   <Cake size={16} class="text-magnum-400 w-[16px]" />
 {/if}
-{#if kindInfo && kind}
-  <span class=" text-neutral-300/50 text-sm whitespace-nowrap ml-1">
+
+{#if kindInfo && kind !== undefined}
+  <span class="text-neutral-300/50 text-sm whitespace-nowrap ml-1">
     {eventKinds.get(kind)?.en ?? `kind:${kind}`}
   </span>
 {/if}
