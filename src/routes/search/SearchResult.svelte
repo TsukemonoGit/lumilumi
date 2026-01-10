@@ -54,8 +54,11 @@
           .map(([url, config]) => config.url)
       : [];
 
-    //  URLで重複を排除し、ユニークなリレーのリストを返す
-    return Array.from(new Set([...readRelayUrls, ...relays]));
+    //  URLで重複を排除
+    const merged = Array.from(new Set([...readRelayUrls, ...relays]));
+
+    // フォールバック: 取得できない場合は検索用既知リレーへ
+    return merged.length > 0 ? merged : nip50relays;
   });
 </script>
 

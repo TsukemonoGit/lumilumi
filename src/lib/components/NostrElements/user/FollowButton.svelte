@@ -32,6 +32,7 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { STORAGE_KEYS, getKind3Key } from "$lib/func/localStorageKeys";
 
   interface Props {
     pubkey: string;
@@ -101,11 +102,22 @@
 
   const refreshContactsData = async (kind3Event: EventPacket | undefined) => {
     $nowProgress = true;
-    console.log(lumiSetting.get().pubkey);
-    // await queryClient.refetchQueries({ queryKey: contactsQueryKey });
-    // await delay(1000);
-    // const newKind3: EventPacket | undefined =
-    //   queryClient.getQueryData(contactsQueryKey);
+
+    // クリア前のキャッシュデータを保存
+    const cachedKind3: EventPacket | undefined =
+      queryClient.getQueryData(contactsQueryKey);
+
+    console.log(
+      "[FollowButton] Cached Kind 3:",
+      cachedKind3?.event.created_at
+        ? new Date(cachedKind3.event.created_at * 1000).toISOString()
+        : "no cache"
+    );
+
+    // キャッシュをクリアして最新データを強制取得
+    queryClient.removeQueries({ queryKey: contactsQueryKey });
+
+    console.log("[FollowButton] Fetching latest Kind 3 contacts...");
     const newKind3: EventPacket[] = await usePromiseReq(
       {
         filters: [
@@ -114,25 +126,79 @@
         operator: pipe(latest()),
       },
       undefined,
-      2000
+      5000 // タイムアウトを5000msに延長
     );
-    // console.log("newKind3", newKind3);
-    // console.log("kind3Event", kind3Event);
-    if (
-      !kind3Event ||
-      (newKind3.length > 0 &&
-        newKind3[0].event.created_at > kind3Event.event.created_at)
-    ) {
-      queryClient.setQueryData(contactsQueryKey, (oldData: any) => newKind3[0]);
 
-      const pubkeyList = pubkeysIn(newKind3[0].event);
-      followList.set(pubkeyList);
-      beforeKind3 = newKind3[0].event;
-    } else if (kind3Event) {
-      beforeKind3 = kind3Event.event;
+    console.log(
+      "[FollowButton] Network fetch result:",
+      newKind3.length > 0
+        ? {
+            created_at: new Date(
+              newKind3[0].event.created_at * 1000
+            ).toISOString(),
+            p_tags_count: newKind3[0].event.tags.filter((t) => t[0] === "p")
+              .length,
+          }
+        : "no data from network"
+    );
+
+    // ネットワークから取得したデータとキャッシュを比較
+    let selectedKind3: Nostr.Event | undefined;
+
+    if (newKind3.length > 0) {
+      const networkTimestamp = newKind3[0].event.created_at;
+      const cachedTimestamp = cachedKind3?.event.created_at || 0;
+
+      if (networkTimestamp > cachedTimestamp) {
+        // ネットワークデータの方が新しい
+        selectedKind3 = newKind3[0].event;
+        console.log("[FollowButton] Using network data (newer)");
+      } else if (cachedKind3) {
+        // キャッシュの方が新しい
+        selectedKind3 = cachedKind3.event;
+        console.log("[FollowButton] Using cached data (newer)");
+        // キャッシュを復元
+        queryClient.setQueryData(
+          contactsQueryKey,
+          (oldData: any) => cachedKind3
+        );
+      } else {
+        // キャッシュなし、ネットワークデータを使用
+        selectedKind3 = newKind3[0].event;
+        console.log("[FollowButton] Using network data (no cache)");
+      }
+    } else if (cachedKind3) {
+      // ネットワークから取得できず、キャッシュを使用
+      selectedKind3 = cachedKind3.event;
+      console.log("[FollowButton] Using cached data (network failed)");
+      // キャッシュを復元
+      queryClient.setQueryData(contactsQueryKey, (oldData: any) => cachedKind3);
     }
 
-    // console.log("beforeKind3", beforeKind3);
+    if (selectedKind3) {
+      beforeKind3 = selectedKind3;
+      const pubkeyList = pubkeysIn(selectedKind3);
+      followList.set(pubkeyList);
+
+      // ローカルストレージに保存
+      try {
+        const kind3Key = getKind3Key(lumiSetting.get().pubkey);
+        localStorage.setItem(kind3Key, JSON.stringify(selectedKind3));
+        console.log("[FollowButton] Kind 3 saved to localStorage");
+      } catch (error) {
+        console.error(
+          "[FollowButton] Failed to save Kind 3 to localStorage:",
+          error
+        );
+      }
+
+      console.log("[FollowButton] Final Kind 3 selected:", {
+        timestamp: new Date(selectedKind3.created_at * 1000).toISOString(),
+        p_tags_count: selectedKind3.tags.filter((t) => t[0] === "p").length,
+      });
+    } else {
+      console.warn("[FollowButton] No Kind 3 data available");
+    }
   };
 
   const handleFollowStateChange = () => {
