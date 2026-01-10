@@ -37,6 +37,7 @@
 
   {#if hasName}
     <DisplayName
+      class="text-magnum-100 text-sm "
       height={21}
       name={`@${prof!.name}`}
       tags={metadata?.tags ?? []}
