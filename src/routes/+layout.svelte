@@ -16,7 +16,6 @@
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
-  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
 
   // ストアインポート
   import {
@@ -78,6 +77,7 @@
   import "../app.css";
   import { getProfile } from "$lib/func/event";
   import { nip19 } from "nostr-tools";
+  import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
 
   // プロパティ定義
   let { data, children } = $props<{
@@ -130,9 +130,9 @@
     data?.relays && data?.relays.length > 0
       ? [...data.relays, ...defaultRelays].slice(
           0,
-          Math.max(data.relays.length, 3)
+          Math.max(data.relays.length, 3),
         )
-      : undefined
+      : undefined,
   );
 
   // ユーザーのリレー情報を取得して設定
@@ -156,7 +156,7 @@
           operator: pipe(latest()),
         },
         undefined,
-        undefined
+        undefined,
       );
 
       if (relays) {
@@ -231,7 +231,7 @@
                 try {
                   localStorage.setItem(
                     STORAGE_KEYS.LUMI_SETTINGS,
-                    JSON.stringify(lumiSetting.get())
+                    JSON.stringify(lumiSetting.get()),
                   );
                 } catch (error) {
                   // エラーメッセージもi18n化
@@ -253,7 +253,7 @@
         try {
           localStorage.setItem(
             STORAGE_KEYS.LUMI_SETTINGS,
-            JSON.stringify(lumiSetting.get())
+            JSON.stringify(lumiSetting.get()),
           );
         } catch (error) {
           console.log("Failed to save");
@@ -383,14 +383,6 @@
         {/snippet}
 
         {#snippet contents()}
-          <!-- 公開鍵が設定されている場合はコンタクトリスト読み込み -->
-          {#if lumiSetting.get().pubkey}
-            <Contacts
-              queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
-              pubkey={lumiSetting.get().pubkey}
-            />
-          {/if}
-
           <Header />
           <SetRepoReactions />
           <Menu />
@@ -402,25 +394,26 @@
             images={mediaList}
             bind:currentIndex={modalIndex}
           />
+          <LoginUserContacts>
+            <!-- メインコンテナ -->
+            <div class="container">
+              <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
+                {@render children?.()}
 
-          <!-- メインコンテナ -->
-          <div class="container">
-            <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
-              {@render children?.()}
+                <!-- プログレス表示 -->
+                {#if $nowProgress}
+                  <div class="fixed right-10 bottom-20 z-[99]">
+                    <LoadingElement />
+                  </div>
+                {/if}
+              </main>
 
-              <!-- プログレス表示 -->
-              {#if $nowProgress}
-                <div class="fixed right-10 bottom-20 z-[99]">
-                  <LoadingElement />
-                </div>
-              {/if}
-            </main>
-
-            <!-- サイドバー -->
-            <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
-              <Sidebar />
-            </div>
-          </div>
+              <!-- サイドバー -->
+              <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
+                <Sidebar />
+              </div>
+            </div></LoginUserContacts
+          >
         {/snippet}
       </SetDefaultRelays>
     {/snippet}
