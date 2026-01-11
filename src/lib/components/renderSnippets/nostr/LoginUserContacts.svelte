@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { type Snippet } from "svelte";
+  import { untrack, type Snippet } from "svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
   import { pubkeysIn } from "$lib/func/nostr";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -40,15 +40,27 @@
     const storedEvent = getLocalStoredEvent();
     const storageCreatedAt = storedEvent?.created_at ?? 0;
 
-    if (event.created_at > storageCreatedAt) {
+    // 1. 最新のイベントはどちらかを判定
+    const isRemoteNewer = event.created_at > storageCreatedAt;
+    const latestEvent = isRemoteNewer ? event : storedEvent;
+
+    if (!latestEvent) return; // 万が一どちらも存在しない場合のガード
+
+    // 2. リレーから来たイベントの方が新しい場合のみ、ストレージ類を更新
+    if (isRemoteNewer) {
       try {
         localStorage.setItem(kind3key, JSON.stringify(event));
         queryClient.setQueryData(queryKey, { event });
-        followList.set(pubkeysIn(event, loginPubkey));
       } catch (e) {
-        console.warn("Failed to sync login user contacts", e);
+        console.warn("Failed to update localStorage", e);
       }
     }
+
+    // 3. 最終的に「最新である」と判定された方でリストを更新
+    // リレーが新しければ event、ローカルが新しければ storedEvent が入る
+    untrack(() => {
+      followList.set(pubkeysIn(latestEvent, loginPubkey));
+    });
   }
 </script>
 
