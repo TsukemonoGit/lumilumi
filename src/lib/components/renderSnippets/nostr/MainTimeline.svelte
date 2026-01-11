@@ -55,7 +55,6 @@
     UPDATE_DELAY: 20,
     LOAD_LIMIT: 50,
     FUTURE_EVENT_TOLERANCE: 10,
-    SCROLL_ADJUSTMENT: 120,
     SCROLL_DELAY: 100,
   };
 
@@ -545,12 +544,14 @@
       }
     );
   }
-
+  let headerElement: HTMLDivElement | undefined = $state();
   function moveUp() {
     if (viewIndex <= 0) return;
-
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT });
+    if (headerElement) {
+      const rect = headerElement.getBoundingClientRect();
+      scroll({
+        top: window.scrollY + rect.bottom,
+      });
     }
 
     viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
@@ -627,7 +628,7 @@
 </script>
 
 {#if viewIndex !== 0}
-  <div class="w-full">
+  <div class="w-full" bind:this={headerElement}>
     <button
       class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
       onclick={moveToTop}

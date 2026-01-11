@@ -659,7 +659,7 @@
   <!--emojis-->
   {#if viewCustomEmojis}
     <div
-      class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto"
+      class="rounded-sm mt-2 border border-magnum-600 flex flex-wrap pt-2 max-h-40 overflow-y-auto relative"
       style="overflow-anchor: auto;"
     >
       {#each $emojis.list as e, index}
@@ -682,8 +682,10 @@
             />
           </button>
         {/if}
-      {/each}<EmojiListUpdate
-        buttonClass="ml-auto p-1 m-1 rounded-full   hover:opacity-75 active:opacity-50 bg-magnum-600 text-magnum-200 "
+      {/each}
+
+      <EmojiListUpdate
+        buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:bg-neutral-900 hover:text-magnum-300 active:scale-90  text-magnum-400 bg-neutral-900/50"
       >
         <RefreshCw />
       </EmojiListUpdate>

@@ -15,7 +15,7 @@
 </script>
 
 {#if ((link && link !== "") || event.content.trim() !== "") && !deleted}
-  <div class="min-w-[16px] h-[16px] flex items-center">
+  <div class="min-w-[16px] h-[16px] flex items-center justify-center">
     <EllipsisMenu
       TriggerIcon={TrendingUp}
       note={event}

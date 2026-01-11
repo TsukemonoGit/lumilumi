@@ -27,7 +27,6 @@
   } from "$lib/stores/globalRunes.svelte";
   import { scanArray } from "$lib/stores/operators";
   import { sortEventPackets } from "$lib/func/util";
-  import { page } from "$app/state";
   import { SvelteMap } from "svelte/reactivity";
 
   interface Props {
@@ -54,7 +53,6 @@
     UPDATE_DELAY: 20,
     LOAD_LIMIT: 50,
     FUTURE_EVENT_TOLERANCE: 10,
-    SCROLL_ADJUSTMENT: 120,
     SCROLL_DELAY: 100,
     INIT_UPDATE_DELAY: 10,
   };
@@ -415,19 +413,24 @@
     );
   }
 
-  const handlePrev = () => {
-    if (viewIndex > 0) {
-      scroll({
-        top: window.scrollY + CONFIG.SCROLL_ADJUSTMENT,
-      });
+  let headerElement: HTMLDivElement | undefined = $state();
 
-      viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
-      loadMoreDisabled = false;
-      setTimeout(() => {
-        if (destroyed) return;
-        updateViewEvent?.($globalData);
-      }, CONFIG.SCROLL_DELAY);
+  const handlePrev = () => {
+    if (viewIndex <= 0) return;
+    if (headerElement) {
+      const rect = headerElement.getBoundingClientRect();
+      scroll({
+        top: window.scrollY + rect.bottom,
+      });
     }
+
+    viewIndex = Math.max(viewIndex - CONFIG.SLIDE_AMOUNT, 0);
+    loadMoreDisabled = false;
+
+    setTimeout(() => {
+      if (destroyed) return;
+      updateViewEvent?.($globalData);
+    }, CONFIG.SCROLL_DELAY);
   };
 
   const handleClickTop = () => {
@@ -443,7 +446,7 @@
 </script>
 
 {#if viewIndex !== 0}
-  <div class="w-full">
+  <div class="w-full" bind:this={headerElement}>
     <button
       class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
       onclick={() => handleClickTop()}
