@@ -62,7 +62,7 @@
   };
 </script>
 
-<div class="flex gap-1">
+<div class="flex gap-1 mr-6">
   <input
     id="emoji"
     type="text"
@@ -130,13 +130,11 @@
     {/await}
   {/if}
 
-  <div class="sticky bottom-0 right-0 ml-auto">
-    <EmojiListUpdate
-      buttonClass="h-fit w-fit rounded-full hover:opacity-75 active:opacity-50 text-magnum-600 bg-neutral-900"
-    >
-      <RefreshCw />
-    </EmojiListUpdate>
-  </div>
+  <EmojiListUpdate
+    buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:opacity-75 active:opacity-50 text-magnum-600 bg-neutral-900"
+  >
+    <RefreshCw />
+  </EmojiListUpdate>
 </div>
 
 {#if customReactionError}
