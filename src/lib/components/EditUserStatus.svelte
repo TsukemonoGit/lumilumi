@@ -2,7 +2,6 @@
 <script lang="ts">
   import { emojis, nowProgress } from "$lib/stores/stores";
   import { createDialog, melt } from "@melt-ui/svelte";
-  import { RefreshCw, SmilePlus, X } from "lucide-svelte";
 
   import { fade } from "svelte/transition";
   import * as Nostr from "nostr-typedef";
@@ -17,12 +16,11 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { checkCustomEmojis } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
-  import InputCustomEmoji from "./InputCustomEmoji.svelte";
   import { addToast } from "./Elements/Toast.svelte";
+  import EmojiPickerPopover from "./Elements/EmojiPickerPopover.svelte";
 
   let { dialogOpen = $bindable() } = $props();
 
-  let openPopover: (bool: boolean) => void = $state(() => {});
   const {
     elements: {
       trigger,
@@ -38,7 +36,6 @@
     forceVisible: true,
   });
   dialogOpen?.subscribe((value: boolean) => {
-    // console.log(value);
     if (value) {
       $open = value;
       $dialogOpen = false;
@@ -47,10 +44,9 @@
 
   let userStatus: string = $state("");
   let userURL: string = $state("");
-  //  $open = true;
+  let customReaction: string = $state("");
 
   open.subscribe(async (value) => {
-    // console.log(value);
     if (value && !$nowProgress) {
       $nowProgress = true;
       try {
@@ -61,23 +57,16 @@
           if (pubkey) {
             loginUser.value = pubkey;
           }
-          //throw Error("failed to get pubkey");
           if (!pubkey) {
             throw Error("failed to get pubkey");
           }
         }
-        // const statusEvent: EventPacket | undefined = $queryClient?.getQueryData(
-        //   ["userStatus", "general", pubkey]
-        // );
         const statusEvent: Nostr.Event | undefined = userStatusMap
-
           .get(loginUser.value)
           ?.get("general");
-        //console.log(statusEvent);
 
         if (statusEvent) {
           userStatus = statusEvent.content;
-          //userURL
           const raeTags = statusEvent.tags.find(
             (tag) => tag[0] === "r" || tag[0] === "e" || tag[0] === "a"
           );
@@ -89,9 +78,6 @@
             } else if (raeTags[0] === "a" && nip33Regex.test(raeTags[1])) {
               userURL = nip19.naddrEncode(parseNaddr(raeTags));
             }
-            /*    emojiTags = statusEvent.tags.filter(
-              (tag) => tag[0] === "emoji" && tag.length >= 3
-            ); */
           }
         }
         $nowProgress = false;
@@ -175,15 +161,8 @@
 
   let statusInput = $state<HTMLInputElement>();
 
-  const handleClickEmojiDisplayName = (e: string[]) => {
-    openPopover?.(false);
-
-    /*    const emojiTag = ["emoji", ...e];
-    if (!emojiTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
-      emojiTags.push(emojiTag);
-    } */
-    const emojiText = `:${e[0]}:`;
-    // userStatus = userStatus + emojiText;
+  const handleEmojiSelect = (emojiContent: string, emojiTag?: string[]) => {
+    const emojiText = emojiTag ? `:${emojiTag[0]}:` : emojiContent;
     const insertStart = statusInput?.selectionStart || 0;
     const insertEnd = insertStart + emojiText.length;
 
@@ -197,8 +176,6 @@
       statusInput?.setSelectionRange(insertEnd, insertEnd);
     }, 0);
   };
-
-  let customReaction: string = "";
 
   function createNewAddTag(str: string): string[] {
     const nip19Regex =
@@ -256,9 +233,6 @@
       <h2 use:melt={$title} class="m-0 text-lg font-medium text-magnum-300">
         {$_("status.edit")}
       </h2>
-      <!-- <p use:melt={$description} class="mb-5 mt-2 leading-normal text-zinc-600">
-        Make changes to your profile here. Click save when you're done.
-      </p> -->
 
       <fieldset class="mb-4 mt-4 flex flex-col gap-2">
         <label class=" text-zinc-100" for="status"> Status </label>
@@ -269,9 +243,14 @@
           id="status"
           type="text"
           bind:value={userStatus}
-        />{#if $emojis && $emojis.list.length > 0}
-          <div class=" w-fit flex self-end">
-            <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
+        />
+        {#if $emojis && $emojis.list.length > 0}
+          <div class="w-fit flex self-end">
+            <EmojiPickerPopover
+              bind:customReaction
+              onSelect={handleEmojiSelect}
+              zIndex={60}
+            />
           </div>
         {/if}
       </fieldset>

@@ -22,8 +22,8 @@
   import type { LayoutData } from "../$types";
   import Birth from "./Birth.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
-  import InputCustomEmoji from "$lib/components/InputCustomEmoji.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import EmojiPickerPopover from "$lib/components/Elements/EmojiPickerPopover.svelte";
 
   let { data }: { data: LayoutData } = $props();
   // const data={pubkey:$page.params.npub};
@@ -44,6 +44,13 @@
   let birth_year: number | undefined = $state();
   let birth_month: number | undefined = $state();
   let birth_day: number | undefined = $state();
+
+  let cursorPosition: number = 0;
+  let displayNameInput = $state<HTMLInputElement>();
+  let aboutTextarea = $state<HTMLTextAreaElement>();
+
+  let customReactionDisplayName: string = $state("");
+  let customReactionAbout: string = $state("");
 
   onMount(async () => {
     if (!queryClient) {
@@ -267,37 +274,72 @@
     }
   };
 
-  let cursorPosition: number = 0;
-
   const handleTextareaInput = (event: Event) => {
     const target = event.target as HTMLTextAreaElement;
     cursorPosition = target.selectionStart;
   };
 
-  const handleClickEmoji = (e: string[]) => {
+  const handleEmojiSelectDisplayName = (
+    emojiContent: string,
+    emojiTag?: string[]
+  ) => {
     if (!newProfile) return;
-    const emojiTag = ["emoji", ...e];
-    if (!newTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
-      newTags.push(emojiTag);
+
+    if (emojiTag) {
+      const emojiTagArray = ["emoji", ...emojiTag];
+      if (
+        !newTags.some((tag) => tag[0] === "emoji" && tag[1] === emojiTag[0])
+      ) {
+        newTags = [...newTags, emojiTagArray];
+      }
     }
-    const emojiText = `:${e[0]}:`;
+
+    const emojiText = emojiTag ? `:${emojiTag[0]}:` : emojiContent;
+    const insertStart =
+      displayNameInput?.selectionStart || newProfile.display_name?.length || 0;
+    const insertEnd = insertStart + emojiText.length;
+
+    newProfile.display_name =
+      (newProfile.display_name?.slice(0, insertStart) || "") +
+      emojiText +
+      (newProfile.display_name?.slice(insertStart) || "");
+
+    setTimeout(() => {
+      displayNameInput?.focus();
+      displayNameInput?.setSelectionRange(insertEnd, insertEnd);
+    }, 0);
+  };
+
+  const handleEmojiSelectAbout = (
+    emojiContent: string,
+    emojiTag?: string[]
+  ) => {
+    if (!newProfile) return;
+
+    if (emojiTag) {
+      const emojiTagArray = ["emoji", ...emojiTag];
+      if (
+        !newTags.some((tag) => tag[0] === "emoji" && tag[1] === emojiTag[0])
+      ) {
+        newTags = [...newTags, emojiTagArray];
+      }
+    }
+
+    const emojiText = emojiTag ? `:${emojiTag[0]}:` : emojiContent;
+    const insertStart = aboutTextarea?.selectionStart || cursorPosition;
+    const insertEnd = insertStart + emojiText.length;
 
     newProfile.about =
-      newProfile.about?.slice(0, cursorPosition) +
+      (newProfile.about?.slice(0, insertStart) || "") +
       emojiText +
-      newProfile.about?.slice(cursorPosition);
-    cursorPosition += emojiText.length;
-  };
-  const handleClickEmojiDisplayName = async (e: string[]) => {
-    if (!newProfile) return;
-    const emojiTag = ["emoji", ...e];
+      (newProfile.about?.slice(insertStart) || "");
 
-    if (!newTags.some((tag) => tag[0] === "emoji" && tag[1] === e[0])) {
-      newTags = [...newTags, emojiTag];
-    }
-    const emojiText = `:${e[0]}:`;
+    cursorPosition = insertEnd;
 
-    newProfile.display_name = newProfile.display_name + emojiText;
+    setTimeout(() => {
+      aboutTextarea?.focus();
+      aboutTextarea?.setSelectionRange(insertEnd, insertEnd);
+    }, 0);
   };
 
   function checkBirth(): { day: number; month: number; year?: number } {
@@ -334,6 +376,8 @@
     // 年が指定されていない場合
     return { month: birth_month, day: birth_day };
   }
+
+  //
 </script>
 
 <section class=" w-full">
@@ -448,6 +492,7 @@
 
       {$_("profile.display_name")}
       <input
+        bind:this={displayNameInput}
         type="text"
         class="h-10 w-full rounded-md px-3 py-2 border border-magnum-500"
         bind:value={newProfile.display_name}
@@ -455,7 +500,10 @@
       />
       <div class="w-fit flex self-end mb-1">
         {#if $emojis && $emojis.list.length > 0}
-          <InputCustomEmoji onClickEmoji={handleClickEmojiDisplayName} />
+          <EmojiPickerPopover
+            bind:customReaction={customReactionDisplayName}
+            onSelect={handleEmojiSelectDisplayName}
+          />
         {/if}
       </div>
       <div class="flex gap-2 mb-2 items-end justify-between">
@@ -483,6 +531,7 @@
 
       {$_("profile.about")}
       <textarea
+        bind:this={aboutTextarea}
         class="h-32 w-full rounded-md border border-magnum-500 p-2 leading-none bg-neutral-800"
         bind:value={newProfile.about}
         oninput={handleTextareaInput}
@@ -491,7 +540,10 @@
 
       <div class="w-fit flex self-end mb-2">
         {#if $emojis && $emojis.list.length > 0}
-          <InputCustomEmoji onClickEmoji={handleClickEmoji} />
+          <EmojiPickerPopover
+            bind:customReaction={customReactionAbout}
+            onSelect={handleEmojiSelectAbout}
+          />
         {/if}
       </div>
 
