@@ -147,13 +147,17 @@
 {#if errorData}
   {@render error?.(errorData)}
 {:else if Object.keys(timelineRelays).length > 0}
-  {#await waitForConnections( { checkrelays: timelineRelays, requiredConnectionRatio: 0.7, onProgress: (connected, total) => {
-          setTimeout(() => {
-            const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
-            console.log(ready);
-            relayConnectionState.setReady(ready);
-          });
-        } } )}
+  {#await (() => {
+    if (relayConnectionState.ready) {
+      return Promise.resolve();
+    }
+    return waitForConnections( { checkrelays: timelineRelays, requiredConnectionRatio: 0.7, onProgress: (connected, total) => {
+            setTimeout(() => {
+              const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
+              relayConnectionState.setReady(ready);
+            });
+          } } );
+  })()}
     {@render loading?.()}
   {:then}
     {@render contents?.()}
