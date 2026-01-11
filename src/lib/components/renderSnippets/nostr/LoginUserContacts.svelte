@@ -49,13 +49,14 @@
     }
   };
 
+  let contacts = $state<Nostr.Event>();
   // -----------------------
   // Sync logic
   // -----------------------
 
   function syncWithRemote(remote: Nostr.Event) {
     if (!browser || !loginPubkey || !kind3key || !queryKey) return;
-
+    contacts = remote;
     const local = getLocalStoredEvent();
     const isRemoteNewer = remote.created_at > (local?.created_at ?? 0);
     const latest = isRemoteNewer ? remote : local;
@@ -82,12 +83,12 @@
   // -----------------------
 
   function handleStateChange(status: ReqStatus) {
-    if (status !== "error") return;
-
-    if (followList.get().size !== 0) return;
+    if (contacts || status === "loading") return; //すでにセットしてたらしなくていい
 
     const local = getLocalStoredEvent();
-    if (!local || !loginPubkey) return;
+    if (!local || !loginPubkey || !queryKey) return;
+
+    queryClient.setQueryData(queryKey, { event: local });
 
     untrack(() => {
       followList.set(pubkeysIn(local, loginPubkey));
