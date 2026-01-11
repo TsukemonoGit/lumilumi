@@ -16,7 +16,7 @@
   import { debug } from "$lib/components/Debug/debug";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
-  let _showBanner: boolean = $state(showBanner.value);
+  let _showBanner: boolean = $state(showBanner.value ?? true);
 
   //-----
   // 現在のページに基づいてアイコンを設定
@@ -37,7 +37,6 @@
 
   $effect(() => {
     if (_showBanner !== undefined && _showBanner !== null) {
-      //console.log(_showBanner);
       untrack(() => {
         showBanner.value = _showBanner;
         try {

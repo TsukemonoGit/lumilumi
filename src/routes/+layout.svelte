@@ -16,7 +16,6 @@
   import Popstate from "./Popstate.svelte";
   import Modal from "./Modal.svelte";
   import DebugPanel2 from "$lib/components/Debug/DebugPanel2.svelte";
-  import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
 
   // ストアインポート
   import {
@@ -78,6 +77,7 @@
   import "../app.css";
   import { getProfile } from "$lib/func/event";
   import { nip19 } from "nostr-tools";
+  import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
 
   // プロパティ定義
   let { data, children } = $props<{
@@ -294,9 +294,14 @@
             }
           }
 
+          const storedBanner = localStorage.getItem(STORAGE_KEYS.SHOW_BANNER);
+
+          // null（未保存）のときは true、保存されているときはその値を評価
           const banner: boolean =
-            localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";
+            storedBanner !== null ? storedBanner === "true" : true;
+
           showBanner.value = banner;
+          console.log("Banner initialized as:", banner);
         } catch (error) {}
 
         // RxNostr初期化
@@ -385,10 +390,7 @@
         {#snippet contents()}
           <!-- 公開鍵が設定されている場合はコンタクトリスト読み込み -->
           {#if lumiSetting.get().pubkey}
-            <Contacts
-              queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
-              pubkey={lumiSetting.get().pubkey}
-            />
+            <LoginUserContacts />
           {/if}
 
           <Header />

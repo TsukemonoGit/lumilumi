@@ -57,11 +57,11 @@ export function useReq(
   let _req:
     | RxReqStrategy
     | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable);
+      RxReqEmittable<{
+        relays: string[];
+      }> &
+      RxReqOverable &
+      RxReqPipeable);
 
   if (req) {
     _req = req;
@@ -89,7 +89,7 @@ export function useReq(
 
         obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
-            //  console.log(v);
+            //console.log(v)
             //  clearTimeoutIfExists();
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
