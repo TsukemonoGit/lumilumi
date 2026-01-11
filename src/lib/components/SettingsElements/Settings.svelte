@@ -253,7 +253,7 @@
         "defaultRelay",
         lumiSetting.get().pubkey,
       ]);
-      console.log(data);
+      //console.log(data);
       if (data && data.length > 0) {
         // データがある場合はイベントの形を整えてセット
         const relays = setRelaysByKind10002(data[0].event);

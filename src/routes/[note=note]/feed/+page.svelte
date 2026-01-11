@@ -16,7 +16,7 @@
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { waitForRelayReady } from "$lib/components/renderSnippets/nostr/timelineList";
   import type { Attachment } from "svelte/attachments";
   import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
 
@@ -102,7 +102,7 @@
   };
 
   const myAttachment: Attachment = (element) => {
-    console.log(element.nodeName); // 'DIV'
+    //console.log(element.nodeName); // 'DIV'
 
     // ターゲットイベントの上端がトップになるようにスクロール
     const scrollToTargetTop = () => {
@@ -120,7 +120,7 @@
     });
 
     return () => {
-      console.log("cleaning up");
+      //  console.log("cleaning up");
     };
   };
 </script>
@@ -168,7 +168,7 @@
     <div
       class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
     >
-      {#await waitForConnections()}
+      {#await waitForRelayReady({ maxWaitTime: 5000 })}
         <EmptyCard
           ><div class="min-h-24 content-center">
             Loading Target Note...

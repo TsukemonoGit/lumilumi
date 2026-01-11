@@ -24,7 +24,7 @@
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
-    waitForConnections,
+    waitForRelayReady,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { readable } from "svelte/store";
@@ -176,7 +176,7 @@
         until: filter.until === undefined ? now() - 15 * 60 : filter.until,
       }))
     );
-    await waitForConnections();
+    await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
     const older = await firstLoadOlderEvents(
       fetchAmount,
       newFilters,

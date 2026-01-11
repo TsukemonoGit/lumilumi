@@ -23,7 +23,7 @@
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { waitForRelayReady } from "$lib/components/renderSnippets/nostr/timelineList";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
 
   // タイムライン表示の制御フラグ
@@ -125,7 +125,7 @@
     }
 
     console.log("[GlobalPage] fetching relay config");
-    await waitForConnections();
+    await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
 
     // キャッシュから取得を試みる
     const cachedData: string[] | undefined = queryClient.getQueryData([
@@ -143,10 +143,7 @@
     $nowProgress = true;
 
     //一定数の接続が確立するまで待つ
-    await waitForConnections({
-      maxWaitTime: 5000,
-      requiredConnectionRatio: 0.7,
-    });
+    await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
 
     const fetchRelays = await usePromiseReq(
       {

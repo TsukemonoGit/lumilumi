@@ -13,7 +13,7 @@
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
-    waitForConnections,
+    waitForRelayReady,
   } from "./timelineList";
   import { now, type EventPacket } from "rx-nostr";
   import Metadata from "./Metadata.svelte";
@@ -262,8 +262,7 @@
         limit: CONFIG.LOAD_LIMIT,
       }));
       isLoadingOlderEvents = true;
-
-      await waitForConnections();
+      await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
       if (destroyed) return;
       const handleIncrementalData = createIncrementalHandler();
 
