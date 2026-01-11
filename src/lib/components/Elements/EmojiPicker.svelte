@@ -131,7 +131,7 @@
   {/if}
 
   <EmojiListUpdate
-    buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:opacity-75 active:opacity-50 text-magnum-600 bg-neutral-900"
+    buttonClass="sticky bottom-1 right-1 p-1  ml-auto h-fit w-fit rounded-full hover:bg-neutral-900 hover:text-magnum-300 active:scale-90  text-magnum-400 bg-neutral-900/50"
   >
     <RefreshCw />
   </EmojiListUpdate>
