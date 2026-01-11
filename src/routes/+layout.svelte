@@ -28,7 +28,6 @@
   } from "$lib/stores/stores";
   import {
     displayEvents,
-    followList,
     loginUser,
     lumiSetting,
     showBanner,
@@ -131,9 +130,9 @@
     data?.relays && data?.relays.length > 0
       ? [...data.relays, ...defaultRelays].slice(
           0,
-          Math.max(data.relays.length, 3),
+          Math.max(data.relays.length, 3)
         )
-      : undefined,
+      : undefined
   );
 
   // ユーザーのリレー情報を取得して設定
@@ -157,7 +156,7 @@
           operator: pipe(latest()),
         },
         undefined,
-        undefined,
+        undefined
       );
 
       if (relays) {
@@ -232,7 +231,7 @@
                 try {
                   localStorage.setItem(
                     STORAGE_KEYS.LUMI_SETTINGS,
-                    JSON.stringify(lumiSetting.get()),
+                    JSON.stringify(lumiSetting.get())
                   );
                 } catch (error) {
                   // エラーメッセージもi18n化
@@ -254,7 +253,7 @@
         try {
           localStorage.setItem(
             STORAGE_KEYS.LUMI_SETTINGS,
-            JSON.stringify(lumiSetting.get()),
+            JSON.stringify(lumiSetting.get())
           );
         } catch (error) {
           console.log("Failed to save");
@@ -295,9 +294,14 @@
             }
           }
 
+          const storedBanner = localStorage.getItem(STORAGE_KEYS.SHOW_BANNER);
+
+          // null（未保存）のときは true、保存されているときはその値を評価
           const banner: boolean =
-            localStorage.getItem(STORAGE_KEYS.SHOW_BANNER) == "true";
+            storedBanner !== null ? storedBanner === "true" : true;
+
           showBanner.value = banner;
+          console.log("Banner initialized as:", banner);
         } catch (error) {}
 
         // RxNostr初期化
