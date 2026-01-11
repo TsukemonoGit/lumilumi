@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { onMount, type Snippet } from "svelte";
+  import { type Snippet } from "svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
   import { pubkeysIn } from "$lib/func/nostr";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -22,48 +22,28 @@
   let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : "");
   let queryKey = $derived(["timeline", "contacts", loginPubkey]);
 
-  let relayReady = $state(false);
-
-  onMount(async () => {
-    if (!browser) return;
+  // ローカルキャッシュを取得するヘルパー
+  function getLocalStoredEvent(): Nostr.Event | undefined {
+    if (!browser || !kind3key) return undefined;
+    const stored = localStorage.getItem(kind3key);
     try {
-      await waitForConnections({
-        maxWaitTime: 5000,
-        requiredConnectionRatio: 0.8,
-      });
-    } finally {
-      relayReady = true;
+      return stored ? JSON.parse(stored) : undefined;
+    } catch {
+      return undefined;
     }
-  });
+  }
 
-  // --------------------------------------------------------------------------
-  // handleSync: リレーからデータが届いた時のみ実行
-  // --------------------------------------------------------------------------
+  // 取得したイベントを同期する関数
   function handleSync(event: Nostr.Event) {
     if (!browser || !event || !loginPubkey || !kind3key) return;
 
-    // 1. localStorage から現在のキャッシュを取得（比較用）
-    const stored = localStorage.getItem(kind3key);
-    let storageCreatedAt = 0;
+    const storedEvent = getLocalStoredEvent();
+    const storageCreatedAt = storedEvent?.created_at ?? 0;
 
-    if (stored) {
-      try {
-        storageCreatedAt = JSON.parse(stored).created_at;
-      } catch {
-        storageCreatedAt = 0;
-      }
-    }
-
-    // 2. 届いたイベントがキャッシュより新しい場合のみ更新
     if (event.created_at > storageCreatedAt) {
       try {
-        // 保存
         localStorage.setItem(kind3key, JSON.stringify(event));
-
-        // TanStack Query のキャッシュを直接書き換える
         queryClient.setQueryData(queryKey, { event });
-
-        // グローバルなフォローリストを更新（これによってタイムラインのフィルタが動く）
         followList.set(pubkeysIn(event, loginPubkey));
       } catch (e) {
         console.warn("Failed to sync login user contacts", e);
@@ -72,20 +52,27 @@
   }
 </script>
 
-{#if loginPubkey && relayReady}
-  <Contacts pubkey={loginPubkey} {queryKey}>
-    {#snippet nodata()}
-      {@render n?.()}
-    {/snippet}
+{#if loginPubkey}
+  {#await waitForConnections( { maxWaitTime: 5000, requiredConnectionRatio: 0.8 } ) then}
+    <Contacts pubkey={loginPubkey} {queryKey}>
+      {#snippet nodata()}
+        {@const localEvent = getLocalStoredEvent()}
+        {#if localEvent}
+          {handleSync(localEvent)}
+          {@render c?.({ contacts: localEvent, status: "success" })}
+        {:else}
+          {@render n?.()}
+        {/if}
+      {/snippet}
 
-    {#snippet loading()}
-      {@render l?.()}
-    {/snippet}
+      {#snippet loading()}
+        {@render l?.()}
+      {/snippet}
 
-    {#snippet content({ contacts, status })}
-      {@const _ = handleSync(contacts)}
-
-      {@render c?.({ contacts, status })}
-    {/snippet}
-  </Contacts>
+      {#snippet content({ contacts, status })}
+        {@const _ = handleSync(contacts)}
+        {@render c?.({ contacts, status })}
+      {/snippet}
+    </Contacts>
+  {/await}
 {/if}
