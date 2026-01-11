@@ -81,7 +81,7 @@
   // -----------------------
   // State fallback logic
   // -----------------------
-
+  //successででーたないときlocalのを使う
   function handleStateChange(status: ReqStatus) {
     if (contacts || status === "loading") return; //すでにセットしてたらしなくていい
 
@@ -94,10 +94,11 @@
       followList.set(pubkeysIn(local, loginPubkey));
     });
   }
+  const waitPromise = $derived(waitForConnections(waitOptions));
 </script>
 
-{#if loginPubkey && queryKey}
-  {#await waitForConnections(waitOptions) then}
+{#if loginPubkey && queryKey && waitPromise}
+  {#await waitPromise then}
     <Contacts
       pubkey={loginPubkey}
       {queryKey}
