@@ -28,6 +28,7 @@
   } from "$lib/stores/stores";
   import {
     displayEvents,
+    followList,
     loginUser,
     lumiSetting,
     showBanner,
@@ -383,6 +384,11 @@
         {/snippet}
 
         {#snippet contents()}
+          <!-- 公開鍵が設定されている場合はコンタクトリスト読み込み -->
+          {#if lumiSetting.get().pubkey}
+            <LoginUserContacts />
+          {/if}
+
           <Header />
           <SetRepoReactions />
           <Menu />
@@ -394,26 +400,25 @@
             images={mediaList}
             bind:currentIndex={modalIndex}
           />
-          <LoginUserContacts>
-            <!-- メインコンテナ -->
-            <div class="container">
-              <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
-                {@render children?.()}
 
-                <!-- プログレス表示 -->
-                {#if $nowProgress}
-                  <div class="fixed right-10 bottom-20 z-[99]">
-                    <LoadingElement />
-                  </div>
-                {/if}
-              </main>
+          <!-- メインコンテナ -->
+          <div class="container">
+            <main class="md:ml-52 xs:ml-0 ml-0 mt-8 md:mb-2 xs:mb-20 mb-20">
+              {@render children?.()}
 
-              <!-- サイドバー -->
-              <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
-                <Sidebar />
-              </div>
-            </div></LoginUserContacts
-          >
+              <!-- プログレス表示 -->
+              {#if $nowProgress}
+                <div class="fixed right-10 bottom-20 z-[99]">
+                  <LoadingElement />
+                </div>
+              {/if}
+            </main>
+
+            <!-- サイドバー -->
+            <div class="fixed lift-0 top-0 md:w-52 xs:w-0 w-0">
+              <Sidebar />
+            </div>
+          </div>
         {/snippet}
       </SetDefaultRelays>
     {/snippet}

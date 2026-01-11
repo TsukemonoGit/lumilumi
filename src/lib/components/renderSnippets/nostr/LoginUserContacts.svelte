@@ -1,110 +1,91 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
-    import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { onMount, type Snippet } from "svelte";
+  import { getKind3Key } from "$lib/func/localStorageKeys";
+  import { pubkeysIn } from "$lib/func/nostr";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import type { ReqStatus } from "$lib/types";
+  import type Nostr from "nostr-typedef";
+  import { waitForConnections } from "./timelineList";
+  import Contacts from "./Contacts.svelte";
+  import { queryClient } from "$lib/stores/stores";
 
-    import { getKind3Key } from "$lib/func/localStorageKeys";
-    import { pubkeysIn } from "$lib/func/nostr";
-    import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
-    import { app } from "$lib/stores/stores";
-    import { useContacts } from "$lib/stores/useContacts";
-    import type { EventPacket } from "rx-nostr";
-    import { waitForConnections } from "./timelineList";
+  interface Props {
+    nodata?: Snippet;
+    loading?: Snippet;
+    content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
+  }
 
-    let { children } = $props();
-    // --------------------------------------------------------------------------
-    // state
-    // --------------------------------------------------------------------------
-    let loginPubkey = $derived(lumiSetting.get().pubkey);
-    let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : "");
+  let { nodata: n, loading: l, content: c }: Props = $props();
 
-    let storageKind3 = $state<EventPacket["event"] | undefined>(undefined);
+  let loginPubkey = $derived(lumiSetting.get().pubkey);
+  let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : "");
+  let queryKey = $derived(["timeline", "contacts", loginPubkey]);
 
-    // relay 接続待ち完了フラグ
-    let relayReady = $state(false);
+  let relayReady = $state(false);
 
-    // Kind3 取得完了フラグ
-    let kind3Ready = $state(false);
+  onMount(async () => {
+    if (!browser) return;
+    try {
+      await waitForConnections({
+        maxWaitTime: 5000,
+        requiredConnectionRatio: 0.8,
+      });
+    } finally {
+      relayReady = true;
+    }
+  });
 
-    // --------------------------------------------------------------------------
-    // mount
-    // --------------------------------------------------------------------------
-    onMount(async () => {
-        if (!browser) return;
+  // --------------------------------------------------------------------------
+  // handleSync: リレーからデータが届いた時のみ実行
+  // --------------------------------------------------------------------------
+  function handleSync(event: Nostr.Event) {
+    if (!browser || !event || !loginPubkey || !kind3key) return;
 
-        // relay 接続待ち
-        try {
-            await waitForConnections({
-                maxWaitTime: 5000,
-                requiredConnectionRatio: 0.8,
-            });
-            relayReady = true;
-        } catch {
-            // タイムアウトしても処理を進める
-            relayReady = true;
-        }
+    // 1. localStorage から現在のキャッシュを取得（比較用）
+    const stored = localStorage.getItem(kind3key);
+    let storageCreatedAt = 0;
 
-        // localStorage 読み込み
-        if (!kind3key) return;
+    if (stored) {
+      try {
+        storageCreatedAt = JSON.parse(stored).created_at;
+      } catch {
+        storageCreatedAt = 0;
+      }
+    }
 
-        const stored = localStorage.getItem(kind3key);
-        if (!stored) return;
+    // 2. 届いたイベントがキャッシュより新しい場合のみ更新
+    if (event.created_at > storageCreatedAt) {
+      try {
+        // 保存
+        localStorage.setItem(kind3key, JSON.stringify(event));
 
-        try {
-            storageKind3 = JSON.parse(stored) as EventPacket["event"];
-        } catch {
-            return;
-        }
+        // TanStack Query のキャッシュを直接書き換える
+        queryClient.setQueryData(queryKey, { event });
 
-        if (storageKind3) {
-            const pubkeyList = pubkeysIn(storageKind3, loginPubkey);
-            followList.set(pubkeyList);
-            kind3Ready = true;
-        }
-    });
-
-    // --------------------------------------------------------------------------
-    // Contacts 取得（relayReady が true になるまで起動しない）
-    // --------------------------------------------------------------------------
-    let contactsResult = $derived(
-        relayReady && $app?.rxNostr && loginPubkey
-            ? useContacts(
-                  $app.rxNostr,
-                  ["timeline", "contacts", loginPubkey],
-                  loginPubkey,
-              )
-            : undefined,
-    );
-
-    let contactsData = $derived(contactsResult?.data);
-    let contactsEvent = $derived(
-        contactsData ? $contactsData?.event : undefined,
-    );
-
-    // --------------------------------------------------------------------------
-    // 最新データの保存・反映
-    // --------------------------------------------------------------------------
-    $effect(() => {
-        if (!contactsEvent || !loginPubkey || !kind3key) return;
-
-        if (
-            !storageKind3 ||
-            contactsEvent.created_at > storageKind3.created_at
-        ) {
-            try {
-                localStorage.setItem(kind3key, JSON.stringify(contactsEvent));
-                storageKind3 = contactsEvent;
-
-                const pubkeyList = pubkeysIn(contactsEvent, loginPubkey);
-                followList.set(pubkeyList);
-
-                kind3Ready = true;
-            } catch {
-                // noop
-            }
-        }
-    });
+        // グローバルなフォローリストを更新（これによってタイムラインのフィルタが動く）
+        followList.set(pubkeysIn(event, loginPubkey));
+      } catch (e) {
+        console.warn("Failed to sync login user contacts", e);
+      }
+    }
+  }
 </script>
 
-{#if relayReady || !kind3key}<!--ログインしてなくても閲覧できる-->
-    {@render children?.()}
+{#if loginPubkey && relayReady}
+  <Contacts pubkey={loginPubkey} {queryKey}>
+    {#snippet nodata()}
+      {@render n?.()}
+    {/snippet}
+
+    {#snippet loading()}
+      {@render l?.()}
+    {/snippet}
+
+    {#snippet content({ contacts, status })}
+      {@const _ = handleSync(contacts)}
+
+      {@render c?.({ contacts, status })}
+    {/snippet}
+  </Contacts>
 {/if}

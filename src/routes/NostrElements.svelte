@@ -23,6 +23,7 @@
     lumiSetting,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
+  import LoginUserContacts from "$lib/components/renderSnippets/nostr/LoginUserContacts.svelte";
 
   let since: number | undefined = $state(undefined);
   let timelineQuery: QueryKey = $derived([
@@ -141,10 +142,7 @@
   >
   <SampleGlobalLink />
 {:else}
-  <Contacts
-    queryKey={["timeline", "contacts", lumiSetting.get().pubkey]}
-    pubkey={lumiSetting.get().pubkey}
-  >
+  <LoginUserContacts>
     {#snippet nodata()}
       <div><MakeNewKind3 /></div>
     {/snippet}
@@ -175,8 +173,8 @@
           {/snippet}
         </MainTimeline>
       {/if}
-    {/snippet}
-  </Contacts>
+    {/snippet}</LoginUserContacts
+  >
 
   <div class="postWindow">
     <OpenPostWindow

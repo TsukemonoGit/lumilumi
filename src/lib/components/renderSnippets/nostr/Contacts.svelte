@@ -1,3 +1,4 @@
+<!--Contacts.svelte-->
 <script lang="ts">
   import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
@@ -43,15 +44,13 @@
   });
 
   let result = $derived(
-    $app?.rxNostr
-      ? useContacts($app.rxNostr, queryKey, pubkey, req)
-      : undefined,
+    $app?.rxNostr ? useContacts($app.rxNostr, queryKey, pubkey, req) : undefined
   );
 
   let data = $derived(result?.data);
   let status = $derived(result?.status);
   let contactsEvent = $derived(data && $data?.event);
-  $inspect($app?.rxNostr, $data);
+  //$inspect($app?.rxNostr, $data);
   // コンソールログ削除
 </script>
 
