@@ -1,6 +1,6 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { type Snippet } from "svelte";
+  import { untrack, type Snippet } from "svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
   import { pubkeysIn } from "$lib/func/nostr";
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
@@ -16,61 +16,109 @@
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
   }
 
-  let { nodata: n, loading: l, content: c }: Props = $props();
+  const { nodata: n, loading: l, content: c }: Props = $props();
 
-  let loginPubkey = $derived(lumiSetting.get().pubkey);
-  let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : "");
-  let queryKey = $derived(["timeline", "contacts", loginPubkey]);
+  // 基本設定のリアクティブ宣言
+  const loginPubkey = $derived(lumiSetting.get().pubkey);
+  const kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : null);
+  const queryKey = $derived(
+    loginPubkey ? (["timeline", "contacts", loginPubkey] as const) : null
+  );
 
-  // ローカルキャッシュを取得するヘルパー
-  function getLocalStoredEvent(): Nostr.Event | undefined {
-    if (!browser || !kind3key) return undefined;
+  const waitOptions = {
+    maxWaitTime: 5000,
+    requiredConnectionRatio: 0.8,
+  } as const;
+
+  // -----------------------
+  // localStorage utilities
+  // -----------------------
+
+  const isEvent = (v: unknown): v is Nostr.Event =>
+    !!v && typeof v === "object" && "created_at" in v;
+
+  const getLocalStoredEvent = (): Nostr.Event | undefined => {
+    if (!browser || !kind3key) return;
+
     const stored = localStorage.getItem(kind3key);
     try {
-      return stored ? JSON.parse(stored) : undefined;
+      const parsed = stored ? JSON.parse(stored) : undefined;
+      return isEvent(parsed) ? parsed : undefined;
     } catch {
       return undefined;
     }
-  }
+  };
 
-  // 取得したイベントを同期する関数
-  function handleSync(event: Nostr.Event) {
-    if (!browser || !event || !loginPubkey || !kind3key) return;
+  let contacts = $state<Nostr.Event>();
+  // -----------------------
+  // Sync logic
+  // -----------------------
 
-    const storedEvent = getLocalStoredEvent();
-    const storageCreatedAt = storedEvent?.created_at ?? 0;
+  function syncWithRemote(remote: Nostr.Event) {
+    if (!browser || !loginPubkey || !kind3key || !queryKey) return;
+    contacts = remote;
+    const local = getLocalStoredEvent();
+    const isRemoteNewer = remote.created_at > (local?.created_at ?? 0);
+    const latest = isRemoteNewer ? remote : local;
 
-    if (event.created_at > storageCreatedAt) {
-      try {
-        localStorage.setItem(kind3key, JSON.stringify(event));
-        queryClient.setQueryData(queryKey, { event });
-        followList.set(pubkeysIn(event, loginPubkey));
-      } catch (e) {
-        console.warn("Failed to sync login user contacts", e);
+    if (!latest) return;
+
+    try {
+      if (isRemoteNewer) {
+        localStorage.setItem(kind3key, JSON.stringify(remote));
       }
+
+      queryClient.setQueryData(queryKey, { event: latest });
+    } catch (e) {
+      console.warn("Failed to update sync storage", e);
     }
+
+    untrack(() => {
+      followList.set(pubkeysIn(latest, loginPubkey));
+    });
   }
+
+  // -----------------------
+  // State fallback logic
+  // -----------------------
+  //successででーたないときlocalのを使う
+  function handleStateChange(status: ReqStatus) {
+    if (contacts || status === "loading") return; //すでにセットしてたらしなくていい
+
+    const local = getLocalStoredEvent();
+    if (!local || !loginPubkey || !queryKey) return;
+
+    queryClient.setQueryData(queryKey, { event: local });
+
+    untrack(() => {
+      followList.set(pubkeysIn(local, loginPubkey));
+    });
+  }
+  const waitPromise = $derived(waitForConnections(waitOptions));
 </script>
 
-{#if loginPubkey}
-  {#await waitForConnections( { maxWaitTime: 5000, requiredConnectionRatio: 0.8 } ) then}
-    <Contacts pubkey={loginPubkey} {queryKey}>
+{#if loginPubkey && queryKey && waitPromise}
+  {#await waitPromise then}
+    <Contacts
+      pubkey={loginPubkey}
+      {queryKey}
+      onchange={syncWithRemote}
+      onstatechange={handleStateChange}
+    >
+      {#snippet loading()}
+        {@render l?.()}
+      {/snippet}
+
       {#snippet nodata()}
-        {@const localEvent = getLocalStoredEvent()}
-        {#if localEvent}
-          {handleSync(localEvent)}
-          {@render c?.({ contacts: localEvent, status: "success" })}
+        {@const local = getLocalStoredEvent()}
+        {#if local}
+          {@render c?.({ contacts: local, status: "success" })}
         {:else}
           {@render n?.()}
         {/if}
       {/snippet}
 
-      {#snippet loading()}
-        {@render l?.()}
-      {/snippet}
-
       {#snippet content({ contacts, status })}
-        {@const _ = handleSync(contacts)}
         {@render c?.({ contacts, status })}
       {/snippet}
     </Contacts>

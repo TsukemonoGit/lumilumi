@@ -26,6 +26,8 @@
     nodata?: Snippet;
     loading?: Snippet;
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
+    onchange?: (contacts: Nostr.Event) => void;
+    onstatechange?: (status: ReqStatus) => void;
   }
 
   let {
@@ -36,6 +38,8 @@
     loading,
     nodata,
     content,
+    onchange,
+    onstatechange,
   }: Props = $props();
 
   $effect(() => {
@@ -52,6 +56,21 @@
   let contactsEvent = $derived(data && $data?.event);
   //$inspect($app?.rxNostr, $data);
   // コンソールログ削除
+
+  $effect(() => {
+    if (contactsEvent) {
+      untrack(() => {
+        onchange?.(contactsEvent);
+      });
+    }
+  });
+  $effect(() => {
+    if ($status) {
+      untrack(() => {
+        onstatechange?.($status);
+      });
+    }
+  });
 </script>
 
 {#if contactsEvent}
