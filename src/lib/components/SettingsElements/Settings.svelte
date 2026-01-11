@@ -193,24 +193,31 @@
 
   $effect(() => {
     const snapshot = $state.snapshot(settings);
-    inputPubkey;
+    // inputPubkeyの監視を削除
 
     untrack(() => {
-      //リードリレーかライトリレーがないときはセーブしない
       if (isRelaySelectionInvalid()) return;
 
-      // 既存のタイマーをクリア
       if (saveTimeout !== undefined || $nowProgress) {
         clearTimeout(saveTimeout);
       }
 
-      isPubkeyValid(); //settings.pubkeyここで更新される invalidでも保存はできるようにする
+      // isPubkeyValid()の呼び出しを削除
+      // または別のeffectに分離
 
-      // デバウンス処理: 300ms後に実行
       saveTimeout = setTimeout(() => {
         saveSettings();
         saveTimeout = undefined;
       }, 300);
+    });
+  });
+
+  // inputPubkey専用のeffectを追加
+  $effect(() => {
+    inputPubkey;
+
+    untrack(() => {
+      isPubkeyValid();
     });
   });
 
@@ -253,7 +260,7 @@
         "defaultRelay",
         lumiSetting.get().pubkey,
       ]);
-      console.log(data);
+      //console.log(data);
       if (data && data.length > 0) {
         // データがある場合はイベントの形を整えてセット
         const relays = setRelaysByKind10002(data[0].event);

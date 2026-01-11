@@ -15,12 +15,13 @@
   import { defaultRelays as defo } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
   import { get, type Unsubscriber } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    lumiSetting,
+    relayConnectionState,
+  } from "$lib/stores/globalRunes.svelte";
   import { untrack, type Snippet } from "svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
-
   interface Props {
-    // pubkey: string;
     localRelays: DefaultRelayConfig[];
     paramRelays: string[] | undefined;
     req?:
@@ -31,19 +32,14 @@
           RxReqOverable &
           RxReqPipeable)
       | undefined;
-    //relayChange: (data: string[]) => void;
     error?: Snippet<[Error]>;
-
     loading?: Snippet;
-
     contents?: Snippet;
   }
   let {
     req = undefined,
-    // pubkey,
     localRelays,
     paramRelays = undefined,
-    // relayChange,
     error,
     loading,
     contents,
@@ -51,25 +47,34 @@
   let pubkey = lumiSetting.get().pubkey;
   let queryKey = ["defaultRelay", pubkey];
   let filters = [
-    // { authors: [pubkey], kinds: [3], limit: 1 },
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ] as Nostr.Filter[];
-
-  //パラムリレーがあったりlocalリレーがあるときはそれを返す。なくて、ログインしてるときに10002とる。ログインしてなかったらデフォリレーをセットする。
 
   let zyouken = $derived(
     localRelays.length > 0 ||
       (paramRelays && paramRelays.length > 0) ||
       !lumiSetting.get().pubkey
   );
-  // console.log(zyouken);
+
   let _relays: DefaultRelayConfig[] | string[] = $derived(
-    paramRelays && paramRelays.length > 0 //neventとかのやつ
+    paramRelays && paramRelays.length > 0
       ? paramRelays
-      : localRelays.length > 0 //設定でローカルのリレー使うことにしてるときのやつ
+      : localRelays.length > 0
         ? localRelays
         : []
   );
+
+  // TL取得用のリレーのみをフィルタリング
+  let timelineRelays = $derived.by(() => {
+    if (!$defo) return {};
+
+    return Object.fromEntries(
+      Object.entries($defo).filter(([url, config]) => {
+        // read: trueのリレーのみ抽出（TL取得用）
+        return config.read === true;
+      })
+    );
+  });
 
   $effect(() => {
     let unsubData: Unsubscriber | undefined;
@@ -108,7 +113,6 @@
           if (!data && _relays.length > 0) {
             setRelays(_relays);
           } else if (!data && !lumiSetting.get().pubkey) {
-            //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
             setRelays(defaultRelays);
           }
         });
@@ -116,10 +120,8 @@
     } else if (_relays.length > 0) {
       setRelays(_relays);
     } else if (!lumiSetting.get().pubkey) {
-      //neventとかじゃなくてリレーなくてログインもしてなかったらデフォリレー
       setRelays(defaultRelays);
     }
-    // クリーンアップ
     return () => {
       unsubData?.();
       unsubStatus?.();
@@ -131,27 +133,11 @@
   let status: ReqStatus | undefined = $state();
   let errorData: Error | undefined = $state();
 
-  // relay connection progress for UI
-  let relayConnected: number = $state(0);
-  let relayTotal: number = $state(0);
-
-  // computed percent (0..100). If no relays configured (total === 0), treat as 100% ready.
-  let relayPercent: number = $derived(
-    relayTotal
-      ? Math.round((relayConnected / relayTotal) * 100)
-      : relayTotal === 0
-        ? 100
-        : 0
-  );
-
   app.subscribe((value) => {
-    // console.log(value, localRelays, paramRelays);
     if (
       value &&
       (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
     ) {
-      //localかparamにリレーがあるときは10002じゃなくてlocalかparamのリレーがセットされるところ
-
       console.log(localRelays, paramRelays);
       setRelays(_relays);
     }
@@ -160,13 +146,18 @@
 
 {#if errorData}
   {@render error?.(errorData)}
-{:else if $defo && Object.values($defo).length > 0}
-  {#await waitForConnections( { requiredConnectionRatio: 0.5, onProgress: (connected, total) => {
-          setTimeout(() => {
-            relayConnected = connected;
-            relayTotal = total;
-          });
-        } } )}
+{:else if Object.keys(timelineRelays).length > 0}
+  {#await (() => {
+    if (relayConnectionState.ready) {
+      return Promise.resolve();
+    }
+    return waitForConnections( { checkrelays: timelineRelays, requiredConnectionRatio: 0.7, onProgress: (connected, total) => {
+            setTimeout(() => {
+              const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
+              relayConnectionState.setReady(ready);
+            });
+          } } );
+  })()}
     {@render loading?.()}
   {:then}
     {@render contents?.()}

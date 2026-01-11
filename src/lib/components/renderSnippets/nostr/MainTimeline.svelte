@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { afterNavigate } from "$app/navigation";
-  import { onDestroy, onMount, untrack, type Snippet } from "svelte";
+  import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
   import { now, type EventPacket } from "rx-nostr";
   import { createUniq } from "rx-nostr/src";
@@ -18,6 +17,7 @@
   import {
     displayEvents,
     lumiSetting,
+    relayConnectionState,
     timelineFilter,
   } from "$lib/stores/globalRunes.svelte";
 
@@ -32,7 +32,7 @@
   import {
     firstLoadOlderEvents,
     loadOlderEvents,
-    waitForConnections,
+    waitForRelayReady,
   } from "./timelineList";
   import { useMainTimeline } from "$lib/stores/useMainTimeline";
 
@@ -62,7 +62,6 @@
     queryKey: QueryKey;
     filters: Nostr.Filter[];
     olderFilters: Nostr.Filter[];
-
     relays?: string[] | undefined;
     eventFilter: (event: Nostr.Event) => boolean;
     error?: Snippet<[Error]>;
@@ -77,7 +76,6 @@
     queryKey,
     filters,
     olderFilters,
-
     relays = undefined,
     eventFilter = () => true,
     error,
@@ -100,7 +98,6 @@
     filteredNewerEventCount = $state(0);
     requiredEventCount = $derived(viewIndex + amount + CONFIG.SLIDE_AMOUNT);
 
-    // Map による管理
     currentEventsMap = $state<Map<string, Nostr.Event>>(new Map());
     olderEventsMap = $state<Map<string, Nostr.Event>>(new Map());
 
@@ -133,7 +130,6 @@
 
   // Rx-Nostr setup
   const keyFn = (packet: EventPacket): string => packet.event.id;
-
   const [uniq, eventIds] = createUniq(keyFn);
 
   // Query setup
@@ -152,6 +148,9 @@
       .map((config) => config.url);
   });
 
+  // リレー接続状況を監視
+  const isRelayReady = $derived(relayConnectionState.ready);
+
   function configureOperators() {
     let operator = pipe(tie, uniq);
 
@@ -167,9 +166,6 @@
     return pipe(operator, saveEachNote(), scanArray());
   }
 
-  /**
-   * イベントをフィルタリングして Map に追加
-   */
   function filterAndAddToMap(
     events: EventPacket[],
     targetMap: Map<string, Nostr.Event>
@@ -187,9 +183,6 @@
     }, 0);
   }
 
-  /**
-   * 複数の Map を結合して配列を生成
-   */
   function combineFilteredEvents(
     currentMap: Map<string, Nostr.Event>,
     olderMap: Map<string, Nostr.Event>,
@@ -197,17 +190,14 @@
   ): Nostr.Event[] {
     const resultMap = new Map<string, Nostr.Event>();
 
-    // currentMap を追加
     currentMap.forEach((event, id) => {
       resultMap.set(id, event);
     });
 
-    // olderMap を追加
     olderMap.forEach((event, id) => {
       resultMap.set(id, event);
     });
 
-    // partialEvents をフィルタリングして追加
     if (partialEvents) {
       partialEvents.forEach((pk) => {
         const event = pk.event;
@@ -223,9 +213,6 @@
     return Array.from(resultMap.values());
   }
 
-  /**
-   * Update scheduling and execution
-   */
   const updateViewEvent = (partialdata?: EventPacket[] | null | undefined) => {
     if (timelineManager.isUpdateScheduled) return;
 
@@ -256,19 +243,16 @@
 
       const { startIndex, endIndex } = calculateDisplayRange();
 
-      // currentEventsMap を更新
       timelineManager.currentEventsMap.clear();
       timelineManager.filteredNewerEventCount = filterAndAddToMap(
         $data || [],
         timelineManager.currentEventsMap
       );
 
-      // 現在のデータだけで十分かチェック
       if (timelineManager.currentEventsMap.size >= endIndex) {
         const events = Array.from(timelineManager.currentEventsMap.values());
         displayEvents.set(events.slice(startIndex, endIndex));
       } else {
-        // 古いデータも取得して結合
         const olderEvents: EventPacket[] | null | undefined =
           queryClient?.getQueryData([...queryKey, "olderData"]);
 
@@ -309,9 +293,6 @@
     return { startIndex, endIndex };
   }
 
-  /**
-   * Timeline initialization
-   */
   async function initializeTimeline() {
     const urlParams =
       typeof window !== "undefined"
@@ -342,9 +323,10 @@
 
       timelineManager.isLoadingOlderEvents = true;
 
-      if (readUrls && readUrls.length > 0) {
+      if (readUrls && readUrls.length > 0 && !isRelayReady) {
         addDebugLog("リレー接続を確立中...");
-        await waitForConnections();
+        // relayConnectionState が ready になるまで待つ
+        await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
       }
 
       const initialFilters = createInitialFilters();

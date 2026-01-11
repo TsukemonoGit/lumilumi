@@ -19,8 +19,8 @@
   import { debounce, sortEvents } from "$lib/func/util";
   import { scanArray } from "$lib/stores/operators";
   import {
-    waitForConnections,
     loadOlderEvents,
+    waitForRelayReady,
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
@@ -178,7 +178,7 @@
 
     try {
       // Wait for relay connections
-      await waitForConnections();
+      await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
 
       // Load initial events
       const olderEvents = await usePromiseReq(

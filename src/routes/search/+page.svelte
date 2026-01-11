@@ -24,7 +24,7 @@
 
   import { safePublishEvent } from "$lib/func/publishError";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { waitForRelayReady } from "$lib/components/renderSnippets/nostr/timelineList";
 
   let { data }: { data: PageData } = $props();
 
@@ -103,10 +103,7 @@
       $nowProgress = true;
 
       //一定数の接続が確立するまで待つ
-      await waitForConnections({
-        maxWaitTime: 5000,
-        requiredConnectionRatio: 0.7,
-      });
+      await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
 
       const fetchRelays = await usePromiseReq(
         {

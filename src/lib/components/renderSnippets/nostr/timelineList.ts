@@ -1,11 +1,20 @@
 // timelineList.ts
 
 import { usePromiseReq } from "$lib/func/nostr";
-import { displayEvents, relayStateMap } from "$lib/stores/globalRunes.svelte";
+import {
+  displayEvents,
+  relayConnectionState,
+  relayStateMap,
+} from "$lib/stores/globalRunes.svelte";
 //import { scanArray } from "$lib/stores/operators";
 import { defaultRelays } from "$lib/stores/stores";
 import type { Filter } from "nostr-typedef";
-import { createRxBackwardReq, uniq, type EventPacket } from "rx-nostr";
+import {
+  createRxBackwardReq,
+  uniq,
+  type DefaultRelayConfig,
+  type EventPacket,
+} from "rx-nostr";
 import { type OperatorFunction } from "rxjs";
 import { get } from "svelte/store";
 
@@ -136,16 +145,19 @@ const getRelayUrls = () => {
  * Wait for sufficient relay connections before proceeding
  *
  * @param options - Optional settings
+ * @param options.checkrelays - Specific relays to check (if not provided, uses all configured relays)
  * @param options.maxWaitTime - Maximum time to wait for connections in milliseconds (default 5000)
  * @param options.requiredConnectionRatio - Fraction (0..1) of relays that must be in a final state before proceeding (default 0.8)
+ * @param options.onProgress - Callback invoked periodically with (connectedCount, totalRelays)
  */
 export async function waitForConnections(options?: {
+  checkrelays?: Record<string, DefaultRelayConfig>; // 追加
   maxWaitTime?: number;
   requiredConnectionRatio?: number;
-  /** Callback invoked periodically with (connectedCount, totalRelays) */
   onProgress?: (connected: number, total: number) => void;
 }): Promise<void> {
   const {
+    checkrelays, // 追加
     maxWaitTime = 5000,
     requiredConnectionRatio = 0.8,
     onProgress,
@@ -155,11 +167,11 @@ export async function waitForConnections(options?: {
 
   const stateMap = relayStateMap as Map<string, string>;
   const startTime = Date.now();
-  const RELAY_CHECK_INTERVAL = 300; // milliseconds
+  const RELAY_CHECK_INTERVAL = 300;
 
-  // Function to check how many relays have reached a final connection state
   const getFinalStateRelayCount = (): number => {
-    const readUrls = getRelayUrls();
+    // checkrelays が指定されていればそれを使用、なければ既存の getRelayUrls()
+    const readUrls = checkrelays ? Object.keys(checkrelays) : getRelayUrls();
     const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
 
     return normalizedReadUrls.filter((url) => {
@@ -168,22 +180,14 @@ export async function waitForConnections(options?: {
     }).length;
   };
 
-  // Wait until sufficient relays are connected or timeout is reached
   while (true) {
-    const readUrls = getRelayUrls();
+    const readUrls = checkrelays ? Object.keys(checkrelays) : getRelayUrls();
     const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
     const finalStateCount = getFinalStateRelayCount();
     const totalRelays = normalizedReadUrls.length;
     const connectionRatio =
       totalRelays === 0 ? 1 : finalStateCount / totalRelays;
 
-    console.log(
-      `Progress: ${finalStateCount} out of ${totalRelays} relays (target ${Math.round(
-        requiredConnectionRatio * 100
-      )}%)`
-    );
-
-    // Notify progress to caller if callback provided
     try {
       onProgress?.(finalStateCount, totalRelays);
     } catch (e) {
@@ -191,21 +195,52 @@ export async function waitForConnections(options?: {
     }
 
     if (connectionRatio >= requiredConnectionRatio) {
-      console.log(
-        `${Math.round(
-          connectionRatio * 100
-        )}% relays are in a final state. Proceeding...`
-      );
       break;
     }
 
     const elapsedTime = Date.now() - startTime;
     if (elapsedTime >= maxWaitTime) {
-      console.log("Maximum wait time exceeded. Proceeding...");
       break;
     }
 
-    // Wait before checking again
     await new Promise((resolve) => setTimeout(resolve, RELAY_CHECK_INTERVAL));
   }
+}
+
+/**
+ * リレーが ready になるまで待機
+ *
+ * @param options.maxWaitTime - 最大待機時間(ms) (default: 5000)
+ * @param options.checkInterval - チェック間隔(ms) (default: 100)
+ * @returns ready になったら resolve、タイムアウトでも resolve
+ */
+export async function waitForRelayReady(options?: {
+  maxWaitTime?: number;
+  checkInterval?: number;
+}): Promise<void> {
+  const { maxWaitTime = 5000, checkInterval = 100 } = options ?? {};
+
+  // すでに ready ならすぐ返す
+  if (relayConnectionState.ready) {
+    return;
+  }
+
+  const startTime = Date.now();
+
+  return new Promise<void>((resolve) => {
+    const checkInterval_id = setInterval(() => {
+      if (relayConnectionState.ready) {
+        clearInterval(checkInterval_id);
+        resolve();
+        return;
+      }
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= maxWaitTime) {
+        clearInterval(checkInterval_id);
+        console.warn(`Relay wait timeout after ${maxWaitTime}ms`);
+        resolve();
+      }
+    }, checkInterval);
+  });
 }

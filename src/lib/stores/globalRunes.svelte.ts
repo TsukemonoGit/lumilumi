@@ -64,3 +64,21 @@ function createCustomStore<T>(initialValue: T) {
     },
   };
 }
+
+// $lib/stores/relayConnection.svelte.ts
+export const relayConnectionState = (() => {
+  let isReady = $state(false);
+
+  return {
+    get ready() {
+      return isReady;
+    },
+    setReady(ready: boolean) {
+      if (isReady === ready) return;
+      isReady = ready;
+    },
+    reset() {
+      isReady = false;
+    },
+  };
+})();

@@ -10,7 +10,10 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
-  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import {
+    waitForConnections,
+    waitForRelayReady,
+  } from "$lib/components/renderSnippets/nostr/timelineList";
 
   // 定数
   const LOAD_LIMIT = 300;
@@ -95,7 +98,7 @@
 
   onMount(async () => {
     loadInitialMedia();
-    await waitForConnections();
+    await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
     isInitialized = true;
   });
 

@@ -3,10 +3,13 @@
   import { untrack, type Snippet } from "svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
   import { pubkeysIn } from "$lib/func/nostr";
-  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import {
+    followList,
+    lumiSetting,
+    relayConnectionState,
+  } from "$lib/stores/globalRunes.svelte";
   import type { ReqStatus } from "$lib/types";
   import type Nostr from "nostr-typedef";
-  import { waitForConnections } from "./timelineList";
   import Contacts from "./Contacts.svelte";
   import { queryClient } from "$lib/stores/stores";
 
@@ -18,21 +21,14 @@
 
   const { nodata: n, loading: l, content: c }: Props = $props();
 
-  // 基本設定のリアクティブ宣言
   const loginPubkey = $derived(lumiSetting.get().pubkey);
   const kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : null);
   const queryKey = $derived(
     loginPubkey ? (["timeline", "contacts", loginPubkey] as const) : null
   );
 
-  const waitOptions = {
-    maxWaitTime: 5000,
-    requiredConnectionRatio: 0.8,
-  } as const;
-
-  // -----------------------
-  // localStorage utilities
-  // -----------------------
+  // リレー接続状況を監視（70%以上、または2個以下なら1個接続でOK）
+  const isRelayReady = $derived(relayConnectionState.ready);
 
   const isEvent = (v: unknown): v is Nostr.Event =>
     !!v && typeof v === "object" && "created_at" in v;
@@ -50,9 +46,6 @@
   };
 
   let contacts = $state<Nostr.Event>();
-  // -----------------------
-  // Sync logic
-  // -----------------------
 
   function syncWithRemote(remote: Nostr.Event) {
     if (!browser || !loginPubkey || !kind3key || !queryKey) return;
@@ -78,12 +71,8 @@
     });
   }
 
-  // -----------------------
-  // State fallback logic
-  // -----------------------
-  //successででーたないときlocalのを使う
   function handleStateChange(status: ReqStatus) {
-    if (contacts || status === "loading") return; //すでにセットしてたらしなくていい
+    if (contacts || status === "loading") return;
 
     const local = getLocalStoredEvent();
     if (!local || !loginPubkey || !queryKey) return;
@@ -94,11 +83,10 @@
       followList.set(pubkeysIn(local, loginPubkey));
     });
   }
-  const waitPromise = $derived(waitForConnections(waitOptions));
 </script>
 
-{#if loginPubkey && queryKey && waitPromise}
-  {#await waitPromise then}
+{#if loginPubkey && queryKey}
+  {#if isRelayReady}
     <Contacts
       pubkey={loginPubkey}
       {queryKey}
@@ -122,5 +110,7 @@
         {@render c?.({ contacts, status })}
       {/snippet}
     </Contacts>
-  {/await}
+  {:else}
+    {@render l?.()}
+  {/if}
 {/if}
