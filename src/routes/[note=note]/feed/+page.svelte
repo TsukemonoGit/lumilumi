@@ -36,7 +36,7 @@
   let targetPosition: "visible" | "above" | "below" = $state("visible");
   let noteParam = $derived(page.params.note);
   beforeNavigate((navi) => {
-    console.log(navi);
+    // console.log(navi);
     if (navi.type === "goto") {
       targetEvent = undefined;
       contactsEvent = undefined;

@@ -63,7 +63,9 @@
         localStorage.setItem(kind3key, JSON.stringify(remote));
       }
 
-      queryClient.setQueryData(queryKey, formatToEventPacket(latest));
+      queryClient.setQueryData(queryKey, (oldData: any) =>
+        formatToEventPacket(latest)
+      );
     } catch (e) {
       console.warn("Failed to update sync storage", e);
     }
@@ -79,7 +81,9 @@
     const local = getLocalStoredEvent();
     if (!local || !loginPubkey || !queryKey) return;
 
-    queryClient.setQueryData(queryKey, formatToEventPacket(local));
+    queryClient.setQueryData(queryKey, (oldData: any) =>
+      formatToEventPacket(local)
+    );
 
     untrack(() => {
       followList.set(pubkeysIn(local, loginPubkey));
