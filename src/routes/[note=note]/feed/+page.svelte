@@ -19,6 +19,9 @@
   import { waitForRelayReady } from "$lib/components/renderSnippets/nostr/timelineList";
   import type { Attachment } from "svelte/attachments";
   import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
+  import { relayConnectionState } from "$lib/stores/globalRunes.svelte";
+  import type { Inspect } from "lucide-svelte";
+  import { tick, untrack } from "svelte";
 
   // State
   let id: string = $state("");
@@ -27,7 +30,7 @@
   let contactsEvent: Nostr.Event | undefined = $state(undefined);
   let feed: ReturnType<typeof createNeighborFeed> | undefined =
     $state(undefined);
-  let targetNoteElement: HTMLDivElement;
+  let targetNoteElement = $state<HTMLDivElement>();
   let targetPosition: "visible" | "above" | "below" = $state("visible");
 
   // Parse ID from URL params
@@ -35,26 +38,32 @@
     const noteParam = page.params.note;
     if (!noteParam) return;
 
-    try {
-      const { type, data } = nip19.decode(noteParam);
-      let newId = "";
+    untrack(async () => {
+      try {
+        const { type, data } = nip19.decode(noteParam);
+        let newId = "";
 
-      if (type === "note") {
-        newId = data;
-      } else if (type === "nevent") {
-        newId = data.id;
-        if (data.relays) relays = data.relays;
-      }
+        if (type === "note") {
+          newId = data;
+        } else if (type === "nevent") {
+          newId = data.id;
+          if (data.relays) relays = data.relays;
+        }
 
-      if (newId && newId !== id) {
-        id = newId;
-        targetEvent = undefined;
-        contactsEvent = undefined;
-        feed = undefined;
+        if (newId && newId !== id) {
+          id = newId;
+          targetEvent = undefined;
+          contactsEvent = undefined;
+          feed = undefined;
+        }
+        setTimeout(() => {
+          scrollToTargetTop();
+          console.log("scrollToTargetTop");
+        }, 10);
+      } catch (e) {
+        console.error("Failed to decode note param:", e);
       }
-    } catch (e) {
-      console.error("Failed to decode note param:", e);
-    }
+    });
   });
 
   // Intersection Observer for Target Note
@@ -76,11 +85,22 @@
     return () => observer.disconnect();
   });
 
+  // LoadNewerのしたのとこ
   const scrollToTarget = () => {
     targetNoteElement?.scrollIntoView({
       behavior: "smooth",
       block: "center",
     });
+  };
+
+  // ターゲットイベントの上端がトップになるようにスクロール
+  const scrollToTargetTop = () => {
+    if (targetNoteElement) {
+      targetNoteElement.scrollIntoView({
+        behavior: "instant",
+        block: "start",
+      });
+    }
   };
 
   const onChangeContacts = (event: Nostr.Event) => {
@@ -100,81 +120,52 @@
   const onChangeTarget = (event: Nostr.Event) => {
     targetEvent = event;
   };
-
-  const myAttachment: Attachment = (element) => {
-    //console.log(element.nodeName); // 'DIV'
-
-    // ターゲットイベントの上端がトップになるようにスクロール
-    const scrollToTargetTop = () => {
-      if (targetNoteElement) {
-        targetNoteElement.scrollIntoView({
-          behavior: "instant",
-          block: "start",
-        });
-      }
-    };
-
-    // targetNoteElementがレンダリングされるのを待つ
-    requestAnimationFrame(() => {
-      requestAnimationFrame(scrollToTargetTop);
-    });
-
-    return () => {
-      //  console.log("cleaning up");
-    };
-  };
 </script>
 
-<div
-  class="relative container mx-auto max-w-2xl px-4 my-6"
-  {@attach myAttachment}
->
-  <!-- Newer Events -->
-  <div class="flex flex-col gap-2 mb-4">
-    <!-- Edge spacer (top) -->
-    <div class="anchor-none h-6"></div>
-    <!-- Missing newer events skeletons -->
-    {#each Array(Math.max(0, 3 - (feed?.newerEvents.length ?? 0))) as _, i (i)}
-      <div class="border-l-4 border-magnum-300/50 pl-2 anchor-none">
-        <EmptyCard />
-      </div>
-    {/each}
-    {#if feed}
-      {#each feed.newerEvents as event (event.id)}
-        <div class="border-l-4 border-magnum-300 pl-2 anchor-auto">
-          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
-            {#snippet content({ metadata })}
-              <EventCard note={event} {metadata} />
-            {/snippet}
-            {#snippet loading()}
-              <EventCard note={event} />
-            {/snippet}
-            {#snippet error()}
-              <EventCard note={event} />
-            {/snippet}
-          </Metadata>
+{#if relayConnectionState.ready}
+  <div class="relative container mx-auto max-w-2xl px-4 my-6">
+    <!-- Newer Events -->
+    <div class="flex flex-col gap-2 mb-4">
+      <!-- Edge spacer (top) -->
+      <div class="anchor-none h-6"></div>
+      <!-- Missing newer events skeletons -->
+      {#each Array(Math.max(0, 3 - (feed?.newerEvents.length ?? 0))) as _, i (i)}
+        <div class="border-l-4 border-magnum-300/50 pl-2 anchor-none">
+          <EmptyCard />
         </div>
       {/each}
-    {/if}
-  </div>
+      {#if feed}
+        {#each feed.newerEvents as event (event.id)}
+          <div class="border-l-4 border-magnum-300 pl-2 anchor-auto">
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet content({ metadata })}
+                <EventCard note={event} {metadata} />
+              {/snippet}
+              {#snippet loading()}
+                <EventCard note={event} />
+              {/snippet}
+              {#snippet error()}
+                <EventCard note={event} />
+              {/snippet}
+            </Metadata>
+          </div>
+        {/each}
+      {/if}
+    </div>
 
-  <!-- Target Event (Anchor) -->
-  <div
-    id="target-note"
-    class="py-4"
-    style={"overflow-anchor:auto"}
-    bind:this={targetNoteElement}
-  >
+    <!-- Target Event (Anchor) -->
     <div
-      class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
+      id="target-note"
+      class="py-4"
+      style={"overflow-anchor:auto"}
+      bind:this={targetNoteElement}
     >
-      {#await waitForRelayReady({ maxWaitTime: 5000 })}
-        <EmptyCard
-          ><div class="min-h-24 content-center">
-            Loading Target Note...
-          </div></EmptyCard
-        >
-      {:then d}
+      <div
+        class="shadow-2xl ring-4 ring-magnum-500 rounded-lg bg-neutral-900 border border-magnum-400 anchor-auto"
+      >
         <Text queryKey={["timeline", id]} {id} onChange={onChangeTarget}>
           {#snippet loading()}
             <EmptyCard
@@ -222,144 +213,146 @@
               {/snippet}
             </Metadata>{/snippet}
         </Text>
-      {/await}
+      </div>
     </div>
-  </div>
 
-  <!-- Older Events -->
-  <div class="flex flex-col gap-2 mt-4">
-    {#if feed}
-      {#each feed.olderEvents as event (event.id)}
-        <div class="border-l-4 border-neutral-600 pl-2 anchor-auto">
-          <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
-            {#snippet content({ metadata })}
-              <EventCard note={event} {metadata} />
-            {/snippet}
-            {#snippet loading()}
-              <EventCard note={event} />
-            {/snippet}
-            {#snippet error()}
-              <EventCard note={event} />
-            {/snippet}
-          </Metadata>
+    <!-- Older Events -->
+    <div class="flex flex-col gap-2 mt-4">
+      {#if feed}
+        {#each feed.olderEvents as event (event.id)}
+          <div class="border-l-4 border-neutral-600 pl-2 anchor-auto">
+            <Metadata
+              queryKey={["metadata", event.pubkey]}
+              pubkey={event.pubkey}
+            >
+              {#snippet content({ metadata })}
+                <EventCard note={event} {metadata} />
+              {/snippet}
+              {#snippet loading()}
+                <EventCard note={event} />
+              {/snippet}
+              {#snippet error()}
+                <EventCard note={event} />
+              {/snippet}
+            </Metadata>
+          </div>
+        {/each}
+      {/if}
+      <!-- Missing older events skeletons -->
+      {#each Array(Math.max(0, 8 - (feed?.olderEvents.length ?? 0))) as _, i (i)}
+        <div class="border-l-4 border-neutral-600/50 pl-2 anchor-none">
+          <EmptyCard />
         </div>
       {/each}
-    {/if}
-    <!-- Missing older events skeletons -->
-    {#each Array(Math.max(0, 8 - (feed?.olderEvents.length ?? 0))) as _, i (i)}
-      <div class="border-l-4 border-neutral-600/50 pl-2 anchor-none">
-        <EmptyCard />
-      </div>
-    {/each}
-    <!-- Edge spacer (bottom) -->
-    <div class="anchor-none h-8"></div>
-  </div>
-
-  <!-- Floating Action Button -->
-  {#if targetPosition !== "visible"}
-    <div
-      class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10 anchor-none"
-    >
-      <button
-        class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
-        onclick={scrollToTarget}
-        aria-label="Scroll to target"
-      >
-        {#if id && targetEvent}
-          <Metadata
-            queryKey={["metadata", targetEvent.pubkey]}
-            pubkey={targetEvent.pubkey}
-          >
-            {#snippet content({ metadata })}
-              {@const prof = profile(metadata)}
-              <UserAvatar
-                url={prof?.picture}
-                name={prof?.name}
-                pubkey={prof?.pubkey}
-                size={28}
-              />
-            {/snippet}
-            {#snippet loading()}
-              <UserAvatar
-                size={28}
-                pubkey={targetEvent!.pubkey}
-                url={undefined}
-                name={undefined}
-              />
-            {/snippet}
-            {#snippet error()}
-              <UserAvatar
-                size={28}
-                pubkey={targetEvent!.pubkey}
-                url={undefined}
-                name={undefined}
-              />
-            {/snippet}
-          </Metadata>
-          <span class="text-sm font-semibold">Main Post</span>
-          {#if targetPosition === "above"}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m18 15-6-6-6 6" />
-            </svg>
-          {:else}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          {/if}
-        {/if}
-      </button>
+      <!-- Edge spacer (bottom) -->
+      <div class="anchor-none h-8"></div>
     </div>
-  {/if}
 
-  <!-- Newer Button -->
+    <!-- Floating Action Button -->
+    {#if targetPosition !== "visible"}
+      <div
+        class="fixed bottom-12 right-4 flex flex-col gap-2 items-end z-10 anchor-none"
+      >
+        <button
+          class="bg-magnum-800 hover:bg-magnum-700 text-neutral-100 pl-1 pr-3 py-1 rounded-full shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer opacity-90 hover:opacity-100"
+          onclick={scrollToTarget}
+          aria-label="Scroll to target"
+        >
+          {#if id && targetEvent}
+            <Metadata
+              queryKey={["metadata", targetEvent.pubkey]}
+              pubkey={targetEvent.pubkey}
+            >
+              {#snippet content({ metadata })}
+                {@const prof = profile(metadata)}
+                <UserAvatar
+                  url={prof?.picture}
+                  name={prof?.name}
+                  pubkey={prof?.pubkey}
+                  size={28}
+                />
+              {/snippet}
+              {#snippet loading()}
+                <UserAvatar
+                  size={28}
+                  pubkey={targetEvent!.pubkey}
+                  url={undefined}
+                  name={undefined}
+                />
+              {/snippet}
+              {#snippet error()}
+                <UserAvatar
+                  size={28}
+                  pubkey={targetEvent!.pubkey}
+                  url={undefined}
+                  name={undefined}
+                />
+              {/snippet}
+            </Metadata>
+            <span class="text-sm font-semibold">Main Post</span>
+            {#if targetPosition === "above"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+            {:else}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            {/if}
+          {/if}
+        </button>
+      </div>
+    {/if}
 
-  <button
-    class="absolute top-0 bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 anchor-none"
-    onclick={() => {
-      const scroller = document.scrollingElement; // body / html
+    <!-- Newer Button -->
 
-      if (scroller && scroller.scrollTop === 0) {
-        scroller.scrollTop = 1;
-      }
+    <button
+      class="absolute top-0 bg-magnum-600 hover:bg-magnum-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 anchor-none"
+      onclick={() => {
+        const scroller = document.scrollingElement; // body / html
 
-      feed?.loadNewer();
-    }}
-    disabled={feed?.isLoadingNewer}
-  >
-    {feed?.isLoadingNewer ? "Loading..." : "Load Newer"}
-  </button>
+        if (scroller && scroller.scrollTop === 0) {
+          scroller.scrollTop = 1;
+        }
 
-  <!-- Older Button -->
+        feed?.loadNewer();
+      }}
+      disabled={feed?.isLoadingNewer}
+    >
+      {feed?.isLoadingNewer ? "Loading..." : "Load Newer"}
+    </button>
 
-  <button
-    class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 absolute bottom-0"
-    onclick={feed?.loadOlder}
-    disabled={feed?.isLoadingOlder}
-  >
-    {feed?.isLoadingOlder ? "Loading..." : "Load Older"}
-  </button>
-</div>
+    <!-- Older Button -->
 
+    <button
+      class="bg-neutral-600 hover:bg-neutral-500 text-neutral-100 font-bold py-2 px-4 rounded disabled:opacity-50 place-self-center flex m-1 absolute bottom-0"
+      onclick={feed?.loadOlder}
+      disabled={feed?.isLoadingOlder}
+    >
+      {feed?.isLoadingOlder ? "Loading..." : "Load Older"}
+    </button>
+  </div>
+{/if}
 <div class="postWindow">
   <OpenPostWindow options={{ tags: [], kind: 1 }} />
 </div>
