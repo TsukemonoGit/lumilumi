@@ -47,9 +47,8 @@
   let dialogOpen: (bool: boolean) => void = () => {};
 
   let contactsQueryKey: QueryKey = $derived([
-    "timeline",
-    "contacts",
-    lumiSetting.get().pubkey,
+    "naddr",
+    `${3}:${lumiSetting.get().pubkey}:`,
   ]);
   let isfollowee: boolean = $derived(followList.get().has(pubkey));
 

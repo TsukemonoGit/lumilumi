@@ -57,7 +57,7 @@
         } else {
           //location.reload();
           queryClient.setQueryData(
-            ["timeline", "contacts", lumiSetting.get().pubkey],
+            ["naddr", `${3}:${lumiSetting.get().pubkey}:`],
             (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from)
           );
 

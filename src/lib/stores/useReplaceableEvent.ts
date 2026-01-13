@@ -8,8 +8,7 @@ import type {
   RxReqPipeable,
 } from "rx-nostr";
 import { latest, uniq } from "rx-nostr";
-import { pipe } from "rxjs";
-import { reduce, tap, filter } from "rxjs/operators";
+import { debounceTime, pipe, take } from "rxjs";
 import type { ReqResult } from "$lib/types.js";
 import { useReq } from "$lib/func/useReq";
 import { tie } from "./stores";
@@ -21,11 +20,11 @@ export function useReplaceableEvent(
   kind: number,
   req?:
     | (RxReq<"backward"> &
-      RxReqEmittable<{
-        relays: string[];
-      }> &
-      RxReqOverable &
-      RxReqPipeable)
+        RxReqEmittable<{
+          relays: string[];
+        }> &
+        RxReqOverable &
+        RxReqPipeable)
     | undefined,
   initData?: EventPacket | EventPacket[] | undefined,
   staleTime: number = Infinity,
@@ -35,28 +34,9 @@ export function useReplaceableEvent(
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
   const operator = pipe(
     tie,
-    uniq(), latest(),
-    /* // デバッグ: kind 3（Contacts）のイベント受信のみを確認
-    tap((packet: EventPacket) => {
-
-    }),
-    // reduceはObservable完了時に最終値のみを出力
-    reduce((latest: EventPacket | null, current: EventPacket) => {
-      // pubkeyが一致しないイベントは無視
-      if (current.event.pubkey !== pubkey) return latest;
-
-      if (!latest) return current;
-
-      // 同じイベントIDなら更新しない
-      if (latest.event.id === current.event.id) return latest;
-
-      // created_atで比較
-      return current.event.created_at > latest.event.created_at
-        ? current
-        : latest;
-    }, null as EventPacket | null),
-    // nullを除外 (イベントが来なかった場合)
-    filter((packet): packet is EventPacket => packet !== null) */
+    latest(),
+    debounceTime(1000) // 変化が止まるまで待つ
+    //take(1) // 最初の1回だけ流す
   );
 
   return useReq(

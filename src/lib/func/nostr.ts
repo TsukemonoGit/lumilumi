@@ -30,7 +30,6 @@ import {
   filterByType,
   type AuthPacket,
   createUniq,
-  type ConnectionStatePacket,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
 import { type Observable, type OperatorFunction } from "rxjs";
