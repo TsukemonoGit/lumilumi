@@ -12,6 +12,7 @@
   import type Nostr from "nostr-typedef";
   import Contacts from "./Contacts.svelte";
   import { queryClient } from "$lib/stores/stores";
+  import { formatToEventPacket } from "$lib/func/util";
 
   interface Props {
     nodata?: Snippet;
@@ -19,16 +20,16 @@
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
   }
 
-  const { nodata: n, loading: l, content: c }: Props = $props();
+  let { nodata: n, loading: l, content: c }: Props = $props();
 
-  const loginPubkey = $derived(lumiSetting.get().pubkey);
-  const kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : null);
-  const queryKey = $derived(
-    loginPubkey ? (["timeline", "contacts", loginPubkey] as const) : null
+  let loginPubkey = $derived(lumiSetting.get().pubkey);
+  let kind3key = $derived(loginPubkey ? getKind3Key(loginPubkey) : null);
+
+  let queryKey = $derived(
+    loginPubkey ? ["naddr", `${3}:${loginPubkey}:`] : null
   );
-
   // リレー接続状況を監視（70%以上、または2個以下なら1個接続でOK）
-  const isRelayReady = $derived(relayConnectionState.ready);
+  let isRelayReady = $derived(relayConnectionState.ready);
 
   const isEvent = (v: unknown): v is Nostr.Event =>
     !!v && typeof v === "object" && "created_at" in v;
@@ -48,6 +49,7 @@
   let contacts = $state<Nostr.Event>();
 
   function syncWithRemote(remote: Nostr.Event) {
+    console.log("syncWithRemote", remote);
     if (!browser || !loginPubkey || !kind3key || !queryKey) return;
     contacts = remote;
     const local = getLocalStoredEvent();
@@ -61,7 +63,7 @@
         localStorage.setItem(kind3key, JSON.stringify(remote));
       }
 
-      queryClient.setQueryData(queryKey, { event: latest });
+      queryClient.setQueryData(queryKey, formatToEventPacket(latest));
     } catch (e) {
       console.warn("Failed to update sync storage", e);
     }
@@ -77,7 +79,7 @@
     const local = getLocalStoredEvent();
     if (!local || !loginPubkey || !queryKey) return;
 
-    queryClient.setQueryData(queryKey, { event: local });
+    queryClient.setQueryData(queryKey, formatToEventPacket(local));
 
     untrack(() => {
       followList.set(pubkeysIn(local, loginPubkey));

@@ -1,9 +1,9 @@
 import type { EventPacket } from "rx-nostr";
 import { latestEach } from "rx-nostr";
 import type { OperatorFunction } from "rxjs";
-import { filter, from, map, mergeMap, of, pipe, scan, tap } from "rxjs";
+import { filter, from, map, mergeMap, pipe, scan, tap } from "rxjs";
 import { metadataQueue, queryClient, reactionToast } from "./stores";
-import { get } from "svelte/store";
+
 import * as Nostr from "nostr-typedef";
 import { sortEventPackets } from "$lib/func/util";
 import { type QueryKey } from "@tanstack/svelte-query";

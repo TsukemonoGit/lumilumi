@@ -4,7 +4,6 @@
   import { useContacts } from "$lib/stores/useContacts";
   import type { ReqStatus } from "$lib/types";
 
-  import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
     RxReq,
@@ -26,7 +25,10 @@
     loading?: Snippet;
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
     onchange?: (contacts: Nostr.Event) => void;
-    onstatechange?: (status: ReqStatus) => void;
+    onstatechange?: (
+      status: ReqStatus,
+      contacts: Nostr.Event | undefined
+    ) => void;
   }
 
   let {
@@ -67,7 +69,7 @@
   $effect(() => {
     if ($status) {
       untrack(() => {
-        onstatechange?.($status);
+        onstatechange?.($status, contactsEvent);
       });
     }
   });

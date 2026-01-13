@@ -77,6 +77,7 @@ export function createNeighborFeed(
   }
 
   function loadNewer() {
+    // console.log(isLoadingNewer);
     if (isLoadingNewer) return;
     isLoadingNewer = true;
 

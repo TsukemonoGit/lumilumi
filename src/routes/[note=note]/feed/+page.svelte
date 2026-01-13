@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { get } from "svelte/store";
-  import { app } from "$lib/stores/stores";
+  import { app, queryClient } from "$lib/stores/stores";
 
   import * as Nostr from "nostr-typedef";
   import * as nip19 from "nostr-tools/nip19";
@@ -15,15 +15,9 @@
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import Text from "$lib/components/renderSnippets/nostr/Text.svelte";
 
-  import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import {
-    waitForConnections,
-    waitForRelayReady,
-  } from "$lib/components/renderSnippets/nostr/timelineList";
-  import type { Attachment } from "svelte/attachments";
+  import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
   import EmptyCard from "$lib/components/NostrElements/kindEvents/EventCard/EmptyCard.svelte";
-  import { relayConnectionState } from "$lib/stores/globalRunes.svelte";
-  import type { Inspect } from "lucide-svelte";
+
   import { tick, untrack } from "svelte";
   import Contacts from "$lib/components/renderSnippets/nostr/Contacts.svelte";
   import type { ReqStatus } from "$lib/types";
@@ -62,10 +56,6 @@
           contactsEvent = undefined;
           feed = undefined;
         }
-        setTimeout(() => {
-          scrollToTargetTop();
-          console.log("scrollToTargetTop");
-        }, 10);
       } catch (e) {
         console.error("Failed to decode note param:", e);
       }
@@ -109,42 +99,56 @@
     }
   };
 
-  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  const DEBOUNCE_MS = 300; // 待ち時間
+  let createFeedTimer: ReturnType<typeof setTimeout> | null = null;
+  let creating = false;
+  const CREATE_FEED_DEBOUNCE_MS = 100;
 
-  const onChangeContacts = (event: Nostr.Event) => {
-    // 最新イベントを保存
-    contactsEvent = event;
+  const scheduleCreateFeed = () => {
+    if (creating) return;
 
-    // 直前の予約処理をキャンセル
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
+    if (createFeedTimer) {
+      clearTimeout(createFeedTimer);
     }
 
-    // 一定時間、追加の変更がなければ実行
-    debounceTimer = setTimeout(() => {
-      if (!contactsEvent) return;
+    createFeedTimer = setTimeout(async () => {
+      if (creating) return;
+      console.log(
+        queryClient.getQueryData(["naddr", `${3}:${targetEvent.pubkey}:`])
+      );
+      if (!contactsEvent || !targetEvent) return;
+
+      creating = true;
 
       const map = pubkeysIn(contactsEvent);
       const authors = Array.from(map.keys());
 
-      if (targetEvent) {
-        if (!authors.includes(targetEvent.pubkey)) {
-          authors.push(targetEvent.pubkey);
-        }
-
-        feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
-        feed.loadOlder();
-        feed.loadNewer();
+      if (!authors.includes(targetEvent.pubkey)) {
+        authors.push(targetEvent.pubkey);
       }
-    }, DEBOUNCE_MS);
+
+      feed = createNeighborFeed(get(app).rxNostr, targetEvent, authors);
+      feed.loadOlder();
+      feed.loadNewer();
+
+      await tick();
+      scrollToTargetTop();
+    }, CREATE_FEED_DEBOUNCE_MS);
+  };
+
+  const onChangeContacts = (event: Nostr.Event) => {
+    contactsEvent = event;
+    scheduleCreateFeed();
   };
 
   const onChangeTarget = (event: Nostr.Event) => {
     targetEvent = event;
+    scheduleCreateFeed();
   };
 
-  const onStateChange = (state: ReqStatus) => {
+  const onStateChange = (state: ReqStatus, event: Nostr.Event | undefined) => {
+    if (event) {
+      contactsEvent = event;
+    }
     if (state === "success" && !contactsEvent) {
       addToast({
         data: {
