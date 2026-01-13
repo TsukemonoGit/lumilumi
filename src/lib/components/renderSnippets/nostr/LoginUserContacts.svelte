@@ -49,7 +49,7 @@
   let contacts = $state<Nostr.Event>();
 
   function syncWithRemote(remote: Nostr.Event) {
-    console.log("syncWithRemote", remote);
+    //console.log("syncWithRemote", remote);
     if (!browser || !loginPubkey || !kind3key || !queryKey) return;
     contacts = remote;
     const local = getLocalStoredEvent();

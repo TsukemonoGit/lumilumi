@@ -23,6 +23,7 @@
   import type { ReqStatus } from "$lib/types";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
   import NoteByRelayhint from "$lib/components/NostrElements/kindEvents/NoteByRelayhint.svelte";
+  import { beforeNavigate } from "$app/navigation";
 
   // State
   let id: string = $state("");
@@ -34,6 +35,16 @@
   let targetNoteElement = $state<HTMLDivElement>();
   let targetPosition: "visible" | "above" | "below" = $state("visible");
   let noteParam = $derived(page.params.note);
+  beforeNavigate((navi) => {
+    console.log(navi);
+    if (navi.type === "goto") {
+      targetEvent = undefined;
+      contactsEvent = undefined;
+      feed = undefined;
+      id = "";
+      relays = [];
+    }
+  });
   // Parse ID from URL params
   $effect(() => {
     if (!noteParam) return;
@@ -52,9 +63,6 @@
 
         if (newId && newId !== id) {
           id = newId;
-          targetEvent = undefined;
-          contactsEvent = undefined;
-          feed = undefined;
         }
       } catch (e) {
         console.error("Failed to decode note param:", e);
@@ -100,24 +108,16 @@
   };
 
   let createFeedTimer: ReturnType<typeof setTimeout> | null = null;
-  let creating = false;
+
   const CREATE_FEED_DEBOUNCE_MS = 100;
 
   const scheduleCreateFeed = () => {
-    if (creating) return;
-
     if (createFeedTimer) {
       clearTimeout(createFeedTimer);
     }
 
     createFeedTimer = setTimeout(async () => {
-      if (creating) return;
-      console.log(
-        queryClient.getQueryData(["naddr", `${3}:${targetEvent.pubkey}:`])
-      );
       if (!contactsEvent || !targetEvent) return;
-
-      creating = true;
 
       const map = pubkeysIn(contactsEvent);
       const authors = Array.from(map.keys());
