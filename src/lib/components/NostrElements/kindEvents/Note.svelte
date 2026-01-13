@@ -68,7 +68,7 @@
     onenterViewport={handleEnterViewport}
   >
     {#if hasLoaded}
-      <Text queryKey={["note", id]} {id} onChange={handleOnChange}>
+      <Text {id} onChange={handleOnChange}>
         {#snippet loading()}
           <EmptyCard nevent={displayMenu ? loadingText : undefined}
             >Loading {loadingText}</EmptyCard

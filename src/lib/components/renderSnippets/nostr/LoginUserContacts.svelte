@@ -89,7 +89,6 @@
   {#if isRelayReady}
     <Contacts
       pubkey={loginPubkey}
-      {queryKey}
       onchange={syncWithRemote}
       onstatechange={handleStateChange}
     >

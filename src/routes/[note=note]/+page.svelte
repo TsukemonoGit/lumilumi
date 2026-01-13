@@ -160,7 +160,7 @@
       {#if data.event}
         {@render eventDisplay(data.event)}
       {:else}
-        <Text queryKey={["note", data.id]} id={data.id}>
+        <Text id={data.id}>
           {#snippet loading()}
             <div class="w-full text-sm text-neutral-500 flex-inline break-all">
               Loading {nip19.noteEncode(data.id)}

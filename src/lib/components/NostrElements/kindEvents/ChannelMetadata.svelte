@@ -17,7 +17,7 @@
   };
 </script>
 
-<Text queryKey={["timeline", id]} {id} {onChange}>
+<Text {id} {onChange}>
   {#snippet loading()}
     {@render channelMetadata?.(null)}
   {/snippet}

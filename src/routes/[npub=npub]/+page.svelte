@@ -604,10 +604,7 @@
 
           <div use:melt={$content("followee")} class="content">
             {#if $value === "followee"}
-              <Contacts
-                queryKey={["timeline", "contacts", data.pubkey]}
-                pubkey={data.pubkey}
-              >
+              <Contacts pubkey={data.pubkey}>
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}
