@@ -149,7 +149,7 @@
     value.set("");
   });
   async function init() {
-    console.log(page.url.hash);
+    // console.log(page.url.hash);
     const hash = triggers.find((t) => `#${t.id}` === page.url.hash);
     if (hash) {
       value.set(hash.id);
@@ -604,10 +604,7 @@
 
           <div use:melt={$content("followee")} class="content">
             {#if $value === "followee"}
-              <Contacts
-                queryKey={["timeline", "contacts", data.pubkey]}
-                pubkey={data.pubkey}
-              >
+              <Contacts pubkey={data.pubkey}>
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}

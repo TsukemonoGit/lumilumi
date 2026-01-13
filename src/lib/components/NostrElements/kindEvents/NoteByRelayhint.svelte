@@ -21,7 +21,7 @@
 
     relayhint: string[];
     zIndex?: number;
-    omit: boolean;
+    omit?: boolean;
     isOmitted?: boolean;
   }
 
@@ -36,7 +36,7 @@
 
     relayhint,
     zIndex,
-    omit,
+    omit = false,
     isOmitted = $bindable(),
   }: Props = $props();
   let loadingText = $derived(encodetoNote(id));
@@ -56,7 +56,7 @@
     >Loading {loadingText}</EmptyCard
   >
 {:then}
-  <Text queryKey={["note", id]} {id} relays={relayhint} {onChange}>
+  <Text {id} relays={relayhint} {onChange}>
     {#snippet loading()}
       <EmptyCard nevent={displayMenu ? loadingText : undefined}
         >Loading {loadingText}</EmptyCard

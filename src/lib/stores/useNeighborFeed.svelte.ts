@@ -48,7 +48,7 @@ export function createNeighborFeed(
         ? rxNostr.use(req, { relays })
         : rxNostr.use(req);
 
-    reqToUse.pipe(uniq(), completeOnTimeout(3000)).subscribe({
+    reqToUse.pipe(uniq(), completeOnTimeout(2000)).subscribe({
       next: (packet) => {
         if (packet?.event && packet.event.id !== targetEvent.id) {
           events.push(packet.event);
@@ -102,7 +102,7 @@ export function createNeighborFeed(
         ? rxNostr.use(req, { relays })
         : rxNostr.use(req);
 
-    reqToUse.pipe(uniq(), completeOnTimeout(3000)).subscribe({
+    reqToUse.pipe(uniq(), completeOnTimeout(2000)).subscribe({
       next: (p) => events.push(p.event),
       complete: () => {
         const sorted = sortEvents(events); // Descending (Newest first) in chunk

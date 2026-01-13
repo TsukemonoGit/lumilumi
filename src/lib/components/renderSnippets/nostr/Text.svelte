@@ -2,7 +2,6 @@
   import { useEvent } from "$lib/stores/useEvent";
   import type { ReqStatus } from "$lib/types";
 
-  import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
     RxReq,
@@ -14,7 +13,6 @@
 
   interface Props {
     relays?: string[] | undefined;
-    queryKey: QueryKey;
     id: string;
     req?:
       | (RxReq<"backward"> &
@@ -35,7 +33,7 @@
   let {
     req = undefined,
     relays = undefined,
-    queryKey,
+
     id,
     error,
     loading,
@@ -44,6 +42,7 @@
     onChange,
   }: Props = $props();
 
+  let queryKey = $derived(["note", id]);
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
   let result = $derived(useEvent(queryKey, id, req, max3relays));
   let data = $derived(result.data);

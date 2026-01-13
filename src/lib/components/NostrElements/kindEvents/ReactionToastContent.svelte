@@ -63,7 +63,7 @@
       {kind}
     {/if} -->
 
-  <Text queryKey={["note", tag[1]]} id={tag[1]}>
+  <Text id={tag[1]}>
     {#snippet loading()}
       <div
         class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"

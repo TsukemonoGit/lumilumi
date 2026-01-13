@@ -2,12 +2,11 @@
 <script lang="ts">
   import { app } from "$lib/stores/stores";
   import { useContacts } from "$lib/stores/useContacts";
-  import type { ReqResult, ReqStatus } from "$lib/types";
+  import type { ReqStatus } from "$lib/types";
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
   import type {
-    EventPacket,
     RxReq,
     RxReqEmittable,
     RxReqOverable,
@@ -17,7 +16,7 @@
 
   interface Props {
     relays?: string[];
-    queryKey: QueryKey;
+
     pubkey: string;
     req?: RxReq<"backward"> &
       RxReqEmittable<{ relays: string[] }> &
@@ -33,7 +32,7 @@
   let {
     req = undefined,
     relays = undefined,
-    queryKey,
+
     pubkey,
     loading,
     nodata,
@@ -41,6 +40,7 @@
     onchange,
     onstatechange,
   }: Props = $props();
+  let queryKey = $derived(["naddr", `${3}:${pubkey}:`]);
 
   $effect(() => {
     if (!relays?.length || !$app?.rxNostr) return;

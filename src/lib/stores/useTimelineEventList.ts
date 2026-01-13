@@ -21,7 +21,7 @@ export function useTimelineEventList(
 
   relays?: string[] | undefined
 ): ReqResult<EventPacket[]> {
-  console.log(relays);
+  //console.log(relays);
   return relays
     ? (useGlobalReq({ queryKey, filters, operator, req }, relays, {
         staleTime: Infinity,
