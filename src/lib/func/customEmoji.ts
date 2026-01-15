@@ -5,6 +5,9 @@ import { type EventPacket, latest } from "rx-nostr";
 import { get } from "svelte/store";
 import { usePromiseReq } from "./nostr";
 import { npubRegex } from "./regex";
+import { extractEmojiSet } from "./contentCheck";
+
+type EmojiPair = [string, string];
 
 // ----------------------------------------
 // Emoji Tag Management
@@ -84,40 +87,39 @@ export async function collectEmojiTagsFromText(
   input: string
 ): Promise<string[][]> {
   let returnTags = [...tags];
-  const emojiMatches = input.match(/:[a-zA-Z0-9_]+:/g);
-
-  if (!emojiMatches) return returnTags;
+  const emojiSet = extractEmojiSet(input);
+  if (emojiSet.size === 0) return returnTags;
 
   const emojiList = get(emojis);
+  const newEmojiPairs: EmojiPair[] = [];
 
-  const processEmoji = async (emoji: string): Promise<void> => {
-    const emojiName = emoji.slice(1, -1);
+  await Promise.allSettled(
+    [...emojiSet].map(async (emojiName) => {
+      if (returnTags.some((t) => t[0] === "emoji" && t[1] === emojiName))
+        return;
 
-    if (returnTags.find((tag) => tag[0] === "emoji" && tag[1] === emojiName)) {
-      return;
-    }
-
-    const customEmoji = emojiList.list.find((e) => e[0] === emojiName);
-    if (customEmoji) {
-      const result = addEmojiTag(returnTags, customEmoji);
-      returnTags = result.tags;
-    } else if (npubRegex.test(emojiName)) {
-      try {
-        const hex = nip19.decode(emojiName)?.data as string;
-        const profile = await getUserProfile(hex);
-        const picture = profile?.picture;
-
-        if (picture) {
-          const result = addEmojiTag(returnTags, [emojiName, picture]);
-          returnTags = result.tags;
-        }
-      } catch (error) {
-        console.warn(`Failed to process npub emoji: ${emojiName}`, error);
+      const customEmoji = emojiList.list.find((e) => e[0] === emojiName);
+      if (customEmoji) {
+        newEmojiPairs.push([customEmoji[0], customEmoji[1]]);
+        return;
       }
-    }
-  };
 
-  await Promise.allSettled(emojiMatches.map(processEmoji));
+      if (npubRegex.test(emojiName)) {
+        try {
+          const hex = nip19.decode(emojiName)?.data as unknown as string;
+          const profile = await getUserProfile(hex);
+          if (profile?.picture) {
+            newEmojiPairs.push([emojiName, profile.picture]);
+          }
+        } catch {}
+      }
+    })
+  );
+
+  for (const pair of newEmojiPairs) {
+    returnTags = addEmojiTag(returnTags, pair).tags;
+  }
+
   return returnTags;
 }
 

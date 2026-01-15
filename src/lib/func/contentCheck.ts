@@ -126,17 +126,19 @@ export function pruneEmojiTagsByText(
   text: string,
   tags: string[][]
 ): { text: string; tags: string[][] } {
-  let newTags = [...tags];
+  const emojiSet = extractEmojiSet(text);
 
-  const emojiTag = tags
-    .filter((tag) => tag[0] === "emoji")
-    .map((tag) => tag[1]);
-
-  emojiTag.forEach((emoji) => {
-    if (!text.includes(`:${emoji}:`)) {
-      newTags = newTags.filter((tag) => tag[0] !== "emoji" || tag[1] !== emoji);
-    }
-  });
+  const newTags = tags.filter(
+    (tag) => tag[0] !== "emoji" || emojiSet.has(tag[1])
+  );
 
   return { text, tags: newTags };
 }
+
+export const extractEmojiSet = (text: string): Set<string> => {
+  const set = new Set<string>();
+  const matches = text.match(/:([a-zA-Z0-9_]+):/g);
+  if (!matches) return set;
+  for (const m of matches) set.add(m.slice(1, -1));
+  return set;
+};
