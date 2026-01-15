@@ -7,14 +7,14 @@
   import * as Nostr from "nostr-typedef";
 
   import { publishEvent } from "$lib/func/nostr";
-  import { contentEmojiCheck } from "$lib/func/contentCheck";
+  import { pruneEmojiTagsByText } from "$lib/func/contentCheck";
   import { parseNaddr } from "$lib/func/util";
   import { hexRegex, nip33Regex } from "$lib/func/regex";
   import * as nip19 from "nostr-tools/nip19";
   import { nip07Signer } from "rx-nostr";
   import { loginUser, userStatusMap } from "$lib/stores/globalRunes.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
-  import { checkCustomEmojis } from "$lib/func/customEmoji";
+  import { collectEmojiTagsFromText } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { addToast } from "./Elements/Toast.svelte";
   import EmojiPickerPopover from "./Elements/EmojiPickerPopover.svelte";
@@ -117,14 +117,13 @@
       }
     }
 
-    const emojitag: string[][] | undefined = await checkCustomEmojis(
+    const emojitag: string[][] | undefined = await collectEmojiTagsFromText(
       tags,
       userStatus
     );
-    if (emojitag) {
-      tags = [...tags, ...emojitag];
-    }
-    const newtags = contentEmojiCheck(userStatus, tags);
+
+    const newtags = pruneEmojiTagsByText(userStatus, emojitag);
+
     const newStatus: Nostr.EventParameters = {
       kind: 30315,
       tags: newtags.tags,

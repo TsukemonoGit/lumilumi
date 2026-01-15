@@ -67,7 +67,19 @@ export function resetEmojiCacheForHex(hex: string): void {
   attemptedHexes.delete(hex);
 }
 
-export async function checkCustomEmojis(
+/**
+ * テキスト中の `:emoji:` 形式のトークンを走査し、
+ * 既存タグに存在しないカスタム絵文字を検出して `emoji` タグとして追加する。
+ *
+ * - 既に同名の emoji タグがある場合は追加しない
+ * - ローカルの絵文字リストに存在する場合はその URL を使用
+ * - `npub` 形式の場合はプロフィール取得後、picture を絵文字 URL として使用
+ *
+ * @param tags 既存の Nostr event tags
+ * @param input 投稿本文
+ * @returns 絵文字タグを追加した tags 配列
+ */
+export async function collectEmojiTagsFromText(
   tags: string[][],
   input: string
 ): Promise<string[][]> {
@@ -81,12 +93,10 @@ export async function checkCustomEmojis(
   const processEmoji = async (emoji: string): Promise<void> => {
     const emojiName = emoji.slice(1, -1);
 
-    // 既に同じ名前のタグがあったらスキップ
     if (returnTags.find((tag) => tag[0] === "emoji" && tag[1] === emojiName)) {
       return;
     }
 
-    // 絵文字リストから探す
     const customEmoji = emojiList.list.find((e) => e[0] === emojiName);
     if (customEmoji) {
       const result = addEmojiTag(returnTags, customEmoji);
@@ -94,10 +104,9 @@ export async function checkCustomEmojis(
     } else if (npubRegex.test(emojiName)) {
       try {
         const hex = nip19.decode(emojiName)?.data as string;
-
         const profile = await getUserProfile(hex);
-
         const picture = profile?.picture;
+
         if (picture) {
           const result = addEmojiTag(returnTags, [emojiName, picture]);
           returnTags = result.tags;

@@ -28,7 +28,7 @@
   import { onMount, tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
   import { TokenType, type Token } from "@konemono/nostr-content-parser";
-  import { addEmojiTag, checkCustomEmojis } from "$lib/func/customEmoji";
+  import { addEmojiTag, collectEmojiTagsFromText } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { checkUserInput, userName } from "$lib/func/user";
@@ -562,7 +562,7 @@
       bind:value={text}
       oninput={async (e) => {
         clickEscape = 0;
-        tags = await checkCustomEmojis(tags, text);
+        tags = await collectEmojiTagsFromText(tags, text);
       }}
       onclick={(e) => {
         clickEscape = 0;
