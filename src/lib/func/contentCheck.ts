@@ -112,18 +112,26 @@ export function contentCheck(
   return { text, tags: newTags };
 }
 
-export function contentEmojiCheck(
+/**
+ * 本文に含まれていない絵文字に対応する `emoji` タグを削除する。
+ *
+ * - `:emoji:` が本文に存在しない場合、その emoji タグを除外
+ * - text 自体は変更せず、そのまま返す
+ *
+ * @param text 投稿本文
+ * @param tags Nostr event tags
+ * @returns text と不要な emoji タグを除去した tags
+ */
+export function pruneEmojiTagsByText(
   text: string,
   tags: string[][]
 ): { text: string; tags: string[][] } {
   let newTags = [...tags];
 
-  // 絵文字タグを抽出
   const emojiTag = tags
     .filter((tag) => tag[0] === "emoji")
     .map((tag) => tag[1]);
 
-  // 絵文字タグをテキスト内でチェックし、含まれていない場合に削除
   emojiTag.forEach((emoji) => {
     if (!text.includes(`:${emoji}:`)) {
       newTags = newTags.filter((tag) => tag[0] !== "emoji" || tag[1] !== emoji);

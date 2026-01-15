@@ -398,9 +398,9 @@
     }, 2);
   };
 
-  let repost: Nostr.Event[] = $state.raw([]);
-  let reaction: Nostr.Event[] = $state.raw([]);
-  let zap: Nostr.Event[] = $state.raw([]);
+  let repost: Nostr.Event[] = $state([]);
+  let reaction: Nostr.Event[] = $state([]);
+  let zap: Nostr.Event[] = $state([]);
   let repost_length: number = $derived(repost.length);
 
   let reaction_length: number = $derived(reaction.length);
@@ -408,7 +408,7 @@
   let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
-  const updateInterval = 1000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
+  const updateInterval = 2000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
   let timeoutId: NodeJS.Timeout | undefined = undefined;
 
   function scheduleUpdate() {
