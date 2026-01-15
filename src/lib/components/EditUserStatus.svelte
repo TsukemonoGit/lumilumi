@@ -106,45 +106,59 @@
     }
   });
 
+  /**
+   * 投稿用タグを生成する
+   * - ベースタグをコピーして開始
+   * - URLがあれば追加タグを生成して付与
+   * - 本文からカスタム絵文字タグを収集
+   * - 本文に存在しない絵文字タグを除去して最終タグを返す
+   *
+   * @param baseTags 常に含める初期タグ配列
+   * @param url 入力されたURL（任意）
+   * @param text 投稿本文（絵文字抽出・剪定に使用）
+   * @returns 最終的に使用するタグ配列
+   */
+  const buildTags = async (base: string[][], url: string, text: string) => {
+    const tags = [...base];
+
+    const trimmed = url.trim();
+    if (trimmed) {
+      const addTag = createNewAddTag(trimmed);
+      if (addTag) tags.push(addTag);
+    }
+
+    const emojiTags = await collectEmojiTagsFromText(tags, text);
+    return pruneEmojiTagsByText(text, emojiTags).tags;
+  };
+
+  /**
+   * 保存ボタン押下時の処理
+   * - 送信中フラグを立てる
+   * - URL と本文からタグを生成（絵文字タグ含む）
+   * - Nostrイベントを署名して publish
+   * - 成功/失敗トースト表示
+   * - 最後に進行中フラグ解除とモーダルクローズ
+   */
   const handleClickSave = async () => {
     $nowProgress = true;
 
-    let tags = [["d", "general"]];
-    if (userURL.trim() !== "") {
-      const addTag = createNewAddTag(userURL.trim());
-      if (addTag) {
-        tags.push(addTag);
-      }
-    }
-
-    const emojitag: string[][] | undefined = await collectEmojiTagsFromText(
-      tags,
-      userStatus
-    );
-
-    const newtags = pruneEmojiTagsByText(userStatus, emojitag);
-
-    const newStatus: Nostr.EventParameters = {
-      kind: 30315,
-      tags: newtags.tags,
-      content: userStatus,
-    };
-    const signer = nip07Signer();
     try {
+      const tags = await buildTags([["d", "general"]], userURL, userStatus);
+
+      const newStatus: Nostr.EventParameters = {
+        kind: 30315,
+        tags,
+        content: userStatus,
+      };
+
+      const signer = nip07Signer();
       const event = await signer.signEvent(newStatus);
-
       publishEvent(event);
-      addToast({
-        data: {
-          title: "Published",
-          description: "",
-          color: "bg-green-500",
-        },
-      });
 
-      $nowProgress = false;
-      $open = false;
-    } catch (error) {
+      addToast({
+        data: { title: "Published", description: "", color: "bg-green-500" },
+      });
+    } catch {
       addToast({
         data: {
           title: "Failed",
@@ -152,7 +166,7 @@
           color: "bg-red-500",
         },
       });
-
+    } finally {
       $nowProgress = false;
       $open = false;
     }
