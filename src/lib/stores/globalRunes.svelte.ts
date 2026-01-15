@@ -30,14 +30,14 @@ export let userStatusMap: SvelteMap<
 > = new SvelteMap();
 export const viewEventIds = createCustomStore<string[][]>([]);
 export const lumiSetting = createCustomStore<LumiSetting>(initSettings);
-export const showBanner: { value: boolean } = $state.raw({ value: true });
+export const showBanner: { value: boolean } = $state({ value: true });
 export const verifier = createCustomStore<EventVerifier | undefined>(undefined);
 
 export const authRelay = createCustomStore<string[]>([]);
 
 export const bookmark10003 = createCustomStore<Nostr.Event | null>(null);
 
-export const uploader: UploaderOption = $state.raw(initUploaderOption);
+export const uploader: UploaderOption = $state(initUploaderOption);
 //-------------------------------------
 
 // 汎用的なカスタムストア作成関数

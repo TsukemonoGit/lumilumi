@@ -16,8 +16,6 @@
   import { debug } from "$lib/components/Debug/debug";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
-  let _showBanner: boolean = $state(showBanner.value ?? true);
-
   //-----
   // 現在のページに基づいてアイコンを設定
   let currentPage = $derived.by(() => {
@@ -36,21 +34,16 @@
   });
 
   $effect(() => {
-    if (_showBanner !== undefined && _showBanner !== null) {
-      untrack(() => {
-        showBanner.value = _showBanner;
-        try {
-          if (browser) {
-            localStorage.setItem(
-              STORAGE_KEYS.SHOW_BANNER,
-              showBanner.value.toString()
-            );
-          }
-        } catch (error: any) {
-          console.warn("Failed to save timelineFilter:", error);
-        }
-      });
-    }
+    showBanner.value;
+    console.log(showBanner.value);
+    untrack(() => {
+      if (browser) {
+        localStorage.setItem(
+          STORAGE_KEYS.SHOW_BANNER,
+          showBanner.value.toString()
+        );
+      }
+    });
   });
   // $inspect(_showBanner);
   let Icon = $derived(currentPage?.Icon);
@@ -117,7 +110,7 @@
                     <input
                       type="checkbox"
                       class="rounded-checkbox"
-                      bind:checked={_showBanner}
+                      bind:checked={showBanner.value}
                     />
                     {$_("settings.display.banner")}
                   </label>
