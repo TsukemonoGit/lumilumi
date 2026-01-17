@@ -6,6 +6,7 @@ import type { Ogp } from "./ogp";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import * as nip19 from "nostr-tools/nip19";
 import { getRelaysById } from "./nostr";
+import { replaceText } from "./util";
 
 export const repostedId = (
   tags: string[][]
@@ -238,4 +239,9 @@ export const noteLink = (note: Nostr.Event): string /**nevent or naddr */ => {
     };
     return nip19.naddrEncode(naddrpointer);
   }
+};
+
+export const shortText = (text: string, contentLen: number = 40) => {
+  const t = replaceText(text);
+  return t.length < contentLen ? t : `${t.slice(0, contentLen)}...`;
 };

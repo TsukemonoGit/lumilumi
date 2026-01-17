@@ -1,7 +1,5 @@
 import * as nip19 from "nostr-tools/nip19";
 import { hashtagRegex, nip19Regex, urlRegex } from "./regex";
-import { emojis } from "$lib/stores/stores";
-import { get } from "svelte/store";
 
 export function contentCheck(
   text: string,

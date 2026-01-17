@@ -17,6 +17,7 @@
   // Utility function imports
   import { muteCheck } from "$lib/func/muteCheck";
   import {
+    checkContentWarning,
     get31990Ogp,
     removeFirstMatchingId,
     replyedEvent,
@@ -135,10 +136,6 @@
   });
 
   let warning = $derived(checkContentWarning(note?.tags));
-
-  function checkContentWarning(tags: string[][]): string[] | undefined {
-    return tags.find((item) => item[0] === "content-warning");
-  }
 
   function noteIDchange(note: Nostr.Event) {
     if (!note.id) return;
