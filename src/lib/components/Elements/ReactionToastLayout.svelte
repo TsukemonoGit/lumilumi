@@ -85,7 +85,7 @@
       {#if zapRequest}
         <UserName pubhex={zapRequest.pubkey} />
         {#if checkContentWarning(zapRequest.tags)}
-          <span class="italic text-neutral-500">WARNING CONTENT</span>
+          <ReactionToastWarningText />
         {:else}
           {zapRequest.content}
         {/if}
