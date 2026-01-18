@@ -24,11 +24,7 @@
   } from "$lib/components/renderSnippets/nostr/timelineList";
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
-  import {
-    displayEvents,
-    lumiSetting,
-    notifiSettings,
-  } from "$lib/stores/globalRunes.svelte";
+  import { displayEvents, lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   // Constants
   const SLIDE_AMOUNT = 40; // Amount to slide when navigating
@@ -165,11 +161,6 @@
     if (value && value.length > 0 && (viewIndex >= 0 || !$nowProgress)) {
       updateViewNotifi();
     }
-  });
-
-  // Update view when follow filter changes
-  notifiSettings.subscribe(() => {
-    updateViewNotifi();
   });
 
   // Timeline initialization
