@@ -57,18 +57,18 @@
   let description = $derived(
     (note?.tags || []).find(
       (tag) =>
-        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
-    )?.[1]
+        (tag[0] === "description" || tag[0] === "summary") && tag.length > 1,
+    )?.[1],
   );
   let image = $derived(
-    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1],
   );
   let atag = $derived(`${note.kind}:${note?.pubkey || ""}:${dtag}`);
   //このカスタム絵文字が10030に含まれるかチェック
   let inMyCustomEmoji = $derived(
     $emojis.event?.tags.find(
-      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
-    )
+      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag,
+    ),
   );
 
   // svelte-ignore non_reactive_update
@@ -177,7 +177,7 @@
 
       //新しいリストにほんとに含まれてないか確認
       const check = newestKind10030.tags.find(
-        (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
+        (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag,
       );
 
       if (!check) {
@@ -259,13 +259,13 @@
     }
     //新しいリストにほんとに含まれているか確認
     const check = newestKind10030?.tags.find(
-      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag
+      (tag) => tag[0] === "a" && tag.length > 1 && tag[1] === atag,
     );
 
     if (check) {
       //含まれていたらデータを更新してpublishしてから
       const newTags = newestKind10030.tags.filter(
-        (tag) => !(tag[0] === "a" && tag.length > 1 && tag[1] === atag)
+        (tag) => !(tag[0] === "a" && tag.length > 1 && tag[1] === atag),
       );
       const newEvPara: Nostr.EventParameters = {
         kind: 10030,
@@ -320,7 +320,7 @@
         operator: pipe(latest()),
       },
       undefined,
-      2000
+      2000,
     );
     console.log("kind10030", kind10030);
     console.log("$emojis", $emojis.event);
@@ -404,10 +404,10 @@
             part={{
               type: TokenType.CUSTOM_EMOJI,
               content: shortcode,
-              metadata: { name: shortcode, url: url },
+              metadata: { name: shortcode, url: url, hasMetadata: true },
               start: 0,
               end: 0,
-            } as Token}
+            }}
           />
         {/each}<ClientTag depth={0} tags={note?.tags || []} />
       </div>

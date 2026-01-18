@@ -6,6 +6,7 @@ import { get } from "svelte/store";
 import { usePromiseReq } from "./nostr";
 import { npubRegex } from "./regex";
 import { extractEmojiSet } from "./contentCheck";
+import type { Token } from "@konemono/nostr-content-parser";
 
 type EmojiPair = [string, string];
 
@@ -165,3 +166,8 @@ export const getUserProfile = async (hex: string): Promise<Profile | null> => {
 
   return null;
 };
+
+export type CustomEmojiWithMeta = Extract<
+  Token,
+  { type: "custom_emoji"; metadata: { hasMetadata: true } }
+>;

@@ -6,6 +6,7 @@
     type Token,
   } from "@konemono/nostr-content-parser";
   import CustomEmoji from "../content/CustomEmoji.svelte";
+  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
 
   interface Props {
     tags: string[][];
@@ -17,11 +18,11 @@
   let { tags, name, height, class: className }: Props = $props();
 
   let emojiTags = $derived(
-    tags.filter((tag) => tag[0] === "emoji" && tag.length > 2)
+    tags.filter((tag) => tag[0] === "emoji" && tag.length > 2),
   );
 
   let parts: Token[] | undefined = $derived(
-    emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined
+    emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined,
   );
 </script>
 
@@ -31,8 +32,9 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;"
-  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === TokenType.CUSTOM_EMOJI}<CustomEmoji
-          {part}
+  >{#if !parts}{name}{:else}{#each parts as part}{#if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+        <CustomEmoji
+          part={part as CustomEmojiWithMeta}
           {height}
         />{:else}{part.content}{/if}
     {/each}

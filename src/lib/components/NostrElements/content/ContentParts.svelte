@@ -22,6 +22,8 @@
   import { nipLink, parseNaddr } from "$lib/func/util";
 
   import RelayMenu from "../RelayMenu.svelte";
+  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
+  import { type UrlTokenWithNumber } from "$lib/types";
 
   interface Props {
     event: Partial<Nostr.Event>;
@@ -68,17 +70,17 @@
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)
-      .filter((t) => t !== undefined)
+      .filter((t) => t !== undefined),
   );
 
   const openModal = (index: number) => {
     $viewMediaModal = { index: index, mediaList: $state.snapshot(mediaList) };
 
-    console.log(index, $state.snapshot(mediaList));
+    //  console.log(index, $state.snapshot(mediaList));
   };
 
   const nip19Decode = (
-    content: string | undefined
+    content: string | undefined,
   ): nip19.DecodedResult | undefined => {
     if (content === undefined) {
       return undefined;
@@ -108,13 +110,13 @@
     }
   };
   let geohash = $derived(
-    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
+    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1],
   ); // string | undefined
   let proxy = $derived(tags.find((item) => item[0] === "proxy")); // string[] | undefined
 
   const arekore = (
     type: string,
-    id: string
+    id: string,
   ): nip19.DecodedResult | undefined => {
     try {
       switch (type) {
@@ -133,7 +135,7 @@
 </script>
 
 {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
-      part.metadata!.plainNip19 as string
+      part.metadata.plainNip19 as string,
     )}
     {#if decoded}
       <DecodedContent
@@ -149,7 +151,7 @@
   {:else if part.type === TokenType.LEGACY_REFERENCE && part.metadata && part.metadata.tagType && part.metadata.referenceId}
     {@const decoded = arekore(
       part.metadata.tagType as string,
-      part.metadata.referenceId as string
+      part.metadata.referenceId as string,
     )}
     {#if decoded}
       <DecodedContent
@@ -163,9 +165,13 @@
         {zIndex}
       />{:else}{part}{part.content}{/if}
   {:else if part.type === "url"}
-    <UrlDisplay {part} {openModal} author={event.pubkey || ""} />
-  {:else if part.type === TokenType.CUSTOM_EMOJI}
-    <CustomEmoji {part} />
+    <UrlDisplay
+      part={part as UrlTokenWithNumber}
+      {openModal}
+      author={event.pubkey || ""}
+    />
+  {:else if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+    <CustomEmoji part={part as CustomEmojiWithMeta} />
   {:else if part.type === "hashtag"}
     <a
       aria-label={"Search for events containing the hashtag"}

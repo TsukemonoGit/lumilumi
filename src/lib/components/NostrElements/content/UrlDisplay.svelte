@@ -8,14 +8,16 @@
   import { isvalidURL } from "$lib/func/ogp";
   import MediaEmbedSwitcher from "./MediaEmbedSwitcher.svelte";
   import ContentVideo from "./ContentVideo.svelte";
-  import type { Token } from "@konemono/nostr-content-parser";
+
   import ContentAudio from "./ContentAudio.svelte";
+  import type { UrlTokenWithNumber } from "$lib/types";
 
   interface Props {
-    part: Token;
+    part: UrlTokenWithNumber;
     openModal: (index: number) => void;
     author: string;
   }
+
   let { part, openModal, author }: Props = $props();
 </script>
 
@@ -33,7 +35,7 @@
         <!-- <ContentOneImage url={part.content ?? ""} /> -->
         <ContentImage
           url={part.content}
-          number={(part.metadata!.number as number) || 0}
+          number={(part.metadata?.number as number) || 0}
           {openModal}
           {author}
         />

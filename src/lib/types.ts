@@ -1,3 +1,4 @@
+import type { Token } from "@konemono/nostr-content-parser";
 import type { QueryKey } from "@tanstack/svelte-query";
 import type Nostr from "nostr-typedef";
 import type {
@@ -65,13 +66,12 @@ export interface UseReqOpts<A> {
   queryKey: QueryKey;
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
-  req?:
-    | RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable;
+  req?: RxReq<"backward"> &
+    RxReqEmittable<{
+      relays: string[];
+    }> &
+    RxReqOverable &
+    RxReqPipeable;
 
   initData?: A;
 }
@@ -263,3 +263,13 @@ export interface UploaderOption {
   type: UploaderType;
   address: string;
 }
+
+export type UrlTokenWithNumber = Extract<Token, { type: "url" }> & {
+  metadata: {
+    scheme?: string;
+    type?: "image" | "audio" | "video";
+    number?: number;
+  };
+};
+
+export type ExtendedToken = Token | UrlTokenWithNumber;
