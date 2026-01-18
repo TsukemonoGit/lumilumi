@@ -1,9 +1,9 @@
 <script lang="ts">
+  import type { CustomEmojiWithMeta } from "$lib/func/customEmoji";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import type { Token } from "@konemono/nostr-content-parser";
 
   interface Props {
-    part: Token;
+    part: CustomEmojiWithMeta;
     height?: number;
   }
 
@@ -12,13 +12,15 @@
   let imgLoad: boolean = $state(false);
 </script>
 
-{#if part.metadata && part.metadata.url && lumiSetting.get().showImg && !imgError}{#if !imgLoad}{part.content}{/if}<img
+{#if lumiSetting.get().showImg && !imgError}
+  {#if !imgLoad}{part.content}{/if}
+  <img
     height={`${height}px`}
     loading="lazy"
-    alt={`${part.content}`}
-    src={part.metadata!.url as string}
-    title={`${part.content}`}
-    class={`inline object-contain m-0 overflow-hidden align-bottom`}
+    alt={part.content}
+    src={part.metadata.url}
+    title={part.content}
+    class="inline object-contain m-0 overflow-hidden align-bottom"
     style={`height:${height}px`}
     onload={() => {
       imgLoad = true;
@@ -26,4 +28,7 @@
     onerror={() => {
       imgError = true;
     }}
-  />{:else}{part.content}{/if}
+  />
+{:else}
+  {part.content}
+{/if}

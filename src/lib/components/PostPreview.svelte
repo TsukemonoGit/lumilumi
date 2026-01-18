@@ -44,6 +44,8 @@
   import Protected from "./Elements/Protected.svelte";
   import Muted from "./Elements/Muted.svelte";
   import Metadata from "./renderSnippets/nostr/Metadata.svelte";
+  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
+  import { type UrlTokenWithNumber } from "$lib/types";
 
   // Props definition
   interface Props {
@@ -78,7 +80,7 @@
 
   // State
   let parts: Token[] = $derived(
-    parseContent(text, tags, { hashtagsFromTagsOnly: false })
+    parseContent(text, tags, { hashtagsFromTagsOnly: false }),
   );
   let showMore: Writable<boolean> = $state(writable(false));
 
@@ -93,11 +95,11 @@
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)
-      .filter((t) => t !== undefined)
+      .filter((t) => t !== undefined),
   );
 
   let geohash = $derived(
-    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1]
+    tags.find((tag) => tag[0] === "g" && tag.length > 1)?.[1],
   );
 
   let proxy = $derived(tags.find((item) => item[0] === "proxy"));
@@ -164,7 +166,7 @@
       | { type: "nprofile"; data: nip19.ProfilePointer }
       | { type: "nsec"; data: Uint8Array }
       | { type: "npub" | "note"; data: string }
-      | undefined
+      | undefined,
   ) => {
     if (!decode) return;
 
@@ -313,9 +315,13 @@
                     {zIndex}
                   />{:else}<span class="break-all">{part.content}</span>{/if}
               {:else if part.type === "url"}
-                <UrlDisplay {part} {openModal} author={signPubkey || ""} />
-              {:else if part.type === TokenType.CUSTOM_EMOJI}
-                <CustomEmoji {part} />
+                <UrlDisplay
+                  part={part as UrlTokenWithNumber}
+                  {openModal}
+                  author={signPubkey || ""}
+                />
+              {:else if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+                <CustomEmoji part={part as CustomEmojiWithMeta} />
               {:else if part.type === "hashtag"}
                 <a
                   aria-label={"Search for events containing the hashtag"}
@@ -348,7 +354,7 @@
           </Truncate>
           {#if event.kind === 42}
             {@const heyaId = tags.find(
-              (tag) => tag[0] === "e" && tag[3] === "root"
+              (tag) => tag[0] === "e" && tag[3] === "root",
             )?.[1]}
             <ChannelTag {heyaId} />{/if}
         {/snippet}

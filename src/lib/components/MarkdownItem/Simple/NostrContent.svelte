@@ -17,6 +17,8 @@
   } from "@konemono/nostr-content-parser";
   import CustomEmoji from "$lib/components/NostrElements/content/CustomEmoji.svelte";
   import { nipLink, parseNaddr } from "$lib/func/util";
+  import { type CustomEmojiWithMeta } from "$lib/func/customEmoji";
+  import { type ExtendedToken, type UrlTokenWithNumber } from "$lib/types";
   interface Props {
     event: Partial<Nostr.Event>;
     displayMenu: boolean;
@@ -40,15 +42,16 @@
   let text = $derived(event.content || "");
   let tags = $derived(event.tags || []);
 
-  let parts: Token[] = $derived.by(() => {
+  let parts: ExtendedToken[] = $derived.by(() => {
     let rawParts = parseContent(text, tags);
     let imageIndex = 0;
+
     return rawParts.map((token) => {
-      if (token.type === TokenType.URL && token.metadata?.type === "image") {
+      if (token.type === "url" && token.metadata?.type === "image") {
         return {
           ...token,
           metadata: { ...token.metadata, number: imageIndex++ },
-        };
+        } satisfies UrlTokenWithNumber;
       }
       return token;
     });
@@ -60,7 +63,7 @@
     parts
       .filter((part) => part.type === "url")
       .map((p) => p.content)
-      .filter((t) => t !== undefined)
+      .filter((t) => t !== undefined),
   );
 
   const openModal = (index: number) => {
@@ -69,7 +72,7 @@
   };
 
   const nip19Decode = (
-    content: string | undefined
+    content: string | undefined,
   ):
     | { type: "naddr"; data: nip19.AddressPointer }
     | { type: "nevent"; data: nip19.EventPointer }
@@ -107,7 +110,7 @@
 
   const arekore = (
     type: string,
-    id: string
+    id: string,
   ): nip19.DecodedResult | undefined => {
     try {
       switch (type) {
@@ -126,7 +129,7 @@
 </script>
 
 {#each parts as part}{#if part.type === "nip19"}{@const decoded = nip19Decode(
-      part.metadata!.plainNip19 as string
+      part.metadata!.plainNip19 as string,
     )}
     {#if decoded}
       <DecodedContent
@@ -142,7 +145,7 @@
   {:else if part.type === TokenType.LEGACY_REFERENCE && part.metadata && part.metadata.tagType && part.metadata.referenceId}
     {@const decoded = arekore(
       part.metadata.tagType as string,
-      part.metadata.referenceId as string
+      part.metadata.referenceId as string,
     )}
     {#if decoded}
       <DecodedContent
@@ -157,10 +160,11 @@
       />{:else}{part}{part.content}{/if}
   {:else if part.type === "url"}
     <UrlDisplay
-      {part}
+      part={part as UrlTokenWithNumber}
       {openModal}
       author={event.pubkey || ""}
-    />{:else if part.type === TokenType.CUSTOM_EMOJI}<CustomEmoji {part} />
+    />{:else if part.type === TokenType.CUSTOM_EMOJI && part.metadata.hasMetadata}
+    <CustomEmoji part={part as CustomEmojiWithMeta} />
   {:else if part.type === "relay"}
     <a
       class="underline text-magnum-300 break-all hover:opacity-80"

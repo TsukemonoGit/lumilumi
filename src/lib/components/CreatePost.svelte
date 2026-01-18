@@ -186,7 +186,7 @@
        * we want to keep the cursor position unchanged.
        */
       moveCursor?: boolean;
-    } = {}
+    } = {},
   ) {
     const {
       addSpaceBefore = false,
@@ -278,7 +278,7 @@
       const uploadedURPs = await filesUpload(
         fileList,
         uploader,
-        uploadAbortController.signal
+        uploadAbortController.signal,
       );
 
       const promises = uploadedURPs.map(
@@ -324,7 +324,7 @@
               });
             }
           }
-        }
+        },
       );
 
       await Promise.all(promises);
@@ -333,7 +333,7 @@
       // InvalidStateErrorの詳細を確認
       if (error instanceof DOMException && error.name === "InvalidStateError") {
         console.error(
-          "Image decode error - check image file format and validity"
+          "Image decode error - check image file format and validity",
         );
       }
     } finally {
@@ -527,7 +527,7 @@
               class="bg-magnum-600 rounded-md text-magnum-100 w-fit px-2 py-1 flex items-center gap-1 transition-all duration-200 shadow-sm hover:brightness-125"
               onclick={() => {
                 additionalReplyUsers = additionalReplyUsers.filter(
-                  (user) => user !== replyUser
+                  (user) => user !== replyUser,
                 );
               }}
               aria-label={`Remove ${replyUser} from reply list`}
@@ -675,10 +675,10 @@
               part={{
                 type: TokenType.CUSTOM_EMOJI,
                 content: e[0],
-                metadata: { name: e[0], url: e[1] },
+                metadata: { name: e[0], url: e[1], hasMetadata: true },
                 start: 0,
                 end: 0,
-              } as Token}
+              }}
             />
           </button>
         {/if}

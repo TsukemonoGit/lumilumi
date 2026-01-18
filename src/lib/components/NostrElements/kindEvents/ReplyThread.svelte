@@ -6,6 +6,7 @@
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import NaddrEvent from "./NaddrEvent.svelte";
   import Note from "./Note.svelte";
+  import { type UrlTokenWithNumber } from "$lib/types";
 
   interface Props {
     replyTag: string[] | undefined;
@@ -60,7 +61,7 @@
     <!---->
     {#if id.startsWith("http")}
       {@const part = toPart(replyTag)}
-      <UrlDisplay {part} {openModal} author={""} />
+      <UrlDisplay part={part as UrlTokenWithNumber} {openModal} author={""} />
     {:else}
       <!---->
       {id}

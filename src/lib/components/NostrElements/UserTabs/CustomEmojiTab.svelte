@@ -35,7 +35,7 @@
     {#if event}
       {@const filteredList = event.tags
         .filter(
-          (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1
+          (tag) => (tag[0] === "a" || tag[0] === "emoji") && tag.length > 1,
         )
         .slice()
         .reverse()}
@@ -43,18 +43,22 @@
         {#snippet children(li, index)}
           {@const id = li as string}
           {#if filteredList[index][0] === "emoji"}
+            {@const name = filteredList[index][1]}
+            {@const url = filteredList[index][2]}
             <div
               class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
             >
               <CustomEmoji
                 part={{
                   type: "custom_emoji",
-                  content: filteredList[index][1],
-                  metadata: {
-                    url: filteredList[index][2],
-                  },
+                  content: `:${name}:`,
                   start: 0,
                   end: 0,
+                  metadata: {
+                    name,
+                    url,
+                    hasMetadata: true,
+                  },
                 }}
               />
             </div>

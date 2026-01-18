@@ -8,6 +8,7 @@
   import UrlDisplay from "../content/UrlDisplay.svelte";
   import type { Token } from "@konemono/nostr-content-parser";
   import { onMount } from "svelte";
+  import { type UrlTokenWithNumber } from "$lib/types";
 
   interface Props {
     replyTag: string[] | undefined;
@@ -42,7 +43,7 @@
           }
         });
       },
-      { rootMargin: "200px" }
+      { rootMargin: "200px" },
     );
 
     observer.observe(containerElement);
@@ -63,7 +64,7 @@
         class="flex items-center w-fit px-1 py-0.5 rounded-md bg-magnum-200 text-sm font-bold text-magnum-600 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
         onclick={() => (loadNote = false)}
         ><Minimize2 size="20" class="mr-1" />{$_(
-          "timeline.hideParentPost"
+          "timeline.hideParentPost",
         )}</button
       >
 
@@ -96,7 +97,11 @@
       {:else if replyTag[0] === "I" || replyTag[0] === "i"}
         {#if replyTag[1].startsWith("http")}
           {@const part = createUrlToken(replyTag[1])}
-          <UrlDisplay {part} openModal={noop} author={""} />
+          <UrlDisplay
+            part={part as UrlTokenWithNumber}
+            openModal={noop}
+            author={""}
+          />
         {:else}
           {replyTag.toString()}
         {/if}
