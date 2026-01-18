@@ -128,7 +128,7 @@
 
   //ミュートメニューの設定は考慮しない
   let muteType = $derived.by(() => {
-    if (!$mutes && !$mutebykinds && !timelineFilter) {
+    if (!$mutes && !$mutebykinds && !muteType) {
       return "null";
     }
     if (paramNoteId === note.id || excludefunc(note)) {

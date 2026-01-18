@@ -48,9 +48,9 @@
   // $inspect(_showBanner);
   let Icon = $derived(currentPage?.Icon);
 
-  const onMuteChange = () => {
-    timelineFilter.adaptMute = !timelineFilter.adaptMute;
-
+  $effect(() => {
+    timelineFilter.adaptMute;
+    console.log(timelineFilter.adaptMute);
     if (browser) {
       try {
         localStorage.setItem(
@@ -61,7 +61,7 @@
         console.warn("Failed to save timelineFilter:", error);
       }
     }
-  };
+  });
 </script>
 
 <header class="fixed top-0 w-full z-50 h-8 backdrop-blur bg-neutral-900/50">
@@ -99,8 +99,7 @@
                     <input
                       type="checkbox"
                       class="rounded-checkbox"
-                      checked={timelineFilter.adaptMute}
-                      onchange={onMuteChange}
+                      bind:checked={timelineFilter.adaptMute}
                     />
                     {$_("filter.menu.muteOn")}
                   </label>

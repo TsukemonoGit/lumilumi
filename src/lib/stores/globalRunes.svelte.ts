@@ -16,9 +16,9 @@ import {
 } from "../../routes/notifications/notificationTypes";
 
 export const notifiSettings = createCustomStore<NotifiSettings>(notifiInit);
-export const loginUser: { value: string } = $state.raw({ value: "" });
+export const loginUser: { value: string } = $state({ value: "" });
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
-export const timelineFilter: TimelineFilter = $state.raw(timelineFilterInit);
+export const timelineFilter: TimelineFilter = $state(timelineFilterInit);
 export const followList = createCustomStore<Map<string, string | undefined>>(
   new Map()
 );
