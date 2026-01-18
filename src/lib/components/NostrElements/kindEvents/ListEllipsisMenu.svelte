@@ -31,8 +31,8 @@
     try {
       const naddrPointer: nip19.AddressPointer = {
         kind: note.kind,
-        identifier: note.tags.find((t) => t[0] === "d")?.[1] ?? "",
-        pubkey: note.pubkey,
+        identifier: (note?.tags || []).find((t) => t[0] === "d")?.[1] ?? "",
+        pubkey: note?.pubkey || "",
         relays: getRelaysById(note.id),
       };
       return nip19.naddrEncode(naddrPointer);
@@ -55,8 +55,9 @@
     // NIP-70 条件
     if (
       !(
-        note.tags.find((t) => t[0] === "-") &&
-        note.pubkey !== lumiSetting.get().pubkey
+        note?.tags ||
+        ([].find((t) => t[0] === "-") &&
+          (note?.pubkey || "") !== lumiSetting.get().pubkey)
       )
     ) {
       actionGroup.push({

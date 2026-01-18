@@ -47,7 +47,7 @@
   <NoteComponent warningText={undefined}>
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={20}
         {displayMenu}
@@ -60,7 +60,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         kind={note.kind}
         {metadata}
         kindInfo={true}
@@ -71,7 +71,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
 

@@ -47,7 +47,9 @@
   }: Props = $props();
 
   let deleted = $state(false);
-  let statusTag = $derived(note.tags.find((tag) => tag[0] === "d")?.[1]);
+  let statusTag = $derived(
+    (note?.tags || []).find((tag) => tag[0] === "d")?.[1]
+  );
 
   let statusLink = $derived(getStatusLink(note, page.url.origin));
 </script>
@@ -64,7 +66,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -77,7 +79,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         kind={note.kind}
         {metadata}
         kindInfo={true}
@@ -88,7 +90,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
 

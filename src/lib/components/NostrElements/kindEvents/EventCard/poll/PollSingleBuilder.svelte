@@ -217,7 +217,7 @@
                 />
               </div>
 
-              {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === note.pubkey}
+              {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
                 <div
                   class="ml-auto flex overflow-hidden items-center flex-row-reverse pr-4"
                 >
@@ -297,7 +297,7 @@
         </button>
       {/if}
     {/if}
-    {#if userVoteEvent || lumiSetting.get().pubkey === note.pubkey}
+    {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
       <button
         onclick={handleRefresh}
         title="Refresh poll results"

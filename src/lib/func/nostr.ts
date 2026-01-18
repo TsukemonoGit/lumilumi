@@ -565,6 +565,7 @@ export function getRelayById(id: string): string {
 
   return select(list.filter((r) => !r.startsWith("ws://"))) ?? select(list);
 }
+
 export function usePromiseReq(
   {
     filters,

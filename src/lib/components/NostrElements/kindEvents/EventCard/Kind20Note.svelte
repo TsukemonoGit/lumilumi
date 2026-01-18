@@ -55,11 +55,11 @@
     note?.tags
       .filter((tag: string[]) => tag[0] === "imeta" && tag.length > 1)
       ?.map((i) => reverseConvertMetaTags(i))
-      .filter((url) => url !== undefined),
+      .filter((url) => url !== undefined)
   );
   //console.log(imeta);
   let imageList = $derived(
-    imeta.map((i) => i.url).filter((tag) => tag !== undefined),
+    imeta.map((i) => i.url).filter((tag) => tag !== undefined)
   );
 
   const openModal = (index: number) => {
@@ -68,7 +68,9 @@
     // console.log(imageList, index);
     $viewMediaModal = { index: index, mediaList: imageList };
   };
-  let title = $derived(note.tags.find((tag) => tag[0] === "title")?.[1]);
+  let title = $derived(
+    (note?.tags || []).find((tag) => tag[0] === "title")?.[1]
+  );
 </script>
 
 {#if deleted}
@@ -83,7 +85,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -95,14 +97,14 @@
         <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
     {/snippet}
     {#snippet name()}
-      <ProfileDisplay pubkey={note.pubkey} {metadata} />
+      <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
     {/snippet}
     {#snippet time()}
       <DisplayTime {displayMenu} {note} />
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
     {#snippet replyUser()}
@@ -122,7 +124,12 @@
         </div>{/if}
       {#if imageList.length > 0}
         {#each imageList as url, number}
-          <ContentImage {url} {number} {openModal} author={note.pubkey} />
+          <ContentImage
+            {url}
+            {number}
+            {openModal}
+            author={note?.pubkey || ""}
+          />
         {/each}{/if}
       <Content
         {maxHeight}

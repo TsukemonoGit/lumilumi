@@ -59,9 +59,9 @@
   });
 
   let response: string[] | undefined = $derived(
-    note.tags
+    (note?.tags || [])
       .filter((tag: string[]) => tag[0] === "response")
-      .map((tag) => tag[1]),
+      .map((tag) => tag[1])
   );
 
   let selectedOptionTags: string[][] | undefined = $state(undefined);
@@ -71,7 +71,7 @@
     if (response) {
       selectedOptionTags = ev.tags.filter(
         (tag) =>
-          tag[0] === "option" && tag.length > 2 && response.includes(tag[1]),
+          tag[0] === "option" && tag.length > 2 && response.includes(tag[1])
       );
     }
     //console.log(selectedOptionTags);
@@ -90,7 +90,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -103,7 +103,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         kind={note.kind}
         kindInfo={true}
@@ -114,7 +114,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
     {#snippet replyUser()}

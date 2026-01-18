@@ -77,8 +77,8 @@
       );
     }
     if (note) {
-      const blocked = note.tags.find((t) => t[0] === "-");
-      const isSelf = note.pubkey === selfPubkey;
+      const blocked = (note?.tags || []).find((t) => t[0] === "-");
+      const isSelf = (note?.pubkey || "") === selfPubkey;
 
       if (!(blocked && !isSelf)) {
         actionGroup.push(

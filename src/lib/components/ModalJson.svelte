@@ -35,8 +35,9 @@
         if (replaceable) {
           const naddrpointer: nip19.AddressPointer = {
             kind: note.kind,
-            identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-            pubkey: note.pubkey,
+            identifier:
+              (note?.tags || []).find((item) => item[0] === "d")?.[1] ?? "",
+            pubkey: note?.pubkey || "",
             relays: getRelaysById(note.id),
           };
           naddr = nip19.naddrEncode(naddrpointer);
@@ -45,7 +46,7 @@
           const eventpointer: nip19.EventPointer = {
             id: note.id,
             relays: getRelaysById(note.id),
-            author: note.pubkey,
+            author: note?.pubkey || "",
             kind: note.kind,
           };
 
@@ -57,7 +58,7 @@
         naddr = undefined;
       }
       try {
-        encodedPubkey = nip19.npubEncode(note.pubkey);
+        encodedPubkey = nip19.npubEncode(note?.pubkey || "");
       } catch {
         encodedPubkey = undefined;
       }

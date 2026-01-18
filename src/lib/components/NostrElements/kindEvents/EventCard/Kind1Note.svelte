@@ -90,7 +90,7 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       size={mini ? 20 : 40}
       {displayMenu}
@@ -104,7 +104,7 @@
   {/snippet}
   {#snippet name()}
     <ProfileDisplay
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       kind={note.kind}
       {metadata}
       {kindInfo}
@@ -116,7 +116,7 @@
 
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}
   {#snippet replyUser()}

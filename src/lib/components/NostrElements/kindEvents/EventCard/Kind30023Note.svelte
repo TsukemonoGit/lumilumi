@@ -44,19 +44,19 @@
 
   let deleted = $state(false);
   let title = $derived(
-    note.tags.find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "title" && tag.length > 1)?.[1]
   );
   let dtag = $derived(
-    note.tags.find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "d" && tag.length > 1)?.[1]
   );
   let description = $derived(
-    note.tags.find(
+    (note?.tags || []).find(
       (tag) =>
         (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
     )?.[1]
   );
   let image = $derived(
-    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
   );
 
   let warning = $derived(checkContentWarning(note?.tags));
@@ -67,7 +67,7 @@
         (tag) =>
           tag[0] === "a" &&
           tag[1] ===
-            `${note.kind}:${note.pubkey}:${note.tags.find((tag) => tag[0] === "d")?.[1] || ""}`
+            `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`
       ) ?? false
   );
 </script>
@@ -99,7 +99,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -112,7 +112,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         kind={note.kind}
         {metadata}
         kindInfo={true}
@@ -123,7 +123,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
 
@@ -159,7 +159,7 @@
         {depth}
         {repostable}
         {zIndex}
-      /><ClientTag tags={note.tags} {depth} />
+      /><ClientTag tags={note?.tags || []} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}

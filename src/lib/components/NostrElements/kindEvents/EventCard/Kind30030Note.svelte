@@ -55,15 +55,15 @@
   let dtag = $derived(note?.tags?.find((tag) => tag[0] === "d")?.[1]);
   let title = $derived(note?.tags?.find((tag) => tag[0] === "title")?.[1]);
   let description = $derived(
-    note.tags.find(
+    (note?.tags || []).find(
       (tag) =>
         (tag[0] === "description" || tag[0] === "summary") && tag.length > 1
     )?.[1]
   );
   let image = $derived(
-    note.tags.find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "image" && tag.length > 1)?.[1]
   );
-  let atag = $derived(`${note.kind}:${note.pubkey}:${dtag}`);
+  let atag = $derived(`${note.kind}:${note?.pubkey || ""}:${dtag}`);
   //このカスタム絵文字が10030に含まれるかチェック
   let inMyCustomEmoji = $derived(
     $emojis.event?.tags.find(
@@ -349,7 +349,7 @@
       : undefined}
     >{#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -362,7 +362,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         kind={note.kind}
         {metadata}
         kindInfo={true}
@@ -373,7 +373,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
 
@@ -399,7 +399,7 @@
             />{/if}{/if}
       </div>
       <div class="flex gap-1 flex-wrap break-all">
-        {#each note.tags.filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
+        {#each (note?.tags || []).filter((tag) => tag[0] === "emoji") as [tag, shortcode, url]}
           <CustomEmoji
             part={{
               type: TokenType.CUSTOM_EMOJI,
@@ -409,7 +409,7 @@
               end: 0,
             } as Token}
           />
-        {/each}<ClientTag depth={0} tags={note.tags} />
+        {/each}<ClientTag depth={0} tags={note?.tags || []} />
       </div>
       {#if lumiSetting.get().pubkey}
         {#if inMyCustomEmoji}

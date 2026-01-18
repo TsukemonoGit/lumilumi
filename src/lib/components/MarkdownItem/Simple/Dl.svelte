@@ -73,7 +73,11 @@
       {/if}{/each}
   {:else}
     <NostrContent
-      event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+      event={{
+        content: part.content,
+        tags: note?.tags || [],
+        pubkey: note?.pubkey || "",
+      }}
       {repostable}
       {depth}
       {displayMenu}

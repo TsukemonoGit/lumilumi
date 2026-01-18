@@ -29,7 +29,7 @@
     loading?: Snippet;
 
     success?: Snippet<[{ event: Nostr.Event; status: ReqStatus }]>;
-    onChange?: (metadata: Nostr.Event) => void;
+    onChange?: (metadata: Nostr.Event | undefined) => void;
   }
   let {
     req = undefined,
@@ -48,10 +48,11 @@
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
+  let event = $derived($data?.event);
 
   $effect(() => {
-    if ($data?.event) {
-      untrack(() => onChange?.($data.event));
+    if (event) {
+      untrack(() => onChange?.(event));
     }
   });
 </script>
@@ -60,8 +61,8 @@
   {@render error?.($errorData)}
 {:else if $status === "success" && !$data}
   {@render nodata?.()}
-{:else if $data && $data.event}
-  {@render success?.({ event: $data.event, status: $status })}
+{:else if event}
+  {@render success?.({ event: event, status: $status })}
 {:else}
   {@render loading?.()}
 {/if}

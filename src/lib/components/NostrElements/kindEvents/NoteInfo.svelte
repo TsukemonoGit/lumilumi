@@ -9,7 +9,9 @@
 
   let { note }: Props = $props();
 
-  let clientTag = $derived(note.tags.find((tag) => tag[0] === "client"));
+  let clientTag = $derived(
+    (note?.tags || []).find((tag) => tag[0] === "client")
+  );
 
   const onClickClientTag = (atag: string[]) => {
     const naddrAddress = parseNaddr(["a", ...atag]);

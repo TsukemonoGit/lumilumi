@@ -50,10 +50,10 @@
 
   let deleted = $state(false);
   let heyaId = $derived(
-    note.tags.find((tag) => tag[0] === "e" && tag[3] === "root")?.[1]
+    (note?.tags || []).find((tag) => tag[0] === "e" && tag[3] === "root")?.[1]
   );
 
-  let warning = $derived(checkContentWarning(note.tags));
+  let warning = $derived(checkContentWarning(note?.tags || []));
 
   let isBookmarked: boolean = $derived(
     bookmark10003
@@ -86,7 +86,7 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       size={mini ? 20 : 40}
       {displayMenu}
@@ -98,14 +98,14 @@
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
-    <ProfileDisplay pubkey={note.pubkey} {metadata} />
+    <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}
   {#snippet replyUser()}

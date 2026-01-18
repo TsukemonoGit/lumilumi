@@ -55,7 +55,9 @@
 
   let deleted = $state(false);
   let referenceTag = $derived(
-    note.tags.find((tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e"),
+    (note?.tags || []).find(
+      (tag) => tag[0] === "r" || tag[0] === "a" || tag[0] === "e"
+    )
   ); //https://github.com/nostr-protocol/nips/blob/master/84.md#references
 
   // 引用元へのリンクパスを取得する関数
@@ -90,7 +92,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -103,7 +105,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         kindInfo={note.kind !== 1 ? true : false}
       />
@@ -113,7 +115,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
     {#snippet replyUser()}
@@ -155,7 +157,7 @@
           {/if}
         </blockquote>
       </div>
-      <ClientTag tags={note.tags} {depth} />
+      <ClientTag tags={note?.tags || []} {depth} />
     {/snippet}
     {#snippet actionButtons()}
       {#if displayMenu}

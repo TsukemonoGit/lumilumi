@@ -265,7 +265,10 @@
   </div>
 {/if}
 <LatestEvent
-  onChange={(event) => (currentEvent = event)}
+  onChange={(event) => {
+    if (!event) return;
+    currentEvent = event;
+  }}
   {queryKey}
   filters={[
     {

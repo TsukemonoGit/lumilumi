@@ -53,7 +53,8 @@
   };
   let isOmitted = $state(false);
   let dynamicClasses = $derived(className);
-  const onChange = (ev: Nostr.Event) => {
+  const onChange = (ev: Nostr.Event | undefined) => {
+    if (!ev) return;
     isOmitted = omit && ev.pubkey === lumiSetting.get().pubkey;
     if (isOmitted) {
       dynamicClasses = `${className} ml-5 opacity-90 text-sm`;

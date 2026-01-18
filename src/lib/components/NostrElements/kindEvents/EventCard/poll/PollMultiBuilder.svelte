@@ -212,7 +212,7 @@
       />
     </span>
 
-    {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === note.pubkey}
+    {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
       {@const votesForOption = getVotesForOption(id)}
 
       <div
@@ -288,7 +288,7 @@
         {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
       </button>
     {/if}
-    {#if userVoteEvent || lumiSetting.get().pubkey === note.pubkey}
+    {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
       <button
         onclick={handleRefresh}
         title="Refresh poll results"

@@ -25,7 +25,9 @@
 
 <LatestEvent
   queryKey={["channel", "kind41", note.id]}
-  filters={[{ kinds: [41], authors: [note.pubkey], limit: 1, "#e": [note.id] }]}
+  filters={[
+    { kinds: [41], authors: [note?.pubkey || ""], limit: 1, "#e": [note.id] },
+  ]}
 >
   {#snippet loading()}
     <div>

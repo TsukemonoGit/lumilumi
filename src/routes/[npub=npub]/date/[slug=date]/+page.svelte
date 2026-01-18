@@ -46,7 +46,8 @@
 
   let userRelayList: string[] | undefined = $state(undefined);
 
-  const onChange = (ev: Nostr.Event) => {
+  const onChange = (ev: Nostr.Event | undefined) => {
+    if (!ev) return;
     console.log(ev);
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])

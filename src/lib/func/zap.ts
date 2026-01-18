@@ -240,7 +240,7 @@ export function extractAmount(
   zapRequestEvent: Nostr.Event | undefined
 ): number | undefined {
   //bolt11 tag を持たなければならない
-  const bolt11Tag = note.tags.find((tag) => tag[0] === "bolt11");
+  const bolt11Tag = (note?.tags || []).find((tag) => tag[0] === "bolt11");
   //console.log(bolt11Tag);
   if (!bolt11Tag || bolt11Tag.length <= 1) {
     console.log("zap bolt11Tag error");
