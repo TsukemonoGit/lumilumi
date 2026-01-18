@@ -42,7 +42,7 @@
   let isInitializing = false;
 
   // タイムラインクエリキー
-  let timelineQuery = $derived(["global", "feed"]);
+  const timelineQuery = ["global", "feed"];
 
   // ユーザーがログインしているか
   let hasUser = $derived(lumiSetting.get().pubkey);
@@ -245,16 +245,14 @@
 
       // 会話（リプライ）を除外
       if (global.excludeConversation && (note.kind === 1 || note.kind === 42)) {
-        if (Array.isArray(note?.tags || [])) {
-          const hasPTags =
-            note?.tags ||
-            [].some(
-              (tag) =>
-                Array.isArray(tag) &&
-                tag[0] === "p" &&
-                tag.length > 1 &&
-                tag[1] !== (note?.pubkey || "")
-            );
+        if (Array.isArray(note.tags)) {
+          const hasPTags = note.tags.some(
+            (tag) =>
+              Array.isArray(tag) &&
+              tag[0] === "p" &&
+              tag.length > 1 &&
+              tag[1] !== (note?.pubkey || "")
+          );
           if (hasPTags) return false;
         }
       }
