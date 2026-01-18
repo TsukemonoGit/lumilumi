@@ -31,7 +31,7 @@
     zIndex,
   }: Props = $props();
 
-  let root = $derived(note.tags.find((tag) => tag[0] === "e")?.[1]);
+  let root = $derived((note?.tags || []).find((tag) => tag[0] === "e")?.[1]);
 
   const handleClickToChannel = (id: string) => {
     if (!id) {

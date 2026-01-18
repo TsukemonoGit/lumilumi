@@ -59,15 +59,15 @@
   }: Props = $props();
 
   let replyUsers: string[] = $derived(
-    note.tags
+    (note?.tags || [])
       .filter(
-        (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1]),
+        (tag) => tag[0] === "p" && tag.length > 1 && hexRegex.test(tag[1])
       )
-      .map((tag) => tag[1]),
+      .map((tag) => tag[1])
   );
   let badgeAddress: nip19.AddressPointer | undefined = $derived.by(() => {
-    const atag = note.tags.find(
-      (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1]),
+    const atag = (note?.tags || []).find(
+      (tag) => tag[0] === "a" && tag.length > 1 && nip33Regex.test(tag[1])
     );
     return atag ? parseNaddr(atag) : undefined;
   });
@@ -80,7 +80,7 @@
       const eventpointer: nip19.EventPointer = {
         id: note.id,
         relays: getRelaysById(note.id),
-        author: note.pubkey,
+        author: note?.pubkey || "",
         kind: note.kind,
       };
       return nip19.neventEncode(eventpointer);
@@ -99,7 +99,7 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       size={mini ? 20 : 40}
       {displayMenu}
@@ -112,7 +112,7 @@
   {/snippet}
   {#snippet name()}
     <ProfileDisplay
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       kindInfo={true}
       kind={note.kind}
@@ -123,7 +123,7 @@
   {/snippet}
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}
   {#snippet replyUser()}

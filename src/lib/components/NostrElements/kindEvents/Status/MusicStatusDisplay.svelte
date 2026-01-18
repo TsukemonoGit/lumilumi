@@ -14,7 +14,7 @@
 </script>
 
 {#if (link !== "" || event.content.trim() !== "") && !deleted}
-  <div class=" min-w-[16px] h-[16px]">
+  <div class="min-w-[16px] h-[16px] flex items-center justify-center">
     <EllipsisMenu
       TriggerIcon={Music}
       note={event}

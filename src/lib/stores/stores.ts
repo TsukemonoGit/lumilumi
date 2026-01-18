@@ -10,17 +10,13 @@ import {
   type DefaultRelayConfig,
 } from "rx-nostr";
 import {
-  // timelineFilterInit,
   type AdditionalPostOptions,
   type LumiEmoji,
   type LumiMute,
   type LumiMuteByKind,
-  //type TimelineFilter,
 } from "$lib/types";
-//import * as Nostr from "nostr-typedef";
 
 import { createTie } from "./operators";
-//import type { Part } from "$lib/func/content";
 
 export interface Popstate {
   id: string;

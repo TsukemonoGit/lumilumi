@@ -164,9 +164,13 @@
         {zIndex}
       /></s
     >
-  {:else if part.type === "text"}
+  {:else if part.type === "text" && note}
     <NostrContent
-      event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+      event={{
+        content: part.content,
+        tags: note?.tags || [],
+        pubkey: note?.pubkey || "",
+      }}
       {repostable}
       {depth}
       {displayMenu}
@@ -230,9 +234,13 @@
     <CheckboxInput {part} />
   {:else if part.type === "label"}
     <Label {part} {repostable} {depth} {displayMenu} {note} {nolist} {zIndex} />
-  {:else}<b>{part.type}</b>
+  {:else if note}<b>{part.type}</b>
     <NostrContent
-      event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+      event={{
+        content: part.content,
+        tags: note?.tags || [],
+        pubkey: note?.pubkey || "",
+      }}
       {repostable}
       {depth}
       {displayMenu}

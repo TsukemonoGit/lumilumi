@@ -50,8 +50,8 @@
     const relayHint = getRelayById(note.id);
 
     tags.push(
-      ["p", note.pubkey],
-      ["e", note.id, relayHint, note.pubkey],
+      ["p", note?.pubkey || ""],
+      ["e", note.id, relayHint, note?.pubkey || ""],
       ["k", note.kind.toString()]
     );
 

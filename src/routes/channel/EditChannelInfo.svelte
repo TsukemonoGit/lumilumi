@@ -43,7 +43,7 @@
   let channelAbout = $derived(channelData.about || "");
   let channelPicture = $derived(channelData.picture || "");
   let categories = $derived(
-    note.tags.reduce<{ value: string }[]>((a, b) => {
+    (note?.tags || []).reduce<{ value: string }[]>((a, b) => {
       if (b[0] === "t") {
         return [...a, { value: b[1] }];
       } else {
@@ -122,7 +122,9 @@
       };
       const relayhint = getRelayById(note.id);
       // tags の作成
-      const tags: string[][] = [["e", heyaId, relayhint, "root", note.pubkey]];
+      const tags: string[][] = [
+        ["e", heyaId, relayhint, "root", note?.pubkey || ""],
+      ];
 
       // カテゴリータグを追加
       categories.forEach((cat) => {

@@ -35,7 +35,7 @@
     states: { value },
   } = createToggleGroup({
     type: "multiple",
-    defaultValue: notifiSettings.get().selects,
+    defaultValue: notifiSettings.selects,
   });
 
   // State
@@ -84,25 +84,26 @@
     }
   });
 
-  // Subscribe to filter changes
-  value?.subscribe((val) => {
-    setTimeout(() => {
-      if (Array.isArray(val) && updateViewNotifi) {
-        updateViewNotifi();
+  //選択が変わったら更新
+  value.subscribe((v) => {
+    notifiSettings.selects = v as string[];
+    saveNotifiSettings(notifiSettings);
+    updateViewNotifi();
+  });
+  //チェックボックスが変わったら更新
 
-        saveNotifiSettings({
-          onlyFollowee: notifiSettings.get().onlyFollowee,
-          selects: val,
-        });
-      }
-    }, 0);
+  $effect(() => {
+    notifiSettings.onlyFollowee;
+
+    saveNotifiSettings(notifiSettings);
+    updateViewNotifi();
   });
 
   // Filter helpers
   function getNotificationFilterPredicate(event: Nostr.Event): boolean {
     if (event.pubkey === lumiSetting.get()?.pubkey) return false;
 
-    if (notifiSettings.get().onlyFollowee && followList.get()) {
+    if (notifiSettings.onlyFollowee && followList.get()) {
       if (!isEventFromFollowedUser(event)) return false;
     }
 

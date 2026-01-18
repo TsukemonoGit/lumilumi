@@ -42,7 +42,10 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  <Metadata queryKey={["metadata", note.pubkey]} pubkey={note.pubkey}>
+  <Metadata
+    queryKey={["metadata", note?.pubkey || ""]}
+    pubkey={note?.pubkey || ""}
+  >
     {#snippet loading()}
       <NoteComponent
         warningText={warning !== undefined
@@ -53,7 +56,7 @@
       >
         {#snippet icon()}
           <UserPopupMenu
-            pubkey={note.pubkey}
+            pubkey={note?.pubkey || ""}
             metadata={undefined}
             size={mini ? 20 : 40}
             {displayMenu}
@@ -65,14 +68,14 @@
             <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
         {/snippet}
         {#snippet name()}
-          <ProfileDisplay pubkey={note.pubkey} metadata={undefined} />
+          <ProfileDisplay pubkey={note?.pubkey || ""} metadata={undefined} />
         {/snippet}
         {#snippet time()}
           <DisplayTime {displayMenu} {note} />
         {/snippet}
         {#snippet status()}
           {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
             />{/if}
         {/snippet}
 
@@ -97,7 +100,7 @@
       >
         {#snippet icon()}
           <UserPopupMenu
-            pubkey={note.pubkey}
+            pubkey={note?.pubkey || ""}
             metadata={undefined}
             size={mini ? 20 : 40}
             {displayMenu}
@@ -109,14 +112,14 @@
             <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
         {/snippet}
         {#snippet name()}
-          <ProfileDisplay pubkey={note.pubkey} metadata={undefined} />
+          <ProfileDisplay pubkey={note?.pubkey || ""} metadata={undefined} />
         {/snippet}
         {#snippet time()}
           <DisplayTime {displayMenu} {note} />
         {/snippet}
         {#snippet status()}
           {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
             />{/if}
         {/snippet}
 
@@ -141,7 +144,7 @@
       >
         {#snippet icon()}
           <UserPopupMenu
-            pubkey={note.pubkey}
+            pubkey={note?.pubkey || ""}
             metadata={undefined}
             size={mini ? 20 : 40}
             {displayMenu}
@@ -153,14 +156,14 @@
             <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
         {/snippet}
         {#snippet name()}
-          <ProfileDisplay pubkey={note.pubkey} metadata={undefined} />
+          <ProfileDisplay pubkey={note?.pubkey || ""} metadata={undefined} />
         {/snippet}
         {#snippet time()}
           <DisplayTime {displayMenu} {note} />
         {/snippet}
         {#snippet status()}
           {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
             />{/if}
         {/snippet}
 
@@ -186,7 +189,7 @@
       >
         {#snippet icon()}
           <UserPopupMenu
-            pubkey={note.pubkey}
+            pubkey={note?.pubkey || ""}
             {metadata}
             size={mini ? 20 : 40}
             {displayMenu}
@@ -198,14 +201,14 @@
             <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
         {/snippet}
         {#snippet name()}
-          <ProfileDisplay pubkey={note.pubkey} {metadata} />
+          <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
         {/snippet}
         {#snippet time()}
           <DisplayTime {displayMenu} {note} />
         {/snippet}
         {#snippet status()}
           {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
             />{/if}
         {/snippet}
 

@@ -152,8 +152,8 @@
             {#if event}
               {@const note = event as Nostr.Event}
               <Metadata
-                queryKey={["metadata", note.pubkey]}
-                pubkey={note.pubkey}
+                queryKey={["metadata", note?.pubkey || ""]}
+                pubkey={note?.pubkey || ""}
               >
                 {#snippet loading()}
                   <EventCard

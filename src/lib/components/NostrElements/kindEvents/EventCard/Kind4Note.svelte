@@ -58,25 +58,25 @@
 
   //自分宛て？もしくは自分が書いた？
   let forme = $derived(
-    note.pubkey === lumiSetting.get().pubkey ||
-      note.tags.find(
+    (note?.pubkey || "") === lumiSetting.get().pubkey ||
+      (note?.tags || []).find(
         (tag) =>
           tag[0] === "p" &&
           tag.length > 1 &&
-          tag[1] === lumiSetting.get().pubkey,
-      ),
+          tag[1] === lumiSetting.get().pubkey
+      )
   );
 
   //どっちがどっち
   async function decryptMessage() {
-    const user = note.tags.find(
+    const user = (note?.tags || []).find(
       (tag) =>
-        tag[0] === "p" && tag.length > 1 && tag[1] !== lumiSetting.get().pubkey,
+        tag[0] === "p" && tag.length > 1 && tag[1] !== lumiSetting.get().pubkey
     )?.[1];
     try {
       decrypt = await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(
-        user ?? note.pubkey,
-        note.content,
+        user ?? (note?.pubkey || ""),
+        note.content
       );
 
       if (!decrypt) {
@@ -97,7 +97,7 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       size={mini ? 20 : 40}
       {displayMenu}
@@ -109,14 +109,14 @@
       <SeenonIcons id={note.id} width={mini ? 20 : 40} />{/if}
   {/snippet}
   {#snippet name()}
-    <ProfileDisplay pubkey={note.pubkey} {metadata} />
+    <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
   {/snippet}
   {#snippet time()}
     <DisplayTime {displayMenu} {note} />
   {/snippet}
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}
   {#snippet replyUser()}

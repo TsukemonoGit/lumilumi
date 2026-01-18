@@ -1,7 +1,8 @@
+<!--ReactionToastContent.svelte-->
 <script lang="ts">
   import * as nip19 from "nostr-tools/nip19";
 
-  import { parseNaddr, replaceText } from "$lib/func/util";
+  import { parseNaddr } from "$lib/func/util";
   import * as Nostr from "nostr-typedef";
 
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
@@ -10,8 +11,9 @@
   import EllipsisMenuNote from "./NoteActionButtuns/EllipsisMenuNote.svelte";
   import EllipsisMenuNaddr from "./NoteActionButtuns/EllipsisMenuNaddr.svelte";
   import { nip33Regex } from "$lib/func/regex";
-
-  const contentLen = 40;
+  import { checkContentWarning, shortText } from "$lib/func/event";
+  import { TriangleAlert } from "lucide-svelte";
+  import ReactionToastWarningText from "$lib/components/Elements/ReactionToastWarningText.svelte";
 
   interface Props {
     //tagはaかe
@@ -59,10 +61,6 @@
 
 {#if tag[0] === "e"}
   {@const loadingText = encodeNotehex(tag[1])}
-  <!-- {#if kind}
-      {kind}
-    {/if} -->
-
   <Text id={tag[1]}>
     {#snippet loading()}
       <div
@@ -86,25 +84,12 @@
       </div>
     {/snippet}
     {#snippet content({ data: text })}
-      {@const replacedText = replaceText(text.content)}
-      {replacedText.length < contentLen
-        ? replacedText
-        : `${replacedText.slice(0, contentLen)}...`}
-      <!-- <div class="mx-2 text-sm">
-        <Content
-          event={{
-            ...text,
-            content:
-              text.content.length < contentLen
-                ? (text.content ?? "")
-                : `${text.content.slice(0, contentLen)}...`,
-          }}
-          displayMenu={false}
-          depth={0}
-          repostable={false}
-          isShowClientTag={false}
-        />
-      </div> -->
+      {@const warning = checkContentWarning(text.tags)}
+      {#if warning}
+        <ReactionToastWarningText />
+      {:else}
+        {shortText(text.content)}
+      {/if}
     {/snippet}
   </Text>
 {:else if tag[0] === "a"}
@@ -129,22 +114,12 @@
       {/snippet}
 
       {#snippet success({ event })}
-        {@const replacedText = replaceText(event.content)}
-        {replacedText.length < contentLen
-          ? replacedText
-          : `${replacedText.slice(0, contentLen)}...`}
-        <!--  <Content
-          event={{
-            ...event,
-            content:
-              event.content.length < contentLen
-                ? (event.content ?? "")
-                : `${event.content.slice(0, contentLen)}...`,
-          }}
-          displayMenu={false}
-          depth={0}
-          repostable={false}
-        /> -->
+        {@const warning = checkContentWarning(event.tags)}
+        {#if warning}
+          <ReactionToastWarningText />
+        {:else}
+          {shortText(event.content)}
+        {/if}
       {/snippet}
     </LatestEvent>
   {/if}

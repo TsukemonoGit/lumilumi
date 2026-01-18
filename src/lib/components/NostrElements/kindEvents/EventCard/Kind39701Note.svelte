@@ -50,8 +50,8 @@
     showStatus = true,
   }: Props = $props();
   let siteUrl = $derived.by(() => {
-    const urlTag = note.tags.find(
-      (tag) => tag[0] == "d" && tag.length > 1,
+    const urlTag = (note?.tags || []).find(
+      (tag) => tag[0] == "d" && tag.length > 1
     )?.[1];
     if (!urlTag) return;
     if (!urlTag?.startsWith("http")) {
@@ -61,15 +61,17 @@
     }
   });
   let title = $derived(
-    note.tags.find((tag) => tag[0] == "title" && tag.length > 1)?.[1],
+    (note?.tags || []).find((tag) => tag[0] == "title" && tag.length > 1)?.[1]
   );
   let published_at = $derived(
-    note.tags.find((tag) => tag[0] == "published_at" && tag.length > 1)?.[1],
+    (note?.tags || []).find(
+      (tag) => tag[0] == "published_at" && tag.length > 1
+    )?.[1]
   );
   let hashTags = $derived(
-    note.tags
+    (note?.tags || [])
       .filter((tag) => tag[0] == "t" && tag.length > 1)
-      .map((tag) => tag[1]),
+      .map((tag) => tag[1])
   );
 </script>
 
@@ -82,7 +84,7 @@
 >
   {#snippet icon()}
     <UserPopupMenu
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       size={mini ? 20 : 40}
       {displayMenu}
@@ -95,7 +97,7 @@
   {/snippet}
   {#snippet name()}
     <ProfileDisplay
-      pubkey={note.pubkey}
+      pubkey={note?.pubkey || ""}
       {metadata}
       kindInfo={true}
       kind={note.kind}
@@ -106,14 +108,14 @@
   {/snippet}
   {#snippet status()}
     {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
       />{/if}
   {/snippet}
 
   {#snippet content()}
     <div>
       <div class="text-lg font-bold">{title}</div>
-      <MediaEmbedSwitcher url={siteUrl || ""} author={note.pubkey} />
+      <MediaEmbedSwitcher url={siteUrl || ""} author={note?.pubkey || ""} />
       <div class="mt-2">
         <Content
           {zIndex}
@@ -133,7 +135,6 @@
           >
         {/each}
       </div>
-      <!--  <ClientTag tags={note.tags} {depth} /> -->
       {#if !isNaN(Number(published_at))}
         <time class="float-end" datetime={datetime(Number(published_at))}
           >at {formatAbsoluteDateFromUnix(Number(published_at))}</time

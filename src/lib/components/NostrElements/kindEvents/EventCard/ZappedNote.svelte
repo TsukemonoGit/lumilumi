@@ -130,7 +130,7 @@
           {/if}
 
           <UserPopupMenu
-            pubkey={note.pubkey}
+            pubkey={note?.pubkey || ""}
             metadata={undefined}
             size={20}
             {depth}

@@ -60,8 +60,8 @@
           <NostrContent
             event={{
               content: part.content,
-              tags: note.tags,
-              pubkey: note.pubkey,
+              tags: note?.tags || [],
+              pubkey: note?.pubkey || "",
             }}
             {repostable}
             {depth}
@@ -72,7 +72,11 @@
       </li>{/each}
   </ul>{:else}
   <NostrContent
-    event={{ content: part.content, tags: note.tags, pubkey: note.pubkey }}
+    event={{
+      content: part.content,
+      tags: note?.tags || [],
+      pubkey: note?.pubkey || "",
+    }}
     {repostable}
     {depth}
     {displayMenu}

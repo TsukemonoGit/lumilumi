@@ -89,8 +89,8 @@
         note.kind === 3)
     ) {
       //atag　で　りぽすと
-      const dtag = note.tags.find((tag) => tag[0] === "d");
-      return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+      const dtag = (note?.tags || []).find((tag) => tag[0] === "d");
+      return `${note.kind}:${note?.pubkey || ""}:${dtag ? dtag[1] : ""}`;
     } else {
       return undefined;
     }
@@ -107,8 +107,8 @@
     const relayHint = getRelayById(note.id);
     //atagでもetagもいれてリアクションするらしい
     tags.push(
-      ["p", note.pubkey],
-      ["e", note.id, relayHint, note.pubkey],
+      ["p", note?.pubkey || ""],
+      ["e", note.id, relayHint, note?.pubkey || ""],
       ["k", note.kind.toString()]
     );
     if (atag) {
@@ -188,11 +188,11 @@
   //https://www.deepl.com/translator?share=generic#auto/auto/{0}
 
   let allPtag: string[] = $derived(
-    note.tags.reduce((acc, item) => {
+    (note?.tags || []).reduce((acc, item) => {
       if (
         item[0] === "p" &&
         !acc.includes(item[1]) &&
-        item[1] !== note.pubkey
+        item[1] !== (note?.pubkey || "")
       ) {
         acc.push(item[1]);
       }
@@ -221,7 +221,7 @@
     const eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: relayhints,
-      author: note.pubkey,
+      author: note?.pubkey || "",
       kind: note.kind,
     };
     const nevent = nip19.neventEncode(eventpointer);
@@ -229,8 +229,8 @@
     switch (action) {
       case "repost":
         let tags: string[][] = [
-          ["p", note.pubkey],
-          ["e", note.id, relayHint, note.pubkey],
+          ["p", note?.pubkey || ""],
+          ["e", note.id, relayHint, note?.pubkey || ""],
         ];
 
         if (atag) tags.push(["a", atag, relayHint]);
@@ -252,7 +252,7 @@
             ? ` nostr:${encodeNaddr(atag, relayhints)} \n`
             : ` nostr:${nevent} \n`,
           defaultUsers: [],
-          addableUserList: [note.pubkey],
+          addableUserList: [note?.pubkey || ""],
           warningText: warning ? warning[1] : undefined,
         };
         additionalPostOptions.set(options);
@@ -360,9 +360,9 @@
 
   const onClickReplyIcon = () => {
     let tags: string[][] = [];
-    tags.push(["p", note.pubkey]);
+    tags.push(["p", note?.pubkey || ""]);
     const relaylist = getRelayById(note.id);
-    const root = note.tags.find(
+    const root = (note?.tags || []).find(
       (item) =>
         (item[0] === "e" || item[0] === "a") &&
         item.length > 2 &&
@@ -385,7 +385,7 @@
       kind: note.kind === 42 ? 42 : 1,
       tags: tags,
       content: "",
-      defaultUsers: [note.pubkey],
+      defaultUsers: [note?.pubkey || ""],
       addableUserList: allPtag,
       warningText: warning ? warning[1] : undefined,
     };
@@ -512,7 +512,9 @@
   <!---->
 
   {#if note.kind !== 6 && note.kind !== 16 && note.kind !== 7 && note.kind !== 17 && note.kind !== 9734 && note.kind !== 9735 && !noReactionKind.includes(note.kind)}
-    <Metadata queryKey={["metadata", note.pubkey]} pubkey={note.pubkey}
+    <Metadata
+      queryKey={["metadata", note?.pubkey || ""]}
+      pubkey={note?.pubkey || ""}
       >{#snippet loading()}
         <div class="w-[20px]"></div>
       {/snippet}

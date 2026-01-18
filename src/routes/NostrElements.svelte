@@ -89,14 +89,15 @@
     if (select === 0) {
       return true;
     }
-    const pTags: string[] = note.tags
+    const pTags: string[] = (note?.tags || [])
       .filter(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] !== note.pubkey
+        (tag) =>
+          tag[0] === "p" && tag.length > 1 && tag[1] !== (note?.pubkey || "")
       )
       .map((tag) => tag[1]);
 
     if (
-      note.pubkey === lumiSetting.get().pubkey ||
+      (note?.pubkey || "") === lumiSetting.get().pubkey ||
       pTags.includes(lumiSetting.get().pubkey)
     ) {
       return true;

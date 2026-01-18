@@ -330,8 +330,7 @@ export function reactionCheck(show: boolean) {
         } else {
           // フォロー外からの反応は通知のみ
           const canShow =
-            muteCheckEvent(event) === "null" &&
-            !notifiSettings.get().onlyFollowee;
+            muteCheckEvent(event) === "null" && !notifiSettings.onlyFollowee;
           maybeSetReaction(canShow);
           return false;
         }
@@ -345,7 +344,7 @@ export function reactionCheck(show: boolean) {
     if (isReactionEvent) {
       // フォロイーからのリアクション、または「フォロイーのみ」設定がオフの場合に通知をセット
       const isFollower = isFollowingUser(event.pubkey);
-      const canShow = isFollower || !notifiSettings.get().onlyFollowee;
+      const canShow = isFollower || !notifiSettings.onlyFollowee;
       maybeSetReaction(canShow);
     }
 

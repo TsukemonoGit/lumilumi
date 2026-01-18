@@ -1,19 +1,24 @@
 <script lang="ts">
-  import { Mail, Repeat, Reply, Zap } from "lucide-svelte";
+  import { Mail, Repeat, Reply, TriangleAlert, Zap } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import Reaction from "../NostrElements/kindEvents/Reaction.svelte";
   import ReactionToastContent from "../NostrElements/kindEvents/ReactionToastContent.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
 
-  import { extractZappedId, replyedEvent, repostedId } from "$lib/func/event";
+  import {
+    checkContentWarning,
+    extractZappedId,
+    replyedEvent,
+    repostedId,
+    shortText,
+  } from "$lib/func/event";
   import { extractKind9734, extractAmount } from "$lib/func/zap";
-  import { replaceText } from "$lib/func/util";
+  import ReactionToastWarningText from "./ReactionToastWarningText.svelte";
 
   interface Props {
     event: Nostr.Event;
   }
 
-  const contentLen = 40;
   let { event }: Props = $props();
 
   type KindType = "repost" | "reaction" | "zap" | "reply" | "mention" | "dm";
@@ -46,10 +51,7 @@
   const kType = $derived(kindType(event));
   const tag = $derived(handledTag(event));
 
-  const shortText = (text: string) => {
-    const t = replaceText(text);
-    return t.length < contentLen ? t : `${t.slice(0, contentLen)}...`;
-  };
+  const warning = $derived(checkContentWarning(event.tags));
 </script>
 
 {#if kType === "dm"}
@@ -82,7 +84,11 @@
       {zapAmount}
       {#if zapRequest}
         <UserName pubhex={zapRequest.pubkey} />
-        {zapRequest.content}
+        {#if checkContentWarning(zapRequest.tags)}
+          <ReactionToastWarningText />
+        {:else}
+          {zapRequest.content}
+        {/if}
       {/if}
     </div>
     <div class="px-2 w-full">
@@ -94,10 +100,18 @@
       <ReactionToastContent {tag} />
     </div>
     <UserName pubhex={event.pubkey} />
-    {shortText(event.content)}
+    {#if warning}
+      <ReactionToastWarningText />
+    {:else}
+      {shortText(event.content)}
+    {/if}
   {/if}
 {:else}
   <!-- mention (no handled tag) -->
   <Reply class="text-magnum-400 min-w-4" />
-  {shortText(event.content)}
+  {#if warning}
+    <ReactionToastWarningText />
+  {:else}
+    {shortText(event.content)}
+  {/if}
 {/if}

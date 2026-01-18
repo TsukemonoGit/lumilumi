@@ -17,6 +17,7 @@
   // Utility function imports
   import { muteCheck } from "$lib/func/muteCheck";
   import {
+    checkContentWarning,
     get31990Ogp,
     removeFirstMatchingId,
     replyedEvent,
@@ -90,7 +91,7 @@
     showStatus = true,
   }: Props = $props();
 
-  let isProtected = $derived(note.tags.find((tag) => tag[0] === "-"));
+  let isProtected = $derived((note?.tags || []).find((tag) => tag[0] === "-"));
   // State variables
   let currentNoteTag: string[] | undefined = $state(undefined);
   let deleted = $state(false);
@@ -98,8 +99,11 @@
 
   // Process reply tags
   let { replyTag, replyUsers } = $derived.by(() => {
-    if (note && [1, 42, 4, 1111].includes(note.kind) && note.tags.length > 0) {
-      const res = replyedEvent(note.tags, note.kind);
+    if (
+      (note && [1, 42, 4, 1111].includes(note.kind) && note?.tags) ||
+      [].length > 0
+    ) {
+      const res = replyedEvent(note?.tags || [], note.kind);
 
       return { replyTag: res.replyTag, replyUsers: res.replyUsers };
     }
@@ -114,8 +118,8 @@
       return undefined;
     }
 
-    const dtag = note.tags.find((tag) => tag[0] === "d");
-    return `${note.kind}:${note.pubkey}:${dtag ? dtag[1] : ""}`;
+    const dtag = (note?.tags || []).find((tag) => tag[0] === "d");
+    return `${note.kind}:${note?.pubkey || ""}:${dtag ? dtag[1] : ""}`;
   });
 
   let paramNoteId = $derived(
@@ -124,7 +128,7 @@
 
   //ミュートメニューの設定は考慮しない
   let muteType = $derived.by(() => {
-    if (!$mutes && !$mutebykinds && !timelineFilter) {
+    if (!$mutes && !$mutebykinds && !muteType) {
       return "null";
     }
     if (paramNoteId === note.id || excludefunc(note)) {
@@ -135,10 +139,6 @@
   });
 
   let warning = $derived(checkContentWarning(note?.tags));
-
-  function checkContentWarning(tags: string[][]): string[] | undefined {
-    return tags.find((item) => item[0] === "content-warning");
-  }
 
   function noteIDchange(note: Nostr.Event) {
     if (!note.id) return;
@@ -187,9 +187,9 @@
   // CSS classes
   const baseClass = " overflow-hidden ";
   const noteClass = () => {
-    const ptag = note.tags.filter((tag) => tag[0] === "p");
+    const ptag = (note?.tags || []).filter((tag) => tag[0] === "p");
     const user =
-      note.pubkey !== lumiSetting.get().pubkey &&
+      (note?.pubkey || "") !== lumiSetting.get().pubkey &&
       ptag.find((tag) => tag[1] === lumiSetting.get().pubkey);
 
     return user ? ` bg-magnum-700/10 ${baseClass}` : `${baseClass}`;
@@ -214,7 +214,7 @@
 {#if deleted}
   <div class="italic text-neutral-500 px-1">Deleted Note</div>
 {:else if note}
-  {#if note.pubkey !== loginUser.value && timelineFilter.adaptMute && muteType !== "null" && depth >= 1}
+  {#if (note?.pubkey || "") !== loginUser.value && timelineFilter.adaptMute && muteType !== "null" && depth >= 1}
     <button
       class="rounded bg-magnum-700 hover:opacity-75 active:opacity-50 text-magnum-50"
       onclick={() => (viewMuteEvent = !viewMuteEvent)}
@@ -222,7 +222,7 @@
       {viewMuteEvent ? "hide" : "view"} Mute:{muteType}
     </button>
   {/if}
-  {#if !timelineFilter.adaptMute || note.pubkey === loginUser.value || muteType === "null" || viewMuteEvent}
+  {#if !timelineFilter.adaptMute || (note?.pubkey || "") === loginUser.value || muteType === "null" || viewMuteEvent}
     {#if thread && replyTag}
       {#if depth >= 1 && depth % 6 === 0 && !loadThread}
         <button
@@ -289,7 +289,7 @@
           {/snippet}
           {#snippet userIcon()}
             <UserPopupMenu
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
               {metadata}
               size={20}
               {displayMenu}
@@ -297,7 +297,7 @@
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay pubkey={note.pubkey} {metadata} />
+            <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
           {/snippet}
 
           {#snippet actionButtons()}
@@ -312,7 +312,7 @@
         </RepostComponent>
 
         <!--リアクションしたノートの情報-->
-        {@const { kind, tag } = repostedId(note.tags)}
+        {@const { kind, tag } = repostedId(note?.tags || [])}
         {#if tag}
           <RepostedNote
             {tag}
@@ -335,7 +335,7 @@
           {/snippet}
           {#snippet userIcon()}
             <UserPopupMenu
-              pubkey={note.pubkey}
+              pubkey={note?.pubkey || ""}
               {metadata}
               size={20}
               {displayMenu}
@@ -343,7 +343,7 @@
             />
           {/snippet}
           {#snippet name()}
-            <ProfileDisplay pubkey={note.pubkey} {metadata} />
+            <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
           {/snippet}
 
           {#snippet actionButtons()}
@@ -358,7 +358,7 @@
         </RepostComponent>
 
         <!--リアクションしたノートの情報（リポストのを使いまわし）-->
-        {@const { kind, tag } = repostedId(note.tags)}
+        {@const { kind, tag } = repostedId(note?.tags || [])}
         <!--会話へのリアクションでPに自分が入ってるけどリアクション先は自分のポストじゃないやつある　nevent1qvzqqqqqqupzpujqe8p9zrpuv0f4ykk3rmgnqa6p6r0lan0t8ewd0ksj89kqcz5xqyxhwumn8ghj77tpvf6jumt9qyghwumn8ghj7u3wddhk56tjvyhxjmcpypmhxue69uhhyetvv9uj66ns9ehx7um5wgh8w6tjv4jxuet59e48qqpqs88y4gkru95k9neks03d8u58w2d4nq8lvpn9qrjeuxv2fehg05hqj2xgas-->
         {#if tag}
           <RepostedNote

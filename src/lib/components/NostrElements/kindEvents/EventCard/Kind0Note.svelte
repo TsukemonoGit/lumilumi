@@ -20,13 +20,18 @@
   let { displayMenu, note = $bindable(), depth, repostable }: Props = $props();
 
   let prof = $derived(profile(note));
-  let petname = $derived(followList.get().get(note.pubkey));
+  let petname = $derived(followList.get().get(note?.pubkey || ""));
   let isBirthDay = $derived(checkBirthDay(prof));
 </script>
 
 <div class="grid grid-cols-[auto_1fr] py-1">
   <div class="p-1">
-    <UserPopupMenu pubkey={note.pubkey} metadata={note} size={40} {depth} />
+    <UserPopupMenu
+      pubkey={note?.pubkey || ""}
+      metadata={note}
+      size={40}
+      {depth}
+    />
   </div>
   <div class="p-1 overflow-x-hidden">
     <div
@@ -38,7 +43,7 @@
           <DisplayName
             height={21}
             name={prof.display_name ?? ""}
-            tags={note.tags}
+            tags={note?.tags || []}
           />
 
           {#if prof.name && prof.name !== ""}<span
@@ -47,14 +52,14 @@
               ><DisplayName
                 height={21}
                 name={`@${prof.name}`}
-                tags={note.tags}
+                tags={note?.tags || []}
               />
             </span>{/if}{/if}{#if petname}<span class="text-magnum-100"
             >📛{petname}</span
           >{/if}{#if isBirthDay}<Cake size={16} class="text-magnum-400" />{/if}
       </div>
       <div class="ml-auto">
-        <FollowButton pubkey={note.pubkey} />
+        <FollowButton pubkey={note?.pubkey || ""} />
       </div>
     </div>
 

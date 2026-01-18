@@ -40,11 +40,20 @@
   import { page } from "$app/state";
   import { nostviewstrable } from "$lib/func/constants";
 
-  import { generateResultMessage, translateText } from "$lib/func/util";
+  import {
+    generateResultMessage,
+    parseNaddr,
+    translateText,
+  } from "$lib/func/util";
 
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
-  import { latest, nip07Signer, type OkPacketAgainstEvent } from "rx-nostr";
+  import {
+    latest,
+    nip07Signer,
+    type EventPacket,
+    type OkPacketAgainstEvent,
+  } from "rx-nostr";
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
 
   import Note from "../Note.svelte";
@@ -55,6 +64,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { useLatestEvent } from "$lib/stores/useLatestEvent";
 
   interface MenuItem {
     text: string;
@@ -104,8 +114,9 @@
       try {
         const naddrpointer: nip19.AddressPointer = {
           kind: note.kind,
-          identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-          pubkey: note.pubkey,
+          identifier:
+            (note?.tags || []).find((item) => item[0] === "d")?.[1] ?? "",
+          pubkey: note?.pubkey || "",
           relays: getRelaysById(note.id),
         };
         return nip19.naddrEncode(naddrpointer);
@@ -119,7 +130,7 @@
         const eventpointer: nip19.EventPointer = {
           id: note.id,
           relays: getRelaysById(note.id),
-          author: note.pubkey,
+          author: note?.pubkey || "",
           kind: note.kind,
         };
         return nip19.neventEncode(eventpointer);
@@ -130,7 +141,7 @@
 
     const encodePubkey = () => {
       try {
-        return nip19.npubEncode(note.pubkey);
+        return nip19.npubEncode(note?.pubkey || "");
       } catch {
         return undefined;
       }
@@ -232,8 +243,8 @@
     // アクショングループ
     if (
       !(
-        note.tags.find((tag) => tag[0] === "-") &&
-        note.pubkey !== lumiSetting.get().pubkey
+        (note?.tags || []).find((tag) => tag[0] === "-") &&
+        (note?.pubkey || "") !== lumiSetting.get().pubkey
       )
     ) {
       actionItems.push({
@@ -243,7 +254,10 @@
       });
     }
 
-    if (note.pubkey === lumiSetting.get().pubkey && note.kind === 30023) {
+    if (
+      (note?.pubkey || "") === lumiSetting.get().pubkey &&
+      note.kind === 30023
+    ) {
       actionItems.push({
         text: `${$_("menu.action.MAKIMONO")}`,
         icon: FilePenLine,
@@ -268,7 +282,7 @@
     }
 
     if (
-      note.pubkey === lumiSetting.get().pubkey &&
+      (note?.pubkey || "") === lumiSetting.get().pubkey &&
       note.kind !== 5 &&
       note.kind !== 62
     ) {
@@ -487,20 +501,54 @@
         break;
 
       case "open_makimono":
-        const makimono = `https://makimono.lumilumi.app//${naddr}`;
+        const makimono = `https://makimono.lumilumi.app/${naddr}`;
         window.open(makimono, "_blank", "noreferrer");
         break;
 
       case "refresh_data":
         $nowProgress = true;
-        const key: QueryKey = [
-          "naddr",
-          `${note.kind}:${note.pubkey}:${note.tags.find((tag) => tag[0] === "d")?.[1] || ""}`,
-        ] as QueryKey;
-        queryClient.invalidateQueries({ queryKey: key });
-        setTimeout(() => {
-          $nowProgress = false;
-        }, 1000);
+        const atag = `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`;
+        const key: QueryKey = ["naddr", atag] as QueryKey;
+        const address = parseNaddr(["a", atag]);
+
+        const filter: Nostr.Filter = {
+          kinds: [address.kind],
+          authors: [address.pubkey],
+          ...(address.identifier ? { "#d": [address.identifier] } : {}),
+          limit: 1,
+        };
+
+        try {
+          await usePromiseReq(
+            {
+              filters: [filter],
+              operator: pipe(latest()),
+            },
+            address.relays?.slice(0, 3),
+            5000,
+            (data: EventPacket[]) => {
+              // onDataコールバック: データ受信の都度実行
+              if (data.length > 0) {
+                const newEvent = data[0].event;
+                const currentData = queryClient.getQueryData(key) as
+                  | EventPacket
+                  | undefined;
+
+                // 既存データより新しい場合のみ更新
+                if (
+                  !currentData ||
+                  newEvent.created_at > currentData.event.created_at
+                ) {
+                  queryClient.setQueryData(key, () => data[0]);
+                }
+              }
+            }
+          );
+        } catch (error) {
+          console.error(error);
+        }
+
+        $nowProgress = false;
         break;
 
       case "toggle_bookmark":
@@ -540,7 +588,7 @@
             const [tagType, tagValue] = replaceable
               ? [
                   "a",
-                  `${note.kind}:${note.pubkey}:${note.tags.find((t) => t[0] === "d")?.[1] || ""}`,
+                  `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((t) => t[0] === "d")?.[1] || ""}`,
                 ]
               : ["e", note.id];
 
@@ -606,7 +654,7 @@
       if (isAddressableKind(note.kind) || isReplaceableKind(note.kind)) {
         deletetags.push([
           "a",
-          `${note.kind}:${note.pubkey}:${note.tags.find((item) => item[0] === "d")?.[1] || ""}`,
+          `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((item) => item[0] === "d")?.[1] || ""}`,
         ]);
       }
       const {

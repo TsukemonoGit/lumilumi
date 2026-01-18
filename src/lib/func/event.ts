@@ -6,6 +6,7 @@ import type { Ogp } from "./ogp";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import * as nip19 from "nostr-tools/nip19";
 import { getRelaysById } from "./nostr";
+import { replaceText } from "./util";
 
 export const repostedId = (
   tags: string[][]
@@ -225,17 +226,22 @@ export const noteLink = (note: Nostr.Event): string /**nevent or naddr */ => {
     let eventpointer: nip19.EventPointer = {
       id: note.id,
       relays: getRelaysById(note.id),
-      author: note.pubkey,
+      author: note?.pubkey || "",
       kind: note.kind,
     };
     return nip19.neventEncode(eventpointer);
   } else {
     let naddrpointer: nip19.AddressPointer = {
       kind: note.kind,
-      identifier: note.tags.find((item) => item[0] === "d")?.[1] ?? "",
-      pubkey: note.pubkey,
+      identifier: (note?.tags || []).find((item) => item[0] === "d")?.[1] ?? "",
+      pubkey: note?.pubkey || "",
       relays: getRelaysById(note.id),
     };
     return nip19.naddrEncode(naddrpointer);
   }
+};
+
+export const shortText = (text: string, contentLen: number = 40) => {
+  const t = replaceText(text);
+  return t.length < contentLen ? t : `${t.slice(0, contentLen)}...`;
 };

@@ -54,10 +54,16 @@
 
   let deleted = $state(false);
   let polltype: string | undefined = $derived(
-    note.tags.find((tag) => tag[0] === "polltype" && tag.length > 1)?.[1],
+    (note?.tags || []).find(
+      (tag) => tag[0] === "polltype" && tag.length > 1
+    )?.[1]
   );
   let endsAt: number | undefined = $derived(
-    Number(note.tags.find((tag) => tag[0] === "endsAt" && tag.length > 1)?.[1]),
+    Number(
+      (note?.tags || []).find(
+        (tag) => tag[0] === "endsAt" && tag.length > 1
+      )?.[1]
+    )
   );
 
   let nevent: string | undefined = $derived.by(() => {
@@ -68,7 +74,7 @@
       const eventpointer: nip19.EventPointer = {
         id: note.id,
         relays: getRelaysById(note.id),
-        author: note.pubkey,
+        author: note?.pubkey || "",
         kind: note.kind,
       };
       return nip19.neventEncode(eventpointer);
@@ -95,7 +101,7 @@
   >
     {#snippet icon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={mini ? 20 : 40}
         {displayMenu}
@@ -108,7 +114,7 @@
     {/snippet}
     {#snippet name()}
       <ProfileDisplay
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         kindInfo={note.kind !== 1 ? true : false}
       />
@@ -118,7 +124,7 @@
     {/snippet}
     {#snippet status()}
       {#if lumiSetting.get().showUserStatus && showStatus}<ShowStatus
-          pubkey={note.pubkey}
+          pubkey={note?.pubkey || ""}
         />{/if}
     {/snippet}
 
@@ -143,7 +149,7 @@
           <!--NOTEとかページの投稿は展開する-->
           <!--投票もできるようにする-->
         {:else}
-          {#each note.tags.filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
+          {#each (note?.tags || []).filter((tag) => tag[0] === "option" && tag.length > 2) as itemTag}
             <label class="inline-flex">
               <input type="radio" disabled={true} /><span class="ml-2 break-all"
                 ><Content

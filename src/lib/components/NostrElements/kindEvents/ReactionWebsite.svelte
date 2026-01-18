@@ -25,12 +25,12 @@
 
   // iタグを全件取得
   let iTags = $derived(
-    note.tags.filter((tag) => tag[0] === "i" && tag.length > 2)
+    (note?.tags || []).filter((tag) => tag[0] === "i" && tag.length > 2)
   );
 
   // rタグを全件取得
   let rTags = $derived(
-    note.tags.filter((tag) => tag[0] === "r" && tag.length > 1)
+    (note?.tags || []).filter((tag) => tag[0] === "r" && tag.length > 1)
   );
 
   // 表示用配列。iタグがあればそれを使い、なければrタグ
@@ -50,7 +50,7 @@
     {/snippet}
     {#snippet userIcon()}
       <UserPopupMenu
-        pubkey={note.pubkey}
+        pubkey={note?.pubkey || ""}
         {metadata}
         size={20}
         {displayMenu}
@@ -58,7 +58,7 @@
       />
     {/snippet}
     {#snippet name()}
-      <ProfileDisplay pubkey={note.pubkey} {metadata} />
+      <ProfileDisplay pubkey={note?.pubkey || ""} {metadata} />
     {/snippet}
 
     {#snippet actionButtons()}
@@ -72,7 +72,7 @@
   {#each websiteTags as url}
     <div class="p-2">
       {#if lumiSetting.get().showImg && isvalidURL(url)}
-        <MediaEmbedSwitcher {url} author={note.pubkey} />
+        <MediaEmbedSwitcher {url} author={note?.pubkey || ""} />
       {:else}
         <Link className="underline text-magnum-300 break-all" href={url}>
           {url}

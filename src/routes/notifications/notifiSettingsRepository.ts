@@ -9,7 +9,8 @@ export function migrateNotifiSettings() {
   if (raw) {
     try {
       const notifi = JSON.parse(raw) as NotifiSettings;
-      notifiSettings.set(notifi);
+
+      Object.assign(notifiSettings, notifi);
     } catch {
       // 壊れていたら初期化
       const settings: NotifiSettings = {
@@ -20,7 +21,8 @@ export function migrateNotifiSettings() {
         STORAGE_KEYS.NOTIFI_SETTINGS,
         JSON.stringify(settings)
       );
-      notifiSettings.set(settings);
+
+      Object.assign(notifiSettings, settings);
     }
   } else {
     // データが無い場合 → 初期化 & 移行
@@ -33,7 +35,7 @@ export function migrateNotifiSettings() {
       STORAGE_KEYS.NOTIFI_SETTINGS,
       JSON.stringify(settings)
     );
-    notifiSettings.set(settings);
+    Object.assign(notifiSettings, settings);
   }
 
   // 既存データがあっても OLD キーが残っていれば削除のみ
