@@ -42,7 +42,7 @@
   let isInitializing = false;
 
   // タイムラインクエリキー
-  let timelineQuery = $derived(["global", "feed"]);
+  const timelineQuery = ["global", "feed"];
 
   // ユーザーがログインしているか
   let hasUser = $derived(lumiSetting.get().pubkey);
