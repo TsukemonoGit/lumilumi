@@ -13,8 +13,7 @@
 </script>
 
 {#if lumiSetting.get().showImg && !imgError}
-  {#if !imgLoad}{part.content}{/if}
-  <img
+  {#if !imgLoad}{part.content}{/if}<img
     height={`${height}px`}
     loading="lazy"
     alt={part.content}
@@ -28,7 +27,4 @@
     onerror={() => {
       imgError = true;
     }}
-  />
-{:else}
-  {part.content}
-{/if}
+  />{:else}{part.content}{/if}
