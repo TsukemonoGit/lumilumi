@@ -40,7 +40,7 @@
   let zapRequestEvent = $derived(extractKind9734(note));
 
   let amount: number | undefined = $derived(
-    extractAmount(note, zapRequestEvent)
+    extractAmount(note, zapRequestEvent),
   );
 </script>
 
@@ -72,16 +72,6 @@
       {zIndex}
       message={"failed to get zapped user"}
     />
-
-    <!-- <Kind9735Invalid
-      {note}
-      {repostable}
-      {displayMenu}
-      {depth}
-      
-      {mini}
-      message={"failed to get zapped user"}
-    /> -->
   {:else}
     <Metadata queryKey={["metadata", receivepub]} pubkey={receivepub}>
       {#snippet loading()}
@@ -98,16 +88,6 @@
           {zIndex}
           message={"loading zap recipient's data..."}
         />
-
-        <!-- <Kind9735Invalid
-            {note}
-            {repostable}
-            {displayMenu}
-            {depth}
-            
-            {mini}
-            message={"loading zap recipient's data..."}
-          /> -->
       {/snippet}
       {#snippet nodata()}
         <ZappedNote
@@ -123,16 +103,6 @@
           {zIndex}
           message={"failed to get zap recipient's data."}
         />
-
-        <!-- <Kind9735Invalid
-            {note}
-            {repostable}
-            {displayMenu}
-            {depth}
-            
-            {mini}
-            message={"failed to get zap recipient's data."}
-          /> -->
       {/snippet}
       {#snippet error()}
         <ZappedNote
@@ -148,16 +118,6 @@
           {zIndex}
           message={"error to get zap recipient's data."}
         />
-
-        <!-- <Kind9735Invalid
-            {note}
-            {repostable}
-            {displayMenu}
-            {depth}
-            
-            {mini}
-            message={"error to get zap recipient's data."}
-          /> -->
       {/snippet}
       {#snippet content({ metadata: receiverMetadata })}
         {#await getZapLNURLPubkey(receiverMetadata)}
@@ -174,16 +134,6 @@
             {zIndex}
             message={"Checking the LNURL Server's pubkey..."}
           />
-
-          <!-- <Kind9735Invalid
-            {note}
-            {repostable}
-            {displayMenu}
-            {depth}
-            
-            {mini}
-            message={"Checking the LNURL Server's pubkey..."}
-          /> -->
         {:then isValidEvent9735}
           {#if !isValidEvent9735.pub}
             <ZappedNote
@@ -199,16 +149,6 @@
               {zIndex}
               message={isValidEvent9735.error}
             />
-
-            <!-- <Kind9735Invalid
-              {note}
-              {repostable}
-              {displayMenu}
-              {depth}
-              
-              {mini}
-              message={isValidEvent9735.error}
-            /> -->
           {:else}
             <ZappedNote
               {zapRequestEvent}

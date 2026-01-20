@@ -56,7 +56,7 @@
         ? "null"
         : $mutes || $mutebykinds
           ? muteCheck(zapRequestEvent)
-          : "null"
+          : "null",
   );
 </script>
 
@@ -100,7 +100,12 @@
               size={20}
             />{/if}
           {amount}
-
+          <div
+            class="truncate line-clamp-1 max-w-full"
+            style="	white-space: pre-wrap; word-break: break-word;"
+          >
+            {zapRequestEvent.content}
+          </div>
           <div class="self-center">
             <UserPopupMenu
               pubkey={zapRequestEvent.pubkey}
