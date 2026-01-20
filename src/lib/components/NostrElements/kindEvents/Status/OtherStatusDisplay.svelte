@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleHelp } from "lucide-svelte";
+  import { CircleQuestionMark } from "lucide-svelte";
   import EllipsisMenu from "../NoteActionButtuns/EllipsisMenu.svelte";
   import * as Nostr from "nostr-typedef";
   import DisplayName from "../../user/DisplayName.svelte";
@@ -15,7 +15,7 @@
 {#if link && link !== "" && !deleted}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
-      TriggerIcon={CircleHelp}
+      TriggerIcon={CircleQuestionMark}
       note={event}
       iconSize={16}
       iconClass="text-zinc-500"
@@ -38,7 +38,7 @@
 {:else if event.content.trim() !== ""}
   <div class=" min-w-[16px] h-[16px]">
     <EllipsisMenu
-      TriggerIcon={CircleHelp}
+      TriggerIcon={CircleQuestionMark}
       note={event}
       iconSize={16}
       iconClass="text-zinc-500"
