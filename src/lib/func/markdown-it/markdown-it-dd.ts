@@ -35,7 +35,7 @@ const markdownDdPlugin = function (md: MarkdownIt) {
       content,
       state.md,
       state.env,
-      []
+      [],
     );
     tempState.md.inline.tokenize(tempState);
 
