@@ -42,7 +42,7 @@
   "dependencies": {
     "@internationalized/date": "^3.11.0",
     "@konemono/nostr-content-parser": "^0.7.0",
-    "@konemono/nostr-login": "^1.12.8",
+    "@konemono/nostr-login": "^1.12.9",
     "@konemono/svelte5-i18n": "^0.2.3",
     "@melt-ui/pp": "^0.3.2",
     "@rx-nostr/crypto": "^0.0.0",
