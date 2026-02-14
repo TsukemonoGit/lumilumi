@@ -93,14 +93,14 @@ export function setRxNostr() {
       (
         e: AuthPacket & {
           type: "AUTH";
-        }
+        },
       ) => {
         console.log(e.type, e.from, e.message);
 
         if (!authRelay.get().includes(e.from)) {
           authRelay.update((v) => [...v, e.from]);
         }
-      }
+      },
     );
 }
 
@@ -133,7 +133,7 @@ metadataQueue.subscribe((queue) => {
         const [changed, savedMetadata] = saveMetadataToLocalStorage(
           currentMetadata,
           key,
-          data
+          data,
         );
         if (changed) {
           metadataChanged = true;
@@ -143,7 +143,7 @@ metadataQueue.subscribe((queue) => {
       if (metadataChanged) {
         localStorage?.setItem(
           STORAGE_KEYS.METADATA,
-          JSON.stringify(currentMetadata)
+          JSON.stringify(currentMetadata),
         );
         metadataChanged = false;
       }
@@ -158,7 +158,7 @@ metadataQueue.subscribe((queue) => {
 
 export function pubkeysIn(
   contacts: Nostr.Event,
-  pubkey: string | undefined = undefined
+  pubkey: string | undefined = undefined,
 ): Map<string, string | undefined> {
   const followingMap = contacts.tags.reduce(
     (acc, [tag, value, relay, petname]) => {
@@ -170,7 +170,7 @@ export function pubkeysIn(
       }
       return acc;
     },
-    new Map<string, string | undefined>()
+    new Map<string, string | undefined>(),
   );
 
   // 指定された pubkey が Map に存在しない場合、追加
@@ -185,11 +185,11 @@ export function pubkeysIn(
 const saveMetadataToLocalStorage = (
   currentMetadata: [QueryKey, EventPacket][],
   key: QueryKey,
-  data: EventPacket
+  data: EventPacket,
 ): [boolean, [QueryKey, EventPacket][]] => {
   let metadataChanged = false;
   const existingIndex = currentMetadata.findIndex(
-    ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key)
+    ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key),
   );
 
   if (followList.get().has(data.event.pubkey)) {
@@ -208,7 +208,7 @@ const saveMetadataToLocalStorage = (
         // 保存されているメタデータの方をクエリにセット（？）
         queryClient.setQueryData(
           key,
-          (oldData: any) => currentMetadata[existingIndex][1]
+          (oldData: any) => currentMetadata[existingIndex][1],
         );
       }
     } else {
@@ -236,7 +236,7 @@ export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
 
     // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
     const result = metadata.find(
-      ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey)
+      ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey),
     );
     //console.log(result);
     return result ? result[1] : undefined;
@@ -257,7 +257,7 @@ export function changeMainEmit(filters: Nostr.Filter[]) {
 }
 export const makeMainFilters = (
   contacts: Nostr.Event<number>,
-  since: number
+  since: number,
 ): { mainFilters: Nostr.Filter[]; olderFilters: Nostr.Filter[] } => {
   //console.log(contacts);
 
@@ -319,7 +319,7 @@ export const makeMainFilters = (
 export function useMainTimelineReq(
   operator: OperatorFunction<EventPacket, EventPacket | EventPacket[]>,
   queryKey: QueryKey,
-  filters: Nostr.Filter[]
+  filters: Nostr.Filter[],
 ): {
   data: Readable<EventPacket | EventPacket[] | undefined>;
   status: Readable<ReqStatus>;
@@ -415,7 +415,7 @@ export function publishEvent(ev: Nostr.EventParameters) {
 
 export async function promisePublishSignedEvent(
   event: Nostr.Event,
-  relays?: string[] | undefined
+  relays?: string[] | undefined,
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   const _rxNostr = get(app).rxNostr;
   if (!relays && Object.entries(_rxNostr.getDefaultRelays()).length === 0) {
@@ -437,7 +437,7 @@ export async function promisePublishSignedEvent(
 
       // 送信成功も失敗も受信していないリレーが存在するかチェック
       const pendingRelays = defaultRelays.filter(
-        (relay) => !results.some((packet) => packet.from === relay)
+        (relay) => !results.some((packet) => packet.from === relay),
       );
       console.log("未応答のリレー:", pendingRelays.length);
       if (
@@ -472,7 +472,7 @@ export async function promisePublishSignedEvent(
 
 export async function promisePublishEvent(
   ev: Nostr.EventParameters,
-  relays?: string[] | undefined
+  relays?: string[] | undefined,
 ): Promise<{ event: Nostr.Event; res: OkPacketAgainstEvent[] }> {
   try {
     const signer = nip07Signer();
@@ -545,25 +545,21 @@ export function getRelaysById(id: string): string[] {
 /**
  * 指定した id に対応するリレーから1件を選んで返す。
  * 選択ルール:
- *  1. ws:// で始まらない候補を優先
- *     - その中で authRelay.get() に含まれない最初の要素があればそれを返す
- *     - なければ最初の要素を返す
- *  2. ws:// の候補しかない場合
- *     - 同様に authRelay.get() に含まれない最初の要素を返す
- *     - なければ最初の要素を返す
- * tieMap に存在しない場合や空の場合は "" を返す。
+ *  1. ws:// で始まるリレーは除外
+ *  2. 残った候補の中で authRelay.get() に含まれない最初の要素を返す
+ *  3. 全て authRelay.get() に含まれる場合は最初の要素を返す
+ *  4. ws:// のみの場合や tieMap に存在しない場合は "" を返す
  */
 export function getRelayById(id: string): string {
   const tieSet = tieMap?.get(id);
   if (!tieSet || tieSet.size === 0) return "";
 
   const authList = authRelay.get();
-  const list = Array.from(tieSet); // Set は挿入順を保持する → 小さい番号優先
+  const list = Array.from(tieSet).filter((r) => !r.startsWith("ws://"));
 
-  const select = (candidates: string[]): string =>
-    candidates.find((r) => !authList.includes(r)) ?? candidates[0];
+  if (list.length === 0) return "";
 
-  return select(list.filter((r) => !r.startsWith("ws://"))) ?? select(list);
+  return list.find((r) => !authList.includes(r)) ?? list[0];
 }
 
 export function usePromiseReq(
@@ -576,7 +572,7 @@ export function usePromiseReq(
   relays: string[] | undefined,
   timeout: number | undefined = 4000,
   onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
-  sift?: number
+  sift?: number,
 ): Promise<EventPacket[]> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
@@ -611,7 +607,7 @@ export function usePromiseReq(
       bookmark(),
 
       operator,
-      completeOnTimeout(timeout)
+      completeOnTimeout(timeout),
     );
 
   const throttledOnData = onData ? throttle(onData, 200) : undefined;
@@ -635,7 +631,7 @@ export function usePromiseReq(
         // 処理途中のデータを都度コールバックで返す
         if (throttledOnData) {
           throttledOnData(
-            [...accumulatedData].slice(0, sift === 0 ? undefined : sift)
+            [...accumulatedData].slice(0, sift === 0 ? undefined : sift),
           );
         }
       },
@@ -666,7 +662,7 @@ export interface UserData {
 }
 
 export function getMetadataList(
-  querydata: [QueryKey, EventPacket][]
+  querydata: [QueryKey, EventPacket][],
 ): MetadataList {
   return querydata.reduce((acc: MetadataList, [key, packet]) => {
     try {
@@ -721,7 +717,7 @@ export function useMediaPromiseReq(
   relays: string[] | undefined,
   timeout: number | undefined = 3000,
   sift: number,
-  onData?: (result: MediaResult) => void
+  onData?: (result: MediaResult) => void,
 ): Promise<MediaOperatorOutput> {
   const _rxNostr = get(app).rxNostr;
   if (Object.entries(_rxNostr.getDefaultRelays()).length <= 0) {
@@ -815,7 +811,7 @@ export function usePaginatedReq(
     maxLoop?: number;
   },
   relays: string[] | undefined,
-  timeout: number | undefined = 5000
+  timeout: number | undefined = 5000,
 ): ReqResult<EventPacket[]> {
   const data = writable<EventPacket[] | null>(null);
   const status = writable<ReqStatus>("loading");
@@ -860,10 +856,10 @@ export function usePaginatedReq(
               // 現在の全データ + 新しいユニークデータでUI更新
               const tempAllEvents = [...allEvents, ...globalUniqueChunk];
               tempAllEvents.sort(
-                (a, b) => b.event.created_at - a.event.created_at
+                (a, b) => b.event.created_at - a.event.created_at,
               );
               data.set(tempAllEvents);
-            }
+            },
           );
 
           // チャンクが空の場合は終了
@@ -899,7 +895,7 @@ export function usePaginatedReq(
           // 最終確定データで更新
           const sortedAllEvents = [...allEvents];
           sortedAllEvents.sort(
-            (a, b) => b.event.created_at - a.event.created_at
+            (a, b) => b.event.created_at - a.event.created_at,
           );
           data.set(sortedAllEvents);
 
@@ -939,7 +935,7 @@ export function usePaginatedReq(
       status.set(
         allEvents.length > 0
           ? ("success" as ReqStatus)
-          : ("nodata" as ReqStatus)
+          : ("nodata" as ReqStatus),
       );
     } catch (e) {
       error.set(e instanceof Error ? e : new Error(String(e)));
