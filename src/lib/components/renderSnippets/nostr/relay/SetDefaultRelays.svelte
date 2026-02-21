@@ -1,26 +1,30 @@
 <script lang="ts">
-  import { useRelaySet } from "$lib/stores/useRelaySet";
+  import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
   import {
     type DefaultRelayConfig,
+    type EventPacket,
     type RxReq,
     type RxReqEmittable,
     type RxReqOverable,
     type RxReqPipeable,
+    latest,
+    uniq,
   } from "rx-nostr";
-  import { setRelays } from "$lib/func/nostr";
+  import { pipe } from "rxjs";
+  import { setRelays, usePromiseReq } from "$lib/func/nostr";
   import { defaultRelays } from "$lib/stores/relays";
-  import { defaultRelays as defo } from "$lib/stores/stores";
+  import { defaultRelays as defo, queryClient } from "$lib/stores/stores";
   import { app } from "$lib/stores/stores";
-  import { get, type Unsubscriber } from "svelte/store";
   import {
     lumiSetting,
     relayConnectionState,
   } from "$lib/stores/globalRunes.svelte";
   import { untrack, type Snippet } from "svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+
   interface Props {
     localRelays: DefaultRelayConfig[];
     paramRelays: string[] | undefined;
@@ -36,6 +40,7 @@
     loading?: Snippet;
     contents?: Snippet;
   }
+
   let {
     req = undefined,
     localRelays,
@@ -44,108 +49,96 @@
     loading,
     contents,
   }: Props = $props();
+
   let pubkey = lumiSetting.get().pubkey;
   let queryKey = ["defaultRelay", pubkey];
   let filters = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ] as Nostr.Filter[];
 
-  let zyouken = $derived(
-    localRelays.length > 0 ||
-      (paramRelays && paramRelays.length > 0) ||
-      !lumiSetting.get().pubkey
-  );
-
-  let _relays: DefaultRelayConfig[] | string[] = $derived(
-    paramRelays && paramRelays.length > 0
-      ? paramRelays
-      : localRelays.length > 0
-        ? localRelays
-        : []
-  );
-
-  // TL取得用のリレーのみをフィルタリング
+  // TL取得用のリレーのみをフィルタリング（read: true のもの）
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
-
     return Object.fromEntries(
-      Object.entries($defo).filter(([url, config]) => {
-        // read: trueのリレーのみ抽出（TL取得用）
-        return config.read === true;
-      })
+      Object.entries($defo).filter(([_, config]) => config.read === true),
     );
   });
 
-  $effect(() => {
-    let unsubData: Unsubscriber | undefined;
-    let unsubStatus: Unsubscriber | undefined;
-    let unsubError: Unsubscriber | undefined;
-    if (!zyouken) {
-      untrack(() => {
-        const result = useRelaySet(queryKey, filters, req);
-        unsubData = result?.data.subscribe(
-          (value: DefaultRelayConfig[] | null | undefined) => {
-            if (value && value.length > 0) {
-              data = value;
-            }
-          }
-        );
-
-        unsubStatus = result?.status.subscribe(
-          (value: ReqStatus | undefined) => {
-            if (value) {
-              status = value;
-              if (
-                value === "success" &&
-                (!result?.data || (get(result.data) || []).length <= 0)
-              ) {
-                setRelays(defaultRelays);
-                data = defaultRelays;
-              }
-            }
-          }
-        );
-
-        unsubError = result?.error.subscribe((value: Error | null) => {
-          if (value) {
-            errorData = value;
-          }
-          if (!data && _relays.length > 0) {
-            setRelays(_relays);
-          } else if (!data && !lumiSetting.get().pubkey) {
-            setRelays(defaultRelays);
-          }
-        });
-      });
-    } else if (_relays.length > 0) {
-      setRelays(_relays);
-    } else if (!lumiSetting.get().pubkey) {
-      setRelays(defaultRelays);
-    }
-    return () => {
-      unsubData?.();
-      unsubStatus?.();
-      unsubError?.();
-    };
-  });
-
-  let data: DefaultRelayConfig[] | null | undefined | string[] = $state();
   let status: ReqStatus | undefined = $state();
-  let errorData: Error | undefined = $state();
+  // 「メインTL用リレーが設定済みか」のフラグを別途持つ
+  let mainRelaysInitialized = $state(false);
 
-  app.subscribe((value) => {
-    if (
-      value &&
-      (localRelays.length > 0 || (paramRelays && paramRelays.length > 0))
-    ) {
-      console.log(localRelays, paramRelays);
-      setRelays(_relays);
+  $effect(() => {
+    // neventページ等で paramRelays が存在する場合
+    if (paramRelays && paramRelays.length > 0) {
+      if (!mainRelaysInitialized) {
+        // 直接アクセス：paramRelays を一時セット
+        untrack(() =>
+          setRelays(
+            paramRelays!.map((r) => ({ url: r, read: true, write: false })),
+          ),
+        );
+      }
+      // mainRelaysInitialized === true なら何もしない（メインTL用を維持）
+      return;
     }
+
+    // root または paramRelays なし
+    // → メインTL用リレーをセット
+    untrack(async () => {
+      const pubkey = lumiSetting.get().pubkey;
+      if (!pubkey) {
+        setRelays(defaultRelays);
+        mainRelaysInitialized = true;
+        return;
+      }
+      status = "loading";
+      if (lumiSetting.get().useRelaySet === "0") {
+        let cachedData: EventPacket | undefined | null =
+          queryClient.getQueryData(queryKey);
+        if (!cachedData) {
+          $app.rxNostr.setDefaultRelays(defaultRelays);
+
+          try {
+            const result = await usePromiseReq(
+              { filters, operator: pipe(uniq(), latest()), req },
+              defaultRelays,
+              3000,
+              (packet: EventPacket[]) => {
+                if (packet.length > 0) {
+                  const relays = setRelaysByKind10002(packet[0].event);
+                  setRelays(relays);
+                  queryClient.setQueryData(queryKey, packet[0]);
+                  mainRelaysInitialized = true;
+                  status = "success";
+                }
+              },
+            );
+            if (result.length > 0 && !mainRelaysInitialized) {
+              queryClient.setQueryData(queryKey, result[0]);
+              cachedData = result[0];
+            }
+          } catch (e) {
+            status = "error";
+            return;
+          }
+        }
+        if (cachedData) {
+          const relays = setRelaysByKind10002(cachedData.event);
+          setRelays(relays);
+          mainRelaysInitialized = true;
+        }
+      } else {
+        setRelays(lumiSetting.get().relays);
+        mainRelaysInitialized = true;
+      }
+      status = "success";
+    });
   });
 </script>
 
-{#if errorData}
-  {@render error?.(errorData)}
+{#if status === "error"}
+  {@render error?.(new Error("Failed to load relays"))}
 {:else if Object.keys(timelineRelays).length > 0}
   {#await (() => {
     if (relayConnectionState.ready) {
@@ -156,7 +149,7 @@
               const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
               relayConnectionState.setReady(ready);
             });
-          } } );
+          } }, );
   })()}
     {@render loading?.()}
   {:then}

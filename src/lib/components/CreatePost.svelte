@@ -25,9 +25,9 @@
   import PostPreview from "./PostPreview.svelte";
   import EmojiListUpdate from "./SettingsElements/EmojiListUpdate.svelte";
   import GeohashMap from "./GeohashMap.svelte";
-  import { onMount, tick, untrack } from "svelte";
+  import { tick, untrack } from "svelte";
   import MakePollUI from "./MakePollUI.svelte";
-  import { TokenType, type Token } from "@konemono/nostr-content-parser";
+  import { TokenType } from "@konemono/nostr-content-parser";
   import { addEmojiTag, collectEmojiTagsFromText } from "$lib/func/customEmoji";
   import CloseButton from "./Elements/CloseButton.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
