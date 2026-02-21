@@ -24,6 +24,8 @@
   } from "$lib/stores/globalRunes.svelte";
   import { untrack, type Snippet } from "svelte";
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
+  import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
+  import { get } from "svelte/store";
 
   interface Props {
     localRelays: DefaultRelayConfig[];
@@ -64,9 +66,29 @@
     );
   });
 
+  let connectionPromise: Promise<void> = $state(Promise.resolve());
   let status: ReqStatus | undefined = $state();
-  // 「メインTL用リレーが設定済みか」のフラグを別途持つ
   let mainRelaysInitialized = $state(false);
+
+  function applyRelays(relays: AcceptableDefaultRelaysConfig) {
+    setRelays(relays);
+    relayConnectionState.setReady(false); // リセット
+    const currentReadRelays = Object.fromEntries(
+      Object.entries(get(defo) ?? {}).filter(
+        ([_, config]) => config.read === true,
+      ),
+    );
+    connectionPromise = waitForConnections({
+      checkrelays: currentReadRelays,
+      requiredConnectionRatio: 0.7,
+      onProgress: (connected, total) => {
+        setTimeout(() => {
+          const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
+          relayConnectionState.setReady(ready);
+        });
+      },
+    });
+  }
 
   $effect(() => {
     // neventページ等で paramRelays が存在する場合
@@ -74,7 +96,7 @@
       if (!mainRelaysInitialized) {
         // 直接アクセス：paramRelays を一時セット
         untrack(() =>
-          setRelays(
+          applyRelays(
             paramRelays!.map((r) => ({ url: r, read: true, write: false })),
           ),
         );
@@ -88,7 +110,7 @@
     untrack(async () => {
       const pubkey = lumiSetting.get().pubkey;
       if (!pubkey) {
-        setRelays(defaultRelays);
+        applyRelays(defaultRelays);
         mainRelaysInitialized = true;
         return;
       }
@@ -107,7 +129,7 @@
               (packet: EventPacket[]) => {
                 if (packet.length > 0) {
                   const relays = setRelaysByKind10002(packet[0].event);
-                  setRelays(relays);
+                  applyRelays(relays);
                   queryClient.setQueryData(queryKey, packet[0]);
                   mainRelaysInitialized = true;
                   status = "success";
@@ -125,11 +147,11 @@
         }
         if (cachedData) {
           const relays = setRelaysByKind10002(cachedData.event);
-          setRelays(relays);
+          applyRelays(relays);
           mainRelaysInitialized = true;
         }
       } else {
-        setRelays(lumiSetting.get().relays);
+        applyRelays(lumiSetting.get().relays);
         mainRelaysInitialized = true;
       }
       status = "success";
@@ -140,17 +162,7 @@
 {#if status === "error"}
   {@render error?.(new Error("Failed to load relays"))}
 {:else if Object.keys(timelineRelays).length > 0}
-  {#await (() => {
-    if (relayConnectionState.ready) {
-      return Promise.resolve();
-    }
-    return waitForConnections( { checkrelays: timelineRelays, requiredConnectionRatio: 0.7, onProgress: (connected, total) => {
-            setTimeout(() => {
-              const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
-              relayConnectionState.setReady(ready);
-            });
-          } }, );
-  })()}
+  {#await connectionPromise}
     {@render loading?.()}
   {:then}
     {@render contents?.()}
