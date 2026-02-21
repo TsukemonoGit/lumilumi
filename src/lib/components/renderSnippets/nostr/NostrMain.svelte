@@ -39,10 +39,9 @@
     loading,
   }: {
     loading?: Snippet;
-    contents: Snippet<[{ localRelays: DefaultRelayConfig[] }]>;
+    contents: Snippet;
   } = $props();
 
-  let localRelays: DefaultRelayConfig[] = $state.raw([]);
   let nowLoading = $state(true);
 
   onMount(() => {
@@ -88,7 +87,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.TIMELINE_FILTER,
-          JSON.stringify(defaultFilter)
+          JSON.stringify(defaultFilter),
         );
       } catch (e) {
         console.log(e);
@@ -181,7 +180,7 @@
     if (typeof o.defaultReaction.content !== "string") {
       console.log(
         "defaultReaction.content is invalid:",
-        o.defaultReaction.content
+        o.defaultReaction.content,
       );
       return false;
     }
@@ -192,7 +191,7 @@
     if (!o.defaultReaction.tag.every((t: unknown) => typeof t === "string")) {
       console.log(
         "defaultReaction.tag contains non-string:",
-        o.defaultReaction.tag
+        o.defaultReaction.tag,
       );
       return false;
     }
@@ -219,15 +218,6 @@
     if (!lumiSetting.get().imageAutoExpand) {
       lumiSetting.update((v) => ({ ...v, imageAutoExpand: "all" }));
     }
-    if (
-      lumiSetting.get().useRelaySet === "1" &&
-      lumiSetting.get().relays.length > 0
-    ) {
-      localRelays = lumiSetting.get().relays;
-      setRelays(localRelays as DefaultRelayConfig[]);
-    } else {
-      localRelays = [];
-    }
   }
 
   function loadMutetokanoSettei() {
@@ -245,7 +235,7 @@
         $mutebykinds = { ...$mutebykinds, list: list ?? [] };
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log(error);
@@ -273,5 +263,5 @@
 {#if nowLoading}
   {@render loading?.()}
 {:else}
-  {@render contents({ localRelays })}
+  {@render contents()}
 {/if}

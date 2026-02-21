@@ -26,9 +26,9 @@
   import { waitForConnections } from "$lib/components/renderSnippets/nostr/timelineList";
   import type { AcceptableDefaultRelaysConfig } from "rx-nostr";
   import { get } from "svelte/store";
+  import { normalizeURL } from "nostr-tools/utils";
 
   interface Props {
-    localRelays: DefaultRelayConfig[];
     paramRelays: string[] | undefined;
     req?:
       | (RxReq<"backward"> &
@@ -45,7 +45,6 @@
 
   let {
     req = undefined,
-    localRelays,
     paramRelays = undefined,
     error,
     loading,
@@ -62,7 +61,9 @@
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
     return Object.fromEntries(
-      Object.entries($defo).filter(([_, config]) => config.read === true),
+      Object.entries($defo).filter(([_, config]) => {
+        return config.read === true; // ← return が欠落していた
+      }),
     );
   });
 
@@ -91,22 +92,122 @@
   }
 
   $effect(() => {
-    // neventページ等で paramRelays が存在する場合
     if (paramRelays && paramRelays.length > 0) {
       if (!mainRelaysInitialized) {
-        // 直接アクセス：paramRelays を一時セット
-        untrack(() =>
-          applyRelays(
-            paramRelays!.map((r) => ({ url: r, read: true, write: false })),
-          ),
-        );
+        untrack(async () => {
+          const readEntries = paramRelays!.map((r) => ({
+            url: normalizeURL(r),
+            read: true,
+            write: true,
+          }));
+
+          const pubkey = lumiSetting.get().pubkey;
+
+          // 未ログイン：paramRelays をそのまま read/write でセット
+          if (!pubkey) {
+            applyRelays(readEntries);
+            mainRelaysInitialized = true;
+            return;
+          }
+
+          // ログイン済み：writeリレーをユーザー設定から取得してマージ
+          let writeRelayConfig: {
+            url: string;
+            read: boolean;
+            write: boolean;
+          }[] = [];
+
+          if (lumiSetting.get().useRelaySet === "0") {
+            // kind:10002 からwriteリレーを取得
+            let cachedData: EventPacket | undefined | null =
+              queryClient.getQueryData(queryKey);
+
+            if (!cachedData) {
+              $app.rxNostr.setDefaultRelays(defaultRelays);
+              try {
+                const result = await usePromiseReq(
+                  { filters, operator: pipe(uniq(), latest()), req },
+                  defaultRelays,
+                  3000,
+                  (packet: EventPacket[]) => {
+                    if (packet.length > 0) {
+                      queryClient.setQueryData(queryKey, packet[0]);
+                    }
+                  },
+                );
+                if (result.length > 0) {
+                  queryClient.setQueryData(queryKey, result[0]);
+                  cachedData = result[0];
+                }
+              } catch (e) {
+                // フェッチ失敗時はwriteなしで続行
+                console.warn(
+                  "kind:10002 fetch failed, proceeding without write relays",
+                  e,
+                );
+              }
+            }
+
+            if (cachedData) {
+              const relays = setRelaysByKind10002(cachedData.event);
+              writeRelayConfig = (
+                relays as { url: string; read: boolean; write: boolean }[]
+              )
+                .filter((r) => r.write === true)
+                .map((r) => ({
+                  url: normalizeURL(r.url),
+                  read: false,
+                  write: true,
+                }));
+            }
+          } else {
+            // useRelaySet === "1"：lumiSetting のリレーセットからwriteのみ抽出
+            writeRelayConfig = Object.entries(lumiSetting.get().relays)
+              .filter(([_, config]) => config.write === true)
+              .map(([url]) => ({
+                url: normalizeURL(url),
+                read: false,
+                write: true,
+              }));
+            console.log(writeRelayConfig);
+          }
+
+          // read（paramRelays）＋ write（ユーザー設定）をマージ
+          // 同一URLが両方に存在する場合は read: true, write: true にまとめる
+          const merged = new Map<
+            string,
+            { url: string; read: boolean; write: boolean }
+          >();
+
+          for (const entry of readEntries) {
+            merged.set(entry.url, { ...entry });
+          }
+
+          for (const entry of writeRelayConfig) {
+            const nurl = normalizeURL(entry.url);
+            if (merged.has(nurl)) {
+              merged.get(nurl)!.write = true;
+            } else {
+              // read: false のまま追加（writeのみのリレー）
+              merged.set(nurl, {
+                url: nurl,
+                read: false,
+                write: true,
+              });
+            }
+          }
+
+          const mergedArray = [...merged.values()];
+          console.log("merged before applyRelays:", mergedArray);
+          applyRelays(mergedArray);
+
+          mainRelaysInitialized = true;
+        });
       }
-      // mainRelaysInitialized === true なら何もしない（メインTL用を維持）
       return;
     }
 
-    // root または paramRelays なし
-    // → メインTL用リレーをセット
+    // paramRelays なし → メインTL用リレーをセット
     untrack(async () => {
       const pubkey = lumiSetting.get().pubkey;
       if (!pubkey) {
@@ -114,13 +215,15 @@
         mainRelaysInitialized = true;
         return;
       }
+
       status = "loading";
+
       if (lumiSetting.get().useRelaySet === "0") {
         let cachedData: EventPacket | undefined | null =
           queryClient.getQueryData(queryKey);
+
         if (!cachedData) {
           $app.rxNostr.setDefaultRelays(defaultRelays);
-
           try {
             const result = await usePromiseReq(
               { filters, operator: pipe(uniq(), latest()), req },
@@ -145,6 +248,7 @@
             return;
           }
         }
+
         if (cachedData) {
           const relays = setRelaysByKind10002(cachedData.event);
           applyRelays(relays);
@@ -154,6 +258,7 @@
         applyRelays(lumiSetting.get().relays);
         mainRelaysInitialized = true;
       }
+
       status = "success";
     });
   });
