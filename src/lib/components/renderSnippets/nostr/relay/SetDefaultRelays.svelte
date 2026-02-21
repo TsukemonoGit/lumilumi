@@ -1,3 +1,4 @@
+<!--SetDefaultRelays.svelte-->
 <script lang="ts">
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import type { ReqStatus } from "$lib/types";
@@ -271,14 +272,9 @@
 
 {#if status === "error"}
   {@render error?.(new Error("Failed to load relays"))}
-{:else if Object.keys(timelineRelays).length > 0}
-  {#await connectionPromise}
-    {@render loading?.()}
-  {:then}
-    {@render contents?.()}
-  {:catch e}
-    {@render error?.(e)}
-  {/await}
+  <!--レンダリングとしては、初回完了後contactsにしっぱなし。-->
+{:else if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
+  {@render contents?.()}
 {:else if status === "loading"}
   {@render loading?.()}
 {/if}
