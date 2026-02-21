@@ -375,8 +375,8 @@
 
 <QueryClientProvider client={queryClient}>
   <NostrMain>
-    {#snippet contents({ localRelays })}
-      <SetDefaultRelays paramRelays={dataRelays} {localRelays}>
+    {#snippet contents()}
+      <SetDefaultRelays paramRelays={dataRelays}>
         {#snippet loading()}
           {#await delay(1000) then}
             Connecting to relays
