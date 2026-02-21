@@ -130,9 +130,9 @@
     data?.relays && data?.relays.length > 0
       ? [...data.relays, ...defaultRelays].slice(
           0,
-          Math.max(data.relays.length, 3)
+          Math.max(data.relays.length, 3),
         )
-      : undefined
+      : undefined,
   );
 
   // ユーザーのリレー情報を取得して設定
@@ -156,7 +156,7 @@
           operator: pipe(latest()),
         },
         undefined,
-        undefined
+        undefined,
       );
 
       if (relays) {
@@ -231,7 +231,7 @@
                 try {
                   localStorage.setItem(
                     STORAGE_KEYS.LUMI_SETTINGS,
-                    JSON.stringify(lumiSetting.get())
+                    JSON.stringify(lumiSetting.get()),
                   );
                 } catch (error) {
                   // エラーメッセージもi18n化
@@ -253,7 +253,7 @@
         try {
           localStorage.setItem(
             STORAGE_KEYS.LUMI_SETTINGS,
-            JSON.stringify(lumiSetting.get())
+            JSON.stringify(lumiSetting.get()),
           );
         } catch (error) {
           console.log("Failed to save");
