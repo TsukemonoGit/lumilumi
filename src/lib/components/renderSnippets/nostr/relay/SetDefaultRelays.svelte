@@ -162,14 +162,19 @@
             }
           } else {
             // useRelaySet === "1"：lumiSetting のリレーセットからwriteのみ抽出
-            writeRelayConfig = Object.entries(lumiSetting.get().relays)
-              .filter(([_, config]) => config.write === true)
-              .map(([url]) => ({
-                url: normalizeURL(url),
+            writeRelayConfig = (
+              lumiSetting.get().relays as {
+                url: string;
+                read: boolean;
+                write: boolean;
+              }[]
+            )
+              .filter((r) => r.write === true)
+              .map((r) => ({
+                url: normalizeURL(r.url),
                 read: false,
                 write: true,
               }));
-            console.log(writeRelayConfig);
           }
 
           // read（paramRelays）＋ write（ユーザー設定）をマージ
