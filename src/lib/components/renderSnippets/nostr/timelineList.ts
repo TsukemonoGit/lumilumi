@@ -151,29 +151,25 @@ const getRelayUrls = () => {
  * @param options.onProgress - Callback invoked periodically with (connectedCount, totalRelays)
  */
 export async function waitForConnections(options?: {
-  checkrelays?: Record<string, DefaultRelayConfig>; // 追加
+  checkrelays?: Record<string, DefaultRelayConfig>;
   maxWaitTime?: number;
   requiredConnectionRatio?: number;
   onProgress?: (connected: number, total: number) => void;
 }): Promise<void> {
   const {
-    checkrelays, // 追加
+    checkrelays,
     maxWaitTime = 5000,
     requiredConnectionRatio = 0.8,
     onProgress,
   } = options ?? {};
-
-  await new Promise((resolve) => setTimeout(resolve, 500));
 
   const stateMap = relayStateMap as Map<string, string>;
   const startTime = Date.now();
   const RELAY_CHECK_INTERVAL = 300;
 
   const getFinalStateRelayCount = (): number => {
-    // checkrelays が指定されていればそれを使用、なければ既存の getRelayUrls()
     const readUrls = checkrelays ? Object.keys(checkrelays) : getRelayUrls();
     const normalizedReadUrls = readUrls.map((url) => normalizeURL(url));
-
     return normalizedReadUrls.filter((url) => {
       const state = stateMap.get(normalizeURL(url));
       return state !== "initialize" && state !== "connecting";
@@ -203,6 +199,7 @@ export async function waitForConnections(options?: {
       break;
     }
 
+    // 初回ループで条件未達の場合のみ待機
     await new Promise((resolve) => setTimeout(resolve, RELAY_CHECK_INTERVAL));
   }
 }
