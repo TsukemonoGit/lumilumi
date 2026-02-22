@@ -611,25 +611,18 @@
     <!--リアクション-->
     <div class="flex max-w-[40%] items-end">
       <Reactioned id={atag ?? note.id}>
-        {#snippet loading()}
-          <button
-            class="actionButton"
-            aria-label="reaction"
-            onclick={handleClickReaction}
-          >
-            <Heart size="20" class=" mt-auto overflow-hidden" />
-          </button>
-        {/snippet}
-
         {#snippet content({ event })}
           {#if event === undefined}
-            <button
+            <!-- svelte-ignore a11y_interactive_supports_focus -->
+            <div
+              role="button"
               class="actionButton"
               aria-label="reaction"
               onclick={handleClickReaction}
+              onkeydown={(e) => e.key === "Enter" && handleClickReaction()}
             >
               <Heart size="20" class=" mt-auto overflow-hidden" />
-            </button>{:else}<div class="overflow-hidden my-auto">
+            </div>{:else}<div class="overflow-hidden my-auto">
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
