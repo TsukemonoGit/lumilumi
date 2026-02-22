@@ -114,8 +114,6 @@
     }
   }
 
-  const configureOperators = pipe(tie, uniq(), scanArray());
-
   let olderQueryKey = $derived([...queryKey, "olderData"]);
 
   onDestroy(() => {
@@ -125,19 +123,24 @@
     clearTimelineTimeout();
   });
 
-  $effect(() => {
-    createQuery({
-      queryKey: olderQueryKey,
-      queryFn: undefined,
-      staleTime: Infinity,
-      gcTime: Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    });
+  //svelte-ignore state_referenced_locally
+  createQuery({
+    queryKey: olderQueryKey,
+    queryFn: undefined,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   let result = $derived(
-    useTimelineEventList(queryKey, filters, configureOperators, req, relays),
+    useTimelineEventList(
+      queryKey,
+      filters,
+      pipe(tie, uniq(), scanArray()),
+      req,
+      relays,
+    ),
   );
   $effect(() => {
     const currentResult = result;
@@ -268,7 +271,7 @@
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         newFilters,
-        configureOperators,
+        pipe(tie, uniq(), scanArray()),
         relays,
         handleIncrementalData,
       );
@@ -344,7 +347,7 @@
         fetchAmount,
         filtersWithoutSince,
         untilTime,
-        configureOperators,
+        pipe(tie, uniq(), scanArray()),
         relays,
         (partialData) => {
           if (destroyed || partialData.length === 0) return;
