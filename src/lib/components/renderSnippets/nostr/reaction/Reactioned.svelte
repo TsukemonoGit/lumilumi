@@ -1,19 +1,18 @@
+<!--Reactioned.svelte-->
 <script lang="ts">
   import type Nostr from "nostr-typedef";
 
   import { queryClient } from "$lib/stores/stores";
   import { QueryObserver } from "@tanstack/svelte-query";
 
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, type Snippet } from "svelte";
   import type { EventPacket } from "rx-nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
 
   interface Props {
     id: string;
-
-    loading?: import("svelte").Snippet;
-
-    content?: import("svelte").Snippet<
+    loading?: Snippet;
+    content?: Snippet<
       [
         {
           event: Nostr.Event;

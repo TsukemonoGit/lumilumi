@@ -98,16 +98,12 @@
 
   // トークンからパーツを生成
   let parts = $derived(transformTokens(tokens));
-
-  const openModal = (index: number) => {
-    // modalIndex = index;
-  };
 </script>
 
 <article class="contentBlock overflow-hidden">
   {#if md && parts.length > 0 && note}
     {#if maxHeight !== 0}
-      <Truncate {maxHeight} {depth}>
+      <Truncate {maxHeight} {depth} {zIndex} useDialog={false}>
         {#snippet truncate()}
           <a
             href={`/${noteLink(note)}`}

@@ -3,8 +3,6 @@
 
   import Truncate from "./Truncate.svelte";
   import ContentParts from "./ContentParts.svelte";
-  import Dialog from "$lib/components/Elements/Dialog.svelte";
-  import { writable, type Writable } from "svelte/store";
   import * as Nostr from "nostr-typedef";
   interface Props {
     event: Partial<Nostr.Event>;
@@ -31,15 +29,6 @@
     displayTags,
   }: Props = $props();
   let text = $derived(event.content || "");
-
-  // svelte-ignore non_reactive_update
-  let showMore: Writable<boolean> = writable(false);
-
-  const onClickShowMore = () => {
-    console.log("showMore");
-
-    $showMore = true;
-  };
 </script>
 
 {#snippet contentDisplay()}
@@ -56,29 +45,27 @@
 {/snippet}
 
 {#if maxHeight !== 0}
-  <Truncate {maxHeight} {onClickShowMore} {depth}>
+  <Truncate
+    useDialog={true}
+    {maxHeight}
+    {depth}
+    {zIndex}
+    dialogId={`showMore_${text.slice(5)}_${depth}`}
+  >
     {@render contentDisplay()}
+    {#snippet dialogContent()}
+      <ContentParts
+        {maxHeight}
+        {event}
+        {isShowClientTag}
+        {displayMenu}
+        {depth}
+        {repostable}
+        zIndex={zIndex + 10}
+        {displayTags}
+      />
+    {/snippet}
   </Truncate>
 {:else}
   {@render contentDisplay()}
 {/if}
-<!--Show more no Dialog-->
-
-<Dialog
-  id={`showMore_${text.slice(5)}_${depth}`}
-  bind:open={showMore}
-  zIndex={zIndex + 10}
->
-  {#snippet main()}
-    <ContentParts
-      {maxHeight}
-      {event}
-      {isShowClientTag}
-      {displayMenu}
-      {depth}
-      {repostable}
-      zIndex={zIndex + 10}
-      {displayTags}
-    />
-  {/snippet}</Dialog
->

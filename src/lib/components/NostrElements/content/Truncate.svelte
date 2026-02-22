@@ -2,31 +2,39 @@
   import { useTruncate } from "$lib/func/useTruncate";
   import type { Snippet } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
+  import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import { writable } from "svelte/store";
 
-  interface Props {
+  type Props = {
     maxHeight?: number;
-    children: any;
+    children: Snippet;
     depth: number;
-    onClickShowMore?: () => void;
     truncate?: Snippet;
-  }
-  let {
-    maxHeight = 460,
-    children,
-    onClickShowMore,
-    depth = 0,
-    truncate,
-  }: Props = $props();
-  let threshold = $derived(maxHeight * 0.35);
+    zIndex: number;
+  } & (
+    | { useDialog: true; dialogId: string; dialogContent: Snippet }
+    | { useDialog?: false; dialogId?: never; dialogContent?: never }
+  );
+
+  let props: Props = $props();
+
+  let threshold = $derived((props.maxHeight ?? 460) * 0.35);
+
   let isTruncated = $state(false);
 
+  // svelte-ignore non_reactive_update
+  let open = writable(false);
   function toggleShowMore() {
-    onClickShowMore?.();
+    $open = true;
   }
 
+  let maxHeight = $derived(props.maxHeight ?? 460);
   let minHeight = $derived(maxHeight * 0.2);
   let contentHeight = $derived(
-    Math.max(Math.floor(maxHeight * Math.pow(0.8, depth * 1.8)), minHeight)
+    Math.max(
+      Math.floor(maxHeight * Math.pow(0.8, props.depth * 1.8)),
+      minHeight,
+    ),
   );
 </script>
 
@@ -42,14 +50,14 @@
       ? `max-height: ${contentHeight + threshold}px; overflow-y: hidden;`
       : `max-height: ${contentHeight}px; overflow: hidden;`}
   >
-    {@render children?.()}
+    {@render props.children?.()}
     {#if isTruncated}
-      <div class=" truncate-overlay"></div>
+      <div class="truncate-overlay"></div>
     {/if}
   </div>
   {#if isTruncated}
-    {#if truncate}
-      {@render truncate?.()}
+    {#if props.truncate}
+      {@render props.truncate()}
     {:else}
       <button
         onclick={toggleShowMore}
@@ -57,6 +65,13 @@
       >
         {$_("truncate.expand")}
       </button>
+    {/if}
+    {#if props.useDialog}
+      <Dialog id={props.dialogId} bind:open zIndex={props.zIndex + 10}>
+        {#snippet main()}
+          {@render props.dialogContent()}
+        {/snippet}
+      </Dialog>
     {/if}
   {/if}
 {/if}
