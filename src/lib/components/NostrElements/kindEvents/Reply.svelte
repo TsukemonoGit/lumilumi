@@ -54,19 +54,25 @@
 {#if replyTag}
   <div bind:this={containerElement}>
     {#if !loadNote}
-      <button
+      <!-- svelte-ignore a11y_interactive_supports_focus -->
+      <div
+        role="button"
         class="flex items-center w-fit px-1 py-0.5 max-w-full font-bold rounded-md text-sm bg-magnum-700 text-magnum-100 hover:opacity-75 active:opacity-50 overflow-hidden h-fit"
         onclick={() => (loadNote = true)}
-        ><Reply size="20" />{$_("timeline.viewParentPost")}</button
+        onkeydown={(e) => e.key === "Enter" && (loadNote = true)}
       >
+        <Reply size="20" />{$_("timeline.viewParentPost")}
+      </div>
     {:else}
-      <button
+      <!-- svelte-ignore a11y_interactive_supports_focus -->
+      <div
+        role="button"
         class="flex items-center w-fit px-1 py-0.5 rounded-md bg-magnum-200 text-sm font-bold text-magnum-600 hover:opacity-75 active:opacity-50 overflow-hidden max-w-full h-fit"
         onclick={() => (loadNote = false)}
-        ><Minimize2 size="20" class="mr-1" />{$_(
-          "timeline.hideParentPost",
-        )}</button
+        onkeydown={(e) => e.key === "Enter" && (loadNote = true)}
       >
+        <Minimize2 size="20" class="mr-1" />{$_("timeline.hideParentPost")}
+      </div>
 
       {#if replyTag[0] === "e" || replyTag[0] === "E"}
         {@const relayhint =

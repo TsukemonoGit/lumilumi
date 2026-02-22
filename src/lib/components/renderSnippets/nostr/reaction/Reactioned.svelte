@@ -11,17 +11,16 @@
 
   interface Props {
     id: string;
-    loading?: Snippet;
     content?: Snippet<
       [
         {
-          event: Nostr.Event;
+          event: Nostr.Event | undefined;
         },
       ]
     >;
   }
 
-  let { id, loading, content }: Props = $props();
+  let { id, content }: Props = $props();
 
   let data: Nostr.Event | undefined = $state();
 
@@ -69,5 +68,5 @@
 {#if data}
   {@render content?.({ event: data })}
 {:else}
-  {@render loading?.()}
+  {@render content?.({ event: undefined })}
 {/if}
