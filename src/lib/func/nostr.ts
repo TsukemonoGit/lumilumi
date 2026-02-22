@@ -943,5 +943,5 @@ export function usePaginatedReq(
     }
   })();
 
-  return { data, status, error };
+  return { data, status, error, destroy: () => {} };
 }

@@ -1,4 +1,4 @@
-<!--
+<!--TimelineList.svelte
   メインTL以外のタイムラインコンポーネント
   （グローバルTL、リストTL、ユーザーページのTLなど）
 -->
@@ -136,14 +136,13 @@
     });
   });
 
-  //svelte-ignore state_referenced_locally
-  let result = useTimelineEventList(
-    queryKey,
-    filters,
-    configureOperators,
-    req,
-    relays
+  let result = $derived(
+    useTimelineEventList(queryKey, filters, configureOperators, req, relays),
   );
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   let globalData = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
@@ -180,7 +179,7 @@
   function mergeEventsToMap(
     current: EventPacket[] | null | undefined,
     older: EventPacket[] | undefined,
-    partial: EventPacket[] | undefined
+    partial: EventPacket[] | undefined,
   ): void {
     allUniqueEventsMap.clear();
     if (destroyed) return;
@@ -208,7 +207,7 @@
 
       // Mapから配列を生成してソート
       const sortedEvents = Array.from(allUniqueEventsMap.values()).sort(
-        (a, b) => b.created_at - a.created_at
+        (a, b) => b.created_at - a.created_at,
       );
 
       const startIndex = Math.max(0, viewIndex);
@@ -271,7 +270,7 @@
         newFilters,
         configureOperators,
         relays,
-        handleIncrementalData
+        handleIncrementalData,
       );
       if (destroyed) return;
       if (olderEvents.length > 0) {
@@ -361,7 +360,7 @@
           }
 
           updateViewEvent(partialData);
-        }
+        },
       );
       if (destroyed) return;
       if (olderEvents.length > 0) {
@@ -404,11 +403,11 @@
 
         const existingIds = new Set(oldData.map((pk) => pk.event.id));
         const uniqueEvents = events.filter(
-          (pk) => !existingIds.has(pk.event.id)
+          (pk) => !existingIds.has(pk.event.id),
         );
 
         return sortEventPackets([...oldData, ...uniqueEvents]);
-      }
+      },
     );
   }
 

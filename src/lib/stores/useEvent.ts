@@ -1,3 +1,4 @@
+//useEvent.ts
 import type { QueryKey } from "@tanstack/svelte-query";
 import {
   type EventPacket,
@@ -23,12 +24,12 @@ export function useEvent(
         RxReqOverable &
         RxReqPipeable)
     | undefined,
-  relays?: string[] | undefined
+  relays?: string[] | undefined,
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
   const operator = pipe(tie);
   return useReq(
     { queryKey, filters, operator, req },
-    relays
+    relays,
   ) as ReqResult<EventPacket>;
 }

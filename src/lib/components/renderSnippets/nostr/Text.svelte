@@ -1,3 +1,4 @@
+<!--Text.svelte-->
 <script lang="ts">
   import { useEvent } from "$lib/stores/useEvent";
   import type { ReqStatus } from "$lib/types";
@@ -45,6 +46,12 @@
   let queryKey = $derived(["note", id]);
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
   let result = $derived(useEvent(queryKey, id, req, max3relays));
+
+  $effect(() => {
+    const currentResult = result; // effectの依存としてresultを追跡
+    return () => currentResult.destroy();
+  });
+
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

@@ -32,7 +32,7 @@ export function useRelaySet(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | undefined
+    | undefined,
 ): ReqResult<DefaultRelayConfig[]> | undefined {
   // console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
@@ -52,13 +52,14 @@ export function useRelaySet(
     data: transformedData,
     status: reqResult.status,
     error: reqResult.error,
+    destroy: () => {},
   };
 }
 let kind10002: Nostr.Event;
 let kind3: Nostr.Event;
 let relay: DefaultRelayConfig[] = [];
 export function toRelaySet(
-  value: EventPacket | EventPacket[] | undefined | null
+  value: EventPacket | EventPacket[] | undefined | null,
 ): DefaultRelayConfig[] {
   // console.log(value);
   if (!value) {

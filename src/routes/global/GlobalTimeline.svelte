@@ -1,3 +1,4 @@
+<!--GlobalTimeline.svelte-->
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
@@ -38,7 +39,7 @@
       "[GlobalTimeline] since initialized:",
       since,
       "current time:",
-      Math.floor(Date.now() / 1000)
+      Math.floor(Date.now() / 1000),
     );
   };
 
@@ -88,7 +89,7 @@
 
     if (isInitializing) {
       console.log(
-        "[GlobalTimeline] navigation during initialization, skipping"
+        "[GlobalTimeline] navigation during initialization, skipping",
       );
       return;
     }

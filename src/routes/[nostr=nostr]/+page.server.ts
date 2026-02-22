@@ -1,6 +1,7 @@
 import { redirect } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
-export const load = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
   const { nostr } = params;
   let decodedNostr: string;
 

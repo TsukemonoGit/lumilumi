@@ -44,8 +44,12 @@
   }: Props = $props();
 
   let result = $derived(
-    useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req)
+    useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req),
   );
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

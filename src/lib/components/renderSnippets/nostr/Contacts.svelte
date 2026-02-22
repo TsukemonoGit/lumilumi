@@ -27,7 +27,7 @@
     onchange?: (contacts: Nostr.Event) => void;
     onstatechange?: (
       status: ReqStatus,
-      contacts: Nostr.Event | undefined
+      contacts: Nostr.Event | undefined,
     ) => void;
   }
 
@@ -50,9 +50,14 @@
   });
 
   let result = $derived(
-    $app?.rxNostr ? useContacts($app.rxNostr, queryKey, pubkey, req) : undefined
+    $app?.rxNostr
+      ? useContacts($app.rxNostr, queryKey, pubkey, req)
+      : undefined,
   );
-
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult?.destroy();
+  });
   let data = $derived(result?.data);
   let status = $derived(result?.status);
   let contactsEvent = $derived(data && $data?.event);

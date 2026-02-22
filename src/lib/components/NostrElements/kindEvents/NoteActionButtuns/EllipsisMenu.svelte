@@ -64,7 +64,6 @@
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { useLatestEvent } from "$lib/stores/useLatestEvent";
 
   interface MenuItem {
     text: string;
@@ -102,7 +101,7 @@
   let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -378,7 +377,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? "")
+            replaceable ? (naddr ?? "") : (nevent ?? ""),
           );
           addToast({
             data: {
@@ -542,7 +541,7 @@
                   queryClient.setQueryData(key, () => data[0]);
                 }
               }
-            }
+            },
           );
         } catch (error) {
           console.error(error);
@@ -573,7 +572,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000
+              2000,
             );
 
             if (bookmarkEvent.length > 0) {
