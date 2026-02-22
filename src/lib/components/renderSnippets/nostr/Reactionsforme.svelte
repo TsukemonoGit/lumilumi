@@ -34,6 +34,10 @@
     $props();
 
   let result = $derived(useUniqueEventList(queryKey, filters, req));
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

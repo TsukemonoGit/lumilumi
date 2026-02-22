@@ -1,6 +1,6 @@
 // +page.server.ts
 
-import { fail } from "@sveltejs/kit";
+import { fail, type RequestEvent } from "@sveltejs/kit";
 
 let data: { title: any; text: any; url?: any; media?: any } = {
   title: "",
@@ -8,7 +8,7 @@ let data: { title: any; text: any; url?: any; media?: any } = {
 };
 
 export const actions = {
-  default: async ({ request }) => {
+  default: async ({ request }: RequestEvent) => {
     try {
       const formData = await request.formData();
 

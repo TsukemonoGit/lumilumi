@@ -52,6 +52,10 @@
     }), */
 
   let result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

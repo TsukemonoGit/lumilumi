@@ -28,24 +28,23 @@
     {@render channelMetadata?.(null)}
   {/snippet}
   {#snippet content({ data: kind40Event })}
-    <LatestEvent
-      queryKey={["channel", "kind41", id]}
-      filters={[
-        { kinds: [41], authors: [kind40Event.pubkey], limit: 1, "#e": [id] },
-      ]}
-    >
-      {#snippet success({ event: kind41Event })}
-        {@render channelMetadata?.(kind41Event)}
-      {/snippet}
-      {#snippet loading()}
-        {@render channelMetadata?.(kind40Event)}
-      {/snippet}
-      {#snippet nodata()}
-        {@render channelMetadata?.(kind40Event)}
-      {/snippet}
-      {#snippet error()}
-        {@render channelMetadata?.(kind40Event)}
-      {/snippet}
-    </LatestEvent>
+    {#if kind40Event?.pubkey}
+      <LatestEvent
+        queryKey={["channel", "kind41", id]}
+        filters={[{ kinds: [41], limit: 1, "#e": [id] }]}
+      >
+        {#snippet success({ event: kind41Event })}
+          {@render channelMetadata?.(kind41Event)}
+        {/snippet}
+        {#snippet loading()}
+          {@render channelMetadata?.(kind40Event)}
+        {/snippet}
+        {#snippet nodata()}
+          {@render channelMetadata?.(kind40Event)}
+        {/snippet}
+        {#snippet error()}
+          {@render channelMetadata?.(kind40Event)}
+        {/snippet}
+      </LatestEvent>{/if}
   {/snippet}
 </Text>

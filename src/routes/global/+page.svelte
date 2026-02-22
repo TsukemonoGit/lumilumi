@@ -1,3 +1,4 @@
+<!--/global/+page.svelte-->
 <script lang="ts">
   import { onMount, untrack } from "svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -11,7 +12,7 @@
   import { usePromiseReq } from "$lib/func/nostr";
   import { generateResultMessage } from "$lib/func/util";
   import { toGlobalRelaySet } from "$lib/stores/useGlobalRelaySet";
-  import { unsucscribeGlobal } from "$lib/func/useReq";
+  import { unsubscribeGlobal } from "$lib/func/useReq";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
   import Settei from "./Settei.svelte";
   import GlobalDescription from "./GlobalDescription.svelte";
@@ -100,7 +101,7 @@
       if (relaylist.length > 0) {
         queryClient.setQueryData(
           ["globalRelay", lumiSetting.get().pubkey],
-          relaylist
+          relaylist,
         );
         globalRelays = relaylist;
       }
@@ -158,7 +159,7 @@
         operator: pipe(latest()),
       },
       undefined,
-      5000
+      5000,
     );
 
     $nowProgress = false;
@@ -169,7 +170,7 @@
         console.log("[GlobalPage] fetched relay config:", relayList);
         queryClient.setQueryData(
           ["globalRelay", lumiSetting.get().pubkey],
-          relayList
+          relayList,
         );
         globalRelays = relayList;
       }
@@ -213,7 +214,7 @@
     if (relaysFromParams.length > 0) {
       console.log(
         "[GlobalPage] using relays from URL params:",
-        relaysFromParams
+        relaysFromParams,
       );
       globalRelays = relaysFromParams;
     } else {
@@ -251,7 +252,7 @@
               Array.isArray(tag) &&
               tag[0] === "p" &&
               tag.length > 1 &&
-              tag[1] !== (note?.pubkey || "")
+              tag[1] !== (note?.pubkey || ""),
           );
           if (hasPTags) return false;
         }
@@ -295,7 +296,7 @@
     openGlobalTimeline = false;
 
     // グローバルタイムラインの購読を解除
-    unsucscribeGlobal();
+    unsubscribeGlobal();
   });
 
   // リレー設定が変更されたときにタイムラインを再初期化

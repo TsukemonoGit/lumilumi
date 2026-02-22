@@ -1,3 +1,4 @@
+<!--MainTimeline.svelte-->
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from "svelte";
   import { pipe } from "rxjs";
@@ -134,8 +135,12 @@
 
   // Query setup
   let result = $derived(
-    useMainTimeline(queryKey, configureOperators(), filters)
+    useMainTimeline(queryKey, configureOperators(), filters),
   );
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   const data = $derived(result.data);
   const status = $derived(result.status);
   const errorData = $derived(result.error);
@@ -160,7 +165,7 @@
 
     operator = pipe(
       operator,
-      reactionCheck(lumiSetting.get().showReactioninTL)
+      reactionCheck(lumiSetting.get().showReactioninTL),
     );
 
     return pipe(operator, saveEachNote(), scanArray());
@@ -168,7 +173,7 @@
 
   function filterAndAddToMap(
     events: EventPacket[],
-    targetMap: Map<string, Nostr.Event>
+    targetMap: Map<string, Nostr.Event>,
   ): number {
     return events.reduce((count, pk) => {
       const event = pk.event;
@@ -186,7 +191,7 @@
   function combineFilteredEvents(
     currentMap: Map<string, Nostr.Event>,
     olderMap: Map<string, Nostr.Event>,
-    partialEvents?: EventPacket[]
+    partialEvents?: EventPacket[],
   ): Nostr.Event[] {
     const resultMap = new Map<string, Nostr.Event>();
 
@@ -246,7 +251,7 @@
       timelineManager.currentEventsMap.clear();
       timelineManager.filteredNewerEventCount = filterAndAddToMap(
         $data || [],
-        timelineManager.currentEventsMap
+        timelineManager.currentEventsMap,
       );
 
       if (timelineManager.currentEventsMap.size >= endIndex) {
@@ -260,14 +265,14 @@
           timelineManager.olderEventsMap.clear();
           timelineManager.filteredOlderEventCount = filterAndAddToMap(
             olderEvents,
-            timelineManager.olderEventsMap
+            timelineManager.olderEventsMap,
           );
         }
 
         const allFilteredEvents = combineFilteredEvents(
           timelineManager.currentEventsMap,
           timelineManager.olderEventsMap,
-          partialdata
+          partialdata,
         );
 
         displayEvents.set(allFilteredEvents.slice(startIndex, endIndex));
@@ -339,7 +344,7 @@
         initialFilters,
         pipe(tie, uniq, scanArray()),
         relays,
-        handleIncrementalData
+        handleIncrementalData,
       );
 
       if (olderEvents.length > 0) {
@@ -383,20 +388,20 @@
         });
 
         const deduplicatedData = sortEventPackets(
-          Array.from(eventMap.values())
+          Array.from(eventMap.values()),
         );
 
         // フィルタリング後のカウントを更新
         const tempMap = new Map<string, Nostr.Event>();
         timelineManager.filteredOlderEventCount = filterAndAddToMap(
           deduplicatedData,
-          tempMap
+          tempMap,
         );
 
         return CONFIG.LOAD_LIMIT > 0
           ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
           : deduplicatedData;
-      }
+      },
     );
   }
 
@@ -429,7 +434,7 @@
       console.log(
         timelineManager.filteredNewerEventCount +
           timelineManager.filteredOlderEventCount,
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1,
       );
 
       if (hasEnoughStock) {
@@ -487,7 +492,7 @@
           }
 
           updateViewEvent(partialData);
-        }
+        },
       );
 
       if (olderEvents.length > 0) {
@@ -523,7 +528,7 @@
         });
 
         return sortEventPackets(Array.from(eventMap.values()));
-      }
+      },
     );
   }
   let headerElement: HTMLDivElement | undefined = $state();
@@ -556,7 +561,7 @@
     queryKey: [...queryKey, "olderData"],
     queryFn: undefined,
     staleTime: Infinity,
-    gcTime: Infinity,
+    gcTime: 1 * 60 * 60 * 1000, // Infinityから変更
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -571,7 +576,7 @@
   $effect(() => {
     // オブジェクト全体を展開して全プロパティを参照
     const _ = { ...timelineFilter };
-
+    //579行目
     untrack(() => updateViewEvent());
   });
 
@@ -582,6 +587,7 @@
       clearTimeout(timelineManager.timeoutId);
     }
     timelineManager.clear();
+    displayEvents.set([]); // 追加
   });
 
   $effect(() => {

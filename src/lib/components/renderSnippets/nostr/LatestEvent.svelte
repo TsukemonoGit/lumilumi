@@ -1,3 +1,4 @@
+<!--LatestEvent.svelte-->
 <script lang="ts">
   import { useLatestEvent } from "$lib/stores/useLatestEvent";
 
@@ -45,11 +46,14 @@
 
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
   let result = $derived(useLatestEvent(queryKey, filters, req, max3relays));
+  $effect(() => {
+    const currentResult = result;
+    return () => currentResult.destroy();
+  });
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
   let event = $derived($data?.event);
-
   $effect(() => {
     if (event) {
       untrack(() => onChange?.(event));

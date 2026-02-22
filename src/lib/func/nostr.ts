@@ -32,7 +32,7 @@ import {
   createUniq,
 } from "rx-nostr";
 import { writable, derived, get, type Readable } from "svelte/store";
-import { type Observable, type OperatorFunction } from "rxjs";
+import { Subscription, type Observable, type OperatorFunction } from "rxjs";
 import * as Nostr from "nostr-typedef";
 import {
   bookmark,
@@ -323,10 +323,9 @@ export function useMainTimelineReq(
 ): {
   data: Readable<EventPacket | EventPacket[] | undefined>;
   status: Readable<ReqStatus>;
-  error: Readable<Error>;
+  error: Readable<Error | null>;
+  destroy: () => void;
 } {
-  //console.log(filters);
-
   const _queryClient = queryClient;
 
   if (!_queryClient) {
@@ -334,21 +333,27 @@ export function useMainTimelineReq(
   }
 
   const status = writable<ReqStatus>("loading");
-  const error = writable<Error>();
+  const error = writable<Error | null>(null);
 
-  const obs: Observable<EventPacket | EventPacket[]> = get(app)
-    .rxNostr.use(req)
-    .pipe(metadata(), bookmark(), operator);
+  let subscription: Subscription | undefined;
 
   const query = createQuery({
     queryKey: queryKey,
     gcTime: Infinity,
     staleTime: Infinity,
     queryFn: (): Promise<EventPacket | EventPacket[]> => {
-      return new Promise((resolve, reject) => {
-        let fulfilled = false;
+      subscription?.unsubscribe();
 
-        obs.subscribe({
+      return new Promise((resolve, reject) => {
+        const obs: Observable<EventPacket | EventPacket[]> = get(app)
+          .rxNostr.use(req)
+          .pipe(metadata(), bookmark(), operator);
+
+        let fulfilled = false;
+        status.set("loading");
+        error.set(null);
+
+        subscription = obs.subscribe({
           next: (v: EventPacket | EventPacket[]) => {
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
@@ -362,6 +367,10 @@ export function useMainTimelineReq(
             console.error("[rx-nostr]", e);
             status.set("error");
             error.set(e);
+            if (!fulfilled) {
+              reject(e);
+              fulfilled = true;
+            }
           },
         });
         changeMainEmit(filters);
@@ -372,21 +381,15 @@ export function useMainTimelineReq(
   return {
     data: derived(query, ($query) => $query.data, undefined),
     status: derived([query, status], ([$query, $status]) => {
-      if ($query.isSuccess) {
-        return "success";
-      } else if ($query.isError) {
-        return "error";
-      } else {
-        return $status;
-      }
+      if ($query.isSuccess) return "success";
+      if ($query.isError) return "error";
+      return $status;
     }),
-    error: derived([query, error], ([$query, $error]) => {
-      if ($query.isError) {
-        return $query.error;
-      } else {
-        return $error;
-      }
+    error: derived([query, error], ([$query, $e]) => {
+      if ($query.isError) return $query.error;
+      return $e;
     }),
+    destroy: () => subscription?.unsubscribe(),
   };
 }
 
@@ -404,13 +407,13 @@ export function publishEvent(ev: Nostr.EventParameters) {
     console.log("error");
     throw Error();
   }
-  _rxNostr.send(ev).subscribe((packet) => {
-    /* addDebugLog(
+  /* _rxNostr.send(ev).subscribe((packet) => {
+    addDebugLog(
       `リレー ${packet.from} への送信が ${
         packet.ok ? "成功" : "失敗"
       } しました。`
-    ); */
-  });
+    ); 
+  });*/
 }
 
 export async function promisePublishSignedEvent(
@@ -943,5 +946,5 @@ export function usePaginatedReq(
     }
   })();
 
-  return { data, status, error };
+  return { data, status, error, destroy: () => {} };
 }

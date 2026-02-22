@@ -51,10 +51,12 @@ export const timelineFilterInit: TimelineFilter = {
   },
 };
 
+// types.ts に追加
 export interface ReqResult<A> {
   data: Readable<A | undefined | null>;
   status: Readable<ReqStatus>;
   error: Readable<Error | null>;
+  destroy: () => void; // 追加
 }
 
 export interface UseConnectionsOpts {

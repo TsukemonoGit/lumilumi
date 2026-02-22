@@ -1,3 +1,4 @@
+//useLatestEvent.ts
 import { useReq } from "$lib/func/useReq";
 import type { ReqResult } from "$lib/types";
 import type { QueryKey } from "@tanstack/svelte-query";
@@ -9,7 +10,7 @@ import type {
   RxReqOverable,
   RxReqPipeable,
 } from "rx-nostr";
-import { latest } from "rx-nostr";
+import { latest, uniq } from "rx-nostr";
 import { pipe } from "rxjs";
 import { tie } from "./stores";
 
@@ -24,11 +25,11 @@ export function useLatestEvent(
         RxReqOverable &
         RxReqPipeable)
     | undefined,
-  relays?: string[] | undefined
+  relays?: string[] | undefined,
 ): ReqResult<EventPacket> {
-  const operator = pipe(tie, latest());
+  const operator = pipe(tie, latest(), uniq());
   return useReq(
     { queryKey, filters, operator, req },
-    relays
+    relays,
   ) as ReqResult<EventPacket>;
 }
