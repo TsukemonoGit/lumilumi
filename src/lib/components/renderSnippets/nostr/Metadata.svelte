@@ -55,7 +55,7 @@
   let localData = $derived(getMetadata(queryKey));
   //console.log(localData);
   let initData: EventPacket | undefined = $derived(
-    lumiSetting.get().showImg ? undefined : localData
+    lumiSetting.get().showImg ? undefined : localData,
   ); //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
 
   let result = $derived(
@@ -67,8 +67,8 @@
       initData,
       staleTime,
       undefined,
-      refetchInterval
-    )
+      refetchInterval,
+    ),
   );
 
   let data = $derived(result.data);

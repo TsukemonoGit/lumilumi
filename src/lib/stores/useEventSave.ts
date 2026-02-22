@@ -24,7 +24,7 @@ export function useEventSave(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | undefined
+    | undefined,
 ): ReqResult<EventPacket> {
   const filters = [{ ids: [id], limit: 1 }];
   const operator = pipe(tie, uniq());

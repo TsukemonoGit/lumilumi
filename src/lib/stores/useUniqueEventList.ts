@@ -25,7 +25,7 @@ export function useUniqueEventList(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | undefined
+    | undefined,
 ): ReqResult<EventPacket[]> {
   const operator = pipe(tie, uniq(), scanArray());
   return useReq({ queryKey, filters, operator, req }) as ReqResult<

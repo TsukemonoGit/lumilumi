@@ -4,11 +4,11 @@
   import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
-  import type {
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
+  import {
+    type RxReq,
+    type RxReqEmittable,
+    type RxReqOverable,
+    type RxReqPipeable,
   } from "rx-nostr";
   import { untrack, type Snippet } from "svelte";
 

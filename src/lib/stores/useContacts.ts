@@ -22,7 +22,7 @@ export function useContacts(
         }> &
         RxReqOverable &
         RxReqPipeable)
-    | undefined
+    | undefined,
 ): ReqResult<EventPacket> {
   return useReplaceableEvent(rxNostr, queryKey, pubkey, 3, req);
 }

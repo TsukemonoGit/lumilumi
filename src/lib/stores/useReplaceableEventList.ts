@@ -18,14 +18,12 @@ export function useReplaceableEventList(
   queryKey: QueryKey,
   pubkey: string,
   kind: number,
-  req?:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | undefined
+  req: RxReq<"backward"> &
+    RxReqEmittable<{
+      relays: string[];
+    }> &
+    RxReqOverable &
+    RxReqPipeable,
 ): ReqResult<EventPacket[]> {
   // TODO: Add npub support
   const filters = [{ kinds: [kind], authors: [pubkey] }];
@@ -38,7 +36,7 @@ export function useReplaceableEventList(
       return tag ? tag[1] : null;
     }), */
 
-    scanArray()
+    scanArray(),
   );
   return useReq({ queryKey, filters, operator, req }) as ReqResult<
     EventPacket[]

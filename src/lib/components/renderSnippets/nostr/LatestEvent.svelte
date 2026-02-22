@@ -54,7 +54,6 @@
   let status = $derived(result.status);
   let errorData = $derived(result.error);
   let event = $derived($data?.event);
-
   $effect(() => {
     if (event) {
       untrack(() => onChange?.(event));

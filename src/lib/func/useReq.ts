@@ -58,7 +58,13 @@ function buildReqResult<T>(
 // createQuery が再実行される。呼び出し元では $effect + destroy() による
 // cleanup を必ず実装すること。
 export function useReq<T extends EventPacket | EventPacket[]>(
-  { queryKey, filters, operator, req, initData }: UseReqOpts<T>,
+  {
+    queryKey,
+    filters,
+    operator,
+    req = createRxBackwardReq(),
+    initData,
+  }: UseReqOpts<T>,
   relays: string[] | undefined = undefined,
   { staleTime, gcTime, initialDataUpdatedAt, refetchInterval }: UseQueryOpt = {
     staleTime: 1 * 60 * 60 * 1000,
@@ -84,8 +90,6 @@ export function useReq<T extends EventPacket | EventPacket[]>(
   const status = writable<ReqStatus>("loading");
   const error = writable<Error | null>(null);
 
-  let subscription: Subscription | undefined;
-
   const query = createQuery({
     queryKey: queryKey,
     staleTime: staleTime,
@@ -94,7 +98,7 @@ export function useReq<T extends EventPacket | EventPacket[]>(
     refetchInterval: refetchInterval,
     gcTime: gcTime,
     queryFn: (): Promise<T | null> => {
-      subscription?.unsubscribe();
+      // subscription?.unsubscribe(); ← 削除
 
       return new Promise((resolve, reject) => {
         // 外部注入の req は over() 済みの場合があるため、
@@ -104,7 +108,7 @@ export function useReq<T extends EventPacket | EventPacket[]>(
           | (RxReq<"backward"> &
               RxReqEmittable<{ relays: string[] }> &
               RxReqOverable &
-              RxReqPipeable) = req ?? createRxBackwardReq(generateRandomId());
+              RxReqPipeable) = req ?? createRxBackwardReq();
 
         const obs: Observable<T> = _rxNostr
           .use(_req, { relays: relays })
@@ -114,14 +118,9 @@ export function useReq<T extends EventPacket | EventPacket[]>(
         status.set("loading");
         error.set(null);
 
-        subscription = obs.subscribe({
+        obs.subscribe({
           next: (v: T) => {
-            if (fulfilled) {
-              _queryClient.setQueryData(queryKey, v);
-            } else {
-              resolve(v);
-              fulfilled = true;
-            }
+            _queryClient.setQueryData(queryKey, v);
           },
           complete: () => {
             status.set("success");
@@ -141,14 +140,16 @@ export function useReq<T extends EventPacket | EventPacket[]>(
         });
 
         _req.emit(filters);
-        _req.over();
+        _req.over(); // これでcompleteが呼ばれsubscriptionが自然終了する
       });
     },
   });
 
-  return buildReqResult<T>(query, status, error, initData, () =>
-    subscription?.unsubscribe(),
-  );
+  return buildReqResult<T>(query, status, error, initData, () => {
+    // backward reqはover()でcompleteするため空でよい
+    // 同じqueryKeyで複数インスタンスが存在する場合に
+    // 他のインスタンスのsubscriptionをキャンセルしないようにする
+  });
 }
 
 // -------------------------------------------------------

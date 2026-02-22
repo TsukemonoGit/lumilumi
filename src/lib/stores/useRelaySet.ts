@@ -25,14 +25,12 @@ import { debugError, debugInfo } from "$lib/components/Debug/debug";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
-  req?:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | undefined,
+  req: RxReq<"backward"> &
+    RxReqEmittable<{
+      relays: string[];
+    }> &
+    RxReqOverable &
+    RxReqPipeable,
 ): ReqResult<DefaultRelayConfig[]> | undefined {
   // console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);

@@ -16,7 +16,7 @@ import { tie } from "./stores";
 export function useEvent(
   queryKey: QueryKey,
   id: string,
-  req?:
+  req:
     | (RxReq<"backward"> &
         RxReqEmittable<{
           relays: string[];

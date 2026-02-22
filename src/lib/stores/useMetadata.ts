@@ -26,7 +26,7 @@ export function useMetadata(
   initData?: EventPacket | EventPacket[] | undefined,
   staleTime: number = Infinity,
   initialDataUpdatedAt: number | undefined = undefined,
-  refetchInterval: number = Infinity
+  refetchInterval: number = Infinity,
 ): ReqResult<EventPacket> {
   return useReplaceableEvent(
     rxNostr,
@@ -37,6 +37,6 @@ export function useMetadata(
     initData,
     staleTime,
     initialDataUpdatedAt,
-    refetchInterval
+    refetchInterval,
   );
 }

@@ -29,13 +29,13 @@ export function useReplaceableEvent(
   initData?: EventPacket | EventPacket[] | undefined,
   staleTime: number = Infinity,
   initialDataUpdatedAt: number | undefined = undefined,
-  refetchInterval: number = Infinity
+  refetchInterval: number = Infinity,
 ): ReqResult<EventPacket> {
   const filters = [{ kinds: [kind], authors: [pubkey], limit: 1 }];
   const operator = pipe(
     tie,
     latest(),
-    debounceTime(1000) // 変化が止まるまで待つ
+    debounceTime(1000), // 変化が止まるまで待つ
     //take(1) // 最初の1回だけ流す
   );
 
@@ -53,6 +53,6 @@ export function useReplaceableEvent(
       gcTime: staleTime,
       initialDataUpdatedAt,
       refetchInterval,
-    }
+    },
   ) as ReqResult<EventPacket>;
 }
