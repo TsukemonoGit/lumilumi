@@ -72,12 +72,12 @@
   } = $props();
 
   let warning = $derived(
-    note?.tags.find((item) => item[0] === "content-warning")
+    note?.tags.find((item) => item[0] === "content-warning"),
   );
   let root = $derived(
     note?.tags.find(
-      (item) => item[0] === "e" && item.length > 3 && item[3] === "root"
-    ) as string[] | undefined
+      (item) => item[0] === "e" && item.length > 3 && item[3] === "root",
+    ) as string[] | undefined,
   );
 
   let atag: string | undefined = $derived.by(() => {
@@ -109,7 +109,7 @@
     tags.push(
       ["p", note?.pubkey || ""],
       ["e", note.id, relayHint, note?.pubkey || ""],
-      ["k", note.kind.toString()]
+      ["k", note.kind.toString()],
     );
     if (atag) {
       tags.push(["a", atag, relayHint]);
@@ -135,7 +135,7 @@
 
   async function publishAndSetQuery(
     eventParam: Nostr.EventParameters,
-    queryKey: QueryKey
+    queryKey: QueryKey,
   ) {
     const result = await safePublishEvent($state.snapshot(eventParam));
     if ("errorCode" in result) {
@@ -197,7 +197,7 @@
         acc.push(item[1]);
       }
       return acc;
-    }, [])
+    }, []),
   );
 
   let menuGroups: MenuGroup[] = $derived([
@@ -215,7 +215,7 @@
     prosessing = true;
 
     const relayhints = getRelaysById(note.id).filter((relay) =>
-      relay.startsWith("wss://")
+      relay.startsWith("wss://"),
     );
     const relayHint = getRelayById(note.id);
     const eventpointer: nip19.EventPointer = {
@@ -366,7 +366,7 @@
       (item) =>
         (item[0] === "e" || item[0] === "a") &&
         item.length > 2 &&
-        item[3] === "root"
+        item[3] === "root",
     );
 
     const addTag = atag ? ["a", atag, relaylist] : ["e", note.id, relaylist];
@@ -443,7 +443,7 @@
       .filter(
         ([key, value]) =>
           Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event)
+          value.every((item) => (item as EventPacket).event),
       ) // EventPacket[]をチェック
       .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
       .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
@@ -455,7 +455,7 @@
       .filter(
         ([key, value]) =>
           Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event)
+          value.every((item) => (item as EventPacket).event),
       ) // EventPacket[]をチェック
       .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
       .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す
@@ -467,7 +467,7 @@
       .filter(
         ([key, value]) =>
           Array.isArray(value) &&
-          value.every((item) => (item as EventPacket).event)
+          value.every((item) => (item as EventPacket).event),
       ) // EventPacket[]をチェック
       .map(([key, value]) => value as EventPacket[]) // 型を EventPacket[] に変換
       .flatMap((value: EventPacket[]) => value.map((item) => item.event)); // 配列からeventを取り出す

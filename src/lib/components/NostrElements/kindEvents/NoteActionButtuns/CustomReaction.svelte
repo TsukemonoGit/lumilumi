@@ -1,3 +1,4 @@
+<!--CustomReaction.svelte-->
 <script lang="ts">
   import Popover from "$lib/components/Elements/Popover.svelte";
   import { SmilePlus } from "lucide-svelte";
@@ -33,7 +34,7 @@
 
   const handleEmojiSelect = async (
     emojiContent: string,
-    emojiTag?: string[]
+    emojiTag?: string[],
   ) => {
     if (emojiTag) {
       emoji = emojiTag;
@@ -52,7 +53,7 @@
     tags.push(
       ["p", note?.pubkey || ""],
       ["e", note.id, relayHint, note?.pubkey || ""],
-      ["k", note.kind.toString()]
+      ["k", note.kind.toString()],
     );
 
     if (atag) {

@@ -1,13 +1,7 @@
 <script lang="ts">
   import { replyedEvent } from "$lib/func/event";
   import { lumiSetting, timelineFilter } from "$lib/stores/globalRunes.svelte";
-  import {
-    mutebykinds,
-    mutes,
-    queryClient,
-    viewMediaModal,
-  } from "$lib/stores/stores";
-  import type { EventPacket } from "rx-nostr";
+  import { mutebykinds, mutes, viewMediaModal } from "$lib/stores/stores";
   import ProfileDisplay from "./NostrElements/kindEvents/EventCard/ProfileDisplay.svelte";
   import NoteComponent from "./NostrElements/kindEvents/layout/NoteComponent.svelte";
   import ReplyTo from "./NostrElements/kindEvents/layout/ReplyTo.svelte";
@@ -17,8 +11,6 @@
   import UserPopupMenu from "./NostrElements/user/UserPopupMenu.svelte";
 
   import ChannelTag from "./NostrElements/content/ChannelTag.svelte";
-  import { type Writable, writable } from "svelte/store";
-  import Dialog from "./Elements/Dialog.svelte";
   import ContentParts from "./NostrElements/content/ContentParts.svelte";
   import Truncate from "./NostrElements/content/Truncate.svelte";
   import DecodedContent from "./NostrElements/kindEvents/DecodedContent.svelte";
@@ -82,7 +74,6 @@
   let parts: Token[] = $derived(
     parseContent(text, tags, { hashtagsFromTagsOnly: false }),
   );
-  let showMore: Writable<boolean> = $state(writable(false));
 
   let replyTag = $derived.by(() => {
     if ([1, 42, 4, 1111].includes(event.kind || 1) && tags.length > 0) {
@@ -184,10 +175,6 @@
       default:
         break;
     }
-  };
-
-  const onClickShowMore = () => {
-    $showMore = true;
   };
 
   const openModal = (index: number) => {
@@ -299,7 +286,23 @@
         {/snippet}
         {#snippet content()}<!--ここのしょりによってたぐにpが追加されたりするのか？pがないnostr:noteとかにpをつけるquoteUsers に入れて渡す-->
 
-          <Truncate {maxHeight} {onClickShowMore} {depth}>
+          <Truncate
+            {maxHeight}
+            useDialog={true}
+            dialogId={"showMore_preview"}
+            {depth}
+            {zIndex}
+          >
+            {#snippet dialogContent()}
+              <ContentParts
+                {maxHeight}
+                {event}
+                {displayMenu}
+                {depth}
+                {repostable}
+                zIndex={zIndex + 10}
+              />
+            {/snippet}
             {#each parts as part}{#if part.type === "nip19"}{@const decoded =
                   nip19Decode(part.metadata!.plainNip19 as string)}
 
@@ -362,16 +365,3 @@
     </div>
   </div>
 {/if}
-
-<Dialog id={"showMore_preview"} bind:open={showMore} zIndex={zIndex + 10}>
-  {#snippet main()}
-    <ContentParts
-      {maxHeight}
-      {event}
-      {displayMenu}
-      {depth}
-      {repostable}
-      zIndex={zIndex + 10}
-    />
-  {/snippet}</Dialog
->

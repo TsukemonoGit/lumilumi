@@ -39,9 +39,9 @@
   });
 
   const resetScrollPosition = () => {
-    if (scrollContainer) {
+    /*  if (scrollContainer) {
       scrollContainer.scrollTop = 0;
-    }
+    } */
   };
 
   const openDialog = () => {
@@ -65,10 +65,16 @@
   });
 
   // 外部からのダイアログ制御
+  //初回subscribeのコールバックを無視
   $effect(() => {
     if (!open) return;
 
+    let initial = true;
     return open.subscribe((value) => {
+      if (initial) {
+        initial = false;
+        return;
+      }
       value ? openDialog() : closeDialog();
     });
   });
