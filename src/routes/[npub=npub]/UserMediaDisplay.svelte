@@ -311,7 +311,7 @@
 </div>
 {#if selectedEventIndex !== null}
   <Dialog
-    contentClass={"w-[1000px] max-w-[96vw] "}
+    contentClass={"!w-[1000px] !max-w-[96vw] "}
     id={"showMore_preview"}
     bind:open={showModal}
     zIndex={10}

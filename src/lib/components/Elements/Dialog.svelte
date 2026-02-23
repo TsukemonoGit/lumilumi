@@ -112,7 +112,7 @@
     <div
       use:melt={$content}
       class={[
-        "fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px)) -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900 p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col",
+        "fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900 p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col",
         contentClass,
       ]}
       style:z-index={zIndex}
