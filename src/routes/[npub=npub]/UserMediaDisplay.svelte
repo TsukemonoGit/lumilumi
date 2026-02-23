@@ -14,6 +14,7 @@
     waitForConnections,
     waitForRelayReady,
   } from "$lib/components/renderSnippets/nostr/timelineList";
+  import { ChevronLeft, ChevronRight } from "lucide-svelte";
 
   // 定数
   const LOAD_LIMIT = 300;
@@ -44,12 +45,12 @@
   let oldestCreatedAt: number | null = null;
   let imageLoadStatus = $state<Record<string, ImageLoadStatus>>({});
   let isInitialized = $state(false);
-  let selectedEvent = $state<MediaEvent | null>(null);
+  let selectedEventIndex = $state<number | null>(null);
   let showModal: Writable<boolean> = $state(writable(false));
   let isCancelled = false;
   // 派生状態
   let viewList = $derived(
-    mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE)
+    mediaEvents.slice(page * MEDIA_PER_PAGE, (page + 1) * MEDIA_PER_PAGE),
   );
 
   // ユーティリティ関数
@@ -76,8 +77,8 @@
   };
 
   // モーダル処理
-  const openModal = (media: MediaEvent) => {
-    selectedEvent = media;
+  const openModal = (index: number) => {
+    selectedEventIndex = index;
     $showModal = true;
   };
 
@@ -91,7 +92,7 @@
     isLoading = false;
     loadingProgress = "";
     imageLoadStatus = {};
-    selectedEvent = null;
+    selectedEventIndex = null;
     showModal.set(false);
     isCancelled = false;
   };
@@ -140,7 +141,7 @@
               undefined,
               5000,
               LOAD_LIMIT,
-              onData
+              onData,
             );
 
             // 重複排除して結合（mediaUrl ベースでユニークに）
@@ -157,7 +158,7 @@
               .sort(
                 (a, b) =>
                   b.eventPacket.event.created_at -
-                  a.eventPacket.event.created_at
+                  a.eventPacket.event.created_at,
               );
 
             const previousOldestCreatedAt = oldestCreatedAt;
@@ -174,7 +175,7 @@
               "mediaLen:",
               mediaEvents.length,
               "totalPackets:",
-              results.totalPacketsProcessed
+              results.totalPacketsProcessed,
             );
 
             // 必要な数に達したら終了
@@ -242,117 +243,142 @@
 
   <div class="media-grid">
     {#each Array(MEDIA_PER_PAGE) as _, index}
-      {@const media = viewList[index]}
-      {@const warning = media?.eventPacket?.event?.tags?.find(
-        (tag) => tag[0] === "content-warning"
-      )}
-      {#if media}
-        <button class="media-item" onclick={() => openModal(media)}>
-          <div
-            class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm z-10"
-          >
-            {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
-          </div>
+      {#if viewList.length > index}
+        {@const media = viewList[index]}
 
-          {#if media.mediaType === "image" || media.mediaType === "svg"}
-            {#if imageLoadStatus[media.mediaUrl] === "error"}
-              <div class="image-error-placeholder"></div>
-            {:else}
-              <img
-                src={media.mediaUrl}
-                alt=""
-                loading="lazy"
-                onload={() => handleImageLoad(media.mediaUrl)}
-                onerror={() => handleImageError(media.mediaUrl)}
-                onloadstart={() => initImageLoad(media.mediaUrl)}
-                class:loading={imageLoadStatus[media.mediaUrl] === "loading"}
-                class:blur-md={warning}
-              />
-              {#if imageLoadStatus[media.mediaUrl] === "loading"}
-                <div class="image-loading-placeholder"></div>
+        {@const warning = media?.eventPacket?.event?.tags?.find(
+          (tag) => tag[0] === "content-warning",
+        )}
+        {#if media}
+          <button class="media-item" onclick={() => openModal(index)}>
+            <div
+              class="absolute bottom-0 right-0 text-xs bg-neutral-900/50 px-1 rounded-sm z-10"
+            >
+              {formatAbsoluteDateFromUnix(media.eventPacket.event.created_at)}
+            </div>
+
+            {#if media.mediaType === "image" || media.mediaType === "svg"}
+              {#if imageLoadStatus[media.mediaUrl] === "error"}
+                <div class="image-error-placeholder"></div>
+              {:else}
+                <img
+                  src={media.mediaUrl}
+                  alt=""
+                  loading="lazy"
+                  onload={() => handleImageLoad(media.mediaUrl)}
+                  onerror={() => handleImageError(media.mediaUrl)}
+                  onloadstart={() => initImageLoad(media.mediaUrl)}
+                  class:loading={imageLoadStatus[media.mediaUrl] === "loading"}
+                  class:blur-md={warning}
+                />
+                {#if imageLoadStatus[media.mediaUrl] === "loading"}
+                  <div class="image-loading-placeholder"></div>
+                {/if}
               {/if}
+            {:else if media.mediaType === "movie"}
+              <div class="relative w-full h-full">
+                <video
+                  src={media.mediaUrl}
+                  muted
+                  preload="metadata"
+                  class:blur-md={warning}
+                >
+                  <track kind="captions" />
+                </video>
+                <div class="media-type-indicator">🎬</div>
+              </div>
+            {:else if media.mediaType === "audio"}
+              <div class="audio-placeholder">
+                <span>🎵</span>
+              </div>
+            {:else if media.mediaType === "3D"}
+              <div class="media-3d-placeholder">
+                <span>🎲</span>
+              </div>
             {/if}
-          {:else if media.mediaType === "movie"}
-            <div class="relative w-full h-full">
-              <video
-                src={media.mediaUrl}
-                muted
-                preload="metadata"
-                class:blur-md={warning}
-              >
-                <track kind="captions" />
-              </video>
-              <div class="media-type-indicator">🎬</div>
-            </div>
-          {:else if media.mediaType === "audio"}
-            <div class="audio-placeholder">
-              <span>🎵</span>
-            </div>
-          {:else if media.mediaType === "3D"}
-            <div class="media-3d-placeholder">
-              <span>🎲</span>
-            </div>
-          {/if}
 
-          {#if warning}
-            <div class="warning-indicator">⚠️</div>
-          {/if}
-        </button>
-      {:else}
-        <div class="media-item placeholder"></div>
-      {/if}
+            {#if warning}
+              <div class="warning-indicator">⚠️</div>
+            {/if}
+          </button>
+        {:else}
+          <div class="media-item placeholder"></div>
+        {/if}{/if}
     {/each}
   </div>
 
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 </div>
-
-<Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
-  {#snippet main()}
-    {#if selectedEvent?.eventPacket}
-      <div class="rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
-        <Metadata
-          queryKey={["metadata", selectedEvent.eventPacket.event.pubkey]}
-          pubkey={selectedEvent.eventPacket.event.pubkey}
+{#if selectedEventIndex !== null}
+  <Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
+    {#snippet main()}
+      {#if selectedEventIndex! < viewList.length}
+        {@const viewEvent = viewList[selectedEventIndex!].eventPacket.event}
+        {#if viewEvent}
+          <div class="rounded-md p-2 bg-zinc-800/40 w-full overflow-x-hidden">
+            <Metadata
+              queryKey={["metadata", viewEvent.pubkey]}
+              pubkey={viewEvent.pubkey}
+            >
+              {#snippet loading()}
+                <EventCard
+                  note={viewEvent}
+                  {...EVENT_CARD_CONFIG}
+                  showStatus={true}
+                  thread={false}
+                />
+              {/snippet}
+              {#snippet nodata()}
+                <EventCard
+                  note={viewEvent}
+                  {...EVENT_CARD_CONFIG}
+                  showStatus={true}
+                  thread={false}
+                />
+              {/snippet}
+              {#snippet error()}
+                <EventCard
+                  note={viewEvent}
+                  {...EVENT_CARD_CONFIG}
+                  showStatus={true}
+                  thread={false}
+                />
+              {/snippet}
+              {#snippet content({ metadata })}
+                <EventCard
+                  {metadata}
+                  note={viewEvent}
+                  {...EVENT_CARD_CONFIG}
+                  showStatus={true}
+                  thread={false}
+                />
+              {/snippet}
+            </Metadata>
+          </div>
+        {/if}
+      {/if}
+      <!-- ナビゲーションボタン -->
+      {#if selectedEventIndex! >= 1}
+        <button
+          class="fixed sm:left-4 left-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onclick={() => selectedEventIndex!--}
+          aria-label="prev image"
         >
-          {#snippet loading()}
-            <EventCard
-              note={selectedEvent!.eventPacket.event}
-              {...EVENT_CARD_CONFIG}
-              showStatus={true}
-              thread={false}
-            />
-          {/snippet}
-          {#snippet nodata()}
-            <EventCard
-              note={selectedEvent!.eventPacket.event}
-              {...EVENT_CARD_CONFIG}
-              showStatus={true}
-              thread={false}
-            />
-          {/snippet}
-          {#snippet error()}
-            <EventCard
-              note={selectedEvent!.eventPacket.event}
-              {...EVENT_CARD_CONFIG}
-              showStatus={true}
-              thread={false}
-            />
-          {/snippet}
-          {#snippet content({ metadata })}
-            <EventCard
-              {metadata}
-              note={selectedEvent!.eventPacket.event}
-              {...EVENT_CARD_CONFIG}
-              showStatus={true}
-              thread={false}
-            />
-          {/snippet}
-        </Metadata>
-      </div>
-    {/if}
-  {/snippet}
-</Dialog>
+          <ChevronLeft size={24} />
+        </button>
+      {/if}
+      {#if selectedEventIndex! < viewList.length - 1}
+        <button
+          class="fixed sm:right-4 right-1 top-1/2 z-[999] -translate-y-1/2 rounded-full bg-neutral-800/70 p-2 text-neutral-200 shadow-lg hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onclick={() => selectedEventIndex!++}
+          aria-label="next image"
+        >
+          <ChevronRight size={24} />
+        </button>
+      {/if}
+    {/snippet}
+  </Dialog>
+{/if}
 
 <style>
   .media-gallery {
