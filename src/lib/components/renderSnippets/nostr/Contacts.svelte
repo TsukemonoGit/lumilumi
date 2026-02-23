@@ -5,34 +5,25 @@
   import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
-  import type {
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
-  } from "rx-nostr";
+
   import { untrack, type Snippet } from "svelte";
 
   interface Props {
     relays?: string[];
 
     pubkey: string;
-    req?: RxReq<"backward"> &
-      RxReqEmittable<{ relays: string[] }> &
-      RxReqOverable &
-      RxReqPipeable;
+
     nodata?: Snippet;
     loading?: Snippet;
     content?: Snippet<[{ contacts: Nostr.Event; status: ReqStatus }]>;
     onchange?: (contacts: Nostr.Event) => void;
     onstatechange?: (
       status: ReqStatus,
-      contacts: Nostr.Event | undefined
+      contacts: Nostr.Event | undefined,
     ) => void;
   }
 
   let {
-    req = undefined,
     relays = undefined,
 
     pubkey,
@@ -50,7 +41,7 @@
   });
 
   let result = $derived(
-    $app?.rxNostr ? useContacts($app.rxNostr, queryKey, pubkey, req) : undefined
+    $app?.rxNostr ? useContacts($app.rxNostr, queryKey, pubkey) : undefined,
   );
 
   let data = $derived(result?.data);

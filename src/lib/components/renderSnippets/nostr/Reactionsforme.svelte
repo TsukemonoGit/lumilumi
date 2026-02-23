@@ -30,10 +30,9 @@
     content?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
   }
 
-  let { queryKey, filters, req, error, loading, nodata, content }: Props =
-    $props();
+  let { queryKey, filters, error, loading, nodata, content }: Props = $props();
 
-  let result = $derived(useUniqueEventList(queryKey, filters, req));
+  let result = $derived(useUniqueEventList(queryKey, filters));
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

@@ -1,5 +1,5 @@
 import { describe, it, test } from "vitest";
-import { checkImageQuality, formatFileSize, removeExif } from "./upload";
+import { checkImageQuality, formatFileSize } from "./upload";
 import fs from "fs";
 import path from "path";
 test("", () => {});

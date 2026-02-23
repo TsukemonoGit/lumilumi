@@ -108,7 +108,7 @@
           const index = viewEventIds
             .get()
             .findIndex(
-              (item) => item[0] === "a" && item[1] === monoZap.eventTag[1]
+              (item) => item[0] === "a" && item[1] === monoZap.eventTag[1],
             );
           if (index !== -1) {
             viewEventIds.get().splice(index, 1);
@@ -170,7 +170,7 @@
         zapperEvent(event)?.pubkey !==
           "5650178597525e90ea16a4d7a9e33700ac238a1be9dbf3f5093862929d9a1e60" &&
         zapperEvent(event)?.pubkey !==
-          "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5"
+          "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
     ); //テストザップ除く
   };
 </script>
@@ -185,11 +185,7 @@
         <p>
           Including those sent through other notes—your support means a lot!
         </p>
-        <UniqueEventList
-          queryKey={zappedQuery}
-          filters={zappedFilters}
-          req={undefined}
-        >
+        <UniqueEventList queryKey={zappedQuery} filters={zappedFilters}>
           {#snippet nodata()}
             <!---->
           {/snippet}

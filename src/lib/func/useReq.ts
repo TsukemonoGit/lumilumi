@@ -8,17 +8,8 @@ import type {
   UseForwardReqOpts,
 } from "$lib/types";
 import { useQueryClient, createQuery } from "@tanstack/svelte-query";
-import {
-  type EventPacket,
-  type RxReq,
-  type RxReqEmittable,
-  type RxReqOverable,
-  type RxReqPipeable,
-  type RxReqStrategy,
-  createRxBackwardReq,
-} from "rx-nostr";
+import { type EventPacket, createRxBackwardReq } from "rx-nostr";
 import { get, writable, derived } from "svelte/store";
-import { generateRandomId } from "./nostr";
 import { type Subscription, type Observable } from "rxjs";
 
 export function useReq(
@@ -26,7 +17,6 @@ export function useReq(
     queryKey,
     filters,
     operator,
-    req,
     initData,
   }: UseReqOpts<EventPacket | EventPacket[]>,
   relays: string[] | undefined = undefined,
@@ -35,11 +25,9 @@ export function useReq(
     gcTime: 1 * 60 * 60 * 1000, // 2 hour
     initialDataUpdatedAt: undefined,
     refetchInterval: Infinity,
-  }
+  },
 ): ReqResult<EventPacket | EventPacket[]> {
-  // console.log(filters);
-  const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
-  //console.log(_queryClient);
+  const _queryClient = useQueryClient();
 
   if (!_queryClient) {
     console.log("!_queryClient error");
@@ -52,29 +40,9 @@ export function useReq(
     console.log("DefaultRelays error", queryKey);
     throw Error();
   }
-  // console.log(_rxNostr.getDefaultRelays());
 
-  let _req:
-    | RxReqStrategy
-    | (RxReq<"backward"> &
-      RxReqEmittable<{
-        relays: string[];
-      }> &
-      RxReqOverable &
-      RxReqPipeable);
-
-  if (req) {
-    _req = req;
-  } else {
-    _req = createRxBackwardReq(generateRandomId());
-  }
   const status = writable<ReqStatus>("loading");
   const error = writable<Error>();
-
-  //一定時間立って削除したデータの再取得できるように
-  const obs: Observable<EventPacket | EventPacket[]> = _rxNostr
-    .use(_req, { relays: relays })
-    .pipe(metadata(), bookmark(), operator);
 
   const query = createQuery({
     queryKey: queryKey,
@@ -85,12 +53,16 @@ export function useReq(
     gcTime: gcTime, //未使用/非アクティブのキャッシュ・データがメモリに残る時間
     queryFn: (): Promise<EventPacket | EventPacket[] | null> => {
       return new Promise((resolve, reject) => {
-        let fulfilled = false;
+        //一定時間立って削除したデータの再取得できるように、queryFnのなかにかく。
+        //あとこれつかうんBackward用だけだからcreateRxBackwardReqも固定にする
+        const _req = createRxBackwardReq();
+        const obs = _rxNostr
+          .use(_req, { relays: relays })
+          .pipe(metadata(), bookmark(), operator);
 
+        let fulfilled = false;
         obs.subscribe({
-          next: (v: EventPacket | EventPacket[]) => {
-            //console.log(v)
-            //  clearTimeoutIfExists();
+          next: (v) => {
             if (fulfilled) {
               _queryClient.setQueryData(queryKey, v);
             } else {
@@ -98,28 +70,20 @@ export function useReq(
               fulfilled = true;
             }
           },
-
           complete: () => {
-            //   clearTimeoutIfExists();
-            //console.log("complete");
             status.set("success");
-
-            if (!fulfilled) {
-              resolve(null); // データが一度も来ていない場合は undefined を返す
-            }
+            if (!fulfilled) resolve(null);
           },
           error: (e) => {
-            //   clearTimeoutIfExists();
-            console.log("error", e);
             status.set("error");
             error.set(e);
-
             if (!fulfilled) {
-              reject(e); // エラーの場合は Promise を reject
+              reject(e);
               fulfilled = true;
             }
           },
         });
+
         _req.emit(filters);
         _req.over();
       });
@@ -163,7 +127,7 @@ export function useForwardReq(
     gcTime: Infinity,
     initialDataUpdatedAt: undefined,
     refetchInterval: Infinity,
-  }
+  },
 ): ReqResult<EventPacket | EventPacket[]> {
   const _queryClient = useQueryClient(); //queryClient; //useQueryClient();
 
@@ -269,7 +233,7 @@ export function useSearchReq(
     gcTime: Infinity,
     initialDataUpdatedAt: undefined,
     refetchInterval: Infinity,
-  }
+  },
 ): ReqResult<EventPacket | EventPacket[]> {
   unsucscribeSearch();
 
@@ -377,7 +341,7 @@ export function useGlobalReq(
     gcTime: Infinity,
     initialDataUpdatedAt: undefined,
     refetchInterval: Infinity,
-  }
+  },
 ): ReqResult<EventPacket | EventPacket[]> {
   unsucscribeGlobal();
   const _queryClient = useQueryClient(); //queryClient; //useQueryClient();

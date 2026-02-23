@@ -5,25 +5,13 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import type {
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
-  } from "rx-nostr";
+
   import { untrack, type Snippet } from "svelte";
   interface Props {
     relays?: string[] | undefined;
     queryKey: QueryKey;
     filters: Nostr.Filter[];
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
+
     error?: Snippet<[Error]>;
     nodata?: Snippet;
     loading?: Snippet;
@@ -32,7 +20,6 @@
     onChange?: (metadata: Nostr.Event | undefined) => void;
   }
   let {
-    req = undefined,
     relays = undefined,
     queryKey,
     filters,
@@ -44,7 +31,7 @@
   }: Props = $props();
 
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
-  let result = $derived(useLatestEvent(queryKey, filters, req, max3relays));
+  let result = $derived(useLatestEvent(queryKey, filters, max3relays));
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
