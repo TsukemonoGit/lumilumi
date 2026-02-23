@@ -1,3 +1,4 @@
+<!--Text.svelte-->
 <script lang="ts">
   import { useEvent } from "$lib/stores/useEvent";
   import type { ReqStatus } from "$lib/types";

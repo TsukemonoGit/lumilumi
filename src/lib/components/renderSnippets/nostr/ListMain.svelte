@@ -5,26 +5,14 @@
 
   import type { QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import type {
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
-  } from "rx-nostr";
+
   import type { Snippet } from "svelte";
 
   interface Props {
     queryKey: QueryKey;
     pubkey: string;
     kind: number;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
+
     error?: Snippet<[Error]>;
     nodata?: Snippet;
     loading?: Snippet;
@@ -32,17 +20,8 @@
     children?: Snippet<[{ events: Nostr.Event[]; status: ReqStatus }]>;
   }
 
-  let {
-    req = undefined,
-
-    queryKey,
-    pubkey,
-    error,
-    loading,
-    nodata,
-    children,
-    kind,
-  }: Props = $props();
+  let { queryKey, pubkey, error, loading, nodata, children, kind }: Props =
+    $props();
   //これできてないっぽい
   /*  
       latestEach((eventpacket) => {
@@ -51,7 +30,7 @@
       //  import { latestList } from "$lib/func/event";でやってる
     }), */
 
-  let result = $derived(useReplaceableEventList(queryKey, pubkey, kind, req));
+  let result = $derived(useReplaceableEventList(queryKey, pubkey, kind));
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);

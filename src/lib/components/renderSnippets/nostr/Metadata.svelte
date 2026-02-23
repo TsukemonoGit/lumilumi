@@ -7,13 +7,7 @@
 
   import { type QueryKey } from "@tanstack/svelte-query";
   import type Nostr from "nostr-typedef";
-  import {
-    type EventPacket,
-    type RxReq,
-    type RxReqEmittable,
-    type RxReqOverable,
-    type RxReqPipeable,
-  } from "rx-nostr";
+  import { type EventPacket } from "rx-nostr";
   import { getMetadata } from "$lib/func/nostr";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { untrack, type Snippet } from "svelte";
@@ -21,14 +15,7 @@
   interface Props {
     queryKey: QueryKey;
     pubkey: string;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
+
     error?: Snippet<[Error]>;
     nodata?: Snippet;
     loading?: Snippet;
@@ -37,7 +24,6 @@
     onChange?: (metadata: Nostr.Event) => void;
   }
   let {
-    req = undefined,
     pubkey,
     queryKey,
 
@@ -55,7 +41,7 @@
   let localData = $derived(getMetadata(queryKey));
   //console.log(localData);
   let initData: EventPacket | undefined = $derived(
-    lumiSetting.get().showImg ? undefined : localData
+    lumiSetting.get().showImg ? undefined : localData,
   ); //画像オンのときは初っ端最新チェックなのでinitDataいらないけど代わりにローディングのときとかにおいてみる
 
   let result = $derived(
@@ -63,12 +49,11 @@
       $app.rxNostr,
       queryKey,
       pubkey,
-      req,
       initData,
       staleTime,
       undefined,
-      refetchInterval
-    )
+      refetchInterval,
+    ),
   );
 
   let data = $derived(result.data);

@@ -10,17 +10,14 @@ import type { ConnectionState } from "rx-nostr";
 import type { EventVerifier } from "rx-nostr-crypto";
 import { SvelteMap } from "svelte/reactivity";
 
-import {
-  notifiInit,
-  type NotifiSettings,
-} from "../../routes/notifications/notificationTypes";
+import { notifiInit } from "../../routes/notifications/notificationTypes";
 
 export const notifiSettings = $state(notifiInit);
 export const loginUser: { value: string } = $state({ value: "" });
 export const displayEvents = createCustomStore<Nostr.Event[]>([]);
 export const timelineFilter: TimelineFilter = $state(timelineFilterInit);
 export const followList = createCustomStore<Map<string, string | undefined>>(
-  new Map()
+  new Map(),
 );
 export let relayStateMap: SvelteMap<string, ConnectionState> = new SvelteMap();
 

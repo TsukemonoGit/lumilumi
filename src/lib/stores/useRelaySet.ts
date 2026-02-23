@@ -25,21 +25,13 @@ import { debugError, debugInfo } from "$lib/components/Debug/debug";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
-  req?:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | undefined
 ): ReqResult<DefaultRelayConfig[]> | undefined {
   // console.log(relaySearchRelays, queryKey);
   setRelays(relaySearchRelays);
 
   const operator = pipe(tie, uniq(), saveEachNote(), completeOnTimeout(5000));
   //console.log(queryKey, filters, operator, req);
-  const reqResult = useReq({ queryKey, filters, operator, req }, undefined, {
+  const reqResult = useReq({ queryKey, filters, operator }, undefined, {
     staleTime: Infinity,
     gcTime: Infinity,
     initialDataUpdatedAt: undefined,
@@ -58,7 +50,7 @@ let kind10002: Nostr.Event;
 let kind3: Nostr.Event;
 let relay: DefaultRelayConfig[] = [];
 export function toRelaySet(
-  value: EventPacket | EventPacket[] | undefined | null
+  value: EventPacket | EventPacket[] | undefined | null,
 ): DefaultRelayConfig[] {
   // console.log(value);
   if (!value) {

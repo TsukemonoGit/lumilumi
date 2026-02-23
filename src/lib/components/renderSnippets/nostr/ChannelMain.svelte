@@ -17,14 +17,7 @@
   interface Props {
     queryKey: QueryKey;
     pubkey: string;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
+
     error?: Snippet<[Error]>;
     nodata?: Snippet;
     loading?: Snippet;
@@ -32,19 +25,10 @@
     children?: Snippet<[{ event: Nostr.Event; status: ReqStatus }]>;
   }
 
-  let {
-    req = undefined,
-
-    queryKey,
-    pubkey,
-    error,
-    loading,
-    nodata,
-    children,
-  }: Props = $props();
+  let { queryKey, pubkey, error, loading, nodata, children }: Props = $props();
 
   let result = $derived(
-    useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005, req)
+    useReplaceableEvent($app?.rxNostr, queryKey, pubkey, 10005),
   );
   let data = $derived(result.data);
   let status = $derived(result.status);
