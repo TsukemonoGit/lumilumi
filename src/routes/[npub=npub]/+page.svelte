@@ -87,10 +87,10 @@
     //  onValueChange: handleChange,
   });
 
-  const triggers = [
+  const triggers = $derived([
     { id: "post", title: "Post", Icon: ReceiptText },
     //ログイン時のみ自分と相手のあれをみれる
-    ...(lumiSetting.get().pubkey
+    ...(lumiSetting.get().pubkey && lumiSetting.get().pubkey !== userPubkey
       ? [
           {
             id: "withme",
@@ -122,7 +122,7 @@
 
     { id: "zap", title: "Zapped", Icon: Zap },
     { id: "relays", title: "Relay", Icon: RadioTower },
-  ];
+  ]);
 
   const [send, receive] = crossfade({
     duration: 150,
