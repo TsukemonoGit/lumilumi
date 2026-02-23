@@ -310,7 +310,12 @@
   <Controls bind:page {maxPage} {isLoading} {loadingProgress} />
 </div>
 {#if selectedEventIndex !== null}
-  <Dialog id={"showMore_preview"} bind:open={showModal} zIndex={10}>
+  <Dialog
+    contentClass={"w-[1000px] max-w-[96vw] "}
+    id={"showMore_preview"}
+    bind:open={showModal}
+    zIndex={10}
+  >
     {#snippet main()}
       {#if selectedEventIndex! < viewList.length}
         {@const viewEvent = viewList[selectedEventIndex!].eventPacket.event}
