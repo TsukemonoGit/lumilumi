@@ -24,7 +24,7 @@
     main,
     zIndex = 10,
     id,
-    contentClass,
+    contentClass = "",
     closeOnOutsideClick = true,
   }: Props = $props();
 

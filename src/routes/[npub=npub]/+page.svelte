@@ -3,7 +3,7 @@
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import { createRxForwardReq, now, type EventPacket } from "rx-nostr";
   import UserProfile from "$lib/components/NostrElements/user/UserProfile.svelte";
-  import { onDestroy, onMount, tick } from "svelte";
+  import { onMount, tick } from "svelte";
   import { afterNavigate, beforeNavigate } from "$app/navigation";
   import { setRelays } from "$lib/func/nostr";
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
@@ -24,6 +24,7 @@
     SmilePlus,
     Library,
     Images,
+    AtSign,
   } from "lucide-svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
 
@@ -49,6 +50,7 @@
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import UserMediaDisplay from "./UserMediaDisplay.svelte";
   import PinList from "./PinList.svelte";
+  import WithMe from "./WithMe.svelte";
 
   interface Props {
     data: {
@@ -70,9 +72,6 @@
   /*  const excludeKind1 = (event: Nostr.Event) => {
     return event.kind === 1 && event.pubkey === data.pubkey;
   }; */
-  const excludeKind7 = (event: Nostr.Event) => {
-    return event.kind === 7 && event.pubkey === data.pubkey;
-  };
 
   let userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
@@ -88,8 +87,21 @@
     //  onValueChange: handleChange,
   });
 
-  const triggers = [
+  const triggers = $derived([
     { id: "post", title: "Post", Icon: ReceiptText },
+    //ログイン時のみ自分と相手のあれをみれる
+    ...(lumiSetting.get().pubkey && lumiSetting.get().pubkey !== userPubkey
+      ? [
+          {
+            id: "withme",
+            title: "With Me",
+            Icon: AtSign,
+          },
+        ]
+      : []),
+
+    { id: "reactions", title: "Reaction", Icon: Sticker },
+
     //画像オンの時だけメディア欄を出す
     ...(lumiSetting.get().showImg
       ? [
@@ -101,7 +113,6 @@
         ]
       : []),
     { id: "chat", title: "Chat", Icon: MessageSquareText },
-    { id: "reactions", title: "Reaction", Icon: Sticker },
 
     { id: "followee", title: "Follow", Icon: Users },
     { id: "emojis", title: "Emojis", Icon: SmilePlus },
@@ -110,9 +121,8 @@
     { id: "bookmark", title: "Bookmark", Icon: BookMarked },
 
     { id: "zap", title: "Zapped", Icon: Zap },
-    // { id: "pin", title: "Pin" },
     { id: "relays", title: "Relay", Icon: RadioTower },
-  ];
+  ]);
 
   const [send, receive] = crossfade({
     duration: 150,
@@ -176,7 +186,7 @@
         ["nip05", data.pubkey, data.nip05Address.toLowerCase()],
         {
           result: true,
-        }
+        },
       );
     }
   }
@@ -231,7 +241,7 @@
             {#each triggers as triggerItem}
               <button
                 use:melt={$trigger(triggerItem.id)}
-                class="trigger relative flex-col gap-1 min-w-16 text-sm"
+                class="trigger relative flex-col gap-1 min-w-14 md:min-w-20 text-sm"
               >
                 {#if triggerItem.Icon}<triggerItem.Icon
                     size={20}
@@ -393,10 +403,21 @@
             {/if}
           </div>
           <div
+            use:melt={$content("withme")}
+            class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+          >
+            {#if $value === "withme"}
+              <WithMe yourPubkey={userPubkey} {req} {amount} />
+            {/if}
+          </div>
+          <div
             use:melt={$content("reactions")}
             class="content max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
           >
             {#if $value === "reactions"}
+              {@const excludeKind7 = (event: Nostr.Event) => {
+                return event.kind === 7 && event.pubkey === data.pubkey;
+              }}
               <TimelineList
                 queryKey={["user", "reactions", userPubkey]}
                 filters={[
@@ -510,34 +531,21 @@
                         >
                           {#snippet loading()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind7}
-                              />
+                              <EventCard note={event} />
                             </div>
                           {/snippet}
                           {#snippet nodata()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind7}
-                              />
+                              <EventCard note={event} />
                             </div>
                           {/snippet}
                           {#snippet error()}
                             <div>
-                              <EventCard
-                                note={event}
-                                excludefunc={excludeKind7}
-                              />
+                              <EventCard note={event} />
                             </div>
                           {/snippet}
                           {#snippet content({ metadata })}
-                            <EventCard
-                              {metadata}
-                              note={event}
-                              excludefunc={excludeKind7}
-                            />
+                            <EventCard {metadata} note={event} />
                           {/snippet}
                         </Metadata>
                       {/each}
