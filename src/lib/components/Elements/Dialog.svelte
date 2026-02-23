@@ -3,7 +3,6 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { tick, untrack, type Snippet } from "svelte";
   import { fade } from "svelte/transition";
-  import { X } from "lucide-svelte";
   import type { Writable } from "svelte/store";
   import { pushState } from "$app/navigation";
   import { popStack } from "$lib/stores/stores";
@@ -16,6 +15,7 @@
     zIndex?: number;
     id: string;
     closeOnOutsideClick?: boolean;
+    contentClass?: string;
   }
 
   let {
@@ -24,6 +24,7 @@
     main,
     zIndex = 10,
     id,
+    contentClass,
     closeOnOutsideClick = true,
   }: Props = $props();
 
@@ -110,9 +111,10 @@
     <!-- ダイアログコンテンツ -->
     <div
       use:melt={$content}
-      class="fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px))]
-             -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900
-             p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col"
+      class={[
+        "fixed left-1/2 top-1/2 max-h-[90vh] w-[calc(min(96vw,720px)) -translate-x-1/2 -translate-y-1/2 rounded-xl bg-neutral-900 p-2 sm:p-6 shadow-lg overflow-hidden flex flex-col",
+        contentClass,
+      ]}
       style:z-index={zIndex}
     >
       <!-- ヘッダー -->

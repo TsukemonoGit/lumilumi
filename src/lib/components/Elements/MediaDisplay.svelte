@@ -3,8 +3,7 @@
   import { createDialog, melt } from "@melt-ui/svelte";
   import { ChevronLeft, ChevronRight, X } from "lucide-svelte";
   import { fade } from "svelte/transition";
-  import type { Writable } from "svelte/store";
-  import { popStack, queryClient } from "$lib/stores/stores";
+  import { popStack } from "$lib/stores/stores";
   import { userPromiseUrl, type UrlType } from "$lib/func/useUrl";
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
@@ -56,7 +55,7 @@
         //console.log(url);
         const data: UrlType | null = await userPromiseUrl(url);
         return { url, originalIndex: index, type: data || "url" };
-      })
+      }),
     );
 
     // 2. フィルター
@@ -76,7 +75,7 @@
   // 元のインデックスから表示インデックスへの変換
   function findDisplayIndex(originalIdx: number): number {
     const found = displayImages.findIndex(
-      (img) => img.originalIndex === originalIdx
+      (img) => img.originalIndex === originalIdx,
     );
     return found >= 0 ? found : 0;
   }
@@ -177,7 +176,7 @@
       untrack(() => {
         closeDialog();
         popStack.update((stack) =>
-          stack.filter((entry) => entry.id !== DIALOG_ID)
+          stack.filter((entry) => entry.id !== DIALOG_ID),
         );
       });
     }
