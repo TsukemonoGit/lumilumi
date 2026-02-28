@@ -270,11 +270,11 @@
   });
 </script>
 
-{#if status === "error"}
-  {@render error?.(new Error("Failed to load relays"))}
-  <!--レンダリングとしては、初回完了後contactsにしっぱなし。-->
-{:else if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
+{#if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
   {@render contents?.()}
 {:else if status === "loading"}
   {@render loading?.()}
+{:else}
+  {@render error?.(new Error("Failed to load relays"))}
+  <!--レンダリングとしては、初回完了後contactsにしっぱなし。-->
 {/if}

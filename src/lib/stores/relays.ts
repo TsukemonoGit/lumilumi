@@ -5,22 +5,25 @@ export const relaySearchRelays = [
   //nevent1qvzqqqqqqypzpdc866l8lkwvncdwaqlgrsueg9tvlnm5mm2mpyg3jv8aam445rpqqqsqvjvg63yukccdpfx0285v72skgv59sykpce9jtn3ynmv6jzt0v6qa84j4e
   //nevent1qvzqqqqqqypzpdc866l8lkwvncdwaqlgrsueg9tvlnm5mm2mpyg3jv8aam445rpqqyg8wumn8ghj7mn0wd68ytnhd9hx2qpq7u249qm05a9t83meh7rqxlyxq3gdrtnfswapq2sxly29zxyk0xmq977qva
   "wss://purplepag.es", //https://purplepag.es/what
-  "wss://relay.nostr.band",
+
   //"wss://nos.lol",
 
   //https://lumilumi.app/nevent1qvzqqqqqqypzp978pfzrv6n9xhq5tvenl9e74pklmskh4xw6vxxyp3j8qkke3cezqqsgfmmcxyknak5frh0jpmp55w2k32l9e9h05qxjvj09hkcf0uh27nclstphx
   //https://github.com/coracle-social/compass
   "wss://indexer.coracle.social",
+  "wss://nostr.wine",
+  "wss://relay.nostr.band",
 ];
 
 export const defaultRelays = [
   //'wss://tes'
   //'wss://relay.nostr.wirednet.jp'
-  "wss://relay.nostr.band",
+
   "wss://nos.lol",
   // "wss://relayable.org",
 
   "wss://nostr.bitcoiner.social",
+  "wss://relay.nostr.band",
 ];
 
 //feedback送信用のリレー
