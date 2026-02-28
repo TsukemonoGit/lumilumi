@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SmilePlus } from "lucide-svelte";
+  import { UserPlus } from "lucide-svelte";
 
   import Popover from "./Elements/Popover.svelte";
   import { getMetadataList, type MetadataList } from "$lib/func/nostr";
@@ -38,7 +38,7 @@
   <div
     class="text-magnum-400 hover:text-magnum-200 transition-colors cursor-pointer"
   >
-    <SmilePlus size="20" />
+    <UserPlus size="20" />
   </div>
   {#snippet popoverContent()}
     <div>
