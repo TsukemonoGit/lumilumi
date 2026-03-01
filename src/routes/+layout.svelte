@@ -374,8 +374,6 @@
 <Popstate />
 
 <QueryClientProvider client={queryClient}>
-  <Header />
-  <Toast />
   <NostrMain>
     {#snippet contents()}
       <SetDefaultRelays paramRelays={dataRelays}>
@@ -400,7 +398,8 @@
           {#if lumiSetting.get().pubkey}
             <LoginUserContacts />
           {/if}
-
+          <Header />
+          <Toast />
           <SetRepoReactions />
           <Menu />
 
