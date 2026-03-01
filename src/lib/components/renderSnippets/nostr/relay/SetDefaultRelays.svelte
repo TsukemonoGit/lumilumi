@@ -150,6 +150,50 @@
                   (packet: EventPacket[]) => {
                     if (packet.length > 0) {
                       queryClient.setQueryData(queryKey, packet[0]);
+                      // 途中受信データでも即座にリレーを適用してsuccessに移行
+                      const midRelays = setRelaysByKind10002(packet[0].event);
+                      const midWriteConfig = (
+                        midRelays as {
+                          url: string;
+                          read: boolean;
+                          write: boolean;
+                        }[]
+                      )
+                        .filter((r) => r.write === true)
+                        .map((r) => ({
+                          url: normalizeURL(r.url),
+                          read: false,
+                          write: true,
+                        }));
+
+                      const midMerged = new Map<
+                        string,
+                        { url: string; read: boolean; write: boolean }
+                      >();
+                      for (const entry of readEntries) {
+                        midMerged.set(entry.url, { ...entry });
+                      }
+                      for (const entry of midWriteConfig) {
+                        const nurl = normalizeURL(entry.url);
+                        if (midMerged.has(nurl)) {
+                          midMerged.get(nurl)!.write = true;
+                        } else {
+                          midMerged.set(nurl, {
+                            url: nurl,
+                            read: false,
+                            write: true,
+                          });
+                        }
+                      }
+                      const midMergedArray = [...midMerged.values()];
+                      applyRelays(midMergedArray)
+                        .then(() => {
+                          status = "success";
+                          mainRelaysInitialized = true;
+                        })
+                        .catch((e) => {
+                          console.warn("Mid-stream relay apply failed:", e);
+                        });
                     }
                   },
                 );
@@ -261,6 +305,16 @@
               (packet: EventPacket[]) => {
                 if (packet.length > 0) {
                   queryClient.setQueryData(queryKey, packet[0]);
+                  // 途中受信データでも即座にリレーを適用してsuccessに移行
+                  const midRelays = setRelaysByKind10002(packet[0].event);
+                  applyRelays(midRelays)
+                    .then(() => {
+                      status = "success";
+                      mainRelaysInitialized = true;
+                    })
+                    .catch((e) => {
+                      console.warn("Mid-stream relay apply failed:", e);
+                    });
                 }
               },
             );
