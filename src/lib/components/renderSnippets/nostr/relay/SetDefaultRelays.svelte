@@ -63,39 +63,59 @@
     if (!$defo) return {};
     return Object.fromEntries(
       Object.entries($defo).filter(([_, config]) => {
-        return config.read === true; // ← return が欠落していた
+        return config.read === true;
       }),
     );
   });
 
-  let connectionPromise: Promise<void> = $state(Promise.resolve());
   let status: ReqStatus | undefined = $state();
   let mainRelaysInitialized = $state(false);
 
-  function applyRelays(relays: AcceptableDefaultRelaysConfig) {
+  // applyRelays: リレーをセットし、接続完了まで待機してから setReady(true) を呼ぶ。
+  // 呼び出し元は await して status 更新を行うこと。
+  async function applyRelays(
+    relays: AcceptableDefaultRelaysConfig,
+  ): Promise<void> {
     setRelays(relays);
-    relayConnectionState.setReady(false); // リセット
+    relayConnectionState.setReady(false);
+
     const currentReadRelays = Object.fromEntries(
       Object.entries(get(defo) ?? {}).filter(
         ([_, config]) => config.read === true,
       ),
     );
-    connectionPromise = waitForConnections({
+
+    await waitForConnections({
       checkrelays: currentReadRelays,
-      requiredConnectionRatio: 0.7,
+      requiredConnectionRatio: 0.5,
       onProgress: (connected, total) => {
-        setTimeout(() => {
-          const ready = total <= 2 ? connected >= 1 : connected / total >= 0.7;
-          relayConnectionState.setReady(ready);
-        });
+        // 進捗通知のみ。setReady は await 完了後に行う。
+        console.debug(`relay connection progress: ${connected}/${total}`);
       },
     });
+
+    // waitForConnections は条件達成・タイムアウトどちらでも resolve する。
+    // resolve 後に接続比率を再評価して setReady を確定させる。
+    const finalReadRelays = Object.fromEntries(
+      Object.entries(get(defo) ?? {}).filter(
+        ([_, config]) => config.read === true,
+      ),
+    );
+    const totalCount = Object.keys(finalReadRelays).length;
+    // totalCount が 0 の場合は Error
+    if (totalCount === 0) {
+      throw new Error("No read relays available after connection attempt");
+    }
+
+    relayConnectionState.setReady(true);
   }
 
   $effect(() => {
     if (paramRelays && paramRelays.length > 0) {
       if (!mainRelaysInitialized) {
         untrack(async () => {
+          status = "loading";
+
           const readEntries = paramRelays!.map((r) => ({
             url: normalizeURL(r),
             read: true,
@@ -106,7 +126,12 @@
 
           // 未ログイン：paramRelays をそのまま read/write でセット
           if (!pubkey) {
-            applyRelays(readEntries);
+            try {
+              await applyRelays(readEntries);
+              status = "success";
+            } catch (e) {
+              status = "error";
+            }
             mainRelaysInitialized = true;
             return;
           }
@@ -194,7 +219,6 @@
             if (merged.has(nurl)) {
               merged.get(nurl)!.write = true;
             } else {
-              // read: false のまま追加（writeのみのリレー）
               merged.set(nurl, {
                 url: nurl,
                 read: false,
@@ -205,7 +229,13 @@
 
           const mergedArray = [...merged.values()];
           console.log("merged before applyRelays:", mergedArray);
-          applyRelays(mergedArray);
+
+          try {
+            await applyRelays(mergedArray);
+            status = "success";
+          } catch (e) {
+            status = "error";
+          }
 
           mainRelaysInitialized = true;
         });
@@ -217,7 +247,12 @@
     untrack(async () => {
       const pubkey = lumiSetting.get().pubkey;
       if (!pubkey) {
-        applyRelays(defaultRelays);
+        try {
+          await applyRelays(defaultRelays);
+          status = "success";
+        } catch (e) {
+          status = "error";
+        }
         mainRelaysInitialized = true;
         return;
       }
@@ -237,15 +272,13 @@
               3000,
               (packet: EventPacket[]) => {
                 if (packet.length > 0) {
-                  const relays = setRelaysByKind10002(packet[0].event);
-                  applyRelays(relays);
                   queryClient.setQueryData(queryKey, packet[0]);
-                  mainRelaysInitialized = true;
-                  status = "success";
+                  // onProgress コールバック内では applyRelays を呼ばない。
+                  // result を受け取った後にまとめて処理する。
                 }
               },
             );
-            if (result.length > 0 && !mainRelaysInitialized) {
+            if (result.length > 0) {
               queryClient.setQueryData(queryKey, result[0]);
               cachedData = result[0];
             }
@@ -257,24 +290,36 @@
 
         if (cachedData) {
           const relays = setRelaysByKind10002(cachedData.event);
-          applyRelays(relays);
+          try {
+            await applyRelays(relays);
+            status = "success";
+          } catch (e) {
+            status = "error";
+            return;
+          }
           mainRelaysInitialized = true;
+        } else {
+          status = "error";
+          return;
         }
       } else {
-        applyRelays(lumiSetting.get().relays);
+        try {
+          await applyRelays(lumiSetting.get().relays);
+          status = "success";
+        } catch (e) {
+          status = "error";
+          return;
+        }
         mainRelaysInitialized = true;
       }
-
-      status = "success";
     });
   });
 </script>
 
 {#if mainRelaysInitialized && Object.keys(timelineRelays).length > 0}
   {@render contents?.()}
-{:else if status === "loading"}
-  {@render loading?.()}
-{:else}
+{:else if status === "error"}
   {@render error?.(new Error("Failed to load relays"))}
-  <!--レンダリングとしては、初回完了後contactsにしっぱなし。-->
+{:else}
+  {@render loading?.()}
 {/if}

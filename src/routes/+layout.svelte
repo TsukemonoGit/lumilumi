@@ -42,7 +42,7 @@
   import { browser } from "$app/environment";
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import { t as _ } from "@konemono/svelte5-i18n";
+  import { t as _, t } from "@konemono/svelte5-i18n";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { latest, type EventPacket } from "rx-nostr";
   import { waitNostr } from "nip07-awaiter";
@@ -379,12 +379,16 @@
       <SetDefaultRelays paramRelays={dataRelays}>
         {#snippet loading()}
           {#await delay(1000) then}
-            Connecting to relays
+            <p class="text-base font-medium text-base-content text-center p-4">
+              {$t("connectingRelay.connecting")}
+            </p>
           {/await}
         {/snippet}
 
         {#snippet error()}
-          An error occurred while connecting to relays
+          <p class="text-base font-medium text-base-content text-center p-4">
+            {$t("connectingRelay.connectingDetail")}
+          </p>
         {/snippet}
 
         {#snippet contents()}

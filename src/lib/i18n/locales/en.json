@@ -161,7 +161,6 @@
       "copylink": "Copy link",
       "sharelink": "Share link"
     },
-
     "external": {
       "njump": "Open with njump",
       "emoji": "Open with emojito",
@@ -474,5 +473,9 @@
     "description": "Logged in as a new account ({pub}). Would you like to switch the timeline view?",
     "action_label": "Switch",
     "error_save": "Failed to save settings"
+  },
+  "connectingRelay": {
+    "connecting": "Connecting to relays",
+    "connectingDetail": "An error occurred while connecting to relays"
   }
 }
