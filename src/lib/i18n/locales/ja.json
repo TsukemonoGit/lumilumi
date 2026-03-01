@@ -473,5 +473,9 @@
     "description": "新しいアカウント({pub})でログインしました。TL表示を変更しますか?",
     "action_label": "変更する",
     "error_save": "設定の保存に失敗しました"
+  },
+  "connectingRelay": {
+    "connecting": "リレーに接続中",
+    "connectingDetail": "リレーへの接続中にエラーが発生しました"
   }
 }

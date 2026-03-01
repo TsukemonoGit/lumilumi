@@ -87,7 +87,7 @@
 
     await waitForConnections({
       checkrelays: currentReadRelays,
-      requiredConnectionRatio: 0.7,
+      requiredConnectionRatio: 0.5,
       onProgress: (connected, total) => {
         // 進捗通知のみ。setReady は await 完了後に行う。
         console.debug(`relay connection progress: ${connected}/${total}`);
@@ -102,7 +102,11 @@
       ),
     );
     const totalCount = Object.keys(finalReadRelays).length;
-    // totalCount が 0 の場合は ready とみなす（リレーなし状態）
+    // totalCount が 0 の場合は Error
+    if (totalCount === 0) {
+      throw new Error("No read relays available after connection attempt");
+    }
+
     relayConnectionState.setReady(true);
   }
 
