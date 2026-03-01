@@ -476,6 +476,8 @@
   },
   "connectingRelay": {
     "connecting": "リレーに接続中",
-    "connectingDetail": "リレーへの接続中にエラーが発生しました"
+    "connectingDetail": "リレーへの接続中にエラーが発生しました",
+    "establishing": "接続を確立しています...",
+    "usingDefault": "kind:10002 が見つからなかったため、デフォルトリレーに接続します"
   }
 }
