@@ -52,18 +52,16 @@
     contents,
   }: Props = $props();
 
-  let pubkey = lumiSetting.get().pubkey;
-  let queryKey = ["defaultRelay", pubkey];
-  let filters = [
+  const pubkey = lumiSetting.get().pubkey;
+  const queryKey = ["defaultRelay", pubkey];
+  const filters: Nostr.Filter[] = [
     { authors: [pubkey], kinds: [10002], limit: 1 },
-  ] as Nostr.Filter[];
+  ];
 
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
     return Object.fromEntries(
-      Object.entries($defo).filter(([_, config]) => {
-        return config.read === true;
-      }),
+      Object.entries($defo).filter(([_, config]) => config.read === true),
     );
   });
 
@@ -71,6 +69,42 @@
   let loadingMessage: string = $state("connectingRelay.establishing");
   let mainRelaysInitialized = $state(false);
 
+  // --- ヘルパー関数 ---
+
+  /** writeリレー設定を抽出（read=false, write=true のみ） */
+  function extractWriteRelays(
+    relayConfigs: DefaultRelayConfig[],
+  ): DefaultRelayConfig[] {
+    return relayConfigs
+      .filter((r) => r.write === true)
+      .map((r) => ({
+        url: normalizeURL(r.url),
+        read: false,
+        write: true,
+      }));
+  }
+
+  /** readEntries と writeRelays をマージ（同一URLはwrite=trueを付与） */
+  function mergeRelays(
+    readEntries: DefaultRelayConfig[],
+    writeRelays: DefaultRelayConfig[],
+  ): DefaultRelayConfig[] {
+    const merged = new Map<string, DefaultRelayConfig>();
+    for (const entry of readEntries) {
+      merged.set(entry.url, { ...entry });
+    }
+    for (const entry of writeRelays) {
+      const nurl = normalizeURL(entry.url);
+      if (merged.has(nurl)) {
+        merged.get(nurl)!.write = true;
+      } else {
+        merged.set(nurl, { url: nurl, read: false, write: true });
+      }
+    }
+    return [...merged.values()];
+  }
+
+  /** リレーを適用し、接続を待機 */
   async function applyRelays(
     relays: AcceptableDefaultRelaysConfig,
   ): Promise<void> {
@@ -91,276 +125,196 @@
       },
     });
 
-    const finalReadRelays = Object.fromEntries(
-      Object.entries(get(defo) ?? {}).filter(
-        ([_, config]) => config.read === true,
-      ),
+    const finalReadRelays = Object.entries(get(defo) ?? {}).filter(
+      ([_, config]) => config.read === true,
     );
-    const totalCount = Object.keys(finalReadRelays).length;
 
-    if (totalCount === 0) {
+    if (finalReadRelays.length === 0) {
       throw new Error("No read relays available after connection attempt");
     }
 
     relayConnectionState.setReady(true);
   }
 
+  /** 成功状態に移行 */
+  function setSuccess(): void {
+    status = "success";
+    mainRelaysInitialized = true;
+  }
+
+  /** エラー状態に移行 */
+  function setError(): void {
+    status = "error";
+  }
+
+  /** lumiSettingのuseRelaySetに応じてwriteリレー設定を取得 */
+  function getWriteRelaysFromSettings(): DefaultRelayConfig[] {
+    return extractWriteRelays(lumiSetting.get().relays as DefaultRelayConfig[]);
+  }
+
+  /** kind:10002のEventPacketからwriteリレー設定を取得 */
+  function getWriteRelaysFrom10002(
+    eventPacket: EventPacket,
+  ): DefaultRelayConfig[] {
+    const relays = setRelaysByKind10002(eventPacket.event);
+    return extractWriteRelays(relays);
+  }
+
+  /** kind:10002をフェッチ（キャッシュ確認 → リクエスト） */
+  async function fetchKind10002(
+    onMidStreamData?: (packet: EventPacket) => void,
+  ): Promise<EventPacket | undefined> {
+    // キャッシュチェック
+    const cachedData: EventPacket | undefined | null =
+      queryClient.getQueryData(queryKey);
+    if (cachedData) return cachedData;
+
+    // フェッチ
+    $app.rxNostr.setDefaultRelays(defaultRelays);
+    const result = await usePromiseReq(
+      { filters, operator: pipe(uniq(), latest()), req },
+      defaultRelays,
+      3000,
+      (packets: EventPacket[]) => {
+        if (packets.length > 0) {
+          queryClient.setQueryData(queryKey, packets[0]);
+          onMidStreamData?.(packets[0]);
+        }
+      },
+    );
+    if (result.length > 0) {
+      queryClient.setQueryData(queryKey, result[0]);
+      return result[0];
+    }
+    return undefined;
+  }
+
+  // --- paramRelaysあり: paramRelaysをread用、10002のwriteをマージ ---
+  async function initWithParamRelays(
+    readEntries: DefaultRelayConfig[],
+  ): Promise<void> {
+    status = "loading";
+
+    if (!pubkey) {
+      await applyRelays(readEntries);
+      setSuccess();
+      return;
+    }
+
+    let writeRelays: DefaultRelayConfig[] = [];
+
+    if (lumiSetting.get().useRelaySet === "0") {
+      try {
+        const eventPacket = await fetchKind10002((midPacket) => {
+          // 途中受信データでも即座にリレーを適用してsuccessに移行
+          const midWriteRelays = getWriteRelaysFrom10002(midPacket);
+          const midMerged = mergeRelays(readEntries, midWriteRelays);
+          applyRelays(midMerged)
+            .then(() => setSuccess())
+            .catch((e) => console.warn("Mid-stream relay apply failed:", e));
+        });
+        if (eventPacket) {
+          writeRelays = getWriteRelaysFrom10002(eventPacket);
+        }
+      } catch (e) {
+        console.warn(
+          "kind:10002 fetch failed, proceeding without write relays",
+          e,
+        );
+      }
+    } else {
+      writeRelays = getWriteRelaysFromSettings();
+    }
+
+    const merged = mergeRelays(readEntries, writeRelays);
+    console.log("merged before applyRelays:", merged);
+
+    try {
+      await applyRelays(merged);
+      setSuccess();
+    } catch (e) {
+      setError();
+    }
+  }
+
+  // --- paramRelaysなし: kind:10002またはsettingsからリレーをセット ---
+  async function initWithDefaultRelays(): Promise<void> {
+    if (!pubkey) {
+      try {
+        await applyRelays(defaultRelays);
+        setSuccess();
+      } catch (e) {
+        setError();
+      }
+      return;
+    }
+
+    status = "loading";
+
+    if (lumiSetting.get().useRelaySet !== "0") {
+      try {
+        await applyRelays(lumiSetting.get().relays);
+        setSuccess();
+      } catch (e) {
+        setError();
+      }
+      return;
+    }
+
+    // useRelaySet === "0": kind:10002から取得
+    let eventPacket: EventPacket | undefined;
+    try {
+      eventPacket = await fetchKind10002((midPacket) => {
+        // 途中受信データでも即座にリレーを適用してsuccessに移行
+        const midRelays = setRelaysByKind10002(midPacket.event);
+        applyRelays(midRelays)
+          .then(() => setSuccess())
+          .catch((e) => console.warn("Mid-stream relay apply failed:", e));
+      });
+    } catch (e) {
+      setError();
+      return;
+    }
+
+    if (eventPacket) {
+      const relays = setRelaysByKind10002(eventPacket.event);
+      try {
+        await applyRelays(relays);
+        setSuccess();
+      } catch (e) {
+        setError();
+      }
+    } else {
+      // kind:10002 が見つからなかった場合、defaultRelays にフォールバック
+      console.warn("kind:10002 not found, falling back to default relays");
+      loadingMessage = "connectingRelay.usingDefault";
+      try {
+        await applyRelays(defaultRelays);
+        setSuccess();
+      } catch (e) {
+        setError();
+      }
+    }
+  }
+
+  // --- $effect ---
   $effect(() => {
     if (paramRelays && paramRelays.length > 0) {
       if (!mainRelaysInitialized) {
-        untrack(async () => {
-          status = "loading";
-
+        untrack(() => {
           const readEntries = paramRelays!.map((r) => ({
             url: normalizeURL(r),
             read: true,
             write: true,
           }));
-
-          const pubkey = lumiSetting.get().pubkey;
-
-          if (!pubkey) {
-            try {
-              await applyRelays(readEntries);
-              status = "success";
-            } catch (e) {
-              status = "error";
-            }
-            mainRelaysInitialized = true;
-            return;
-          }
-
-          let writeRelayConfig: {
-            url: string;
-            read: boolean;
-            write: boolean;
-          }[] = [];
-
-          if (lumiSetting.get().useRelaySet === "0") {
-            let cachedData: EventPacket | undefined | null =
-              queryClient.getQueryData(queryKey);
-
-            if (!cachedData) {
-              $app.rxNostr.setDefaultRelays(defaultRelays);
-              try {
-                const result = await usePromiseReq(
-                  { filters, operator: pipe(uniq(), latest()), req },
-                  defaultRelays,
-                  3000,
-                  (packet: EventPacket[]) => {
-                    if (packet.length > 0) {
-                      queryClient.setQueryData(queryKey, packet[0]);
-                      // 途中受信データでも即座にリレーを適用してsuccessに移行
-                      const midRelays = setRelaysByKind10002(packet[0].event);
-                      const midWriteConfig = (
-                        midRelays as {
-                          url: string;
-                          read: boolean;
-                          write: boolean;
-                        }[]
-                      )
-                        .filter((r) => r.write === true)
-                        .map((r) => ({
-                          url: normalizeURL(r.url),
-                          read: false,
-                          write: true,
-                        }));
-
-                      const midMerged = new Map<
-                        string,
-                        { url: string; read: boolean; write: boolean }
-                      >();
-                      for (const entry of readEntries) {
-                        midMerged.set(entry.url, { ...entry });
-                      }
-                      for (const entry of midWriteConfig) {
-                        const nurl = normalizeURL(entry.url);
-                        if (midMerged.has(nurl)) {
-                          midMerged.get(nurl)!.write = true;
-                        } else {
-                          midMerged.set(nurl, {
-                            url: nurl,
-                            read: false,
-                            write: true,
-                          });
-                        }
-                      }
-                      const midMergedArray = [...midMerged.values()];
-                      applyRelays(midMergedArray)
-                        .then(() => {
-                          status = "success";
-                          mainRelaysInitialized = true;
-                        })
-                        .catch((e) => {
-                          console.warn("Mid-stream relay apply failed:", e);
-                        });
-                    }
-                  },
-                );
-                if (result.length > 0) {
-                  queryClient.setQueryData(queryKey, result[0]);
-                  cachedData = result[0];
-                }
-              } catch (e) {
-                console.warn(
-                  "kind:10002 fetch failed, proceeding without write relays",
-                  e,
-                );
-              }
-            }
-
-            if (cachedData) {
-              const relays = setRelaysByKind10002(cachedData.event);
-              writeRelayConfig = (
-                relays as { url: string; read: boolean; write: boolean }[]
-              )
-                .filter((r) => r.write === true)
-                .map((r) => ({
-                  url: normalizeURL(r.url),
-                  read: false,
-                  write: true,
-                }));
-            }
-          } else {
-            writeRelayConfig = (
-              lumiSetting.get().relays as {
-                url: string;
-                read: boolean;
-                write: boolean;
-              }[]
-            )
-              .filter((r) => r.write === true)
-              .map((r) => ({
-                url: normalizeURL(r.url),
-                read: false,
-                write: true,
-              }));
-          }
-
-          const merged = new Map<
-            string,
-            { url: string; read: boolean; write: boolean }
-          >();
-
-          for (const entry of readEntries) {
-            merged.set(entry.url, { ...entry });
-          }
-
-          for (const entry of writeRelayConfig) {
-            const nurl = normalizeURL(entry.url);
-            if (merged.has(nurl)) {
-              merged.get(nurl)!.write = true;
-            } else {
-              merged.set(nurl, {
-                url: nurl,
-                read: false,
-                write: true,
-              });
-            }
-          }
-
-          const mergedArray = [...merged.values()];
-          console.log("merged before applyRelays:", mergedArray);
-
-          try {
-            await applyRelays(mergedArray);
-            status = "success";
-          } catch (e) {
-            status = "error";
-          }
-
-          mainRelaysInitialized = true;
+          initWithParamRelays(readEntries);
         });
       }
       return;
     }
 
-    // paramRelays なし → メインTL用リレーをセット
-    untrack(async () => {
-      const pubkey = lumiSetting.get().pubkey;
-      if (!pubkey) {
-        try {
-          await applyRelays(defaultRelays);
-          status = "success";
-        } catch (e) {
-          status = "error";
-        }
-        mainRelaysInitialized = true;
-        return;
-      }
-
-      status = "loading";
-
-      if (lumiSetting.get().useRelaySet === "0") {
-        let cachedData: EventPacket | undefined | null =
-          queryClient.getQueryData(queryKey);
-
-        if (!cachedData) {
-          $app.rxNostr.setDefaultRelays(defaultRelays);
-          try {
-            const result = await usePromiseReq(
-              { filters, operator: pipe(uniq(), latest()), req },
-              defaultRelays,
-              3000,
-              (packet: EventPacket[]) => {
-                if (packet.length > 0) {
-                  queryClient.setQueryData(queryKey, packet[0]);
-                  // 途中受信データでも即座にリレーを適用してsuccessに移行
-                  const midRelays = setRelaysByKind10002(packet[0].event);
-                  applyRelays(midRelays)
-                    .then(() => {
-                      status = "success";
-                      mainRelaysInitialized = true;
-                    })
-                    .catch((e) => {
-                      console.warn("Mid-stream relay apply failed:", e);
-                    });
-                }
-              },
-            );
-            if (result.length > 0) {
-              queryClient.setQueryData(queryKey, result[0]);
-              cachedData = result[0];
-            }
-          } catch (e) {
-            status = "error";
-            return;
-          }
-        }
-
-        if (cachedData) {
-          const relays = setRelaysByKind10002(cachedData.event);
-          try {
-            await applyRelays(relays);
-            status = "success";
-          } catch (e) {
-            status = "error";
-            return;
-          }
-          mainRelaysInitialized = true;
-        } else {
-          // kind:10002 が見つからなかった場合、defaultRelays にフォールバック
-          console.warn("kind:10002 not found, falling back to default relays");
-          loadingMessage = "connectingRelay.usingDefault";
-          try {
-            await applyRelays(defaultRelays);
-            status = "success";
-          } catch (e) {
-            status = "error";
-            return;
-          }
-          mainRelaysInitialized = true;
-        }
-      } else {
-        try {
-          await applyRelays(lumiSetting.get().relays);
-          status = "success";
-        } catch (e) {
-          status = "error";
-          return;
-        }
-        mainRelaysInitialized = true;
-      }
+    untrack(() => {
+      initWithDefaultRelays();
     });
   });
 </script>
