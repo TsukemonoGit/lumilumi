@@ -374,17 +374,23 @@
 <Popstate />
 
 <QueryClientProvider client={queryClient}>
+  <Header />
+  <Toast />
   <NostrMain>
     {#snippet contents()}
       <SetDefaultRelays paramRelays={dataRelays}>
         {#snippet loading(messageKey)}
-          <p class="text-base font-medium text-base-content text-center p-4">
+          <p
+            class="text-base mt-10 font-medium text-base-content text-center p-4"
+          >
             {$t(messageKey ?? "connectingRelay.connecting")}
           </p>
         {/snippet}
 
         {#snippet error()}
-          <p class="text-base font-medium text-base-content text-center p-4">
+          <p
+            class="text-base font-medium text-base-content text-center p-4 mt-10"
+          >
             {$t("connectingRelay.connectingDetail")}
           </p>
         {/snippet}
@@ -395,10 +401,8 @@
             <LoginUserContacts />
           {/if}
 
-          <Header />
           <SetRepoReactions />
           <Menu />
-          <Toast />
 
           <!-- メディア表示モーダル -->
           <MediaDisplay
