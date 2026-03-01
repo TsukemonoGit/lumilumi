@@ -85,7 +85,7 @@
 
     await waitForConnections({
       checkrelays: currentReadRelays,
-      requiredConnectionRatio: 0.7,
+      requiredConnectionRatio: 0.6,
       onProgress: (connected, total) => {
         console.debug(`relay connection progress: ${connected}/${total}`);
       },
