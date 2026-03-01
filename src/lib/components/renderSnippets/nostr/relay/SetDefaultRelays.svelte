@@ -40,7 +40,7 @@
           RxReqPipeable)
       | undefined;
     error?: Snippet<[Error]>;
-    loading?: Snippet;
+    loading?: Snippet<[string]>;
     contents?: Snippet;
   }
 
@@ -58,7 +58,6 @@
     { authors: [pubkey], kinds: [10002], limit: 1 },
   ] as Nostr.Filter[];
 
-  // TL取得用のリレーのみをフィルタリング（read: true のもの）
   let timelineRelays = $derived.by(() => {
     if (!$defo) return {};
     return Object.fromEntries(
@@ -69,10 +68,9 @@
   });
 
   let status: ReqStatus | undefined = $state();
+  let loadingMessage: string = $state("connectingRelay.establishing");
   let mainRelaysInitialized = $state(false);
 
-  // applyRelays: リレーをセットし、接続完了まで待機してから setReady(true) を呼ぶ。
-  // 呼び出し元は await して status 更新を行うこと。
   async function applyRelays(
     relays: AcceptableDefaultRelaysConfig,
   ): Promise<void> {
@@ -89,20 +87,17 @@
       checkrelays: currentReadRelays,
       requiredConnectionRatio: 0.5,
       onProgress: (connected, total) => {
-        // 進捗通知のみ。setReady は await 完了後に行う。
         console.debug(`relay connection progress: ${connected}/${total}`);
       },
     });
 
-    // waitForConnections は条件達成・タイムアウトどちらでも resolve する。
-    // resolve 後に接続比率を再評価して setReady を確定させる。
     const finalReadRelays = Object.fromEntries(
       Object.entries(get(defo) ?? {}).filter(
         ([_, config]) => config.read === true,
       ),
     );
     const totalCount = Object.keys(finalReadRelays).length;
-    // totalCount が 0 の場合は Error
+
     if (totalCount === 0) {
       throw new Error("No read relays available after connection attempt");
     }
@@ -124,7 +119,6 @@
 
           const pubkey = lumiSetting.get().pubkey;
 
-          // 未ログイン：paramRelays をそのまま read/write でセット
           if (!pubkey) {
             try {
               await applyRelays(readEntries);
@@ -136,7 +130,6 @@
             return;
           }
 
-          // ログイン済み：writeリレーをユーザー設定から取得してマージ
           let writeRelayConfig: {
             url: string;
             read: boolean;
@@ -144,7 +137,6 @@
           }[] = [];
 
           if (lumiSetting.get().useRelaySet === "0") {
-            // kind:10002 からwriteリレーを取得
             let cachedData: EventPacket | undefined | null =
               queryClient.getQueryData(queryKey);
 
@@ -166,7 +158,6 @@
                   cachedData = result[0];
                 }
               } catch (e) {
-                // フェッチ失敗時はwriteなしで続行
                 console.warn(
                   "kind:10002 fetch failed, proceeding without write relays",
                   e,
@@ -187,7 +178,6 @@
                 }));
             }
           } else {
-            // useRelaySet === "1"：lumiSetting のリレーセットからwriteのみ抽出
             writeRelayConfig = (
               lumiSetting.get().relays as {
                 url: string;
@@ -203,8 +193,6 @@
               }));
           }
 
-          // read（paramRelays）＋ write（ユーザー設定）をマージ
-          // 同一URLが両方に存在する場合は read: true, write: true にまとめる
           const merged = new Map<
             string,
             { url: string; read: boolean; write: boolean }
@@ -273,8 +261,6 @@
               (packet: EventPacket[]) => {
                 if (packet.length > 0) {
                   queryClient.setQueryData(queryKey, packet[0]);
-                  // onProgress コールバック内では applyRelays を呼ばない。
-                  // result を受け取った後にまとめて処理する。
                 }
               },
             );
@@ -299,8 +285,17 @@
           }
           mainRelaysInitialized = true;
         } else {
-          status = "error";
-          return;
+          // kind:10002 が見つからなかった場合、defaultRelays にフォールバック
+          console.warn("kind:10002 not found, falling back to default relays");
+          loadingMessage = "connectingRelay.usingDefault";
+          try {
+            await applyRelays(defaultRelays);
+            status = "success";
+          } catch (e) {
+            status = "error";
+            return;
+          }
+          mainRelaysInitialized = true;
         }
       } else {
         try {
@@ -321,5 +316,5 @@
 {:else if status === "error"}
   {@render error?.(new Error("Failed to load relays"))}
 {:else}
-  {@render loading?.()}
+  {@render loading?.(loadingMessage)}
 {/if}

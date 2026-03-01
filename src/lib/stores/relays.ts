@@ -23,7 +23,8 @@ export const defaultRelays = [
   // "wss://relayable.org",
 
   "wss://nostr.bitcoiner.social",
-  "wss://relay.nostr.band",
+  "wss://nostr-pub.wellorder.net/",
+  "wss://relay.snort.social/",
 ];
 
 //feedback送信用のリレー

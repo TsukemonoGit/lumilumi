@@ -476,6 +476,8 @@
   },
   "connectingRelay": {
     "connecting": "Connecting to relays",
-    "connectingDetail": "An error occurred while connecting to relays"
+    "connectingDetail": "An error occurred while connecting to relays",
+    "establishing": "Establishing secure connections...",
+    "usingDefault": "kind:10002 not found, connecting to default relays"
   }
 }

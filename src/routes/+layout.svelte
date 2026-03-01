@@ -377,12 +377,10 @@
   <NostrMain>
     {#snippet contents()}
       <SetDefaultRelays paramRelays={dataRelays}>
-        {#snippet loading()}
-          {#await delay(1000) then}
-            <p class="text-base font-medium text-base-content text-center p-4">
-              {$t("connectingRelay.connecting")}
-            </p>
-          {/await}
+        {#snippet loading(messageKey)}
+          <p class="text-base font-medium text-base-content text-center p-4">
+            {$t(messageKey ?? "connectingRelay.connecting")}
+          </p>
         {/snippet}
 
         {#snippet error()}
