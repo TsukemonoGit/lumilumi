@@ -4,25 +4,11 @@
   import type { ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
-  import type {
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
-  } from "rx-nostr";
   import { untrack, type Snippet } from "svelte";
 
   interface Props {
     relays?: string[] | undefined;
     id: string;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
     error?: Snippet<[Error]>;
     nodata?: Snippet;
     loading?: Snippet;
@@ -32,7 +18,6 @@
   }
 
   let {
-    req = undefined,
     relays = undefined,
 
     id,
@@ -45,7 +30,7 @@
 
   let queryKey = $derived(["note", id]);
   let max3relays = $derived(relays ? relays.slice(0, 3) : undefined);
-  let result = $derived(useEvent(queryKey, id, req, max3relays));
+  let result = $derived(useEvent(queryKey, id, max3relays));
   let data = $derived(result.data);
   let status = $derived(result.status);
   let errorData = $derived(result.error);
@@ -63,7 +48,7 @@
   {@render content?.({
     data: $data?.event,
     status: $status,
-  })}{:else if $status === "success" && !$data?.event && !$data?.event.id}
+  })}{:else if $status === "success" && !$data?.event?.id}
   {@render nodata?.()}
 {:else}
   {@render loading?.()}
