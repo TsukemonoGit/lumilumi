@@ -374,10 +374,10 @@
 <Popstate />
 
 <QueryClientProvider client={queryClient}>
-  <Header />
   <Toast />
   <NostrMain>
     {#snippet contents()}
+      <Header />
       <SetDefaultRelays paramRelays={dataRelays}>
         {#snippet loading(messageKey)}
           <p
