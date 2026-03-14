@@ -19,7 +19,7 @@
     lumiSetting.get().imageAutoExpand === "all" ||
       (lumiSetting.get().imageAutoExpand === "following" &&
         author &&
-        (author === lumiSetting.get().pubkey || followList.get().has(author)))
+        (author === lumiSetting.get().pubkey || followList.get().has(author))),
   );
 </script>
 

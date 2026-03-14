@@ -13,10 +13,10 @@
   let { contents, url }: Props = $props();
 
   let imageURL = $derived(
-    isvalidURL(contents.image) ? contents.image : undefined
+    isvalidURL(contents.image) ? contents.image : undefined,
   );
   let favicon = $derived(
-    isvalidURL(contents.favicon) ? contents.favicon : undefined
+    isvalidURL(contents.favicon) ? contents.favicon : undefined,
   );
   let hostname = $derived(isvalidURL(url) ? new URL(url).hostname : "");
 </script>
@@ -44,6 +44,7 @@
       >
         <figure class="overflow-hidden flex items-center justify-center">
           <img
+            crossorigin="anonymous"
             loading="lazy"
             height="128"
             width="128"
@@ -79,6 +80,7 @@
         {#if favicon}
           {#if lumiSetting.get().showImg && imageURL}
             <img
+              crossorigin="anonymous"
               width="20"
               height="20"
               loading="lazy"
