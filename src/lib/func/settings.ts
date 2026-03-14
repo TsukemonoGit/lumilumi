@@ -39,7 +39,7 @@ export function setTheme(theme: Theme) {
 }
 
 export async function getRelayList(
-  pubkey: string
+  pubkey: string,
 ): Promise<EventPacket | null> {
   const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
@@ -74,7 +74,7 @@ export async function getRelayList(
 
 export async function getDoukiList(
   filters: Filter[],
-  relays: DefaultRelayConfig[]
+  relays: DefaultRelayConfig[],
 ): Promise<EventPacket> {
   const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
@@ -112,7 +112,7 @@ export async function getDoukiList(
 }
 
 export async function getQueryRelays(
-  pubkey: string
+  pubkey: string,
 ): Promise<DefaultRelayConfig[] | undefined> {
   let defaultRelayData: EventPacket | null | undefined =
     queryClient?.getQueryData(["defaultRelay", pubkey] as QueryKey);
@@ -183,7 +183,7 @@ export async function toMuteList(event: Nostr.Event): Promise<MuteList> {
 export async function getNaddrEmojiList(
   _rxNostr: RxNostr | undefined,
   filters: Filter[],
-  relays: DefaultRelayConfig[] | undefined
+  relays: DefaultRelayConfig[] | undefined,
 ): Promise<EventPacket[]> {
   // const rxNostr = createRxNostr({ verifier: get(verifier) ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
@@ -222,7 +222,7 @@ export async function getNaddrEmojiList(
 
 export async function getMutebykindList(
   filters: Filter[],
-  relays: DefaultRelayConfig[]
+  relays: DefaultRelayConfig[],
 ): Promise<EventPacket[]> {
   const rxNostr = createRxNostr({ verifier: verifier.get() ?? cryptoVerifier });
   const rxReq = createRxBackwardReq();
@@ -262,7 +262,7 @@ export async function getMutebykindList(
 //pachet[]をmutebykindのほぞんのかたちにする
 export async function getMuteByList(
   events: Nostr.Event[],
-  beforeMuteByList: LumiMuteByKindList[] | undefined
+  beforeMuteByList: LumiMuteByKindList[] | undefined,
 ): Promise<LumiMuteByKindList[]> {
   let muteByList: LumiMuteByKindList[] = [];
 
@@ -270,7 +270,7 @@ export async function getMuteByList(
     const beforeData = beforeMuteByList?.find(
       (list) =>
         list.event?.tags.find((tag) => tag[0] === "d")?.[1] ===
-        packet.tags.find((tag) => tag[0] === "d")?.[1]
+        packet.tags.find((tag) => tag[0] === "d")?.[1],
     );
 
     // 前回データがあり、同じpubkeyで、より新しい場合は既存データを使用
@@ -305,7 +305,7 @@ export async function getMuteByList(
         if (pTags.length > 0) {
           // muteByListに同じkindが存在するか確認
           const existingKindIndex = muteByList.findIndex(
-            (item) => item.kind === kind
+            (item) => item.kind === kind,
           );
 
           if (existingKindIndex !== -1) {
@@ -328,18 +328,18 @@ export async function getMuteByList(
 }
 
 export async function decryptContent(
-  event: Nostr.Event
+  event: Nostr.Event,
 ): Promise<string[][] | null> {
   try {
     //旧式nip04 新式nip44 対応
     const privateTagsJson = event.content.includes("?iv=")
       ? await (window?.nostr as Nostr.Nip07.Nostr)?.nip04?.decrypt(
           event.pubkey,
-          event.content
+          event.content,
         )
       : await (window?.nostr as Nostr.Nip07.Nostr)?.nip44?.decrypt(
           event.pubkey,
-          event.content
+          event.content,
         );
     return privateTagsJson ? JSON.parse(privateTagsJson) : null;
   } catch (error) {
@@ -350,7 +350,7 @@ export async function decryptContent(
 
 export async function encryptPrvTags(
   pubkey: string,
-  prvTags: string[][]
+  prvTags: string[][],
 ): Promise<string | undefined> {
   try {
     //44で暗号化
@@ -376,7 +376,7 @@ export interface ProgressDetails {
 export type ProgressCallback = (
   current: number,
   total: number,
-  details?: ProgressDetails
+  details?: ProgressDetails,
 ) => void;
 
 interface FilterWithId {
@@ -420,7 +420,7 @@ function createNaddrFilters(event: Nostr.Event): FilterWithId[] {
       }
       return acc;
     },
-    []
+    [],
   );
 }
 
@@ -429,7 +429,7 @@ async function processChunksInParallel(
   chunkedFilters: Nostr.Filter[][],
   rxNostr: RxNostr | undefined,
   relays: DefaultRelayConfig[] | undefined,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
 ): Promise<any[][]> {
   let completedChunks = 0;
 
@@ -460,7 +460,7 @@ async function processChunksInParallel(
 
         return [];
       }
-    })
+    }),
   );
 }
 
@@ -475,18 +475,20 @@ function normalizeShortcode(shortcode: string): string | null {
 }
 
 // イベントから絵文字を抽出
-function extractEmojisFromEvent(event: any): string[][] {
+function extractEmojisFromEvent(event: Nostr.Event): string[][] {
+  const atag = `${event.kind}:${event.pubkey}:${event.tags.find((tag: string[]) => tag[0] === "d")?.[1] || ""}`;
+
   return event.tags.reduce(
     (acc: string[][], [tag, shortcode, url]: string[]) => {
       if (tag === "emoji") {
         const normalizedShortcode = normalizeShortcode(shortcode);
         if (normalizedShortcode !== null) {
-          return [...acc, [normalizedShortcode, url]];
+          return [...acc, [normalizedShortcode, url, atag]];
         }
       }
       return acc;
     },
-    []
+    [],
   );
 }
 
@@ -513,7 +515,7 @@ function createLatestEventsMap(flattenedList: any[]): Map<string, any> {
 // フィルターに対応するイベントを取得
 function getSortedEvents(
   naddrFilters: FilterWithId[],
-  latestEventsMap: Map<string, any>
+  latestEventsMap: Map<string, any>,
 ): any[] {
   return naddrFilters.map((filter) => {
     const id = filter.id;
@@ -529,7 +531,7 @@ function getSortedEvents(
 // 結果を統合
 function mergeResults(
   pkListArray: any[][],
-  naddrFilters: FilterWithId[]
+  naddrFilters: FilterWithId[],
 ): string[][] {
   if (pkListArray.length === 0) {
     return [];
@@ -542,6 +544,7 @@ function mergeResults(
   return sortedLatestEvents.reduce((acc: string[][], pk) => {
     if (pk?.event) {
       const emojis = extractEmojisFromEvent(pk.event);
+      console.log(emojis);
       return [...acc, ...emojis];
     }
     return acc;
@@ -552,7 +555,7 @@ export async function createEmojiListFrom10030(
   event: Nostr.Event,
   rxNostr: RxNostr | undefined = undefined,
   relays: DefaultRelayConfig[] | undefined = undefined,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
 ): Promise<string[][]> {
   // ステップ1: 直接の絵文字を抽出
   onProgress?.(1, 4, { directEmojiCount: 0 });
@@ -567,7 +570,7 @@ export async function createEmojiListFrom10030(
 
   const chunkedFilters = chunkArray(
     naddrFilters.map((fil) => fil.filter),
-    20
+    20,
   );
 
   onProgress?.(2, 4, {
@@ -580,7 +583,7 @@ export async function createEmojiListFrom10030(
     chunkedFilters,
     rxNostr,
     relays,
-    onProgress
+    onProgress,
   );
 
   // ステップ4: 結果を統合
@@ -604,14 +607,14 @@ export async function createEmojiListFrom10030(
 // フィルターを5個ずつのチャンクに分割する関数
 function chunkArray(array: Filter[], chunkSize: number) {
   return Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, i) =>
-    array.slice(i * chunkSize, i * chunkSize + chunkSize)
+    array.slice(i * chunkSize, i * chunkSize + chunkSize),
   );
 }
 
 export function updateMuteByList(
   tags: string[][],
   ev: Nostr.Event,
-  list: LumiMuteByKindList[]
+  list: LumiMuteByKindList[],
 ): LumiMuteByKindList[] {
   // 対象の 'p' タグから新しいリストを生成
   const newList = tags

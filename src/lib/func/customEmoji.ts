@@ -15,13 +15,13 @@ type EmojiPair = [string, string];
 // ----------------------------------------
 export function addEmojiTag(
   tags: string[][],
-  emoji: string[]
+  emoji: string[],
 ): { tags: string[][]; finalName: string } {
   const newTags = [...tags];
 
   // 1. URLが同じ絵文字を探す
   const sameEmoji = newTags.find(
-    (tag) => tag[0] === "emoji" && tag[2] === emoji[1]
+    (tag) => tag[0] === "emoji" && tag[2] === emoji[1],
   );
 
   if (sameEmoji) {
@@ -31,7 +31,7 @@ export function addEmojiTag(
   // 2. 同じ名前の絵文字があるか確認
   let currentEmojiName = emoji[0];
   let sameNameEmoji = newTags.find(
-    (tag) => tag[0] === "emoji" && tag[1] === currentEmojiName
+    (tag) => tag[0] === "emoji" && tag[1] === currentEmojiName,
   );
 
   // 3. 名前の重複を解決
@@ -43,15 +43,15 @@ export function addEmojiTag(
       do {
         currentEmojiName = `${baseName}_${num}`;
         sameNameEmoji = newTags.find(
-          (tag) => tag[0] === "emoji" && tag[1] === currentEmojiName
+          (tag) => tag[0] === "emoji" && tag[1] === currentEmojiName,
         );
         num++;
       } while (sameNameEmoji);
 
-      newTags.push(["emoji", currentEmojiName, emoji[1]]);
+      newTags.push(["emoji", currentEmojiName, ...emoji.slice(1)]);
     }
   } else {
-    newTags.push(["emoji", currentEmojiName, emoji[1]]);
+    newTags.push(["emoji", currentEmojiName, ...emoji.slice(1)]);
   }
 
   console.log(newTags);
@@ -85,7 +85,7 @@ export function resetEmojiCacheForHex(hex: string): void {
  */
 export async function collectEmojiTagsFromText(
   tags: string[][],
-  input: string
+  input: string,
 ): Promise<string[][]> {
   let returnTags = [...tags];
   const emojiSet = extractEmojiSet(input);
@@ -114,7 +114,7 @@ export async function collectEmojiTagsFromText(
           }
         } catch {}
       }
-    })
+    }),
   );
 
   for (const pair of newEmojiPairs) {
@@ -153,7 +153,7 @@ export const getUserProfile = async (hex: string): Promise<Profile | null> => {
       operator: latest(),
     },
     undefined,
-    3000
+    3000,
   );
 
   if (metadata[0]?.event) {
