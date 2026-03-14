@@ -1,6 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { unfurl } from "unfurl.js";
 import type { RequestHandler } from "./$types";
+import type { Metadata } from "unfurl.js/dist/types";
 
 export const GET: RequestHandler = async ({ url: request }) => {
   const url = request.searchParams.get("url");
@@ -28,7 +29,7 @@ export const GET: RequestHandler = async ({ url: request }) => {
     userAgent = "facebookexternalhit";
   }
 
-  const result = await unfurl(url, {
+  const result: Metadata = await unfurl(url, {
     headers: {
       Accept: "text/html, application/xhtml+xml",
       "User-Agent": userAgent,

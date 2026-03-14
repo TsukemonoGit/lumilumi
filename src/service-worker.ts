@@ -56,7 +56,7 @@ const manifest = self.__WB_MANIFEST as Array<ManifestEntry>;
 const cacheEntries: RequestInfo[] = [];
 
 const manifestURLs = manifest.map(
-  (entry) => new URL(entry.url, self.location.href).href
+  (entry) => new URL(entry.url, self.location.href).href,
 );
 
 // --- Event Listeners ---
@@ -72,7 +72,11 @@ registerRoute(({ url }) => manifestURLs.includes(url.href), buildStrategy());
 // #cache を含む URL だけをキャッシュ
 let lastCheckedTime = 0; // 最後にチェックしたタイムスタンプ
 
-const cacheKeyWillBeUsed = async ({ request }): Promise<string> => {
+const cacheKeyWillBeUsed = async ({
+  request,
+}: {
+  request: Request;
+}): Promise<string> => {
   const url = new URL(request.url);
   url.hash = ""; // ハッシュを削除
   return url.toString();
@@ -126,7 +130,7 @@ registerRoute(
       { cacheKeyWillBeUsed },
       { cachedResponseWillBeUsed },
     ],
-  })
+  }),
 );
 //この修正により、https://example.com/image.jpg#cache という形式のリクエストでもキャッシュを利用可能になります。同時に、https://example.com/image.jpg のリクエストも同じキャッシュを利用できるため、柔軟な対応が可能です。
 //一定間隔（例: 30秒）以内のリクエストでは期限チェックをスキップし、キャッシュをそのまま返します。
@@ -135,7 +139,7 @@ registerRoute(
 registerRoute(
   ({ request }) =>
     request.destination === "image" || request.destination === "video",
-  new NetworkOnly()
+  new NetworkOnly(),
 );
 
 setDefaultHandler(new NetworkFirst({ cacheName }));
@@ -148,7 +152,7 @@ setCatchHandler(
       return fallback || Response.error();
     }
     return Response.error();
-  }
+  },
 );
 // this is necessary, since the new service worker will keep on skipWaiting state
 // and then, caches will not be cleared since it is not activated
@@ -160,7 +164,7 @@ function buildStrategy(): Strategy {
     class CacheNetworkRace extends Strategy {
       _handle(
         request: Request,
-        handler: StrategyHandler
+        handler: StrategyHandler,
       ): Promise<Response | undefined> {
         const fetchAndCachePutDone: Promise<Response> =
           handler.fetchAndCachePut(request);
@@ -184,7 +188,7 @@ function buildStrategy(): Strategy {
                 !cacheMatchResult.value
               )
                 reject(fetchAndCachePutResult.reason);
-            }
+            },
           );
         });
       }
@@ -210,7 +214,7 @@ async function handleInstallEvent(event: ExtendableEvent) {
           existingRequests = await cache.keys();
           if (existingRequests.length > 1000) {
             console.warn(
-              "[SW] Too many cache entries, skipping install cache population"
+              "[SW] Too many cache entries, skipping install cache population",
             );
             return;
           }
@@ -221,7 +225,7 @@ async function handleInstallEvent(event: ExtendableEvent) {
 
         const existingURLs = new Set(existingRequests.map((req) => req.url));
         const newEntries = cacheEntries.filter(
-          (entry) => !existingURLs.has((entry as Request).url)
+          (entry) => !existingURLs.has((entry as Request).url),
         );
 
         if (newEntries.length > 0) {
@@ -234,7 +238,7 @@ async function handleInstallEvent(event: ExtendableEvent) {
       })
       .then(() => {
         self.skipWaiting();
-      })
+      }),
   );
 }
 
@@ -275,7 +279,7 @@ async function handleActivateEvent(event: ExtendableEvent) {
       } catch (e) {
         console.error("[SW] Failed to clear media cache:", e);
       }
-    })()
+    })(),
   );
 }
 
@@ -288,7 +292,7 @@ async function handleFetchEvent(event: FetchEvent) {
   }
 }
 
-async function handlePostRequest(request) {
+async function handlePostRequest(request: Request) {
   if (!request) {
     console.error("Request is undefined");
     return new Response("Invalid Request", { status: 400 });
@@ -296,10 +300,10 @@ async function handlePostRequest(request) {
 
   const formData = await request.clone().formData();
   targetData = {
-    url: formData.get("url"),
-    text: formData.get("text"),
-    title: formData.get("title"),
-    media: formData.getAll("media"),
+    url: formData.get("url") as string | undefined,
+    text: formData.get("text") as string | undefined,
+    title: formData.get("title") as string | undefined,
+    media: formData.getAll("media") as File[] | undefined,
   };
   console.log("data", targetData);
   // メディアキャッシュ処理
@@ -311,7 +315,7 @@ async function handlePostRequest(request) {
           `/cached-media/${file.name}-${index}`,
           {
             method: "GET",
-          }
+          },
         );
         const cacheResponse = new Response(file, {
           headers: {
@@ -319,17 +323,18 @@ async function handlePostRequest(request) {
           },
         });
         await cache.put(cacheRequest, cacheResponse);
-      })
+      }),
     );
   }
 
   // クライアントへの送信
-  const allClients = await (self as any).clients.matchAll({
+  const allClients = await self.clients.matchAll({
     includeUncontrolled: true,
   });
+
   media = targetData.media
     ? targetData.media.map(
-        (file, index) => `/cached-media/${file.name}-${index}`
+        (file, index) => `/cached-media/${file.name}-${index}`,
       )
     : null;
   console.log(media);
@@ -341,13 +346,13 @@ async function handlePostRequest(request) {
         url: targetData.url,
         media: media,
       });
-    })
+    }),
   );
 
   return new Response("", { status: 200 });
 }
 
-async function handleMessageEvent(event) {
+async function handleMessageEvent(event: ExtendableMessageEvent) {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
@@ -372,7 +377,7 @@ async function handleMessageEvent(event) {
         }
       })
       .finally(() => {
-        event.ports[0].postMessage({ success: true });
+        (event.ports[0] as MessagePort).postMessage({ success: true });
       });
     //const cache = await caches.open("media-cache");
     //await cache.delete(event.data.url);
@@ -380,9 +385,9 @@ async function handleMessageEvent(event) {
   }
 }
 
-async function sendLatestDataToClient(client) {
-  // キャッシュから最新データを取得して送信
-
+async function sendLatestDataToClient(
+  client: Client | MessagePort | ServiceWorker | null,
+) {
   const response = targetData
     ? {
         title: targetData.title,
@@ -391,5 +396,5 @@ async function sendLatestDataToClient(client) {
         media: media,
       }
     : null;
-  client.postMessage(response);
+  (client as Client).postMessage(response);
 }

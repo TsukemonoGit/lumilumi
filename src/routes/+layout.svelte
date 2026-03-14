@@ -60,7 +60,6 @@
   } from "$lib/func/reactions";
   import { setRelaysByKind10002 } from "$lib/stores/useRelaySet";
   import { initThemeSettings } from "$lib/func/theme";
-  import { delay } from "$lib/func/util";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
 
   // Workerインポート
