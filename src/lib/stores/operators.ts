@@ -108,7 +108,7 @@ export function filterNaddr(
       event.kind === kind &&
       event.pubkey === pubkey &&
       !!event.tags?.[0]?.[1] &&
-      event.tags[0][1] === identifier,
+      event.tags.find((tag) => tag[0] === "d")?.[1] === identifier,
   );
 }
 
@@ -253,12 +253,12 @@ function getTagValue(
 }
 
 export function zapCheck() {
-  return filter((event: EventPacket) => {
-    if (!event?.event || event.event.kind !== 9735) {
+  return filter((pk: EventPacket) => {
+    if (!pk?.event || pk.event.kind !== 9735) {
       return true;
     }
 
-    const pub = zappedPubkey(event.event);
+    const pub = pk.event.tags.find((tag) => tag[0] === "p")?.[1];
     if (pub === lumiSetting.get().pubkey) {
       return true;
     } else {
@@ -428,7 +428,7 @@ export const mediaOperator = (sift: number) => {
         map((result) => ({
           result,
           oldestCreatedAt:
-              sift !== 0 && eventBuffer.length >= sift
+            sift !== 0 && eventBuffer.length >= sift
               ? eventBuffer[sift - 1].event.created_at
               : eventBuffer[eventBuffer.length - 1].event.created_at,
           totalPacketsProcessed: eventBuffer.length,

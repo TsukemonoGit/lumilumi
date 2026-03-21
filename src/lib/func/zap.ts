@@ -42,7 +42,7 @@ export async function makeInvoice({
       ...(kind !== undefined ? { kind } : {}),
     });
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(
-      zapRequest
+      zapRequest,
     );
     const encoded = encodeURI(JSON.stringify(signedRequest));
 
@@ -68,7 +68,7 @@ export async function makeInvoice({
 }
 
 export const getZapLNURLPubkey = async (
-  metadata: Nostr.Event
+  metadata: Nostr.Event,
 ): Promise<{ pub: string | undefined; error?: string }> => {
   const data: { pub: string | undefined; error?: string } | undefined =
     queryClient.getQueryData(["zapLNURLPubkey", metadata.pubkey]);
@@ -86,7 +86,7 @@ export const getZapLNURLPubkey = async (
 };
 
 export async function fetchZapLNURLPubkey(
-  metadata: Nostr.Event
+  metadata: Nostr.Event,
 ): Promise<{ pub: string | undefined; error?: string }> {
   try {
     let lnurl: string = "";
@@ -97,7 +97,7 @@ export async function fetchZapLNURLPubkey(
       const [name, domain] = lud16.split("@");
       lnurl = new URL(
         `/.well-known/lnurlp/${name}`,
-        `https://${domain}`
+        `https://${domain}`,
       ).toString();
     } else if (lud06) {
       const { words } = bech32.decode(lud06, 1000);
@@ -197,15 +197,15 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
         operator: pipe(latest(), uniq()),
         req: undefined,
       },
-      undefined
+      undefined,
     );
     if (relayData.length > 0) {
       queryClient.setQueryData(
-        ["relays", pubkey],
-        (oldData: any) => relayData[0]
+        ["defaultRelay", pubkey],
+        (oldData: EventPacket | undefined) => relayData[0],
       );
       queryRelay = relayData[0];
-      console.log(queryClient.getQueryData(["relays", pubkey]));
+      console.log(queryClient.getQueryData(["defaultRelay", pubkey]));
     }
   }
 
@@ -223,7 +223,7 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
         return acc;
       }
     },
-    [] // 初期値を空の配列に設定
+    [], // 初期値を空の配列に設定
   );
 
   console.log("readRelay", readRelay);
@@ -237,7 +237,7 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
 //https://scrapbox.io/nostr/NIP-57
 export function extractAmount(
   note: Nostr.Event,
-  zapRequestEvent: Nostr.Event | undefined
+  zapRequestEvent: Nostr.Event | undefined,
 ): number | undefined {
   //bolt11 tag を持たなければならない
   const bolt11Tag = (note?.tags || []).find((tag) => tag[0] === "bolt11");
@@ -251,13 +251,13 @@ export function extractAmount(
     //console.log(decoded);
     if (decoded) {
       const amountSection = decoded.sections.find(
-        (section) => section.name === "amount"
+        (section) => section.name === "amount",
       )?.value;
       //  console.log("zapRequestEvent", zapRequestEvent);
       // console.log("amountSection", amountSection);
 
       const requestAmount = zapRequestEvent?.tags.find(
-        (tag) => tag[0] === "amount"
+        (tag) => tag[0] === "amount",
       )?.[1];
       // console.log("requestAmount", requestAmount);
       //`zapレシート`の`bolt11`タグに含まれる`invoiceAmount`は（存在する場合には）`zapリクエスト`の`amount`タグと等しくなければならない
@@ -324,7 +324,7 @@ export function lnurlToZapAddress(lud06: string): string | undefined {
     const lnurl = new TextDecoder().decode(data);
 
     const match = lnurl.match(
-      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/([^\/]+)$/
+      /^https:\/\/([^\/]+)\/\.well-known\/lnurlp\/([^\/]+)$/,
     );
 
     if (match && match.length >= 3) {
@@ -343,7 +343,7 @@ export function lnurlToZapAddress(lud06: string): string | undefined {
 //https://github.com/nbd-wtf/nostr-tools/blob/master/nip57.ts
 //lud16( name@domain )優先
 export async function getZapEndpoint(
-  metadata: Nostr.Event
+  metadata: Nostr.Event,
 ): Promise<null | string> {
   try {
     let lnurl: string = "";
@@ -353,7 +353,7 @@ export async function getZapEndpoint(
       let [name, domain] = lud16.split("@");
       lnurl = new URL(
         `/.well-known/lnurlp/${name}`,
-        `https://${domain}`
+        `https://${domain}`,
       ).toString();
     } else if (lud06) {
       let { words } = bech32.decode(lud06, 1000);
