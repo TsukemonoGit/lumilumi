@@ -221,7 +221,7 @@
         event.pubkey,
         newDecryptContent,
       );
-      if (!encryptedContent) {
+      if (encryptedContent === undefined) {
         addToast({
           data: {
             title: "Error",
