@@ -38,8 +38,7 @@
     },
   });
 
-  // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen = $state(false);
   let addTag: string[] = [];
   async function handleClickAdd() {
     console.log("[type]", $selectedLabel, "[str]", muteInput);
@@ -116,13 +115,13 @@
 
       $nowProgress = false;
 
-      dialogOpen?.(true);
+      dialogOpen = true;
       return;
     }
     //本当に含まれていないか探す
     const privateTags = await decryptContent(kind10000);
     const check = [...(privateTags ?? []), ...kind10000.tags].find(
-      (tag) => tag[0] === addTag[0] && tag.length > 1 && tag[1] === addTag[1]
+      (tag) => tag[0] === addTag[0] && tag.length > 1 && tag[1] === addTag[1],
     );
     if (!check) {
       //含まれてなかったたらデータを更新してpublishしてから
@@ -188,7 +187,7 @@
   }
 
   async function handleClickOk() {
-    dialogOpen?.(false);
+    dialogOpen = false;
 
     if (addTag.length <= 0) {
       addToast({
@@ -305,7 +304,7 @@
   >
 </div>
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={handleClickOk}
   title={$_("create.kind10000.title")}
   okButtonName="OK"

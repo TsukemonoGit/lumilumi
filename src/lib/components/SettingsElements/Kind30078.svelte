@@ -49,8 +49,8 @@
 
   // svelte-ignore non_reactive_update
   let dialogOpen: Writable<boolean> = writable(false);
-  // svelte-ignore non_reactive_update
-  let alertdialogOpen: (bool: boolean) => void = () => {};
+
+  let alertdialogOpen = $state(false);
 
   async function handleClickUpDownload() {
     //localのデータを整形 nameは未定？
@@ -105,7 +105,7 @@
         req: undefined,
         initData: undefined,
       },
-      relays.map(({ url, read, write }) => url)
+      relays.map(({ url, read, write }) => url),
     );
     if (kind30078.length > 0) {
       set30078(kind30078[0].event);
@@ -125,13 +125,13 @@
       return;
     }
 
-    alertdialogOpen?.(true);
+    alertdialogOpen = true;
   };
 
   const handleClickPublish = async () => {
-    alertdialogOpen?.(false);
+    alertdialogOpen = false;
     const sameIndex = kind30078LumiSettings.findIndex(
-      (data) => data.name === saveName
+      (data) => data.name === saveName,
     );
     const addData: Kind30078LumiSetting = {
       name: saveName,
@@ -215,7 +215,7 @@
       try {
         localStorage?.setItem(
           STORAGE_KEYS.SHOW_BANNER,
-          loadData.showBanner.toString()
+          loadData.showBanner.toString(),
         );
       } catch (error) {
         debugError("failed to save", error);
@@ -244,7 +244,7 @@
       try {
         localStorage?.setItem(
           STORAGE_KEYS.REGEX_FILTER,
-          loadData.globalRegexFilter
+          loadData.globalRegexFilter,
         );
       } catch (error) {
         debugError("failed to save", error);
@@ -281,7 +281,7 @@
         try {
           localStorage?.setItem(
             STORAGE_KEYS.TIMELINE_FILTER,
-            JSON.stringify(mergedFilter)
+            JSON.stringify(mergedFilter),
           );
         } catch (e) {
           console.warn("Failed to save loaded timelineFilter:", e);
@@ -291,7 +291,7 @@
       } catch (error: any) {
         console.warn(
           "Loaded timelineFilter is invalid, using default:",
-          error.message
+          error.message,
         );
 
         // エラー時はデフォルト値を使用
@@ -302,7 +302,7 @@
         try {
           localStorage?.setItem(
             STORAGE_KEYS.TIMELINE_FILTER,
-            JSON.stringify(defaultFilter)
+            JSON.stringify(defaultFilter),
           );
         } catch (e) {
           console.warn("Failed to save default timelineFilter:", e);
@@ -319,7 +319,7 @@
       Object.assign(uploader, uploaderData);
       localStorage?.setItem(
         STORAGE_KEYS.UPLOADER,
-        JSON.stringify(uploaderData)
+        JSON.stringify(uploaderData),
       );
     }
 
@@ -332,7 +332,7 @@
   };
 
   async function publishSettings(
-    lumiData: Kind30078LumiSetting[]
+    lumiData: Kind30078LumiSetting[],
   ): Promise<boolean> {
     try {
       $nowProgress = true;
@@ -389,7 +389,7 @@
   }
 
   const configToWrite = (
-    relays: DefaultRelayConfig[] | undefined
+    relays: DefaultRelayConfig[] | undefined,
   ): string[] | undefined => {
     return !relays
       ? undefined
@@ -451,7 +451,7 @@
                   <td
                     ><time datetime={datetime(setting.created_at)}
                       >{new Date(
-                        setting.created_at * 1000
+                        setting.created_at * 1000,
                       ).toLocaleString()}</time
                     ></td
                   >
@@ -488,7 +488,7 @@
 </Dialog>
 
 <AlertDialog
-  bind:openDialog={alertdialogOpen}
+  bind:open={alertdialogOpen}
   onClickOK={handleClickPublish}
   title={`SAVE`}
   okButtonName="OK"

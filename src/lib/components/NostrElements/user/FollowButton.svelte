@@ -44,7 +44,7 @@
   let afterEventParameters: Nostr.EventParameters | undefined = $state();
 
   // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+  let dialogOpen = $state(false);
 
   let contactsQueryKey: QueryKey = $derived([
     "naddr",
@@ -70,8 +70,7 @@
     });
   };
 
-  // svelte-ignore non_reactive_update
-  let dialogCreateKind3Open: (bool: boolean) => void = () => {};
+  let dialogCreateKind3Open = $state(false);
 
   // Handle follow/unfollow logic
   const handleFollow = async () => {
@@ -85,7 +84,7 @@
 
     if (!beforeKind3) {
       //新しいKind3作っていいですかを出す
-      dialogCreateKind3Open?.(true);
+      dialogCreateKind3Open = true;
       return;
     }
 
@@ -110,7 +109,7 @@
       "[FollowButton] Cached Kind 3:",
       cachedKind3?.event.created_at
         ? new Date(cachedKind3.event.created_at * 1000).toISOString()
-        : "no cache"
+        : "no cache",
     );
 
     // キャッシュをクリアして最新データを強制取得
@@ -125,7 +124,7 @@
         operator: pipe(latest()),
       },
       undefined,
-      5000 // タイムアウトを5000msに延長
+      5000, // タイムアウトを5000msに延長
     );
 
     console.log(
@@ -133,12 +132,12 @@
       newKind3.length > 0
         ? {
             created_at: new Date(
-              newKind3[0].event.created_at * 1000
+              newKind3[0].event.created_at * 1000,
             ).toISOString(),
             p_tags_count: newKind3[0].event.tags.filter((t) => t[0] === "p")
               .length,
           }
-        : "no data from network"
+        : "no data from network",
     );
 
     // ネットワークから取得したデータとキャッシュを比較
@@ -159,7 +158,7 @@
         // キャッシュを復元
         queryClient.setQueryData(
           contactsQueryKey,
-          (oldData: any) => cachedKind3
+          (oldData: any) => cachedKind3,
         );
       } else {
         // キャッシュなし、ネットワークデータを使用
@@ -187,7 +186,7 @@
       } catch (error) {
         console.error(
           "[FollowButton] Failed to save Kind 3 to localStorage:",
-          error
+          error,
         );
       }
 
@@ -206,7 +205,7 @@
 
     const tags = isfollowee
       ? snapbefore.tags.filter(
-          ([tagName, pub]) => !(tagName === "p" && pub === pubkey)
+          ([tagName, pub]) => !(tagName === "p" && pub === pubkey),
         )
       : [...snapbefore.tags, ["p", pubkey]];
 
@@ -218,18 +217,18 @@
     };
 
     $nowProgress = false;
-    dialogOpen?.(true);
+    dialogOpen = true;
   };
 
   // Handle event publishing
   const publishEvent = async () => {
-    dialogOpen?.(false);
+    dialogOpen = false;
     $nowProgress = true;
     //kind3の更新はrelaySearchRelaysにも投げる（kind3,10002,kind0なんかそのへん特化（kind:3含むとこだけにする））
 
     try {
       const result = await safePublishEvent(
-        $state.snapshot(afterEventParameters) as Nostr.Event
+        $state.snapshot(afterEventParameters) as Nostr.Event,
       );
 
       if ("errorCode" in result) {
@@ -249,7 +248,7 @@
 
   const handlePublishResult = (
     res: OkPacketAgainstEvent[],
-    ev: Nostr.Event
+    ev: Nostr.Event,
   ) => {
     const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
     const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
@@ -258,7 +257,7 @@
     showToast(
       isSuccess.length > 0 ? "Success" : "Failed",
       message,
-      isSuccess.length > 0 ? "bg-green-500" : "bg-red-500"
+      isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
     );
 
     if (isSuccess.length > 0) {
@@ -286,8 +285,7 @@
   };
 
   // Handle petname dialog
-  // svelte-ignore non_reactive_update
-  let openPetnameDialog: (bool: boolean) => void = () => {};
+  let openPetnameDialog = $state(false);
   let petnameInput: string = $state("");
 
   const handlePetnameClick = async () => {
@@ -295,7 +293,7 @@
       queryClient.getQueryData(contactsQueryKey);
     await refreshContactsData(kind3Event);
     petnameInput = followList.get().get(pubkey) ?? "";
-    openPetnameDialog?.(true);
+    openPetnameDialog = true;
     $nowProgress = false;
   };
 
@@ -327,12 +325,12 @@
       pubkey: beforeKind3.pubkey,
     };
     publishEvent();
-    openPetnameDialog?.(false);
+    openPetnameDialog = false;
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    dialogCreateKind3Open?.(false);
+    dialogCreateKind3Open = false;
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -358,7 +356,7 @@
       } else {
         const { event: ev, res } = await promisePublishSignedEvent(event);
         const isSuccessRelays: OkPacketAgainstEvent[] = res.filter(
-          (item) => item.ok
+          (item) => item.ok,
         );
 
         if (isSuccessRelays.length <= 0) {
@@ -412,7 +410,7 @@
   {/if}
 {/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={publishEvent}
   title={$_("user.followList.update")}
 >
@@ -430,7 +428,7 @@
                 datetime={datetime(beforeKind3?.created_at)}
                 >{formatAbsoluteDateFromUnix(
                   beforeKind3?.created_at,
-                  true
+                  true,
                 )}</time
               ><span class="ml-2"
                 >({formatRelativeDate(beforeKind3?.created_at, $locale)})</span
@@ -486,7 +484,7 @@
 </AlertDialog>
 
 <AlertDialog
-  bind:openDialog={openPetnameDialog}
+  bind:open={openPetnameDialog}
   onClickOK={updatePetname}
   title={$_("user.petname.petname")}
   okButtonName="OK"
@@ -521,7 +519,7 @@
 </AlertDialog>
 
 <AlertDialog
-  bind:openDialog={dialogCreateKind3Open}
+  bind:open={dialogCreateKind3Open}
   {onClickOK}
   title={$_("create_kind3.create")}
   >{#snippet main()}

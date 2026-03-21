@@ -11,16 +11,16 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen = $state(false);
 
   const handleClickCreateKind3 = () => {
     //つくっていいかがめんだしておｋでかきこむ
-    dialogOpen?.(true);
+    dialogOpen = true;
   };
 
   const onClickOK = async () => {
     console.log("onClickOK");
-    dialogOpen?.(false);
+    dialogOpen = false;
     $nowProgress = true;
     const ev: Nostr.EventParameters = {
       kind: 3,
@@ -43,7 +43,7 @@
       } else {
         const { event: ev, res } = await promisePublishSignedEvent(event);
         const isSuccessRelays: OkPacketAgainstEvent[] = res.filter(
-          (item) => item.ok
+          (item) => item.ok,
         );
 
         if (isSuccessRelays.length <= 0) {
@@ -58,7 +58,7 @@
           //location.reload();
           queryClient.setQueryData(
             ["naddr", `${3}:${lumiSetting.get().pubkey}:`],
-            (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from)
+            (oldData: any) => formatToEventPacket(ev, isSuccessRelays[0].from),
           );
 
           const pubkeyList = pubkeysIn(ev);
@@ -90,7 +90,7 @@
     >{$_("create_kind3.create")}</button
   >{/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   {onClickOK}
   title={$_("create_kind3.create")}
   >{#snippet main()}

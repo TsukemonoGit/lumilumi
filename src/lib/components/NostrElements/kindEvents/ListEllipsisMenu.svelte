@@ -7,6 +7,7 @@
     SquareArrowOutUpRight,
     Radio,
     Share,
+    Trash,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
@@ -15,17 +16,20 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { page } from "$app/state";
   import ModalJson from "$lib/components/ModalJson.svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import DeleteNoteDialog from "./NoteActionButtuns/DeleteNoteDialog.svelte";
 
   interface Props {
     note: Nostr.Event;
     indexes?: number[];
     listData: { dtag?: string; title?: string; description?: string };
+    onDelete?: () => void;
   }
 
-  let { note, indexes, listData }: Props = $props();
+  let { note, indexes, listData, onDelete }: Props = $props();
 
+  let deleteDialogOpen = $state(false);
   let naddr = $derived.by(() => {
     if (!note) return undefined;
     try {
@@ -55,15 +59,24 @@
     // NIP-70 条件
     if (
       !(
-        note?.tags ||
-        ([].find((t) => t[0] === "-") &&
-          (note?.pubkey || "") !== lumiSetting.get().pubkey)
+        (note?.tags || []).find((t) => t[0] === "-") &&
+        (note?.pubkey || "") !== lumiSetting.get().pubkey
       )
     ) {
       actionGroup.push({
         text: $_("menu.action.broadcast"),
         icon: Radio,
         action: "broadcast",
+      });
+    }
+    if (
+      (note?.pubkey || "") === lumiSetting.get().pubkey &&
+      loginUser.value === lumiSetting.get().pubkey
+    ) {
+      actionGroup.push({
+        text: `${$_("menu.action.delete")}`,
+        icon: Trash,
+        action: "delete",
       });
     }
     const externalGroup = [
@@ -75,7 +88,7 @@
     ];
     // indexes 指定があればフィルタ
     const filterItems = (
-      items: typeof viewGroup | typeof copyGroup | typeof actionGroup
+      items: typeof viewGroup | typeof copyGroup | typeof actionGroup,
     ) => (indexes ? items.filter((_, idx) => indexes.includes(idx)) : items);
 
     return [
@@ -141,6 +154,9 @@
           });
         }
         break;
+      case "delete":
+        deleteDialogOpen = true;
+        break;
     }
   };
 </script>
@@ -148,3 +164,6 @@
 <DropdownMenu {menuGroups} {handleSelectItem}>
   <Ellipsis size="20" />
 </DropdownMenu>
+{#if (note?.pubkey || "") === lumiSetting.get().pubkey && loginUser.value === lumiSetting.get().pubkey}
+  <DeleteNoteDialog bind:deleteDialogOpen {note} {onDelete} />
+{/if}

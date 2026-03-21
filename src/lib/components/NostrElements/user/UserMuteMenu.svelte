@@ -91,10 +91,10 @@
   ];
 
   let muteStatus = $derived(
-    $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined
+    $mutes || $mutebykinds ? userMuteStatus(pubkey) : undefined,
   );
 
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen = $state(false);
 
   let kind: number | undefined;
   let dtag: string | undefined;
@@ -125,13 +125,13 @@
         text = `${$_("create.kind10000.text")}`;
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
         return;
       }
       //新しいリストにほんとに含まれてないか確認
       const privateTags = await decryptContent(kind10000);
       const check = [...(privateTags ?? []), ...kind10000.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       if (!check) {
         //含まれてなかったたらデータを更新してpublishしてから
@@ -209,13 +209,13 @@
         text = `${$_("create.kind30007.6.text")}`;
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
         return;
       }
       //新しいリストにほんとに含まれてないか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       let newTags = privateTags ?? [];
       if (!check) {
@@ -271,7 +271,7 @@
         list: updateMuteByList(
           [...kind30007.tags, ...newTags],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -279,7 +279,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -299,14 +299,14 @@
 
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
 
         return;
       }
       //新しいリストにほんとに含まれてないか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       let newTags = privateTags ?? [];
       if (!check) {
@@ -362,7 +362,7 @@
         list: updateMuteByList(
           [...kind30007.tags, ...newTags],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -370,7 +370,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -389,14 +389,14 @@
 
         $nowProgress = false;
 
-        dialogOpen?.(true);
+        dialogOpen = true;
 
         return;
       }
       //新しいリストにほんとに含まれてないか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       let newTags = privateTags ?? [];
       if (!check) {
@@ -452,7 +452,7 @@
         list: updateMuteByList(
           [...kind30007.tags, ...newTags],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -460,7 +460,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -495,15 +495,15 @@
       //新しいリストにほんとに含まれているか確認
       const privateTags = await decryptContent(kind10000);
       const check = [...(privateTags ?? []), ...kind10000.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       if (check) {
         //含まれていたらデータを更新してpublishしてから
         const newpubTags = kind10000.tags.filter(
-          (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+          (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
         );
         const newPrvTags = privateTags?.filter(
-          (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+          (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
         );
         const newEvPara: Nostr.EventParameters = {
           kind: kind10000.kind,
@@ -581,15 +581,15 @@
       //新しいリストにほんとに含まれているか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
 
       //含まれていたらデータを更新してpublishしてから
       const newpubTags = kind30007.tags.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
       const newPrvTags = privateTags?.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
 
       if (check) {
@@ -642,7 +642,7 @@
         list: updateMuteByList(
           [...newpubTags, ...(newPrvTags ?? [])],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -650,7 +650,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -676,14 +676,14 @@
       //新しいリストにほんとに含まれているか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
       //含まれていたらデータを更新してpublishしてから
       const newpubTags = kind30007.tags.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
       const newPrvTags = privateTags?.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
       if (check) {
         const newEvPara: Nostr.EventParameters = {
@@ -735,7 +735,7 @@
         list: updateMuteByList(
           [...newpubTags, ...(newPrvTags ?? [])],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -743,7 +743,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -769,15 +769,15 @@
       //新しいリストにほんとに含まれているか確認
       const privateTags = await decryptContent(kind30007);
       const check = [...(privateTags ?? []), ...kind30007.tags].find(
-        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey
+        (tag) => tag[0] === "p" && tag.length > 1 && tag[1] === pubkey,
       );
 
       //含まれていたらデータを更新してpublishしてから
       const newpubTags = kind30007.tags.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
       const newPrvTags = privateTags?.filter(
-        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey)
+        (tag) => !(tag[0] === "p" && tag.length > 1 && tag[1] === pubkey),
       );
 
       if (check) {
@@ -830,7 +830,7 @@
         list: updateMuteByList(
           [...newpubTags, ...(newPrvTags ?? [])],
           kind30007,
-          $mutebykinds.list
+          $mutebykinds.list,
         ),
         updated: Math.floor(Date.now() / 1000),
       };
@@ -838,7 +838,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -848,7 +848,7 @@
   }
 
   async function refetchKind30007(
-    dtag: string
+    dtag: string,
   ): Promise<Nostr.Event | undefined> {
     const kind30007 = await usePromiseReq(
       {
@@ -863,10 +863,10 @@
         operator: pipe(latest()),
       },
       undefined,
-      2000
+      2000,
     );
     const localData = $mutebykinds?.list?.find(
-      (li) => li.kind === Number(dtag)
+      (li) => li.kind === Number(dtag),
     );
 
     if (
@@ -883,7 +883,7 @@
   async function handleClickOk() {
     //データないけど新しく作っていいよのとこ
     console.log("kind", kind, "dtag", dtag);
-    dialogOpen?.(false);
+    dialogOpen = false;
     if (!kind) {
       addToast({
         data: {
@@ -965,7 +965,7 @@
       try {
         localStorage.setItem(
           STORAGE_KEYS.LUMI_MUTE_BY_KIND,
-          JSON.stringify($mutebykinds)
+          JSON.stringify($mutebykinds),
         );
       } catch (error) {
         console.log("failed to save localStorage");
@@ -1018,7 +1018,7 @@
   </div>
 {/if}
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={handleClickOk}
   {title}
   okButtonName="OK"

@@ -1,3 +1,4 @@
+<!--ListLinkCard.svelte-->
 <script lang="ts">
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
@@ -13,14 +14,15 @@
   interface Props {
     event: Nostr.Event;
     depth: number;
+    onDelete?: () => void;
   }
 
-  let { event, depth }: Props = $props();
+  let { event, depth, onDelete }: Props = $props();
 
   let dtag = $derived(event.tags.find((tag) => tag[0] === "d")?.[1]);
   let title = $derived(event.tags.find((tag) => tag[0] === "title")?.[1]);
   let description = $derived(
-    event.tags.find((tag) => tag[0] === "description")?.[1]
+    event.tags.find((tag) => tag[0] === "description")?.[1],
   );
   let image = $derived(event.tags.find((tag) => tag[0] === "image")?.[1]);
   const size = 80;
@@ -96,5 +98,6 @@
     <ListEllipsisMenu
       note={event}
       listData={{ dtag: dtag, title: title, description: description }}
+      {onDelete}
     />{/snippet}
 </ListCardComponent>

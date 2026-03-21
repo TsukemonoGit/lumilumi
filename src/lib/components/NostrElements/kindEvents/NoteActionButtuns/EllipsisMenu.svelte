@@ -25,7 +25,6 @@
 
   import * as Nostr from "nostr-typedef";
   import {
-    deleteEvent,
     getRelayById,
     getRelaysById,
     publishEvent,
@@ -48,15 +47,8 @@
 
   import ModalJson from "$lib/components/ModalJson.svelte";
   import { isReplaceableKind, isAddressableKind } from "nostr-tools/kinds";
-  import {
-    latest,
-    nip07Signer,
-    type EventPacket,
-    type OkPacketAgainstEvent,
-  } from "rx-nostr";
-  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import { latest, nip07Signer, type EventPacket } from "rx-nostr";
 
-  import Note from "../Note.svelte";
   import {
     bookmark10003,
     loginUser,
@@ -64,7 +56,7 @@
   } from "$lib/stores/globalRunes.svelte";
   import type { QueryKey } from "@tanstack/svelte-query";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { useLatestEvent } from "$lib/stores/useLatestEvent";
+  import DeleteNoteDialog from "./DeleteNoteDialog.svelte";
 
   interface MenuItem {
     text: string;
@@ -99,10 +91,10 @@
     isBookmarked,
   }: Props = $props();
 
-  let deleteDialogOpen: (bool: boolean) => void = $state(() => {});
+  let deleteDialogOpen = $state(false);
 
   let replaceable = $derived(
-    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind))
+    note && (isReplaceableKind(note.kind) || isAddressableKind(note.kind)),
   );
 
   let { naddr, nevent, encodedPubkey } = $derived.by(() => {
@@ -160,12 +152,10 @@
         };
   });
 
-  // 埋め込みコードを生成する関数
   const generateEmbedCode = (): string => {
     const seenon = getRelaysById(note.id);
     const scriptTag = `<${"script"} src="https://cdn.jsdelivr.net/npm/@konemono/nostr-web-components@latest/dist/nostr-web-components.iife.js"></${"script"}>`;
 
-    // relays配列をJSON形式でエスケープして文字列化
     const relaysAttr =
       seenon && seenon.length > 0 ? ` relays='${JSON.stringify(seenon)}'` : "";
 
@@ -181,7 +171,7 @@
       ].join("\n");
     }
   };
-  // メニュー項目を階層構造に整理
+
   let menuGroups: MenuGroup[] = $derived.by(() => {
     const viewItems: MenuItem[] = [];
     const copyItems: MenuItem[] = [];
@@ -189,7 +179,7 @@
     const editItems: MenuItem[] = [];
     const otherItems: MenuItem[] = [];
     const externalItems: MenuItem[] = [];
-    // 表示グループ
+
     viewItems.push({
       text: `${$_("menu.view.note")}`,
       icon: Notebook,
@@ -205,19 +195,17 @@
       icon: FileJson2,
       action: "view_json",
     });
-
     viewItems.push({
       text: `${$_("menu.view.neighbor")}`,
       icon: Route,
       action: "goto_feed",
     });
-
     viewItems.push({
       text: `${$_("menu.view.translate")}`,
       icon: Earth,
       action: "translate",
     });
-    // コピーグループ
+
     copyItems.push({
       text: `${$_("menu.copy.text")}`,
       icon: NotepadText,
@@ -233,14 +221,12 @@
       icon: CodeXml,
       action: "copy_embed_code",
     });
-
     copyItems.push({
       text: `${$_("menu.copy.sharelink")}`,
       icon: Share,
       action: "share_link",
     });
 
-    // アクショングループ
     if (
       !(
         (note?.tags || []).find((tag) => tag[0] === "-") &&
@@ -283,6 +269,7 @@
 
     if (
       (note?.pubkey || "") === lumiSetting.get().pubkey &&
+      loginUser.value === lumiSetting.get().pubkey &&
       note.kind !== 5 &&
       note.kind !== 62
     ) {
@@ -292,8 +279,6 @@
         action: "delete",
       });
     }
-
-    // 外部リンクグループ
 
     if (note.kind === 30030) {
       externalItems.push({
@@ -326,13 +311,12 @@
         action: "open_nostviewstr",
       });
     }
-    // グループを構築
+
     const groups = [];
 
     if (viewItems.length > 0) {
       groups.push({ label: `${$_("menu.group.view")}`, items: viewItems });
     }
-
     if (copyItems.length > 0) {
       groups.push({ label: `${$_("menu.group.copy")}`, items: copyItems });
     }
@@ -378,7 +362,7 @@
       case "copy_id":
         try {
           await navigator.clipboard.writeText(
-            replaceable ? (naddr ?? "") : (nevent ?? "")
+            replaceable ? (naddr ?? "") : (nevent ?? ""),
           );
           addToast({
             data: {
@@ -461,7 +445,6 @@
         try {
           const embedCode = generateEmbedCode();
           await navigator.clipboard.writeText(embedCode);
-
           addToast({
             data: {
               title: "Success",
@@ -497,7 +480,7 @@
         break;
 
       case "delete":
-        deleteDialogOpen(true);
+        deleteDialogOpen = true;
         break;
 
       case "open_makimono":
@@ -527,14 +510,12 @@
             address.relays?.slice(0, 3),
             5000,
             (data: EventPacket[]) => {
-              // onDataコールバック: データ受信の都度実行
               if (data.length > 0) {
                 const newEvent = data[0].event;
                 const currentData = queryClient.getQueryData(key) as
                   | EventPacket
                   | undefined;
 
-                // 既存データより新しい場合のみ更新
                 if (
                   !currentData ||
                   newEvent.created_at > currentData.event.created_at
@@ -542,7 +523,7 @@
                   queryClient.setQueryData(key, () => data[0]);
                 }
               }
-            }
+            },
           );
         } catch (error) {
           console.error(error);
@@ -573,7 +554,7 @@
                 operator: pipe(latest()),
               },
               undefined,
-              2000
+              2000,
             );
 
             if (bookmarkEvent.length > 0) {
@@ -598,6 +579,7 @@
               ? existing.filter((t) => !(t[0] === tagType && t[1] === tagValue))
               : [...existing, [tagType, tagValue, relayHint]];
           };
+
           const eventParam: Nostr.EventParameters = {
             kind: 10003,
             pubkey: pub,
@@ -608,7 +590,6 @@
           const signer = nip07Signer();
           try {
             const event = await signer.signEvent(eventParam);
-
             publishEvent(event);
             addToast({
               data: {
@@ -617,7 +598,6 @@
                 color: "bg-green-500",
               },
             });
-
             $nowProgress = false;
           } catch (error) {
             addToast({
@@ -627,7 +607,6 @@
                 color: "bg-red-500",
               },
             });
-
             $nowProgress = false;
           }
         } catch (error) {
@@ -644,54 +623,6 @@
         break;
     }
   };
-  const onClickOK = async () => {
-    deleteDialogOpen(false);
-    try {
-      const deletetags = [
-        ["e", note.id],
-        ["k", note.kind.toString()],
-      ];
-      if (isAddressableKind(note.kind) || isReplaceableKind(note.kind)) {
-        deletetags.push([
-          "a",
-          `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((item) => item[0] === "d")?.[1] || ""}`,
-        ]);
-      }
-      const {
-        event,
-        res,
-      }: {
-        event: Nostr.Event;
-        res: OkPacketAgainstEvent[];
-      } = await deleteEvent(deletetags);
-
-      const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
-      const isFailed = res.filter((item) => !item.ok).map((item) => item.from);
-      let str = generateResultMessage(isSuccess, isFailed);
-
-      addToast({
-        data: {
-          title: isSuccess.length > 0 ? "Success" : "Failed",
-          description: str,
-          color: isSuccess.length > 0 ? "bg-green-500" : "bg-red-500",
-        },
-      });
-      if (isSuccess.length > 0) {
-        queryClient.removeQueries({ queryKey: ["note", note.id] });
-        deleted = true;
-      }
-    } catch (error) {
-      console.error(error);
-      addToast({
-        data: {
-          title: "Error",
-          description: "Failed to delete",
-          color: "bg-orange-500",
-        },
-      });
-    }
-    return;
-  };
 </script>
 
 <DropdownMenu
@@ -702,21 +633,6 @@
 >
   <TriggerIcon size={iconSize} class="min-w-[{iconSize}px] {iconClass}" />
 </DropdownMenu>
-
-<AlertDialog
-  bind:openDialog={deleteDialogOpen}
-  onClickOK={() => onClickOK()}
-  title="Delete note"
->
-  {#snippet main()}<p>{$_("post.delete")}</p>
-    <div class="rounded-md border-magnum-600/30 border">
-      <Note
-        id={note.id}
-        displayMenu={false}
-        depth={0}
-        repostable={false}
-        maxHeight={192}
-      />
-    </div>
-  {/snippet}
-</AlertDialog>
+{#if (note?.pubkey || "") === lumiSetting.get().pubkey && loginUser.value === lumiSetting.get().pubkey && note.kind !== 5 && note.kind !== 62}
+  <DeleteNoteDialog bind:deleteDialogOpen {note} bind:deleted />
+{/if}

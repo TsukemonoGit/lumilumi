@@ -19,6 +19,7 @@
 
   import type { PageData } from "./$types";
   import { decryptContent } from "$lib/func/settings";
+  import { t } from "@konemono/svelte5-i18n";
   let { data }: { data: PageData } = $props();
 
   let atag = $derived(`${data.kind}:${data.pubkey}${data.identifier}`);
@@ -118,73 +119,76 @@
         {#await pubkeyList(event)}
           waiting decrypt list
         {:then pubkeys}
-          <ListUsersCard {pubkeys} />
+          {#if pubkeys.length > 0}
+            <ListUsersCard {pubkeys} />
 
-          {#if since}
-            <TimelineList
-              queryKey={timelineQuery}
-              filters={[
-                {
-                  kinds: [1, 6, 16],
-                  authors: pubkeys,
-                  since: since,
-                },
-              ]}
-              olderFilters={[
-                {
-                  kinds: [1, 6, 16],
-                  authors: pubkeys,
-                  since: since,
-                },
-              ]}
-              req={createRxForwardReq()}
-              {viewIndex}
-              {amount}
-            >
-              {#snippet content({ events, len })}
-                <!-- <SetRepoReactions /> -->
-                <div
-                  class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
-                >
-                  {#if events && events.length > 0}
-                    {#each events as event, index (event.id)}
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                      >
-                        {#snippet loading()}
-                          <div class="w-full">
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet nodata()}
-                          <div class="w-full">
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet error()}
-                          <div class="w-full">
-                            <EventCard note={event} />
-                          </div>
-                        {/snippet}
-                        {#snippet content({ metadata })}
-                          <EventCard {metadata} note={event} />
-                        {/snippet}
-                      </Metadata>
-                    {/each}{/if}
-                </div>{/snippet}
-              {#snippet loading()}
-                <div>
-                  <p>Loading...</p>
-                </div>
-              {/snippet}
+            {#if since}
+              <TimelineList
+                queryKey={timelineQuery}
+                filters={[
+                  {
+                    kinds: [1, 6, 16],
+                    authors: pubkeys,
+                    since: since,
+                  },
+                ]}
+                olderFilters={[
+                  {
+                    kinds: [1, 6, 16],
+                    authors: pubkeys,
+                    since: since,
+                  },
+                ]}
+                req={createRxForwardReq()}
+                {viewIndex}
+                {amount}
+              >
+                {#snippet content({ events, len })}
+                  <!-- <SetRepoReactions /> -->
+                  <div
+                    class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
+                  >
+                    {#if events && events.length > 0}
+                      {#each events as event, index (event.id)}
+                        <Metadata
+                          queryKey={["metadata", event.pubkey]}
+                          pubkey={event.pubkey}
+                        >
+                          {#snippet loading()}
+                            <div class="w-full">
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet nodata()}
+                            <div class="w-full">
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet error()}
+                            <div class="w-full">
+                              <EventCard note={event} />
+                            </div>
+                          {/snippet}
+                          {#snippet content({ metadata })}
+                            <EventCard {metadata} note={event} />
+                          {/snippet}
+                        </Metadata>
+                      {/each}{/if}
+                  </div>{/snippet}
+                {#snippet loading()}
+                  <div>
+                    <p>Loading...</p>
+                  </div>
+                {/snippet}
 
-              {#snippet error()}
-                <div>
-                  <p>{error}</p>
-                </div>
-              {/snippet}
-            </TimelineList>{/if}
+                {#snippet error()}
+                  <div>
+                    <p>{error}</p>
+                  </div>
+                {/snippet}
+              </TimelineList>{/if}{:else}
+            {$t("list.nobody")}
+          {/if}
         {/await}
       {/snippet}
     </LatestEvent>
