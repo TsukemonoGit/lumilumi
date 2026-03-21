@@ -209,15 +209,21 @@ const saveMetadataToLocalStorage = (
   if (existing) {
     if (data.event.created_at > existing.data.event.created_at) {
       currentMetadata[pubkey] = { key, data };
-      queryClient.setQueryData(key, (_oldData: any) => data);
+      queryClient.setQueryData(
+        key,
+        (_oldData: EventPacket | undefined) => data,
+      );
       return [true, currentMetadata];
     } else {
-      queryClient.setQueryData(key, (_oldData: any) => existing.data);
+      queryClient.setQueryData(
+        key,
+        (_oldData: EventPacket | undefined) => existing.data,
+      );
       return [false, currentMetadata];
     }
   } else {
     currentMetadata[pubkey] = { key, data };
-    queryClient.setQueryData(key, (_oldData: any) => data);
+    queryClient.setQueryData(key, (_oldData: EventPacket | undefined) => data);
     return [true, currentMetadata];
   }
 };

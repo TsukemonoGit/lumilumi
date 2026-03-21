@@ -461,7 +461,7 @@ obs.subscribe({
 
 ---
 
-### H-15. `eruda` (400KB) が本番ビルドで条件チェックなくロードされる
+### H-15. `eruda` (400KB) が本番ビルドで条件チェックなくロードされる → そのまま
 
 **カテゴリ:** パフォーマンス
 **ファイル:** `src/lib/components/Debug/DebugPanel2.svelte:14-16`
