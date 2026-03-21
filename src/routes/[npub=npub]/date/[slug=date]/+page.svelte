@@ -41,7 +41,7 @@
       const until = since + 86400;
 
       return { since, until };
-    }
+    },
   );
 
   let userRelayList: string[] | undefined = $state(undefined);
@@ -52,7 +52,7 @@
     //writeもreadもリレーリストをuserRelayListにいれる。
     userRelayList = (ev.tags as string[][])
       .filter(
-        (tag) => tag[0] === "r" && tag.length > 1 //&& relayRegex.test(tag[1])
+        (tag) => tag[0] === "r" && tag.length > 1, //&& relayRegex.test(tag[1])
         //    && relayRegex.test(tag[1]) &&
         //     (tag.length === 2 || tag[2] === "write")
       )
@@ -78,7 +78,7 @@
         if (!metadataPk) throw error;
         const nip05Address = await getNip05FromMetadata(
           metadataPk.event,
-          queryClient
+          queryClient,
         );
 
         // nip05アドレスが取得できた場合のみ置換
@@ -125,7 +125,7 @@
       <!-- メインコンテンツ -->
       <div>
         <LatestEvent
-          queryKey={["relays", data.pubkey]}
+          queryKey={["defaultRelay", data.pubkey]}
           filters={[{ kinds: [10002], authors: [data.pubkey], limit: 1 }]}
           {onChange}
         >
@@ -204,7 +204,7 @@
             class="text-xs break-all whitespace-pre-wrap max-w-full overflow-hidden">{JSON.stringify(
               data,
               null,
-              2
+              2,
             )}</pre>
         </div>
       </div>

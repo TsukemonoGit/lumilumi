@@ -118,16 +118,16 @@ export function getDefaultWriteRelays(): string[] {
     .map((config) => config.url);
 }
 
-//metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
+// metadataを更新したいときは、クエリーデータの削除とローカルストレージの削除両方する
 metadataQueue.subscribe((queue) => {
   if (followList.get().size > 0) {
     try {
-      // まず、現在のローカルストレージのデータを取得
       const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-      let currentMetadata: [QueryKey, EventPacket][] = metadataStr
+      let currentMetadata: MetadataRecord = metadataStr
         ? JSON.parse(metadataStr)
-        : [];
+        : {};
       let metadataChanged = false;
+
       while (queue.length > 0) {
         const [key, data] = queue.shift()!;
         const [changed, savedMetadata] = saveMetadataToLocalStorage(
@@ -140,14 +140,25 @@ metadataQueue.subscribe((queue) => {
         }
         currentMetadata = savedMetadata;
       }
+
       if (metadataChanged) {
-        localStorage?.setItem(
+        localStorage.setItem(
           STORAGE_KEYS.METADATA,
           JSON.stringify(currentMetadata),
         );
-        metadataChanged = false;
       }
-    } catch (error) {}
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.name === "QuotaExceededError"
+      ) {
+        console.error(
+          "LocalStorage quota exceeded: metadata could not be saved.",
+        );
+      } else {
+        console.error("Unexpected error in metadataQueue.subscribe:", error);
+      }
+    }
   }
 });
 
@@ -181,47 +192,33 @@ export function pubkeysIn(
   //followList.set(new Map(followingMap));
   return followingMap;
 }
+type MetadataRecord = Record<string, { key: QueryKey; data: EventPacket }>;
 
 const saveMetadataToLocalStorage = (
-  currentMetadata: [QueryKey, EventPacket][],
+  currentMetadata: MetadataRecord,
   key: QueryKey,
   data: EventPacket,
-): [boolean, [QueryKey, EventPacket][]] => {
-  let metadataChanged = false;
-  const existingIndex = currentMetadata.findIndex(
-    ([savedKey]) => JSON.stringify(savedKey) === JSON.stringify(key),
-  );
-
-  if (followList.get().has(data.event.pubkey)) {
-    if (existingIndex !== -1) {
-      // 既に保存されているデータがある場合、上書きする
-      if (
-        data.event.created_at >
-        currentMetadata[existingIndex][1].event.created_at
-      ) {
-        //新しいデータだったら上書き
-        currentMetadata[existingIndex] = [key, data];
-        queryClient.setQueryData(key, (oldData: any) => data);
-        metadataChanged = true;
-      } else {
-        //古いデータだったら保存されてる方を返す
-        // 保存されているメタデータの方をクエリにセット（？）
-        queryClient.setQueryData(
-          key,
-          (oldData: any) => currentMetadata[existingIndex][1],
-        );
-      }
-    } else {
-      // 保存されていない場合、新しいデータを追加する
-      currentMetadata.push([key, data]);
-      queryClient.setQueryData(key, (oldData: any) => data);
-      metadataChanged = true;
-    }
-    // // 更新されたデータをローカルストレージに保存
-    // localStorage.setItem("metadata", JSON.stringify(currentMetadata));
-    return [metadataChanged, currentMetadata];
-  } else {
+): [boolean, MetadataRecord] => {
+  if (!followList.get().has(data.event.pubkey)) {
     return [false, currentMetadata];
+  }
+
+  const pubkey = data.event.pubkey;
+  const existing = currentMetadata[pubkey];
+
+  if (existing) {
+    if (data.event.created_at > existing.data.event.created_at) {
+      currentMetadata[pubkey] = { key, data };
+      queryClient.setQueryData(key, (_oldData: any) => data);
+      return [true, currentMetadata];
+    } else {
+      queryClient.setQueryData(key, (_oldData: any) => existing.data);
+      return [false, currentMetadata];
+    }
+  } else {
+    currentMetadata[pubkey] = { key, data };
+    queryClient.setQueryData(key, (_oldData: any) => data);
+    return [true, currentMetadata];
   }
 };
 
@@ -640,6 +637,7 @@ export function usePromiseReq(
         resolve(accumulatedData.slice(0, sift === 0 ? undefined : sift));
       },
       error: (e) => {
+        subscription.unsubscribe();
         console.log(e);
         console.error("[rx-nostr]", e);
         clearTimeout(timeoutId);

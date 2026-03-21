@@ -1,49 +1,59 @@
 import type MarkdownIt from "markdown-it";
+import type { Token } from "markdown-it/index.js";
 
-const markdownLinkPlugin = function (md: MarkdownIt) {
-  md.inline.ruler.before("text", "html_link", (state, silent) => {
-    const pos = state.pos;
-    // リンクの正規表現に改行や空白を許容
-    const linkRegex = /^<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i;
+const ALLOWED_PROTOCOLS = ["https:", "http:", "mailto:"];
 
-    const match = linkRegex.exec(state.src.slice(pos));
-    if (match) {
-      if (!silent) {
-        const href = match[1]; // リンク先URL
-        const content = match[2]; // リンク内コンテンツ（HTMLも含む）
+function isSafeHref(href: string): boolean {
+  try {
+    const url = new URL(href, "https://example.com");
+    return ALLOWED_PROTOCOLS.includes(url.protocol);
+  } catch {
+    return false;
+  }
+}
 
-        // リンク開始のトークンを生成
-        const tokenOpen = state.push("link_open", "a", 1);
-        tokenOpen.attrs = [["href", href]];
+function tokenizeInline(
+  md: MarkdownIt,
+  content: string,
+  env: unknown,
+): Token[] {
+  const blockTokens = md.parseInline(content, env);
+  return blockTokens[0]?.children ?? [];
+}
 
-        // リンク内のコンテンツを再帰的にパース
-        parseHtmlContent(content, state);
+const markdownLinkPlugin = function (md: MarkdownIt): void {
+  md.inline.ruler.before("html_inline", "html_link", (state, silent) => {
+    const remaining = state.src.slice(state.pos);
 
-        // リンク閉じのトークンを生成
-        state.push("link_close", "a", -1);
+    const linkRegex = /^<a\s+href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/i;
+    const match = linkRegex.exec(remaining);
+    if (!match) return false;
+
+    const href = match[1];
+    const innerContent = match[2];
+
+    // 不正スキームは後続ルール（html_inline）に委ねる。
+    // Svelte5でinnerHTML未使用の場合、テキストとして出力されるだけで実行されない。
+    if (!isSafeHref(href)) return false;
+
+    if (!silent) {
+      const tokenOpen = state.push("link_open", "a", 1);
+      tokenOpen.attrSet("href", href);
+      tokenOpen.markup = "autolink";
+      tokenOpen.info = "auto";
+
+      const children = tokenizeInline(md, innerContent, state.env);
+      for (const child of children) {
+        state.tokens.push(child);
       }
 
-      // マッチした長さだけ位置を進める
-      state.pos += match[0].length;
-      return true;
+      const tokenClose = state.push("link_close", "a", -1);
+      tokenClose.markup = "autolink";
     }
 
-    return false;
+    state.pos += match[0].length;
+    return true;
   });
-
-  // 任意のHTMLコンテンツをパースする関数
-  function parseHtmlContent(content: string, state: any) {
-    const tempState = new state.md.inline.State(
-      content,
-      state.md,
-      state.env,
-      []
-    );
-    tempState.md.inline.tokenize(tempState);
-
-    // 子トークンを親のトークンに追加
-    state.tokens.push(...tempState.tokens);
-  }
 };
 
 export default markdownLinkPlugin;
