@@ -31,6 +31,7 @@
   import UserName from "$lib/components/NostrElements/user/UserName.svelte";
   import { formatToEventPacket } from "$lib/func/util";
   import ListMemberAdder from "../ListMemberAdder.svelte";
+  import { loginUser } from "$lib/stores/globalRunes.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -309,10 +310,11 @@
           </div>
 
           <div class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2">
-            <ListMemberAdder
-              onAddUser={(type, pubkey) =>
-                addUser(type, pubkey, event, decryptContent)}
-            />
+            {#if loginUser.value === event.pubkey}
+              <ListMemberAdder
+                onAddUser={(type, pubkey) =>
+                  addUser(type, pubkey, event, decryptContent)}
+              />{/if}
 
             <!--publist-->
             <div class="flex gap-1 flex-wrap">
@@ -335,7 +337,7 @@
                   />
                 {/if}{/each}
             </div>
-            {#if pubkeys.length > 0}<IconButton
+            {#if pubkeys.length > 0 && loginUser.value === event.pubkey}<IconButton
                 variant={"fill"}
                 title={deleteMode ? "Cancel Delete" : "Delete User"}
                 onclick={() => (deleteMode = !deleteMode)}

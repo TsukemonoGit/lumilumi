@@ -5,7 +5,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
 
   import { SquareArrowOutUpRight } from "lucide-svelte";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { loginUser, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { encodetoNpub } from "$lib/func/encode";
   import CreateList from "./CreateList.svelte";
   import { queryClient } from "$lib/stores/stores";
@@ -25,7 +25,9 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
-      <CreateList {queryKey} />
+      {#if loginUser.value === lumiSetting.get().pubkey}
+        <CreateList {queryKey} />
+      {/if}
       <ListMain {queryKey} pubkey={lumiSetting.get().pubkey} kind={30000}>
         {#snippet children({ events })}
           {#each events as event}
