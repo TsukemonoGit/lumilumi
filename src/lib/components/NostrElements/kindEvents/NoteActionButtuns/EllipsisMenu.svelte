@@ -490,6 +490,14 @@
 
       case "refresh_data":
         $nowProgress = true;
+        queryClient.refetchQueries({
+          queryKey: [
+            "naddr",
+            `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`,
+          ],
+        });
+
+        /* 
         const atag = `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`;
         const key: QueryKey = ["naddr", atag] as QueryKey;
         const address = parseNaddr(["a", atag]);
@@ -529,7 +537,9 @@
           console.error(error);
         }
 
-        $nowProgress = false;
+     */ setTimeout(() => {
+          $nowProgress = false;
+        }, 2000);
         break;
 
       case "toggle_bookmark":

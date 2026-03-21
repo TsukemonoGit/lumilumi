@@ -217,7 +217,8 @@
       "image": "Image",
       "submit": "Create"
     },
-    "nobody": "No users in this list."
+    "nobody": "No users in this list.",
+    "deleteUserConfirmTitle": "Remove User from This List?"
   },
   "alia": {
     "label": {

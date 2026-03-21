@@ -3,13 +3,13 @@
   import EventCard from "$lib/components/NostrElements/kindEvents/EventCard/EventCard.svelte";
   import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
   import LatestEvent from "$lib/components/renderSnippets/nostr/LatestEvent.svelte";
-  import ListUsersCard from "$lib/components/NostrElements/ListUsersCard.svelte";
+
   import Metadata from "$lib/components/renderSnippets/nostr/Metadata.svelte";
 
   import TimelineList from "$lib/components/renderSnippets/nostr/TimelineList.svelte";
   import OpenPostWindow from "$lib/components/OpenPostWindow.svelte";
-  import { setRelays } from "$lib/func/nostr";
-  import { defaultRelays, queryClient } from "$lib/stores/stores";
+  import { publishEvent, setRelays } from "$lib/func/nostr";
+  import { defaultRelays, nowProgress, queryClient } from "$lib/stores/stores";
   import type { QueryKey } from "@tanstack/svelte-query";
 
   import * as Nostr from "nostr-typedef";
@@ -18,15 +18,27 @@
   import { onMount } from "svelte";
 
   import type { PageData } from "./$types";
-  import { decryptContent } from "$lib/func/settings";
+  import { decryptContent, encryptPrvTags } from "$lib/func/settings";
   import { t } from "@konemono/svelte5-i18n";
+
+  import IconButton from "$lib/components/Elements/IconButton.svelte";
+  import { Delete, Plus, Undo2 } from "lucide-svelte";
+  import { hexRegex } from "$lib/func/regex";
+  import ListUserIcon from "$lib/components/NostrElements/ListUserIcon.svelte";
+  import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import { safePublishEvent } from "$lib/func/publishError";
+  import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
+  import UserName from "$lib/components/NostrElements/user/UserName.svelte";
+  import { formatToEventPacket } from "$lib/func/util";
+  import ListMemberAdder from "../ListMemberAdder.svelte";
+
   let { data }: { data: PageData } = $props();
 
-  let atag = $derived(`${data.kind}:${data.pubkey}${data.identifier}`);
+  let atag = $derived(`${data.kind}:${data.pubkey}:${data.identifier}`);
   let filters: Nostr.Filter[] = $derived([
     { "#d": [data.identifier], kinds: [data.kind], authors: [data.pubkey] },
   ]);
-  //console.log(filters);
+
   let amount = 50;
   let viewIndex = 0;
 
@@ -35,19 +47,26 @@
   let isOnMount = false;
   let since: number | undefined = $state(undefined);
   let timelineQuery: QueryKey = $derived(["list", "feed", atag]);
+
+  // 削除確認ダイアログ用
+  let dialogOpen = $state(false);
+  let pendingDelete = $state<{
+    pubkey: string;
+    eventParameters: Nostr.EventParameters;
+  } | null>(null);
+
   onMount(async () => {
     if (!isOnMount) {
       isOnMount = true;
       await init();
-
       isOnMount = false;
     }
   });
+
   afterNavigate((navigate) => {
     if (navigate.type !== "form" && !isOnMount) {
       isOnMount = true;
       init();
-
       isOnMount = false;
     }
   });
@@ -65,27 +84,28 @@
       "olderData",
     ]);
     if (!ev || ev.length <= 0) {
-      since = now() - 15 * 60; //15分くらいならもれなく取れることとして初期sinceを15分前に設定することで、初期読込時間を短縮する;;;
+      since = now() - 15 * 60;
     } else {
       since = ev[0].event.created_at;
     }
     loading = false;
   }
 
-  const pubkeyList = async (event: Nostr.Event): Promise<string[]> => {
+  const pubkeyList = (
+    event: Nostr.Event,
+    decryptContent: string[][] | null,
+  ): string[] => {
     const pubList = event.tags
-      .filter((tag) => tag[0] === "p")
+      .filter((tag) => tag[0] === "p" && hexRegex.test(tag[1]))
       .map((tag) => tag[1]);
 
     if (event.content.length <= 0) {
       return pubList;
     }
     try {
-      const prvList = await decryptContent(event);
-
-      if (prvList && prvList.length > 0) {
-        const prv = prvList
-          .filter((tag) => tag[0] === "p")
+      if (decryptContent && decryptContent.length > 0) {
+        const prv = decryptContent
+          .filter((tag) => tag[0] === "p" && hexRegex.test(tag[1]))
           .map((tag) => tag[1]);
         return Array.from(new Set([...pubList, ...prv]));
       } else {
@@ -95,6 +115,173 @@
       return pubList;
     }
   };
+
+  let deleteMode = $state(false);
+
+  async function addUser(
+    type: "pub" | "prv",
+    pubkey: string,
+    event: Nostr.Event,
+    decryptedContent: string[][] | null,
+  ): Promise<void> {
+    let eventParameters: Nostr.EventParameters;
+
+    if (type === "pub") {
+      // 重複チェック
+      const alreadyExists = event.tags.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      if (alreadyExists) {
+        addToast({
+          data: {
+            title: "Info",
+            description: "Already in public list",
+            color: "bg-yellow-500",
+          },
+        });
+        return;
+      }
+
+      const newTags = [...$state.snapshot(event.tags), ["p", pubkey]];
+      eventParameters = {
+        kind: event.kind,
+        tags: newTags,
+        content: event.content,
+      };
+    } else {
+      // prv: decryptedContent が null の場合は空配列として扱う
+      const currentPrv = decryptedContent ?? [];
+
+      // 重複チェック（pub側にいる場合も含む）
+      const alreadyInPrv = currentPrv.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      const alreadyInPub = event.tags.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      if (alreadyInPrv || alreadyInPub) {
+        addToast({
+          data: {
+            title: "Info",
+            description: "Already in list",
+            color: "bg-yellow-500",
+          },
+        });
+        return;
+      }
+
+      const newDecryptContent = [...currentPrv, ["p", pubkey]];
+      const encryptedContent = await encryptPrvTags(
+        event.pubkey,
+        newDecryptContent,
+      );
+      if (!encryptedContent) {
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to encrypt",
+            color: "bg-red-500",
+          },
+        });
+        return;
+      }
+
+      eventParameters = {
+        kind: event.kind,
+        tags: $state.snapshot(event.tags),
+        content: encryptedContent,
+      };
+    }
+
+    await publishList(eventParameters);
+  }
+
+  async function deleteUser(
+    type: "pub" | "prv",
+    index: number,
+    event: Nostr.Event,
+    decryptedContent?: string[][],
+  ): Promise<void> {
+    let eventParameters: Nostr.EventParameters;
+    let pubkey: string;
+
+    if (type === "pub") {
+      pubkey = event.tags[index]?.[1] ?? "";
+      const newTags = event.tags.filter((_, i) => i !== index);
+      eventParameters = {
+        kind: event.kind,
+        tags: $state.snapshot(newTags),
+        content: event.content,
+      };
+    } else {
+      if (!decryptedContent) return;
+      pubkey = decryptedContent[index]?.[1] ?? "";
+      const newDecryptContent = decryptedContent.filter((_, i) => i !== index);
+      const encryptedContent = await encryptPrvTags(
+        event.pubkey,
+        newDecryptContent,
+      );
+      if (!encryptedContent) {
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to encrypt",
+            color: "bg-red-500",
+          },
+        });
+        return;
+      }
+      eventParameters = {
+        kind: event.kind,
+        tags: $state.snapshot(event.tags),
+        content: encryptedContent,
+      };
+    }
+
+    pendingDelete = { pubkey, eventParameters };
+    dialogOpen = true;
+  }
+
+  async function handleClickOk() {
+    if (!pendingDelete) return;
+    await publishList(pendingDelete.eventParameters);
+    pendingDelete = null;
+  }
+
+  async function publishList(eventParameters: Nostr.EventParameters) {
+    $nowProgress = true;
+    const result = await safePublishEvent(eventParameters);
+    if ("errorCode" in result) {
+      if (result.isCanceled) {
+        $nowProgress = false;
+        return false;
+      }
+      addToast({
+        data: {
+          title: "Error",
+          description: $t(result.errorCode),
+          color: "bg-red-500",
+        },
+      });
+      $nowProgress = false;
+      return false;
+    }
+    const { event: ev, res } = result;
+    const isSuccess = res.filter((item) => item.ok).map((item) => item.from);
+    console.log(isSuccess);
+    if (isSuccess.length <= 0) {
+      addToast({
+        data: {
+          title: "Error",
+          description: "Failed to publish",
+          color: "bg-red-500",
+        },
+      });
+    } else {
+      queryClient.setQueryData(["naddr", atag], formatToEventPacket(ev));
+    }
+    $nowProgress = false;
+  }
 </script>
 
 {#if loading}
@@ -112,16 +299,56 @@
         <div>nodata</div>
       {/snippet}
       {#snippet success({ event })}
-        <div class="w-full flex justify-between">
-          <ListLinkCard {event} depth={0} />
-        </div>
-
-        {#await pubkeyList(event)}
+        {#await decryptContent(event)}
           waiting decrypt list
-        {:then pubkeys}
-          {#if pubkeys.length > 0}
-            <ListUsersCard {pubkeys} />
+        {:then decryptContent}
+          {@const pubkeys = pubkeyList(event, decryptContent)}
 
+          <div class="w-full flex justify-between">
+            <ListLinkCard {event} depth={0} />
+          </div>
+
+          <div class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2">
+            <ListMemberAdder
+              onAddUser={(type, pubkey) =>
+                addUser(type, pubkey, event, decryptContent)}
+            />
+
+            <!--publist-->
+            <div class="flex gap-1 flex-wrap">
+              {#each event.tags as tag, index}
+                {#if tag[0] === "p" && hexRegex.test(tag[1])}
+                  <ListUserIcon
+                    pubkey={tag[1]}
+                    onDelete={() => deleteUser("pub", index, event)}
+                    {deleteMode}
+                  />
+                {/if}{/each}
+              <!--prvlist-->
+              {#each decryptContent || [] as tag, index}
+                {#if tag[0] === "p" && hexRegex.test(tag[1])}
+                  <ListUserIcon
+                    pubkey={tag[1]}
+                    onDelete={() =>
+                      deleteUser("prv", index, event, decryptContent || [])}
+                    {deleteMode}
+                  />
+                {/if}{/each}
+            </div>
+            {#if pubkeys.length > 0}<IconButton
+                variant={"fill"}
+                title={deleteMode ? "Cancel Delete" : "Delete User"}
+                onclick={() => (deleteMode = !deleteMode)}
+              >
+                {#if deleteMode}
+                  <Undo2 />
+                {:else}
+                  <Delete />
+                {/if}
+              </IconButton>{/if}
+          </div>
+
+          {#if pubkeys.length > 0}
             {#if since}
               <TimelineList
                 queryKey={timelineQuery}
@@ -144,7 +371,6 @@
                 {amount}
               >
                 {#snippet content({ events, len })}
-                  <!-- <SetRepoReactions /> -->
                   <div
                     class="max-w-[100vw] break-words box-border divide-y divide-magnum-600/30 w-full"
                   >
@@ -202,3 +428,22 @@
     />
   </div>
 {/if}
+
+<AlertDialog
+  bind:open={dialogOpen}
+  onClickOK={() => {
+    dialogOpen = false;
+    handleClickOk();
+  }}
+  title={$t("list.deleteUserConfirmTitle")}
+  okButtonName="OK"
+>
+  {#snippet main()}
+    <div class="flex justify-center items-center">
+      <ListUserIcon
+        deleteMode={false}
+        pubkey={pendingDelete?.pubkey ?? ""}
+      /><UserName pubhex={pendingDelete?.pubkey ?? ""} />
+    </div>
+  {/snippet}
+</AlertDialog>

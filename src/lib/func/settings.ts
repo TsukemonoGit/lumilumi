@@ -352,6 +352,9 @@ export async function encryptPrvTags(
   pubkey: string,
   prvTags: string[][],
 ): Promise<string | undefined> {
+  if (prvTags.length <= 0) {
+    return "";
+  }
   try {
     //44で暗号化
     const privateString = await (
