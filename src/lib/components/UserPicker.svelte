@@ -1,3 +1,4 @@
+<!--UserPicker.svelte-->
 <script lang="ts">
   import { UserPlus } from "lucide-svelte";
 
@@ -58,7 +59,10 @@
           {#if checkUserInput(input, profile)}
             <button
               aria-label={`Select profile ${profile.display_name || profile.name || pubkey}`}
-              onclick={() => onClickUser(pubkey)}
+              onclick={() => {
+                onClickUser(pubkey);
+                openPopover(false);
+              }}
               class="rounded-md border m-0.5 p-2 border-magnum-600 font-medium text-magnum-100 hover:opacity-75 active:opacity-50 text-sm"
             >
               {userName(pubkey, profile)}

@@ -30,6 +30,7 @@
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import UserName from "$lib/components/NostrElements/user/UserName.svelte";
   import { formatToEventPacket } from "$lib/func/util";
+  import ListMemberAdder from "../ListMemberAdder.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -117,8 +118,82 @@
 
   let deleteMode = $state(false);
 
-  function openAddUser(event: Nostr.Event<number>): void {
-    throw new Error("Function not implemented.");
+  async function addUser(
+    type: "pub" | "prv",
+    pubkey: string,
+    event: Nostr.Event,
+    decryptedContent: string[][] | null,
+  ): Promise<void> {
+    let eventParameters: Nostr.EventParameters;
+
+    if (type === "pub") {
+      // 重複チェック
+      const alreadyExists = event.tags.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      if (alreadyExists) {
+        addToast({
+          data: {
+            title: "Info",
+            description: "Already in public list",
+            color: "bg-yellow-500",
+          },
+        });
+        return;
+      }
+
+      const newTags = [...$state.snapshot(event.tags), ["p", pubkey]];
+      eventParameters = {
+        kind: event.kind,
+        tags: newTags,
+        content: event.content,
+      };
+    } else {
+      // prv: decryptedContent が null の場合は空配列として扱う
+      const currentPrv = decryptedContent ?? [];
+
+      // 重複チェック（pub側にいる場合も含む）
+      const alreadyInPrv = currentPrv.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      const alreadyInPub = event.tags.some(
+        (tag) => tag[0] === "p" && tag[1] === pubkey,
+      );
+      if (alreadyInPrv || alreadyInPub) {
+        addToast({
+          data: {
+            title: "Info",
+            description: "Already in list",
+            color: "bg-yellow-500",
+          },
+        });
+        return;
+      }
+
+      const newDecryptContent = [...currentPrv, ["p", pubkey]];
+      const encryptedContent = await encryptPrvTags(
+        event.pubkey,
+        newDecryptContent,
+      );
+      if (!encryptedContent) {
+        addToast({
+          data: {
+            title: "Error",
+            description: "Failed to encrypt",
+            color: "bg-red-500",
+          },
+        });
+        return;
+      }
+
+      eventParameters = {
+        kind: event.kind,
+        tags: $state.snapshot(event.tags),
+        content: encryptedContent,
+      };
+    }
+
+    await publishList(eventParameters);
   }
 
   async function deleteUser(
@@ -234,13 +309,11 @@
           </div>
 
           <div class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2">
-            <IconButton
-              variant={"fill"}
-              title={"ListMemberAdder"}
-              onclick={() => openAddUser(event)}
-            >
-              <Plus /></IconButton
-            >
+            <ListMemberAdder
+              onAddUser={(type, pubkey) =>
+                addUser(type, pubkey, event, decryptContent)}
+            />
+
             <!--publist-->
             <div class="flex gap-1 flex-wrap">
               {#each event.tags as tag, index}
