@@ -29,9 +29,9 @@
   }: Props = $props();
 
   const variantClass: Record<typeof variant, string> = {
-    fill: "bg-magnum-700 text-magnum-100",
-    outline: "bg-transparent border border-neutral-400 text-magnum-800",
-    ghost: "bg-transparent text-magnum-800",
+    fill: "bg-magnum-700 text-magnum-200",
+    outline: "bg-transparent border border-magnum-700 text-magnum-700",
+    ghost: "bg-magnum-800/50 text-magnum-600",
   };
 
   let buttonSizeClassName = $derived(`h-[${size + 12}px] w-[${size + 12}px]`);

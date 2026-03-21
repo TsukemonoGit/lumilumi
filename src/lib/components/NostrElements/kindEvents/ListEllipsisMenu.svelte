@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modalState } from "$lib/stores/stores";
+  import { modalState, nowProgress, queryClient } from "$lib/stores/stores";
   import {
     Copy,
     Ellipsis,
@@ -8,6 +8,7 @@
     Radio,
     Share,
     Trash,
+    RefreshCw,
   } from "lucide-svelte";
   import * as Nostr from "nostr-typedef";
   import { getRelaysById, publishEvent } from "$lib/func/nostr";
@@ -69,6 +70,11 @@
         action: "broadcast",
       });
     }
+    actionGroup.push({
+      text: `${$_("menu.action.refresh")}`,
+      icon: RefreshCw,
+      action: "refresh_data",
+    });
     if (
       (note?.pubkey || "") === lumiSetting.get().pubkey &&
       loginUser.value === lumiSetting.get().pubkey
@@ -157,6 +163,17 @@
       case "delete":
         deleteDialogOpen = true;
         break;
+      case "refresh_data":
+        $nowProgress = true;
+        queryClient.refetchQueries({
+          queryKey: [
+            "naddr",
+            `${note.kind}:${note?.pubkey || ""}:${(note?.tags || []).find((tag) => tag[0] === "d")?.[1] || ""}`,
+          ],
+        });
+        setTimeout(() => {
+          $nowProgress = false;
+        }, 2000);
     }
   };
 </script>
