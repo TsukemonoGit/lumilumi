@@ -250,7 +250,7 @@
 
   async function publishList(eventParameters: Nostr.EventParameters) {
     $nowProgress = true;
-    const result = await safePublishEvent(eventParameters);
+    const result = await safePublishEvent($state.snapshot(eventParameters));
     if ("errorCode" in result) {
       if (result.isCanceled) {
         $nowProgress = false;
