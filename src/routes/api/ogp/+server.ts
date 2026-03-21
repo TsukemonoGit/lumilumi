@@ -21,7 +21,7 @@ export const GET: RequestHandler = async ({ url: request }) => {
   }
 
   const blockedRanges =
-    /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0|169\.254\.|::1|\[::1\])/i;
+  /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.0\.0\.0|169\.254\.|::1|\[::1\]|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:|fe80:)/i;
   if (blockedRanges.test(parsedUrl.hostname)) {
     throw error(403, { message: "Private addresses are not allowed" });
   }
