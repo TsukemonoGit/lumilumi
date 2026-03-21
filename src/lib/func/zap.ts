@@ -202,7 +202,7 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
     if (relayData.length > 0) {
       queryClient.setQueryData(
         ["defaultRelay", pubkey],
-        (oldData: any) => relayData[0],
+        (oldData: EventPacket | undefined) => relayData[0],
       );
       queryRelay = relayData[0];
       console.log(queryClient.getQueryData(["defaultRelay", pubkey]));
