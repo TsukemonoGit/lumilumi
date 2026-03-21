@@ -217,10 +217,10 @@
       if (!decryptedContent) return;
       pubkey = decryptedContent[index]?.[1] ?? "";
       const newDecryptContent = decryptedContent.filter((_, i) => i !== index);
-      const encryptedContent = await encryptPrvTags(
-        event.pubkey,
-        newDecryptContent,
-      );
+      const encryptedContent =
+        newDecryptContent.length > 0
+          ? await encryptPrvTags(event.pubkey, newDecryptContent)
+          : "";
       if (encryptedContent === undefined) {
         addToast({
           data: {
