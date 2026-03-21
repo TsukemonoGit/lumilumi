@@ -428,7 +428,7 @@ export const mediaOperator = (sift: number) => {
         map((result) => ({
           result,
           oldestCreatedAt:
-            eventBuffer.length >= sift
+              sift !== 0 && eventBuffer.length >= sift
               ? eventBuffer[sift - 1].event.created_at
               : eventBuffer[eventBuffer.length - 1].event.created_at,
           totalPacketsProcessed: eventBuffer.length,
