@@ -207,7 +207,17 @@
     }
   },
   "list": {
-    "settingswarning": "To view the list page, you must set up a pubkey first."
+    "settingswarning": "To view the list page, you must set up a pubkey first.",
+    "create": {
+      "title": "List Name",
+      "error": "Failed to create list.",
+      "description": "Description",
+      "descPlaceholder": "Enter a description...",
+      "titlePlaceholder": "Enter a list name...",
+      "image": "Image",
+      "submit": "Create"
+    },
+    "nobody": "No users in this list."
   },
   "alia": {
     "label": {

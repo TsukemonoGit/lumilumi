@@ -206,7 +206,17 @@
     }
   },
   "list": {
-    "settingswarning": "リストページを閲覧するには、公開鍵の設定が必要です。"
+    "settingswarning": "リストページを閲覧するには、公開鍵の設定が必要です。",
+    "create": {
+      "title": "リスト名",
+      "error": "リストの作成に失敗しました。",
+      "description": "説明",
+      "descPlaceholder": "説明を入力...",
+      "titlePlaceholder": "リスト名を入力...",
+      "image": "画像",
+      "submit": "作成"
+    },
+    "nobody": "このリストにはユーザーがいません。"
   },
   "alia": {
     "label": {

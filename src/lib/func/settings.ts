@@ -343,7 +343,7 @@ export async function decryptContent(
         );
     return privateTagsJson ? JSON.parse(privateTagsJson) : null;
   } catch (error) {
-    console.error("Failed to decrypt content:", error);
+    console.log("Failed to decrypt content:", error);
     return null;
   }
 }

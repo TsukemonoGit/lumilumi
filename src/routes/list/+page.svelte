@@ -10,6 +10,7 @@
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { encodetoNpub } from "$lib/func/encode";
+  import CreateList from "./CreateList.svelte";
 
   const handleClickToList = (event: Nostr.Event) => {
     const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
@@ -36,26 +37,18 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
+      <CreateList queryKey={["kind30000", lumiSetting.get().pubkey]} />
       <ListMain
         queryKey={["kind30000", lumiSetting.get().pubkey]}
         pubkey={lumiSetting.get().pubkey}
         kind={30000}
       >
         {#snippet children({ events })}
-          {@const peopleList = filtered(events)}
-          {#if peopleList.length === 0}
-            <Link
-              className="underline text-magnum-300 break-all "
-              href={`https://nostviewstr.vercel.app/${encodePub}/${30000}`}
-              >{$_("nostviewstr.kind30000")}</Link
-            >
-          {:else}
-            {#each peopleList as event}
-              <div class="border border-magnum-500 rounded-lg overflow-hidden">
-                <ListLinkCard {event} depth={0} />
-              </div>
-            {/each}
-          {/if}
+          {#each events as event}
+            <div class="border border-magnum-500 rounded-lg overflow-hidden">
+              <ListLinkCard {event} depth={0} />
+            </div>
+          {/each}
         {/snippet}
       </ListMain>
       <div
