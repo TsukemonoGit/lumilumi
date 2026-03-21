@@ -43,12 +43,12 @@ export function rxNostr3RelaysReconnectChallenge() {
     ([key, value]) =>
       value.read &&
       !authRelay.get().includes(key) &&
-      get(app).rxNostr3.getRelayStatus(key)?.connection === "error"
+      get(app).rxNostr3.getRelayStatus(key)?.connection === "error",
   );
   if (relays.length === 0) return;
 
   relays.forEach(([key, value]) => {
-    get(app).rxNostr.reconnect(key);
+    get(app).rxNostr3.reconnect(key);
   });
 }
 
@@ -154,7 +154,7 @@ function handleEvent(v: EventPacket) {
       if (item[0] === "a") return item as string[]; // "a" が見つかったら即決定
       return acc || ((item[0] === "e" ? item : null) as string[] | null); // "e" が見つかったらそれを記憶
     },
-    null
+    null,
   );
 
   if (etag) {

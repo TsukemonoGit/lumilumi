@@ -52,7 +52,7 @@
     } else {
       const data: EventPacket[] | undefined =
         queryClient?.getQueryData(timelineQuery);
-      if (data && data.length <= 0) {
+      if (data && data.length > 0) {
         since = data[0].event.created_at;
       } else {
         since = ev[0].event.created_at;
@@ -62,7 +62,7 @@
 
   export const getFollowFilteredEvents = (
     events: Nostr.Event[],
-    onlyFollowee: boolean
+    onlyFollowee: boolean,
   ) => {
     if (onlyFollowee && followList.get()) {
       return events.filter((event) => {
@@ -92,7 +92,7 @@
     const pTags: string[] = (note?.tags || [])
       .filter(
         (tag) =>
-          tag[0] === "p" && tag.length > 1 && tag[1] !== (note?.pubkey || "")
+          tag[0] === "p" && tag.length > 1 && tag[1] !== (note?.pubkey || ""),
       )
       .map((tag) => tag[1]);
 
@@ -130,8 +130,8 @@
   const eventFilter = $derived(
     composeFilters(
       (note) => checkCanvasation(note, timelineFilter.selectCanversation),
-      excludeKind0
-    )
+      excludeKind0,
+    ),
   );
 </script>
 

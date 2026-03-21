@@ -41,16 +41,12 @@ export const useOgp = (url: string) => {
   };
 };
 
-export const fetchOgpContent = async (
-  urlString: string
-): Promise<Ogp | null> => {
+export const fetchOgpContent = async (url: string): Promise<Ogp | null> => {
   try {
-    const response = await fetch(
-      `/api/ogp?url=${encodeURIComponent(urlString)}`
-    ).catch((err) => console.log(err));
-    const result = (await response
-      ?.json()
-      .catch((err) => console.log(err))) as Metadata;
+    const response = await fetch(`/api/ogp?url=${encodeURIComponent(url)}`);
+    if (!response.ok)
+      return { title: "", image: "", description: "", favicon: "" };
+    const result: Metadata = await response.json();
     // console.log(result);
     // APIエンドポイントから取得したOGP情報を返す
     return {
@@ -68,10 +64,10 @@ export const fetchOgpContent = async (
       audio: result.open_graph?.audio
         ? result.open_graph.audio[result.open_graph.audio.length - 1]?.url
         : result.twitter_card?.players &&
-          Array.isArray(result.twitter_card.players)
-        ? result.twitter_card.players[result.twitter_card.players.length - 1]
-            ?.stream || ""
-        : "",
+            Array.isArray(result.twitter_card.players)
+          ? result.twitter_card.players[result.twitter_card.players.length - 1]
+              ?.stream || ""
+          : "",
       video:
         result.open_graph &&
         Array.isArray(result.open_graph.videos) &&
