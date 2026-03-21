@@ -330,6 +330,7 @@ export async function getMuteByList(
 export async function decryptContent(
   event: Nostr.Event,
 ): Promise<string[][] | null> {
+  if (event.content.length <= 0) return null;
   try {
     //旧式nip04 新式nip44 対応
     const privateTagsJson = event.content.includes("?iv=")
