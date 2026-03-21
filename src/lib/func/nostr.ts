@@ -65,6 +65,8 @@ import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { set3Relays } from "./reactions";
 import { untrack } from "svelte";
 
+type MetadataRecord = Record<string, { key: QueryKey; data: EventPacket }>;
+
 let rxNostr: RxNostr;
 export function setRxNostr() {
   if (get(app)?.rxNostr) {
@@ -192,7 +194,6 @@ export function pubkeysIn(
   //followList.set(new Map(followingMap));
   return followingMap;
 }
-type MetadataRecord = Record<string, { key: QueryKey; data: EventPacket }>;
 
 const saveMetadataToLocalStorage = (
   currentMetadata: MetadataRecord,

@@ -267,7 +267,7 @@ export function zapCheck() {
   });
 }
 
-/* export const zappedPubkey = (event: Nostr.Event): string | undefined => {
+export const zappedPubkey = (event: Nostr.Event): string | undefined => {
   try {
     return JSON.parse(
       event.tags.find((tag) => tag[0] === "description")?.[1] ?? "",
@@ -275,7 +275,7 @@ export function zapCheck() {
   } catch (error) {
     return undefined;
   }
-}; */
+};
 
 export function reactionCheck(show: boolean) {
   return filter((packet: EventPacket) => {

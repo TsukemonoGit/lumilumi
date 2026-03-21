@@ -165,6 +165,7 @@ function handleEvent(v: EventPacket) {
     } else if (v.event.kind === 6 || v.event.kind === 16) {
       queryKey = ["reactions", etag[1], "repost", v.event.pubkey];
     } else if (v.event.kind === 9735) {
+      //おくったひと
       const zappedUser = zappedPubkey(v.event);
       if (zappedUser) {
         queryKey = ["reactions", etag[1], "zapped", zappedUser];
