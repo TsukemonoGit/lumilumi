@@ -31,6 +31,7 @@
   import UserName from "$lib/components/NostrElements/user/UserName.svelte";
   import { formatToEventPacket } from "$lib/func/util";
   import ListMemberAdder from "../ListMemberAdder.svelte";
+  import { loginUser } from "$lib/stores/globalRunes.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -217,11 +218,11 @@
       if (!decryptedContent) return;
       pubkey = decryptedContent[index]?.[1] ?? "";
       const newDecryptContent = decryptedContent.filter((_, i) => i !== index);
-      const encryptedContent = await encryptPrvTags(
-        event.pubkey,
-        newDecryptContent,
-      );
-      if (!encryptedContent) {
+      const encryptedContent =
+        newDecryptContent.length > 0
+          ? await encryptPrvTags(event.pubkey, newDecryptContent)
+          : "";
+      if (encryptedContent === undefined) {
         addToast({
           data: {
             title: "Error",
@@ -250,7 +251,7 @@
 
   async function publishList(eventParameters: Nostr.EventParameters) {
     $nowProgress = true;
-    const result = await safePublishEvent(eventParameters);
+    const result = await safePublishEvent($state.snapshot(eventParameters));
     if ("errorCode" in result) {
       if (result.isCanceled) {
         $nowProgress = false;
@@ -309,10 +310,11 @@
           </div>
 
           <div class="grid w-full grid-cols-[32px_1fr_32px] gap-2 mt-2">
-            <ListMemberAdder
-              onAddUser={(type, pubkey) =>
-                addUser(type, pubkey, event, decryptContent)}
-            />
+            {#if loginUser.value === event.pubkey}
+              <ListMemberAdder
+                onAddUser={(type, pubkey) =>
+                  addUser(type, pubkey, event, decryptContent)}
+              />{/if}
 
             <!--publist-->
             <div class="flex gap-1 flex-wrap">
@@ -335,7 +337,7 @@
                   />
                 {/if}{/each}
             </div>
-            {#if pubkeys.length > 0}<IconButton
+            {#if pubkeys.length > 0 && loginUser.value === event.pubkey}<IconButton
                 variant={"fill"}
                 title={deleteMode ? "Cancel Delete" : "Delete User"}
                 onclick={() => (deleteMode = !deleteMode)}
