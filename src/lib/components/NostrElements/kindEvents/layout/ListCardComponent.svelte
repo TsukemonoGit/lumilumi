@@ -43,7 +43,10 @@
       </div>
 
       <div class="ml-2 text-start flex flex-col">
-        <div class="text-lg font-bold text-magnum-400">
+        <div
+          class="text-lg font-bold text-magnum-400 line-clamp-4"
+          style="white-space: pre-wrap; word-break: break-word;"
+        >
           {listProps.name}
         </div>
 
