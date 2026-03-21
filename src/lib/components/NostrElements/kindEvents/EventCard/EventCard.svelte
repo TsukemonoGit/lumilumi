@@ -123,7 +123,7 @@
   });
 
   let paramNoteId = $derived(
-    page.params.note ? getIDbyParam(page.params.note) : undefined
+    page.params.note ? getIDbyParam(page.params.note) : undefined,
   );
 
   //ミュートメニューの設定は考慮しない
@@ -150,7 +150,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag)
+          removeFirstMatchingId(value, currentNoteTag),
         );
       }
 
@@ -170,7 +170,7 @@
       // Remove current tag if exists
       if (currentNoteTag) {
         viewEventIds.update((value) =>
-          removeFirstMatchingId(value, currentNoteTag)
+          removeFirstMatchingId(value, currentNoteTag),
         );
       }
 
@@ -205,7 +205,7 @@
   onDestroy(() => {
     if (currentNoteTag) {
       viewEventIds.update((value) =>
-        removeFirstMatchingId(value, currentNoteTag)
+        removeFirstMatchingId(value, currentNoteTag),
       );
     }
   });
@@ -437,7 +437,7 @@
           {showStatus}
         />
       {:else if note.kind === 30000}
-        <ListLinkCard event={note} {depth} />
+        <ListLinkCard event={note} {depth} onDelete={() => (deleted = true)} />
       {:else if note.kind === 30030}
         <!--kind30030-->
         <Kind30030Note

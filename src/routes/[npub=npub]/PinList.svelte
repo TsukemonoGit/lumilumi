@@ -91,13 +91,13 @@
       previewData = { type: null, id: trimmed, isValid: false };
     }
   });
-  // svelte-ignore non_reactive_update
-  let dialogOpen: (bool: boolean) => void = () => {};
+
+  let dialogOpen = $state(false);
   const openDialog = () => {
     dialogMode = "add";
     inputValue = "";
     previewData = { type: null, id: "", isValid: false };
-    dialogOpen(true);
+    dialogOpen = true;
   };
 
   const addPin = async () => {
@@ -127,7 +127,7 @@
     try {
       // 既存イベントがある場合は重複チェック
       const isDuplicate = currentEvent?.tags.some(
-        (tag: string[]) => tag[0] === newTag[0] && tag[1] === newTag[1]
+        (tag: string[]) => tag[0] === newTag[0] && tag[1] === newTag[1],
       );
 
       if (isDuplicate) {
@@ -153,7 +153,7 @@
       if (from) {
         queryClient.setQueryData(
           queryKey,
-          formatToEventPacket(event, from.from)
+          formatToEventPacket(event, from.from),
         );
       }
       addToast({
@@ -165,7 +165,7 @@
       });
 
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     } catch (error) {
       addToast({
         data: {
@@ -175,13 +175,13 @@
         },
       });
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     }
   };
   const confirmDelete = (tag: string[]) => {
     dialogMode = "delete";
     deletingTag = tag;
-    dialogOpen(true);
+    dialogOpen = true;
   };
 
   const executeDelete = async () => {
@@ -191,7 +191,7 @@
 
     try {
       const existingTags = currentEvent.tags.filter(
-        (t: string[]) => !(delTag && t[0] === delTag[0] && t[1] === delTag[1])
+        (t: string[]) => !(delTag && t[0] === delTag[0] && t[1] === delTag[1]),
       );
 
       const newPin: EventParameters = {
@@ -205,7 +205,7 @@
       if (from) {
         queryClient.setQueryData(
           queryKey,
-          formatToEventPacket(event, from.from)
+          formatToEventPacket(event, from.from),
         );
       }
       addToast({
@@ -217,7 +217,7 @@
       });
 
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     } catch (error) {
       addToast({
         data: {
@@ -227,7 +227,7 @@
         },
       });
       $nowProgress = false;
-      dialogOpen(false);
+      dialogOpen = false;
     }
   };
 
@@ -305,7 +305,7 @@
   {/snippet}
 </LatestEvent>
 <AlertDialog
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   title={$t(dialogMode === "add" ? "pin.addTitle" : "pin.deleteTitle")}
   okButtonName={dialogMode === "add" ? "ADD" : "DELETE"}
   closeOnOutsideClick={true}

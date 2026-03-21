@@ -9,7 +9,7 @@
     description?: string;
     okButtonName?: string | undefined;
     main?: import("svelte").Snippet;
-    openDialog?: (bool: boolean) => void;
+    open?: boolean;
     closeOnOutsideClick?: boolean;
     dialogStatus?: Writable<boolean>;
   }
@@ -20,7 +20,7 @@
     description = "",
     okButtonName = undefined,
     main,
-    openDialog = $bindable(),
+    open = $bindable(false),
     dialogStatus = $bindable(writable(false)),
     closeOnOutsideClick = true,
   }: Props = $props();
@@ -43,11 +43,12 @@
     closeOnOutsideClick: closeOnOutsideClick,
   });
 
-  openDialog = (bool: boolean) => {
-    $openEle = bool;
-  };
-  // export { open };
+  $effect(() => {
+    $openEle = open;
+  });
+
   openEle.subscribe((value) => {
+    open = value;
     $dialogStatus = value;
   });
 </script>

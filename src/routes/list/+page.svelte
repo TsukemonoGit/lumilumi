@@ -1,31 +1,19 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import Link from "$lib/components/Elements/Link.svelte";
   import ListLinkCard from "$lib/components/NostrElements/kindEvents/EventCard/ListLinkCard.svelte";
   import ListMain from "$lib/components/renderSnippets/nostr/ListMain.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
 
-  import * as nip19 from "nostr-tools/nip19";
-  import * as Nostr from "nostr-typedef";
   import { SquareArrowOutUpRight } from "lucide-svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { encodetoNpub } from "$lib/func/encode";
   import CreateList from "./CreateList.svelte";
+  import { queryClient } from "$lib/stores/stores";
+  import type { EventPacket } from "rx-nostr";
 
-  const handleClickToList = (event: Nostr.Event) => {
-    const dtag = event.tags.find((tag) => tag[0] === "d")?.[1];
-    const naddr: nip19.AddressPointer = {
-      identifier: dtag ?? "",
-      kind: event.kind,
-      pubkey: event.pubkey,
-    };
-    goto(`/list/${nip19.naddrEncode(naddr)}`);
-  };
-
-  const filtered = (events: Nostr.Event[]) => {
-    return events.filter((event) => event.tags.find((item) => item[0] === "p"));
-  };
   let encodePub = $derived(encodetoNpub(lumiSetting.get().pubkey));
+
+  let queryKey = $derived(["kind30000", lumiSetting.get().pubkey]);
 </script>
 
 {#if !lumiSetting.get()?.pubkey}
@@ -37,16 +25,25 @@
 {:else}
   <section>
     <div class="flex flex-col gap-2 w-full overflow-x-hidden">
-      <CreateList queryKey={["kind30000", lumiSetting.get().pubkey]} />
-      <ListMain
-        queryKey={["kind30000", lumiSetting.get().pubkey]}
-        pubkey={lumiSetting.get().pubkey}
-        kind={30000}
-      >
+      <CreateList {queryKey} />
+      <ListMain {queryKey} pubkey={lumiSetting.get().pubkey} kind={30000}>
         {#snippet children({ events })}
           {#each events as event}
             <div class="border border-magnum-500 rounded-lg overflow-hidden">
-              <ListLinkCard {event} depth={0} />
+              <ListLinkCard
+                {event}
+                depth={0}
+                onDelete={() => {
+                  queryClient.setQueryData(
+                    queryKey,
+                    (oldData: EventPacket[] | undefined) => {
+                      return oldData?.filter(
+                        (packet) => packet.event.id !== event.id,
+                      );
+                    },
+                  );
+                }}
+              ></ListLinkCard>
             </div>
           {/each}
         {/snippet}

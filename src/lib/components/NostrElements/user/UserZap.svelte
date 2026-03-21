@@ -28,7 +28,7 @@
     zapOpen = $bindable(false),
   }: Props = $props();
   let invoice: string | undefined = $state();
-  let dialogOpen: (bool: boolean) => void = $state(() => {});
+  let dialogOpen = $state(false);
   let zapAmount: number = $state(50);
   let zapComment: string = $derived(comment ?? "");
   let invoiceOpen: (bool: boolean) => void = $state(() => {});
@@ -42,7 +42,7 @@
     if (zapAmount <= 0) {
       zapOpen = false;
       //toast dasite
-      dialogOpen?.(false);
+      dialogOpen = false;
       return;
     }
     $nowProgress = true;
@@ -69,7 +69,7 @@
     }
     $nowProgress = false;
     invoice = zapInvoice;
-    dialogOpen?.(false);
+    dialogOpen = false;
     invoiceOpen?.(true);
     invOp = true;
     try {
@@ -89,7 +89,7 @@
       zapAmount = Number(storagezap);
     }
     //amount comment画面を開いてamountのinputにfocus
-    dialogOpen?.(true);
+    dialogOpen = true;
     setTimeout(() => {
       amountEle?.focus();
     }, 1);
@@ -118,7 +118,7 @@
 </button>
 <AlertDialog
   bind:dialogStatus
-  bind:openDialog={dialogOpen}
+  bind:open={dialogOpen}
   onClickOK={() => onClickOK()}
   title="Zap"
 >

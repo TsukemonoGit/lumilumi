@@ -13,6 +13,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { writable, type Writable } from "svelte/store";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
+  import type { MenuItem } from "$lib/types";
 
   interface Props {
     naddr: string | undefined;
@@ -30,8 +31,6 @@
     iconClass = "",
   }: Props = $props();
 
-  let dialogOpen: Writable<boolean> = writable(false);
-
   const decodeNaddr = (str: string | undefined) => {
     if (!str) return undefined;
     try {
@@ -40,13 +39,9 @@
     } catch {}
     return undefined;
   };
-
+  let naddrpointer = $derived(decodeNaddr(naddr));
   let menuGroups = $derived.by(() => {
-    const naddrpointer = decodeNaddr(naddr);
-
-    const viewGroup = [
-      { text: $_("menu.view.json"), icon: Copy, action: "viewJson" },
-    ];
+    const actionItems: MenuItem[] = [];
 
     const copyGroup = [
       { text: $_("menu.copy.naddr"), icon: Copy, action: "copyNaddr" },
@@ -81,27 +76,24 @@
       });
     }
 
-    const filterItems = (
-      items: typeof viewGroup | typeof copyGroup | typeof externalGroup
-    ) => (indexes ? items.filter((_, idx) => indexes.includes(idx)) : items);
+    const filterItems = (items: typeof copyGroup | typeof externalGroup) =>
+      indexes ? items.filter((_, idx) => indexes.includes(idx)) : items;
 
-    return [
-      { label: $_("menu.group.view"), items: filterItems(viewGroup) },
+    const groups = [
       { label: $_("menu.group.copy"), items: filterItems(copyGroup) },
-      {
-        label: $_("menu.group.external"),
-        items: filterItems(externalGroup),
-      },
-    ].filter(Boolean) as { label: string; items: typeof viewGroup }[];
+      ...(actionItems.length > 0
+        ? [{ label: $_("menu.group.action"), items: actionItems }]
+        : []),
+      { label: $_("menu.group.external"), items: filterItems(externalGroup) },
+    ];
+
+    return groups;
   });
 
   const handleSelectItem = async (action: string) => {
     if (!naddr) return;
 
     switch (action) {
-      case "viewJson":
-        $dialogOpen = true;
-        break;
       case "copyNaddr":
         try {
           await navigator.clipboard.writeText(naddr);
@@ -135,7 +127,7 @@
         window.open(
           `https://nostviewstr.vercel.app/${naddr}`,
           "_blank",
-          "noreferrer"
+          "noreferrer",
         );
         break;
     }
