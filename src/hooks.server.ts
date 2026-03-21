@@ -4,8 +4,8 @@ import { setLocale, locale, waitLocale } from "@konemono/svelte5-i18n";
 import { get } from "svelte/store";
 
 const allowedOrigins = [
-  "https://lumilumi.vercel.app/",
-  "https://lumilumi.app/",
+  "https://lumilumi.vercel.app",
+  "https://lumilumi.app",
 ];
 
 // レート制限設定
