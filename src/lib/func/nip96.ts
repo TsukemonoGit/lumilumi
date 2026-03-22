@@ -210,17 +210,15 @@ export type DelayedProcessingResponse = {
  * @returns True if the configuration is valid, false otherwise.
  */
 export function validateServerConfiguration(
-  config: ServerConfiguration
+  config: ServerConfiguration,
 ): boolean {
-  if (Boolean(config.api_url) == false) {
-    return false;
+  // delegated_to_url が存在する場合、api_url は空でなければならない
+  if (Boolean(config.delegated_to_url)) {
+    return !Boolean(config.api_url);
   }
 
-  if (Boolean(config.delegated_to_url) && Boolean(config.api_url)) {
-    return false;
-  }
-
-  return true;
+  // delegated_to_url が存在しない場合、api_url は必須
+  return Boolean(config.api_url);
 }
 
 /**
@@ -230,7 +228,7 @@ export function validateServerConfiguration(
  * @returns The server configuration, or an error if the configuration could not be fetched or parsed.
  */
 export async function readServerConfig(
-  serverUrl: string
+  serverUrl: string,
 ): Promise<ServerConfiguration> {
   const HTTPROUTE = "/.well-known/nostr/nip96.json" as const;
   let fetchUrl = "";
@@ -272,7 +270,7 @@ export async function readServerConfig(
  * @returns true if the object is a valid FileUploadResponse, otherwise false.
  */
 export function validateFileUploadResponse(
-  response: any
+  response: any,
 ): response is FileUploadResponse {
   if (typeof response !== "object" || response === null) {
     return false;
@@ -336,7 +334,7 @@ export async function uploadFile(
   file: File,
   serverApiUrl: string,
   nip98AuthorizationHeader: string,
-  optionalFormDataFields?: OptionalFormDataFields
+  optionalFormDataFields?: OptionalFormDataFields,
 ): Promise<FileUploadResponse> {
   // Create FormData object
   const formData = new FormData();
@@ -375,7 +373,7 @@ export async function uploadFile(
     // 403 Forbidden
     if (response.status === 403) {
       throw new Error(
-        "Forbidden! Payload tag does not match the requested file!"
+        "Forbidden! Payload tag does not match the requested file!",
       );
     }
 
@@ -409,7 +407,7 @@ export async function uploadFile(
 export function generateDownloadUrl(
   fileHash: string,
   serverDownloadUrl: string,
-  fileExtension?: string
+  fileExtension?: string,
 ): string {
   // Construct the base download URL using the file hash
   let downloadUrl = `${serverDownloadUrl}/${fileHash}`;
@@ -434,7 +432,7 @@ export function generateDownloadUrl(
 export async function deleteFile(
   fileHash: string,
   serverApiUrl: string,
-  nip98AuthorizationHeader: string
+  nip98AuthorizationHeader: string,
 ): Promise<any> {
   // make sure the serverApiUrl ends with a slash
   if (!serverApiUrl.endsWith("/")) {
@@ -472,7 +470,7 @@ export async function deleteFile(
  * @returns A boolean indicating whether the response is valid.
  */
 export function validateDelayedProcessingResponse(
-  response: any
+  response: any,
 ): response is DelayedProcessingResponse {
   if (typeof response !== "object" || response === null) return false;
 
@@ -506,7 +504,7 @@ export function validateDelayedProcessingResponse(
  * @returns A promise that resolves to an object containing the processing status and other relevant information.
  */
 export async function checkFileProcessingStatus(
-  processingUrl: string
+  processingUrl: string,
 ): Promise<FileUploadResponse | DelayedProcessingResponse> {
   // Make the GET request to the processing URL
   const response = await fetch(processingUrl);
@@ -514,7 +512,7 @@ export async function checkFileProcessingStatus(
   // Handle the response
   if (!response.ok) {
     throw new Error(
-      `Failed to retrieve processing status. Server responded with status: ${response.status}`
+      `Failed to retrieve processing status. Server responded with status: ${response.status}`,
     );
   }
 

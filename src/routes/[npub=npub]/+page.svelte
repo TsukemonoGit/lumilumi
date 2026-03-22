@@ -69,9 +69,6 @@
 
   // svelte-ignore non_reactive_update
   let req = createRxForwardReq();
-  /*  const excludeKind1 = (event: Nostr.Event) => {
-    return event.kind === 1 && event.pubkey === data.pubkey;
-  }; */
 
   let userPubkey = $derived(data.pubkey); // Make pubkey reactive
 
@@ -82,14 +79,10 @@
   const {
     elements: { root, list, content, trigger },
     states: { value },
-  } = createTabs({
-    // defaultValue: "post",
-    //  onValueChange: handleChange,
-  });
+  } = createTabs({});
 
   const triggers = $derived([
     { id: "post", title: "Post", Icon: ReceiptText },
-    //ログイン時のみ自分と相手のあれをみれる
     ...(lumiSetting.get().pubkey && lumiSetting.get().pubkey !== userPubkey
       ? [
           {
@@ -102,7 +95,6 @@
 
     { id: "reactions", title: "Reaction", Icon: Sticker },
 
-    //画像オンの時だけメディア欄を出す
     ...(lumiSetting.get().showImg
       ? [
           {
@@ -159,14 +151,12 @@
     value.set("");
   });
   async function init() {
-    // console.log(page.url.hash);
     const hash = triggers.find((t) => `#${t.id}` === page.url.hash);
     if (hash) {
       value.set(hash.id);
     } else {
       value.set("post");
     }
-    //ログインしてない＝10002リレーないから
     if (!lumiSetting.get().pubkey && data.relays && data.relays.length > 0) {
       setRelays(data.relays);
     }
@@ -180,7 +170,6 @@
     } else {
       since = now();
     }
-    // console.log(data.nip05Address);
     if (data.nip05Address) {
       queryClient?.setQueryData(
         ["nip05", data.pubkey, data.nip05Address.toLowerCase()],
@@ -193,8 +182,7 @@
 
   value.subscribe((v) => {
     if (v) {
-      // window.location.hash = v; // これを削除
-      history.replaceState(null, "", `#${v}`); // これに変更
+      history.replaceState(null, "", `#${v}`);
 
       const tabsElement = document?.querySelector("#userTabs");
       setTimeout(() => {
@@ -219,6 +207,26 @@
     isBirthDay = false;
   });
 </script>
+
+{#snippet metadataEventCard(
+  event: Nostr.Event,
+  excludefunc?: (event: Nostr.Event) => boolean,
+)}
+  <Metadata queryKey={["metadata", event.pubkey]} pubkey={event.pubkey}>
+    {#snippet loading()}
+      <div><EventCard note={event} {excludefunc} /></div>
+    {/snippet}
+    {#snippet nodata()}
+      <div><EventCard note={event} {excludefunc} /></div>
+    {/snippet}
+    {#snippet error()}
+      <div><EventCard note={event} {excludefunc} /></div>
+    {/snippet}
+    {#snippet content({ metadata })}
+      <EventCard {metadata} note={event} {excludefunc} />
+    {/snippet}
+  </Metadata>
+{/snippet}
 
 {#key userPubkey}
   <section>
@@ -271,7 +279,6 @@
                     filters={[
                       {
                         kinds: [1, 6, 16],
-
                         authors: [userPubkey],
                         since: since,
                       },
@@ -279,7 +286,6 @@
                     olderFilters={[
                       {
                         kinds: [1, 6, 16],
-
                         authors: [userPubkey],
                         since: since,
                       },
@@ -288,45 +294,17 @@
                     {amount}
                   >
                     {#snippet content({ events, len })}
-                      <!-- <SetRepoReactions /> -->
-
                       {#if events && events.length > 0}
                         {#each events as event, index (event.id)}
-                          <Metadata
-                            queryKey={["metadata", event.pubkey]}
-                            pubkey={event.pubkey}
-                          >
-                            {#snippet loading()}
-                              <div>
-                                <EventCard note={event} />
-                              </div>
-                            {/snippet}
-                            {#snippet nodata()}
-                              <div>
-                                <EventCard note={event} />
-                              </div>
-                            {/snippet}
-                            {#snippet error()}
-                              <div>
-                                <EventCard note={event} />
-                              </div>
-                            {/snippet}
-                            {#snippet content({ metadata })}
-                              <EventCard {metadata} note={event} />
-                            {/snippet}
-                          </Metadata>
-                          <!-- </div> -->
+                          {@render metadataEventCard(event)}
                         {/each}
                       {/if}
                     {/snippet}
                     {#snippet loading()}
                       <EmptyCardList length={10} />
                     {/snippet}
-
                     {#snippet error()}
-                      <div>
-                        <p>{error}</p>
-                      </div>
+                      <div><p>{error}</p></div>
                     {/snippet}
                   </TimelineList>{/if}
               {/if}{/await}
@@ -342,7 +320,6 @@
                   filters={[
                     {
                       kinds: [42],
-
                       authors: [userPubkey],
                       since: since,
                     },
@@ -350,7 +327,6 @@
                   olderFilters={[
                     {
                       kinds: [42],
-
                       authors: [userPubkey],
                       since: since,
                     },
@@ -359,45 +335,17 @@
                   {amount}
                 >
                   {#snippet content({ events })}
-                    <!-- <SetRepoReactions /> -->
-
                     {#if events && events.length > 0}
                       {#each events as event, index (event.id)}
-                        <Metadata
-                          queryKey={["metadata", event.pubkey]}
-                          pubkey={event.pubkey}
-                        >
-                          {#snippet loading()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet nodata()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet error()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet content({ metadata })}
-                            <EventCard {metadata} note={event} />
-                          {/snippet}
-                        </Metadata>
-                        <!-- </div> -->
+                        {@render metadataEventCard(event)}
                       {/each}
                     {/if}
                   {/snippet}
                   {#snippet loading()}
                     <EmptyCardList length={10} />
                   {/snippet}
-
                   {#snippet error()}
-                    <div>
-                      <p>{error}</p>
-                    </div>
+                    <div><p>{error}</p></div>
                   {/snippet}
                 </TimelineList>{/if}
             {/if}
@@ -442,53 +390,15 @@
                 {#snippet content({ events })}
                   {#if events && events.length > 0}
                     {#each events as event, index (event.id)}
-                      <Metadata
-                        queryKey={["metadata", event.pubkey]}
-                        pubkey={event.pubkey}
-                      >
-                        {#snippet loading()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet nodata()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet error()}
-                          <div>
-                            <EventCard
-                              note={event}
-                              excludefunc={excludeKind7}
-                            />
-                          </div>
-                        {/snippet}
-                        {#snippet content({ metadata })}
-                          <EventCard
-                            {metadata}
-                            note={event}
-                            excludefunc={excludeKind7}
-                          />
-                        {/snippet}
-                      </Metadata>
+                      {@render metadataEventCard(event, excludeKind7)}
                     {/each}
                   {/if}
                 {/snippet}
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}
-
                 {#snippet error()}
-                  <div>
-                    <p>{error}</p>
-                  </div>
+                  <div><p>{error}</p></div>
                 {/snippet}
               </TimelineList>
             {/if}
@@ -525,40 +435,16 @@
                   >
                     {#if events && events.length > 0}
                       {#each events as event, index (event.id)}
-                        <Metadata
-                          queryKey={["metadata", event.pubkey]}
-                          pubkey={event.pubkey}
-                        >
-                          {#snippet loading()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet nodata()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet error()}
-                            <div>
-                              <EventCard note={event} />
-                            </div>
-                          {/snippet}
-                          {#snippet content({ metadata })}
-                            <EventCard {metadata} note={event} />
-                          {/snippet}
-                        </Metadata>
+                        {@render metadataEventCard(event)}
                       {/each}
                     {/if}
-                  </div>{/snippet}
+                  </div>
+                {/snippet}
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}
-
                 {#snippet error()}
-                  <div>
-                    <p>{error}</p>
-                  </div>
+                  <div><p>{error}</p></div>
                 {/snippet}
               </TimelineList>
             {/if}
@@ -582,18 +468,12 @@
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}
-
                 {#snippet error()}
-                  <div class="p-1">
-                    <p>{error}</p>
-                  </div>
+                  <div class="p-1"><p>{error}</p></div>
                 {/snippet}
                 {#snippet nodata()}
-                  <div class="p-1">
-                    <p>relays nodata</p>
-                  </div>
+                  <div class="p-1"><p>relays nodata</p></div>
                 {/snippet}
-
                 {#snippet success({ event })}
                   {#each event.tags.filter((tag) => tag[0] === "r") as [r, url, rw], index}
                     <div class=" overflow-hidden p-1">
@@ -616,11 +496,8 @@
                 {#snippet loading()}
                   <EmptyCardList length={10} />
                 {/snippet}
-
                 {#snippet nodata()}
-                  <div class="p-1">
-                    <p>nodata</p>
-                  </div>
+                  <div class="p-1"><p>nodata</p></div>
                 {/snippet}
                 {#snippet content({ contacts, status })}
                   {#if contacts}
@@ -631,11 +508,13 @@
                         .map((tag) => tag[1])
                         .slice()
                         .reverse()}
-                      >{#snippet children(event, index)}
+                    >
+                      {#snippet children(event, index)}
                         {@const id = event as string}
                         <Metadatanoyatu pubkey={id} />
                       {/snippet}
-                    </PaginationList>{/if}
+                    </PaginationList>
+                  {/if}
                 {/snippet}
               </Contacts>
             {/if}
@@ -659,7 +538,8 @@
                 queryKey={["kind30023", userPubkey]}
                 pubkey={userPubkey}
                 kind={30023}
-                >{#snippet loading()}
+              >
+                {#snippet loading()}
                   loading
                 {/snippet}
                 {#snippet nodata()}
@@ -722,7 +602,6 @@
 
     flex: 1;
     height: theme(spacing.14);
-    /* padding-inline: theme(spacing.2); */
 
     &:focus {
       position: relative;
