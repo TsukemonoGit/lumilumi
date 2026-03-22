@@ -270,7 +270,7 @@ export async function readServerConfig(
  * @returns true if the object is a valid FileUploadResponse, otherwise false.
  */
 export function validateFileUploadResponse(
-  response: any,
+  response: unknown,
 ): response is FileUploadResponse {
   if (typeof response !== "object" || response === null) {
     return false;
