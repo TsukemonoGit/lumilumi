@@ -39,7 +39,6 @@ function isRateLimited(ip: string): boolean {
 
 const RATE_LIMITED_PATHS = ["/api/ogp", "/api/url-check"];
 
-// TODO: app.html の model-viewer.min.js の実際のホストに変更すること
 const MODEL_VIEWER_HOST = "https://ajax.googleapis.com";
 
 const SECURITY_HEADERS: Record<string, string> = {
