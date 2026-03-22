@@ -15,14 +15,14 @@ export async function refetchKind10000(): Promise<Nostr.Event | undefined> {
       operator: pipe(latest()),
     },
     undefined,
-    2000
+    2000,
   );
 
   if (
     kind10000.length > 0 &&
     (!get(mutes).event ||
       get(mutes).event?.pubkey !== kind10000[0].event.pubkey ||
-      kind10000[0].event.created_at >= (get(mutes).event?.created_at ?? 0))
+      kind10000[0].event.created_at > (get(mutes).event?.created_at ?? 0))
   ) {
     return kind10000[0].event;
   } else {

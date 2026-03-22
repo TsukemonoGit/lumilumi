@@ -52,7 +52,7 @@ export function calculateColor(hex: string): string {
     (
       acc: { r: number; g: number; b: number },
       hexPair: string,
-      index: number
+      index: number,
     ) => {
       const value = parseInt(hexPair, 16);
       if (index % 3 === 0) acc.r = (acc.r + value) % 256;
@@ -60,7 +60,7 @@ export function calculateColor(hex: string): string {
       else if (index % 3 === 2) acc.b = (acc.b + value) % 256;
       return acc;
     },
-    { r: 0, g: 0, b: 0 }
+    { r: 0, g: 0, b: 0 },
   );
 
   return `rgb(${r},${g},${b})`;
@@ -72,7 +72,7 @@ export function calculateColor(hex: string): string {
 function getDateFormatOptions(
   date: Date,
   now: Date,
-  full: boolean
+  full: boolean,
 ): Intl.DateTimeFormatOptions {
   const sameYear = date.getFullYear() === now.getFullYear();
   const sameMonth = sameYear && date.getMonth() === now.getMonth();
@@ -100,7 +100,7 @@ function getDateFormatOptions(
  */
 function formatDateWithOptions(
   date: Date,
-  options: Intl.DateTimeFormatOptions
+  options: Intl.DateTimeFormatOptions,
 ): string {
   return date.toLocaleString([], options);
 }
@@ -110,7 +110,7 @@ function formatDateWithOptions(
  */
 export function formatAbsoluteDateFromUnix(
   unixTime: number,
-  full: boolean = false
+  full: boolean = false,
 ): string {
   const date = new Date(unixTime * 1000);
   return formatAbsoluteDateFromDate(date, full);
@@ -121,7 +121,7 @@ export function formatAbsoluteDateFromUnix(
  */
 export function formatAbsoluteDateFromDate(
   date: Date,
-  full: boolean = false
+  full: boolean = false,
 ): string {
   const now = new Date();
   const options = getDateFormatOptions(date, now, full);
@@ -138,7 +138,7 @@ export const formatDate = (date: Date): string => {
 
 export function formatRelativeDate(
   unixTime: number,
-  locale: string | null | undefined
+  locale: string | null | undefined,
 ): string {
   const date = new Date(unixTime * 1000);
   const now = new Date();
@@ -195,7 +195,7 @@ export function datetime(unixtime: number) {
 
 export const generateResultMessage = (
   isSuccess: string[],
-  isFailed: string[]
+  isFailed: string[],
 ) => {
   let str = "";
   if (isSuccess.length > 0) {
@@ -212,7 +212,7 @@ export const generateResultMessage = (
 };
 
 export const getRelayInfo = async (
-  url: string
+  url: string,
 ): Promise<Nip11.RelayInfo | undefined> => {
   const relayInfo = Nip11Registry.get(url);
   if (relayInfo) {
@@ -257,7 +257,7 @@ export function sortEvents(events: Nostr.Event[]): Nostr.Event[] {
 //新しいのが上
 export function insertEventPacketIntoDescendingList<A extends EventPacket>(
   sortedArray: A[],
-  eventPacket: A
+  eventPacket: A,
 ): A[] {
   const [idx, found] = binarySearch(sortedArray, (b: A) => {
     if (eventPacket.event.id === b.event.id) return 0;
@@ -273,7 +273,7 @@ export function insertEventPacketIntoDescendingList<A extends EventPacket>(
 //新しいのが下
 export function insertEventPacketIntoAscendingList(
   sortedArray: EventPacket[],
-  eventPacket: EventPacket
+  eventPacket: EventPacket,
 ): EventPacket[] {
   const [idx, found] = binarySearch(sortedArray, (b) => {
     if (eventPacket.event.id === b.event.id) return 0;
@@ -306,7 +306,7 @@ export function parseNaddr(tag: string[]): nip19.AddressPointer {
 }
 
 export const nip19Decode = (
-  content: string | undefined
+  content: string | undefined,
 ):
   | { type: "naddr"; data: nip19.AddressPointer }
   | { type: "nevent"; data: nip19.EventPointer }
@@ -435,7 +435,7 @@ export const translateText = (text: string) => {
 
 export function formatToEventPacket(
   ev: Nostr.Event,
-  from: string = ""
+  from: string = "",
 ): EventPacket {
   return {
     event: ev,
@@ -448,7 +448,7 @@ export function formatToEventPacket(
 
 export function debounce<T extends (...args: any[]) => Promise<void> | void>(
   func: T,
-  delay: number
+  delay: number,
 ): (...args: Parameters<T>) => void {
   let timer: ReturnType<typeof setTimeout> | undefined;
   return (...args: Parameters<T>): void => {

@@ -120,7 +120,8 @@ export function latestEachNaddr(): OperatorFunction<EventPacket, EventPacket> {
   return pipe(
     filter((packet) => !!packet?.event),
     latestEach(
-      ({ event }) => `${event.kind}:${event.pubkey}:${event.tags[0][1]}`,
+      ({ event }) =>
+        `${event.kind}:${event.pubkey}:${event.tags.find((t) => t[0] === "d")?.[1] ?? ""}`,
     ),
   );
 }

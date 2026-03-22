@@ -64,6 +64,7 @@ import { STORAGE_KEYS } from "./localStorageKeys";
 import { isAddressableKind, isReplaceableKind } from "nostr-tools/kinds";
 import { set3Relays } from "./reactions";
 import { untrack } from "svelte";
+import { t as _ } from "@konemono/svelte5-i18n";
 
 type MetadataRecord = Record<string, { key: QueryKey; data: EventPacket }>;
 
@@ -492,13 +493,17 @@ export async function promisePublishEvent(
 
     return promisePublishSignedEvent(event, relays);
   } catch (error: any) {
+    const t = get(_);
     if (error.message.includes("invalid plaintext size")) {
-      throw new SigningError("イベントデータのサイズが無効", "INVALID_SIZE");
+      throw new SigningError(t("signError.eventSize"), "INVALID_SIZE");
     }
     if (error.message.includes("User rejected")) {
-      throw new SigningError("署名がキャンセルされました", "USER_REJECTED");
+      throw new SigningError(t("signError.cancel"), "USER_REJECTED");
     }
-    throw new SigningError(`署名エラー: ${error.message}`, "SIGNING_FAILED");
+    throw new SigningError(
+      `${t("signError.signFailed")}: ${error.message}`,
+      "SIGNING_FAILED",
+    );
   }
 }
 
