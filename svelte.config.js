@@ -18,7 +18,8 @@ const config = {
 
     // 旧:csrf: { checkOrigin: false },
     // これつけないと共有のときにCross-site POST form submissions are forbiddenがでる
-    // 新: 許可するオリジンを列挙
+    // 旧: csrf: { checkOrigin: false } / trustedOrigins: ["https://..."]
+    // Web Share Target の POST は OS/ブラウザが Origin を送信しないためワイルドカードで許可
     csrf: {
       trustedOrigins: ["*"],
     },
