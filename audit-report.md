@@ -74,7 +74,7 @@ Nostrユーザーが投稿内に内部URLを含めるだけで、そのURLを閲
 
 ---
 
-### C-3. CSRF保護の全面無効化 → Done
+### C-3. CSRF保護の全面無効化 → 選択肢Bで対応
 
 **カテゴリ:** セキュリティ / アーキテクチャ
 **ファイル:** `svelte.config.js:22-24`
@@ -96,6 +96,35 @@ csrf: {
   trustedOrigins: ["https://lumilumi.app", "https://lumilumi.vercel.app"];
 }
 ```
+
+**補足コメント (C-3):**
+
+推奨修正の「`/post` エンドポイントのみを除外すれば十分」は実装不可能。
+
+SvelteKitの組み込みCSRFチェックは`handle`フックより前に実行されるため、
+`hooks.server.ts`でルート単位にバイパスする手段が存在しない。
+ルート単位の`csrf: false`設定もSvelteKitは標準サポートしていない。
+
+現状の`trustedOrigins: ["https://lumilumi.app", "https://lumilumi.vercel.app"]`は
+Web Share TargetのPOSTをブロックする（OSの共有機能経由のオリジンが
+これらのドメインと一致しないため）。
+
+実現可能な選択肢は以下の2つ：
+
+**選択肢A（推奨）:**
+`svelte.config.js`を`trustedOrigins: ["*"]`に戻し、
+`hooks.server.ts`の`handle`内で自前のオリジン検証を実装する。
+`/post`のみスキップ、それ以外は`TRUSTED_ORIGINS`リストで検証。
+
+**選択肢B:**
+`trustedOrigins: ["*"]`のまま受け入れる。
+LumilumiはサーバーサイドにセッションやDBを持たずNostrの署名は
+クライアントサイドで完結するため、CSRFの実害範囲は限定的。
+
+**Cloudflare側での代替について:**
+CloudflareのWAFはCSRFトークン検証機能を持たない。
+OriginヘッダーのチェックはアプリケーションレイヤーのSvelteKitが担う。
+Cloudflare側の設定変更でこの問題を回避することはできない。
 
 ---
 
