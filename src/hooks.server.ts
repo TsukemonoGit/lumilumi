@@ -48,8 +48,8 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Content-Security-Policy": [
-    "default-src 'self'",
-    `script-src 'self' ${MODEL_VIEWER_HOST} 'unsafe-inline'`,
+    "default-src 'self'", // ← frame-src 未指定時のフォールバック
+    `script-src 'self' ${MODEL_VIEWER_HOST} 'unsafe-inline' https://platform.twitter.com`, //Twitter埋め込みは platform.twitter.com/widgets.js をscriptタグで読み込み、そのスクリプトが内部でiframeを動的生成する方式のためリストについか
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "connect-src 'self' ws: wss: https:",
@@ -58,6 +58,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
+    "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://bsky.app", // ← iframe うめこみ許可リスト
   ].join("; "),
 };
 
