@@ -73,7 +73,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname === "/post" && event.request.method === "POST";
   if (!isShareTarget && event.request.method === "POST") {
     const origin = event.request.headers.get("origin");
-    if (origin && !allowedOrigins.includes(origin)) {
+    if (!origin || !allowedOrigins.includes(origin)) {
       return new Response("Forbidden", { status: 403 });
     }
   }
