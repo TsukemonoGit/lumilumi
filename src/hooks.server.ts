@@ -68,13 +68,21 @@ function applySecurityHeaders(response: Response): void {
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
+  // CSRF保護（Web Share Target以外のPOSTリクエスト）
+  const isShareTarget =
+    event.url.pathname === "/post" && event.request.method === "POST";
+  if (!isShareTarget && event.request.method === "POST") {
+    const origin = event.request.headers.get("origin");
+    if (!origin || !allowedOrigins.includes(origin)) {
+      return new Response("Forbidden", { status: 403 });
+    }
+  }
   // レート制限チェック
   if (RATE_LIMITED_PATHS.some((path) => event.url.pathname.startsWith(path))) {
     const ip =
       event.request.headers.get("cf-connecting-ip") ??
       event.request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
       event.getClientAddress();
-
     if (isRateLimited(ip)) {
       return new Response(JSON.stringify({ error: "Too Many Requests" }), {
         status: 429,
@@ -85,7 +93,6 @@ export const handle: Handle = async ({ event, resolve }) => {
       });
     }
   }
-
   // ロケール設定
   const langHeader = event.request.headers
     .get("accept-language")
@@ -95,8 +102,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     setLocale(lang);
     await waitLocale();
   }
-
-  // OPTIONSプリフライト（resolve不要）
+  // OPTIONSプリフライト(resolve不要)
   if (
     event.url.pathname.startsWith("/api") &&
     event.request.method === "OPTIONS"
@@ -114,22 +120,18 @@ export const handle: Handle = async ({ event, resolve }) => {
       },
     });
   }
-
   // resolve を1箇所に集約
   const response = await resolve(event, {
     transformPageChunk: ({ html }) => html.replace("%lang%", get(locale)),
   });
-
-  // CORSヘッダー（APIルートのみ）
+  // CORSヘッダー(APIルートのみ)
   if (event.url.pathname.startsWith("/api")) {
     const origin = event.request.headers.get("Origin");
     if (origin && allowedOrigins.includes(origin)) {
       response.headers.append("Access-Control-Allow-Origin", origin);
     }
   }
-
   // セキュリティヘッダーを全レスポンスに付与
   applySecurityHeaders(response);
-
   return response;
 };

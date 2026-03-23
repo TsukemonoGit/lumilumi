@@ -18,9 +18,9 @@ const config = {
 
     // 旧:csrf: { checkOrigin: false },
     // これつけないと共有のときにCross-site POST form submissions are forbiddenがでる
-    // 新: 許可するオリジンを列挙
+
     csrf: {
-      trustedOrigins: ["https://lumilumi.app", "https://lumilumi.vercel.app"],
+      trustedOrigins: ["*"],
     },
   },
   // compilerOptions: { runes: true }
