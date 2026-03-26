@@ -198,6 +198,7 @@
     untrack(() => {
       if (saveTimeout !== undefined || $nowProgress) {
         clearTimeout(saveTimeout);
+        saveTimeout = undefined;
       }
 
       if (isRelaySelectionInvalid()) return;
