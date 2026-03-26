@@ -196,11 +196,11 @@
     // inputPubkeyの監視を削除
 
     untrack(() => {
-      if (isRelaySelectionInvalid()) return;
-
       if (saveTimeout !== undefined || $nowProgress) {
         clearTimeout(saveTimeout);
       }
+
+      if (isRelaySelectionInvalid()) return;
 
       // isPubkeyValid()の呼び出しを削除
       // または別のeffectに分離
