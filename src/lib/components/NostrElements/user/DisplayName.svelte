@@ -22,7 +22,7 @@
   );
 
   let parts: Token[] | undefined = $derived(
-    emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined,
+    emojiTags.length > 0 ? parseContent(name, emojiTags) : undefined,
   );
 </script>
 
