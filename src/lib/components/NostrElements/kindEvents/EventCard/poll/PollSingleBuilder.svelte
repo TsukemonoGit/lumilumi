@@ -29,21 +29,19 @@
   let voteEvents: Nostr.Event[] = $state([]);
   let voteRelays: string[] = $state([]);
   let isSubmitting: boolean = $state(false);
+  let isLoading: boolean = $state(false);
 
   let optionTags: string[][] = $derived(
-    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || []
+    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || [],
   );
 
-  // リセット処理
   function reset(): void {
-    group = undefined;
     userVoteEvent = undefined;
     voteEvents = [];
     voteRelays = [];
     isSubmitting = false;
   }
 
-  // リレーの抽出
   function extractVoteRelays(noteEvent: Nostr.Event): string[] {
     return noteEvent.tags.reduce((relays: string[], tag) => {
       if (tag[0] === "relay" && tag.length > 1) {
@@ -53,7 +51,6 @@
     }, []);
   }
 
-  // 投票フィルターの作成
   function createVoteFilter(noteId: string, endTime?: number): Nostr.Filter {
     const filter: Nostr.Filter = { kinds: [1018], "#e": [noteId] };
     if (endTime) {
@@ -62,46 +59,49 @@
     return filter;
   }
 
-  // ユーザーの投票値を取得
   function getUserVoteValue(voteEvent: Nostr.Event | undefined): string {
     if (!voteEvent) return "";
 
     const responseTag = voteEvent.tags.find(
-      (tag) => tag[0] === "response" && tag.length > 1
+      (tag) => tag[0] === "response" && tag.length > 1,
     );
     if (!responseTag) return "";
 
     const matchingOption = optionTags.find(
-      (option) => option[1] === responseTag[1]
+      (option) => option[1] === responseTag[1],
     );
     return matchingOption ? matchingOption[1] : "";
   }
-
-  // 投票イベントを取得
   async function fetchVoteEvents(): Promise<void> {
-    voteRelays = extractVoteRelays(note);
+    isLoading = true;
 
-    const filter = createVoteFilter(note.id, endsAt);
-    const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
+    try {
+      voteRelays = extractVoteRelays(note);
 
-    const events = await usePromiseReq(
-      {
-        filters: [filter],
-        operator: pipe(uniq(), latestEachPubkey()),
-      },
-      targetRelays
-    );
+      const filter = createVoteFilter(note.id, endsAt);
+      const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
 
-    voteEvents = events?.map((ev) => ev.event) || [];
-    userVoteEvent = voteEvents.find(
-      (ev) => ev.pubkey === lumiSetting.get().pubkey
-    );
+      const events = await usePromiseReq(
+        {
+          filters: [filter],
+          operator: pipe(uniq(), latestEachPubkey()),
+        },
+        targetRelays,
+      );
 
-    const userVoteValue = getUserVoteValue(userVoteEvent);
-    group = new RadioGroup({ disabled: hasEnded, value: userVoteValue });
+      voteEvents = events?.map((ev) => ev.event) || [];
+      userVoteEvent = voteEvents.find(
+        (ev) => ev.pubkey === lumiSetting.get().pubkey,
+      );
+
+      if (group) {
+        group.value = getUserVoteValue(userVoteEvent);
+      }
+    } finally {
+      isLoading = false;
+    }
   }
 
-  // 投票送信処理
   async function submitVote(): Promise<void> {
     if (!group?.value || !lumiSetting.get().pubkey || isSubmitting) return;
 
@@ -127,7 +127,7 @@
 
       const publishResult = await promisePublishSignedEvent(
         signedEvent,
-        targetRelays
+        targetRelays,
       );
 
       if (publishResult.res.length > 0) {
@@ -156,21 +156,22 @@
     }
   }
 
-  // リフレッシュ処理
   function handleRefresh(): void {
     reset();
     fetchVoteEvents();
   }
 
-  // 特定の選択肢に投票したイベントをフィルタリング
   function getVotesForOption(optionId: string): Nostr.Event[] {
     return voteEvents.filter((ev) => getUserVoteValue(ev) === optionId);
   }
 
-  // エフェクト: noteが変更されたときの処理
   $effect(() => {
     if (note) {
       untrack(() => {
+        group = new RadioGroup({
+          disabled: () => hasEnded || isLoading,
+          value: "",
+        });
         reset();
         fetchVoteEvents();
       });
@@ -178,140 +179,145 @@
   });
 </script>
 
-{#if group}
-  <div {...group.root}>
-    <div {...group.root} class="radio-group">
-      {#if optionTags.length > 0}
-        {#each optionTags as [_, id, label]}
-          {@const item = group.getItem(id)}
-          {@const votesForOption = getVotesForOption(id)}
+<!-- isLoading中はpointer-eventsを無効化するフォールバック（extractがgetterを受け付けない場合の保険） -->
+<div
+  {...group?.root}
+  style={isLoading ? "pointer-events: none; opacity: 0.6;" : undefined}
+>
+  <div {...group?.root} class="radio-group">
+    {#if optionTags.length > 0}
+      {#each optionTags as [_, id, label]}
+        {@const item = group?.getItem(id)}
+        {@const votesForOption = getVotesForOption(id)}
 
-          <div class="radio-item">
-            <div {...item.attrs} class="radio-button">
-              <div
-                class={[
-                  "grid h-6 w-6 min-w-6 place-items-center rounded-full border shadow-sm ",
-                  "bg-neutral-900 border-magnum-500 ",
-                  `${hasEnded ? "border-neutral-500" : "border-magnum-500"}`,
-                ]}
-              >
-                {#if item.checked}
-                  <div
-                    class={[
-                      "h-3 w-3 rounded-full",
-                      item.checked &&
-                        `${hasEnded ? "bg-neutral-500" : "bg-magnum-500"}`,
-                    ]}
-                    aria-hidden="true"
-                  ></div>
-                {/if}
-              </div>
-
-              <div class="text-gray-600 dark:text-gray-100 ml-1">
-                <Content
-                  event={{ ...note, content: label }}
-                  displayTags={false}
-                  displayMenu={false}
-                  {depth}
-                  repostable={false}
-                />
-              </div>
-
-              {#if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
+        <div class="radio-item">
+          <div {...item?.attrs} class="radio-button">
+            <div
+              class={[
+                "grid h-6 w-6 min-w-6 place-items-center rounded-full border shadow-sm",
+                "bg-neutral-900",
+                hasEnded || isLoading
+                  ? "border-neutral-500"
+                  : "border-magnum-500",
+              ]}
+            >
+              {#if item?.checked}
                 <div
-                  class="ml-auto flex overflow-hidden items-center flex-row-reverse pr-4"
-                >
-                  {#each votesForOption as voteEvent}
-                    <div class="w-2 overflow-visible">
-                      <Metadata
-                        queryKey={["metadata", voteEvent.pubkey]}
-                        pubkey={voteEvent.pubkey}
-                      >
-                        {#snippet loading()}
-                          <UserPopupMenu
-                            pubkey={voteEvent.pubkey}
-                            metadata={undefined}
-                            size={24}
-                            {depth}
-                          />
-                        {/snippet}
-
-                        {#snippet error()}
-                          <UserPopupMenu
-                            pubkey={voteEvent.pubkey}
-                            metadata={undefined}
-                            size={24}
-                            {depth}
-                          />
-                        {/snippet}
-
-                        {#snippet nodata()}
-                          <UserPopupMenu
-                            pubkey={voteEvent.pubkey}
-                            metadata={undefined}
-                            size={24}
-                            {depth}
-                          />
-                        {/snippet}
-
-                        {#snippet content({ metadata })}
-                          <UserPopupMenu
-                            pubkey={voteEvent.pubkey}
-                            {metadata}
-                            size={24}
-                            {depth}
-                          />
-                        {/snippet}
-                      </Metadata>
-                    </div>
-                  {/each}
-                </div>
-                <div class="ml-2">{votesForOption.length}</div>
+                  class={[
+                    "h-3 w-3 rounded-full",
+                    hasEnded || isLoading ? "bg-neutral-500" : "bg-magnum-500",
+                  ]}
+                  aria-hidden="true"
+                ></div>
               {/if}
             </div>
+
+            <div class="text-gray-600 dark:text-gray-100 ml-1">
+              <Content
+                event={{ ...note, content: label }}
+                displayTags={false}
+                displayMenu={false}
+                {depth}
+                repostable={false}
+              />
+            </div>
+
+            {#if isLoading}
+              <span class="ml-auto italic text-neutral-500 text-sm pr-4"
+                >loading...</span
+              >
+            {:else if userVoteEvent || hasEnded || lumiSetting.get().pubkey === (note?.pubkey || "")}
+              <div
+                class="ml-auto flex overflow-hidden items-center flex-row-reverse pr-4"
+              >
+                {#each votesForOption as voteEvent}
+                  <div class="w-2 overflow-visible">
+                    <Metadata
+                      queryKey={["metadata", voteEvent.pubkey]}
+                      pubkey={voteEvent.pubkey}
+                    >
+                      {#snippet loading()}
+                        <UserPopupMenu
+                          pubkey={voteEvent.pubkey}
+                          metadata={undefined}
+                          size={24}
+                          {depth}
+                        />
+                      {/snippet}
+
+                      {#snippet error()}
+                        <UserPopupMenu
+                          pubkey={voteEvent.pubkey}
+                          metadata={undefined}
+                          size={24}
+                          {depth}
+                        />
+                      {/snippet}
+
+                      {#snippet nodata()}
+                        <UserPopupMenu
+                          pubkey={voteEvent.pubkey}
+                          metadata={undefined}
+                          size={24}
+                          {depth}
+                        />
+                      {/snippet}
+
+                      {#snippet content({ metadata })}
+                        <UserPopupMenu
+                          pubkey={voteEvent.pubkey}
+                          {metadata}
+                          size={24}
+                          {depth}
+                        />
+                      {/snippet}
+                    </Metadata>
+                  </div>
+                {/each}
+              </div>
+              <div class="ml-2">{votesForOption.length}</div>
+            {/if}
           </div>
-        {/each}
-      {/if}
-      <input {...group.hiddenInput} />
-    </div>
-  </div>
-  <div class="flex justify-between items-center">
-    {#if !hasEnded}
-      {#if userVoteEvent}
-        <button
-          class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          type="button"
-          disabled={isSubmitting}
-          onclick={submitVote}
-        >
-          {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.change")}`}
-        </button>
-      {:else if group && group.value !== ""}
-        <button
-          class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          type="button"
-          disabled={isSubmitting}
-          onclick={submitVote}
-        >
-          {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
-        </button>
-      {/if}
+        </div>
+      {/each}
     {/if}
-    {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
+    <input {...group?.hiddenInput} />
+  </div>
+</div>
+<div class="flex justify-between items-center">
+  {#if !hasEnded}
+    {#if userVoteEvent}
       <button
-        onclick={handleRefresh}
-        title="Refresh poll results"
-        class=" ml-auto"
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        type="button"
+        disabled={isSubmitting}
+        onclick={submitVote}
       >
-        <RefreshCw
-          class=" rounded-full hover:bg-magnum-600/50 p-1  active:bg-magnum-600 text-magnum-200"
-        />
+        {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.change")}`}
+      </button>
+    {:else if group && group.value !== ""}
+      <button
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        type="button"
+        disabled={isSubmitting}
+        onclick={submitVote}
+      >
+        {isSubmitting ? `${$_("poll.submitting")}` : `${$_("poll.vote")}`}
       </button>
     {/if}
-  </div>
-{:else}
-  <span class="italic text-neutral-500">loading...</span>
-{/if}
+  {/if}
+  {#if userVoteEvent || lumiSetting.get().pubkey === (note?.pubkey || "")}
+    <button
+      onclick={handleRefresh}
+      title="Refresh poll results"
+      class="ml-auto"
+    >
+      <RefreshCw
+        class="rounded-full hover:bg-magnum-600/50 p-1 active:bg-magnum-600 text-magnum-200"
+      />
+    </button>
+  {/if}
+</div>
 
 <style>
   .radio-group {
