@@ -22,13 +22,13 @@
   );
 
   let parts: Token[] | undefined = $derived(
-    emojiTags.length >= 0 ? parseContent(name, emojiTags) : undefined,
+    emojiTags.length > 0 ? parseContent(name, emojiTags) : undefined,
   );
 </script>
 
 <span
   class={[" line-clamp-1 truncate max-w-full overflow-hidden", className]}
-  style="white-space: normal; word-break: break-word; overflow: hidden;
+  style="white-space: break-spaces; word-break: break-word; overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;"
