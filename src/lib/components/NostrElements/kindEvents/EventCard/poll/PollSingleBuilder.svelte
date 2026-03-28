@@ -72,33 +72,34 @@
     );
     return matchingOption ? matchingOption[1] : "";
   }
-
   async function fetchVoteEvents(): Promise<void> {
     isLoading = true;
 
-    voteRelays = extractVoteRelays(note);
+    try {
+      voteRelays = extractVoteRelays(note);
 
-    const filter = createVoteFilter(note.id, endsAt);
-    const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
+      const filter = createVoteFilter(note.id, endsAt);
+      const targetRelays = voteRelays.length > 0 ? voteRelays : undefined;
 
-    const events = await usePromiseReq(
-      {
-        filters: [filter],
-        operator: pipe(uniq(), latestEachPubkey()),
-      },
-      targetRelays,
-    );
+      const events = await usePromiseReq(
+        {
+          filters: [filter],
+          operator: pipe(uniq(), latestEachPubkey()),
+        },
+        targetRelays,
+      );
 
-    voteEvents = events?.map((ev) => ev.event) || [];
-    userVoteEvent = voteEvents.find(
-      (ev) => ev.pubkey === lumiSetting.get().pubkey,
-    );
+      voteEvents = events?.map((ev) => ev.event) || [];
+      userVoteEvent = voteEvents.find(
+        (ev) => ev.pubkey === lumiSetting.get().pubkey,
+      );
 
-    if (group) {
-      group.value = getUserVoteValue(userVoteEvent);
+      if (group) {
+        group.value = getUserVoteValue(userVoteEvent);
+      }
+    } finally {
+      isLoading = false;
     }
-
-    isLoading = false;
   }
 
   async function submitVote(): Promise<void> {
