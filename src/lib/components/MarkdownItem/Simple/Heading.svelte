@@ -134,22 +134,22 @@
     @apply border-b border-neutral-200;
   }
   .h1 {
-    font-size: 2em;
-    font-weight: 600;
-  }
-
-  .h2 {
     font-size: 1.8em;
     font-weight: 600;
   }
 
-  .h3 {
+  .h2 {
     font-size: 1.6em;
     font-weight: 600;
   }
 
-  .h4 {
+  .h3 {
     font-size: 1.4em;
+    font-weight: 600;
+  }
+
+  .h4 {
+    font-size: 1.3em;
     font-weight: 600;
   }
 
@@ -160,7 +160,7 @@
 
   .h6 {
     /* @apply text-base  mt-4 mb-2 font-bold; */
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: 600;
   }
 </style>
