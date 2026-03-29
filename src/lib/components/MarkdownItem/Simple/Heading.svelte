@@ -127,7 +127,7 @@
   .h5,
   .h6 {
     @apply font-title tracking-wide  mt-8 mb-6  py-1.5;
-    line-height: 1em;
+    line-height: 1.2em;
   }
   .h1,
   .h2 {
