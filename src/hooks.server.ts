@@ -52,6 +52,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     `script-src 'self' ${MODEL_VIEWER_HOST} 'unsafe-inline' https://platform.twitter.com`, //Twitter埋め込みは platform.twitter.com/widgets.js をscriptタグで読み込み、そのスクリプトが内部でiframeを動的生成する方式のためリストについか
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
+    "media-src 'self' https: data: blob:",
     "connect-src 'self' ws: wss: https:",
     "font-src 'self'",
     "object-src 'none'",
