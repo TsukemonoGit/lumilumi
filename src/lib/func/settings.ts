@@ -467,10 +467,11 @@ async function processChunksInParallel(
     }),
   );
 }
-
+// カスタム絵文字の shortcode にハイフン入れてもいいってさ
+// https://github.com/nostr-protocol/nips/pull/2297
 // ショートコードを正規化する関数（無効な場合はnullを返す）
 function normalizeShortcode(shortcode: string): string | null {
-  const normalized = shortcode.replace(/[^a-zA-Z0-9_]/g, "_");
+  const normalized = shortcode.replace(/[^a-zA-Z0-9_-]/g, "_");
   // 英数字が含まれているかチェック
   if (!/[a-zA-Z0-9]/.test(normalized)) {
     return null;
