@@ -30,12 +30,12 @@
     }, 12000); // 元のタイマーと同じ12秒に設定
   }
   function endAnimation() {
-    visible = false;
     // タイマーをクリア
     if (animationTimer) {
       clearTimeout(animationTimer);
       animationTimer = null;
     }
+    close();
   }
 
   onMount(() => {
@@ -46,8 +46,6 @@
     fadingOut = true;
     setTimeout(() => (visible = false), 500);
   }
-
-  setTimeout(close, 10000);
 </script>
 
 {#if visible}
