@@ -5,6 +5,7 @@
   import UserPopupMenu from "../NostrElements/user/UserPopupMenu.svelte";
   import UserName from "../NostrElements/user/UserName.svelte";
   import { Zap } from "lucide-svelte";
+  import * as Nostr from "nostr-typedef";
 
   interface ShootingStar {
     id: number;
@@ -34,7 +35,11 @@
     size: number;
   }
 
-  let { metadata } = $props();
+  interface Props {
+    metadata: Nostr.Event;
+  }
+
+  let { metadata }: Props = $props();
 
   let shootingStars: ShootingStar[] = $state([]);
   let lanterns: Lantern[] = $state([]);
@@ -46,6 +51,7 @@
   let containerOpacity = $state(1);
   let zapOpen = $state(false);
   let animationTimer: ReturnType<typeof setTimeout> | null = null;
+  let fadeTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Ring particles for avatar
   const ringParticleCount = 24;
@@ -70,9 +76,11 @@
   }
 
   function endAnimation() {
+    if (fadeTimer) return; // 二重呼び出し防止
     containerOpacity = 0;
-    setTimeout(() => {
+    fadeTimer = setTimeout(() => {
       animationActive = false;
+      fadeTimer = null;
     }, 1200);
     if (animationTimer) {
       clearTimeout(animationTimer);
@@ -82,54 +90,56 @@
 
   onMount(() => {
     // 流れ星を生成
-    for (let i = 0; i < 12; i++) {
-      shootingStars.push({
-        id: i,
-        startX: Math.random() * 120 - 10,
-        startY: Math.random() * 40,
-        angle: 25 + Math.random() * 20,
-        delay: Math.random() * 8,
-        duration: 0.8 + Math.random() * 1.2,
-        length: 80 + Math.random() * 120,
-      });
-    }
+    shootingStars = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      startX: Math.random() * 120 - 10,
+      startY: Math.random() * 40,
+      angle: 25 + Math.random() * 20,
+      delay: Math.random() * 8,
+      duration: 0.8 + Math.random() * 1.2,
+      length: 80 + Math.random() * 120,
+    }));
 
     // ランタンを生成
-    for (let i = 0; i < 18; i++) {
-      lanterns.push({
-        id: i,
-        left: 5 + Math.random() * 90,
-        delay: Math.random() * 6,
-        duration: 10 + Math.random() * 8,
-        size: 1.2 + Math.random() * 1.0,
-        sway: 15 + Math.random() * 30,
-        hue: 20 + Math.random() * 40,
-      });
-    }
+    lanterns = Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      left: 5 + Math.random() * 90,
+      delay: Math.random() * 6,
+      duration: 10 + Math.random() * 8,
+      size: 1.2 + Math.random() * 1.0,
+      sway: 15 + Math.random() * 30,
+      hue: 20 + Math.random() * 40,
+    }));
 
     // キラキラ粒子を生成
-    for (let i = 0; i < 50; i++) {
-      sparkles.push({
-        id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        delay: Math.random() * 6,
-        size: 2 + Math.random() * 3,
-      });
-    }
+    sparkles = Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 6,
+      size: 2 + Math.random() * 3,
+    }));
 
     // 段階的にコンテンツを表示
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       showContent = true;
     }, 800);
-    setTimeout(() => {
+    const t2 = setTimeout(() => {
       showTitle = true;
     }, 1800);
-    setTimeout(() => {
+    const t3 = setTimeout(() => {
       showZap = true;
     }, 2800);
 
     setAnimationTimer();
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      if (animationTimer) clearTimeout(animationTimer);
+      if (fadeTimer) clearTimeout(fadeTimer);
+    };
   });
 </script>
 
