@@ -429,11 +429,11 @@
     }
     80% {
       opacity: 0;
-      transform: rotate(var(--star-angle)) translateX(-400px);
+      transform: rotate(var(--star-angle)) translateX(400px);
     }
     100% {
       opacity: 0;
-      transform: rotate(var(--star-angle)) translateX(-400px);
+      transform: rotate(var(--star-angle)) translateX(400px);
     }
   }
 
