@@ -3,7 +3,11 @@
   import { UserPlus } from "lucide-svelte";
 
   import Popover from "./Elements/Popover.svelte";
-  import { getMetadataList, type MetadataList } from "$lib/func/nostr";
+  import {
+    getMetadataList,
+    loadMetadataFromLocalStorage,
+    type MetadataList,
+  } from "$lib/func/nostr";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import type { QueryKey } from "@tanstack/svelte-query";
   import type { EventPacket } from "rx-nostr";
@@ -19,12 +23,8 @@
   const onOpenStateChange = (value: boolean) => {
     if (value) {
       try {
-        const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-        if (!metadataStr) return {};
-
-        const metadataQueryData: [QueryKey, EventPacket][] =
-          JSON.parse(metadataStr);
-        metadataList = getMetadataList(metadataQueryData);
+        const metadata = loadMetadataFromLocalStorage();
+        metadataList = getMetadataList(metadata);
       } catch (error) {}
     }
   };

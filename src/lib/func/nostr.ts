@@ -66,7 +66,7 @@ import { set3Relays } from "./reactions";
 import { untrack } from "svelte";
 import { t as _ } from "@konemono/svelte5-i18n";
 
-type MetadataRecord = Record<string, { key: QueryKey; data: EventPacket }>;
+type MetadataRecord = { [pubkey: string]: EventPacket };
 
 let rxNostr: RxNostr;
 export function setRxNostr() {
@@ -125,10 +125,7 @@ export function getDefaultWriteRelays(): string[] {
 metadataQueue.subscribe((queue) => {
   if (followList.get().size > 0) {
     try {
-      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-      let currentMetadata: MetadataRecord = metadataStr
-        ? JSON.parse(metadataStr)
-        : {};
+      let currentMetadata: MetadataRecord = loadMetadataFromLocalStorage();
       let metadataChanged = false;
 
       while (queue.length > 0) {
@@ -209,8 +206,8 @@ const saveMetadataToLocalStorage = (
   const existing = currentMetadata[pubkey];
 
   if (existing) {
-    if (data.event.created_at > existing.data.event.created_at) {
-      currentMetadata[pubkey] = { key, data };
+    if (data.event.created_at > existing.event.created_at) {
+      currentMetadata[pubkey] = data;
       queryClient.setQueryData(
         key,
         (_oldData: EventPacket | undefined) => data,
@@ -219,32 +216,21 @@ const saveMetadataToLocalStorage = (
     } else {
       queryClient.setQueryData(
         key,
-        (_oldData: EventPacket | undefined) => existing.data,
+        (_oldData: EventPacket | undefined) => existing,
       );
       return [false, currentMetadata];
     }
   } else {
-    currentMetadata[pubkey] = { key, data };
+    currentMetadata[pubkey] = data;
     queryClient.setQueryData(key, (_oldData: EventPacket | undefined) => data);
     return [true, currentMetadata];
   }
 };
 
-export const getMetadata = (queryKey: QueryKey): EventPacket | undefined => {
+export const getMetadata = (pubkey: string): EventPacket | undefined => {
   try {
-    const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-    if (!metadataStr) {
-      return;
-    }
-
-    const metadata: [QueryKey, EventPacket][] = JSON.parse(metadataStr);
-
-    // queryKeyがオブジェクトや配列の場合、JSON.stringifyを使って比較
-    const result = metadata.find(
-      ([key, _]) => JSON.stringify(key) === JSON.stringify(queryKey),
-    );
-    //console.log(result);
-    return result ? result[1] : undefined;
+    const metadata = loadMetadataFromLocalStorage();
+    return metadata[pubkey];
   } catch (error) {
     return undefined;
   }
@@ -671,15 +657,12 @@ export interface UserData {
   petname: string | undefined;
 }
 
-export function getMetadataList(
-  querydata: [QueryKey, EventPacket][],
-): MetadataList {
-  return querydata.reduce((acc: MetadataList, [key, packet]) => {
+export function getMetadataList(metadata: MetadataRecord): MetadataList {
+  return Object.values(metadata).reduce((acc: MetadataList, packet) => {
     try {
       const profile: Profile = JSON.parse(packet.event.content);
       const pubkey = nip19.npubEncode(packet.event.pubkey);
       const petname = followList.get().get(packet.event.pubkey);
-      // 新しいプロファイルデータを結果に追加
       acc[pubkey] = {
         name: profile.name,
         display_name: profile.display_name,
@@ -689,7 +672,7 @@ export function getMetadataList(
     } catch (error) {
       console.error("Error parsing profile:", error);
     }
-    return acc; // 蓄積された結果を返す
+    return acc;
   }, {} as MetadataList);
 }
 
@@ -955,3 +938,40 @@ export function usePaginatedReq(
 
   return { data, status, error };
 }
+
+export const loadMetadataFromLocalStorage = (): MetadataRecord => {
+  try {
+    const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
+    if (!metadataStr) return {};
+
+    const parsed = JSON.parse(metadataStr);
+
+    // 配列または非オブジェクトは旧フォーマット
+    if (
+      Array.isArray(parsed) ||
+      typeof parsed !== "object" ||
+      parsed === null
+    ) {
+      localStorage.removeItem(STORAGE_KEYS.METADATA);
+      return {};
+    }
+
+    // 旧オブジェクト形式（{ key, data } 構造）の検出
+    // 値に event プロパティが直接存在しない場合は旧形式と判断
+    const firstValue = Object.values(parsed)[0];
+    if (
+      firstValue !== undefined &&
+      (typeof firstValue !== "object" ||
+        firstValue === null ||
+        !("event" in firstValue))
+    ) {
+      localStorage.removeItem(STORAGE_KEYS.METADATA);
+      return {};
+    }
+
+    return parsed as MetadataRecord;
+  } catch (error) {
+    localStorage.removeItem(STORAGE_KEYS.METADATA);
+    return {};
+  }
+};
