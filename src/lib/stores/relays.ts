@@ -12,7 +12,7 @@ export const relaySearchRelays = [
   //https://github.com/coracle-social/compass
   "wss://indexer.coracle.social",
   "wss://nostr.wine",
-  "wss://relay.nostr.band",
+  //"wss://relay.nostr.band",
 ];
 
 export const defaultRelays = [
@@ -32,6 +32,6 @@ export const feedbackRelay = [
   "wss://nos.lol",
   "wss://relay.nostr.wirednet.jp",
   // "wss://relayable.org",
-
-  "wss://relay.nostr.band/",
+  "wss://cagliostr.compile-error.net",
+  // "wss://relay.nostr.band/",
 ];
