@@ -25,7 +25,7 @@ export const clientTag = [
   "client",
   "lumilumi",
   "31990:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:1727506446612",
-  "wss://relay.nostr.band",
+  "wss://cagliostr.compile-error.net",
 ];
 export const monoZap = {
   //https://${domain}/.well-known/lnurlp/${name} の callback の部分
@@ -36,7 +36,8 @@ export const monoZap = {
   relays: [
     "wss://nostr.mutinywallet.com",
     "wss://nos.lol",
-    "wss://relay.nostr.band/",
+    //"wss://relay.nostr.band/",
+    "wss://cagliostr.compile-error.net",
     "wss://relay.nostr.wirednet.jp",
   ],
   pubkey: "84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5",
@@ -46,11 +47,12 @@ export const monoZap = {
   ],
 };
 export const nip50relays = [
-  "wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
+  //"wss://relay.nostr.band", //クソ長フィルターのとき（only foloweeのとき）nodataになる
   "wss://search.nos.today",
   // "wss://relay.noswhere.com", //クソ長フィルターのとき（only foloweeのとき）nodataになる /let chank = 100;だと結果出てくる
   //"wss://bostr.nokotaro.com",
   "wss://nostr.wine", //クソながフィルターでも返ってくるけどなんかデータがぬけぬけかも？
+  "wss://cagliostr.compile-error.net",
 ];
 
 export const nip96MediaUploader = [

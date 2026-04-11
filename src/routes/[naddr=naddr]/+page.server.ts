@@ -13,13 +13,14 @@ interface CustomParams {
 }
 
 const defaultRelays = [
-  "wss://relay.nostr.band",
+  // "wss://relay.nostr.band",
   "wss://nos.lol",
   "wss://nostr.bitcoiner.social",
+  "wss://relay.nostr.wirednet.jp",
 ];
 
 const fetchEvent = async (
-  naddrPointer: nip19.AddressPointer
+  naddrPointer: nip19.AddressPointer,
 ): Promise<Nostr.Event | undefined> => {
   try {
     const naddr = nip19.naddrEncode(naddrPointer);
@@ -116,28 +117,28 @@ export const load: PageServerLoad = async ({
       if (res.event) {
         const title = res.event.tags.find((tag) => tag[0] === "title")?.[1];
         const desc = res.event.tags.find(
-          (tag) => tag[0] === "description" || tag[0] === "summary"
+          (tag) => tag[0] === "description" || tag[0] === "summary",
         )?.[1];
         ogTitle.set(
           `Lumilumi - kind:${res.kind} ${
             title ? title : kindString ? `(${kindString})` : ""
-          }`
+          }`,
         );
         ogDescription.set(desc || "");
       } else {
         ogTitle.set(
-          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`,
         );
         ogDescription.set(`Id:${res.identifier}`);
       }
     } else {
       console.debug(
-        "[naddr page] skipping fetch - internal navigation from same site"
+        "[naddr page] skipping fetch - internal navigation from same site",
       );
 
       // 内部遷移の場合でも最低限のOG設定
       ogTitle.set(
-        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+        `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`,
       );
       ogDescription.set(`Id:${res.identifier}`);
     }

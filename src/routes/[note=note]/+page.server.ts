@@ -10,15 +10,11 @@ interface CustomParams {
   note: string;
 }
 
-const defaultRelays = [
-  "wss://relay.nostr.band",
-  "wss://nos.lol",
-  "wss://nostr.bitcoiner.social",
-];
+const defaultRelays = ["wss://nos.lol", "wss://nostr.bitcoiner.social"];
 
 const fetchEvent = async (
   id: string,
-  relays: string[]
+  relays: string[],
 ): Promise<Nostr.Event | undefined> => {
   try {
     const nevent = nip19.neventEncode({ id: id, relays: relays.slice(0, 3) });
@@ -114,7 +110,7 @@ export const load = async ({
     if (shouldFetch) {
       res.event = await fetchEvent(
         res.id,
-        res.relays?.length ? res.relays : defaultRelays
+        res.relays?.length ? res.relays : defaultRelays,
       );
       console.log(res.event);
 
@@ -125,7 +121,7 @@ export const load = async ({
         ogTitle.set(
           `Lumilumi - kind:${res.event.kind} ${
             kindString ? `(${kindString})` : ""
-          }`
+          }`,
         );
         ogDescription.set(res.event.content);
       } else if (res.kind) {
@@ -133,12 +129,12 @@ export const load = async ({
           get(locale) === "ja" ? "ja" : "en"
         ];
         ogTitle.set(
-          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`,
         );
       }
     } else {
       console.debug(
-        "[thread page] skipping fetch - internal navigation from same site"
+        "[thread page] skipping fetch - internal navigation from same site",
       );
 
       // 内部遷移の場合でも、kindが分かっている場合は最低限のOG設定
@@ -147,7 +143,7 @@ export const load = async ({
           get(locale) === "ja" ? "ja" : "en"
         ];
         ogTitle.set(
-          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`
+          `Lumilumi - kind:${res.kind} ${kindString ? `(${kindString})` : ""}`,
         );
       }
     }
