@@ -940,16 +940,38 @@ export function usePaginatedReq(
 }
 
 export const loadMetadataFromLocalStorage = (): MetadataRecord => {
-  const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-  if (!metadataStr) return {};
+  try {
+    const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
+    if (!metadataStr) return {};
 
-  const parsed = JSON.parse(metadataStr);
+    const parsed = JSON.parse(metadataStr);
 
-  // 旧フォーマット（配列）または不正な型の場合は削除して初期化
-  if (Array.isArray(parsed) || typeof parsed !== "object" || parsed === null) {
+    // 配列または非オブジェクトは旧フォーマット
+    if (
+      Array.isArray(parsed) ||
+      typeof parsed !== "object" ||
+      parsed === null
+    ) {
+      localStorage.removeItem(STORAGE_KEYS.METADATA);
+      return {};
+    }
+
+    // 旧オブジェクト形式（{ key, data } 構造）の検出
+    // 値に event プロパティが直接存在しない場合は旧形式と判断
+    const firstValue = Object.values(parsed)[0];
+    if (
+      firstValue !== undefined &&
+      (typeof firstValue !== "object" ||
+        firstValue === null ||
+        !("event" in firstValue))
+    ) {
+      localStorage.removeItem(STORAGE_KEYS.METADATA);
+      return {};
+    }
+
+    return parsed as MetadataRecord;
+  } catch (error) {
     localStorage.removeItem(STORAGE_KEYS.METADATA);
     return {};
   }
-
-  return parsed as MetadataRecord;
 };
