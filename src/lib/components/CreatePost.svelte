@@ -9,7 +9,11 @@
     Bell,
     RefreshCw,
   } from "lucide-svelte";
-  import { getMetadataList, type MetadataList } from "$lib/func/nostr";
+  import {
+    getMetadataList,
+    loadMetadataFromLocalStorage,
+    type MetadataList,
+  } from "$lib/func/nostr";
   import { emojis, nowProgress } from "$lib/stores/stores";
 
   import MediaPicker from "./Elements/MediaPicker.svelte";
@@ -98,12 +102,8 @@
     if (!viewMetadataList) return {};
 
     try {
-      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-      if (!metadataStr) return {};
-
-      const metadataQueryData: [QueryKey, EventPacket][] =
-        JSON.parse(metadataStr);
-      return getMetadataList(metadataQueryData);
+      const metadata = loadMetadataFromLocalStorage();
+      return getMetadataList(metadata);
     } catch (error) {
       return {};
     }

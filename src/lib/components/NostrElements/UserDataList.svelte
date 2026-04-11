@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     getMetadataList,
+    loadMetadataFromLocalStorage,
     type MetadataList,
     type UserData,
   } from "$lib/func/nostr";
@@ -26,11 +27,8 @@
 
   function setMetadataList() {
     try {
-      const metadataStr = localStorage.getItem(STORAGE_KEYS.METADATA);
-      let metadataQueryData: [QueryKey, EventPacket][] = metadataStr
-        ? JSON.parse(metadataStr)
-        : [];
-      metadataList = getMetadataList(metadataQueryData);
+      const metadata = loadMetadataFromLocalStorage();
+      metadataList = getMetadataList(metadata);
     } catch (error) {}
   }
   let onOpenStateChange = (bool: boolean) => {
