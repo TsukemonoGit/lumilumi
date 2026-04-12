@@ -70,15 +70,12 @@ export function contentCheck(
         }
 
         case "naddr": {
+          const relay = pickRelay(decoded.data.relays);
           const addrTag = [
             "q",
             `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+            relay,
           ];
-
-          const relay = pickRelay(decoded.data.relays);
-          if (relay) {
-            addrTag.push(relay);
-          }
 
           newTags.push(addrTag);
           break;
