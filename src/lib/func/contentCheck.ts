@@ -3,7 +3,7 @@ import { hashtagRegex, nip19Regex, urlRegex } from "./regex";
 
 export function contentCheck(
   text: string,
-  tags: string[][]
+  tags: string[][],
 ): { text: string; tags: string[][] } {
   let newTags = [...tags];
 
@@ -34,7 +34,7 @@ export function contentCheck(
   imetaURLs.forEach((url) => {
     if (!text.includes(url)) {
       newTags = newTags.filter(
-        (tag) => tag[0] !== "imeta" || !tag.find((item) => item.includes(url))
+        (tag) => tag[0] !== "imeta" || !tag.find((item) => item.includes(url)),
       );
     }
   });
@@ -42,6 +42,9 @@ export function contentCheck(
   // Process NIP-19 matches
 
   const nip19Matches = text.matchAll(nip19Regex);
+
+  const pickRelay = (relays?: string[]): string =>
+    relays?.find((r) => r.startsWith("wss://")) ?? "";
 
   for (const match of nip19Matches) {
     const matchValue = match?.[1] ?? match?.[0]; // fallback
@@ -56,7 +59,7 @@ export function contentCheck(
           const neventTag = [
             "q",
             decoded.data.id,
-            decoded.data.relays?.[0] ?? "",
+            pickRelay(decoded.data.relays),
           ];
 
           if (decoded.data.author) {
@@ -67,14 +70,12 @@ export function contentCheck(
         }
 
         case "naddr": {
+          const relay = pickRelay(decoded.data.relays);
           const addrTag = [
             "q",
             `${decoded.data.kind}:${decoded.data.pubkey}:${decoded.data.identifier}`,
+            relay,
           ];
-
-          if (decoded.data.relays?.[0]) {
-            addrTag.push(decoded.data.relays[0]);
-          }
 
           newTags.push(addrTag);
           break;
@@ -90,7 +91,7 @@ export function contentCheck(
     } catch (error) {
       console.log(
         "Failed to decode NIP-19 identifier:",
-        match?.[1] ?? match?.[0]
+        match?.[1] ?? match?.[0],
       );
     }
   }
@@ -122,12 +123,12 @@ export function contentCheck(
  */
 export function pruneEmojiTagsByText(
   text: string,
-  tags: string[][]
+  tags: string[][],
 ): { text: string; tags: string[][] } {
   const emojiSet = extractEmojiSet(text);
 
   const newTags = tags.filter(
-    (tag) => tag[0] !== "emoji" || emojiSet.has(tag[1])
+    (tag) => tag[0] !== "emoji" || emojiSet.has(tag[1]),
   );
 
   return { text, tags: newTags };
