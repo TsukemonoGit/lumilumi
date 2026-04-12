@@ -402,7 +402,7 @@
           <CustomEmoji
             part={{
               type: TokenType.CUSTOM_EMOJI,
-              content: shortcode,
+              content: `:${shortcode}:`,
               metadata: { name: shortcode, url: url, hasMetadata: true },
               start: 0,
               end: 0,
