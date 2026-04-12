@@ -44,7 +44,7 @@ export function contentCheck(
   const nip19Matches = text.matchAll(nip19Regex);
 
   const pickRelay = (relays?: string[]): string =>
-    relays?.find((r) => !r.startsWith("ws://")) ?? "";
+    relays?.find((r) => r.startsWith("wss://")) ?? "";
 
   for (const match of nip19Matches) {
     const matchValue = match?.[1] ?? match?.[0]; // fallback
