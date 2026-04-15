@@ -40,18 +40,13 @@
             tag[0] === "t" ||
             tag[0] === "r" ||
             tag[0] === "a") &&
-          tag.length > 1
+          tag.length > 1,
       )}
-      <PaginationList
-        ev={event}
-        list={filteredList
-          .map((tag) => tag[1])
-          .slice()
-          .reverse()}
-      >
+      {@const list = filteredList.slice().reverse()}
+      <PaginationList ev={event} list={list.map((tag) => tag[1])}>
         {#snippet children(li, index)}
           {@const id = li as string}
-          {#if filteredList[index][0] === "e"}
+          {#if list[index][0] === "e"}
             <Note
               {id}
               mini={false}
@@ -60,31 +55,31 @@
               repostable={true}
             />
             <!---->
-          {:else if filteredList[index][0] === "a"}
-            {@const naddr = parseNaddr(filteredList[index])}
+          {:else if list[index][0] === "a"}
+            {@const naddr = parseNaddr(list[index])}
+            {@const filter =
+              naddr.identifier !== ""
+                ? {
+                    kinds: [naddr.kind],
+                    authors: [naddr.pubkey],
+                    "#d": [naddr.identifier],
+                  }
+                : {
+                    kinds: [naddr.kind],
+                    authors: [naddr.pubkey],
+                  }}
             <LatestEvent
               queryKey={[
                 "naddr",
                 `${naddr.kind}:${naddr.pubkey}:${naddr.identifier}`,
               ]}
-              filters={[
-                naddr.identifier !== ""
-                  ? {
-                      kinds: [naddr.kind],
-                      authors: [naddr.pubkey],
-                      "#d": [naddr.identifier],
-                    }
-                  : {
-                      kinds: [naddr.kind],
-                      authors: [naddr.pubkey],
-                    },
-              ]}
+              filters={[filter]}
             >
               {#snippet loading()}
                 <div
                   class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
+                  {list[index]}<EllipsisMenuNaddr
                     naddr={nip19.naddrEncode(naddr)}
                   />
                 </div>
@@ -93,7 +88,7 @@
                 <div
                   class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
+                  {list[index]}<EllipsisMenuNaddr
                     naddr={nip19.naddrEncode(naddr)}
                   />
                 </div>
@@ -102,7 +97,7 @@
                 <div
                   class="text-sm text-neutral-500 flex-inline break-all flex align-middle justify-between"
                 >
-                  {filteredList[index]}<EllipsisMenuNaddr
+                  {list[index]}<EllipsisMenuNaddr
                     naddr={nip19.naddrEncode(naddr)}
                   />
                 </div>
@@ -151,7 +146,7 @@
               {/snippet}
             </LatestEvent>
             <!---->
-          {:else if filteredList[index][0] === "t"}
+          {:else if list[index][0] === "t"}
             [t,{id}]
             <!---->
           {:else}
