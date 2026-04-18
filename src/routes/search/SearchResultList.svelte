@@ -85,7 +85,7 @@
     tie,
     uniq(),
     userStatus(),
-    /* reactionCheck(), */ scanArray()
+    /* reactionCheck(), */ scanArray(),
   );
   $inspect(filters[0].until);
   let result = $derived(
@@ -98,14 +98,14 @@
           })),
           operator,
           req,
-          relays
+          relays,
         )
       : //untilがあったら、未来の投稿はいらないから適当にウメトク
         {
           data: undefined,
           status: readable("loading" as ReqStatus),
           error: undefined,
-        }
+        },
   );
   let data = $derived(result.data);
   let status = $derived(result.status);
@@ -127,7 +127,7 @@
   function dataChange(
     data: EventPacket[] | null | undefined,
     index: number,
-    progress: boolean
+    progress: boolean,
   ) {
     console.log("dataChange");
     if ((data && index >= 0) || !progress) {
@@ -160,7 +160,7 @@
         const dedupMap = new Map(merged.map((p) => [p.event.id, p]));
 
         return sortEventPackets(Array.from(dedupMap.values()));
-      }
+      },
     );
   }
   async function init() {
@@ -174,7 +174,7 @@
         ...filter,
 
         until: filter.until === undefined ? now() - 15 * 60 : filter.until,
-      }))
+      })),
     );
     await waitForRelayReady({ maxWaitTime: 5000 }); // 最大5秒待つ
     const older = await firstLoadOlderEvents(
@@ -187,7 +187,7 @@
         if (partialData.length === 0) return;
         updateViewEvent(partialData);
       },
-      5000
+      5000,
     );
 
     if (older.length > 0) {
@@ -231,7 +231,7 @@
 
           updateViewEvent(partialData);
         },
-        5000
+        5000,
       );
       //console.log(older);
       if (older.length > 0) {
@@ -282,9 +282,9 @@
           [...allEvents, ...(partialData || [])].map((event) => [
             event.event.id,
             event.event,
-          ])
-        ).values()
-      )
+          ]),
+        ).values(),
+      ),
     );
     const allEv = uniqueEvents.filter(eventFilter);
     if (!partialData) {
@@ -311,7 +311,7 @@
 
 {#if viewIndex !== 0}
   <button
-    class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
+    class=" w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
     onclick={() => handleClickTop()}
     disabled={$nowProgress}
     ><SkipForward
@@ -322,7 +322,7 @@
 
   <button
     disabled={$nowProgress}
-    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
     onclick={() => handlePrev()}
     ><Triangle
       size={20}
@@ -353,7 +353,7 @@
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={$nowProgress}
-    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:opacity-75"
+    class=" rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-200 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
     onclick={() => handleNext()}
     ><Triangle
       size={20}

@@ -37,11 +37,12 @@
   let buttonSizeClassName = $derived(`h-[${size + 12}px] w-[${size + 12}px]`);
 
   const commonClasses = [
+    "transition",
     "inline-flex",
     "items-center",
     "justify-center",
     "rounded-full",
-    "duration-100",
+    "duration-200",
     "scale-95",
     "hover:scale-100",
     "active:scale-90",

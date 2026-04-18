@@ -30,7 +30,7 @@
   let isSubmitting: boolean = $state(false);
 
   let optionTags: string[][] = $derived(
-    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || []
+    note?.tags?.filter((tag) => tag[0] === "option" && tag.length > 2) || [],
   );
 
   // リセット処理
@@ -66,7 +66,7 @@
     if (!voteEvent) return [];
 
     const responseTags = voteEvent.tags.filter(
-      (tag) => tag[0] === "response" && tag.length > 1
+      (tag) => tag[0] === "response" && tag.length > 1,
     );
 
     return responseTags.map((tag) => tag[1]);
@@ -84,12 +84,12 @@
         filters: [filter],
         operator: pipe(uniq(), latestEachPubkey()),
       },
-      targetRelays
+      targetRelays,
     );
 
     voteEvents = events?.map((ev) => ev.event) || [];
     userVoteEvent = voteEvents.find(
-      (ev) => ev.pubkey === lumiSetting.get().pubkey
+      (ev) => ev.pubkey === lumiSetting.get().pubkey,
     );
 
     // ユーザーが過去に投票していた選択肢を取得して選択状態を復元
@@ -142,7 +142,7 @@
 
       const publishResult = await promisePublishSignedEvent(
         signedEvent,
-        targetRelays
+        targetRelays,
       );
 
       if (publishResult.res.length > 0) {
@@ -271,7 +271,7 @@
   {#if !hasEnded}
     {#if userVoteEvent}
       <button
-        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         disabled={isSubmitting}
         onclick={submitVote}
@@ -280,7 +280,7 @@
       </button>
     {:else if selectedIds.length > 0}
       <button
-        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         disabled={isSubmitting}
         onclick={submitVote}
