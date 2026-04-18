@@ -41,7 +41,7 @@
     "items-center",
     "justify-center",
     "rounded-full",
-    "duration-100",
+    "duration-200",
     "scale-95",
     "hover:scale-100",
     "active:scale-90",

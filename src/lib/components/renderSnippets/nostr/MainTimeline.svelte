@@ -134,7 +134,7 @@
 
   // Query setup
   let result = $derived(
-    useMainTimeline(queryKey, configureOperators(), filters)
+    useMainTimeline(queryKey, configureOperators(), filters),
   );
   const data = $derived(result.data);
   const status = $derived(result.status);
@@ -160,7 +160,7 @@
 
     operator = pipe(
       operator,
-      reactionCheck(lumiSetting.get().showReactioninTL)
+      reactionCheck(lumiSetting.get().showReactioninTL),
     );
 
     return pipe(operator, saveEachNote(), scanArray());
@@ -168,7 +168,7 @@
 
   function filterAndAddToMap(
     events: EventPacket[],
-    targetMap: Map<string, Nostr.Event>
+    targetMap: Map<string, Nostr.Event>,
   ): number {
     return events.reduce((count, pk) => {
       const event = pk.event;
@@ -186,7 +186,7 @@
   function combineFilteredEvents(
     currentMap: Map<string, Nostr.Event>,
     olderMap: Map<string, Nostr.Event>,
-    partialEvents?: EventPacket[]
+    partialEvents?: EventPacket[],
   ): Nostr.Event[] {
     const resultMap = new Map<string, Nostr.Event>();
 
@@ -246,7 +246,7 @@
       timelineManager.currentEventsMap.clear();
       timelineManager.filteredNewerEventCount = filterAndAddToMap(
         $data || [],
-        timelineManager.currentEventsMap
+        timelineManager.currentEventsMap,
       );
 
       if (timelineManager.currentEventsMap.size >= endIndex) {
@@ -260,14 +260,14 @@
           timelineManager.olderEventsMap.clear();
           timelineManager.filteredOlderEventCount = filterAndAddToMap(
             olderEvents,
-            timelineManager.olderEventsMap
+            timelineManager.olderEventsMap,
           );
         }
 
         const allFilteredEvents = combineFilteredEvents(
           timelineManager.currentEventsMap,
           timelineManager.olderEventsMap,
-          partialdata
+          partialdata,
         );
 
         displayEvents.set(allFilteredEvents.slice(startIndex, endIndex));
@@ -339,7 +339,7 @@
         initialFilters,
         pipe(tie, uniq, scanArray()),
         relays,
-        handleIncrementalData
+        handleIncrementalData,
       );
 
       if (olderEvents.length > 0) {
@@ -383,20 +383,20 @@
         });
 
         const deduplicatedData = sortEventPackets(
-          Array.from(eventMap.values())
+          Array.from(eventMap.values()),
         );
 
         // フィルタリング後のカウントを更新
         const tempMap = new Map<string, Nostr.Event>();
         timelineManager.filteredOlderEventCount = filterAndAddToMap(
           deduplicatedData,
-          tempMap
+          tempMap,
         );
 
         return CONFIG.LOAD_LIMIT > 0
           ? deduplicatedData.slice(0, CONFIG.LOAD_LIMIT)
           : deduplicatedData;
-      }
+      },
     );
   }
 
@@ -429,7 +429,7 @@
       console.log(
         timelineManager.filteredNewerEventCount +
           timelineManager.filteredOlderEventCount,
-        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1
+        viewIndex + amount + CONFIG.SLIDE_AMOUNT + viewIndex * 0.1,
       );
 
       if (hasEnoughStock) {
@@ -487,7 +487,7 @@
           }
 
           updateViewEvent(partialData);
-        }
+        },
       );
 
       if (olderEvents.length > 0) {
@@ -523,7 +523,7 @@
         });
 
         return sortEventPackets(Array.from(eventMap.values()));
-      }
+      },
     );
   }
   let headerElement: HTMLDivElement | undefined = $state();
@@ -612,7 +612,7 @@
 {#if viewIndex !== 0}
   <div class="w-full" bind:this={headerElement}>
     <button
-      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
       onclick={moveToTop}
       disabled={$nowProgress}
     >
@@ -623,7 +623,7 @@
     </button>
     <button
       disabled={$nowProgress}
-      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
       onclick={moveUp}
     >
       <Triangle size={20} class="mx-auto stroke-magnum-100 fill-magnum-100" />
@@ -655,7 +655,7 @@
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={timelineManager.loadMoreDisabled}
-    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:opacity-75"
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
     onclick={loadOlderAndMoveDown}
   >
     <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />

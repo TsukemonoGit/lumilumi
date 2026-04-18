@@ -288,7 +288,7 @@
   {#if !hasEnded}
     {#if userVoteEvent}
       <button
-        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit font-semibold active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         disabled={isSubmitting}
         onclick={submitVote}
@@ -297,7 +297,7 @@
       </button>
     {:else if group && group.value !== ""}
       <button
-        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="border border-magnum-500 hover:border-magnum-300 rounded-md px-2 py-1 w-fit m-1 font-semibold active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         type="button"
         disabled={isSubmitting}
         onclick={submitVote}
