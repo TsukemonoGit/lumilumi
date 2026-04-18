@@ -447,7 +447,7 @@
 {#if viewIndex !== 0}
   <div class="w-full" bind:this={headerElement}>
     <button
-      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
+      class="w-full rounded-md bg-magnum-600 py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
       onclick={() => handleClickTop()}
       disabled={$nowProgress}
     >
@@ -458,7 +458,7 @@
     </button>
     <button
       disabled={$nowProgress}
-      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
+      class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
       onclick={() => handlePrev()}
     >
       <Triangle size={20} class="mx-auto stroke-magnum-100 fill-magnum-100" />
@@ -490,7 +490,7 @@
 {#if displayEvents.get() && displayEvents.get().length > 0}
   <button
     disabled={$nowProgress || loadMoreDisabled}
-    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200"
+    class="rounded-md bg-magnum-600 w-full py-2 disabled:opacity-25 flex justify-center items-center font-bold text-lg text-magnum-100 gap-2 my-1 hover:brightness-110 active:brightness-90 active:scale-95 duration-200 transition"
     onclick={() => handleNext()}
   >
     <Triangle size={20} class="rotate-180 stroke-magnum-100 fill-magnum-100" />
