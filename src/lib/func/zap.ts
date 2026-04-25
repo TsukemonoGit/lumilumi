@@ -1,7 +1,7 @@
 // fetchにタイムアウトを付与するユーティリティ
 export async function fetchWithTimeout(
   resource: RequestInfo,
-  options: any = {},
+  options: RequestInit = {},
   timeout = 10000,
 ) {
   const controller = new AbortController();
@@ -45,14 +45,11 @@ export async function makeInvoice({
   kind,
 }: InvoiceProp): Promise<string | null> {
   try {
-    console.log("makeInvoice: before getZapEndpoint");
     const zapEndpoint = await getZapEndpoint(metadata);
-    console.log("makeInvoice: after getZapEndpoint", zapEndpoint);
     if (!zapEndpoint) {
       return null;
     }
 
-    console.log("makeInvoice: before makeZapRequest");
     const zapRequest: EventTemplate = makeZapRequest({
       profile: metadata.pubkey,
       eventTag: eventTag ?? null,
@@ -61,28 +58,25 @@ export async function makeInvoice({
       comment: comment,
       ...(kind !== undefined ? { kind } : {}),
     });
-    console.log("makeInvoice: before signEvent");
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(
       zapRequest,
     );
-    console.log("makeInvoice: after signEvent");
     const encoded = encodeURI(JSON.stringify(signedRequest));
 
     const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
-    console.log("[zap url]", url);
-    console.log("makeInvoice: before fetch zap endpoint");
-    const response = await fetch(url);
-    console.log("makeInvoice: after fetch zap endpoint");
-    if (!response.ok) {
-      console.error("[zap failed]", await response.text());
-
+    let response;
+    try {
+      response = await fetchWithTimeout(url, {}, 10000);
+    } catch (e) {
+      console.error("[zap failed] fetchWithTimeout error", e);
       return null;
     }
-    console.log("makeInvoice: before response.json");
+    if (!response.ok) {
+      console.error("[zap failed]", await response.text());
+      return null;
+    }
     const payment = await response.json();
-    console.log("makeInvoice: after response.json");
     const { pr: zapInvoice } = payment;
-    console.log("[zap invoice]", zapInvoice);
     if (zapInvoice === undefined) {
       console.error("[zap failed]", payment);
       return null;
