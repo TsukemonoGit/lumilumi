@@ -38,7 +38,7 @@
 
   import AlertDialog from "$lib/components/Elements/AlertDialog.svelte";
   import EventCard from "../EventCard/EventCard.svelte";
-  import { untrack } from "svelte";
+  import { onDestroy, untrack } from "svelte";
   import ZapInvoiceWindow from "$lib/components/Elements/ZapInvoiceWindow.svelte";
   import { getZapRelay, makeInvoice } from "$lib/func/zap";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -400,28 +400,27 @@
   let repost: Nostr.Event[] = $state([]);
   let reaction: Nostr.Event[] = $state([]);
   let zap: Nostr.Event[] = $state([]);
-  let repost_length: number = $derived(repost.length);
-
-  let reaction_length: number = $derived(reaction.length);
-
-  let zap_length: number = $derived(zap.length);
   let hasReactions: boolean = $state(false);
 
   const updateInterval = 2000; //idが変わってからフィルター変えて取り直してイベント取得するまでのラグ
-  let timeoutId: NodeJS.Timeout | undefined = undefined;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
+  let destroyed = false;
 
   function scheduleUpdate() {
+    if (destroyed) return;
+
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
     timeoutId = setTimeout(() => {
+      if (destroyed) return;
       updateReactionsData();
       timeoutId = undefined;
     }, updateInterval);
   }
 
-  viewEventIds.subscribe((value) => {
+  const unsubscribeViewEventIds = viewEventIds.subscribe((value) => {
     scheduleUpdate(); // viewEventIdsが変わったら500ms後に実行をスケジュール
   });
 
@@ -435,6 +434,8 @@
   });
 
   function updateReactionsData() {
+    if (destroyed) return;
+
     repost = queryClient
       .getQueriesData({
         queryKey: ["reactions", queryId, "repost"],
@@ -479,10 +480,19 @@
   }
 
   function hasAnyReaction(): boolean {
-    return repost_length > 0 || reaction_length > 0 || zap_length > 0;
+    return repost.length > 0 || reaction.length > 0 || zap.length > 0;
   }
   //$: console.log(allReactions);
   let viewAllReactions: boolean = $state(false);
+
+  onDestroy(() => {
+    destroyed = true;
+    unsubscribeViewEventIds();
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+  });
 </script>
 
 <div
@@ -556,7 +566,7 @@
               {/if}
             {/snippet}
           </Zapped><span class="text-sm"
-            >{#if lumiSetting.get().showAllReactions && zap_length > 0}{zap_length}{/if}</span
+            >{#if lumiSetting.get().showAllReactions && zap.length > 0}{zap.length}{/if}</span
           >
         </div>
         <AlertDialog
@@ -625,7 +635,7 @@
               <Reaction {event} />
             </div>{/if}{/snippet}</Reactioned
       ><span class=" text-sm"
-        >{#if lumiSetting.get().showAllReactions && reaction_length > 0}{reaction_length}{/if}</span
+        >{#if lumiSetting.get().showAllReactions && reaction.length > 0}{reaction.length}{/if}</span
       >
     </div>
   {/if}
@@ -654,8 +664,8 @@
               <Repeat2 size="22" class={event ? "text-magnum-200" : ""} />
             </DropdownMenu>
           {/snippet}
-        </Reposted>{#if lumiSetting.get().showAllReactions && repost_length > 0}<span
-            class="text-sm">{repost_length}</span
+        </Reposted>{#if lumiSetting.get().showAllReactions && repost.length > 0}<span
+            class="text-sm">{repost.length}</span
           >{/if}
       </div>
     {:else}<button
@@ -684,16 +694,16 @@
 
 {#if viewAllReactions}
   <!--kind6-->
-  {#if repost_length > 0}
+  {#if repost.length > 0}
     <RepostList events={repost} />
   {/if}
 
-  {#if reaction_length > 0}
+  {#if reaction.length > 0}
     <!--kind7-->
     <ReactionList events={reaction} />
   {/if}
 
-  {#if zap_length > 0}
+  {#if zap.length > 0}
     <!--zap レシート-->
     <ZapList events={zap} />
   {/if}
