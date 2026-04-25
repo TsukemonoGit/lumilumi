@@ -137,9 +137,7 @@ export async function fetchZapLNURLPubkey(
       };
     }
 
-    console.log("fetchZapLNURLPubkey: before getNurlFetch", lnurl);
     const body = await getNurlFetch(lnurl);
-    // console.log("fetchZapLNURLPubkey: after getNurlFetch", body);
     if (!body) {
       return { pub: undefined, error: `Failed to fetch from ${lnurl}` };
     }
@@ -173,11 +171,9 @@ export async function getNurlFetch(
   if (data) return data;
 
   try {
-    console.log("getNurlFetch: before fetchQuery", lnurl);
     const response = await queryClient?.fetchQuery({
       queryKey: ["fetchNnurl", lnurl] as QueryKey,
       queryFn: async () => {
-        console.log("getNurlFetch: before fetch", lnurl);
         let res;
         try {
           res = await fetchWithTimeout(lnurl, {}, 10000); // 10秒タイムアウト
@@ -185,16 +181,13 @@ export async function getNurlFetch(
           console.error("getNurlFetch: fetchWithTimeout error", e);
           throw new Error(`Timeout or fetch error for ${lnurl}`);
         }
-        console.log("getNurlFetch: after fetch", res);
         if (!res.ok) throw new Error(`Failed to fetch from ${lnurl}`);
         const json = await res?.json();
-        console.log("getNurlFetch: after res.json", json);
         return json;
       },
       staleTime: Infinity,
       gcTime: Infinity,
     });
-    console.log("getNurlFetch: after fetchQuery", response);
     return response;
   } catch (error: any) {
     console.error("getNurlFetch: error", error);
@@ -206,7 +199,7 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
   //description tag を持たなければならない
   const descriptionTag = event.tags.find((tag) => tag[0] === "description");
   if (!descriptionTag || descriptionTag.length <= 1) {
-    console.log("zap descriptionTag error");
+    // descriptionタグがなければ何も返さない
     return;
   }
   try {
@@ -215,7 +208,7 @@ export function extractKind9734(event: Nostr.Event): Nostr.Event | undefined {
     if (verifyEvent(kind9734)) {
       return kind9734;
     } else {
-      console.log("zap kind9734 error");
+      // 不正な場合も何も返さない
       return;
     }
   } catch (error) {
