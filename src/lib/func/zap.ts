@@ -6,6 +6,10 @@ export async function fetchWithTimeout(
 ) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
+  if (options.signal) {
+    console.warn("[fetchWithTimeout] options.signalが既に設定されています。タイムアウト用signalで上書きします。既存のsignalは無視されます。");
+    // 既存signalを合成する場合はAbortSignal.any([options.signal, controller.signal])などを使うが、現状は上書きのみ。
+  }
   options.signal = controller.signal;
   try {
     const response = await fetch(resource, options);
