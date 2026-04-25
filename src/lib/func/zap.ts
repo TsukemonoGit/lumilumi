@@ -1,3 +1,21 @@
+// fetchにタイムアウトを付与するユーティリティ
+export async function fetchWithTimeout(
+  resource: RequestInfo,
+  options: any = {},
+  timeout = 10000,
+) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  options.signal = controller.signal;
+  try {
+    const response = await fetch(resource, options);
+    clearTimeout(id);
+    return response;
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
 import { verifyEvent, type EventTemplate } from "nostr-tools";
 import * as Nostr from "nostr-typedef";
 import { getDefaultWriteRelays, usePromiseReq } from "./nostr";
@@ -27,12 +45,14 @@ export async function makeInvoice({
   kind,
 }: InvoiceProp): Promise<string | null> {
   try {
+    console.log("makeInvoice: before getZapEndpoint");
     const zapEndpoint = await getZapEndpoint(metadata);
-    console.log(zapEndpoint);
+    console.log("makeInvoice: after getZapEndpoint", zapEndpoint);
     if (!zapEndpoint) {
       return null;
     }
 
+    console.log("makeInvoice: before makeZapRequest");
     const zapRequest: EventTemplate = makeZapRequest({
       profile: metadata.pubkey,
       eventTag: eventTag ?? null,
@@ -41,20 +61,26 @@ export async function makeInvoice({
       comment: comment,
       ...(kind !== undefined ? { kind } : {}),
     });
+    console.log("makeInvoice: before signEvent");
     const signedRequest = await (window.nostr as Nostr.Nip07.Nostr)?.signEvent(
       zapRequest,
     );
+    console.log("makeInvoice: after signEvent");
     const encoded = encodeURI(JSON.stringify(signedRequest));
 
     const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
     console.log("[zap url]", url);
+    console.log("makeInvoice: before fetch zap endpoint");
     const response = await fetch(url);
+    console.log("makeInvoice: after fetch zap endpoint");
     if (!response.ok) {
       console.error("[zap failed]", await response.text());
 
       return null;
     }
+    console.log("makeInvoice: before response.json");
     const payment = await response.json();
+    console.log("makeInvoice: after response.json");
     const { pr: zapInvoice } = payment;
     console.log("[zap invoice]", zapInvoice);
     if (zapInvoice === undefined) {
@@ -63,6 +89,7 @@ export async function makeInvoice({
     }
     return zapInvoice;
   } catch (error) {
+    console.error("makeInvoice: error", error);
     return null;
   }
 }
@@ -110,7 +137,9 @@ export async function fetchZapLNURLPubkey(
       };
     }
 
+    console.log("fetchZapLNURLPubkey: before getNurlFetch", lnurl);
     const body = await getNurlFetch(lnurl);
+    console.log("fetchZapLNURLPubkey: after getNurlFetch", body);
     if (!body) {
       return { pub: undefined, error: `Failed to fetch from ${lnurl}` };
     }
@@ -126,6 +155,7 @@ export async function fetchZapLNURLPubkey(
       };
     }
   } catch (err) {
+    console.error("fetchZapLNURLPubkey: error", err);
     return {
       pub: undefined,
       error: "An error occurred while fetching LNURL data.",
@@ -141,19 +171,31 @@ export async function getNurlFetch(lnurl: string): Promise<any | undefined> {
   if (data) return data;
 
   try {
+    console.log("getNurlFetch: before fetchQuery", lnurl);
     const response = await queryClient?.fetchQuery({
       queryKey: ["fetchNnurl", lnurl] as QueryKey,
       queryFn: async () => {
-        const res = await fetch(lnurl);
+        console.log("getNurlFetch: before fetch", lnurl);
+        let res;
+        try {
+          res = await fetchWithTimeout(lnurl, {}, 10000); // 10秒タイムアウト
+        } catch (e) {
+          console.error("getNurlFetch: fetchWithTimeout error", e);
+          throw new Error(`Timeout or fetch error for ${lnurl}`);
+        }
+        console.log("getNurlFetch: after fetch", res);
         if (!res.ok) throw new Error(`Failed to fetch from ${lnurl}`);
-        return await res?.json();
+        const json = await res?.json();
+        console.log("getNurlFetch: after res.json", json);
+        return json;
       },
       staleTime: Infinity,
       gcTime: Infinity,
     });
+    console.log("getNurlFetch: after fetchQuery", response);
     return response;
   } catch (error: any) {
-    console.error("Fetch error:", error);
+    console.error("getNurlFetch: error", error);
     return undefined;
   }
 }
@@ -363,13 +405,15 @@ export async function getZapEndpoint(
       return null;
     }
 
+    console.log("getZapEndpoint: before getNurlFetch", lnurl);
     let body = await getNurlFetch(lnurl);
+    console.log("getZapEndpoint: after getNurlFetch", body);
 
     if (body && body.allowsNostr && body.nostrPubkey) {
       return body.callback;
     }
   } catch (err) {
-    /*-*/
+    console.error("getZapEndpoint: error", err);
   }
 
   return null;
