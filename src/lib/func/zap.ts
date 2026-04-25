@@ -7,7 +7,9 @@ export async function fetchWithTimeout(
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
   if (options.signal) {
-    console.warn("[fetchWithTimeout] options.signalが既に設定されています。タイムアウト用signalで上書きします。既存のsignalは無視されます。");
+    console.warn(
+      "[fetchWithTimeout] options.signalが既に設定されています。タイムアウト用signalで上書きします。既存のsignalは無視されます。",
+    );
     // 既存signalを合成する場合はAbortSignal.any([options.signal, controller.signal])などを使うが、現状は上書きのみ。
   }
   options.signal = controller.signal;
@@ -137,7 +139,7 @@ export async function fetchZapLNURLPubkey(
 
     console.log("fetchZapLNURLPubkey: before getNurlFetch", lnurl);
     const body = await getNurlFetch(lnurl);
-    console.log("fetchZapLNURLPubkey: after getNurlFetch", body);
+    // console.log("fetchZapLNURLPubkey: after getNurlFetch", body);
     if (!body) {
       return { pub: undefined, error: `Failed to fetch from ${lnurl}` };
     }
@@ -161,7 +163,9 @@ export async function fetchZapLNURLPubkey(
   }
 }
 
-export async function getNurlFetch(lnurl: string): Promise<any | undefined> {
+export async function getNurlFetch(
+  lnurl: string,
+): Promise<Record<string, any> | undefined> {
   const data: Response | undefined = queryClient?.getQueryData([
     "fetchNnurl",
     lnurl,
