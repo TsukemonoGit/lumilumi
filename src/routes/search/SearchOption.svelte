@@ -177,7 +177,7 @@
   function handleUnifiedSearch() {
     if (searchWord || "".trim()) {
       // URLパラメータを更新
-      const url = new URL(buildParam());
+      const url = buildParam();
 
       pushState(url.toString(), {});
 
