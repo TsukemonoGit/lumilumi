@@ -55,6 +55,13 @@
       isMount = true;
       init();
     }
+    // フォローリスト取得前にクエリが変更されると反映されないので取得時にも反映
+    const unsubscribe = followList.subscribe((value) => {
+      if (searchWord) {
+        createFilter(searchWord);
+      }
+    });
+    return unsubscribe;
   });
 
   async function waitForDefaultRelays(maxWaitTime: number) {
