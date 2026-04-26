@@ -259,7 +259,7 @@
                   <div
                     in:send={{ key: "trigger" }}
                     out:receive={{ key: "trigger" }}
-                    class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400"
+                    class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400 overflow-hidden"
                   ></div>
                 {/if}
               </button>
