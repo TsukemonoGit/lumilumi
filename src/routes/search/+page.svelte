@@ -72,12 +72,12 @@
   }
 
   async function init() {
-    setSearchRelay();
-
     // +page.tsから受け取ったデータを使用
     searchWord = data.searchWord;
     followee = data.followee;
     excludeProxy = data.excludeProxy;
+
+    await setSearchRelay();
 
     // 検索ワードがある場合は検索を実行
     if (searchWord) {
