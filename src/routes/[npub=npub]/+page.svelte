@@ -249,7 +249,7 @@
             {#each triggers as triggerItem}
               <button
                 use:melt={$trigger(triggerItem.id)}
-                class="trigger relative flex-col gap-1 min-w-14 md:min-w-20 text-sm"
+                class="trigger relative flex-col gap-1 min-w-14 md:min-w-20 text-sm overflow-x-hidden"
               >
                 {#if triggerItem.Icon}<triggerItem.Icon
                     size={20}
@@ -259,7 +259,7 @@
                   <div
                     in:send={{ key: "trigger" }}
                     out:receive={{ key: "trigger" }}
-                    class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400 overflow-hidden"
+                    class="absolute bottom-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-magnum-400"
                   ></div>
                 {/if}
               </button>
