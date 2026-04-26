@@ -249,7 +249,7 @@
             {#each triggers as triggerItem}
               <button
                 use:melt={$trigger(triggerItem.id)}
-                class="trigger relative flex-col gap-1 min-w-14 md:min-w-20 text-sm"
+                class="trigger relative flex-col gap-1 min-w-14 md:min-w-20 text-sm overflow-x-hidden"
               >
                 {#if triggerItem.Icon}<triggerItem.Icon
                     size={20}

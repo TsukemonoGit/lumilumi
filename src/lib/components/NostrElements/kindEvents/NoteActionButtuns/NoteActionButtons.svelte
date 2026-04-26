@@ -574,10 +574,9 @@
           onClickOK={() => onClickOK(metadata)}
           title="Zap"
           >{#snippet main()}
-            <div class=" text-neutral-200">
+            <div class=" text-neutral-200 overflow-y-auto max-h-[60vh]">
               <div class="rounded-md">
                 <EventCard
-                  maxHeight={192}
                   {note}
                   {metadata}
                   displayMenu={false}
