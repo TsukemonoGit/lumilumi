@@ -31,7 +31,7 @@ export const load: PageLoad = ({ url }) => {
   let searchWord = "";
   let followee = false;
   let excludeProxy = false;
-  let shouldLoad = true;
+  let shouldLoad = false;
 
   // 新しい形式が存在するかチェック
   if (qParam) {

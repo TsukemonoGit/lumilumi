@@ -138,7 +138,7 @@
   }
 
   async function handleClickShare() {
-    const shareData = { url: sharaParam() };
+    const shareData = { url: buildParam().toString() };
     try {
       await navigator.share(shareData);
     } catch (error: any) {
@@ -153,7 +153,7 @@
     }
   }
 
-  function sharaParam() {
+  function buildParam() {
     const url = new URL(page.url.origin + page.url.pathname);
     const params = url.searchParams;
 
@@ -163,10 +163,10 @@
       params.delete("q");
     }
 
-    followee ? params.set("f", "1") : params.delete("f");
-    excludeProxy ? params.set("x", "1") : params.delete("x");
+    followee ? params.set("followee", "1") : params.delete("followee");
+    excludeProxy ? params.set("excludeProxy", "1") : params.delete("excludeProxy");
 
-    return url.toString();
+    return url;
   }
 
   /* function handleResetValue() {
@@ -177,17 +177,7 @@
   function handleUnifiedSearch() {
     if (searchWord || "".trim()) {
       // URLパラメータを更新
-      const url = new URL(window.location.href);
-      if (searchWord && searchWord.trim()) {
-        url.searchParams.set("q", searchWord.trim());
-      } else {
-        url.searchParams.delete("q");
-      }
-
-      followee ? url.searchParams.set("f", "1") : url.searchParams.delete("f");
-      excludeProxy
-        ? url.searchParams.set("x", "1")
-        : url.searchParams.delete("x");
+      const url = buildParam();
 
       pushState(url.toString(), {});
 

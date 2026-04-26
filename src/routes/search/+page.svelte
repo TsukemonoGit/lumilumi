@@ -55,6 +55,13 @@
       isMount = true;
       init();
     }
+    // フォローリスト取得前にクエリが変更されると反映されないので取得時にも反映
+    const unsubscribe = followList.subscribe((value) => {
+      if (searchWord) {
+        createFilter(searchWord);
+      }
+    });
+    return unsubscribe;
   });
 
   async function waitForDefaultRelays(maxWaitTime: number) {
@@ -72,12 +79,12 @@
   }
 
   async function init() {
-    setSearchRelay();
-
     // +page.tsから受け取ったデータを使用
     searchWord = data.searchWord;
     followee = data.followee;
     excludeProxy = data.excludeProxy;
+
+    await setSearchRelay();
 
     // 検索ワードがある場合は検索を実行
     if (searchWord) {
