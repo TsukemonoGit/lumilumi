@@ -63,9 +63,21 @@
     const paramTitle = page.url.searchParams.get("title");
     const paramText = page.url.searchParams.get("text");
     const paramUrl = page.url.searchParams.get("url");
+    const paramTags = page.url.searchParams.get("tags");
     const paramSharedContent = [paramTitle, paramText, paramUrl]
       .filter((param) => param && param !== "undefined")
       .join("\n");
+
+    if (paramTags) {
+      try {
+        const parsedTags: string[][] = JSON.parse(paramTags);
+        if (Array.isArray(parsedTags)) {
+          tags = tags.concat(parsedTags);
+        }
+      } catch (e) {
+        console.error("tagsのJSONパースに失敗しました:", e);
+      }
+    }
 
     if (paramSharedContent && paramSharedContent !== "") {
       additionalPostOptions.set({

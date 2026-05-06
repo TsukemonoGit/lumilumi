@@ -13,7 +13,7 @@ export type UrlType =
 const genUrlQueryKey = (url: string) => ["useUrl", url] as const;
 
 export const useUrl = (
-  url: string
+  url: string,
 ): {
   data: Readable<UrlType | null | undefined>;
 } => {
@@ -36,7 +36,7 @@ const imageRegex = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
 // SVGを別で定義
 const svgRegex = /\.svg$/i;
 //movie
-const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg)$/i;
+const movieRegex = /\.(avi|mp4|mov|wmv|flv|mpg|webm|mkv)$/i;
 
 const audioRegex = /\.(mp3|wav|ogg|m4a)$/i;
 
@@ -64,7 +64,7 @@ export const checkFileExtension = async (url: string): Promise<UrlType> => {
       try {
         // プロキシAPI経由でContent-Typeを取得
         const response = await fetch(
-          `/api/url-check?url=${encodeURIComponent(url)}`
+          `/api/url-check?url=${encodeURIComponent(url)}`,
         );
         const data = await response.json();
         const contentType = data.contentType;
