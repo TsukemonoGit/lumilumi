@@ -150,7 +150,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto`}
-            title={"Daity User Activity"}
+            title={"Daily User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -173,7 +173,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto`}
-            title={"Daity User Activity"}
+            title={"Daily User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -196,7 +196,7 @@
               {pubkey}
             /><ReplyToUserButton {pubkey} />{/if}<button
             class={`${MenuButtonClass} my-auto `}
-            title={"Daity User Activity"}
+            title={"Daily User Activity"}
             onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
             ><CalendarSearch /></button
           >
@@ -306,7 +306,7 @@
                       {pubkey}
                     /><ReplyToUserButton {pubkey} />{/if}<button
                     class={`${MenuButtonClass} my-auto`}
-                    title={"Daity User Activity"}
+                    title={"Daily User Activity"}
                     onclick={() => goto(`/${encodetoNpub(pubkey)}/date`)}
                     ><CalendarSearch /></button
                   >
