@@ -15,7 +15,7 @@
     "@neoconfetti/svelte": "^2.2.2",
     "@sveltejs/adapter-auto": "^6.1.1",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
-    "@sveltejs/kit": "^2.57.1",
+    "@sveltejs/kit": "^2.61.1",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/svelte": "^5.3.1",
@@ -30,7 +30,7 @@
     "autoprefixer": "^10.5.0",
     "baseline-browser-mapping": "^2.10.19",
     "postcss": "^8.5.10",
-    "svelte": "^5.55.4",
+    "svelte": "^5.55.7",
     "svelte-check": "^4.4.6",
     "tailwindcss": "^3.4.19",
     "tslib": "^2.8.1",
@@ -69,6 +69,6 @@
     "sveaflet": "^0.1.4",
     "svelte-boring-avatars": "^1.2.6",
     "unfurl.js": "^6.4.0",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   }
 }
