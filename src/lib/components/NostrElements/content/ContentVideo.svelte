@@ -23,11 +23,11 @@
     lumiSetting.get().imageAutoExpand === "all" ||
       (lumiSetting.get().imageAutoExpand === "following" &&
         author &&
-        (author === lumiSetting.get().pubkey || followList.get().has(author)))
+        (author === lumiSetting.get().pubkey || followList.get().has(author))),
   );
 </script>
 
-{#if (lumiSetting.get().showImg && showDirectly && !videoError) || view}
+{#if !videoError && ((lumiSetting.get().showImg && showDirectly) || view)}
   {#if !videoLoad}
     <Link
       props={{ "aria-label": `External Links: ${url}` }}

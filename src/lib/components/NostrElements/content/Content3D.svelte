@@ -1,8 +1,9 @@
 <script lang="ts">
   import { Box, ZoomIn } from "lucide-svelte";
   import loaderIcon from "$lib/assets/loader.svg";
-  import { t as _ } from '@konemono/svelte5-i18n';
+  import { t as _ } from "@konemono/svelte5-i18n";
   import Dialog from "$lib/components/Elements/Dialog.svelte";
+  import { browser } from "$app/environment";
 
   import { type Writable, writable } from "svelte/store";
 
@@ -19,33 +20,35 @@
   let showMore: Writable<boolean> = writable(false);
 </script>
 
-{#if view}
-  <div class="relative w-fit h-fit overflow-hidden">
-    <model-viewer
-      style="width:18rem; height:18rem; "
-      lazy={true}
-      alt="3D"
-      src={content ?? ""}
-      ar
-      shadow-intensity="1"
-      camera-controls
-      touch-action="pan-y"
-    ></model-viewer>
-    <div class="absolute bottom-0 right-0 flex flex-col gap-2">
+{#if browser}
+  {#await import("@google/model-viewer") then}
+    {#if view}
+      <div class="relative w-fit h-fit overflow-hidden">
+        <model-viewer
+          style="width:18rem; height:18rem; "
+          lazy={true}
+          alt="3D"
+          src={content ?? ""}
+          ar
+          shadow-intensity="1"
+          camera-controls
+          touch-action="pan-y"
+        ></model-viewer>
+        <div class="absolute bottom-0 right-0 flex flex-col gap-2">
+          <button
+            class="text-magnum-300 hover:opacity-80"
+            onclick={() => ($showMore = true)}
+          >
+            <ZoomIn /></button
+          >
+        </div>
+      </div>
+    {:else}
       <button
-        class="text-magnum-300 hover:opacity-80"
-        onclick={() => ($showMore = true)}
-      >
-        <ZoomIn /></button
-      >
-    </div>
-  </div>
-{:else}
-  <button
-    class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-2 m-1 hover:opacity-75 active:opacity-50 flex-col items-center flex gap-1"
-    onclick={() => (view = true)}><Box size={42} />View 3D model</button
-  >{/if}
-
+        class=" rounded-md border font-semibold border-magnum-600 text-magnum-200 p-2 m-1 hover:opacity-75 active:opacity-50 flex-col items-center flex gap-1"
+        onclick={() => (view = true)}><Box size={42} />View 3D model</button
+      >{/if}
+  {/await}{/if}
 <!--Show more no Dialog-->
 <Dialog bind:open={showMore} id={`3d_${content}`}>
   {#snippet main()}

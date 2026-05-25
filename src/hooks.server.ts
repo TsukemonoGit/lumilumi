@@ -39,7 +39,7 @@ function isRateLimited(ip: string): boolean {
 
 const RATE_LIMITED_PATHS = ["/api/ogp", "/api/url-check"];
 
-const MODEL_VIEWER_HOST = "https://ajax.googleapis.com";
+//const MODEL_VIEWER_HOST = "https://ajax.googleapis.com";
 
 const SECURITY_HEADERS: Record<string, string> = {
   "X-Frame-Options": "DENY",
@@ -48,18 +48,18 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "Content-Security-Policy": [
-    "default-src 'self'", // ← frame-src 未指定時のフォールバック
-    `script-src 'self' ${MODEL_VIEWER_HOST} 'unsafe-inline' https://platform.twitter.com`, //Twitter埋め込みは platform.twitter.com/widgets.js をscriptタグで読み込み、そのスクリプトが内部でiframeを動的生成する方式のためリストについか
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'  'wasm-unsafe-eval' https://platform.twitter.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "media-src 'self' https: data: blob:",
     "connect-src 'self' ws: wss: https:",
-    "font-src 'self'",
+    "font-src 'self' data: https:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://bsky.app", // ← iframe うめこみ許可リスト
+    "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://bsky.app",
   ].join("; "),
 };
 

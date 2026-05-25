@@ -40,6 +40,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@google/model-viewer": "^4.2.0",
     "@internationalized/date": "^3.12.1",
     "@konemono/nostr-content-parser": "^0.7.0",
     "@konemono/nostr-login": "^1.15.7",
@@ -68,6 +69,7 @@
     "rx-nostr-crypto": "^3.1.3",
     "sveaflet": "^0.1.4",
     "svelte-boring-avatars": "^1.2.6",
+    "three": "^0.182.0",
     "unfurl.js": "^6.4.0",
     "ws": "^8.21.0"
   }
