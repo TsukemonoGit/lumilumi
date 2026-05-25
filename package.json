@@ -69,6 +69,6 @@
     "sveaflet": "^0.1.4",
     "svelte-boring-avatars": "^1.2.6",
     "unfurl.js": "^6.4.0",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   }
 }
