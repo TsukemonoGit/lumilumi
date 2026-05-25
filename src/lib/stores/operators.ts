@@ -183,8 +183,6 @@ export function bookmark(): OperatorFunction<EventPacket, EventPacket> {
       pk.event.kind === 10003 &&
       pk.event.pubkey === lumiSetting.get().pubkey
     ) {
-      //     console.log(pk.event);
-
       const queryKey: QueryKey = ["naddr", `${10003}:${pk.event.pubkey}:`];
 
       const preMeta: EventPacket | undefined =
