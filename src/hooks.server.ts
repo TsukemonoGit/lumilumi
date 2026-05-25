@@ -47,8 +47,20 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-  /*  "Content-Security-Policy": [
-    "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://platform.twitter.com",
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'  'wasm-unsafe-eval' https://platform.twitter.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "media-src 'self' https: data: blob:",
+    "connect-src 'self' ws: wss: https:",
+    "font-src 'self' data: https:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://twitter.com https://platform.twitter.com https://bsky.app",
+  ].join("; "),
 };
 
 function applySecurityHeaders(response: Response): void {
