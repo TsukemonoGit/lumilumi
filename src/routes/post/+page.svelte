@@ -70,9 +70,15 @@
 
     if (paramTags) {
       try {
-        const parsedTags: string[][] = JSON.parse(paramTags);
-        if (Array.isArray(parsedTags)) {
-          tags = tags.concat(parsedTags);
+        const parsedTags: unknown = JSON.parse(paramTags);
+        if (
+          Array.isArray(parsedTags) &&
+          parsedTags.every(
+            (tag) =>
+              Array.isArray(tag) && tag.every((v) => typeof v === "string"),
+          )
+        ) {
+          tags = tags.concat(parsedTags as string[][]);
         }
       } catch (e) {
         console.error("tagsのJSONパースに失敗しました:", e);
