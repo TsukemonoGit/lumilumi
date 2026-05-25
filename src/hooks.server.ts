@@ -53,7 +53,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "media-src 'self' https: data: blob:",
-    "connect-src 'self' ws: wss: https:",
+    "connect-src 'self' ws: wss: https: blob:",
     "font-src 'self' data: https:",
     "object-src 'none'",
     "base-uri 'self'",
