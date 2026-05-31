@@ -110,7 +110,7 @@ export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
   debugInfo("setRelaysByKind10002", event);
   try {
     const relayList: string[][] = event.tags.filter(
-      (tag) => tag[0] === "r" && relayRegex.test(tag[1]),
+      (tag) => tag[0] === "r" && relayRegex2.test(tag[1]),
     );
     return relayList.map(([, url, ...config]) => {
       let conf: DefaultRelayConfig = { url: url, read: false, write: false };
