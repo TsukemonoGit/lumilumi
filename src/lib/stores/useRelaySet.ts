@@ -22,7 +22,7 @@ import { saveEachNote } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
 import { debugError, debugInfo } from "$lib/components/Debug/debug";
-import { relayRegex } from "$lib/func/regex";
+import { relayRegex2 } from "$lib/func/regex";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
