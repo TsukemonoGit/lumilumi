@@ -22,6 +22,7 @@ import { saveEachNote } from "./operators";
 import * as Nostr from "nostr-typedef";
 import { useReq } from "$lib/func/useReq";
 import { debugError, debugInfo } from "$lib/components/Debug/debug";
+import { relayRegex2 } from "$lib/func/regex";
 export function useRelaySet(
   queryKey: QueryKey,
   filters: Filter[],
@@ -108,7 +109,9 @@ export function setRelaysByKind3(event: Event): DefaultRelayConfig[] {
 export function setRelaysByKind10002(event: Event): DefaultRelayConfig[] {
   debugInfo("setRelaysByKind10002", event);
   try {
-    const relayList: string[][] = event.tags;
+    const relayList: string[][] = event.tags.filter(
+      (tag) => tag[0] === "r" && relayRegex2.test(tag[1]),
+    );
     return relayList.map(([, url, ...config]) => {
       let conf: DefaultRelayConfig = { url: url, read: false, write: false };
       if (!config || config.length <= 0)
