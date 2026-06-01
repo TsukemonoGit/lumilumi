@@ -83,7 +83,8 @@
               authors: lumiSetting.get().showAllReactions
                 ? undefined
                 : [lumiSetting.get().pubkey],
-              kinds: [7, 6, 16],limit:0
+              kinds: [7, 6, 16],
+              limit: 0
             },
             {
               "#e": $state.snapshot(etagList),
