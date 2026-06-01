@@ -84,10 +84,11 @@
                 ? undefined
                 : [lumiSetting.get().pubkey],
               kinds: [7, 6, 16],
+              limit: 0
             },
             {
               "#e": $state.snapshot(etagList),
-              kinds: [9735],
+              kinds: [9735],limit:0
             },
           ]
         : [];
@@ -98,11 +99,11 @@
           authors: lumiSetting.get().showAllReactions
             ? undefined
             : [lumiSetting.get().pubkey],
-          kinds: [7, 6, 16],
+          kinds: [7, 6, 16],limit:0
         },
         {
           "#a": $state.snapshot(atagList),
-          kinds: [9735],
+          kinds: [9735],limit:0
         }
       );
     }
