@@ -5,6 +5,7 @@ import type { QueryClient } from "@tanstack/svelte-query";
 import { NIP05_REGEX } from "nostr-tools/nip05";
 import type { ReqStatus, Profile } from "$lib/types";
 import * as Nostr from "nostr-typedef";
+import { isBitIdentifier, resolveBitNip05 } from "$lib/namecoin";
 
 /**
  * NIP-05検証結果の型定義
@@ -36,6 +37,26 @@ async function validateNip05(
   const match = nip05Address.match(NIP05_REGEX);
   if (!match) {
     return { result: false, error: NIP05_ERROR_TYPES.FORMAT_ERROR };
+  }
+
+  // `.bit` domains don't live in DNS — resolve them via Namecoin instead of
+  // hitting an HTTPS endpoint that doesn't exist.
+  if (isBitIdentifier(nip05Address)) {
+    try {
+      const resolved = await resolveBitNip05(nip05Address);
+      if (!resolved) {
+        return { result: false, error: NIP05_ERROR_TYPES.NO_PUBKEY };
+      }
+      return {
+        result: resolved.pubkey === pubkey,
+        error:
+          resolved.pubkey === pubkey
+            ? undefined
+            : NIP05_ERROR_TYPES.IMPERSONATION,
+      };
+    } catch {
+      return { result: false, error: NIP05_ERROR_TYPES.FETCH_ERROR };
+    }
   }
 
   const [, name = "_", domain] = match;
