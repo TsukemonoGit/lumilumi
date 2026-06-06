@@ -92,6 +92,3 @@ Implemented voting functionality supporting [NIP-56](https://github.com/nostr-pr
 <img src="./image/8.png" width="500" alt="Screenshot 9">
 <img src="./image/9.png" width="500" alt="Screenshot 10">
 <img src="./image/12.png" width="500" alt="Screenshot 11">
-
-
-Content-Security-Policy: ページの設定により blob:http://localhost:5174/a5e64a67-f61d-4bdb-9065-e5b9df77bd7c の Worker スクリプト (worker-src) の実行をブロックしました。次のディレクティブに違反しています: “script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://platform.twitter.com”
