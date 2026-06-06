@@ -75,6 +75,7 @@
     )
       return;
 
+    const now=Math.floor(Date.now() / 1000);
     filters =
       etagList.length > 0
         ? [
@@ -84,10 +85,13 @@
                 ? undefined
                 : [lumiSetting.get().pubkey],
               kinds: [7, 6, 16],
+              limit: 0,
+              since:now
             },
             {
               "#e": $state.snapshot(etagList),
               kinds: [9735],
+              limit:0
             },
           ]
         : [];
@@ -99,10 +103,14 @@
             ? undefined
             : [lumiSetting.get().pubkey],
           kinds: [7, 6, 16],
+          limit:0,
+          since:now
         },
         {
           "#a": $state.snapshot(atagList),
           kinds: [9735],
+          limit:0,
+          since:now
         }
       );
     }
