@@ -384,7 +384,7 @@
   // UI Interaction
   // ----------------------------------------
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.ctrlKey && event.key === "Enter") {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
       postNote();
       return;
     }
