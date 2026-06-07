@@ -247,7 +247,11 @@
           </thead>
           <tbody>
             <tr> <td>N</td><td>{$_("shortcut.N")}</td></tr>
-            <tr><td>Ctrl+Enter</td><td>{$_("shortcut.CtrlEnter")}</td></tr>
+            <tr
+              ><td>Ctrl+Enter or Cmd+Enter</td><td
+                >{$_("shortcut.CtrlEnter")}</td
+              ></tr
+            >
             <tr><td>Esc Esc</td><td>{$_("shortcut.EscEsc")}</td></tr>
           </tbody>
         </table>

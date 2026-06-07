@@ -5,10 +5,6 @@ import {
   uniq,
   type DefaultRelayConfig,
   type EventPacket,
-  type RxReq,
-  type RxReqEmittable,
-  type RxReqOverable,
-  type RxReqPipeable,
 } from "rx-nostr";
 import type { ReqResult } from "$lib/types.js";
 import type { Filter } from "nostr-typedef";

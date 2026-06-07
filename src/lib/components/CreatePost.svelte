@@ -384,7 +384,7 @@
   // UI Interaction
   // ----------------------------------------
   function handleKeyDown(event: KeyboardEvent) {
-    if (event.ctrlKey && event.key === "Enter") {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
       postNote();
       return;
     }
@@ -647,7 +647,7 @@
       <button
         disabled={isPosting || text.trim() === ""}
         aria-label="post"
-        title="Post (Ctrl+Enter)"
+        title="Post (Ctrl+Enter, Cmd+Enter)"
         class="sendButton"
         onclick={postNote}
       >
