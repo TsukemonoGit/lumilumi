@@ -647,7 +647,7 @@
       <button
         disabled={isPosting || text.trim() === ""}
         aria-label="post"
-        title="Post (Ctrl+Enter)"
+        title="Post (Ctrl+Enter, Cmd+Enter)"
         class="sendButton"
         onclick={postNote}
       >
