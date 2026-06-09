@@ -642,6 +642,7 @@ export function usePromiseReq(
     });
 
     _req.emit(filters);
+    _req.over();
   });
 }
 
