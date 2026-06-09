@@ -575,14 +575,12 @@ export function usePromiseReq(
     throw Error("No default relays available");
   }
 
-  let _req:
-    | (RxReq<"backward"> &
-        RxReqEmittable<{
-          relays: string[];
-        }> &
-        RxReqOverable &
-        RxReqPipeable)
-    | (RxReq<"forward"> & RxReqEmittable & RxReqPipeable);
+  let _req: RxReq<"backward"> &
+    RxReqEmittable<{
+      relays: string[];
+    }> &
+    RxReqOverable &
+    RxReqPipeable;
 
   if (req) {
     _req = req;
