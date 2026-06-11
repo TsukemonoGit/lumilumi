@@ -3,27 +3,13 @@
   import type { ReqResult, ReqStatus } from "$lib/types";
 
   import type Nostr from "nostr-typedef";
-  import type {
-    EventPacket,
-    RxReq,
-    RxReqEmittable,
-    RxReqOverable,
-    RxReqPipeable,
-  } from "rx-nostr";
+  import type { EventPacket } from "rx-nostr";
   import { untrack } from "svelte";
   import { readable } from "svelte/store";
 
   interface Props {
     id?: string | undefined;
     atag?: string | undefined;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
     error?: import("svelte").Snippet<[Error]>;
     nodata?: import("svelte").Snippet;
     loading?: import("svelte").Snippet;
@@ -42,7 +28,6 @@
   }
 
   let {
-    req = undefined,
     id = undefined,
     atag = undefined,
 
@@ -52,7 +37,7 @@
     children,
   }: Props = $props();
 
-  let result = $derived(useAllReactions(id, atag, req));
+  let result = $derived(useAllReactions(id, atag));
 
   // debounce用の状態
   let debounceTimeoutId: NodeJS.Timeout | undefined = undefined;

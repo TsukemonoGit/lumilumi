@@ -232,7 +232,6 @@ export async function getZapRelay(pubkey: string): Promise<string[]> {
           },
         ],
         operator: pipe(latest(), uniq()),
-        req: undefined,
       },
       undefined,
     );

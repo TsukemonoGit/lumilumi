@@ -79,13 +79,6 @@ export interface UseForwardReqOpts<A> {
 export interface UsePromiseReqOpts<A> {
   filters: Nostr.Filter[];
   operator: OperatorFunction<EventPacket, A>;
-  req?: RxReq<"backward"> &
-    RxReqEmittable<{
-      relays: string[];
-    }> &
-    RxReqOverable &
-    RxReqPipeable;
-
   initData?: A;
 }
 export interface UseReqOpts2<A> {

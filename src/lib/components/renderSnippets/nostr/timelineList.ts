@@ -10,8 +10,6 @@ import {
 import { defaultRelays } from "$lib/stores/stores";
 import type { Filter } from "nostr-typedef";
 import {
-  createRxBackwardReq,
-  uniq,
   type DefaultRelayConfig,
   type EventPacket,
 } from "rx-nostr";
@@ -61,23 +59,17 @@ export async function loadOlderEvents(
 
   //console.log(newFilters, sift, operator);
 
-  // Create request and operator pipeline
-  const newReq = createRxBackwardReq();
-
   // Fetch events
   const olderEvents = await usePromiseReq(
     {
       operator,
       filters: newFilters,
-      req: newReq,
     },
     relays,
     timeout,
     onData,
     sift
   );
-
-  newReq.over();
   // Filter events by timestamp
   const filteredOlderEvents = olderEvents.filter(
     (packet) => packet.event.created_at <= until
@@ -106,14 +98,11 @@ export async function firstLoadOlderEvents(
   onData?: (data: EventPacket[]) => void, // 処理途中のデータを受け取るコールバック
   timeout?: number
 ): Promise<EventPacket[]> {
-  const newReq = createRxBackwardReq();
-
   // Fetch events with longer timeout (4000ms)
   const olderEvents = await usePromiseReq(
     {
       operator,
       filters,
-      req: newReq,
     },
     relays,
     timeout,
