@@ -173,7 +173,7 @@
 
       // Load initial events
       const olderEvents = await usePromiseReq(
-        { filters, operator, req: undefined },
+        { filters, operator },
         undefined,
       );
 

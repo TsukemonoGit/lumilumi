@@ -561,7 +561,6 @@ export function usePromiseReq(
   {
     filters,
     operator,
-    req,
     initData = [],
   }: UsePromiseReqOpts<EventPacket[] | EventPacket>,
   relays: string[] | undefined,
@@ -575,18 +574,7 @@ export function usePromiseReq(
     throw Error("No default relays available");
   }
 
-  let _req: RxReq<"backward"> &
-    RxReqEmittable<{
-      relays: string[];
-    }> &
-    RxReqOverable &
-    RxReqPipeable;
-
-  if (req) {
-    _req = req;
-  } else {
-    _req = createRxBackwardReq();
-  }
+  const _req = createRxBackwardReq();
 
   // 初期データが配列でない場合は、配列に変換
   let accumulatedData: EventPacket[] = Array.isArray(initData)
@@ -790,15 +778,10 @@ export function useMediaPromiseReq(
 export function usePaginatedReq(
   {
     filters,
-    req,
     limit = 300,
     maxLoop = 50,
   }: {
     filters: Array<any>;
-    req?: RxReq<"backward"> &
-      RxReqEmittable<{ relays: string[] }> &
-      RxReqOverable &
-      RxReqPipeable;
     limit?: number;
     maxLoop?: number;
   },
@@ -823,7 +806,7 @@ export function usePaginatedReq(
           console.log(pagedFilter);
 
           const chunk = await usePromiseReq(
-            { filters: [pagedFilter], operator: scanArray(), req },
+            { filters: [pagedFilter], operator: scanArray() },
             relays,
             timeout,
             (intermediateData) => {

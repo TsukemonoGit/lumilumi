@@ -1,10 +1,4 @@
-import {
-  type EventPacket,
-  type RxReq,
-  type RxReqEmittable,
-  type RxReqOverable,
-  type RxReqPipeable,
-} from "rx-nostr";
+import type { EventPacket } from "rx-nostr";
 import type { ReqResult } from "$lib/types.js";
 
 import { usePaginatedReq } from "$lib/func/nostr";
@@ -12,11 +6,6 @@ import { usePaginatedReq } from "$lib/func/nostr";
 export function useAllReactions(
   id: string | undefined,
   atag: string | undefined,
-  req?:
-    | RxReq<"backward"> &
-        RxReqEmittable<{ relays: string[] }> &
-        RxReqOverable &
-        RxReqPipeable
 ): ReqResult<EventPacket[]> {
   const filters =
     atag !== undefined
@@ -32,5 +21,5 @@ export function useAllReactions(
       : [];
 
   // そのまま usePaginatedReq を返す
-  return usePaginatedReq({ filters, req, limit: 500 }, undefined);
+  return usePaginatedReq({ filters, limit: 500 }, undefined);
 }

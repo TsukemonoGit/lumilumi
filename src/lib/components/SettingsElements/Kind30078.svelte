@@ -102,7 +102,6 @@
           },
         ],
         operator: pipe(latest()),
-        req: undefined,
         initData: undefined,
       },
       relays.map(({ url, read, write }) => url),

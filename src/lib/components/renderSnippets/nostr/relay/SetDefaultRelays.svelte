@@ -7,10 +7,6 @@
   import {
     type DefaultRelayConfig,
     type EventPacket,
-    type RxReq,
-    type RxReqEmittable,
-    type RxReqOverable,
-    type RxReqPipeable,
     latest,
     uniq,
   } from "rx-nostr";
@@ -31,21 +27,12 @@
 
   interface Props {
     paramRelays: string[] | undefined;
-    req?:
-      | (RxReq<"backward"> &
-          RxReqEmittable<{
-            relays: string[];
-          }> &
-          RxReqOverable &
-          RxReqPipeable)
-      | undefined;
     error?: Snippet<[Error]>;
     loading?: Snippet<[string]>;
     contents?: Snippet;
   }
 
   let {
-    req = undefined,
     paramRelays = undefined,
     error,
     loading,
@@ -172,7 +159,7 @@
     // フェッチ
     $app.rxNostr.setDefaultRelays(defaultRelays);
     const result = await usePromiseReq(
-      { filters, operator: pipe(uniq(), latest()), req },
+      { filters, operator: pipe(uniq(), latest()) },
       defaultRelays,
       3000,
       (packets: EventPacket[]) => {
