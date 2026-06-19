@@ -32,7 +32,7 @@
   import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
-  import { STORAGE_KEYS, getKind3Key } from "$lib/func/localStorageKeys";
+  import { getKind3Key } from "$lib/func/localStorageKeys";
 
   interface Props {
     pubkey: string;
@@ -215,7 +215,6 @@
       kind: 3,
       pubkey: snapbefore.pubkey,
     };
-
     $nowProgress = false;
     dialogOpen = true;
   };
