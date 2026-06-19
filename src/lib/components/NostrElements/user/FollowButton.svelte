@@ -29,11 +29,7 @@
   import { latest } from "rx-nostr/src";
   import { type QueryKey } from "@tanstack/svelte-query";
   import { validateLoginPubkey } from "$lib/func/validateLoginPubkey";
-  import {
-    followList,
-    loginUser,
-    lumiSetting,
-  } from "$lib/stores/globalRunes.svelte";
+  import { followList, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { safePublishEvent } from "$lib/func/publishError";
   import { addToast } from "$lib/components/Elements/Toast.svelte";
   import { getKind3Key } from "$lib/func/localStorageKeys";
@@ -219,7 +215,6 @@
       kind: 3,
       pubkey: snapbefore.pubkey,
     };
-    loginUser.value;
     $nowProgress = false;
     dialogOpen = true;
   };

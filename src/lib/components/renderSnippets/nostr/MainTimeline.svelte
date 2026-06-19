@@ -152,7 +152,6 @@
   const isRelayReady = $derived(relayConnectionState.ready);
 
   function configureOperators() {
-    eventIds.clear();
     let operator = pipe(tie, uniq);
 
     if (lumiSetting.get().showUserStatus) {
