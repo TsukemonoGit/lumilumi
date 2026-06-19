@@ -152,6 +152,7 @@
   const isRelayReady = $derived(relayConnectionState.ready);
 
   function configureOperators() {
+    eventIds.clear();
     let operator = pipe(tie, uniq);
 
     if (lumiSetting.get().showUserStatus) {
@@ -333,7 +334,7 @@
       const handleIncrementalData = createIncrementalHandler();
 
       addDebugLog("初期データを取得中...");
-
+      eventIds.clear();
       const olderEvents = await firstLoadOlderEvents(
         CONFIG.LOAD_LIMIT,
         initialFilters,
@@ -462,6 +463,7 @@
 
       const fetchAmount = CONFIG.LOAD_LIMIT * 5;
 
+      eventIds.clear();
       const olderEvents = await loadOlderEvents(
         fetchAmount,
         olderFilters.map((fil) => {
