@@ -35,7 +35,7 @@
       // ユーザー自身のサーバーを優先し、ハードコードのリストと重複を除く
       ...userBlossomServers,
       ...blossomMediaUploader.filter(
-        (url) => !userBlossomServers.includes(url),
+       (url) => !userBlossomServers.some((u) => normalizeURL(u) === normalizeURL(url)),
       ),
     ].map((url) => ({
       type: "blossom" as const,
