@@ -59,7 +59,7 @@
       );
       if (packets.length > 0) {
         userBlossomServers = packets[0].event.tags
-          .filter((tag) => tag[0] === "server" && tag[1])
+          .filter((tag): tag is [string, string, ...string[]] => tag[0] === "server" && !!tag[1])
           .map((tag) => tag[1]);
       }
     } catch (error) {
