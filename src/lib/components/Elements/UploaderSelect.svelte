@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createSelect, melt } from "@melt-ui/svelte";
   import { fade } from "svelte/transition";
+  import { onMount } from "svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import {
     nip96MediaUploader,
@@ -9,8 +10,11 @@
   import { Check, ChevronDown } from "lucide-svelte";
   import type { UploaderOption, UploaderType } from "$lib/types";
 
-  import { uploader } from "$lib/stores/globalRunes.svelte";
-
+  import { uploader, lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { usePromiseReq } from "$lib/func/nostr";
+  import { pipe } from "rxjs";
+  import { latest } from "rx-nostr";
+import { normalizeURL } from "nostr-tools/utils";
   function getHostname(url: string) {
     try {
       return new URL(url).hostname;
@@ -19,13 +23,49 @@
     }
   }
 
-  const groupedOptions: Record<UploaderType, UploaderOption[]> = {
-    nip96: nip96MediaUploader.map((url) => ({ type: "nip96", address: url })),
-    blossom: blossomMediaUploader.map((url) => ({
-      type: "blossom",
+  // ユーザーの kind 10063 (Blossom サーバーリスト / BUD-03) から取得したサーバー
+  let userBlossomServers: string[] = $state([]);
+
+  const groupedOptions: Record<UploaderType, UploaderOption[]> = $derived({
+    nip96: nip96MediaUploader.map((url) => ({
+      type: "nip96" as const,
       address: url,
     })),
-  };
+    blossom: [
+      // ユーザー自身のサーバーを優先し、ハードコードのリストと重複を除く
+      ...userBlossomServers,
+      ...blossomMediaUploader.filter(
+       (url) => !userBlossomServers.some((u) => normalizeURL(u) === normalizeURL(url)),
+      ),
+    ].map((url) => ({
+      type: "blossom" as const,
+      address: url,
+    })),
+  });
+
+  onMount(async () => {
+    const pubkey = lumiSetting.get().pubkey;
+    if (!pubkey) {
+      return;
+    }
+    try {
+      const packets = await usePromiseReq(
+        {
+          filters: [{ kinds: [10063], authors: [pubkey], limit: 1 }],
+          operator: pipe(latest()),
+        },
+        undefined,
+        5000,
+      );
+      if (packets.length > 0) {
+        userBlossomServers = packets[0].event.tags
+          .filter((tag): tag is [string, string, ...string[]] => tag[0] === "server" && !!tag[1])
+          .map((tag) => tag[1]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch kind 10063 blossom server list:", error);
+    }
+  });
 
   const {
     elements: { trigger, menu, option, group, groupLabel, label },
