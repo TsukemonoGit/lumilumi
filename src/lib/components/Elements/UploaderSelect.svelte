@@ -14,7 +14,7 @@
   import { usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
   import { latest } from "rx-nostr";
-
+import { normalizeURL } from "nostr-tools/utils";
   function getHostname(url: string) {
     try {
       return new URL(url).hostname;
