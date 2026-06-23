@@ -13,7 +13,7 @@
   import { uploader, lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { usePromiseReq } from "$lib/func/nostr";
   import { pipe } from "rxjs";
-  import { latest } from "rx-nostr/src";
+  import { latest } from "rx-nostr";
 
   function getHostname(url: string) {
     try {
