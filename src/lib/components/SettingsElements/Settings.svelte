@@ -1,9 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from "svelte";
-  import { writable, type Writable } from "svelte/store";
 
   import * as Nostr from "nostr-typedef";
-  import ThemeSwitch from "../Elements/ThemeSwitch/ThemeSwitch.svelte";
   import {
     emojis,
     mutes,
@@ -30,9 +28,7 @@
   } from "$lib/func/constants";
   import { npubRegex } from "$lib/func/regex";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
-  import ColorThemeSelect from "./ColorThemeSelect.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
-  import Dialog from "../Elements/Dialog.svelte";
   import SettingsCard from "./SettingsCard.svelte";
   import RelaySettings from "./RelaySettings.svelte";
   import PostSettings from "./PostSettings.svelte";
@@ -289,17 +285,17 @@
     >
   </SettingsCard>
   <!-- ラジオボタン -->
-  <RelaySettings {inputPubkey} {settings} />
-  <PostSettings {settings} />
+  <RelaySettings {inputPubkey} bind:settings />
+  <PostSettings bind:settings />
 
   <!--- データ使用に関する設定 --->
-  <DataUsage {settings} />
+  <DataUsage bind:settings />
 
   <!--- 表示設定 --->
-  <DisplaySettings {settings} />
+  <DisplaySettings bind:settings />
 
   <!--- Douki --->
-  <DoukiSettings {settings} />
+  <DoukiSettings bind:settings />
 
   <!-- NWC 設定 -->
   <!-- <div class="border border-magnum-500 rounded-md p-2">

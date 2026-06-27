@@ -3,7 +3,6 @@
   import { getDoukiList, getQueryRelays, toMuteList } from "$lib/func/settings";
 
   import { formatAbsoluteDateFromUnix } from "$lib/func/util";
-  import * as nip19 from "nostr-tools/nip19";
   import { mutes, nowProgress } from "$lib/stores/stores";
   import Dialog from "../Elements/Dialog.svelte";
   import { t as _ } from "@konemono/svelte5-i18n";
@@ -11,10 +10,8 @@
 
   import MuteTabList from "./MuteTabList.svelte";
   import { writable } from "svelte/store";
-  import { lumiSetting } from "$lib/stores/globalRunes.svelte";
   import { STORAGE_KEYS } from "$lib/func/localStorageKeys";
   import { addToast } from "../Elements/Toast.svelte";
-  import { RotateCw } from "lucide-svelte";
   import SyncCard from "./SyncCard.svelte";
   import { saveLocalStorage } from "$lib/func/storage";
 
