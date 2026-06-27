@@ -12,7 +12,7 @@
 </script>
 
 <section
-  class="rounded-md shadow bg-neutral-950 sm:px-6 py-6 mx-2 px-2 !items-start"
+  class="rounded-md shadow bg-neutral-950 sm:px-6 py-6 px-2 w-full !items-start"
 >
   <h2 class="text-lg top-8 backdrop-blur-sm font-bold text-magnum-300 sticky">
     {title}
@@ -20,7 +20,7 @@
   {#if desc}
     <div class="text-neutral-500 text-xs">{desc}</div>
   {/if}
-  <div class="mt-4 mb-2 w-full ml-4">
+  <div class="mt-4 pb-2 w-full pl-4">
     {@render children?.()}
   </div>
 </section>

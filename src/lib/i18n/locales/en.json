@@ -23,7 +23,10 @@
       "kind42inTL": "Display public chats on HomeTL",
       "embed": "Show embed supported content?",
       "imageAutoExpand": {
-        "label": "Auto-expand images"
+        "label": "Auto-expand images",
+        "all": "Auto-expand all images",
+        "following": "Auto-expand images from following users only",
+        "manual": "Manual expand (click to view)"
       },
       "title": "Display"
     },
@@ -319,7 +322,7 @@
   },
   "nip05": {
     "verify": "Verify",
-     "error": {
+    "error": {
       "formatError": "NIP-05 format error",
       "fetchResponseError": "Wrong response code",
       "noPubkey": "Pubkey not set in nostr.json",
@@ -469,7 +472,7 @@
     "error_save": "Failed to save settings"
   },
   "connectingRelay": {
-   "connecting": "Connecting to relays",
+    "connecting": "Connecting to relays",
     "connectingDetail": "An error occurred while connecting to relays",
     "establishing": "Establishing secure connections...",
     "usingDefault": "kind:10002 not found, connecting to default relays"
