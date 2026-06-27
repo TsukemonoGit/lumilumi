@@ -44,7 +44,7 @@
 <SettingsCard title={$_("settings.usage.title")}>
   <div class="flex flex-col gap-4 box-border">
     <div
-      class="mb-1 flex items-center gap-2"
+      class="mb-4 flex items-center gap-2"
       role="meter"
       aria-valuemin={0}
       aria-valuemax={maxUsageWeight}

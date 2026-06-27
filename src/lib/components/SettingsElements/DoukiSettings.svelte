@@ -7,8 +7,7 @@
   import UpdateEmojiList from "./UpdateEmojiList.svelte";
   import UpdateMutebykindList from "./UpdateMutebykindList.svelte";
   import UpdateMuteList from "./UpdateMuteList.svelte";
-  import { writable, type Writable } from "svelte/store";
-  import Dialog from "../Elements/Dialog.svelte";
+
   import Link from "../Elements/Link.svelte";
 
   interface Props {

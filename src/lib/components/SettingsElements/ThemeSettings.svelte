@@ -5,7 +5,7 @@
   import SettingsCard from "./SettingsCard.svelte";
 </script>
 
-<SettingsCard title={"Theme"}>
+<SettingsCard title={$_("settings.theme.title")}>
   <div class="flex gap-4 flex-col">
     <ThemeSwitch />
     <ColorThemeSelect />

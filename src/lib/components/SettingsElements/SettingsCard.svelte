@@ -14,11 +14,13 @@
 <section
   class="rounded-md shadow bg-neutral-950 sm:px-6 py-6 px-2 !items-start"
 >
-  <h2 class="text-lg font-bold text-neutral-300">{title}</h2>
+  <h2 class="text-lg top-8 backdrop-blur-sm font-bold text-magnum-300 sticky">
+    {title}
+  </h2>
   {#if desc}
     <div class="text-neutral-500 text-xs">{desc}</div>
   {/if}
-  <div class="mt-4 mb-2 w-full">
+  <div class="mt-4 mb-2 w-full ml-4">
     {@render children?.()}
   </div>
 </section>

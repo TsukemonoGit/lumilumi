@@ -4,7 +4,7 @@
   import { setColorScheme, type ColorScheme } from "$lib/func/theme";
   import { Triangle } from "lucide-svelte";
   import { onMount } from "svelte";
-
+  import { t as _ } from "@konemono/svelte5-i18n";
   // スキーム定義（ここだけ編集すればOK）
   const colorSchemeMeta: Record<ColorScheme, { label: string; color: string }> =
     {
@@ -68,7 +68,7 @@
 </script>
 
 <div class="flex justify-between items-center">
-  Color
+  {$_("settings.theme.color")}
 
   <div class="relative inline-block" bind:this={containerEl}>
     <button
@@ -98,7 +98,7 @@
             role="option"
             tabindex="0"
             aria-selected={value === currentScheme}
-            class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-500/50 rounded-sm"
+            class="flex cursor-pointer items-center gap-2 px-2 py-2 hover:bg-magnum-500/50 rounded-sm"
             style="border-right: 4px solid {colorSchemeMeta[value].color}"
             onclick={() => selectScheme(value)}
             onkeydown={(e) => handleOptionKeydown(e, value)}
