@@ -11,7 +11,7 @@
 </script>
 
 <SettingsCard title={$_("settings.display.title")}>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-6">
     <label>
       <input
         type="checkbox"

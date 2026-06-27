@@ -389,5 +389,5 @@ body.hide-nostr-login nl-banner {
 }
 
 .myButton {
-  @apply shadow hover:-translate-y-0.5 hover:shadow-md disabled:brightness-50 active:translate-y-0.5  active:shadow-sm transform duration-100;
+  @apply shadow hover:-translate-y-0.5 hover:shadow-md disabled:brightness-50 active:translate-y-0.5  active:shadow-sm transform duration-100 hover:brightness-105 disabled:opacity-80;
 }

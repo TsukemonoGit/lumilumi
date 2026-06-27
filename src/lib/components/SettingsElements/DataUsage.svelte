@@ -42,7 +42,7 @@
 </script>
 
 <SettingsCard title={$_("settings.usage.title")}>
-  <div class="flex flex-col gap-4 box-border">
+  <div class="flex flex-col gap-6 box-border">
     <div
       class="mb-4 flex items-center gap-2"
       role="meter"
@@ -68,7 +68,7 @@
         {$_("settings.usage.high")}
       </span>
     </div>
-    <div>
+    <div class="mb-6">
       <div class="flex items-center justify-between gap-4">
         <label class="flex flex-1 items-center gap-2">
           <input
@@ -83,8 +83,7 @@
       </div>
 
       {#if settings.showImg}
-        <ImageAutoExpand bind:imageAutoExpand={settings.imageAutoExpand} />
-        <label class="ml-8 flex gap-2 pt-1">
+        <label class="ml-8 flex gap-2 pt-1 my-2">
           <input
             type="checkbox"
             class="rounded-checkbox"
@@ -92,6 +91,7 @@
           />
           {$_("settings.display.embed")}(youtube, twitter, bluesky)
         </label>
+        <ImageAutoExpand bind:imageAutoExpand={settings.imageAutoExpand} />
       {/if}
     </div>
 

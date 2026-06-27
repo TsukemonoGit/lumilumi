@@ -78,7 +78,7 @@
 <SettingsCard title={$_("settings.relay.title")}>
   <div
     role="radiogroup"
-    class="flex flex-col gap-3 data-[orientation=horizontal]:flex-row"
+    class="flex flex-col gap-6 data-[orientation=horizontal]:flex-row"
     aria-label="View density"
   >
     {#each optionsArrStr as option, index}
