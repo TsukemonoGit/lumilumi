@@ -426,7 +426,12 @@
     "expand": "Read More",
     "openpage": "Open Article"
   },
-  "signError": {},
+  "signError": {
+    "eventSize": "Invalid event data size (must be between 1 and 65535 bytes)",
+    "signFailed": "Failed to sign event",
+    "cancel": "Signature was canceled by user",
+    "publishFailed": "Failed to publish event"
+  },
   "process": {
     "merging": "Merging",
     "processing": "Processing"
