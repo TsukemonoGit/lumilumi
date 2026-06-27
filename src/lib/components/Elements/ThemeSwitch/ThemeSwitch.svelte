@@ -59,7 +59,7 @@
   <div class="relative inline-block" bind:this={containerEl}>
     <button
       type="button"
-      class="flex h-10 items-center rounded-md px-2 font-medium shadow w-32 myButton justify-between bg-neutral-900"
+      class="flex h-10 items-center rounded-full px-4 font-medium shadow w-32 myButton justify-between bg-neutral-800"
       aria-haspopup="listbox"
       aria-expanded={open}
       aria-label="Open theme switcher"
@@ -76,6 +76,7 @@
         tabindex="-1"
       >
         {#each themes as { value, label }}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <li
             role="option"
             aria-selected={value === userPrefersMode}

@@ -66,13 +66,13 @@
   <div class="relative inline-block" bind:this={containerEl}>
     <button
       type="button"
-      class="flex h-10 items-center rounded-md pl-4 pr-8 font-medium shadow w-32 bg-neutral-900 myButton"
+      class="flex h-10 items-center rounded-full pl-4 pr-8 font-medium shadow w-32 bg-neutral-800 myButton"
       aria-haspopup="listbox"
       aria-expanded={open}
       onclick={toggleOpen}
     >
       {colorSchemeMeta[currentScheme].label}
-      <span class="pointer-events-none absolute right-2" aria-hidden="true">
+      <span class="pointer-events-none absolute right-4" aria-hidden="true">
         <Triangle
           class="rotate-180 fill-magnum-500 text-magnum-500"
           size={12}
@@ -87,6 +87,7 @@
         tabindex="-1"
       >
         {#each colorSchemes as { value, label }}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <li
             role="option"
             aria-selected={value === currentScheme}
