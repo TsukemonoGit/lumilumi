@@ -4,6 +4,7 @@
   import { t as _ } from "@konemono/svelte5-i18n";
   import { onMount } from "svelte";
   import { lumiSetting } from "$lib/stores/globalRunes.svelte";
+  import { Circle, Dot } from "lucide-svelte";
 
   let { imageAutoExpand = $bindable() } = $props();
 
@@ -20,13 +21,17 @@
   });
 </script>
 
-<div {...group.root} class="space-y-3 ml-8 my-2 rounded-md bg-neutral-800 p-2">
+<div {...group.root} class=" ml-8">
   <!-- svelte-ignore a11y_label_has_associated_control -- https://github.com/sveltejs/svelte/issues/15067 -->
-  <label {...group.label} class="font-medium m-2 p-4!">
+
+  <label {...group.label} class=" flex gap-2 pt-1 my-2">
+    <dev class="w-[24px] h-[24px] flex justify-center items-center"
+      ><Circle size={16} class="fill-neutral-500 text-neutral-500" /></dev
+    >
     {$_("settings.display.imageAutoExpand.label")}
   </label>
 
-  <div class=" mx-2">
+  <div class=" ml-7 pl-1 border-l-2 border-neutral-500/20 rounded-md">
     {#each items as i}
       {@const item = group.getItem(i)}
       <label
