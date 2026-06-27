@@ -21,8 +21,8 @@
     label,
   }));
 
-  let currentScheme: ColorScheme = "default";
-  let open = false;
+  let currentScheme: ColorScheme = $state("default");
+  let open = $state(false);
   let containerEl: HTMLDivElement;
 
   onMount(() => {
@@ -58,6 +58,13 @@
   function toggleOpen() {
     open = !open;
   }
+
+  function handleOptionKeydown(e: KeyboardEvent, value: ColorScheme) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectScheme(value);
+    }
+  }
 </script>
 
 <div class="flex justify-between items-center">
@@ -66,13 +73,13 @@
   <div class="relative inline-block" bind:this={containerEl}>
     <button
       type="button"
-      class="flex h-10 items-center rounded-md pl-4 pr-8 font-medium shadow w-32 bg-neutral-900 myButton"
+      class="flex h-10 items-center rounded-full pl-4 pr-8 font-medium shadow w-32 bg-neutral-800 myButton"
       aria-haspopup="listbox"
       aria-expanded={open}
       onclick={toggleOpen}
     >
       {colorSchemeMeta[currentScheme].label}
-      <span class="pointer-events-none absolute right-2" aria-hidden="true">
+      <span class="pointer-events-none absolute right-4" aria-hidden="true">
         <Triangle
           class="rotate-180 fill-magnum-500 text-magnum-500"
           size={12}
@@ -89,10 +96,12 @@
         {#each colorSchemes as { value, label }}
           <li
             role="option"
+            tabindex="0"
             aria-selected={value === currentScheme}
             class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-500/50 rounded-sm"
             style="border-right: 4px solid {colorSchemeMeta[value].color}"
             onclick={() => selectScheme(value)}
+            onkeydown={(e) => handleOptionKeydown(e, value)}
           >
             {label}
           </li>
