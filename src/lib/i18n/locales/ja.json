@@ -418,7 +418,12 @@
     "expand": "続きを読む",
     "openpage": "記事を開く"
   },
-  "signError": {},
+"signError": {
+    "eventSize": "イベントデータのサイズが無効です（1-65535バイトである必要があります）",
+    "cancel": "署名がキャンセルされました",
+    "signFailed": "イベントの署名に失敗しました",
+    "publishFailed": "イベントの公開に失敗しました"
+  },
   "process": {
     "merging": "統合中",
     "processing": "処理中"
