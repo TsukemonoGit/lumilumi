@@ -458,7 +458,9 @@
   "pin": {
     "label": "Enter ID to pin",
     "invalid": "Invalid ID",
-    "delete": "Are you sure you want to delete this pin?"
+    "delete": "Are you sure you want to delete this pin?",
+    "addTitle": "Add Pin",
+    "deleteTitle": "Delete Pin"
   },
   "account_change": {
     "title": "Account Changed",
