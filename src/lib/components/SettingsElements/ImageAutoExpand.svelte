@@ -25,9 +25,9 @@
   <!-- svelte-ignore a11y_label_has_associated_control -- https://github.com/sveltejs/svelte/issues/15067 -->
 
   <label {...group.label} class=" flex gap-2 pt-1 my-2">
-    <dev class="w-[24px] h-[24px] flex justify-center items-center"
-      ><Circle size={16} class="fill-neutral-500 text-neutral-500" /></dev
-    >
+    <div class="w-[24px] h-[24px] flex justify-center items-center">
+      <Circle size={16} class="fill-neutral-500 text-neutral-500" />
+    </div>
     {$_("settings.display.imageAutoExpand.label")}
   </label>
 
