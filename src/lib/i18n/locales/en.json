@@ -319,7 +319,14 @@
   },
   "nip05": {
     "verify": "Verify",
-    "error": {}
+     "error": {
+      "formatError": "NIP-05 format error",
+      "fetchResponseError": "Wrong response code",
+      "noPubkey": "Pubkey not set in nostr.json",
+      "impersonation": "Possibility of impersonation",
+      "fetchError": "An error occurred during fetch",
+      "corsError": "CORS error."
+    }
   },
   "shortcut": {
     "title": "Keyboard Shortcut",
