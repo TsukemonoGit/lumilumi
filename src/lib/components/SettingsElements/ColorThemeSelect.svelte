@@ -58,6 +58,13 @@
   function toggleOpen() {
     open = !open;
   }
+
+  function handleOptionKeydown(e: KeyboardEvent, value: ColorScheme) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectScheme(value);
+    }
+  }
 </script>
 
 <div class="flex justify-between items-center">
@@ -87,13 +94,14 @@
         tabindex="-1"
       >
         {#each colorSchemes as { value, label }}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <li
             role="option"
+            tabindex="0"
             aria-selected={value === currentScheme}
             class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-500/50 rounded-sm"
             style="border-right: 4px solid {colorSchemeMeta[value].color}"
             onclick={() => selectScheme(value)}
+            onkeydown={(e) => handleOptionKeydown(e, value)}
           >
             {label}
           </li>

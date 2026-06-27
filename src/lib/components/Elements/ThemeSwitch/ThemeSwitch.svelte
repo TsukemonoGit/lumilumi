@@ -51,6 +51,13 @@
   function currentLabel(mode: Theme): string {
     return themes.find((t) => t.value === mode)?.label ?? themes[0].label;
   }
+
+  function handleOptionKeydown(e: KeyboardEvent, value: Theme) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectMode(value);
+    }
+  }
 </script>
 
 <div class="flex justify-between items-center">
@@ -76,12 +83,13 @@
         tabindex="-1"
       >
         {#each themes as { value, label }}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
           <li
             role="option"
+            tabindex="0"
             aria-selected={value === userPrefersMode}
             class="flex cursor-pointer items-center gap-2 px-2 py-1 hover:bg-magnum-700/50 rounded-sm justify-between"
             onclick={() => selectMode(value)}
+            onkeydown={(e) => handleOptionKeydown(e, value)}
           >
             <span class="text-sm font-semibold">{label}</span>
             <ThemeIcon theme={value} />
