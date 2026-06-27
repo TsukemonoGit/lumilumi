@@ -458,7 +458,9 @@
   "pin": {
     "delete": "このPINを削除してもよろしいですか？",
     "invalid": "無効なIDです",
-    "label": "ピンするIDを入力"
+    "label": "ピンするIDを入力",
+    "addTitle": "PIN追加",
+    "deleteTitle": "PIN削除"
   },
   "account_change": {
     "title": "アカウント変更",
